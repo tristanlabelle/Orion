@@ -9,14 +9,18 @@ namespace Orion.Commandment
     public abstract class Command
     {
         #region Fields
-            Faction sourceFaction; 
+        private readonly Faction sourceFaction;
 
-
-
+       
+ 
         #endregion
 
         #region Constructors
-
+        protected Command(Faction sourceFaction)
+        {
+            Argument.EnsureNotNull(sourceFaction, "sourceFaction");
+            this.sourceFaction = sourceFaction;
+        }
         #endregion
 
         #region Events
@@ -24,12 +28,17 @@ namespace Orion.Commandment
         #endregion
 
         #region Properties
-
+        /// <summary>
+        /// Gets the <see cref="Faction"/> that emitted this <see cref="Command"/>.
+        /// </summary>
+        public Faction SourceFaction
+        {
+            get { return sourceFaction; }
+        } 
         #endregion
 
         #region Methods
             public abstract void Execute();
-            
         #endregion
 
 

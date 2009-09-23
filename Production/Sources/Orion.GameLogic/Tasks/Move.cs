@@ -48,6 +48,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
+
         public override void Update(float timeDelta)
         {
             if (HasEnded) return;
@@ -60,7 +61,6 @@ namespace Orion.GameLogic.Tasks
 
             unit.Position += direction * distance;
         }
-        #endregion
         #endregion
 
         #region Static

@@ -16,17 +16,23 @@ namespace Orion.Commandment.Commands
         Vector2 destination;
 
         #endregion
-        public Move(IEnumerable<Unit> unitsToMove, Vector2 destination)
+        
+
+        #region Constructors
+
+        public Move(Faction sourceFaction, IEnumerable<Unit> unitsToMove, Vector2 destination)
+            : base(sourceFaction)
         {
             Argument.EnsureNotNullNorEmpty(unitsToMove, "unitsToMove");
+            if (unitsToMove.Any(unit => unit.Faction != base.SourceFaction))
+                throw new ArgumentException("Expected all units to be from the source faction.", "unitsToMove");
+            
 
             this.unitsToMove = unitsToMove.Distinct().ToList();
 
             this.destination = destination;
 
         }
-
-        #region Constructors
 
         #endregion
 

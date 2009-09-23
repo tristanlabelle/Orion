@@ -13,9 +13,10 @@ namespace Orion.GameLogic
     {
         #region Properties
         /// <summary>
-        /// Gets a value indicating if this <see cref="Task"/> is in an idle state.
+        /// Gets a value indicating if this <see cref="Task"/> has terminated its execution,
+        /// rendering the unit idle.
         /// </summary>
-        public virtual bool IsIdle
+        public virtual bool HasEnded
         {
             get { return false; }
         }
@@ -36,7 +37,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Aborts this <see cref="Task"/>, indicating that it will no longer be used.
         /// </summary>
-        public abstract void Abort();
+        public virtual void Abort() { }
 
         public override sealed string ToString()
         {

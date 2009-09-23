@@ -13,9 +13,13 @@ namespace Orion.GameLogic.Tasks
     {
         #region Instance
         #region Properties
-        public override bool IsIdle
+        public override bool HasEnded
         {
-            get { return true; }
+            get
+            {
+                // This command acts as a null object, so the unit executing it is always idle.
+                return true;
+            }
         }
 
         public override string Description
@@ -26,7 +30,6 @@ namespace Orion.GameLogic.Tasks
 
         #region Methods
         public override void Update(float timeDelta) { }
-        public override void Abort() { }
         #endregion
         #endregion
 

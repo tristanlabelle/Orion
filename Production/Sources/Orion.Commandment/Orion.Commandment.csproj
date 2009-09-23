@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="CommandManager.cs" />
     <Compile Include="Commander.cs" />
-    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="Commands\Move.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

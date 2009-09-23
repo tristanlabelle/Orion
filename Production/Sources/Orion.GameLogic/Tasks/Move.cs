@@ -43,7 +43,7 @@ namespace Orion.GameLogic.Tasks
 
         public override string Description
         {
-            get { return "moving to {0}".FormatInvariant(des); }
+            get { return "moving to {0}".FormatInvariant(destination); }
         }
         #endregion
 

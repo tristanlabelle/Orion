@@ -121,6 +121,15 @@ namespace Orion.GameLogic
         public Task Task
         {
             get { return task; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Task");
+
+                if (task.HasEnded)
+                    task.Abort();
+              
+                task = value;
+            }
         }
         #endregion
         #endregion

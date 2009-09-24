@@ -46,6 +46,7 @@ namespace Orion.Graphics
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             Glu.Perspective(45.0, Width / (double)Height, 1.0, 64.0);
+            GL.MatrixMode(MatrixMode.Modelview);
         }
 
         /// <summary>
@@ -91,8 +92,8 @@ namespace Orion.Graphics
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
-        static void Main()
+        //[STAThread]
+        static void Maiin()
         {
             // The 'using' idiom guarantees proper resource cleanup.
             // We request 30 UpdateFrame events per second, and unlimited

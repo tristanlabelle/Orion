@@ -54,7 +54,16 @@ namespace Orion.Graphics
 		
 		#region Public Methods
 		#region Constructors
-		
+
+        /// <summary>
+        /// Constructs a Rect object with a given width and height. The origin is set to zero.
+        /// </summary>
+        /// <param name="width">The width of the rect</param>
+        /// <param name="height">The height of the rect</param>
+        public Rect(float width, float height)
+            : this(0f, 0f, width, height)
+        { }
+
 		/// <summary>
 		/// Constructs a Rect object with a given X and Y origin, and Width and Height parameters.
 		/// </summary>

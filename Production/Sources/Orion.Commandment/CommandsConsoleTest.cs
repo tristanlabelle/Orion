@@ -12,6 +12,7 @@ namespace Orion.Commandment
     {
         static void Main(string[] args)
         {
+
             CommandManager commandManager = new CommandManager();
             Faction faction = new Faction();
             MockCommander commander = new MockCommander(faction);

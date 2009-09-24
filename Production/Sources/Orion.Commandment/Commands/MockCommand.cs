@@ -41,7 +41,6 @@ namespace Orion.Commandment.Commands
         /// </summary>
         public override void Execute()
         {
-
             Console.WriteLine("Command Executed");
         }
 

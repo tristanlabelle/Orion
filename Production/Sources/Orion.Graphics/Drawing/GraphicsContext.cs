@@ -93,7 +93,8 @@ namespace Orion.Graphics.Drawing
             Vector2 positionCopy = CoordsSystem.Position;
             Vector2 baseSize = CoordsSystem.Size;
             baseSize.Add(ref positionCopy);
-            Vector2 scale = new Vector2(CoordsSystem.Size.X / system.Size.X, CoordsSystem.Size.Y / system.Size.Y);
+            //Vector2 scale = new Vector2(CoordsSystem.Size.X / system.Size.X, CoordsSystem.Size.Y / system.Size.Y);
+            Vector2 scale = new Vector2(system.Size.X / CoordsSystem.Size.X, system.Size.Y / CoordsSystem.Size.Y);
 
             GL.Translate(system.Position.X, system.Position.Y, 0);
             GL.Scale(scale.X, scale.Y, 1);

@@ -39,12 +39,19 @@ namespace Orion.Graphics
         /// <param name="context"></param>
         protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
         {
+            Vector2 a = new Vector2(10, 10);
+            Vector2 b = new Vector2(20, 30);
+            Vector2 c = new Vector2(30, 10);
+            Triangle t = new Triangle(a, b, c, Color.Plum);
+            context.Fill(t);
         }
 
         internal override void Render()
         {
-            GL.ClearColor(Color.White);
+            GL.ClearColor(Color.BlanchedAlmond);
             GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.LoadIdentity();
+
             base.Render();
         }
     }

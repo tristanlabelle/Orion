@@ -16,8 +16,14 @@ namespace Orion.Graphics
         public Window()
         {
             InitializeComponent();
-            rootView = new RootView(new Rect(glControl.Width, glControl.Height), new Rect(1024f, 768f));
-            rootView.AddSubview(new TerrainView(new Rect(-5, -5, 10, 10)));
+
+            Rect fullScreen = new Rect(1024f, 768f);
+            Rect rootBounds = new Rect(glControl.Width, glControl.Height);
+            rootView = new RootView(rootBounds, fullScreen);
+
+            View terrain = new TerrainView(fullScreen);
+            //terrain.Bounds = new Rect(50, 50);
+            rootView.AddSubview(terrain);
         }
 
         private void glControl_Paint(object sender, PaintEventArgs e)

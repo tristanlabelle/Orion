@@ -156,6 +156,8 @@ namespace Orion.Graphics
 		/// </summary>
 		internal virtual void Render()
 		{
+            Console.WriteLine("Frame: {0}", Frame);
+            Console.WriteLine("Bounds: {0}", Bounds);
 			Context.Clear();
 			Draw(Context);
 			Context.DrawInto(Frame);

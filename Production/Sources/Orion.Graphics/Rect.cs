@@ -342,10 +342,22 @@ namespace Orion.Graphics
 			return new Rect(Position, newSize);
 		}
 		#endregion
-		#endregion
-		
-		#region Private Methods
-		private bool OnewayIntersects(Rect otherRect)
+
+        #region Overrides
+
+        /// <summary>
+        /// Returns a textual representation of the <see cref="Rect"/> with the form {{x,y}, {w,h}}.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("{{{0}, {1}}}", Position, Size);
+        }
+        #endregion
+        #endregion
+
+        #region Private Methods
+        private bool OnewayIntersects(Rect otherRect)
 		{
 			return otherRect.X.IsBetween(X, X + Width) && otherRect.Y.IsBetween(Y, Y + Height);
 		}

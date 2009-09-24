@@ -18,12 +18,31 @@ namespace Orion.Graphics
             : base(frame)
         {
             world = new World();
+
+            for (uint i = 0; i < 3; i++)
+            {
+                world.Units.Add(new Unit(i, new UnitType("mcwarrior"), world));
+            }
+            float count = 0;
+            foreach (Unit unit in world.Units) 
+            {
+                unit.Position = new Vector2(count, count);
+                count++;
+            }
+            
         }
 
         protected override void Draw(GraphicsContext context)
         {
-            Triangle triangle = new Triangle(new Vector2(10, 10), new Vector2(20, 30), new Vector2(30, 10), Color.Red);
-            context.Fill(triangle);
+            var rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.White);
+            context.Fill(rect);
+            rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.Black);
+            context.Stroke(rect);
+
+            foreach (Unit unit in world.Units)
+            {
+                Triangle triangle = new Triangle(unit.Position + (Vector2.UnitX * 10), unit.Position + (Vector2.UnitY * 10), unit.Position - (Vector2.UnitY * 10), Color.Red);
+            }
         }
     }
 }

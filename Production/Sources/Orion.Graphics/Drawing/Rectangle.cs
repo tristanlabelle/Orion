@@ -29,7 +29,7 @@ namespace Orion.Graphics.Drawing
 
         public void Stroke()
         {
-            GL.Begin(BeginMode.Lines);
+            GL.Begin(BeginMode.LineStrip);
             Render();
             GL.End();
         }

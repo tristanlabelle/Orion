@@ -31,7 +31,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        internal Unit(uint id, UnitType type, World world)
+        public Unit(uint id, UnitType type, World world)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(type, "type");

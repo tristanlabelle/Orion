@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -12,8 +12,6 @@
     <AssemblyName>Orion.Graphics</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <StartupObject>
-    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,11 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=0.9.9.2, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Debug\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK.Utilities, Version=0.9.8.2, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="OpenTK.Utilities, Version=0.9.8.2, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Debug\OpenTK.Utilities.dll</HintPath>
     </Reference>
@@ -58,11 +56,8 @@
   <ItemGroup>
     <Compile Include="Button.cs" />
     <Compile Include="ClippedView.cs" />
-    <Compile Include="Graphics\DrawingOperation.cs" />
-    <Compile Include="Graphics\GraphicsContext.cs" />
-    <Compile Include="GraphicsManager.cs" />
-    <Compile Include="Graphics\LineOperation.cs" />
-    <Compile Include="Graphics\Rect.cs" />
+    <Compile Include="Drawing\IDrawable.cs" />
+    <Compile Include="Drawing\GraphicsContext.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="OrionWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,8 +65,11 @@
     <Compile Include="UIManager.cs" />
     <Compile Include="UnitView.cs" />
     <Compile Include="View.cs" />
+    <Compile Include="Drawing\Line.cs" />
+    <Compile Include="Drawing\DrawingOperation.cs" />
+    <Compile Include="Rect.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -73,9 +73,10 @@ namespace Orion.Graphics
 
             GL.Begin(BeginMode.Triangles);
 
-            GL.Color3(Color.Red); GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            GL.Color3(Color.Blue); GL.Vertex3(1.0f, -1.0f, 4.0f);
-            GL.Color3(Color.Green); GL.Vertex3(0.0f, 1.0f, 4.0f);
+            GL.Color3(Color.Red);
+			GL.Vertex3(-1.0f, -2.0f, 10.0f);
+			GL.Vertex3(0.0f, 2.0f, 10.0f);
+			GL.Vertex3(1.0f, -2.0f, 10.0f);
 
             GL.End();
 

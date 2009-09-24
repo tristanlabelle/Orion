@@ -10,12 +10,12 @@ namespace Orion.Graphics.Drawing
 	internal struct DrawingOperation
 	{
 		public IDrawable Operation;
-		public OperationMode mode;
+		public OperationMode Mode;
 		
 		public DrawingOperation (IDrawable operation, OperationMode mode)
 		{
 			Operation = operation;
-			OperationMode = mode;
+			Mode = mode;
 		}
 	}
 }

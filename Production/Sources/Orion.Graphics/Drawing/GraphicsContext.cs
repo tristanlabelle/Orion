@@ -66,7 +66,7 @@ namespace Orion.Graphics.Drawing
 			
 			foreach(DrawingOperation operation in operations)
 			{
-				if(operation.mode == OperationMode.Fill)
+				if(operation.Mode == OperationMode.Fill)
 					operation.Operation.Fill();
 				else
 					operation.Operation.Stroke();

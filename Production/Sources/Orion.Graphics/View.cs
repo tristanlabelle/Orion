@@ -5,7 +5,6 @@ using System.Text;
 using Orion.Graphics.Drawing;
 
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Math;
 
 namespace Orion.Graphics
@@ -43,7 +42,7 @@ namespace Orion.Graphics
 		{
 			get
 			{
-				return Context.CoordsSystem;
+                return Context.CoordsSystem;
 			}
 			
 			set
@@ -61,7 +60,7 @@ namespace Orion.Graphics
 		public View(Rect frame)
 		{
 			Context = new GraphicsContext(frame);
-			Subviews = new List<View>();
+			subviewsList = new List<View>();
 			Frame = frame;
 		}
 		
@@ -106,7 +105,7 @@ namespace Orion.Graphics
 				throw new ArgumentException("Cannot remove a subview whose superview is not this object");
 			}
 			
-			Subviews.Remove(subview);
+			subviewsList.Remove(subview);
 			subview.Superview = null;
 		}
 		
@@ -152,7 +151,7 @@ namespace Orion.Graphics
 		internal virtual void Render()
 		{
 			Context.Clear();
-			Draw();
+			Draw(Context);
 			Context.DrawInto(Frame);
 			
 			foreach(View view in subviewsList)

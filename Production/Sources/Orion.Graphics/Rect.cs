@@ -13,13 +13,14 @@ namespace Orion.Graphics
 		/// <summary>
 		/// An empty rectangle (origin, width and height are all zeroed).
 		/// </summary>
-		public static const Rect EmptyRect = new Rect(0, 0, 0, 0);
+		public static readonly Rect EmptyRect = new Rect(0, 0, 0, 0);
 		#endregion
 		
 		/// <summary>
 		/// The position of the rectangle
 		/// </summary>
 		public readonly Vector2 Position;
+
 		/// <summary>
 		/// The size of the rectangle (X is the width, and Y is the height)
 		/// </summary>
@@ -77,7 +78,7 @@ namespace Orion.Graphics
 		/// <param name="size">
 		/// A <see cref="Vector2"/> representing the size of the rectangle
 		/// </param>
-		public Rect(Vector2 positition, Vector2 size)
+		public Rect(Vector2 position, Vector2 size)
 		{
 			Size = size;
 			Position = position;
@@ -111,7 +112,7 @@ namespace Orion.Graphics
 		/// </returns>
 		public bool Intersects(Rect otherRect)
 		{
-			return OnewayIntersection(otherRect) || otherRect.OnewayIntersection(this);
+			return OnewayIntersects(otherRect) || otherRect.OnewayIntersects(this);
 		}
 		
 		/// <summary>
@@ -215,7 +216,7 @@ namespace Orion.Graphics
 		/// </returns>
 		public Rect TranslateTo(float x, float y)
 		{
-			return SetOrigin(new Vector2(x, y));
+			return TranslateTo(new Vector2(x, y));
 		}
 		
 		/// <summary>
@@ -263,8 +264,8 @@ namespace Orion.Graphics
 		/// </returns>
 		public Rect Resize(Vector2 sizeChange)
 		{
-			Rect newSize = Size;
-			newSize.Add(ref change);
+			Vector2 newSize = Size;
+			newSize.Add(ref sizeChange);
 			return ResizeTo(newSize);
 		}
 		

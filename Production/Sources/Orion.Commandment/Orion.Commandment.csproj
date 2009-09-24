@@ -55,8 +55,11 @@
     <Compile Include="CommandManager.cs" />
     <Compile Include="Commander.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="CommandsConsoleTest.cs" />
+    <Compile Include="Commands\MockCommand.cs" />
     <Compile Include="Commands\Cancel.cs" />
     <Compile Include="Commands\Move.cs" />
+    <Compile Include="MockCommander.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

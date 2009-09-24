@@ -17,16 +17,30 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-
+        public Commander(Faction sourceFaction)
+        {
+            Argument.EnsureNotNull(sourceFaction, "sourceFaction");
+            this.faction = sourceFaction;
+        }
         #endregion
 
         #region Events
 
         #endregion
 
+        
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Faction"/> of this Commander.
+        /// </summary>
+        /// 
+        public Faction Faction
+        {
+            get { return faction; }
+        }
 
         #endregion
+        
 
         #region Methods
         public abstract IEnumerable<Command> CreateCommands();

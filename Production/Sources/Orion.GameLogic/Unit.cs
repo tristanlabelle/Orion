@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using OpenTK;
+using OpenTK.Math;
 
 namespace Orion.GameLogic
 {
@@ -135,6 +135,14 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Updates this <see cref="Unit"/> for a frame.
+        /// </summary>
+        /// <param name="timeDelta">The time elapsed since the last frame.</param>
+        public void Update(float timeDelta)
+        {
+            task.Update(timeDelta);
+        }
         #endregion
     }
 }

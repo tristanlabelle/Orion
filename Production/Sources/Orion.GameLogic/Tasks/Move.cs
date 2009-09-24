@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using OpenTK;
+using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -13,7 +13,6 @@ namespace Orion.GameLogic.Tasks
     [Serializable]
     public sealed class Move : Task
     {
-        #region Instance
         #region Fields
         private readonly Unit unit;
         private readonly Vector2 destination;

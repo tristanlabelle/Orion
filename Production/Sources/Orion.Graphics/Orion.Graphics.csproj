@@ -59,12 +59,12 @@
     <Compile Include="Drawing\Ellipse.cs" />
     <Compile Include="Drawing\IDrawable.cs" />
     <Compile Include="Drawing\GraphicsContext.cs" />
+    <Compile Include="Drawing\Rectangle.cs" />
     <Compile Include="Drawing\Triangle.cs" />
     <Compile Include="OrionWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootView.cs" />
     <Compile Include="TerrainView.cs" />
-    <Compile Include="UIManager.cs" />
     <Compile Include="UnitView.cs" />
     <Compile Include="View.cs" />
     <Compile Include="Drawing\Line.cs" />
@@ -83,6 +83,20 @@
     <EmbeddedResource Include="Window.resx">
       <DependentUpon>Window.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
+      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
+      <Name>Orion.Commandment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">
+      <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
+      <Name>Orion.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.GameLogic\Orion.GameLogic.csproj">
+      <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
+      <Name>Orion.GameLogic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -39,8 +39,6 @@ namespace Orion.Graphics
         /// <param name="context"></param>
         protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
         {
-            Triangle triangle = new Triangle(new Vector2(10, 10), new Vector2(20, 30), new Vector2(30, 10), Color.Red);
-            context.Fill(triangle);
         }
 
         internal override void Render()

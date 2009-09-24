@@ -22,7 +22,8 @@ namespace Orion.Graphics
 
         protected override void Draw(GraphicsContext context)
         {
-
+            Triangle triangle = new Triangle(new Vector2(10, 10), new Vector2(20, 30), new Vector2(30, 10), Color.Red);
+            context.Fill(triangle);
         }
     }
 }

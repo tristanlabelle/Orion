@@ -9,9 +9,9 @@ using OpenTK.Graphics;
 
 namespace Orion.Graphics.Drawing
 {
-    interface IDrawable
+    public interface IDrawable
     {
-		internal void Fill();
-		internal void Stroke();
+		void Fill();
+		void Stroke();
     }
 }

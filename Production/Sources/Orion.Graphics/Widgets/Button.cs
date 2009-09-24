@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Graphics
+using Orion.Graphics;
+
+namespace Orion.Graphics.Widgets
 {
-    class Label : View
+    class Button : View
     {
     }
 }

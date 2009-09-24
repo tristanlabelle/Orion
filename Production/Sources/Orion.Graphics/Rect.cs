@@ -5,6 +5,11 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
+    /// <summary>
+    /// A Rect instance encapsulates an origin vector (<see cref="Rect.X"/> and <see cref="Rect.Y"/>)
+    /// and a size vector (<see cref="Rect.Width"/> and <see cref="Rect.Height"/>). They can be
+    /// intersected, translated and resized.
+    /// </summary>
 	public struct Rect
 	{
 		#region Fields

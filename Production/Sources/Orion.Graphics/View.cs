@@ -9,6 +9,11 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
+    /// <summary>
+    /// The class View is the base class for rendered components.
+    /// Views are organized in a tree hierarchy, and each View has a list of sub-Views.
+    /// When rendering, a View will first render itself, then render all of its subviews.
+    /// </summary>
     public abstract class View
     {
 		private List<View> subviewsList;
@@ -38,6 +43,7 @@ namespace Orion.Graphics
 		/// <summary>
 		/// The internal coordinates system rectangle used for drawing.
 		/// </summary>
+        /// <remarks>Drawing is clamped to this rectangle.</remarks>
 		public Rect Bounds
 		{
 			get

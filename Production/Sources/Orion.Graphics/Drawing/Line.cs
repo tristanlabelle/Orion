@@ -13,16 +13,48 @@ using OpenTK.Platform;
 
 namespace Orion.Graphics.Drawing
 {
+    /// <summary>
+    /// A Line object represents a drawable line. It has a color, a width and two coordinates.
+    /// </summary>
     sealed class Line : IDrawable
     {
+        /// <summary>
+        /// The default color when one wasn't specified in the constructor.
+        /// </summary>
 		public static Color DefaultColor = System.Drawing.Color.Black;
+
+        /// <summary>
+        /// The default line width when one wasn't specified in the constructor.
+        /// </summary>
 		public static int DefaultWidth = 1;
 		
+        /// <summary>
+        /// The color of the line.
+        /// </summary>
 		public readonly Color Color;
+
+        /// <summary>
+        /// The stroke width.
+        /// </summary>
 		public readonly int Width;
+
+        /// <summary>
+        /// The first point of the line.
+        /// </summary>
 		public Vector2 Start;
+
+        /// <summary>
+        /// The final point of the line.
+        /// </summary>
 		public Vector2 End;
 		
+        /// <summary>
+        /// Constructs a new Line object.
+        /// </summary>
+        /// <param name="start">The start coordinate</param>
+        /// <param name="end">The end coordinate</param>
+        /// <param name="color">The color of the line</param>
+        /// <param name="width">The stroke width of the line</param>
 		public Line(Vector2 start, Vector2 end, Color color, int width)
 		{
 			Color = color;
@@ -30,15 +62,30 @@ namespace Orion.Graphics.Drawing
 			Start = start;
 			End = end;
 		}
-		
+
+        /// <summary>
+        /// Constructs a new Line object.
+        /// </summary>
+        /// <param name="start">The start coordinate</param>
+        /// <param name="end">The end coordinate</param>
 		public Line(Vector2 start, Vector2 end)
 			: this(start, end, DefaultColor, DefaultWidth)
 		{ }
-		
+
+        /// <summary>
+        /// Constructs a new Line object.
+        /// </summary>
+        /// <param name="start">The start coordinate</param>
+        /// <param name="end">The end coordinate</param>
+        /// <param name="color">The color of the line</param>
 		public Line(Vector2 start, Vector2 end, Color color)
 			: this(start, end, color, DefaultWidth)
 		{ }
 		
+        /// <summary>
+        /// Makes a single stroke from the point to the end, using two vertexes and the basic
+        /// Line mode. Has no respect to the Width field.
+        /// </summary>
 		public void Stroke()
 		{
 			GL.Begin(BeginMode.Lines);
@@ -48,6 +95,9 @@ namespace Orion.Graphics.Drawing
 			GL.End();
 		}
 		
+        /// <summary>
+        /// Fills the line in respect to the Width field.
+        /// </summary>
 		public void Fill()
 		{
 			Vector2[] coords = new Vector2[2];

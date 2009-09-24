@@ -21,7 +21,7 @@ namespace Orion.Graphics
 
         /// <summary>Creates a 800x600 window with the specified title.</summary>
         public OrionWindow()
-            : base(800, 600, GraphicsMode.Default, "OpenTK Quick Start Sample")
+            : base(800, 600, new GraphicsMode(new ColorFormat(8,8,8,0), 0, 1), "OpenTK Quick Start Sample")
         {
             VSync = VSyncMode.On;
         }
@@ -64,8 +64,7 @@ namespace Orion.Graphics
         /// <param name="e">Contains timing information.</param>
         public override void OnRenderFrame(RenderFrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit |
-                     ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();

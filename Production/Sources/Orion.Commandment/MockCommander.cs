@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Commandment;
 using Orion.Commandment.Commands;
 using Orion.GameLogic;
+using OpenTK.Math;
 
 namespace Orion.Commandment
 {
@@ -13,8 +14,8 @@ namespace Orion.Commandment
 
         #region Constructors
 
-        public MockCommander(Faction sourceFaction)
-            : base(sourceFaction)
+        public MockCommander(Faction sourceFaction, World world)
+            : base(sourceFaction, world)
         {
         }
 
@@ -24,9 +25,8 @@ namespace Orion.Commandment
 
         public override IEnumerable<Command> CreateCommands()
         {
-            return new Command[] { new MockCommand(base.Faction) };
+            return new Command[] { new MockCommand(base.Faction), new Move(base.Faction,base.World.Units, new Vector2(0f,0f)) };
         }
-
         #endregion
     }
 }

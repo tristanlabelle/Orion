@@ -14,11 +14,11 @@ namespace Orion.Graphics.Widgets
     {
         private Label caption;
 
-        public Button(Rect frame)
+        public Button(Rectangle frame)
             : base(frame)
         { }
 
-        public Button(Rect frame, Label caption)
+        public Button(Rectangle frame, Label caption)
             : base(frame)
         {
             this.caption = caption;

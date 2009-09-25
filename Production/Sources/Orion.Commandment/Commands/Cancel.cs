@@ -31,7 +31,6 @@ namespace Orion.Commandment.Commands
         public Cancel(Faction faction, IEnumerable<Unit> units)
             : base(faction)
         {
-            Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNullNorEmpty(units, "units");
             if (units.Any(unit => unit.Faction != base.SourceFaction))
                 throw new ArgumentException("Expected all units to be from the source faction.", "units");

@@ -2,67 +2,53 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.GameLogic;
-using Orion.GameLogic.Tasks;
-using OpenTK.Math;
 
 using OpenTK.Math;
+
+using Orion.GameLogic;
+
+using MoveTask = Orion.GameLogic.Tasks.Move;
 
 namespace Orion.Commandment.Commands
 {
-    public class Move : Command
+    /// <summary>
+    /// A <see cref="Command"/> which assigns to a set of <see cref="Unit"/>s the
+    /// <see cref="Task"/> to move to a destination.
+    /// </summary>
+    [Serializable]
+    public sealed class Move : Command
     {
-
         #region Fields
-        List<Unit> unitsToMove;
-        Vector2 destination;
-
+        private readonly List<Unit> units;
+        private readonly Vector2 destination;
         #endregion
         
-
         #region Constructors
-
-        public Move(Faction sourceFaction, IEnumerable<Unit> unitsToMove, Vector2 destination)
-            : base(sourceFaction)
+        /// <summary>
+        /// Initializes a new <see cref="Move"/> command from the <see cref="Faction"/> that
+        /// created the command, the <see cref="Unit"/>s involved and the destination to be reached.
+        /// </summary>
+        /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
+        /// <param name="units">A sequence of <see cref="Unit"/>s involved in this command.</param>
+        /// <param name="destination">The location of the destination of the movement.</param>
+        public Move(Faction faction, IEnumerable<Unit> units, Vector2 destination)
+            : base(faction)
         {
-            Argument.EnsureNotNullNorEmpty(unitsToMove, "unitsToMove");
-            if (unitsToMove.Any(unit => unit.Faction != base.SourceFaction))
-                throw new ArgumentException("Expected all units to be from the source faction.", "unitsToMove");
+            Argument.EnsureNotNullNorEmpty(units, "unitsToMove");
+            if (units.Any(unit => unit.Faction != base.SourceFaction))
+                throw new ArgumentException("Expected all units to be from the source faction.", "units");
             
-
-            this.unitsToMove = unitsToMove.Distinct().ToList();
-
+            this.units = units.Distinct().ToList();
             this.destination = destination;
-
         }
-
-        #endregion
-
-        #region Events
-
-        #endregion
-
-        #region Properties
-
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Assign task to all unit for this command
-        /// </summary>
         public override void Execute()
         {
-
-            foreach (Unit unit in unitsToMove)
-            {
-                unit.Task = new Orion.GameLogic.Tasks.Move(unit,destination);
-            }
+            foreach (Unit unit in units)
+                unit.Task = new MoveTask(unit, destination);
         }
-
         #endregion
-       
-
-        
     }
 }

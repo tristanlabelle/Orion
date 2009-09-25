@@ -55,6 +55,7 @@ namespace Orion.Graphics
             this.Name = "Window";
             this.Text = "Window";
             this.ResumeLayout(false);
+			this.Resize += form_Resize;
 
         }
 

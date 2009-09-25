@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -56,20 +57,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClippedView.cs" />
-    <Compile Include="Drawing\Ellipse.cs" />
-    <Compile Include="Drawing\IDrawable.cs" />
     <Compile Include="Drawing\GraphicsContext.cs" />
-    <Compile Include="Drawing\Rectangle.cs" />
-    <Compile Include="Drawing\Triangle.cs" />
-    <Compile Include="OrionWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootView.cs" />
     <Compile Include="TerrainView.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UnitView.cs" />
     <Compile Include="View.cs" />
-    <Compile Include="Drawing\Line.cs" />
-    <Compile Include="Drawing\DrawingOperation.cs" />
     <Compile Include="Rect.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Frame.cs" />
@@ -80,6 +74,9 @@
     <Compile Include="Window.Designer.cs">
       <DependentUpon>Window.cs</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\GraphicsContextRectangle.cs" />
+    <Compile Include="Drawing\GraphicsContextTriangle.cs" />
+    <Compile Include="Drawing\GraphicsContextEllipse.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Window.resx">

@@ -9,10 +9,16 @@ using System.Windows.Forms;
 
 namespace Orion.Graphics
 {
+	/// <summary>
+	/// The base game window class. 
+	/// </summary>
     public partial class Window : Form
     {
         private View rootView;
 
+		/// <summary>
+		/// Instantiates a new game window. 
+		/// </summary>
         public Window()
         {
             InitializeComponent();
@@ -21,8 +27,7 @@ namespace Orion.Graphics
             Rect rootBounds = new Rect(glControl.Width, glControl.Height);
             rootView = new RootView(rootBounds, fullScreen);
 
-            View terrain = new TerrainView(fullScreen);
-            //terrain.Bounds = new Rect(50, 50);
+            View terrain = new TerrainView(new Rect(200, 200, 100, 100));
             rootView.AddSubview(terrain);
         }
 
@@ -31,7 +36,15 @@ namespace Orion.Graphics
             rootView.Render();
             glControl.SwapBuffers();
         }
+		
+		private void form_Resize(object sender, EventArgs args)
+		{
+			rootView.Frame = rootView.Frame.ResizeTo(Size.Width, Size.Height);
+		}
 
+		/// <summary>
+		/// Executes the test program. Creates a game window and runs it, for fun. 
+		/// </summary>
         public static void Main()
         {
             Application.EnableVisualStyles();

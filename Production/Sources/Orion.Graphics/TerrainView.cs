@@ -34,14 +34,14 @@ namespace Orion.Graphics
 
         protected override void Draw(GraphicsContext context)
         {
-            var rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.White);
-            context.Fill(rect);
-            rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.Black);
-            context.Stroke(rect);
-
-            foreach (Unit unit in world.Units)
-            {
-                Triangle triangle = new Triangle(unit.Position + (Vector2.UnitX * 10), unit.Position + (Vector2.UnitY * 10), unit.Position - (Vector2.UnitY * 10), Color.Red);
+			context.Color = Color.Red;
+			foreach (Unit unit in world.Units)
+			{
+				Vector2 a = new Vector2(unit.Position + (Vector2.UnitX * 10));
+				Vector2 b = new Vector2(unit.Position + (Vector2.UnitY * 10));
+				Vector2 c = new Vector2(unit.Position - (Vector2.UnitY * 10));
+				
+				context.FillTriangle(a, b, c);
             }
         }
     }

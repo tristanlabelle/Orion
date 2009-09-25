@@ -50,6 +50,16 @@ namespace Orion.Graphics
 		/// The height of the rectangle
 		/// </summary>
 		public float Height { get { return Size.Y; } }
+		
+		/// <summary>
+		/// The second X coordinate of the rectangle (origin's abscissa plus width) 
+		/// </summary>
+		public float MaxX { get { return X + Width; } }
+		
+		/// <summary>
+		/// The second Y coordinate of the rectangle (origin's ordinate plus height) 
+		/// </summary>
+		public float MaxY { get { return Y + Height; } }
 		#endregion
 		
 		#region Public Methods
@@ -61,8 +71,18 @@ namespace Orion.Graphics
         /// <param name="width">The width of the rect</param>
         /// <param name="height">The height of the rect</param>
         public Rect(float width, float height)
-            : this(0f, 0f, width, height)
+            : this(new Vector2(width, height))
         { }
+		
+		/// <summary>
+		/// Constructs a Rect object with a given size. The origin is set to zero. 
+		/// </summary>
+		/// <param name="size">
+		/// A <see cref="Vector2"/> representing the size of the rectangle
+		/// </param>
+		public Rect(Vector2 size)
+			: this(new Vector2(0, 0), size)
+		{ }
 
 		/// <summary>
 		/// Constructs a Rect object with a given X and Y origin, and Width and Height parameters.
@@ -86,7 +106,7 @@ namespace Orion.Graphics
 		/// <summary>
 		/// Constructs a Rect object with a given origin and size.
 		/// </summary>
-		/// <param name="positition">
+		/// <param name="position">
 		/// A <see cref="Vector2"/> representing the origin of the rectangle
 		/// </param>
 		/// <param name="size">
@@ -113,7 +133,42 @@ namespace Orion.Graphics
 		}
 		#endregion
 		
-		#region Intersection
+		#region Hit Testing
+		
+		/// <summary>
+		/// Indicates if the rectangle contains a point.
+		/// </summary>
+		/// <param name="x">
+		/// A <see cref="System.Single"/> for the point's abscissa
+		/// </param>
+		/// <param name="y">
+		/// A <see cref="System.Single"/> for the point's ordinate
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>; true if the rect conains the point, false otherwise
+		/// </returns>
+		public bool ContainsPoint(float x, float y)
+		{
+			return ContainsPoint(new Vector2(x, y));
+		}
+		
+		/// <summary>
+		/// Indicates if the rectangle contains a point.
+		/// </summary>
+		/// <param name="point">
+		/// A <see cref="OpenTK.Math.Vector2"/> indicating the point's coordinates
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>; true if the rect contains the point, false otherwise
+		/// </returns>
+		public bool ContainsPoint(Vector2 point)
+		{
+			return point.X.IsBetween(X, MaxX) && point.Y.IsBetween(Y, MaxY);
+		}
+		
+		#endregion
+		
+		#region Intersecting
 		
 		/// <summary>
 		/// Indicates if this rectangle intersects with another one.
@@ -126,7 +181,7 @@ namespace Orion.Graphics
 		/// </returns>
 		public bool Intersects(Rect otherRect)
 		{
-			return OnewayIntersects(otherRect) || otherRect.OnewayIntersects(this);
+			return ContainsPoint(otherRect.Position) || otherRect.ContainsPoint(this.Position);
 		}
 		
 		/// <summary>
@@ -140,11 +195,11 @@ namespace Orion.Graphics
 		/// </returns>
 		public Rect Intersection(Rect otherRect)
 		{
-			if(OnewayIntersects(otherRect))
+			if(ContainsPoint(otherRect.Position))
 			{
 				return OnewayIntersection(otherRect);
 			}
-			if(otherRect.OnewayIntersects(this))
+			if(otherRect.ContainsPoint(this.Position))
 			{
 				return otherRect.OnewayIntersection(this);
 			}
@@ -182,9 +237,7 @@ namespace Orion.Graphics
 		/// </returns>
 		public Rect Translate(Vector2 direction)
 		{
-			Vector2 newPos = Position;
-			newPos.Add(ref direction);
-			return TranslateTo(newPos);
+			return TranslateTo(Position + direction);
 		}
 		
 		/// <summary>
@@ -278,9 +331,7 @@ namespace Orion.Graphics
 		/// </returns>
 		public Rect Resize(Vector2 sizeChange)
 		{
-			Vector2 newSize = Size;
-			newSize.Add(ref sizeChange);
-			return ResizeTo(newSize);
+			return ResizeTo(Size + sizeChange);
 		}
 		
 		/// <summary>
@@ -357,17 +408,10 @@ namespace Orion.Graphics
         #endregion
 
         #region Private Methods
-        private bool OnewayIntersects(Rect otherRect)
-		{
-			return otherRect.X.IsBetween(X, X + Width) && otherRect.Y.IsBetween(Y, Y + Height);
-		}
 		
 		private Rect OnewayIntersection(Rect otherRect)
 		{
-			Vector2 size = otherRect.Size;
-			size.Add(Position);
-			size.Sub(otherRect.Position);
-			return otherRect.ResizeTo(size);
+			return otherRect.ResizeTo(otherRect.Size + Position - otherRect.Position);
 		}
 		
 		#endregion

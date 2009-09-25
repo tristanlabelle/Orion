@@ -16,10 +16,10 @@ namespace Orion.Graphics.Widgets
 
         protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
         {
-            var rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.White);
-            context.Fill(rect);
-            rect = new Orion.Graphics.Drawing.Rectangle(Bounds, Color.Black);
-            context.Stroke(rect);
+			context.Color = Color.White;
+			context.FillRect(Bounds);
+			context.Color = Color.Black;
+			context.StrokeRect(Bounds);
         }
     }
 }

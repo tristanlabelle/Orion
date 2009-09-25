@@ -17,6 +17,18 @@ namespace Orion.Graphics
     /// </summary>
     class RootView : View
     {
+		Rect frameStore;
+		
+		public override Rect Frame
+		{
+			get { return frameStore; }
+			set
+			{
+				frameStore = value;
+            		GL.Viewport(0, 0, (int)frameStore.Size.X, (int)frameStore.Size.Y);
+			}
+		}
+		
         /// <summary>
         /// Creates a RootView object with a frame and bounds.
         /// </summary>
@@ -38,13 +50,7 @@ namespace Orion.Graphics
         /// </summary>
         /// <param name="context"></param>
         protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
-        {
-            Vector2 a = new Vector2(10, 10);
-            Vector2 b = new Vector2(20, 30);
-            Vector2 c = new Vector2(30, 10);
-            Triangle t = new Triangle(a, b, c, Color.Plum);
-            context.Fill(t);
-        }
+        { }
 
         internal override void Render()
         {

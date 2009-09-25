@@ -38,7 +38,7 @@ namespace Orion.Graphics
 		/// <summary>
 		/// The rectangle in which this view appears in its superview. May be different from the bounds.
 		/// </summary>
-		public Rect Frame { get; set; }
+		public virtual Rect Frame { get; set; }
 		
 		/// <summary>
 		/// The internal coordinates system rectangle used for drawing.
@@ -65,7 +65,7 @@ namespace Orion.Graphics
 		/// </param>
 		public View(Rect frame)
 		{
-			Context = new GraphicsContext(frame);
+			Context = new GraphicsContext(new Rect(frame.Size));
 			subviewsList = new List<View>();
 			Frame = frame;
 		}
@@ -73,7 +73,7 @@ namespace Orion.Graphics
 		/// <summary>
 		/// Inserts the given view in the view hierarchy under this one. 
 		/// </summary>
-		/// <param name="subview">
+		/// <param name="view">
 		/// A <see cref="View"/>
 		/// </param>
 		/// <exception cref="ArgumentException">
@@ -156,11 +156,9 @@ namespace Orion.Graphics
 		/// </summary>
 		internal virtual void Render()
 		{
-            Console.WriteLine("Frame: {0}", Frame);
-            Console.WriteLine("Bounds: {0}", Bounds);
-			Context.Clear();
+			Context.SetUpGLContext(Frame);
 			Draw(Context);
-			Context.DrawInto(Frame);
+			Context.RestoreGLContext();
 			
 			foreach(View view in subviewsList)
 			{

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 using Orion.Commandment;
 using Orion.Commandment.Commands;
 using Orion.GameLogic;
 using OpenTK.Math;
+
 
 namespace Orion.Commandment
 {
@@ -14,8 +16,8 @@ namespace Orion.Commandment
 
         #region Constructors
 
-        public MockCommander(Faction sourceFaction, World world)
-            : base(sourceFaction, world)
+        public MockCommander(Faction faction, World world)
+            : base(faction, world)
         {
         }
 
@@ -25,7 +27,10 @@ namespace Orion.Commandment
 
         public override IEnumerable<Command> CreateCommands()
         {
-            return new Command[] { new MockCommand(base.Faction), new Move(base.Faction,base.World.Units, new Vector2(0f,0f)) };
+            ICollection<Unit> allUnits = World.Units;
+            IEnumerable<Unit> myUnits = allUnits.Where(unit => unit.Faction == Faction);
+
+            return new Command[] { new Move(Faction, myUnits, new Vector2(0f,0f)) };
         }
         #endregion
     }

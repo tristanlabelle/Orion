@@ -20,6 +20,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
+        public Faction(string name)
+        {
+            Argument.EnsureNotNullNorBlank(name, "name");
+            this.name = name;
+        }
         #endregion
 
         #region Events

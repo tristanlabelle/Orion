@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Orion.GameLogic;
-
+using OpenTK.Math;
 using MoveTask = Orion.GameLogic.Tasks.Move;
 
 namespace Orion.Commandment.Commands

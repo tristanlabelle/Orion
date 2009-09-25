@@ -12,28 +12,36 @@ namespace Orion.Commandment
     {
         static void Main(string[] args)
         {
-
-            CommandManager commandManager = new CommandManager();
-            Faction faction = new Faction();
             World world = new World();
+            CommandManager commandManager = new CommandManager();
 
-            Unit u1 = new Unit(1, new UnitType("lolwut"), world);
-            u1.Faction = faction;
-            Unit u2 = new Unit(2, new UnitType("lolwut"), world);
-            u2.Faction = faction;
-            Unit u3 = new Unit(3, new UnitType("lolwut"), world);
-            u3.Faction = faction;
-            Unit u4 = new Unit(4, new UnitType("lolwut"), world);
-            u4.Faction = faction;
+            Faction redFaction = new Faction("Red");
+            MockCommander redCommander = new MockCommander(redFaction, world);
+            commandManager.AddCommander(redCommander);
 
-            world.Units.Add(u1);
-            world.Units.Add(u2);
-            world.Units.Add(u3);
-            world.Units.Add(u4);
+            Unit redJedi = new Unit(0, new UnitType("Jedi"), world);
+            Unit redPirate = new Unit(1, new UnitType("Pirate"), world);
+            Unit redNinja = new Unit(2, new UnitType("Ninja"), world);
+            redJedi.Faction = redFaction;
+            redPirate.Faction = redFaction;
+            redNinja.Faction = redFaction;
+            world.Units.Add(redJedi);
+            world.Units.Add(redPirate);
+            world.Units.Add(redNinja);
 
+            Faction blueFaction = new Faction("Blue");
+            MockCommander blueCommander = new MockCommander(blueFaction, world);
+            commandManager.AddCommander(blueCommander);
 
-            MockCommander commander = new MockCommander(faction, world);
-            commandManager.AddCommander(commander);
+            Unit blueJedi = new Unit(3, new UnitType("Jedi"), world);
+            Unit bluePirate = new Unit(4, new UnitType("Pirate"), world);
+            Unit blueNinja = new Unit(5, new UnitType("Ninja"), world);
+            blueJedi.Faction = blueFaction;
+            bluePirate.Faction = blueFaction;
+            blueNinja.Faction = blueFaction;
+            world.Units.Add(blueJedi);
+            world.Units.Add(bluePirate);
+            world.Units.Add(blueNinja);
        
             commandManager.QueryCommands();
             commandManager.ExecuteCommandQueue();

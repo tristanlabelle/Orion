@@ -19,13 +19,13 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-        public Commander(Faction sourceFaction, World world)
+        public Commander(Faction faction, World world)
         {
-            Argument.EnsureNotNull(sourceFaction, "sourceFaction");
+            Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
-            this.faction = sourceFaction;
+            this.faction = faction;
         }
         #endregion
 

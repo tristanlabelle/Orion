@@ -9,7 +9,7 @@ namespace Orion.Graphics
 {
     class ClippedView : View
     {
-        public ClippedView(Rect frame)
+        public ClippedView(Rectangle frame)
             : base(frame)
         { }
 

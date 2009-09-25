@@ -15,7 +15,7 @@ namespace Orion.Graphics
     class TerrainView : ClippedView
     {
         private World world;
-        public TerrainView(Rect frame)
+        public TerrainView(Rectangle frame)
             : base(frame)
         {
             world = new World();

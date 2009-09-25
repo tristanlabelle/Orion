@@ -10,7 +10,7 @@ namespace Orion.Graphics.Widgets
 {
     class Frame : View
     {
-        public Frame(Rect frame)
+        public Frame(Rectangle frame)
             : base(frame)
         { }
 

@@ -1,16 +1,17 @@
 using System;
+
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion.Graphics
+namespace Orion
 {
     /// <summary>
-    /// A Rect instance encapsulates an origin vector (<see cref="Rect.X"/> and <see cref="Rect.Y"/>)
-    /// and a size vector (<see cref="Rect.Width"/> and <see cref="Rect.Height"/>). They can be
+    /// A Rectangle instance encapsulates an origin vector (<see cref="Rectangle.X"/> and <see cref="Rectangle.Y"/>)
+    /// and a size vector (<see cref="Rectangle.Width"/> and <see cref="Rectangle.Height"/>). They can be
     /// intersected, translated and resized.
     /// </summary>
-	public struct Rect
+	public struct Rectangle
 	{
 		#region Fields
 		#region Static
@@ -18,7 +19,7 @@ namespace Orion.Graphics
 		/// <summary>
 		/// An empty rectangle (origin, width and height are all zeroed).
 		/// </summary>
-		public static readonly Rect EmptyRect = new Rect(0, 0, 0, 0);
+		public static readonly Rectangle EmptyRect = new Rectangle(0, 0, 0, 0);
 		#endregion
 		
 		/// <summary>
@@ -66,26 +67,26 @@ namespace Orion.Graphics
 		#region Constructors
 
         /// <summary>
-        /// Constructs a Rect object with a given width and height. The origin is set to zero.
+        /// Constructs a Rectangle object with a given width and height. The origin is set to zero.
         /// </summary>
         /// <param name="width">The width of the rect</param>
         /// <param name="height">The height of the rect</param>
-        public Rect(float width, float height)
+        public Rectangle(float width, float height)
             : this(new Vector2(width, height))
         { }
 		
 		/// <summary>
-		/// Constructs a Rect object with a given size. The origin is set to zero. 
+		/// Constructs a Rectangle object with a given size. The origin is set to zero. 
 		/// </summary>
 		/// <param name="size">
 		/// A <see cref="Vector2"/> representing the size of the rectangle
 		/// </param>
-		public Rect(Vector2 size)
+		public Rectangle(Vector2 size)
 			: this(new Vector2(0, 0), size)
 		{ }
 
 		/// <summary>
-		/// Constructs a Rect object with a given X and Y origin, and Width and Height parameters.
+		/// Constructs a Rectangle object with a given X and Y origin, and Width and Height parameters.
 		/// </summary>
 		/// <param name="x">
 		/// A <see cref="System.Single"/> specifying the abscissa of the origin
@@ -99,12 +100,12 @@ namespace Orion.Graphics
 		/// <param name="height">
 		/// A <see cref="System.Single"/> specifying the height of the rectangle
 		/// </param>
-		public Rect(float x, float y, float width, float height)
+		public Rectangle(float x, float y, float width, float height)
 			: this(new Vector2(x, y), new Vector2(width, height))
 		{ }
 		
 		/// <summary>
-		/// Constructs a Rect object with a given origin and size.
+		/// Constructs a Rectangle object with a given origin and size.
 		/// </summary>
 		/// <param name="position">
 		/// A <see cref="Vector2"/> representing the origin of the rectangle
@@ -112,7 +113,7 @@ namespace Orion.Graphics
 		/// <param name="size">
 		/// A <see cref="Vector2"/> representing the size of the rectangle
 		/// </param>
-		public Rect(Vector2 position, Vector2 size)
+		public Rectangle(Vector2 position, Vector2 size)
 		{
 			Size = size;
 			Position = position;
@@ -174,12 +175,12 @@ namespace Orion.Graphics
 		/// Indicates if this rectangle intersects with another one.
 		/// </summary>
 		/// <param name="otherRect">
-		/// The <see cref="Rect"/> we want to test for intersection
+		/// The <see cref="Rectangle"/> we want to test for intersection
 		/// </param>
 		/// <returns>
 		/// true if the rectangle intersects with this one; false otherwise
 		/// </returns>
-		public bool Intersects(Rect otherRect)
+		public bool Intersects(Rectangle otherRect)
 		{
 			return ContainsPoint(otherRect.Position) || otherRect.ContainsPoint(this.Position);
 		}
@@ -188,12 +189,12 @@ namespace Orion.Graphics
 		/// Returns the intersection of two rectangles
 		/// </summary>
 		/// <param name="otherRect">
-		/// The <see cref="Rect"/> with which we want this rectangle to intersect
+		/// The <see cref="Rectangle"/> with which we want this rectangle to intersect
 		/// </param>
 		/// <returns>
-		/// The intersection <see cref="Rect"/> of both rectangles, or <see cref="Rect.EmptyRect"/> if they don't intersect
+		/// The intersection <see cref="Rectangle"/> of both rectangles, or <see cref="Rectangle.EmptyRect"/> if they don't intersect
 		/// </returns>
-		public Rect Intersection(Rect otherRect)
+		public Rectangle Intersection(Rectangle otherRect)
 		{
 			if(ContainsPoint(otherRect.Position))
 			{
@@ -219,9 +220,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> representing the move along the Y axis
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> based on this one whose origin is translated by the specified units
+		/// A new <see cref="Rectangle"/> based on this one whose origin is translated by the specified units
 		/// </returns>
-		public Rect Translate(float x, float y)
+		public Rectangle Translate(float x, float y)
 		{
 			return Translate(new Vector2(x, y));
 		}
@@ -233,9 +234,9 @@ namespace Orion.Graphics
 		/// A <see cref="Vector2"/> specifying the direction of the translation
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> based on this one, whose origin is translated by the specified vector
+		/// A new <see cref="Rectangle"/> based on this one, whose origin is translated by the specified vector
 		/// </returns>
-		public Rect Translate(Vector2 direction)
+		public Rectangle Translate(Vector2 direction)
 		{
 			return TranslateTo(Position + direction);
 		}
@@ -247,9 +248,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> indicating the move along the X axis
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> based on this one, whose origin abscissa is translated by the specified units
+		/// A new <see cref="Rectangle"/> based on this one, whose origin abscissa is translated by the specified units
 		/// </returns>
-		public Rect TranslateX(float x)
+		public Rectangle TranslateX(float x)
 		{
 			return Translate(x, 0);
 		}
@@ -262,9 +263,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> representing the move along the Y axis
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> based on this one, whose origin ordinate is translated by the specified units 
+		/// A new <see cref="Rectangle"/> based on this one, whose origin ordinate is translated by the specified units 
 		/// </returns>
-		public Rect TranslateY(float y)
+		public Rectangle TranslateY(float y)
 		{
 			return Translate(0, y);
 		}
@@ -279,9 +280,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> indicating the origin ordinate
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the size of this one but the specified origin
+		/// A new <see cref="Rectangle"/> with the size of this one but the specified origin
 		/// </returns>
-		public Rect TranslateTo(float x, float y)
+		public Rectangle TranslateTo(float x, float y)
 		{
 			return TranslateTo(new Vector2(x, y));
 		}
@@ -293,11 +294,11 @@ namespace Orion.Graphics
 		/// A <see cref="Vector2"/> representing the new origin
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the same size as this one but the specified origin
+		/// A new <see cref="Rectangle"/> with the same size as this one but the specified origin
 		/// </returns>
-		public Rect TranslateTo(Vector2 origin)
+		public Rectangle TranslateTo(Vector2 origin)
 		{
-			return new Rect(origin, Size);
+			return new Rectangle(origin, Size);
 		}
 		#endregion
 		
@@ -313,9 +314,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> by which the height of the rectangle must be increased or decreased
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the modified size
+		/// A new <see cref="Rectangle"/> with the modified size
 		/// </returns>
-		public Rect Resize(float width, float height)
+		public Rectangle Resize(float width, float height)
 		{
 			return Resize(new Vector2(width, height));
 		}
@@ -327,9 +328,9 @@ namespace Orion.Graphics
 		/// A <see cref="Vector2"/> specifying the width and height increments or decrements to be applied to the current rectangle
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the modified size
+		/// A new <see cref="Rectangle"/> with the modified size
 		/// </returns>
-		public Rect Resize(Vector2 sizeChange)
+		public Rectangle Resize(Vector2 sizeChange)
 		{
 			return ResizeTo(Size + sizeChange);
 		}
@@ -341,9 +342,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> representing the width increment or decrement to the current size
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the modified width
+		/// A new <see cref="Rectangle"/> with the modified width
 		/// </returns>
-		public Rect ResizeWidth(float width)
+		public Rectangle ResizeWidth(float width)
 		{
 			return Resize(width, 0);
 		}
@@ -355,9 +356,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> representing the height increment or decrement to apply to the current size
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the modified height
+		/// A new <see cref="Rectangle"/> with the modified height
 		/// </returns>
-		public Rect ResizeHeight(float height)
+		public Rectangle ResizeHeight(float height)
 		{
 			return Resize(0, height);
 		}
@@ -372,9 +373,9 @@ namespace Orion.Graphics
 		/// A <see cref="System.Single"/> indicating the height of the new rectangle
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> at the same origin but with a different size
+		/// A new <see cref="Rectangle"/> at the same origin but with a different size
 		/// </returns>
-		public Rect ResizeTo(float width, float height)
+		public Rectangle ResizeTo(float width, float height)
 		{
 			return ResizeTo(new Vector2(width, height));
 		}
@@ -386,18 +387,18 @@ namespace Orion.Graphics
 		/// A <see cref="Vector2"/> specifying the size of the new rectangle
 		/// </param>
 		/// <returns>
-		/// A new <see cref="Rect"/> with the same origin as this rectangle's one but a different size
+		/// A new <see cref="Rectangle"/> with the same origin as this rectangle's one but a different size
 		/// </returns>
-		public Rect ResizeTo(Vector2 newSize)
+		public Rectangle ResizeTo(Vector2 newSize)
 		{
-			return new Rect(Position, newSize);
+			return new Rectangle(Position, newSize);
 		}
 		#endregion
 
         #region Overrides
 
         /// <summary>
-        /// Returns a textual representation of the <see cref="Rect"/> with the form {{x,y}, {w,h}}.
+        /// Returns a textual representation of the <see cref="Rectangle"/> with the form {{x,y}, {w,h}}.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -409,7 +410,7 @@ namespace Orion.Graphics
 
         #region Private Methods
 		
-		private Rect OnewayIntersection(Rect otherRect)
+		private Rectangle OnewayIntersection(Rectangle otherRect)
 		{
 			return otherRect.ResizeTo(otherRect.Size + Position - otherRect.Position);
 		}

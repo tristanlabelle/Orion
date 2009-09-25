@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateDocumentation>true</GenerateDocumentation>
+    <DocumentationFile>bin\Debug\Orion.Graphics.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,13 +60,13 @@
     <Compile Include="ClippedView.cs" />
     <Compile Include="Drawing\GraphicsContextText.cs" />
     <Compile Include="Drawing\GraphicsContext.cs" />
+    <Compile Include="MouseEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootView.cs" />
     <Compile Include="TerrainView.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UnitView.cs" />
     <Compile Include="View.cs" />
-    <Compile Include="Rect.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Frame.cs" />
     <Compile Include="Widgets\Label.cs" />
@@ -85,6 +86,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">
+      <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
+      <Name>Orion.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orion.GameLogic\Orion.GameLogic.csproj">
       <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
       <Name>Orion.GameLogic</Name>

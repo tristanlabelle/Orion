@@ -22,12 +22,11 @@ namespace Orion.Graphics
         public Window()
         {
             InitializeComponent();
-
-            Rect fullScreen = new Rect(1024f, 768f);
-            Rect rootBounds = new Rect(glControl.Width, glControl.Height);
+            Rectangle fullScreen = new Rectangle(1024f, 768f);
+            Rectangle rootBounds = new Rectangle(glControl.Width, glControl.Height);
             rootView = new RootView(rootBounds, fullScreen);
 
-            View terrain = new TerrainView(new Rect(200, 200, 100, 100));
+            View terrain = new TerrainView(new Rectangle(200, 200, 100, 100));
             rootView.AddSubview(terrain);
         }
 
@@ -36,14 +35,23 @@ namespace Orion.Graphics
             rootView.Render();
             glControl.SwapBuffers();
         }
-		
-		private void form_Resize(object sender, EventArgs args)
-		{
-			rootView.Frame = rootView.Frame.ResizeTo(Size.Width, Size.Height);
-		}
+
+        /// <summary>
+        /// Fires the Resized event to all listener, and resizes the glControl.
+        /// </summary>
+        /// <param name="e">Unused arguments</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            if (rootView != null)
+            {
+                rootView.Frame = rootView.Frame.ResizeTo(Size.Width, Size.Height);
+                glControl.Refresh();
+            }
+        }
 
 		/// <summary>
-		/// Executes the test program. Creates a game window and runs it, for fun. 
+		/// Executes the test program. Creates a game window and runs it. 
 		/// </summary>
         public static void Main()
         {

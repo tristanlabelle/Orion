@@ -17,9 +17,9 @@ namespace Orion.Graphics
     /// </summary>
     class RootView : View
     {
-		Rect frameStore;
+		Rectangle frameStore;
 		
-		public override Rect Frame
+		public override Rectangle Frame
 		{
 			get { return frameStore; }
 			set
@@ -34,7 +34,7 @@ namespace Orion.Graphics
         /// </summary>
         /// <param name="frame">The frame of the view</param>
         /// <param name="bounds">The bounds of the view</param>
-        public RootView(Rect frame, Rect bounds)
+        public RootView(Rectangle frame, Rectangle bounds)
             : base(frame)
         {
             Bounds = bounds;

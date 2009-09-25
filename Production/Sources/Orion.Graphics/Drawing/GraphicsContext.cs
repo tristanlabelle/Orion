@@ -19,7 +19,7 @@ namespace Orion.Graphics.Drawing
         /// <summary>
         /// The bounds of the local coordinates system. 
         /// </summary>
-        public Rect CoordsSystem { get; set; }
+        public Rectangle CoordsSystem { get; set; }
 		
 		/// <summary>
 		/// The 'Color' member sets and gets the current drawing color.
@@ -28,9 +28,10 @@ namespace Orion.Graphics.Drawing
 		{
 			get
 			{
-				int[] components = new int[4];
-				GL.GetInteger(GetPName.CurrentColor, components);
-				return System.Drawing.Color.FromArgb(components[3], components[0], components[1], components[2]);
+				float[] components = new float[4];
+				GL.GetFloat(GetPName.CurrentColor, components);
+                byte[] clampedComponents = components.Select(i => (byte)(i * 0xFF)).ToArray();
+                return System.Drawing.Color.FromArgb(clampedComponents[3], clampedComponents[0], clampedComponents[1], clampedComponents[2]);
 			}
 			set { GL.Color4(value); }
 		}
@@ -39,19 +40,21 @@ namespace Orion.Graphics.Drawing
         /// Constructs a GraphicsContext object with given bounds for its local coordinates system. 
         /// </summary>
         /// <param name="bounds">
-        /// The <see cref="Rect"/> defining the local coordinates system
+        /// The <see cref="Rectangle"/> defining the local coordinates system
         /// </param>
-        internal GraphicsContext(Rect bounds)
+        internal GraphicsContext(Rectangle bounds)
         {
             CoordsSystem = bounds;
         }
 
-        internal void SetUpGLContext(Rect system)
+        internal void SetUpGLContext(Rectangle system)
         {
             GL.PushMatrix();
 			
             GL.Scale(system.Size.X / CoordsSystem.Size.X, system.Size.Y / CoordsSystem.Size.Y, 1);
             GL.Translate(system.Position.X, system.Position.Y, 0);
+            GL.Translate(-CoordsSystem.Position.X, -CoordsSystem.Position.Y, 0);
+
         }
 
         internal void RestoreGLContext()

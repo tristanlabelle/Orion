@@ -9,7 +9,7 @@ namespace Orion.Graphics
 {
     class UnitView : View
     {
-        public UnitView(Rect frame)
+        public UnitView(Rectangle frame)
             : base(frame)
         { }
 

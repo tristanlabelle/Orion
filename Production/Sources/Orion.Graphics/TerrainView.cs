@@ -8,6 +8,7 @@ using OpenTK.Math;
 
 using Orion.Graphics.Drawing;
 using Orion.GameLogic;
+using Orion.Graphics.Widgets;
 
 namespace Orion.Graphics
 {
@@ -26,7 +27,7 @@ namespace Orion.Graphics
             float count = 0;
             foreach (Unit unit in world.Units) 
             {
-                unit.Position = new Vector2(count, count);
+                unit.Position = new Vector2(count*10, count*10);
                 count++;
             }
             
@@ -37,11 +38,13 @@ namespace Orion.Graphics
 			context.Color = Color.Red;
 			foreach (Unit unit in world.Units)
 			{
-				Vector2 a = new Vector2(unit.Position + (Vector2.UnitX * 10));
+				/*Vector2 a = new Vector2(unit.Position + (Vector2.UnitX * 10));
 				Vector2 b = new Vector2(unit.Position + (Vector2.UnitY * 10));
-				Vector2 c = new Vector2(unit.Position - (Vector2.UnitY * 10));
+				Vector2 c = new Vector2(unit.Position - (Vector2.UnitX * 10));
 				
-				context.FillTriangle(a, b, c);
+				context.FillTriangle(a, b, c);*/
+
+                //this.AddSubview();
             }
         }
     }

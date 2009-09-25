@@ -27,7 +27,7 @@ namespace Orion.Graphics
             rootView = new RootView(rootBounds, fullScreen);
 
             View terrain = new TerrainView(new Rectangle(200, 200, 100, 100));
-            rootView.AddSubview(terrain);
+            rootView.Children.Add(terrain);
         }
 
         private void glControl_Paint(object sender, PaintEventArgs e)

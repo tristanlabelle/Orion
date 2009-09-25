@@ -22,7 +22,8 @@ namespace Orion.Graphics
     public abstract class View
     {
         #region Fields
-        private List<View> subviewsList;
+        private View parent;
+        private readonly ViewChildrenCollection children;
         private Orion.Graphics.Drawing.GraphicsContext Context;
         #endregion
 
@@ -36,7 +37,7 @@ namespace Orion.Graphics
         public View(Rectangle frame)
         {
             Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
-            subviewsList = new List<View>();
+            children = new ViewChildrenCollection(this);
             Frame = frame;
         }
         #endregion
@@ -65,19 +66,20 @@ namespace Orion.Graphics
 
         #region Properties
         /// <summary>
-        /// The superview of this view. 
+        /// Gets of this view. 
         /// </summary>
-        public View Superview { get; private set; }
+        public View Parent
+        {
+            get { return parent; }
+            internal set { parent = value; }
+        }
 
         /// <summary>
-        /// The list of subviews this view has. 
+        /// Gets the collection of this <see cref="View"/>'s children.
         /// </summary>
-        public IEnumerable<View> Subviews
+        public ViewChildrenCollection Children
         {
-            get
-            {
-                return subviewsList.ToArray();
-            }
+            get { return children; }
         }
 
         /// <summary>
@@ -91,93 +93,55 @@ namespace Orion.Graphics
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds
         {
-            get
-            {
-                return Context.CoordsSystem;
-            }
-
-            set
-            {
-                Context.CoordsSystem = value;
-            }
+            get { return Context.CoordsSystem; }
+            set { Context.CoordsSystem = value; }
         }
         #endregion
 
         #region Methods
         #region View Hierarchy
         /// <summary>
-        /// Inserts the given view in the view hierarchy under this one. 
+        /// Tests if this <see cref="View"/> is within the children of another <see cref="View"/>,
+        /// recursively.
         /// </summary>
-        /// <param name="view">
-        /// A <see cref="View"/>
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// If the passed view already has a superview, or if the passed view contains this view somewhere down its hierarchy
-        /// </exception>
-        public void AddSubview(View view)
-        {
-            if (view.Superview != null)
-            {
-                throw new ArgumentException("Cannot add as a subview a view that's already in another superview");
-            }
-
-            if (view.ContainsSubview(this))
-            {
-                throw new ArgumentException("Cannot add a view as a subview to itself");
-            }
-
-            view.Superview = this;
-            subviewsList.Add(view);
-        }
-
-        /// <summary>
-        /// Removes a directly descendant view of this object from the view hierarchy. 
-        /// </summary>
-        /// <param name="subview">
-        /// The direct descendant <see cref="View"/>
-        /// </param>
-        /// <exception cref="System.ArgumentException">
-        /// If the passed view is not a direct descendant of this one
-        /// </exception> 
-        public void RemoveSubview(View subview)
-        {
-            if (subview.Superview != this)
-            {
-                throw new ArgumentException("Cannot remove a subview whose superview is not this object");
-            }
-
-            subviewsList.Remove(subview);
-            subview.Superview = null;
-        }
-
-        /// <summary>
-        /// Removes the object from the view hierarchy. 
-        /// </summary>
-        public void RemoveFromSuperview()
-        {
-            Superview.RemoveSubview(this);
-        }
-
-        /// <summary>
-        /// Indicates if the passed view is a descendant of this one. 
-        /// </summary>
-        /// <param name="view">
-        /// The supposedly child view <see cref="View"/>
-        /// </param>
+        /// <param name="other">The other <see cref="View"/> to test against.</param>
         /// <returns>
-        /// True if the passed view the same one as this one, or if it is under this one in the view hierarchy, false otherwise
+        /// <c>True</c> if this <see cref="View"/> is a descendant of <paramref name="other"/>,
+        /// <c>false</c> if not.
         /// </returns>
-        public bool ContainsSubview(View view)
+        public bool IsDescendantOf(View other)
         {
-            while (view != null)
+            Argument.EnsureNotNull(other, "other");
+            while (other != null)
             {
-                if (view == this)
-                    return true;
-                view = view.Superview;
+                if (other == this) return true;
+                other = other.Parent;
             }
             return false;
         }
 
+        /// <summary>
+        /// Tests if this <see cref="View"/> is a the parent of another <see cref="View"/>,
+        /// recursively.
+        /// </summary>
+        /// <param name="other">The other <see cref="View"/> to test against.</param>
+        /// <returns>
+        /// <c>True</c> if this <see cref="View"/> is an ancestor of <paramref name="other"/>,
+        /// <c>false</c> if not.
+        /// </returns>
+        public bool IsAncestorOf(View other)
+        {
+            Argument.EnsureNotNull(other, "other");
+            return other.IsAncestorOf(this);
+        }
+
+        /// <summary>
+        /// Removes this <see cref="View"/> from its parent. 
+        /// </summary>
+        public void RemoveFromParent()
+        {
+            if (parent != null) parent.Children.Remove(this);
+        }
         #endregion
 
         #region Event handling
@@ -199,7 +163,7 @@ namespace Orion.Graphics
             Vector2 coords = Vector4.Transform(eventCoords, transformMatrix).Xy;
 
             bool eventSinking = true;
-            foreach (View subview in Enumerable.Reverse(subviewsList))
+            foreach (View subview in Enumerable.Reverse(children))
             {
                 if (subview.Frame.ContainsPoint(coords))
                 {
@@ -306,7 +270,7 @@ namespace Orion.Graphics
             Draw(Context);
             Context.RestoreGLContext();
 
-            foreach (View view in subviewsList)
+            foreach (View view in children)
             {
                 view.Render();
             }

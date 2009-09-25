@@ -22,11 +22,12 @@ namespace Orion.Graphics
         public Window()
         {
             InitializeComponent();
-            Rectangle fullScreen = new Rectangle(1024f, 768f);
-            Rectangle rootBounds = new Rectangle(glControl.Width, glControl.Height);
-            rootView = new RootView(rootBounds, fullScreen);
+            Rectangle maxResolution = new Rectangle(1024f, 768f);
+            Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
+            rootView = new RootView(windowBounds, maxResolution);
 
-            View terrain = new TerrainView(new Rectangle(200, 200, 100, 100));
+            View terrain = new TerrainView(maxResolution);
+            terrain.Bounds = new Rectangle(0, 0, 500, 500);
             rootView.Children.Add(terrain);
         }
 
@@ -45,7 +46,7 @@ namespace Orion.Graphics
             base.OnResize(e);
             if (rootView != null)
             {
-                rootView.Frame = rootView.Frame.ResizeTo(Size.Width, Size.Height);
+                rootView.Frame = rootView.Frame.ResizeTo(glControl.Width, glControl.Height);
                 glControl.Refresh();
             }
         }

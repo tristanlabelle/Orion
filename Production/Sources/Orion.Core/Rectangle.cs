@@ -26,7 +26,7 @@ namespace Orion
 		/// <summary>
 		/// The position of the rectangle
 		/// </summary>
-		public readonly Vector2 Position;
+		public readonly Vector2 Origin;
 
 		/// <summary>
 		/// The size of the rectangle (X is the width, and Y is the height)
@@ -39,11 +39,11 @@ namespace Orion
 		/// <summary>
 		/// The origin abscissa of the rectangle
 		/// </summary>
-		public float X { get { return Position.X; } }
+		public float X { get { return Origin.X; } }
 		/// <summary>
 		/// The origin ordinate of the rectangle
 		/// </summary>
-		public float Y { get { return Position.Y; } }
+		public float Y { get { return Origin.Y; } }
 		/// <summary>
 		/// The width of the rectangle
 		/// </summary>
@@ -117,19 +117,19 @@ namespace Orion
 		public Rectangle(Vector2 position, Vector2 size)
 		{
 			Size = size;
-			Position = position;
+			Origin = position;
 			
 			// size must never be negative! this would break so many things.
 			// the origin must always be the bottom left corner; reajust rectangles so they match this rule if necessary
 			if(Size.X < 0)
 			{
-				Position.X += Size.X;
+				Origin.X += Size.X;
 				Size.X *= -1;
 			}
 			
 			if(Size.Y < 0)
 			{
-				Position.Y += Size.Y;
+				Origin.Y += Size.Y;
 				Size.Y *= -1;
 			}
 		}
@@ -183,7 +183,7 @@ namespace Orion
 		/// </returns>
 		public bool Intersects(Rectangle otherRect)
 		{
-			return ContainsPoint(otherRect.Position) || otherRect.ContainsPoint(this.Position);
+			return ContainsPoint(otherRect.Origin) || otherRect.ContainsPoint(this.Origin);
 		}
 		
 		/// <summary>
@@ -197,11 +197,11 @@ namespace Orion
 		/// </returns>
 		public Rectangle Intersection(Rectangle otherRect)
 		{
-			if(ContainsPoint(otherRect.Position))
+			if(ContainsPoint(otherRect.Origin))
 			{
 				return OnewayIntersection(otherRect);
 			}
-			if(otherRect.ContainsPoint(this.Position))
+			if(otherRect.ContainsPoint(this.Origin))
 			{
 				return otherRect.OnewayIntersection(this);
 			}
@@ -239,7 +239,7 @@ namespace Orion
 		/// </returns>
 		public Rectangle Translate(Vector2 direction)
 		{
-			return TranslateTo(Position + direction);
+			return TranslateTo(Origin + direction);
 		}
 		
 		/// <summary>
@@ -392,7 +392,7 @@ namespace Orion
 		/// </returns>
 		public Rectangle ResizeTo(Vector2 newSize)
 		{
-			return new Rectangle(Position, newSize);
+			return new Rectangle(Origin, newSize);
 		}
 		#endregion
 
@@ -404,7 +404,7 @@ namespace Orion
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{{{0}, {1}}}", Position, Size);
+            return string.Format("{{{0}, {1}}}", Origin, Size);
         }
         #endregion
         #endregion
@@ -413,7 +413,7 @@ namespace Orion
 		
 		private Rectangle OnewayIntersection(Rectangle otherRect)
 		{
-			return otherRect.ResizeTo(otherRect.Size + Position - otherRect.Position);
+			return otherRect.ResizeTo(otherRect.Size + Origin - otherRect.Origin);
 		}
 		
 		#endregion

@@ -31,16 +31,24 @@ namespace Orion.Graphics
                 count++;
             }
 
+            Frame panel = new Frame(new Rectangle(50, 50, 100, 100));
+            AddSubview(panel);
         }
 
         protected override void Draw(GraphicsContext context)
         {
             context.Color = Color.Red;
+
+            context.StrokeRect(600, 600, 150, 300);
+            context.Color = Color.Chocolate;
+            context.FillEllipse(500, 500, 200, 100);
+            context.StrokeTriangle(200, 200, 300, 400, 400, 200);
+
             foreach (Unit unit in world.Units)
             {
-                /*Vector2 a = new Vector2(unit.Position + (Vector2.UnitX * 10));
-                Vector2 b = new Vector2(unit.Position + (Vector2.UnitY * 10));
-                Vector2 c = new Vector2(unit.Position - (Vector2.UnitX * 10));
+                /*Vector2 a = new Vector2(unit.Origin + (Vector2.UnitX * 10));
+                Vector2 b = new Vector2(unit.Origin + (Vector2.UnitY * 10));
+                Vector2 c = new Vector2(unit.Origin - (Vector2.UnitX * 10));
 				
                 context.FillTriangle(a, b, c);*/
 

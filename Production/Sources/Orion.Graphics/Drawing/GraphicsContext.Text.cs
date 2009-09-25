@@ -18,12 +18,14 @@ namespace Orion.Graphics.Drawing
         public void DrawTextInView(string text, View view)
         {
             printer.Begin();
-            GL.Translate(view.Frame.Position.X, view.Frame.Position.Y, 0);
+            GL.Translate(view.Frame.Origin.X, view.Frame.Origin.Y, 0);
             printer.Print(text, sans_serif, Color.Black);
             printer.End();
         }*/
 
         // ----------------------------------------------------------------------------------
+
+        /*
 
         // Crée un TextPrinter à chaque opération de dessin.
         // Utilise la property 'Font' comme font à utiliser dans la méthode Print.
@@ -38,5 +40,7 @@ namespace Orion.Graphics.Drawing
         //  (si possible à la mode de ceux des autres méthodes de la classe).
 
         // merci :)
+         * 
+         * */
     }
 }

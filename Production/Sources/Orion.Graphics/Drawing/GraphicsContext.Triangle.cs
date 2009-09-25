@@ -57,7 +57,7 @@ namespace Orion.Graphics.Drawing
         /// <param name="c">Third control point</param>
 		public void StrokeTriangle(Vector2 a, Vector2 b, Vector2 c)
 		{
-			GL.Begin(BeginMode.LineStrip);
+			GL.Begin(BeginMode.LineLoop);
 			DrawTriangle(a, b, c);
 			GL.End();
 		}

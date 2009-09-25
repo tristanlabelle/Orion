@@ -17,7 +17,7 @@ namespace Orion.Graphics.Drawing
     public partial class GraphicsContext
     {
         /// <summary>
-        /// The bounds of the local coordinates system. 
+        /// The bounds of the local coordinates parentSystem. 
         /// </summary>
         public Rectangle CoordsSystem { get; set; }
 		
@@ -37,24 +37,25 @@ namespace Orion.Graphics.Drawing
 		}
 
         /// <summary>
-        /// Constructs a GraphicsContext object with given bounds for its local coordinates system. 
+        /// Constructs a GraphicsContext object with given bounds for its local coordinates parentSystem. 
         /// </summary>
         /// <param name="bounds">
-        /// The <see cref="Rectangle"/> defining the local coordinates system
+        /// The <see cref="Rectangle"/> defining the local coordinates parentSystem
         /// </param>
         internal GraphicsContext(Rectangle bounds)
         {
             CoordsSystem = bounds;
         }
 
-        internal void SetUpGLContext(Rectangle system)
+        internal void SetUpGLContext(Rectangle parentSystem)
         {
             GL.PushMatrix();
-			
-            GL.Scale(system.Size.X / CoordsSystem.Size.X, system.Size.Y / CoordsSystem.Size.Y, 1);
-            GL.Translate(system.Position.X, system.Position.Y, 0);
-            GL.Translate(-CoordsSystem.Position.X, -CoordsSystem.Position.Y, 0);
 
+            // I'm not quite sure about the transformation order.
+            // If something weird happens in the bounds scaling/translating, check this first.
+            GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
+            GL.Scale(parentSystem.Size.X / CoordsSystem.Size.X, parentSystem.Size.Y / CoordsSystem.Size.Y, 1);
+            GL.Translate(-CoordsSystem.Origin.X, -CoordsSystem.Origin.Y, 0);
         }
 
         internal void RestoreGLContext()

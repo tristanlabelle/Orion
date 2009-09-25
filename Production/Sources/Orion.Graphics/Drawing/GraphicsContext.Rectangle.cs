@@ -49,14 +49,14 @@ namespace Orion.Graphics.Drawing
         /// <param name="rectangle">The <see href="Rectangle"/> structure to fill onscreen</param>
 		public void StrokeRect(Rectangle rectangle)
 		{
-			GL.Begin(BeginMode.LineStrip);
+			GL.Begin(BeginMode.LineLoop);
 			DrawRect(rectangle);
 			GL.End();
 		}
 		
 		private void DrawRect(Rectangle rectangle)
 		{
-            Vector2 coords = rectangle.Position;
+            Vector2 coords = rectangle.Origin;
             GL.Vertex2(coords);
             coords.Y += rectangle.Size.Y;
             GL.Vertex2(coords);

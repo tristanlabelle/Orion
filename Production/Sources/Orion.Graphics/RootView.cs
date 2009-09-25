@@ -17,15 +17,13 @@ namespace Orion.Graphics
     /// </summary>
     class RootView : View
     {
-        Rectangle frameStore;
-
         public override Rectangle Frame
         {
-            get { return frameStore; }
+            get { return base.Frame; }
             set
             {
-                frameStore = value;
-                GL.Viewport(0, 0, (int)frameStore.Size.X, (int)frameStore.Size.Y);
+                base.Frame = value;
+                ResetViewport();
             }
         }
 
@@ -38,11 +36,7 @@ namespace Orion.Graphics
             : base(frame)
         {
             Bounds = bounds;
-            GL.Viewport(0, 0, (int)frame.Size.X, (int)frame.Size.Y);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, 1024, 0, 768, -1, 1);
-            GL.MatrixMode(MatrixMode.Modelview);
+            ResetViewport();
         }
 
         /// <summary>
@@ -58,7 +52,22 @@ namespace Orion.Graphics
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
 
-            base.Render();
+            Draw(Context);
+
+            foreach (View view in Subviews)
+            {
+                view.Render();
+            }
+        }
+
+        private void ResetViewport()
+        {
+            Rectangle bounds = Bounds;
+            GL.Viewport(0, 0, (int)Frame.Size.X, (int)Frame.Size.Y);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(bounds.Origin.X, bounds.Size.X, bounds.Origin.Y, bounds.Size.Y, -1, 1);
+            GL.MatrixMode(MatrixMode.Modelview);
         }
     }
 }

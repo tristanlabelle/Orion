@@ -17,14 +17,14 @@ namespace Orion.Graphics
     /// When rendering, a View will first render itself, then render all of its subviews.
     /// </summary>
     /// <remarks>
-    /// Views use a first-quadrant system coordinates, which means the origin is at the bottom left corner.
+    /// Views use a first-quadrant parentSystem coordinates, which means the origin is at the bottom left corner.
     /// </remarks>
     public abstract class View
     {
         #region Fields
         private View parent;
         private readonly ViewChildrenCollection children;
-        private Orion.Graphics.Drawing.GraphicsContext Context;
+        internal Orion.Graphics.Drawing.GraphicsContext Context;
         #endregion
 
         #region Constructors
@@ -88,7 +88,7 @@ namespace Orion.Graphics
         public virtual Rectangle Frame { get; set; }
 
         /// <summary>
-        /// The internal coordinates system rectangle used for drawing.
+        /// The internal coordinates parentSystem rectangle used for drawing.
         /// </summary>
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds
@@ -162,19 +162,19 @@ namespace Orion.Graphics
             GL.GetFloat(GetPName.ModelviewMatrix, out transformMatrix);
             Vector2 coords = Vector4.Transform(eventCoords, transformMatrix).Xy;
 
-            bool eventSinking = true;
+            bool eventCanSink = true;
             foreach (View subview in Enumerable.Reverse(children))
             {
                 if (subview.Frame.ContainsPoint(coords))
                 {
-                    eventSinking = subview.PropagateMouseEvent(eventType, args);
+                    eventCanSink = subview.PropagateMouseEvent(eventType, args);
                     break;
                 }
             }
 
             Context.RestoreGLContext();
 
-            if (eventSinking)
+            if (eventCanSink)
             {
                 return DispatchMouseEvent(eventType, args);
             }
@@ -267,13 +267,15 @@ namespace Orion.Graphics
         internal virtual void Render()
         {
             Context.SetUpGLContext(Frame);
+
             Draw(Context);
-            Context.RestoreGLContext();
 
             foreach (View view in children)
             {
                 view.Render();
             }
+
+            Context.RestoreGLContext();
         }
         #endregion
         #endregion

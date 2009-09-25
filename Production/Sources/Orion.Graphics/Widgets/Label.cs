@@ -28,7 +28,7 @@ namespace Orion.Graphics.Widgets
 
         protected override void Draw(GraphicsContext context)
         {
-            context.DrawTextInView("bla", this);
+            //context.DrawTextInView("bla", this);
         }
     }
 }

@@ -21,9 +21,49 @@ namespace Orion.Graphics
     /// </remarks>
     public abstract class View
     {
+        #region Fields
         private List<View> subviewsList;
         private Orion.Graphics.Drawing.GraphicsContext Context;
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructs a view with a given frame. 
+        /// </summary>
+        /// <param name="frame">
+        /// The <see cref="Rectangle"/> that will be this object's Frame and (by default) Bounds
+        /// </param>
+        public View(Rectangle frame)
+        {
+            Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
+            subviewsList = new List<View>();
+            Frame = frame;
+        }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// The event triggered when the user presses the left button of the mouse while positioned over the view
+        /// </summary>
+        public event GenericEventHandler<View, MouseEventArgs> MouseDown;
+
+        /// <summary>
+        /// The event triggered when the user releases the left button of the mouse while positioned over the view
+        /// </summary>
+        public event GenericEventHandler<View, MouseEventArgs> MouseUp;
+
+        /// <summary>
+        /// The event triggered when the used presses and releases the mouse button
+        /// </summary>
+        public event GenericEventHandler<View, MouseEventArgs> MouseClicked;
+
+        /// <summary>
+        /// The event triggered when the user moves the mouse over the view
+        /// </summary>
+        public event GenericEventHandler<View, MouseEventArgs> MouseMoved;
+        #endregion
+
+        #region Properties
         /// <summary>
         /// The superview of this view. 
         /// </summary>
@@ -61,42 +101,10 @@ namespace Orion.Graphics
                 Context.CoordsSystem = value;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// The event triggered when the user presses the left button of the mouse while positioned over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseDown;
-
-        /// <summary>
-        /// The event triggered when the user releases the left button of the mouse while positioned over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseUp;
-
-        /// <summary>
-        /// The event triggered when the used presses and releases the mouse button
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseClicked;
-
-        /// <summary>
-        /// The event triggered when the user moves the mouse over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseMoved;
-
-        /// <summary>
-        /// Constructs a view with a given frame. 
-        /// </summary>
-        /// <param name="frame">
-        /// The <see cref="Rectangle"/> that will be this object's Frame and (by default) Bounds
-        /// </param>
-        public View(Rectangle frame)
-        {
-            Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
-            subviewsList = new List<View>();
-            Frame = frame;
-        }
-
+        #region Methods
         #region View Hierarchy
-
         /// <summary>
         /// Inserts the given view in the view hierarchy under this one. 
         /// </summary>
@@ -173,7 +181,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Event handling
-
         /// <summary>
         /// Propagates a mouse event to the subviews.
         /// Events are propagated in a bottom-up order, but priority of execution is given in a up-bottom order (that we will call "event sinking").
@@ -235,7 +242,7 @@ namespace Orion.Graphics
         /// <returns>True if event sinking is allowed; false otherwise</returns>
         protected internal virtual bool OnMouseClick(MouseEventArgs args)
         {
-            HandleEvent(MouseClicked, args);
+            InvokeEventHandlers(MouseClicked, args);
             return true;
         }
 
@@ -246,7 +253,7 @@ namespace Orion.Graphics
         /// <returns>True if event sinking is allowed; false otherwise</returns>
         protected internal virtual bool OnMouseDown(MouseEventArgs args)
         {
-            HandleEvent(MouseDown, args);
+            InvokeEventHandlers(MouseDown, args);
             return true;
         }
 
@@ -257,7 +264,7 @@ namespace Orion.Graphics
         /// <returns>True if event sinking is allowed; false otherwise</returns>
         protected internal virtual bool OnMouseMove(MouseEventArgs args)
         {
-            HandleEvent(MouseMoved, args);
+            InvokeEventHandlers(MouseMoved, args);
             return true;
         }
 
@@ -268,20 +275,20 @@ namespace Orion.Graphics
         /// <returns>True if event sinking is allowed; false otherwise</returns>
         protected internal virtual bool OnMouseUp(MouseEventArgs args)
         {
-            HandleEvent(MouseUp, args);
+            InvokeEventHandlers(MouseUp, args);
             return true;
         }
 
-        private void HandleEvent(GenericEventHandler<View, MouseEventArgs> handler, MouseEventArgs args)
+        private void InvokeEventHandlers(GenericEventHandler<View, MouseEventArgs> handler, MouseEventArgs args)
         {
             if (handler != null)
             {
                 handler(this, args);
             }
         }
-
         #endregion
 
+        #region Drawing
         /// <summary>
         /// Renders the view inside the passed <see cref="Orion.Graphics.Drawing.GraphicsContext"/> object.
         /// </summary>
@@ -304,5 +311,7 @@ namespace Orion.Graphics
                 view.Render();
             }
         }
+        #endregion
+        #endregion
     }
 }

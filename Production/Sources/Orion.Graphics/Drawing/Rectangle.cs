@@ -9,7 +9,10 @@ using OpenTK.Graphics;
 
 namespace Orion.Graphics.Drawing
 {
-    class Rectangle : IDrawable
+	/// <summary>
+	/// This class is used to draw a rectangle. 
+	/// </summary>
+    sealed public class Rectangle : IDrawable
     {
         public readonly Rect Zone;
         public readonly System.Drawing.Color Color;
@@ -36,6 +39,7 @@ namespace Orion.Graphics.Drawing
 
         private void Render()
         {
+			GL.Color3(Color);
             Vector2 coords = Zone.Position;
             GL.Vertex2(coords);
             coords.Y += Zone.Size.Y;

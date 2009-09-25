@@ -35,9 +35,10 @@ namespace Orion.GameLogic
         public abstract void Update(float timeDelta);
 
         /// <summary>
-        /// Aborts this <see cref="Task"/>, indicating that it will no longer be used.
+        /// Called when this <see cref="Task"/> has been cancelled by a <see cref="Unit"/> using it.
         /// </summary>
-        public virtual void Abort() { }
+        /// <param name="unit">The <see cref="Unit"/> that cancelled this <see cref="Task"/>.</param>
+        internal virtual void OnCancelled(Unit unit) { }
 
         public override sealed string ToString()
         {

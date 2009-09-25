@@ -124,10 +124,7 @@ namespace Orion.GameLogic
             set
             {
                 Argument.EnsureNotNull(value, "Task");
-
-                if (task.HasEnded)
-                    task.Abort();
-              
+                if (!task.HasEnded) task.OnCancelled(this);
                 task = value;
             }
         }

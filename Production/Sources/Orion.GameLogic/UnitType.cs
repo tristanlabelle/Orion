@@ -39,6 +39,14 @@ namespace Orion.GameLogic
         {
             get { return tags; }
         }
+
+        /// <summary>
+        /// Gets the speed at which <see cref="Unit"/>s with this <see cref="UnitType"/> move.
+        /// </summary>
+        public float MovementSpeed
+        {
+            get { return 1; }
+        }
         #endregion
 
         #region Methods

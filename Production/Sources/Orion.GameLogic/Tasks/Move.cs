@@ -37,7 +37,7 @@ namespace Orion.GameLogic.Tasks
         #region Properties
         public override bool HasEnded
         {
-            get { return (unit.Position - destination).Length <= stopDistance; }
+            get { return (unit.Position - destination).Length <= 0.01f; }
         }
 
         public override string Description
@@ -55,18 +55,11 @@ namespace Orion.GameLogic.Tasks
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
-            float distance = speed * timeDelta;
-            if (distance > delta.Length) distance = delta.Length;
+            float distance = unit.Type.MovementSpeed * timeDelta;
+            if (distance < delta.Length) unit.Position += direction * distance;
+            else unit.Position = destination;
 
-            unit.Position += direction * distance;
         }
-        #endregion
-
-        #region Static
-        #region Fields
-        private const float stopDistance = 1.0f;
-        private const float speed = 1.0f;
-        #endregion
         #endregion
     }
 }

@@ -11,6 +11,7 @@ namespace Orion
     /// and a size vector (<see cref="Rectangle.Width"/> and <see cref="Rectangle.Height"/>). They can be
     /// intersected, translated and resized.
     /// </summary>
+    [Serializable]
 	public struct Rectangle
 	{
 		#region Fields

@@ -21,33 +21,33 @@ namespace Orion.Graphics
     /// </remarks>
     public abstract class View
     {
-		private List<View> subviewsList;
-		private Orion.Graphics.Drawing.GraphicsContext Context;
-		
-		/// <summary>
-		/// The superview of this view. 
-		/// </summary>
-		public View Superview { get; private set; }
-		
-		/// <summary>
-		/// The list of subviews this view has. 
-		/// </summary>
-		public IEnumerable<View> Subviews
-		{
-			get
-			{
-				return subviewsList.ToArray();
-			}
-		}
-		
-		/// <summary>
-		/// The rectangle in which this view appears in its superview. May be different from the bounds.
-		/// </summary>
-		public virtual Rectangle Frame { get; set; }
-		
-		/// <summary>
-		/// The internal coordinates system rectangle used for drawing.
-		/// </summary>
+        private List<View> subviewsList;
+        private Orion.Graphics.Drawing.GraphicsContext Context;
+
+        /// <summary>
+        /// The superview of this view. 
+        /// </summary>
+        public View Superview { get; private set; }
+
+        /// <summary>
+        /// The list of subviews this view has. 
+        /// </summary>
+        public IEnumerable<View> Subviews
+        {
+            get
+            {
+                return subviewsList.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// The rectangle in which this view appears in its superview. May be different from the bounds.
+        /// </summary>
+        public virtual Rectangle Frame { get; set; }
+
+        /// <summary>
+        /// The internal coordinates system rectangle used for drawing.
+        /// </summary>
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds
         {
@@ -81,93 +81,93 @@ namespace Orion.Graphics
         /// The event triggered when the user moves the mouse over the view
         /// </summary>
         public event GenericEventHandler<View, MouseEventArgs> MouseMoved;
-		
-		/// <summary>
-		/// Constructs a view with a given frame. 
-		/// </summary>
-		/// <param name="frame">
-		/// The <see cref="Rectangle"/> that will be this object's Frame and (by default) Bounds
-		/// </param>
-		public View(Rectangle frame)
-		{
-			Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
-			subviewsList = new List<View>();
-			Frame = frame;
+
+        /// <summary>
+        /// Constructs a view with a given frame. 
+        /// </summary>
+        /// <param name="frame">
+        /// The <see cref="Rectangle"/> that will be this object's Frame and (by default) Bounds
+        /// </param>
+        public View(Rectangle frame)
+        {
+            Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
+            subviewsList = new List<View>();
+            Frame = frame;
         }
 
         #region View Hierarchy
 
         /// <summary>
-		/// Inserts the given view in the view hierarchy under this one. 
-		/// </summary>
-		/// <param name="view">
-		/// A <see cref="View"/>
-		/// </param>
-		/// <exception cref="ArgumentException">
-		/// If the passed view already has a superview, or if the passed view contains this view somewhere down its hierarchy
-		/// </exception>
-		public void AddSubview(View view)
-		{
-			if(view.Superview != null)
-			{
-				throw new ArgumentException("Cannot add as a subview a view that's already in another superview");
-			}
-			
-			if(view.ContainsSubview(this))
-			{
-				throw new ArgumentException("Cannot add a view as a subview to itself");
-			}
-			
-			view.Superview = this;
-			subviewsList.Add(view);
-		}
-		
-		/// <summary>
-		/// Removes a directly descendant view of this object from the view hierarchy. 
-		/// </summary>
-		/// <param name="subview">
-		/// The direct descendant <see cref="View"/>
-		/// </param>
-		/// <exception cref="System.ArgumentException">
-		/// If the passed view is not a direct descendant of this one
-		/// </exception> 
-		public void RemoveSubview(View subview)
-		{
-			if(subview.Superview != this)
-			{
-				throw new ArgumentException("Cannot remove a subview whose superview is not this object");
-			}
-			
-			subviewsList.Remove(subview);
-			subview.Superview = null;
-		}
-		
-		/// <summary>
-		/// Removes the object from the view hierarchy. 
-		/// </summary>
-		public void RemoveFromSuperview()
-		{
-			Superview.RemoveSubview(this);
-		}
-		
-		/// <summary>
-		/// Indicates if the passed view is a descendant of this one. 
-		/// </summary>
-		/// <param name="view">
-		/// The supposedly child view <see cref="View"/>
-		/// </param>
-		/// <returns>
-		/// True if the passed view the same one as this one, or if it is under this one in the view hierarchy, false otherwise
-		/// </returns>
-		public bool ContainsSubview(View view)
-		{
-			while(view != null)
-			{
-				if(view == this)
-					return true;
-				view = view.Superview;
-			}
-			return false;
+        /// Inserts the given view in the view hierarchy under this one. 
+        /// </summary>
+        /// <param name="view">
+        /// A <see cref="View"/>
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// If the passed view already has a superview, or if the passed view contains this view somewhere down its hierarchy
+        /// </exception>
+        public void AddSubview(View view)
+        {
+            if (view.Superview != null)
+            {
+                throw new ArgumentException("Cannot add as a subview a view that's already in another superview");
+            }
+
+            if (view.ContainsSubview(this))
+            {
+                throw new ArgumentException("Cannot add a view as a subview to itself");
+            }
+
+            view.Superview = this;
+            subviewsList.Add(view);
+        }
+
+        /// <summary>
+        /// Removes a directly descendant view of this object from the view hierarchy. 
+        /// </summary>
+        /// <param name="subview">
+        /// The direct descendant <see cref="View"/>
+        /// </param>
+        /// <exception cref="System.ArgumentException">
+        /// If the passed view is not a direct descendant of this one
+        /// </exception> 
+        public void RemoveSubview(View subview)
+        {
+            if (subview.Superview != this)
+            {
+                throw new ArgumentException("Cannot remove a subview whose superview is not this object");
+            }
+
+            subviewsList.Remove(subview);
+            subview.Superview = null;
+        }
+
+        /// <summary>
+        /// Removes the object from the view hierarchy. 
+        /// </summary>
+        public void RemoveFromSuperview()
+        {
+            Superview.RemoveSubview(this);
+        }
+
+        /// <summary>
+        /// Indicates if the passed view is a descendant of this one. 
+        /// </summary>
+        /// <param name="view">
+        /// The supposedly child view <see cref="View"/>
+        /// </param>
+        /// <returns>
+        /// True if the passed view the same one as this one, or if it is under this one in the view hierarchy, false otherwise
+        /// </returns>
+        public bool ContainsSubview(View view)
+        {
+            while (view != null)
+            {
+                if (view == this)
+                    return true;
+                view = view.Superview;
+            }
+            return false;
         }
 
         #endregion
@@ -274,32 +274,35 @@ namespace Orion.Graphics
 
         private void HandleEvent(GenericEventHandler<View, MouseEventArgs> handler, MouseEventArgs args)
         {
-            handler(this, args);
+            if (handler != null)
+            {
+                handler(this, args);
+            }
         }
 
         #endregion
 
         /// <summary>
         /// Renders the view inside the passed <see cref="Orion.Graphics.Drawing.GraphicsContext"/> object.
-		/// </summary>
-		/// <param name="context">
+        /// </summary>
+        /// <param name="context">
         /// A <see cref="Orion.Graphics.Drawing.GraphicsContext"/> on which the view can operate to render itself
-		/// </param>
-		protected abstract void Draw(Orion.Graphics.Drawing.GraphicsContext context);
-		
-		/// <summary>
-		/// Renders the view hierarchy. 
-		/// </summary>
-		internal virtual void Render()
-		{
-			Context.SetUpGLContext(Frame);
-			Draw(Context);
-			Context.RestoreGLContext();
-			
-			foreach(View view in subviewsList)
-			{
-				view.Render();
-			}
-		}
+        /// </param>
+        protected abstract void Draw(Orion.Graphics.Drawing.GraphicsContext context);
+
+        /// <summary>
+        /// Renders the view hierarchy. 
+        /// </summary>
+        internal virtual void Render()
+        {
+            Context.SetUpGLContext(Frame);
+            Draw(Context);
+            Context.RestoreGLContext();
+
+            foreach (View view in subviewsList)
+            {
+                view.Render();
+            }
+        }
     }
 }

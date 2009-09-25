@@ -64,7 +64,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootView.cs" />
     <Compile Include="TerrainView.cs" />
-    <Compile Include="UIManager.cs" />
     <Compile Include="UnitView.cs" />
     <Compile Include="View.cs" />
     <Compile Include="Widgets\Button.cs" />

@@ -17,18 +17,18 @@ namespace Orion.Graphics
     /// </summary>
     class RootView : View
     {
-		Rectangle frameStore;
-		
-		public override Rectangle Frame
-		{
-			get { return frameStore; }
-			set
-			{
-				frameStore = value;
-            		GL.Viewport(0, 0, (int)frameStore.Size.X, (int)frameStore.Size.Y);
-			}
-		}
-		
+        Rectangle frameStore;
+
+        public override Rectangle Frame
+        {
+            get { return frameStore; }
+            set
+            {
+                frameStore = value;
+                GL.Viewport(0, 0, (int)frameStore.Size.X, (int)frameStore.Size.Y);
+            }
+        }
+
         /// <summary>
         /// Creates a RootView object with a frame and bounds.
         /// </summary>

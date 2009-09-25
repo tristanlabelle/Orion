@@ -9,16 +9,16 @@ using System.Windows.Forms;
 
 namespace Orion.Graphics
 {
-	/// <summary>
-	/// The base game window class. 
-	/// </summary>
+    /// <summary>
+    /// The base game window class. 
+    /// </summary>
     public partial class Window : Form
     {
         private View rootView;
 
-		/// <summary>
-		/// Instantiates a new game window. 
-		/// </summary>
+        /// <summary>
+        /// Instantiates a new game window. 
+        /// </summary>
         public Window()
         {
             InitializeComponent();
@@ -50,9 +50,9 @@ namespace Orion.Graphics
             }
         }
 
-		/// <summary>
-		/// Executes the test program. Creates a game window and runs it. 
-		/// </summary>
+        /// <summary>
+        /// Executes the test program. Creates a game window and runs it. 
+        /// </summary>
         public static void Main()
         {
             Application.EnableVisualStyles();

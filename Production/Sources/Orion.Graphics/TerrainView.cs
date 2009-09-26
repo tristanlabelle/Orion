@@ -32,7 +32,7 @@ namespace Orion.Graphics
             }
 
             Frame panel = new Frame(new Rectangle(50, 50, 100, 100));
-            AddSubview(panel);
+            Children.Add(panel);
         }
 
         protected override void Draw(GraphicsContext context)

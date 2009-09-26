@@ -54,10 +54,8 @@ namespace Orion.Graphics
 
             Draw(Context);
 
-            foreach (View view in Subviews)
-            {
-                view.Render();
-            }
+            foreach (View child in Children)
+                child.Render();
         }
 
         private void ResetViewport()

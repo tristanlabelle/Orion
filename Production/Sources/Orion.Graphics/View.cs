@@ -132,7 +132,7 @@ namespace Orion.Graphics
         public bool IsAncestorOf(View other)
         {
             Argument.EnsureNotNull(other, "other");
-            return other.IsAncestorOf(this);
+            return other.IsDescendantOf(this);
         }
 
         /// <summary>

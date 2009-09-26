@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-using Orion.Graphics.Drawing;
-
 namespace Orion.Graphics.Widgets
 {
     class Frame : View
@@ -14,11 +12,11 @@ namespace Orion.Graphics.Widgets
             : base(frame)
         { }
 
-        protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
+        protected override void Draw(GraphicsContext context)
         {
-			context.Color = Color.White;
+			context.FillColor = Color.White;
+            context.StrokeColor = Color.Black;
 			context.FillRect(Bounds);
-			context.Color = Color.Black;
 			context.StrokeRect(Bounds);
         }
     }

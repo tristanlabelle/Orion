@@ -7,66 +7,34 @@ using OpenTK.Math;
 namespace Orion
 {
     /// <summary>
-    /// A Rectangle instance encapsulates an origin vector (<see cref="Rectangle.X"/> and <see cref="Rectangle.Y"/>)
-    /// and a size vector (<see cref="Rectangle.Width"/> and <see cref="Rectangle.Height"/>). They can be
-    /// intersected, translated and resized.
+    /// Represents a rectangular shape using an origin vector (<see cref="P:Origin"/>)
+    /// and a size vector (<see cref="P:Size"/>). Instances of this structure are immutable.
     /// </summary>
     [Serializable]
 	public struct Rectangle
-	{
-		#region Fields
-		#region Static
-		
+    {
+        #region Instance
+        #region Fields
 		/// <summary>
-		/// An empty rectangle (origin, width and height are all zeroed).
+		/// The position of the rectangle.
 		/// </summary>
-		public static readonly Rectangle EmptyRect = new Rectangle(0, 0, 0, 0);
-		#endregion
-		
-		/// <summary>
-		/// The position of the rectangle
-		/// </summary>
-		public readonly Vector2 Origin;
+        /// <remarks>
+        /// Encapsulated as <see cref="Vector2"/> is not immutable,
+        /// and <c>readonly</c> sadly cannot change this fact.
+        /// </remarks>
+        private readonly Vector2 origin;
 
 		/// <summary>
-		/// The size of the rectangle (X is the width, and Y is the height)
-		/// </summary>
-		public readonly Vector2 Size;
+		/// The size of the rectangle (X is the width, and Y is the height).
+        /// </summary>
+        /// <remarks>
+        /// Encapsulated as <see cref="Vector2"/> is not immutable,
+        /// and <c>readonly</c> sadly cannot change this fact.
+        /// </remarks>
+        private readonly Vector2 size;
 		#endregion
-		
-		#region Propeties
-		
-		/// <summary>
-		/// The origin abscissa of the rectangle
-		/// </summary>
-		public float X { get { return Origin.X; } }
-		/// <summary>
-		/// The origin ordinate of the rectangle
-		/// </summary>
-		public float Y { get { return Origin.Y; } }
-		/// <summary>
-		/// The width of the rectangle
-		/// </summary>
-		public float Width { get { return Size.X; } }
-		/// <summary>
-		/// The height of the rectangle
-		/// </summary>
-		public float Height { get { return Size.Y; } }
-		
-		/// <summary>
-		/// The second X coordinate of the rectangle (origin's abscissa plus width) 
-		/// </summary>
-		public float MaxX { get { return X + Width; } }
-		
-		/// <summary>
-		/// The second Y coordinate of the rectangle (origin's ordinate plus height) 
-		/// </summary>
-		public float MaxY { get { return Y + Height; } }
-		#endregion
-		
-		#region Public Methods
-		#region Constructors
 
+        #region Constructors
         /// <summary>
         /// Constructs a Rectangle object with a given width and height. The origin is set to zero.
         /// </summary>
@@ -75,68 +43,163 @@ namespace Orion
         public Rectangle(float width, float height)
             : this(new Vector2(width, height))
         { }
-		
-		/// <summary>
-		/// Constructs a Rectangle object with a given size. The origin is set to zero. 
+
+        /// <summary>
+        /// Constructs a Rectangle object with a given size. The origin is set to zero. 
+        /// </summary>
+        /// <param name="size">
+        /// A <see cref="Vector2"/> representing the size of the rectangle
+        /// </param>
+        public Rectangle(Vector2 size)
+            : this(new Vector2(0, 0), size)
+        { }
+
+        /// <summary>
+        /// Constructs a Rectangle object with a given X and Y origin, and Width and Height parameters.
+        /// </summary>
+        /// <param name="x">
+        /// A <see cref="System.Single"/> specifying the abscissa of the origin
+        /// </param>
+        /// <param name="y">
+        /// A <see cref="System.Single"/> specifying the ordinate of the origin
+        /// </param>
+        /// <param name="width">
+        /// A <see cref="System.Single"/> specifying the width of the rectangle
+        /// </param>
+        /// <param name="height">
+        /// A <see cref="System.Single"/> specifying the height of the rectangle
+        /// </param>
+        public Rectangle(float x, float y, float width, float height)
+            : this(new Vector2(x, y), new Vector2(width, height))
+        { }
+
+        /// <summary>
+        /// Constructs a Rectangle object with a given origin and size.
+        /// </summary>
+        /// <param name="position">
+        /// A <see cref="Vector2"/> representing the origin of the rectangle
+        /// </param>
+        /// <param name="size">
+        /// A <see cref="Vector2"/> representing the size of the rectangle
+        /// </param>
+        public Rectangle(Vector2 position, Vector2 size)
+        {
+            // size must never be negative! this would break so many things.
+            // the origin must always be the bottom left corner; reajust rectangles so they match this rule if necessary
+            if (size.X < 0)
+            {
+                position.X += size.X;
+                size.X *= -1;
+            }
+
+            if (size.Y < 0)
+            {
+                position.Y += size.Y;
+                size.Y *= -1;
+            }
+
+            this.size = size;
+            this.origin = position;
+        }
+        #endregion
+
+        #region Properties
+        #region Coordinates
+        /// <summary>
+        /// Gets the origin of this <see cref="Rectangle"/>.
+        /// </summary>
+        public Vector2 Origin
+        {
+            get { return origin; }
+        }
+
+        /// <summary>
+		/// Gets the origin abscissa of the rectangle.
 		/// </summary>
-		/// <param name="size">
-		/// A <see cref="Vector2"/> representing the size of the rectangle
-		/// </param>
-		public Rectangle(Vector2 size)
-			: this(new Vector2(0, 0), size)
-		{ }
+		public float X
+        {
+            get { return origin.X; }
+        }
 
 		/// <summary>
-		/// Constructs a Rectangle object with a given X and Y origin, and Width and Height parameters.
+		/// Gets the origin ordinate of the rectangle.
 		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Single"/> specifying the abscissa of the origin
-		/// </param>
-		/// <param name="y">
-		/// A <see cref="System.Single"/> specifying the ordinate of the origin
-		/// </param>
-		/// <param name="width">
-		/// A <see cref="System.Single"/> specifying the width of the rectangle
-		/// </param>
-		/// <param name="height">
-		/// A <see cref="System.Single"/> specifying the height of the rectangle
-		/// </param>
-		public Rectangle(float x, float y, float width, float height)
-			: this(new Vector2(x, y), new Vector2(width, height))
-		{ }
-		
-		/// <summary>
-		/// Constructs a Rectangle object with a given origin and size.
-		/// </summary>
-		/// <param name="position">
-		/// A <see cref="Vector2"/> representing the origin of the rectangle
-		/// </param>
-		/// <param name="size">
-		/// A <see cref="Vector2"/> representing the size of the rectangle
-		/// </param>
-		public Rectangle(Vector2 position, Vector2 size)
-		{
-			Size = size;
-			Origin = position;
-			
-			// size must never be negative! this would break so many things.
-			// the origin must always be the bottom left corner; reajust rectangles so they match this rule if necessary
-			if(Size.X < 0)
-			{
-				Origin.X += Size.X;
-				Size.X *= -1;
-			}
-			
-			if(Size.Y < 0)
-			{
-				Origin.Y += Size.Y;
-				Size.Y *= -1;
-			}
-		}
+		public float Y
+        {
+            get { return origin.Y; }
+        }
+
+        /// <summary>
+        /// Gets the coordinates of the center of this <see cref="Rectangle"/>.
+        /// </summary>
+        public Vector2 Center
+        {
+            get { return origin + Extent; }
+        }
+
+        /// <summary>
+        /// Gets the coordinates of the corner of this <see cref="Rectangle"/> at the opposite of its origin.
+        /// </summary>
+        public Vector2 Max
+        {
+            get { return origin + size; }
+        }
+
+        /// <summary>
+        /// The second X coordinate of this <see cref="Rectangle"/> (origin's abscissa plus width).
+        /// </summary>
+        public float MaxX
+        {
+            get { return X + Width; }
+        }
+
+        /// <summary>
+        /// The second Y coordinate of this <see cref="Rectangle"/> (origin's ordinate plus height).
+        /// </summary>
+        public float MaxY
+        {
+            get { return Y + Height; }
+        }
+        #endregion
+
+        #region Size
+        /// <summary>
+        /// Gets the width of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float Width
+        {
+            get { return size.X; }
+        }
+
+        /// <summary>
+        /// Gets the height of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float Height
+        {
+            get { return size.Y; }
+        }
+
+        /// <summary>
+        /// Gets the size of this <see cref="Rectangle"/>.
+        /// </summary>
+        public Vector2 Size
+        {
+            get { return size; }
+        } 
+
+        /// <summary>
+        /// Gets the extent (half-size vector) of this <see cref="Rectangle"/>.
+        /// </summary>
+        public Vector2 Extent
+        {
+            get { return size * 0.5f; }
+        }
+        #endregion
 		#endregion
-		
+
+        #region Methods
+        #region Public
 		#region Hit Testing
-		
 		/// <summary>
 		/// Indicates if the rectangle contains a point.
 		/// </summary>
@@ -165,13 +228,12 @@ namespace Orion
 		/// </returns>
 		public bool ContainsPoint(Vector2 point)
 		{
-			return point.X.IsBetween(X, MaxX) && point.Y.IsBetween(Y, MaxY);
+            return point.X >= X && point.X <= MaxX
+                && point.Y >= Y && point.Y <= MaxY;
 		}
-		
 		#endregion
 		
-		#region Intersecting
-		
+		#region Intersection
 		/// <summary>
 		/// Indicates if this rectangle intersects with another one.
 		/// </summary>
@@ -183,7 +245,7 @@ namespace Orion
 		/// </returns>
 		public bool Intersects(Rectangle otherRect)
 		{
-			return ContainsPoint(otherRect.Origin) || otherRect.ContainsPoint(this.Origin);
+			return ContainsPoint(otherRect.origin) || otherRect.ContainsPoint(this.origin);
 		}
 		
 		/// <summary>
@@ -193,24 +255,22 @@ namespace Orion
 		/// The <see cref="Rectangle"/> with which we want this rectangle to intersect
 		/// </param>
 		/// <returns>
-		/// The intersection <see cref="Rectangle"/> of both rectangles, or <see cref="Rectangle.EmptyRect"/> if they don't intersect
+		/// The intersection <see cref="Rectangle"/> of both rectangles,
+        /// or <c>null</c> if they do not intersect.
 		/// </returns>
-		public Rectangle Intersection(Rectangle otherRect)
+		public Rectangle? Intersection(Rectangle otherRect)
 		{
-			if(ContainsPoint(otherRect.Origin))
-			{
-				return OnewayIntersection(otherRect);
-			}
-			if(otherRect.ContainsPoint(this.Origin))
-			{
-				return otherRect.OnewayIntersection(this);
-			}
-			return EmptyRect;
+			if (ContainsPoint(otherRect.origin))
+                return OnewayIntersection(otherRect);
+		    
+			if (otherRect.ContainsPoint(this.origin))
+                return otherRect.OnewayIntersection(this);
+
+			return null;
 		}
 		#endregion
 		
-		#region Translating
-		
+		#region Translation
 		/// <summary>
 		/// Returns a new rectangle translated by the specified units.
 		/// </summary>
@@ -239,7 +299,7 @@ namespace Orion
 		/// </returns>
 		public Rectangle Translate(Vector2 direction)
 		{
-			return TranslateTo(Origin + direction);
+			return TranslateTo(origin + direction);
 		}
 		
 		/// <summary>
@@ -255,7 +315,6 @@ namespace Orion
 		{
 			return Translate(x, 0);
 		}
-		
 		
 		/// <summary>
 		/// Creates a new rectangle whose ordinate is translated by the specified units
@@ -299,12 +358,11 @@ namespace Orion
 		/// </returns>
 		public Rectangle TranslateTo(Vector2 origin)
 		{
-			return new Rectangle(origin, Size);
+			return new Rectangle(origin, size);
 		}
 		#endregion
 		
 		#region Resizing
-		
 		/// <summary>
 		/// Creates a new rectangle resized by the specified values.
 		/// </summary>
@@ -333,7 +391,7 @@ namespace Orion
 		/// </returns>
 		public Rectangle Resize(Vector2 sizeChange)
 		{
-			return ResizeTo(Size + sizeChange);
+			return ResizeTo(size + sizeChange);
 		}
 		
 		/// <summary>
@@ -392,53 +450,41 @@ namespace Orion
 		/// </returns>
 		public Rectangle ResizeTo(Vector2 newSize)
 		{
-			return new Rectangle(Origin, newSize);
+			return new Rectangle(origin, newSize);
 		}
 		#endregion
 
-        #region Overrides
-
+        #region Object Model
         /// <summary>
-        /// Returns a textual representation of the <see cref="Rectangle"/> with the form {{x,y}, {w,h}}.
+        /// Gets a string representation of this <see cref="Rectangle"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A string representation of this <see cref="Rectangle"/> with the form {{X,Y}, WxH}.</returns>
         public override string ToString()
         {
-            return string.Format("{{{0}, {1}}}", Origin, Size);
+            return string.Format("{{{0}, {1}x{2}}}", origin, size.X, size.Y);
         }
         #endregion
         #endregion
 
-        #region Private Methods
-		
+        #region Private
 		private Rectangle OnewayIntersection(Rectangle otherRect)
 		{
-			return otherRect.ResizeTo(otherRect.Size + Origin - otherRect.Origin);
+			return otherRect.ResizeTo(otherRect.size + origin - otherRect.origin);
 		}
-		
 		#endregion
-	}
-	
-	internal static class RangeChecking
-	{
-		/// <summary>
-		/// Checks if a float is within the [min, max[ interval.
-		/// </summary>
-		/// <param name="val">
-		/// This <see cref="System.Single"/>
-		/// </param>
-		/// <param name="min">
-		/// The (inclusive) minimum value
-		/// </param>
-		/// <param name="max">
-		/// The (non-inclusive) maximum value
-		/// </param>
-		/// <returns>
-		/// True if the float is in the [min, max[ range; false otherwise
-		/// </returns>
-		public static bool IsBetween(this float val, float min, float max)
-		{
-			return val >= min && val < max; 
-		}
-	}
+        #endregion
+        #endregion
+
+        #region Static
+        #region Fields
+        /// <summary>
+        /// An empty rectangle (origin, width and height are all zeroed).
+        /// </summary>
+        public static readonly Rectangle Empty = new Rectangle(0, 0, 0, 0);
+        #endregion
+
+        #region Methods
+        #endregion
+        #endregion
+    }
 }

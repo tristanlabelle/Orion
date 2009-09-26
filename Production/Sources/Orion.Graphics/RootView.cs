@@ -8,7 +8,6 @@ using OpenTK.Graphics;
 using OpenTK.Math;
 
 using Orion.Graphics;
-using Orion.Graphics.Drawing;
 
 namespace Orion.Graphics
 {
@@ -43,7 +42,7 @@ namespace Orion.Graphics
         /// Draws nothing.
         /// </summary>
         /// <param name="context"></param>
-        protected override void Draw(Orion.Graphics.Drawing.GraphicsContext context)
+        protected override void Draw(GraphicsContext context)
         { }
 
         internal override void Render()

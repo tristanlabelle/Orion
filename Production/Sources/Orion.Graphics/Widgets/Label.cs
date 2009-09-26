@@ -8,7 +8,6 @@ using OpenTK;
 //using OpenTK.Graphics;
 
 using Orion.Graphics;
-using Orion.Graphics.Drawing;
 
 namespace Orion.Graphics.Widgets
 {

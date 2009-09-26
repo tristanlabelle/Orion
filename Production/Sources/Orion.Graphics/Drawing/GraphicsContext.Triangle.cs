@@ -4,7 +4,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion.Graphics.Drawing
+namespace Orion.Graphics
 {
 	public partial class GraphicsContext
 	{
@@ -31,7 +31,7 @@ namespace Orion.Graphics.Drawing
 		public void FillTriangle(Vector2 a, Vector2 b, Vector2 c)
 		{
 			GL.Begin(BeginMode.Triangles);
-			DrawTriangle(a, b, c);
+			DrawTriangleVertices(a, b, c);
 			GL.End();
 		}
 		
@@ -58,11 +58,11 @@ namespace Orion.Graphics.Drawing
 		public void StrokeTriangle(Vector2 a, Vector2 b, Vector2 c)
 		{
 			GL.Begin(BeginMode.LineLoop);
-			DrawTriangle(a, b, c);
+			DrawTriangleVertices(a, b, c);
 			GL.End();
 		}
 		
-		private void DrawTriangle(Vector2 a, Vector2 b, Vector2 c)
+		private void DrawTriangleVertices(Vector2 a, Vector2 b, Vector2 c)
 		{
 			GL.Vertex2(a);
 			GL.Vertex2(b);

@@ -9,12 +9,12 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion.Graphics.Drawing
+namespace Orion.Graphics
 {
 	partial class GraphicsContext
     {
+        #region Methods
         #region Circles
-
         /// <summary>
         /// Fills a circle centered at a given origin, with a given radius.
         /// </summary>
@@ -59,7 +59,6 @@ namespace Orion.Graphics.Drawing
         #endregion
 
         #region Ellipses
-
         /// <summary>
         /// Fills an ellipse centered at a given origin, with two independant radii (X radius and Y radius).
         /// </summary>
@@ -80,7 +79,8 @@ namespace Orion.Graphics.Drawing
 		public void FillEllipse(Vector2 center, Vector2 radii)
 		{
 			GL.Begin(BeginMode.Polygon);
-			DrawEllipse(center, radii);
+            CommitFillColor();
+			DrawEllipseVertices(center, radii);
 			GL.End();
 		}
 
@@ -104,20 +104,22 @@ namespace Orion.Graphics.Drawing
 		public void StrokeEllipse(Vector2 center, Vector2 radii)
 		{
 			GL.Begin(BeginMode.LineStrip);
-			DrawEllipse(center, radii);
+            CommitStrokeColor();
+			DrawEllipseVertices(center, radii);
 			GL.End();
         }
+
+        private void DrawEllipseVertices(Vector2 center, Vector2 radii)
+        {
+            for (int i = 0; i < EllipsePoints; i++)
+            {
+                double alpha = i * (360f / EllipsePoints) * (Math.PI / 180);
+                GL.Vertex2(center.X + radii.X * Math.Cos(alpha), center.Y + radii.Y * Math.Sin(alpha));
+            }
+        }
+        #endregion
         #endregion
 
         private const int EllipsePoints = 36;
-
-		private void DrawEllipse(Vector2 center, Vector2 radii)
-		{
-			for(int i = 0; i < EllipsePoints; i++)
-			{
-				double alpha = i * (360f / EllipsePoints) * (Math.PI / 180);
-				GL.Vertex2(center.X + radii.X * Math.Cos(alpha), center.Y + radii.Y * Math.Sin(alpha));
-			}
-		}
 	}
 }

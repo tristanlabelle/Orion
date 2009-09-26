@@ -8,7 +8,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion.Graphics.Drawing
+namespace Orion.Graphics
 {
     partial class GraphicsContext
     {

@@ -6,7 +6,6 @@ using System.Text;
 using System.Drawing;
 
 using Orion.Graphics;
-using Orion.Graphics.Drawing;
 
 namespace Orion.Graphics.Widgets
 {
@@ -26,9 +25,9 @@ namespace Orion.Graphics.Widgets
 
         protected override void Draw(GraphicsContext context)
         {
-            context.Color = Color.Blue;
+            context.FillColor = Color.Blue;
+            context.StrokeColor = Color.Black;
             context.FillRect(Bounds);
-            context.Color = Color.Black;
             context.StrokeRect(Bounds);
         }
     }

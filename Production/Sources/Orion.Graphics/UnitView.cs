@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Orion.Graphics.Drawing;
-
 namespace Orion.Graphics
 {
     class UnitView : View

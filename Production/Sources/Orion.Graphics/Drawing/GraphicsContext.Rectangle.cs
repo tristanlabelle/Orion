@@ -4,10 +4,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion.Graphics.Drawing
+namespace Orion.Graphics
 {
 	public partial class GraphicsContext
-	{
+    {
+        #region Methods
         /// <summary>
         /// Fills a rectangle with a given origin, width and height.
         /// </summary>
@@ -27,7 +28,7 @@ namespace Orion.Graphics.Drawing
 		public void FillRect(Rectangle rectangle)
 		{
 			GL.Begin(BeginMode.Polygon);
-			DrawRect(rectangle);
+			DrawRectVertices(rectangle);
 			GL.End();
 		}
 
@@ -50,11 +51,11 @@ namespace Orion.Graphics.Drawing
 		public void StrokeRect(Rectangle rectangle)
 		{
 			GL.Begin(BeginMode.LineLoop);
-			DrawRect(rectangle);
+			DrawRectVertices(rectangle);
 			GL.End();
 		}
 		
-		private void DrawRect(Rectangle rectangle)
+		private void DrawRectVertices(Rectangle rectangle)
 		{
             Vector2 coords = rectangle.Origin;
             GL.Vertex2(coords);
@@ -64,6 +65,7 @@ namespace Orion.Graphics.Drawing
             GL.Vertex2(coords);
             coords.Y -= rectangle.Size.Y;
             GL.Vertex2(coords);
-		}
-	}
+        }
+        #endregion
+    }
 }

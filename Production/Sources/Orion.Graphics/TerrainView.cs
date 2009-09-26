@@ -6,7 +6,6 @@ using System.Drawing;
 
 using OpenTK.Math;
 
-using Orion.Graphics.Drawing;
 using Orion.GameLogic;
 using Orion.Graphics.Widgets;
 
@@ -37,10 +36,9 @@ namespace Orion.Graphics
 
         protected override void Draw(GraphicsContext context)
         {
-            context.Color = Color.Red;
-
+            context.StrokeColor = Color.Red;
             context.StrokeRect(600, 600, 150, 300);
-            context.Color = Color.Chocolate;
+            context.FillColor = Color.Chocolate;
             context.FillEllipse(500, 500, 200, 100);
             context.StrokeTriangle(200, 200, 300, 400, 400, 200);
 

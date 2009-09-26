@@ -7,8 +7,6 @@ using OpenTK;
 using OpenTK.Math;
 using OpenTK.Graphics;
 
-using Orion.Graphics.Drawing;
-
 namespace Orion.Graphics
 {
     /// <summary>
@@ -24,7 +22,7 @@ namespace Orion.Graphics
         #region Fields
         private View parent;
         private readonly ViewChildrenCollection children;
-        internal Orion.Graphics.Drawing.GraphicsContext Context;
+        internal GraphicsContext Context;
         #endregion
 
         #region Constructors
@@ -36,7 +34,7 @@ namespace Orion.Graphics
         /// </param>
         public View(Rectangle frame)
         {
-            Context = new Orion.Graphics.Drawing.GraphicsContext(new Rectangle(frame.Size));
+            Context = new GraphicsContext(new Rectangle(frame.Size));
             children = new ViewChildrenCollection(this);
             Frame = frame;
         }
@@ -139,8 +137,8 @@ namespace Orion.Graphics
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds
         {
-            get { return Context.CoordsSystem; }
-            set { Context.CoordsSystem = value; }
+            get { return Context.CoordinateSystem; }
+            set { Context.CoordinateSystem = value; }
         }
         #endregion
 
@@ -305,7 +303,7 @@ namespace Orion.Graphics
         /// <param name="context">
         /// A <see cref="Orion.Graphics.Drawing.GraphicsContext"/> on which the view can operate to render itself
         /// </param>
-        protected abstract void Draw(Orion.Graphics.Drawing.GraphicsContext context);
+        protected abstract void Draw(GraphicsContext context);
 
         /// <summary>
         /// Renders the view hierarchy. 

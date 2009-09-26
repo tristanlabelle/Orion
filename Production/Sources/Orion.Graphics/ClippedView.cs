@@ -7,15 +7,15 @@ using Orion.Geometry;
 
 namespace Orion.Graphics
 {
-    class ClippedView : View
+    /// <summary>
+    /// A <see cref="View"/> which clips its content within its display frame.
+    /// </summary>
+    public abstract class ClippedView : View
     {
+        #region Constructors
         public ClippedView(Rectangle frame)
             : base(frame)
         { }
-
-        protected override void Draw(GraphicsContext context)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

@@ -19,8 +19,8 @@ namespace Orion.Graphics.Widgets
         {
 			context.FillColor = Color.White;
             context.StrokeColor = Color.Black;
-			context.FillRect(Bounds);
-			context.StrokeRect(Bounds);
+			context.Fill(Bounds);
+			context.Stroke(Bounds);
         }
     }
 }

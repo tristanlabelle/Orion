@@ -4,6 +4,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
+using Orion.Geometry;
+
 namespace Orion.Graphics
 {
 	public partial class GraphicsContext
@@ -28,6 +30,7 @@ namespace Orion.Graphics
 		public void FillRect(Rectangle rectangle)
 		{
 			GL.Begin(BeginMode.Polygon);
+            CommitFillColor();
 			DrawRectVertices(rectangle);
 			GL.End();
 		}
@@ -51,6 +54,7 @@ namespace Orion.Graphics
 		public void StrokeRect(Rectangle rectangle)
 		{
 			GL.Begin(BeginMode.LineLoop);
+            CommitStrokeColor();
 			DrawRectVertices(rectangle);
 			GL.End();
 		}

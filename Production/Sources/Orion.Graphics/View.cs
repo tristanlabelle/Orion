@@ -7,6 +7,8 @@ using OpenTK;
 using OpenTK.Math;
 using OpenTK.Graphics;
 
+using Orion.Geometry;
+
 namespace Orion.Graphics
 {
     /// <summary>

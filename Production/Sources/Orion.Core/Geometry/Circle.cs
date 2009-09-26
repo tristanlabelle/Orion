@@ -5,7 +5,7 @@ using System.Text;
 
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Geometry
 {
     /// <summary>
     /// Defines a 2d circle as a central point and a radius

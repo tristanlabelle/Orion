@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Orion.Graphics;
-
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
+
+using Orion.Geometry;
 
 using Color = System.Drawing.Color;
 

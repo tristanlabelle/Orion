@@ -4,7 +4,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Geometry
 {
     /// <summary>
     /// Represents a rectangular shape using an origin vector (<see cref="P:Origin"/>)
@@ -484,6 +484,16 @@ namespace Orion
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Creates a new <see cref="Rectangle"/> from its center and extent.
+        /// </summary>
+        /// <param name="center">The position of the <see cref="Rectangle"/>'s center.</param>
+        /// <param name="extent">The half-size vector of the <see cref="Rectangle"/>.</param>
+        /// <returns>The resulting <see cref="Rectangle"/>.</returns>
+        public static Rectangle FromCenterExtent(Vector2 center, Vector2 extent)
+        {
+            return new Rectangle(center - extent, center + extent);
+        }
         #endregion
         #endregion
     }

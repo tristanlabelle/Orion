@@ -31,6 +31,7 @@ namespace Orion.Graphics
 		public void FillTriangle(Vector2 a, Vector2 b, Vector2 c)
 		{
 			GL.Begin(BeginMode.Triangles);
+            CommitFillColor();
 			DrawTriangleVertices(a, b, c);
 			GL.End();
 		}
@@ -58,6 +59,7 @@ namespace Orion.Graphics
 		public void StrokeTriangle(Vector2 a, Vector2 b, Vector2 c)
 		{
 			GL.Begin(BeginMode.LineLoop);
+            CommitStrokeColor();
 			DrawTriangleVertices(a, b, c);
 			GL.End();
 		}

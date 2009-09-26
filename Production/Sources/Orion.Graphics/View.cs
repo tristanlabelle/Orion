@@ -83,6 +83,52 @@ namespace Orion.Graphics
         }
 
         /// <summary>
+        /// Gets the sequence of <see cref="View"/> which are descendants of this one.
+        /// </summary>
+        public IEnumerable<View> Descendants
+        {
+            get
+            {
+                foreach (View child in children)
+                {
+                    yield return child;
+                    foreach (View childDescendant in child.Descendants)
+                    {
+                        yield return childDescendant;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the sequence of <see cref="View"/> which are ancestors of this one.
+        /// </summary>
+        public IEnumerable<View> Ancestors
+        {
+            get
+            {
+                View ancestor = parent;
+                while (ancestor != null)
+                {
+                    yield return ancestor;
+                    ancestor = ancestor.Parent;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the Z-index of this <see cref="View"/> within its parent. Bigger is higher.
+        /// </summary>
+        public int ZIndex
+        {
+            get
+            {
+                if (parent == null) return 0;
+                return parent.Children.IndexOf(this);
+            }
+        }
+
+        /// <summary>
         /// The rectangle in which this view appears in its superview. May be different from the bounds.
         /// </summary>
         public virtual Rectangle Frame { get; set; }

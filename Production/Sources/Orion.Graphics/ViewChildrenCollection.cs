@@ -18,20 +18,80 @@ namespace Orion.Graphics
     {
         #region Fields
         private readonly View parent;
+        private readonly List<View> children;
         #endregion
 
         #region Constructors
         internal ViewChildrenCollection(View parent)
+            : base(new List<View>())
         {
             Argument.EnsureNotNull(parent, "parent");
             this.parent = parent;
+            this.children = (List<View>)base.Items;
         }
         #endregion
 
         #region Methods
+        #region Helper Methods
+        /// <summary>
+        /// Brings a given child <see cref="View"/> to the highest depth.
+        /// </summary>
+        /// <param name="child">A child <see cref="View"/> to be brought to the front.</param>
+        public void BringToFront(View child)
+        {
+            Argument.EnsureNotNull(child, "child");
+            if (child.Parent != parent)
+            {
+                throw new ArgumentException(
+                    "Expected the view to bring to front to be a children of this view.", "child");
+            }
+
+            for (int i = 0; i < children.Count; ++i)
+            {
+                if (children[i] == child)
+                {
+                    if (i < children.Count - 1)
+                    {
+                        children.RemoveAt(i);
+                        children.Add(child);
+                    }
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends a given child <see cref="View"/> to the lowest depth.
+        /// </summary>
+        /// <param name="child">A child <see cref="View"/> to be sent to the back.</param>
+        public void SendToBack(View child)
+        {
+            Argument.EnsureNotNull(child, "child");
+            if (child.Parent != parent)
+            {
+                throw new ArgumentException(
+                    "Expected the view to send back to be a children of this view.", "child");
+            }
+
+            for (int i = 0; i < children.Count; ++i)
+            {
+                if (children[i] == child)
+                {
+                    if (i > 0)
+                    {
+                        children.RemoveAt(i);
+                        children.Insert(0, child);
+                    }
+                    break;
+                }
+            }
+        }
+        #endregion
+
+        #region Overrides & Shadowings
         public new List<View>.Enumerator GetEnumerator()
         {
-            return ((List<View>)Items).GetEnumerator();
+            return children.GetEnumerator();
         }
 
         protected override void InsertItem(int index, View item)
@@ -57,6 +117,7 @@ namespace Orion.Graphics
                 Items[i].Parent = null;
             base.ClearItems();
         }
+        #endregion
         #endregion
     }
 }

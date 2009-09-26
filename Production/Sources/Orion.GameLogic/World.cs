@@ -15,20 +15,31 @@ namespace Orion.GameLogic
         #region Nested Types
         private sealed class UnitCollection : Collection<Unit>
         {
+            #region Fields
             private readonly World world;
+            #endregion
 
+            #region Constructors
             public UnitCollection(World world)
             {
                 Argument.EnsureNotNull(world, "world");
                 this.world = world;
             }
+            #endregion
 
+            #region Methods
             protected override void InsertItem(int index, Unit item)
             {
                 Argument.EnsureNotNull(item, "item");
                 Argument.EnsureEqual(item.World, world, "item.World");
                 if (!Contains(item)) base.InsertItem(index, item);
             }
+
+            protected override void SetItem(int index, Unit item)
+            {
+                throw new NotSupportedException();
+            }
+            #endregion
         }
         #endregion
 

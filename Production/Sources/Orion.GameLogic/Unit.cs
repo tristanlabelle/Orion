@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -18,7 +19,15 @@ namespace Orion.GameLogic
         private readonly uint id;
         private readonly UnitType type;
         private readonly World world;
-        private Faction faction;
+
+        /// <summary>
+        /// The <see cref="Faction"/> to which this <see cref="Unit"/> belongs.
+        /// </summary>
+        /// <remarks>
+        /// <c>internal</c> as it is accessed by <see cref="Faction"/>. Do not modify otherwise.
+        /// </remarks>
+        internal Faction faction;
+
         private Vector2 position;
         private float angle;
         private float damage;
@@ -79,7 +88,24 @@ namespace Orion.GameLogic
         public Faction Faction
         {
             get { return faction; }
-            set { faction = value; }
+            set
+            {
+                if (value == faction) return;
+
+                if (faction != null)
+                {
+                    faction.Units.Remove(this);
+                    Debug.Assert(faction == null,
+                        "Removing a unit from a faction should have set its faction to null.");
+                }
+
+                if (value != null)
+                {
+                    value.Units.Add(this);
+                    Debug.Assert(faction != value,
+                        "Adding a unit to a faction should have set its faction that faction.");
+                }
+            }
         }
         #endregion
 

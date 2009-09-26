@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Commandment.Commands;
+
+using Color = System.Drawing.Color;
 
 namespace Orion.Commandment
 {
@@ -15,7 +18,7 @@ namespace Orion.Commandment
             World world = new World();
             CommandManager commandManager = new CommandManager();
 
-            Faction redFaction = new Faction("Red");
+            Faction redFaction = new Faction(world, "Red", Color.Red);
             MockCommander redCommander = new MockCommander(redFaction, world);
             commandManager.AddCommander(redCommander);
 
@@ -29,7 +32,7 @@ namespace Orion.Commandment
             world.Units.Add(redPirate);
             world.Units.Add(redNinja);
 
-            Faction blueFaction = new Faction("Blue");
+            Faction blueFaction = new Faction(world, "Blue", Color.Blue);
             MockCommander blueCommander = new MockCommander(blueFaction, world);
             commandManager.AddCommander(blueCommander);
 
@@ -45,8 +48,6 @@ namespace Orion.Commandment
        
             commandManager.QueryCommands();
             commandManager.ExecuteCommandQueue();
-
-           
 
             Console.ReadLine();
         }

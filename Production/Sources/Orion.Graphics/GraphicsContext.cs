@@ -23,11 +23,12 @@ namespace Orion.Graphics
         private Rectangle coordinateSystem;
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
+		private bool readyForDrawing;
         #endregion
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref=GraphicsContext""/> object with the given bounds for its local coordinate system. 
+        /// Initializes a new <see cref="GraphicsContext"/> object with the given bounds for its local coordinate system. 
         /// </summary>
         /// <param name="bounds">
         /// A <see cref="Rectangle"/> defining the local coordinate system.
@@ -116,6 +117,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Ellipse ellipse, int vertexCount)
         {
+			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             Argument.EnsureStrictlyPositive(vertexCount, "vertexCount");
 
             double angleIncrement = Math.PI * 2 / vertexCount;
@@ -155,6 +157,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Rectangle rectangle)
         {
+			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             GL.Vertex2(rectangle.X, rectangle.Y);
             GL.Vertex2(rectangle.X, rectangle.MaxY);
             GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
@@ -189,6 +192,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Triangle triangle)
         {
+			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             GL.Vertex2(triangle.Vertex1);
             GL.Vertex2(triangle.Vertex2);
             GL.Vertex2(triangle.Vertex3);
@@ -250,16 +254,20 @@ namespace Orion.Graphics
         {
             GL.PushMatrix();
 
-            // I'm not quite sure about the transformation order.
+            // I'm not quite sure about the transformation order. This looks functional, though.
             // If something weird happens in the bounds scaling/translating, check this first.
             GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
-            GL.Scale(parentSystem.Size.X / CoordinateSystem.Size.X, parentSystem.Size.Y / CoordinateSystem.Size.Y, 1);
+            GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
             GL.Translate(-CoordinateSystem.Origin.X, -CoordinateSystem.Origin.Y, 0);
+			
+			readyForDrawing = true;
         }
 
         internal void RestoreGLContext()
         {
             GL.PopMatrix();
+			
+			readyForDrawing = false;
         }
         #endregion
         #endregion

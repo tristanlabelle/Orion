@@ -16,13 +16,19 @@ namespace Orion.Graphics
     /// <summary>
     /// A <see cref="View"/> which displays the game <see cref="Terrain"/>.
     /// </summary>
-    public sealed class TerrainView : ClippedView
+    public sealed class TerrainView : View
     {
         #region Fields
         private World world;
         #endregion
 
         #region Constructor
+		/// <summary>
+		/// Constructs the main game view. 
+		/// </summary>
+		/// <param name="frame">
+		/// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
+		/// </param>
         public TerrainView(Rectangle frame)
             : base(frame)
         {
@@ -45,24 +51,12 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        protected override void Draw(GraphicsContext context)
+		/// <summary>
+		/// Draws the main game view. 
+		/// </summary>
+        protected override void Draw()
         {
-            context.StrokeColor = Color.Red;
-            context.Stroke(new Rectangle(600, 600, 150, 300));
-            context.FillColor = Color.Chocolate;
-            context.Fill(new Ellipse(500, 500, 200, 100));
-            context.Stroke(new Triangle(200, 200, 300, 400, 400, 200));
-
-            foreach (Unit unit in world.Units)
-            {
-                /*Vector2 a = new Vector2(unit.Origin + (Vector2.UnitX * 10));
-                Vector2 b = new Vector2(unit.Origin + (Vector2.UnitY * 10));
-                Vector2 c = new Vector2(unit.Origin - (Vector2.UnitX * 10));
-				
-                context.FillTriangle(a, b, c);*/
-
-                //this.AddSubview();
-            }
+			//throw new NotImplementedException();
         }
         #endregion
     }

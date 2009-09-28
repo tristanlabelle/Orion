@@ -38,21 +38,39 @@ namespace Orion.Graphics
             Bounds = bounds;
             ResetViewport();
         }
+		
+		internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
+		{
+            Matrix4 transformMatrix = Matrix4.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height, 1);
+            Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
+			
+			args = new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks);
+			
+			foreach(View child in Enumerable.Reverse(Children))
+			{
+				if(child.Frame.ContainsPoint(coords))
+				{
+					child.PropagateMouseEvent(eventType, args);
+				}
+			}
+			
+			return false;
+		}
 
+		
         /// <summary>
         /// Draws nothing.
         /// </summary>
-        /// <param name="context"></param>
-        protected override void Draw(GraphicsContext context)
+        protected override void Draw()
         { }
 
         internal override void Render()
         {
-            GL.ClearColor(Color.BlanchedAlmond);
+            GL.ClearColor(Color.ForestGreen); // we all love forest green!
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
 
-            Draw(Context);
+            Draw();
 
             foreach (View child in Children)
                 child.Render();
@@ -64,7 +82,7 @@ namespace Orion.Graphics
             GL.Viewport(0, 0, (int)Frame.Size.X, (int)Frame.Size.Y);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(bounds.Origin.X, bounds.Size.X, bounds.Origin.Y, bounds.Size.Y, -1, 1);
+            GL.Ortho(bounds.X, bounds.Width, bounds.Y, bounds.Height, -1, 1);
             GL.MatrixMode(MatrixMode.Modelview);
         }
     }

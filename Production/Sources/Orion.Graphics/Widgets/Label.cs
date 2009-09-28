@@ -23,9 +23,9 @@ namespace Orion.Graphics.Widgets
             this.caption = caption;
         }
 
-        protected override void Draw(GraphicsContext context)
+        protected override void Draw()
         {
-            //context.DrawTextInView("bla", this);
+			throw new NotImplementedException();
         }
     }
 }

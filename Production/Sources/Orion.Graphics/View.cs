@@ -17,7 +17,7 @@ namespace Orion.Graphics
     /// When rendering, a View will first render itself, then render all of its subviews.
     /// </summary>
     /// <remarks>
-    /// Views use a first-quadrant parentSystem coordinates, which means the origin is at the bottom left corner.
+    /// Views use a first-quadrant system coordinates, which means the origin is at the bottom left corner.
     /// </remarks>
     public abstract class View
     {
@@ -192,37 +192,38 @@ namespace Orion.Graphics
 
         #region Event handling
         /// <summary>
-        /// Propagates a mouse event to the subviews.
-        /// Events are propagated in a bottom-up order, but priority of execution is given in a up-bottom order (that we will call "event sinking").
+        /// Propagates a mouse event to the child views.
         /// </summary>
+        /// <remarks>
+        /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
+        /// </remarks>
         /// <param name="eventType">The type of event to propagate</param>
         /// <param name="args">The event arguments as a <see cref="MouseEventArgs"/></param>
-        /// <returns>True if this view (and subviews) accepts to propagate events; false otherwise</returns>
-        internal bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
+        internal virtual bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-            Context.SetUpGLContext(Frame);
-
+			Context.SetUpGLContext(Frame);
+			
             Matrix4 transformMatrix;
-            Vector4 eventCoords = new Vector4(args.X, args.Y, 0, 1);
-
             GL.GetFloat(GetPName.ModelviewMatrix, out transformMatrix);
-            Vector2 coords = Vector4.Transform(eventCoords, transformMatrix).Xy;
-
-            bool eventCanSink = true;
-            foreach (View subview in Enumerable.Reverse(children))
-            {
-                if (subview.Frame.ContainsPoint(coords))
-                {
-                    eventCanSink = subview.PropagateMouseEvent(eventType, args);
-                    break;
-                }
-            }
-
-            Context.RestoreGLContext();
+			transformMatrix.Invert();
+            Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
+			
+			bool eventCanSink = true;
+			foreach(View child in Enumerable.Reverse(children))
+			{
+				if(child.Frame.ContainsPoint(coords))
+				{
+					eventCanSink = child.PropagateMouseEvent(eventType, args);
+					break;
+				}
+			}
+			
+			Context.RestoreGLContext();
 
             if (eventCanSink)
             {
-                return DispatchMouseEvent(eventType, args);
+                return DispatchMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks));
             }
             return false;
         }
@@ -242,7 +243,7 @@ namespace Orion.Graphics
                 case MouseEventType.MouseMoved: return OnMouseMove(args);
                 case MouseEventType.MouseUp: return OnMouseUp(args);
             }
-            throw new ArgumentException("Event type {0} has no assigned dispatch method");
+            throw new ArgumentException(String.Format("Event type {0} does not have a handler method", eventType));
         }
 
         /// <summary>
@@ -300,12 +301,13 @@ namespace Orion.Graphics
 
         #region Drawing
         /// <summary>
-        /// Renders the view inside the passed <see cref="Orion.Graphics.Drawing.GraphicsContext"/> object.
+        /// This method is called when the view needs to render itself using its <see cref="GraphicsContext"/>.
         /// </summary>
-        /// <param name="context">
-        /// A <see cref="Orion.Graphics.Drawing.GraphicsContext"/> on which the view can operate to render itself
-        /// </param>
-        protected abstract void Draw(GraphicsContext context);
+        /// <remarks>
+        /// When this methods is called, the <see cref="GraphicsContext"/> object, and the OpenGL control, are guaranteed to have been
+        /// properly prepared for drawing. Attempts to draw outside of this method will throw an <see cref="System.InvalidOperationException"/>.
+        /// </remarks>
+        protected abstract void Draw();
 
         /// <summary>
         /// Renders the view hierarchy. 
@@ -314,7 +316,7 @@ namespace Orion.Graphics
         {
             Context.SetUpGLContext(Frame);
 
-            Draw(Context);
+            Draw();
 
             foreach (View view in children)
             {

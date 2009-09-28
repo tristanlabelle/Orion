@@ -254,8 +254,6 @@ namespace Orion.Graphics
         {
             GL.PushMatrix();
 
-            // I'm not quite sure about the transformation order. This looks functional, though.
-            // If something weird happens in the bounds scaling/translating, check this first.
             GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
             GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
             GL.Translate(-CoordinateSystem.Origin.X, -CoordinateSystem.Origin.Y, 0);

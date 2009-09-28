@@ -494,6 +494,17 @@ namespace Orion.Geometry
         {
             return new Rectangle(center - extent, center + extent);
         }
+
+        /// <summary>
+        /// Creates a new <see cref="Rectangle"/> defined by two points.
+        /// </summary>
+        /// <param name="point1">The first point.</param>
+        /// <param name="point2">The second point.</param>
+        /// <returns>A <see cref="Rectangle"/> containing both points.</returns>
+        public static Rectangle FromPoints(Vector2 point1, Vector2 point2)
+        {
+            return new Rectangle(point1, point2 - point1);
+        }
         #endregion
         #endregion
     }

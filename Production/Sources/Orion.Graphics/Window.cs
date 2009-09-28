@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using OpenTK.Math;
+
+using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Graphics;
+using Orion.Commandment;
+
+using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
@@ -27,57 +33,81 @@ namespace Orion.Graphics
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             rootView = new RootView(windowBounds, maxResolution);
 
-            View terrain = new TerrainView(maxResolution);
-            terrain.Bounds = new Rectangle(0, 0, 500, 500);
-            rootView.Children.Add(terrain);
+            World world = new World();
+            WorldView worldView = new WorldView(maxResolution, new WorldRenderer(world));
+            worldView.Bounds = new Rectangle(0, 0, 32, 24);
+            rootView.Children.Add(worldView);
+            
+            // putting little guys to life
+            {
+                CommandManager commandManager = new CommandManager();
+    
+                Faction redFaction = new Faction(world, "Red", Color.Red);
+                MockCommander redCommander = new MockCommander(redFaction);
+                commandManager.AddCommander(redCommander);
+
+                Faction blueFaction = new Faction(world, "Blue", Color.Blue);
+                MockCommander blueCommander = new MockCommander(blueFaction);
+                commandManager.AddCommander(blueCommander);
+
+                UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
+                Random random = new Random();
+                for (int i = 0; i < 60; ++i)
+                {
+                    Unit unit = new Unit((uint)i, unitTypes[i % unitTypes.Length], world);
+                    unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                    unit.Faction = (i % 2) == 0 ? redFaction : blueFaction;
+                    world.Units.Add(unit);
+                }
+            }
         }
-		
-		/// <summary>
-		/// Refreshes the OpenGL control. 
-		/// </summary>
-		public void RenderGLControl()
-		{
-			glControl.Refresh();
-		}
+        
+        /// <summary>
+        /// Refreshes the OpenGL control. 
+        /// </summary>
+        public void RenderGLControl()
+        {
+            glControl.Refresh();
+        }
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
             rootView.Render();
             glControl.SwapBuffers();
         }
-		
-		private void glControl_MouseClick(object sender, System.Windows.Forms.MouseEventArgs args)
-		{
-			TriggerMouseEvent(MouseEventType.MouseClicked, args.X, args.Y, args.Button, args.Clicks);
-		}
-		
-		private void glControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs args)
-		{
-			TriggerMouseEvent(MouseEventType.MouseDown, args.X, args.Y, args.Button, args.Clicks);
-		}
-		
-		private void glControl_MouseUp(object sender, System.Windows.Forms.MouseEventArgs args)
-		{
-			TriggerMouseEvent(MouseEventType.MouseUp, args.X, args.Y, args.Button, args.Clicks);
-		}
-		
-		private void glControl_MouseMove(object sender, System.Windows.Forms.MouseEventArgs args)
-		{
-			TriggerMouseEvent(MouseEventType.MouseMoved, args.X, args.Y, args.Button, args.Clicks);
-		}
-		
-		private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks)
-		{
-			MouseButton pressedButton = MouseButton.None;
+        
+        private void glControl_MouseClick(object sender, System.Windows.Forms.MouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.MouseClicked, args.X, args.Y, args.Button, args.Clicks);
+        }
+        
+        private void glControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.MouseDown, args.X, args.Y, args.Button, args.Clicks);
+        }
+        
+        private void glControl_MouseUp(object sender, System.Windows.Forms.MouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.MouseUp, args.X, args.Y, args.Button, args.Clicks);
+        }
+        
+        private void glControl_MouseMove(object sender, System.Windows.Forms.MouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.MouseMoved, args.X, args.Y, args.Button, args.Clicks);
+        }
+        
+        private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks)
+        {
+            MouseButton pressedButton = MouseButton.None;
             switch (argsButton)
             {
                 case System.Windows.Forms.MouseButtons.Left: pressedButton = MouseButton.Left; break;
                 case System.Windows.Forms.MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
                 case System.Windows.Forms.MouseButtons.Right: pressedButton = MouseButton.Right; break;
             }
-			
-			rootView.PropagateMouseEvent(type, new Orion.Graphics.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks));
-		}
+            
+            rootView.PropagateMouseEvent(type, new Orion.Graphics.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks));
+        }
 
         /// <summary>
         /// Fires the Resized event to all listener, and resizes the glControl.

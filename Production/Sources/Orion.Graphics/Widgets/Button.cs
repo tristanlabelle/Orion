@@ -17,7 +17,7 @@ namespace Orion.Graphics.Widgets
             : base(frame)
         {
             this.caption = caption;
-			Children.Add(this.caption);
+            Children.Add(this.caption);
         }
 
         protected override void Draw()
@@ -26,7 +26,7 @@ namespace Orion.Graphics.Widgets
             context.StrokeColor = Color.Black;
             context.Fill(Bounds);
             context.Stroke(Bounds);
-			
+            
         }
     }
 }

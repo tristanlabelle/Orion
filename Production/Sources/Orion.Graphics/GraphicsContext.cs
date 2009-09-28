@@ -23,7 +23,7 @@ namespace Orion.Graphics
         private Rectangle coordinateSystem;
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
-		private bool readyForDrawing;
+        private bool readyForDrawing;
         #endregion
 
         #region Constructors
@@ -117,7 +117,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Ellipse ellipse, int vertexCount)
         {
-			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             Argument.EnsureStrictlyPositive(vertexCount, "vertexCount");
 
             double angleIncrement = Math.PI * 2 / vertexCount;
@@ -157,7 +157,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Rectangle rectangle)
         {
-			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             GL.Vertex2(rectangle.X, rectangle.Y);
             GL.Vertex2(rectangle.X, rectangle.MaxY);
             GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
@@ -192,7 +192,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Triangle triangle)
         {
-			if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
             GL.Vertex2(triangle.Vertex1);
             GL.Vertex2(triangle.Vertex2);
             GL.Vertex2(triangle.Vertex3);
@@ -259,15 +259,15 @@ namespace Orion.Graphics
             GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
             GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
             GL.Translate(-CoordinateSystem.Origin.X, -CoordinateSystem.Origin.Y, 0);
-			
-			readyForDrawing = true;
+            
+            readyForDrawing = true;
         }
 
         internal void RestoreGLContext()
         {
             GL.PopMatrix();
-			
-			readyForDrawing = false;
+            
+            readyForDrawing = false;
         }
         #endregion
         #endregion

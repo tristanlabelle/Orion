@@ -14,7 +14,7 @@ using Color = System.Drawing.Color;
 namespace Orion.Graphics
 {
     /// <summary>
-    /// A <see cref="View"/> which displays the game <see cref="Terrain"/>.
+    /// A <see cref="View"/> which displays the game <see cref="World"/>.
     /// </summary>
     public sealed class WorldView : View
     {
@@ -23,27 +23,29 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructor
-		/// <summary>
-		/// Constructs the main game view. 
-		/// </summary>
-		/// <param name="frame">
-		/// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
-		/// </param>
+        /// <summary>
+        /// Constructs the main game view. 
+        /// </summary>
+        /// <param name="frame">
+        /// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
+        /// </param>
+        /// <param name="renderer">The <see cref="WorldRenderer"/> to be used to draw the game <see cref="World"/>.</param>
         public WorldView(Rectangle frame, WorldRenderer renderer)
             : base(frame)
         {
-			worldRenderer = renderer;
+            Argument.EnsureNotNull(renderer, "renderer");
+            worldRenderer = renderer;
         }
         #endregion
 
         #region Methods
-		/// <summary>
-		/// Draws the main game view. 
-		/// </summary>
+        /// <summary>
+        /// Draws the main game view. 
+        /// </summary>
         protected override void Draw()
         {
-			worldRenderer.DrawTerrain(context, Bounds);
-			worldRenderer.DrawEntities(context, Bounds);
+            worldRenderer.DrawTerrain(context, Bounds);
+            worldRenderer.DrawEntities(context, Bounds);
         }
         #endregion
     }

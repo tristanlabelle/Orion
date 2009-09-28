@@ -6,13 +6,14 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment
 {
+    /// <summary>
+    /// Abstract base class for commands, the atomic unit of game state change
+    /// which encapsulate an order given by a <see cref="Commander"/>.
+    /// </summary>
     public abstract class Command
     {
         #region Fields
         private readonly Faction sourceFaction;
-
-       
- 
         #endregion
 
         #region Constructors
@@ -21,10 +22,6 @@ namespace Orion.Commandment
             Argument.EnsureNotNull(sourceFaction, "sourceFaction");
             this.sourceFaction = sourceFaction;
         }
-        #endregion
-
-        #region Events
-
         #endregion
 
         #region Properties
@@ -38,9 +35,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-            public abstract void Execute();
+        public abstract void Execute();
         #endregion
-
-
     }
 }

@@ -89,26 +89,26 @@ namespace Orion.Graphics
         #endregion
 
         #region Overrides & Shadowings
-		/// <summary>
-		/// Returns an enumerator to pass through the collection. 
-		/// </summary>
-		/// <returns>
-		/// An enumerator for the collection
-		/// </returns>
+        /// <summary>
+        /// Returns an enumerator to pass through the collection. 
+        /// </summary>
+        /// <returns>
+        /// An enumerator for the collection
+        /// </returns>
         public new List<View>.Enumerator GetEnumerator()
         {
             return children.GetEnumerator();
         }
 
-		/// <summary>
-		/// Inserts a view at a specific index. 
-		/// </summary>
-		/// <param name="index">
-		/// A <see cref="System.Int32"/> specifying the index
-		/// </param>
-		/// <param name="item">
-		/// The <see cref="View"/> to insert
-		/// </param>
+        /// <summary>
+        /// Inserts a view at a specific index. 
+        /// </summary>
+        /// <param name="index">
+        /// A <see cref="System.Int32"/> specifying the index
+        /// </param>
+        /// <param name="item">
+        /// The <see cref="View"/> to insert
+        /// </param>
         protected override void InsertItem(int index, View item)
         {
             Argument.EnsureNotNull(item, "item");
@@ -120,21 +120,21 @@ namespace Orion.Graphics
             base.InsertItem(index, item);
         }
 
-		/// <summary>
-		/// Removes the view at a specific index.
-		/// </summary>
-		/// <param name="index">
-		/// The index of the view to remove
-		/// </param>
+        /// <summary>
+        /// Removes the view at a specific index.
+        /// </summary>
+        /// <param name="index">
+        /// The index of the view to remove
+        /// </param>
         protected override void RemoveItem(int index)
         {
             Items[index].Parent = null;
             base.RemoveItem(index);
         }
 
-		/// <summary>
-		/// Clears the list. 
-		/// </summary>
+        /// <summary>
+        /// Clears the list. 
+        /// </summary>
         protected override void ClearItems()
         {
             for (int i = 0; i < Items.Count; ++i)

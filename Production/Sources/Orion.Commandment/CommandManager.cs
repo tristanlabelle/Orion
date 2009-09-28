@@ -7,62 +7,49 @@ using Orion.Commandment.Commands;
 
 namespace Orion.Commandment
 {
+    /// <summary>
+    /// Keeps a list of <see cref="Commander"/>s and handles their <see cref="Command"/>s.
+    /// </summary>
     public sealed class CommandManager
     {
         #region Fields
-        List<Commander> commmanderList = new List<Commander>();
-        Queue<Command> commandQueue = new Queue<Command>();
-
-        #endregion
-
-        #region Constructors
-
-        #endregion
-
-        #region Events
-
-        #endregion
-
-        #region Properties
-
+        private readonly List<Commander> commanders = new List<Commander>();
+        private readonly Queue<Command> queuedCommands = new Queue<Command>();
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Query command from all existing commander in the list commanderList
-        /// </summary>
-        public void QueryCommands()
+        private void OnCommandGenerated(Commander sender, Command args)
         {
-            foreach (Commander aCommander in commmanderList)
-            {
-                foreach(Command aCommandFromACommander in aCommander.CreateCommands())
-                {
-                    commandQueue.Enqueue(aCommandFromACommander);
-                }
-                
-            }
+            Argument.EnsureNotNull(args, "args");
+            queuedCommands.Enqueue(args);
         }
 
         /// <summary>
-        /// add a commander to the list of the commander in the current game
+        /// Adds a <see cref="Commander"/> to this <see cref="CommandManager"/>.
         /// </summary>
-        /// <param name="commander">the commander to add</param>
+        /// <param name="commander">The <see cref="Commander"/> to be added.</param>
         public void AddCommander(Commander commander)
         {
-            commmanderList.Add(commander);
+            Argument.EnsureNotNull(commander, "commander");
+
+            if (!commanders.Contains(commander))
+            {
+                commanders.Add(commander);
+                commander.CommandGenerated += OnCommandGenerated;
+            }
         }
 
-
         /// <summary>
-        /// Execute the current commandQueue
+        /// Updates this <see cref="CommandManager"/> for a frame.
         /// </summary>
-        public void ExecuteCommandQueue()
+        /// <param name="timeDelta"></param>
+        public void Update(float timeDelta)
         {
-            foreach (Command command in commandQueue)
-            {
-                command.Execute();
-            }
+            foreach (Commander commander in commanders)
+                commander.Update(timeDelta);
+
+            while (queuedCommands.Count > 0)
+                queuedCommands.Dequeue().Execute();
         }
         #endregion
     }

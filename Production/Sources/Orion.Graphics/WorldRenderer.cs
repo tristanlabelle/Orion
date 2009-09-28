@@ -38,10 +38,10 @@ namespace Orion.Graphics
 
         #region Methods
         /// <summary>
-        /// Draws the <see cref="World"/>'s <see cref="Terrain"/>.
+        /// Draws the <see cref="World"/>'s terrain.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> in which to draw.</param>
-        /// <param name="clippingRectangle">
+        /// <param name="viewRectangle">
         /// A <see cref="Rectangle"/>, in world units, which specifies the parts of the
         /// <see cref="World"/> which have to be drawn.
         /// </param>
@@ -62,7 +62,7 @@ namespace Orion.Graphics
         /// Draws the <see cref="World"/>'s entities, including <see cref="Unit"/>s.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> in which to draw.</param>
-        /// <param name="clippingRectangle">
+        /// <param name="viewRectangle">
         /// A <see cref="Rectangle"/>, in world units, which specifies the parts of the
         /// <see cref="World"/> which have to be drawn.
         /// </param>

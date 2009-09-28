@@ -38,26 +38,26 @@ namespace Orion.Graphics
             Bounds = bounds;
             ResetViewport();
         }
-		
-		internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
-		{
+        
+        internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
+        {
             Matrix4 transformMatrix = Matrix4.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height, 1);
             Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
-			
-			args = new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks);
-			
-			foreach(View child in Enumerable.Reverse(Children))
-			{
-				if(child.Frame.ContainsPoint(coords))
-				{
-					child.PropagateMouseEvent(eventType, args);
-				}
-			}
-			
-			return false;
-		}
+            
+            args = new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks);
+            
+            foreach(View child in Enumerable.Reverse(Children))
+            {
+                if(child.Frame.ContainsPoint(coords))
+                {
+                    child.PropagateMouseEvent(eventType, args);
+                }
+            }
+            
+            return false;
+        }
 
-		
+        
         /// <summary>
         /// Draws nothing.
         /// </summary>

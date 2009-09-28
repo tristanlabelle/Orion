@@ -25,7 +25,7 @@ namespace Orion.Graphics.Widgets
 
         protected override void Draw()
         {
-			throw new NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

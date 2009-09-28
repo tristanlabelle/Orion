@@ -19,7 +19,7 @@ namespace Orion.Commandment
             CommandManager commandManager = new CommandManager();
 
             Faction redFaction = new Faction(world, "Red", Color.Red);
-            MockCommander redCommander = new MockCommander(redFaction, world);
+            MockCommander redCommander = new MockCommander(redFaction);
             commandManager.AddCommander(redCommander);
 
             Unit redJedi = new Unit(0, new UnitType("Jedi"), world);
@@ -33,7 +33,7 @@ namespace Orion.Commandment
             world.Units.Add(redNinja);
 
             Faction blueFaction = new Faction(world, "Blue", Color.Blue);
-            MockCommander blueCommander = new MockCommander(blueFaction, world);
+            MockCommander blueCommander = new MockCommander(blueFaction);
             commandManager.AddCommander(blueCommander);
 
             Unit blueJedi = new Unit(3, new UnitType("Jedi"), world);
@@ -45,10 +45,8 @@ namespace Orion.Commandment
             world.Units.Add(blueJedi);
             world.Units.Add(bluePirate);
             world.Units.Add(blueNinja);
-       
-            commandManager.QueryCommands();
-            commandManager.ExecuteCommandQueue();
 
+            commandManager.Update(0.5f);
             Console.ReadLine();
         }
     }

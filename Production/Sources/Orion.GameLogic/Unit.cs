@@ -102,7 +102,7 @@ namespace Orion.GameLogic
                 if (value != null)
                 {
                     value.Units.Add(this);
-                    Debug.Assert(faction != value,
+                    Debug.Assert(faction == value,
                         "Adding a unit to a faction should have set its faction that faction.");
                 }
             }

@@ -10,7 +10,7 @@ namespace Orion.Graphics
     /// <summary>
     /// Indicates a mouse event type. Internal use only.
     /// </summary>
-    internal enum MouseEventType
+    public enum MouseEventType
     {
         MouseDown, MouseUp, MouseClicked, MouseMoved
     }
@@ -81,7 +81,7 @@ namespace Orion.Graphics
         /// <param name="args">The <see cref="System.Windows.Forms.MouseEventArgs"/> originating event</param>
         internal MouseEventArgs(System.Windows.Forms.MouseEventArgs args)
         {
-			Console.WriteLine("Created event");
+            Console.WriteLine("Created event");
             X = args.X;
             Y = args.Y;
 
@@ -95,28 +95,28 @@ namespace Orion.Graphics
             Clicks = args.Clicks;
         }
         
-		/// <summary>
-		/// Creates a MouseEventArgs structure with a specified point, which mouse button was pressed, and the number of repeated clicks. 
-		/// The X and Y positions should be directly usable for views.
-		/// </summary>
-		/// <param name="x">
-		/// The position along the X axis of the mouse
-		/// </param>
-		/// <param name="y">
-		/// The position along the Y axis of the mouse
-		/// </param>
-		/// <param name="button">
-		/// The <see cref="MouseButton"/> involved
-		/// </param>
-		/// <param name="clicks">
-		/// The number of repeated clicks with the <see cref="MouseButton"/>
-		/// </param>
+        /// <summary>
+        /// Creates a MouseEventArgs structure with a specified point, which mouse button was pressed, and the number of repeated clicks. 
+        /// The X and Y positions should be directly usable for views.
+        /// </summary>
+        /// <param name="x">
+        /// The position along the X axis of the mouse
+        /// </param>
+        /// <param name="y">
+        /// The position along the Y axis of the mouse
+        /// </param>
+        /// <param name="button">
+        /// The <see cref="MouseButton"/> involved
+        /// </param>
+        /// <param name="clicks">
+        /// The number of repeated clicks with the <see cref="MouseButton"/>
+        /// </param>
         internal MouseEventArgs(float x, float y, MouseButton button, int clicks)
-		{
-			X = x;
-			Y = y;
-			ButtonPressed = button;
-			Clicks = clicks;
-		}
-	}
+        {
+            X = x;
+            Y = y;
+            ButtonPressed = button;
+            Clicks = clicks;
+        }
+    }
 }

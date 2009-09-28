@@ -202,24 +202,24 @@ namespace Orion.Graphics
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         internal virtual bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-			context.SetUpGLContext(Frame);
-			
+            context.SetUpGLContext(Frame);
+            
             Matrix4 transformMatrix;
             GL.GetFloat(GetPName.ModelviewMatrix, out transformMatrix);
-			transformMatrix.Invert();
+            transformMatrix.Invert();
             Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
-			
-			bool eventCanSink = true;
-			foreach(View child in Enumerable.Reverse(children))
-			{
-				if(child.Frame.ContainsPoint(coords))
-				{
-					eventCanSink = child.PropagateMouseEvent(eventType, args);
-					break;
-				}
-			}
-			
-			context.RestoreGLContext();
+            
+            bool eventCanSink = true;
+            foreach(View child in Enumerable.Reverse(children))
+            {
+               if(child.Frame.ContainsPoint(coords))
+               {
+                    eventCanSink = child.PropagateMouseEvent(eventType, args);
+                    break;
+                }
+            }
+            
+            context.RestoreGLContext();
 
             if (eventCanSink)
             {

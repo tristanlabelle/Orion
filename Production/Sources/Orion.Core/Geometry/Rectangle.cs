@@ -11,28 +11,28 @@ namespace Orion.Geometry
     /// and a size vector (<see cref="P:Size"/>). Instances of this structure are immutable.
     /// </summary>
     [Serializable]
-	public struct Rectangle
+    public struct Rectangle
     {
         #region Instance
         #region Fields
-		/// <summary>
-		/// The position of the rectangle.
-		/// </summary>
+        /// <summary>
+        /// The position of the rectangle.
+        /// </summary>
         /// <remarks>
         /// Encapsulated as <see cref="Vector2"/> is not immutable,
         /// and <c>readonly</c> sadly cannot change this fact.
         /// </remarks>
         private readonly Vector2 origin;
 
-		/// <summary>
-		/// The size of the rectangle (X is the width, and Y is the height).
+        /// <summary>
+        /// The size of the rectangle (X is the width, and Y is the height).
         /// </summary>
         /// <remarks>
         /// Encapsulated as <see cref="Vector2"/> is not immutable,
         /// and <c>readonly</c> sadly cannot change this fact.
         /// </remarks>
         private readonly Vector2 size;
-		#endregion
+        #endregion
 
         #region Constructors
         /// <summary>
@@ -114,17 +114,17 @@ namespace Orion.Geometry
         }
 
         /// <summary>
-		/// Gets the origin abscissa of the rectangle.
-		/// </summary>
-		public float X
+        /// Gets the origin abscissa of the rectangle.
+        /// </summary>
+        public float X
         {
             get { return origin.X; }
         }
 
-		/// <summary>
-		/// Gets the origin ordinate of the rectangle.
-		/// </summary>
-		public float Y
+        /// <summary>
+        /// Gets the origin ordinate of the rectangle.
+        /// </summary>
+        public float Y
         {
             get { return origin.Y; }
         }
@@ -195,264 +195,264 @@ namespace Orion.Geometry
             get { return size * 0.5f; }
         }
         #endregion
-		#endregion
+        #endregion
 
         #region Methods
         #region Public
-		#region Hit Testing
-		/// <summary>
-		/// Indicates if the rectangle contains a point.
-		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Single"/> for the point's abscissa
-		/// </param>
-		/// <param name="y">
-		/// A <see cref="System.Single"/> for the point's ordinate
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>; true if the rect conains the point, false otherwise
-		/// </returns>
-		public bool ContainsPoint(float x, float y)
-		{
-			return ContainsPoint(new Vector2(x, y));
-		}
-		
-		/// <summary>
-		/// Indicates if the rectangle contains a point.
-		/// </summary>
-		/// <param name="point">
-		/// A <see cref="OpenTK.Math.Vector2"/> indicating the point's coordinates
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>; true if the rect contains the point, false otherwise
-		/// </returns>
-		public bool ContainsPoint(Vector2 point)
-		{
+        #region Hit Testing
+        /// <summary>
+        /// Indicates if the rectangle contains a point.
+        /// </summary>
+        /// <param name="x">
+        /// A <see cref="System.Single"/> for the point's abscissa
+        /// </param>
+        /// <param name="y">
+        /// A <see cref="System.Single"/> for the point's ordinate
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.Boolean"/>; true if the rect conains the point, false otherwise
+        /// </returns>
+        public bool ContainsPoint(float x, float y)
+        {
+            return ContainsPoint(new Vector2(x, y));
+        }
+        
+        /// <summary>
+        /// Indicates if the rectangle contains a point.
+        /// </summary>
+        /// <param name="point">
+        /// A <see cref="OpenTK.Math.Vector2"/> indicating the point's coordinates
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.Boolean"/>; true if the rect contains the point, false otherwise
+        /// </returns>
+        public bool ContainsPoint(Vector2 point)
+        {
             return point.X >= X && point.X <= MaxX
                 && point.Y >= Y && point.Y <= MaxY;
-		}
-		#endregion
-		
-		#region Intersection
-		/// <summary>
-		/// Indicates if this rectangle intersects with another one.
-		/// </summary>
-		/// <param name="otherRect">
-		/// The <see cref="Rectangle"/> we want to test for intersection
-		/// </param>
-		/// <returns>
-		/// true if the rectangle intersects with this one; false otherwise
-		/// </returns>
-		public bool Intersects(Rectangle otherRect)
-		{
-			return ContainsPoint(otherRect.origin) || otherRect.ContainsPoint(this.origin);
-		}
-		
-		/// <summary>
-		/// Returns the intersection of two rectangles
-		/// </summary>
-		/// <param name="otherRect">
-		/// The <see cref="Rectangle"/> with which we want this rectangle to intersect
-		/// </param>
-		/// <returns>
-		/// The intersection <see cref="Rectangle"/> of both rectangles,
+        }
+        #endregion
+        
+        #region Intersection
+        /// <summary>
+        /// Indicates if this rectangle intersects with another one.
+        /// </summary>
+        /// <param name="otherRect">
+        /// The <see cref="Rectangle"/> we want to test for intersection
+        /// </param>
+        /// <returns>
+        /// true if the rectangle intersects with this one; false otherwise
+        /// </returns>
+        public bool Intersects(Rectangle otherRect)
+        {
+            return ContainsPoint(otherRect.origin) || otherRect.ContainsPoint(this.origin);
+        }
+        
+        /// <summary>
+        /// Returns the intersection of two rectangles
+        /// </summary>
+        /// <param name="otherRect">
+        /// The <see cref="Rectangle"/> with which we want this rectangle to intersect
+        /// </param>
+        /// <returns>
+        /// The intersection <see cref="Rectangle"/> of both rectangles,
         /// or <c>null</c> if they do not intersect.
-		/// </returns>
-		public Rectangle? Intersection(Rectangle otherRect)
-		{
-			if (ContainsPoint(otherRect.origin))
+        /// </returns>
+        public Rectangle? Intersection(Rectangle otherRect)
+        {
+            if (ContainsPoint(otherRect.origin))
                 return OnewayIntersection(otherRect);
-		    
-			if (otherRect.ContainsPoint(this.origin))
+            
+            if (otherRect.ContainsPoint(this.origin))
                 return otherRect.OnewayIntersection(this);
 
-			return null;
-		}
-		#endregion
-		
-		#region Translation
-		/// <summary>
-		/// Returns a new rectangle translated by the specified units.
-		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Single"/> representing the move along the X axis
-		/// </param>
-		/// <param name="y">
-		/// A <see cref="System.Single"/> representing the move along the Y axis
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> based on this one whose origin is translated by the specified units
-		/// </returns>
-		public Rectangle Translate(float x, float y)
-		{
-			return Translate(new Vector2(x, y));
-		}
-		
-		/// <summary>
-		/// Returns a new rectangle translated by the specified vector.
-		/// </summary>
-		/// <param name="direction">
-		/// A <see cref="Vector2"/> specifying the direction of the translation
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> based on this one, whose origin is translated by the specified vector
-		/// </returns>
-		public Rectangle Translate(Vector2 direction)
-		{
-			return TranslateTo(origin + direction);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle whose abscissa is translated by the specified units
-		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Single"/> indicating the move along the X axis
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> based on this one, whose origin abscissa is translated by the specified units
-		/// </returns>
-		public Rectangle TranslateX(float x)
-		{
-			return Translate(x, 0);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle whose ordinate is translated by the specified units
-		/// </summary>
-		/// <param name="y">
-		/// A <see cref="System.Single"/> representing the move along the Y axis
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> based on this one, whose origin ordinate is translated by the specified units 
-		/// </returns>
-		public Rectangle TranslateY(float y)
-		{
-			return Translate(0, y);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle at a new origin
-		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Single"/> indicating the origin abscissa
-		/// </param>
-		/// <param name="y">
-		/// A <see cref="System.Single"/> indicating the origin ordinate
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the size of this one but the specified origin
-		/// </returns>
-		public Rectangle TranslateTo(float x, float y)
-		{
-			return TranslateTo(new Vector2(x, y));
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle at a new origin
-		/// </summary>
-		/// <param name="origin">
-		/// A <see cref="Vector2"/> representing the new origin
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the same size as this one but the specified origin
-		/// </returns>
-		public Rectangle TranslateTo(Vector2 origin)
-		{
-			return new Rectangle(origin, size);
-		}
-		#endregion
-		
-		#region Resizing
-		/// <summary>
-		/// Creates a new rectangle resized by the specified values.
-		/// </summary>
-		/// <param name="width">
-		/// A <see cref="System.Single"/> by which the width of the rectangle must be increased or decreased
-		/// </param>
-		/// <param name="height">
-		/// A <see cref="System.Single"/> by which the height of the rectangle must be increased or decreased
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the modified size
-		/// </returns>
-		public Rectangle Resize(float width, float height)
-		{
-			return Resize(new Vector2(width, height));
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle resized by the vector.
-		/// </summary>
-		/// <param name="sizeChange">
-		/// A <see cref="Vector2"/> specifying the width and height increments or decrements to be applied to the current rectangle
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the modified size
-		/// </returns>
-		public Rectangle Resize(Vector2 sizeChange)
-		{
-			return ResizeTo(size + sizeChange);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle with the width resized by a specified value
-		/// </summary>
-		/// <param name="width">
-		/// A <see cref="System.Single"/> representing the width increment or decrement to the current size
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the modified width
-		/// </returns>
-		public Rectangle ResizeWidth(float width)
-		{
-			return Resize(width, 0);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle with the height resized by a specified value
-		/// </summary>
-		/// <param name="height">
-		/// A <see cref="System.Single"/> representing the height increment or decrement to apply to the current size
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the modified height
-		/// </returns>
-		public Rectangle ResizeHeight(float height)
-		{
-			return Resize(0, height);
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle at the same origin but a different size
-		/// </summary>
-		/// <param name="width">
-		/// A <see cref="System.Single"/> to determine the width of the new rectangle
-		/// </param>
-		/// <param name="height">
-		/// A <see cref="System.Single"/> indicating the height of the new rectangle
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> at the same origin but with a different size
-		/// </returns>
-		public Rectangle ResizeTo(float width, float height)
-		{
-			return ResizeTo(new Vector2(width, height));
-		}
-		
-		/// <summary>
-		/// Creates a new rectangle at the same origin but a different size
-		/// </summary>
-		/// <param name="newSize">
-		/// A <see cref="Vector2"/> specifying the size of the new rectangle
-		/// </param>
-		/// <returns>
-		/// A new <see cref="Rectangle"/> with the same origin as this rectangle's one but a different size
-		/// </returns>
-		public Rectangle ResizeTo(Vector2 newSize)
-		{
-			return new Rectangle(origin, newSize);
-		}
-		#endregion
+            return null;
+        }
+        #endregion
+        
+        #region Translation
+        /// <summary>
+        /// Returns a new rectangle translated by the specified units.
+        /// </summary>
+        /// <param name="x">
+        /// A <see cref="System.Single"/> representing the move along the X axis
+        /// </param>
+        /// <param name="y">
+        /// A <see cref="System.Single"/> representing the move along the Y axis
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> based on this one whose origin is translated by the specified units
+        /// </returns>
+        public Rectangle Translate(float x, float y)
+        {
+            return Translate(new Vector2(x, y));
+        }
+        
+        /// <summary>
+        /// Returns a new rectangle translated by the specified vector.
+        /// </summary>
+        /// <param name="direction">
+        /// A <see cref="Vector2"/> specifying the direction of the translation
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> based on this one, whose origin is translated by the specified vector
+        /// </returns>
+        public Rectangle Translate(Vector2 direction)
+        {
+            return TranslateTo(origin + direction);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle whose abscissa is translated by the specified units
+        /// </summary>
+        /// <param name="x">
+        /// A <see cref="System.Single"/> indicating the move along the X axis
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> based on this one, whose origin abscissa is translated by the specified units
+        /// </returns>
+        public Rectangle TranslateX(float x)
+        {
+            return Translate(x, 0);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle whose ordinate is translated by the specified units
+        /// </summary>
+        /// <param name="y">
+        /// A <see cref="System.Single"/> representing the move along the Y axis
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> based on this one, whose origin ordinate is translated by the specified units 
+        /// </returns>
+        public Rectangle TranslateY(float y)
+        {
+            return Translate(0, y);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle at a new origin
+        /// </summary>
+        /// <param name="x">
+        /// A <see cref="System.Single"/> indicating the origin abscissa
+        /// </param>
+        /// <param name="y">
+        /// A <see cref="System.Single"/> indicating the origin ordinate
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the size of this one but the specified origin
+        /// </returns>
+        public Rectangle TranslateTo(float x, float y)
+        {
+            return TranslateTo(new Vector2(x, y));
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle at a new origin
+        /// </summary>
+        /// <param name="origin">
+        /// A <see cref="Vector2"/> representing the new origin
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the same size as this one but the specified origin
+        /// </returns>
+        public Rectangle TranslateTo(Vector2 origin)
+        {
+            return new Rectangle(origin, size);
+        }
+        #endregion
+        
+        #region Resizing
+        /// <summary>
+        /// Creates a new rectangle resized by the specified values.
+        /// </summary>
+        /// <param name="width">
+        /// A <see cref="System.Single"/> by which the width of the rectangle must be increased or decreased
+        /// </param>
+        /// <param name="height">
+        /// A <see cref="System.Single"/> by which the height of the rectangle must be increased or decreased
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the modified size
+        /// </returns>
+        public Rectangle Resize(float width, float height)
+        {
+            return Resize(new Vector2(width, height));
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle resized by the vector.
+        /// </summary>
+        /// <param name="sizeChange">
+        /// A <see cref="Vector2"/> specifying the width and height increments or decrements to be applied to the current rectangle
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the modified size
+        /// </returns>
+        public Rectangle Resize(Vector2 sizeChange)
+        {
+            return ResizeTo(size + sizeChange);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle with the width resized by a specified value
+        /// </summary>
+        /// <param name="width">
+        /// A <see cref="System.Single"/> representing the width increment or decrement to the current size
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the modified width
+        /// </returns>
+        public Rectangle ResizeWidth(float width)
+        {
+            return Resize(width, 0);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle with the height resized by a specified value
+        /// </summary>
+        /// <param name="height">
+        /// A <see cref="System.Single"/> representing the height increment or decrement to apply to the current size
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the modified height
+        /// </returns>
+        public Rectangle ResizeHeight(float height)
+        {
+            return Resize(0, height);
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle at the same origin but a different size
+        /// </summary>
+        /// <param name="width">
+        /// A <see cref="System.Single"/> to determine the width of the new rectangle
+        /// </param>
+        /// <param name="height">
+        /// A <see cref="System.Single"/> indicating the height of the new rectangle
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> at the same origin but with a different size
+        /// </returns>
+        public Rectangle ResizeTo(float width, float height)
+        {
+            return ResizeTo(new Vector2(width, height));
+        }
+        
+        /// <summary>
+        /// Creates a new rectangle at the same origin but a different size
+        /// </summary>
+        /// <param name="newSize">
+        /// A <see cref="Vector2"/> specifying the size of the new rectangle
+        /// </param>
+        /// <returns>
+        /// A new <see cref="Rectangle"/> with the same origin as this rectangle's one but a different size
+        /// </returns>
+        public Rectangle ResizeTo(Vector2 newSize)
+        {
+            return new Rectangle(origin, newSize);
+        }
+        #endregion
 
         #region Object Model
         /// <summary>
@@ -467,11 +467,11 @@ namespace Orion.Geometry
         #endregion
 
         #region Private
-		private Rectangle OnewayIntersection(Rectangle otherRect)
-		{
-			return otherRect.ResizeTo(otherRect.size + origin - otherRect.origin);
-		}
-		#endregion
+        private Rectangle OnewayIntersection(Rectangle otherRect)
+        {
+            return otherRect.ResizeTo(otherRect.size + origin - otherRect.origin);
+        }
+        #endregion
         #endregion
         #endregion
 

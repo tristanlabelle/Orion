@@ -7,58 +7,79 @@ using Orion.Commandment.Commands;
 
 namespace Orion.Commandment
 {
+    /// <summary>
+    /// Abstract base class for commanders, classes responsible of generating
+    /// <see cref="Command"/>s that alter the game's state.
+    /// </summary>
     public abstract class Commander
     {
-
         #region Fields
-        Faction faction;
-        World world;
-
-
-
+        private readonly Faction faction;
         #endregion
 
         #region Constructors
-        public Commander(Faction faction, World world)
+        /// <summary>
+        /// Initializes a new <see cref="Commander"/> from the <see cref="Faction"/> it controls.
+        /// </summary>
+        /// <param name="faction">The <see cref="Faction"/> this <see cref="Commander"/> controls.</param>
+        public Commander(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(world, "world");
 
-            this.world = world;
             this.faction = faction;
         }
         #endregion
 
         #region Events
-
+        /// <summary>
+        /// Raised when a <see cref="Commander"/> generates a new <see cref="Command"/>.
+        /// </summary>
+        public event GenericEventHandler<Commander, Command> CommandGenerated;
         #endregion
 
-        
         #region Properties
         /// <summary>
-        /// Gets the <see cref="Faction"/> of this Commander.
+        /// Gets the <see cref="Faction"/> that this <see cref="Commander"/> is in control of.
         /// </summary>
-        /// 
         public Faction Faction
         {
             get { return faction; }
         }
 
         /// <summary>
-        /// Gets the <see cref="World"/> of this Commander.
+        /// Gets the <see cref="World"/> of the <see cref="Faction"/>
+        /// which  is controlled by this <see cref="Commander"/>.
         /// </summary>
-        /// 
-        public World World
+        protected World World
         {
-            get { return world; }
+            get { return faction.World; }
         }
-
         #endregion
 
-        
-
         #region Methods
-        public abstract IEnumerable<Command> CreateCommands();
+        /// <summary>
+        /// Raises the <see cref="E:CommandGenerated"/> event
+        /// with the <see cref="Command"/> that was generated.
+        /// </summary>
+        /// <param name="command">The <see cref="Command"/> that was generated.</param>
+        protected void GenerateCommand(Command command)
+        {
+            Argument.EnsureNotNull(command, "command");
+
+            if (CommandGenerated != null) CommandGenerated(this, command);
+        }
+
+        /// <summary>
+        /// Updates this <see cref="Commander"/> for a frame, giving it a chance
+        /// to generate <see cref="Command"/>s.
+        /// </summary>
+        /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
+        public abstract void Update(float timeDelta);
+
+        public override string ToString()
+        {
+            return "{0} of {1}".FormatInvariant(GetType().Name, faction);
+        }
         #endregion
     }
 }

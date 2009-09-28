@@ -70,7 +70,6 @@
     <Compile Include="Tasks\Follow.cs" />
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\Stand.cs" />
-    <Compile Include="Terrain.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="World.cs" />

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
+using Orion.Geometry;
+
 namespace Orion.GameLogic
 {
     /// <summary>
@@ -65,6 +67,38 @@ namespace Orion.GameLogic
         public ICollection<Unit> Units
         {
             get { return units; }
+        }
+
+        /// <summary>
+        /// Gets the width of this <see cref="World"/>, in tiles.
+        /// </summary>
+        public int Width
+        {
+            get
+            {
+                // To be later replaced by Terrain.Width.
+                return 100;
+            }
+        }
+
+        /// <summary>
+        /// Gets the height of this <see cref="World"/>, in tiles.
+        /// </summary>
+        public int Height
+        {
+            get
+            {
+                // To be later replaced by Terrain.Width.
+                return 100;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Rectangle"/> that bounds this <see cref="World"/>, in tiles.
+        /// </summary>
+        public Rectangle Bounds
+        {
+            get { return new Rectangle(0, 0, Width, Height); }
         }
         #endregion
 

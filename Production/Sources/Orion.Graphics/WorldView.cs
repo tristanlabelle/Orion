@@ -16,10 +16,10 @@ namespace Orion.Graphics
     /// <summary>
     /// A <see cref="View"/> which displays the game <see cref="Terrain"/>.
     /// </summary>
-    public sealed class TerrainView : View
+    public sealed class WorldView : View
     {
         #region Fields
-        private World world;
+        private readonly WorldRenderer worldRenderer;
         #endregion
 
         #region Constructor
@@ -29,24 +29,10 @@ namespace Orion.Graphics
 		/// <param name="frame">
 		/// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
 		/// </param>
-        public TerrainView(Rectangle frame)
+        public WorldView(Rectangle frame, WorldRenderer renderer)
             : base(frame)
         {
-            world = new World();
-
-            for (uint i = 0; i < 3; i++)
-            {
-                world.Units.Add(new Unit(i, new UnitType("mcwarrior"), world));
-            }
-            float count = 0;
-            foreach (Unit unit in world.Units)
-            {
-                unit.Position = new Vector2(count * 10, count * 10);
-                count++;
-            }
-
-            Frame panel = new Frame(new Rectangle(50, 50, 100, 100));
-            Children.Add(panel);
+			worldRenderer = renderer;
         }
         #endregion
 
@@ -56,7 +42,8 @@ namespace Orion.Graphics
 		/// </summary>
         protected override void Draw()
         {
-			//throw new NotImplementedException();
+			worldRenderer.DrawTerrain(context, Bounds);
+			worldRenderer.DrawEntities(context, Bounds);
         }
         #endregion
     }

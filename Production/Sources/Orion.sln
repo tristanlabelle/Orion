@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Commandment", "Orion.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Graphics", "Orion.Graphics\Orion.Graphics.csproj", "{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Main", "Orion.Main\Orion.Main.csproj", "{CFCCA285-1ED8-4D2F-94C2-B9F50120A92E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCCA285-1ED8-4D2F-94C2-B9F50120A92E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCCA285-1ED8-4D2F-94C2-B9F50120A92E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCCA285-1ED8-4D2F-94C2-B9F50120A92E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCCA285-1ED8-4D2F-94C2-B9F50120A92E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.GameLogic\Orion.GameLogic.csproj

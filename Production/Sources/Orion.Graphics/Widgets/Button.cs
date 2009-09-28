@@ -22,10 +22,10 @@ namespace Orion.Graphics.Widgets
 
         protected override void Draw()
         {
-            Context.FillColor = Color.Blue;
-            Context.StrokeColor = Color.Black;
-            Context.Fill(Bounds);
-            Context.Stroke(Bounds);
+            context.FillColor = Color.Blue;
+            context.StrokeColor = Color.Black;
+            context.Fill(Bounds);
+            context.Stroke(Bounds);
 			
         }
     }

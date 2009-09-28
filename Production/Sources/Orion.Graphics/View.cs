@@ -24,7 +24,7 @@ namespace Orion.Graphics
         #region Fields
         private View parent;
         private readonly ViewChildrenCollection children;
-        internal GraphicsContext Context;
+        internal readonly GraphicsContext context;
         #endregion
 
         #region Constructors
@@ -36,7 +36,7 @@ namespace Orion.Graphics
         /// </param>
         public View(Rectangle frame)
         {
-            Context = new GraphicsContext(new Rectangle(frame.Size));
+            context = new GraphicsContext(new Rectangle(frame.Size));
             children = new ViewChildrenCollection(this);
             Frame = frame;
         }
@@ -139,8 +139,8 @@ namespace Orion.Graphics
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds
         {
-            get { return Context.CoordinateSystem; }
-            set { Context.CoordinateSystem = value; }
+            get { return context.CoordinateSystem; }
+            set { context.CoordinateSystem = value; }
         }
         #endregion
 
@@ -202,7 +202,7 @@ namespace Orion.Graphics
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         internal virtual bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-			Context.SetUpGLContext(Frame);
+			context.SetUpGLContext(Frame);
 			
             Matrix4 transformMatrix;
             GL.GetFloat(GetPName.ModelviewMatrix, out transformMatrix);
@@ -219,7 +219,7 @@ namespace Orion.Graphics
 				}
 			}
 			
-			Context.RestoreGLContext();
+			context.RestoreGLContext();
 
             if (eventCanSink)
             {
@@ -314,7 +314,7 @@ namespace Orion.Graphics
         /// </summary>
         internal virtual void Render()
         {
-            Context.SetUpGLContext(Frame);
+            context.SetUpGLContext(Frame);
 
             Draw();
 
@@ -323,7 +323,7 @@ namespace Orion.Graphics
                 view.Render();
             }
 
-            Context.RestoreGLContext();
+            context.RestoreGLContext();
         }
         #endregion
         #endregion

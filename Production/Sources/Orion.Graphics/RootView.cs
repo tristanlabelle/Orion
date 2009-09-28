@@ -64,7 +64,7 @@ namespace Orion.Graphics
         protected override void Draw()
         { }
 
-        internal override void Render()
+        public new void Render()
         {
             GL.ClearColor(Color.ForestGreen); // we all love forest green!
             GL.Clear(ClearBufferMask.ColorBufferBit);

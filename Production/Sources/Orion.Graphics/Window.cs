@@ -122,14 +122,5 @@ namespace Orion.Graphics
                 glControl.Refresh();
             }
         }
-
-        /// <summary>
-        /// Executes the test program. Creates a game window and runs it. 
-        /// </summary>
-        public static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.Run(new Window());
-        }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Commandment", "Orion.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Graphics", "Orion.Graphics\Orion.Graphics.csproj", "{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Main", "Orion.Main\Orion.Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

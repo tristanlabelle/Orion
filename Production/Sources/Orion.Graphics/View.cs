@@ -134,7 +134,7 @@ namespace Orion.Graphics
         public virtual Rectangle Frame { get; set; }
 
         /// <summary>
-        /// The internal coordinates parentSystem rectangle used for drawing.
+        /// The internal coordinate system rectangle used for drawing.
         /// </summary>
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
         public Rectangle Bounds

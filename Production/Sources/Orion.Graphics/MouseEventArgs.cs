@@ -10,7 +10,7 @@ namespace Orion.Graphics
     /// <summary>
     /// Indicates a mouse event type. Internal use only.
     /// </summary>
-    public enum MouseEventType
+    internal enum MouseEventType
     {
         MouseDown, MouseUp, MouseClicked, MouseMoved
     }

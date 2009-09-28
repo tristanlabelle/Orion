@@ -232,7 +232,44 @@ namespace Orion.Geometry
                 && point.Y >= Y && point.Y <= MaxY;
         }
         #endregion
-        
+
+        #region Coordinate Systems
+        /// <summary>
+        /// Converts a point from the coordinate system in which this <see cref="Rectangle"/>
+        /// is defined to the local coordinate system defined by the bounds of this
+        /// <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="point">
+        /// A <see cref="Point"/> in the coordinate system in which this <see cref="Rectangle"/> is defined.
+        /// </param>
+        /// <returns>
+        /// The corresponding point in the local coordinate system
+        /// defined by the bounds of this <see cref="Rectangle"/>.
+        /// </returns>
+        public Vector2 ParentToLocal(Vector2 point)
+        {
+            return new Vector2((point.X - X) / Width, (point.Y - Y) / Height);
+        }
+
+        /// <summary>
+        /// Converts a point from the local coordinate system defined
+        /// by the bounds of this <see cref="Rectangle"/> to the
+        /// coordinate system in which this <see cref="Rectangle"/> is defined.
+        /// </summary>
+        /// <param name="point">
+        /// A point in the local coordinate system defined
+        /// by the bounds of this <see cref="Rectangle"/>.
+        /// </param>
+        /// <returns>
+        /// The corresponding point in the coordinate system
+        /// in which this <see cref="Rectangle"/> is defined.
+        /// </returns>
+        public Vector2 LocalToParent(Vector2 point)
+        {
+            return new Vector2(point.X * Width + X, point.Y * Height + Y);
+        }
+        #endregion
+
         #region Intersection
         /// <summary>
         /// Indicates if this rectangle intersects with another one.

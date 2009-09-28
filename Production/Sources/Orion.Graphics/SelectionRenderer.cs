@@ -23,6 +23,14 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new <see cref="SelectionRenderer"/> from a
+        /// <see cref="SelectionManager"/> providing information
+        /// on the current selection.
+        /// </summary>
+        /// <param name="selectionManager">
+        /// The <see cref="SelectionManager"/> which provides selection information.
+        /// </param>
         public SelectionRenderer(SelectionManager selectionManager)
         {
             Argument.EnsureNotNull(selectionManager, "selectionManager");

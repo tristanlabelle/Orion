@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using OpenTK.Math;
+
 namespace Orion.GameLogic.Tasks
 {
+    // Étienne, ça compile pas.
+
+    /*
     /// <summary>
     /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>
     /// </summary>
@@ -53,7 +58,7 @@ namespace Orion.GameLogic.Tasks
 
         }
         #endregion
-
     }
+    */
 }
 

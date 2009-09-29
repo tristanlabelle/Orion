@@ -7,10 +7,7 @@ using System.Windows.Forms;
 
 using OpenTK.Math;
 
-using Orion.GameLogic;
 using Orion.Geometry;
-using Orion.Graphics;
-using Orion.Commandment;
 
 using Color = System.Drawing.Color;
 
@@ -21,7 +18,7 @@ namespace Orion.Graphics
     /// </summary>
     public partial class Window : Form
     {
-        private View rootView;
+        internal readonly View rootView;
 
         /// <summary>
         /// Instantiates a new game window. 
@@ -32,34 +29,6 @@ namespace Orion.Graphics
             Rectangle maxResolution = new Rectangle(1024f, 768f);
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             rootView = new RootView(windowBounds, maxResolution);
-
-            World world = new World();
-            WorldView worldView = new WorldView(maxResolution, new WorldRenderer(world));
-            worldView.Bounds = new Rectangle(0, 0, 32, 24);
-            rootView.Children.Add(worldView);
-            
-            // putting little guys to life
-            {
-                CommandManager commandManager = new CommandManager();
-    
-                Faction redFaction = new Faction(world, "Red", Color.Red);
-                MockCommander redCommander = new MockCommander(redFaction);
-                commandManager.AddCommander(redCommander);
-
-                Faction blueFaction = new Faction(world, "Blue", Color.Blue);
-                MockCommander blueCommander = new MockCommander(blueFaction);
-                commandManager.AddCommander(blueCommander);
-
-                UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
-                Random random = new Random();
-                for (int i = 0; i < 60; ++i)
-                {
-                    Unit unit = new Unit((uint)i, unitTypes[i % unitTypes.Length], world);
-                    unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                    unit.Faction = (i % 2) == 0 ? redFaction : blueFaction;
-                    world.Units.Add(unit);
-                }
-            }
         }
         
         /// <summary>
@@ -106,7 +75,7 @@ namespace Orion.Graphics
                 case System.Windows.Forms.MouseButtons.Right: pressedButton = MouseButton.Right; break;
             }
             
-            rootView.PropagateMouseEvent(type, new Orion.Graphics.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks));
+            rootView.PropagateMouseEvent(type, new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks));
         }
 
         /// <summary>

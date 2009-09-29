@@ -5,12 +5,12 @@ using System.Text;
 
 using OpenTK.Math;
 
-namespace Orion.Graphics
+namespace Orion
 {
     /// <summary>
     /// Indicates a mouse event type. Internal use only.
     /// </summary>
-    internal enum MouseEventType
+    public enum MouseEventType
     {
         MouseDown, MouseUp, MouseClicked, MouseMoved
     }
@@ -63,37 +63,6 @@ namespace Orion.Graphics
         /// How many consecutive clicks were there (if any)
         /// </summary>
         public readonly int Clicks;
-        /// <summary>
-        /// A shorthand property to get a vector containing the position
-        /// </summary>
-        internal Vector2 Position
-        {
-            get
-            {
-                return new Vector2(X, Y);
-            }
-        }
-
-        /// <summary>
-        /// Creates a MouseEventArgs using the data contained in a <see cref="System.Windows.Forms.MouseEventArgs"/> object
-        /// to pass it around to <see cref="View"/> subclasses event listeners.
-        /// </summary>
-        /// <param name="args">The <see cref="System.Windows.Forms.MouseEventArgs"/> originating event</param>
-        internal MouseEventArgs(System.Windows.Forms.MouseEventArgs args)
-        {
-            Console.WriteLine("Created event");
-            X = args.X;
-            Y = args.Y;
-
-            ButtonPressed = MouseButton.None;
-            switch (args.Button)
-            {
-                case System.Windows.Forms.MouseButtons.Left: ButtonPressed = MouseButton.Left; break;
-                case System.Windows.Forms.MouseButtons.Middle: ButtonPressed = MouseButton.Middle; break;
-                case System.Windows.Forms.MouseButtons.Right: ButtonPressed = MouseButton.Right; break;
-            }
-            Clicks = args.Clicks;
-        }
         
         /// <summary>
         /// Creates a MouseEventArgs structure with a specified point, which mouse button was pressed, and the number of repeated clicks. 
@@ -111,7 +80,7 @@ namespace Orion.Graphics
         /// <param name="clicks">
         /// The number of repeated clicks with the <see cref="MouseButton"/>
         /// </param>
-        internal MouseEventArgs(float x, float y, MouseButton button, int clicks)
+        public MouseEventArgs(float x, float y, MouseButton button, int clicks)
         {
             X = x;
             Y = y;

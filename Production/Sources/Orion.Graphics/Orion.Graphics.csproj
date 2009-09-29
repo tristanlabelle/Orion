@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameRenderer.cs" />
     <Compile Include="GraphicsContext.cs" />
-    <Compile Include="MouseEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootView.cs" />
     <Compile Include="SelectionManager.cs" />

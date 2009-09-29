@@ -13,6 +13,11 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
+    public enum StrokeStyle
+    {
+        Solid, Dashed
+    }
+
     /// <summary>
     /// Represents a space in which it is possible to draw. Methods to fill and stroke shapes are supplied.
     /// </summary>
@@ -23,6 +28,7 @@ namespace Orion.Graphics
         private Rectangle coordinateSystem;
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
+        private StrokeStyle strokeStyle = StrokeStyle.Solid;
         private bool readyForDrawing;
         #endregion
 
@@ -65,6 +71,15 @@ namespace Orion.Graphics
         {
             get { return strokeColor; }
             set { strokeColor = value; }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="StrokeStyle"/> currently used to stroke shape outlines. (Currently has no effect.)
+        /// </summary>
+        public StrokeStyle StrokeStyle
+        {
+            get { return strokeStyle; }
+            set { strokeStyle = value; }
         }
         #endregion
 
@@ -124,7 +139,7 @@ namespace Orion.Graphics
             for (int i = 0; i < vertexCount; i++)
             {
                 double angle = angleIncrement * i;
-                GL.Vertex2(ellipse.Center.X + ellipse.Radii.X * Math.Cos(angle),
+                AddVertex(ellipse.Center.X + ellipse.Radii.X * Math.Cos(angle),
                     ellipse.Center.Y + ellipse.Radii.Y * Math.Sin(angle));
             }
         }
@@ -158,10 +173,10 @@ namespace Orion.Graphics
         private void DrawVertices(Rectangle rectangle)
         {
             if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            GL.Vertex2(rectangle.X, rectangle.Y);
-            GL.Vertex2(rectangle.X, rectangle.MaxY);
-            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
-            GL.Vertex2(rectangle.MaxX, rectangle.Y);
+            AddVertex(rectangle.X, rectangle.Y);
+            AddVertex(rectangle.X, rectangle.MaxY);
+            AddVertex(rectangle.MaxX, rectangle.MaxY);
+            AddVertex(rectangle.MaxX, rectangle.Y);
         }
         #endregion
 
@@ -193,9 +208,9 @@ namespace Orion.Graphics
         private void DrawVertices(Triangle triangle)
         {
             if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            GL.Vertex2(triangle.Vertex1);
-            GL.Vertex2(triangle.Vertex2);
-            GL.Vertex2(triangle.Vertex3);
+            AddVertex(triangle.Vertex1);
+            AddVertex(triangle.Vertex2);
+            AddVertex(triangle.Vertex3);
         }
         #endregion
 
@@ -231,6 +246,16 @@ namespace Orion.Graphics
          * 
          * */
         #endregion
+
+        private void AddVertex(double x, double y)
+        {
+            AddVertex(new Vector2((float)x, (float)y));
+        }
+
+        private void AddVertex(Vector2 position)
+        {
+            GL.Vertex2(position);
+        }
         #endregion
 
         #region Non-Public

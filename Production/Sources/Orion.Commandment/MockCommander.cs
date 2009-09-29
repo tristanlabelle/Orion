@@ -14,6 +14,10 @@ namespace Orion.Commandment
 {
     public sealed class MockCommander : Commander
     {
+        #region fields
+        Random random = new Random();
+
+        #endregion
         #region Constructors
         public MockCommander(Faction faction)
             : base(faction)
@@ -24,8 +28,15 @@ namespace Orion.Commandment
         #region Methods
         public override void Update(float timeDelta)
         {
-            Command command = new Move(Faction, World.Units.Where(unit => unit.Faction == Faction), new Vector2(0, 0));
-            GenerateCommand(command);
+            List<Unit> unitsToMove = World.Units.Where(unit => unit.Faction == Faction && unit.Task.HasEnded).ToList();
+            if (unitsToMove.Count != 0)
+            {
+                Command command = new Move(Faction,
+                    unitsToMove,
+                     new Vector2(random.Next(World.Width), random.Next(World.Height)));
+                GenerateCommand(command);
+            }
+           
         }
         #endregion
     }

@@ -45,7 +45,7 @@ namespace Orion.GameLogic
         /// </summary>
         public float MovementSpeed
         {
-            get { return 1; }
+            get { return 10; }
         }
         #endregion
 

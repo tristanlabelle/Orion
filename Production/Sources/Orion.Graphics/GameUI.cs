@@ -15,20 +15,15 @@ namespace Orion.Graphics
     /// Objects of this class are used to render the game. They encapsulate a game window and a world renderer.
     /// They are capable of refreshing the OpenGL control.
     /// </summary>
-    public class GameUI
+    public sealed class GameUI : IDisposable
     {
+        #region Fields
         private readonly Window mainWindow;
+        private readonly WorldRenderer renderer;
         private SelectionManager selectionManager;
+        #endregion
 
-        /// <summary>
-        /// The object used to render the world.
-        /// </summary>
-        public readonly WorldRenderer Renderer;
-        /// <summary>
-        /// The Form in which resides the OpenGL control that renders the game.
-        /// </summary>
-        public Form MainWindow { get { return mainWindow; } }
-
+        #region Constructors
         /// <summary>
         /// Constructs a GameRenderer from a passed World object.
         /// </summary>
@@ -36,17 +31,29 @@ namespace Orion.Graphics
         public GameUI(World world)
         {
             mainWindow = new Window();
-            Renderer = new WorldRenderer(world);
 
+            renderer = new WorldRenderer(world);
             selectionManager = new SelectionManager(world);
+            WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, selectionManager);
 
-            WorldView view = new WorldView(mainWindow.rootView.Bounds, Renderer, selectionManager);
-            view.Bounds = new Rectangle(0, 0, 32, 24);
+            view.Bounds = new Rectangle(0, 0, 40, 30);
             mainWindow.rootView.Children.Add(view);
 
             view.MouseDown += WorldViewMouseDown;
             view.MouseMoved += WorldViewMouseMove;
             view.MouseUp += WorldViewMouseUp;
+
+            mainWindow.Show();
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets a value indicating if the window is still created.
+        /// </summary>
+        public bool IsWindowCreated
+        {
+            get { return mainWindow.Created; }
         }
 
         private void WorldViewMouseDown(View source, MouseEventArgs args)
@@ -63,13 +70,25 @@ namespace Orion.Graphics
         {
             selectionManager.OnMouseMove(new Vector2(args.X, args.Y));
         }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Causes the game to render itself.
+        /// </summary>
+        public void Render()
+        {
+            Application.DoEvents();
+            mainWindow.Refresh();
+        }
 
         /// <summary>
-        /// Refreshes the OpenGL view of the game.
+        /// Disposes this <see cref="GameRenderer"/>, releasing all used resources.
         /// </summary>
-        public void Refresh()
+        public void Dispose()
         {
-            mainWindow.rootView.Render();
+            mainWindow.Dispose();
         }
+        #endregion
     }
 }

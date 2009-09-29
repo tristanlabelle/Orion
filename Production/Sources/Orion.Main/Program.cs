@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Color = System.Drawing.Color;
+using System.Diagnostics;
 
 using OpenTK.Math;
 
 using Orion.Graphics;
 using Orion.GameLogic;
 using Orion.Commandment;
+
+using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
@@ -18,7 +20,28 @@ namespace Orion.Main
         /// Main entry point for the program.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            World world = CreateWorld();
+
+            using (GameUI ui = new GameUI(world))
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                while (ui.IsWindowCreated)
+                {
+                    ui.Render();
+                    float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
+                    world.Update(timeDelta);
+                    stopwatch.Reset();
+                    stopwatch.Start();
+                }
+            }
+        }
+
+        private static World CreateWorld()
         {
             World world = new World();
 
@@ -44,12 +67,7 @@ namespace Orion.Main
                     world.Units.Add(unit);
                 }
             }
-
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            GameUI renderer = new GameUI(world);
-            Application.Run(renderer.MainWindow);
+            return world;
         }
     }
 }

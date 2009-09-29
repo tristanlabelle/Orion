@@ -17,23 +17,29 @@ namespace Orion.Graphics
     /// </summary>
     public partial class Window : Form
     {
+        #region Fields
         internal readonly View rootView;
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Instantiates a new game window. 
         /// </summary>
         public Window()
         {
             InitializeComponent();
+
             Rectangle maxResolution = new Rectangle(1024f, 768f);
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             rootView = new RootView(windowBounds, maxResolution);
         }
-        
+        #endregion
+
+        #region Methods
         /// <summary>
-        /// Refreshes the OpenGL control. 
+        /// Refreshes this game window, causing a render.
         /// </summary>
-        public void RenderGLControl()
+        public override void Refresh()
         {
             glControl.Refresh();
         }
@@ -90,5 +96,6 @@ namespace Orion.Graphics
                 glControl.Refresh();
             }
         }
+        #endregion
     }
 }

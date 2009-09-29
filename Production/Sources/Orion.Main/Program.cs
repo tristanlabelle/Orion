@@ -48,7 +48,7 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            GameRenderer renderer = new GameRenderer(world);
+            GameUI renderer = new GameUI(world);
             Application.Run(renderer.MainWindow);
         }
     }

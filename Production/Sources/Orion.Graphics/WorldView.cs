@@ -20,6 +20,7 @@ namespace Orion.Graphics
     {
         #region Fields
         private readonly WorldRenderer worldRenderer;
+        private readonly SelectionRenderer selectionRenderer;
         #endregion
 
         #region Constructor
@@ -30,11 +31,12 @@ namespace Orion.Graphics
         /// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
         /// </param>
         /// <param name="renderer">The <see cref="WorldRenderer"/> to be used to draw the game <see cref="World"/>.</param>
-        public WorldView(Rectangle frame, WorldRenderer renderer)
+        public WorldView(Rectangle frame, WorldRenderer renderer, SelectionManager selection)
             : base(frame)
         {
             Argument.EnsureNotNull(renderer, "renderer");
             worldRenderer = renderer;
+            selectionRenderer = new SelectionRenderer(selection);
         }
         #endregion
 
@@ -46,6 +48,8 @@ namespace Orion.Graphics
         {
             worldRenderer.DrawTerrain(context, Bounds);
             worldRenderer.DrawEntities(context, Bounds);
+            selectionRenderer.DrawAboveUnits(context);
+            selectionRenderer.DrawBelowUnits(context);
         }
         #endregion
     }

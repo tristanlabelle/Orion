@@ -17,8 +17,8 @@ namespace Orion.Graphics
     public sealed class SelectionManager
     {
         #region Fields
-        private readonly Faction faction;
         private readonly List<Unit> selectedUnits = new List<Unit>();
+        private readonly World world;
         private Vector2 cursorPosition;
         private Vector2? selectionStartPosition;
         #endregion
@@ -28,11 +28,11 @@ namespace Orion.Graphics
         /// Initializes a new <see cref="SelectionManager"/> from the <see cref="Faction"/>
         /// which is being controlled.
         /// </summary>
-        /// <param name="faction">The <see cref="Faction"/> being controlled.</param>
-        public SelectionManager(Faction faction)
+        /// <param name="world">The <see cref="World"/> used for now.</param>
+        public SelectionManager(World world)
         {
-            Argument.EnsureNotNull(faction, "faction");
-            this.faction = faction;
+            Argument.EnsureNotNull(world, "faction");
+            this.world = world;
         }
         #endregion
 
@@ -85,9 +85,7 @@ namespace Orion.Graphics
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = faction.World.Units
-                        .Where(unit => unit.Faction == faction)
-                        .Where(unit => selectionRectangle.ContainsPoint(unit.Position));
+                    var units = world.Units.Where(unit => selectionRectangle.ContainsPoint(unit.Position));
 
                     selectedUnits.Clear();
                     selectedUnits.AddRange(units);

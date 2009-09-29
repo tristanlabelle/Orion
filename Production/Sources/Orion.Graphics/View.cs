@@ -142,6 +142,23 @@ namespace Orion.Graphics
             get { return context.CoordinateSystem; }
             set { context.CoordinateSystem = value; }
         }
+
+        /// <summary>
+        /// Gets the rectangle which bounds this <see cref="View"/> in top-level coordinates.
+        /// </summary>
+        public Rectangle AbsoluteFrame
+        {
+            get
+            {
+                if (parent == null) return Frame;
+                Rectangle parentFrame = parent.AbsoluteFrame;
+                Rectangle parentBounds = parent.Bounds;
+
+                return Rectangle.FromPoints(
+                    parentFrame.Origin + parentBounds.LocalToParent(Frame.Origin),
+                    parentFrame.Origin + parentBounds.LocalToParent(Frame.Max));
+            }
+        }
         #endregion
 
         #region Methods

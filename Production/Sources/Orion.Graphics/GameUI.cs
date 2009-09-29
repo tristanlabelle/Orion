@@ -30,13 +30,15 @@ namespace Orion.Graphics
         /// <param name="world">The World object containing the game data</param>
         public GameUI(World world)
         {
+            Argument.EnsureNotNull(world, "world");
+
             mainWindow = new Window();
 
             renderer = new WorldRenderer(world);
             selectionManager = new SelectionManager(world);
             WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, selectionManager);
 
-            view.Bounds = new Rectangle(0, 0, 40, 30);
+            view.Bounds = new Rectangle(-10, -10, world.Width + 20, world.Height + 20);
             mainWindow.rootView.Children.Add(view);
 
             view.MouseDown += WorldViewMouseDown;

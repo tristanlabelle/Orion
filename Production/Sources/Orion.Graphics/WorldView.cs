@@ -35,6 +35,8 @@ namespace Orion.Graphics
             : base(frame)
         {
             Argument.EnsureNotNull(renderer, "renderer");
+            Argument.EnsureNotNull(selection, "selection");
+
             worldRenderer = renderer;
             selectionRenderer = new SelectionRenderer(selection);
         }

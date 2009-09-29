@@ -42,7 +42,7 @@ namespace Orion.Commandment
         /// <summary>
         /// Updates this <see cref="CommandManager"/> for a frame.
         /// </summary>
-        /// <param name="timeDelta"></param>
+        /// <param name="timeDelta">The amount of time elapsed since the last frame.</param>
         public void Update(float timeDelta)
         {
             foreach (Commander commander in commanders)

@@ -50,7 +50,7 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(graphics, "graphics");
 
             // Later, walkable and non-walkable tiles should be distinguishable.
-            Rectangle? rectangle = world.Bounds.Intersection(viewRectangle);
+            Rectangle? rectangle = world.Bounds; //.Intersection(viewRectangle);
             if (rectangle.HasValue)
             {
                 graphics.FillColor = Color.Gray;

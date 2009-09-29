@@ -49,9 +49,9 @@ namespace Orion.Graphics
         protected override void Draw()
         {
             worldRenderer.DrawTerrain(context, Bounds);
+            selectionRenderer.DrawBelowUnits(context);
             worldRenderer.DrawEntities(context, Bounds);
             selectionRenderer.DrawAboveUnits(context);
-            selectionRenderer.DrawBelowUnits(context);
         }
         #endregion
     }

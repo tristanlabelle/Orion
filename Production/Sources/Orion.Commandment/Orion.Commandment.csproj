@@ -50,6 +50,7 @@
     <Compile Include="Commander.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandsConsoleTest.cs" />
+    <Compile Include="Commands\Attack.cs" />
     <Compile Include="Commands\MockCommand.cs" />
     <Compile Include="Commands\Cancel.cs" />
     <Compile Include="Commands\Move.cs" />

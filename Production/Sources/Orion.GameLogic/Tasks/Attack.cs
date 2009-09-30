@@ -6,10 +6,7 @@ using System.Text;
 using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
-{
-    // Étienne, ça compile pas.
-
-    /*
+{    
     /// <summary>
     /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>
     /// </summary>
@@ -18,6 +15,8 @@ namespace Orion.GameLogic.Tasks
         #region Field
         private readonly Unit striker;
         private readonly Unit enemy; 
+        private const float secondsToHitEnemy = 1;
+        private float secondsStored = 0; 
         #endregion
 
         #region Constructors
@@ -44,21 +43,38 @@ namespace Orion.GameLogic.Tasks
             if (HasEnded) 
                 return;
 
-            Vector2 delta = destination - unit.Position;
+            Vector2 delta = enemy.Position - striker.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
-            float distance = unit.Type.MovementSpeed * timeDelta;
-            if (distance < delta.Length) 
-                unit.Position += direction * distance;
-            else 
-                unit.Position = destination;
+            float distance = striker.Type.MovementSpeed * timeDelta;
+            if (distance < delta.Length)
+                striker.Position += direction * distance;
+            else
+            {
+                striker.Position = enemy.Position;
+                if(InflictDamageToEnemyPossible(timeDelta))
+                    enemy.Damage += 1;
+            }
 
-            // http://cgp.wikidot.com/circle-to-circle-collision-detection
-            // To be checked for circle collision detection. 
-
+        }/// <summary>
+        /// Calculates the number of time elapsed in seconds and 
+        /// inflicts damage to the enemy; dependant of the constant 
+        /// named "secondsToHitEnemy". 
+        /// </summary>
+        /// 
+        private bool InflictDamageToEnemyPossible(float timeDelta)
+        {
+            if (secondsStored >= secondsToHitEnemy)
+            {
+                secondsStored = 0;
+                return true;
+            }
+            else
+            {
+                secondsStored += timeDelta;
+                return false;
+            }
         }
         #endregion
     }
-    */
 }
-

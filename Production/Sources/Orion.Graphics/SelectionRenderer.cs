@@ -64,6 +64,8 @@ namespace Orion.Graphics
             {
                 graphics.StrokeColor = selectionRectangleStrokeColor;
                 graphics.Stroke(selectionManager.SelectionRectangle.Value);
+                graphics.FillColor = selectionRectangleFillColor;
+                graphics.Fill(selectionManager.SelectionRectangle.Value);
             }
         }
         #endregion
@@ -73,6 +75,7 @@ namespace Orion.Graphics
         #region Fields
         private static readonly Color selectionMarkerColor = Color.FromArgb(51, 153, 255);
         private static readonly Color selectionRectangleStrokeColor = Color.FromArgb(51, 153, 255);
+        private static readonly Color selectionRectangleFillColor = Color.FromArgb(100, 51, 153, 255);
         #endregion
         #endregion
     }

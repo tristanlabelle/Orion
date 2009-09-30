@@ -93,8 +93,8 @@ namespace Orion.Graphics
         /// <param name="vertexCount">The number of vertices to use to approximate the shape.</param>
         public void Fill(Ellipse ellipse, int vertexCount)
         {
-            GL.Begin(BeginMode.Polygon);
             CommitFillColor();
+            GL.Begin(BeginMode.Polygon);
             DrawVertices(ellipse, vertexCount);
             GL.End();
         }
@@ -115,8 +115,8 @@ namespace Orion.Graphics
         /// <param name="vertexCount">The number of vertices to use to approximate the shape.</param>
         public void Stroke(Ellipse ellipse, int vertexCount)
         {
-            GL.Begin(BeginMode.LineLoop);
             CommitStrokeColor();
+            GL.Begin(BeginMode.LineLoop);
             DrawVertices(ellipse, vertexCount);
             GL.End();
         }
@@ -152,11 +152,13 @@ namespace Orion.Graphics
         /// <param name="rectangle">A <see href="Rectangle"/> to fill with color.</param>
         public void Fill(Rectangle rectangle)
         {
-            GL.Begin(BeginMode.Polygon);
             CommitFillColor();
+            GL.Begin(BeginMode.Polygon);
             DrawVertices(rectangle);
             GL.End();
         }
+
+
 
         /// <summary>
         /// Strokes the outline of a <see cref="Rectangle"/> using the current <see cref="P:StrokeColor"/>.
@@ -164,8 +166,8 @@ namespace Orion.Graphics
         /// <param name="rectangle">A <see href="Rectangle"/> to stroke.</param>
         public void Stroke(Rectangle rectangle)
         {
-            GL.Begin(BeginMode.LineLoop);
             CommitStrokeColor();
+            GL.Begin(BeginMode.LineLoop);
             DrawVertices(rectangle);
             GL.End();
         }
@@ -187,8 +189,8 @@ namespace Orion.Graphics
         /// <param name="triangle">The <see cref="Triangle"/> to be filled.</param>
         public void Fill(Triangle triangle)
         {
-            GL.Begin(BeginMode.Triangles);
             CommitFillColor();
+            GL.Begin(BeginMode.Triangles);
             DrawVertices(triangle);
             GL.End();
         }
@@ -199,8 +201,8 @@ namespace Orion.Graphics
         /// <param name="triangle">The <see cref="Triangle"/> to be stroked.</param>
         public void Stroke(Triangle triangle)
         {
-            GL.Begin(BeginMode.LineLoop);
             CommitStrokeColor();
+            GL.Begin(BeginMode.LineLoop);
             DrawVertices(triangle);
             GL.End();
         }
@@ -264,6 +266,14 @@ namespace Orion.Graphics
         /// </summary>
         private void CommitFillColor()
         {
+            if (fillColor.A < 255)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            }
+            else
+                GL.Disable(EnableCap.Blend);
+
             GL.Color4(fillColor.R, fillColor.G, fillColor.B, fillColor.A);
         }
 

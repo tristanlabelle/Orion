@@ -506,6 +506,8 @@ namespace Orion.Geometry
         #region Private
         private Rectangle OnewayIntersection(Rectangle otherRect)
         {
+            if (otherRect.MaxX < MaxX && otherRect.MaxY < MaxY)
+                return otherRect;
             return otherRect.ResizeTo(otherRect.size + origin - otherRect.origin);
         }
         #endregion

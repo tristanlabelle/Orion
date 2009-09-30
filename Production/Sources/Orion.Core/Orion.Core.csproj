@@ -54,6 +54,7 @@
     <Compile Include="Geometry\Ellipse.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GenericEventHandler.cs" />
+    <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Geometry\Rectangle.cs" />

@@ -5,6 +5,7 @@ using System.Text;
 
 using OpenTK.Math;
 using System.Diagnostics;
+using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
@@ -155,6 +156,12 @@ namespace Orion.GameLogic
             }
         }
         #endregion
+
+        public Circle UnitCircle
+        {
+            get { return new Circle(position, 1); }
+        }
+
         #endregion
 
         #region Methods

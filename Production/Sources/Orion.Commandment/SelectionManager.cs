@@ -7,9 +7,8 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
-using Orion.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Commandment
 {
     /// <summary>
     /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.
@@ -85,9 +84,7 @@ namespace Orion.Graphics
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = world.Units.Where(unit => Intersection.RectangleIntersectsCircle(selectionRectangle, unit.UnitCircle));
-                        
-                        //selectionRectangle.ContainsPoint(unit.Position));
+                    var units = world.Units.Where(unit => selectionRectangle.ContainsPoint(unit.Position));
 
                     selectedUnits.Clear();
                     selectedUnits.AddRange(units);

@@ -10,6 +10,7 @@ using Orion.Geometry;
 using Orion.Graphics.Widgets;
 
 using Color = System.Drawing.Color;
+using Orion.Commandment;
 
 namespace Orion.Graphics
 {

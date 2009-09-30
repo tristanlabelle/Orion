@@ -32,7 +32,7 @@ namespace Orion.Main
             CommandManager commandManager = new CommandManager();
 
             Faction redFaction = new Faction(world, "Red", Color.Red);
-            MockCommander redCommander = new MockCommander(redFaction);
+            UserInputCommander redCommander = new UserInputCommander(redFaction);
             commandManager.AddCommander(redCommander);
 
             Faction blueFaction = new Faction(world, "Blue", Color.Blue);
@@ -60,7 +60,7 @@ namespace Orion.Main
 
             #endregion
 
-            using (GameUI ui = new GameUI(world))
+            using (GameUI ui = new GameUI(world,redCommander))
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 while (ui.IsWindowCreated)

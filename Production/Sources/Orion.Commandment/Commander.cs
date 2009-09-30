@@ -74,7 +74,7 @@ namespace Orion.Commandment
         /// to generate <see cref="Command"/>s.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public abstract void Update(float timeDelta);
+        public virtual void Update(float timeDelta) { }
 
         public override string ToString()
         {

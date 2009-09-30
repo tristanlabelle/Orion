@@ -8,6 +8,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 
 using OpenTK.Math;
+using Orion.Commandment;
 
 namespace Orion.Graphics
 {
@@ -20,7 +21,7 @@ namespace Orion.Graphics
         #region Fields
         private readonly Window mainWindow;
         private readonly WorldRenderer renderer;
-        private SelectionManager selectionManager;
+        private UserInputCommander userInputCommander;
         #endregion
 
         #region Constructors
@@ -28,16 +29,17 @@ namespace Orion.Graphics
         /// Constructs a GameRenderer from a passed World object.
         /// </summary>
         /// <param name="world">The World object containing the game data</param>
-        public GameUI(World world)
+        public GameUI(World world, UserInputCommander userInputCommander)
         {
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(userInputCommander, "userInputCommander");
 
             mainWindow = new Window();
 
             renderer = new WorldRenderer(world);
-            selectionManager = new SelectionManager(world);
-            WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, selectionManager);
 
+            this.userInputCommander = userInputCommander;
+            WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
             view.Bounds = new Rectangle(-10, -10, world.Width + 20, world.Height + 20);
             mainWindow.rootView.Children.Add(view);
 
@@ -60,17 +62,17 @@ namespace Orion.Graphics
 
         private void WorldViewMouseDown(View source, MouseEventArgs args)
         {
-            selectionManager.OnMouseButton(args.ButtonPressed, true);
+            userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, true);
         }
 
         private void WorldViewMouseUp(View source, MouseEventArgs args)
         {
-            selectionManager.OnMouseButton(args.ButtonPressed, false);
+            userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, false);
         }
 
         private void WorldViewMouseMove(View source, MouseEventArgs args)
         {
-            selectionManager.OnMouseMove(new Vector2(args.X, args.Y));
+            userInputCommander.OnMouseMove(new Vector2(args.X, args.Y));
         }
         #endregion
 

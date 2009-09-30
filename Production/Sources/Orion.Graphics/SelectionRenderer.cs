@@ -7,7 +7,7 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
-
+using Orion.Commandment;
 using Color = System.Drawing.Color;
 
 namespace Orion.Graphics

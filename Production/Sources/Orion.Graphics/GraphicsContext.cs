@@ -15,7 +15,10 @@ namespace Orion.Graphics
 {
     public enum StrokeStyle
     {
-        Solid, Dashed
+        Solid = 0xFFFF,
+        Dashed = 0x00FF,
+        Dotted = 0xAAAA,
+        DotDash = 0x1C47
     }
 
     /// <summary>
@@ -42,6 +45,7 @@ namespace Orion.Graphics
         internal GraphicsContext(Rectangle bounds)
         {
             coordinateSystem = bounds;
+            strokeStyle = StrokeStyle.Solid;
         }
         #endregion
 
@@ -79,7 +83,11 @@ namespace Orion.Graphics
         public StrokeStyle StrokeStyle
         {
             get { return strokeStyle; }
-            set { strokeStyle = value; }
+            set 
+            { 
+                strokeStyle = value;
+                CommitStrokeStyle();
+            }
         }
         #endregion
 
@@ -201,7 +209,7 @@ namespace Orion.Graphics
         /// <param name="triangle">The <see cref="Triangle"/> to be stroked.</param>
         public void Stroke(Triangle triangle)
         {
-            CommitStrokeColor();
+            CommitStrokeStyle();
             GL.Begin(BeginMode.LineLoop);
             DrawVertices(triangle);
             GL.End();
@@ -283,6 +291,11 @@ namespace Orion.Graphics
         private void CommitStrokeColor()
         {
             GL.Color4(strokeColor.R, strokeColor.G, strokeColor.B, strokeColor.A);
+        }
+
+        private void CommitStrokeStyle()
+        {
+            GL.LineStipple(1, (short)strokeStyle);
         }
 
         internal void SetUpGLContext(Rectangle parentSystem)

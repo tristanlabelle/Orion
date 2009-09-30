@@ -37,6 +37,7 @@ namespace Orion.Graphics
         {
             Bounds = bounds;
             ResetViewport();
+            GL.Enable(EnableCap.LineStipple);
         }
         
         internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)

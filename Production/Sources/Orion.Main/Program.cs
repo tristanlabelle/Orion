@@ -45,7 +45,7 @@ namespace Orion.Main
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             Random random = new Random();
-            for (int i = 0; i < 600; ++i)
+            for (int i = 0; i < 1600; ++i)
             {
                 Unit unit = new Unit((uint)i, unitTypes[i % unitTypes.Length], world);
                 unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));

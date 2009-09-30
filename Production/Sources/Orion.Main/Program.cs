@@ -39,19 +39,14 @@ namespace Orion.Main
             MockCommander blueCommander = new MockCommander(blueFaction);
             commandManager.AddCommander(blueCommander);
 
-            Faction greenFaction = new Faction(world, "Blue", Color.GreenYellow);
-            MockCommander greenCommander = new MockCommander(greenFaction);
-            commandManager.AddCommander(greenCommander);
-
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             Random random = new Random();
             for (int i = 0; i < 1600; ++i)
             {
                 Unit unit = new Unit((uint)i, unitTypes[i % unitTypes.Length], world);
                 unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                if (i % 3 == 0) redFaction.Units.Add(unit);
-                else if (i % 3 == 1) blueFaction.Units.Add(unit);
-                else greenFaction.Units.Add(unit);
+                if (i % 2 == 0) redFaction.Units.Add(unit);
+                else blueFaction.Units.Add(unit);
                 
                 world.Units.Add(unit);
             }

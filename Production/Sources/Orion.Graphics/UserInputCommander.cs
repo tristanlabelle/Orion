@@ -57,10 +57,23 @@ namespace Orion.Graphics
             {
                 if (selectionManager.SelectedUnits.Count() != 0)
                 {
-                    List<Unit> unitsToMove = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                    Command command = new Move(Faction, unitsToMove, position);
+                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
+                    if (unitsToAssignTask.Count() != 0)
+                    {
+                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.Contains(position));
+                        Command command;
+                        if (enemy != null)
+                        {
+                            // TO CHANGE TO ATTACK!
+                            command = new Move(Faction, unitsToAssignTask, position);
 
-                    GenerateCommand(command);
+                        }
+                        else
+                        {
+                            command = new Move(Faction, unitsToAssignTask, position);
+                        }
+                        GenerateCommand(command);
+                    }
                 }
             }
         }

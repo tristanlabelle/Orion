@@ -157,11 +157,10 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        public Circle UnitCircle
+        public Circle Circle
         {
             get { return new Circle(position, 1); }
         }
-
         #endregion
 
         #region Methods

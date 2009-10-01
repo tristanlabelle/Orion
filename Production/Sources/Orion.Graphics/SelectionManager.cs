@@ -42,7 +42,20 @@ namespace Orion.Graphics
         /// </summary>
         public IEnumerable<Unit> SelectedUnits
         {
-            get { return selectedUnits.Where(unit => unit.Faction == faction).ToList(); }
+            get
+            {
+                if (selectedUnits.Count == 1 || selectedUnits.Count == 0)
+                    return selectedUnits;
+                else if (selectedUnits.Where(unit => unit.Faction == faction).ToList().Count > 0)
+                    return selectedUnits.Where(unit => unit.Faction == faction).ToList();
+                else
+                {
+                    List<Unit> firstEnemyUnit = new List<Unit>();
+                    firstEnemyUnit.Add(selectedUnits[0]);
+                    return firstEnemyUnit;
+                }    
+
+            }
         }
 
         /// <summary>

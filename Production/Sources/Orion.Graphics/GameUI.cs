@@ -56,6 +56,7 @@ namespace Orion.Graphics
             view.MouseDown += WorldViewMouseDown;
             view.MouseMoved += WorldViewMouseMove;
             view.MouseUp += WorldViewMouseUp;
+            view.KeyDown += WorldViewKeyDown;
 
             mainWindow.Show();
         }
@@ -83,6 +84,11 @@ namespace Orion.Graphics
         private void WorldViewMouseMove(Responder source, MouseEventArgs args)
         {
             userInputCommander.OnMouseMove(new Vector2(args.X, args.Y));
+        }
+
+        private void WorldViewKeyDown(Responder source, KeyboardEventArgs args)
+        {
+            userInputCommander.OnKeyDown(args.Key);
         }
         #endregion
 

@@ -7,6 +7,7 @@ using Orion.Graphics;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
 using Orion.Commandment;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Graphics
 {
@@ -70,6 +71,22 @@ namespace Orion.Graphics
                         {
                             command = new Move(Faction, unitsToAssignTask, position);
                         }
+                        GenerateCommand(command);
+                    }
+                }
+            }
+        }
+
+        public void OnKeyDown(Keys key)
+        {
+            if (key == Keys.S)
+            {
+                if (selectionManager.SelectedUnits.Count() != 0)
+                {
+                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
+                    if (unitsToAssignTask.Count() != 0)
+                    {
+                        Command command = new Cancel(Faction, unitsToAssignTask);
                         GenerateCommand(command);
                     }
                 }

@@ -15,7 +15,7 @@ namespace Orion.Graphics.Widgets
             : base(frame)
         { }
         
-        protected internal override bool OnMouseClick(MouseEventArgs args)
+        protected override bool OnMouseClick(MouseEventArgs args)
         {
             Console.WriteLine("Frame was clicked at ({0}, {1})!", args.X, args.Y);
             base.OnMouseClick(args);

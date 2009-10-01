@@ -12,7 +12,7 @@ namespace Orion
     /// </summary>
     public enum MouseEventType
     {
-        MouseDown, MouseUp, MouseClicked, MouseMoved
+        MouseDown, MouseUp, MouseClicked, MouseMoved, MouseEntered, MouseExited
     }
 
     /// <summary>
@@ -63,6 +63,14 @@ namespace Orion
         /// How many consecutive clicks were there (if any)
         /// </summary>
         public readonly int Clicks;
+
+        /// <summary>
+        /// Convenience property that returns a <see cref="Vector2"/> from this object's X and Y fields.
+        /// </summary>
+        public Vector2 Position
+        {
+            get { return new Vector2(X, Y); }
+        }
         
         /// <summary>
         /// Creates a MouseEventArgs structure with a specified point, which mouse button was pressed, and the number of repeated clicks. 

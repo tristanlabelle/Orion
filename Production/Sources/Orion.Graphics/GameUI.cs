@@ -96,6 +96,11 @@ namespace Orion.Graphics
             mainWindow.Refresh();
         }
 
+        public void Update(float delta)
+        {
+            mainWindow.rootView.Update(delta);
+        }
+
         /// <summary>
         /// Disposes this <see cref="GameUI"/>, releasing all used resources.
         /// </summary>

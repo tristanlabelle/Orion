@@ -69,7 +69,6 @@ namespace Orion.Graphics
         public void DrawEntities(GraphicsContext graphics, Rectangle viewRectangle)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            graphics.StrokeStyle = StrokeStyle.Solid;
             // Later, walkable and non-walkable tiles should be distinguishable.
             foreach (Unit unit in world.Units)
             {

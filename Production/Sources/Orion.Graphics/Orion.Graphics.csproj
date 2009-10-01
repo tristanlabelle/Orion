@@ -61,6 +61,7 @@
     <Compile Include="UserInputCommander.cs" />
     <Compile Include="View.cs" />
     <Compile Include="ViewChildrenCollection.cs" />
+    <Compile Include="ViewContainer.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Frame.cs" />
     <Compile Include="Widgets\Label.cs" />

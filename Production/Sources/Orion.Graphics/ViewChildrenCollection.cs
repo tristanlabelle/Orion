@@ -14,20 +14,28 @@ namespace Orion.Graphics
     /// by their position within this collection.
     /// </remarks>
     [Serializable]
-    public sealed class ViewChildrenCollection : Collection<View>
+    public sealed class ViewChildrenCollection : Collection<ViewContainer>
     {
         #region Fields
-        private readonly View parent;
-        private readonly List<View> children;
+        private ViewContainer parent;
+        private readonly List<ViewContainer> children;
+        #endregion
+
+        #region Properties
+        public ViewContainer Parent
+        {
+            get { return parent; }
+            internal set { parent = value; }
+        }
         #endregion
 
         #region Constructors
-        internal ViewChildrenCollection(View parent)
-            : base(new List<View>())
+        internal ViewChildrenCollection(ViewContainer parent)
+            : base(new List<ViewContainer>())
         {
             Argument.EnsureNotNull(parent, "parent");
             this.parent = parent;
-            this.children = (List<View>)base.Items;
+            this.children = (List<ViewContainer>)base.Items;
         }
         #endregion
 
@@ -37,7 +45,7 @@ namespace Orion.Graphics
         /// Brings a given child <see cref="View"/> to the highest depth.
         /// </summary>
         /// <param name="child">A child <see cref="View"/> to be brought to the front.</param>
-        public void BringToFront(View child)
+        public void BringToFront(ViewContainer child)
         {
             Argument.EnsureNotNull(child, "child");
             if (child.Parent != parent)
@@ -64,7 +72,7 @@ namespace Orion.Graphics
         /// Sends a given child <see cref="View"/> to the lowest depth.
         /// </summary>
         /// <param name="child">A child <see cref="View"/> to be sent to the back.</param>
-        public void SendToBack(View child)
+        public void SendToBack(ViewContainer child)
         {
             Argument.EnsureNotNull(child, "child");
             if (child.Parent != parent)
@@ -95,7 +103,7 @@ namespace Orion.Graphics
         /// <returns>
         /// An enumerator for the collection
         /// </returns>
-        public new List<View>.Enumerator GetEnumerator()
+        public new List<ViewContainer>.Enumerator GetEnumerator()
         {
             return children.GetEnumerator();
         }
@@ -109,7 +117,7 @@ namespace Orion.Graphics
         /// <param name="item">
         /// The <see cref="View"/> to insert
         /// </param>
-        protected override void InsertItem(int index, View item)
+        protected override void InsertItem(int index, ViewContainer item)
         {
             Argument.EnsureNotNull(item, "item");
             if (item.Parent != null) throw new ArgumentException("Expected a view without any parent.");

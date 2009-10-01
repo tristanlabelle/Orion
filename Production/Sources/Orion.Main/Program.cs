@@ -64,6 +64,7 @@ namespace Orion.Main
                     float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
                     commandManager.Update(timeDelta);
                     world.Update(timeDelta);
+                    ui.Update(timeDelta);
                     stopwatch.Reset();
                     stopwatch.Start();
                 }

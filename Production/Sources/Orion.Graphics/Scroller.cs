@@ -12,24 +12,43 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
-    class Scroller : View
+    /// <summary>
+    /// Objects of this view subclass scroll another view in a given direction (they translate the bounds) when the user puts the mouse over it.
+    /// </summary>
+    public class Scroller : View
     {
-        private WorldView worldView;
+        #region Fields
+        private ViewContainer scrolledView;
         private Vector2 direction;
-        private Rectangle worldBounds;
+        private Rectangle maxBounds;
+        #endregion
 
-        public Scroller(Rectangle frame, WorldView worldView, Vector2 direction, Rectangle worldBounds)
+        #region Constructors
+        /// <summary>
+        /// Construct a Scroller object that will stand in a given frame, scrolling the given view in a given direction.
+        /// </summary>
+        /// <param name="frame">The frame of the scroller view</param>
+        /// <param name="view">The view to scroll</param>
+        /// <param name="direction">The direction in which to translate the bounds</param>
+        /// <param name="maxBounds">The bounds in which it's possible to scroll: the scroller can't translate the view past these</param>
+        public Scroller(Rectangle frame, ViewContainer view, Vector2 direction, Rectangle maxBounds)
             : base(frame)
         {
-            this.worldView = worldView;
+            this.scrolledView = view;
             this.direction = direction;
-            this.worldBounds = worldBounds;
+            this.maxBounds = maxBounds;
         }
+        #endregion
 
-        private bool checkViewBounds()
+        #region Methods
+        /// <summary>
+        /// Checks if the scroller will overflow the maximum bounds.
+        /// </summary>
+        /// <returns>True if we can safely translate the target view's bounds; false otherwise</returns>
+        private bool ValidateBoundsOverflow()
         {
-            if(worldBounds.ContainsPoint(worldView.Bounds.Origin + direction) &&
-                worldBounds.ContainsPoint(worldView.Bounds.Max + direction))
+            if(maxBounds.ContainsPoint(scrolledView.Bounds.Origin + direction) &&
+                maxBounds.ContainsPoint(scrolledView.Bounds.Max + direction))
             {
                 return true;
             }
@@ -39,19 +58,44 @@ namespace Orion.Graphics
             }
         }
 
-        protected internal override bool OnMouseMove(MouseEventArgs args)
+        /// <summary>
+        /// Updates the scroller to move its target view's bounds origin.
+        /// </summary>
+        /// <param name="args">The <see cref="UpdateEventArgs"/></param>
+        protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (checkViewBounds())
+            if (ValidateBoundsOverflow())
             {
-                worldView.Bounds = worldView.Bounds.Translate(direction);
+                scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
             }
-            return true;
         }
 
-        protected override void Draw()
+        /// <summary>
+        /// Indicates the user moved the mouse on to the scroller.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/></param>
+        /// <returns>true</returns>
+        protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            /*context.FillColor = Color.Beige;
-            context.Fill(Bounds);*/
+            return base.OnMouseEnter(args);
         }
+
+        /// <summary>
+        /// Indicates the user moved the mouse out of the scroller.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/></param>
+        /// <returns>true</returns>
+        protected override bool OnMouseExit(MouseEventArgs args)
+        {
+            return base.OnMouseExit(args);
+        }
+
+        /// <summary>
+        /// Draws nothing.
+        /// </summary>
+        protected override void Draw()
+        { }
+
+        #endregion
     }
 }

@@ -19,11 +19,9 @@ namespace Orion.Graphics
     /// <remarks>
     /// Views use a first-quadrant system coordinates, which means the origin is at the bottom left corner.
     /// </remarks>
-    public abstract class View : Responder
+    public abstract class View : ViewContainer
     {
         #region Fields
-        private View parent;
-        private readonly ViewChildrenCollection children;
         internal readonly GraphicsContext context;
         #endregion
 
@@ -35,57 +33,22 @@ namespace Orion.Graphics
         /// The <see cref="Rectangle"/> that will be this object's Frame and (by default) Bounds
         /// </param>
         public View(Rectangle frame)
+            : base()
         {
             context = new GraphicsContext(new Rectangle(frame.Size));
-            children = new ViewChildrenCollection(this);
             Frame = frame;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets of this view. 
-        /// </summary>
-        public View Parent
-        {
-            get { return parent; }
-            internal set { parent = value; }
-        }
-
-        /// <summary>
-        /// Gets the collection of this <see cref="View"/>'s children.
-        /// </summary>
-        public ViewChildrenCollection Children
-        {
-            get { return children; }
-        }
-
-        /// <summary>
-        /// Gets the sequence of <see cref="View"/> which are descendants of this one.
-        /// </summary>
-        public IEnumerable<View> Descendants
-        {
-            get
-            {
-                foreach (View child in children)
-                {
-                    yield return child;
-                    foreach (View childDescendant in child.Descendants)
-                    {
-                        yield return childDescendant;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the sequence of <see cref="View"/> which are ancestors of this one.
         /// </summary>
-        public IEnumerable<View> Ancestors
+        public IEnumerable<ViewContainer> Ancestors
         {
             get
             {
-                View ancestor = parent;
+                ViewContainer ancestor = Parent;
                 while (ancestor != null)
                 {
                     yield return ancestor;
@@ -101,8 +64,8 @@ namespace Orion.Graphics
         {
             get
             {
-                if (parent == null) return 0;
-                return parent.Children.IndexOf(this);
+                if (Parent == null) return 0;
+                return Parent.Children.IndexOf(this);
             }
         }
 
@@ -128,9 +91,9 @@ namespace Orion.Graphics
         {
             get
             {
-                if (parent == null) return Frame;
-                Rectangle parentFrame = parent.AbsoluteFrame;
-                Rectangle parentBounds = parent.Bounds;
+                if (Parent == null) return Frame;
+                Rectangle parentFrame = Parent.AbsoluteFrame;
+                Rectangle parentBounds = Parent.Bounds;
 
                 return Rectangle.FromPoints(
                     parentFrame.Origin + parentBounds.LocalToParent(Frame.Origin),
@@ -150,7 +113,7 @@ namespace Orion.Graphics
         /// <c>True</c> if this <see cref="View"/> is a descendant of <paramref name="other"/>,
         /// <c>false</c> if not.
         /// </returns>
-        public bool IsDescendantOf(View other)
+        public bool IsDescendantOf(ViewContainer other)
         {
             Argument.EnsureNotNull(other, "other");
             while (other != null)
@@ -181,7 +144,7 @@ namespace Orion.Graphics
         /// </summary>
         public void RemoveFromParent()
         {
-            if (parent != null) parent.Children.Remove(this);
+            if (Parent != null) Parent.Children.Remove(this);
         }
         #endregion
 
@@ -197,52 +160,14 @@ namespace Orion.Graphics
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal sealed override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-            context.SetUpGLContext(Frame);
-            
-            Matrix4 transformMatrix;
-            GL.GetFloat(GetPName.ModelviewMatrix, out transformMatrix);
-            transformMatrix.Invert();
-            Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
-            
-            bool eventCanSink = true;
-            foreach(View child in Enumerable.Reverse(children))
-            {
-               if(child.Frame.ContainsPoint(coords))
-               {
-                    eventCanSink = child.PropagateMouseEvent(eventType, args);
-                    break;
-                }
-            }
-            
-            context.RestoreGLContext();
+            Vector2 coords = args.Position;
+            coords -= Frame.Origin;
+            coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
+            coords += Bounds.Origin;
 
-            if (eventCanSink)
-            {
-                return DispatchMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks));
-            }
-            return false;
+            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks));
         }
-		
-        /// <summary>
-        /// Propagates a keyboard event to the child views.
-        /// </summary>
-        /// <remarks>
-        /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
-        /// </remarks>
-        /// <param name="type">The type of event to propagate</param>
-        /// <param name="args">The event arguments as a <see cref="KeyboardEventAtgs"/></param>
-        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</return>
-		protected internal override sealed bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
-		{
-			// for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
-			foreach(View child in Enumerable.Reverse(children))
-			{
-				child.DispatchKeyboardEvent(type, args);
-			}
-			
-			return DispatchKeyboardEvent(type, args);
-		}
-		
+
         #endregion
 
         #region Drawing
@@ -258,16 +183,13 @@ namespace Orion.Graphics
         /// <summary>
         /// Renders the view hierarchy. 
         /// </summary>
-        internal void Render()
+        protected internal override sealed void Render()
         {
             context.SetUpGLContext(Frame);
 
             Draw();
 
-            foreach (View view in children)
-            {
-                view.Render();
-            }
+            base.Render();
 
             context.RestoreGLContext();
         }

@@ -69,19 +69,11 @@ namespace Orion.Graphics
         /// <param name="args">The <see cref="UpdateEventArgs"/></param>
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (mouseIsIn)
+            if (mouseIsIn || keyIsDown)
             {
                 if (ValidateBoundsOverflow())
                 {
-                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
-                }
-            }
-
-            if (keyIsDown)
-            {
-                if (ValidateBoundsOverflow())
-                {
-                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
+                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction * args.Delta * 40);
                 }
             }
         }

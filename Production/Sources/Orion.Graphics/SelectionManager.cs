@@ -85,7 +85,7 @@ namespace Orion.Graphics
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = world.Units.Where(unit => Intersection.RectangleIntersectsCircle(selectionRectangle, unit.UnitCircle));
+                    var units = world.Units.Where(unit => Intersection.RectangleIntersectsCircle(selectionRectangle, unit.Circle));
                         
                         //selectionRectangle.ContainsPoint(unit.Position));
 

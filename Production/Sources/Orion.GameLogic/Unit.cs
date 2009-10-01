@@ -155,6 +155,7 @@ namespace Orion.GameLogic
                 task = value;
             }
         }
+
         #endregion
 
         public Circle Circle

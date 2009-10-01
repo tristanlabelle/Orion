@@ -27,7 +27,7 @@ namespace Orion.Main
 
             World world = new World();
 
-            #region putting little guys to life
+            #region Putting little guys to life
 
             CommandManager commandManager = new CommandManager();
 

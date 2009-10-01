@@ -148,6 +148,7 @@ namespace Orion.GameLogic
         public float Health
         {
             get { return type.MaxHealth - damage; }
+            set { damage = type.MaxHealth - value; }
         }
 
         /// <summary>

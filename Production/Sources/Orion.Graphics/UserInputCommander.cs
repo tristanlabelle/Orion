@@ -27,7 +27,7 @@ namespace Orion.Graphics
         public UserInputCommander(Faction faction)
             : base(faction)
         {
-            this.selectionManager = new SelectionManager(faction.World);
+            this.selectionManager = new SelectionManager(faction);
             
         }
         #endregion

@@ -41,6 +41,15 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the time, in seconds, needed to create <see cref="Unit"/>s
+        /// of this <see cref="UnitType"/>.
+        /// </summary>
+        public float CreationTime
+        {
+            get { return 5; }
+        }
+
+        /// <summary>
         /// Gets the maximum amount of health points a unit of this type can have.
         /// </summary>
         public float MaxHealth
@@ -63,8 +72,6 @@ namespace Orion.GameLogic
             get { return 2; }
         }
         #endregion
-
-        
 
         #region Methods
         public override string ToString()

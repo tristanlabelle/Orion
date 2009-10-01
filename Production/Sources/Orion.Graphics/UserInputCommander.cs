@@ -62,11 +62,9 @@ namespace Orion.Graphics
                     {
                         Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.Contains(position));
                         Command command;
-                        if (enemy != null)
+                        if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
                         {
-                            // TO CHANGE TO ATTACK!
-                            command = new Move(Faction, unitsToAssignTask, position);
-
+                                command = new Attack(Faction, unitsToAssignTask, enemy);
                         }
                         else
                         {
@@ -77,11 +75,13 @@ namespace Orion.Graphics
                 }
             }
         }
-        #endregion
 
         internal void OnMouseMove(Vector2 position)
         {
             selectionManager.OnMouseMove(position);
         }
+        #endregion
+
+      
     }
 }

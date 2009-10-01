@@ -55,7 +55,16 @@ namespace Orion.GameLogic
         {
             get { return 10; }
         }
+        /// <summary>
+        /// Gets the distance at which <see cref="Unit"/>s whit this  <see cref="UnitType"/> can reach the enemy to attack him.
+        /// </summary>
+        public float AttackRange
+        {
+            get { return 2; }
+        }
         #endregion
+
+        
 
         #region Methods
         public override string ToString()

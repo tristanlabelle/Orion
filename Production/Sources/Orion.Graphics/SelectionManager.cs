@@ -81,7 +81,7 @@ namespace Orion.Graphics
                 {
                     selectionStartPosition = cursorPosition;
                 }
-                else
+                else if(SelectionRectangle.HasValue)
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 

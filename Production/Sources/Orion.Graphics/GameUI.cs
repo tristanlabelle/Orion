@@ -41,7 +41,7 @@ namespace Orion.Graphics
 
             this.userInputCommander = userInputCommander;
             WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
-            view.Bounds = new Rectangle(-10, -10, world.Width + 20, world.Height + 20);
+            view.Bounds = new Rectangle(40,30);
             mainWindow.rootView.Children.Add(view);
 
 			Scroller northScroller = new Scroller(new Rectangle(0, mainWindow.rootView.Bounds.Height, mainWindow.rootView.Bounds.Width, -mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, 1), world.Bounds);

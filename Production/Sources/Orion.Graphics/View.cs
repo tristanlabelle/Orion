@@ -19,7 +19,7 @@ namespace Orion.Graphics
     /// <remarks>
     /// Views use a first-quadrant system coordinates, which means the origin is at the bottom left corner.
     /// </remarks>
-    public abstract class View
+    public abstract class View : Responder
     {
         #region Fields
         private View parent;
@@ -40,28 +40,6 @@ namespace Orion.Graphics
             children = new ViewChildrenCollection(this);
             Frame = frame;
         }
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// The event triggered when the user presses the left button of the mouse while positioned over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseDown;
-
-        /// <summary>
-        /// The event triggered when the user releases the left button of the mouse while positioned over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseUp;
-
-        /// <summary>
-        /// The event triggered when the used presses and releases the mouse button
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseClicked;
-
-        /// <summary>
-        /// The event triggered when the user moves the mouse over the view
-        /// </summary>
-        public event GenericEventHandler<View, MouseEventArgs> MouseMoved;
         #endregion
 
         #region Properties
@@ -131,13 +109,13 @@ namespace Orion.Graphics
         /// <summary>
         /// The rectangle in which this view appears in its superview. May be different from the bounds.
         /// </summary>
-        public virtual Rectangle Frame { get; set; }
+        public override Rectangle Frame { get; set; }
 
         /// <summary>
         /// The internal coordinate system rectangle used for drawing.
         /// </summary>
         /// <remarks>Drawing is clamped to this rectangle.</remarks>
-        public Rectangle Bounds
+        public override Rectangle Bounds
         {
             get { return context.CoordinateSystem; }
             set { context.CoordinateSystem = value; }
@@ -217,7 +195,7 @@ namespace Orion.Graphics
         /// <param name="eventType">The type of event to propagate</param>
         /// <param name="args">The event arguments as a <see cref="MouseEventArgs"/></param>
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
-        internal virtual bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
+        protected internal sealed override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             context.SetUpGLContext(Frame);
             
@@ -244,76 +222,27 @@ namespace Orion.Graphics
             }
             return false;
         }
-
+		
         /// <summary>
-        /// Calls the appropriate event method for an event type
+        /// Propagates a keyboard event to the child views.
         /// </summary>
-        /// <param name="eventType">The type of the event</param>
-        /// <param name="args">The event arguments as a <see cref="MouseEventArgs"/></param>
-        /// <returns></returns>
-        internal bool DispatchMouseEvent(MouseEventType eventType, MouseEventArgs args)
-        {
-            switch (eventType)
-            {
-                case MouseEventType.MouseClicked: return OnMouseClick(args);
-                case MouseEventType.MouseDown: return OnMouseDown(args);
-                case MouseEventType.MouseMoved: return OnMouseMove(args);
-                case MouseEventType.MouseUp: return OnMouseUp(args);
-            }
-            throw new ArgumentException(String.Format("Event type {0} does not have a handler method", eventType));
-        }
-
-        /// <summary>
-        /// Calls the event handler for mouse clicks. The default implementation allows for event sinking by always returning true.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected internal virtual bool OnMouseClick(MouseEventArgs args)
-        {
-            InvokeEventHandlers(MouseClicked, args);
-            return true;
-        }
-
-        /// <summary>
-        /// Calls the event handler for mouse button pressing. The default implementation allows for event sinking by always returning true.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected internal virtual bool OnMouseDown(MouseEventArgs args)
-        {
-            InvokeEventHandlers(MouseDown, args);
-            return true;
-        }
-
-        /// <summary>
-        /// Calls the event handler for mouse moving. The default implementation allows for event sinking by always returning true.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected internal virtual bool OnMouseMove(MouseEventArgs args)
-        {
-            InvokeEventHandlers(MouseMoved, args);
-            return true;
-        }
-
-        /// <summary>
-        /// Calls the event handler for mouse button releasing. The default implementation allows for event sinking by always returning true.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected internal virtual bool OnMouseUp(MouseEventArgs args)
-        {
-            InvokeEventHandlers(MouseUp, args);
-            return true;
-        }
-
-        private void InvokeEventHandlers(GenericEventHandler<View, MouseEventArgs> handler, MouseEventArgs args)
-        {
-            if (handler != null)
-            {
-                handler(this, args);
-            }
-        }
+        /// <remarks>
+        /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
+        /// </remarks>
+        /// <param name="type">The type of event to propagate</param>
+        /// <param name="args">The event arguments as a <see cref="KeyboardEventAtgs"/></param>
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</return>
+		protected internal override sealed bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+		{
+			// for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
+			foreach(View child in Enumerable.Reverse(children))
+			{
+				child.DispatchKeyboardEvent(type, args);
+			}
+			
+			return DispatchKeyboardEvent(type, args);
+		}
+		
         #endregion
 
         #region Drawing
@@ -329,7 +258,7 @@ namespace Orion.Graphics
         /// <summary>
         /// Renders the view hierarchy. 
         /// </summary>
-        internal virtual void Render()
+        internal void Render()
         {
             context.SetUpGLContext(Frame);
 

@@ -15,17 +15,24 @@ namespace Orion.Graphics
     /// <summary>
     /// A RootView is a base container. It does no drawing on its own.
     /// </summary>
-    class RootView : View
+    class RootView : Responder
     {
+		private Rectangle frame;
+		private readonly List<View> children;
+		
         public override Rectangle Frame
         {
-            get { return base.Frame; }
+            get { return frame; }
             set
             {
-                base.Frame = value;
+                frame = value;
                 ResetViewport();
             }
         }
+		
+		public override Rectangle Bounds { get; set; }
+		
+		public List<View> Children { get { return children; } }
 
         /// <summary>
         /// Creates a RootView object with a frame and bounds.
@@ -33,21 +40,21 @@ namespace Orion.Graphics
         /// <param name="frame">The frame of the view</param>
         /// <param name="bounds">The bounds of the view</param>
         public RootView(Rectangle frame, Rectangle bounds)
-            : base(frame)
         {
             Bounds = bounds;
-            ResetViewport();
-            GL.Enable(EnableCap.LineStipple);
+			Frame = frame;
+			
+			children = new List<View>();
         }
         
-        internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
+        protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             Matrix4 transformMatrix = Matrix4.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height, 1);
             Vector2 coords = Vector4.Transform(new Vector4(args.X, args.Y, 0, 1), transformMatrix).Xy;
             
             args = new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks);
             
-            foreach(View child in Enumerable.Reverse(Children))
+            foreach(View child in Enumerable.Reverse(children))
             {
                 if(child.Frame.ContainsPoint(coords))
                 {
@@ -57,21 +64,24 @@ namespace Orion.Graphics
             
             return false;
         }
+		
+		protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+		{
+			// for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
+			// and we don't need that until we have UI widgets
+			foreach(View child in children)
+			{
+				child.DispatchKeyboardEvent(type, args);
+			}
+			
+			return DispatchKeyboardEvent(type, args);
+		}
 
-        
-        /// <summary>
-        /// Draws nothing.
-        /// </summary>
-        protected override void Draw()
-        { }
-
-        internal override void Render()
+        internal void Render()
         {
             GL.ClearColor(Color.ForestGreen); // we all love forest green!
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
-
-            Draw();
 
             foreach (View child in Children)
                 child.Render();

@@ -31,6 +31,9 @@ namespace Orion.Graphics
         /// </summary>
         private void InitializeComponent()
         {
+			//
+			// Controls
+			//
             this.glControl = new OpenTK.GLControl();
             this.SuspendLayout();
             // 
@@ -49,6 +52,8 @@ namespace Orion.Graphics
             this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseDown);
             this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseUp);
             this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseMove);
+			this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
+			this.glControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyUp);
             // 
             // Window
             // 
@@ -59,6 +64,10 @@ namespace Orion.Graphics
             this.Name = "Window";
             this.Text = "Window";
             this.ResumeLayout(false);
+			//
+			// OpenGL
+			//
+            GL.Enable(EnableCap.LineStipple);
 
         }
 

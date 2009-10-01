@@ -18,7 +18,7 @@ namespace Orion.Graphics
     public partial class Window : Form
     {
         #region Fields
-        internal readonly View rootView;
+        internal readonly RootView rootView;
         #endregion
 
         #region Constructors
@@ -69,6 +69,22 @@ namespace Orion.Graphics
         {
             TriggerMouseEvent(MouseEventType.MouseMoved, args.X, args.Y, args.Button, args.Clicks);
         }
+		
+		private void glControl_KeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
+		{
+			TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
+		}
+		
+		private void glControl_KeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
+		{
+			TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
+		}
+		
+		private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
+		{
+			KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
+			rootView.PropagateKeyboardEvent(type, args);
+		}
         
         private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks)
         {

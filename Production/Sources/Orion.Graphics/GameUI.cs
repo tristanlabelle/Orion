@@ -29,6 +29,7 @@ namespace Orion.Graphics
         /// Constructs a GameRenderer from a passed World object.
         /// </summary>
         /// <param name="world">The World object containing the game data</param>
+        /// <param name="userInputCommander">The user input commander that will receive UI events</param>
         public GameUI(World world, UserInputCommander userInputCommander)
         {
             Argument.EnsureNotNull(world, "world");
@@ -69,17 +70,17 @@ namespace Orion.Graphics
             get { return mainWindow.Created; }
         }
 
-        private void WorldViewMouseDown(View source, MouseEventArgs args)
+        private void WorldViewMouseDown(Responder source, MouseEventArgs args)
         {
             userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, true);
         }
 
-        private void WorldViewMouseUp(View source, MouseEventArgs args)
+        private void WorldViewMouseUp(Responder source, MouseEventArgs args)
         {
             userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, false);
         }
 
-        private void WorldViewMouseMove(View source, MouseEventArgs args)
+        private void WorldViewMouseMove(Responder source, MouseEventArgs args)
         {
             userInputCommander.OnMouseMove(new Vector2(args.X, args.Y));
         }
@@ -96,7 +97,7 @@ namespace Orion.Graphics
         }
 
         /// <summary>
-        /// Disposes this <see cref="GameRenderer"/>, releasing all used resources.
+        /// Disposes this <see cref="GameUI"/>, releasing all used resources.
         /// </summary>
         public void Dispose()
         {

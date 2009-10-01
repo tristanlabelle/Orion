@@ -31,7 +31,8 @@ namespace Orion.Graphics
         /// <param name="frame">
         /// The <see cref="Rectangle"/> frame of the view (normally the full OpenGL control size).
         /// </param>
-        /// <param name="renderer">The <see cref="WorldRenderer"/> to be used to draw the game <see cref="World"/>.</param>
+        /// <param name="renderer">The <see cref="WorldRenderer"/> to be used to draw the game <see cref="World"/></param>
+        /// <param name="selection">The selection manager bound to be rendered by this view</param>
         public WorldView(Rectangle frame, WorldRenderer renderer, SelectionManager selection)
             : base(frame)
         {

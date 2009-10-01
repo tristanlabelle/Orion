@@ -72,6 +72,8 @@ namespace Orion.Graphics
             // Later, walkable and non-walkable tiles should be distinguishable.
             foreach (Unit unit in world.Units)
             {
+                if (!unit.IsAlive)
+                    continue;
                 if (viewRectangle.ContainsPoint(unit.Position))
                 {
                     if (unit.Faction == null) graphics.StrokeColor = Color.White;

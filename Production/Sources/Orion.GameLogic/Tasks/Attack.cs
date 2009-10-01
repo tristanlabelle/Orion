@@ -18,6 +18,7 @@ namespace Orion.GameLogic.Tasks
         private const float secondsToHitEnemy = 1;
         private float secondsStored = 0;
         private Follow follow;
+        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -29,7 +30,8 @@ namespace Orion.GameLogic.Tasks
             this.striker = striker;
             this.enemy = enemy;
             this.follow = new Follow(striker, enemy, striker.Type.AttackRange);
-
+            enemy.Died += enemy_Died;
+            secondsStored = secondsToHitEnemy;
         }
         #endregion
 
@@ -38,6 +40,15 @@ namespace Orion.GameLogic.Tasks
         {
             get { return "attacking"; }
         }
+
+        public override bool HasEnded
+        {
+            get
+            {
+                return hasEnded;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -47,21 +58,23 @@ namespace Orion.GameLogic.Tasks
         /// <param name="timeDelta"></param>
         public override void Update(float timeDelta)
         {
-            if (HasEnded) 
+            if (hasEnded)
                 return;
 
-           if(follow.IsInRange)
-           {
-                if(InflictDamageToEnemyPossible(timeDelta))
-                    enemy.Damage += 1;
+            if (follow.IsInRange)
+            {
+                if (InflictDamageToEnemyPossible(timeDelta))
+                    enemy.Damage += striker.Type.AttackDamage;
             }
-           else
+            else
             {
                 follow.Update(timeDelta);
-          
-           }
 
-        }/// <summary>
+            }
+
+        }
+        
+        /// <summary>
         /// Calculates the number of time elapsed in seconds and 
         /// inflicts damage to the enemy; dependant of the constant 
         /// named "secondsToHitEnemy". 
@@ -80,6 +93,12 @@ namespace Orion.GameLogic.Tasks
                 return false;
             }
         }
+
+        private void enemy_Died(Unit sender)
+        {
+            hasEnded = true;
+        }
+
         #endregion
     }
 }

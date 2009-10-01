@@ -70,12 +70,21 @@ namespace Orion.GameLogic.Tasks
         }
 
         /// <summary>
+        /// Gets the current distance remaining between this <see cref="Unit"/>
+        /// and the followed <see cref="Unit"/>.
+        /// </summary>
+        public float CurrentDistance
+        {
+            get { return Circle.SignedDistance(unit.Circle, target.Circle); }
+        }
+
+        /// <summary>
         /// Gets a value indicating if the following <see cref="Unit"/>
         /// is within the target range of its <see cref="target"/>.
         /// </summary>
         public bool IsInRange
         {
-            get { return (target.Position - unit.Position).Length <= targetDistance; }
+            get { return CurrentDistance <= targetDistance; }
         }
 
         public override bool HasEnded
@@ -98,7 +107,7 @@ namespace Orion.GameLogic.Tasks
         public override void Update(float timeDelta)
         {
             Vector2 delta = target.Position - unit.Position;
-            float distanceRemaining = Circle.SignedDistance(unit.Circle, target.Circle) - targetDistance;
+            float distanceRemaining = CurrentDistance - targetDistance;
             if (distanceRemaining < 0) return;
 
             Vector2 direction = Vector2.Normalize(delta);

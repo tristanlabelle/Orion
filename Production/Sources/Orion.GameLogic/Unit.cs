@@ -228,7 +228,8 @@ namespace Orion.GameLogic
         /// <param name="timeDelta">The time elapsed since the last frame.</param>
         public void Update(float timeDelta)
         {
-            task.Update(timeDelta);
+            if(!task.HasEnded)
+                task.Update(timeDelta);
         }
         #endregion
     }

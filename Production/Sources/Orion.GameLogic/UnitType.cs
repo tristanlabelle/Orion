@@ -65,12 +65,20 @@ namespace Orion.GameLogic
             get { return 10; }
         }
         /// <summary>
-        /// Gets the distance at which <see cref="Unit"/>s whit this  <see cref="UnitType"/> can reach the enemy to attack him.
+        /// Gets the distance at which <see cref="Unit"/>s with this  <see cref="UnitType"/> can reach the enemy to attack him.
         /// </summary>
         public float AttackRange
         {
             get { return 2; }
         }
+        /// <summary>
+        /// Gets the damage at which <see cref="Unit"/>s whit this  <see cref="UnitType"/> can inflict damage to the enemy.
+        /// </summary>
+        public float AttackDamage
+        {
+            get { return 1; }
+        }
+
         #endregion
 
         #region Methods

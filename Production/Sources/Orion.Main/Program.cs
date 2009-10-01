@@ -61,12 +61,15 @@ namespace Orion.Main
                 while (ui.IsWindowCreated)
                 {
                     ui.Render();
+
                     float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
+                    stopwatch.Stop();
+                    stopwatch.Reset();
+                    stopwatch.Start();
+
                     commandManager.Update(timeDelta);
                     world.Update(timeDelta);
                     ui.Update(timeDelta);
-                    stopwatch.Reset();
-                    stopwatch.Start();
                 }
             }
         }

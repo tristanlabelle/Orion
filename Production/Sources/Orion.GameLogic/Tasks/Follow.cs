@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -68,9 +69,23 @@ namespace Orion.GameLogic.Tasks
             get { return targetDistance; }
         }
 
-        public override bool HasEnded
+        /// <summary>
+        /// Gets a value indicating if the following <see cref="Unit"/>
+        /// is within the target range of its <see cref="target"/>.
+        /// </summary>
+        public bool IsInRange
         {
             get { return (target.Position - unit.Position).Length <= targetDistance; }
+        }
+
+        public override bool HasEnded
+        {
+            get
+            {
+                // This task never ends as even if we get in range at one point in time,
+                // the target may move again later.
+                return false;
+            }
         }
 
         public override string Description
@@ -83,7 +98,7 @@ namespace Orion.GameLogic.Tasks
         public override void Update(float timeDelta)
         {
             Vector2 delta = target.Position - unit.Position;
-            float distanceRemaining = delta.Length - targetDistance;
+            float distanceRemaining = Circle.SignedDistance(unit.Circle, target.Circle) - targetDistance;
             if (distanceRemaining < 0) return;
 
             Vector2 direction = Vector2.Normalize(delta);

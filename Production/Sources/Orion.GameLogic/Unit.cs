@@ -143,6 +143,14 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the amount of health points this <see cref="Unit"/> has.
+        /// </summary>
+        public float Health
+        {
+            get { return type.MaxHealth - damage; }
+        }
+
+        /// <summary>
         /// Accesses the <see cref="Task"/> currently executed by this <see cref="Unit"/>.
         /// </summary>
         public Task Task
@@ -155,9 +163,11 @@ namespace Orion.GameLogic
                 task = value;
             }
         }
-
         #endregion
 
+        /// <summary>
+        /// Gets the bounding <see cref="Circle"/> of this <see cref="Unit"/>.
+        /// </summary>
         public Circle Circle
         {
             get { return new Circle(position, 1); }

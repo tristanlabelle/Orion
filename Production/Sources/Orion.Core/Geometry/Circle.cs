@@ -182,6 +182,21 @@ namespace Orion.Geometry
             Vector2 center = (circle1.center * circle1.radius + circle2.center * circle2.radius) / radiusSum;
             return new Circle(center, radiusSum * 0.5f);
         }
+
+        /// <summary>
+        /// Gets the signed distance between two <see cref="Circle"/>.
+        /// </summary>
+        /// <param name="circle1">The first <see cref="Circle"/> to be tested..</param>
+        /// <param name="circle2">The second <see cref="Circle"/> to be tested.</param>
+        /// <returns>
+        /// The signed distance between the two <see cref="Circle"/>s,
+        /// a positive value if they do not overlap and a negative value if they do.
+        /// </returns>
+        public static float SignedDistance(Circle circle1, Circle circle2)
+        {
+            return (circle2.center - circle1.center).Length
+                - circle1.radius - circle2.radius;
+        }
         #endregion
         #endregion
         #endregion

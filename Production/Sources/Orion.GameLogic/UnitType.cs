@@ -41,6 +41,14 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the maximum amount of health points a unit of this type can have.
+        /// </summary>
+        public float MaxHealth
+        {
+            get { return 10; }
+        }
+
+        /// <summary>
         /// Gets the speed at which <see cref="Unit"/>s with this <see cref="UnitType"/> move.
         /// </summary>
         public float MovementSpeed

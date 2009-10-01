@@ -34,7 +34,7 @@ namespace Orion.Graphics
 			//
 			// Controls
 			//
-            this.glControl = new OpenTK.GLControl();
+            this.glControl = new Orion.Graphics.CustomGLControl();
             this.SuspendLayout();
             // 
             // glControl
@@ -73,6 +73,6 @@ namespace Orion.Graphics
 
         #endregion
 
-        private OpenTK.GLControl glControl;
+        private Orion.Graphics.CustomGLControl glControl;
     }
 }

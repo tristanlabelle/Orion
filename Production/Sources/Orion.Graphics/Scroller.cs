@@ -9,6 +9,7 @@ using OpenTK.Graphics;
 
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using Key = System.Windows.Forms.Keys; 
 
 namespace Orion.Graphics
 {
@@ -22,6 +23,9 @@ namespace Orion.Graphics
         private Vector2 direction;
         private Rectangle maxBounds;
         #endregion
+        private bool keyIsDown = false;
+        private bool mouseIsIn = false;
+        private Key triggerKey;
 
         #region Constructors
         /// <summary>
@@ -31,9 +35,10 @@ namespace Orion.Graphics
         /// <param name="view">The view to scroll</param>
         /// <param name="direction">The direction in which to translate the bounds</param>
         /// <param name="maxBounds">The bounds in which it's possible to scroll: the scroller can't translate the view past these</param>
-        public Scroller(Rectangle frame, ViewContainer view, Vector2 direction, Rectangle maxBounds)
+        public Scroller(Rectangle frame, ViewContainer view, Vector2 direction, Rectangle maxBounds, Key triggerKey)
             : base(frame)
         {
+            this.triggerKey = triggerKey;
             this.scrolledView = view;
             this.direction = direction;
             this.maxBounds = maxBounds;
@@ -64,12 +69,39 @@ namespace Orion.Graphics
         /// <param name="args">The <see cref="UpdateEventArgs"/></param>
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (ValidateBoundsOverflow())
+            if (mouseIsIn)
             {
-                scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
+                if (ValidateBoundsOverflow())
+                {
+                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
+                }
+            }
+
+            if (keyIsDown)
+            {
+                if (ValidateBoundsOverflow())
+                {
+                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction);
+                }
             }
         }
-
+        protected override bool OnKeyDown(KeyboardEventArgs args)
+        {
+            if (args.Key == triggerKey)
+            {
+                keyIsDown = true;
+            }
+            
+            return true; 
+        }
+        protected override bool OnKeyUp(KeyboardEventArgs args)
+        {
+            if (args.Key == triggerKey)
+            {
+                keyIsDown = false;
+            }
+            return true;
+        }
         /// <summary>
         /// Indicates the user moved the mouse on to the scroller.
         /// </summary>
@@ -77,6 +109,8 @@ namespace Orion.Graphics
         /// <returns>true</returns>
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
+            mouseIsIn = true;
+
             return base.OnMouseEnter(args);
         }
 
@@ -87,6 +121,8 @@ namespace Orion.Graphics
         /// <returns>true</returns>
         protected override bool OnMouseExit(MouseEventArgs args)
         {
+            mouseIsIn = false;
+
             return base.OnMouseExit(args);
         }
 

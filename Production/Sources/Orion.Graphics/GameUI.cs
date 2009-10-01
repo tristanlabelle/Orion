@@ -44,10 +44,10 @@ namespace Orion.Graphics
             view.Bounds = new Rectangle(40,30);
             mainWindow.rootView.Children.Add(view);
 
-			Scroller northScroller = new Scroller(new Rectangle(0, mainWindow.rootView.Bounds.Height, mainWindow.rootView.Bounds.Width, -mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, 1), world.Bounds);
-            Scroller southScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width, mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, -1), world.Bounds);
-            Scroller eastScroller = new Scroller(new Rectangle(mainWindow.rootView.Bounds.Width, 0, -mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(1, 0), world.Bounds);
-            Scroller westScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(-1, 0), world.Bounds);
+			Scroller northScroller = new Scroller(new Rectangle(0, mainWindow.rootView.Bounds.Height, mainWindow.rootView.Bounds.Width, -mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, 1), world.Bounds, Keys.Up);
+            Scroller southScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width, mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, -1), world.Bounds, Keys.Down);
+            Scroller eastScroller = new Scroller(new Rectangle(mainWindow.rootView.Bounds.Width, 0, -mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(1, 0), world.Bounds, Keys.Right);
+            Scroller westScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(-1, 0), world.Bounds, Keys.Left);
             mainWindow.rootView.Children.Add(northScroller);
             mainWindow.rootView.Children.Add(southScroller);
             mainWindow.rootView.Children.Add(eastScroller);

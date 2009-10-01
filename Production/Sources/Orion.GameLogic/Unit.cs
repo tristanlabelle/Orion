@@ -41,6 +41,16 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new <see cref="Unit"/> from its identifier,
+        /// <see cref="UnitType"/> and <see cref="World"/>.
+        /// </summary>
+        /// <param name="id">A hopefully unique identifier for this <see cref="Unit"/>.</param>
+        /// <param name="type">
+        /// The <see cref="UnitType"/> which determines
+        /// the stats and capabilities of this <see cref="Unit"/>
+        /// </param>
+        /// <param name="world">The <see cref="World"/> in which this <see cref="Unit"/> lives.</param>
         public Unit(uint id, UnitType type, World world)
         {
             Argument.EnsureNotNull(world, "world");
@@ -53,6 +63,25 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when this <see cref="Unit"/> gets damaged or healed.
+        /// </summary>
+        public event GenericEventHandler<Unit> DamageChanged;
+
+        /// <summary>
+        /// Raised when this <see cref="Unit"/> has died.
+        /// </summary>
+        public event GenericEventHandler<Unit> Died;
+
+        private void OnDamageChanged()
+        {
+            if (DamageChanged != null) DamageChanged(this);
+        }
+
+        private void OnDied()
+        {
+            if (Died != null) Died(this);
+        }
         #endregion
 
         #region Properties
@@ -121,6 +150,14 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the bounding <see cref="Circle"/> of this <see cref="Unit"/>.
+        /// </summary>
+        public Circle Circle
+        {
+            get { return new Circle(position, 1); }
+        }
+
+        /// <summary>
         /// Gets the angle this <see cref="Unit"/> is facing.
         /// </summary>
         public float Angle
@@ -138,7 +175,13 @@ namespace Orion.GameLogic
             set
             {
                 Argument.EnsurePositive(value, "Damage");
+                if (value > type.MaxHealth) value = type.MaxHealth;
+                if (value == damage) return;
+
                 damage = value;
+
+                OnDamageChanged();
+                if (damage == type.MaxHealth) OnDied();
             }
         }
 
@@ -148,7 +191,18 @@ namespace Orion.GameLogic
         public float Health
         {
             get { return type.MaxHealth - damage; }
-            set { damage = type.MaxHealth - value; }
+            set { Damage = type.MaxHealth - value; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Unit"/> is alive.
+        /// </summary>
+        /// <remarks>
+        /// Dead <see cref="Unit"/>s get garbage collected.
+        /// </remarks>
+        public bool IsAlive
+        {
+            get { return Health > 0; }
         }
 
         /// <summary>
@@ -165,14 +219,6 @@ namespace Orion.GameLogic
             }
         }
         #endregion
-
-        /// <summary>
-        /// Gets the bounding <see cref="Circle"/> of this <see cref="Unit"/>.
-        /// </summary>
-        public Circle Circle
-        {
-            get { return new Circle(position, 1); }
-        }
         #endregion
 
         #region Methods

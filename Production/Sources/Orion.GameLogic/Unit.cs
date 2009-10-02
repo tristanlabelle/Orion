@@ -220,6 +220,13 @@ namespace Orion.GameLogic
                 task = value;
             }
         }
+        /// <summary>
+        /// get the value indicating if the unit does nothing
+        /// </summary>
+        public bool IsIdle
+        {
+            get { return task.HasEnded; }
+        }
         #endregion
         #endregion
 
@@ -230,8 +237,20 @@ namespace Orion.GameLogic
         /// <param name="timeDelta">The time elapsed since the last frame.</param>
         public void Update(float timeDelta)
         {
+            if (IsIdle)
+            {
+                List<Unit> unitsInRage = GetOtherFactionUnitsInRange().ToList();
+                if (unitsInRage.Count > 0)
+                    task = new Tasks.Attack(this, unitsInRage[0]);
+            }
             if(!task.HasEnded)
                 task.Update(timeDelta);
+        }
+         // TODO : Change to get only Enemy and not Other Faction 
+        public IEnumerable<Unit> GetOtherFactionUnitsInRange()
+        {
+            return world.Units.Where(unit => 
+                Circle.SignedDistance(Circle,unit.Circle) <= type.VisionRange && unit.faction != faction);
         }
         #endregion
     }

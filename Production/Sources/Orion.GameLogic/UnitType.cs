@@ -79,6 +79,11 @@ namespace Orion.GameLogic
             get { return 1; }
         }
 
+        public float VisionRange
+        {
+            get { return 5; }
+        }
+
         #endregion
 
         #region Methods

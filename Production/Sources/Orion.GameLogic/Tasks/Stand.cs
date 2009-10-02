@@ -29,7 +29,8 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta) { }
+        public override void Update(float timeDelta) { 
+        }
         #endregion
         #endregion
 

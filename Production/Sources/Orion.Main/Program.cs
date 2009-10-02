@@ -55,7 +55,7 @@ namespace Orion.Main
 
             #endregion
 
-            using (GameUI ui = new GameUI(world,redCommander))
+            using (GameUI ui = new GameUI(world, redCommander))
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 while (ui.IsWindowCreated)

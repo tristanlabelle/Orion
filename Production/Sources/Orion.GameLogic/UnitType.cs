@@ -62,7 +62,7 @@ namespace Orion.GameLogic
         /// </summary>
         public float MovementSpeed
         {
-            get { return 10; }
+            get { return 20; }
         }
         /// <summary>
         /// Gets the distance at which <see cref="Unit"/>s with this  <see cref="UnitType"/> can reach the enemy to attack him.

@@ -102,6 +102,12 @@ namespace Orion.Graphics
             mainWindow.Refresh();
         }
 
+		/// <summary>
+		/// Updates the window and its components state. 
+		/// </summary>
+		/// <param name="delta">
+		/// A <see cref="System.Single"/> representing how many seconds elapsed since the last update event
+		/// </param>
         public void Update(float delta)
         {
             mainWindow.rootView.Update(delta);

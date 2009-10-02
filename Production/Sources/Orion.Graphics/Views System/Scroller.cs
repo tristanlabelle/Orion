@@ -35,6 +35,7 @@ namespace Orion.Graphics
         /// <param name="view">The view to scroll</param>
         /// <param name="direction">The direction in which to translate the bounds</param>
         /// <param name="maxBounds">The bounds in which it's possible to scroll: the scroller can't translate the view past these</param>
+        /// <param name="triggerKey">The key that can be pressed to trigger this scroller</param>
         public Scroller(Rectangle frame, ViewContainer view, Vector2 direction, Rectangle maxBounds, Key triggerKey)
             : base(frame)
         {
@@ -77,6 +78,16 @@ namespace Orion.Graphics
                 }
             }
         }
+		
+		/// <summary>
+		/// Handles keyboard events to tell if the scroller must scroll its attached view. 
+		/// </summary>
+		/// <param name="args">
+		/// The triggering <see cref="KeyboardEventArgs"/>
+		/// </param>
+		/// <returns>
+		/// true, to allow the event to sink
+		/// </returns>
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             if (args.Key == triggerKey)
@@ -86,6 +97,16 @@ namespace Orion.Graphics
             
             return true; 
         }
+		
+		/// <summary>
+		/// Handles keyboard events to tell if the scroller must scroll its attached view. 
+		/// </summary>
+		/// <param name="args">
+		/// The <see cref="KeyboardEventArgs"/>
+		/// </param>
+		/// <returns>
+		/// true, to allow the event to sink
+		/// </returns>
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             if (args.Key == triggerKey)
@@ -94,6 +115,7 @@ namespace Orion.Graphics
             }
             return true;
         }
+		
         /// <summary>
         /// Indicates the user moved the mouse on to the scroller.
         /// </summary>

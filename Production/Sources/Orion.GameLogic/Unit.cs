@@ -101,6 +101,8 @@ namespace Orion.GameLogic
         {
             get { return type; }
         }
+		
+		public Circle UnitCircle { get { return new Circle(0, 0, 1); } }
         #endregion
 
         #region Affiliation

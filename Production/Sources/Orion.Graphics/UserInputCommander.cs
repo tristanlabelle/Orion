@@ -77,6 +77,12 @@ namespace Orion.Graphics
             }
         }
 
+		/// <summary>
+		/// Parses KeyDown events to capture those whose key has a special meaning.
+		/// </summary>
+		/// <param name="key">
+		/// The <see cref="Keys"/> that were pressedd
+		/// </param>
         public void OnKeyDown(Keys key)
         {
             if (key == Keys.S)
@@ -93,6 +99,12 @@ namespace Orion.Graphics
             }
         }
 
+		/// <summary>
+		/// Parses a MouseMove event.
+		/// </summary>
+		/// <param name="position">
+		/// The position in form of a <see cref="Vector2"/>
+		/// </param>
         internal void OnMouseMove(Vector2 position)
         {
             selectionManager.OnMouseMove(position);

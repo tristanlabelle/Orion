@@ -84,69 +84,9 @@ namespace Orion.Graphics
             set { context.CoordinateSystem = value; }
         }
 
-        /// <summary>
-        /// Gets the rectangle which bounds this <see cref="View"/> in top-level coordinates.
-        /// </summary>
-        public Rectangle AbsoluteFrame
-        {
-            get
-            {
-                if (Parent == null) return Frame;
-                Rectangle parentFrame = Parent.AbsoluteFrame;
-                Rectangle parentBounds = Parent.Bounds;
-
-                return Rectangle.FromPoints(
-                    parentFrame.Origin + parentBounds.LocalToParent(Frame.Origin),
-                    parentFrame.Origin + parentBounds.LocalToParent(Frame.Max));
-            }
-        }
         #endregion
 
         #region Methods
-        #region View Hierarchy
-        /// <summary>
-        /// Tests if this <see cref="View"/> is within the children of another <see cref="View"/>,
-        /// recursively.
-        /// </summary>
-        /// <param name="other">The other <see cref="View"/> to test against.</param>
-        /// <returns>
-        /// <c>True</c> if this <see cref="View"/> is a descendant of <paramref name="other"/>,
-        /// <c>false</c> if not.
-        /// </returns>
-        public bool IsDescendantOf(ViewContainer other)
-        {
-            Argument.EnsureNotNull(other, "other");
-            while (other != null)
-            {
-                if (other == this) return true;
-                other = other.Parent;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Tests if this <see cref="View"/> is a the parent of another <see cref="View"/>,
-        /// recursively.
-        /// </summary>
-        /// <param name="other">The other <see cref="View"/> to test against.</param>
-        /// <returns>
-        /// <c>True</c> if this <see cref="View"/> is an ancestor of <paramref name="other"/>,
-        /// <c>false</c> if not.
-        /// </returns>
-        public bool IsAncestorOf(View other)
-        {
-            Argument.EnsureNotNull(other, "other");
-            return other.IsDescendantOf(this);
-        }
-
-        /// <summary>
-        /// Removes this <see cref="View"/> from its parent. 
-        /// </summary>
-        public void RemoveFromParent()
-        {
-            if (Parent != null) Parent.Children.Remove(this);
-        }
-        #endregion
 
         #region Event handling
         /// <summary>

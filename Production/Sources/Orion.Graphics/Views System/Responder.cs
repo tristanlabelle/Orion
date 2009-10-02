@@ -68,6 +68,10 @@ namespace Orion.Graphics
         /// </summary>
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyUp;
 
+		/// <summary>
+		/// The event triggered when the responder's state is updated.
+		/// </summary>
+		/// <remarks>This happens once in every run loop iteration.</remarks>
         public event GenericEventHandler<Responder, UpdateEventArgs> Updated;
         #endregion
 
@@ -277,6 +281,12 @@ namespace Orion.Graphics
             }
         }
 
+		/// <summary>
+		/// Propagates the Update event handler to all child responders. 
+		/// </summary>
+		/// <param name="args">
+		/// A <see cref="UpdateEventArgs"/> telling how much time passed since the last update event
+		/// </param>
         protected internal abstract void PropagateUpdateEvent(UpdateEventArgs args);
 
         #endregion

@@ -137,6 +137,14 @@ namespace Orion.Graphics
             return other.IsDescendantOf(this);
         }
 
+        /// <summary>
+        /// Removes this <see cref="View"/> from its parent. 
+        /// </summary>
+        public void RemoveFromParent()
+        {
+            if (Parent != null) Parent.Children.Remove(this);
+        }
+
         #endregion
 
         #endregion
@@ -151,35 +159,30 @@ namespace Orion.Graphics
         /// <remarks>
         /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
         /// </remarks>
-        /// <param name="eventType">The type of event to propagate</param>
+        /// <param name="type">The type of event to propagate</param>
         /// <param name="args">The event arguments as a <see cref="MouseEventArgs"/></param>
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal override bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
         {
             bool eventCanSink = true;
-            bool found = false;
             foreach (View child in Enumerable.Reverse(children))
             {
                 if (child.Frame.ContainsPoint(args.Position))
                 {
-                    if (!found)
+                    if (eventCanSink)
                     {
                         if (!child.IsMouseOver)
                         {
                             child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
                             child.IsMouseOver = true;
                         }
-                        eventCanSink = child.PropagateMouseEvent(type, args);
-                        found = true;
+                        eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
                 }
-                else
+                else if(child.IsMouseOver)
                 {
-                    if (child.IsMouseOver)
-                    {
-                        child.DispatchMouseEvent(MouseEventType.MouseExited, args);
-                        child.IsMouseOver = false;
-                    }
+                    child.DispatchMouseEvent(MouseEventType.MouseExited, args);
+                    child.IsMouseOver = false;
                 }
             }
 
@@ -197,8 +200,8 @@ namespace Orion.Graphics
         /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
         /// </remarks>
         /// <param name="type">The type of event to propagate</param>
-        /// <param name="args">The event arguments as a <see cref="KeyboardEventAtgs"/></param>
-        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</return>
+        /// <param name="args">The event arguments as a <see cref="KeyboardEventArgs"/></param>
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
             // for now, just propagate keyboard events to everyone, since more precise handling will require a focus system

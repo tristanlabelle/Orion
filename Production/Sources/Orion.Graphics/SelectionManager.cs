@@ -84,6 +84,7 @@ namespace Orion.Graphics
         /// <summary>
         /// Informs this <see cref="SelectionManager"/> that a <see cref="MouseButton"/> was pressed or released.
         /// </summary>
+        /// <param name="clickPosition">Tells where the click happened, in world coordinates</param>
         /// <param name="button">The <see cref="MouseButton"/> that was pressed or released.</param>
         /// <param name="pressed"><c>True</c> if the button was pressed, <c>false</c> if it was released.</param>
         public void OnMouseButton(Vector2 clickPosition, MouseButton button, bool pressed)

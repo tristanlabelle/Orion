@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Graphics", "Orion.Gra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Main", "Orion.Main\Orion.Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mersenne", "Mersenne\Mersenne.csproj", "{3C34C7F0-6244-4C4C-B216-F4C45C02E58E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C34C7F0-6244-4C4C-B216-F4C45C02E58E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C34C7F0-6244-4C4C-B216-F4C45C02E58E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C34C7F0-6244-4C4C-B216-F4C45C02E58E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C34C7F0-6244-4C4C-B216-F4C45C02E58E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

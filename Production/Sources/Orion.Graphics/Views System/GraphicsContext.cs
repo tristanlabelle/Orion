@@ -10,6 +10,7 @@ using OpenTK.Math;
 using Orion.Geometry;
 
 using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 
 namespace Orion.Graphics
 {
@@ -50,6 +51,8 @@ namespace Orion.Graphics
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
         private StrokeStyle strokeStyle = StrokeStyle.Solid;
+        private Font font;
+        private TextPrinter printer;
         private bool readyForDrawing;
         #endregion
 
@@ -64,6 +67,7 @@ namespace Orion.Graphics
         {
             coordinateSystem = bounds;
             strokeStyle = StrokeStyle.Solid;
+            printer = new TextPrinter();
         }
         #endregion
 
@@ -106,6 +110,15 @@ namespace Orion.Graphics
                 strokeStyle = value;
                 CommitStrokeStyle();
             }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="Font"/> currently used to render text.
+        /// </summary>
+        public Font Font
+        {
+            get { return font; }
+            set { font = value; }
         }
         #endregion
 
@@ -243,36 +256,19 @@ namespace Orion.Graphics
         #endregion
 
         #region Text
-        /*TextPrinter printer = new TextPrinter();
-        Font sans_serif = new Font(FontFamily.GenericSansSerif, 18.0f);
 
-        public void DrawTextInView(string text, View view)
+        public void DrawText(string text)
         {
-            printer.Begin();
-            GL.Translate(view.Frame.Origin.X, view.Frame.Origin.Y, 0);
-            printer.Print(text, sans_serif, Color.Black);
-            printer.End();
-        }*/
+            printer.Print(text, font, fillColor);
+        }
 
-        // ----------------------------------------------------------------------------------
+        public void DrawText(string text, Vector2 position)
+        {
+            GL.Translate(position.X, position.Y, 0);
+            printer.Print(text, font, fillColor);
+            GL.Translate(-position.X, -position.Y, 0);
+        }
 
-        /*
-
-        // Crée un TextPrinter à chaque opération de dessin.
-        // Utilise la property 'Font' comme font à utiliser dans la méthode Print.
-        public Font Font { get; set; }
-        // Pour la couleur, utilise la property 'Color' définie quelque part dans GraphicsContext.cs.
-
-        public void FillText(string text) { } // FillText(0,0, text)
-        public void FillText(Vector2 position, string text) { } // FillText(position.X, position.Y, text);
-        public void FillText(float x, float y, string text) { } // implémentation complète ici
-
-        // supprime les commentaires d'instructions, et fais des tags de documentation
-        //  (si possible à la mode de ceux des autres méthodes de la classe).
-
-        // merci :)
-         * 
-         * */
         #endregion
 
         private void AddVertex(double x, double y)

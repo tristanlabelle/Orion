@@ -21,16 +21,15 @@ namespace Orion.Graphics
 		
 		public void Zoom(double factor, Vector2 center)
 		{
-			Console.WriteLine("{0} at center {1}", factor, center);
 			// TODO: check for full bounds when zooming
 			Vector2 scale = new Vector2((float)factor, (float)factor);
-			Vector2 newSize = Bounds.Size;
-			newSize.Scale(scale);
-			Vector2 newOrigin = Bounds.Origin;
-			newOrigin -= Bounds.Center;
-			newOrigin += center;
-			
-			Bounds = new Rectangle(newOrigin, newSize);
+            Vector2 newSize = Bounds.Size;
+            newSize.Scale(scale);
+
+            Vector2 newOrigin = Bounds.Origin;
+            newOrigin += Bounds.Size - newSize;
+
+            Bounds = new Rectangle(newOrigin, newSize);
 		}
 		
 		public void ScrollBy(double x, double y)

@@ -70,7 +70,7 @@ namespace Orion.Graphics
 		/// <returns>A <see cref="System.Boolean"/></returns>
 		protected override bool OnMouseWheel (MouseEventArgs args)
 		{
-			Zoom(args.WheelDelta / -600.0, args.Position);
+			Zoom(1 + args.WheelDelta / -600.0, args.Position);
 			base.OnMouseWheel(args);
 			return false;
 		}

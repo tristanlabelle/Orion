@@ -53,7 +53,7 @@ namespace Orion.Graphics
             Vector2 coords = args.Position;
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
-            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks));
+            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)

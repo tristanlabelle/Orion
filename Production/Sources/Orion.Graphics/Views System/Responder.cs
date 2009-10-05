@@ -46,6 +46,11 @@ namespace Orion.Graphics
         /// The event triggered when the user moves the mouse over the view
         /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseMoved;
+		
+		/// <summary>
+		/// The event triggered when the user scrolls using the mouse wheel. 
+		/// </summary>
+		public event GenericEventHandler<Responder, MouseEventArgs> MouseWheel;
 
         /// <summary>
         /// The event triggered when the mouse pointer enters the view region.
@@ -108,6 +113,7 @@ namespace Orion.Graphics
                 case MouseEventType.MouseUp: return OnMouseUp(args);
                 case MouseEventType.MouseEntered: return OnMouseEnter(args);
                 case MouseEventType.MouseExited: return OnMouseExit(args);
+			case MouseEventType.MouseWheel: return OnMouseWheel(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
@@ -160,6 +166,18 @@ namespace Orion.Graphics
             InvokeEventHandlers(MouseUp, args);
             return true;
         }
+		
+		/// <summary>
+		/// Calls the event handler for mouse wheel scrolling. 
+		/// </summary>
+        /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
+        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
+        /// <returns>True if event sinking is allowed; false otherwise</returns>
+		protected virtual bool OnMouseWheel(MouseEventArgs args)
+		{
+			InvokeEventHandlers(MouseWheel, args);
+			return true;
+		}
 
         /// <summary>
         /// Calls the event handler for mouse enter.

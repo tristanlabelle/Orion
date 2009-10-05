@@ -35,13 +35,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Mersenne
+namespace Orion.Core
 {
     /// <summary>
     /// The Mersenne Twister is a portable random number generator with a high period and decent performances (or at least we'll hope so,
     /// since we can't use vector instructions with the .net framework). Its prototype is slightly similar to the System.Random class.
     /// </summary>
-    public class Twister
+    public class MersenneTwister
     {
         #region Nested Types
         private struct Vector128
@@ -96,46 +96,98 @@ namespace Mersenne
                 this.c = c;
                 this.d = d;
             }
+			
+			/// <summary>
+			/// Returns the binary or'ing of two vectors.
+			/// </summary>
+			/// <param name="v">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <param name="w">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <returns>
+			/// The result of the two vectors being or'ed
+			/// </returns>
+			public static Vector128 operator|(Vector128 v, Vector128 w)
+			{
+				return new Vector128(v.a | w.a, v.b | w.b, v.c | w.c, v.d | w.d);
+			}
+			
+			/// <summary>
+			/// Returns the binary and'ing of two vectors.
+			/// </summary>
+			/// <param name="v">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <param name="w">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <returns>
+			/// The result of the two vectors being or'ed
+			/// </returns>
+			public static Vector128 operator&(Vector128 v, Vector128 w)
+			{
+				return new Vector128(v.a & w.a, v.b & w.b, v.c & w.c, v.d & w.d);
+			}
+			
+			/// <summary>
+			/// Returns the binary xor'ing of two vectors.
+			/// </summary>
+			/// <param name="v">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <param name="w">
+			/// A <see cref="Vector128"/>
+			/// </param>
+			/// <returns>
+			/// The result of the two vectors being or'ed
+			/// </returns>
+			public static Vector128 operator^(Vector128 v, Vector128 w)
+			{
+				return new Vector128(v.a ^ w.a, v.b ^ w.b, v.c ^ w.c, v.d ^ w.d);
+			}
 
             /// <summary>
-            /// Shifts a vector to the left by a specified number of BYTES.
+            /// Shifts a vector to the left by a specified number of bits.
             /// </summary>
             /// <param name="vec">The vector to shift</param>
-            /// <param name="shift">The number of bytes to shift</param>
+            /// <param name="shift">The number of bits to shift</param>
             /// <returns>The shifted vector</returns>
             public static Vector128 operator<<(Vector128 vec, int shift)
             {
-                long vectorHigh = vec.c << 32 | vec.d;
-                long vectorLow = vec.a << 32 | vec.b;
+				long high = vec.a << 32 | vec.b;
+				long low = vec.c << 32 | vec.d;
+				high <<= shift;
+				high |= low >> (sizeof(long) * 8 - shift);
+				low <<= shift;
 
-                long outputHigh = vectorHigh << (shift * 8);
-                long outputLow = vectorLow << (shift * 8);
-                outputLow |= vectorHigh >> (64 - shift * 8);
-
-                return new Vector128((uint) outputLow >> 32, (uint) outputLow, (uint) outputHigh >> 32, (uint) outputHigh);
+                return new Vector128((uint) high >> 32, (uint) high, (uint) low >> 32, (uint) low);
             }
 
             /// <summary>
-            /// Shifts a vector to the right by a specified number of BYTES.
+            /// Shifts a vector to the right by a specified number of bits.
             /// </summary>
             /// <param name="vec">The vector to shift</param>
-            /// <param name="shift">The number of bytes to shift</param>
+            /// <param name="shift">The number of bits to shift</param>
             /// <returns>The shifted vector</returns>
             public static Vector128 operator>>(Vector128 vec, int shift)
             {
-                long vectorHigh = vec.c << 32 | vec.d;
-                long vectorLow = vec.a << 32 | vec.b;
+				long high = vec.a << 32 | vec.b;
+				long low = vec.c << 32 | vec.d;
+				low >>= shift;
+				low |= high << (sizeof(long) * 8 - shift);
+				high >>= shift;
 
-                long outputHigh = vectorHigh >> (shift * 8);
-                long outputLow = vectorLow >> (shift * 8);
-                outputLow |= vectorHigh << (64 - shift * 8);
-
-                return new Vector128((uint) outputLow >> 32, (uint) outputLow, (uint) outputHigh >> 32, (uint) outputHigh);
+                return new Vector128((uint) high >> 32, (uint) high, (uint) low >> 32, (uint) low);
             }
         }
         #endregion
 
         #region Static Fields
+		/// <summary>
+		/// Indicates the Mersenne Exponent (MEXP) used to generate numbers.
+		/// </summary>
         public const int MersenneExponent = 19937;
 
         #region Private Static Fields
@@ -154,54 +206,53 @@ namespace Mersenne
         /// </summary>
         private const int PickupPosition = 122;
 
-        /// <summary>
-        /// The number of bits to shift left when the vector is represented as four unsigned ints.
-        /// </summary>
-        private const int uintLeftShift = 18;
-
-        /// <summary>
-        /// The number of bytes to shift left when the vector is represented as a single 128 bits entity.
-        /// </summary>
-        private const int vectorLeftShift = 1;
-
-        /// <summary>
-        /// The number of bits to shift right when the vector is represented as four unsigned ints.
-        /// </summary>
-        private const int uintRightShift = 11;
-
-        /// <summary>
-        /// The number of bytes to shift right when the vector is represented as a single 128 bits entity.
-        /// </summary>
-        private const int vectorRightShift = 1;
-
-        /// <summary>
-        /// The masks are used to break the symmetry of SIMD instructions.
-        /// </summary>
-        private static readonly uint[] masks = { 0xdfffffef, 0xddfecb7f, 0xbffaffff, 0xbffffff6 };
-
-        private static uint[] parityCheckArray = { 0x00000001, 0x00000000, 0x00000000, 0x13C9E684 };
+        private static readonly Vector128 maskVector = new Vector128(0xdfffffef, 0xddfecb7f, 0xbffaffff, 0xbffffff6);
+		private static readonly Vector128 parityVector = new Vector128(0x00000001, 0x00000000, 0x00000000, 0x13C9E684);
+		
+		/// <summary>
+		/// The time of the beginning of the UNIX Epoch.
+		/// </summary>
+		private static readonly DateTime unixEpochStart = new DateTime(1970, 1, 1);
         #endregion
         #endregion
 
         #region Fields
+		/// <summary>
+		/// The seed used to initialize this Mersenne Twister.
+		/// </summary>
+		public readonly int Seed;
+		
+		#region Private Fields
         /// <summary>
         /// The internal state array
         /// </summary>
-        private Vector128[] state;
+        private readonly Vector128[] state;
 
         /// <summary>
         /// The state array position
         /// </summary>
         private int vectorIndex;
+		#endregion
         #endregion
 
         #region Constructors
-        public Twister()
-            : this(DateTime.Now.Second)
+		/// <summary>
+		/// Constructs a new Mersenne Twister, using the current number of seconds since the beginning of the Unix Epoch as the seed.
+		/// </summary>
+        public MersenneTwister()
+            : this((int)(DateTime.UtcNow - unixEpochStart).TotalSeconds)
         { }
 
-        public Twister(int seed)
+		/// <summary>
+		/// Constructs a new Mersenne Twister using a passed <see cref="System.Int32"/> to initialize the generator.
+		/// </summary>
+		/// <param name="seed">
+		/// A <see cref="System.Int32"/> used as the seed for the pseudorandom number generator
+		/// </param>
+        public MersenneTwister(int seed)
         {
+			Seed = seed;
+			
             state = new Vector128[N];
             state[0][0] = (uint)seed;
             for (int i = 1; i < ArraySize32; i++)
@@ -211,7 +262,7 @@ namespace Mersenne
                 state[i / 4][i % 4] = 1812433253 * (prev ^ (prev >> 30)) + 1;
             }
             vectorIndex = ArraySize32;
-            CertificatePeriod();
+            CertifyPeriod();
         }
         #endregion
 
@@ -219,6 +270,12 @@ namespace Mersenne
 
         #region Pseudorandom Numbers Generation
         #region Int Generation
+		/// <summary>
+		/// Returns a positive pseudorandom <see cref="System.Int32"/> value comprised in the interval [0, 2^31-1).
+		/// </summary>
+		/// <returns>
+		/// The pseudorandom <see cref="System.Int32"/>
+		/// </returns>
         public int Next()
         {
             if (vectorIndex >= ArraySize32)
@@ -230,11 +287,34 @@ namespace Mersenne
             vectorIndex++;
             return random;
         }
+		
+		/// <summary>
+		/// Returns a pseudorandom integer between 0 inclusively and the specified maximum value, exclusively. 
+		/// </summary>
+		/// <param name="maxValue">
+		/// The maximum value
+		/// </param>
+		/// <returns>
+		/// The pseudorandom <see cref="System.Int32"/>
+		/// </returns>
+		/// <remarks>Passing a negative maxValue will still return positive integers because of how the modulo operator works in the .NET Framework.</remarks>
         public int Next(int maxValue)
         {
             return Next() % maxValue;
         }
 
+		/// <summary>
+		/// Returns a pseudorandom integer in the range [minValue, maxValue).
+		/// </summary>
+		/// <param name="minValue">
+		/// The minimum value for the pseudorandom integer
+		/// </param>
+		/// <param name="maxValue">
+		/// The maximum value for the pseudorandom integer
+		/// </param>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Int32"/>
+		/// </returns>
         public int Next(int minValue, int maxValue)
         {
             return Next() % (maxValue - minValue) + minValue;
@@ -242,16 +322,38 @@ namespace Mersenne
         #endregion
 
         #region Single Generation
+
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Single"/> in the range [0, 1).
+		/// </summary>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Single"/>
+		/// </returns>
         public float NextSingle()
         {
             return Next() / (float)0x7FFFFFFF;
         }
 
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Single"/> in the range [0, max).
+		/// </summary>
+		/// <param name="max">The maximum possible desired value</param>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Single"/>
+		/// </returns>
         public float NextSingle(float max)
         {
             return NextSingle() * max;
         }
-
+		
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Single"/> in the range [min, max).
+		/// </summary>
+		/// <param name="min">The minimum possible desired value</param>
+		/// <param name="max">The maximum possible desired value</param>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Single"/>
+		/// </returns>
         public float NextSingle(float min, float max)
         {
             return NextSingle() * (max - min) + min;
@@ -259,16 +361,38 @@ namespace Mersenne
         #endregion
 
         #region Double Generation
+		
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Double"/> in the range [0, 1).
+		/// </summary>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Double"/>
+		/// </returns>
         public double NextDouble()
         {
             return Next() / (double)0x7FFFFFFF;
         }
+		
 
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Double"/> in the range [0, max).
+		/// </summary>
+		/// <param name="max">The maximum possible desired value</param>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Double"/>
         public double NextDouble(double max)
         {
             return NextDouble() * max;
         }
-
+		
+		/// <summary>
+		/// Returns a pseudorandom <see cref="System.Double"/> in the range [min, max).
+		/// </summary>
+		/// <param name="min">The minimum possible desired value</param>
+		/// <param name="max">The maximum possible desired value</param>
+		/// <returns>
+		/// A pseudorandom <see cref="System.Double"/>
+		/// </returns>
         public double NextDouble(double min, double max)
         {
             return NextDouble() * (max - min) + min;
@@ -279,7 +403,7 @@ namespace Mersenne
         #region Private Methods
 
         /// <summary>
-        /// Fills the internal state array with pseudorandom integers
+        /// Fills the internal state array with pseudorandom integers.
         /// </summary>
         private void RegenerateStateArray()
         {
@@ -304,13 +428,14 @@ namespace Mersenne
             }
         }
 
-        private void CertificatePeriod()
+        private void CertifyPeriod()
         {
             uint inner = 0;
             int i;
-
+            
+			Vector128 parityState = state[0] & parityVector;
             for (i = 0; i < 4; i++)
-                inner ^= state[0][i] & parityCheckArray[i];
+                inner ^= parityState[i];
 
             for (i = 16; i > 0; i >>= 1)
                 inner ^= inner >> i;
@@ -324,7 +449,7 @@ namespace Mersenne
                 uint work = 1;
                 for (int j = 0; j < 32; j++)
                 {
-                    if ((work & parityCheckArray[i]) != 0)
+                    if ((work & parityVector[i]) != 0)
                     {
                         state[0][i] ^= work;
                         return;
@@ -344,15 +469,7 @@ namespace Mersenne
         /// <returns>Another vector</returns>
         private Vector128 DoRecursion(ref Vector128 a, ref Vector128 b, ref Vector128 c, ref Vector128 d)
         {
-            Vector128 x = a << vectorLeftShift;
-            Vector128 y = c >> vectorRightShift;
-
-            uint e = a[0] ^ x[0] ^ ((b[0] >> uintRightShift) & masks[0]) ^ y[0] ^ (d[0] << uintLeftShift);
-            uint f = a[1] ^ x[1] ^ ((b[1] >> uintRightShift) & masks[1]) ^ y[1] ^ (d[1] << uintLeftShift);
-            uint g = a[2] ^ x[2] ^ ((b[2] >> uintRightShift) & masks[2]) ^ y[2] ^ (d[1] << uintLeftShift);
-            uint h = a[3] ^ x[3] ^ ((b[3] >> uintRightShift) & masks[3]) ^ y[3] ^ (d[2] << uintLeftShift);
-
-            return new Vector128(e, f, g, h);
+			return a ^ (a << 8) ^ ((b >> 11) & maskVector) ^ (c >> 8) ^ (d << 18);
         }
 
         #endregion

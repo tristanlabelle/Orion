@@ -257,11 +257,11 @@ namespace Orion.Graphics
 
         #region Text
 
-        public void DrawText(string text)
-        {
-            printer.Print(text, font, fillColor);
-        }
-
+		/// <summary>
+		/// Prints text to the view at specified coordinates. 
+		/// </summary>
+		/// <param name="text">The <see cref="System.String"/> to print</param>
+		/// <param name="position">The position at which to print the string</param>
         public void DrawText(string text, Vector2 position)
         {
             GL.Translate(position.X, position.Y, 0);

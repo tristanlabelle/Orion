@@ -12,7 +12,7 @@ namespace Orion
     /// </summary>
     public enum MouseEventType
     {
-        MouseDown, MouseUp, MouseClicked, MouseMoved, MouseEntered, MouseExited
+        MouseDown, MouseUp, MouseClicked, MouseMoved, MouseEntered, MouseExited, MouseWheel
     }
 
     /// <summary>
@@ -63,6 +63,10 @@ namespace Orion
         /// How many consecutive clicks were there (if any)
         /// </summary>
         public readonly int Clicks;
+		/// <summary>
+		/// How many notches the mouse wheel has rotated. 
+		/// </summary>
+		public readonly int WheelDelta;
 
         /// <summary>
         /// Convenience property that returns a <see cref="Vector2"/> from this object's X and Y fields.
@@ -88,12 +92,13 @@ namespace Orion
         /// <param name="clicks">
         /// The number of repeated clicks with the <see cref="MouseButton"/>
         /// </param>
-        public MouseEventArgs(float x, float y, MouseButton button, int clicks)
+        public MouseEventArgs(float x, float y, MouseButton button, int clicks, int delta)
         {
             X = x;
             Y = y;
             ButtonPressed = button;
             Clicks = clicks;
+			WheelDelta = delta;
         }
     }
 }

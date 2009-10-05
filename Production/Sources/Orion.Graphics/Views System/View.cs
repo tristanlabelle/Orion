@@ -105,7 +105,7 @@ namespace Orion.Graphics
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
             coords += Bounds.Origin;
 
-            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks));
+            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }
 
         #endregion

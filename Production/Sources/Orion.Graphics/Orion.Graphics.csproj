@@ -77,6 +77,7 @@
     <Compile Include="Views System\ViewChildrenCollection.cs" />
     <Compile Include="Views System\ViewContainer.cs" />
     <Compile Include="Views System\WorldView.cs" />
+    <Compile Include="Views System\ClippedView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

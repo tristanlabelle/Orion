@@ -17,7 +17,7 @@ namespace Orion.Graphics
     /// <summary>
     /// A <see cref="View"/> which displays the game <see cref="World"/>.
     /// </summary>
-    public sealed class WorldView : View
+    public sealed class WorldView : ClippedView
     {
         #region Fields
         private readonly WorldRenderer worldRenderer;
@@ -43,8 +43,41 @@ namespace Orion.Graphics
             selectionRenderer = new SelectionRenderer(selection);
         }
         #endregion
+		
+		#region Properties
+		
+		/// <summary>
+		/// Accesses the bounds of the world being drawn.
+		/// </summary>
+		public override Rectangle FullBounds
+		{
+			get
+			{
+				return worldRenderer.WorldBounds;
+			}
+		}
+
+		#endregion
 
         #region Methods
+		
+		#region Events Handling
+		
+		/// <summary>
+		/// Zooms in or out when the user scrolls using the mouse wheel.
+		/// </summary>
+		/// <param name="args">A <see cref="MouseEventArgs"/></param>
+		/// <returns>A <see cref="System.Boolean"/></returns>
+		protected override bool OnMouseWheel (MouseEventArgs args)
+		{
+			Zoom(args.WheelDelta / -600.0, args.Position);
+			base.OnMouseWheel(args);
+			return false;
+		}
+
+		
+		#endregion
+		
         /// <summary>
         /// Draws the main game view. 
         /// </summary>

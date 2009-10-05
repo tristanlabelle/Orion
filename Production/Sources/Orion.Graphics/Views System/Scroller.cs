@@ -19,9 +19,8 @@ namespace Orion.Graphics
     public class Scroller : View
     {
         #region Fields
-        private ViewContainer scrolledView;
+        private ClippedView scrolledView;
         private Vector2 direction;
-        private Rectangle maxBounds;
         #endregion
         private bool keyIsDown = false;
         private bool mouseIsIn = false;
@@ -36,33 +35,16 @@ namespace Orion.Graphics
         /// <param name="direction">The direction in which to translate the bounds</param>
         /// <param name="maxBounds">The bounds in which it's possible to scroll: the scroller can't translate the view past these</param>
         /// <param name="triggerKey">The key that can be pressed to trigger this scroller</param>
-        public Scroller(Rectangle frame, ViewContainer view, Vector2 direction, Rectangle maxBounds, Key triggerKey)
+        public Scroller(Rectangle frame, ClippedView view, Vector2 direction, Key triggerKey)
             : base(frame)
         {
             this.triggerKey = triggerKey;
             this.scrolledView = view;
             this.direction = direction;
-            this.maxBounds = maxBounds;
         }
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Checks if the scroller will overflow the maximum bounds.
-        /// </summary>
-        /// <returns>True if we can safely translate the target view's bounds; false otherwise</returns>
-        private bool ValidateBoundsOverflow()
-        {
-            if(maxBounds.ContainsPoint(scrolledView.Bounds.Origin + direction) &&
-                maxBounds.ContainsPoint(scrolledView.Bounds.Max + direction))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         /// <summary>
         /// Updates the scroller to move its target view's bounds origin.
@@ -72,10 +54,7 @@ namespace Orion.Graphics
         {
             if (mouseIsIn || keyIsDown)
             {
-                if (ValidateBoundsOverflow())
-                {
-                    scrolledView.Bounds = scrolledView.Bounds.Translate(direction * args.Delta * 40);
-                }
+				scrolledView.ScrollBy(direction * args.Delta * 40);
             }
         }
 		
@@ -94,8 +73,7 @@ namespace Orion.Graphics
             {
                 keyIsDown = true;
             }
-            
-            return true; 
+            return base.OnKeyDown(args);
         }
 		
 		/// <summary>
@@ -113,7 +91,7 @@ namespace Orion.Graphics
             {
                 keyIsDown = false;
             }
-            return true;
+            return base.OnKeyUp(args);
         }
 		
         /// <summary>
@@ -124,7 +102,6 @@ namespace Orion.Graphics
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
             mouseIsIn = true;
-
             return base.OnMouseEnter(args);
         }
 
@@ -144,7 +121,7 @@ namespace Orion.Graphics
         /// Draws nothing.
         /// </summary>
         protected override void Draw()
-        { }
+		{ }
 
         #endregion
     }

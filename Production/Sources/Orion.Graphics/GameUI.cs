@@ -40,23 +40,28 @@ namespace Orion.Graphics
             renderer = new WorldRenderer(world);
 
             this.userInputCommander = userInputCommander;
-            WorldView view = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
-            view.Bounds = new Rectangle(40,30);
-            mainWindow.rootView.Children.Add(view);
+            WorldView worldView = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
+            worldView.Bounds = new Rectangle(40,30);
+            mainWindow.rootView.Children.Add(worldView);
 
-			Scroller northScroller = new Scroller(new Rectangle(0, mainWindow.rootView.Bounds.Height, mainWindow.rootView.Bounds.Width, -mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, 1), world.Bounds, Keys.Up);
-            Scroller southScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width, mainWindow.rootView.Bounds.Height / 20), view, new Vector2(0, -1), world.Bounds, Keys.Down);
-            Scroller eastScroller = new Scroller(new Rectangle(mainWindow.rootView.Bounds.Width, 0, -mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(1, 0), world.Bounds, Keys.Right);
-            Scroller westScroller = new Scroller(new Rectangle(0, 0, mainWindow.rootView.Bounds.Width / 20, mainWindow.rootView.Bounds.Height), view, new Vector2(-1, 0), world.Bounds, Keys.Left);
+			Rectangle rootBounds = mainWindow.rootView.Bounds;
+			Rectangle northFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -rootBounds.Height / 20);
+			Rectangle southFrame = new Rectangle(0, 0, rootBounds.Width, rootBounds.Height / 20);
+			Rectangle eastFrame = new Rectangle(rootBounds.Width, 0, -rootBounds.Width / 20, rootBounds.Height);
+			Rectangle westFrame = new Rectangle(0, 0, rootBounds.Width / 20, rootBounds.Height);
+			Scroller northScroller = new Scroller(northFrame, worldView, new Vector2(0, 1), Keys.Up);
+            Scroller southScroller = new Scroller(southFrame, worldView, new Vector2(0, -1), Keys.Down);
+            Scroller eastScroller = new Scroller(eastFrame, worldView, new Vector2(1, 0), Keys.Right);
+            Scroller westScroller = new Scroller(westFrame, worldView, new Vector2(-1, 0), Keys.Left);
             mainWindow.rootView.Children.Add(northScroller);
             mainWindow.rootView.Children.Add(southScroller);
             mainWindow.rootView.Children.Add(eastScroller);
             mainWindow.rootView.Children.Add(westScroller);
 			
-            view.MouseDown += WorldViewMouseDown;
-            view.MouseMoved += WorldViewMouseMove;
-            view.MouseUp += WorldViewMouseUp;
-            view.KeyDown += WorldViewKeyDown;
+            worldView.MouseDown += WorldViewMouseDown;
+            worldView.MouseMoved += WorldViewMouseMove;
+            worldView.MouseUp += WorldViewMouseUp;
+            worldView.KeyDown += WorldViewKeyDown;
 
             mainWindow.Show();
         }

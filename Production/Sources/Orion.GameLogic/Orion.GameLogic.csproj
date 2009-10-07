@@ -64,6 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Faction.cs" />
+    <Compile Include="Path.cs" />
+    <Compile Include="PathFinder.cs" />
+    <Compile Include="PathNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RessourceNode.cs" />
     <Compile Include="TagSet.cs" />

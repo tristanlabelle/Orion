@@ -16,7 +16,6 @@ namespace Orion.GameLogic
         private readonly int totalRessources;
         private int ressourcesLeft;
         private readonly Vector2 position;
-        private readonly World world;
 
         #endregion
 

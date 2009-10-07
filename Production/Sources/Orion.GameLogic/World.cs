@@ -48,12 +48,14 @@ namespace Orion.GameLogic
         #region Instance
         #region Fields
         private readonly UnitCollection units;
+        private List<RessourceNode> ressourceNodes;
         #endregion
 
         #region Constructors
         public World()
         {
             units = new UnitCollection(this);
+            ressourceNodes = new List<RessourceNode>();
         }
         #endregion
 
@@ -67,6 +69,11 @@ namespace Orion.GameLogic
         public ICollection<Unit> Units
         {
             get { return units; }
+        }
+
+        public List<RessourceNode> RessourceNodes
+        {
+            get { return ressourceNodes; }
         }
 
         /// <summary>

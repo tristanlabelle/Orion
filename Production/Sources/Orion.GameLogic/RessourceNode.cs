@@ -8,12 +8,20 @@ using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
+    public enum RessourceType
+        {
+            Alladium = 1,
+            Allagene = 2
+        }
+
     public class RessourceNode
     {
+        
+
         #region Fields
 
         private readonly int id;
-        private readonly string ressourceType;
+        private readonly RessourceType ressourceType;
         private readonly int totalRessources;
         private int ressourcesLeft;
         private readonly Vector2 position;
@@ -29,7 +37,7 @@ namespace Orion.GameLogic
         /// <param name="ressourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
         /// <param name="amountOfRessources"></param>
         /// <param name="position"></param>
-        public RessourceNode(int id, string ressourceType, int amountOfRessources, Vector2 position)
+        public RessourceNode(int id, RessourceType ressourceType, int amountOfRessources, Vector2 position)
         {
             this.id = id;
             this.ressourceType = ressourceType;
@@ -40,7 +48,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
-        public string RessourceType
+        public RessourceType RessourceType
         {
             get { return ressourceType; }
         }

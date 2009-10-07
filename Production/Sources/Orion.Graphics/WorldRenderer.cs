@@ -99,9 +99,9 @@ namespace Orion.Graphics
             {
                 if (viewRectangle.ContainsPoint(node.Position))
                 {
-                    if (node.RessourceType == "Alladium")
+                    if (node.RessourceType == RessourceType.Alladium)
                         graphics.FillColor = Color.LightBlue;
-                    else if (node.RessourceType == "Allagene")
+                    else if (node.RessourceType == RessourceType.Allagene)
                         graphics.FillColor = Color.Green;
                     else
                         continue;

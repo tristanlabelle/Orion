@@ -257,8 +257,17 @@ namespace Orion.Graphics
 
         #region Text
 
+        /// <summary>
+        /// Printes text, using this context's defined font and color, to the view at the origin coordinates
+        /// </summary>
+        /// <param name="text">The text to print</param>
+        public void DrawText(string text)
+        {
+            printer.Print(text, font, fillColor);
+        }
+
 		/// <summary>
-		/// Prints text to the view at specified coordinates. 
+        /// Prints text, using this context's defined font and color, to the view at specified coordinates. 
 		/// </summary>
 		/// <param name="text">The <see cref="System.String"/> to print</param>
 		/// <param name="position">The position at which to print the string</param>

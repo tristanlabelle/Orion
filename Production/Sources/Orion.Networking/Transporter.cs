@@ -12,7 +12,7 @@ namespace Orion.Networking
     {
         #region Fields
         private readonly Socket udpSocket;
-       // private readonly List<Transaction> transactions;
+        private readonly List<Transaction> transactions;
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
         private bool isDisposed;
@@ -35,7 +35,7 @@ namespace Orion.Networking
             Port = port;
             udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-           // transactions = new List<Transaction>();
+            transactions = new List<Transaction>();
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
         }

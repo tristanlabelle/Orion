@@ -58,6 +58,7 @@
     <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="MapGenerator.cs" />
     <Compile Include="MouseEventArgs.cs" />
+    <Compile Include="NetworkEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />

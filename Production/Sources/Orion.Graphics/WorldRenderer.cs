@@ -93,6 +93,22 @@ namespace Orion.Graphics
                     graphics.Stroke(circle);
                 }
             }
+
+            //Renders Ressource Nodes to the game world
+            foreach (RessourceNode node in world.RessourceNodes)
+            {
+                if (viewRectangle.ContainsPoint(node.Position))
+                {
+                    if (node.RessourceType == "Alladium")
+                        graphics.FillColor = Color.LightBlue;
+                    else if (node.RessourceType == "Allagene")
+                        graphics.FillColor = Color.Green;
+                    else
+                        continue;
+
+                    graphics.Fill(node.Circle);       
+                }
+            }
         }
         #endregion
     }

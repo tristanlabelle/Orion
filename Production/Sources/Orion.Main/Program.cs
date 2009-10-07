@@ -51,6 +51,22 @@ namespace Orion.Main
                 world.Units.Add(unit);
             }
 
+            //Adding Ressource Nodes to the game world
+            for (int i = 0; i < 5; i++)
+            {
+                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                RessourceNode node = new RessourceNode(i, "Alladium", 500, position);
+
+                world.RessourceNodes.Add(node);
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                RessourceNode node = new RessourceNode(i, "Allagene", 500, position);
+
+                world.RessourceNodes.Add(node);
+            }
 
 
             #endregion

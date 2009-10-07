@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
-    class RessourceNode
+    public class RessourceNode
     {
         #region Fields
 
@@ -20,14 +21,21 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        public RessourceNode(int id, string ressourceType, int amountOfRessources, Vector2 position, World world)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ressourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
+        /// <param name="amountOfRessources"></param>
+        /// <param name="position"></param>
+        public RessourceNode(int id, string ressourceType, int amountOfRessources, Vector2 position)
         {
             this.id = id;
             this.ressourceType = ressourceType;
             this.totalRessources = amountOfRessources;
             this.ressourcesLeft = amountOfRessources;
             this.position = position;
-            this.world = world;
         }
         #endregion
 
@@ -51,6 +59,11 @@ namespace Orion.GameLogic
         public Vector2 Position
         {
             get { return position; }
+        }
+
+        public Circle Circle
+        {
+            get { return new Circle(position, 2); }
         }
 
         #endregion

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D0480855-C463-4146-ADF8-642DA7129780}</ProjectGuid>
+    <ProjectGuid>{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Orion.Networking</RootNamespace>
@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ReceivingTransaction.cs" />
+    <Compile Include="SendingTransaction.cs" />
+    <Compile Include="Transaction.cs" />
     <Compile Include="Transporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

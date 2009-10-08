@@ -13,12 +13,12 @@ namespace Orion.Networking
         #region Fields
         #region Private
 
-        private object locker = new object();
-        private static int NextSessionId;
+        private object sessionIdLocker = new object();
+        private static uint NextSessionId;
 
         private readonly Socket udpSocket;
         private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> answerTimes;
-        private readonly Dictionary<IPEndPoint, Dictionary<int, Transaction>> transactions;
+        private readonly Dictionary<IPEndPoint, Dictionary<uint, Transaction>> transactions;
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
         private bool isDisposed;
@@ -45,7 +45,7 @@ namespace Orion.Networking
             Port = port;
             udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            transactions = new Dictionary<IPEndPoint, Dictionary<int, Transaction>>();
+            transactions = new Dictionary<IPEndPoint, Dictionary<uint, Transaction>>();
             answerTimes = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
@@ -56,23 +56,6 @@ namespace Orion.Networking
         #region Methods
 
         #region Private
-        private void SenderThread()
-        {
-            while (true)
-            {
-                if (isDisposed)
-                    break;
-            }
-        }
-
-        private void ReceiverThread()
-        {
-            while (true)
-            {
-                if (isDisposed)
-                    break;
-            }
-        }
 
         private void CheckIfDisposed()
         {
@@ -81,6 +64,57 @@ namespace Orion.Networking
                 throw new ObjectDisposedException(null);
             }
         }
+
+        private void SenderThread()
+        {
+            while (true)
+            {
+                if (isDisposed) break;
+
+                lock (transactions)
+                {
+                    foreach(KeyValuePair<IPEndPoint, Dictionary<uint, Transaction>> hostTransactions in transactions)
+                    {
+                        IPEndPoint remoteHost = hostTransactions.Key;
+                        foreach (KeyValuePair<uint, Transaction> pair in hostTransactions.Value)
+                        {
+                            Transaction transaction = pair.Value;
+                            if (transaction.IsReady)
+                            {
+                                uint sessionId = pair.Key;
+                                if (transaction is SendingTransaction)
+                                {
+                                    sessionId |= 0x80000000;
+                                }
+
+                                byte[] dataToSend = transaction.Send();
+                                byte[] packetData = new byte[sizeof(int) + dataToSend.Length];
+
+                                BitConverter.GetBytes(sessionId).CopyTo(packetData, 0);
+                                dataToSend.CopyTo(packetData, sizeof(int));
+                                udpSocket.SendTo(packetData, remoteHost);
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(10);
+            }
+        }
+
+        private void ReceiverThread()
+        {
+            byte[] buffer = new byte[512];
+            EndPoint endpointFrom = null;
+            while (true)
+            {
+                if (isDisposed) break;
+
+                int size = udpSocket.ReceiveFrom(buffer, ref endpointFrom);
+                IPEndPoint from = endpointFrom as IPEndPoint;
+            }
+        }
+
         #endregion
 
         #region Internal
@@ -104,14 +138,19 @@ namespace Orion.Networking
         {
             CheckIfDisposed();
             SendingTransaction transaction = new SendingTransaction(this, to, data);
-            lock (locker)
+            uint sessionId;
+            lock (sessionIdLocker)
             {
-                int sessionId = NextSessionId;
+                sessionId = NextSessionId;
                 NextSessionId++;
+                NextSessionId &= 0x7FFFFFFF;
+            }
 
+            lock (transactions)
+            {
                 if (!transactions.ContainsKey(to))
                 {
-                    transactions[to] = new Dictionary<int, Transaction>();
+                    transactions[to] = new Dictionary<uint, Transaction>();
                 }
 
                 transactions[to][sessionId] = transaction;

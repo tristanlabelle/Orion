@@ -11,6 +11,8 @@ namespace Orion.GameLogic
     {
         #region Fields
         PathNode parentNode;
+
+       
         Point position;
 
         
@@ -44,6 +46,12 @@ namespace Orion.GameLogic
         {
             get { return position; }
             set { position = value; }
+        }
+
+        public PathNode ParentNode
+        {
+            get { return parentNode; }
+            set { parentNode = value; }
         }
 
         #endregion

@@ -62,10 +62,16 @@ namespace Orion.Graphics
                     if (unitsToAssignTask.Count() != 0)
                     {
                         Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.Contains(position));
+                        RessourceNode node = World.RessourceNodes.FirstOrDefault(ressourceNode => ressourceNode.Circle.Contains(position));
                         Command command;
                         if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
                         {
                                 command = new Attack(Faction, unitsToAssignTask, enemy);
+                        }
+                            // Assigns a gathering task
+                        else if(node != null)
+                        {
+                            command = new Harvest(Faction, unitsToAssignTask, node);
                         }
                         else
                         {

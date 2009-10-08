@@ -73,6 +73,7 @@
     <Compile Include="Task.cs" />
     <Compile Include="Tasks\Attack.cs" />
     <Compile Include="Tasks\Follow.cs" />
+    <Compile Include="Tasks\Harvest.cs" />
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\Stand.cs" />
     <Compile Include="Unit.cs" />

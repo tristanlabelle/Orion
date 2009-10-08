@@ -18,7 +18,6 @@ namespace Orion.GameLogic.Tasks
         private const float secondsToHitEnemy = 1;
         private float secondsStored = 0;
         private Follow follow;
-        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -30,7 +29,6 @@ namespace Orion.GameLogic.Tasks
             this.striker = striker;
             this.enemy = enemy;
             this.follow = new Follow(striker, enemy, striker.Type.AttackRange);
-            enemy.Died += enemy_Died;
             secondsStored = secondsToHitEnemy;
         }
         #endregion
@@ -43,12 +41,8 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get
-            {
-                return hasEnded;
-            }
+            get { return !enemy.IsAlive; }
         }
-
         #endregion
 
         #region Methods
@@ -58,12 +52,12 @@ namespace Orion.GameLogic.Tasks
         /// <param name="timeDelta"></param>
         public override void Update(float timeDelta)
         {
-            if (hasEnded)
+            if (HasEnded)
                 return;
 
             if (follow.IsInRange)
             {
-                if (InflictDamageToEnemyPossible(timeDelta))
+                if (TryInflictDamage(timeDelta))
                     enemy.Damage += striker.Type.AttackDamage;
             }
             else
@@ -79,8 +73,7 @@ namespace Orion.GameLogic.Tasks
         /// inflicts damage to the enemy; dependant of the constant 
         /// named "secondsToHitEnemy". 
         /// </summary>
-        /// 
-        private bool InflictDamageToEnemyPossible(float timeDelta)
+        private bool TryInflictDamage(float timeDelta)
         {
             if (secondsStored >= secondsToHitEnemy)
             {
@@ -93,12 +86,6 @@ namespace Orion.GameLogic.Tasks
                 return false;
             }
         }
-
-        private void enemy_Died(Unit sender)
-        {
-            hasEnded = true;
-        }
-
         #endregion
     }
 }

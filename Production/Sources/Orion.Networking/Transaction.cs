@@ -36,13 +36,17 @@ namespace Orion.Networking
 
         #region Properties
 
-        public abstract bool IsReady { get; }
-        public abstract bool IsCompleted { get; }
+        public bool IsReady 
+        {
+            get { return DateTime.UtcNow > ResendTimeout && !IsCompleted; }
+        }
 
         public bool HasTimedOut
         {
             get { return DateTime.UtcNow > TransactionTimeout; }
         }
+
+        public abstract bool IsCompleted { get; }
 
         #endregion
 

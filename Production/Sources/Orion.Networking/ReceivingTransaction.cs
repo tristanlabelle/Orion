@@ -8,15 +8,6 @@ namespace Orion.Networking
 {
     internal abstract class ReceivingTransaction : Transaction
     {
-        #region Nested Types
-
-        private enum TransationState
-        {
-            Ready, ReceivedData, ReceivedSecondAcknowledgement, Done
-        }
-
-        #endregion
-
         #region Fields
 
         internal static byte[] firstAcknowledgeByteArray = Encoding.ASCII.GetBytes("1ACK");
@@ -26,7 +17,7 @@ namespace Orion.Networking
 
         #endregion
 
-        public ReceivingTransaction(Transporter transporter, IPEndPoint host)
+        public ReceivingTransaction(Transporter transporter, IPEndPoint host, byte[] data)
             : base(transporter, host)
         { }
     }

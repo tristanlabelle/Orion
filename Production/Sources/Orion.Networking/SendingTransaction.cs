@@ -33,11 +33,6 @@ namespace Orion.Networking
 
         #region Properties
 
-        public override bool IsReady
-        {
-            get { return !IsCompleted && DateTime.UtcNow >= ResendTimeout; }
-        }
-
         public override bool IsCompleted
         {
             get { return successfullySentData && !shouldSendSecondAcknowledge; }
@@ -50,6 +45,7 @@ namespace Orion.Networking
         public override byte[] Send()
         {
             ResetSendingTimeout();
+            packetId++;
 
             if (!successfullySentData)
                 return data;

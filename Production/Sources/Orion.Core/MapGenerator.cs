@@ -5,41 +5,39 @@ using System.Text;
 
 namespace Orion
 {
-    public sealed class MapGenerator
+    public static class MapGenerator
     {
         #region Fields
-        
-        double MapLength;
-        double MapHeight;
-        PerlinNoise noise;
+
+        public static PerlinNoise noise;
 
         #endregion
 
         #region Constructors
-
-        public MapGenerator(double MapLength, double MapHeight, Random random)
-        {
-            this.MapHeight = MapHeight;
-            this.MapLength = MapLength;
-            this.noise = new PerlinNoise(random);
-        }
         
         #endregion
 
         #region Properties
 
-        /*public bool Walkable
-        {
-            get {  }
-        }*/
-
         #endregion
 
         #region Methods
 
-        public void Generate()
+        public static GameMap GetNewMap(int MapHeight, int MapWitdh, Random random)
         {
-        
+            GameMap map = new GameMap(MapHeight, MapWitdh);
+            noise = new PerlinNoise(random);
+            for(double i = 0; i < MapWitdh; i += 0.5)
+            {
+                for (double j = 0; j < MapHeight; j += 0.5)
+                {
+                    /*if (noise[i, j] > 0.5)
+                        map[i][j] = true;
+                    else
+                        map[i][j] = false;*/
+                }
+            }
+            return map;
         }
 
         #endregion

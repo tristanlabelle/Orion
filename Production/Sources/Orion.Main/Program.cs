@@ -37,18 +37,15 @@ namespace Orion.Main
 
             Faction blueFaction = new Faction(world, "Blue", Color.Blue);
             MockCommander blueCommander = new MockCommander(blueFaction);
-            commandManager.AddCommander(blueCommander);
+            //commandManager.AddCommander(blueCommander);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             Random random = new Random();
             for (int i = 0; i < 1600; ++i)
             {
-                Unit unit = new Unit((uint)i, unitTypes[i % unitTypes.Length], world);
+                Faction faction = (i % 2 == 0) ? redFaction : blueFaction;
+                Unit unit = faction.CreateUnit(unitTypes[i % unitTypes.Length]);
                 unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                if (i % 2 == 0) redFaction.Units.Add(unit);
-                else blueFaction.Units.Add(unit);
-                
-                world.Units.Add(unit);
             }
 
             //Adding Ressource Nodes to the game world

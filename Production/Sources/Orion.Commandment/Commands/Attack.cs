@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
+
 using Orion.GameLogic;
+
 using AttackTask = Orion.GameLogic.Tasks.Attack;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
+    /// to attack another <see cref="Unit"/>.
+    /// </summary>
+    [SerializableCommand(0)]
     public sealed class Attack : Command
     {
         #region Fields
@@ -35,11 +43,20 @@ namespace Orion.Commandment.Commands
             this.strikers = strikers.Distinct().ToList();
         }
         #endregion
+
         #region Methods
         public override void Execute()
         {
             foreach (Unit striker in strikers)
                 striker.Task = new AttackTask(striker, enemy);
+        }
+
+        protected override void DoSerialize(BinaryWriter writer)
+        {
+            writer.Write(strikers.Count);
+            foreach (Unit unit in strikers)
+                writer.Write(unit.ID);
+            writer.Write(enemy.ID);
         }
         #endregion
     }

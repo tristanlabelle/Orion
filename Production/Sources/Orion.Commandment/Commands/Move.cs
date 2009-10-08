@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 
-using Orion.GameLogic;
 using OpenTK.Math;
+
+using Orion.GameLogic;
+
 using MoveTask = Orion.GameLogic.Tasks.Move;
 
 namespace Orion.Commandment.Commands
@@ -14,6 +17,7 @@ namespace Orion.Commandment.Commands
     /// <see cref="Task"/> to move to a destination.
     /// </summary>
     [Serializable]
+    [SerializableCommand(2)]
     public sealed class Move : Command
     {
         #region Fields
@@ -46,6 +50,15 @@ namespace Orion.Commandment.Commands
         {
             foreach (Unit unit in units)
                 unit.Task = new MoveTask(unit, destination);
+        }
+
+        protected override void DoSerialize(BinaryWriter writer)
+        {
+            writer.Write(units.Count);
+            foreach (Unit unit in units)
+                writer.Write(unit.ID);
+            writer.Write(destination.X);
+            writer.Write(destination.Y);
         }
         #endregion
     }

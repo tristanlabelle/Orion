@@ -19,14 +19,6 @@ namespace Orion.GameLogic
         #region Fields
         private readonly uint id;
         private readonly UnitType type;
-        private readonly World world;
-
-        /// <summary>
-        /// The <see cref="Faction"/> to which this <see cref="Unit"/> belongs.
-        /// </summary>
-        /// <remarks>
-        /// <c>internal</c> as it is accessed by <see cref="Faction"/>. Do not modify otherwise.
-        /// </remarks>
         internal Faction faction;
 
         private Vector2 position;
@@ -50,38 +42,42 @@ namespace Orion.GameLogic
         /// The <see cref="UnitType"/> which determines
         /// the stats and capabilities of this <see cref="Unit"/>
         /// </param>
-        /// <param name="world">The <see cref="World"/> in which this <see cref="Unit"/> lives.</param>
-        public Unit(uint id, UnitType type, World world)
+        /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
+        internal Unit(uint id, UnitType type, Faction faction)
         {
-            Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(type, "type");
+            Argument.EnsureNotNull(faction, "faction");
 
             this.id = id;
             this.type = type;
-            this.world = world;
+            this.faction = faction;
         }
         #endregion
 
         #region Events
+        #region DamageChanged
         /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
         /// </summary>
         public event GenericEventHandler<Unit> DamageChanged;
 
+        private void OnDamageChanged()
+        {
+            if (DamageChanged != null) DamageChanged(this);
+        }
+        #endregion
+
+        #region Died
         /// <summary>
         /// Raised when this <see cref="Unit"/> has died.
         /// </summary>
         public event GenericEventHandler<Unit> Died;
 
-        private void OnDamageChanged()
-        {
-            if (DamageChanged != null) DamageChanged(this);
-        }
-
         private void OnDied()
         {
             if (Died != null) Died(this);
         }
+        #endregion
         #endregion
 
         #region Properties
@@ -111,7 +107,7 @@ namespace Orion.GameLogic
         /// </summary>
         public World World
         {
-            get { return world; }
+            get { return faction.World; }
         }
 
         /// <summary>
@@ -239,18 +235,14 @@ namespace Orion.GameLogic
         {
             if (IsIdle)
             {
-                List<Unit> unitsInRage = GetOtherFactionUnitsInRange().ToList();
-                if (unitsInRage.Count > 0)
-                    task = new Tasks.Attack(this, unitsInRage[0]);
+                Unit unitToAttack = World.Units.FirstOrDefault(unit =>
+                    unit.faction != faction
+                    && Circle.SignedDistance(Circle, unit.Circle) <= type.VisionRange);
+
+                if (unitToAttack != null) task = new Tasks.Attack(this, unitToAttack);
             }
             if(!task.HasEnded)
                 task.Update(timeDelta);
-        }
-         // TODO : Change to get only Enemy and not Other Faction 
-        public IEnumerable<Unit> GetOtherFactionUnitsInRange()
-        {
-            return world.Units.Where(unit => 
-                Circle.SignedDistance(Circle,unit.Circle) <= type.VisionRange && unit.faction != faction);
         }
         #endregion
     }

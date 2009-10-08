@@ -14,47 +14,19 @@ namespace Orion.GameLogic
     [Serializable]
     public sealed class World
     {
-        #region Nested Types
-        private sealed class UnitCollection : Collection<Unit>
-        {
-            #region Fields
-            private readonly World world;
-            #endregion
-
-            #region Constructors
-            public UnitCollection(World world)
-            {
-                Argument.EnsureNotNull(world, "world");
-                this.world = world;
-            }
-            #endregion
-
-            #region Methods
-            protected override void InsertItem(int index, Unit item)
-            {
-                Argument.EnsureNotNull(item, "item");
-                Argument.EnsureEqual(item.World, world, "item.World");
-                if (!Contains(item)) base.InsertItem(index, item);
-            }
-
-            protected override void SetItem(int index, Unit item)
-            {
-                throw new NotSupportedException();
-            }
-            #endregion
-        }
-        #endregion
-
         #region Instance
         #region Fields
-        private readonly UnitCollection units;
+        private readonly List<Unit> units = new List<Unit>();
+        private readonly List<Unit> deadUnits = new List<Unit>();
+        private readonly GenericEventHandler<Unit> unitDiedEventHandler;
+        private uint nextUnitID = 0;
         private List<RessourceNode> ressourceNodes;
         #endregion
 
         #region Constructors
         public World()
         {
-            units = new UnitCollection(this);
+            unitDiedEventHandler = OnUnitDied;
             ressourceNodes = new List<RessourceNode>();
         }
         #endregion
@@ -64,9 +36,9 @@ namespace Orion.GameLogic
 
         #region Properties
         /// <summary>
-        /// Gets the collection of <see cref="Unit"/>s part of this <see cref="World"/>.
+        /// Gets the sequence of <see cref="Unit"/>s part of this <see cref="World"/>.
         /// </summary>
-        public ICollection<Unit> Units
+        public IEnumerable<Unit> Units
         {
             get { return units; }
         }
@@ -110,6 +82,31 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        private void OnUnitDied(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            deadUnits.Add(unit);
+        }
+
+        /// <summary>
+        /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
+        /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
+        /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
+        /// <returns>The newly created <see cref="Unit"/>.</returns>
+        internal Unit CreateUnit(UnitType type, Faction faction)
+        {
+            Argument.EnsureNotNull(type, "type");
+            Argument.EnsureNotNull(faction, "faction");
+
+            Unit unit = new Unit(nextUnitID++, type, faction);
+            unit.Died += unitDiedEventHandler;
+
+            units.Add(unit);
+            return unit;
+        }
+
         /// <summary>
         /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
         /// </summary>
@@ -118,6 +115,11 @@ namespace Orion.GameLogic
         {
             foreach (Unit unit in Units)
                 unit.Update(timeDelta);
+
+            foreach (Unit unit in deadUnits)
+                units.Remove(unit);
+
+            deadUnits.Clear();
         }
         #endregion
         #endregion

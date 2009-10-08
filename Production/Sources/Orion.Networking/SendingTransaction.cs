@@ -16,7 +16,6 @@ namespace Orion.Networking
         internal static readonly int secondAcknowledgeSignature = BitConverter.ToInt32(secondAcknowledgeByteArray, 0);
 
         private bool successfullySentData;
-        private bool shouldSendSecondAcknowledge;
         private byte[] data;
 
         #endregion
@@ -26,7 +25,9 @@ namespace Orion.Networking
         public SendingTransaction(Transporter transporter, IPEndPoint host, byte[] dataToSend)
             : base(transporter, host)
         {
-            data = dataToSend;
+            data = new byte[dataToSend.Length + 4];
+            dataByteArray.CopyTo(data, 0);
+            dataToSend.CopyTo(data, dataByteArray.Length);
         }
 
         #endregion
@@ -35,7 +36,7 @@ namespace Orion.Networking
 
         public override bool IsCompleted
         {
-            get { return successfullySentData && !shouldSendSecondAcknowledge; }
+            get { return successfullySentData; }
         }
 
         #endregion
@@ -60,11 +61,10 @@ namespace Orion.Networking
             if (packetSignature == ReceivingTransaction.firstAcknowledgeSignature)
             {
                 successfullySentData = true;
-                shouldSendSecondAcknowledge = true;
             }
-            else if (packetSignature == ReceivingTransaction.completedSignature)
+            else 
             {
-                shouldSendSecondAcknowledge = false;
+                throw new ArgumentException("Sending Transaction received packet signature not that of a first acknowledgement");
             }
         }
 

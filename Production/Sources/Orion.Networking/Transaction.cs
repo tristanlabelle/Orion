@@ -16,7 +16,7 @@ namespace Orion.Networking
         protected DateTime TransactionTimeout;
         protected byte packetId;
         protected Transporter Transporter;
-        protected List<DateTime> packetSendTimes;
+        protected Dictionary<byte, DateTime> packetSendTimes;
 
         public readonly IPEndPoint RemoteHost;
 

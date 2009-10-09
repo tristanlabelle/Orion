@@ -16,8 +16,6 @@ namespace Orion.GameLogic
 
     public class RessourceNode
     {
-        
-
         #region Fields
 
         private readonly int id;
@@ -25,6 +23,7 @@ namespace Orion.GameLogic
         private readonly int totalRessources;
         private int ressourcesLeft;
         private readonly Vector2 position;
+        private World world;
 
         #endregion
 
@@ -37,13 +36,14 @@ namespace Orion.GameLogic
         /// <param name="ressourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
         /// <param name="amountOfRessources"></param>
         /// <param name="position"></param>
-        public RessourceNode(int id, RessourceType ressourceType, int amountOfRessources, Vector2 position)
+        public RessourceNode(int id, RessourceType ressourceType, int amountOfRessources, Vector2 position, World world)
         {
             this.id = id;
             this.ressourceType = ressourceType;
             this.totalRessources = amountOfRessources;
             this.ressourcesLeft = amountOfRessources;
             this.position = position;
+            this.world = world;
         }
         #endregion
 
@@ -81,6 +81,10 @@ namespace Orion.GameLogic
         public void Harvest(int amount)
         {
             ressourcesLeft -= amount;
+            if (ressourcesLeft == 0)
+            {
+                world.RessourceNodes.Remove(this);
+            }
         }
 
         #endregion

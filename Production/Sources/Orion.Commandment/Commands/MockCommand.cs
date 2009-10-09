@@ -44,6 +44,10 @@ namespace Orion.Commandment.Commands
             Console.WriteLine("Command Executed");
         }
 
+        protected override void DoSerialize(System.IO.BinaryWriter writer)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
 

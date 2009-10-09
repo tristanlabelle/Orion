@@ -52,7 +52,7 @@ namespace Orion.Main
             for (int i = 0; i < 5; i++)
             {
                 Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                RessourceNode node = new RessourceNode(i, RessourceType.Alladium, 500, position);
+                RessourceNode node = new RessourceNode(i, RessourceType.Alladium, 500, position, world);
 
                 world.RessourceNodes.Add(node);
             }
@@ -60,7 +60,7 @@ namespace Orion.Main
             for (int i = 0; i < 5; i++)
             {
                 Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                RessourceNode node = new RessourceNode(i, RessourceType.Allagene, 500, position);
+                RessourceNode node = new RessourceNode(i, RessourceType.Allagene, 500, position, world);
 
                 world.RessourceNodes.Add(node);
             }

@@ -43,21 +43,25 @@ namespace Orion.GameLogic.Tasks
             {
                 if (harvestingIsOver(timeDelta))
                 {
-                    //determines the amount of ressources to be harvested and substracts that amount to the node
-                    if (node.RessourcesLeft >= amountToHarvest)
-                        amountToHarvest = defaultAmountToHarvest;
-                    else
-                        amountToHarvest = node.RessourcesLeft;
+                    if(node.RessourcesLeft != 0)
+                    {
+                        //determines the amount of ressources to be harvested and substracts that amount to the node
+                        if (node.RessourcesLeft >= amountToHarvest)
+                            amountToHarvest = defaultAmountToHarvest;
+                        else
+                            amountToHarvest = node.RessourcesLeft;
 
-                    node.Harvest(amountToHarvest);
+                        node.Harvest(amountToHarvest);
 
-                    //adds the ressources to the unit's faction
-                    if (node.RessourceType == RessourceType.Alladium)
-                        harvester.Faction.AladdiumAmount += amountToHarvest;
-                    else if (node.RessourceType == RessourceType.Allagene)
-                        harvester.Faction.AllageneAmount += amountToHarvest;
+                        //adds the ressources to the unit's faction
+                        if (node.RessourceType == RessourceType.Alladium)
+                            harvester.Faction.AladdiumAmount += amountToHarvest;
+                        else if (node.RessourceType == RessourceType.Allagene)
+                            harvester.Faction.AllageneAmount += amountToHarvest;
 
-                    System.Console.Write("Alladium: " + harvester.Faction.AladdiumAmount + "\nAllagene: " + harvester.Faction.AllageneAmount);
+                        System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAllagene: " + harvester.Faction.AllageneAmount);
+                        secondsSpentHarvesting = 0;
+                    }
                 }
             }
             else

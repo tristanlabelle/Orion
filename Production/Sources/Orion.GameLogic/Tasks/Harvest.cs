@@ -59,7 +59,7 @@ namespace Orion.GameLogic.Tasks
                         else if (node.RessourceType == RessourceType.Allagene)
                             harvester.Faction.AllageneAmount += amountToHarvest;
 
-                        System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAllagene: " + harvester.Faction.AllageneAmount);
+                        //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAllagene: " + harvester.Faction.AllageneAmount);
                         secondsSpentHarvesting = 0;
                     }
                 }

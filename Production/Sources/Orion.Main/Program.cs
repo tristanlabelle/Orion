@@ -31,17 +31,17 @@ namespace Orion.Main
 
             CommandManager commandManager = new CommandManager();
 
-            Faction redFaction = new Faction(world, "Red", Color.Red);
+            Faction redFaction = world.CreateFaction("Red", Color.Red);
             UserInputCommander redCommander = new UserInputCommander(redFaction);
             commandManager.AddCommander(redCommander);
 
-            Faction blueFaction = new Faction(world, "Blue", Color.Blue);
+            Faction blueFaction = world.CreateFaction("Blue", Color.Blue);
             MockCommander blueCommander = new MockCommander(blueFaction);
-            //commandManager.AddCommander(blueCommander);
+            commandManager.AddCommander(blueCommander);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             Random random = new Random();
-            for (int i = 0; i < 1600; ++i)
+            for (int i = 0; i < 200; ++i)
             {
                 Faction faction = (i % 2 == 0) ? redFaction : blueFaction;
                 Unit unit = faction.CreateUnit(unitTypes[i % unitTypes.Length]);
@@ -64,8 +64,6 @@ namespace Orion.Main
 
                 world.RessourceNodes.Add(node);
             }
-
-
             #endregion
 
             using (GameUI ui = new GameUI(world, redCommander))

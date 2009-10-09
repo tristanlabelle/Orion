@@ -7,6 +7,7 @@ using System.Text;
 using Orion.GameLogic;
 
 using AttackTask = Orion.GameLogic.Tasks.Attack;
+using System.Diagnostics;
 
 namespace Orion.Commandment.Commands
 {
@@ -18,8 +19,8 @@ namespace Orion.Commandment.Commands
     public sealed class Attack : Command
     {
         #region Fields
-        private readonly List<Unit> strikers;
-        private readonly Unit enemy; 
+        private readonly List<Unit> attackers;
+        private readonly Unit target; 
         #endregion
 
         #region Constructors
@@ -29,34 +30,91 @@ namespace Orion.Commandment.Commands
         /// current <see cref="Task"/> should be attacked. 
         /// </summary>
         /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
-        /// <param name="units">
-        /// The <see cref="Unit"/>s of that <see cref="Faction"/> which <see cref="Task"/>s are to be attacked.
+        /// <param name="attackers">
+        /// The <see cref="Unit"/>s of that <see cref="Faction"/> which should attack.
         /// </param>
-        public Attack(Faction faction, IEnumerable<Unit> strikers, Unit enemy)
+        /// <param name="target">The target <see cref="Unit"/> to be attacked.</param>
+        public Attack(Faction faction, IEnumerable<Unit> attackers, Unit target)
             : base(faction)
         {
-            Argument.EnsureNotNull(enemy, "enemy");
-            Argument.EnsureNotNullNorEmpty(strikers, "strikers");
-            if (strikers.Any(unit => unit.Faction != base.SourceFaction))
+            Argument.EnsureNotNull(target, "target");
+            Argument.EnsureNotNullNorEmpty(attackers, "attackers");
+
+            this.target = target;
+            this.attackers = attackers.Distinct().ToList();
+
+            if (this.attackers.Any(unit => unit.Faction != base.SourceFaction))
                 throw new ArgumentException("Expected all units to be from the source faction.", "units");
-            this.enemy = enemy; 
-            this.strikers = strikers.Distinct().ToList();
+
+            if (this.attackers.Contains(target))
+                throw new ArgumentException("The attack target cannot be one of the attackers.", "target");
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the number of attacking <see cref="Unit"/>s.
+        /// </summary>
+        public int AttackerCount
+        {
+            get { return attackers.Count; }
+        }
+
+        /// <summary>
+        /// Gets the sequence of attacking <see cref="Unit"/>s.
+        /// </summary>
+        public IEnumerable<Unit> Attackers
+        {
+            get { return attackers; }
+        }
+
+        /// <summary>
+        /// Gets the target <see cref="Unit"/> to be attacked.
+        /// </summary>
+        public Unit Target
+        {
+            get { return target; }
         }
         #endregion
 
         #region Methods
         public override void Execute()
         {
-            foreach (Unit striker in strikers)
-                striker.Task = new AttackTask(striker, enemy);
+            foreach (Unit striker in attackers)
+                striker.Task = new AttackTask(striker, target);
+        }
+        #endregion
+    }
+
+    /// <summary>
+    /// A <see cref="CommandSerializer"/> that can serialize <see cref="Attack"/> commands.
+    /// </summary>
+    [Serializable]
+    public sealed class AttackSerializer : CommandSerializer<Attack>
+    {
+        #region Properties
+        public override byte ID
+        {
+            get { return 0; }
+        }
+        #endregion
+
+        #region Methods
+        protected override void DoSerialize(Attack command, BinaryWriter writer)
+        {
+            writer.Write(command.SourceFaction.ID);
+            writer.Write(command.AttackerCount);
+            foreach (Unit attacker in command.Attackers)
+                writer.Write(attacker.ID);
+            writer.Write(command.Target.ID);
         }
 
-        protected override void DoSerialize(BinaryWriter writer)
+        protected override Attack DoDeserialize(BinaryReader reader, World world)
         {
-            writer.Write(strikers.Count);
-            foreach (Unit unit in strikers)
-                writer.Write(unit.ID);
-            writer.Write(enemy.ID);
+            Faction sourceFaction = ReadFaction(reader, world);
+            Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
+            Unit target = ReadUnit(reader, world);
+            return new Attack(sourceFaction, attackers, target);
         }
         #endregion
     }

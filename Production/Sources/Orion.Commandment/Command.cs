@@ -55,30 +55,6 @@ namespace Orion.Commandment
         /// Executes this <see cref="Command"/>.
         /// </summary>
         public abstract void Execute();
-
-        /// <summary>
-        /// Serializes this <see cref="Command"/> to a binary
-        /// representation from which it can be deserialized.
-        /// </summary>
-        /// <param name="writer">
-        /// A <see cref="BinaryWriter"/> that can be used to write
-        /// the serialized representation of this <see cref="Comamnd"/>.
-        /// </param>
-        public void Serialize(BinaryWriter writer)
-        {
-            Argument.EnsureNotNull(writer, "writer");
-            writer.Write(TypeID);
-            DoSerialize(writer);
-        }
-
-        /// <summary>
-        /// When overrided in a derived class, performs the actual serialization work.
-        /// </summary>
-        /// <param name="writer">
-        /// A <see cref="BinaryWriter"/> that can be used to write
-        /// the serialized representation of this <see cref="Comamnd"/>.
-        /// </param>
-        protected abstract void DoSerialize(BinaryWriter writer);
         #endregion
     }
 }

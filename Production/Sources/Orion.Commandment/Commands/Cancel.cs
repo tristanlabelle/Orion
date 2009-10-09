@@ -58,13 +58,6 @@ namespace Orion.Commandment.Commands
             foreach (Unit unit in units)
                 unit.Task = Stand.Instance;
         }
-
-        protected override void DoSerialize(BinaryWriter writer)
-        {
-            writer.Write(units.Count);
-            foreach (Unit unit in units)
-                writer.Write(unit.ID);
-        }
         #endregion
     }
 }

@@ -6,6 +6,8 @@ using System.Collections.ObjectModel;
 
 using Orion.Geometry;
 
+using Color = System.Drawing.Color;
+
 namespace Orion.GameLogic
 {
     /// <summary>
@@ -14,17 +16,20 @@ namespace Orion.GameLogic
     [Serializable]
     public sealed class World
     {
-        #region Instance
         #region Fields
+        private readonly List<Faction> factions = new List<Faction>();
         private readonly List<Unit> units = new List<Unit>();
         private readonly List<Unit> deadUnits = new List<Unit>();
         private readonly GenericEventHandler<Unit> unitDiedEventHandler;
-        private uint nextUnitID = 0;
+        private int nextUnitID = 0;
         private List<RessourceNode> ressourceNodes = new List<RessourceNode>();
         private List<Building> buildings = new List<Building>();
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new <see cref="World"/>.
+        /// </summary>
         public World()
         {
             unitDiedEventHandler = OnUnitDied;
@@ -35,6 +40,14 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the sequence of <see cref="Faction"/>s part of this <see cref="World"/>.
+        /// </summary>
+        public IEnumerable<Faction> Factions
+        {
+            get { return factions; }
+        }
+
         /// <summary>
         /// Gets the sequence of <see cref="Unit"/>s part of this <see cref="World"/>.
         /// </summary>
@@ -94,6 +107,48 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets a <see cref="Faction"/> of this <see cref="World"/> from its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the <see cref="Faction"/> to be found.</param>
+        /// <returns>
+        /// The <see cref="Faction"/> with that identifier, or <c>null</c> if the identifier is invalid.
+        /// </returns>
+        public Faction FindFactionWithID(int id)
+        {
+            if (id < 0 || id >= factions.Count) return null;
+            return factions[id];
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Unit"/> of this <see cref="World"/> from its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the <see cref="Unit"/> to be found.</param>
+        /// <returns>
+        /// The <see cref="Unit"/> with that identifier, or <c>null</c> if the identifier is invalid.
+        /// </returns>
+        public Unit FindUnitWithID(int id)
+        {
+            for (int i = 0; i < units.Count; ++i)
+                if (units[i].ID == id)
+                    return units[i];
+
+            return null;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Faction"/> and adds it to this <see cref="World"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
+        /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
+        /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
+        public Faction CreateFaction(string name, Color color)
+        {
+            Faction faction = new Faction(factions.Count, this, name, color);
+            factions.Add(faction);
+            return faction;
+        }
+
+        /// <summary>
         /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
         /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
         /// </summary>
@@ -126,7 +181,6 @@ namespace Orion.GameLogic
 
             deadUnits.Clear();
         }
-        #endregion
         #endregion
     }
 }

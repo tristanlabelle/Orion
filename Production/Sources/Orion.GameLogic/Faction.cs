@@ -133,6 +133,7 @@ namespace Orion.GameLogic
 
         #region Instance
         #region Fields
+        private readonly int id;
         private readonly World world;
         private readonly string name;
         private readonly Color color;
@@ -145,14 +146,16 @@ namespace Orion.GameLogic
         /// <summary>
         /// Initializes a new <see cref="Faction"/> from its name and <see cref="Color"/>.
         /// </summary>
+        /// <param name="id">The unique identifier of this <see cref="Faction"/>.</param>
         /// <param name="world">The <see cref="World"/> hosting this <see cref="Faction"/>.</param>
         /// <param name="name">The name of this <see cref="Faction"/>.</param>
         /// <param name="color">The distinctive <see cref="Color"/> of this <see cref="Faction"/>'s units.</param>
-        public Faction(World world, string name, Color color)
+        internal Faction(int id, World world, string name, Color color)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNullNorBlank(name, "name");
 
+            this.id = id;
             this.world = world;
             this.name = name;
             this.color = color;
@@ -164,6 +167,14 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the unique identifier of this <see cref="Faction"/>.
+        /// </summary>
+        public int ID
+        {
+            get { return id; }
+        }
+
         /// <summary>
         /// Gets the <see cref="World"/> which hosts this faction.
         /// </summary>

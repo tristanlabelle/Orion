@@ -10,13 +10,13 @@ namespace Orion.Networking
     {
         #region Fields
 
-        protected static DateTime BigBang = new DateTime(0);
+        protected static DateTime bigBang = new DateTime(0);
 
-        protected DateTime ResendTimeout;
-        protected DateTime TransactionTimeout;
+        protected DateTime resendTimeout;
+        protected DateTime transactionTimeout = DateTime.MaxValue;
         protected byte packetId;
-        protected Transporter Transporter;
-        protected Dictionary<byte, DateTime> packetSendTimes;
+        protected Transporter transporter;
+        protected Dictionary<byte, DateTime> packetSendTimes = new Dictionary<byte, DateTime>();
 
         public readonly IPEndPoint RemoteHost;
 
@@ -26,10 +26,8 @@ namespace Orion.Networking
 
         public Transaction(Transporter transporter, IPEndPoint host)
         {
-            Transporter = transporter;
-            RemoteHost = host;
-            packetSendTimes = new List<DateTime>();
-            TransactionTimeout = DateTime.MaxValue;
+            this.transporter = transporter;
+            this.RemoteHost = host;
         }
 
         #endregion
@@ -38,12 +36,12 @@ namespace Orion.Networking
 
         public bool IsReady 
         {
-            get { return DateTime.UtcNow > ResendTimeout && !IsCompleted; }
+            get { return DateTime.UtcNow > resendTimeout && !IsCompleted; }
         }
 
         public bool HasTimedOut
         {
-            get { return DateTime.UtcNow > TransactionTimeout; }
+            get { return DateTime.UtcNow > transactionTimeout; }
         }
 
         public abstract bool IsCompleted { get; }
@@ -54,12 +52,12 @@ namespace Orion.Networking
 
         protected void ResetTransactionTimeout()
         {
-            TransactionTimeout = DateTime.UtcNow + new TimeSpan(0, 0, 5);
+            transactionTimeout = DateTime.UtcNow + new TimeSpan(0, 0, 5);
         }
 
         protected void ResetSendingTimeout()
         {
-            ResendTimeout = DateTime.UtcNow + Transporter.AverageAnswerTimeForHost(RemoteHost);
+            resendTimeout = DateTime.UtcNow + transporter.AverageAnswerTimeForHost(RemoteHost);
         }
 
         public abstract void Receive(byte[] data);

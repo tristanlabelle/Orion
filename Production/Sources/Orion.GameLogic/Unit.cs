@@ -17,7 +17,7 @@ namespace Orion.GameLogic
     public sealed class Unit
     {
         #region Fields
-        private readonly uint id;
+        private readonly int id;
         private readonly UnitType type;
         internal Faction faction;
 
@@ -43,7 +43,7 @@ namespace Orion.GameLogic
         /// the stats and capabilities of this <see cref="Unit"/>
         /// </param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
-        internal Unit(uint id, UnitType type, Faction faction)
+        internal Unit(int id, UnitType type, Faction faction)
         {
             Argument.EnsureNotNull(type, "type");
             Argument.EnsureNotNull(faction, "faction");
@@ -85,7 +85,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the unique identifier of this <see cref="Unit"/>.
         /// </summary>
-        public uint ID
+        public int ID
         {
             get { return id; }
         }

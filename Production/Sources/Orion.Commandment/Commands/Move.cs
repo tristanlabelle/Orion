@@ -51,15 +51,6 @@ namespace Orion.Commandment.Commands
             foreach (Unit unit in units)
                 unit.Task = new MoveTask(unit, destination);
         }
-
-        protected override void DoSerialize(BinaryWriter writer)
-        {
-            writer.Write(units.Count);
-            foreach (Unit unit in units)
-                writer.Write(unit.ID);
-            writer.Write(destination.X);
-            writer.Write(destination.Y);
-        }
         #endregion
     }
 }

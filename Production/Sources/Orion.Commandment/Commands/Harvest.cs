@@ -32,11 +32,6 @@ namespace Orion.Commandment.Commands
                 harvester.Task = new HarvestTask(harvester, node);
             }
         }
-
-        protected override void DoSerialize(System.IO.BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
     }
 }

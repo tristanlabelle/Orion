@@ -14,9 +14,13 @@ namespace Orion
 
         #region Constructors
 
-        public GameMap(int MapHeight, int MapWitdh)
+        public GameMap(int MapWitdh, int MapHeight)
         {
-            
+            this.map = new bool[MapWitdh][];
+            for (int i = 0; i < MapWitdh; i++)
+            {
+                this.map[i] = new bool[MapHeight];
+            }
         }
 
         #endregion
@@ -27,6 +31,12 @@ namespace Orion
 
         #region Indexers
 
+        public bool[] this[int x]
+        {
+            get { return this[x]; }
+            set { map[x] = value; }
+        }
+
         public bool this[int x, int y]
         {
             get { return map[x][y]; }
@@ -36,6 +46,11 @@ namespace Orion
         #endregion
 
         #region Methods
+
+        public bool IsWalkable(int x, int y)
+        {
+            return map[x][y];
+        }
 
         #endregion
     }

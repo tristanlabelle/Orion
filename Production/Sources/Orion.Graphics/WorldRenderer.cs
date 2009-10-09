@@ -19,6 +19,7 @@ namespace Orion.Graphics
     {
         #region Fields
         private readonly World world;
+        private GameMap map;
         #endregion
 
         #region Constructors
@@ -30,6 +31,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
+            map = MapGenerator.GenerateNewMap(world.Width, world.Height, new Random());
         }
         #endregion
 
@@ -59,13 +61,31 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            
+            /*
             // Later, walkable and non-walkable tiles should be distinguishable.
             Rectangle? rectangle = world.Bounds; //.Intersection(viewRectangle);
             if (rectangle.HasValue)
             {
                 graphics.FillColor = Color.Gray;
                 graphics.Fill(rectangle.Value);
+            }
+            */
+
+            for (int i = 0; i < world.Width; i++)
+            {
+                for (int j = 0; j < world.Height; j++)
+                {
+                    Rectangle rectangle = new Rectangle(i, j, 1, 1);
+                    if (map[i, j])
+                    {
+                        graphics.FillColor = Color.White;
+                    }
+                    else
+                    {
+                        graphics.FillColor = Color.Black;
+                    }
+                    graphics.Fill(rectangle);
+                }
             }
         }
 

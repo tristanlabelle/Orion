@@ -23,18 +23,18 @@ namespace Orion
 
         #region Methods
 
-        public static GameMap GetNewMap(int MapHeight, int MapWitdh, Random random)
+        public static GameMap GenerateNewMap(int MapWitdh, int MapHeight, Random random)
         {
-            GameMap map = new GameMap(MapHeight, MapWitdh);
+            GameMap map = new GameMap(MapWitdh, MapHeight);
             noise = new PerlinNoise(random);
-            for(double i = 0; i < MapWitdh; i += 0.5)
+            for(int i = 0; i < MapWitdh; i ++)
             {
-                for (double j = 0; j < MapHeight; j += 0.5)
+                for (int j = 0; j < MapHeight; j ++)
                 {
-                    /*if (noise[i, j] > 0.5)
-                        map[i][j] = true;
+                    if (noise[i, j] > 0.5)
+                        map[i, j] = true;
                     else
-                        map[i][j] = false;*/
+                        map[i, j] = false;
                 }
             }
             return map;

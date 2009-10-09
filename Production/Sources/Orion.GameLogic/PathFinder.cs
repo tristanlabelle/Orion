@@ -23,12 +23,12 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="source">The Position of the unit</param>
         /// <param name="destination">The destination point</param>
-        public PathFinder(Point source, Point destination)
+        public PathFinder(Vector2 source, Vector2 destination)
         {
             Argument.EnsureNotNull(source, "sourcePoint");
             Argument.EnsureNotNull(destination, "destinationPoint");
-            this.source = new PathNode(null,source,0);
-            this.destination = destination;
+            this.source = new PathNode(null, new Point((int)source.X, (int)source.Y), 0);
+            this.destination = new Point((int)destination.X,(int)destination.Y);
             theFinalPath = new Path();
         }
         
@@ -96,12 +96,19 @@ namespace Orion.GameLogic
            PathNode currentNode = source;
            while (currentNode.Position != destination)
            {
+               
                closeNode.Add(currentNode);
+               openNode.Remove(currentNode);
                getNearPointToAdd(currentNode);
                if(openNode.Count >0)
                {
-                   //Get Minimum
-                //currentNode = openNode.M
+                   currentNode = openNode[0];
+                   foreach (PathNode aNode in openNode)
+                   {
+                       if (aNode.TotalCost < currentNode.TotalCost)
+                           currentNode = aNode;
+                   }
+   
                 }
                else
                {
@@ -109,9 +116,19 @@ namespace Orion.GameLogic
                }
 
            }
-            
 
-            return null;
+
+           if (currentNode.Position == destination)
+           {
+               Path path = new Path();
+               while (currentNode != source)
+               {
+                   path.AddNode(currentNode);
+                   currentNode = currentNode.ParentNode;
+               }
+               return path;
+           }
+           return null;
         }
 
         #endregion

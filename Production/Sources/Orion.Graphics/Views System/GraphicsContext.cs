@@ -275,7 +275,6 @@ namespace Orion.Graphics
         {
             GL.PushMatrix();
             GL.Translate(position.X, position.Y, 0);
-            GL.Scale(1, -1, 1);
             printer.Print(text, font, fillColor);
             GL.PopMatrix();
         }

@@ -70,6 +70,7 @@ namespace Orion.Networking
                 throw new ArgumentException("Sending Transaction received packet signature not that of a first acknowledgement");
             }
             successfullySentData = true;
+            secondAcknowledgePacket.RemotePacketId = holder.PacketId;
             ReceivedAnswerForPacket(holder.RemotePacketId);
         }
 

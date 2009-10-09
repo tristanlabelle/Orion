@@ -6,7 +6,7 @@ using System.Net;
 
 namespace Orion.Networking
 {
-    internal abstract class ReceivingTransaction : Transaction
+    internal class ReceivingTransaction : Transaction
     {
         #region Fields
         
@@ -14,21 +14,21 @@ namespace Orion.Networking
         internal static readonly int firstAcknowledgeSignature = BitConverter.ToInt32(firstAcknowledgeByteArray, 0);
 
         private bool receivedReceptionConfirmation;
-        private byte[] data;
+        private DataHolder firstAcknowledgePacket;
+        private DataHolder dataPacket;
 
         #endregion
 
         #region Constructors
         public ReceivingTransaction(Transporter transporter, IPEndPoint host, byte[] receivedData)
             : base(transporter, host)
-        { 
-            int packetSignature = BitConverter.ToInt32(data, 1);
-            if(packetSignature != SendingTransaction.dataSignature)
+        {
+            dataPacket = new DataHolder(receivedData);
+            firstAcknowledgePacket = new DataHolder(firstAcknowledgeByteArray);
+            if(dataPacket.TypeSignature != SendingTransaction.dataSignature)
             {
                 throw new ArgumentException("Receiving Transaction first packet signature not that of a data packet");
             }
-
-            data = receivedData;
         }
         #endregion
 
@@ -39,31 +39,37 @@ namespace Orion.Networking
             get { return receivedReceptionConfirmation; } 
         }
 
+        public override byte[] Data
+        {
+            get
+            {
+                if (!receivedReceptionConfirmation) return null;
+                return dataPacket.Data;
+            }
+        }
+
         #endregion
 
         #region Methods
 
         public override void Receive(byte[] data)
         {
-            ResetTransactionTimeout();
-            int packetSignature = BitConverter.ToInt32(data, 0);
-            if (packetSignature == SendingTransaction.secondAcknowledgeSignature)
-            {
-                receivedReceptionConfirmation = true;
-            }
-            else
+            DataHolder holder = new DataHolder(data);
+            if (holder.TypeSignature != SendingTransaction.secondAcknowledgeSignature)
             {
                 throw new ArgumentException("Receiving Transaction second packet signature not that of a second acknowledgement packet");
             }
 
+            ResetTransactionTimeout();
+            receivedReceptionConfirmation = true;
+            firstAcknowledgePacket.RemotePacketId = holder.PacketId;
+
         }
         public override byte[] Send()
         {
-            //PrepareSend();
-
-            return firstAcknowledgeByteArray;
+            PrepareSend(firstAcknowledgePacket);
+            return firstAcknowledgePacket.Bytes;
         }
-
 
         #endregion
     }

@@ -10,7 +10,7 @@ namespace Orion.Networking
     {
         #region Nested Types
 
-        protected class DataHolder
+        protected sealed class DataHolder
         {
             #region Fields
             public byte[] Bytes;
@@ -68,6 +68,13 @@ namespace Orion.Networking
                     }
                     value.CopyTo(Bytes, 2);
                 }
+            }
+            #endregion
+
+            #region Methods
+            public override string ToString()
+            {
+                return string.Format("Packet of type {0} (id {1}, in response to {2}) with data {3}", TypeSignature, PacketId, RemotePacketId, Data);
             }
             #endregion
         }

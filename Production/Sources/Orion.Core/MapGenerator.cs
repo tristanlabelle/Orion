@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion
+namespace Orion.Core
 {
     public static class MapGenerator
     {
@@ -23,20 +23,29 @@ namespace Orion
 
         #region Methods
 
-        public static GameMap GenerateNewMap(int MapWitdh, int MapHeight, Random random)
+        public static GameMap GenerateNewMap(int MapWidth, int MapHeight, MersenneTwister random)
         {
-            GameMap map = new GameMap(MapWitdh, MapHeight);
-            noise = new PerlinNoise(random);
-            for(int i = 0; i < MapWitdh; i ++)
+            if (noise == null)
+                noise = new PerlinNoise(random);
+
+            GameMap map = new GameMap(MapWidth, MapHeight);
+            double[] rawMap = new double[MapWidth * MapHeight];
+            for(int i = 0; i < MapHeight; i ++)
             {
-                for (int j = 0; j < MapHeight; j ++)
+                for (int j = 0; j < MapWidth; j ++)
                 {
-                    if (noise[i, j] < 0.5)
-                        map[i, j] = true;
-                    else
-                        map[i, j] = false;
+                    rawMap[i * MapWidth + j] = noise[j, i];
                 }
             }
+            
+            double max = rawMap.Max();
+            int k = 0;
+            foreach (double noiseValue in rawMap.Select(d => d / max))
+            {
+                map[k % MapHeight, k / MapHeight] = noiseValue >= 0.5;
+                k++;
+            }
+
             return map;
         }
 

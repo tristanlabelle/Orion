@@ -7,6 +7,7 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Core;
 
 using Color = System.Drawing.Color;
 
@@ -31,7 +32,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
-            map = MapGenerator.GenerateNewMap(world.Width, world.Height, new Random());
+            map = MapGenerator.GenerateNewMap(world.Width, world.Height, new MersenneTwister());
         }
         #endregion
 

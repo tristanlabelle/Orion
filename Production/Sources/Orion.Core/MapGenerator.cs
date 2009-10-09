@@ -31,7 +31,7 @@ namespace Orion
             {
                 for (int j = 0; j < MapHeight; j ++)
                 {
-                    if (noise[i, j] > 0.5)
+                    if (noise[i, j] < 0.5)
                         map[i, j] = true;
                     else
                         map[i, j] = false;

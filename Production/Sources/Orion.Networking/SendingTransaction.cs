@@ -16,7 +16,8 @@ namespace Orion.Networking
         internal static readonly int secondAcknowledgeSignature = BitConverter.ToInt32(secondAcknowledgeByteArray, 0);
 
         private bool successfullySentData;
-        private byte[] data;
+        private DataHolder dataPacket;
+        private DataHolder secondAcknowledgePacket;
 
         #endregion
 
@@ -25,9 +26,8 @@ namespace Orion.Networking
         public SendingTransaction(Transporter transporter, IPEndPoint host, byte[] dataToSend)
             : base(transporter, host)
         {
-            data = new byte[dataToSend.Length + 4];
-            dataByteArray.CopyTo(data, 0);
-            dataToSend.CopyTo(data, dataByteArray.Length);
+            dataPacket = new DataHolder(0, dataToSend);
+            secondAcknowledgePacket = new DataHolder(secondAcknowledgeByteArray);
         }
 
         #endregion
@@ -39,33 +39,38 @@ namespace Orion.Networking
             get { return successfullySentData; }
         }
 
+        public override byte[] Data
+        {
+            get { return dataPacket.Data; }
+        }
+
         #endregion
 
         #region Methods
 
         public override byte[] Send()
         {
-            ResetSendingTimeout();
-            packetId++;
-
             if (!successfullySentData)
-                return data;
-            return secondAcknowledgeByteArray;
+            {
+                PrepareSend(dataPacket);
+                return dataPacket.Data;
+            }
+
+            PrepareSend(secondAcknowledgePacket);
+            return secondAcknowledgePacket.Data;
         }
 
         public override void Receive(byte[] data)
         {
             ResetTransactionTimeout();
+            DataHolder holder = new DataHolder(data);
 
-            int packetSignature = BitConverter.ToInt32(data, 0);
-            if (packetSignature == ReceivingTransaction.firstAcknowledgeSignature)
-            {
-                successfullySentData = true;
-            }
-            else 
+            if (holder.TypeSignature != ReceivingTransaction.firstAcknowledgeSignature)
             {
                 throw new ArgumentException("Sending Transaction received packet signature not that of a first acknowledgement");
             }
+            successfullySentData = true;
+            ReceivedAnswerForPacket(holder.RemotePacketId);
         }
 
         #endregion

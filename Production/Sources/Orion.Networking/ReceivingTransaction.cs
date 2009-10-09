@@ -18,20 +18,17 @@ namespace Orion.Networking
 
         #endregion
 
-        #region constructor
-        public ReceivingTransaction(Transporter transporter, IPEndPoint host, byte[] data)
+        #region Constructors
+        public ReceivingTransaction(Transporter transporter, IPEndPoint host, byte[] receivedData)
             : base(transporter, host)
         { 
-            int packetSignature = BitConverter.ToInt32(data,0);
+            int packetSignature = BitConverter.ToInt32(data, 1);
             if(packetSignature != SendingTransaction.dataSignature)
             {
                 throw new ArgumentException("Receiving Transaction first packet signature not that of a data packet");
             }
-            else
-            {
-                this.data = data;
-            }
 
+            data = receivedData;
         }
         #endregion
 
@@ -39,12 +36,12 @@ namespace Orion.Networking
 
         public override bool IsCompleted 
         { 
-            get{return receivedReceptionConfirmation;} 
+            get { return receivedReceptionConfirmation; } 
         }
 
         #endregion
 
-        #region methods
+        #region Methods
 
         public override void Receive(byte[] data)
         {
@@ -62,8 +59,7 @@ namespace Orion.Networking
         }
         public override byte[] Send()
         {
-            ResetSendingTimeout();
-            packetId++;
+            //PrepareSend();
 
             return firstAcknowledgeByteArray;
         }

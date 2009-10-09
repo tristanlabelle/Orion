@@ -81,11 +81,7 @@ namespace Orion.Networking
                             Transaction transaction = pair.Value;
                             if (transaction.IsReady)
                             {
-                                uint sessionId = pair.Key;
-                                if (transaction is SendingTransaction)
-                                {
-                                    sessionId |= 0x80000000;
-                                }
+                                uint sessionId = pair.Key ^ 0x80000000;
 
                                 byte[] dataToSend = transaction.Send();
                                 byte[] packetData = new byte[sizeof(int) + dataToSend.Length];
@@ -119,8 +115,17 @@ namespace Orion.Networking
 
         #region Internal
 
+        /// <summary>
+        /// Returns the average time packets took to reach a host over the last 50 successful tries.
+        /// </summary>
+        /// <param name="host">The <see cref="IPEndPoint"/> representing the host</param>
+        /// <returns>A <see cref="TimeSpan"/> structure indicating the average time it takes to reach the host</returns>
+        /// <remarks>If the host was never reached before, this method returns a default value of 100 milliseconds.</remarks>
         internal TimeSpan AverageAnswerTimeForHost(IPEndPoint host)
         {
+            if (!answerTimes.ContainsKey(host))
+                return new TimeSpan(0, 0, 0, 100);
+
             double result = 0;
             foreach (TimeSpan answerTime in answerTimes[host])
             {
@@ -128,6 +133,21 @@ namespace Orion.Networking
             }
 
             return new TimeSpan(0, 0, 0, 0, (int)result);
+        }
+
+        internal void PushAnswerTime(IPEndPoint host, TimeSpan duration)
+        {
+            if (!answerTimes.ContainsKey(host))
+            {
+                answerTimes[host] = new Queue<TimeSpan>();
+            }
+
+            Queue<TimeSpan> timeSpanQueue = answerTimes[host];
+            timeSpanQueue.Enqueue(duration);
+            if (timeSpanQueue.Count > 50)
+            {
+                timeSpanQueue.Dequeue();
+            }
         }
 
         #endregion

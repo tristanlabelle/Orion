@@ -51,7 +51,7 @@ namespace Orion.Graphics
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
         private StrokeStyle strokeStyle = StrokeStyle.Solid;
-        private Font font;
+        private Font font = new Font("Consolas", 12);
         private TextPrinter printer;
         private bool readyForDrawing;
         #endregion
@@ -263,7 +263,7 @@ namespace Orion.Graphics
         /// <param name="text">The text to print</param>
         public void DrawText(string text)
         {
-            printer.Print(text, font, fillColor);
+            DrawText(text, new Vector2(0, 0));
         }
 
 		/// <summary>
@@ -273,9 +273,11 @@ namespace Orion.Graphics
 		/// <param name="position">The position at which to print the string</param>
         public void DrawText(string text, Vector2 position)
         {
+            GL.PushMatrix();
             GL.Translate(position.X, position.Y, 0);
+            GL.Scale(1, -1, 1);
             printer.Print(text, font, fillColor);
-            GL.Translate(-position.X, -position.Y, 0);
+            GL.PopMatrix();
         }
 
         #endregion

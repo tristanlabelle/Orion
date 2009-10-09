@@ -20,14 +20,14 @@ namespace Orion.GameLogic
         private readonly List<Unit> deadUnits = new List<Unit>();
         private readonly GenericEventHandler<Unit> unitDiedEventHandler;
         private uint nextUnitID = 0;
-        private List<RessourceNode> ressourceNodes;
+        private List<RessourceNode> ressourceNodes = new List<RessourceNode>();
+        private List<Building> buildings = new List<Building>();
         #endregion
 
         #region Constructors
         public World()
         {
             unitDiedEventHandler = OnUnitDied;
-            ressourceNodes = new List<RessourceNode>();
         }
         #endregion
 
@@ -46,6 +46,11 @@ namespace Orion.GameLogic
         public List<RessourceNode> RessourceNodes
         {
             get { return ressourceNodes; }
+        }
+
+        public List<Building> Buildings
+        {
+            get { return buildings; }
         }
 
         /// <summary>

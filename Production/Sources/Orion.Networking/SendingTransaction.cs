@@ -27,7 +27,7 @@ namespace Orion.Networking
             : base(transporter, host)
         {
             dataPacket = new DataHolder(0, dataToSend);
-            secondAcknowledgePacket = new DataHolder(secondAcknowledgeByteArray);
+            secondAcknowledgePacket = new DataHolder(0, secondAcknowledgeByteArray);
         }
 
         #endregion

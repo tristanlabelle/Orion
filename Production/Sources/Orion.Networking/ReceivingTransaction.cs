@@ -6,11 +6,21 @@ using System.Net;
 
 namespace Orion.Networking
 {
+	/// <summary>
+	/// A ReceivingTransaction is the receiving endpoint of a safe UDP transaction. 
+	/// </summary>
     internal class ReceivingTransaction : Transaction
     {
         #region Fields
         
+		/// <summary>
+		/// Holds the byte array representing the signature of a first acknowledge packet.
+		/// </summary>
         internal static byte[] firstAcknowledgeByteArray = Encoding.ASCII.GetBytes("1ACK");
+		
+		/// <summary>
+		/// Holds the signature of a first acknowledge packet. 
+		/// </summary>
         internal static readonly int firstAcknowledgeSignature = BitConverter.ToInt32(firstAcknowledgeByteArray, 0);
 
 		private bool receivedInitialData;
@@ -21,10 +31,19 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
+		/// <summary>
+		/// Constructs a ReceivingTransaction.
+		/// </summary>
+		/// <param name="transporter">
+		/// The <see cref="Transporter"/> that created this transaction
+		/// </param>
+		/// <param name="host">
+		/// The remote host connection's <see cref="IPEndPoint"/>
+		/// </param>
         public ReceivingTransaction(Transporter transporter, IPEndPoint host)
             : base(transporter, host)
         {
-            firstAcknowledgePacket = new DataHolder(firstAcknowledgeByteArray);
+            firstAcknowledgePacket = new DataHolder(0, firstAcknowledgeByteArray);
         }
         #endregion
 
@@ -58,7 +77,9 @@ namespace Orion.Networking
 				{
 					throw new ArgumentException("Receiving Transaction first packet signature not that of a data packet");
 				}
+				receivedInitialData = true;
 				dataPacket = holder;
+            		firstAcknowledgePacket.RemotePacketId = dataPacket.PacketId;
 			}
 			else
 			{
@@ -67,7 +88,6 @@ namespace Orion.Networking
 	                throw new ArgumentException("Receiving Transaction second packet signature not that of a second acknowledgement packet");
 	            }
 				receivedReceptionConfirmation = true;
-            		firstAcknowledgePacket.RemotePacketId = holder.PacketId;
 			}
 
             ResetTransactionTimeout();

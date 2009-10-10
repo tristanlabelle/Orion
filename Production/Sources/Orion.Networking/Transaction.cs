@@ -6,22 +6,40 @@ using System.Net;
 
 namespace Orion.Networking
 {
+	/// <summary>
+	/// The Transaction class represents one endpoint of communication in the Safe UDP pseudo-protocol.
+	/// </summary>
     internal abstract class Transaction
     {
         #region Nested Types
 
+		/// <summary>
+		/// A Data Holder represents the basic structure of the packet wrapper for the Safe UDP protocol. 
+		/// </summary>
         protected sealed class DataHolder
         {
             #region Fields
+			/// <summary>
+			/// The raw bytes held by this object
+			/// </summary>
             public byte[] Bytes;
             #endregion
 
             #region Constructeurs
+			/// <summary>
+			/// Creates a new and empty holder.
+			/// </summary>
             public DataHolder()
             {
                 Bytes = new byte[2];
             }
 
+			/// <summary>
+			/// Creates a new 
+			/// </summary>
+			/// <param name="data">
+			/// A <see cref="System.Byte[]"/>
+			/// </param>
             public DataHolder(byte[] data)
             {
                 Bytes = data;

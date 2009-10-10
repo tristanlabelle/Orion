@@ -8,6 +8,10 @@ using System.Threading;
 
 namespace Orion.Networking
 {
+	/// <summary>
+	/// A Transporter is responsible for safely transporting UDP packets over a network. It has the same guaratees the UDP protocol provides, plus
+	/// it guarantees packets are going to be received.
+	/// </summary>
     public sealed class Transporter : IDisposable
     {
         #region Fields
@@ -21,14 +25,17 @@ namespace Orion.Networking
         private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> answerTimes = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
         private readonly Dictionary<IPEndPoint, Dictionary<uint, Transaction>> transactions = new Dictionary<IPEndPoint, Dictionary<uint, Transaction>>();
-        private readonly Thread senderThread = new Thread(SenderThread);
-        private readonly Thread receiverThread = new Thread(ReceiverThread);
+        private readonly Thread senderThread;
+        private readonly Thread receiverThread;
         private bool isDisposed;
 
         #endregion
         
         #region Public
 
+		/// <summary>
+		/// Holds the port to which the UDP socket is bound.
+		/// </summary>
         public readonly int Port;
 
         #endregion
@@ -36,16 +43,30 @@ namespace Orion.Networking
 
         #region Events
 
+		/// <summary>
+		/// The event triggered when a packet is successfully received.
+		/// </summary>
         public event GenericEventHandler<Transporter, NetworkEventArgs> Received;
 
         #endregion
 
         #region Constructor
 
+		/// <summary>
+		/// Creates a Transporter, binding its UDP socket to the specified port.
+		/// </summary>
+		/// <param name="port">
+		/// The port on which to bind
+		/// </param>
         public Transporter(int port)
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+			senderThread = new Thread(SenderThread);
+			receiverThread = new Thread(ReceiverThread);
+			
+			senderThread.Start();
+			receiverThread.Start();
         }
 
         #endregion
@@ -109,7 +130,7 @@ namespace Orion.Networking
             {
                 if (isDisposed) break;
 
-                int size = udpSocket.ReceiveFrom(buffer, ref endpointFrom);
+                udpSocket.ReceiveFrom(buffer, ref endpointFrom);
                 IPEndPoint from = endpointFrom as IPEndPoint;
 				
 				Dictionary<uint, Transaction> hostTransactions;
@@ -127,14 +148,14 @@ namespace Orion.Networking
 				sessionId ^= localSessionMask;
 				byte[] packetData = buffer.Skip(sizeof(uint)).ToArray();
 				
-				ReceivingTransaction incomingTransaction;
+				Transaction incomingTransaction;
 				lock(hostTransactions)
 				{
 					if(!hostTransactions.ContainsKey(sessionId))
 					{
 						if((sessionId & localSessionMask) == localSessionMask)
 						{
-							throw new KeyNotFoundException("Session id {0} should have been local but does not exist", sessionId);
+							throw new KeyNotFoundException(string.Format("Session id {0} should have been local but does not exist", sessionId));
 						}
 						incomingTransaction = new ReceivingTransaction(this, from);
 					}
@@ -180,37 +201,61 @@ namespace Orion.Networking
         /// <remarks>If the host was never reached before, this method returns a default value of 100 milliseconds.</remarks>
         internal TimeSpan AverageAnswerTimeForHost(IPEndPoint host)
         {
-            if (!answerTimes.ContainsKey(host))
-                return new TimeSpan(0, 0, 0, 100);
-
             double result = 0;
-            foreach (TimeSpan answerTime in answerTimes[host])
-            {
-                result += answerTime.TotalMilliseconds;
-            }
-
+			Queue<TimeSpan> timeSpans;
+			lock(answerTimes)
+			{
+	            if (!answerTimes.ContainsKey(host))
+	                return new TimeSpan(0, 0, 0, 100);
+				timeSpans = answerTimes[host];
+			}
+			
+			lock(timeSpans)
+			{
+	            foreach (TimeSpan answerTime in timeSpans)
+	            {
+	                result += answerTime.TotalMilliseconds;
+	            }
+			}
+			
             return new TimeSpan(0, 0, 0, 0, (int)result);
         }
 
         internal void PushAnswerTime(IPEndPoint host, TimeSpan duration)
         {
-            if (!answerTimes.ContainsKey(host))
-            {
-                answerTimes[host] = new Queue<TimeSpan>();
-            }
+			Queue<TimeSpan> timeSpans;
+			lock(answerTimes)
+			{
+	            if (!answerTimes.ContainsKey(host))
+	            {
+	                answerTimes[host] = new Queue<TimeSpan>();
+	            }
+				timeSpans = answerTimes[host];
+			}
 
-            Queue<TimeSpan> timeSpanQueue = answerTimes[host];
-            timeSpanQueue.Enqueue(duration);
-            if (timeSpanQueue.Count > 50)
-            {
-                timeSpanQueue.Dequeue();
-            }
+			lock(timeSpans)
+			{
+	            timeSpans.Enqueue(duration);
+	            if (timeSpans.Count > 50)
+	            {
+	                timeSpans.Dequeue();
+	            }
+			}
         }
 
         #endregion
 
         #region Public
 
+		/// <summary>
+		/// Sends data over the transporter to a specified address.
+		/// </summary>
+		/// <param name="data">
+		/// The byte array to send
+		/// </param>
+		/// <param name="to">
+		/// The destination <see cref="IPEndPoint"/>
+		/// </param>
         public void SendTo(byte[] data, IPEndPoint to)
         {
             CheckIfDisposed();
@@ -223,33 +268,50 @@ namespace Orion.Networking
                 nextSessionId &= 0x7FFFFFFF;
             }
 
+			Dictionary<uint, Transaction> hostTransactions;
             lock (transactions)
             {
                 if (!transactions.ContainsKey(to))
                 {
                     transactions[to] = new Dictionary<uint, Transaction>();
                 }
-
-                transactions[to][sessionId] = transaction;
-            }
+				hostTransactions = transactions[to];
+			}
+			
+			lock(hostTransactions)
+			{
+            		hostTransactions[sessionId] = transaction;
+			}
         }
 		
+		/// <summary>
+		/// Polls the Transporter, triggering reception events for every received packet.
+		/// </summary>
 		public void Poll()
 		{
+			CheckIfDisposed();
 			var handler = Received;
-			if(handler)
+			if(handler != null)
 			{
-				foreach(ReceivingTransaction completedTransaction in completedTransactions)
+				lock(completedTransactions)
 				{
-					handler(this, new NetworkEventArgs(completedTransaction.RemoteHost, completedTransaction.Data));
+					foreach(ReceivingTransaction completedTransaction in completedTransactions)
+					{
+						handler(this, new NetworkEventArgs(completedTransaction.RemoteHost, completedTransaction.Data));
+					}
 				}
 			}
 		}
 
+		/// <summary>
+		/// Disposes of the Transporter.
+		/// </summary>
         public void Dispose()
         {
             CheckIfDisposed();
             isDisposed = true;
+			udpSocket.Shutdown(SocketShutdown.Both);
+			udpSocket.Close();
         }
 
         #endregion

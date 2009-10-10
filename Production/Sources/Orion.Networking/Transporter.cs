@@ -14,13 +14,15 @@ namespace Orion.Networking
         #region Private
 
         private object sessionIdLocker = new object();
-        private static uint NextSessionId;
+		private const uint localSessionMask = 0x80000000;
+        private static uint nextSessionId;
 
-        private readonly Socket udpSocket;
-        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> answerTimes;
-        private readonly Dictionary<IPEndPoint, Dictionary<uint, Transaction>> transactions;
-        private readonly Thread senderThread;
-        private readonly Thread receiverThread;
+		private readonly Queue<ReceivingTransaction> completedTransactions = new Queue<ReceivingTransaction>();
+        private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> answerTimes = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
+        private readonly Dictionary<IPEndPoint, Dictionary<uint, Transaction>> transactions = new Dictionary<IPEndPoint, Dictionary<uint, Transaction>>();
+        private readonly Thread senderThread = new Thread(SenderThread);
+        private readonly Thread receiverThread = new Thread(ReceiverThread);
         private bool isDisposed;
 
         #endregion
@@ -43,12 +45,7 @@ namespace Orion.Networking
         public Transporter(int port)
         {
             Port = port;
-            udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            transactions = new Dictionary<IPEndPoint, Dictionary<uint, Transaction>>();
-            answerTimes = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
-            senderThread = new Thread(SenderThread);
-            receiverThread = new Thread(ReceiverThread);
         }
 
         #endregion
@@ -73,24 +70,30 @@ namespace Orion.Networking
 
                 lock (transactions)
                 {
-                    foreach(KeyValuePair<IPEndPoint, Dictionary<uint, Transaction>> hostTransactions in transactions)
+                    foreach(KeyValuePair<IPEndPoint, Dictionary<uint, Transaction>> hostPair in transactions)
                     {
-                        IPEndPoint remoteHost = hostTransactions.Key;
-                        foreach (KeyValuePair<uint, Transaction> pair in hostTransactions.Value)
-                        {
-                            Transaction transaction = pair.Value;
-                            if (transaction.IsReady)
-                            {
-                                uint sessionId = pair.Key ^ 0x80000000;
-
-                                byte[] dataToSend = transaction.Send();
-                                byte[] packetData = new byte[sizeof(int) + dataToSend.Length];
-
-                                BitConverter.GetBytes(sessionId).CopyTo(packetData, 0);
-                                dataToSend.CopyTo(packetData, sizeof(int));
-                                udpSocket.SendTo(packetData, remoteHost);
-                            }
-                        }
+                        IPEndPoint remoteHost = hostPair.Key;
+						lock(hostPair.Value)
+						{
+	                        foreach (KeyValuePair<uint, Transaction> pair in hostPair.Value)
+	                        {
+	                            Transaction transaction = pair.Value;
+								lock(transaction)
+								{
+		                            if (transaction.IsReady)
+		                            {
+		                                uint sessionId = pair.Key ^ localSessionMask;
+		
+		                                byte[] dataToSend = transaction.Send();
+		                                byte[] packetData = new byte[sizeof(int) + dataToSend.Length];
+		
+		                                BitConverter.GetBytes(sessionId).CopyTo(packetData, 0);
+		                                dataToSend.CopyTo(packetData, sizeof(int));
+		                                udpSocket.SendTo(packetData, remoteHost);
+		                            }
+								}
+	                        }
+						}
                     }
                 }
 
@@ -108,6 +111,60 @@ namespace Orion.Networking
 
                 int size = udpSocket.ReceiveFrom(buffer, ref endpointFrom);
                 IPEndPoint from = endpointFrom as IPEndPoint;
+				
+				Dictionary<uint, Transaction> hostTransactions;
+				lock(transactions)
+				{
+					if(!transactions.ContainsKey(from))
+					{
+						transactions[from] = new Dictionary<uint, Transaction>();
+					}
+					
+					hostTransactions = transactions[from];
+				}
+				
+				uint sessionId = BitConverter.ToUInt32(buffer, 0);
+				sessionId ^= localSessionMask;
+				byte[] packetData = buffer.Skip(sizeof(uint)).ToArray();
+				
+				ReceivingTransaction incomingTransaction;
+				lock(hostTransactions)
+				{
+					if(!hostTransactions.ContainsKey(sessionId))
+					{
+						if((sessionId & localSessionMask) == localSessionMask)
+						{
+							throw new KeyNotFoundException("Session id {0} should have been local but does not exist", sessionId);
+						}
+						incomingTransaction = new ReceivingTransaction(this, from);
+					}
+					else
+					{
+						incomingTransaction = hostTransactions[sessionId];
+					}
+				}
+				
+				lock(incomingTransaction)
+				{
+					incomingTransaction.Receive(packetData);
+					if(incomingTransaction.IsCompleted)
+					{
+						if(incomingTransaction is ReceivingTransaction)
+						{
+							lock(completedTransactions)
+							{
+								completedTransactions.Enqueue(incomingTransaction as ReceivingTransaction);
+							}
+						}
+						
+						lock(hostTransactions)
+						{
+							hostTransactions.Remove(sessionId);
+						}
+					}
+				}
+				
+				Thread.Sleep(10);
             }
         }
 
@@ -161,9 +218,9 @@ namespace Orion.Networking
             uint sessionId;
             lock (sessionIdLocker)
             {
-                sessionId = NextSessionId;
-                NextSessionId++;
-                NextSessionId &= 0x7FFFFFFF;
+                sessionId = nextSessionId;
+                nextSessionId++;
+                nextSessionId &= 0x7FFFFFFF;
             }
 
             lock (transactions)
@@ -176,6 +233,18 @@ namespace Orion.Networking
                 transactions[to][sessionId] = transaction;
             }
         }
+		
+		public void Poll()
+		{
+			var handler = Received;
+			if(handler)
+			{
+				foreach(ReceivingTransaction completedTransaction in completedTransactions)
+				{
+					handler(this, new NetworkEventArgs(completedTransaction.RemoteHost, completedTransaction.Data));
+				}
+			}
+		}
 
         public void Dispose()
         {

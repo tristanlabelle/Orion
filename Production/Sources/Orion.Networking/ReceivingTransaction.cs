@@ -13,6 +13,7 @@ namespace Orion.Networking
         internal static byte[] firstAcknowledgeByteArray = Encoding.ASCII.GetBytes("1ACK");
         internal static readonly int firstAcknowledgeSignature = BitConverter.ToInt32(firstAcknowledgeByteArray, 0);
 
+		private bool receivedInitialData;
         private bool receivedReceptionConfirmation;
         private DataHolder firstAcknowledgePacket;
         private DataHolder dataPacket;
@@ -20,15 +21,10 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public ReceivingTransaction(Transporter transporter, IPEndPoint host, byte[] receivedData)
+        public ReceivingTransaction(Transporter transporter, IPEndPoint host)
             : base(transporter, host)
         {
-            dataPacket = new DataHolder(receivedData);
             firstAcknowledgePacket = new DataHolder(firstAcknowledgeByteArray);
-            if(dataPacket.TypeSignature != SendingTransaction.dataSignature)
-            {
-                throw new ArgumentException("Receiving Transaction first packet signature not that of a data packet");
-            }
         }
         #endregion
 
@@ -55,14 +51,26 @@ namespace Orion.Networking
         public override void Receive(byte[] data)
         {
             DataHolder holder = new DataHolder(data);
-            if (holder.TypeSignature != SendingTransaction.secondAcknowledgeSignature)
-            {
-                throw new ArgumentException("Receiving Transaction second packet signature not that of a second acknowledgement packet");
-            }
+			
+			if(!receivedInitialData)
+			{
+				if(holder.TypeSignature != SendingTransaction.dataSignature)
+				{
+					throw new ArgumentException("Receiving Transaction first packet signature not that of a data packet");
+				}
+				dataPacket = holder;
+			}
+			else
+			{
+	            if (holder.TypeSignature != SendingTransaction.secondAcknowledgeSignature)
+	            {
+	                throw new ArgumentException("Receiving Transaction second packet signature not that of a second acknowledgement packet");
+	            }
+				receivedReceptionConfirmation = true;
+            		firstAcknowledgePacket.RemotePacketId = holder.PacketId;
+			}
 
             ResetTransactionTimeout();
-            receivedReceptionConfirmation = true;
-            firstAcknowledgePacket.RemotePacketId = holder.PacketId;
 
         }
         public override byte[] Send()

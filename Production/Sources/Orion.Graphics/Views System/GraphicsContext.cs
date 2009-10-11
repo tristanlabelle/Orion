@@ -255,6 +255,32 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Other Shapes (ShapePath)
+
+        /// <summary>
+        /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
+        /// </summary>
+        /// <param name="shapePath">A <see href="ShapePath"/> to stroke.</param>
+        public void Stroke(ShapePath shapePath)
+        {
+            CommitStrokeColor();
+            GL.Begin(BeginMode.LineLoop);
+            DrawVertices(shapePath);
+            GL.End();
+        }
+
+        private void DrawVertices(ShapePath shapePath)
+        {
+            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            for (int i = 0; i < shapePath.Count; i++)
+                if (i == shapePath.Count - 1)
+                    AddVertex(shapePath.GetPointAt(i), shapePath.GetPointAt(0));
+                else
+                    AddVertex(shapePath.GetPointAt(i), shapePath.GetPointAt(i + 1));
+        }
+
+        #endregion
+
         #region Text
 
         /// <summary>

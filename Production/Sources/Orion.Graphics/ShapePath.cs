@@ -24,6 +24,11 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
+        
+        public int Count
+        {
+            get { return Points.Count; }
+        }
 
         #endregion
 
@@ -32,6 +37,11 @@ namespace Orion.Graphics
         public void AddPoint(Vector2 Point)
         {
             Points.Add(Point);
+        }
+
+        public Vector2 GetPointAt(int index)
+        {
+            return Points.ElementAt(index); 
         }
 
         #endregion

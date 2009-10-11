@@ -46,11 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ReceivingTransaction.cs" />
-    <Compile Include="SendingTransaction.cs" />
-    <Compile Include="Transaction.cs" />
-    <Compile Include="Transporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">

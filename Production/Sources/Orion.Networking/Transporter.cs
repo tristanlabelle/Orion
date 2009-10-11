@@ -11,7 +11,12 @@ using Orion.Core;
 
 namespace Orion.Networking
 {
-	public class Transporter
+	/// <summary>
+	/// A Transporter is responsible for safely transporting UDP packets over a network. It guarantees that packets are going to arrive, and that they will have
+	/// been properly transported. The only guarantee not provided is the order in which they arrive.
+	/// It creates a single UDP socket for communication to various hosts. The remote host must use a Transporter as well for reception.
+	/// </summary>
+	public sealed class Transporter : IDisposable
 	{
 		#region Nested Types
 		
@@ -97,39 +102,62 @@ namespace Orion.Networking
 		
 		#region Fields
 		#region Private
+		#region Constants
 		private const byte DataPacket = 0;
 		private const byte AcknowledgePacket = 1;
 		private const long DefaultPing = 100;
+		#endregion
 		
 		private uint nextSessionId;
 		
 		private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
+		private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 		
 		private readonly Dictionary<IPEndPoint, Queue<long>> pings = new Dictionary<IPEndPoint, Queue<long>>();
 		private readonly List<PacketId> answeredPackets = new List<PacketId>();
-		private readonly List<PacketId> packetsToAnswer = new List<PacketId>();
 		
 		private readonly Dictionary<PacketId, PacketSession> packetsToSend = new Dictionary<PacketId, PacketSession>();
+		
 		private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 		
 		private readonly Thread senderThread;
 		private readonly Thread receiverThread;
+		
 		private bool isDisposed;
 		
 		#endregion
 		
 		#region Public
+		/// <summary>
+		/// The port on which the UDP socket is bound.
+		/// </summary>
 		public readonly int Port;
 		#endregion
 		#endregion
 		
 		#region Events
 		
+		/// <summary>
+		/// The event triggered when a packet arrives.
+		/// </summary>
+		/// <remarks>This event is only triggered when the method <see cref="M:Poll"/> is called.</remarks>
 		public event GenericEventHandler<Transporter, NetworkEventArgs> Received;
+		
+		/// <summary>
+		/// The event triggered when a packet cannot reach its destination.
+		/// </summary>
+		/// <remarks>This event is only triggered when the method <see cref="M:Poll"/> is called.</remarks>
+		public event GenericEventHandler<Transporter, NetworkTimeoutEventArgs> TimedOut;
 		
 		#endregion
 		
 		#region Constructor
+		/// <summary>
+		/// Creates a new Transporter whose UDP socket is bound to a specified port on all interfaces.
+		/// </summary>
+		/// <param name="port">
+		/// The port on which to bind
+		/// </param>
 		public Transporter(int port)
 		{
 			Port = port;
@@ -137,16 +165,21 @@ namespace Orion.Networking
 			udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 5000);
 			senderThread = new Thread(SenderThread);
 			receiverThread = new Thread(ReceiverThread);
+			
+			receiverThread.Start();
+			senderThread.Start();
 		}
 		#endregion
 		
 		#region Methods
 		
+		#region Private Methods
 		private void ValidateObjectState()
 		{
 			if(isDisposed) throw new ObjectDisposedException(null);
 		}
 		
+		#region Ping calculation methods
 		private void AddPing(IPEndPoint host, long milliseconds)
 		{
 			Queue<long> hostPings;
@@ -205,13 +238,17 @@ namespace Orion.Networking
 				foreach(long ping in hostPings)
 				{
 					long pingDeviation = average - ping;
-					deviation += Math.Sqrt(pingDeviation * pingDeviation);
+					deviation += (long)Math.Sqrt(pingDeviation * pingDeviation);
 				}
 				deviation /= hostPings.Count();
 			}
 			
 			return deviation;
 		}
+		
+		#endregion
+		
+		#region Threading methods
 		
 		private void ReceiverThread()
 		{
@@ -220,90 +257,128 @@ namespace Orion.Networking
 			
 			byte[] packet = new byte[1024];
 			EndPoint endpoint = new IPEndPoint(0, 0);
-			while(true)
+			
+			try
 			{
-				if(isDisposed) break;
-				
-				lock(udpSocket)
+				while(true)
 				{
-					try
-					{
-						udpSocket.ReceiveFrom(packet, ref endpoint);
-					}
-					catch(SocketException e)
-					{
-						Console.WriteLine("Socket threw up a SocketException with code {0}", e.ErrorCode);
-						break;
-					}
-				}
-				
-				uint sessionId = BitConverter.ToUInt32(packet, 1);
-				PacketId id = new PacketId(sessionId, endpoint as IPEndPoint);
-				
-				if(packet[0] == DataPacket)
-				{
-					lock(answeredPackets)
-					{
-						if(answeredPackets.Contains(id) || packetsToAnswer.Contains(id)) continue;
-						answeredPackets.Add(id);
-					}
-					
-					lock(readyData)
-					{
-						readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packet.Skip(5).ToArray()));
-					}
-					
-					// copy the session id
-					for(int i = 1; i < 5; i++)
-						answer[i] = packet[i];
+					if(isDisposed) break;
 					
 					lock(udpSocket)
 					{
-						udpSocket.SendTo(answer, endpoint);
+						udpSocket.ReceiveFrom(packet, ref endpoint);
 					}
-				}
-				else
-				{
-					lock(packetsToSend)
+					
+					uint sessionId = BitConverter.ToUInt32(packet, 1);
+					PacketId id = new PacketId(sessionId, endpoint as IPEndPoint);
+					
+					if(packet[0] == DataPacket)
 					{
-						if(packetsToSend.ContainsKey(id))
+						// copy the session id
+						for(int i = 1; i < 5; i++)
+							answer[i] = packet[i];
+						
+						// it is always necessary to send an answer to data packets
+						lock(udpSocket)
 						{
-							AddPing(id.RemoteHost, packetsToSend[id].Acknowledge());
-							packetsToSend.Remove(id);
+							udpSocket.SendTo(answer, endpoint);
+						}
+						
+						lock(answeredPackets)
+						{
+							if(answeredPackets.Contains(id)) continue;
+							answeredPackets.Add(id);
+						}
+						
+						lock(readyData)
+						{
+							readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packet.Skip(5).ToArray()));
+						}
+					}
+					else
+					{
+						lock(packetsToSend)
+						{
+							if(packetsToSend.ContainsKey(id))
+							{
+								AddPing(id.RemoteHost, packetsToSend[id].Acknowledge());
+								packetsToSend.Remove(id);
+							}
 						}
 					}
 				}
+			}
+			catch(SocketException e)
+			{
+				Console.WriteLine("Broke from socket exception {0}", e.ErrorCode);
 			}
 		}
 		
 		private void SenderThread()
 		{
-			while(true)
+			try
 			{
-				if(isDisposed) break;
-				
-				List<PacketSession> sessions;
-				lock(packetsToSend)
+				List<PacketSession> trash = new List<PacketSession>();
+				while(true)
 				{
-					sessions = packetsToSend.Values.ToList();
-				}
-				
-				foreach(PacketSession session in sessions)
-				{
-					if(session.NeedsResend)
+					if(isDisposed) break;
+					
+					List<PacketSession> sessions;
+					lock(packetsToSend)
 					{
-						lock(udpSocket)
+						sessions = packetsToSend.Values.ToList();
+					}
+					
+					lock(udpSocket)
+					{
+						foreach(PacketSession session in sessions)
 						{
-							session.SendThrough(udpSocket);
-							session.ResetSendTime(AveragePing(session.Id.RemoteHost) + StandardDeviationForPings(session.Id.RemoteHost));
+							if(session.HasTimedOut)
+							{
+								trash.Add(session);
+								timedOut.Enqueue(new NetworkTimeoutEventArgs(session.Id.RemoteHost, session.Data));
+							}
+							
+							if(session.NeedsResend)
+							{
+								session.SendThrough(udpSocket);
+								session.ResetSendTime(AveragePing(session.Id.RemoteHost) + StandardDeviationForPings(session.Id.RemoteHost));
+							}
 						}
 					}
+					
+					lock(packetsToSend)
+					{
+						foreach(PacketSession session in trash)
+						{
+							packetsToSend.Remove(session.Id);
+						}
+					}
+					
+					Thread.Sleep(10);
 				}
-				
-				Thread.Sleep(10);
+			}
+			catch(SocketException e)
+			{
+				Console.WriteLine("Broke from socket exception {0}", e.ErrorCode);
 			}
 		}
 		
+		#endregion
+		
+		#endregion
+		
+		#region Public methods
+		
+		/// <summary>
+		/// Sends data to a specified host.
+		/// </summary>
+		/// <param name="data">
+		/// The data to send
+		/// </param>
+		/// <param name="remoteAddress">
+		/// The host to which the data is addressed
+		/// </param>
 		public void SendTo(byte[] data, IPEndPoint remoteAddress)
 		{
 			ValidateObjectState();
@@ -321,12 +396,53 @@ namespace Orion.Networking
 			}
 		}
 		
+		/// <summary>
+		/// Triggers any pending packet reception event.
+		/// </summary>
+		/// <remarks>Events are not triggered until you call this method.</remarks>
+		public void Poll()
+		{
+			ValidateObjectState();
+			
+			GenericEventHandler<Transporter, NetworkEventArgs> receptionHandler = Received;
+			if(receptionHandler != null)
+			{
+				lock(readyData)
+				{
+					while(readyData.Count() > 0)
+					{
+						receptionHandler(this, readyData.Dequeue());
+					}
+				}
+			}
+			
+			GenericEventHandler<Transporter, NetworkTimeoutEventArgs> timeoutHandler = TimedOut;
+			if(timeoutHandler != null)
+			{
+				lock(timedOut)
+				{
+					while(timedOut.Count() > 0)
+					{
+						timeoutHandler(this, timedOut.Dequeue());
+					}
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Disposes of this object.
+		/// </summary>
 		public void Dispose()
 		{
 			isDisposed = true;
-			udpSocket.Shutdown(SocketShutdown.Both);
-			udpSocket.Close();
+			lock(udpSocket)
+			{
+				udpSocket.Shutdown(SocketShutdown.Both);
+				udpSocket.Close();
+			}
 		}
+		
+		#endregion
 		
 		#endregion
 	}

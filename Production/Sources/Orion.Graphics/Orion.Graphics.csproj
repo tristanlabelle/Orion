@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />
     <Compile Include="SelectionRenderer.cs" />
+    <Compile Include="ShapePath.cs" />
     <Compile Include="UserInputCommander.cs" />
     <Compile Include="Views System\RessourceDisplay.cs" />
     <Compile Include="Widgets\Button.cs" />

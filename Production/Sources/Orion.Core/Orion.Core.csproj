@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,6 +60,7 @@
     <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="MapGenerator.cs" />
     <Compile Include="MouseEventArgs.cs" />
+    <Compile Include="NetworkTimeoutEventArgs.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="NetworkEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,7 +69,6 @@
     <Compile Include="KeyboardEventArgs.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
-    <Compile Include="NetworkTimedOutEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

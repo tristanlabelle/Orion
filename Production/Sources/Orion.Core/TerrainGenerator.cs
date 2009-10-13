@@ -16,14 +16,6 @@ namespace Orion.Core
 
         #endregion
 
-        #region Constructors
-        
-        #endregion
-
-        #region Properties
-
-        #endregion
-
         #region Methods
 
         /// <summary>

@@ -10,7 +10,6 @@ namespace Orion.Core
     /// </summary>
     public sealed class Terrain
     {
-
         #region Fields
 
         private bool[,] terrain;

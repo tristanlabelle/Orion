@@ -16,7 +16,7 @@ namespace Orion.Networking
             {
                 transporter.Received += delegate(Transporter source, NetworkEventArgs args)
                 {
-                    Console.WriteLine(Encoding.ASCII.GetString(args.Data));
+                    Console.WriteLine(Encoding.ASCII.GetString(args.Data, 0, args.Data.Length));
                 };
 
                 transporter.TimedOut += delegate(Transporter source, NetworkTimeoutEventArgs args)
@@ -32,7 +32,8 @@ namespace Orion.Networking
                     IPEndPoint endPoint = new IPEndPoint(address, port);
 
                     Console.Write("Message: ");
-                    transporter.SendTo(Encoding.ASCII.GetBytes(Console.ReadLine()), new IPEndPoint(address, port));
+                    string message = Console.ReadLine();
+                    transporter.SendTo(Encoding.ASCII.GetBytes(message), new IPEndPoint(address, port));
                     transporter.Poll();
                 }
             }

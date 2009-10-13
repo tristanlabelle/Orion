@@ -163,7 +163,7 @@ namespace Orion.Networking
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
+            //udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
 
@@ -328,6 +328,7 @@ namespace Orion.Networking
                 }
                 finally
                 {
+                    Array.Clear(packet, 0, packet.Length);
                     socketSemaphore.Release();
                 }
             }
@@ -431,7 +432,7 @@ namespace Orion.Networking
             {
                 lock (readyData)
                 {
-                    while (readyData.Count() > 0)
+                    while (readyData.Count > 0)
                     {
                         receptionHandler(this, readyData.Dequeue());
                     }

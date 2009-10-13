@@ -14,7 +14,7 @@ namespace Orion.GameLogic
         PathNode source;
         Point destination;
         List<PathNode> openNode = new List<PathNode>();
-        List<PathNode> closeNode = new List<PathNode>();
+        HashSet<Point> closedNodes = new HashSet<Point>();
         #endregion
 
         #region constructor
@@ -44,50 +44,47 @@ namespace Orion.GameLogic
 
         private float DistanceBetweenTwoPoint(Point a, Point b)
         {
-            double squareDistance = Math.Pow((a.X - b.X),2.0) + Math.Pow((a.Y - b.Y),2.0);
-            return (float)Math.Sqrt(squareDistance);
+            int deltaX = a.X - b.X;
+            int deltaY = a.Y - b.Y;
+            double squaredDistance = deltaX * deltaX + deltaY * deltaY;
+            return (float)Math.Sqrt(squaredDistance);
         }
 
-        private void getNearPointToAdd(PathNode currentNode)
+        private void GetNearPointToAdd(PathNode currentNode)
         {
-            for (int j = -1; j <= 1; j++) // colonne 
+            for (int x = -1; x <= 1; x++) // colonne 
             {
-                for (int i = -1; i <= 1; i++) // ligne
+                for (int y = -1; y <= 1; y++) // ligne
                 {
-                    Point nearNode = new Point(currentNode.Position.X - j, currentNode.Position.Y - i);
-                    if (!(i == 0 && j == 0)) // Avoid that addind 0,0 (current node to the open list)
+                    if (y == 0 && x == 0) continue;
+
+                    Point nearNode = new Point(currentNode.Position.X - x, currentNode.Position.Y - y);
+
+                    if (nearNode.X >= 0 && nearNode.Y >= 0 && closedNodes.Contains(nearNode))
+                        continue;
+
+                    // && Terrain.isWalkable(currentNode.Position.X - i,currentNode.Position.X - j)
+
+                    PathNode firstNode = openNode.FirstOrDefault(node =>
+                                                    node.Position.X == nearNode.X &&
+                                                    node.Position.Y == nearNode.Y);
+                    if (firstNode != null)
                     {
-                        //If it's in the close list
-                        if (nearNode.X >= 0 && nearNode.Y >= 0 && 
-                            !closeNode.Any(node =>
-                            node.Position.X == nearNode.X &&
-                            node.Position.Y == nearNode.Y)
-                            // && Terrain.isWalkable(currentNode.Position.X - i,currentNode.Position.X - j)
-                            )
-                        {
-                             PathNode firstNode = openNode.FirstOrDefault(node =>
-                                                            node.Position.X == nearNode.X &&
-                                                            node.Position.Y == nearNode.Y);
-                            if (firstNode != null)
-                            {
-                                float moveCost = CalculateMoveCost(firstNode, currentNode.TotalCost, DistanceBetweenTwoPoint(firstNode.Position, currentNode.Position));
-                                if (firstNode.TotalCost > moveCost)
-                                { // If its a better choise to pass thru the current node , overwrite the parent and the move cost
-                                    firstNode.ParentNode = currentNode;
-                                    firstNode.TotalCost = moveCost;
-                                }
-                            } 
-                            //Not in any list and Walkable
-                            else
-                            {
-                                PathNode aNode = new PathNode(currentNode, nearNode, 0);
-                                aNode.TotalCost = CalculateMoveCost(aNode,currentNode.TotalCost,DistanceBetweenTwoPoint(currentNode.Position,aNode.Position));
-                                openNode.Add(aNode);
-
-                            }
+                        float moveCost = CalculateMoveCost(firstNode, currentNode.TotalCost, DistanceBetweenTwoPoint(firstNode.Position, currentNode.Position));
+                        if (firstNode.TotalCost > moveCost)
+                        { // If its a better choise to pass thru the current node , overwrite the parent and the move cost
+                            firstNode.ParentNode = currentNode;
+                            firstNode.TotalCost = moveCost;
                         }
-                    }
+                    } 
+                    //Not in any list and Walkable
+                    else
+                    {
+                        PathNode aNode = new PathNode(currentNode, nearNode, 0);
+                        aNode.TotalCost = CalculateMoveCost(aNode,currentNode.TotalCost,DistanceBetweenTwoPoint(currentNode.Position,aNode.Position));
+                        openNode.Add(aNode);
 
+                    }
                 }
             }
         }
@@ -96,11 +93,11 @@ namespace Orion.GameLogic
            PathNode currentNode = source;
            while (currentNode.Position != destination)
            {
-               
-               closeNode.Add(currentNode);
+               closedNodes.Add(currentNode.Position);
                openNode.Remove(currentNode);
-               getNearPointToAdd(currentNode);
-               if(openNode.Count >0)
+               GetNearPointToAdd(currentNode);
+
+               if(openNode.Count > 0)
                {
                    currentNode = openNode[0];
                    foreach (PathNode aNode in openNode)
@@ -108,15 +105,12 @@ namespace Orion.GameLogic
                        if (aNode.TotalCost < currentNode.TotalCost)
                            currentNode = aNode;
                    }
-   
                 }
                else
                {
                    break;
                }
-
            }
-
 
            if (currentNode.Position == destination)
            {

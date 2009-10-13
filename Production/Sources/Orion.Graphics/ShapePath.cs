@@ -41,7 +41,7 @@ namespace Orion.Graphics
 
         public Vector2 GetPointAt(int index)
         {
-            return Points[index]; 
+            return points[index]; 
         }
 
         #endregion

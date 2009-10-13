@@ -108,13 +108,17 @@ namespace Orion.GameLogic.Tasks
         {
             Vector2 delta = target.Position - unit.Position;
             float distanceRemaining = CurrentDistance - targetDistance;
-            if (distanceRemaining <= 0.01f) return;
+            if (distanceRemaining <= 0) return;
 
             Vector2 direction = Vector2.Normalize(delta);
 
             float movementDistance = unit.Type.MovementSpeed * timeDelta;
             if (movementDistance > distanceRemaining)
-                movementDistance = distanceRemaining;
+            {
+                // Move just a little more than needed,
+                // this saves us from floating point inaccuracies.
+                movementDistance = distanceRemaining + 0.01f;
+            }
 
             unit.Position += direction * movementDistance;
         }

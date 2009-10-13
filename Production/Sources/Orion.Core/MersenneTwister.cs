@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Core
+namespace Orion
 {
     /// <summary>
     /// The Mersenne Twister is a portable random number generator with a high period and decent performances (or at least we'll hope so,

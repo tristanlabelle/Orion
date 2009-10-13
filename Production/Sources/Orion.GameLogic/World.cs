@@ -5,7 +5,6 @@ using System.Text;
 using System.Collections.ObjectModel;
 
 using Orion.Geometry;
-using Orion.Core;
 
 using Color = System.Drawing.Color;
 
@@ -18,19 +17,22 @@ namespace Orion.GameLogic
     public sealed class World
     {
         #region Fields
+        private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly UnitRegistry units;
         private List<RessourceNode> ressourceNodes = new List<RessourceNode>();
         private List<Building> buildings = new List<Building>();
-        private Terrain terrain;
         #endregion
 
         #region Constructors
         /// <summary>
         /// Initializes a new <see cref="World"/>.
         /// </summary>
-        public World()
+        /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
+        public World(Terrain terrain)
         {
+            Argument.EnsureNotNull(terrain, "terrain");
+            this.terrain = terrain;
             units = new UnitRegistry(this, 5, 5);
             this.terrain = TerrainGenerator.GenerateNewTerrain(this.Width, this.Height, new MersenneTwister());
         }
@@ -68,11 +70,7 @@ namespace Orion.GameLogic
         /// </summary>
         public int Width
         {
-            get
-            {
-                // To be later replaced by Terrain.Width.
-                return 100;
-            }
+            get { return terrain.Width; }
         }
 
         /// <summary>
@@ -80,11 +78,7 @@ namespace Orion.GameLogic
         /// </summary>
         public int Height
         {
-            get
-            {
-                // To be later replaced by Terrain.Width.
-                return 100;
-            }
+            get { return terrain.Height; }
         }
 
         /// <summary>

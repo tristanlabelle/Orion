@@ -193,12 +193,10 @@ namespace Orion.Graphics
         public void Fill(Rectangle rectangle)
         {
             CommitFillColor();
-            GL.Begin(BeginMode.Polygon);
+            GL.Begin(BeginMode.Quads);
             DrawVertices(rectangle);
             GL.End();
         }
-
-
 
         /// <summary>
         /// Strokes the outline of a <see cref="Rectangle"/> using the current <see cref="P:StrokeColor"/>.
@@ -304,6 +302,26 @@ namespace Orion.Graphics
             GL.PopMatrix();
         }
 
+        #endregion
+
+        #region Textured
+        public void FillTextured(Rectangle rectangle, int textureID)
+        {
+            GL.Color3(1f, 1f, 1f);
+            GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, textureID);
+            GL.Begin(BeginMode.Quads);
+            GL.TexCoord2(0, 1);
+            GL.Vertex2(rectangle.X, rectangle.Y);
+            GL.TexCoord2(0, 0);
+            GL.Vertex2(rectangle.X, rectangle.MaxY);
+            GL.TexCoord2(1, 0);
+            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(1, 1);
+            GL.Vertex2(rectangle.MaxX, rectangle.Y);
+            GL.End();
+            GL.Disable(EnableCap.Texture2D);
+        }
         #endregion
         #endregion
 

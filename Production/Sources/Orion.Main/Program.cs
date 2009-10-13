@@ -25,7 +25,9 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            World world = new World();
+            MersenneTwister random = new MersenneTwister();
+            Terrain terrain = TerrainGenerator.GenerateNewTerrain(100, 100, random);
+            World world = new World(terrain);
 
             #region Putting little guys to life
 
@@ -37,10 +39,9 @@ namespace Orion.Main
 
             Faction blueFaction = world.CreateFaction("Blue", Color.Blue);
             MockCommander blueCommander = new MockCommander(blueFaction);
-            commandManager.AddCommander(blueCommander);
+            //commandManager.AddCommander(blueCommander);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
-            Random random = new Random();
             for (int i = 0; i < 200; ++i)
             {
                 Faction faction = (i % 2 == 0) ? redFaction : blueFaction;

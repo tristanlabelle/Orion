@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Core
+namespace Orion
 {
     /// <summary>
     /// Defines a terrain generator which generates random terrains.

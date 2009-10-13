@@ -7,8 +7,6 @@ using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 
-using Orion.Core;
-
 namespace Orion.Networking
 {
     /// <summary>

@@ -7,7 +7,6 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
-using Orion.Core;
 
 using Color = System.Drawing.Color;
 
@@ -16,10 +15,11 @@ namespace Orion.Graphics
     /// <summary>
     /// Provides methods to draw the game <see cref="World"/>.
     /// </summary>
-    public sealed class WorldRenderer
+    public sealed class WorldRenderer : IDisposable
     {
         #region Fields
         private readonly World world;
+        private readonly TerrainRenderer terrainRenderer;
         #endregion
 
         #region Constructors
@@ -30,7 +30,9 @@ namespace Orion.Graphics
         public WorldRenderer(World world)
         {
             Argument.EnsureNotNull(world, "world");
+
             this.world = world;
+            this.terrainRenderer = new TerrainRenderer(world.Terrain);
         }
         #endregion
 
@@ -60,22 +62,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            for (int i = 0; i < world.Width; i++)
-            {
-                for (int j = 0; j < world.Height; j++)
-                {
-                    Rectangle rectangle = new Rectangle(i, j, 1, 1);
-                    if (world.Terrain.IsWalkable(i, j))
-                    {
-                        graphics.FillColor = Color.White;
-                    }
-                    else
-                    {
-                        graphics.FillColor = Color.Black;
-                    }
-                    graphics.Fill(rectangle);
-                }
-            }
+            terrainRenderer.Draw(graphics);
         }
 
         /// <summary>
@@ -118,6 +105,11 @@ namespace Orion.Graphics
                     graphics.Fill(node.Circle);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            terrainRenderer.Dispose();
         }
         #endregion
     }

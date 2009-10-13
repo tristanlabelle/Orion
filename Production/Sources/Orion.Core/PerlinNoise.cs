@@ -5,7 +5,7 @@ using System.Text;
 
 using OpenTK.Math;
 
-namespace Orion.Core
+namespace Orion
 {
     [Serializable]
     public sealed class PerlinNoise

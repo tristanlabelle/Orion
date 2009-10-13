@@ -61,8 +61,8 @@ namespace Orion.Graphics
                     List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
                     if (unitsToAssignTask.Count() != 0)
                     {
-                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.Contains(position));
-                        RessourceNode node = World.RessourceNodes.FirstOrDefault(ressourceNode => ressourceNode.Circle.Contains(position));
+                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
+                        RessourceNode node = World.RessourceNodes.FirstOrDefault(ressourceNode => ressourceNode.Circle.ContainsPoint(position));
                         Command command;
                         if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
                         {

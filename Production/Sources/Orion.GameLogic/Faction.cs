@@ -242,7 +242,7 @@ namespace Orion.GameLogic
         /// <returns>The newly created <see cref="Unit"/>.</returns>
         public Unit CreateUnit(UnitType type)
         {
-            return world.CreateUnit(type, this);
+            return world.Units.Create(type, this);
         }
 
         public override string ToString()

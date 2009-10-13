@@ -84,7 +84,7 @@ namespace Orion.Commandment
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = world.Units.Where(unit => Intersection.RectangleIntersectsCircle(selectionRectangle, unit.Circle));
+                    var units = world.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
 
                     selectedUnits.Clear();
                     selectedUnits.AddRange(units);

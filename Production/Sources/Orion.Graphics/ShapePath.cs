@@ -6,7 +6,7 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
-    public class ShapePath
+    public sealed class ShapePath
     {
         #region Fields
 
@@ -41,7 +41,7 @@ namespace Orion.Graphics
 
         public Vector2 GetPointAt(int index)
         {
-            return points.ElementAt(index); 
+            return Points[index]; 
         }
 
         #endregion

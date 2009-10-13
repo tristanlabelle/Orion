@@ -79,6 +79,7 @@
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\Stand.cs" />
     <Compile Include="Unit.cs" />
+    <Compile Include="UnitRegistry.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>

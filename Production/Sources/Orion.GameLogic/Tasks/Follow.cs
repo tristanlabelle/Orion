@@ -108,7 +108,7 @@ namespace Orion.GameLogic.Tasks
         {
             Vector2 delta = target.Position - unit.Position;
             float distanceRemaining = CurrentDistance - targetDistance;
-            if (distanceRemaining < 0) return;
+            if (distanceRemaining <= 0.01f) return;
 
             Vector2 direction = Vector2.Normalize(delta);
 

@@ -99,7 +99,7 @@ namespace Orion.Graphics
                 {
                     Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = faction.World.Units.Where(unit => Intersection.RectangleIntersectsCircle(selectionRectangle, unit.Circle));
+                    var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
 
                     selectedUnits.Clear();
                     selectedUnits.AddRange(units);

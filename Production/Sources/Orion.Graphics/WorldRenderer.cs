@@ -62,16 +62,6 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            /*
-            // Later, walkable and non-walkable tiles should be distinguishable.
-            Rectangle? rectangle = world.Bounds; //.Intersection(viewRectangle);
-            if (rectangle.HasValue)
-            {
-                graphics.FillColor = Color.Gray;
-                graphics.Fill(rectangle.Value);
-            }
-            */
-
             for (int i = 0; i < world.Width; i++)
             {
                 for (int j = 0; j < world.Height; j++)
@@ -101,25 +91,24 @@ namespace Orion.Graphics
         public void DrawEntities(GraphicsContext graphics, Rectangle viewRectangle)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            // Later, walkable and non-walkable tiles should be distinguishable.
+
             foreach (Unit unit in world.Units)
             {
-                if (!unit.IsAlive)
-                    continue;
-                if (viewRectangle.ContainsPoint(unit.Position))
+                if (Intersection.Test(viewRectangle, unit.Circle))
                 {
                     if (unit.Faction == null) graphics.StrokeColor = Color.White;
                     else graphics.StrokeColor = unit.Faction.Color;
 
-                    Circle circle = new Circle(unit.Position, 1);
-                    graphics.Stroke(circle);
+                    graphics.Stroke(unit.Circle);
                 }
             }
+        }
 
-            //Renders Ressource Nodes to the game world
+        public void DrawResources(GraphicsContext graphics, Rectangle viewRectangle)
+        {
             foreach (RessourceNode node in world.RessourceNodes)
             {
-                if (viewRectangle.ContainsPoint(node.Position))
+                if (Intersection.Test(viewRectangle, node.Circle))
                 {
                     if (node.RessourceType == RessourceType.Alladium)
                         graphics.FillColor = Color.LightBlue;
@@ -128,7 +117,7 @@ namespace Orion.Graphics
                     else
                         continue;
 
-                    graphics.Fill(node.Circle);       
+                    graphics.Fill(node.Circle);
                 }
             }
         }

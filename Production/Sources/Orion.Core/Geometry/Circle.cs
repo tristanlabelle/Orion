@@ -119,7 +119,7 @@ namespace Orion.Geometry
         /// <returns>The closets point to that point within the circle.</returns>
         public Vector2 ClosestPointInside(Vector2 point)
         {
-            if (Contains(point)) return point;
+            if (ContainsPoint(point)) return point;
             return Vector2.Normalize(point - center) * radius + center;
         }
 
@@ -128,7 +128,7 @@ namespace Orion.Geometry
         /// </summary>
         /// <param name="point">The point to be tested.</param>
         /// <returns>True if it is within the circle, false otherwise.</returns>
-        public bool Contains(Vector2 point)
+        public bool ContainsPoint(Vector2 point)
         {
             return (point - center).LengthSquared <= SquaredRadius;
         }

@@ -178,8 +178,9 @@ namespace Orion.Graphics
             for (int i = 0; i < vertexCount; i++)
             {
                 double angle = angleIncrement * i;
-                AddVertex(ellipse.Center.X + ellipse.Radii.X * Math.Cos(angle),
-                    ellipse.Center.Y + ellipse.Radii.Y * Math.Sin(angle));
+                double x = ellipse.Center.X + ellipse.Radii.X * Math.Cos(angle);
+                double y = ellipse.Center.Y + ellipse.Radii.Y * Math.Sin(angle);
+                GL.Vertex2(x, y);
             }
         }
         #endregion
@@ -214,10 +215,11 @@ namespace Orion.Graphics
         private void DrawVertices(Rectangle rectangle)
         {
             if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            AddVertex(rectangle.X, rectangle.Y);
-            AddVertex(rectangle.X, rectangle.MaxY);
-            AddVertex(rectangle.MaxX, rectangle.MaxY);
-            AddVertex(rectangle.MaxX, rectangle.Y);
+
+            GL.Vertex2(rectangle.X, rectangle.Y);
+            GL.Vertex2(rectangle.X, rectangle.MaxY);
+            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
+            GL.Vertex2(rectangle.MaxX, rectangle.Y);
         }
         #endregion
 
@@ -249,14 +251,14 @@ namespace Orion.Graphics
         private void DrawVertices(Triangle triangle)
         {
             if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            AddVertex(triangle.Vertex1);
-            AddVertex(triangle.Vertex2);
-            AddVertex(triangle.Vertex3);
+
+            GL.Vertex2(triangle.Vertex1);
+            GL.Vertex2(triangle.Vertex2);
+            GL.Vertex2(triangle.Vertex3);
         }
         #endregion
 
         #region Other Shapes (ShapePath)
-
         /// <summary>
         /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
         /// </summary>
@@ -272,10 +274,10 @@ namespace Orion.Graphics
         private void DrawVertices(ShapePath shapePath)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-			for(int i = 0; i < shapePath.Count; i++)
-				AddVertex(shapePath.GetPointAt(i));
-        }
 
+            for (int i = 0; i < shapePath.Count; i++)
+                GL.Vertex2(shapePath.GetPointAt(i));
+        }
         #endregion
 
         #region Text
@@ -303,16 +305,6 @@ namespace Orion.Graphics
         }
 
         #endregion
-
-        private void AddVertex(double x, double y)
-        {
-            AddVertex(new Vector2((float)x, (float)y));
-        }
-
-        private void AddVertex(Vector2 position)
-        {
-            GL.Vertex2(position);
-        }
         #endregion
 
         #region Non-Public

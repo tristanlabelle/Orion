@@ -7,58 +7,23 @@ using OpenTK.Math;
 
 namespace Orion.Geometry
 {
+    /// <summary>
+    /// Provide helper methods to determine if various shapes intersect.
+    /// </summary>
     public static class Intersection
     {
-        #region Fields
-
-        #endregion
-
-        #region Constructors
-
-        #endregion
-
-        #region Properties
-
-        #endregion
-
         #region Methods
-
-        public static bool RectangleIntersectsCircle(Rectangle rectangle, Circle circle)
+        public static bool Test(Rectangle rectangle, Circle circle)
         {
-            Vector2 closestPointInRect = ClosestPointInRect(rectangle, circle.Center);
-            bool distanceLessThanRadius = DistanceLessThanRadius(closestPointInRect, circle.Center, circle.Radius);
-            if (distanceLessThanRadius)
-                return true;
-            return false;
+            Vector2 closestPointInRect = rectangle.ClosestPointInside(circle.Center);
+            float squaredDistance = (circle.Center - closestPointInRect).LengthSquared;
+            return squaredDistance < circle.SquaredRadius;
         }
 
-        public static Vector2 ClosestPointInRect(Rectangle rectangle, Vector2 center)
+        public static bool Test(Circle circle, Rectangle rectangle)
         {
-            float X = center.X;
-            float Y = center.Y;
-            
-            if (center.X < rectangle.X)
-                X = rectangle.X;
-            else if (center.X > rectangle.MaxX)
-                X = rectangle.MaxX;
-
-            if (center.Y < rectangle.Y)
-                Y = rectangle.Y;
-            else if (center.Y > rectangle.MaxY)
-                Y = rectangle.MaxY;
-
-            return new Vector2(X,Y);
+            return Intersection.Test(rectangle, circle);
         }
-
-        public static bool DistanceLessThanRadius(Vector2 closestPointInRect, Vector2 center, float radius)
-        {
-            float distance = (center - closestPointInRect).Length;
-            if (distance < radius)
-                return true;
-            return false;
-        }
-
         #endregion
-        
     }
 }

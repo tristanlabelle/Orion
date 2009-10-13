@@ -203,23 +203,6 @@ namespace Orion.Geometry
         /// <summary>
         /// Indicates if the rectangle contains a point.
         /// </summary>
-        /// <param name="x">
-        /// A <see cref="System.Single"/> for the point's abscissa
-        /// </param>
-        /// <param name="y">
-        /// A <see cref="System.Single"/> for the point's ordinate
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.Boolean"/>; true if the rect conains the point, false otherwise
-        /// </returns>
-        public bool ContainsPoint(float x, float y)
-        {
-            return ContainsPoint(new Vector2(x, y));
-        }
-        
-        /// <summary>
-        /// Indicates if the rectangle contains a point.
-        /// </summary>
         /// <param name="point">
         /// A <see cref="OpenTK.Math.Vector2"/> indicating the point's coordinates
         /// </param>
@@ -230,6 +213,24 @@ namespace Orion.Geometry
         {
             return point.X >= X && point.X <= MaxX
                 && point.Y >= Y && point.Y <= MaxY;
+        }
+        #endregion
+
+        #region ClosestPointInside
+        /// <summary>
+        /// Gets a point within this <see cref="Rectangle"/> that is the closest to a given point.
+        /// </summary>
+        /// <param name="point">The point which's closest image is to be found.</param>
+        /// <returns>The closest image of that point within this <see cref="Rectangle"/>.</returns>
+        public Vector2 ClosestPointInside(Vector2 point)
+        {
+            if (point.X < X) point.X = X;
+            else if (point.X > MaxX) point.X = MaxX;
+
+            if (point.Y < Y) point.Y = Y;
+            else if (point.Y > MaxY) point.Y = MaxY;
+
+            return point;
         }
         #endregion
 

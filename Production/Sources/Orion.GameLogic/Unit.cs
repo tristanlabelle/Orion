@@ -21,6 +21,12 @@ namespace Orion.GameLogic
         private readonly UnitType type;
         internal Faction faction;
 
+        /// <summary>
+        /// The last position as stored in the <see cref="UnitRegistry"/>.
+        /// Do not modify.
+        /// </summary>
+        internal Vector2 lastKnownPosition;
+
         private Vector2 position;
         private float angle;
         private float damage;
@@ -55,6 +61,18 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        #region Moved
+        /// <summary>
+        /// Raised when this <see cref="Unit"/> moves.
+        /// </summary>
+        public event GenericEventHandler<Unit> Moved;
+
+        private void OnMoved()
+        {
+            if (Moved != null) Moved(this);
+        }
+        #endregion
+
         #region DamageChanged
         /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
@@ -97,8 +115,6 @@ namespace Orion.GameLogic
         {
             get { return type; }
         }
-		
-		public Circle UnitCircle { get { return new Circle(0, 0, 1); } }
         #endregion
 
         #region Affiliation
@@ -144,7 +160,12 @@ namespace Orion.GameLogic
         public Vector2 Position
         {
             get { return position; }
-            set { position = value; }
+            set
+            {
+                if (value == position) return;
+                position = value;
+                OnMoved();
+            }
         }
 
         /// <summary>
@@ -152,7 +173,7 @@ namespace Orion.GameLogic
         /// </summary>
         public Circle Circle
         {
-            get { return new Circle(position, 1); }
+            get { return new Circle(position, 0.5f); }
         }
 
         /// <summary>
@@ -162,6 +183,15 @@ namespace Orion.GameLogic
         {
             get { return angle; }
             set { angle = value; }
+        }
+
+        /// <summary>
+        /// Gets a circle representing the area of the world that is within
+        /// the line of sight of this <see cref="Unit"/>.
+        /// </summary>
+        public Circle LineOfSight
+        {
+            get { return new Circle(position, Circle.Radius + type.VisionRange); }
         }
 
         /// <summary>
@@ -228,21 +258,46 @@ namespace Orion.GameLogic
 
         #region Methods
         /// <summary>
+        /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="unit">The <see cref="Unit"/> to be tested.</param>
+        /// <returns>
+        /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
+        /// </returns>
+        public bool CanSee(Unit unit)
+        {
+            return Circle.SignedDistance(Circle, unit.Circle) <= type.VisionRange;
+        }
+
+        /// <summary>
         /// Updates this <see cref="Unit"/> for a frame.
         /// </summary>
-        /// <param name="timeDelta">The time elapsed since the last frame.</param>
-        public void Update(float timeDelta)
+        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
+        /// <remarks>
+        /// Used by <see cref="UnitRegistry"/>.
+        /// </remarks>
+        internal void Update(float timeDeltaInSeconds)
         {
             if (IsIdle)
             {
-                Unit unitToAttack = World.Units.FirstOrDefault(unit =>
-                    unit.faction != faction
-                    && Circle.SignedDistance(Circle, unit.Circle) <= type.VisionRange);
-
+                Unit unitToAttack = World.Units.InArea(LineOfSight).FirstOrDefault(unit => unit.faction != faction);
                 if (unitToAttack != null) task = new Tasks.Attack(this, unitToAttack);
             }
-            if(!task.HasEnded)
-                task.Update(timeDelta);
+
+            if (!task.HasEnded)
+            {
+                task.Update(timeDeltaInSeconds);
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return id;
+        }
+
+        public override string ToString()
+        {
+            return "{0} {1}".FormatInvariant(type, faction);
         }
         #endregion
     }

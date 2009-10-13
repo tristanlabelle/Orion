@@ -85,6 +85,7 @@ namespace Orion.Graphics
         {
             worldRenderer.DrawTerrain(context, Bounds);
             selectionRenderer.DrawBelowUnits(context);
+            worldRenderer.DrawResources(context, Bounds);
             worldRenderer.DrawEntities(context, Bounds);
             selectionRenderer.DrawAboveUnits(context);
         }

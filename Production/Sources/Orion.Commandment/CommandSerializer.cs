@@ -62,7 +62,7 @@ namespace Orion.Commandment
         protected Unit ReadUnit(BinaryReader reader, World world)
         {
             int unitID = reader.ReadInt32();
-            Unit unit = world.FindUnitWithID(unitID);
+            Unit unit = world.Units.FindFromID(unitID);
             if (unit == null) throw new InvalidDataException("Invalid unit identifier.");
             return unit;
         }

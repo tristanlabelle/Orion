@@ -73,14 +73,21 @@ namespace Orion.Main
                 {
                     ui.Render();
 
-                    float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
+                    float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
+                    if (timeDeltaInSeconds > 0.1f)
+                    {
+                        // This prevents the simulation from "blowing up" under lag,
+                        // it is especially useful as we break in the code.
+                        timeDeltaInSeconds = 0.1f;
+                    }
+
                     stopwatch.Stop();
                     stopwatch.Reset();
                     stopwatch.Start();
 
-                    commandManager.Update(timeDelta);
-                    world.Update(timeDelta);
-                    ui.Update(timeDelta);
+                    commandManager.Update(timeDeltaInSeconds);
+                    world.Update(timeDeltaInSeconds);
+                    ui.Update(timeDeltaInSeconds);
                 }
             }
         }

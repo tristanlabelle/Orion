@@ -264,12 +264,13 @@ namespace Orion.Networking
             byte[] packet = new byte[1024];
             EndPoint endpoint = new IPEndPoint(0, 0);
 
-            try
+            while (true)
             {
-                while (true)
+                if (isDisposed) break;
+                socketSemaphore.WaitOne();
+
+                try
                 {
-                    if (isDisposed) break;
-                    socketSemaphore.WaitOne();
                     while (true)
                     {
                         try
@@ -319,26 +320,29 @@ namespace Orion.Networking
                             }
                         }
                     }
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
+                    break;
+                }
+                finally
+                {
                     socketSemaphore.Release();
                 }
-            }
-            catch (SocketException e)
-            {
-                if(e.ErrorCode != 10058) // broken pipe; this can be normal
-                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
             }
         }
 
         private void SenderThread()
         {
-            try
+            List<PacketSession> trash = new List<PacketSession>();
+            while (true)
             {
-                List<PacketSession> trash = new List<PacketSession>();
-                while (true)
-                {
-                    if (isDisposed) break;
+                if (isDisposed) break;
+                socketSemaphore.WaitOne();
 
-                    socketSemaphore.WaitOne();
+                try
+                {
                     List<PacketSession> sessions;
                     lock (packetsToSend)
                     {
@@ -370,15 +374,18 @@ namespace Orion.Networking
                             packetsToSend.Remove(session.Id);
                         }
                     }
-                    socketSemaphore.Release();
-
-                    Thread.Sleep(10);
                 }
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine("Broke from socket exception {0}", e.ErrorCode);
-                Console.WriteLine(e);
+                catch (SocketException e)
+                {
+                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
+                    break;
+                }
+                finally
+                {
+                    socketSemaphore.Release();
+                }
+
+                Thread.Sleep(10);
             }
         }
 

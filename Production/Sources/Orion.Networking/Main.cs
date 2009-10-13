@@ -43,6 +43,7 @@ namespace Orion.Networking
                 {
                     transporter.Poll();
                 }
+                Console.WriteLine("Received them all");
             }
             Console.Read();
         }

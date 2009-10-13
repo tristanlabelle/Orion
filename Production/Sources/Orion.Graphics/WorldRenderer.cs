@@ -9,6 +9,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 
 using Color = System.Drawing.Color;
+using Orion.GameLogic.Tasks;
 
 namespace Orion.Graphics
 {
@@ -76,6 +77,17 @@ namespace Orion.Graphics
         public void DrawEntities(GraphicsContext graphics, Rectangle viewRectangle)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+
+            var paths = world.Units.Select(unit => unit.Task)
+                .OfType<Move>()
+                .Select(task => task.Path)
+                .Where(path => path != null);
+
+            graphics.StrokeColor = Color.Lime;
+            foreach (Path path in paths)
+            {
+                graphics.Stroke(path.Points.Select(p => new Vector2(p.X, p.Y)));
+            }
 
             foreach (Unit unit in world.Units)
             {

@@ -3,34 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Collections.ObjectModel;
+
+using OpenTK.Math;
 
 namespace Orion.GameLogic
 {
     public class Path
     {
         #region Fields
-        LinkedList<PathNode> linkList;
-        PathFinder pathFinder;
-        Point destination;
-        Dictionary<Point, PathNode> openNodes;
-        HashSet<Point> closedNodes;
-
+        private readonly PathFinder pathFinder;
+        private readonly Vector2 source;
+        private readonly Point sourcePoint;
+        private readonly Vector2 destination;
+        private readonly Point destinationPoint;
+        private readonly Dictionary<Point, PathNode> openNodes = new Dictionary<Point, PathNode>();
+        private readonly HashSet<Point> closedNodes = new HashSet<Point>();
+        private readonly ReadOnlyCollection<Point> points;
         #endregion
 
         #region Constructor
-        public Path(Point source, Point destinationPoint, PathFinder pathFinder)
+        internal Path(PathFinder pathFinder, Vector2 source, Vector2 destination)
         {
-            linkList = new LinkedList<PathNode>();
-            openNodes = new Dictionary<Point, PathNode>();
-            closedNodes = new HashSet<Point>();
-
             this.pathFinder = pathFinder;
+            this.source = source;
+            this.destination = destination;
 
-            PathNode sourceNode = new PathNode(null, new Point((int)source.X, (int)source.Y), 0);
-            this.destination = destinationPoint;
+            sourcePoint = new Point((int)source.X, (int)source.Y);
+            destinationPoint = new Point((int)destination.X, (int)destination.Y);
+            PathNode sourceNode = new PathNode(null, sourcePoint, 0);
 
             PathNode currentNode = sourceNode;
-            while (currentNode.Position.X != destination.X || currentNode.Position.Y != destination.Y)
+            while (currentNode.Position.X != destinationPoint.X || currentNode.Position.Y != destinationPoint.Y)
             {
                 closedNodes.Add(currentNode.Position);
                 openNodes.Remove(currentNode.Position);
@@ -42,34 +46,63 @@ namespace Orion.GameLogic
                 foreach (PathNode aNode in openNodes.Values)
                 {
                     if (CalculateTotalCost(aNode.Position, aNode.MoveCost) <
-                         CalculateTotalCost(currentNode.Position, currentNode.MoveCost))
+                        CalculateTotalCost(currentNode.Position, currentNode.MoveCost))
                         currentNode = aNode;
                 }
             }
 
             if (currentNode.Position == destinationPoint)
             {
+                List<Point> pointList = new List<Point>();
                 while (currentNode != null)
                 {
-                    AddNode(currentNode);
+                    pointList.Add(currentNode.Position);
                     currentNode = currentNode.ParentNode;
                 }
+                pointList.Reverse();
+                points = new ReadOnlyCollection<Point>(pointList);
             }
-            linkList =  null;
         }
         #endregion
-      
-        
-        #region Methods
-        public void AddNode(PathNode node)
+
+        #region Properties
+        /// <summary>
+        /// Gets a value indicating if this path was successfully found.
+        /// </summary>
+        internal bool Succeeded
         {
-            linkList.AddFirst(node);
+            get { return points != null; }
         }
 
+        /// <summary>
+        /// Gets the point that is at the source of this path.
+        /// </summary>
+        public Vector2 Source
+        {
+            get { return source; }
+        }
 
+        /// <summary>
+        /// Gets the destination point of this path.
+        /// </summary>
+        public Vector2 Destination
+        {
+            get { return destination; }
+        }
+
+        /// <summary>
+        /// Gets the sequence of points that trace this path.
+        /// </summary>
+        public ReadOnlyCollection<Point> Points
+        {
+            get { return points; }
+        }
+        #endregion
+
+        #region Methods
         private float CalculateTotalCost(Point aPoint, float moveCost)
         {
-            return Math.Abs(aPoint.X - destination.X) + Math.Abs(aPoint.Y - destination.Y)
+            return Math.Abs(aPoint.X - destinationPoint.X) + Math.Abs(aPoint.Y - destinationPoint.Y)
                 + moveCost;
         }
 
@@ -122,7 +155,8 @@ namespace Orion.GameLogic
                 float cost = currentNode.MoveCost + movementCost;
 
                 if (firstNodeFound.MoveCost > cost)
-                { // If its a better choise to pass thru the current node , overwrite the parent and the move cost
+                {
+                    // If its a better choise to pass thru the current node , overwrite the parent and the move cost
                     firstNodeFound.ParentNode = currentNode;
                     firstNodeFound.MoveCost = cost;
                 }
@@ -136,15 +170,6 @@ namespace Orion.GameLogic
                 openNodes.Add(nearNodeCoords, aNode);
             }
         }
-        #endregion
-
-        #region Proprieties
-
-        public List<PathNode> List
-        {
-            get { return linkList.ToList(); }
-        }
-
         #endregion
     }
 }

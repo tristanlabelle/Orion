@@ -11,8 +11,6 @@ namespace Orion.GameLogic
     {
         #region Fields
         readonly World world;
-
-
         #endregion
 
         #region Constructors
@@ -23,22 +21,17 @@ namespace Orion.GameLogic
         /// <param name="destination">The destination point</param>
         public PathFinder(World world)
         {
+            Argument.EnsureNotNull(world, "world");
             this.world = world;
         }
-        
         #endregion
 
         #region Methods
-        
-
         public Path FindPath(Vector2 source, Vector2 destination)
         {
-            Point SourcePoint = new Point((int)source.X, (int)source.Y);
-            Point DestinationPoint = new Point((int)destination.X, (int)destination.Y);
-            Path unitPath = new Path(SourcePoint,DestinationPoint,this);
-            return unitPath;
+            Path path = new Path(this, source, destination);
+            return path.Succeeded ? path : null;
         }
-
         #endregion
 
         #region Proprieties

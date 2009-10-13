@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using System.Drawing;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -16,6 +17,8 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit unit;
         private readonly Vector2 destination;
+        private readonly Path path;
+        private int nextPointIndex = 1;
         #endregion
 
         #region Constructors
@@ -31,15 +34,22 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.destination = destination;
-            this.unit.World.PathFinder.FindPath(unit.Position, destination);
-            
+            this.path = unit.World.PathFinder.FindPath(unit.Position, destination);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Path"/> this <see cref="Unit"/> uses to get to its destination.
+        /// </summary>
+        public Path Path
+        {
+            get { return path; }
+        }
+
         public override bool HasEnded
         {
-            get { return (unit.Position - destination).Length <= 0.01f; }
+            get { return path == null || nextPointIndex > path.Points.Count - 1; }
         }
 
         public override string Description
@@ -49,18 +59,27 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-
         public override void Update(float timeDelta)
         {
             if (HasEnded) return;
 
+            Point destinationPoint = path.Points[nextPointIndex];
+            Vector2 destination = new Vector2(destinationPoint.X, destinationPoint.Y);
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
             float distance = unit.Type.MovementSpeed * timeDelta;
-            if (distance < delta.Length) unit.Position += direction * distance;
-            else unit.Position = destination;
-
+            if (distance < delta.Length)
+            {
+                // Unit walks along a segment of the path within this frame.
+                unit.Position += direction * distance;
+            }
+            else
+            {
+                // Unit will reach destination within this frame
+                unit.Position = destination;
+                ++nextPointIndex;
+            }
         }
         #endregion
     }

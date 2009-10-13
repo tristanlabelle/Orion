@@ -234,6 +234,28 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Lines
+        /// <summary>
+        /// Strokes a line using the current <see cref="P:StrokeColor"/>.
+        /// </summary>
+        /// <param name="points">A sequence of points forming a line.</param>
+        public void Stroke(IEnumerable<Vector2> points)
+        {
+            CommitStrokeColor();
+            GL.Begin(BeginMode.LineStrip);
+            DrawVertices(points);
+            GL.End();
+        }
+
+        private void DrawVertices(IEnumerable<Vector2> points)
+        {
+            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+
+            foreach (Vector2 point in points)
+                GL.Vertex2(point);
+        }
+        #endregion
+
         #region Other Shapes (ShapePath)
         /// <summary>
         /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
@@ -289,13 +311,13 @@ namespace Orion.Graphics
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, textureID);
             GL.Begin(BeginMode.Quads);
-            GL.TexCoord2(0, 1);
-            GL.Vertex2(rectangle.X, rectangle.Y);
             GL.TexCoord2(0, 0);
+            GL.Vertex2(rectangle.X, rectangle.Y);
+            GL.TexCoord2(0, 1);
             GL.Vertex2(rectangle.X, rectangle.MaxY);
-            GL.TexCoord2(1, 0);
-            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(1, 1);
+            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(1, 0);
             GL.Vertex2(rectangle.MaxX, rectangle.Y);
             GL.End();
             GL.Disable(EnableCap.Texture2D);

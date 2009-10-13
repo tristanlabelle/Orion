@@ -13,12 +13,13 @@ namespace Orion.GameLogic
         PathNode parentNode;
 
        
-        Point position;
+        readonly Point position;
 
         
         float totalCost;
 
         #endregion
+
         #region constructor
         /// <summary>
         /// Constructor for a Node (path of terrain).
@@ -45,7 +46,6 @@ namespace Orion.GameLogic
         public Point Position
         {
             get { return position; }
-            set { position = value; }
         }
 
         public PathNode ParentNode

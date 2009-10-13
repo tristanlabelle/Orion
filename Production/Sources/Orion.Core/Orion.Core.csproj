@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -51,14 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Argument.cs" />
-    <Compile Include="GameMap.cs" />
     <Compile Include="GameFrameInfo.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Ellipse.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GenericEventHandler.cs" />
     <Compile Include="Geometry\Intersection.cs" />
-    <Compile Include="MapGenerator.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="NetworkTimeoutEventArgs.cs" />
     <Compile Include="PerlinNoise.cs" />
@@ -67,6 +65,8 @@
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="KeyboardEventArgs.cs" />
+    <Compile Include="Terrain.cs" />
+    <Compile Include="TerrainGenerator.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
   </ItemGroup>

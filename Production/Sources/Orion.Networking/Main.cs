@@ -18,8 +18,8 @@ namespace Orion.Networking
 
             using (Transporter transporter = new Transporter(port))
             {
-                int received = 0;
-
+                int count = 0;
+                Dictionary<int, bool> received = new Dictionary<int,bool>();
                 for (int i = 0; i < 0xFF; i++)
                 {
                     transporter.SendTo(BitConverter.GetBytes(i), endPoint);
@@ -27,8 +27,10 @@ namespace Orion.Networking
 
                 transporter.Received += delegate(Transporter origin, NetworkEventArgs args)
                 {
-                    Console.WriteLine("{0}: {1}", args.Host, BitConverter.ToInt32(args.Data, 0));
-                    received++;
+                    int id = BitConverter.ToInt32(args.Data, 0);
+                    Console.WriteLine("{0}: {1}", args.Host, id);
+                    received[id] = true;
+                    count++;
                 };
 
                 transporter.TimedOut += delegate(Transporter origin, NetworkTimeoutEventArgs args)
@@ -36,10 +38,11 @@ namespace Orion.Networking
                     transporter.SendTo(args.Data, args.Host);
                 };
 
-                while (received < 0xFF)
+                while (count != 0xFF)
                 {
                     transporter.Poll();
                 }
+                Console.Read();
             }
         }
     }

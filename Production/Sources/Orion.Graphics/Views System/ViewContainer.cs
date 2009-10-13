@@ -174,15 +174,15 @@ namespace Orion.Graphics
                         if (!child.IsMouseOver)
                         {
                             child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
-                            child.IsMouseOver = true;
                         }
+                        child.CursorPosition = args.Position;
                         eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
                 }
                 else if(child.IsMouseOver)
                 {
                     child.DispatchMouseEvent(MouseEventType.MouseExited, args);
-                    child.IsMouseOver = false;
+                    child.CursorPosition = null;
                 }
             }
 

@@ -81,7 +81,15 @@ namespace Orion.Graphics
         public override Rectangle Bounds
         {
             get { return context.CoordinateSystem; }
-            set { context.CoordinateSystem = value; }
+            set
+            {
+                context.CoordinateSystem = value;
+                if (IsMouseOver)
+                {
+                    Vector2 position = CursorPosition.Value;
+                    PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position.X, position.Y, MouseButton.None, 0, 0));
+                }
+            }
         }
 
         #endregion

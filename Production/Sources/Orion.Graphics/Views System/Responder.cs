@@ -1,6 +1,6 @@
 using System;
-
 using Orion.Geometry;
+using OpenTK.Math;
 
 namespace Orion.Graphics
 {
@@ -11,7 +11,7 @@ namespace Orion.Graphics
     {
         #region Fields
 
-        private bool isMouseOver = false;
+        private Vector2? cursorPosition = null;
 
         #endregion
 
@@ -21,8 +21,16 @@ namespace Orion.Graphics
         /// </summary>
         public bool IsMouseOver
         {
-            get { return isMouseOver; }
-            set { isMouseOver = value; }
+            get { return cursorPosition.HasValue; }
+        }
+
+        /// <summary>
+        /// Accesses the position, in local coordinates, of the mouse cursor over the view.
+        /// </summary>
+        public Vector2? CursorPosition
+        {
+            get { return cursorPosition; }
+            set { cursorPosition = value; }
         }
         #endregion
 

@@ -119,6 +119,7 @@ namespace Orion.Networking
         private readonly Dictionary<PacketId, PacketSession> packetsToSend = new Dictionary<PacketId, PacketSession>();
 
         private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
 
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
@@ -162,7 +163,7 @@ namespace Orion.Networking
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 5000);
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
 
@@ -267,15 +268,13 @@ namespace Orion.Networking
             {
                 while (true)
                 {
+                    if (isDisposed) break;
+                    socketSemaphore.WaitOne();
                     while (true)
                     {
                         try
                         {
-                            lock (udpSocket)
-                            {
-                                if (isDisposed) break;
-                                udpSocket.ReceiveFrom(packet, ref endpoint);
-                            }
+                            udpSocket.ReceiveFrom(packet, ref endpoint);
                             break;
                         }
                         catch (SocketException e)
@@ -296,11 +295,7 @@ namespace Orion.Networking
                             answer[i] = packet[i];
 
                         // it is always necessary to send an answer to data packets
-                        lock (udpSocket)
-                        {
-                            if (isDisposed) break;
-                            udpSocket.SendTo(answer, endpoint);
-                        }
+                        udpSocket.SendTo(answer, endpoint);
 
                         lock (answeredPackets)
                         {
@@ -324,6 +319,7 @@ namespace Orion.Networking
                             }
                         }
                     }
+                    socketSemaphore.Release();
                 }
             }
             catch (SocketException e)
@@ -342,6 +338,7 @@ namespace Orion.Networking
                 {
                     if (isDisposed) break;
 
+                    socketSemaphore.WaitOne();
                     List<PacketSession> sessions;
                     lock (packetsToSend)
                     {
@@ -373,6 +370,7 @@ namespace Orion.Networking
                             packetsToSend.Remove(session.Id);
                         }
                     }
+                    socketSemaphore.Release();
 
                     Thread.Sleep(10);
                 }
@@ -452,11 +450,15 @@ namespace Orion.Networking
         public void Dispose()
         {
             isDisposed = true;
-            lock (udpSocket)
-            {
-                udpSocket.Shutdown(SocketShutdown.Both);
-                udpSocket.Close();
-            }
+
+            socketSemaphore.WaitOne();
+            socketSemaphore.WaitOne();
+
+            udpSocket.Shutdown(SocketShutdown.Both);
+            udpSocket.Close();
+
+            socketSemaphore.Release();
+            socketSemaphore.Release();
         }
 
         public override string ToString()

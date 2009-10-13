@@ -162,7 +162,6 @@ namespace Orion.Networking
 		{
 			Port = port;
 			udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-			udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 5000);
 			senderThread = new Thread(SenderThread);
 			receiverThread = new Thread(ReceiverThread);
 			
@@ -310,7 +309,7 @@ namespace Orion.Networking
 			}
 			catch(SocketException e)
 			{
-				Console.WriteLine("Broke from socket exception {0}", e.ErrorCode);
+				Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
 			}
 		}
 		

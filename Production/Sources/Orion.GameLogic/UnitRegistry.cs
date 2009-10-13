@@ -128,6 +128,15 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Events
+
+        /// <summary>
+        /// The event triggered when a unit dies.
+        /// </summary>
+        public event GenericEventHandler<UnitRegistry, Unit> UnitDied;
+
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the spatial bounds of this collection.
@@ -280,6 +289,11 @@ namespace Orion.GameLogic
         {
             units.Remove(unit);
             RemoveFromZone(unit);
+            GenericEventHandler<UnitRegistry, Unit> handler = UnitDied;
+            if (handler != null)
+            {
+                handler(this, unit);
+            }
         }
 
         private void RemoveFromZone(Unit unit)

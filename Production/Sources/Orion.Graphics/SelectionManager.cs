@@ -117,6 +117,18 @@ namespace Orion.Graphics
         {
             cursorPosition = location;
         }
+
+        /// <summary>
+        /// Informs this <see cref="SelectionManager"/> that a unit died.
+        /// </summary>
+        /// <param name="source">The source UnitRegistry</param>
+        /// <param name="unit">The killed unit</param>
+        public void UnitDied(UnitRegistry source, Unit unit)
+        {
+            if (selectedUnits.Contains(unit))
+                selectedUnits.Remove(unit);
+        }
+
         #endregion
     }
 }

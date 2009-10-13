@@ -39,6 +39,8 @@ namespace Orion.Graphics
 
             renderer = new WorldRenderer(world);
 
+            world.Units.UnitDied += userInputCommander.SelectionManager.UnitDied;
+
             this.userInputCommander = userInputCommander;
             WorldView worldView = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
             worldView.Bounds = new Rectangle(40,30);

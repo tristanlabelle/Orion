@@ -15,6 +15,8 @@ namespace Orion.Graphics
         /// Returns the maximum bounds of this object (in contrast to Bounds, which are the visible bounds of this object).
         /// </summary>
 		public abstract Rectangle FullBounds { get; }
+        //private const Vector2 BoundsLimit = new Vector2 (); 
+
 		
         /// <summary>
         /// Constructs a new ClippedView.
@@ -41,15 +43,51 @@ namespace Orion.Graphics
 		public void Zoom(double factor, Vector2 center)
 		{
 			// TODO: check for full bounds when zooming so we don't break the aspect ratio
-			Vector2 scale = new Vector2((float)factor, (float)factor);
-			Vector2 newSize = Bounds.Size;
-			newSize.Scale(scale);
-			Vector2 newOrigin = Bounds.Origin;
-            newOrigin += (Bounds.Size - newSize) + (center - Bounds.Center);
-			
+			Vector2 scale = new Vector2((float)factor, (float)factor);// Détermine la grosseur du scale. 
+			Vector2 newSize = Bounds.Size; // Créer une nouvelle variable de grosseur. 
+			newSize.Scale(scale);// Appliquele nouveau scale, et créer la nouvelle grosseur. 
+			Vector2 newOrigin = Bounds.Origin; // Créer un nouveau point d'origine. 
+            // Le scalability, n'est pas une chose efficace pour effectuer une agrandissement
+            // d'écran mieux vaut utiliser une variable qui ... agrandira la taille de 
+            // newSize tout simplement, par addition et non par homothétie. 
+
+            
+            //newOrigin = (Bounds.Size - newSize) + (center - Bounds.Center);
+            if (scale.X > 1.0 || scale.Y > 1.0) // Zoomt out
+            {
+               // if(Bounds.Origin.X < 0)
+                newOrigin.X = Bounds.X + scale.X;
+                newOrigin.Y = Bounds.Y + scale.Y;
+            }
+            else                                // Zoom in
+            {
+                if ((Bounds.X - scale.X )< 0)
+                    newOrigin.X = 0;
+                else
+                    newOrigin.X = Bounds.X - scale.X;
+                newOrigin.Y = Bounds.Y - scale.Y;
+            }
+            /*
+            if (newOrigin.X < 0)
+            {
+                newOrigin.X = (newSize.X / 2 + scale.X);//+ (center - Bounds.Center);
+                //newOrigin.Y = (newSize.X / 2 + scale.X);   
+            }
+            /*
+            if (Bounds.Origin.Y < 0)*/
+            //else
+
+            
 			Bounds = new Rectangle(newOrigin, newSize);
 		}
-		
+        /*private void determineNewXOrigin
+        { 
+            
+        }
+        private void determineNewYOrigin
+        { 
+        
+        }*/
         /// <summary>
         /// Translates the bounds origin by given X and Y offsets. Checks the bounds so it's impossible to scroll past them.
         /// </summary>

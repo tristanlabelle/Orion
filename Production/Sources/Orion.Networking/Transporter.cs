@@ -298,6 +298,7 @@ namespace Orion.Networking
                         // it is always necessary to send an answer to data packets
                         lock (udpSocket)
                         {
+                            if (isDisposed) break;
                             udpSocket.SendTo(answer, endpoint);
                         }
 

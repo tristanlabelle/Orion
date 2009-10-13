@@ -12,18 +12,21 @@ namespace Orion.Networking
 
         static void Main()
         {
-            Transporter transporter = new Transporter(port);
-            transporter.Received += delegate(Transporter origin, NetworkEventArgs args)
-            {
-                Console.WriteLine(Encoding.ASCII.GetChars(args.Data));
-            };
+            IPAddress address;
+            IPAddress.TryParse(Console.ReadLine(), out address);
 
-            while (true)
+            using (Transporter transporter = new Transporter(port))
             {
-                IPAddress address;
-                IPAddress.TryParse(Console.ReadLine(), out address);
-                transporter.SendTo(Encoding.ASCII.GetBytes(Console.ReadLine()), new IPEndPoint(address, port));
-                transporter.Poll();
+                transporter.Received += delegate(Transporter origin, NetworkEventArgs args)
+                {
+                    Console.WriteLine("{0}: {1}", args.Host, Encoding.ASCII.GetChars(args.Data));
+                };
+
+                while (true)
+                {
+                    transporter.SendTo(Encoding.ASCII.GetBytes(Console.ReadLine()), new IPEndPoint(address, port));
+                    transporter.Poll();
+                }
             }
         }
     }

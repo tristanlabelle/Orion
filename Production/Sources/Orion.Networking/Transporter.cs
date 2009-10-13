@@ -164,6 +164,9 @@ namespace Orion.Networking
 			udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
 			senderThread = new Thread(SenderThread);
 			receiverThread = new Thread(ReceiverThread);
+
+            senderThread.Name = string.Format("Sender Thread for {0}", this);
+            receiverThread.Name = string.Format("Receiver Thread for {0}", this);
 			
 			receiverThread.Start();
 			senderThread.Start();
@@ -263,10 +266,7 @@ namespace Orion.Networking
 				{
 					if(isDisposed) break;
 					
-					lock(udpSocket)
-					{
-						udpSocket.ReceiveFrom(packet, ref endpoint);
-					}
+					udpSocket.ReceiveFrom(packet, ref endpoint);
 					
 					uint sessionId = BitConverter.ToUInt32(packet, 1);
 					PacketId id = new PacketId(sessionId, endpoint as IPEndPoint);
@@ -328,21 +328,18 @@ namespace Orion.Networking
 						sessions = packetsToSend.Values.ToList();
 					}
 					
-					lock(udpSocket)
+					foreach(PacketSession session in sessions)
 					{
-						foreach(PacketSession session in sessions)
+						if(session.HasTimedOut)
 						{
-							if(session.HasTimedOut)
-							{
-								trash.Add(session);
-								timedOut.Enqueue(new NetworkTimeoutEventArgs(session.Id.RemoteHost, session.Data));
-							}
-							
-							if(session.NeedsResend)
-							{
-								session.SendThrough(udpSocket);
-								session.ResetSendTime(AveragePing(session.Id.RemoteHost) + StandardDeviationForPings(session.Id.RemoteHost));
-							}
+							trash.Add(session);
+							timedOut.Enqueue(new NetworkTimeoutEventArgs(session.Id.RemoteHost, session.Data));
+						}
+						
+						if(session.NeedsResend)
+						{
+							session.SendThrough(udpSocket);
+							session.ResetSendTime(AveragePing(session.Id.RemoteHost) + StandardDeviationForPings(session.Id.RemoteHost));
 						}
 					}
 					
@@ -440,6 +437,11 @@ namespace Orion.Networking
 				udpSocket.Close();
 			}
 		}
+
+        public string ToString()
+        {
+            return string.Format("{Transporter:{0}", Port);
+        }
 		
 		#endregion
 		

@@ -12,38 +12,29 @@ namespace Orion.Networking
 
         static void Main()
         {
-            IPAddress address;
-            IPAddress.TryParse(Console.ReadLine(), out address);
-            IPEndPoint endPoint = new IPEndPoint(address, port);
-
             using (Transporter transporter = new Transporter(port))
             {
-                int count = 0;
-                Dictionary<int, bool> received = new Dictionary<int,bool>();
-                for (int i = 0; i < 0xFF; i++)
+                transporter.Received += delegate(Transporter source, NetworkEventArgs args)
                 {
-                    transporter.SendTo(BitConverter.GetBytes(i), endPoint);
-                }
-
-                transporter.Received += delegate(Transporter origin, NetworkEventArgs args)
-                {
-                    int id = BitConverter.ToInt32(args.Data, 0);
-                    Console.WriteLine("{0}: {1}", args.Host, id);
-                    received[id] = true;
-                    count++;
+                    Console.WriteLine(Encoding.ASCII.GetString(args.Data));
                 };
 
-                transporter.TimedOut += delegate(Transporter origin, NetworkTimeoutEventArgs args)
+                transporter.TimedOut += delegate(Transporter source, NetworkTimeoutEventArgs args)
                 {
-                    Console.WriteLine("*** {0} timed out", BitConverter.ToInt32(args.Data, 0));
-                    transporter.SendTo(args.Data, args.Host);
+                    Console.WriteLine("*** Message timed out: {0}", Encoding.ASCII.GetString(args.Data));
                 };
 
-                while (count != 0xFF)
+                while (true)
                 {
+                    Console.Write("Adresse: ");
+                    IPAddress address;
+                    IPAddress.TryParse(Console.ReadLine(), out address);
+                    IPEndPoint endPoint = new IPEndPoint(address, port);
+
+                    Console.Write("Message: ");
+                    transporter.SendTo(Encoding.ASCII.GetBytes(Console.ReadLine()), new IPEndPoint(address, port));
                     transporter.Poll();
                 }
-                Console.WriteLine("Received them all");
             }
             Console.Read();
         }

@@ -162,6 +162,7 @@ namespace Orion.Networking
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 5000);
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
 
@@ -266,9 +267,24 @@ namespace Orion.Networking
             {
                 while (true)
                 {
-                    if (isDisposed) break;
-
-                    udpSocket.ReceiveFrom(packet, ref endpoint);
+                    while (true)
+                    {
+                        try
+                        {
+                            lock (udpSocket)
+                            {
+                                if (isDisposed) break;
+                                udpSocket.ReceiveFrom(packet, ref endpoint);
+                            }
+                            break;
+                        }
+                        catch (SocketException e)
+                        {
+                            // 10060: WSAETIMEDOUT: the socket didn't receive anything before it timed out
+                            // this is normal; proceed
+                            if (e.ErrorCode != 10060) throw;
+                        }
+                    }
 
                     uint sessionId = BitConverter.ToUInt32(packet, 1);
                     PacketId id = new PacketId(sessionId, endpoint as IPEndPoint);
@@ -311,7 +327,8 @@ namespace Orion.Networking
             }
             catch (SocketException e)
             {
-                Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
+                if(e.ErrorCode != 10058) // broken pipe; this can be normal
+                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
             }
         }
 

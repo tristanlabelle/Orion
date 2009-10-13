@@ -362,6 +362,7 @@ namespace Orion.Networking
             catch (SocketException e)
             {
                 Console.WriteLine("Broke from socket exception {0}", e.ErrorCode);
+                Console.WriteLine(e);
             }
         }
 
@@ -386,14 +387,11 @@ namespace Orion.Networking
 
             uint sid = nextSessionId;
             nextSessionId++;
-            byte[] packet = new byte[data.Length + 4];
-            BitConverter.GetBytes(sid).CopyTo(packet, 0);
-            data.CopyTo(packet, sizeof(uint));
 
             lock (packetsToSend)
             {
                 PacketId id = new PacketId(sid, remoteAddress);
-                packetsToSend[id] = new PacketSession(id, packet);
+                packetsToSend[id] = new PacketSession(id, data);
             }
         }
 
@@ -443,9 +441,9 @@ namespace Orion.Networking
             }
         }
 
-        public string ToString()
+        public override string ToString()
         {
-            return string.Format("{Transporter:{0}", Port);
+            return string.Format("{{Transporter:{0}}}", Port);
         }
 
         #endregion

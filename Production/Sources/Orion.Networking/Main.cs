@@ -35,6 +35,7 @@ namespace Orion.Networking
 
                 transporter.TimedOut += delegate(Transporter origin, NetworkTimeoutEventArgs args)
                 {
+                    Console.WriteLine("*** {0} timed out", BitConverter.ToInt32(args.Data, 0));
                     transporter.SendTo(args.Data, args.Host);
                 };
 
@@ -42,8 +43,8 @@ namespace Orion.Networking
                 {
                     transporter.Poll();
                 }
-                Console.Read();
             }
+            Console.Read();
         }
     }
 }

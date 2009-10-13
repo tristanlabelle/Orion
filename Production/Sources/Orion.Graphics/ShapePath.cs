@@ -6,6 +6,9 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
+    /// <summary>
+    /// Defines a shape to be drawn by drawing lines between points.
+    /// </summary>
     public sealed class ShapePath
     {
         #region Fields

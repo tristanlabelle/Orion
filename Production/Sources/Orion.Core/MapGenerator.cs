@@ -5,11 +5,14 @@ using System.Text;
 
 namespace Orion.Core
 {
-    public static class MapGenerator
+    /// <summary>
+    /// Defines a terrain generator which generates random terrains.
+    /// </summary>
+    public static class TerrainGenerator
     {
         #region Fields
 
-        public static PerlinNoise noise;
+        private static PerlinNoise noise;
 
         #endregion
 
@@ -23,30 +26,37 @@ namespace Orion.Core
 
         #region Methods
 
-        public static GameMap GenerateNewMap(int MapWidth, int MapHeight, MersenneTwister random)
+        /// <summary>
+        /// Returns a <see cref="Terrain"/> to be generated using a <see cref="PerlinNoise"/>. 
+        /// </summary>
+        /// <param name="terrainWidth"> The width of the terrain to be generated.</param>
+        /// <param name="terrainHeight"> The height of the terrain to be generated.</param>
+        /// <param name="random"> The <see cref="MersenneTwister"/> to be used to generate the terrain.</param>
+        /// <returns>A newly generated <see cref="Terrain"/>.</returns>
+        public static Terrain GenerateNewTerrain(int terrainWidth, int terrainHeight, MersenneTwister random)
         {
             if (noise == null)
                 noise = new PerlinNoise(random);
 
-            GameMap map = new GameMap(MapWidth, MapHeight);
-            double[] rawMap = new double[MapWidth * MapHeight];
-            for(int i = 0; i < MapHeight; i ++)
+            Terrain terrain = new Terrain(terrainWidth, terrainHeight);
+            double[] rawTerrain = new double[terrainWidth * terrainHeight];
+            for(int i = 0; i < terrainHeight; i ++)
             {
-                for (int j = 0; j < MapWidth; j ++)
+                for (int j = 0; j < terrainWidth; j ++)
                 {
-                    rawMap[i * MapWidth + j] = noise[j, i];
+                    rawTerrain[i * terrainWidth + j] = noise[j, i];
                 }
             }
             
-            double max = rawMap.Max();
+            double max = rawTerrain.Max();
             int k = 0;
-            foreach (double noiseValue in rawMap.Select(d => d / max))
+            foreach (double noiseValue in rawTerrain.Select(d => d / max))
             {
-                map[k % MapHeight, k / MapHeight] = noiseValue >= 0.5;
+                terrain[k % terrainHeight, k / terrainHeight] = noiseValue >= 0.5;
                 k++;
             }
 
-            return map;
+            return terrain;
         }
 
         #endregion

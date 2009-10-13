@@ -20,7 +20,6 @@ namespace Orion.Graphics
     {
         #region Fields
         private readonly World world;
-        private GameMap map;
         #endregion
 
         #region Constructors
@@ -32,7 +31,6 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
-            map = MapGenerator.GenerateNewMap(world.Width, world.Height, new MersenneTwister());
         }
         #endregion
 
@@ -67,7 +65,7 @@ namespace Orion.Graphics
                 for (int j = 0; j < world.Height; j++)
                 {
                     Rectangle rectangle = new Rectangle(i, j, 1, 1);
-                    if (map[i, j])
+                    if (world.Terrain.IsWalkable(i, j))
                     {
                         graphics.FillColor = Color.White;
                     }

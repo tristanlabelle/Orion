@@ -5,22 +5,28 @@ using System.Text;
 
 namespace Orion.Core
 {
-    public sealed class GameMap
+    /// <summary>
+    /// Defines a terrain to be drawn in background, parts of this terrain are walkable, others are not.
+    /// </summary>
+    public sealed class Terrain
     {
 
         #region Fields
-        private bool[][] map;
+
+        private bool[,] terrain;
+        
         #endregion
 
         #region Constructors
 
-        public GameMap(int MapWitdh, int MapHeight)
+        /// <summary>
+        /// Initializes a new <see cref="Terrain"/> object. 
+        /// </summary>
+        /// <param name="terrainWidth"> The width of the terrain to be generated.</param>
+        /// <param name="terrainHeight"> The height of the terrain to be generated.</param>
+        public Terrain(int TerrainWitdh, int TerrainHeight)
         {
-            this.map = new bool[MapWitdh][];
-            for (int i = 0; i < MapWitdh; i++)
-            {
-                this.map[i] = new bool[MapHeight];
-            }
+            this.terrain = new bool[TerrainWitdh, TerrainHeight];
         }
 
         #endregion
@@ -31,25 +37,31 @@ namespace Orion.Core
 
         #region Indexers
 
-        public bool[] this[int x]
-        {
-            get { return this[x]; }
-            set { map[x] = value; }
-        }
-
+        /// <summary>
+        /// Gets the boolean value of the terrain field at a given coordinate.
+        /// </summary>
+        /// <param name="x">The x coordinate in the field.</param>
+        /// <param name="y">The y coordinate in the field.</param>
+        /// <returns>A boolean value from the terrain field.</returns>
         public bool this[int x, int y]
         {
-            get { return map[x][y]; }
-            set { map[x][y] = value; }
+            get { return terrain[x, y]; }
+            set { terrain[x, y] = value; ; }
         }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Gets the boolean value of the terrain field at a given coordinate.
+        /// </summary>
+        /// <param name="x">The x coordinate in the field.</param>
+        /// <param name="y">The y coordinate in the field.</param>
+        /// <returns>A boolean value from the terrain field.</returns>
         public bool IsWalkable(int x, int y)
         {
-            return map[x][y];
+            return terrain[x, y];
         }
 
         #endregion

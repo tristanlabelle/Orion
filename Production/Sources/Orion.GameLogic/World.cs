@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 
 using Orion.Geometry;
+using Orion.Core;
 
 using Color = System.Drawing.Color;
 
@@ -21,6 +22,7 @@ namespace Orion.GameLogic
         private readonly UnitRegistry units;
         private List<RessourceNode> ressourceNodes = new List<RessourceNode>();
         private List<Building> buildings = new List<Building>();
+        private Terrain terrain;
         #endregion
 
         #region Constructors
@@ -30,6 +32,7 @@ namespace Orion.GameLogic
         public World()
         {
             units = new UnitRegistry(this, 5, 5);
+            this.terrain = TerrainGenerator.GenerateNewTerrain(this.Width, this.Height, new MersenneTwister());
         }
         #endregion
 
@@ -90,6 +93,11 @@ namespace Orion.GameLogic
         public Rectangle Bounds
         {
             get { return new Rectangle(0, 0, Width, Height); }
+        }
+
+        public Terrain Terrain
+        {
+            get { return terrain; }
         }
         #endregion
 

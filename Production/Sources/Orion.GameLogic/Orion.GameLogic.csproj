@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -78,6 +78,7 @@
     <Compile Include="Tasks\Harvest.cs" />
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\Stand.cs" />
+    <Compile Include="Tasks\ZoneAttack.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitRegistry.cs" />
     <Compile Include="UnitType.cs" />

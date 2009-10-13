@@ -19,6 +19,9 @@ namespace Orion.Graphics
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new <see cref="ShapePath"/> object. 
+        /// </summary>
         public ShapePath()
         {
             points = new List<Vector2>();
@@ -27,7 +30,10 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-        
+
+        /// <summary>
+        /// Gets the size of the list of points.
+        /// </summary>
         public int Count
         {
             get { return points.Count; }
@@ -37,11 +43,19 @@ namespace Orion.Graphics
 
         #region Methods
 
-        public void AddPoint(Vector2 Point)
+        /// <summary>
+        /// Adds a new point to the list.
+        /// </summary>
+        /// <param name="point">The point to add to the list.</param>
+        public void AddPoint(Vector2 point)
         {
-            points.Add(Point);
+            points.Add(point);
         }
 
+        /// <summary>
+        /// Returns a point from the list at a given index.
+        /// </summary>
+        /// <param name="index">The index of the requested point.</param>
         public Vector2 GetPointAt(int index)
         {
             return points[index]; 

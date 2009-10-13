@@ -129,34 +129,11 @@ namespace Orion.Graphics
         /// Fills a given <see cref="Ellipse"/> using the current <see cref="P:FillColor"/>.
         /// </summary>
         /// <param name="ellipse">An <see cref="Ellipse"/> to be filled.</param>
-        /// <param name="vertexCount">The number of vertices to use to approximate the shape.</param>
-        public void Fill(Ellipse ellipse, int vertexCount)
+        public void Fill(Ellipse ellipse)
         {
             CommitFillColor();
             GL.Begin(BeginMode.Polygon);
-            DrawVertices(ellipse, vertexCount);
-            GL.End();
-        }
-
-        /// <summary>
-        /// Fills a given <see cref="Ellipse"/> using the current <see cref="P:FillColor"/>.
-        /// </summary>
-        /// <param name="ellipse">An <see cref="Ellipse"/> to be filled.</param>
-        public void Fill(Ellipse ellipse)
-        {
-            Fill(ellipse, DefaultCircleVertexCount);
-        }
-
-        /// <summary>
-        /// Strokes the outline of a given <see cref="Ellipse"/> using the current <see cref="P:StrokeColor"/>.
-        /// </summary>
-        /// <param name="ellipse">An <see cref="Ellipse"/> to be strokes.</param>
-        /// <param name="vertexCount">The number of vertices to use to approximate the shape.</param>
-        public void Stroke(Ellipse ellipse, int vertexCount)
-        {
-            CommitStrokeColor();
-            GL.Begin(BeginMode.LineLoop);
-            DrawVertices(ellipse, vertexCount);
+            DrawVertices(ellipse);
             GL.End();
         }
 
@@ -166,20 +143,21 @@ namespace Orion.Graphics
         /// <param name="ellipse">An <see cref="Ellipse"/> to be strokes.</param>
         public void Stroke(Ellipse ellipse)
         {
-            Stroke(ellipse, DefaultCircleVertexCount);
+            CommitStrokeColor();
+            GL.Begin(BeginMode.LineLoop);
+            DrawVertices(ellipse);
+            GL.End();
         }
 
-        private void DrawVertices(Ellipse ellipse, int vertexCount)
+        private void DrawVertices(Ellipse ellipse)
         {
             if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            Argument.EnsureStrictlyPositive(vertexCount, "vertexCount");
 
-            double angleIncrement = Math.PI * 2 / vertexCount;
-            for (int i = 0; i < vertexCount; i++)
+            for (int i = 0; i < unitCirclePoints.Length; ++i)
             {
-                double angle = angleIncrement * i;
-                double x = ellipse.Center.X + ellipse.Radii.X * Math.Cos(angle);
-                double y = ellipse.Center.Y + ellipse.Radii.Y * Math.Sin(angle);
+                Vector2 unitCirclePoint = unitCirclePoints[i];
+                float x = ellipse.Center.X + unitCirclePoint.X * ellipse.Radii.X;
+                float y = ellipse.Center.Y + unitCirclePoint.Y * ellipse.Radii.Y;
                 GL.Vertex2(x, y);
             }
         }
@@ -378,7 +356,22 @@ namespace Orion.Graphics
 
         #region Static
         #region Fields
-        private const int DefaultCircleVertexCount = 32;
+        private static readonly Vector2[] unitCirclePoints;
+        #endregion
+
+        #region Constructor
+        static GraphicsContext()
+        {
+            unitCirclePoints = new Vector2[32];
+            double angleIncrement = Math.PI * 2 / unitCirclePoints.Length;
+            for (int i = 0; i < unitCirclePoints.Length; ++i)
+            {
+                double angle = angleIncrement * i;
+                double x = Math.Cos(angle);
+                double y = Math.Sin(angle);
+                unitCirclePoints[i] = new Vector2((float)x, (float)y);
+            }
+        }
         #endregion
         #endregion
     }

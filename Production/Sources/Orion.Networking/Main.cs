@@ -14,17 +14,30 @@ namespace Orion.Networking
         {
             IPAddress address;
             IPAddress.TryParse(Console.ReadLine(), out address);
+            IPEndPoint endPoint = new IPEndPoint(address, port);
 
             using (Transporter transporter = new Transporter(port))
             {
+                int received = 0;
+
+                for (int i = 0; i < 0xFF; i++)
+                {
+                    transporter.SendTo(BitConverter.GetBytes(i), endPoint);
+                }
+
                 transporter.Received += delegate(Transporter origin, NetworkEventArgs args)
                 {
-                    Console.WriteLine("{0}: {1}", args.Host, Encoding.ASCII.GetChars(args.Data));
+                    Console.WriteLine("{0}: {1}", args.Host, BitConverter.ToInt32(args.Data, 0));
+                    received++;
                 };
 
-                while (true)
+                transporter.TimedOut += delegate(Transporter origin, NetworkTimeoutEventArgs args)
                 {
-                    transporter.SendTo(Encoding.ASCII.GetBytes(Console.ReadLine()), new IPEndPoint(address, port));
+                    transporter.SendTo(args.Data, args.Host);
+                };
+
+                while (received < 0xFF)
+                {
                     transporter.Poll();
                 }
             }

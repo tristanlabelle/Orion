@@ -226,15 +226,17 @@ namespace Orion.Networking
 		
 		private long StandardDeviationForPings(IPEndPoint host)
 		{
-			long average = AveragePing(host);
-			
 			long deviation = 0;
 			Queue<long> hostPings;
 			lock(pings)
 			{
 				hostPings = pings[host];
 			}
-			
+
+            if (hostPings.Count == 0)
+                return 50;
+
+            long average = AveragePing(host);
 			lock(hostPings)
 			{
 				foreach(long ping in hostPings)

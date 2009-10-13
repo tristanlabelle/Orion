@@ -272,11 +272,8 @@ namespace Orion.Graphics
         private void DrawVertices(ShapePath shapePath)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-            for (int i = 0; i < shapePath.Count; i++)
-                if (i == shapePath.Count - 1)
-                    AddVertex(shapePath.GetPointAt(i), shapePath.GetPointAt(0));
-                else
-                    AddVertex(shapePath.GetPointAt(i), shapePath.GetPointAt(i + 1));
+			for(int i = 0; i < shapePath.Count; i++)
+				AddVertex(shapePath.GetPointAt(i));
         }
 
         #endregion

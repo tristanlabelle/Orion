@@ -6,11 +6,11 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
-    class ShapePath
+    public class ShapePath
     {
         #region Fields
 
-        public List<Vector2> Points;
+        private readonly List<Vector2> points;
 
         #endregion
 
@@ -18,7 +18,7 @@ namespace Orion.Graphics
 
         public ShapePath()
         {
-            Points = new List<Vector2>();
+            points = new List<Vector2>();
         }
 
         #endregion
@@ -27,7 +27,7 @@ namespace Orion.Graphics
         
         public int Count
         {
-            get { return Points.Count; }
+            get { return points.Count; }
         }
 
         #endregion
@@ -36,12 +36,12 @@ namespace Orion.Graphics
 
         public void AddPoint(Vector2 Point)
         {
-            Points.Add(Point);
+            points.Add(Point);
         }
 
         public Vector2 GetPointAt(int index)
         {
-            return Points.ElementAt(index); 
+            return points.ElementAt(index); 
         }
 
         #endregion

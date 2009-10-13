@@ -31,9 +31,8 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.destination = destination;
-
-            PathFinder finder = new PathFinder(unit.Position, destination);
-            finder.FindPath();
+            this.unit.World.PathFinder.FindPath(unit.Position, destination);
+            
         }
         #endregion
 

@@ -22,6 +22,7 @@ namespace Orion.GameLogic
         private readonly UnitRegistry units;
         private List<RessourceNode> ressourceNodes = new List<RessourceNode>();
         private List<Building> buildings = new List<Building>();
+        readonly PathFinder pathFinder;
         #endregion
 
         #region Constructors
@@ -35,6 +36,7 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             units = new UnitRegistry(this, 5, 5);
             this.terrain = TerrainGenerator.GenerateNewTerrain(this.Width, this.Height, new MersenneTwister());
+            pathFinder = new PathFinder(this);
         }
         #endregion
 
@@ -93,6 +95,12 @@ namespace Orion.GameLogic
         {
             get { return terrain; }
         }
+
+        public PathFinder PathFinder
+        {
+            get { return pathFinder; }
+        }
+
         #endregion
 
         #region Methods

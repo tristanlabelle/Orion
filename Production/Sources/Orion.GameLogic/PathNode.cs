@@ -16,7 +16,7 @@ namespace Orion.GameLogic
         readonly Point position;
 
         
-        float totalCost;
+        float moveCost;
 
         #endregion
 
@@ -27,20 +27,20 @@ namespace Orion.GameLogic
         /// <param name="parentNode">The parent represent the fastest way to move from an near by Node </param>
         /// <param name="position">The x y position of the node in the world</param>
         /// <param name="totalCost">The cost of the move by adding the deplacement done and the distance from de destination</param>
-        public PathNode(PathNode parentNode, Point position, float totalCost)
+        public PathNode(PathNode parentNode, Point position, float moveCost)
         {
             this.parentNode = parentNode;
             this.position = position;
-            this.totalCost = totalCost;
+            this.moveCost = moveCost;
         }
         #endregion
 
         #region Proprieties
 
-        public float TotalCost
+        public float MoveCost
         {
-            get { return totalCost; }
-            set { totalCost = value; }
+            get { return moveCost; }
+            set { moveCost = value; }
         }
 
         public Point Position

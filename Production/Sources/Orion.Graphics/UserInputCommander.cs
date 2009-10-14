@@ -103,6 +103,24 @@ namespace Orion.Graphics
                     }
                 }
             }
+            else if (key == Keys.ControlKey)
+            {
+                selectionManager.OnCtrlKeyChanged(true);
+            }
+        }
+
+        /// <summary>
+        /// Parses KeyUp events to capture those whose key has a special meaning.
+        /// </summary>
+        /// <param name="key">
+        /// The <see cref="Keys"/> that were pressedd
+        /// </param>
+        public void OnKeyUp(Keys key)
+        {
+            if (key == Keys.ControlKey)
+            {
+                selectionManager.OnCtrlKeyChanged(false);
+            }
         }
 
 		/// <summary>

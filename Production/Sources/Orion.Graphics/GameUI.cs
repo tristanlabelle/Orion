@@ -67,6 +67,7 @@ namespace Orion.Graphics
             worldView.MouseMoved += WorldViewMouseMove;
             worldView.MouseUp += WorldViewMouseUp;
             worldView.KeyDown += WorldViewKeyDown;
+            worldView.KeyUp += WorldViewKeyUp;
 
             mainWindow.Show();
         }
@@ -81,6 +82,12 @@ namespace Orion.Graphics
             get { return mainWindow.Created; }
         }
 
+       
+        #endregion
+
+        #region Methods
+
+        #region Private
         private void WorldViewMouseDown(Responder source, MouseEventArgs args)
         {
             userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, true);
@@ -100,9 +107,13 @@ namespace Orion.Graphics
         {
             userInputCommander.OnKeyDown(args.Key);
         }
+
+        private void WorldViewKeyUp(Responder source, KeyboardEventArgs args)
+        {
+            userInputCommander.OnKeyUp(args.Key);
+        }
         #endregion
 
-        #region Methods
         /// <summary>
         /// Causes the game to render itself.
         /// </summary>

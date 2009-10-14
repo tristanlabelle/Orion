@@ -7,8 +7,9 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Graphics;
 
-namespace Orion.Commandment
+namespace Orion.Graphics
 {
     /// <summary>
     /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.
@@ -17,9 +18,10 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly List<Unit> selectedUnits = new List<Unit>();
-        private readonly World world;
+        private readonly Faction faction;
         private Vector2 cursorPosition;
         private Vector2? selectionStartPosition;
+        private bool ctrlKeyPressed;
         #endregion
 
         #region Constructors
@@ -27,11 +29,11 @@ namespace Orion.Commandment
         /// Initializes a new <see cref="SelectionManager"/> from the <see cref="Faction"/>
         /// which is being controlled.
         /// </summary>
-        /// <param name="world">The <see cref="World"/> used for now.</param>
-        public SelectionManager(World world)
+        /// <param name="faction">The <see cref="Faction"/> used for now.</param>
+        public SelectionManager(Faction faction)
         {
-            Argument.EnsureNotNull(world, "faction");
-            this.world = world;
+            Argument.EnsureNotNull(faction, "faction");
+            this.faction = faction;
         }
         #endregion
 
@@ -41,7 +43,29 @@ namespace Orion.Commandment
         /// </summary>
         public IEnumerable<Unit> SelectedUnits
         {
-            get { return selectedUnits; }
+            get
+            {
+                if (selectedUnits.Count == 1 || selectedUnits.Count == 0)
+                    return selectedUnits;
+                else if (selectedUnits.Where(unit => unit.Faction == faction).ToList().Count > 0)
+                    return selectedUnits.Where(unit => unit.Faction == faction).ToList();
+                else
+                {
+                    List<Unit> firstEnemyUnit = new List<Unit>();
+                    firstEnemyUnit.Add(selectedUnits[0]);
+                    return firstEnemyUnit;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets if the control key is pressed or not;
+        /// </summary>
+        public bool CtrlKeyPressed
+        {
+            get { return ctrlKeyPressed; }
+            set { ctrlKeyPressed = value; }
         }
 
         /// <summary>
@@ -70,6 +94,7 @@ namespace Orion.Commandment
         /// <summary>
         /// Informs this <see cref="SelectionManager"/> that a <see cref="MouseButton"/> was pressed or released.
         /// </summary>
+        /// <param name="clickPosition">Tells where the click happened, in world coordinates</param>
         /// <param name="button">The <see cref="MouseButton"/> that was pressed or released.</param>
         /// <param name="pressed"><c>True</c> if the button was pressed, <c>false</c> if it was released.</param>
         public void OnMouseButton(Vector2 clickPosition, MouseButton button, bool pressed)
@@ -80,16 +105,56 @@ namespace Orion.Commandment
                 {
                     selectionStartPosition = cursorPosition;
                 }
-                else
+                else if (SelectionRectangle.HasValue)
                 {
-                    Rectangle selectionRectangle = SelectionRectangle.Value;
+                    if (!CtrlKeyPressed)
+                    {
+                        Rectangle selectionRectangle = SelectionRectangle.Value;
 
-                    var units = world.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
+                        var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
 
-                    selectedUnits.Clear();
-                    selectedUnits.AddRange(units);
+                        selectedUnits.Clear();
+                        selectedUnits.AddRange(units);
 
-                    selectionStartPosition = null;
+                        selectionStartPosition = null;
+                    }
+                    else  //adding or removal of units to selection
+                    {
+                        Rectangle selectionRectangle = SelectionRectangle.Value;
+
+                        var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
+
+                        List<Unit> unitsToAdd = new List<Unit>();
+                        
+                        for (int i = 0; i < units.Count(); i++)
+                        {
+                            if (!selectedUnits.Contains(units.ElementAt(i)))
+                            {
+                                unitsToAdd.Add(units.ElementAt(i));
+                            }
+                        }
+
+                        if (unitsToAdd.Count() > 0) //if there is at least one new units in the current selection that wasn't in the previous selection
+                        {
+                            selectedUnits.AddRange(unitsToAdd);
+                        }
+                        else //if all the units in the new selection are already part of the selection 
+                        {
+                            List<Unit> newSelectedUnitList = new List<Unit>();
+                            for (int i = 0; i < selectedUnits.Count(); ++i)
+                            {
+                                if (!units.Contains(selectedUnits.ElementAt(i)))
+                                {
+                                    newSelectedUnitList.Add(selectedUnits.ElementAt(i));
+                                }
+                            }
+
+                            selectedUnits.Clear();
+                            selectedUnits.AddRange(newSelectedUnitList);
+
+                        }
+                        selectionStartPosition = null;
+                    }
                 }
             }
         }
@@ -102,6 +167,27 @@ namespace Orion.Commandment
         {
             cursorPosition = location;
         }
+
+        /// <summary>
+        /// Informs this <see cref="SelectionManager"/> that a unit died.
+        /// </summary>
+        /// <param name="source">The source UnitRegistry</param>
+        /// <param name="unit">The killed unit</param>
+        public void UnitDied(UnitRegistry source, Unit unit)
+        {
+            if (selectedUnits.Contains(unit))
+                selectedUnits.Remove(unit);
+        }
+
+        /// <summary>
+        /// Informs this <see cref="SelectionManager"/> that they control key state has changed.
+        /// </summary>
+        /// <param name="ctrlKeyState">The source UnitRegistry</param>
+        public void OnCtrlKeyChanged(bool ctrlKeyState)
+        {
+            CtrlKeyPressed = ctrlKeyState;
+        }
+
         #endregion
     }
 }

@@ -56,7 +56,6 @@
     </Compile>
     <Compile Include="GameUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectionManager.cs" />
     <Compile Include="SelectionRenderer.cs" />
     <Compile Include="ShapePath.cs" />
     <Compile Include="TerrainRenderer.cs" />

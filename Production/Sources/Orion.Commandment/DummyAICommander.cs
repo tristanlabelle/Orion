@@ -12,16 +12,18 @@ using OpenTK.Math;
 
 namespace Orion.Commandment
 {
-    public sealed class MockCommander : Commander
+    public sealed class DummyAICommander : Commander
     {
         #region fields
-        Random random = new Random();
-
+        private readonly Random random = new Random();
         #endregion
+
         #region Constructors
-        public MockCommander(Faction faction)
+        public DummyAICommander(Faction faction, Random random)
             : base(faction)
         {
+            Argument.EnsureNotNull(random, "random");
+            this.random = random;
         }
         #endregion
 
@@ -31,12 +33,10 @@ namespace Orion.Commandment
             List<Unit> unitsToMove = World.Units.Where(unit => unit.Faction == Faction && unit.Task.HasEnded).ToList();
             if (unitsToMove.Count != 0)
             {
-                Command command = new Move(Faction,
-                    unitsToMove,
-                     new Vector2(random.Next(World.Width), random.Next(World.Height)));
+                Command command = new Move(Faction, unitsToMove,
+                    new Vector2(random.Next(World.Width), random.Next(World.Height)));
                 GenerateCommand(command);
             }
-           
         }
         #endregion
     }

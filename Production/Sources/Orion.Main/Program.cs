@@ -25,7 +25,7 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            MersenneTwister random = new MersenneTwister();
+            Random random = new MersenneTwister();
             Terrain terrain = TerrainGenerator.GenerateNewTerrain(100, 100, random);
             World world = new World(terrain);
 
@@ -38,8 +38,8 @@ namespace Orion.Main
             commandManager.AddCommander(redCommander);
 
             Faction blueFaction = world.CreateFaction("Blue", Color.Blue);
-            MockCommander blueCommander = new MockCommander(blueFaction);
-            //commandManager.AddCommander(blueCommander);
+            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
+            commandManager.AddCommander(blueCommander);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             for (int i = 0; i < 200; ++i)
@@ -69,26 +69,30 @@ namespace Orion.Main
 
             using (GameUI ui = new GameUI(world, redCommander))
             {
+                const float targetFramesPerSecond = 30;
+                const float targetSecondsPerFrame = 1.0f / targetFramesPerSecond;
+
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 while (ui.IsWindowCreated)
                 {
                     ui.Render();
 
                     float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
-                    if (timeDeltaInSeconds > 0.1f)
+                    if (timeDeltaInSeconds >= targetSecondsPerFrame)
                     {
-                        // This prevents the simulation from "blowing up" under lag,
-                        // it is especially useful as we break in the code.
-                        timeDeltaInSeconds = 0.1f;
+                        stopwatch.Stop();
+                        stopwatch.Reset();
+                        stopwatch.Start();
+
+                        do
+                        {
+                            commandManager.Update(targetSecondsPerFrame);
+                            world.Update(targetSecondsPerFrame);
+                            ui.Update(targetSecondsPerFrame);
+
+                            timeDeltaInSeconds -= targetSecondsPerFrame;
+                        } while (timeDeltaInSeconds >= targetSecondsPerFrame);
                     }
-
-                    stopwatch.Stop();
-                    stopwatch.Reset();
-                    stopwatch.Start();
-
-                    commandManager.Update(timeDeltaInSeconds);
-                    world.Update(timeDeltaInSeconds);
-                    ui.Update(timeDeltaInSeconds);
                 }
             }
         }

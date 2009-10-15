@@ -41,7 +41,7 @@ namespace Orion
     /// The Mersenne Twister is a portable random number generator with a high period and decent performances (or at least we'll hope so,
     /// since we can't use vector instructions with the .net framework). Its prototype is slightly similar to the System.Random class.
     /// </summary>
-    public class MersenneTwister
+    public sealed class MersenneTwister : Random
     {
         #region Nested Types
         private struct Vector128
@@ -267,7 +267,6 @@ namespace Orion
         #endregion
 
         #region Methods
-
         #region Pseudorandom Numbers Generation
         #region Int Generation
 		/// <summary>
@@ -276,7 +275,7 @@ namespace Orion
 		/// <returns>
 		/// The pseudorandom <see cref="System.Int32"/>
 		/// </returns>
-        public int Next()
+        public override int Next()
         {
             if (vectorIndex >= ArraySize32)
             {
@@ -292,13 +291,13 @@ namespace Orion
 		/// Returns a pseudorandom integer between 0 inclusively and the specified maximum value, exclusively. 
 		/// </summary>
 		/// <param name="maxValue">
-		/// The maximum value
+		/// The exclusive maximum bound of the random number range.
 		/// </param>
 		/// <returns>
 		/// The pseudorandom <see cref="System.Int32"/>
 		/// </returns>
 		/// <remarks>Passing a negative maxValue will still return positive integers because of how the modulo operator works in the .NET Framework.</remarks>
-        public int Next(int maxValue)
+        public override int Next(int maxValue)
         {
             return Next() % maxValue;
         }
@@ -315,14 +314,13 @@ namespace Orion
 		/// <returns>
 		/// A pseudorandom <see cref="System.Int32"/>
 		/// </returns>
-        public int Next(int minValue, int maxValue)
+        public override int Next(int minValue, int maxValue)
         {
             return Next() % (maxValue - minValue) + minValue;
         }
         #endregion
 
         #region Single Generation
-
 		/// <summary>
 		/// Returns a pseudorandom <see cref="System.Single"/> in the range [0, 1).
 		/// </summary>
@@ -361,14 +359,13 @@ namespace Orion
         #endregion
 
         #region Double Generation
-		
 		/// <summary>
 		/// Returns a pseudorandom <see cref="System.Double"/> in the range [0, 1).
 		/// </summary>
 		/// <returns>
 		/// A pseudorandom <see cref="System.Double"/>
 		/// </returns>
-        public double NextDouble()
+        public override double NextDouble()
         {
             return Next() / (double)0x7FFFFFFF;
         }
@@ -398,9 +395,23 @@ namespace Orion
             return NextDouble() * (max - min) + min;
         }
         #endregion
+
+        #region Byte Buffer Generation
+        public override void NextBytes(byte[] buffer)
+        {
+            Argument.EnsureNotNull(buffer, "buffer");
+
+            for (int i = 0; i < buffer.Length; ++i)
+                buffer[i] = (byte)Next(256);
+        }
+        #endregion
         #endregion
 
-        #region Private Methods
+        #region Non-Public Methods
+        protected override double Sample()
+        {
+            return NextDouble();
+        }
 
         /// <summary>
         /// Fills the internal state array with pseudorandom integers.
@@ -473,7 +484,6 @@ namespace Orion
         }
 
         #endregion
-
         #endregion
     }
 }

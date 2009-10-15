@@ -23,9 +23,9 @@ namespace Orion
         /// </summary>
         /// <param name="terrainWidth"> The width of the terrain to be generated.</param>
         /// <param name="terrainHeight"> The height of the terrain to be generated.</param>
-        /// <param name="random"> The <see cref="MersenneTwister"/> to be used to generate the terrain.</param>
+        /// <param name="random">The <see cref="Random"/> to be used to generate the terrain.</param>
         /// <returns>A newly generated <see cref="Terrain"/>.</returns>
-        public static Terrain GenerateNewTerrain(int terrainWidth, int terrainHeight, MersenneTwister random)
+        public static Terrain GenerateNewTerrain(int terrainWidth, int terrainHeight, Random random)
         {
             if (noise == null)
                 noise = new PerlinNoise(random);

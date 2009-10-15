@@ -9,10 +9,10 @@ using Orion.Geometry;
 namespace Orion.GameLogic
 {
     public enum RessourceType
-        {
-            Alladium = 1,
-            Allagene = 2
-        }
+    {
+        Alladium = 1,
+        Allagene = 2
+    }
 
     public class RessourceNode
     {

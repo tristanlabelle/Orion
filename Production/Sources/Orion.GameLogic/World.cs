@@ -35,7 +35,6 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
             units = new UnitRegistry(this, 5, 5);
-            this.terrain = TerrainGenerator.GenerateNewTerrain(this.Width, this.Height, new MersenneTwister());
             pathFinder = new PathFinder(this);
         }
         #endregion

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{84DCA135-541D-41F5-9118-C83324225E2B}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -56,7 +56,7 @@
     <Compile Include="Commands\Move.cs" />
     <Compile Include="CommandSerializer.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
-    <Compile Include="MockCommander.cs" />
+    <Compile Include="DummyAICommander.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />
     <Compile Include="SerializableCommandAttribute.cs" />

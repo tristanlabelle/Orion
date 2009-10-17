@@ -15,9 +15,9 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to attack another <see cref="Unit"/>.
     /// </summary>
-    [SerializableCommand(0)]
     public sealed class Attack : Command
     {
+        #region Instance
         #region Fields
         private readonly List<Unit> attackers;
         private readonly Unit target; 
@@ -84,37 +84,51 @@ namespace Orion.Commandment.Commands
                 striker.Task = new AttackTask(striker, target);
         }
         #endregion
-    }
-
-    /// <summary>
-    /// A <see cref="CommandSerializer"/> that can serialize <see cref="Attack"/> commands.
-    /// </summary>
-    [Serializable]
-    public sealed class AttackSerializer : CommandSerializer<Attack>
-    {
-        #region Properties
-        public override byte ID
-        {
-            get { return 0; }
-        }
         #endregion
 
-        #region Methods
-        protected override void DoSerialize(Attack command, BinaryWriter writer)
+        #region Serializer Class
+        /// <summary>
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
+        /// </summary>
+        [Serializable]
+        public sealed class Serializer : CommandSerializer<Attack>
         {
-            writer.Write(command.SourceFaction.ID);
-            writer.Write(command.AttackerCount);
-            foreach (Unit attacker in command.Attackers)
-                writer.Write(attacker.ID);
-            writer.Write(command.Target.ID);
-        }
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 1; }
+            }
+            #endregion
 
-        protected override Attack DoDeserialize(BinaryReader reader, World world)
-        {
-            Faction sourceFaction = ReadFaction(reader, world);
-            Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
-            Unit target = ReadUnit(reader, world);
-            return new Attack(sourceFaction, attackers, target);
+            #region Methods
+            protected override void SerializeData(Attack command, BinaryWriter writer)
+            {
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.AttackerCount);
+                foreach (Unit attacker in command.Attackers)
+                    writer.Write(attacker.ID);
+                writer.Write(command.Target.ID);
+            }
+
+            protected override Attack DeserializeData(BinaryReader reader, World world)
+            {
+                Faction sourceFaction = ReadFaction(reader, world);
+                Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
+                Unit target = ReadUnit(reader, world);
+                return new Attack(sourceFaction, attackers, target);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
         }
         #endregion
     }

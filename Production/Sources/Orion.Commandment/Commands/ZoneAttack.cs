@@ -13,16 +13,15 @@ using ZoneAttackTask = Orion.GameLogic.Tasks.ZoneAttack;
 namespace Orion.Commandment.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s to move to a location and attack enemies on their way.
+    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
+    /// to move to a location and attack enemies on their way.
     /// </summary>
     public sealed class ZoneAttack : Command
     {
-
+        #region Instance
         #region Fields
-
         private readonly List<Unit> attackers;
         private readonly Vector2 destination; 
-        
         #endregion
 
         #region Constructors
@@ -51,7 +50,6 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Properties
-        
         /// <summary>
         /// Gets the number of attacking <see cref="Unit"/>s.
         /// </summary>
@@ -68,6 +66,13 @@ namespace Orion.Commandment.Commands
             get { return attackers; }
         }
 
+        /// <summary>
+        /// Gets the destination of this movement.
+        /// </summary>
+        public Vector2 Destination
+        {
+            get { return destination; }
+        }
         #endregion
 
         #region Methods
@@ -79,7 +84,55 @@ namespace Orion.Commandment.Commands
         }
         
         #endregion
+        #endregion
 
+        #region Serializer Class
+        /// <summary>
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="ZoneAttack"/> command.
+        /// </summary>
+        [Serializable]
+        public sealed class Serializer : CommandSerializer<ZoneAttack>
+        {
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 3; }
+            }
+            #endregion
 
+            #region Methods
+            protected override void SerializeData(ZoneAttack command, BinaryWriter writer)
+            {
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.AttackerCount);
+                foreach (Unit unit in command.Attackers)
+                    writer.Write(unit.ID);
+                writer.Write(command.Destination.X);
+                writer.Write(command.Destination.Y);
+            }
+
+            protected override ZoneAttack DeserializeData(BinaryReader reader, World world)
+            {
+                Faction sourceFaction = ReadFaction(reader, world);
+                Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
+                float x = reader.ReadSingle();
+                float y = reader.ReadSingle();
+                Vector2 destination = new Vector2(x, y);
+                return new ZoneAttack(sourceFaction, attackers, destination);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
+        }
+        #endregion
     }
 }

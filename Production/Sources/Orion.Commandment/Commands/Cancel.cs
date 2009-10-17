@@ -13,9 +13,9 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which cancels the current <see cref="Task"/> of a set of <see cref="Unit"/>s.
     /// </summary>
     [Serializable]
-    [SerializableCommand(1)]
     public sealed class Cancel : Command
     {
+        #region Instance
         #region Fields
         private readonly List<Unit> units;
         #endregion
@@ -57,6 +57,51 @@ namespace Orion.Commandment.Commands
         {
             foreach (Unit unit in units)
                 unit.Task = Stand.Instance;
+        }
+        #endregion
+        #endregion
+
+        #region Serializer Class
+        /// <summary>
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Cancel"/> command.
+        /// </summary>
+        [Serializable]
+        public sealed class Serializer : CommandSerializer<Cancel>
+        {
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 2; }
+            }
+            #endregion
+
+            #region Methods
+            protected override void SerializeData(Cancel command, BinaryWriter writer)
+            {
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.Units.Count());
+                foreach (Unit unit in command.Units)
+                    writer.Write(unit.ID);
+            }
+
+            protected override Cancel DeserializeData(BinaryReader reader, World world)
+            {
+                Faction sourceFaction = ReadFaction(reader, world);
+                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
+                return new Cancel(sourceFaction, units);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
         }
         #endregion
     }

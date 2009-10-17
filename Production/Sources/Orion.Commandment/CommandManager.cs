@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+
 using Orion.Commandment.Commands;
+using Orion.GameLogic;
 
 namespace Orion.Commandment
 {
@@ -13,8 +15,29 @@ namespace Orion.Commandment
     public sealed class CommandManager
     {
         #region Fields
+        private readonly World world;
         private readonly List<Commander> commanders = new List<Commander>();
+        private readonly CommandFactory factory;
         private readonly Queue<Command> queuedCommands = new Queue<Command>();
+        #endregion
+
+        #region Constructors
+        public CommandManager(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+            this.world = world;
+            this.factory = new CommandFactory(world);
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets a <see cref="CommandFactory"/> that can be used to create <see cref="Commands"/>.
+        /// </summary>
+        public CommandFactory Factory
+        {
+            get { return factory; }
+        }
         #endregion
 
         #region Methods

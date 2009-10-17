@@ -17,9 +17,9 @@ namespace Orion.Commandment.Commands
     /// <see cref="Task"/> to move to a destination.
     /// </summary>
     [Serializable]
-    [SerializableCommand(2)]
     public sealed class Move : Command
     {
+        #region Instance
         #region Fields
         private readonly List<Unit> units;
         private readonly Vector2 destination;
@@ -45,11 +45,79 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Gets the sequence of <see cref="Unit"/>s participating in this command.
+        /// </summary>
+        public IEnumerable<Unit> Units
+        {
+            get { return units; }
+        }
+
+        /// <summary>
+        /// Gets the location of the destination of this movement.
+        /// </summary>
+        public Vector2 Destination
+        {
+            get { return destination; }
+        }
+        #endregion
+
         #region Methods
         public override void Execute()
         {
             foreach (Unit unit in units)
                 unit.Task = new MoveTask(unit, destination);
+        }
+        #endregion
+        #endregion
+
+        #region Serializer Class
+        /// <summary>
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Move"/> command.
+        /// </summary>
+        [Serializable]
+        public sealed class Serializer : CommandSerializer<Move>
+        {
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 0; }
+            }
+            #endregion
+
+            #region Methods
+            protected override void SerializeData(Move command, BinaryWriter writer)
+            {
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.Units.Count());
+                foreach (Unit unit in command.Units)
+                    writer.Write(unit.ID);
+                writer.Write(command.Destination.X);
+                writer.Write(command.Destination.Y);
+            }
+
+            protected override Move DeserializeData(BinaryReader reader, World world)
+            {
+                Faction sourceFaction = ReadFaction(reader, world);
+                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
+                float x = reader.ReadSingle();
+                float y = reader.ReadSingle();
+                Vector2 destination = new Vector2(x, y);
+                return new Move(sourceFaction, units, destination);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
         }
         #endregion
     }

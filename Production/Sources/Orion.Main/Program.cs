@@ -31,7 +31,7 @@ namespace Orion.Main
 
             #region Putting little guys to life
 
-            CommandManager commandManager = new CommandManager();
+            CommandManager commandManager = new CommandManager(world);
 
             Faction redFaction = world.CreateFaction("Red", Color.Red);
             UserInputCommander redCommander = new UserInputCommander(redFaction);

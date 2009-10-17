@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandFactory.cs" />
     <Compile Include="CommandManager.cs" />
     <Compile Include="Commander.cs" />
     <Compile Include="Command.cs" />
@@ -59,7 +60,6 @@
     <Compile Include="DummyAICommander.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />
-    <Compile Include="SerializableCommandAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">

@@ -115,7 +115,8 @@ namespace Orion.Commandment
             Argument.EnsureBaseType(command, Type, "command");
             Argument.EnsureNotNull(writer, "writer");
 
-            DoSerialize((TCommand)command, writer);
+            writer.Write(ID);
+            SerializeData((TCommand)command, writer);
         }
 
         public sealed override Command Deserialize(BinaryReader reader, World world)
@@ -123,11 +124,11 @@ namespace Orion.Commandment
             Argument.EnsureNotNull(reader, "reader");
             Argument.EnsureNotNull(world, "world");
 
-            return DoDeserialize(reader, world);
+            return DeserializeData(reader, world);
         }
 
-        protected abstract void DoSerialize(TCommand command, BinaryWriter writer);
-        protected abstract TCommand DoDeserialize(BinaryReader reader, World world);
+        protected abstract void SerializeData(TCommand command, BinaryWriter writer);
+        protected abstract TCommand DeserializeData(BinaryReader reader, World world);
         #endregion
     }
 }

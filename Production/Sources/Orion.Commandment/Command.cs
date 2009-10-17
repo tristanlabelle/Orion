@@ -34,20 +34,6 @@ namespace Orion.Commandment
         {
             get { return sourceFaction; }
         }
-
-        /// <summary>
-        /// Gets the id associated to the type of this <see cref="Command"/>.
-        /// </summary>
-        public byte TypeID
-        {
-            get
-            {
-                SerializableCommandAttribute serializationInfo =
-                    (SerializableCommandAttribute)GetType().GetCustomAttributes(
-                    typeof(SerializableCommandAttribute), false)[0];
-                return serializationInfo.ID;
-            }
-        }
         #endregion
 
         #region Methods

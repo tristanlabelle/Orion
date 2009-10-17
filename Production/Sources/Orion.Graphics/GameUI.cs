@@ -59,9 +59,9 @@ namespace Orion.Graphics
             mainWindow.rootView.Children.Add(southScroller);
             mainWindow.rootView.Children.Add(eastScroller);
             mainWindow.rootView.Children.Add(westScroller);
-            Rectangle ressourceDisplayFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -rootBounds.Height/25);
-            RessourceDisplay ressourceDisplay = new RessourceDisplay(ressourceDisplayFrame, userInputCommander.Faction);
-            mainWindow.rootView.Children.Add(ressourceDisplay);
+            Rectangle resourceDisplayFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -rootBounds.Height/25);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
+            mainWindow.rootView.Children.Add(resourceDisplay);
 			
             worldView.MouseDown += WorldViewMouseDown;
             worldView.MouseMoved += WorldViewMouseMove;

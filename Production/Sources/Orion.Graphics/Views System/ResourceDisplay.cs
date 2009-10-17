@@ -12,14 +12,14 @@ using OpenTK.Math;
 
 namespace Orion.Graphics
 {
-    public class RessourceDisplay : View
+    public class ResourceDisplay : View
     {
         #region Fields
         Faction faction;
         #endregion
 
         #region Constructor
-        public RessourceDisplay(Rectangle frame, Faction faction)
+        public ResourceDisplay(Rectangle frame, Faction faction)
             :base(frame)
         {
             this.faction = faction;
@@ -29,9 +29,9 @@ namespace Orion.Graphics
         #region Methods
         protected override void Draw()
         {
-            string ressources = "Alladium: " + faction.AladdiumAmount + "  Allagene: " + faction.AllageneAmount;
+            string resources = "Alladium: " + faction.AladdiumAmount + "  Allagene: " + faction.AllageneAmount;
             context.FillColor = Color.White;
-            context.DrawText(ressources, new Vector2(0,Bounds.Height));
+            context.DrawText(resources, new Vector2(0,Bounds.Height));
         }
         #endregion
     }

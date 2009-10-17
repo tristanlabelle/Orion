@@ -12,11 +12,11 @@ namespace Orion.Commandment.Commands
     {
         #region Fields
         private readonly List<Unit> harvesters;
-        private readonly RessourceNode node;
+        private readonly ResourceNode node;
         #endregion
 
         #region Contructors
-        public Harvest(Faction faction, IEnumerable<Unit> harvesters, RessourceNode node)
+        public Harvest(Faction faction, IEnumerable<Unit> harvesters, ResourceNode node)
             :base(faction)
         {
             this.harvesters = harvesters.Distinct().ToList();

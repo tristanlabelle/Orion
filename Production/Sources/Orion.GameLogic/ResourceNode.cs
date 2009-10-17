@@ -8,20 +8,20 @@ using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
-    public enum RessourceType
+    public enum ResourceType
     {
         Alladium = 1,
         Allagene = 2
     }
 
-    public class RessourceNode
+    public class ResourceNode
     {
         #region Fields
 
         private readonly int id;
-        private readonly RessourceType ressourceType;
-        private readonly int totalRessources;
-        private int ressourcesLeft;
+        private readonly ResourceType resourceType;
+        private readonly int totalResources;
+        private int resourcesLeft;
         private readonly Vector2 position;
         private World world;
 
@@ -33,35 +33,35 @@ namespace Orion.GameLogic
         /// 
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="ressourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
-        /// <param name="amountOfRessources"></param>
+        /// <param name="resourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
+        /// <param name="amountOfResources"></param>
         /// <param name="position"></param>
-        public RessourceNode(int id, RessourceType ressourceType, int amountOfRessources, Vector2 position, World world)
+        public ResourceNode(int id, ResourceType resourceType, int amountOfResources, Vector2 position, World world)
         {
             this.id = id;
-            this.ressourceType = ressourceType;
-            this.totalRessources = amountOfRessources;
-            this.ressourcesLeft = amountOfRessources;
+            this.resourceType = resourceType;
+            this.totalResources = amountOfResources;
+            this.resourcesLeft = amountOfResources;
             this.position = position;
             this.world = world;
         }
         #endregion
 
         #region Properties
-        public RessourceType RessourceType
+        public ResourceType ResourceType
         {
-            get { return ressourceType; }
+            get { return resourceType; }
         }
 
-        public int TotalRessources
+        public int TotalResources
         {
-            get { return totalRessources; }
+            get { return totalResources; }
         }
 
-        public int RessourcesLeft
+        public int ResourcesLeft
         {
-            get { return ressourcesLeft; }
-            set { ressourcesLeft = value; }
+            get { return resourcesLeft; }
+            set { resourcesLeft = value; }
         }
 
         public Vector2 Position
@@ -80,10 +80,10 @@ namespace Orion.GameLogic
 
         public void Harvest(int amount)
         {
-            ressourcesLeft -= amount;
-            if (ressourcesLeft == 0)
+            resourcesLeft -= amount;
+            if (resourcesLeft == 0)
             {
-                world.RessourceNodes.Remove(this);
+                world.ResourceNodes.Remove(this);
             }
         }
 

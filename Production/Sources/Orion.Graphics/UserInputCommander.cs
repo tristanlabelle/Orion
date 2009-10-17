@@ -62,7 +62,7 @@ namespace Orion.Graphics
                     if (unitsToAssignTask.Count() != 0)
                     {
                         Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
-                        RessourceNode node = World.RessourceNodes.FirstOrDefault(ressourceNode => ressourceNode.Circle.ContainsPoint(position));
+                        ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
                         Command command;
                         if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
                         {

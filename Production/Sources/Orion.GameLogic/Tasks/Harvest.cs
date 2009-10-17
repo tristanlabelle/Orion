@@ -12,7 +12,7 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit harvester;
-        private readonly RessourceNode node;
+        private readonly ResourceNode node;
         private const float secondsToHarvest = 5;
         private const int defaultAmountToHarvest = 5;
         private int amountToHarvest = 0;
@@ -21,7 +21,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-        public Harvest(Unit harvester, RessourceNode node)
+        public Harvest(Unit harvester, ResourceNode node)
         {
             this.harvester = harvester;
             this.node = node;
@@ -43,20 +43,20 @@ namespace Orion.GameLogic.Tasks
             {
                 if (harvestingIsOver(timeDelta))
                 {
-                    if(node.RessourcesLeft != 0)
+                    if(node.ResourcesLeft != 0)
                     {
-                        //determines the amount of ressources to be harvested and substracts that amount to the node
-                        if (node.RessourcesLeft >= amountToHarvest)
+                        //determines the amount of resources to be harvested and substracts that amount to the node
+                        if (node.ResourcesLeft >= amountToHarvest)
                             amountToHarvest = defaultAmountToHarvest;
                         else
-                            amountToHarvest = node.RessourcesLeft;
+                            amountToHarvest = node.ResourcesLeft;
 
                         node.Harvest(amountToHarvest);
 
-                        //adds the ressources to the unit's faction
-                        if (node.RessourceType == RessourceType.Alladium)
+                        //adds the resources to the unit's faction
+                        if (node.ResourceType == ResourceType.Alladium)
                             harvester.Faction.AladdiumAmount += amountToHarvest;
-                        else if (node.RessourceType == RessourceType.Allagene)
+                        else if (node.ResourceType == ResourceType.Allagene)
                             harvester.Faction.AllageneAmount += amountToHarvest;
 
                         //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAllagene: " + harvester.Faction.AllageneAmount);

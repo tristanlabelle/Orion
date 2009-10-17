@@ -103,13 +103,13 @@ namespace Orion.Graphics
 
         public void DrawResources(GraphicsContext graphics, Rectangle viewRectangle)
         {
-            foreach (RessourceNode node in world.RessourceNodes)
+            foreach (ResourceNode node in world.ResourceNodes)
             {
                 if (Intersection.Test(viewRectangle, node.Circle))
                 {
-                    if (node.RessourceType == RessourceType.Alladium)
+                    if (node.ResourceType == ResourceType.Alladium)
                         graphics.FillColor = Color.LightBlue;
-                    else if (node.RessourceType == RessourceType.Allagene)
+                    else if (node.ResourceType == ResourceType.Allagene)
                         graphics.FillColor = Color.Green;
                     else
                         continue;

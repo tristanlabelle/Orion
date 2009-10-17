@@ -25,6 +25,17 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            using (MatchSettingsDialog dialog = new MatchSettingsDialog())
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                if (dialog.StartType != MatchStartType.Solo)
+                {
+                    MessageBox.Show("Match type not implemented.", "Error!");
+                    return;
+                }
+            }
+
             Random random = new MersenneTwister();
             Terrain terrain = TerrainGenerator.GenerateNewTerrain(100, 100, random);
             World world = new World(terrain);
@@ -49,21 +60,14 @@ namespace Orion.Main
                 unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
             }
 
-            //Adding Ressource Nodes to the game world
-            for (int i = 0; i < 5; i++)
+            //Adding Resource Nodes to the game world
+            for (int i = 0; i < 10; i++)
             {
                 Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                RessourceNode node = new RessourceNode(i, RessourceType.Alladium, 500, position, world);
+                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Allagene;
+                ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
 
-                world.RessourceNodes.Add(node);
-            }
-
-            for (int i = 0; i < 5; i++)
-            {
-                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                RessourceNode node = new RessourceNode(i, RessourceType.Allagene, 500, position, world);
-
-                world.RessourceNodes.Add(node);
+                world.ResourceNodes.Add(node);
             }
             #endregion
 

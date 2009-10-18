@@ -84,6 +84,10 @@
       <Project>{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}</Project>
       <Name>Orion.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Orion.Networking\Orion.Networking.csproj">
+      <Project>{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}</Project>
+      <Name>Orion.Networking</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

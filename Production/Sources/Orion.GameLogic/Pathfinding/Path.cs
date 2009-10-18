@@ -147,7 +147,7 @@ namespace Orion.GameLogic.Pathfinding
                 nearNodeCoords.Y < this.pathFinder.World.Terrain.Height);
 
             if (!isWithinBounds || closedNodes.Contains(nearNodeCoords)
-                || pathFinder.World.Terrain.IsWalkable(nearNodeCoords.X,nearNodeCoords.Y))
+                || !pathFinder.World.Terrain.IsWalkable(nearNodeCoords.X,nearNodeCoords.Y))
                 return;
 
             float movementCost = DistanceBetweenTwoPoint(currentNode.Position, nearNodeCoords);

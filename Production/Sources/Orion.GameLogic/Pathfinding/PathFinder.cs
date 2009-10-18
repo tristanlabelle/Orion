@@ -29,6 +29,12 @@ namespace Orion.GameLogic.Pathfinding
         #region Methods
         public Path FindPath(Vector2 source, Vector2 destination)
         {
+            Point16 destinationPoint = new Point16((short)destination.X, (short)destination.Y);
+            if (destinationPoint.X < 0 || destinationPoint.Y < 0
+                || destinationPoint.X >= world.Width || destinationPoint.Y >= world.Height
+                || !world.Terrain.IsWalkable(destinationPoint.X, destinationPoint.Y))
+                return null;
+
             Path path = new Path(this, source, destination);
             return path.Succeeded ? path : null;
         }

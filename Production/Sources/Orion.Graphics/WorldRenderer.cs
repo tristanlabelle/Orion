@@ -6,10 +6,11 @@ using System.Text;
 using OpenTK.Math;
 
 using Orion.GameLogic;
+using Orion.GameLogic.Tasks;
+using Orion.GameLogic.Pathfinding;
 using Orion.Geometry;
 
 using Color = System.Drawing.Color;
-using Orion.GameLogic.Tasks;
 
 namespace Orion.Graphics
 {

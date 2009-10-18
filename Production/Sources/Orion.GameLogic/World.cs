@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 
 using Orion.Geometry;
+using Orion.GameLogic.Pathfinding;
 
 using Color = System.Drawing.Color;
 
@@ -22,7 +23,7 @@ namespace Orion.GameLogic
         private readonly UnitRegistry units;
         private List<ResourceNode> resourceNodes = new List<ResourceNode>();
         private List<Building> buildings = new List<Building>();
-        readonly PathFinder pathFinder;
+        readonly Pathfinder pathFinder;
         #endregion
 
         #region Constructors
@@ -35,7 +36,7 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
             units = new UnitRegistry(this, 5, 5);
-            pathFinder = new PathFinder(this);
+            pathFinder = new Pathfinder(this);
         }
         #endregion
 
@@ -95,7 +96,7 @@ namespace Orion.GameLogic
             get { return terrain; }
         }
 
-        public PathFinder PathFinder
+        public Pathfinder PathFinder
         {
             get { return pathFinder; }
         }

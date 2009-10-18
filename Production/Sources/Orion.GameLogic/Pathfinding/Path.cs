@@ -2,36 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
 using System.Collections.ObjectModel;
 
 using OpenTK.Math;
 
-namespace Orion.GameLogic
+namespace Orion.GameLogic.Pathfinding
 {
     public class Path
     {
         #region Fields
-        private readonly PathFinder pathFinder;
+        private readonly Pathfinder pathFinder;
         private readonly Vector2 source;
-        private readonly Point sourcePoint;
+        private readonly Point16 sourcePoint;
         private readonly Vector2 destination;
-        private readonly Point destinationPoint;
-        private readonly Dictionary<Point, PathNode> openNodes = new Dictionary<Point, PathNode>();
-        private readonly HashSet<Point> closedNodes = new HashSet<Point>();
-        private readonly ReadOnlyCollection<Point> points;
+        private readonly Point16 destinationPoint;
+        private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
+        private readonly HashSet<Point16> closedNodes = new HashSet<Point16>();
+        private readonly ReadOnlyCollection<Point16> points;
         #endregion
 
         #region Constructor
-        internal Path(PathFinder pathFinder, Vector2 source, Vector2 destination)
+        internal Path(Pathfinder pathFinder, Vector2 source, Vector2 destination)
         {
             this.pathFinder = pathFinder;
             this.source = source;
             this.destination = destination;
 
-            sourcePoint = new Point((int)source.X, (int)source.Y);
-            destinationPoint = new Point((int)destination.X, (int)destination.Y);
-            PathNode sourceNode = new PathNode(null, sourcePoint, 0);
+            sourcePoint = new Point16((short)source.X, (short)source.Y);
+            destinationPoint = new Point16((short)destination.X, (short)destination.Y);
+
+            PathNode sourceNode = new PathNode(null, sourcePoint, 0, GetCostToDestination(sourcePoint));
 
             PathNode currentNode = sourceNode;
             while (currentNode.Position.X != destinationPoint.X || currentNode.Position.Y != destinationPoint.Y)
@@ -43,24 +43,23 @@ namespace Orion.GameLogic
                 if (openNodes.Count == 0) break;
 
                 currentNode = openNodes.First().Value;
-                foreach (PathNode aNode in openNodes.Values)
+                foreach (PathNode openNode in openNodes.Values)
                 {
-                    if (CalculateTotalCost(aNode.Position, aNode.MoveCost) <
-                        CalculateTotalCost(currentNode.Position, currentNode.MoveCost))
-                        currentNode = aNode;
+                    if (openNode.TotalCost < currentNode.TotalCost)
+                        currentNode = openNode;
                 }
             }
 
             if (currentNode.Position == destinationPoint)
             {
-                List<Point> pointList = new List<Point>();
+                List<Point16> pointList = new List<Point16>();
                 while (currentNode != null)
                 {
                     pointList.Add(currentNode.Position);
                     currentNode = currentNode.ParentNode;
                 }
                 pointList.Reverse();
-                points = new ReadOnlyCollection<Point>(pointList);
+                points = new ReadOnlyCollection<Point16>(pointList);
             }
         }
         #endregion
@@ -93,20 +92,24 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the sequence of points that trace this path.
         /// </summary>
-        public ReadOnlyCollection<Point> Points
+        public ReadOnlyCollection<Point16> Points
         {
             get { return points; }
         }
         #endregion
 
         #region Methods
-        private float CalculateTotalCost(Point aPoint, float moveCost)
+        private float GetTotalCost(Point16 point, float movementCost)
         {
-            return Math.Abs(aPoint.X - destinationPoint.X) + Math.Abs(aPoint.Y - destinationPoint.Y)
-                + moveCost;
+            return GetCostToDestination(point) + movementCost;
         }
 
-        private float DistanceBetweenTwoPoint(Point a, Point b)
+        private float GetCostToDestination(Point16 point)
+        {
+            return Math.Abs(point.X - destinationPoint.X) + Math.Abs(point.Y - destinationPoint.Y);
+        }
+
+        private float DistanceBetweenTwoPoint(Point16 a, Point16 b)
         {
             int deltaX = a.X - b.X;
             int deltaY = a.Y - b.Y;
@@ -129,44 +132,43 @@ namespace Orion.GameLogic
             AddNearbyNode(currentNode, 1, 1);
         }
 
-        private void AddNearbyNode(PathNode currentNode, int offsetX, int offsetY)
+        private void AddNearbyNode(PathNode currentNode, short offsetX, short offsetY)
         {
-            Point nearNode = new Point(currentNode.Position.X + offsetX, currentNode.Position.Y + offsetY);
+            int x = currentNode.Position.X + offsetX;
+            int y = currentNode.Position.Y + offsetY;
+            Point16 nearNode = new Point16((short)x, (short)y);
             AddNearbyNode(currentNode, nearNode);
         }
 
-        private void AddNearbyNode(PathNode currentNode, Point nearNodeCoords)
+        private void AddNearbyNode(PathNode currentNode, Point16 nearNodeCoords)
         {
             bool isWithinBounds = (nearNodeCoords.X >= 0 && nearNodeCoords.Y >= 0 && 
                 nearNodeCoords.X < this.pathFinder.World.Terrain.Width &&
                 nearNodeCoords.Y < this.pathFinder.World.Terrain.Height);
-            if (!isWithinBounds || 
-                closedNodes.Contains(nearNodeCoords)|| 
-                pathFinder.World.Terrain.IsWalkable(nearNodeCoords.X,nearNodeCoords.Y))
+
+            if (!isWithinBounds || closedNodes.Contains(nearNodeCoords)
+                || pathFinder.World.Terrain.IsWalkable(nearNodeCoords.X,nearNodeCoords.Y))
                 return;
 
+            float movementCost = DistanceBetweenTwoPoint(currentNode.Position, nearNodeCoords);
+            float costFromSource = currentNode.CostFromSource + movementCost;
 
             PathNode firstNodeFound;
             if (openNodes.TryGetValue(nearNodeCoords, out firstNodeFound))
             {
-                float movementCost =
-                    DistanceBetweenTwoPoint(nearNodeCoords, currentNode.Position);
-
-                float cost = currentNode.MoveCost + movementCost;
-
-                if (firstNodeFound.MoveCost > cost)
+                if (costFromSource < firstNodeFound.CostFromSource)
                 {
-                    // If its a better choise to pass thru the current node , overwrite the parent and the move cost
+                    // If its a better choise to pass through the current node, overwrite the parent and the move cost
                     firstNodeFound.ParentNode = currentNode;
-                    firstNodeFound.MoveCost = cost;
+                    float costToDestination = GetCostToDestination(nearNodeCoords);
+                    firstNodeFound.SetCost(costFromSource, costToDestination);
                 }
             }
             else
             {
                 // Add the node to the open list
-                PathNode aNode = new PathNode(currentNode, nearNodeCoords, 0);
-                float movementCost = DistanceBetweenTwoPoint(currentNode.Position, aNode.Position);
-                aNode.MoveCost = currentNode.MoveCost + movementCost;
+                float costToDestination = GetCostToDestination(nearNodeCoords);
+                PathNode aNode = new PathNode(currentNode, nearNodeCoords, costFromSource, costToDestination);
                 openNodes.Add(nearNodeCoords, aNode);
             }
         }

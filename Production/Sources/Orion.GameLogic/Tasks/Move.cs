@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
-using System.Drawing;
+
+using Orion.GameLogic.Pathfinding;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -63,8 +64,7 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
-            Point destinationPoint = path.Points[nextPointIndex];
-            Vector2 destination = new Vector2(destinationPoint.X, destinationPoint.Y);
+            Vector2 destination = path.Points[nextPointIndex];
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 

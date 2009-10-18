@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -59,6 +59,7 @@
     <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="NetworkTimeoutEventArgs.cs" />
+    <Compile Include="Point16.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="NetworkEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

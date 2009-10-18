@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Math;
-using System.Drawing;
 
-namespace Orion.GameLogic
+using OpenTK.Math;
+
+namespace Orion.GameLogic.Pathfinding
 {
-    public class PathFinder
+    public sealed class Pathfinder
     {
         #region Fields
         readonly World world;
@@ -19,7 +19,7 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="source">The Position of the unit</param>
         /// <param name="destination">The destination point</param>
-        public PathFinder(World world)
+        public Pathfinder(World world)
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
@@ -35,12 +35,10 @@ namespace Orion.GameLogic
         #endregion
 
         #region Proprieties
-
         public World World
         {
             get { return world; }
         }
-
         #endregion
     }
 }

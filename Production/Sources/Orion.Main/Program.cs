@@ -36,7 +36,9 @@ namespace Orion.Main
                 }
             }
 
-            Random random = new MersenneTwister();
+            var random = new MersenneTwister();
+            Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
+
             Terrain terrain = TerrainGenerator.GenerateNewTerrain(100, 100, random);
             World world = new World(terrain);
 

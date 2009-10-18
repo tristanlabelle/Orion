@@ -247,6 +247,11 @@ namespace Orion.Graphics
             GL.End();
         }
 
+        public void Stroke(params Vector2[] points)
+        {
+            Stroke((IEnumerable<Vector2>)points);
+        }
+
         private void DrawVertices(IEnumerable<Vector2> points)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");

@@ -101,7 +101,9 @@ namespace Orion.Graphics
             worldRenderer.DrawTerrain(context, Bounds);
             selectionRenderer.DrawBelowUnits(context);
             worldRenderer.DrawResources(context, Bounds);
+            worldRenderer.DrawPaths(context);
             worldRenderer.DrawEntities(context, Bounds);
+            worldRenderer.DrawHealthBars(context);
             selectionRenderer.DrawAboveUnits(context);
         }
         #endregion

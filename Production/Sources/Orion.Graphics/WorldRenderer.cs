@@ -79,17 +79,6 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            var paths = world.Units.Select(unit => unit.Task)
-                .OfType<Move>()
-                .Select(task => task.Path)
-                .Where(path => path != null);
-
-            graphics.StrokeColor = Color.Lime;
-            foreach (Path path in paths)
-            {
-                graphics.Stroke(path.Points.Select(p => new Vector2(p.X, p.Y)));
-            }
-
             foreach (Unit unit in world.Units)
             {
                 if (Intersection.Test(viewRectangle, unit.Circle))
@@ -99,6 +88,46 @@ namespace Orion.Graphics
 
                     graphics.Stroke(unit.Circle);
                 }
+            }
+        }
+
+        public void DrawHealthBars(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+            
+            const float healthBarLength = 1;
+
+            foreach (Unit unit in world.Units)
+            {
+                Circle circle = unit.Circle;
+
+                Vector2 healthBarCenter = circle.Center + Vector2.UnitY * (circle.Radius + 0.5f);
+                Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
+                Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
+                
+                float healthRatio = unit.Health / unit.Type.MaxHealth;
+                Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
+
+                graphics.StrokeColor = Color.Lime;
+                graphics.Stroke(healthBarStart, healthBarLevelPosition);
+                graphics.StrokeColor = Color.Red;
+                graphics.Stroke(healthBarLevelPosition, healthBarEnd);
+            }
+        }
+
+        public void DrawPaths(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+
+            var paths = world.Units.Select(unit => unit.Task)
+                .OfType<Move>()
+                .Select(task => task.Path)
+                .Where(path => path != null);
+
+            graphics.StrokeColor = Color.Gray;
+            foreach (Path path in paths)
+            {
+                graphics.Stroke(path.Points.Select(p => new Vector2(p.X, p.Y)));
             }
         }
 

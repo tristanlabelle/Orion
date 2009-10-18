@@ -50,7 +50,7 @@ namespace Orion.Main
             UserInputCommander redCommander = new UserInputCommander(redFaction);
             commandManager.AddCommander(redCommander);
 
-            Faction blueFaction = world.CreateFaction("Blue", Color.Blue);
+            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
             DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
             commandManager.AddCommander(blueCommander);
 

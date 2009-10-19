@@ -416,6 +416,11 @@ namespace Orion.Networking
                 packetsToSend[id] = new PacketSession(id, data);
             }
         }
+		
+		public void SendTo(byte[] data, IEnumerable<IPEndPoint> remoteAddresses)
+		{
+			foreach(IPEndPoint endPoint in remoteAddresses) SendTo(data, endPoint);
+		}
 
         /// <summary>
         /// Triggers any pending packet reception event.

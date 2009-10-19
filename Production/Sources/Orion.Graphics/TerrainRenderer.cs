@@ -42,7 +42,7 @@ namespace Orion.Graphics
                         pixels[pixelIndex] = luminance;
                     }
                 }
-
+				
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Luminance,
                     terrain.Width, terrain.Height, 0, PixelFormat.Luminance, PixelType.UnsignedByte,
                     pixels);

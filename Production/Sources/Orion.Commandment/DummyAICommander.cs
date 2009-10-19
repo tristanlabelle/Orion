@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,11 +19,13 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-        public DummyAICommander(Faction faction, Random random)
+        public DummyAICommander(Faction faction, ISinkRecipient recipient, Random random)
             : base(faction)
         {
             Argument.EnsureNotNull(random, "random");
             this.random = random;
+			
+			sink = new CommandAggregator(recipient);
         }
         #endregion
 
@@ -37,6 +39,7 @@ namespace Orion.Commandment
                     new Vector2(random.Next(World.Width), random.Next(World.Height)));
                 GenerateCommand(command);
             }
+			base.Update(timeDelta);
         }
         #endregion
     }

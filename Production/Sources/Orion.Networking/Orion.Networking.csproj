@@ -52,11 +52,16 @@
     <Compile Include="NetworkSetupHost.cs" />
     <Compile Include="NetworkSetup.cs" />
     <Compile Include="NetworkSetupClient.cs" />
+    <Compile Include="CommandSynchronizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Orion.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
+      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
+      <Name>Orion.Commandment</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

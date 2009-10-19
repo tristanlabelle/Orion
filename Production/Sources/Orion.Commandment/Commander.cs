@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,8 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction faction;
+		
+		protected CommandSink sink;
         #endregion
 
         #region Constructors
@@ -28,13 +30,6 @@ namespace Orion.Commandment
 
             this.faction = faction;
         }
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Raised when a <see cref="Commander"/> generates a new <see cref="Command"/>.
-        /// </summary>
-        public event GenericEventHandler<Commander, Command> CommandGenerated;
         #endregion
 
         #region Properties
@@ -65,8 +60,7 @@ namespace Orion.Commandment
         protected void GenerateCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");
-
-            if (CommandGenerated != null) CommandGenerated(this, command);
+            sink.Feed(command);
         }
 
         /// <summary>
@@ -74,7 +68,10 @@ namespace Orion.Commandment
         /// to generate <see cref="Command"/>s.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public virtual void Update(float timeDelta) { }
+        public virtual void Update(float timeDelta)
+		{
+			sink.Flush();
+		}
 
         public override string ToString()
         {

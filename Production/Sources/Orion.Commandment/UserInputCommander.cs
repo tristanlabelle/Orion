@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,11 +25,13 @@ namespace Orion.Graphics
         /// Constructor For a commander that can listen input to create commands
         /// </summary>
         /// <param name="faction">the faction of the player.</param>
-        public UserInputCommander(Faction faction)
+        public UserInputCommander(Faction faction, ISinkRecipient recipient)
             : base(faction)
         {
             this.selectionManager = new SelectionManager(faction);
-            
+			
+			sink = new CommandOptimizer(recipient);
+			sink = new CommandAggregator(sink);
         }
         #endregion
 
@@ -129,7 +131,7 @@ namespace Orion.Graphics
 		/// <param name="position">
 		/// The position in form of a <see cref="Vector2"/>
 		/// </param>
-        internal void OnMouseMove(Vector2 position)
+        public void OnMouseMove(Vector2 position)
         {
             selectionManager.OnMouseMove(position);
         }

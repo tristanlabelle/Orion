@@ -91,16 +91,19 @@ namespace Orion.Main
             World world = new World(terrain);
 
             #region Putting little guys to life
-
-            CommandManager commandManager = new CommandManager(world);
+			
+			CommandExecutor executor = new CommandExecutor();
+			CommandLogger logger = new CommandLogger(executor);
 
             Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander redCommander = new UserInputCommander(redFaction);
-            commandManager.AddCommander(redCommander);
+            UserInputCommander redCommander = new UserInputCommander(redFaction, logger);
 
             Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
-            commandManager.AddCommander(blueCommander);
+            DummyAICommander blueCommander = new DummyAICommander(blueFaction, executor, random);
+			
+			List<Commander> commanders = new List<Commander>();
+			commanders.Add(redCommander);
+			commanders.Add(blueCommander);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             for (int i = 0; i < 200; ++i)
@@ -110,7 +113,7 @@ namespace Orion.Main
                 unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
             }
 
-            //Adding Resource Nodes to the game world
+			#region Resource Nodes
             for (int i = 0; i < 10; i++)
             {
                 Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
@@ -119,6 +122,7 @@ namespace Orion.Main
 
                 world.ResourceNodes.Add(node);
             }
+			#endregion
             #endregion
 			
             using (GameUI ui = new GameUI(world, redCommander))
@@ -140,7 +144,7 @@ namespace Orion.Main
 
                         do
                         {
-                            commandManager.Update(targetSecondsPerFrame);
+							foreach(Commander commander in commanders) commander.Update(targetFramesPerSecond);
                             world.Update(targetSecondsPerFrame);
                             ui.Update(targetSecondsPerFrame);
 

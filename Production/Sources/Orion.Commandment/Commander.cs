@@ -15,8 +15,8 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction faction;
-		
-		protected CommandSink sink;
+
+        protected CommandSink sink;
         #endregion
 
         #region Constructors
@@ -69,9 +69,9 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
         public virtual void Update(float timeDelta)
-		{
-			sink.Flush();
-		}
+        {
+            sink.Flush();
+        }
 
         public override string ToString()
         {

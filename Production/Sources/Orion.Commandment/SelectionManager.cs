@@ -125,7 +125,7 @@ namespace Orion.Graphics
                         var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
 
                         List<Unit> unitsToAdd = new List<Unit>();
-                        
+
                         for (int i = 0; i < units.Count(); i++)
                         {
                             if (!selectedUnits.Contains(units.ElementAt(i)))

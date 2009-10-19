@@ -39,11 +39,11 @@ namespace Orion.Graphics
                     for (int x = 0; x < terrain.Width; ++x)
                     {
                         int pixelIndex = y * terrain.Width + x;
-                        byte luminance = terrain.IsWalkable(x, y) ? (byte)0 : (byte)255;
+                        byte luminance = terrain.IsWalkable(x, y) ? (byte)255 : (byte)0;
                         pixels[pixelIndex] = luminance;
                     }
                 }
-				
+
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Luminance,
                     terrain.Width, terrain.Height, 0, PixelFormat.Luminance, PixelType.UnsignedByte,
                     pixels);

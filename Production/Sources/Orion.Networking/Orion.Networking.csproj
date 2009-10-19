@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -62,6 +62,10 @@
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Orion.Commandment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.GameLogic\Orion.GameLogic.csproj">
+      <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
+      <Name>Orion.GameLogic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

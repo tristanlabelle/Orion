@@ -24,8 +24,8 @@ namespace Orion.Commandment
         {
             Argument.EnsureNotNull(random, "random");
             this.random = random;
-			
-			sink = new CommandAggregator(recipient);
+
+            sink = new CommandAggregator(recipient);
         }
         #endregion
 
@@ -39,7 +39,7 @@ namespace Orion.Commandment
                     new Vector2(random.Next(World.Width), random.Next(World.Height)));
                 GenerateCommand(command);
             }
-			base.Update(timeDelta);
+            base.Update(timeDelta);
         }
         #endregion
     }

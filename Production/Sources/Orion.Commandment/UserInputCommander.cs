@@ -29,9 +29,9 @@ namespace Orion.Graphics
             : base(faction)
         {
             this.selectionManager = new SelectionManager(faction);
-			
-			sink = new CommandOptimizer(recipient);
-			sink = new CommandAggregator(sink);
+
+            sink = new CommandOptimizer(recipient);
+            sink = new CommandAggregator(sink);
         }
         #endregion
 
@@ -68,10 +68,10 @@ namespace Orion.Graphics
                         Command command;
                         if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
                         {
-                                command = new Attack(Faction, unitsToAssignTask, enemy);
+                            command = new Attack(Faction, unitsToAssignTask, enemy);
                         }
-                            // Assigns a gathering task
-                        else if(node != null)
+                        // Assigns a gathering task
+                        else if (node != null)
                         {
                             command = new Harvest(Faction, unitsToAssignTask, node);
                         }
@@ -85,12 +85,12 @@ namespace Orion.Graphics
             }
         }
 
-		/// <summary>
-		/// Parses KeyDown events to capture those whose key has a special meaning.
-		/// </summary>
-		/// <param name="key">
-		/// The <see cref="Keys"/> that were pressedd
-		/// </param>
+        /// <summary>
+        /// Parses KeyDown events to capture those whose key has a special meaning.
+        /// </summary>
+        /// <param name="key">
+        /// The <see cref="Keys"/> that were pressedd
+        /// </param>
         public void OnKeyDown(Keys key)
         {
             if (key == Keys.S)
@@ -125,18 +125,18 @@ namespace Orion.Graphics
             }
         }
 
-		/// <summary>
-		/// Parses a MouseMove event.
-		/// </summary>
-		/// <param name="position">
-		/// The position in form of a <see cref="Vector2"/>
-		/// </param>
+        /// <summary>
+        /// Parses a MouseMove event.
+        /// </summary>
+        /// <param name="position">
+        /// The position in form of a <see cref="Vector2"/>
+        /// </param>
         public void OnMouseMove(Vector2 position)
         {
             selectionManager.OnMouseMove(position);
         }
         #endregion
 
-      
+
     }
 }

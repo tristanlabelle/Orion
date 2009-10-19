@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Argument.cs" />
-    <Compile Include="GameFrameInfo.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Ellipse.cs" />
     <Compile Include="Formatting.cs" />
@@ -66,7 +65,6 @@
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="KeyboardEventArgs.cs" />
-    <Compile Include="Terrain.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
   </ItemGroup>

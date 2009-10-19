@@ -43,21 +43,21 @@ namespace Orion.Graphics
         /// Draws the selection markers under the <see cref="Unit"/>s.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
-        public void DrawBelowUnits(GraphicsContext graphics)
+        public void DrawSelectionMarkers(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
             graphics.StrokeStyle = StrokeStyle.Solid;
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in selectionManager.SelectedUnits)
-                graphics.Stroke(new Circle(unit.Position, 1.5f));
+                graphics.Stroke(new Circle(unit.Position, 1));
         }
 
         /// <summary>
         /// Draws the selection markers over the <see cref="Unit"/>s.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
-        public void DrawAboveUnits(GraphicsContext graphics)
+        public void DrawSelectionRectangle(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
@@ -68,6 +68,28 @@ namespace Orion.Graphics
                 graphics.Stroke(selectionManager.SelectionRectangle.Value);
                 graphics.FillColor = selectionRectangleFillColor;
                 graphics.Fill(selectionManager.SelectionRectangle.Value);
+            }
+        }
+
+        public void DrawHealthBars(GraphicsContext graphics)
+        {
+            const float healthBarLength = 1;
+
+            foreach (Unit unit in selectionManager.SelectedUnits)
+            {
+                Circle circle = unit.Circle;
+
+                Vector2 healthBarCenter = circle.Center + Vector2.UnitY * (circle.Radius + 0.5f);
+                Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
+                Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
+
+                float healthRatio = unit.Health / unit.Type.MaxHealth;
+                Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
+
+                graphics.StrokeColor = Color.Lime;
+                graphics.Stroke(healthBarStart, healthBarLevelPosition);
+                graphics.StrokeColor = Color.Red;
+                graphics.Stroke(healthBarLevelPosition, healthBarEnd);
             }
         }
         #endregion

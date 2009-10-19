@@ -68,7 +68,7 @@ namespace Orion.Graphics
 		/// </summary>
 		/// <param name="args">A <see cref="MouseEventArgs"/></param>
 		/// <returns>A <see cref="System.Boolean"/></returns>
-		protected override bool OnMouseWheel (MouseEventArgs args)
+		protected override bool OnMouseWheel(MouseEventArgs args)
 		{
             double scale; 
             if(args.WheelDelta < 0)
@@ -89,12 +89,12 @@ namespace Orion.Graphics
         protected override void Draw()
         {
             worldRenderer.DrawTerrain(context, Bounds);
-            selectionRenderer.DrawBelowUnits(context);
+            selectionRenderer.DrawSelectionMarkers(context);
             worldRenderer.DrawResources(context, Bounds);
             worldRenderer.DrawPaths(context);
             worldRenderer.DrawEntities(context, Bounds);
-            worldRenderer.DrawHealthBars(context);
-            selectionRenderer.DrawAboveUnits(context);
+            selectionRenderer.DrawHealthBars(context);
+            selectionRenderer.DrawSelectionRectangle(context);
         }
         #endregion
     }

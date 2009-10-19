@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 
 using OpenTK.Graphics;
 
+using Orion.GameLogic;
 using Orion.Geometry;
-using System.Runtime.InteropServices;
 
 namespace Orion.Graphics
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion
+namespace Orion.GameLogic
 {
     /// <summary>
     /// Defines a terrain to be drawn in background, parts of this terrain are walkable, others are not.

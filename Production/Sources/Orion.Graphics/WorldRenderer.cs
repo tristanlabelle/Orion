@@ -91,30 +91,6 @@ namespace Orion.Graphics
             }
         }
 
-        public void DrawHealthBars(GraphicsContext graphics)
-        {
-            Argument.EnsureNotNull(graphics, "graphics");
-            
-            const float healthBarLength = 1;
-
-            foreach (Unit unit in world.Units)
-            {
-                Circle circle = unit.Circle;
-
-                Vector2 healthBarCenter = circle.Center + Vector2.UnitY * (circle.Radius + 0.5f);
-                Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
-                Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
-                
-                float healthRatio = unit.Health / unit.Type.MaxHealth;
-                Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
-
-                graphics.StrokeColor = Color.Lime;
-                graphics.Stroke(healthBarStart, healthBarLevelPosition);
-                graphics.StrokeColor = Color.Red;
-                graphics.Stroke(healthBarLevelPosition, healthBarEnd);
-            }
-        }
-
         public void DrawPaths(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");

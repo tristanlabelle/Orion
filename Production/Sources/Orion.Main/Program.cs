@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Main entry point for the program.
@@ -27,66 +27,66 @@ namespace Orion.Main
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-			
-			MatchStartType gameType;
-			IPAddress enteredAddress;
+
+            MatchStartType gameType;
+            IPAddress enteredAddress;
             using (MatchSettingsDialog dialog = new MatchSettingsDialog())
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
-				
-				gameType = dialog.StartType;
-				enteredAddress = dialog.Host;
+
+                gameType = dialog.StartType;
+                enteredAddress = dialog.Host;
             }
 
-			switch(gameType)
-			{
-				case MatchStartType.Solo: RunSinglePlayerGame(); return;
-				case MatchStartType.Host: HostGame(); return;
-				case MatchStartType.Join: JoinGame(enteredAddress); return;
-			}
+            switch (gameType)
+            {
+                case MatchStartType.Solo: RunSinglePlayerGame(); return;
+                case MatchStartType.Host: HostGame(); return;
+                case MatchStartType.Join: JoinGame(enteredAddress); return;
+            }
         }
 
-		private static void HostGame()
-		{
-			using(Transporter transporter = new Transporter(41223))
-			{
-				List<IPEndPoint> peers;
-				using(NetworkSetupHost host = new NetworkSetupHost(transporter))
-				{
-					host.WaitForPeers();
-					peers = host.Peers;
-				}
-				
-				RunMultiplayerGame(transporter, peers, true);
-			}
-		}
-		
-		private static void JoinGame(IPAddress host)
-		{
-			using(Transporter transporter = new Transporter(41223))
-			{
-				List<IPEndPoint> peers;
-				using(NetworkSetupClient client = new NetworkSetupClient(transporter))
-				{
-					client.Join(new IPEndPoint(host, transporter.Port));
-					client.WaitForPeers();
-					peers = client.Peers;
-				}
-				
-				RunMultiplayerGame(transporter, peers, false);
-			}
-		}
-		
-		private static void RunMultiplayerGame(Transporter transporter, List<IPEndPoint> peers, bool isAdmin)
-		{
-			
-		}
-		
-		private static void RunSinglePlayerGame()
-		{
+        private static void HostGame()
+        {
+            using (Transporter transporter = new Transporter(41223))
+            {
+                List<IPEndPoint> peers;
+                using (NetworkSetupHost host = new NetworkSetupHost(transporter))
+                {
+                    host.WaitForPeers();
+                    peers = host.Peers.ToList();
+                }
+
+                RunMultiplayerGame(transporter, peers, true);
+            }
+        }
+
+        private static void JoinGame(IPAddress host)
+        {
+            using (Transporter transporter = new Transporter(41223))
+            {
+                List<IPEndPoint> peers;
+                using (NetworkSetupClient client = new NetworkSetupClient(transporter))
+                {
+                    client.Join(new IPEndPoint(host, transporter.Port));
+                    client.WaitForPeers();
+                    peers = client.Peers.ToList();
+                }
+
+                RunMultiplayerGame(transporter, peers, false);
+            }
+        }
+
+        private static void RunMultiplayerGame(Transporter transporter, IEnumerable<IPEndPoint> peers, bool isAdmin)
+        {
+
+        }
+
+        private static void RunSinglePlayerGame()
+        {
             var random = new MersenneTwister();
             Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
-            
+
             Terrain terrain = Terrain.Generate(100, 100, random);
             World world = new World(terrain);
 
@@ -124,7 +124,7 @@ namespace Orion.Main
             }
 			#endregion
             #endregion
-			
+
             using (GameUI ui = new GameUI(world, redCommander))
             {
                 const float targetFramesPerSecond = 30;
@@ -152,7 +152,7 @@ namespace Orion.Main
                         } while (timeDeltaInSeconds >= targetSecondsPerFrame);
                     }
                 }
-	        }
-		}
+            }
+        }
     }
 }

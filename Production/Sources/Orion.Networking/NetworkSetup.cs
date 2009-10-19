@@ -31,9 +31,9 @@ namespace Orion.Networking
 			transporter.Received += receptionDelegate;
 		}
 		
-		public List<IPEndPoint> Peers
+		public IEnumerable<IPEndPoint> Peers
 		{
-			get { return new List<IPEndPoint>(peers); }
+			get { return peers; }
 		}
 		
 		protected abstract void TransporterReceived(Transporter source, NetworkEventArgs args);

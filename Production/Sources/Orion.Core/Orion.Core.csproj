@@ -56,6 +56,7 @@
     <Compile Include="Formatting.cs" />
     <Compile Include="GenericEventHandler.cs" />
     <Compile Include="Geometry\Intersection.cs" />
+    <Compile Include="Geometry\LineSegment.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="NetworkTimeoutEventArgs.cs" />
     <Compile Include="Point16.cs" />

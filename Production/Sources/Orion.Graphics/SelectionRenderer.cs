@@ -87,9 +87,9 @@ namespace Orion.Graphics
                 Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
 
                 graphics.StrokeColor = Color.Lime;
-                graphics.Stroke(healthBarStart, healthBarLevelPosition);
+                graphics.StrokeLineStrip(healthBarStart, healthBarLevelPosition);
                 graphics.StrokeColor = Color.Red;
-                graphics.Stroke(healthBarLevelPosition, healthBarEnd);
+                graphics.StrokeLineStrip(healthBarLevelPosition, healthBarEnd);
             }
         }
         #endregion

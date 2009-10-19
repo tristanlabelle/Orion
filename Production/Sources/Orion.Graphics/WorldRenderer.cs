@@ -103,7 +103,7 @@ namespace Orion.Graphics
             graphics.StrokeColor = Color.Gray;
             foreach (Path path in paths)
             {
-                graphics.Stroke(path.Points.Select(p => new Vector2(p.X, p.Y)));
+                graphics.StrokeLineStrip(path.Points.Select(p => new Vector2(p.X, p.Y)));
             }
         }
 

@@ -239,7 +239,7 @@ namespace Orion.Graphics
         /// Strokes a line using the current <see cref="P:StrokeColor"/>.
         /// </summary>
         /// <param name="points">A sequence of points forming a line.</param>
-        public void Stroke(IEnumerable<Vector2> points)
+        public void StrokeLineStrip(IEnumerable<Vector2> points)
         {
             CommitStrokeColor();
             GL.Begin(BeginMode.LineStrip);
@@ -247,9 +247,9 @@ namespace Orion.Graphics
             GL.End();
         }
 
-        public void Stroke(params Vector2[] points)
+        public void StrokeLineStrip(params Vector2[] points)
         {
-            Stroke((IEnumerable<Vector2>)points);
+            StrokeLineStrip((IEnumerable<Vector2>)points);
         }
 
         private void DrawVertices(IEnumerable<Vector2> points)
@@ -259,27 +259,28 @@ namespace Orion.Graphics
             foreach (Vector2 point in points)
                 GL.Vertex2(point);
         }
-        #endregion
 
-        #region Other Shapes (ShapePath)
         /// <summary>
         /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
         /// </summary>
-        /// <param name="shapePath">A <see href="ShapePath"/> to stroke.</param>
-        public void Stroke(ShapePath shapePath)
+        /// <param name="path">A <see href="LinePath"/> to stroke.</param>
+        public void Stroke(LinePath path)
         {
             CommitStrokeColor();
-            GL.Begin(BeginMode.LineLoop);
-            DrawVertices(shapePath);
+            GL.Begin(BeginMode.Lines);
+            DrawVertices(path.LineSegments);
             GL.End();
         }
 
-        private void DrawVertices(ShapePath shapePath)
+        private void DrawVertices(IEnumerable<LineSegment> lineSegments)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
-            for (int i = 0; i < shapePath.Count; i++)
-                GL.Vertex2(shapePath.GetPointAt(i));
+            foreach (LineSegment lineSegment in lineSegments)
+            {
+                GL.Vertex2(lineSegment.EndPoint1);
+                GL.Vertex2(lineSegment.EndPoint2);
+            }
         }
         #endregion
 

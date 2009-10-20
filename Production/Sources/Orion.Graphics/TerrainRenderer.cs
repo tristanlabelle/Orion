@@ -39,7 +39,7 @@ namespace Orion.Graphics
                     for (int x = 0; x < terrain.Width; ++x)
                     {
                         int pixelIndex = y * terrain.Width + x;
-                        byte luminance = terrain.IsWalkable(x, y) ? (byte)255 : (byte)0;
+                        byte luminance = terrain.IsWalkable(x, y) ? (byte)0 : (byte)255;
                         pixels[pixelIndex] = luminance;
                     }
                 }

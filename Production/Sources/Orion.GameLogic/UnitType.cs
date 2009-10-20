@@ -33,7 +33,15 @@ namespace Orion.GameLogic
 
         #region Properties
         /// <summary>
-        /// Gets the set of this <see cref="UnitType"/>'s tags.
+        /// Gets the name of this <see cref="UnitType"/>.
+        /// </summary>
+        public string Name
+        {
+            get { return name; }
+        }
+
+        /// <summary>
+        /// Gets the set of tags associated with this <see cref="UnitType"/>.
         /// </summary>
         public TagSet Tags
         {

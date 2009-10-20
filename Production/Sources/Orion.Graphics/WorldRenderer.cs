@@ -22,6 +22,7 @@ namespace Orion.Graphics
         #region Fields
         private readonly World world;
         private readonly TerrainRenderer terrainRenderer;
+        private readonly UnitRenderer unitRenderer;
         #endregion
 
         #region Constructors
@@ -35,6 +36,7 @@ namespace Orion.Graphics
 
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
+            this.unitRenderer = new UnitRenderer(world);
         }
         #endregion
 
@@ -79,16 +81,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            foreach (Unit unit in world.Units)
-            {
-                if (Intersection.Test(viewRectangle, unit.Circle))
-                {
-                    if (unit.Faction == null) graphics.StrokeColor = Color.White;
-                    else graphics.StrokeColor = unit.Faction.Color;
-
-                    graphics.Stroke(unit.Circle);
-                }
-            }
+            unitRenderer.Draw(graphics);
         }
 
         public void DrawPaths(GraphicsContext graphics)

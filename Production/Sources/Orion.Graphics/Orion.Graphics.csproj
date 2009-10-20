@@ -65,6 +65,7 @@
     <Compile Include="SelectionRenderer.cs" />
     <Compile Include="LinePath.cs" />
     <Compile Include="TerrainRenderer.cs" />
+    <Compile Include="UnitRenderer.cs" />
     <Compile Include="Views System\ResourceDisplay.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\Frame.cs" />

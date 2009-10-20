@@ -264,22 +264,23 @@ namespace Orion.Graphics
         /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
         /// </summary>
         /// <param name="path">A <see href="LinePath"/> to stroke.</param>
-        public void Stroke(LinePath path)
+        /// <param name="position">A position by which to offset the path's points.</param>
+        public void Stroke(LinePath path, Vector2 position)
         {
             CommitStrokeColor();
             GL.Begin(BeginMode.Lines);
-            DrawVertices(path.LineSegments);
+            DrawVertices(path.LineSegments, position);
             GL.End();
         }
 
-        private void DrawVertices(IEnumerable<LineSegment> lineSegments)
+        private void DrawVertices(IEnumerable<LineSegment> lineSegments, Vector2 position)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             foreach (LineSegment lineSegment in lineSegments)
             {
-                GL.Vertex2(lineSegment.EndPoint1);
-                GL.Vertex2(lineSegment.EndPoint2);
+                GL.Vertex2(lineSegment.EndPoint1 + position);
+                GL.Vertex2(lineSegment.EndPoint2 + position);
             }
         }
         #endregion

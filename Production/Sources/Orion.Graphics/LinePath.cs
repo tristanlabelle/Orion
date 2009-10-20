@@ -71,6 +71,7 @@ namespace Orion.Graphics
                 {
                     currentPoint = enumerator.Current;
                     lineSegments.Add(new LineSegment(previousPoint, currentPoint));
+                    previousPoint = currentPoint;
                 } while (enumerator.MoveNext());
 
                 lineSegments.Add(new LineSegment(currentPoint, firstPoint));

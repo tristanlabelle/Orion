@@ -124,6 +124,10 @@ namespace Orion.Main
             for (int i = 0; i < 10; i++)
             {
                 Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y))
+                {
+                    position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                }
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Allagene;
                 ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
 

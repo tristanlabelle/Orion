@@ -112,7 +112,12 @@ namespace Orion.Main
             {
                 Faction faction = (i % 2 == 0) ? redFaction : blueFaction;
                 Unit unit = faction.CreateUnit(unitTypes[i % unitTypes.Length]);
-                unit.Position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                while(!world.Terrain.IsWalkable((int)position.X,(int)position.Y))
+                {
+                    position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                }
+                unit.Position = position;
             }
 
             #region Resource Nodes

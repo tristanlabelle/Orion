@@ -25,13 +25,10 @@ namespace Orion.Graphics
         /// Constructor For a commander that can listen input to create commands
         /// </summary>
         /// <param name="faction">the faction of the player.</param>
-        public UserInputCommander(Faction faction, ISinkRecipient recipient)
+        public UserInputCommander(Faction faction)
             : base(faction)
         {
             this.selectionManager = new SelectionManager(faction);
-
-            sink = new CommandOptimizer(recipient);
-            sink = new CommandAggregator(sink);
         }
         #endregion
 
@@ -83,6 +80,19 @@ namespace Orion.Graphics
                     }
                 }
             }
+        }
+
+        public override void Update(float timeDelta)
+        {
+            (commandsEntryPoint as CommandSink).Flush();
+        }
+
+        public override void AddToPipeline(CommandPipeline pipeline)
+        {
+            pipeline.AddCommander(this);
+
+            commandsEntryPoint = new CommandOptimizer(pipeline.UserCommandmentEntryPoint);
+            commandsEntryPoint = new CommandAggregator(commandsEntryPoint);
         }
 
         /// <summary>

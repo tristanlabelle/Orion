@@ -57,7 +57,7 @@ namespace Orion.Main
                     peers = host.Peers.ToList();
                 }
 
-                RunMultiplayerGame(transporter, peers, true);
+                RunMultiplayerGame(transporter, peers, null);
             }
         }
 
@@ -66,23 +66,29 @@ namespace Orion.Main
             using (Transporter transporter = new Transporter(41223))
             {
                 List<IPEndPoint> peers;
+                IPEndPoint admin = new IPEndPoint(host, transporter.Port);
                 using (NetworkSetupClient client = new NetworkSetupClient(transporter))
                 {
-                    client.Join(new IPEndPoint(host, transporter.Port));
+                    client.Join(admin);
                     client.WaitForPeers();
                     peers = client.Peers.ToList();
                 }
 
-                RunMultiplayerGame(transporter, peers, false);
+                RunMultiplayerGame(transporter, peers, admin);
             }
         }
 
-        private static void RunMultiplayerGame(Transporter transporter, IEnumerable<IPEndPoint> peers, bool isAdmin)
+        private static void RunMultiplayerGame(Transporter transporter, IEnumerable<IPEndPoint> peers, IPEndPoint admin)
         {
 
         }
 
         private static void RunSinglePlayerGame()
+        {
+            Run(new SinglePlayerCommandPipeline());
+        }
+
+        private static void Run(CommandPipeline pipeline)
         {
             var random = new MersenneTwister();
             Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
@@ -92,18 +98,14 @@ namespace Orion.Main
 
             #region Putting little guys to life
 
-            CommandExecutor executor = new CommandExecutor();
-            CommandLogger logger = new CommandLogger(executor);
-
             Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander redCommander = new UserInputCommander(redFaction, logger);
+            UserInputCommander redCommander = new UserInputCommander(redFaction);
 
             Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            DummyAICommander blueCommander = new DummyAICommander(blueFaction, executor, random);
+            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
 
-            List<Commander> commanders = new List<Commander>();
-            commanders.Add(redCommander);
-            commanders.Add(blueCommander);
+            redCommander.AddToPipeline(pipeline);
+            blueCommander.AddToPipeline(pipeline);
 
             UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
             for (int i = 0; i < 200; ++i)
@@ -144,7 +146,7 @@ namespace Orion.Main
 
                         do
                         {
-                            foreach (Commander commander in commanders) commander.Update(targetFramesPerSecond);
+                            pipeline.Update(targetFramesPerSecond);
                             world.Update(targetSecondsPerFrame);
                             ui.Update(targetSecondsPerFrame);
 

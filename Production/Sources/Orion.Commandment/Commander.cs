@@ -15,8 +15,7 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction faction;
-
-        protected CommandSink sink;
+        protected ISinkRecipient commandsEntryPoint;
         #endregion
 
         #region Constructors
@@ -60,18 +59,22 @@ namespace Orion.Commandment
         protected void GenerateCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");
-            sink.Feed(command);
+            commandsEntryPoint.Feed(command);
         }
 
         /// <summary>
-        /// Updates this <see cref="Commander"/> for a frame, giving it a chance
-        /// to generate <see cref="Command"/>s.
+        /// Schedules the commander to be updated by a given pipeline on the run loop.
+        /// </summary>
+        /// <param name="pipeline">The pipeline on which to schedule this <see cref="Commander"/></param>
+        public abstract void AddToPipeline(CommandPipeline pipeline);
+
+        /// <summary>
+        /// Called by the pipeline to update this <see cref="Commander"/> for a frame, giving it a chance
+        /// to flush its local pipeline.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
         public virtual void Update(float timeDelta)
-        {
-            sink.Flush();
-        }
+        { }
 
         public override string ToString()
         {

@@ -80,6 +80,18 @@ namespace Orion.Graphics
                     }
                 }
             }
+            else if (button == MouseButton.Middle && pressed)
+            {
+                if (selectionManager.SelectedUnits.Count() != 0)
+                {
+                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
+                    if (unitsToAssignTask.Count() != 0)
+                    {
+                        GenerateCommand(new ZoneAttack(Faction, unitsToAssignTask, position));
+                    }
+                }
+            }
+
         }
 
         public override void Update(float timeDelta)

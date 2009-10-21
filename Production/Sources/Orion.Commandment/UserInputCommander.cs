@@ -132,7 +132,8 @@ namespace Orion.Graphics
                 
                 if (builder != null)
                 {
-                    UnitType unitToBuild = builder.Type;
+                    
+                    UnitType unitToBuild = new UnitType("building");
                     if (Faction.AladdiumAmount >= unitToBuild.AladdiumPrice && Faction.AlageneAmount >= unitToBuild.AlagenePrice)
                     {
                         GenerateCommand(new Build(builder, position,unitToBuild));

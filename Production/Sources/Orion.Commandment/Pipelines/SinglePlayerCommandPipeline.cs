@@ -19,12 +19,12 @@ namespace Orion.Commandment
 		#endregion
 
 		#region Properties
-        public override ISinkRecipient UserCommandmentEntryPoint
+        public override ICommandSink UserCommandmentEntryPoint
         {
             get { return logger; }
         }
 
-        public override ISinkRecipient AICommandmentEntryPoint
+        public override ICommandSink AICommandmentEntryPoint
         {
             get { return executor; }
         }

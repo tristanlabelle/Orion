@@ -15,7 +15,7 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction faction;
-        protected ISinkRecipient commandsEntryPoint;
+        protected ICommandSink commandsEntryPoint;
         #endregion
 
         #region Constructors

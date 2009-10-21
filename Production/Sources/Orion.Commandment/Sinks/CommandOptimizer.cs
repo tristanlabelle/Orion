@@ -8,7 +8,7 @@ namespace Orion.Commandment
         public CommandOptimizer()
         { }
 
-        public CommandOptimizer(ISinkRecipient recipient)
+        public CommandOptimizer(ICommandSink recipient)
             : base(recipient)
         { }
     }

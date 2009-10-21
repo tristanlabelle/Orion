@@ -97,7 +97,14 @@ namespace Orion.Networking
 					Thread.Sleep(10);
 					transporter.Poll();
 				}
-				Flush();
+				
+                Flush();
+
+                foreach (IPEndPoint peer in peers)
+                {
+                    receivedFromPeers[peer] = false;
+                    peersCompleted[peer] = false;
+                }
 			}
 		}
 
@@ -114,11 +121,21 @@ namespace Orion.Networking
             if (Recipient == null) throw new NullReferenceException("Sink's recipient must not be null when Flush() is called");
 			
 			Recipient.BeginFeed();
-			
-			while(commands.Count > 0)
-			{
-				Recipient.Feed(commands.Dequeue());
-			}
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream))
+                {
+                    writer.Write((byte)GameMessageType.Commands);
+                    while (commands.Count > 0)
+                    {
+                        Command command = commands.Dequeue();
+                        Recipient.Feed(command);
+                        serializer.Serialize(command, writer);
+                    }
+                }
+                transporter.SendTo(stream.ToArray(), peers);
+            }
 			
 			while(readyCommands.Count > 0)
 			{

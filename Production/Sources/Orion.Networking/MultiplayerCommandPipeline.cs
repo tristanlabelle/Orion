@@ -33,12 +33,12 @@ namespace Orion.Networking
 		#endregion
 
 		#region Properties
-        public override ISinkRecipient AICommandmentEntryPoint
+        public override ICommandSink AICommandmentEntryPoint
         {
             get { return executor; }
         }
 
-        public override ISinkRecipient UserCommandmentEntryPoint
+        public override ICommandSink UserCommandmentEntryPoint
         {
             get { return synchronizer; }
         }

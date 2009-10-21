@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Orion.Commandment
 {
-    public class CommandExecutor : ISinkRecipient
+    public class CommandExecutor : ICommandSink
     {
         public void BeginFeed()
         { }

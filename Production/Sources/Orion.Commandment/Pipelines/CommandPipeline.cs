@@ -13,8 +13,8 @@ namespace Orion.Commandment
 		#endregion
 
 		#region Properties
-        public abstract ISinkRecipient UserCommandmentEntryPoint { get; }
-        public abstract ISinkRecipient AICommandmentEntryPoint { get; }
+        public abstract ICommandSink UserCommandmentEntryPoint { get; }
+        public abstract ICommandSink AICommandmentEntryPoint { get; }
 		#endregion
 
 		#region Methods

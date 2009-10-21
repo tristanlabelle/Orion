@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Orion.Commandment
 {
-    public abstract class CommandSink : ISinkRecipient
+    public abstract class CommandSink : ICommandSink
     {
 		#region Fields
-        private ISinkRecipient recipient;
+        private ICommandSink recipient;
 
         protected Queue<Command> commands = new Queue<Command>();
 		#endregion
@@ -15,14 +15,14 @@ namespace Orion.Commandment
         public CommandSink()
         { }
 
-        public CommandSink(ISinkRecipient recipient)
+        public CommandSink(ICommandSink recipient)
         {
             this.recipient = recipient;
         }
 		#endregion
 
 		#region Properties
-        public ISinkRecipient Recipient
+        public ICommandSink Recipient
         {
             get { return recipient; }
             set { recipient = value; }

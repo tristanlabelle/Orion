@@ -8,7 +8,7 @@ namespace Orion.Commandment
         public CommandLogger()
         { }
 
-        public CommandLogger(ISinkRecipient recipient)
+        public CommandLogger(ICommandSink recipient)
             : base(recipient)
         { }
     }

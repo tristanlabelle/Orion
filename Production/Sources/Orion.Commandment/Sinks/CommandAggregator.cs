@@ -8,7 +8,7 @@ namespace Orion.Commandment
         public CommandAggregator()
         { }
 
-        public CommandAggregator(ISinkRecipient recipient)
+        public CommandAggregator(ICommandSink recipient)
             : base(recipient)
         { }
     }

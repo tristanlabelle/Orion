@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Match.cs" />
+    <Compile Include="MatchConfigurer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -66,6 +68,7 @@
     <Compile Include="Properties\Settings.Designer.cs">
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="RunLoop.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

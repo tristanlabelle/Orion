@@ -148,31 +148,8 @@ namespace Orion.Main
 
             using (GameUI ui = new GameUI(world, redCommander))
             {
-                const float targetFramesPerSecond = 30;
-                const float targetSecondsPerFrame = 1.0f / targetFramesPerSecond;
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                while (ui.IsWindowCreated)
-                {
-                    ui.Render();
-
-                    float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
-                    if (timeDeltaInSeconds >= targetSecondsPerFrame)
-                    {
-                        stopwatch.Stop();
-                        stopwatch.Reset();
-                        stopwatch.Start();
-
-                        do
-                        {
-                            pipeline.Update(targetFramesPerSecond);
-                            world.Update(targetSecondsPerFrame);
-                            ui.Update(targetSecondsPerFrame);
-
-                            timeDeltaInSeconds -= targetSecondsPerFrame;
-                        } while (timeDeltaInSeconds >= targetSecondsPerFrame);
-                    }
-                }
+                MatchRunLoop runLoop = new MatchRunLoop(ui, world, pipeline);
+				while(ui.IsWindowCreated) runLoop.RunOnce();
             }
         }
     }

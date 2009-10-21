@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -117,9 +117,8 @@ namespace Orion.Graphics
         /// <summary>
         /// Causes the game to render itself.
         /// </summary>
-        public void Render()
+        public void Refresh()
         {
-            Application.DoEvents();
             mainWindow.Refresh();
         }
 

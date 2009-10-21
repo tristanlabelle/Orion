@@ -134,6 +134,16 @@ namespace Orion.Main
                 world.ResourceNodes.Add(node);
             }
             #endregion
+
+            #region Buildings
+            Vector2 buildingPosition = new Vector2(random.Next(world.Width), random.Next(world.Height));
+            while (!world.Terrain.IsWalkable((int)buildingPosition.X, (int)buildingPosition.Y))
+            {
+                buildingPosition = new Vector2(random.Next(world.Width), random.Next(world.Height));
+            }
+            Unit building = redFaction.CreateUnit(new UnitType("building"));
+            building.Position = buildingPosition;
+            #endregion
             #endregion
 
             using (GameUI ui = new GameUI(world, redCommander))

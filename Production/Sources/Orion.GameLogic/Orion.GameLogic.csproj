@@ -63,9 +63,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Building.cs" />
-    <Compile Include="Buildings\CommandCenter.cs" />
-    <Compile Include="Buildings\DefenseTower.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="Pathfinding\Path.cs" />
     <Compile Include="Pathfinding\Pathfinder.cs" />

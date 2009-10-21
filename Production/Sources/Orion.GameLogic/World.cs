@@ -22,7 +22,6 @@ namespace Orion.GameLogic
         private readonly List<Faction> factions = new List<Faction>();
         private readonly UnitRegistry units;
         private List<ResourceNode> resourceNodes = new List<ResourceNode>();
-        private List<Building> buildings = new List<Building>();
         readonly Pathfinder pathFinder;
         #endregion
 
@@ -60,11 +59,6 @@ namespace Orion.GameLogic
         public List<ResourceNode> ResourceNodes
         {
             get { return resourceNodes; }
-        }
-
-        public List<Building> Buildings
-        {
-            get { return buildings; }
         }
 
         /// <summary>

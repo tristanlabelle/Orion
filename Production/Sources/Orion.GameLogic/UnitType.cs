@@ -70,7 +70,7 @@ namespace Orion.GameLogic
         /// </summary>
         public float MovementSpeed
         {
-            get { return 20; }
+            get{ return 20; }
         }
         /// <summary>
         /// Gets the distance at which <see cref="Unit"/>s with this  <see cref="UnitType"/> can reach the enemy to attack him.
@@ -92,6 +92,16 @@ namespace Orion.GameLogic
             get { return 5; }
         }
 
+        public bool IsBuilding
+        {
+            get 
+            {
+                if (name == "building")
+                    return true;
+                else
+                    return false;
+            }
+        }
         #endregion
 
         #region Methods

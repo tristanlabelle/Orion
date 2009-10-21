@@ -14,29 +14,29 @@ using Font = System.Drawing.Font;
 
 namespace Orion.Graphics
 {
-	/// <summary>
-	/// Defines possible stroke styles for the Stroke methods of a GraphicsContext.
-	/// </summary>
+    /// <summary>
+    /// Defines possible stroke styles for the Stroke methods of a GraphicsContext.
+    /// </summary>
     public enum StrokeStyle
     {
-		/// <summary>
-		/// A full, solid line 
-		/// </summary>
+        /// <summary>
+        /// A full, solid line 
+        /// </summary>
         Solid = 0xFFFF,
-		
-		/// <summary>
-		/// A dashed line 
-		/// </summary>
+
+        /// <summary>
+        /// A dashed line 
+        /// </summary>
         Dashed = 0x00FF,
-		
-		/// <summary>
-		/// A dotted line 
-		/// </summary>
+
+        /// <summary>
+        /// A dotted line 
+        /// </summary>
         Dotted = 0xAAAA,
-		
-		/// <summary>
-		/// A line whose stroke alternates between a dot and a dash 
-		/// </summary>
+
+        /// <summary>
+        /// A line whose stroke alternates between a dot and a dash 
+        /// </summary>
         DotDash = 0x1C47
     }
 
@@ -105,8 +105,8 @@ namespace Orion.Graphics
         public StrokeStyle StrokeStyle
         {
             get { return strokeStyle; }
-            set 
-            { 
+            set
+            {
                 strokeStyle = value;
                 CommitStrokeStyle();
             }
@@ -151,7 +151,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Ellipse ellipse)
         {
-            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             for (int i = 0; i < unitCirclePoints.Length; ++i)
             {
@@ -190,7 +190,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Rectangle rectangle)
         {
-            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             GL.Vertex2(rectangle.X, rectangle.Y);
             GL.Vertex2(rectangle.X, rectangle.MaxY);
@@ -226,7 +226,7 @@ namespace Orion.Graphics
 
         private void DrawVertices(Triangle triangle)
         {
-            if(!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
+            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             GL.Vertex2(triangle.Vertex1);
             GL.Vertex2(triangle.Vertex2);
@@ -296,15 +296,16 @@ namespace Orion.Graphics
             DrawText(text, new Vector2(0, 0));
         }
 
-		/// <summary>
+        /// <summary>
         /// Prints text, using this context's defined font and color, to the view at specified coordinates. 
-		/// </summary>
-		/// <param name="text">The <see cref="System.String"/> to print</param>
-		/// <param name="position">The position at which to print the string</param>
+        /// </summary>
+        /// <param name="text">The <see cref="System.String"/> to print</param>
+        /// <param name="position">The position at which to print the string</param>
         public void DrawText(string text, Vector2 position)
         {
             GL.PushMatrix();
             GL.Translate(position.X, position.Y, 0);
+            GL.Scale(1, -1, 1);
             printer.Print(text, font, fillColor);
             GL.PopMatrix();
         }
@@ -369,14 +370,14 @@ namespace Orion.Graphics
             GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
             GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
             GL.Translate(-CoordinateSystem.Origin.X, -CoordinateSystem.Origin.Y, 0);
-            
+
             readyForDrawing = true;
         }
 
         internal void RestoreGLContext()
         {
             GL.PopMatrix();
-            
+
             readyForDrawing = false;
         }
         #endregion

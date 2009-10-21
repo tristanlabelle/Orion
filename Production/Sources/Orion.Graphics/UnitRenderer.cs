@@ -24,7 +24,9 @@ namespace Orion.Graphics
         public UnitRenderer(World world)
         {
             Argument.EnsureNotNull(world, "world");
+
             this.world = world;
+            SetTypeShape("Jedi", LinePath.Diamond);
         }
         #endregion
 

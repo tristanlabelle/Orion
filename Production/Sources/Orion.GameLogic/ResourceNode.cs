@@ -11,7 +11,7 @@ namespace Orion.GameLogic
     public enum ResourceType
     {
         Alladium = 1,
-        Allagene = 2
+        Alagene = 2
     }
 
     public class ResourceNode

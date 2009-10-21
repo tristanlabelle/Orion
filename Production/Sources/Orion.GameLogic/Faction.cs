@@ -139,7 +139,7 @@ namespace Orion.GameLogic
         private readonly Color color;
         private readonly UnitCollection units;
         private int aladdiumAmount;
-        private int allageneAmount;
+        private int alageneAmount;
         #endregion
 
         #region Constructors
@@ -221,15 +221,15 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Accesses the amount of the allagene resource that this <see cref="Faction"/> possesses.
+        /// Accesses the amount of the alagene resource that this <see cref="Faction"/> possesses.
         /// </summary>
-        public int AllageneAmount
+        public int AlageneAmount
         {
-            get { return allageneAmount; }
+            get { return alageneAmount; }
             set
             {
                 Argument.EnsurePositive(value, "AllageneAmount");
-                allageneAmount = value;
+                alageneAmount = value;
             }
         }
         #endregion

@@ -29,11 +29,10 @@ namespace Orion.Graphics
         #region Methods
         protected override void Draw()
         {
+            string resources = "Alladium: " + faction.AladdiumAmount + "  Alagene: " + faction.AlageneAmount;
             context.FillColor = Color.Black;
             context.Fill(Bounds);
-            string resources = "Alladium: " + faction.AladdiumAmount + "  Allagene: " + faction.AllageneAmount;
-            context.FillColor = Color.White;
-            context.DrawText(resources, new Vector2(0, Bounds.Height));
+            context.FillColor = Color.White;            context.DrawText(resources, new Vector2(0, Bounds.Height));
         }
         #endregion
     }

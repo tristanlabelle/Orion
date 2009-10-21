@@ -102,6 +102,16 @@ namespace Orion.GameLogic
                     return false;
             }
         }
+        public int AlagenePrice
+        {
+            get { return 0; }
+        }
+
+        public int AladdiumPrice
+        {
+            get { return 50; }
+        }
+
         #endregion
 
         #region Methods

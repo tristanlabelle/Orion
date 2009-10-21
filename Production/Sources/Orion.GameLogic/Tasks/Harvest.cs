@@ -56,10 +56,10 @@ namespace Orion.GameLogic.Tasks
                         //adds the resources to the unit's faction
                         if (node.ResourceType == ResourceType.Alladium)
                             harvester.Faction.AladdiumAmount += amountToHarvest;
-                        else if (node.ResourceType == ResourceType.Allagene)
-                            harvester.Faction.AllageneAmount += amountToHarvest;
+                        else if (node.ResourceType == ResourceType.Alagene)
+                            harvester.Faction.AlageneAmount += amountToHarvest;
 
-                        //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAllagene: " + harvester.Faction.AllageneAmount);
+                        //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAlagene: " + harvester.Faction.AlageneAmount);
                         secondsSpentHarvesting = 0;
                     }
                 }

@@ -92,7 +92,7 @@ namespace Orion.Graphics
                 {
                     if (node.ResourceType == ResourceType.Alladium)
                         graphics.FillColor = Color.LightBlue;
-                    else if (node.ResourceType == ResourceType.Allagene)
+                    else if (node.ResourceType == ResourceType.Alagene)
                         graphics.FillColor = Color.Green;
                     else
                         continue;

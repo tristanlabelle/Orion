@@ -55,44 +55,94 @@ namespace Orion.Graphics
             selectionManager.OnMouseButton(position, button, pressed);
             if (button == MouseButton.Right && pressed)
             {
-                if (selectionManager.SelectedUnits.Count() != 0)
-                {
-                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                    if (unitsToAssignTask.Count() != 0)
-                    {
-                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
-                        ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
-                        Command command;
-                        if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
-                        {
-                            command = new Attack(Faction, unitsToAssignTask, enemy);
-                        }
-                        // Assigns a gathering task
-                        else if (node != null)
-                        {
-                            command = new Harvest(Faction, unitsToAssignTask, node);
-                        }
-                        else
-                        {
-                            command = new Move(Faction, unitsToAssignTask, position);
-                        }
-                        GenerateCommand(command);
-                    }
-                }
+                HandleRightClick(position);
             }
             else if (button == MouseButton.Middle && pressed)
             {
-                if (selectionManager.SelectedUnits.Count() != 0)
-                {
-                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                    if (unitsToAssignTask.Count() != 0)
-                    {
-                        GenerateCommand(new ZoneAttack(Faction, unitsToAssignTask, position));
-                    }
-                }
+                HandleMiddleClick(position);
+            }
+            else if (button == MouseButton.Left && selectionManager.CtrlKeyPressed && pressed)
+            {
+                HandleCtrlLeftClick(position);
             }
 
         }
+
+
+
+        /// <summary>
+        /// The Function Called When a right mouse click happend
+        /// </summary>
+        /// <param name="position"></param>
+        private void HandleRightClick(Vector2 position)
+        {
+            if (selectionManager.SelectedUnits.Count() != 0)
+            {
+                List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
+                if (unitsToAssignTask.Count() != 0)
+                {
+                    Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
+                    ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
+                    Command command;
+                    if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
+                    {
+                        command = new Attack(Faction, unitsToAssignTask, enemy);
+                    }
+                    // Assigns a gathering task
+                    else if (node != null)
+                    {
+                        command = new Harvest(Faction, unitsToAssignTask, node);
+                    }
+                    else
+                    {
+                        command = new Move(Faction, unitsToAssignTask, position);
+                    }
+                    GenerateCommand(command);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Function Called When a Middle mouse Click happend
+        /// </summary>
+        /// <param name="position"></param>
+        private void HandleMiddleClick(Vector2 position)
+        {
+            if (selectionManager.SelectedUnits.Count() != 0)
+            {
+                List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
+                if (unitsToAssignTask.Count() != 0)
+                {
+                    GenerateCommand(new ZoneAttack(Faction, unitsToAssignTask, position));
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Function Called When a Ctrl + Left Click happend
+        /// </summary>
+        /// <param name="position"></param>
+        private void HandleCtrlLeftClick(Vector2 position)
+        { 
+            // Build Command
+            if (World.Terrain.IsWalkable((int)position.X, (int)position.Y))
+            {
+                
+                Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
+                
+                if (builder != null)
+                {
+                    UnitType unitToBuild = builder.Type;
+                    if (Faction.AladdiumAmount >= unitToBuild.AladdiumPrice && Faction.AlageneAmount >= unitToBuild.AlagenePrice)
+                    {
+                        GenerateCommand(new Build(builder, position,unitToBuild));
+                    }
+                }
+
+            }
+        }
+
+
 
         public override void Update(float timeDelta)
         {

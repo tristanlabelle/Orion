@@ -128,7 +128,7 @@ namespace Orion.Main
                 {
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
                 }
-                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Allagene;
+                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Alagene;
                 ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
 
                 world.ResourceNodes.Add(node);

@@ -72,6 +72,7 @@
     <Compile Include="TagSet.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Tasks\Attack.cs" />
+    <Compile Include="Tasks\Build.cs" />
     <Compile Include="Tasks\Follow.cs" />
     <Compile Include="Tasks\Harvest.cs" />
     <Compile Include="Tasks\Move.cs" />

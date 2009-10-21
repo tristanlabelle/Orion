@@ -43,20 +43,7 @@ namespace Orion.Graphics
         /// </summary>
         public IEnumerable<Unit> SelectedUnits
         {
-            get
-            {
-                if (selectedUnits.Count == 1 || selectedUnits.Count == 0)
-                    return selectedUnits;
-                else if (selectedUnits.Where(unit => unit.Faction == faction).ToList().Count > 0)
-                    return selectedUnits.Where(unit => unit.Faction == faction).ToList();
-                else
-                {
-                    List<Unit> firstEnemyUnit = new List<Unit>();
-                    firstEnemyUnit.Add(selectedUnits[0]);
-                    return firstEnemyUnit;
-                }
-
-            }
+            get { return selectedUnits; }
         }
 
         /// <summary>
@@ -107,40 +94,48 @@ namespace Orion.Graphics
                 }
                 else if (SelectionRectangle.HasValue)
                 {
-                    Rectangle selectionRectangle = SelectionRectangle.Value;
-                    List<Unit> unitsInSelectionRectangle = faction.World.Units
-                        .Where(unit => Intersection.Test(selectionRectangle, unit.Circle))
-                        .ToList();
+                    HandleRectangleSelection();
 
-                    if (CtrlKeyPressed)
+                    selectionStartPosition = null;
+                }
+            }
+        }
+
+        private void HandleRectangleSelection()
+        {
+            Rectangle selectionRectangle = SelectionRectangle.Value;
+            List<Unit> unitsInSelectionRectangle = faction.World.Units
+                .Where(unit => Intersection.Test(selectionRectangle, unit.Circle))
+                .ToList();
+
+            bool containsUnitsFromThisFaction = unitsInSelectionRectangle.Any(unit => unit.Faction == faction);
+            if (containsUnitsFromThisFaction)
+            {
+                unitsInSelectionRectangle.RemoveAll(unit => unit.Faction != faction);
+            }
+
+            if (CtrlKeyPressed)
+            {
+                bool allUnitsAlreadySelected = true;
+                foreach (Unit unit in unitsInSelectionRectangle)
+                {
+                    if (!selectedUnits.Contains(unit))
                     {
-                        bool allUnitsAlreadySelected = true;
-                        foreach (Unit unit in unitsInSelectionRectangle)
-                        {
-                            if (!selectedUnits.Contains(unit))
-                            {
-                                selectedUnits.Add(unit);
-                                allUnitsAlreadySelected = false;
-                            }
-                        }
-
-                        if (allUnitsAlreadySelected)
-                        {
-                            // All units in the selection rectangle were already selected.
-                            foreach (Unit unit in unitsInSelectionRectangle)
-                                selectedUnits.Remove(unit);
-                        }
-
-                        selectionStartPosition = null;
-                    }
-                    else
-                    {
-                        selectedUnits.Clear();
-                        selectedUnits.AddRange(unitsInSelectionRectangle);
-
-                        selectionStartPosition = null;
+                        selectedUnits.Add(unit);
+                        allUnitsAlreadySelected = false;
                     }
                 }
+
+                if (allUnitsAlreadySelected)
+                {
+                    foreach (Unit unit in unitsInSelectionRectangle)
+                        selectedUnits.Remove(unit);
+                }
+            }
+            else
+            {
+                selectedUnits.Clear();
+                selectedUnits.AddRange(unitsInSelectionRectangle);
             }
         }
 

@@ -15,7 +15,8 @@ namespace Orion.Graphics
         /// Returns the maximum bounds of this object (in contrast to Bounds, which are the visible bounds of this object).
         /// </summary>
 		public abstract Rectangle FullBounds { get; }
-        //private const Vector2 BoundsLimit = new Vector2 (); 
+        private Vector2 BoundsLimitOuter = new Vector2 (100,75);
+        private Vector2 BoundsLimitInner = new Vector2 (10, 7); 
 
 		
         /// <summary>
@@ -44,50 +45,44 @@ namespace Orion.Graphics
 		{
 			// TODO: check for full bounds when zooming so we don't break the aspect ratio
 			Vector2 scale = new Vector2((float)factor, (float)factor);// Détermine la grosseur du scale. 
-			Vector2 newSize = Bounds.Size; // Créer une nouvelle variable de grosseur. 
-			newSize.Scale(scale);// Appliquele nouveau scale, et créer la nouvelle grosseur. 
-			Vector2 newOrigin = Bounds.Origin; // Créer un nouveau point d'origine. 
-            // Le scalability, n'est pas une chose efficace pour effectuer une agrandissement
-            // d'écran mieux vaut utiliser une variable qui ... agrandira la taille de 
-            // newSize tout simplement, par addition et non par homothétie. 
+			Vector2 newSize = Bounds.Size; // Créer une nouvelle variable de grosseur
+            Vector2 newOrigin = Bounds.Origin;
+            Rectangle newBounds = new Rectangle(newOrigin, newSize);
 
-            
-            //newOrigin = (Bounds.Size - newSize) + (center - Bounds.Center);
-            if (scale.X > 1.0 || scale.Y > 1.0) // Zoomt out
+            if (BoundsLimitOuter.X >= Bounds.Size.X && BoundsLimitOuter.Y >= Bounds.Size.Y)
             {
-               // if(Bounds.Origin.X < 0)
-                newOrigin.X = Bounds.X + scale.X;
-                newOrigin.Y = Bounds.Y + scale.Y;
+                newSize.Scale(scale);// Appliquele nouveau scale, et créer la nouvelle grosseur. 
+                if (newSize.X > BoundsLimitOuter.X)
+                    newSize.X = BoundsLimitOuter.X;
+                if (newSize.Y > BoundsLimitOuter.Y)
+                    newSize.Y = BoundsLimitOuter.Y;
+
             }
-            else                                // Zoom in
+
+            Vector2 difference = Bounds.Center - newBounds.Center;
+            difference.Scale(0.5f, 0.5f);
+            newOrigin += difference;
+
+            if (Bounds.Origin.X > 0)
             {
-                if ((Bounds.X - scale.X )< 0)
+                float Xdifference = newSize.X - Bounds.X;
+                Math.Abs(Xdifference);
+                newOrigin.X -= Xdifference/2;
+                if (newOrigin.X < 0)
                     newOrigin.X = 0;
-                else
-                    newOrigin.X = Bounds.X - scale.X;
-                newOrigin.Y = Bounds.Y - scale.Y;
-            }
-            /*
-            if (newOrigin.X < 0)
-            {
-                newOrigin.X = (newSize.X / 2 + scale.X);//+ (center - Bounds.Center);
-                //newOrigin.Y = (newSize.X / 2 + scale.X);   
-            }
-            /*
-            if (Bounds.Origin.Y < 0)*/
-            //else
 
+            }
+            if (Bounds.Origin.Y > 0)
+            {
+                float Ydifference = newSize.Y - Bounds.Y;
+                Math.Abs(Ydifference);
+                newOrigin.Y -= Ydifference / 2;
+                if (newOrigin.Y < 0)
+                    newOrigin.Y = 0;
+            }
+            Bounds = new Rectangle(newOrigin, newSize);
             
-			Bounds = new Rectangle(newOrigin, newSize);
 		}
-        /*private void determineNewXOrigin
-        { 
-            
-        }
-        private void determineNewYOrigin
-        { 
-        
-        }*/
         /// <summary>
         /// Translates the bounds origin by given X and Y offsets. Checks the bounds so it's impossible to scroll past them.
         /// </summary>

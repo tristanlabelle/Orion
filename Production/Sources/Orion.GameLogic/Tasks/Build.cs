@@ -15,6 +15,8 @@ namespace Orion.GameLogic.Tasks
         private const float secondsToBuild = 1;
         private float secondsSpentBuilding = 0;
         private Move move;
+        private bool buildHaveBegin = false;
+        private bool unitConstructed = false;
         #endregion
 
         #region Constructors
@@ -32,6 +34,14 @@ namespace Orion.GameLogic.Tasks
         {
             get { return "Building"; }
         }
+
+        public override bool HasEnded
+        {
+            get
+            {
+                return unitConstructed;
+            }
+        }
         #endregion
 
         #region Methods
@@ -39,11 +49,31 @@ namespace Orion.GameLogic.Tasks
         {
             if (move.HasEnded)
             {
-                if (BuildingIsOver(timeDelta))
+                if (!buildHaveBegin)
                 {
-                    Unit unitBuilded = builder.faction.CreateUnit(unitToBuild);
-                    unitBuilded.Position = buildPosition;
-                    secondsSpentBuilding = 0;
+                    if (builder.faction.AladdiumAmount >= unitToBuild.AladdiumPrice
+                    && builder.faction.AlageneAmount >= unitToBuild.AlagenePrice)
+                    {
+                        builder.faction.AladdiumAmount -= unitToBuild.AladdiumPrice;
+                        builder.faction.AlageneAmount -= unitToBuild.AlagenePrice;
+                        buildHaveBegin = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not Enought Ressources");
+                        return;
+                    }
+                }
+
+                if (buildHaveBegin)
+                {
+                    if (BuildingIsOver(timeDelta))
+                    {
+                        Unit unitBuilded = builder.faction.CreateUnit(unitToBuild);
+                        unitBuilded.Position = buildPosition;
+                        unitConstructed = true;
+                        
+                    }
                 }
             }
             else

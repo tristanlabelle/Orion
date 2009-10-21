@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
@@ -18,7 +19,7 @@ namespace Orion.GameLogic
         AerialDeploymentCenter = 7
     }*/
 
-    public class Building
+    public abstract class Building
     {
         #region Fields
         private readonly int maxHealthPoints;
@@ -51,6 +52,11 @@ namespace Orion.GameLogic
         public Vector2 Position
         {
             get { return position; }
+        }
+
+        public Circle Circle
+        {
+            get { return new Circle(position, 2); }
         }
         #endregion
 

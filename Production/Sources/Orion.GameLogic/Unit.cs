@@ -242,6 +242,10 @@ namespace Orion.GameLogic
             set
             {
                 Argument.EnsureNotNull(value, "Task");
+
+                if (type.IsBuilding && (value is Tasks.Move || value is Tasks.Attack || value is Tasks.Follow))
+                    return;
+                
                 if (!task.HasEnded) task.OnCancelled(this);
                 task = value;
             }
@@ -281,7 +285,7 @@ namespace Orion.GameLogic
             if (IsIdle)
             {
                 Unit unitToAttack = World.Units.InArea(LineOfSight).FirstOrDefault(unit => unit.faction != faction);
-                if (unitToAttack != null) task = new Tasks.Attack(this, unitToAttack);
+                if (unitToAttack != null) Task = new Tasks.Attack(this, unitToAttack);
             }
 
             if (!task.HasEnded)

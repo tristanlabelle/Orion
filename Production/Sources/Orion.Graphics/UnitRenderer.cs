@@ -71,7 +71,13 @@ namespace Orion.Graphics
                 if (unit.Faction == null) graphics.StrokeColor = Color.White;
                 else graphics.StrokeColor = unit.Faction.Color;
 
-                graphics.Stroke(shape, unit.Position);
+                if (unit.Faction == null) graphics.FillColor = Color.White;
+                else graphics.FillColor = unit.Faction.Color;
+
+                if (unit.Type.IsBuilding)
+                    graphics.Fill(unit.Circle);
+                else
+                    graphics.Stroke(shape, unit.Position);
             }
         }
 

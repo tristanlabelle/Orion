@@ -90,7 +90,7 @@ namespace Orion.Main
 
         private static void Run(CommandPipeline pipeline)
         {
-            var random = new MersenneTwister(1256067728);
+            var random = new MersenneTwister();
             Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
 
             Terrain terrain = Terrain.Generate(128, 128, random);

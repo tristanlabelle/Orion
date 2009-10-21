@@ -107,52 +107,37 @@ namespace Orion.Graphics
                 }
                 else if (SelectionRectangle.HasValue)
                 {
-                    if (!CtrlKeyPressed)
+                    Rectangle selectionRectangle = SelectionRectangle.Value;
+                    List<Unit> unitsInSelectionRectangle = faction.World.Units
+                        .Where(unit => Intersection.Test(selectionRectangle, unit.Circle))
+                        .ToList();
+
+                    if (CtrlKeyPressed)
                     {
-                        Rectangle selectionRectangle = SelectionRectangle.Value;
+                        bool allUnitsAlreadySelected = true;
+                        foreach (Unit unit in unitsInSelectionRectangle)
+                        {
+                            if (!selectedUnits.Contains(unit))
+                            {
+                                selectedUnits.Add(unit);
+                                allUnitsAlreadySelected = false;
+                            }
+                        }
 
-                        var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
-
-                        selectedUnits.Clear();
-                        selectedUnits.AddRange(units);
+                        if (allUnitsAlreadySelected)
+                        {
+                            // All units in the selection rectangle were already selected.
+                            foreach (Unit unit in unitsInSelectionRectangle)
+                                selectedUnits.Remove(unit);
+                        }
 
                         selectionStartPosition = null;
                     }
-                    else  //adding or removal of units to selection
+                    else
                     {
-                        Rectangle selectionRectangle = SelectionRectangle.Value;
+                        selectedUnits.Clear();
+                        selectedUnits.AddRange(unitsInSelectionRectangle);
 
-                        var units = faction.World.Units.Where(unit => Intersection.Test(selectionRectangle, unit.Circle));
-
-                        List<Unit> unitsToAdd = new List<Unit>();
-
-                        for (int i = 0; i < units.Count(); i++)
-                        {
-                            if (!selectedUnits.Contains(units.ElementAt(i)))
-                            {
-                                unitsToAdd.Add(units.ElementAt(i));
-                            }
-                        }
-
-                        if (unitsToAdd.Count() > 0) //if there is at least one new units in the current selection that wasn't in the previous selection
-                        {
-                            selectedUnits.AddRange(unitsToAdd);
-                        }
-                        else //if all the units in the new selection are already part of the selection 
-                        {
-                            List<Unit> newSelectedUnitList = new List<Unit>();
-                            for (int i = 0; i < selectedUnits.Count(); ++i)
-                            {
-                                if (!units.Contains(selectedUnits.ElementAt(i)))
-                                {
-                                    newSelectedUnitList.Add(selectedUnits.ElementAt(i));
-                                }
-                            }
-
-                            selectedUnits.Clear();
-                            selectedUnits.AddRange(newSelectedUnitList);
-
-                        }
                         selectionStartPosition = null;
                     }
                 }

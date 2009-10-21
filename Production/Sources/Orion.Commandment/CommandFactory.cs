@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,7 +47,7 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="reader">A data stream reader to be used to read the serialized data.</param>
         /// <returns>The <see cref="Command"/> that was deserialized.</returns>
-        public Command Deserialize(BinaryReader reader)
+        public Command Unserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

@@ -5,10 +5,13 @@ namespace Orion.Commandment
 {
     public abstract class CommandSink : ISinkRecipient
     {
+		#region Fields
         private ISinkRecipient recipient;
 
         protected Queue<Command> commands = new Queue<Command>();
+		#endregion
 
+		#region Constructors
         public CommandSink()
         { }
 
@@ -16,13 +19,17 @@ namespace Orion.Commandment
         {
             this.recipient = recipient;
         }
+		#endregion
 
+		#region Properties
         public ISinkRecipient Recipient
         {
             get { return recipient; }
             set { recipient = value; }
         }
+		#endregion
 
+		#region Methods
         public virtual void BeginFeed()
         { }
 
@@ -48,5 +55,6 @@ namespace Orion.Commandment
             }
             recipient.EndFeed();
         }
+		#endregion
     }
 }

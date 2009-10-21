@@ -24,6 +24,7 @@ namespace Orion.Networking
 		
 		public NetworkSetupHelper(Transporter transporter)
 		{
+			Argument.EnsureNotNull(transporter, "transporter");
 			this.transporter = transporter;
 			peers = new List<IPEndPoint>();
 			

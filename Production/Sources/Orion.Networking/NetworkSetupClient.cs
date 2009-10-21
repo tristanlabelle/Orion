@@ -13,6 +13,8 @@ namespace Orion.Networking
 		
 		public void Join(IPEndPoint host)
 		{
+			Argument.EnsureNoneNull(host, "host");
+			
 			byte[] packet = new byte[1];
 			packet[0] = (byte)SetupMessageType.JoinRequest;
 			transporter.SendTo(packet, host);

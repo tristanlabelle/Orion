@@ -44,12 +44,31 @@ namespace Orion.Graphics
         #region Fields
         public static readonly LinePath UnitCircle = CreateCircle(1, 32);
         public static readonly LinePath Diamond = CreateCircle(1, 4);
+        public static readonly LinePath Plus;
+        public static readonly LinePath Cross;
+        #endregion
+
+        #region Constructor
+        static LinePath()
+        {
+            Plus = LinePath.FromLineSegments(
+                new LineSegment(-1, 0, 1, 0),
+                new LineSegment(0, -1, 0, 1));
+            Cross = LinePath.FromLineSegments(
+                new LineSegment(-1, -1, 1, 1),
+                new LineSegment(-1, 1, 1, -1));
+        }
         #endregion
 
         #region Methods
         public static LinePath FromLineSegments(IEnumerable<LineSegment> lineSegments)
         {
             return new LinePath(lineSegments);
+        }
+
+        public static LinePath FromLineSegments(params LineSegment[] lineSegments)
+        {
+            return FromLineSegments((IEnumerable<LineSegment>)lineSegments);
         }
 
         public static LinePath CreateStrip(IEnumerable<Vector2> points)

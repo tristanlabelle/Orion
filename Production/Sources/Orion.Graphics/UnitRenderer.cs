@@ -26,6 +26,7 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
+            SetTypeShape("Archer", LinePath.Cross);
             SetTypeShape("Jedi", LinePath.Diamond);
         }
         #endregion

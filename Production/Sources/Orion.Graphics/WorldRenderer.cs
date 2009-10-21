@@ -84,22 +84,6 @@ namespace Orion.Graphics
             unitRenderer.Draw(graphics);
         }
 
-        public void DrawPaths(GraphicsContext graphics)
-        {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            var paths = world.Units.Select(unit => unit.Task)
-                .OfType<Move>()
-                .Select(task => task.Path)
-                .Where(path => path != null);
-
-            graphics.StrokeColor = Color.Gray;
-            foreach (Path path in paths)
-            {
-                graphics.StrokeLineStrip(path.Points.Select(p => new Vector2(p.X, p.Y)));
-            }
-        }
-
         public void DrawResources(GraphicsContext graphics, Rectangle viewRectangle)
         {
             foreach (ResourceNode node in world.ResourceNodes)

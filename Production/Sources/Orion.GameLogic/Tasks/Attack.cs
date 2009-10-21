@@ -13,27 +13,37 @@ namespace Orion.GameLogic.Tasks
     public sealed class Attack : Task
     {
         #region Fields
-        private readonly Unit striker;
-        private readonly Unit enemy; 
-        private const float secondsToHitEnemy = 1;
-        private float secondsStored = 0;
+        private readonly Unit attacker;
+        private readonly Unit target; 
+        private const float hitDelayInSeconds = 1;
+        private float timeSinceLastHitInSeconds = 0;
         private Follow follow;
         #endregion
 
         #region Constructors
-        public Attack(Unit striker, Unit enemy)
+        public Attack(Unit attacker, Unit target)
         {
-            Argument.EnsureNotNull(striker, "striker");
-            Argument.EnsureNotNull(enemy, "enemy");
+            Argument.EnsureNotNull(attacker, "attacker");
+            Argument.EnsureNotNull(target, "target");
             
-            this.striker = striker;
-            this.enemy = enemy;
-            this.follow = new Follow(striker, enemy, striker.Type.AttackRange);
-            secondsStored = secondsToHitEnemy;
+            this.attacker = attacker;
+            this.target = target;
+            this.follow = new Follow(attacker, target, attacker.Type.AttackRange);
+            timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion
 
         #region Properties
+        public Unit Attacker
+        {
+            get { return attacker; }
+        }
+
+        public Unit Target
+        {
+            get { return target; }
+        }
+
         public override string Description
         {
             get { return "attacking"; }
@@ -41,7 +51,7 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return !enemy.IsAlive; }
+            get { return !target.IsAlive; }
         }
         #endregion
 
@@ -58,7 +68,7 @@ namespace Orion.GameLogic.Tasks
             if (follow.IsInRange)
             {
                 if (TryInflictDamage(timeDelta))
-                    enemy.Damage += striker.Type.AttackDamage;
+                    target.Damage += attacker.Type.AttackDamage;
             }
             else
             {
@@ -75,14 +85,14 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         private bool TryInflictDamage(float timeDelta)
         {
-            if (secondsStored >= secondsToHitEnemy)
+            if (timeSinceLastHitInSeconds >= hitDelayInSeconds)
             {
-                secondsStored = 0;
+                timeSinceLastHitInSeconds = 0;
                 return true;
             }
             else
             {
-                secondsStored += timeDelta;
+                timeSinceLastHitInSeconds += timeDelta;
                 return false;
             }
         }

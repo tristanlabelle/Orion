@@ -91,7 +91,6 @@ namespace Orion.Graphics
             worldRenderer.DrawTerrain(context, Bounds);
             selectionRenderer.DrawSelectionMarkers(context);
             worldRenderer.DrawResources(context, Bounds);
-            worldRenderer.DrawPaths(context);
             worldRenderer.DrawEntities(context, Bounds);
             selectionRenderer.DrawHealthBars(context);
             selectionRenderer.DrawSelectionRectangle(context);

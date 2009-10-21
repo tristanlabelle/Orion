@@ -6,6 +6,9 @@ using System.Text;
 using Orion.GameLogic;
 
 using Color = System.Drawing.Color;
+using Orion.GameLogic.Tasks;
+using Orion.GameLogic.Pathfinding;
+using OpenTK.Math;
 
 namespace Orion.Graphics
 {
@@ -50,10 +53,17 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
+            DrawPaths(graphics);
+            DrawUnits(graphics);
+            DrawAttackLines(graphics);
+        }
+
+        private void DrawUnits(GraphicsContext graphics)
+        {
             foreach (Unit unit in world.Units)
             {
                 string unitTypeName = unit.Type.Name;
-                
+
                 LinePath shape;
                 if (!typeShapes.TryGetValue(unitTypeName, out shape))
                     shape = defaultShape;
@@ -63,6 +73,28 @@ namespace Orion.Graphics
 
                 graphics.Stroke(shape, unit.Position);
             }
+        }
+
+        private void DrawPaths(GraphicsContext graphics)
+        {
+            var paths = world.Units.Select(unit => unit.Task)
+                .OfType<Move>()
+                .Select(task => task.Path)
+                .Where(path => path != null);
+
+            graphics.StrokeColor = Color.Gray;
+            foreach (Path path in paths)
+                graphics.StrokeLineStrip(path.Points.Select(p => new Vector2(p.X, p.Y)));
+        }
+
+        private void DrawAttackLines(GraphicsContext graphics)
+        {
+            var attacks = world.Units.Select(unit => unit.Task)
+                .OfType<Attack>();
+
+            graphics.StrokeColor = Color.Orange;
+            foreach (Attack attack in attacks)
+                graphics.StrokeLineStrip(attack.Attacker.Position, attack.Target.Position);
         }
         #endregion
     }

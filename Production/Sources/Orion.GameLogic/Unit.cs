@@ -243,7 +243,7 @@ namespace Orion.GameLogic
             {
                 Argument.EnsureNotNull(value, "Task");
 
-                if (type.IsBuilding && (value is Tasks.Move || value is Tasks.Attack || value is Tasks.Follow))
+                if (type.IsBuilding && (value is Tasks.Move || value is Tasks.Attack || value is Tasks.Follow || value is Tasks.Harvest))
                     return;
                 
                 if (!task.HasEnded) task.OnCancelled(this);

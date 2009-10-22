@@ -153,7 +153,7 @@ namespace Orion.Graphics
             ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
             Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
 
-            if (builder != null && node != null && node.ResourceType == ResourceType.Alagene)
+            if (builder != null && node != null && node.ResourceType == ResourceType.Alagene && !node.IsHarvestable)
             {
                 UnitType extractor = new UnitType("extractor");
                 if (Faction.AladdiumAmount >= extractor.AladdiumPrice && Faction.AlageneAmount >= extractor.AlagenePrice)

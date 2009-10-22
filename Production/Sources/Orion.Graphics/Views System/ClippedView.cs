@@ -18,6 +18,8 @@ namespace Orion.Graphics
         private Vector2 BoundsLimitOuter = new Vector2 (100,75);
         private Vector2 BoundsLimitInner = new Vector2 (10, 7); 
 
+        
+
 		
         /// <summary>
         /// Constructs a new ClippedView.
@@ -47,39 +49,43 @@ namespace Orion.Graphics
 			Vector2 scale = new Vector2((float)factor, (float)factor);// Détermine la grosseur du scale. 
 			Vector2 newSize = Bounds.Size; // Créer une nouvelle variable de grosseur
             Vector2 newOrigin = Bounds.Origin;
-            Rectangle newBounds = new Rectangle(newOrigin, newSize);
-
-            if (BoundsLimitOuter.X >= Bounds.Size.X && BoundsLimitOuter.Y >= Bounds.Size.Y)
+            if (FullBounds.Size.X + 10  >= Bounds.Size.X && FullBounds.Size.Y + 10 >= Bounds.Size.Y)
             {
                 newSize.Scale(scale);// Appliquele nouveau scale, et créer la nouvelle grosseur. 
                 if (newSize.X > BoundsLimitOuter.X)
                     newSize.X = BoundsLimitOuter.X;
                 if (newSize.Y > BoundsLimitOuter.Y)
                     newSize.Y = BoundsLimitOuter.Y;
-
             }
+            Rectangle newBounds = new Rectangle(newOrigin, newSize);
 
             Vector2 difference = Bounds.Center - newBounds.Center;
             difference.Scale(0.5f, 0.5f);
             newOrigin += difference;
-
+            difference.X= Math.Abs(difference.X);
+            difference.Y =Math.Abs(difference.Y);
+            if (scale.X > 1 || scale.Y > 1)
+            {
+                difference.X = difference.X * -1;
+                difference.Y = difference.Y * -1; 
+            }
             if (Bounds.Origin.X > 0)
             {
-                float Xdifference = newSize.X - Bounds.X;
-                Math.Abs(Xdifference);
-                newOrigin.X -= Xdifference/2;
+                newOrigin.X += difference.X;
                 if (newOrigin.X < 0)
                     newOrigin.X = 0;
 
             }
             if (Bounds.Origin.Y > 0)
             {
-                float Ydifference = newSize.Y - Bounds.Y;
-                Math.Abs(Ydifference);
-                newOrigin.Y -= Ydifference / 2;
+                newOrigin.Y += difference.Y;
                 if (newOrigin.Y < 0)
                     newOrigin.Y = 0;
             }
+            
+               
+
+
             Bounds = new Rectangle(newOrigin, newSize);
             
 		}

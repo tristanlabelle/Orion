@@ -22,15 +22,19 @@ namespace Orion.GameLogic.Pathfinding
         /// </summary>
         /// <param name="parentNode">The parent represent the fastest way to move from a nearby node.</param>
         /// <param name="position">The x y position of the node in the world</param>
-        /// <param name="costFromSource">The cumulative cost of the movement from the beginning of the path to this node.</param>
-        /// <param name="costToDestination">The cost associated with the distance to the destination.</param>
+        /// <param name="costFromSource">
+        /// The cumulative cost of the movement from the beginning of the path to this node.
+        /// </param>
+        /// <param name="estimatedCostToDestination">
+        /// The estimated cost to reach the destination from this node.
+        /// </param>
         public PathNode(PathNode parentNode, Point16 position,
-            float costFromSource, float costToDestination)
+            float costFromSource, float estimatedCostToDestination)
         {
             this.parentNode = parentNode;
             this.position = position;
             this.costFromSource = costFromSource;
-            this.totalCost = costFromSource + costToDestination;
+            this.totalCost = costFromSource + estimatedCostToDestination;
         }
         #endregion
 
@@ -51,7 +55,7 @@ namespace Orion.GameLogic.Pathfinding
             get { return costFromSource; }
         }
 
-        public float CostToDestination
+        public float EstimatedCostToDestination
         {
             get { return totalCost - costFromSource; }
         }
@@ -63,10 +67,10 @@ namespace Orion.GameLogic.Pathfinding
         #endregion
 
         #region Methods
-        public void SetCost(float costFromSource, float costToDestination)
+        public void SetCosts(float costFromSource, float estimatedCostToDestination)
         {
             this.costFromSource = costFromSource;
-            this.totalCost = costFromSource + costToDestination;
+            this.totalCost = costFromSource + estimatedCostToDestination;
         }
         #endregion
     }

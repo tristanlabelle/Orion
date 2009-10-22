@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
+using OpenTK.Math;
+
 using Orion.Geometry;
 using Orion.GameLogic.Pathfinding;
 
@@ -98,6 +100,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        #region Factions
         /// <summary>
         /// Gets a <see cref="Faction"/> of this <see cref="World"/> from its unique identifier.
         /// </summary>
@@ -122,6 +125,32 @@ namespace Orion.GameLogic
             Faction faction = new Faction(factions.Count, this, name, color);
             factions.Add(faction);
             return faction;
+        }
+        #endregion
+
+        public bool IsWithinBounds(Point16 point)
+        {
+            return point.X >= 0 && point.Y >= 0
+                && point.X < Width && point.Y < Height;
+        }
+
+        /// <summary>
+        /// Gets the coordinates of the tile on which a point is, clamped within this <see cref="World"/>'s bounds.
+        /// </summary>
+        /// <param name="point">A point which's tile coords are to be retrieved.</param>
+        /// <returns>The coordinates of the tile on which that point falls.</returns>
+        public Point16 GetClampedTileCoordinates(Vector2 point)
+        {
+            int x = (int)point.X;
+            int y = (int)point.Y;
+
+            if (x < 0) x = 0;
+            else if (x >= Width) x = Width - 1;
+
+            if (y < 0) y = 0;
+            else if (y >= Height) y = Height - 1;
+
+            return new Point16((short)x, (short)y);
         }
 
         /// <summary>

@@ -56,6 +56,11 @@ namespace Orion.GameLogic
         {
             return !tiles[x, y];
         }
+
+        public bool IsWalkable(Point16 point)
+        {
+            return IsWalkable(point.X, point.Y);
+        }
         #endregion
         #endregion
 

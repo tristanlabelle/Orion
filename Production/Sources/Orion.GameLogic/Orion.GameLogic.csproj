@@ -67,6 +67,7 @@
     <Compile Include="Pathfinding\Path.cs" />
     <Compile Include="Pathfinding\Pathfinder.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />
+    <Compile Include="Pathfinding\PathNodeQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceNode.cs" />
     <Compile Include="TagSet.cs" />

@@ -111,6 +111,8 @@ namespace Orion.GameLogic.Pathfinding
             float estimatedCostFromSourceToDestination = EstimateCostToDestination(sourcePoint);
             PathNode sourceNode = GetPathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
 
+            int maxNodesToVisit = world.Width * world.Height / 8;
+
             PathNode currentNode = sourceNode;
             while (currentNode.Position.X != destinationPoint.X || currentNode.Position.Y != destinationPoint.Y)
             {
@@ -118,7 +120,8 @@ namespace Orion.GameLogic.Pathfinding
                 openNodes.Remove(currentNode.Position);
                 AddNearbyNodes(currentNode);
 
-                if (openNodes.Count == 0) return null;
+                if (closedNodes.Count > maxNodesToVisit || openNodes.Count == 0)
+                    return null;
 
                 currentNode = openNodes.First().Value;
                 foreach (PathNode openNode in openNodes.Values)

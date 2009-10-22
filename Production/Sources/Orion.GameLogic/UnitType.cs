@@ -12,7 +12,7 @@ namespace Orion.GameLogic
     public sealed class UnitType
     {
         #region Fields
-		public static readonly IEnumerable<UnitType> AllTypes = new UnitType[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi"), new UnitType("building") };
+		public static readonly IEnumerable<UnitType> AllTypes = new UnitType[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi"), new UnitType("Building") };
 		
         private readonly string name;
         private readonly TagSet tags = new TagSet();
@@ -74,6 +74,7 @@ namespace Orion.GameLogic
         {
             get{ return 20; }
         }
+
         /// <summary>
         /// Gets the distance at which <see cref="Unit"/>s with this  <see cref="UnitType"/> can reach the enemy to attack him.
         /// </summary>
@@ -81,6 +82,7 @@ namespace Orion.GameLogic
         {
             get { return 2; }
         }
+
         /// <summary>
         /// Gets the damage at which <see cref="Unit"/>s whit this  <see cref="UnitType"/> can inflict damage to the enemy.
         /// </summary>
@@ -96,11 +98,9 @@ namespace Orion.GameLogic
 
         public bool IsBuilding
         {
-            get 
-            {
-                return name == "building" || name == "extractor";
-            }
+            get { return name == "Building"; }
         }
+
         public int AlagenePrice
         {
             get { return 0; }

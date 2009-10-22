@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -16,7 +17,8 @@ namespace Orion.GameLogic.Tasks
 
         private readonly Unit striker;
         private readonly Vector2 destination;
-        private Unit enemy = null;
+        private readonly float targetDistance;
+        private Unit target = null;
         private Attack attack = null;
         private Move move;
 
@@ -37,6 +39,7 @@ namespace Orion.GameLogic.Tasks
             
             this.striker = striker;
             this.destination = destination;
+            this.targetDistance = striker.Type.AttackRange;
             this.move = new Move(striker, destination);
         }
 
@@ -63,6 +66,24 @@ namespace Orion.GameLogic.Tasks
             get { return "attacking while moving to {0}".FormatInvariant(destination); }
         }
 
+        /// <summary>
+        /// Gets the current distance remaining between this <see cref="Unit"/>
+        /// and the followed <see cref="Unit"/>.
+        /// </summary>
+        public float CurrentDistance
+        {
+            get { return Circle.SignedDistance(striker.Circle, target.Circle); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the following <see cref="Unit"/>
+        /// is within the target range of its <see cref="target"/>.
+        /// </summary>
+        public bool IsInRange
+        {
+            get { return CurrentDistance <= targetDistance; }
+        }
+
         #endregion
 
         #region Methods
@@ -76,13 +97,10 @@ namespace Orion.GameLogic.Tasks
         {
             if (attack == null)
             {
-                enemy = striker.Faction.World.Units.First(unit => unit.Faction != striker.Faction);
-                if (enemy != null)
+                // Si personne dans le range
+                if (!TryAttack())
                 {
-                    attack = new Attack(striker, enemy);
-                }
-                else
-                {
+                    // si yé arrivé à destination
                     if (move.HasEnded)
                     {
                         return;
@@ -93,16 +111,13 @@ namespace Orion.GameLogic.Tasks
                     }
                 }
             }
+                // Si attaque Fonction
             else
             {
+                // Si terminée
                 if (attack.HasEnded)
                 {
-                    enemy = striker.Faction.World.Units.First(unit => unit.Faction != striker.Faction);
-                    if (enemy != null)
-                    {
-                        attack = new Attack(striker, enemy);
-                    }
-                    else
+                    if (!TryAttack())
                     {
                         if (move.HasEnded)
                         {
@@ -114,13 +129,29 @@ namespace Orion.GameLogic.Tasks
                         }
                     }
                 }
+                    //si Non terminée, on update attaque
                 else
-                {
-                    attack.Update(timeDelta);
+               {
+                        attack.Update(timeDelta);
                 }
             }
         }
-      
+
+        public bool TryAttack()
+        {
+            foreach (Unit enemy in striker.Faction.World.Units.Where(unit => unit.Faction != striker.Faction))
+            {
+                target = enemy;
+
+                if (IsInRange)
+                {
+                    attack = new Attack(striker, target);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         #endregion
     }
 }

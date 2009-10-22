@@ -98,10 +98,7 @@ namespace Orion.GameLogic
         {
             get 
             {
-                if (name == "building")
-                    return true;
-                else
-                    return false;
+                return name == "building" || name == "extractor";
             }
         }
         public int AlagenePrice

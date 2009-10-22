@@ -24,6 +24,7 @@ namespace Orion.GameLogic
         private int resourcesLeft;
         private readonly Vector2 position;
         private World world;
+        private bool isHarvestable = true;
 
         #endregion
 
@@ -44,6 +45,8 @@ namespace Orion.GameLogic
             this.resourcesLeft = amountOfResources;
             this.position = position;
             this.world = world;
+            if (resourceType == ResourceType.Alagene)
+                isHarvestable = false;
         }
         #endregion
 
@@ -72,6 +75,12 @@ namespace Orion.GameLogic
         public Circle Circle
         {
             get { return new Circle(position, 2); }
+        }
+
+        public bool IsHarvestable
+        {
+            get { return isHarvestable; }
+            set { this.isHarvestable = value; }
         }
 
         #endregion

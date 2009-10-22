@@ -53,10 +53,11 @@ namespace Orion.Graphics
         public void OnMouseButton(Vector2 position, MouseButton button, bool pressed)
         {
             selectionManager.OnMouseButton(position, button, pressed);
-            if (button == MouseButton.Right && pressed)
+            if (button == MouseButton.Right && selectionManager.CtrlKeyPressed && pressed)
             {
-                HandleRightClick(position);
+                HandleCtrlRightClick(position);
             }
+            
             else if (button == MouseButton.Middle && pressed)
             {
                 HandleMiddleClick(position);
@@ -64,6 +65,10 @@ namespace Orion.Graphics
             else if (button == MouseButton.Left && selectionManager.CtrlKeyPressed && pressed)
             {
                 HandleCtrlLeftClick(position);
+            }
+            else if (button == MouseButton.Right && pressed)
+            {
+                HandleRightClick(position);
             }
 
         }
@@ -91,6 +96,8 @@ namespace Orion.Graphics
                     // Assigns a gathering task
                     else if (node != null)
                     {
+                        if (!node.IsHarvestable)
+                            return;
                         command = new Harvest(Faction, unitsToAssignTask, node);
                     }
                     else
@@ -127,12 +134,10 @@ namespace Orion.Graphics
             // Build Command
             if (World.Terrain.IsWalkable((int)position.X, (int)position.Y))
             {
-                
                 Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
                 
                 if (builder != null)
                 {
-                    
                     UnitType unitToBuild = new UnitType("building");
                     if (Faction.AladdiumAmount >= unitToBuild.AladdiumPrice && Faction.AlageneAmount >= unitToBuild.AlagenePrice)
                     {
@@ -143,7 +148,21 @@ namespace Orion.Graphics
             }
         }
 
+        private void HandleCtrlRightClick(Vector2 position)
+        {
+            ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
+            Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
 
+            if (builder != null && node != null && node.ResourceType == ResourceType.Alagene)
+            {
+                UnitType extractor = new UnitType("extractor");
+                if (Faction.AladdiumAmount >= extractor.AladdiumPrice && Faction.AlageneAmount >= extractor.AlagenePrice)
+                {
+                    GenerateCommand(new Build(builder, node.Circle.Center, extractor));
+                    node.IsHarvestable = true;
+                }
+            }
+        }
 
         public override void Update(float timeDelta)
         {

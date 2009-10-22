@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +12,8 @@ namespace Orion.GameLogic
     public sealed class UnitType
     {
         #region Fields
+		public static readonly IEnumerable<UnitType> AllTypes = new UnitType[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi"), new UnitType("building") };
+		
         private readonly string name;
         private readonly TagSet tags = new TagSet();
         #endregion

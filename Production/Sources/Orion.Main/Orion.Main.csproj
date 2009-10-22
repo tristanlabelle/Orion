@@ -70,6 +70,7 @@
     </Compile>
     <Compile Include="RunLoop.cs" />
     <Compile Include="MatchRunLoop.cs" />
+    <Compile Include="SinglePlayerMatchConfigurer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

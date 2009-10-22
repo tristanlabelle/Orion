@@ -8,6 +8,8 @@ using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Networking;
 
+using OpenTK.Math;
+
 namespace Orion.Main
 {
     class Match
@@ -15,27 +17,58 @@ namespace Orion.Main
         #region Fields
         private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
 
-        private List<Faction> factions = new List<Faction>();
-
-        protected Random random;
-        protected CommandPipeline pipeline;
-        protected Terrain terrain;
-        protected World world;
+        private Random random;
+        private Terrain terrain;
+		
+		public readonly UserInputCommander UserCommander;
+        public readonly World World;
+        public readonly CommandPipeline Pipeline;
         #endregion
 
         #region Constructors
-        internal Match(Random randomGenerator, Terrain terrain, World world)
+        internal Match(Random randomGenerator, UserInputCommander userCommander, Terrain terrain, World world, CommandPipeline pipeline)
         {
             random = randomGenerator;
-            this.terrain = terrain;
-            this.world = world;
-        }
-        #endregion
+			this.terrain = terrain;
+			UserCommander = userCommander;
+			World = world;
+			Pipeline = pipeline;
+			
+			#region Units & Buildings Creation
+			// this really, really sucks
+			// we have to do something better
+			foreach(Faction faction in world.Factions)
+			{
+				foreach(UnitType type in UnitType.AllTypes)
+				{
+					for(int i = 0; i < 10; i++)
+					{
+						Vector2 position;
+						do
+						{
+	                			position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+						} while(!terrain.IsWalkable(position));
+						Unit unit = faction.CreateUnit(type);
+						unit.Position = position;
+					}
+				}
+			}
+			#endregion
+			
+			#region Resource Nodes
+            for (int i = 0; i < 10; i++)
+            {
+				Vector2 position;
+                do
+                {
+                    position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                } while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y));
+                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Alagene;
+                ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
 
-        #region Properties
-        public IEnumerable<Faction> Factions
-        {
-            get { return factions; }
+                world.ResourceNodes.Add(node);
+            }
+			#endregion
         }
         #endregion
 

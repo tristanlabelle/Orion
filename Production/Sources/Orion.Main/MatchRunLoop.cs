@@ -14,19 +14,19 @@ namespace Orion.Main
         public const float targetSecondsPerFrame = 1.0f / targetFramesPerSecond;
 		
 		private Stopwatch stopwatch;
-		private CommandPipeline pipeline;
+		private Match match;
 		private World world;
 		
-		public MatchRunLoop(GameUI ui, World world, CommandPipeline pipeline)
+		public MatchRunLoop(GameUI ui, World world, Match match)
 			: base(ui)
 		{
 			Argument.EnsureNotNull(ui, "ui");
 			Argument.EnsureNotNull(world, "world");
-			Argument.EnsureNotNull(pipeline, "pipeline");
+			Argument.EnsureNotNull(match, "match");
 			
 			stopwatch = Stopwatch.StartNew();
 			this.world = world;
-			this.pipeline = pipeline;
+			this.match = match;
 		}
 
 		protected override void RunLoopMain()
@@ -40,7 +40,7 @@ namespace Orion.Main
 
                 do
                 {
-                    pipeline.Update(targetFramesPerSecond);
+                    match.Pipeline.Update(targetFramesPerSecond);
                     world.Update(targetSecondsPerFrame);
                     userInterface.Update(targetSecondsPerFrame);
 

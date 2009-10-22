@@ -85,70 +85,15 @@ namespace Orion.Main
 
         private static void RunSinglePlayerGame()
         {
-            Run(new SinglePlayerCommandPipeline());
+			MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
+            Run(configurer.Start());
         }
 
-        private static void Run(CommandPipeline pipeline)
+        private static void Run(Match match)
         {
-            var random = new MersenneTwister();
-            Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
-
-            Terrain terrain = Terrain.Generate(128, 128, random);
-            World world = new World(terrain);
-
-            #region Putting little guys to life
-
-            Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander redCommander = new UserInputCommander(redFaction);
-
-            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
-
-            redCommander.AddToPipeline(pipeline);
-            blueCommander.AddToPipeline(pipeline);
-
-            UnitType[] unitTypes = new[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi") };
-            for (int i = 0; i < 200; ++i)
+            using (GameUI ui = new GameUI(match.World, match.UserCommander))
             {
-                Faction faction = (i % 2 == 0) ? redFaction : blueFaction;
-                Unit unit = faction.CreateUnit(unitTypes[i % unitTypes.Length]);
-                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y))
-                {
-                    position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                }
-                unit.Position = position;
-            }
-
-            #region Resource Nodes
-            for (int i = 0; i < 10; i++)
-            {
-                Vector2 position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y))
-                {
-                    position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                }
-                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Alagene;
-                ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
-
-                world.ResourceNodes.Add(node);
-            }
-            #endregion
-
-            #region Buildings
-            Vector2 buildingPosition = new Vector2(random.Next(world.Width), random.Next(world.Height));
-            while (!world.Terrain.IsWalkable((int)buildingPosition.X, (int)buildingPosition.Y))
-            {
-                buildingPosition = new Vector2(random.Next(world.Width), random.Next(world.Height));
-            }
-            Unit building = redFaction.CreateUnit(new UnitType("building"));
-            building.Position = buildingPosition;
-            #endregion
-            #endregion
-
-            using (GameUI ui = new GameUI(world, redCommander))
-            {
-                MatchRunLoop runLoop = new MatchRunLoop(ui, world, pipeline);
+                MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);
 				while(ui.IsWindowCreated) runLoop.RunOnce();
             }
         }

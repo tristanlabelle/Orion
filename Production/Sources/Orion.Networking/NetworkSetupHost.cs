@@ -7,7 +7,9 @@ namespace Orion.Networking
 	{
 		public NetworkSetupHost(Transporter transporter)
 			: base(transporter)
-		{ }
+		{
+            seed = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+        }
 		
 		protected override void TransporterReceived(Transporter source, NetworkEventArgs args)
 		{
@@ -24,6 +26,11 @@ namespace Orion.Networking
 			byte[] accept = new byte[1];
 			accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
 			transporter.SendTo(accept, host);
+
+            byte[] seeder = new byte[5];
+            seeder[0] = (byte)SetupMessageType.Seed;
+            BitConverter.GetBytes(seed).CopyTo(seeder, 1);
+            transporter.SendTo(seeder, host);
 			
 			byte[] addPeerHostBytes = new byte[7];
 			addPeerHostBytes[0] = (byte)SetupMessageType.AddPeer;

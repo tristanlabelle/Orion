@@ -12,13 +12,15 @@ namespace Orion.Networking
 		RefuseJoinRequest,
 		AddPeer,
 		KickPeer,
-		LeaveGame
+		LeaveGame,
+        Seed
 	}
 	
 	public abstract class NetworkSetupHelper : IDisposable
 	{
 		private GenericEventHandler<Transporter, NetworkEventArgs> receptionDelegate;
-		
+
+        protected int seed;
 		protected Transporter transporter;
 		protected List<IPEndPoint> peers;
 		

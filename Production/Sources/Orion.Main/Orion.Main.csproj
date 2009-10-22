@@ -51,8 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Match Configuration\MultiplayerClientMatchConfigurer.cs" />
+    <Compile Include="Match Configuration\MultiplayerHostMatchConfigurer.cs" />
     <Compile Include="Match.cs" />
-    <Compile Include="MatchConfigurer.cs" />
+    <Compile Include="Match Configuration\MatchConfigurer.cs" />
+    <Compile Include="Match Configuration\MultiplayerMatchConfigurer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -70,7 +73,7 @@
     </Compile>
     <Compile Include="RunLoop.cs" />
     <Compile Include="MatchRunLoop.cs" />
-    <Compile Include="SinglePlayerMatchConfigurer.cs" />
+    <Compile Include="Match Configuration\SinglePlayerMatchConfigurer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

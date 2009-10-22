@@ -50,14 +50,8 @@ namespace Orion.Main
         {
             using (Transporter transporter = new Transporter(41223))
             {
-                List<IPEndPoint> peers;
-                using (NetworkSetupHost host = new NetworkSetupHost(transporter))
-                {
-                    host.WaitForPeers();
-                    peers = host.Peers.ToList();
-                }
-
-                RunMultiplayerGame(transporter, peers, null);
+                MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
+                RunMultiplayerGame(configurer);
             }
         }
 
@@ -65,27 +59,21 @@ namespace Orion.Main
         {
             using (Transporter transporter = new Transporter(41223))
             {
-                List<IPEndPoint> peers;
-                IPEndPoint admin = new IPEndPoint(host, transporter.Port);
-                using (NetworkSetupClient client = new NetworkSetupClient(transporter))
-                {
-                    client.Join(admin);
-                    client.WaitForPeers();
-                    peers = client.Peers.ToList();
-                }
-
-                RunMultiplayerGame(transporter, peers, admin);
+                MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter);
+                configurer.Host = host;
+                RunMultiplayerGame(configurer);
             }
         }
 
-        private static void RunMultiplayerGame(Transporter transporter, IEnumerable<IPEndPoint> peers, IPEndPoint admin)
+        private static void RunMultiplayerGame(MultiplayerMatchConfigurer configurer)
         {
-
+            configurer.CreateNetworkConfiguration();
+            Run(configurer.Start());
         }
 
         private static void RunSinglePlayerGame()
         {
-			MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
+            MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
             Run(configurer.Start());
         }
 
@@ -94,7 +82,7 @@ namespace Orion.Main
             using (GameUI ui = new GameUI(match.World, match.UserCommander))
             {
                 MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);
-				while(ui.IsWindowCreated) runLoop.RunOnce();
+                while (ui.IsWindowCreated) runLoop.RunOnce();
             }
         }
     }

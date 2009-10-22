@@ -29,6 +29,7 @@ namespace Orion.Networking
 				case SetupMessageType.KickPeer: ProcessKickPeer(args.Host, args.Data); return;
 				case SetupMessageType.LeaveGame: ProcessLeaveGame(args.Host); return;
 				case SetupMessageType.RefuseJoinRequest: /* cry */ return;
+                case SetupMessageType.Seed: seed = BitConverter.ToInt32(args.Data, 1); return;
 			}
 			throw new NotImplementedException("A network host should never get messages of setup type {0}".FormatInvariant(args.Data[0]));
 		}

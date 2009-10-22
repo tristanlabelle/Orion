@@ -9,15 +9,16 @@ using Orion.Commandment;
 
 namespace Orion.Main
 {
-	class SinglePlayerMatchConfigurer : MatchConfigurer
+	sealed class SinglePlayerMatchConfigurer : MatchConfigurer
 	{
+        public SinglePlayerMatchConfigurer()
+        {
+            seed = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+        }
+
 		public override Match Start()
 		{
-            var random = new MersenneTwister();
-            Console.WriteLine("Mersenne twister seed: {0}", random.Seed);
-			
-			Terrain terrain = Terrain.Generate(100, 100, random);
-			World world = new World(terrain);
+            CreateMap();
 
             Faction redFaction = world.CreateFaction("Red", Color.Red);
             UserInputCommander redCommander = new UserInputCommander(redFaction);
@@ -25,13 +26,12 @@ namespace Orion.Main
             Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
             DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
 
-            SinglePlayerCommandPipeline pipeline = new SinglePlayerCommandPipeline();
+            CommandPipeline pipeline = new SinglePlayerCommandPipeline();
 
             redCommander.AddToPipeline(pipeline);
             blueCommander.AddToPipeline(pipeline);
 
-            return new Match(random, redCommander, terrain, world, pipeline);
+            return new Match(random, terrain, world, redCommander, pipeline);
 		}
-
 	}
 }

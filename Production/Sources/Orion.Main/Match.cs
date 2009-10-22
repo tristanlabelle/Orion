@@ -19,46 +19,46 @@ namespace Orion.Main
 
         private Random random;
         private Terrain terrain;
-		
-		public readonly UserInputCommander UserCommander;
+
+        public readonly UserInputCommander UserCommander;
         public readonly World World;
         public readonly CommandPipeline Pipeline;
         #endregion
 
         #region Constructors
-        internal Match(Random randomGenerator, UserInputCommander userCommander, Terrain terrain, World world, CommandPipeline pipeline)
+        internal Match(Random randomGenerator, Terrain terrain, World world, UserInputCommander userCommander, CommandPipeline pipeline)
         {
             random = randomGenerator;
-			this.terrain = terrain;
-			UserCommander = userCommander;
-			World = world;
-			Pipeline = pipeline;
-			
-			#region Units & Buildings Creation
-			// this really, really sucks
-			// we have to do something better
-			foreach(Faction faction in world.Factions)
-			{
-				foreach(UnitType type in UnitType.AllTypes)
-				{
-					for(int i = 0; i < 10; i++)
-					{
-						Vector2 position;
-						do
-						{
-	                			position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-						} while(!terrain.IsWalkable(position));
-						Unit unit = faction.CreateUnit(type);
-						unit.Position = position;
-					}
-				}
-			}
-			#endregion
-			
-			#region Resource Nodes
+            this.terrain = terrain;
+            UserCommander = userCommander;
+            World = world;
+            Pipeline = pipeline;
+
+            #region Units & Buildings Creation
+            // this really, really sucks
+            // we have to do something better
+            foreach (Faction faction in world.Factions)
+            {
+                foreach (UnitType type in UnitType.AllTypes)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Vector2 position;
+                        do
+                        {
+                            position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                        } while (!terrain.IsWalkable(position));
+                        Unit unit = faction.CreateUnit(type);
+                        unit.Position = position;
+                    }
+                }
+            }
+            #endregion
+
+            #region Resource Nodes
             for (int i = 0; i < 10; i++)
             {
-				Vector2 position;
+                Vector2 position;
                 do
                 {
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
@@ -68,7 +68,7 @@ namespace Orion.Main
 
                 world.ResourceNodes.Add(node);
             }
-			#endregion
+            #endregion
         }
         #endregion
 

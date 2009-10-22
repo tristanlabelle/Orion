@@ -30,12 +30,7 @@ namespace Orion.GameLogic
         private Vector2 position;
         private float angle;
         private float damage;
-
-        /// <summary>
-        /// The current <see cref="Task"/> of this <see cref="Unit"/>.
-        /// This should never be <c>null</c>, <see cref="Tasks.Stand"/> should be used as a null object.
-        /// </summary>
-        private Task task = Tasks.Stand.Instance;
+        private Task task = null;
         #endregion
 
         #region Constructors
@@ -241,12 +236,10 @@ namespace Orion.GameLogic
             get { return task; }
             set
             {
-                Argument.EnsureNotNull(value, "Task");
-
                 if (type.IsBuilding && (value is Tasks.Move || value is Tasks.Attack || value is Tasks.Follow || value is Tasks.Harvest))
                     return;
                 
-                if (!task.HasEnded) task.OnCancelled(this);
+                if (task != null) task.OnCancelled(this);
                 task = value;
             }
         }
@@ -255,7 +248,7 @@ namespace Orion.GameLogic
         /// </summary>
         public bool IsIdle
         {
-            get { return task.HasEnded; }
+            get { return task == null; }
         }
         #endregion
         #endregion
@@ -282,15 +275,16 @@ namespace Orion.GameLogic
         /// </remarks>
         internal void Update(float timeDeltaInSeconds)
         {
-            if (IsIdle)
+            if (task == null)
             {
                 Unit unitToAttack = World.Units.InArea(LineOfSight).FirstOrDefault(unit => unit.faction != faction);
                 if (unitToAttack != null) Task = new Tasks.Attack(this, unitToAttack);
             }
 
-            if (!task.HasEnded)
+            if (task != null)
             {
                 task.Update(timeDeltaInSeconds);
+                if (task.HasEnded) Task = null;
             }
         }
 

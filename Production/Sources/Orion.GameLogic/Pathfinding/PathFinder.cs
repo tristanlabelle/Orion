@@ -13,6 +13,7 @@ namespace Orion.GameLogic.Pathfinding
         private static readonly float[] movementCostFromSteps = new[] { 0f, 1f, (float)Math.Sqrt(2) };
 
         private readonly World world;
+        private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
         private readonly List<Point16> points = new List<Point16>();
@@ -60,8 +61,15 @@ namespace Orion.GameLogic.Pathfinding
             }
             finally
             {
+                // Return the path nodes to the internal pool of nodes.
+                foreach (PathNode node in openNodes.Values)
+                    nodePool.Add(node);
                 openNodes.Clear();
+
+                foreach (PathNode node in closedNodes.Values)
+                    nodePool.Add(node);
                 closedNodes.Clear();
+
                 points.Clear();
             }
         }
@@ -86,6 +94,14 @@ namespace Orion.GameLogic.Pathfinding
             points.Reverse();
         }
 
+        private PathNode GetPathNode(PathNode parentNode, Point16 position,
+            float costFromSource, float estimatedCostToDestination)
+        {
+            PathNode node = nodePool.Get();
+            node.Reset(parentNode, position, costFromSource, estimatedCostToDestination);
+            return node;
+        }
+
         /// <summary>
         /// Finds a path to the destination point, creating the needed nodes along the way.
         /// </summary>
@@ -93,7 +109,7 @@ namespace Orion.GameLogic.Pathfinding
         private PathNode FindPathNodes(Point16 sourcePoint)
         {
             float estimatedCostFromSourceToDestination = EstimateCostToDestination(sourcePoint);
-            PathNode sourceNode = new PathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
+            PathNode sourceNode = GetPathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
 
             PathNode currentNode = sourceNode;
             while (currentNode.Position.X != destinationPoint.X || currentNode.Position.Y != destinationPoint.Y)
@@ -171,7 +187,7 @@ namespace Orion.GameLogic.Pathfinding
             {
                 // Add the node to the open list
                 float estimatedCostToDestination = EstimateCostToDestination(nearbyPoint);
-                nearbyNode = new PathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
+                nearbyNode = GetPathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
                 openNodes.Add(nearbyPoint, nearbyNode);
             }
         }

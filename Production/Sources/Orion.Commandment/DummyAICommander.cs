@@ -14,7 +14,7 @@ namespace Orion.Commandment
 {
     public sealed class DummyAICommander : Commander
     {
-        #region fields
+        #region Fields
         private readonly Random random = new Random();
         #endregion
 
@@ -28,7 +28,6 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-
         public override void AddToPipeline(CommandPipeline pipeline)
         {
             pipeline.AddCommander(this);
@@ -37,7 +36,7 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
-            List<Unit> unitsToMove = World.Units.Where(unit => unit.Faction == Faction && unit.Task.HasEnded).ToList();
+            List<Unit> unitsToMove = World.Units.Where(unit => unit.Faction == Faction && unit.IsIdle).ToList();
             if (unitsToMove.Count != 0)
             {
                 Command command = new Move(Faction, unitsToMove,

@@ -56,7 +56,7 @@ namespace Orion.Commandment.Commands
         public override void Execute()
         {
             foreach (Unit unit in units)
-                unit.Task = Stand.Instance;
+                unit.Task = null;
         }
         #endregion
         #endregion

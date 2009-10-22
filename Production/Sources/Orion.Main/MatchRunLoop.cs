@@ -28,15 +28,6 @@ namespace Orion.Main
 			this.world = world;
 			this.pipeline = pipeline;
 		}
-		
-		protected override void PrepareRun()
-		{
-			Application.DoEvents();
-			userInterface.Refresh();
-		}
-		
-		protected override void CleanupRun()
-		{ }
 
 		protected override void RunLoopMain()
 		{

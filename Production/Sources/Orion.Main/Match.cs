@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace Orion.Main
         #endregion
 
         #region Constructors
-        public Match(Random randomGenerator, Terrain terrain, World world)
+        internal Match(Random randomGenerator, Terrain terrain, World world)
         {
             random = randomGenerator;
             this.terrain = terrain;

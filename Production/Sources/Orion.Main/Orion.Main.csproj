@@ -69,7 +69,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="RunLoop.cs" />
-    <Compile Include="MainRunLoop.cs" />
+    <Compile Include="MatchRunLoop.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

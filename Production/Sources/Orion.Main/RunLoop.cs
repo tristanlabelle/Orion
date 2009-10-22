@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 using Orion.GameLogic;
 using Orion.Graphics;
@@ -16,8 +17,8 @@ namespace Orion.Main
     abstract class RunLoop
     {
         #region Fields
+		private RunLoop parent;
         private RunLoop child;
-        private DeferenceType deferenceType;
 
         protected GameUI userInterface;
         #endregion
@@ -30,52 +31,47 @@ namespace Orion.Main
         }
 
         #endregion
-
-        #region Events
-
-        private event GenericEventHandler<RunLoop, object> Exited;
-
-        #endregion
-
+		
         #region Methods
 
         public void DeferTo(RunLoop runLoop, DeferenceType how)
         {
-            child = runLoop;
-            deferenceType = how;
+			if(how == DeferenceType.Defer)
+			{
+				if(parent == null) throw new InvalidOperationException("Cannot fully defer execution of the main run loop");
+				parent.child = runLoop;
+			}
+			else
+			{
+				runLoop.parent = this;
+	            child = runLoop;
+			}
         }
 
         public void RunOnce()
         {
             PrepareRun();
-            if (child == null)
-            {
-                RunLoopMain();
-            }
-            else
-            {
-                child.RunOnce();
-            }
+            if (child == null) RunLoopMain();
+            else child.RunOnce();
             CleanupRun();
         }
 
-        protected abstract void PrepareRun();
+        protected virtual void PrepareRun()
+		{
+			Application.DoEvents();
+			userInterface.Refresh();
+		}
+		
         protected abstract void RunLoopMain();
-        protected abstract void CleanupRun();
+		
+        protected virtual void CleanupRun()
+		{ }
 
         protected void ExitRunLoop()
         {
-            GenericEventHandler<RunLoop, object> handler = Exited;
-            if (handler != null)
-            {
-                Exited(this, null);
-            }
-        }
-
-        private void WhenExit(RunLoop runLoop, object dummy)
-        {
-            child = null;
-            if (deferenceType == DeferenceType.Defer) ExitRunLoop();
+			// this makes little sense
+			if(parent == null) throw new InvalidOperationException("Cannot exit the main run loop");
+			parent.child = null;
         }
 
         #endregion

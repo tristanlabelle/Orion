@@ -49,48 +49,48 @@ namespace Orion.Graphics
             rootView.Render();
             glControl.SwapBuffers();
         }
-        
+
         private void glControl_MouseClick(object sender, System.Windows.Forms.MouseEventArgs args)
         {
             TriggerMouseEvent(MouseEventType.MouseClicked, args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
-        
+
         private void glControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs args)
         {
             TriggerMouseEvent(MouseEventType.MouseDown, args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
-        
+
         private void glControl_MouseUp(object sender, System.Windows.Forms.MouseEventArgs args)
         {
             TriggerMouseEvent(MouseEventType.MouseUp, args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
-        
+
         private void glControl_MouseMove(object sender, System.Windows.Forms.MouseEventArgs args)
         {
             TriggerMouseEvent(MouseEventType.MouseMoved, args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
-		
-		private void glControl_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs args)
-		{
+
+        private void glControl_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs args)
+        {
             TriggerMouseEvent(MouseEventType.MouseWheel, args.X, args.Y, args.Button, args.Clicks, args.Delta);
-		}
-		
-		private void glControl_KeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
-		{
-			TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
-		}
-		
-		private void glControl_KeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
-		{
-			TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
-		}
-		
-		private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
-		{
-			KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
-			rootView.PropagateKeyboardEvent(type, args);
-		}
-        
+        }
+
+        private void glControl_KeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
+        {
+            TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
+        }
+
+        private void glControl_KeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
+        {
+            TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
+        }
+
+        private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
+        {
+            KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
+            rootView.PropagateKeyboardEvent(type, args);
+        }
+
         private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks, int delta)
         {
             MouseButton pressedButton = MouseButton.None;
@@ -100,7 +100,7 @@ namespace Orion.Graphics
                 case System.Windows.Forms.MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
                 case System.Windows.Forms.MouseButtons.Right: pressedButton = MouseButton.Right; break;
             }
-            
+
             rootView.PropagateMouseEvent(type, new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
         }
 

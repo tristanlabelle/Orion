@@ -179,7 +179,7 @@ namespace Orion.Graphics
                         eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
                 }
-                else if(child.IsMouseOver)
+                else if (child.IsMouseOver)
                 {
                     child.DispatchMouseEvent(MouseEventType.MouseExited, args);
                     child.CursorPosition = null;
@@ -213,8 +213,8 @@ namespace Orion.Graphics
             return DispatchKeyboardEvent(type, args);
         }
 
-		/// <summary>Propagates an update event to the child views.</summary>
-		/// <param name="args">The <see cref="UpdateEventArgs"/></param>
+        /// <summary>Propagates an update event to the child views.</summary>
+        /// <param name="args">The <see cref="UpdateEventArgs"/></param>
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal override void PropagateUpdateEvent(UpdateEventArgs args)
         {

@@ -63,10 +63,10 @@ namespace Orion
         /// How many consecutive clicks were there (if any)
         /// </summary>
         public readonly int Clicks;
-		/// <summary>
-		/// How many notches the mouse wheel has rotated. 
-		/// </summary>
-		public readonly int WheelDelta;
+        /// <summary>
+        /// How many notches the mouse wheel has rotated. 
+        /// </summary>
+        public readonly int WheelDelta;
 
         /// <summary>
         /// Convenience property that returns a <see cref="Vector2"/> from this object's X and Y fields.
@@ -75,7 +75,7 @@ namespace Orion
         {
             get { return new Vector2(X, Y); }
         }
-        
+
         /// <summary>
         /// Creates a MouseEventArgs structure with a specified point, which mouse button was pressed, and the number of repeated clicks. 
         /// The X and Y positions should be directly usable for views.
@@ -98,7 +98,7 @@ namespace Orion
             Y = y;
             ButtonPressed = button;
             Clicks = clicks;
-			WheelDelta = delta;
+            WheelDelta = delta;
         }
     }
 }

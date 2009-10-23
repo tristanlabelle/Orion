@@ -182,7 +182,7 @@ namespace Orion.GameLogic
         {
             get { return world; }
         }
-        
+
         /// <summary>
         /// Gets the name of this <see cref="Faction"/>.
         /// </summary>

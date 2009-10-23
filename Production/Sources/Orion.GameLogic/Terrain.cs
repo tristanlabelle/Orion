@@ -58,22 +58,22 @@ namespace Orion.GameLogic
         {
             return !tiles[x, y];
         }
-		
+
         /// <summary>
         /// Indicates if the tile at a specified coordinate is walkable.
         /// </summary>
         /// <param name="position">A <see cref="Vector2"/> holding the coordinates</param>
         /// <returns>A boolean value from the terrain field.</returns>
-		public bool IsWalkable(Vector2 position)
-		{
-			return IsWalkable((int)position.X, (int)position.Y);
-		}
-		
+        public bool IsWalkable(Vector2 position)
+        {
+            return IsWalkable((int)position.X, (int)position.Y);
+        }
+
         public bool IsWalkable(Point16 point)
         {
             return IsWalkable(point.X, point.Y);
         }
-		
+
         #endregion
         #endregion
 

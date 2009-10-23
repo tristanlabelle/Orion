@@ -41,16 +41,16 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-		/// <summary>
-		/// Accesses the bounds of the world.
-		/// </summary>
-		public Rectangle WorldBounds
-		{
-			get
-			{
-				return world.Bounds;
-			}
-		}
+        /// <summary>
+        /// Accesses the bounds of the world.
+        /// </summary>
+        public Rectangle WorldBounds
+        {
+            get
+            {
+                return world.Bounds;
+            }
+        }
         #endregion
 
         #region Methods

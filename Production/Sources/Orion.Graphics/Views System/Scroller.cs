@@ -9,7 +9,7 @@ using OpenTK.Graphics;
 
 using Orion.Geometry;
 using Color = System.Drawing.Color;
-using Key = System.Windows.Forms.Keys; 
+using Key = System.Windows.Forms.Keys;
 
 namespace Orion.Graphics
 {
@@ -54,19 +54,19 @@ namespace Orion.Graphics
         {
             if (mouseIsIn || keyIsDown)
             {
-				scrolledView.ScrollBy(direction * args.Delta * 40);
+                scrolledView.ScrollBy(direction * args.Delta * 40);
             }
         }
-		
-		/// <summary>
-		/// Handles keyboard events to tell if the scroller must scroll its attached view. 
-		/// </summary>
-		/// <param name="args">
-		/// The triggering <see cref="KeyboardEventArgs"/>
-		/// </param>
-		/// <returns>
-		/// true, to allow the event to sink
-		/// </returns>
+
+        /// <summary>
+        /// Handles keyboard events to tell if the scroller must scroll its attached view. 
+        /// </summary>
+        /// <param name="args">
+        /// The triggering <see cref="KeyboardEventArgs"/>
+        /// </param>
+        /// <returns>
+        /// true, to allow the event to sink
+        /// </returns>
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             if (args.Key == triggerKey)
@@ -75,16 +75,16 @@ namespace Orion.Graphics
             }
             return base.OnKeyDown(args);
         }
-		
-		/// <summary>
-		/// Handles keyboard events to tell if the scroller must scroll its attached view. 
-		/// </summary>
-		/// <param name="args">
-		/// The <see cref="KeyboardEventArgs"/>
-		/// </param>
-		/// <returns>
-		/// true, to allow the event to sink
-		/// </returns>
+
+        /// <summary>
+        /// Handles keyboard events to tell if the scroller must scroll its attached view. 
+        /// </summary>
+        /// <param name="args">
+        /// The <see cref="KeyboardEventArgs"/>
+        /// </param>
+        /// <returns>
+        /// true, to allow the event to sink
+        /// </returns>
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             if (args.Key == triggerKey)
@@ -93,7 +93,7 @@ namespace Orion.Graphics
             }
             return base.OnKeyUp(args);
         }
-		
+
         /// <summary>
         /// Indicates the user moved the mouse on to the scroller.
         /// </summary>
@@ -121,8 +121,9 @@ namespace Orion.Graphics
         /// Draws nothing.
         /// </summary>
         protected override void Draw()
-		{ }
+        { }
 
         #endregion
     }
+
 }

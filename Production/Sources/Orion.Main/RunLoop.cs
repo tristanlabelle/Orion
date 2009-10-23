@@ -17,7 +17,7 @@ namespace Orion.Main
     abstract class RunLoop
     {
         #region Fields
-		private RunLoop parent;
+        private RunLoop parent;
         private RunLoop child;
 
         protected GameUI userInterface;
@@ -31,21 +31,21 @@ namespace Orion.Main
         }
 
         #endregion
-		
+
         #region Methods
 
         public void DeferTo(RunLoop runLoop, DeferenceType how)
         {
-			if(how == DeferenceType.Defer)
-			{
-				if(parent == null) throw new InvalidOperationException("Cannot fully defer execution of the main run loop");
-				parent.child = runLoop;
-			}
-			else
-			{
-				runLoop.parent = this;
-	            child = runLoop;
-			}
+            if (how == DeferenceType.Defer)
+            {
+                if (parent == null) throw new InvalidOperationException("Cannot fully defer execution of the main run loop");
+                parent.child = runLoop;
+            }
+            else
+            {
+                runLoop.parent = this;
+                child = runLoop;
+            }
         }
 
         public void RunOnce()
@@ -57,21 +57,21 @@ namespace Orion.Main
         }
 
         protected virtual void PrepareRun()
-		{
-			Application.DoEvents();
-			userInterface.Refresh();
-		}
-		
+        {
+            Application.DoEvents();
+            userInterface.Refresh();
+        }
+
         protected abstract void RunLoopMain();
-		
+
         protected virtual void CleanupRun()
-		{ }
+        { }
 
         protected void ExitRunLoop()
         {
-			// this makes little sense
-			if(parent == null) throw new InvalidOperationException("Cannot exit the main run loop");
-			parent.child = null;
+            // this makes little sense
+            if (parent == null) throw new InvalidOperationException("Cannot exit the main run loop");
+            parent.child = null;
         }
 
         #endregion

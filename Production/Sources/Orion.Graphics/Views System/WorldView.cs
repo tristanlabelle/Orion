@@ -43,42 +43,41 @@ namespace Orion.Graphics
             selectionRenderer = new SelectionRenderer(selection);
         }
         #endregion
-		
-		#region Properties
-		
-		/// <summary>
-		/// Accesses the bounds of the world being drawn.
-		/// </summary>
-		public override Rectangle FullBounds
-		{
-			get
-			{
-				return worldRenderer.WorldBounds;
-			}
-		}
 
-		#endregion
+        #region Properties
+
+        /// <summary>
+        /// Accesses the bounds of the world being drawn.
+        /// </summary>
+        public override Rectangle FullBounds
+        {
+            get
+            {
+                return worldRenderer.WorldBounds;
+            }
+        }
+
+        #endregion
 
         #region Methods
-		
-		#region Events Handling
-		
-		/// <summary>
-		/// Zooms in or out when the user scrolls using the mouse wheel.
-		/// </summary>
-		/// <param name="args">A <see cref="MouseEventArgs"/></param>
-		/// <returns>A <see cref="System.Boolean"/></returns>
-		protected override bool OnMouseWheel(MouseEventArgs args)
-		{
+
+        #region Events Handling
+
+        /// <summary>
+        /// Zooms in or out when the user scrolls using the mouse wheel.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/></param>
+        /// <returns>A <see cref="System.Boolean"/></returns>
+        protected override bool OnMouseWheel(MouseEventArgs args)
+        {
             double scale = 1 - (args.WheelDelta / 600.0);
             Zoom(scale, args.Position);
             base.OnMouseWheel(args);
             return false;
-		}
+        }
 
-		
-		#endregion
-		
+        #endregion
+
         /// <summary>
         /// Draws the main game view. 
         /// </summary>

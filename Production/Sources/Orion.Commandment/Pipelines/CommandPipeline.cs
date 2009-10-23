@@ -7,17 +7,17 @@ namespace Orion.Commandment
 {
     public abstract class CommandPipeline
     {
-		#region Fields
+        #region Fields
         private List<Commander> commanders = new List<Commander>();
         protected CommandExecutor executor = new CommandExecutor();
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
         public abstract ICommandSink UserCommandmentEntryPoint { get; }
         public abstract ICommandSink AICommandmentEntryPoint { get; }
-		#endregion
+        #endregion
 
-		#region Methods
+        #region Methods
         public void AddCommander(Commander commander)
         {
             commanders.Add(commander);
@@ -35,6 +35,6 @@ namespace Orion.Commandment
                 commander.Update(frameDuration);
             }
         }
-		#endregion
+        #endregion
     }
 }

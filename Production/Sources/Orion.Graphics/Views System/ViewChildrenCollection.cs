@@ -22,9 +22,9 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-		/// <summary>
-		/// Accesses the parent container of all this collection's elements. 
-		/// </summary>
+        /// <summary>
+        /// Accesses the parent container of all this collection's elements. 
+        /// </summary>
         public ViewContainer Parent
         {
             get { return parent; }

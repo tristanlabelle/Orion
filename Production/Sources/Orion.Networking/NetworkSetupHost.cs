@@ -3,54 +3,54 @@ using System.Net;
 
 namespace Orion.Networking
 {
-	public class NetworkSetupHost : NetworkSetupHelper
-	{
-		public NetworkSetupHost(Transporter transporter)
-			: base(transporter)
-		{
-            seed = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+    public class NetworkSetupHost : NetworkSetupHelper
+    {
+        public NetworkSetupHost(Transporter transporter)
+            : base(transporter)
+        {
+            seed = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
         }
-		
-		protected override void TransporterReceived(Transporter source, NetworkEventArgs args)
-		{
-			switch((SetupMessageType)args.Data[0])
-			{
-				case SetupMessageType.JoinRequest: ProcessJoinRequest(args.Host); return;
-				case SetupMessageType.LeaveGame: ProcessLeaveGame(args.Host); return;
-			}
-			throw new NotImplementedException("A network host should never get messages of setup type {0}".FormatInvariant(args.Data[0]));
-		}
-		
-		private void ProcessJoinRequest(IPEndPoint host)
-		{
-			byte[] accept = new byte[1];
-			accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
-			transporter.SendTo(accept, host);
+
+        protected override void TransporterReceived(Transporter source, NetworkEventArgs args)
+        {
+            switch ((SetupMessageType)args.Data[0])
+            {
+                case SetupMessageType.JoinRequest: ProcessJoinRequest(args.Host); return;
+                case SetupMessageType.LeaveGame: ProcessLeaveGame(args.Host); return;
+            }
+            throw new NotImplementedException("A network host should never get messages of setup type {0}".FormatInvariant(args.Data[0]));
+        }
+
+        private void ProcessJoinRequest(IPEndPoint host)
+        {
+            byte[] accept = new byte[1];
+            accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
+            transporter.SendTo(accept, host);
 
             byte[] seeder = new byte[5];
             seeder[0] = (byte)SetupMessageType.Seed;
             BitConverter.GetBytes(seed).CopyTo(seeder, 1);
             transporter.SendTo(seeder, host);
-			
-			byte[] addPeerHostBytes = new byte[7];
-			addPeerHostBytes[0] = (byte)SetupMessageType.AddPeer;
-			host.CopyTo(addPeerHostBytes, 1);
-			
-			byte[] addPeerBytes = new byte[7];
-			addPeerBytes[0] = (byte)SetupMessageType.AddPeer;
-			foreach(IPEndPoint peer in peers)
-			{
-				peer.CopyTo(addPeerBytes, 1);
-				
-				transporter.SendTo(addPeerHostBytes, peer);
-				transporter.SendTo(addPeerBytes, host);
-			}
-			peers.Add(host);
-		}
-		
-		private void ProcessLeaveGame(IPEndPoint host)
-		{
-			peers.Remove(host);
-		}
-	}
+
+            byte[] addPeerHostBytes = new byte[7];
+            addPeerHostBytes[0] = (byte)SetupMessageType.AddPeer;
+            host.CopyTo(addPeerHostBytes, 1);
+
+            byte[] addPeerBytes = new byte[7];
+            addPeerBytes[0] = (byte)SetupMessageType.AddPeer;
+            foreach (IPEndPoint peer in peers)
+            {
+                peer.CopyTo(addPeerBytes, 1);
+
+                transporter.SendTo(addPeerHostBytes, peer);
+                transporter.SendTo(addPeerBytes, host);
+            }
+            peers.Add(host);
+        }
+
+        private void ProcessLeaveGame(IPEndPoint host)
+        {
+            peers.Remove(host);
+        }
+    }
 }

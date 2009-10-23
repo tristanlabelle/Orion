@@ -17,8 +17,8 @@ namespace Orion.Graphics
     /// </summary>
     class RootView : ViewContainer
     {
-		private Rectangle frame;
-		
+        private Rectangle frame;
+
         public override Rectangle Frame
         {
             get { return frame; }
@@ -28,8 +28,8 @@ namespace Orion.Graphics
                 ResetViewport();
             }
         }
-		
-		public override Rectangle Bounds { get; set; }
+
+        public override Rectangle Bounds { get; set; }
 
         /// <summary>
         /// Creates a RootView object with a frame and bounds.
@@ -40,14 +40,14 @@ namespace Orion.Graphics
             : base()
         {
             Bounds = bounds;
-			Frame = frame;
+            Frame = frame;
         }
 
         public void Update(float delta)
         {
             PropagateUpdateEvent(new UpdateEventArgs(delta));
         }
-        
+
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             Vector2 coords = args.Position;

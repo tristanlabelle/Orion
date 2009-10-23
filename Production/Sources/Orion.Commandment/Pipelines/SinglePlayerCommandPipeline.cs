@@ -7,18 +7,18 @@ namespace Orion.Commandment
 {
     public class SinglePlayerCommandPipeline : CommandPipeline
     {
-		#region Fields
+        #region Fields
         private CommandLogger logger = new CommandLogger();
-		#endregion
+        #endregion
 
-		#region Constructors
+        #region Constructors
         public SinglePlayerCommandPipeline()
         {
             logger.Recipient = executor;
         }
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
         public override ICommandSink UserCommandmentEntryPoint
         {
             get { return logger; }
@@ -28,6 +28,6 @@ namespace Orion.Commandment
         {
             get { return executor; }
         }
-		#endregion
+        #endregion
     }
 }

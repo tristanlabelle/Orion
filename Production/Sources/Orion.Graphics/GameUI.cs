@@ -43,15 +43,15 @@ namespace Orion.Graphics
 
             this.userInputCommander = userInputCommander;
             WorldView worldView = new WorldView(mainWindow.rootView.Bounds, renderer, userInputCommander.SelectionManager);
-            worldView.Bounds = new Rectangle(40,30);
+            worldView.Bounds = new Rectangle(40, 30);
             mainWindow.rootView.Children.Add(worldView);
 
-			Rectangle rootBounds = mainWindow.rootView.Bounds;
-			Rectangle northFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -20);
-			Rectangle southFrame = new Rectangle(0, 0, rootBounds.Width, 20);
-			Rectangle eastFrame = new Rectangle(rootBounds.Width, 0, -20, rootBounds.Height);
-			Rectangle westFrame = new Rectangle(0, 0, 20, rootBounds.Height);
-			Scroller northScroller = new Scroller(northFrame, worldView, new Vector2(0, 1), Keys.Up);
+            Rectangle rootBounds = mainWindow.rootView.Bounds;
+            Rectangle northFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -20);
+            Rectangle southFrame = new Rectangle(0, 0, rootBounds.Width, 20);
+            Rectangle eastFrame = new Rectangle(rootBounds.Width, 0, -20, rootBounds.Height);
+            Rectangle westFrame = new Rectangle(0, 0, 20, rootBounds.Height);
+            Scroller northScroller = new Scroller(northFrame, worldView, new Vector2(0, 1), Keys.Up);
             Scroller southScroller = new Scroller(southFrame, worldView, new Vector2(0, -1), Keys.Down);
             Scroller eastScroller = new Scroller(eastFrame, worldView, new Vector2(1, 0), Keys.Right);
             Scroller westScroller = new Scroller(westFrame, worldView, new Vector2(-1, 0), Keys.Left);
@@ -59,10 +59,10 @@ namespace Orion.Graphics
             mainWindow.rootView.Children.Add(southScroller);
             mainWindow.rootView.Children.Add(eastScroller);
             mainWindow.rootView.Children.Add(westScroller);
-            Rectangle resourceDisplayFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -rootBounds.Height/25);
+            Rectangle resourceDisplayFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -rootBounds.Height / 25);
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
             mainWindow.rootView.Children.Add(resourceDisplay);
-			
+
             worldView.MouseDown += WorldViewMouseDown;
             worldView.MouseMoved += WorldViewMouseMove;
             worldView.MouseUp += WorldViewMouseUp;
@@ -82,7 +82,7 @@ namespace Orion.Graphics
             get { return mainWindow.Created; }
         }
 
-       
+
         #endregion
 
         #region Methods
@@ -122,12 +122,12 @@ namespace Orion.Graphics
             mainWindow.Refresh();
         }
 
-		/// <summary>
-		/// Updates the window and its components state. 
-		/// </summary>
-		/// <param name="delta">
-		/// A <see cref="System.Single"/> representing how many seconds elapsed since the last update event
-		/// </param>
+        /// <summary>
+        /// Updates the window and its components state. 
+        /// </summary>
+        /// <param name="delta">
+        /// A <see cref="System.Single"/> representing how many seconds elapsed since the last update event
+        /// </param>
         public void Update(float delta)
         {
             mainWindow.rootView.Update(delta);

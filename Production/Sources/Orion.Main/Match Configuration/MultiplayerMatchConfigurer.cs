@@ -23,23 +23,15 @@ namespace Orion.Main
         }
 
         public abstract void CreateNetworkConfiguration();
+        protected abstract void AssignFactions(out UserInputCommander userCommander);
 
         public override Match Start()
         {
             CreateMap();
-
-            Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander redCommander = new UserInputCommander(redFaction);
-
-            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
-
             CommandPipeline pipeline = new MultiplayerCommandPipeline(world, transporter, peers);
-
-            redCommander.AddToPipeline(pipeline);
-            blueCommander.AddToPipeline(pipeline);
-
-            return new Match(random, terrain, world, redCommander, pipeline);
+            UserInputCommander userCommander;
+            AssignFactions(out userCommander);
+            return new Match(random, terrain, world, userCommander, pipeline);
         }
     }
 }

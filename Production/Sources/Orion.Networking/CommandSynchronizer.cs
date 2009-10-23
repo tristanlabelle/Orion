@@ -154,7 +154,7 @@ namespace Orion.Networking
             byte messageType = args.Data[0];
             if (messageType == (byte)GameMessageType.Commands)
             {
-                Unserialize(args.Data.Skip(1).ToArray());
+                Deserialize(args.Data.Skip(1).ToArray());
                 receivedFromPeers[args.Host] = true;
                 if (ReceivedFromAllPeers)
                 {
@@ -175,7 +175,7 @@ namespace Orion.Networking
             receivedFromPeers.Remove(args.Host);
         }
 
-        private void Unserialize(byte[] array)
+        private void Deserialize(byte[] array)
         {
             using (MemoryStream stream = new MemoryStream(array))
             {
@@ -183,7 +183,7 @@ namespace Orion.Networking
                 {
                     while (stream.Position != stream.Length)
                     {
-                        readyCommands.Enqueue(serializer.Unserialize(reader));
+                        readyCommands.Enqueue(serializer.Deserialize(reader));
                     }
                 }
             }

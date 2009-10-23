@@ -69,7 +69,7 @@ namespace Orion.Networking
             array[index + addressBytes.Length + 1] = (byte)(port >> 8);
         }
 
-        public static IPEndPoint Unserialize(byte[] array, int index)
+        public static IPEndPoint Deserialize(byte[] array, int index)
         {
             long address = BitConverter.ToInt32(array, index);
             int port = BitConverter.ToUInt16(array, index + 4);

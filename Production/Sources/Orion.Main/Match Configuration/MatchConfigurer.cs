@@ -13,8 +13,8 @@ namespace Orion.Main
     {
         protected static Color[] playerColors = new Color[]
         {
-            Color.Red, Color.DarkBlue, Color.Purple, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.Tan, Color.Turquoise, Color.Cyan, Color.Brown
+            Color.Red, Color.Cyan, Color.Purple, Color.Yellow, Color.Orange,
+            Color.Green, Color.Pink, Color.Tan, Color.Turquoise, Color.Brown, Color.LightGray
         };
 
         protected int numberOfPlayers = 2;

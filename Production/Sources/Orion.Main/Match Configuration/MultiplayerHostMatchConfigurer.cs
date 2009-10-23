@@ -35,7 +35,7 @@ namespace Orion.Main
         protected override void AssignFactions(out UserInputCommander userCommander)
         {
             Faction redFaction = world.CreateFaction("Red", Color.Red);
-            Faction blueFaction = world.CreateFaction("Blue", Color.Blue);
+            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
             userCommander = new UserInputCommander(redFaction);
         }
     }

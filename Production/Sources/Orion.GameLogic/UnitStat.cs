@@ -11,14 +11,14 @@ namespace Orion.GameLogic
     [Serializable]
     public enum UnitStat
     {
-        AlageneCost, // [0, infinity
-        AladdiumCost, // [0, infinity
-        AttackRange, // [0, infinity
-        AttackPower, // [0, infinity
-        AttackSpeed, // [0, infinity
-        CreationSpeed, // [0, infinity
-        MaxHealth, // [1, infinity
-        MovementSpeed, // [0, infinity
-        SightRange // [1, infinity
+        AlageneCost,
+        AladdiumCost,
+        AttackRange,
+        AttackPower,
+        AttackSpeed,
+        CreationSpeed,
+        MaxHealth,
+        MovementSpeed,
+        SightRange
     }
 }

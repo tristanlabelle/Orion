@@ -42,7 +42,7 @@ namespace Orion.Networking
 
         private void ProcessAddPeer(byte[] data)
         {
-            AddPeer(IPEndPointSerialization.Unserialize(data, 1));
+            AddPeer(IPEndPointSerialization.Deserialize(data, 1));
         }
 
         private void AddPeer(IPEndPoint host)
@@ -57,7 +57,7 @@ namespace Orion.Networking
         {
             if (server == host)
             {
-                IPEndPoint target = IPEndPointSerialization.Unserialize(data, 1);
+                IPEndPoint target = IPEndPointSerialization.Deserialize(data, 1);
                 if (peers.Contains(target))
                 {
                     peers.Remove(target);

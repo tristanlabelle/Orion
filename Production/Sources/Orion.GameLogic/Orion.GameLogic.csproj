@@ -78,9 +78,12 @@
     <Compile Include="Tasks\Harvest.cs" />
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\ZoneAttack.cs" />
+    <Compile Include="Technology.cs" />
+    <Compile Include="TechnologyEffect.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitRegistry.cs" />
+    <Compile Include="UnitStat.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>

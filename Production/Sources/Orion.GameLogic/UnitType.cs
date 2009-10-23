@@ -16,6 +16,7 @@ namespace Orion.GameLogic
 		
         private readonly string name;
         private readonly TagSet tags = new TagSet();
+        private readonly Dictionary<UnitStat, int> baseStats = new Dictionary<UnitStat, int>();
         #endregion
 
         #region Constructors
@@ -26,7 +27,10 @@ namespace Orion.GameLogic
         public UnitType(string name)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
+
             this.name = name;
+            baseStats[UnitStat.MaxHealth] = 1;
+            baseStats[UnitStat.SightRange] = 1;
         }
         #endregion
 
@@ -110,10 +114,21 @@ namespace Orion.GameLogic
         {
             get { return 50; }
         }
-
         #endregion
 
         #region Methods
+        public int GetBaseStat(UnitStat stat)
+        {
+            int value;
+            baseStats.TryGetValue(stat, out value);
+            return value;
+        }
+
+        public void SetBaseStat(UnitStat stat, int value)
+        {
+            baseStats[stat] = value;
+        }
+
         public override string ToString()
         {
             return name;

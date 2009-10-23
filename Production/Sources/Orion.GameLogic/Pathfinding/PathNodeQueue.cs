@@ -7,7 +7,6 @@ namespace Orion.GameLogic.Pathfinding
 {
     internal sealed class PathNodeQueue
     {
-        #region Instance
         #region Fields
         private PathNode[] nodes = new PathNode[256];
         private int count;
@@ -125,7 +124,6 @@ namespace Orion.GameLogic.Pathfinding
                 }
             }
         }
-        #endregion
         #endregion
     }
 }

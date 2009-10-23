@@ -19,19 +19,21 @@ namespace Orion.Main
 		public override Match Start()
 		{
             CreateMap();
-
-            Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander redCommander = new UserInputCommander(redFaction);
-
-            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            DummyAICommander blueCommander = new DummyAICommander(blueFaction, random);
-
+			
             CommandPipeline pipeline = new SinglePlayerCommandPipeline();
 
-            redCommander.AddToPipeline(pipeline);
-            blueCommander.AddToPipeline(pipeline);
+            Faction redFaction = world.CreateFaction("Red", Color.Red);
+            UserInputCommander userCommander = new UserInputCommander(redFaction);
+			userCommander.AddToPipeline(pipeline);
 
-            return new Match(random, terrain, world, redCommander, pipeline);
+			for(int i = 1; i < numberOfPlayers; i++)
+			{
+				Faction aiFaction = world.CreateFaction(playerColors[i].Name, playerColors[i]);
+				DummyAICommander aiCommander = new DummyAICommander(aiFaction, random);
+				aiCommander.AddToPipeline(pipeline);
+			}
+
+            return new Match(random, terrain, world, userCommander, pipeline);
 		}
 	}
 }

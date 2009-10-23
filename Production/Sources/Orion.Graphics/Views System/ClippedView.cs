@@ -19,9 +19,6 @@ namespace Orion.Graphics
         private Vector2 BoundsLimitOuter = new Vector2(100, 75);
         private Vector2 BoundsLimitInner = new Vector2(10, 7);
 
-
-
-
         /// <summary>
         /// Constructs a new ClippedView.
         /// </summary>
@@ -46,64 +43,37 @@ namespace Orion.Graphics
         /// <param name="center">The point around which to scale</param>
         public void Zoom(double factor, Vector2 center)
         {
-            // TODO: check for full bounds when zooming so we don't break the aspect ratio
-            Vector2 scale = new Vector2((float)factor, (float)factor);// Détermine la grosseur du scale. 
-            Vector2 newSize = Bounds.Size; // Créer une nouvelle variable de grosseur
+            Vector2 scale = new Vector2((float)factor, (float)factor);
+            Vector2 newSize = Bounds.Size;
             Vector2 newOrigin = Bounds.Origin;
-            if (FullBounds.Size.X >= Bounds.Size.X && FullBounds.Size.Y >= Bounds.Size.Y)
-            {
-                newSize.Scale(scale);// Appliquele nouveau scale, et créer la nouvelle grosseur. 
+            newSize.Scale(scale);
 
-                if (newSize.X > FullBounds.Size.X)
-                {
-                    float ratio = Bounds.Size.Y / Bounds.Size.X;
-                    newSize.X = FullBounds.Size.X;
-                    newSize.Y = newSize.X * ratio;
-                }
-                if (newSize.Y > FullBounds.Size.Y)
-                {
-                    float ratio = Bounds.Size.X / Bounds.Size.Y;
-                    newSize.Y = newSize.X * ratio;
-                    newSize.X = newSize.Y * ratio;
-                }
+            if (newSize.X > FullBounds.Size.X)
+            {
+                float ratio = Bounds.Size.Y / Bounds.Size.X;
+                newSize.X = FullBounds.Size.X;
+                newSize.Y = newSize.X * ratio;
             }
+            if (newSize.Y > FullBounds.Size.Y)
+            {
+                float ratio = Bounds.Size.X / Bounds.Size.Y;
+                newSize.Y = newSize.X * ratio;
+                newSize.X = newSize.Y * ratio;
+            }
+
             Rectangle newBounds = new Rectangle(newOrigin, newSize);
 
-            Vector2 difference = Bounds.Center - newBounds.Center;
-            difference.Scale(0.5f, 0.5f);
-            newOrigin += difference;
-            difference.X = Math.Abs(difference.X);
-            difference.Y = Math.Abs(difference.Y);
+            Vector2 originDifference = Bounds.Center - newBounds.Center;
+            originDifference.Scale(0.5f, 0.5f);
+            newOrigin += originDifference;
 
-            
+            if (newOrigin.X < 0) newOrigin.X = 0;
+            if (newOrigin.Y < 0) newOrigin.Y = 0;
 
-            if (scale.X > 1 || scale.Y > 1)
-            {
-                difference.X = difference.X * -1;
-                difference.Y = difference.Y * -1;
-            }
-            if (Bounds.Origin.X > 0)
-            {
-                newOrigin.X += difference.X;
-            }
-            if (Bounds.Origin.Y > 0)
-            {
-                newOrigin.Y += difference.Y;
-            }
+            newBounds = new Rectangle(newOrigin, newSize);
 
-            if (newOrigin.X < 0)
-                newOrigin.X = 0;
-            if (newOrigin.Y < 0)
-                newOrigin.Y = 0;
-
-            if (newBounds.MaxX > Bounds.MaxX || newBounds.MaxY > Bounds.MaxY)            
-                newOrigin -= newBounds.Max - FullBounds.Max; 
-
-            
-
-
-
-
+            if (newBounds.MaxX > FullBounds.MaxX) newOrigin.X -= newBounds.MaxX - FullBounds.MaxX;
+            if (newBounds.MaxY > FullBounds.MaxY) newOrigin.Y -= newBounds.MaxY - FullBounds.MaxY;
 
             Bounds = new Rectangle(newOrigin, newSize);
 

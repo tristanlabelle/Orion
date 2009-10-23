@@ -68,17 +68,21 @@ namespace Orion.Main
         private static void RunMultiplayerGame(MultiplayerMatchConfigurer configurer)
         {
             configurer.CreateNetworkConfiguration();
-            Run(configurer.Start());
+            Start(configurer);
         }
 
         private static void RunSinglePlayerGame()
         {
             MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
-            Run(configurer.Start());
+            Start(configurer);
         }
 
-        private static void Run(Match match)
+        private static void Start(MatchConfigurer configurer)
         {
+            configurer.NumberOfPlayers = 2;
+
+            Console.WriteLine("Mersenne Twister Seed: {0}", configurer.Seed);
+            Match match = configurer.Start();
             using (GameUI ui = new GameUI(match.World, match.UserCommander))
             {
                 MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);

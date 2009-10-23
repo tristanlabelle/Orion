@@ -25,7 +25,6 @@ namespace Orion.Main
             random = new MersenneTwister(seed);
             terrain = Terrain.Generate(128, 128, random);
             world = new World(terrain);
-            Console.WriteLine("Mersenne twister seed: {0}", seed);
         }
 		
 		public int NumberOfPlayers
@@ -37,6 +36,15 @@ namespace Orion.Main
 				numberOfPlayers = value;
 			}
 		}
+
+        /// <summary>
+        /// Sets the seed manually. (For debugging purposes.)
+        /// </summary>
+        public int Seed
+        {
+            get { return seed; }
+            set { seed = value; }
+        }
 
 		public abstract Match Start();
     }

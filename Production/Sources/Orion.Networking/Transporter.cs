@@ -62,10 +62,11 @@ namespace Orion.Networking
                 Id = id;
                 Data = data;
 
-                fullPacket = new byte[data.Length + 5];
+                fullPacket = new byte[data.Length + 7];
                 fullPacket[0] = DataPacket;
                 BitConverter.GetBytes(id.SessionId).CopyTo(fullPacket, 1);
-                Data.CopyTo(fullPacket, 5);
+                BitConverter.GetBytes((ushort)Data.Length).CopyTo(fullPacket, 5);
+                Data.CopyTo(fullPacket, 7);
             }
 
             public void SendThrough(Socket udpSocket)
@@ -304,7 +305,8 @@ namespace Orion.Networking
 
                         lock (readyData)
                         {
-                            readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packet.Skip(5).ToArray()));
+                            ushort packetLength = BitConverter.ToUInt16(packet, 5);
+                            readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packet.Skip(5).Take(packetLength).ToArray()));
                         }
                     }
                     else

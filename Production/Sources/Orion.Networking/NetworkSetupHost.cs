@@ -18,7 +18,6 @@ namespace Orion.Networking
                 case SetupMessageType.JoinRequest: ProcessJoinRequest(args.Host); return;
                 case SetupMessageType.LeaveGame: ProcessLeaveGame(args.Host); return;
             }
-            throw new NotImplementedException("A network host should never get messages of setup type {0}".FormatInvariant(args.Data[0]));
         }
 
         private void ProcessJoinRequest(IPEndPoint host)

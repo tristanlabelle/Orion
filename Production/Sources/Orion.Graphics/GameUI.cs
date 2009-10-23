@@ -47,9 +47,9 @@ namespace Orion.Graphics
             mainWindow.rootView.Children.Add(worldView);
 
 			Rectangle rootBounds = mainWindow.rootView.Bounds;
-			Rectangle northFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, 20);
+			Rectangle northFrame = new Rectangle(0, rootBounds.Height, rootBounds.Width, -20);
 			Rectangle southFrame = new Rectangle(0, 0, rootBounds.Width, 20);
-			Rectangle eastFrame = new Rectangle(rootBounds.Width, 0, 20, rootBounds.Height);
+			Rectangle eastFrame = new Rectangle(rootBounds.Width, 0, -20, rootBounds.Height);
 			Rectangle westFrame = new Rectangle(0, 0, 20, rootBounds.Height);
 			Scroller northScroller = new Scroller(northFrame, worldView, new Vector2(0, 1), Keys.Up);
             Scroller southScroller = new Scroller(southFrame, worldView, new Vector2(0, -1), Keys.Down);

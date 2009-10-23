@@ -55,6 +55,7 @@
     <Compile Include="Commands\Cancel.cs" />
     <Compile Include="Commands\Move.cs" />
     <Compile Include="CommandSerializer.cs" />
+    <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
     <Compile Include="DummyAICommander.cs" />
     <Compile Include="Pipelines\CommandPipeline.cs" />

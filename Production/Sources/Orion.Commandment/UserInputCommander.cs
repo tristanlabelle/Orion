@@ -86,23 +86,30 @@ namespace Orion.Graphics
                 List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
                 if (unitsToAssignTask.Count() != 0)
                 {
-                    Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
-                    ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
                     Command command;
-                    if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
+                    if(unitsToAssignTask.All(unit => unit.Type.IsBuilding))
                     {
-                        command = new Attack(Faction, unitsToAssignTask, enemy);
-                    }
-                    // Assigns a gathering task
-                    else if (node != null)
-                    {
-                        if (!node.IsHarvestable)
-                            return;
-                        command = new Harvest(Faction, unitsToAssignTask, node);
+                        command = new Train(unitsToAssignTask,new UnitType("Jedi"),unitsToAssignTask[0].Faction);
                     }
                     else
                     {
-                        command = new Move(Faction, unitsToAssignTask, position);
+                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
+                        ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
+                        if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
+                        {
+                            command = new Attack(Faction, unitsToAssignTask, enemy);
+                        }
+                        // Assigns a gathering task
+                        else if (node != null)
+                        {
+                            if (!node.IsHarvestable)
+                                return;
+                            command = new Harvest(Faction, unitsToAssignTask, node);
+                        }
+                        else
+                        {
+                            command = new Move(Faction, unitsToAssignTask, position);
+                        }
                     }
                     GenerateCommand(command);
                 }

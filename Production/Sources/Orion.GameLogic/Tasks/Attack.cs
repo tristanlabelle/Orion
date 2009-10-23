@@ -28,7 +28,7 @@ namespace Orion.GameLogic.Tasks
             
             this.attacker = attacker;
             this.target = target;
-            this.follow = new Follow(attacker, target, attacker.Type.AttackRange);
+            this.follow = new Follow(attacker, target, attacker.GetStat(UnitStat.AttackRange));
             timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion
@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
             if (follow.IsInRange)
             {
                 if (TryInflictDamage(timeDelta))
-                    target.Damage += attacker.Type.AttackDamage;
+                    target.Damage += attacker.GetStat(UnitStat.AttackPower);
             }
             else
             {

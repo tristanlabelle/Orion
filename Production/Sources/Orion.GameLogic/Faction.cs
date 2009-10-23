@@ -235,6 +235,12 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        public int GetStat(UnitType type, UnitStat stat)
+        {
+            Argument.EnsureNotNull(type, "type");
+            return type.GetBaseStat(stat);
+        }
+
         /// <summary>
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>

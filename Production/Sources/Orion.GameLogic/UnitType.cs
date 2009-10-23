@@ -29,8 +29,18 @@ namespace Orion.GameLogic
             Argument.EnsureNotNullNorBlank(name, "name");
 
             this.name = name;
+
+            // Those can't logically be zero.
             baseStats[UnitStat.MaxHealth] = 1;
             baseStats[UnitStat.SightRange] = 1;
+
+            // Temporarly hard-coded for backward compatibility.
+            baseStats[UnitStat.CreationSpeed] = 2;
+            baseStats[UnitStat.MaxHealth] = 10;
+            baseStats[UnitStat.MovementSpeed] = 20;
+            baseStats[UnitStat.AttackRange] = 2;
+            baseStats[UnitStat.SightRange] = 5;
+            baseStats[UnitStat.AladdiumCost] = 50;
         }
         #endregion
 
@@ -54,65 +64,9 @@ namespace Orion.GameLogic
             get { return tags; }
         }
 
-        /// <summary>
-        /// Gets the time, in seconds, needed to create <see cref="Unit"/>s
-        /// of this <see cref="UnitType"/>.
-        /// </summary>
-        public float CreationTime
-        {
-            get { return 5; }
-        }
-
-        /// <summary>
-        /// Gets the maximum amount of health points a unit of this type can have.
-        /// </summary>
-        public float MaxHealth
-        {
-            get { return 10; }
-        }
-
-        /// <summary>
-        /// Gets the speed at which <see cref="Unit"/>s with this <see cref="UnitType"/> move.
-        /// </summary>
-        public float MovementSpeed
-        {
-            get{ return 20; }
-        }
-
-        /// <summary>
-        /// Gets the distance at which <see cref="Unit"/>s with this  <see cref="UnitType"/> can reach the enemy to attack him.
-        /// </summary>
-        public float AttackRange
-        {
-            get { return 2; }
-        }
-
-        /// <summary>
-        /// Gets the damage at which <see cref="Unit"/>s whit this  <see cref="UnitType"/> can inflict damage to the enemy.
-        /// </summary>
-        public float AttackDamage
-        {
-            get { return 1; }
-        }
-
-        public float VisionRange
-        {
-            get { return 5; }
-        }
-
         public bool IsBuilding
         {
             get { return name == "Building"; }
-        }
-
-        public int AlagenePrice
-        {
-            get { return 0; }
-        }
-
-        public int AladdiumPrice
-        {
-            get { return 50; }
         }
         #endregion
 

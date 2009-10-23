@@ -6,13 +6,12 @@ using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
 {
-    public class Build : Task
+    public sealed class Build : Task
     {
-          #region Fields
+        #region Fields
         private readonly Unit builder;
-        private readonly UnitType unitToBuild;
+        private readonly UnitType unitTypeToBuild;
         private readonly Vector2 buildPosition;
-        private const float secondsToBuild = 1;
         private float secondsSpentBuilding = 0;
         private Move move;
         private bool buildHaveBegin = false;
@@ -23,7 +22,7 @@ namespace Orion.GameLogic.Tasks
         public Build(Unit builder, Vector2 buildPosition, UnitType unitToBuild)
         {
             this.builder = builder;
-            this.unitToBuild = unitToBuild;
+            this.unitTypeToBuild = unitToBuild;
             this.buildPosition = buildPosition;
             this.move = new Move(builder, this.buildPosition);
         }
@@ -51,16 +50,20 @@ namespace Orion.GameLogic.Tasks
             {
                 if (!buildHaveBegin)
                 {
-                    if (builder.faction.AladdiumAmount >= unitToBuild.AladdiumPrice
-                    && builder.faction.AlageneAmount >= unitToBuild.AlagenePrice)
+                    int aladdiumCost = builder.Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost);
+                    int alageneCost = builder.Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost);
+
+                    if (builder.Faction.AladdiumAmount >= aladdiumCost
+                        && builder.Faction.AlageneAmount >= alageneCost)
                     {
-                        builder.faction.AladdiumAmount -= unitToBuild.AladdiumPrice;
-                        builder.faction.AlageneAmount -= unitToBuild.AlagenePrice;
+                        builder.Faction.AladdiumAmount -= aladdiumCost;
+                        builder.Faction.AlageneAmount -= alageneCost;
                         buildHaveBegin = true;
                     }
                     else
                     {
-                        Console.WriteLine("Not Enought Ressources");
+                        Console.WriteLine("Not Enough Ressources");
+                        System.Diagnostics.Debug.Fail("Not Enough Ressources");
                         return;
                     }
                 }
@@ -69,7 +72,7 @@ namespace Orion.GameLogic.Tasks
                 {
                     if (BuildingIsOver(timeDelta))
                     {
-                        Unit unitBuilded = builder.faction.CreateUnit(unitToBuild);
+                        Unit unitBuilded = builder.faction.CreateUnit(unitTypeToBuild);
                         unitBuilded.Position = buildPosition;
                         unitConstructed = true;
                         
@@ -84,7 +87,9 @@ namespace Orion.GameLogic.Tasks
 
         private bool BuildingIsOver(float timeDelta)
         {
-            if (secondsSpentBuilding >= secondsToBuild)
+            float maxHealth = builder.Faction.GetStat(unitTypeToBuild, UnitStat.MaxHealth);
+            float creationSpeed = builder.Faction.GetStat(unitTypeToBuild, UnitStat.CreationSpeed);
+            if (secondsSpentBuilding >= maxHealth / creationSpeed)
             {
                 return true;
             }

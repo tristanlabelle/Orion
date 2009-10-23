@@ -186,9 +186,10 @@ namespace Orion.GameLogic
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(position, Circle.Radius + type.VisionRange); }
+            get { return new Circle(position, Circle.Radius + GetStat(UnitStat.SightRange)); }
         }
 
+        #region Health
         /// <summary>
         /// Accesses the damage that has been inflicted to this <see cref="Unit"/>, in health points.
         /// </summary>
@@ -198,14 +199,22 @@ namespace Orion.GameLogic
             set
             {
                 Argument.EnsurePositive(value, "Damage");
-                if (value > type.MaxHealth) value = type.MaxHealth;
+                if (value > MaxHealth) value = MaxHealth;
                 if (value == damage) return;
 
                 damage = value;
 
                 OnDamageChanged();
-                if (damage == type.MaxHealth) OnDied();
+                if (damage == MaxHealth) OnDied();
             }
+        }
+
+        /// <summary>
+        /// Gets the maximum amount of health points this <see cref="Unit"/> can have.
+        /// </summary>
+        public float MaxHealth
+        {
+            get { return GetStat(UnitStat.MaxHealth); }
         }
 
         /// <summary>
@@ -213,8 +222,8 @@ namespace Orion.GameLogic
         /// </summary>
         public float Health
         {
-            get { return type.MaxHealth - damage; }
-            set { Damage = type.MaxHealth - value; }
+            get { return MaxHealth - damage; }
+            set { Damage = MaxHealth - value; }
         }
 
         /// <summary>
@@ -227,6 +236,7 @@ namespace Orion.GameLogic
         {
             get { return Health > 0; }
         }
+        #endregion
 
         /// <summary>
         /// Accesses the <see cref="Task"/> currently executed by this <see cref="Unit"/>.
@@ -255,6 +265,16 @@ namespace Orion.GameLogic
 
         #region Methods
         /// <summary>
+        /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
+        /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
+        public int GetStat(UnitStat stat)
+        {
+            return faction.GetStat(type, stat);
+        }
+
+        /// <summary>
         /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
         /// </summary>
         /// <param name="unit">The <see cref="Unit"/> to be tested.</param>
@@ -263,7 +283,7 @@ namespace Orion.GameLogic
         /// </returns>
         public bool CanSee(Unit unit)
         {
-            return Circle.SignedDistance(Circle, unit.Circle) <= type.VisionRange;
+            return Circle.SignedDistance(Circle, unit.Circle) <= GetStat(UnitStat.SightRange);
         }
 
         /// <summary>

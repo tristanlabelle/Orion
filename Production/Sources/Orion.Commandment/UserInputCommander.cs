@@ -138,10 +138,11 @@ namespace Orion.Graphics
                 
                 if (builder != null)
                 {
-                    UnitType unitToBuild = new UnitType("building");
-                    if (Faction.AladdiumAmount >= unitToBuild.AladdiumPrice && Faction.AlageneAmount >= unitToBuild.AlagenePrice)
+                    UnitType unitTypeToBuild = new UnitType("building");
+                    if (Faction.AladdiumAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost)
+                        && Faction.AlageneAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost))
                     {
-                        GenerateCommand(new Build(builder, position,unitToBuild));
+                        GenerateCommand(new Build(builder, position, unitTypeToBuild));
                     }
                 }
 
@@ -153,10 +154,13 @@ namespace Orion.Graphics
             ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
             Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
 
-            if (builder != null && node != null && node.ResourceType == ResourceType.Alagene && !node.IsHarvestable)
+            if (builder != null && node != null
+                && node.ResourceType == ResourceType.Alagene
+                && !node.IsHarvestable)
             {
                 UnitType extractor = new UnitType("extractor");
-                if (Faction.AladdiumAmount >= extractor.AladdiumPrice && Faction.AlageneAmount >= extractor.AlagenePrice)
+                if (Faction.AladdiumAmount >= Faction.GetStat(extractor, UnitStat.AladdiumCost)
+                    && Faction.AlageneAmount >= Faction.GetStat(extractor, UnitStat.AlageneCost))
                 {
                     GenerateCommand(new Build(builder, node.Circle.Center, extractor));
                     node.IsHarvestable = true;

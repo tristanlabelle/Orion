@@ -112,7 +112,7 @@ namespace Orion.GameLogic.Tasks
 
             Vector2 direction = Vector2.Normalize(delta);
 
-            float movementDistance = unit.Type.MovementSpeed * timeDelta;
+            float movementDistance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
             if (movementDistance > distanceRemaining)
             {
                 // Move just a little more than needed,

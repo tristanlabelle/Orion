@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
-            float distance = unit.Type.MovementSpeed * timeDelta;
+            float distance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
             if (distance < delta.Length)
             {
                 // Unit walks along a segment of the path within this frame.

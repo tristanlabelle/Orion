@@ -83,7 +83,7 @@ namespace Orion.Graphics
                 Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
                 Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
 
-                float healthRatio = unit.Health / unit.Type.MaxHealth;
+                float healthRatio = unit.Health / unit.MaxHealth;
                 Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
 
                 graphics.StrokeColor = Color.Lime;

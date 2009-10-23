@@ -25,7 +25,6 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-
         /// <summary>
         /// Initializes a new <see cref="ZoneAttack"/> task from the <see cref="Unit"/>
         /// that attacks and its destination.
@@ -39,10 +38,9 @@ namespace Orion.GameLogic.Tasks
             
             this.striker = striker;
             this.destination = destination;
-            this.targetDistance = striker.Type.AttackRange;
+            this.targetDistance = striker.GetStat(UnitStat.AttackRange);
             this.move = new Move(striker, destination);
         }
-
         #endregion
 
         #region Properties
@@ -87,7 +85,6 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-
         /// <summary>
         /// At each update, checks if an enemy unit is in range of the striker, if so it creates an attack taks
         /// if not the units moves towards its destination. The appropriate tasks are uptated each time.
@@ -97,10 +94,10 @@ namespace Orion.GameLogic.Tasks
         {
             if (attack == null)
             {
-                // Si personne dans le range
+                // If there's no-one in the attack range
                 if (!TryAttack())
                 {
-                    // si yé arrivé à destination
+                    // If we reached our destination.
                     if (move.HasEnded)
                     {
                         return;
@@ -111,10 +108,8 @@ namespace Orion.GameLogic.Tasks
                     }
                 }
             }
-                // Si attaque Fonction
-            else
+            else // if attacking
             {
-                // Si terminée
                 if (attack.HasEnded)
                 {
                     if (!TryAttack())
@@ -129,29 +124,23 @@ namespace Orion.GameLogic.Tasks
                         }
                     }
                 }
-                    //si Non terminée, on update attaque
                 else
-               {
-                        attack.Update(timeDelta);
+                {
+                    attack.Update(timeDelta);
                 }
             }
         }
 
         public bool TryAttack()
         {
-            foreach (Unit enemy in striker.Faction.World.Units.Where(unit => unit.Faction != striker.Faction))
-            {
-                target = enemy;
+            Unit target = striker.World.Units
+                .InArea(striker.LineOfSight)
+                .Where(unit => unit.Faction != striker.Faction)
+                .FirstOrDefault();
 
-                if (IsInRange)
-                {
-                    attack = new Attack(striker, target);
-                    return true;
-                }
-            }
-            return false;
+            if (target != null) attack = new Attack(striker, target);
+            return target != null;
         }
-
         #endregion
     }
 }

@@ -13,7 +13,7 @@ namespace Orion.Main
     {
         public SinglePlayerMatchConfigurer()
         {
-            seed = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            seed = (int)Environment.TickCount;
         }
 
         public override Match Start()

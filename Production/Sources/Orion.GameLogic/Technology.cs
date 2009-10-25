@@ -10,6 +10,14 @@ namespace Orion.GameLogic
     /// Represents a technology that, when researched, has an effect
     /// on one or more stats of a <see cref="UnitType"/>.
     /// </summary>
+    /// <remarks>
+    /// Possible requirements:
+    /// - Resources
+    /// - Other technologies
+    /// Possible effects:
+    /// - Alter a stat of unit types with a tag
+    /// - Unlock a unit type
+    /// </remarks>
     [Serializable]
     public sealed class Technology
     {

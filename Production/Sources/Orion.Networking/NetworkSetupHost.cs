@@ -22,6 +22,7 @@ namespace Orion.Networking
 
         private void ProcessJoinRequest(IPEndPoint host)
         {
+            Console.WriteLine("Received a join request from {0}", host);
             byte[] accept = new byte[1];
             accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
             transporter.SendTo(accept, host);

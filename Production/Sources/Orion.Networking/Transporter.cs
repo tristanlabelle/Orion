@@ -306,7 +306,9 @@ namespace Orion.Networking
                         lock (readyData)
                         {
                             ushort packetLength = BitConverter.ToUInt16(packet, 1 + sizeof(uint));
-                            readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packet.Skip(1 + sizeof(uint) + sizeof(ushort)).Take(packetLength).ToArray()));
+                            byte[] packetData = new byte[packetLength];
+                            Array.Copy(packet, 1 + sizeof(uint) + sizeof(ushort), packetData, 0, packetLength);
+                            readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packetData));
                         }
                     }
                     else

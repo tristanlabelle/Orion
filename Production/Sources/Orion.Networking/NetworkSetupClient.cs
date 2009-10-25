@@ -14,6 +14,7 @@ namespace Orion.Networking
         public void Join(IPEndPoint host)
         {
             Argument.EnsureNotNull(host, "host");
+            Console.WriteLine("Asking {0} to join the game", host);
 
             byte[] packet = new byte[1];
             packet[0] = (byte)SetupMessageType.JoinRequest;
@@ -36,6 +37,7 @@ namespace Orion.Networking
 
         private void ProcessAcceptJoinRequest(IPEndPoint host)
         {
+            Console.WriteLine("Server accepted our join request");
             server = host;
             AddPeer(host);
         }

@@ -31,6 +31,7 @@ namespace Orion.Main
             CommandPipeline pipeline = new MultiplayerCommandPipeline(world, transporter, peers);
             UserInputCommander userCommander;
             AssignFactions(out userCommander);
+            userCommander.AddToPipeline(pipeline);
             return new Match(random, terrain, world, userCommander, pipeline);
         }
     }

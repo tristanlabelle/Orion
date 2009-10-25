@@ -73,8 +73,6 @@ namespace Orion.Graphics
 
         }
 
-
-
         /// <summary>
         /// The Function Called When a right mouse click happend
         /// </summary>

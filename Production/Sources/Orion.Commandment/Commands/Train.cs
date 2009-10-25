@@ -6,11 +6,11 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    class Train:Command
+    public class Train:Command
     {
           #region Fields
-        private readonly List<Unit> BuldingsIdentical;
-        private readonly UnitType unitTobuild;
+        private readonly List<Unit> identicalsBuildings;
+        private readonly UnitType unitToCreate;
         #endregion
 
         #region Constructors
@@ -23,16 +23,25 @@ namespace Orion.Commandment.Commands
         public Train(List<Unit> selectedsSameBuilding,UnitType unitTobuild, Faction faction)
             : base(faction)
         {
-            this.BuldingsIdentical = selectedsSameBuilding;
-            this.unitTobuild = unitTobuild;
+            this.identicalsBuildings = selectedsSameBuilding;
+            this.unitToCreate = unitTobuild;
         }
         #endregion
 
         #region Methods
         public override void Execute()
         {
-           
-               // BuldingsIdentical.Task = new Orion.GameLogic.Tasks.Build(BuldingsIdentical,position,unitTobuild);
+            int aladiumCost = base.SourceFaction.GetStat(unitToCreate, UnitStat.AladdiumCost);
+            int alageneCost = base.SourceFaction.GetStat(unitToCreate, UnitStat.AlageneCost);
+            for (int i = 0; i < identicalsBuildings.Count;i++ )
+            {
+                // If we don't have enought money to continue the production we stop.
+                if (!(base.SourceFaction.AladdiumAmount >= (aladiumCost + aladiumCost * i)
+                       && base.SourceFaction.AlageneAmount >= (alageneCost + alageneCost * i)))
+                    break;
+                identicalsBuildings[i].Task = new Orion.GameLogic.Tasks.Train(identicalsBuildings[i], unitToCreate);
+            }
+
         }
         #endregion
     

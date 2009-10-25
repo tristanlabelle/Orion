@@ -41,6 +41,7 @@ namespace Orion.GameLogic
             baseStats[UnitStat.AttackRange] = 2;
             baseStats[UnitStat.SightRange] = 5;
             baseStats[UnitStat.AladdiumCost] = 50;
+            baseStats[UnitStat.AttackPower] = 1;
         }
         #endregion
 

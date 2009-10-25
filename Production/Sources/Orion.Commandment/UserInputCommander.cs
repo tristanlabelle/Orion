@@ -87,9 +87,12 @@ namespace Orion.Graphics
                 if (unitsToAssignTask.Count() != 0)
                 {
                     Command command;
-                    if(unitsToAssignTask.All(unit => unit.Type.IsBuilding))
+                    if (unitsToAssignTask.All(unit => unit.Type.IsBuilding))
                     {
-                        command = new Train(unitsToAssignTask,new UnitType("Jedi"),unitsToAssignTask[0].Faction);
+                        UnitType unitToCreate = UnitType.AllTypes.FirstOrDefault(unitTypes => unitTypes.Name == "Jedi");
+                        if (unitToCreate == null) return;
+                        command = new Train(unitsToAssignTask, unitToCreate, unitsToAssignTask[0].Faction);
+
                     }
                     else
                     {
@@ -145,7 +148,9 @@ namespace Orion.Graphics
                 
                 if (builder != null)
                 {
-                    UnitType unitTypeToBuild = new UnitType("building");
+                    UnitType unitTypeToBuild = UnitType.AllTypes.FirstOrDefault(unitType => unitType.Name == "Building");
+                    if (unitTypeToBuild == null) return;
+
                     if (Faction.AladdiumAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost)
                         && Faction.AlageneAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost))
                     {

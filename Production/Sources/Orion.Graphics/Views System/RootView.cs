@@ -15,10 +15,32 @@ namespace Orion.Graphics
     /// <summary>
     /// A RootView is a base container. It does no drawing on its own.
     /// </summary>
-    class RootView : ViewContainer
+    public sealed class RootView : ViewContainer
     {
-        private Rectangle frame;
+        #region Fields
+        public static readonly Rectangle ContentsBounds = new Rectangle(1024, 768);
 
+        private Rectangle frame;
+        private Stack<UIDisplay> displays;
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Creates a RootView object with a frame and bounds.
+        /// </summary>
+        /// <param name="frame">The frame of the view</param>
+        /// <param name="bounds">The bounds of the view</param>
+        public RootView(Rectangle frame, Rectangle bounds)
+            : base()
+        {
+            Bounds = bounds;
+            Frame = frame;
+            displays = new Stack<UIDisplay>();
+            displays.Push(new MainMenuUI());
+        }
+        #endregion
+
+        #region Properties
         public override Rectangle Frame
         {
             get { return frame; }
@@ -30,22 +52,34 @@ namespace Orion.Graphics
         }
 
         public override Rectangle Bounds { get; set; }
+        #endregion
 
-        /// <summary>
-        /// Creates a RootView object with a frame and bounds.
-        /// </summary>
-        /// <param name="frame">The frame of the view</param>
-        /// <param name="bounds">The bounds of the view</param>
-        public RootView(Rectangle frame, Rectangle bounds)
-            : base()
+        #region Methods
+        public void PushDisplay(UIDisplay display)
         {
-            Bounds = bounds;
-            Frame = frame;
+            UIDisplay topDisplay = null;
+            while(topDisplay != displays.Peek())
+            {
+                topDisplay = displays.Peek();
+                topDisplay.OnShadow(this);
+            }
+            
+            displays.Push(display);
+            display.OnEnter(this);
+        }
+
+        public void PopDisplay(UIDisplay display)
+        {
+            if (displays.Count < 2) throw new InvalidOperationException("Cannot pop the initial display from the stack");
+            if (displays.Peek() != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
+
+            displays.Pop();
+            displays.Peek().OnEnter(this);
         }
 
         public void Update(float delta)
         {
-            PropagateUpdateEvent(new UpdateEventArgs(delta));
+            displays.Peek().PropagateUpdateEvent(new UpdateEventArgs(delta));
         }
 
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
@@ -53,12 +87,12 @@ namespace Orion.Graphics
             Vector2 coords = args.Position;
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
-            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            return displays.Peek().PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            return base.PropagateKeyboardEvent(type, args);
+            return displays.Peek().PropagateKeyboardEvent(type, args);
         }
 
         protected internal override void Render()
@@ -67,7 +101,7 @@ namespace Orion.Graphics
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
 
-            base.Render();
+            displays.Peek().Render();
         }
 
         private void ResetViewport()
@@ -79,5 +113,6 @@ namespace Orion.Graphics
             GL.Ortho(bounds.X, bounds.Width, bounds.Y, bounds.Height, -1, 1);
             GL.MatrixMode(MatrixMode.Modelview);
         }
+        #endregion
     }
 }

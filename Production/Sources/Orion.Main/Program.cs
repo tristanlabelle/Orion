@@ -83,9 +83,12 @@ namespace Orion.Main
 
             Console.WriteLine("Mersenne Twister Seed: {0}", configurer.Seed);
             Match match = configurer.Start();
-            using (GameUI ui = new GameUI(match.World, match.UserCommander))
+            // todo: use a root menu UI instead of the match display here
+            using (GameUI ui = new GameUI())
             {
+                MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
                 MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);
+                ui.Display(matchUI);
                 while (ui.IsWindowCreated) runLoop.RunOnce();
             }
         }

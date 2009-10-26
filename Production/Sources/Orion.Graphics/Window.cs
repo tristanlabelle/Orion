@@ -29,9 +29,8 @@ namespace Orion.Graphics
         {
             InitializeComponent();
 
-            Rectangle maxResolution = new Rectangle(1024f, 768f);
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
-            rootView = new RootView(windowBounds, maxResolution);
+            rootView = new RootView(windowBounds, RootView.ContentsBounds);
         }
         #endregion
 

@@ -136,9 +136,7 @@ namespace Orion.Graphics
             context.SetUpGLContext(Frame);
 
             Draw();
-
             base.Render();
-
             context.RestoreGLContext();
         }
         #endregion

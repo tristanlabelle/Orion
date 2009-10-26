@@ -1,116 +1,121 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 using Orion.Geometry;
 using OpenTK.Math;
 
-namespace Orion.Graphics
+namespace Orion.UserInterface
 {
-    /// <summary>
-    /// The Responder abstract class provides basic facilities for handling mouse and keyboard events for OpenGL-based graphics environments.
-    /// </summary>
-    public abstract class Responder
+    public abstract class Responder : ViewContainer
     {
         #region Fields
-
-        private Vector2? cursorPosition = null;
-
+        private Vector2? cursorPosition;
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Indicates if the mouse is currently positioned over the Responder.
-        /// </summary>
-        public bool IsMouseOver
-        {
-            get { return cursorPosition.HasValue; }
-        }
+        public abstract Rectangle Bounds { get; set; }
+        public abstract Rectangle Frame { get; set; }
 
-        /// <summary>
-        /// Accesses the position, in local coordinates, of the mouse cursor over the view.
-        /// </summary>
         public Vector2? CursorPosition
         {
             get { return cursorPosition; }
             set { cursorPosition = value; }
         }
+
+        public bool IsMouseOver
+        {
+            get { return cursorPosition.HasValue; }
+        }
         #endregion
 
         #region Events
-        /// <summary>
-        /// The event triggered when the user presses the left button of the mouse while positioned over the view
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseDown;
-
-        /// <summary>
-        /// The event triggered when the user releases the left button of the mouse while positioned over the view
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseUp;
-
-        /// <summary>
-        /// The event triggered when the used presses and releases the mouse button
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseClicked;
-
-        /// <summary>
-        /// The event triggered when the user moves the mouse over the view
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseMoved;
-
-        /// <summary>
-        /// The event triggered when the user scrolls using the mouse wheel. 
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseWheel;
-
-        /// <summary>
-        /// The event triggered when the mouse pointer enters the view region.
-        /// </summary>
-        /// <remarks>This event is typically followed by a MouseMoved event.</remarks>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseEntered;
-
-        /// <summary>
-        /// The event triggered when the mouse pointer exits the view region.
-        /// </summary>
         public event GenericEventHandler<Responder, MouseEventArgs> MouseExited;
-
-        /// <summary>
-        /// The event triggered when the user presses a key.
-        /// </summary>
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyDown;
-
-        /// <summary>
-        /// The event triggered when the user releases a key.
-        /// </summary>
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyUp;
-
-        /// <summary>
-        /// The event triggered when the responder's state is updated.
-        /// </summary>
-        /// <remarks>This happens once in every run loop iteration.</remarks>
         public event GenericEventHandler<Responder, UpdateEventArgs> Updated;
         #endregion
 
-        #region Event Handling
+        #region Methods
 
-        #region Mouse Events
-        /// <summary>
-        /// Propagates a mouse event to the lower responder hierarchy.
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="MouseEventType"/> type of the event
-        /// </param>
-        /// <param name="args">
-        /// The event data itself
-        /// </param>
-        /// <returns>
-        /// True if it's okay to propagate the event to the upper responder hierarchy.
-        /// </returns>
-        protected internal abstract bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args);
-
-        /// <summary>
-        /// Calls the appropriate event method for an event type.
-        /// </summary>
-        /// <param name="eventType">The type of the event</param>
+        #region Event Propagation
+        /// <summary>Propagates a mouse event to the child views.</summary>
+        /// <remarks>
+        /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
+        /// </remarks>
+        /// <param name="type">The type of event to propagate</param>
         /// <param name="args">The event arguments as a <see cref="MouseEventArgs"/></param>
-        /// <returns></returns>
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
+        protected internal virtual bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+            bool eventCanSink = true;
+            foreach (Responder child in Enumerable.Reverse(Children))
+            {
+                if (child.Frame.ContainsPoint(args.Position))
+                {
+                    if (eventCanSink)
+                    {
+                        if (!child.IsMouseOver)
+                        {
+                            child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
+                        }
+                        child.CursorPosition = args.Position;
+                        eventCanSink &= child.PropagateMouseEvent(type, args);
+                    }
+                }
+                else if (child.IsMouseOver)
+                {
+                    child.DispatchMouseEvent(MouseEventType.MouseExited, args);
+                    child.CursorPosition = null;
+                }
+            }
+
+            if (eventCanSink)
+            {
+                return DispatchMouseEvent(type, args);
+            }
+            return false;
+        }
+
+        /// <summary>Propagates a keyboard event to the child views.</summary>
+        /// <remarks>
+        /// Events are propagated in a bottom-up order, but priority of execution is given in an up-bottom order (we will call this "event sinking").
+        /// </remarks>
+        /// <param name="type">The type of event to propagate</param>
+        /// <param name="args">The event arguments as a <see cref="KeyboardEventArgs"/></param>
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
+        protected internal virtual bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+        {
+            // for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
+            foreach (Responder child in Enumerable.Reverse(Children))
+            {
+                child.DispatchKeyboardEvent(type, args);
+            }
+
+            return DispatchKeyboardEvent(type, args);
+        }
+
+        /// <summary>Propagates an update event to the child views.</summary>
+        /// <param name="args">The <see cref="UpdateEventArgs"/></param>
+        /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
+        protected internal virtual void PropagateUpdateEvent(UpdateEventArgs args)
+        {
+            foreach (Responder child in Enumerable.Reverse(Children))
+            {
+                child.PropagateUpdateEvent(args);
+                child.OnUpdate(args);
+            }
+        }
+        #endregion
+
+        #region Event Dispatch
         protected internal bool DispatchMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             switch (eventType)
@@ -126,6 +131,20 @@ namespace Orion.Graphics
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
 
+        protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+        {
+            switch (type)
+            {
+                case KeyboardEventType.KeyDown: return OnKeyDown(args);
+                case KeyboardEventType.KeyUp: return OnKeyUp(args);
+            }
+            throw new NotImplementedException(String.Format("Keyboard event type {0} does not have a handler method", type));
+        }
+        #endregion
+
+        #region Event Handling
+
+        #region Mouse Events
         /// <summary>
         /// Calls the event handler for mouse clicks.
         /// </summary>
@@ -221,44 +240,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Keyboard Events
-
-        /// <summary>
-        /// Propagates a keyboard event to the lower responder hierarchy.
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="KeyboardEventType"/> of the event
-        /// </param>
-        /// <param name="args">
-        /// The event data itself
-        /// </param>
-        /// <returns>
-        /// True if it's okay to propagate the event to the upper responder hierarchy.
-        /// </returns>
-        protected internal abstract bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args);
-
-        /// <summary>
-        /// Dispatches a keyboard event to the correct method, based on the event type.
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="KeyboardEventType"/> of the event
-        /// </param>
-        /// <param name="args">
-        /// The event data
-        /// </param>
-        /// <returns>
-        /// True if it's okay to propagate the event to the upper responder hierarchy
-        /// </returns>
-        protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
-        {
-            switch (type)
-            {
-                case KeyboardEventType.KeyDown: return OnKeyDown(args);
-                case KeyboardEventType.KeyUp: return OnKeyUp(args);
-            }
-            throw new NotImplementedException(String.Format("Keyboard event type {0} does not have a handler method", type));
-        }
-
-
         /// <summary>
         /// Calls the event handler for key pressing. The default implementation allows for event sinking by always returning true.
         /// </summary>
@@ -288,15 +269,9 @@ namespace Orion.Graphics
                 handler(this, args);
             }
         }
-
         #endregion
 
-        #region Update Event
-
-        /// <summary>
-        /// Calls the event handler for game run loop update.
-        /// </summary>
-        /// <param name="args">The update arguments passed to the events</param>
+        #region Update Events
         protected virtual void OnUpdate(UpdateEventArgs args)
         {
             GenericEventHandler<Responder, UpdateEventArgs> handler = Updated;
@@ -305,14 +280,7 @@ namespace Orion.Graphics
                 handler(this, args);
             }
         }
-
-        /// <summary>
-        /// Propagates the Update event handler to all child responders. 
-        /// </summary>
-        /// <param name="args">
-        /// A <see cref="UpdateEventArgs"/> telling how much time passed since the last update event
-        /// </param>
-        protected internal abstract void PropagateUpdateEvent(UpdateEventArgs args);
+        #endregion
 
         #endregion
 

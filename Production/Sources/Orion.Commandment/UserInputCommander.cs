@@ -84,7 +84,7 @@ namespace Orion.Graphics
                 List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
                 if (unitsToAssignTask.Count() != 0)
                 {
-                    Command command;
+                    Command command = null;
                     if (unitsToAssignTask.All(unit => unit.Type.IsBuilding))
                     {
                         UnitType unitToCreate = UnitType.AllTypes.FirstOrDefault(unitTypes => unitTypes.Name == "Jedi");
@@ -92,7 +92,7 @@ namespace Orion.Graphics
                         command = new Train(unitsToAssignTask, unitToCreate, unitsToAssignTask[0].Faction);
 
                     }
-                    else
+                    else if (unitsToAssignTask.All(unit => !unit.Type.IsBuilding))
                     {
                         Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
                         ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
@@ -103,16 +103,20 @@ namespace Orion.Graphics
                         // Assigns a gathering task
                         else if (node != null)
                         {
-                            if (!node.IsHarvestable)
-                                return;
-                            command = new Harvest(Faction, unitsToAssignTask, node);
+                            if (node.IsHarvestable)
+                                command = new Harvest(Faction, unitsToAssignTask, node);
                         }
                         else
                         {
                             command = new Move(Faction, unitsToAssignTask, position);
                         }
                     }
-                    GenerateCommand(command);
+                    else
+                    {
+                        //TO BE FILLED
+                    }
+                    if(command != null)
+                        GenerateCommand(command);
                 }
             }
         }

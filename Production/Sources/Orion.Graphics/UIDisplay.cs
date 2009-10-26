@@ -14,7 +14,7 @@ namespace Orion.Graphics
         internal abstract void OnEnter(RootView enterOn);
         internal abstract void OnShadow(RootView hiddenOf);
 
-        protected override sealed void Draw()
+        protected override void Draw()
         { }
     }
 }

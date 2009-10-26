@@ -310,6 +310,20 @@ namespace Orion.Graphics
             GL.PopMatrix();
         }
 
+        /// <summary>
+        /// Prints text, fitting it into a specified rectangle, using this context's defined font and color.
+        /// </summary>
+        /// <param name="text">The text to print</param>
+        /// <param name="fitInto">The rectangle in which the text must fit</param>
+        public void DrawText(string text, Rectangle fitInto)
+        {
+            GL.PushMatrix();
+            GL.Translate(fitInto.X, fitInto.Y, 0);
+            GL.Scale(1, -1, 1);
+            printer.Print(text, font, fillColor, new System.Drawing.RectangleF(0, 0, fitInto.Width, fitInto.Height));
+            GL.PopMatrix();
+        }
+
         #endregion
 
         #region Textured

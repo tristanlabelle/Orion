@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Color = System.Drawing.Color;
 
 using OpenTK;
 
@@ -17,7 +18,12 @@ namespace Orion.Graphics.Widgets
         /// <summary>
         /// Accesses this object's text contents.
         /// </summary>
-        public virtual string Value { get; set; }
+        public virtual string Text { get; set; }
+
+        /// <summary>
+        /// Accesses this object's text color.
+        /// </summary>
+        public Color Color { get; set; }
 
         /// <summary>
         /// Constructs a Label with a given frame.
@@ -35,12 +41,13 @@ namespace Orion.Graphics.Widgets
         public Label(Rectangle frame, string caption)
             : base(frame)
         {
-            Value = caption;
+            Text = caption;
         }
 
         protected override void Draw()
         {
-            context.DrawText(Value);
+            context.FillColor = Color;
+            context.DrawText(Text, Bounds);
         }
     }
 }

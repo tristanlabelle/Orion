@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Orion.GameLogic
 {
@@ -23,16 +22,19 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly string name;
+        private readonly TechnologyRequirements requirements;
         private readonly ReadOnlyCollection<TechnologyEffect> effects;
         #endregion
 
         #region Constructors
-        public Technology(string name, IEnumerable<TechnologyEffect> effects)
+        public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
+            Argument.EnsureNotNull(requirements, "requirements");
             Argument.EnsureNotNull(effects, "effects");
 
             this.name = name;
+            this.requirements = requirements;
             this.effects = effects.ToList().AsReadOnly();
             Argument.EnsureStrictlyPositive(this.effects.Count, "effects.Count");
         }
@@ -48,9 +50,18 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the read-only list of this <see cref="Technology"/>'s effects.
+        /// Gets the <see cref="TechnologyRequirements"/> which describes the preconditions
+        /// needed to research this technology.
         /// </summary>
-        public IList<TechnologyEffect> Effects
+        public TechnologyRequirements Requirements
+        {
+            get { return requirements; }
+        }
+
+        /// <summary>
+        /// Gets the sequence of this <see cref="Technology"/>'s effects.
+        /// </summary>
+        public IEnumerable<TechnologyEffect> Effects
         {
             get { return effects; }
         }

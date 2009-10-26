@@ -14,11 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Networking", "Orion.Networking\Orion.Networking.csproj", "{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code Style Enforcer", "Code Style Enforcer", "{759387F1-D56A-4FB1-AC55-08C06F4CF147}"
-	ProjectSection(SolutionItems) = preProject
-		C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\ImplementationRules.xml = C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\ImplementationRules.xml
-		C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\NameRules.xml = C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\NameRules.xml
-		C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\VisibilityRules.xml = C:\Users\Tristan\Documents\Code Style Enforcer\CustomRules\VisibilityRules.xml
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +48,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 0
-		CodeStyleEnforcer_Active = -1
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Orion.Main.csproj

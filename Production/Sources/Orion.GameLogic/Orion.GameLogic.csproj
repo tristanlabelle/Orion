@@ -70,6 +70,14 @@
     <Compile Include="Pathfinding\PathNodeQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceNode.cs" />
+    <Compile Include="Skill.cs" />
+    <Compile Include="SkillDependencyAttribute.cs" />
+    <Compile Include="Skills\Attack.cs" />
+    <Compile Include="Skills\Build.cs" />
+    <Compile Include="Skills\HarvestAladdium.cs" />
+    <Compile Include="Skills\Move.cs" />
+    <Compile Include="Skills\Research.cs" />
+    <Compile Include="Skills\Train.cs" />
     <Compile Include="TagSet.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Tasks\Attack.cs" />

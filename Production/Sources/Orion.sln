@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Main", "Orion.Main\Or
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Networking", "Orion.Networking\Orion.Networking.csproj", "{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code Style Enforcer", "Code Style Enforcer", "{759387F1-D56A-4FB1-AC55-08C06F4CF147}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.UserInterface", "Orion.UserInterface\Orion.UserInterface.csproj", "{F2382CAC-67F5-4246-B033-D586A1A68FA7}"
 EndProject
 Global

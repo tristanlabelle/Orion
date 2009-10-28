@@ -15,6 +15,10 @@ namespace Orion.GameLogic
         #region Constructors
         internal Skill() { }
         #endregion
+
+        #region Methods
+        public virtual int? TryGetBaseStat(UnitStat stat) { return null; }
+        #endregion
         #endregion
 
         #region Static

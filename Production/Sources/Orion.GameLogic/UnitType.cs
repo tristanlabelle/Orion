@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MoveSkill = Orion.GameLogic.Skills.Move;
+using AttackSkill = Orion.GameLogic.Skills.Attack;
+using HarvestAladdiumSkill = Orion.GameLogic.Skills.HarvestAladdium;
+using BuildSkill = Orion.GameLogic.Skills.Build;
+
 namespace Orion.GameLogic
 {
     /// <summary>
@@ -16,7 +21,16 @@ namespace Orion.GameLogic
         private readonly string name;
         private readonly TagSet tags = new TagSet();
         private readonly SkillCollection skills = new SkillCollection();
-        private readonly Dictionary<UnitStat, int> baseStats = new Dictionary<UnitStat, int>();
+
+        // Base stats
+        private readonly int aladdiumCost;
+        private readonly int alageneCost;
+        private readonly int maxHealth = 1;
+        private readonly int sightRange = 5;
+
+        // Dimensions
+        private readonly int width = 1;
+        private readonly int height = 1;
         private readonly int Id;
 
         #endregion
@@ -32,18 +46,11 @@ namespace Orion.GameLogic
 
             this.name = name;
             this.Id = id;
-            // Those can't logically be zero.
-            baseStats[UnitStat.MaxHealth] = 1;
-            baseStats[UnitStat.SightRange] = 1;
-
             // Temporarly hard-coded for backward compatibility.
-            baseStats[UnitStat.CreationSpeed] = 2;
-            baseStats[UnitStat.MaxHealth] = 10;
-            baseStats[UnitStat.MovementSpeed] = 20;
-            baseStats[UnitStat.AttackRange] = 2;
-            baseStats[UnitStat.SightRange] = 5;
-            baseStats[UnitStat.AladdiumCost] = 50;
-            baseStats[UnitStat.AttackPower] = 1;
+            skills.Add(new MoveSkill(20));
+            skills.Add(new AttackSkill(1, 2));
+            skills.Add(new HarvestAladdiumSkill(10));
+            skills.Add(new BuildSkill(unitType => true));
         }
         #endregion
 
@@ -51,6 +58,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        public int ID
+        {
+            get { return Id; }
+        } 
+
         /// <summary>
         /// Gets the name of this <see cref="UnitType"/>.
         /// </summary>
@@ -77,24 +89,32 @@ namespace Orion.GameLogic
             get { return name == "Building"; }
         }
 
-        public int ID
+        public int Width
         {
-            get { return Id; }
-        } 
+            get { return width; }
+        }
 
+        public int Height
+        {
+            get { return height; }
+        }
         #endregion
 
         #region Methods
         public int GetBaseStat(UnitStat stat)
         {
-            int value;
-            baseStats.TryGetValue(stat, out value);
-            return value;
-        }
+            if (stat == UnitStat.AladdiumCost) return aladdiumCost;
+            if (stat == UnitStat.AlageneCost) return alageneCost;
+            if (stat == UnitStat.MaxHealth) return maxHealth;
+            if (stat == UnitStat.SightRange) return sightRange;
 
-        public void SetBaseStat(UnitStat stat, int value)
-        {
-            baseStats[stat] = value;
+            for (int i = 0; i < skills.Count; ++i)
+            {
+                int? value = skills[i].TryGetBaseStat(stat);
+                if (value.HasValue) return value.Value;
+            }
+
+            return 0;
         }
 
         public override string ToString()

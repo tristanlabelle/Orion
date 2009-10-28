@@ -11,26 +11,19 @@ namespace Orion.GameLogic.Skills
     [Serializable]
     public sealed class Attack : Skill
     {
-        #region Instance
         #region Fields
         private readonly int power;
-        private readonly int minRange;
         private readonly int maxRange;
-        private readonly int splashDamageRange;
         #endregion
 
         #region Constructors
-        public Attack(int power, int minRange, int maxRange, int splashDamageRange)
+        public Attack(int power, int maxRange)
         {
             Argument.EnsureStrictlyPositive(power, "power");
-            Argument.EnsurePositive(minRange, "minRange");
-            if (maxRange < minRange) throw new ArgumentException("The maximum range must be bigger or equal to the minimum range.", "maxRange");
-            Argument.EnsurePositive(splashDamageRange, "splashDamageRange");
+            Argument.EnsurePositive(maxRange, "maxRange");
 
             this.power = power;
-            this.minRange = minRange;
             this.maxRange = maxRange;
-            this.splashDamageRange = splashDamageRange;
         }
         #endregion
 
@@ -38,6 +31,11 @@ namespace Orion.GameLogic.Skills
         public int Power
         {
             get { return power; }
+        }
+
+        public int MaxRange
+        {
+            get { return maxRange; }
         }
 
         public bool IsMelee
@@ -49,36 +47,14 @@ namespace Orion.GameLogic.Skills
         {
             get { return maxRange > 0; }
         }
-
-        public int MinRange
-        {
-            get { return minRange; }
-        }
-
-        public int MaxRange
-        {
-            get { return maxRange; }
-        }
-
-        public bool DoesSplashDamage
-        {
-            get { return splashDamageRange > 0; }
-        }
-
-        public int SplashDamageRange
-        {
-            get { return splashDamageRange; }
-        }
-        #endregion
         #endregion
 
-        #region Static
         #region Methods
-        public static Attack CreateMelee(int power)
+        public override int? TryGetBaseStat(UnitStat stat)
         {
-            return new Attack(power, 0, 0, 0);
+            if (stat == UnitStat.AttackPower) return power;
+            return null;
         }
-        #endregion
         #endregion
     }
 }

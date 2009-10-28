@@ -24,6 +24,13 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Indexers
+        public Skill this[int index]
+        {
+            get { return skills[index]; }
+        }
+        #endregion
+
         #region Methods
         public void Add(Skill newSkill)
         {
@@ -39,7 +46,7 @@ namespace Orion.GameLogic
             }
 
             Type firstMissingDependency = Skill.GetDependencies(newSkill)
-                .FirstOrDefault(dependency => skills.All(skill => skills.GetType() != dependency));
+                .FirstOrDefault(dependency => skills.All(skill => skill.GetType() != dependency));
             if (firstMissingDependency != null)
             {
                 throw new InvalidOperationException(

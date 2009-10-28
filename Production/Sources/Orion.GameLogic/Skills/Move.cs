@@ -33,5 +33,13 @@ namespace Orion.GameLogic.Skills
             get { return speed; }
         }
         #endregion
+
+        #region Methods
+        public override int? TryGetBaseStat(UnitStat stat)
+        {
+            if (stat == UnitStat.MovementSpeed) return speed;
+            return null;
+        }
+        #endregion
     }
 }

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code Style Enforcer", "Code Style Enforcer", "{759387F1-D56A-4FB1-AC55-08C06F4CF147}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.GameLogic", "Orion.GameLogic\Orion.GameLogic.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Core", "Orion.Core\Orion.Core.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"

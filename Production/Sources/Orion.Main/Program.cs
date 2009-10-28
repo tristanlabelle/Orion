@@ -12,6 +12,7 @@ using Orion.Graphics;
 using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Networking;
+using Orion.UserInterface;
 
 using Color = System.Drawing.Color;
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 
 using Orion.GameLogic;
-using Orion.Graphics;
+using Orion.UserInterface;
 using Orion.Commandment;
 
 namespace Orion.Main

@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using Orion.GameLogic;
-using Orion.Graphics;
+using Orion.UserInterface;
 
 namespace Orion.Main
 {

@@ -71,6 +71,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceNode.cs" />
     <Compile Include="Skill.cs" />
+    <Compile Include="SkillCollection.cs" />
     <Compile Include="SkillDependencyAttribute.cs" />
     <Compile Include="Skills\Attack.cs" />
     <Compile Include="Skills\Build.cs" />

@@ -32,6 +32,7 @@ namespace Orion.GameLogic.Skills
         public bool Supports(UnitType unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
+            if (unitType.IsBuilding) return false;
             return predicate(unitType);
         }
         #endregion

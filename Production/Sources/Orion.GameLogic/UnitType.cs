@@ -16,6 +16,7 @@ namespace Orion.GameLogic
 		
         private readonly string name;
         private readonly TagSet tags = new TagSet();
+        private readonly SkillCollection skills = new SkillCollection();
         private readonly Dictionary<UnitStat, int> baseStats = new Dictionary<UnitStat, int>();
         #endregion
 
@@ -63,6 +64,11 @@ namespace Orion.GameLogic
         public TagSet Tags
         {
             get { return tags; }
+        }
+
+        public SkillCollection Skills
+        {
+            get { return skills; }
         }
 
         public bool IsBuilding

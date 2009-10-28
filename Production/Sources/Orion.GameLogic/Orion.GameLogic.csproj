@@ -97,6 +97,7 @@
     <Compile Include="UnitRegistry.cs" />
     <Compile Include="UnitStat.cs" />
     <Compile Include="UnitType.cs" />
+    <Compile Include="UnitTypeRegistry.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

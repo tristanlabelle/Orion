@@ -23,6 +23,7 @@ namespace Orion.GameLogic
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly UnitRegistry units;
+        private readonly UnitTypeRegistry unitTypes;
         private List<ResourceNode> resourceNodes = new List<ResourceNode>();
         readonly Pathfinder pathFinder;
         #endregion
@@ -37,6 +38,7 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
             units = new UnitRegistry(this, 5, 5);
+            unitTypes = new UnitTypeRegistry();
             pathFinder = new Pathfinder(this);
         }
         #endregion
@@ -56,6 +58,11 @@ namespace Orion.GameLogic
         public UnitRegistry Units
         {
             get { return units; }
+        }
+
+        public UnitTypeRegistry UnitTypes
+        {
+            get { return unitTypes; }
         }
 
         public List<ResourceNode> ResourceNodes

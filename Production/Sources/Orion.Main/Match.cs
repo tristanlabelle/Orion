@@ -37,7 +37,7 @@ namespace Orion.Main
             // we have to do something better
             foreach (Faction faction in world.Factions)
             {
-                foreach (UnitType type in UnitType.AllTypes)
+                foreach (UnitType type in World.UnitTypes.AllUnitTypes)
                 {
                     for (int i = 0; i < 10; i++)
                     {

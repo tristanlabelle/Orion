@@ -87,7 +87,7 @@ namespace Orion.Commandment
                     Command command = null;
                     if (unitsToAssignTask.All(unit => unit.Type.IsBuilding))
                     {
-                        UnitType unitToCreate = UnitType.AllTypes.FirstOrDefault(unitTypes => unitTypes.Name == "Jedi");
+                        UnitType unitToCreate = World.UnitTypes.FromName("Jedi");
                         if (unitToCreate == null) return;
                         command = new Train(unitsToAssignTask, unitToCreate, unitsToAssignTask[0].Faction);
 
@@ -149,7 +149,7 @@ namespace Orion.Commandment
                 
                 if (builder != null)
                 {
-                    UnitType unitTypeToBuild = UnitType.AllTypes.FirstOrDefault(unitType => unitType.Name == "Building");
+                    UnitType unitTypeToBuild = World.UnitTypes.FromName("Building");
                     if (unitTypeToBuild == null) return;
 
                     if (Faction.AladdiumAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost)
@@ -171,7 +171,7 @@ namespace Orion.Commandment
                 && node.ResourceType == ResourceType.Alagene
                 && !node.IsHarvestable)
             {
-                UnitType extractor = new UnitType("extractor");
+                UnitType extractor = World.UnitTypes.FromName("Extractor");
                 if (Faction.AladdiumAmount >= Faction.GetStat(extractor, UnitStat.AladdiumCost)
                     && Faction.AlageneAmount >= Faction.GetStat(extractor, UnitStat.AlageneCost))
                 {

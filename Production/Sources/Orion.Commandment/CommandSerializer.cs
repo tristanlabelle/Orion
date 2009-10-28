@@ -66,6 +66,13 @@ namespace Orion.Commandment
             if (unit == null) throw new InvalidDataException("Invalid unit identifier.");
             return unit;
         }
+        protected UnitType ReadUnitType(BinaryReader reader, World world)
+        {
+            int unitTypeID = reader.ReadInt32();
+            UnitType unitType = world.UnitTypes.FromID(unitTypeID);
+            if (unitType == null) throw new InvalidDataException("Invalid unitType identifier.");
+            return unitType;
+        }
 
         protected Unit[] ReadLengthPrefixedUnitArray(BinaryReader reader, World world)
         {

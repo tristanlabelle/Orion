@@ -12,12 +12,13 @@ namespace Orion.GameLogic
     public sealed class UnitType
     {
         #region Fields
-		public static readonly IEnumerable<UnitType> AllTypes = new UnitType[] { new UnitType("Archer"), new UnitType("Tank"), new UnitType("Jedi"), new UnitType("Building") };
 		
         private readonly string name;
         private readonly TagSet tags = new TagSet();
         private readonly SkillCollection skills = new SkillCollection();
         private readonly Dictionary<UnitStat, int> baseStats = new Dictionary<UnitStat, int>();
+        private readonly int Id;
+
         #endregion
 
         #region Constructors
@@ -25,12 +26,12 @@ namespace Orion.GameLogic
         /// Initializes a new <see cref="UnitType"/> from its name.
         /// </summary>
         /// <param name="name">The name of this <see cref="UnitType"/>.</param>
-        public UnitType(string name)
+        public UnitType(string name, int id)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
 
             this.name = name;
-
+            this.Id = id;
             // Those can't logically be zero.
             baseStats[UnitStat.MaxHealth] = 1;
             baseStats[UnitStat.SightRange] = 1;
@@ -75,6 +76,12 @@ namespace Orion.GameLogic
         {
             get { return name == "Building"; }
         }
+
+        public int ID
+        {
+            get { return Id; }
+        } 
+
         #endregion
 
         #region Methods

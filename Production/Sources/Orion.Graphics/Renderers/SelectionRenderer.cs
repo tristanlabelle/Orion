@@ -84,13 +84,22 @@ namespace Orion.Graphics
                 Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
 
                 float healthRatio = unit.Health / unit.MaxHealth;
-                Vector2 healthBarLevelPosition = healthBarStart + Vector2.UnitX * healthRatio * healthBarLength;
 
-                graphics.StrokeColor = Color.Lime;
-                graphics.StrokeLineStrip(healthBarStart, healthBarLevelPosition);
-                graphics.StrokeColor = Color.Red;
-                graphics.StrokeLineStrip(healthBarLevelPosition, healthBarEnd);
+                DrawHealthBar(graphics, healthBarStart, healthBarEnd, healthRatio);
             }
+        }
+
+        private void DrawHealthBar(GraphicsContext graphics,
+            Vector2 start, Vector2 end, float ratio)
+        {
+            float length = (end - start).Length;
+
+            Vector2 healthBarLevelPosition = start + Vector2.UnitX * ratio * length;
+
+            graphics.StrokeColor = Color.Lime;
+            graphics.StrokeLineStrip(start, healthBarLevelPosition);
+            graphics.StrokeColor = Color.Red;
+            graphics.StrokeLineStrip(healthBarLevelPosition, end);
         }
         #endregion
         #endregion

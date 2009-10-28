@@ -143,10 +143,9 @@ namespace Orion.Graphics
         /// <param name="position"></param>
         private void HandleCtrlLeftClick(Vector2 position)
         { 
-            // Build Command
             if (World.Terrain.IsWalkable((int)position.X, (int)position.Y))
             {
-                Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
+                Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.IsBuilding);
                 
                 if (builder != null)
                 {

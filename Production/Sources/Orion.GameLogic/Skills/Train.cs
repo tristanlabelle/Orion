@@ -9,7 +9,7 @@ namespace Orion.GameLogic.Skills
     /// A <see cref="Skill"/> which permits a <see cref="UnitType"/> to create new units.
     /// </summary>
     [Serializable]
-    public sealed class Train
+    public sealed class Train : Skill
     {
         #region Fields
         private readonly Func<UnitType, bool> predicate;

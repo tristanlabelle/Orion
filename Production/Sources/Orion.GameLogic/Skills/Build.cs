@@ -11,7 +11,7 @@ namespace Orion.GameLogic.Skills
     /// </summary>
     [Serializable]
     [SkillDependency(typeof(Move))]
-    public sealed class Build
+    public sealed class Build : Skill
     {
         #region Fields
         private readonly Func<UnitType, bool> predicate;

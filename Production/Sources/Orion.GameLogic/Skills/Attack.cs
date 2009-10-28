@@ -9,7 +9,7 @@ namespace Orion.GameLogic.Skills
     /// A <see cref="Skill"/> which permits a <see cref="UnitType"/> to attack.
     /// </summary>
     [Serializable]
-    public sealed class Attack
+    public sealed class Attack : Skill
     {
         #region Instance
         #region Fields

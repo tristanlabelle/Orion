@@ -10,7 +10,7 @@ namespace Orion.GameLogic.Skills
     /// new <see cref="Technology">technologies</see>.
     /// </summary>
     [Serializable]
-    public sealed class Research
+    public sealed class Research : Skill
     {
         #region Fields
         private readonly Func<Technology, bool> predicate;

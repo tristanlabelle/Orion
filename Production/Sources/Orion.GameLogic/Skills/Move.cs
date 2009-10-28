@@ -10,7 +10,7 @@ namespace Orion.GameLogic.Skills
     /// follow and do other tasks involving movement.
     /// </summary>
     [Serializable]
-    public sealed class Move
+    public sealed class Move : Skill
     {
         #region Fields
         private readonly int speed;

@@ -10,7 +10,7 @@ namespace Orion.GameLogic.Skills
     /// </summary>
     [Serializable]
     [SkillDependency(typeof(Move))]
-    public sealed class HarvestAladdium
+    public sealed class HarvestAladdium : Skill
     {
         #region Fields
         private readonly int maxCarryingAmount;

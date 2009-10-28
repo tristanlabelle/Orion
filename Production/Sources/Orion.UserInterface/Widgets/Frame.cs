@@ -2,26 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Color = System.Drawing.Color;
 
 using Orion.Geometry;
 using Orion.Graphics;
 
-using Color = System.Drawing.Color;
-
 namespace Orion.UserInterface.Widgets
 {
-    class Frame : View
+    public class Frame : RenderedView
     {
         public Frame(Rectangle frame)
-            : base(frame)
+            : base(frame, new FilledFrameRenderer())
         { }
-
-        protected internal override void Draw(GraphicsContext context)
-        {
-            context.FillColor = Color.White;
-            context.StrokeColor = Color.Black;
-            context.Fill(Bounds);
-            context.Stroke(Bounds);
-        }
+        public Frame(Rectangle frame, Color fillColor)
+            : base(frame, new FilledFrameRenderer(fillColor))
+        { }
     }
 }

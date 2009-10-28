@@ -7,9 +7,8 @@ using OpenTK.Math;
 
 using Orion.GameLogic;
 using Orion.Geometry;
-using Orion.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Commandment
 {
     /// <summary>
     /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.
@@ -35,6 +34,10 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(faction, "faction");
             this.faction = faction;
         }
+        #endregion
+
+        #region Events
+        public event GenericEventHandler<SelectionManager> SelectionChanged;
         #endregion
 
         #region Properties
@@ -141,6 +144,7 @@ namespace Orion.Graphics
                 selectedUnits.Clear();
                 selectedUnits.AddRange(unitsInSelectionRectangle);
             }
+            OnSelectionChange();
         }
 
         /// <summary>
@@ -170,6 +174,12 @@ namespace Orion.Graphics
         public void OnCtrlKeyChanged(bool ctrlKeyState)
         {
             CtrlKeyPressed = ctrlKeyState;
+        }
+
+        protected void OnSelectionChange()
+        {
+            GenericEventHandler<SelectionManager> handler = SelectionChanged;
+            if (handler != null) handler(this);
         }
 
         #endregion

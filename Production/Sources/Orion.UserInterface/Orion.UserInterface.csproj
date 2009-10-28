@@ -62,6 +62,7 @@
       <DependentUpon>MatchSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceDisplay.cs" />
+    <Compile Include="SelectionDisplay.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />
     <Compile Include="UIDisplays\MatchUI.cs" />
     <Compile Include="Views System\ClippedView.cs" />

@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Renderers\ButtonRenderer.cs" />
+    <Compile Include="Renderers\FrameRenderer.cs" />
     <Compile Include="Renderers\DelegatedRenderer.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

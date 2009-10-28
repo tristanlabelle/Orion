@@ -20,10 +20,10 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public Button(Rectangle frame, string caption)
-            : this(frame, caption, new PlainButtonRenderer())
+            : this(frame, caption, new FilledFrameRenderer())
         { }
 
-        public Button(Rectangle frame, string caption, ButtonRenderer renderer)
+        public Button(Rectangle frame, string caption, FrameRenderer renderer)
             : base(frame, renderer)
         {
             this.caption = new Label(Bounds.Translate(2, 2).Resize(-2, -2), caption);

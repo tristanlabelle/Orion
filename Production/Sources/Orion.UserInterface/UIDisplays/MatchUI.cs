@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Keys = System.Windows.Forms.Keys;
+using Color = System.Drawing.Color;
 
 using Orion.Commandment;
 using Orion.GameLogic;
@@ -20,6 +21,8 @@ namespace Orion.UserInterface
         private readonly WorldRenderer renderer;
         private UserInputCommander userInputCommander;
         private ClippedView worldView;
+        private Frame hudFrame;
+        private Frame selectionFrame;
 
         #region Event Handling Delegates
         private GenericEventHandler<Responder, MouseEventArgs> worldViewMouseDown, worldViewMouseMove, worldViewMouseUp, worldViewZoom;
@@ -38,14 +41,20 @@ namespace Orion.UserInterface
             renderer = new WorldRenderer(world);
 
             world.Units.UnitDied += userInputCommander.SelectionManager.UnitDied;
-            worldView = new ClippedView(Bounds, world.Bounds, new MatchRenderer(world, commander.SelectionManager));
-            worldView.Bounds = new Rectangle(40, 30);
-            worldView.Frame = Bounds.Resize(0, -Bounds.Height / 25);
+            Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
+            worldView = new ClippedView(worldFrame, world.Bounds, new MatchRenderer(world, commander.SelectionManager));
+            worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 
             Rectangle resourceDisplayFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -Bounds.Height / 25);
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
             Children.Add(resourceDisplay);
+
+            hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkBlue);
+            Children.Add(hudFrame);
+
+            selectionFrame = new Frame(new Rectangle(Bounds.Width / 4, 0, Bounds.Width / 2, hudFrame.Frame.Height), Color.Red);
+            hudFrame.Children.Add(selectionFrame);
 
             Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
             Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
@@ -127,12 +136,6 @@ namespace Orion.UserInterface
             shadowedFrom.PopDisplay(this);
         }
         #endregion
-
-        protected internal override void Render()
-        {
-            base.Render();
-        }
-
         #endregion
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Orion.GameLogic;
+using Orion.Commandment;
 
 namespace Orion.Graphics
 {

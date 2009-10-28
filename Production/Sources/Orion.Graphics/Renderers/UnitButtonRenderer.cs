@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Orion.Graphics.Renderers
 {
-   public  class UnitButtonRenderer : ButtonRenderer
+   public  class UnitButtonRenderer : FrameRenderer
    {
        LinePath shape;
        Unit unit;

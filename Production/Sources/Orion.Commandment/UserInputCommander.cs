@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.GameLogic;
-using Orion.Graphics;
+using Keys = System.Windows.Forms.Keys;
+
 using OpenTK.Math;
+
+using Orion.GameLogic;
 using Orion.Commandment.Commands;
 using Orion.Commandment;
-using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Commandment
 {

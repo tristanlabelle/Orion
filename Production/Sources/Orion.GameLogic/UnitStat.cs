@@ -15,7 +15,6 @@ namespace Orion.GameLogic
         AladdiumCost,
         AttackRange,
         AttackPower,
-        CreationSpeed,
         MaxHealth,
         MovementSpeed,
         SightRange

@@ -64,7 +64,7 @@ namespace Orion.GameLogic.Tasks
 
             if (trainHaveBegin)
             {
-                if (BuildingIsOver(timeDelta))
+                if (TrainingIsOver(timeDelta))
                 {
                     Unit unitBuilded = building.faction.CreateUnit(unitTypeToBuild);
                     Vector2 newPosition = new Vector2(building.Position.X + 2, building.Position.Y + 2);
@@ -81,11 +81,10 @@ namespace Orion.GameLogic.Tasks
            
         
 
-        private bool BuildingIsOver(float timeDelta)
+        private bool TrainingIsOver(float timeDelta)
         {
             float maxHealth = building.Faction.GetStat(unitTypeToBuild, UnitStat.MaxHealth);
-            float creationSpeed = building.Faction.GetStat(unitTypeToBuild, UnitStat.CreationSpeed);
-            if (secondsSpentTraining >= maxHealth / creationSpeed)
+            if (secondsSpentTraining >= maxHealth)
             {
                 return true;
             }

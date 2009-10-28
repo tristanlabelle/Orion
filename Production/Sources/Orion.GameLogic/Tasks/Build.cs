@@ -88,8 +88,7 @@ namespace Orion.GameLogic.Tasks
         private bool BuildingIsOver(float timeDelta)
         {
             float maxHealth = builder.Faction.GetStat(unitTypeToBuild, UnitStat.MaxHealth);
-            float creationSpeed = builder.Faction.GetStat(unitTypeToBuild, UnitStat.CreationSpeed);
-            if (secondsSpentBuilding >= maxHealth / creationSpeed)
+            if (secondsSpentBuilding >= maxHealth)
             {
                 return true;
             }

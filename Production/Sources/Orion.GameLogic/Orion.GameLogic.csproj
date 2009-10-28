@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Faction.cs" />
+    <Compile Include="FogOfWar.cs" />
     <Compile Include="Pathfinding\Path.cs" />
     <Compile Include="Pathfinding\Pathfinder.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />

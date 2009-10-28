@@ -140,6 +140,7 @@ namespace Orion.GameLogic
         private readonly UnitCollection units;
         private int aladdiumAmount;
         private int alageneAmount;
+        private FogOfWar fog;
         #endregion
 
         #region Constructors
@@ -160,6 +161,7 @@ namespace Orion.GameLogic
             this.name = name;
             this.color = color;
             this.units = new UnitCollection(this);
+            this.fog = new FogOfWar(world.Width, world.Height, this);
         }
         #endregion
 

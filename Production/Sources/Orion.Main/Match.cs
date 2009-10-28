@@ -5,8 +5,6 @@ using System.Text;
 
 using Orion.Commandment;
 using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Networking;
 
 using OpenTK.Math;
 

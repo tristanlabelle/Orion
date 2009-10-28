@@ -35,9 +35,12 @@ namespace Orion.Networking
         private Dictionary<IPEndPoint, bool> receivedFromPeers = new Dictionary<IPEndPoint, bool>();
         private Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
 
+        private List<Unit> deadUnits = new List<Unit>();
         private Queue<Command> readyCommands = new Queue<Command>();
 
         private CommandFactory serializer;
+
+        private GenericEventHandler<UnitRegistry, Unit> unitDied;
         #endregion
 
         #region Constructors
@@ -53,6 +56,9 @@ namespace Orion.Networking
                 receivedFromPeers[endpoint] = true;
                 peersCompleted[endpoint] = true;
             }
+
+            unitDied = UnitDied;
+            world.Units.UnitDied += unitDied;
 
             transporterReceived = new GenericEventHandler<Transporter, NetworkEventArgs>(TransporterReceived);
             transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
@@ -82,7 +88,6 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-
         #region Public
 
         public void Update()
@@ -130,10 +135,13 @@ namespace Orion.Networking
                     while (commands.Count > 0)
                     {
                         Command command = commands.Dequeue();
+                        if (command.UnitsInvolved.Intersect(deadUnits).Count() > 0) continue;
+
                         Recipient.Feed(command);
                         serializer.Serialize(command, writer);
                     }
                 }
+                deadUnits.Clear();
                 transporter.SendTo(stream.ToArray(), peers);
             }
 
@@ -187,6 +195,11 @@ namespace Orion.Networking
                     }
                 }
             }
+        }
+
+        private void UnitDied(UnitRegistry registry, Unit deadUnit)
+        {
+            deadUnits.Add(deadUnit);
         }
 
         #endregion

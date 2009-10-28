@@ -9,7 +9,7 @@ using Orion.Commandment.Commands;
 using Orion.Commandment;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.Graphics
+namespace Orion.Commandment
 {
     /// <summary>
     /// A <see cref="Commander"/> which gives <see cref="Command"/>s based on user input.

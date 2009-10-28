@@ -34,6 +34,11 @@ namespace Orion.Commandment
         {
             get { return sourceFaction; }
         }
+
+        public virtual IEnumerable<Unit> UnitsInvolved
+        {
+            get { throw new NotImplementedException(); }
+        }
         #endregion
 
         #region Methods

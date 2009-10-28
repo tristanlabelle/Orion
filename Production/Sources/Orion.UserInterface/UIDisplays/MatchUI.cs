@@ -40,7 +40,12 @@ namespace Orion.UserInterface
             world.Units.UnitDied += userInputCommander.SelectionManager.UnitDied;
             worldView = new ClippedView(Bounds, world.Bounds, new MatchRenderer(world, commander.SelectionManager));
             worldView.Bounds = new Rectangle(40, 30);
+            worldView.Frame = Bounds.Resize(0, -Bounds.Height / 25);
             Children.Add(worldView);
+
+            Rectangle resourceDisplayFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -Bounds.Height / 25);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
+            Children.Add(resourceDisplay);
 
             Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
             Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
@@ -55,9 +60,6 @@ namespace Orion.UserInterface
             Children.Add(southScroller);
             Children.Add(eastScroller);
             Children.Add(westScroller);
-            Rectangle resourceDisplayFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -Bounds.Height / 25);
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
-            Children.Add(resourceDisplay);
 
             worldViewMouseDown = WorldViewMouseDown;
             worldViewMouseUp = WorldViewMouseUp;
@@ -125,6 +127,11 @@ namespace Orion.UserInterface
             shadowedFrom.PopDisplay(this);
         }
         #endregion
+
+        protected internal override void Render()
+        {
+            base.Render();
+        }
 
         #endregion
     }

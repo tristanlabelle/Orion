@@ -247,7 +247,7 @@ namespace Orion.GameLogic
         /// <remarks>
         /// Used by <see cref="World"/>.
         /// </remarks>
-        internal void Update(float timeDeltaInSeconds)
+        public void Update(float timeDeltaInSeconds)
         {
             foreach (KeyValuePair<Unit, Event> @event in events)
             {

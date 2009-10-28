@@ -89,6 +89,7 @@ namespace Orion.Main
             {
                 MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
                 MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);
+                match.World.Units.Update(0);
                 ui.Display(matchUI);
                 while (ui.IsWindowCreated) runLoop.RunOnce();
             }

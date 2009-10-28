@@ -29,7 +29,7 @@ namespace Orion.Main
             for (int i = 1; i < numberOfPlayers; i++)
             {
                 Faction aiFaction = world.CreateFaction(playerColors[i].Name, playerColors[i]);
-                DummyAICommander aiCommander = new DummyAICommander(aiFaction, random);
+                AICommander aiCommander = new AICommander(aiFaction);
                 aiCommander.AddToPipeline(pipeline);
             }
 

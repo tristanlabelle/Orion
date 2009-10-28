@@ -60,11 +60,11 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Unit"/> moves.
         /// </summary>
-        public event GenericEventHandler<Unit> Moved;
+        public event ValueChangedEventHandler<Unit, Vector2> Moved;
 
-        private void OnMoved()
+        private void OnMoved(Vector2 oldPosition, Vector2 newPosition)
         {
-            if (Moved != null) Moved(this);
+            if (Moved != null) Moved(this, new ValueChangedEventArgs<Vector2>(oldPosition, newPosition));
         }
         #endregion
 
@@ -158,8 +158,9 @@ namespace Orion.GameLogic
             set
             {
                 if (value == position) return;
+                Vector2 oldValue = position;
                 position = value;
-                OnMoved();
+                OnMoved(oldValue, position);
             }
         }
 

@@ -102,7 +102,7 @@ namespace Orion.GameLogic
         private readonly Zone[,] zones;
         private readonly Dictionary<Unit, Event> events = new Dictionary<Unit, Event>();
         private readonly GenericEventHandler<Unit> unitDiedEventHandler;
-        private readonly GenericEventHandler<Unit> unitMovedEventHandler;
+        private readonly ValueChangedEventHandler<Unit, Vector2> unitMovedEventHandler;
         private int nextUnitID;
         #endregion
 
@@ -189,7 +189,7 @@ namespace Orion.GameLogic
             events[unit] = Event.Died;
         }
 
-        private void OnUnitMoved(Unit unit)
+        private void OnUnitMoved(Unit unit, ValueChangedEventArgs<Vector2> eventArgs)
         {
             Argument.EnsureNotNull(unit, "unit");
 

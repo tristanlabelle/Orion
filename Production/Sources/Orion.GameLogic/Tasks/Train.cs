@@ -69,7 +69,7 @@ namespace Orion.GameLogic.Tasks
                     Unit unitBuilded = building.faction.CreateUnit(unitTypeToBuild);
                     Vector2 newPosition = new Vector2(building.Position.X + 2, building.Position.Y + 2);
                     // If the new assigned position is unavalible put it over the building
-                    if (!building.World.Terrain.IsWalkable(newPosition))
+                    if (!building.World.Terrain.IsWalkable(newPosition) && building.World.IsWithinBounds(newPosition))
                         newPosition = building.Position;
 
                     unitBuilded.Position = newPosition;

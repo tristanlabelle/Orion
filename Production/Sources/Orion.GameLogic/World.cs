@@ -133,6 +133,11 @@ namespace Orion.GameLogic
             return point.X >= 0 && point.Y >= 0
                 && point.X < Width && point.Y < Height;
         }
+        public bool IsWithinBounds(Vector2 point)
+        {
+            return point.X >= 0 && point.Y >= 0
+                && point.X < Width && point.Y < Height;
+        }
 
         /// <summary>
         /// Gets the coordinates of the tile on which a point is, clamped within this <see cref="World"/>'s bounds.

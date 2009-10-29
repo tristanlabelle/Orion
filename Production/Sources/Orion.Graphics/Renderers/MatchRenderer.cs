@@ -38,6 +38,7 @@ namespace Orion.Graphics
             worldRenderer.DrawResources(context);
             worldRenderer.DrawEntities(context);
             selectionRenderer.DrawHealthBars(context);
+            //worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }
     }

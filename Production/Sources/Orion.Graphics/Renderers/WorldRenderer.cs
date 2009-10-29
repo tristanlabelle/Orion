@@ -38,7 +38,7 @@ namespace Orion.Graphics
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
             this.unitRenderer = new UnitRenderer(world);
-            this.fogOfWarRenderer = new FogOfWarRenderer(fogOfWar);
+            this.fogOfWarRenderer = new FogOfWarRenderer(world, fogOfWar);
         }
         #endregion
 
@@ -79,6 +79,13 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(graphics, "graphics");
 
             terrainRenderer.Draw(graphics);
+        }
+
+        public void DrawFogOfWar(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+
+            fogOfWarRenderer.Draw(graphics);
         }
 
         /// <summary>

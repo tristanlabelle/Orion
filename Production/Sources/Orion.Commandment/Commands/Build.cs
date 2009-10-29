@@ -41,6 +41,16 @@ namespace Orion.Commandment.Commands
                 constructor.Task = new Orion.GameLogic.Tasks.Build(constructor,position,unitTobuild);
         }
         #endregion
+
+        #region Proprieties
+        public override IEnumerable<Unit> UnitsInvolved
+        {
+            get
+            {
+                yield return constructor;
+            }
+        }
+        #endregion
         #endregion
 
         #region Serializer Class

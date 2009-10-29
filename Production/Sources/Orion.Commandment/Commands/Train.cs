@@ -44,6 +44,17 @@ namespace Orion.Commandment.Commands
 
         }
         #endregion
-    
+
+        #region Proprieties
+        public override IEnumerable<Unit> UnitsInvolved
+        {
+            get
+            {
+                foreach (Unit unit in identicalsBuildings)
+                    yield return unit;
+            }
+        }
+        #endregion
+
     }
 }

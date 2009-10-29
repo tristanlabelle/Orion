@@ -73,6 +73,17 @@ namespace Orion.Commandment.Commands
         {
             get { return destination; }
         }
+
+        public override IEnumerable<Unit> UnitsInvolved
+        {
+            get
+            {
+                foreach (Unit unit in attackers)
+                    yield return unit;
+            }
+        }
+  
+
         #endregion
 
         #region Methods

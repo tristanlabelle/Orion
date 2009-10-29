@@ -50,6 +50,15 @@ namespace Orion.Commandment.Commands
         {
             get { return units; }
         }
+
+        public override IEnumerable<Unit> UnitsInvolved
+        {
+            get
+            {
+                foreach(Unit unit in units)
+                    yield return unit;
+            }
+        }
         #endregion
 
         #region Methods

@@ -50,43 +50,61 @@ namespace Orion.GameLogic
 
         public void UnitMoved(Unit unit, ValueChangedEventArgs<OpenTK.Math.Vector2> eventArgs)
         {
-            if (Math.Floor(unit.Position.X) == Math.Floor(eventArgs.OldValue.X) &&
-                Math.Floor(unit.Position.Y) == Math.Floor(eventArgs.OldValue.Y))
+            Vector2 newRoundedPosition = new Vector2(
+                (float)Math.Floor(unit.Position.X),
+                (float)Math.Floor(unit.Position.Y));
+
+            Vector2 oldRoundedPosition = new Vector2(
+                (float)Math.Floor(eventArgs.OldValue.X),
+                (float)Math.Floor(eventArgs.OldValue.Y));
+
+            if (newRoundedPosition == oldRoundedPosition)
                 return;
 
-            ModifyUnitSight(unit, true);
+            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
+            Circle oldCircle = new Circle(oldRoundedPosition, unit.GetStat(UnitStat.SightRange));
 
-            Unit fakeUnit = unit;
-            fakeUnit.Position = eventArgs.OldValue;
-            ModifyUnitSight(fakeUnit, false);
+            ModifyUnitSight(newCircle, true);
+            ModifyUnitSight(oldCircle, false);
         }
 
         public void UnitCreated(Unit unit)
         {
-            ModifyUnitSight(unit, true);
+            Vector2 newRoundedPosition = new Vector2(
+                (float)Math.Floor(unit.Position.X),
+                (float)Math.Floor(unit.Position.Y));
+            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
+            ModifyUnitSight(newCircle, true);
         }
 
         public void UnitDied(Unit unit)
         {
-            ModifyUnitSight(unit, false);
+            Vector2 newRoundedPosition = new Vector2(
+                (float)Math.Floor(unit.Position.X),
+                (float)Math.Floor(unit.Position.Y));
+            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
+            ModifyUnitSight(newCircle, false);
         }
 
-        private void ModifyUnitSight(Unit unit, bool addOrRemove)
+        private void ModifyUnitSight(Circle sight, bool addOrRemove)
         {
             //addOrRemove : true = add  false = remove
-            Rectangle tilesRectangle = CreateTilesRectangle(unit.LineOfSight.BoundingRectangle);
+            Rectangle tilesRectangle = CreateTilesRectangle(sight.BoundingRectangle);
 
             for (int i = (int)tilesRectangle.X; i < tilesRectangle.MaxX; i++)
             {
                 for (int j = (int)tilesRectangle.Y; j < tilesRectangle.MaxY; j++)
                 {
-                    if (unit.LineOfSight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
+                    if (sight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
                     {
                         if (addOrRemove)
                             if (tiles[i, j] == 255)
                                 tiles[i, j] = 1;
                             else
+                            {
+                                System.Diagnostics.Debug.Assert(tiles[i, j] != 254);
                                 tiles[i, j]++;
+                            }
                         else
                             tiles[i, j]--;
                     }

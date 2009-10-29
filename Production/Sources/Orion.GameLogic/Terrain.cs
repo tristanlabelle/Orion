@@ -14,7 +14,7 @@ namespace Orion.GameLogic
     {
         #region Instance
         #region Fields
-        private bool[,] tiles;
+        private readonly BitArray2D tiles;
         #endregion
 
         #region Constructors
@@ -25,7 +25,9 @@ namespace Orion.GameLogic
         /// <param name="height">The height of the terrain to be generated.</param>
         public Terrain(int width, int height)
         {
-            this.tiles = new bool[width, height];
+            Argument.EnsureStrictlyPositive(width, "width");
+            Argument.EnsureStrictlyPositive(height, "height");
+            this.tiles = new BitArray2D(width, height);
         }
         #endregion
 
@@ -35,7 +37,7 @@ namespace Orion.GameLogic
         /// </summary>
         public int Width
         {
-            get { return tiles.GetLength(0); }
+            get { return tiles.ColumnCount; }
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Orion.GameLogic
         /// </summary>
         public int Height
         {
-            get { return tiles.GetLength(1); }
+            get { return tiles.RowCount; }
         }
         #endregion
 
@@ -73,7 +75,6 @@ namespace Orion.GameLogic
         {
             return IsWalkable(point.X, point.Y);
         }
-
         #endregion
         #endregion
 

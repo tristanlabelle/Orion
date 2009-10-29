@@ -23,6 +23,7 @@ namespace Orion.Graphics
         private readonly World world;
         private readonly TerrainRenderer terrainRenderer;
         private readonly UnitRenderer unitRenderer;
+        private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
 
         #region Constructors
@@ -30,13 +31,14 @@ namespace Orion.Graphics
         /// Initializes a new <see cref="WorldRenderer"/> from the <see cref="World"/> it is going to render.
         /// </summary>
         /// <param name="world">The <see cref="World"/> to be rendered.</param>
-        public WorldRenderer(World world)
+        public WorldRenderer(World world, FogOfWar fogOfWar)
         {
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
             this.unitRenderer = new UnitRenderer(world);
+            this.fogOfWarRenderer = new FogOfWarRenderer(fogOfWar);
         }
         #endregion
 

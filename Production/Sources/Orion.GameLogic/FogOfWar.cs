@@ -8,7 +8,7 @@ using OpenTK.Math;
 
 namespace Orion.GameLogic
 {
-    class FogOfWar
+    public sealed class FogOfWar
     {
         #region Fields
 

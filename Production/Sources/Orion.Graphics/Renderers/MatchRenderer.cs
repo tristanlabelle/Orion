@@ -15,10 +15,10 @@ namespace Orion.Graphics
         private WorldRenderer worldRenderer;
         #endregion
 
-        public MatchRenderer(World world, SelectionManager selectionManager)
+        public MatchRenderer(World world, UserInputCommander commander)
         {
-            selectionRenderer = new SelectionRenderer(selectionManager);
-            worldRenderer = new WorldRenderer(world);
+            selectionRenderer = new SelectionRenderer(commander.SelectionManager);
+            worldRenderer = new WorldRenderer(world, commander.Faction.FogOfWar);
         }
 
         public WorldRenderer WorldRenderer

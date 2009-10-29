@@ -140,7 +140,7 @@ namespace Orion.GameLogic
         private readonly UnitCollection units;
         private int aladdiumAmount;
         private int alageneAmount;
-        private FogOfWar fog;
+        private FogOfWar fogOfWar;
         #endregion
 
         #region Constructors
@@ -161,7 +161,7 @@ namespace Orion.GameLogic
             this.name = name;
             this.color = color;
             this.units = new UnitCollection(this);
-            this.fog = new FogOfWar(world.Width, world.Height, this);
+            this.fogOfWar = new FogOfWar(world.Width, world.Height, this);
         }
         #endregion
 
@@ -234,6 +234,16 @@ namespace Orion.GameLogic
                 alageneAmount = value;
             }
         }
+
+        public FogOfWar FogOfWar
+        {
+            get { return fogOfWar; }
+            set 
+            {
+                Argument.EnsureNotNull(value, "FogOfWar");
+                fogOfWar = value;    
+            }
+        }
         #endregion
 
         #region Methods
@@ -251,9 +261,9 @@ namespace Orion.GameLogic
         public Unit CreateUnit(UnitType type)
         {
             Unit unit = world.Units.Create(type, this);
-            fog.UnitCreated(unit);
-            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fog.UnitMoved);
-            unit.Died += new GenericEventHandler<Unit>(fog.UnitDied);
+            fogOfWar.UnitCreated(unit);
+            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fogOfWar.UnitMoved);
+            unit.Died += new GenericEventHandler<Unit>(fogOfWar.UnitDied);
             return unit;
         }
 

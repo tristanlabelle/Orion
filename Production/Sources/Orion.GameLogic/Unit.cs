@@ -194,7 +194,7 @@ namespace Orion.GameLogic
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(position, Circle.Radius + GetStat(UnitStat.SightRange)); }
+            get { return new Circle(position, GetStat(UnitStat.SightRange)); }
         }
 
         #region Health

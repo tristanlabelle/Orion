@@ -29,7 +29,7 @@ namespace Orion.UserInterface
         #region Methods
         protected internal override void Draw(GraphicsContext context)
         {
-            string resources = "Alladium: " + faction.AladdiumAmount + "  Alagene: " + faction.AlageneAmount;
+            string resources = "Aladdium: " + faction.AladdiumAmount + "  Alagene: " + faction.AlageneAmount;
             context.FillColor = Color.Blue;
             context.Fill(Bounds);
             context.FillColor = Color.White;

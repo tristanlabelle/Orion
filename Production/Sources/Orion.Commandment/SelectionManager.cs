@@ -151,7 +151,10 @@ namespace Orion.Commandment
         public void UnitDied(UnitRegistry source, Unit unit)
         {
             if (selectedUnits.Contains(unit))
+            {
                 selectedUnits.Remove(unit);
+                OnSelectionChange();
+            }
         }
 
         /// <summary>

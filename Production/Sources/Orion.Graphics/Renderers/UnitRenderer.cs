@@ -51,7 +51,7 @@ namespace Orion.Graphics
 
         public LinePath GetTypeShape(UnitType type)
         {
-            if (!typeShapes.ContainsKey(type.Name)) throw new ArgumentException("No shape has been defined for {0}".FormatInvariant(type));
+            if (!typeShapes.ContainsKey(type.Name)) return LinePath.UnitCircle;
             return typeShapes[type.Name];
         }
 

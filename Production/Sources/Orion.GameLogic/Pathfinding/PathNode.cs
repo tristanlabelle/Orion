@@ -7,7 +7,7 @@ using OpenTK.Math;
 
 namespace Orion.GameLogic.Pathfinding
 {
-    internal sealed class PathNode
+    public sealed class PathNode
     {
         #region Fields
         private PathNode parentNode;
@@ -20,7 +20,6 @@ namespace Orion.GameLogic.Pathfinding
         public PathNode ParentNode
         {
             get { return parentNode; }
-            set { parentNode = value; }
         }
 
         public Point16 Position
@@ -45,7 +44,7 @@ namespace Orion.GameLogic.Pathfinding
         #endregion
 
         #region Methods
-        public void Reset(PathNode parentNode, Point16 position,
+        internal void Reset(PathNode parentNode, Point16 position,
             float costFromSource, float estimatedCostToDestination)
         {
             this.parentNode = parentNode;
@@ -54,8 +53,9 @@ namespace Orion.GameLogic.Pathfinding
             this.totalCost = costFromSource + estimatedCostToDestination;
         }
 
-        public void SetCosts(float costFromSource, float estimatedCostToDestination)
+        internal void SetCosts(PathNode parentNode, float costFromSource, float estimatedCostToDestination)
         {
+            this.parentNode = parentNode;
             this.costFromSource = costFromSource;
             this.totalCost = costFromSource + estimatedCostToDestination;
         }

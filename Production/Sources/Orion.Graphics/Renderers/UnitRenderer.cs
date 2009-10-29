@@ -99,6 +99,19 @@ namespace Orion.Graphics
                 graphics.StrokeLineStrip(path.Points.Select(p => new Vector2(p.X, p.Y)));
         }
 
+        private void DrawPathfindingDebugInfo(GraphicsContext graphics, Pathfinder pathfinder)
+        {
+            graphics.StrokeColor = Color.Yellow;
+            foreach (PathNode node in pathfinder.ClosedNodes)
+                if (node.ParentNode != null)
+                    graphics.StrokeLineStrip(node.ParentNode.Position, node.Position);
+
+            graphics.StrokeColor = Color.Lime;
+            foreach (PathNode node in pathfinder.OpenNodes)
+                if (node.ParentNode != null)
+                    graphics.StrokeLineStrip(node.ParentNode.Position, node.Position);
+        }
+
         private void DrawAttackLines(GraphicsContext graphics)
         {
             var attacks = world.Units.Select(unit => unit.Task).OfType<Attack>();

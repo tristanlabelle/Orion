@@ -32,6 +32,18 @@ namespace Orion.GameLogic.Pathfinding
         }
         #endregion
 
+        #region Properties
+        public IEnumerable<PathNode> OpenNodes
+        {
+            get { return openNodes.Values; }
+        }
+
+        public IEnumerable<PathNode> ClosedNodes
+        {
+            get { return closedNodes.Values; }
+        }
+        #endregion
+
         #region Methods
         public Path FindPath(Vector2 source, Vector2 destination)
         {
@@ -50,28 +62,28 @@ namespace Orion.GameLogic.Pathfinding
                 return null;
             }
 
-            try
-            {
-                PathNode destinationNode = FindPathNodes(sourcePoint);
+            CleanUp();
 
-                if (destinationNode == null) destinationNode = FindClosedNodeNearestToDestination();
+            PathNode destinationNode = FindPathNodes(sourcePoint);
 
-                FindPathPointsTo(destinationNode);
-                return new Path(world, source, destination, points);
-            }
-            finally
-            {
-                // Return the path nodes to the internal pool of nodes.
-                foreach (PathNode node in openNodes.Values)
-                    nodePool.Add(node);
-                openNodes.Clear();
+            if (destinationNode == null) destinationNode = FindClosedNodeNearestToDestination();
 
-                foreach (PathNode node in closedNodes.Values)
-                    nodePool.Add(node);
-                closedNodes.Clear();
+            FindPathPointsTo(destinationNode);
+            return new Path(world, source, destination, points);
+        }
 
-                points.Clear();
-            }
+        private void CleanUp()
+        {
+            // Return the path nodes to the internal pool of nodes.
+            foreach (PathNode node in openNodes.Values)
+                nodePool.Add(node);
+            openNodes.Clear();
+
+            foreach (PathNode node in closedNodes.Values)
+                nodePool.Add(node);
+            closedNodes.Clear();
+
+            points.Clear();
         }
 
         private PathNode FindClosedNodeNearestToDestination()
@@ -111,8 +123,6 @@ namespace Orion.GameLogic.Pathfinding
             float estimatedCostFromSourceToDestination = EstimateCostToDestination(sourcePoint);
             PathNode sourceNode = GetPathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
 
-            int maxNodesToVisit = world.Width * world.Height / 8;
-
             PathNode currentNode = sourceNode;
             while (currentNode.Position.X != destinationPoint.X || currentNode.Position.Y != destinationPoint.Y)
             {
@@ -120,16 +130,22 @@ namespace Orion.GameLogic.Pathfinding
                 openNodes.Remove(currentNode.Position);
                 AddNearbyNodes(currentNode);
 
-                if (closedNodes.Count > maxNodesToVisit || openNodes.Count == 0)
+                if (openNodes.Count == 0)
                     return null;
 
-                currentNode = openNodes.First().Value;
-                foreach (PathNode openNode in openNodes.Values)
-                    if (openNode.TotalCost < currentNode.TotalCost)
-                        currentNode = openNode;
+                currentNode = GetCheapestOpenNode();
             }
 
             return currentNode;
+        }
+
+        private PathNode GetCheapestOpenNode()
+        {
+            PathNode cheapestNode = openNodes.First().Value;
+            foreach (PathNode openNode in openNodes.Values)
+                if (openNode.EstimatedCostToDestination < cheapestNode.EstimatedCostToDestination)
+                    cheapestNode = openNode;
+            return cheapestNode;
         }
 
         private float EstimateCostToDestination(Point16 currentPoint)
@@ -165,12 +181,16 @@ namespace Orion.GameLogic.Pathfinding
             AddNearbyNode(currentNode, nearNode);
         }
 
+        private bool IsOpenable(Point16 nearbyPoint)
+        {
+            return world.IsWithinBounds(nearbyPoint)
+                && !closedNodes.ContainsKey(nearbyPoint)
+                && world.Terrain.IsWalkable(nearbyPoint);
+        }
+
         private void AddNearbyNode(PathNode currentNode, Point16 nearbyPoint)
         {
-            if (!world.IsWithinBounds(nearbyPoint)
-                || closedNodes.ContainsKey(nearbyPoint)
-                || !world.Terrain.IsWalkable(nearbyPoint))
-                return;
+            if (!IsOpenable(nearbyPoint)) return;
 
             float movementCost = GetMovementCost(currentNode.Position, nearbyPoint);
             float costFromSource = currentNode.CostFromSource + movementCost;
@@ -181,9 +201,8 @@ namespace Orion.GameLogic.Pathfinding
                 if (costFromSource < nearbyNode.CostFromSource)
                 {
                     // If it is a better choice to pass through the current node, overwrite the parent and the move cost
-                    nearbyNode.ParentNode = currentNode;
                     float estimatedCostToDestination = EstimateCostToDestination(nearbyPoint);
-                    nearbyNode.SetCosts(costFromSource, estimatedCostToDestination);
+                    nearbyNode.SetCosts(currentNode, costFromSource, estimatedCostToDestination);
                 }
             }
             else

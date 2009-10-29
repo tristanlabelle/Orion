@@ -64,7 +64,7 @@ namespace Orion.Commandment.Commands
             #region Properties
             public override byte ID
             {
-                get { return 1; }
+                get { return 3; }
             }
             #endregion
 

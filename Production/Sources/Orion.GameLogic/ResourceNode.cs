@@ -82,6 +82,10 @@ namespace Orion.GameLogic
             get { return isHarvestable; }
             set { this.isHarvestable = value; }
         }
+        public int ID
+        {
+            get { return id; }
+        }
 
         #endregion
 

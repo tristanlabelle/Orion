@@ -5,6 +5,8 @@ using System.Text;
 
 using Orion.GameLogic;
 using HarvestTask = Orion.GameLogic.Tasks.Harvest;
+using System.IO;
+using OpenTK.Math;
 
 namespace Orion.Commandment.Commands
 {
@@ -42,6 +44,55 @@ namespace Orion.Commandment.Commands
                 foreach (Unit unit in harvesters)
                     yield return unit;
             }
+        }
+        #endregion
+
+        #region Serializer Class
+        /// <summary>
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Cancel"/> command.
+        /// </summary>
+        [Serializable]
+        public sealed class Serializer : CommandSerializer<Harvest>
+        {
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 4; }
+            }
+            #endregion
+
+            #region Methods
+            protected override void SerializeData(Harvest command, BinaryWriter writer)
+            {
+               
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.node.ID);
+                writer.Write(command.harvesters.Count());
+                foreach (Unit unit in command.harvesters)
+                    writer.Write(unit.ID);
+            }
+
+            protected override Harvest DeserializeData(BinaryReader reader, World world)
+            {
+                Faction sourceFaction = ReadFaction(reader, world);
+                int nodeID = reader.ReadInt32();
+                ResourceNode node = world.ResourceNodes.FirstOrDefault(aNode => aNode.ID == nodeID);
+                if(node == null) throw new NullReferenceException();
+                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
+                return new Harvest(sourceFaction, units, node);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
         }
         #endregion
     }

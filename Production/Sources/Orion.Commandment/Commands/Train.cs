@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
+using System.IO;
 
 namespace Orion.Commandment.Commands
 {
@@ -20,10 +21,10 @@ namespace Orion.Commandment.Commands
         /// <param name="selectedUnit">The Builder</param>
         /// <param name="position">Where To build</param>
         /// <param name="unitTobuild">What to build</param>
-        public Train(List<Unit> selectedsSameBuilding,UnitType unitTobuild, Faction faction)
+        public Train(IEnumerable<Unit> selectedsSameBuilding,UnitType unitTobuild, Faction faction)
             : base(faction)
         {
-            this.identicalsBuildings = selectedsSameBuilding;
+            this.identicalsBuildings = selectedsSameBuilding.ToList();
             this.unitToCreate = unitTobuild;
         }
         #endregion
@@ -55,6 +56,46 @@ namespace Orion.Commandment.Commands
             }
         }
         #endregion
+
+        public sealed class Serializer : CommandSerializer<Train>
+        {
+            #region Instance
+            #region Properties
+            public override byte ID
+            {
+                get { return 5; }
+            }
+            #endregion
+
+            #region Methods
+            protected override void SerializeData(Train command, BinaryWriter writer)
+            {
+                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.identicalsBuildings.Count());
+                foreach (Unit unit in command.identicalsBuildings)
+                    writer.Write(unit.ID);
+                writer.Write(command.unitToCreate.ID);
+            }
+
+            protected override Train DeserializeData(BinaryReader reader, World world)
+            {
+                Faction faction = ReadFaction(reader,world);
+                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
+                UnitType unitToCreate = ReadUnitType(reader, world);
+                return new Train(units, unitToCreate,faction);
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Fields
+            /// <summary>
+            /// A globally available static instance of this class.
+            /// </summary>
+            public static readonly Serializer Instance = new Serializer();
+            #endregion
+            #endregion
+        }
 
     }
 }

@@ -25,7 +25,7 @@ namespace Orion.GameLogic
         // Base stats
         private readonly int aladdiumCost;
         private readonly int alageneCost;
-        private readonly int maxHealth = 1;
+        private readonly int maxHealth = 10;
         private readonly int sightRange = 5;
 
         // Dimensions

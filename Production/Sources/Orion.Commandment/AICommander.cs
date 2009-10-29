@@ -55,7 +55,10 @@ namespace Orion.Commandment
             foreach (Unit unit in Faction.Units)
             {
                 if (unit.Type.IsBuilding)
+                {
                     hasBuilding = true;
+                    break; 
+                }
                 else
                     hasBuilding = false;
             }

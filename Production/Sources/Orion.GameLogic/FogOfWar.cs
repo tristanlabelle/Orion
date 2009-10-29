@@ -12,8 +12,8 @@ namespace Orion.GameLogic
     {
         #region Fields
 
-        private byte[,] tiles;
-        private Faction faction;
+        //private BitArray2D tiles;
+        private short[,] tiles;
 
         #endregion
         
@@ -21,8 +21,10 @@ namespace Orion.GameLogic
         
         public FogOfWar(int width, int height, Faction faction)
         {
-            this.tiles = new byte[width, height];
-            
+            this.tiles = new short[width, height];
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++)
+                    this.tiles[i, j] = 32767; 
         }
 
         #endregion
@@ -98,11 +100,11 @@ namespace Orion.GameLogic
                     if (sight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
                     {
                         if (addOrRemove)
-                            if (tiles[i, j] == 255)
+                            if (tiles[i, j] == 32767)
                                 tiles[i, j] = 1;
                             else
                             {
-                                System.Diagnostics.Debug.Assert(tiles[i, j] != 254);
+                                System.Diagnostics.Debug.Assert(tiles[i, j] != 32766);
                                 tiles[i, j]++;
                             }
                         else
@@ -139,6 +141,12 @@ namespace Orion.GameLogic
             return new Rectangle(X, Y, MaxX - X, MaxY - Y);
         }
 
+        /// <summary>
+        /// Indicates if the tile was seen at the specified coordinate.
+        /// </summary>
+        /// <param name="x">The x coordinate in the field.</param>
+        /// <param name="y">The y coordinate in the field.</param>
+        /// <returns>A boolean value from the fog of war field.</returns>
         public bool HasSeenTile(int x, int y)
         {
             if (tiles[x, y] == 255)
@@ -156,11 +164,27 @@ namespace Orion.GameLogic
             return HasSeenTile(point.X, point.Y);
         }
 
+        /// <summary>
+        /// Indicates if the tile at the specified coordinate in currently in the sight of a unit.
+        /// </summary>
+        /// <param name="x">The x coordinate in the field.</param>
+        /// <param name="y">The y coordinate in the field.</param>
+        /// <returns>A boolean value from the fog of war field.</returns>
         public bool SeesTileCurrently(int x, int y)
         {
             if (tiles[x, y] == 0 || tiles[x, y] == 255)
                 return false;
             return true;
+        }
+
+        public bool SeesTileCurrently(Vector2 position)
+        {
+            return SeesTileCurrently((int)position.X, (int)position.Y);
+        }
+
+        public bool SeesTileCurrently(Point16 point)
+        {
+            return SeesTileCurrently(point.X, point.Y);
         }
         
         #endregion

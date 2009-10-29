@@ -25,6 +25,12 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
+
+        public new ViewChildrenCollection Children
+        {
+            get { return base.Children as ViewChildrenCollection; }
+        }
+
         public override Rectangle Bounds
         {
             get { return context.CoordinateSystem; }

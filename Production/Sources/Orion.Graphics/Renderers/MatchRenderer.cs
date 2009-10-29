@@ -21,6 +21,16 @@ namespace Orion.Graphics
             worldRenderer = new WorldRenderer(world);
         }
 
+        public WorldRenderer WorldRenderer
+        {
+            get { return worldRenderer; }
+        }
+
+        public SelectionRenderer SelectionRenderer
+        {
+            get { return selectionRenderer; }
+        }
+
         public void RenderInto(GraphicsContext context)
         {
             worldRenderer.DrawTerrain(context);

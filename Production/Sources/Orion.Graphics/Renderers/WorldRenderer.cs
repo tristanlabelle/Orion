@@ -51,6 +51,16 @@ namespace Orion.Graphics
                 return world.Bounds;
             }
         }
+
+        public TerrainRenderer TerrainRenderer
+        {
+            get { return terrainRenderer; }
+        }
+
+        public UnitRenderer UnitRenderer
+        {
+            get { return unitRenderer; }
+        }
         #endregion
 
         #region Methods

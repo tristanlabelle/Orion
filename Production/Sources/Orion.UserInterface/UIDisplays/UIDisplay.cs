@@ -13,6 +13,11 @@ namespace Orion.UserInterface
             Bounds = Frame;
         }
 
+        public new ViewChildrenCollection Children
+        {
+            get { return base.Children as ViewChildrenCollection; }
+        }
+
         internal abstract void OnEnter(RootView enterOn);
         internal abstract void OnShadow(RootView hiddenOf);
     }

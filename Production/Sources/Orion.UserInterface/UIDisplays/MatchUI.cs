@@ -27,6 +27,7 @@ namespace Orion.UserInterface
         #region Event Handling Delegates
         private GenericEventHandler<Responder, MouseEventArgs> worldViewMouseDown, worldViewMouseMove, worldViewMouseUp, worldViewZoom;
         private GenericEventHandler<Responder, KeyboardEventArgs> worldViewKeyDown, worldViewKeyUp;
+        private GenericEventHandler<SelectionManager> selectionChanged;
         #endregion
         #endregion
 
@@ -76,6 +77,7 @@ namespace Orion.UserInterface
             worldViewKeyDown = WorldViewKeyDown;
             worldViewKeyUp = WorldViewKeyUp;
             worldViewZoom = WorldViewZoom;
+            selectionChanged = SelectionChanged;
         }
 
         #endregion
@@ -113,6 +115,27 @@ namespace Orion.UserInterface
         {
             userInputCommander.OnKeyUp(args.Key);
         }
+
+        private void SelectionChanged(SelectionManager selectionManager)
+        {
+            selectionFrame.Children.Clear();
+            const float padding = 10;
+            Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
+            float currentX = padding + selectionFrame.Bounds.X;
+            float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
+            UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
+            foreach (Unit unit in selectionManager.SelectedUnits)
+            {
+                Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit));
+                currentX += frame.Width + padding;
+                if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
+                {
+                    currentY -= frame.Height + padding;
+                    currentX = padding + selectionFrame.Bounds.X;
+                }
+                selectionFrame.Children.Add(unitButton);
+            }
+        }
         #endregion
 
         #region IUIDisplay Implementation
@@ -124,6 +147,7 @@ namespace Orion.UserInterface
             worldView.MouseUp += worldViewMouseUp;
             worldView.KeyDown += worldViewKeyDown;
             worldView.KeyUp += worldViewKeyUp;
+            userInputCommander.SelectionManager.SelectionChanged += selectionChanged;
         }
 
         internal override void OnShadow(RootView shadowedFrom)
@@ -133,6 +157,7 @@ namespace Orion.UserInterface
             worldView.MouseUp -= worldViewMouseUp;
             worldView.KeyDown -= worldViewKeyDown;
             worldView.KeyUp -= worldViewKeyUp;
+            userInputCommander.SelectionManager.SelectionChanged -= selectionChanged;
             shadowedFrom.PopDisplay(this);
         }
         #endregion

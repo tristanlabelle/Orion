@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -12,6 +13,16 @@ namespace Orion.UserInterface
     {
         #region Fields
         private Vector2? cursorPosition;
+        #endregion
+
+        #region Constructors
+        public Responder()
+            : base()
+        { }
+
+        public Responder(Collection<ViewContainer> childrenCollection)
+            : base(childrenCollection)
+        { }
         #endregion
 
         #region Properties

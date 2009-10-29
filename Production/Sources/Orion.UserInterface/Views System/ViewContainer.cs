@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -8,7 +9,7 @@ namespace Orion.UserInterface
     public abstract class ViewContainer
     {
         #region Fields
-        private ViewChildrenCollection children;
+        private Collection<ViewContainer> children;
         private ViewContainer parent;
         #endregion
 
@@ -19,6 +20,11 @@ namespace Orion.UserInterface
         public ViewContainer()
         {
             children = new ViewChildrenCollection(this);
+        }
+
+        public ViewContainer(Collection<ViewContainer> childrenCollection)
+        {
+            children = childrenCollection;
         }
         #endregion
 
@@ -57,7 +63,7 @@ namespace Orion.UserInterface
         /// <summary>
         /// Gets the collection of this <see cref="View"/>'s children.
         /// </summary>
-        public ViewChildrenCollection Children
+        public Collection<ViewContainer> Children
         {
             get { return children; }
         }

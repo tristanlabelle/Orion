@@ -49,6 +49,12 @@ namespace Orion.Graphics
             SetTypeShape(type.Name, shape);
         }
 
+        public LinePath GetTypeShape(UnitType type)
+        {
+            if (!typeShapes.ContainsKey(type.Name)) throw new ArgumentException("No shape has been defined for {0}".FormatInvariant(type));
+            return typeShapes[type.Name];
+        }
+
         public void Draw(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");

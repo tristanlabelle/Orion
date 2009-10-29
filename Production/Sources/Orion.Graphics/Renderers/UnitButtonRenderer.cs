@@ -10,13 +10,13 @@ namespace Orion.Graphics
 {
     public class UnitButtonRenderer : FrameRenderer
     {
-        LinePath shape;
-        Unit unit;
+        public readonly LinePath Shape;
+        public readonly Unit Unit;
 
         public UnitButtonRenderer(LinePath shape, Unit unit)
         {
-            this.shape = shape;
-            this.unit = unit;
+            Shape = shape;
+            Unit = unit;
             StrokeColor = unit.Faction.Color;
         }
 
@@ -31,9 +31,9 @@ namespace Orion.Graphics
 
             float x = context.CoordinateSystem.Width / 2;
             float y = context.CoordinateSystem.Height / 3 * 2;
-            context.Stroke(shape, new Vector2(x, y));
+            context.Stroke(Shape, new Vector2(x, y));
 
-            float healthRatio = unit.Health / unit.MaxHealth;
+            float healthRatio = Unit.Health / Unit.MaxHealth;
             float yHealth = context.CoordinateSystem.Height / 3;
             Vector2 start = new Vector2(context.CoordinateSystem.Width / 4, yHealth);
             Vector2 end = new Vector2(context.CoordinateSystem.Width / 4 * 3, yHealth);

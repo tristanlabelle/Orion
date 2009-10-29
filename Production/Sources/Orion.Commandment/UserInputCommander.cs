@@ -33,7 +33,7 @@ namespace Orion.Commandment
         }
         #endregion
 
-        #region Proprieties
+        #region Properties
         /// <summary>
         /// Gets the <see cref="SelectionManager"/> this <see cref="UserInputCommander"/>
         /// uses internally to detect selection state.

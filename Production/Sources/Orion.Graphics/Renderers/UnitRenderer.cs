@@ -101,8 +101,7 @@ namespace Orion.Graphics
 
         private void DrawAttackLines(GraphicsContext graphics)
         {
-            var attacks = world.Units.Select(unit => unit.Task)
-                .OfType<Attack>();
+            var attacks = world.Units.Select(unit => unit.Task).OfType<Attack>();
 
             graphics.StrokeColor = Color.Orange;
             foreach (Attack attack in attacks)

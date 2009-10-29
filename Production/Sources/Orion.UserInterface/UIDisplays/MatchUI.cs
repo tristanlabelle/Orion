@@ -118,7 +118,12 @@ namespace Orion.UserInterface
 
         private void SelectionChanged(SelectionManager selectionManager)
         {
+            foreach (Button button in selectionFrame.Children)
+            {
+                button.Dispose();
+            }
             selectionFrame.Children.Clear();
+
             const float padding = 10;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
             float currentX = padding + selectionFrame.Bounds.X;
@@ -126,7 +131,9 @@ namespace Orion.UserInterface
             UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             foreach (Unit unit in selectionManager.SelectedUnits)
             {
-                Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit));
+                UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
+                Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", renderer);
+                unitButton.Pressed += ButtonPress;
                 currentX += frame.Width + padding;
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
                 {
@@ -134,6 +141,15 @@ namespace Orion.UserInterface
                     currentX = padding + selectionFrame.Bounds.X;
                 }
                 selectionFrame.Children.Add(unitButton);
+            }
+        }
+
+        private void ButtonPress(Button button)
+        {
+            if (button.Renderer is UnitButtonRenderer)
+            {
+                Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
+                userInputCommander.SelectionManager.SelectUnit(unit);
             }
         }
         #endregion

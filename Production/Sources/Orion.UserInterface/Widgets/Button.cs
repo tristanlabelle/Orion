@@ -10,7 +10,7 @@ using Orion.Graphics;
 
 namespace Orion.UserInterface.Widgets
 {
-    public class Button : RenderedView
+    public class Button : RenderedView, IDisposable
     {
         #region Fields
         private Label caption;
@@ -55,6 +55,11 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
+        public void Dispose()
+        {
+            Pressed = null;
+        }
+
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
             caption.Color = Color.Cyan;

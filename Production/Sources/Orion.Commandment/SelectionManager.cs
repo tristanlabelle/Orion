@@ -91,20 +91,30 @@ namespace Orion.Commandment
         {
             if (button == MouseButton.Left)
             {
-                if (pressed)
-                {
-                    selectionStartPosition = cursorPosition;
-                }
+                if (pressed) selectionStartPosition = cursorPosition;
                 else if (SelectionRectangle.HasValue)
                 {
-                    HandleRectangleSelection();
-
+                    SelectUnits(HandleRectangleSelection());
                     selectionStartPosition = null;
                 }
             }
         }
 
-        private void HandleRectangleSelection()
+        public void SelectUnit(Unit unit)
+        {
+            if(!ctrlKeyPressed) selectedUnits.Clear();
+            selectedUnits.Add(unit);
+            OnSelectionChange();
+        }
+
+        public void SelectUnits(IEnumerable<Unit> units)
+        {
+            if (!ctrlKeyPressed) selectedUnits.Clear();
+            selectedUnits.AddRange(units);
+            OnSelectionChange();
+        }
+
+        private IEnumerable<Unit> HandleRectangleSelection()
         {
             Rectangle selectionRectangle = SelectionRectangle.Value;
             List<Unit> unitsInSelectionRectangle = faction.World.Units
@@ -121,30 +131,7 @@ namespace Orion.Commandment
             if (containsNonBuildingUnits)
                 unitsInSelectionRectangle.RemoveAll(unit => unit.Type.IsBuilding);
 
-            if (CtrlKeyPressed)
-            {
-                bool allUnitsAlreadySelected = true;
-                foreach (Unit unit in unitsInSelectionRectangle)
-                {
-                    if (!selectedUnits.Contains(unit))
-                    {
-                        selectedUnits.Add(unit);
-                        allUnitsAlreadySelected = false;
-                    }
-                }
-
-                if (allUnitsAlreadySelected)
-                {
-                    foreach (Unit unit in unitsInSelectionRectangle)
-                        selectedUnits.Remove(unit);
-                }
-            }
-            else
-            {
-                selectedUnits.Clear();
-                selectedUnits.AddRange(unitsInSelectionRectangle);
-            }
-            OnSelectionChange();
+            return unitsInSelectionRectangle;
         }
 
         /// <summary>

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 
 using OpenTK.Math;
+using OpenTK.Graphics;
 
+using Orion.Geometry;
 using Orion.GameLogic;
 using Orion.Commandment.Commands;
 
@@ -15,7 +17,9 @@ namespace Orion.Commandment
         #region Fields
         private bool baseStarted;
         private bool commandCenterBuilt;
+        private bool hasBuilding;
         private ResourceNode startingNode;
+        private List<Circle> regions = new List<Circle>();
         #endregion
 
         #region Contructors
@@ -24,6 +28,14 @@ namespace Orion.Commandment
             : base(faction)
         {
             baseStarted = false;
+
+            foreach (Unit unit in Faction.Units)
+            {
+                if (unit.Type.IsBuilding)
+                    hasBuilding = true;
+                else
+                    hasBuilding = false;
+            }
         }
 
         #endregion
@@ -40,12 +52,35 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
+            foreach (Unit unit in Faction.Units)
+            {
+                if (unit.Type.IsBuilding)
+                    hasBuilding = true;
+                else
+                    hasBuilding = false;
+            }
+
             //When no base has been started, start one
             if (!baseStarted)
                 BuildBase();
 
             if (!commandCenterBuilt && Faction.AladdiumAmount > 50)
                 BuildMainCommandCenter();
+
+            if (Faction.AladdiumAmount >= 50 && hasBuilding)
+                TrainUnits();
+        }
+
+        private void TrainUnits()
+        {
+            List<Unit> trainers = new List<Unit>();
+            trainers.Add(World.Units.Where(unit => unit.Faction == Faction && unit.Type.IsBuilding).First());
+
+            if (trainers != null)
+            {
+                Command command = new Train(trainers, new UnitType("FooWarrior", 1), Faction);
+                GenerateCommand(command);
+            }
         }
 
         private void DispatchHarvesters(ResourceNode node)
@@ -88,13 +123,15 @@ namespace Orion.Commandment
             Meet();
             //The AI then dispatches Harvesting units to start gathering resources from that node
             DispatchHarvesters(startingNode);
-
         }
 
         private void BuildMainCommandCenter()
         {
             Unit builder = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding && unit.IsIdle).ToList().First();
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.Circle.Diameter), (startingNode.Position.Y + startingNode.Circle.Diameter));
+            
+            if (!World.Bounds.ContainsPoint(position))
+                position = new Vector2((startingNode.Position.X - startingNode.Circle.Diameter), (startingNode.Position.Y - startingNode.Circle.Diameter));
 
             if (builder != null)
             {
@@ -107,9 +144,13 @@ namespace Orion.Commandment
         private void Meet()
         {
             startingNode = World.ResourceNodes.First();
+            regions.Add(new Circle(startingNode.Position, 10));
 
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.Circle.Diameter), (startingNode.Position.Y + startingNode.Circle.Diameter));
             
+            if(!World.Bounds.ContainsPoint(position))
+                position = new Vector2((startingNode.Position.X - startingNode.Circle.Diameter), (startingNode.Position.Y - startingNode.Circle.Diameter));
+
             List<Unit> unitsToMeet = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding).ToList();
 
             if (unitsToMeet.Count != 0)

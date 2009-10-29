@@ -251,7 +251,9 @@ namespace Orion.GameLogic
         public Unit CreateUnit(UnitType type)
         {
             Unit unit = world.Units.Create(type, this);
-            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fog.UpdateUnitSight);
+            fog.UnitCreated(unit);
+            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fog.UnitMoved);
+            unit.Died += new GenericEventHandler<Unit>(fog.UnitDied);
             return unit;
         }
 

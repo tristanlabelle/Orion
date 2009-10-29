@@ -12,7 +12,7 @@ namespace Orion.GameLogic
     {
         #region Fields
 
-        private bool[,] tiles;
+        private byte[,] tiles;
         private Faction faction;
 
         #endregion
@@ -21,7 +21,7 @@ namespace Orion.GameLogic
         
         public FogOfWar(int width, int height, Faction faction)
         {
-            this.tiles = new bool[width, height];
+            this.tiles = new byte[width, height];
             
         }
 
@@ -48,12 +48,32 @@ namespace Orion.GameLogic
 
         #region Methods
 
-        public void UpdateUnitSight(Unit unit, ValueChangedEventArgs<OpenTK.Math.Vector2> eventArgs)
+        public void UnitMoved(Unit unit, ValueChangedEventArgs<OpenTK.Math.Vector2> eventArgs)
         {
             if (Math.Floor(unit.Position.X) == Math.Floor(eventArgs.OldValue.X) &&
                 Math.Floor(unit.Position.Y) == Math.Floor(eventArgs.OldValue.Y))
                 return;
 
+            ModifyUnitSight(unit, true);
+
+            Unit fakeUnit = unit;
+            fakeUnit.Position = eventArgs.OldValue;
+            ModifyUnitSight(fakeUnit, false);
+        }
+
+        public void UnitCreated(Unit unit)
+        {
+            ModifyUnitSight(unit, true);
+        }
+
+        public void UnitDied(Unit unit)
+        {
+            ModifyUnitSight(unit, false);
+        }
+
+        private void ModifyUnitSight(Unit unit, bool addOrRemove)
+        {
+            //addOrRemove : true = add  false = remove
             Rectangle tilesRectangle = CreateTilesRectangle(unit.LineOfSight.BoundingRectangle);
 
             for (int i = (int)tilesRectangle.X; i < tilesRectangle.MaxX; i++)
@@ -62,7 +82,13 @@ namespace Orion.GameLogic
                 {
                     if (unit.LineOfSight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
                     {
-                        tiles[i, j] = true;
+                        if (addOrRemove)
+                            if (tiles[i, j] == 255)
+                                tiles[i, j] = 1;
+                            else
+                                tiles[i, j]++;
+                        else
+                            tiles[i, j]--;
                     }
                 }
             }
@@ -97,7 +123,9 @@ namespace Orion.GameLogic
 
         public bool HasSeenTile(int x, int y)
         {
-            return tiles[x, y];
+            if (tiles[x, y] == 255)
+                return false;
+            return true;
         }
 
         public bool HasSeenTile(Vector2 position)
@@ -108,6 +136,13 @@ namespace Orion.GameLogic
         public bool HasSeenTile(Point16 point)
         {
             return HasSeenTile(point.X, point.Y);
+        }
+
+        public bool SeesTileCurrently(int x, int y)
+        {
+            if (tiles[x, y] == 0 || tiles[x, y] == 255)
+                return false;
+            return true;
         }
         
         #endregion

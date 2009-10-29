@@ -168,6 +168,7 @@ namespace Orion.Commandment
 
         private void OnSelectionChange()
         {
+            selectedUnits.Sort((a, b) => a.Type.ID.CompareTo(b.Type.ID));
             GenericEventHandler<SelectionManager> handler = SelectionChanged;
             if (handler != null) handler(this);
         }

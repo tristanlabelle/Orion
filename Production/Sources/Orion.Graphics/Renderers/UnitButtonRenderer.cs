@@ -12,6 +12,7 @@ namespace Orion.Graphics
     {
         public readonly LinePath Shape;
         public readonly Unit Unit;
+        private bool hasFocus;
 
         public UnitButtonRenderer(LinePath shape, Unit unit)
         {
@@ -20,10 +21,16 @@ namespace Orion.Graphics
             StrokeColor = unit.Faction.Color;
         }
 
+        public bool HasFocus
+        {
+            get { return hasFocus; }
+            set { hasFocus = value; }
+        }
+
         public override void RenderInto(GraphicsContext context)
         {
             context.StrokeColor = Color.Black;
-            context.FillColor = Color.Gainsboro;
+            context.FillColor = hasFocus ? Color.Gray : Color.Gainsboro;
             context.Fill(context.CoordinateSystem);
             context.Stroke(context.CoordinateSystem);
 

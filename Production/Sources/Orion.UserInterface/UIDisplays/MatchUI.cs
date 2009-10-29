@@ -19,10 +19,11 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly WorldRenderer renderer;
-        private UserInputCommander userInputCommander;
-        private ClippedView worldView;
-        private Frame hudFrame;
-        private Frame selectionFrame;
+        private readonly UserInputCommander userInputCommander;
+        private readonly ClippedView worldView;
+        private readonly Frame hudFrame;
+        private readonly Frame selectionFrame;
+        private UnitType selectedType;
 
         #region Event Handling Delegates
         private GenericEventHandler<Responder, MouseEventArgs> worldViewMouseDown, worldViewMouseMove, worldViewMouseUp, worldViewZoom;
@@ -51,10 +52,10 @@ namespace Orion.UserInterface
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
             Children.Add(resourceDisplay);
 
-            hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkBlue);
+            hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkGray);
             Children.Add(hudFrame);
 
-            selectionFrame = new Frame(new Rectangle(Bounds.Width / 4, 0, Bounds.Width / 2, hudFrame.Frame.Height), Color.Red);
+            selectionFrame = new Frame(new Rectangle(Bounds.Width / 4, 0, Bounds.Width / 2, hudFrame.Frame.Height), Color.DarkGray);
             hudFrame.Children.Add(selectionFrame);
 
             Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
@@ -151,7 +152,17 @@ namespace Orion.UserInterface
             if (button.Renderer is UnitButtonRenderer)
             {
                 Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
-                userInputCommander.SelectionManager.SelectUnit(unit);
+                if (unit.Type == selectedType)
+                    userInputCommander.SelectionManager.SelectUnit(unit);
+                else
+                {
+                    selectedType = unit.Type;
+                    foreach (Button unitButton in selectionFrame.Children)
+                    {
+                        UnitButtonRenderer renderer = unitButton.Renderer as UnitButtonRenderer;
+                        renderer.HasFocus = renderer.Unit.Type == selectedType;
+                    }
+                }
             }
         }
         #endregion

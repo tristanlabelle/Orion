@@ -14,7 +14,6 @@ namespace Orion.UserInterface.Widgets
     {
         #region Fields
         private Label caption;
-        private Color fillColor;
         private Keys hotKey;
         #endregion
 

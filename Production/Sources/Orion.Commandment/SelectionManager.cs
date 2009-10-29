@@ -176,7 +176,7 @@ namespace Orion.Commandment
             CtrlKeyPressed = ctrlKeyState;
         }
 
-        protected void OnSelectionChange()
+        private void OnSelectionChange()
         {
             GenericEventHandler<SelectionManager> handler = SelectionChanged;
             if (handler != null) handler(this);

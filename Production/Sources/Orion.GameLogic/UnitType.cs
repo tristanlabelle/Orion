@@ -31,7 +31,7 @@ namespace Orion.GameLogic
         // Dimensions
         private readonly int width = 1;
         private readonly int height = 1;
-        private readonly int Id;
+        private readonly int id;
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace Orion.GameLogic
             Argument.EnsureNotNullNorBlank(name, "name");
 
             this.name = name;
-            this.Id = id;
+            this.id = id;
             // Temporarly hard-coded for backward compatibility.
             skills.Add(new MoveSkill(20));
             skills.Add(new AttackSkill(1, 2));
@@ -60,7 +60,7 @@ namespace Orion.GameLogic
         #region Properties
         public int ID
         {
-            get { return Id; }
+            get { return id; }
         } 
 
         /// <summary>

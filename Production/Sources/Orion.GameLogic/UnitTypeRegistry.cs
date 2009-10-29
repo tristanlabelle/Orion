@@ -10,7 +10,6 @@ namespace Orion.GameLogic
     {
         private List<UnitType> allUnitTypes = new List<UnitType>();
 
-
         #region Proprieties
         public List<UnitType> AllUnitTypes
         {

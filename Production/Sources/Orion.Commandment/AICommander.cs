@@ -98,7 +98,7 @@ namespace Orion.Commandment
 
             if (builder != null)
             {
-                Command command = new Build(builder, position, new UnitType("Building"));
+                Command command = new Build(builder, position, World.UnitTypes.FromName("Building"));
                 GenerateCommand(command);
                 commandCenterBuilt = true;
             }

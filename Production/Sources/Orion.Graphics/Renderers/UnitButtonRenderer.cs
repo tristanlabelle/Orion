@@ -19,7 +19,7 @@ namespace Orion.Graphics.Renderers
            StrokeColor = unit.Faction.Color;
        }
 
-       public void RenderInto(GraphicsContext context)
+       public override void RenderInto(GraphicsContext context)
        {
            context.StrokeColor = StrokeColor;
            context.Stroke(context.CoordinateSystem);

@@ -26,8 +26,6 @@ namespace Orion.UserInterface
         private UnitType selectedType;
 
         #region Event Handling Delegates
-        private GenericEventHandler<Responder, MouseEventArgs> worldViewMouseDown, worldViewMouseMove, worldViewMouseUp, worldViewZoom;
-        private GenericEventHandler<Responder, KeyboardEventArgs> worldViewKeyDown, worldViewKeyUp;
         private GenericEventHandler<SelectionManager> selectionChanged;
         #endregion
         #endregion
@@ -62,22 +60,16 @@ namespace Orion.UserInterface
             Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
             Rectangle eastFrame = new Rectangle(Bounds.Width, 0, -20, Bounds.Height);
             Rectangle westFrame = new Rectangle(0, 0, 20, Bounds.Height);
-            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), MouseEventType.MouseEntered, Keys.Up);
-            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), MouseEventType.MouseEntered, Keys.Down);
-            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), MouseEventType.MouseEntered, Keys.Right);
-            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), MouseEventType.MouseEntered, Keys.Left);
+            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), Keys.Up);
+            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
+            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);
+            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), Keys.Left);
             
             Children.Add(northScroller);
             Children.Add(southScroller);
             Children.Add(eastScroller);
             Children.Add(westScroller);
 
-            worldViewMouseDown = WorldViewMouseDown;
-            worldViewMouseUp = WorldViewMouseUp;
-            worldViewMouseMove = WorldViewMouseMove;
-            worldViewKeyDown = WorldViewKeyDown;
-            worldViewKeyUp = WorldViewKeyUp;
-            worldViewZoom = WorldViewZoom;
             selectionChanged = SelectionChanged;
         }
 
@@ -85,36 +77,41 @@ namespace Orion.UserInterface
 
         #region Methods
         #region Event Handling
-        private void WorldViewZoom(Responder source, MouseEventArgs args)
+        protected override bool OnMouseWheel(MouseEventArgs args)
         {
             double scale = 1 - (args.WheelDelta / 600.0);
-            worldView.Zoom(scale, args.Position);
-            base.OnMouseWheel(args);
+            worldView.Zoom(scale, Rectangle.ConvertPoint(Bounds, worldView.Bounds, args.Position));
+            return base.OnMouseWheel(args);
         }
 
-        private void WorldViewMouseDown(Responder source, MouseEventArgs args)
+        protected override bool OnMouseDown(MouseEventArgs args)
         {
-            userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, true);
+            userInputCommander.OnMouseButton(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position), args.ButtonPressed, true);
+            return base.OnMouseDown(args);
         }
 
-        private void WorldViewMouseUp(Responder source, MouseEventArgs args)
+        protected override bool OnMouseUp(MouseEventArgs args)
         {
-            userInputCommander.OnMouseButton(new Vector2(args.X, args.Y), args.ButtonPressed, false);
+            userInputCommander.OnMouseButton(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position), args.ButtonPressed, false);
+            return base.OnMouseUp(args);
         }
 
-        private void WorldViewMouseMove(Responder source, MouseEventArgs args)
+        protected override bool OnMouseMove(MouseEventArgs args)
         {
-            userInputCommander.OnMouseMove(new Vector2(args.X, args.Y));
+            userInputCommander.OnMouseMove(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position));
+            return base.OnMouseMove(args);
         }
 
-        private void WorldViewKeyDown(Responder source, KeyboardEventArgs args)
+        protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             userInputCommander.OnKeyDown(args.Key);
+            return base.OnKeyDown(args);
         }
 
-        private void WorldViewKeyUp(Responder source, KeyboardEventArgs args)
+        protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             userInputCommander.OnKeyUp(args.Key);
+            return base.OnKeyUp(args);
         }
 
         private void SelectionChanged(SelectionManager selectionManager)
@@ -145,6 +142,11 @@ namespace Orion.UserInterface
                 }
                 selectionFrame.Children.Add(unitButton);
             }
+
+            if (selectionFrame.Children.Count == 0)
+                selectedType = null;
+            else if (selectedType == null)
+                selectedType = selectionManager.SelectedUnits.First().Type;
         }
 
         private void ButtonPress(Button button)
@@ -170,22 +172,11 @@ namespace Orion.UserInterface
         #region IUIDisplay Implementation
         internal override void OnEnter(RootView into)
         {
-            worldView.MouseWheel += worldViewZoom;
-            worldView.MouseDown += worldViewMouseDown;
-            worldView.MouseMoved += worldViewMouseMove;
-            worldView.MouseUp += worldViewMouseUp;
-            worldView.KeyDown += worldViewKeyDown;
-            worldView.KeyUp += worldViewKeyUp;
             userInputCommander.SelectionManager.SelectionChanged += selectionChanged;
         }
 
         internal override void OnShadow(RootView shadowedFrom)
         {
-            worldView.MouseDown -= worldViewMouseDown;
-            worldView.MouseMoved -= worldViewMouseMove;
-            worldView.MouseUp -= worldViewMouseUp;
-            worldView.KeyDown -= worldViewKeyDown;
-            worldView.KeyUp -= worldViewKeyUp;
             userInputCommander.SelectionManager.SelectionChanged -= selectionChanged;
             shadowedFrom.PopDisplay(this);
         }

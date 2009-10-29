@@ -31,13 +31,25 @@ namespace Orion.UserInterface
 
         public Vector2? CursorPosition
         {
-            get { return cursorPosition; }
-            set { cursorPosition = value; }
+            get
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                return cursorPosition;
+            }
+            set
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                cursorPosition = value;
+            }
         }
 
         public bool IsMouseOver
         {
-            get { return cursorPosition.HasValue; }
+            get
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                return cursorPosition.HasValue;
+            }
         }
         #endregion
 
@@ -56,6 +68,22 @@ namespace Orion.UserInterface
 
         #region Methods
 
+        public override void Dispose()
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
+            base.Dispose();
+            MouseDown = null;
+            MouseUp = null;
+            MouseClicked = null;
+            MouseMoved = null;
+            MouseWheel = null;
+            MouseEntered = null;
+            MouseExited = null;
+            KeyDown = null;
+            KeyUp = null;
+            Updated = null;
+        }
+
         #region Event Propagation
         /// <summary>Propagates a mouse event to the child views.</summary>
         /// <remarks>
@@ -66,6 +94,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             bool eventCanSink = true;
             foreach (Responder child in Enumerable.Reverse(Children))
             {
@@ -104,6 +133,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             // for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
             foreach (Responder child in Enumerable.Reverse(Children))
             {
@@ -118,6 +148,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual void PropagateUpdateEvent(UpdateEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             foreach (Responder child in Enumerable.Reverse(Children))
             {
                 child.PropagateUpdateEvent(args);
@@ -129,6 +160,7 @@ namespace Orion.UserInterface
         #region Event Dispatch
         protected internal bool DispatchMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             switch (eventType)
             {
                 case MouseEventType.MouseClicked: return OnMouseClick(args);
@@ -144,6 +176,7 @@ namespace Orion.UserInterface
 
         protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             switch (type)
             {
                 case KeyboardEventType.KeyDown: return OnKeyDown(args);
@@ -242,6 +275,7 @@ namespace Orion.UserInterface
 
         private void InvokeEventHandlers(GenericEventHandler<Responder, MouseEventArgs> handler, MouseEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             if (handler != null)
             {
                 handler(this, args);
@@ -275,6 +309,7 @@ namespace Orion.UserInterface
 
         private void InvokeEventHandlers(GenericEventHandler<Responder, KeyboardEventArgs> handler, KeyboardEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             if (handler != null)
             {
                 handler(this, args);
@@ -285,6 +320,7 @@ namespace Orion.UserInterface
         #region Update Events
         protected virtual void OnUpdate(UpdateEventArgs args)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             GenericEventHandler<Responder, UpdateEventArgs> handler = Updated;
             if (handler != null)
             {

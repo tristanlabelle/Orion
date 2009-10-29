@@ -10,7 +10,7 @@ using Orion.Graphics;
 
 namespace Orion.UserInterface.Widgets
 {
-    public class Button : RenderedView, IDisposable
+    public class Button : RenderedView
     {
         #region Fields
         private Label caption;
@@ -55,9 +55,10 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-        public void Dispose()
+        public override void Dispose()
         {
             Pressed = null;
+            base.Dispose();
         }
 
         protected override bool OnMouseEnter(MouseEventArgs args)

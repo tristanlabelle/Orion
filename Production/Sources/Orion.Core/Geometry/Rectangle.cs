@@ -545,6 +545,13 @@ namespace Orion.Geometry
         {
             return new Rectangle(point1, point2 - point1);
         }
+
+        public static Vector2 ConvertPoint(Rectangle from, Rectangle to, Vector2 point)
+        {
+            point -= from.Origin;
+            point.Scale(to.Width / from.Width, to.Height / from.Height);
+            return point + to.Origin;
+        }
         #endregion
         #endregion
     }

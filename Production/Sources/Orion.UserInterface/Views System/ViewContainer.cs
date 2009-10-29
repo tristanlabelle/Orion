@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Orion.UserInterface
 {
-    public abstract class ViewContainer
+    public abstract class ViewContainer : IDisposable
     {
         #region Nested Types
         /// <summary>
@@ -173,6 +173,7 @@ namespace Orion.UserInterface
         #region Fields
         private Collection<ViewContainer> children;
         private ViewContainer parent;
+        protected internal bool isDisposed;
         #endregion
 
         #region Constructors
@@ -204,6 +205,7 @@ namespace Orion.UserInterface
         {
             get
             {
+                if (isDisposed) throw new ObjectDisposedException(null);
                 ViewContainer ancestor = Parent;
                 while (ancestor != null)
                 {
@@ -217,6 +219,7 @@ namespace Orion.UserInterface
         {
             get
             {
+                if (isDisposed) throw new ObjectDisposedException(null);
                 if (Parent == null) return 0;
                 return Parent.Children.IndexOf(this);
             }
@@ -227,8 +230,16 @@ namespace Orion.UserInterface
         /// </summary>
         public ViewContainer Parent
         {
-            get { return parent; }
-            set { parent = value; }
+            get
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                return parent;
+            }
+            set
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                parent = value;
+            }
         }
 
         /// <summary>
@@ -236,7 +247,11 @@ namespace Orion.UserInterface
         /// </summary>
         public Collection<ViewContainer> Children
         {
-            get { return children; }
+            get
+            {
+                if (isDisposed) throw new ObjectDisposedException(null);
+                return children;
+            }
         }
 
         /// <summary>
@@ -246,6 +261,7 @@ namespace Orion.UserInterface
         {
             get
             {
+                if (isDisposed) throw new ObjectDisposedException(null);
                 foreach (ViewContainer child in children)
                 {
                     yield return child;
@@ -268,6 +284,7 @@ namespace Orion.UserInterface
         /// </returns>
         public bool IsDescendantOf(ViewContainer other)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             Argument.EnsureNotNull(other, "other");
             while (other != null)
             {
@@ -288,6 +305,7 @@ namespace Orion.UserInterface
         /// </returns>
         public bool IsAncestorOf(ViewContainer other)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             Argument.EnsureNotNull(other, "other");
             return other.IsDescendantOf(this);
         }
@@ -297,17 +315,30 @@ namespace Orion.UserInterface
         /// </summary>
         public void RemoveFromParent()
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             if (Parent != null) Parent.Children.Remove(this);
         }
 
         #endregion
 
         #region Methods
+        public virtual void Dispose()
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
+            RemoveFromParent();
+            foreach (ViewContainer child in children) child.Dispose();
+            AddedToParent = null;
+            RemovedFromParent = null;
+            AddedChild = null;
+            RemovedChild = null;
+        }
+
         /// <summary>
         /// Renders this container.
         /// </summary>
         protected internal virtual void Render()
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             foreach (ViewContainer container in Children)
             {
                 container.Render();
@@ -316,26 +347,31 @@ namespace Orion.UserInterface
 
         protected internal virtual void OnAddToParent(ViewContainer parent)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(AddedToParent, parent);
         }
 
         protected internal virtual void OnRemoveFromParent(ViewContainer parent)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(RemovedFromParent, parent);
         }
 
         protected internal virtual void OnAddChild(ViewContainer child)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(AddedChild, child);
         }
 
         protected internal virtual void OnRemoveChild(ViewContainer child)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(RemovedChild, child);
         }
 
         private void TriggerEvent(GenericEventHandler<ViewContainer, ViewContainer> eventHandler, ViewContainer argument)
         {
+            if (isDisposed) throw new ObjectDisposedException(null);
             if (eventHandler != null) eventHandler(this, argument);
         }
 

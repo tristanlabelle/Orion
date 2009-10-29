@@ -121,15 +121,17 @@ namespace Orion.Commandment
                 .Where(unit => Intersection.Test(selectionRectangle, unit.Circle))
                 .ToList();
 
-            // Filter out factions
-            bool containsUnitsFromThisFaction = unitsInSelectionRectangle.Any(unit => unit.Faction == faction);
-            if (containsUnitsFromThisFaction)
-                unitsInSelectionRectangle.RemoveAll(unit => unit.Faction != faction);
-
             // Filter out buildings
             bool containsNonBuildingUnits = unitsInSelectionRectangle.Any(unit => !unit.Type.IsBuilding);
             if (containsNonBuildingUnits)
                 unitsInSelectionRectangle.RemoveAll(unit => unit.Type.IsBuilding);
+
+            // Filter out factions
+            bool containsUnitsFromThisFaction = unitsInSelectionRectangle.Any(unit => unit.Faction == faction);
+            if (containsUnitsFromThisFaction)
+                unitsInSelectionRectangle.RemoveAll(unit => unit.Faction != faction);
+            else if(unitsInSelectionRectangle.Count > 1)
+                unitsInSelectionRectangle.RemoveRange(1, unitsInSelectionRectangle.Count - 1);
 
             return unitsInSelectionRectangle;
         }

@@ -12,9 +12,7 @@ namespace Orion.UserInterface.Widgets
     public class Scroller : Responder
     {
         #region Fields
-        private static readonly Dictionary<MouseEventType, MouseEventType> oppositeMap;
 
-        private readonly MouseEventType mouseTrigger;
         private readonly ClippedView scrolledView;
         private readonly Vector2 direction;
         private readonly Keys keyboardTrigger;
@@ -25,49 +23,31 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public Scroller(ClippedView view, Rectangle frame, Vector2 direction, MouseEventType trigger)
-            : this(view, frame, direction, trigger, Keys.None)
+            : this(view, frame, direction, Keys.None)
         { }
 
-        public Scroller(ClippedView view, Rectangle frame, Vector2 direction, Keys trigger)
-            : this(view, frame, direction, MouseEventType.None, trigger)
-        { }
-
-        public Scroller(ClippedView view, Rectangle frame, Vector2 direction, MouseEventType mouseTrigger, Keys keyboardTrigger)
+        public Scroller(ClippedView view, Rectangle frame, Vector2 direction, Keys keyboardTrigger)
         {
-            if (!oppositeMap.ContainsKey(mouseTrigger))
-                throw new ArgumentException("Cannot use the mouse event type {0} as a trigger because it has no opposite event".FormatInvariant(mouseTrigger));
-            
             Frame = frame;
             Bounds = frame;
             scrolledView = view;
             this.direction = direction;
-            this.mouseTrigger = mouseTrigger;
             this.keyboardTrigger = keyboardTrigger;
-        }
-
-        static Scroller()
-        {
-            oppositeMap = new Dictionary<MouseEventType, MouseEventType>();
-            oppositeMap[MouseEventType.MouseUp] = MouseEventType.MouseDown;
-            oppositeMap[MouseEventType.MouseDown] = MouseEventType.MouseUp;
-            oppositeMap[MouseEventType.MouseExited] = MouseEventType.MouseEntered;
-            oppositeMap[MouseEventType.MouseEntered] = MouseEventType.MouseExited;
         }
         #endregion
 
         #region Methods
 
-        protected internal override bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
+        protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            if (type == mouseTrigger)
-            {
-                mouseTriggered = true;
-            }
-            else if (type == oppositeMap[mouseTrigger])
-            {
-                mouseTriggered = false;
-            }
-            return true;
+            mouseTriggered = true;
+            return base.OnMouseEnter(args);
+        }
+
+        protected override bool OnMouseExit(MouseEventArgs args)
+        {
+            mouseTriggered = false;
+            return base.OnMouseExit(args);
         }
 
         protected override bool OnKeyDown(KeyboardEventArgs args)

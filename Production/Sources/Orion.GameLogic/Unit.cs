@@ -158,6 +158,13 @@ namespace Orion.GameLogic
             set
             {
                 if (value == position) return;
+                if (!World.Bounds.ContainsPoint(value))
+                {
+                    throw new ArgumentException(
+                        "Cannot set the position to a value outside of world bounds.",
+                        "Position");
+                }
+
                 Vector2 oldValue = position;
                 position = value;
                 OnMoved(oldValue, position);

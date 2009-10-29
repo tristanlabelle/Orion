@@ -76,7 +76,7 @@ namespace Orion.Commandment
             List<Unit> trainers = new List<Unit>();
             trainers.Add(World.Units.Where(unit => unit.Faction == Faction && unit.Type.IsBuilding).First());
 
-            if (trainers != null)
+            if (trainers != null && trainers.ElementAt(0).IsIdle)
             {
                 Command command = new Train(trainers, new UnitType("FooWarrior", 1), Faction);
                 GenerateCommand(command);

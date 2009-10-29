@@ -39,19 +39,20 @@ namespace Orion.Main
             // we have to do something better
             foreach (Faction faction in world.Factions)
             {
-                foreach (UnitType type in World.UnitTypes.AllUnitTypes)
-                {
-                    for (int i = 0; i < 10; i++)
+                    foreach (UnitType type in World.UnitTypes.AllUnitTypes)
                     {
-                        Vector2 position;
-                        do
+                        for (int i = 0; i < 10; i++)
                         {
-                            position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                        } while (!terrain.IsWalkable(position));
-                        Unit unit = faction.CreateUnit(type);
-                        unit.Position = position;
+                            Vector2 position;
+                            do
+                            {
+                                position = new Vector2(random.Next(world.Width), random.Next(world.Height));
+                            } while (!terrain.IsWalkable(position));
+                            Unit unit = faction.CreateUnit(type);
+                            unit.Position = position;
+                        }
+                        
                     }
-                }
             }
             #endregion
 

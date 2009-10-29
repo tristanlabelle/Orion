@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Color = System.Drawing.Color;
 
 using OpenTK.Math;
 
 using Orion.Geometry;
+using Color = System.Drawing.Color;
+using Point = System.Drawing.Point;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.UserInterface
 {
@@ -19,6 +21,8 @@ namespace Orion.UserInterface
     {
         #region Fields
         internal readonly RootView rootView;
+        private Point lastGameMousePosition;
+        private MouseButtons lastMouseButtons;
         #endregion
 
         #region Constructors
@@ -31,6 +35,9 @@ namespace Orion.UserInterface
 
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             rootView = new RootView(windowBounds, RootView.ContentsBounds);
+            
+            lastGameMousePosition = GetGameMousePosition();
+            lastMouseButtons = Control.MouseButtons;
         }
         #endregion
 
@@ -40,8 +47,60 @@ namespace Orion.UserInterface
         /// </summary>
         public override void Refresh()
         {
+            if (!glControl.IsDisposed && !IsDisposed)
+                CheckMouseEvents();
+
             glControl.Refresh();
         }
+
+        #region Mouse Stuff
+        private Point GetGameMousePosition()
+        {
+            Point mousePosition = glControl.PointToClient(Control.MousePosition);
+
+            if (mousePosition.X < 0) mousePosition.X = 0;
+            if (mousePosition.X >= glControl.Width) mousePosition.X = glControl.Width - 1;
+
+            if (mousePosition.Y < 0) mousePosition.Y = 0;
+            if (mousePosition.Y >= glControl.Height) mousePosition.Y = glControl.Height - 1;
+
+            return mousePosition;
+        }
+
+        private void CheckMouseEvents()
+        {
+            Point newGameMousePosition = GetGameMousePosition();
+            MouseButtons newMouseButtons = Control.MouseButtons;
+
+            if (newGameMousePosition != lastGameMousePosition)
+            {
+                TriggerMouseEvent(MouseEventType.MouseMoved,
+                    newGameMousePosition.X, newGameMousePosition.Y,
+                    MouseButtons.None, 0, 0);
+                lastGameMousePosition = newGameMousePosition;
+            }
+
+            if (newMouseButtons != lastMouseButtons)
+            {
+                CheckMouseButtonStateChange(lastMouseButtons, newMouseButtons, MouseButtons.Left);
+                CheckMouseButtonStateChange(lastMouseButtons, newMouseButtons, MouseButtons.Middle);
+                CheckMouseButtonStateChange(lastMouseButtons, newMouseButtons, MouseButtons.Right);
+                lastMouseButtons = newMouseButtons;
+            }
+        }
+
+        private void CheckMouseButtonStateChange(
+            MouseButtons lastMouseButtons, MouseButtons newMouseButtons, MouseButtons mouseButton)
+        {
+            if ((lastMouseButtons & mouseButton) != (newMouseButtons & mouseButton))
+            {
+                bool pressed = (newMouseButtons & mouseButton) == mouseButton;
+                TriggerMouseEvent(pressed ? MouseEventType.MouseDown : MouseEventType.MouseUp,
+                    lastGameMousePosition.X, lastGameMousePosition.Y,
+                    mouseButton, 1, 0);
+            }
+        }
+        #endregion
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
@@ -49,37 +108,18 @@ namespace Orion.UserInterface
             glControl.SwapBuffers();
         }
 
-        private void glControl_MouseClick(object sender, System.Windows.Forms.MouseEventArgs args)
-        {
-            TriggerMouseEvent(MouseEventType.MouseClicked, args.X, args.Y, args.Button, args.Clicks, args.Delta);
-        }
-
-        private void glControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs args)
-        {
-            TriggerMouseEvent(MouseEventType.MouseDown, args.X, args.Y, args.Button, args.Clicks, args.Delta);
-        }
-
-        private void glControl_MouseUp(object sender, System.Windows.Forms.MouseEventArgs args)
-        {
-            TriggerMouseEvent(MouseEventType.MouseUp, args.X, args.Y, args.Button, args.Clicks, args.Delta);
-        }
-
-        private void glControl_MouseMove(object sender, System.Windows.Forms.MouseEventArgs args)
-        {
-            TriggerMouseEvent(MouseEventType.MouseMoved, args.X, args.Y, args.Button, args.Clicks, args.Delta);
-        }
-
         private void glControl_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs args)
         {
-            TriggerMouseEvent(MouseEventType.MouseWheel, args.X, args.Y, args.Button, args.Clicks, args.Delta);
+            TriggerMouseEvent(MouseEventType.MouseWheel,
+                args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 
-        private void glControl_KeyDown(object sender, System.Windows.Forms.KeyEventArgs args)
+        private void glControl_KeyDown(object sender, KeyEventArgs args)
         {
             TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
         }
 
-        private void glControl_KeyUp(object sender, System.Windows.Forms.KeyEventArgs args)
+        private void glControl_KeyUp(object sender, KeyEventArgs args)
         {
             TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
         }
@@ -95,12 +135,13 @@ namespace Orion.UserInterface
             MouseButton pressedButton = MouseButton.None;
             switch (argsButton)
             {
-                case System.Windows.Forms.MouseButtons.Left: pressedButton = MouseButton.Left; break;
-                case System.Windows.Forms.MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
-                case System.Windows.Forms.MouseButtons.Right: pressedButton = MouseButton.Right; break;
+                case MouseButtons.Left: pressedButton = MouseButton.Left; break;
+                case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
+                case MouseButtons.Right: pressedButton = MouseButton.Right; break;
             }
 
-            rootView.PropagateMouseEvent(type, new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
+            rootView.PropagateMouseEvent(type,
+                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
         }
 
         /// <summary>

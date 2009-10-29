@@ -41,7 +41,7 @@ namespace Orion.Graphics
             context.Stroke(Shape, new Vector2(x, y));
 
             float healthRatio = Unit.Health / Unit.MaxHealth;
-            float yHealth = context.CoordinateSystem.Height / 3;
+            float yHealth = context.CoordinateSystem.Height / 4;
             Vector2 start = new Vector2(context.CoordinateSystem.Width / 4, yHealth);
             Vector2 end = new Vector2(context.CoordinateSystem.Width / 4 * 3, yHealth);
             DrawHealthBar(context, start, end, healthRatio);

@@ -250,7 +250,9 @@ namespace Orion.GameLogic
         /// <returns>The newly created <see cref="Unit"/>.</returns>
         public Unit CreateUnit(UnitType type)
         {
-            return world.Units.Create(type, this);
+            Unit unit = world.Units.Create(type, this);
+            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fog.UpdateUnitSight);
+            return unit;
         }
 
         public override string ToString()

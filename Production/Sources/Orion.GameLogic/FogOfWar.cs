@@ -48,10 +48,10 @@ namespace Orion.GameLogic
 
         #region Methods
 
-        public void UpdateUnitSight(Unit unit, Vector2 oldPosition)
+        public void UpdateUnitSight(Unit unit, ValueChangedEventArgs<OpenTK.Math.Vector2> eventArgs)
         {
-            if (Math.Floor(unit.Position.X) == Math.Floor(oldPosition.X) &&
-                Math.Floor(unit.Position.Y) == Math.Floor(oldPosition.Y))
+            if (Math.Floor(unit.Position.X) == Math.Floor(eventArgs.OldValue.X) &&
+                Math.Floor(unit.Position.Y) == Math.Floor(eventArgs.OldValue.Y))
                 return;
 
             Rectangle tilesRectangle = CreateTilesRectangle(unit.LineOfSight.BoundingRectangle);

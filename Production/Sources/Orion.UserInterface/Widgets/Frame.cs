@@ -17,5 +17,8 @@ namespace Orion.UserInterface.Widgets
         public Frame(Rectangle frame, Color fillColor)
             : base(frame, new FilledFrameRenderer(fillColor))
         { }
+        public Frame(Rectangle frame, FrameRenderer renderer)
+            : base(frame, renderer)
+        { }
     }
 }

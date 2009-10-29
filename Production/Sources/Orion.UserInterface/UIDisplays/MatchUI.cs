@@ -23,10 +23,12 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
+        private readonly Frame minimapFrame;
         private UnitType selectedType;
 
         #region Event Handling Delegates
         private GenericEventHandler<SelectionManager> selectionChanged;
+        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseDown;
         #endregion
         #endregion
 
@@ -39,9 +41,10 @@ namespace Orion.UserInterface
 
             userInputCommander = commander;
 
+            MatchRenderer matchRenderer = new MatchRenderer(world, commander);
             world.Units.UnitDied += userInputCommander.SelectionManager.UnitDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
-            worldView = new ClippedView(worldFrame, world.Bounds, new MatchRenderer(world, commander));
+            worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 
@@ -52,8 +55,12 @@ namespace Orion.UserInterface
             hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkGray);
             Children.Add(hudFrame);
 
-            selectionFrame = new Frame(new Rectangle(Bounds.Width / 4, 0, Bounds.Width / 2, hudFrame.Frame.Height), Color.DarkGray);
+            selectionFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, 0, hudFrame.Bounds.Width / 2, hudFrame.Frame.Height), Color.DarkGray);
             hudFrame.Children.Add(selectionFrame);
+
+            minimapFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, hudFrame.Bounds.Height), matchRenderer.MinimapRenderer);
+            minimapFrame.Bounds = world.Bounds;
+            hudFrame.Children.Add(minimapFrame);
 
             Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
             Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
@@ -70,6 +77,7 @@ namespace Orion.UserInterface
             Children.Add(westScroller);
 
             selectionChanged = SelectionChanged;
+            minimapMouseDown = MinimapMouseDown;
         }
 
         #endregion
@@ -111,6 +119,10 @@ namespace Orion.UserInterface
         {
             userInputCommander.OnKeyUp(args.Key);
             return base.OnKeyUp(args);
+        }
+
+        private void MinimapMouseDown(Responder source, MouseEventArgs args)
+        {
         }
 
         private void SelectionChanged(SelectionManager selectionManager)

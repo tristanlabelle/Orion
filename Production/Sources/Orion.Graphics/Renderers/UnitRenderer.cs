@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Color = System.Drawing.Color;
 
 using Orion.GameLogic;
+using Orion.Geometry;
 
-using Color = System.Drawing.Color;
 using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Pathfinding;
 using OpenTK.Math;
@@ -62,6 +63,21 @@ namespace Orion.Graphics
             DrawPaths(graphics);
             DrawUnits(graphics);
             DrawAttackLines(graphics);
+        }
+
+        public void DrawMiniature(GraphicsContext context)
+        {
+            DrawMiniatureUnits(context);
+        }
+
+        private void DrawMiniatureUnits(GraphicsContext context)
+        {
+            Rectangle unitRect = new Rectangle(3, 3);
+            foreach (Unit unit in world.Units)
+            {
+                context.FillColor = unit.Faction.Color;
+                context.Fill(unitRect.Translate(unit.Position));
+            }
         }
 
         private void DrawUnits(GraphicsContext graphics)

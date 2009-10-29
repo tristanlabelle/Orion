@@ -18,6 +18,7 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
+        private readonly WorldRenderer renderer;
         private readonly UserInputCommander userInputCommander;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -62,7 +63,7 @@ namespace Orion.UserInterface
             Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
             Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);
             Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), Keys.Left);
-            
+
             Children.Add(northScroller);
             Children.Add(southScroller);
             Children.Add(eastScroller);

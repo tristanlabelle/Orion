@@ -133,6 +133,8 @@ namespace Orion.UserInterface
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
                 Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", renderer);
+                float aspectRatio = Bounds.Width / Bounds.Height;
+                unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
                 unitButton.Pressed += ButtonPress;
                 currentX += frame.Width + padding;
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)

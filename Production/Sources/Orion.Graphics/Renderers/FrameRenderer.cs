@@ -57,22 +57,24 @@ namespace Orion.Graphics
 
     public class TexturedFrameRenderer : FrameRenderer
     {
-        public readonly int TextureId;
+        public readonly Texture Texture;
 
-        public TexturedFrameRenderer(int textureId)
+        public TexturedFrameRenderer(Texture texture)
         {
-            TextureId = textureId;
+            Argument.EnsureNotNull(texture, "texture");
+            Texture = texture;
         }
 
-        public TexturedFrameRenderer(int textureId, Color strokeColor)
+        public TexturedFrameRenderer(Texture texture, Color strokeColor)
             : base(strokeColor)
         {
-            TextureId = textureId;
+            Argument.EnsureNotNull(texture, "texture");
+            Texture = texture;
         }
 
         public override void RenderInto(GraphicsContext context)
         {
-            context.FillTextured(context.CoordinateSystem, TextureId);
+            context.FillTextured(context.CoordinateSystem, Texture);
             base.RenderInto(context);
         }
     }

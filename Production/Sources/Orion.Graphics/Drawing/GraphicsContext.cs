@@ -348,11 +348,13 @@ namespace Orion.Graphics
         #endregion
 
         #region Textured
-        public void FillTextured(Rectangle rectangle, int textureID)
+        public void FillTextured(Rectangle rectangle, Texture texture)
         {
+            Argument.EnsureNotNull(texture, "texture");
+
             GL.Color3(1f, 1f, 1f);
             GL.Enable(EnableCap.Texture2D);
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
+            GL.BindTexture(TextureTarget.Texture2D, texture.ID);
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(0, 0);
             GL.Vertex2(rectangle.X, rectangle.Y);

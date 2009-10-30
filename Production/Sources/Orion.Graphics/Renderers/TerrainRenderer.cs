@@ -14,11 +14,11 @@ namespace Orion.Graphics
     /// <summary>
     /// Provides methods to draw a <see cref="Terrain"/> on-screen.
     /// </summary>
-    public sealed class TerrainRenderer
+    public sealed class TerrainRenderer : IDisposable
     {
         #region Fields
         private readonly Terrain terrain;
-        private int textureID;
+        private readonly Texture texture;
         #endregion
 
         #region Constructors
@@ -27,57 +27,19 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(terrain, "terrain");
 
             this.terrain = terrain;
-            this.textureID = GL.GenTexture();
 
-            try
+            byte[] pixels = new byte[terrain.Width * terrain.Height];
+            for (int y = 0; y < terrain.Height; ++y)
             {
-                GL.BindTexture(TextureTarget.Texture2D, textureID);
-
-                byte[] pixels = new byte[terrain.Width * terrain.Height];
-                for (int y = 0; y < terrain.Height; ++y)
+                for (int x = 0; x < terrain.Width; ++x)
                 {
-                    for (int x = 0; x < terrain.Width; ++x)
-                    {
-                        int pixelIndex = y * terrain.Width + x;
-                        byte luminance = terrain.IsWalkable(x, y) ? (byte)0 : (byte)255;
-                        pixels[pixelIndex] = luminance;
-                    }
+                    int pixelIndex = y * terrain.Width + x;
+                    byte luminance = terrain.IsWalkable(x, y) ? (byte)0 : (byte)255;
+                    pixels[pixelIndex] = luminance;
                 }
-
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Luminance,
-                    terrain.Width, terrain.Height, 0, PixelFormat.Luminance, PixelType.UnsignedByte,
-                    pixels);
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                    (int)TextureMinFilter.Nearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                    (int)TextureMagFilter.Nearest);
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-                    (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-                    (int)TextureWrapMode.Repeat);
-
-                GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
-                    (int)TextureEnvMode.Modulate);
-
-                GL.BindTexture(TextureTarget.Texture2D, 0);
             }
-            catch
-            {
-                GL.DeleteTexture(textureID);
-                throw;
-            }
-        }
-        #endregion
 
-        #region Properties
-        /// <summary>
-        /// Gets the OpenGL identifier of this texture.
-        /// </summary>
-        public int TextureID
-        {
-            get { return textureID; }
+            this.texture = new Texture(terrain.Width, terrain.Height, TextureFormat.Luminance, pixels);
         }
         #endregion
 
@@ -85,14 +47,12 @@ namespace Orion.Graphics
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-            graphics.FillTextured(terrainBounds, textureID);
+            graphics.FillTextured(terrainBounds, texture);
         }
 
         public void Dispose()
         {
-            if (textureID == 0) throw new ObjectDisposedException(null);
-            GL.DeleteTexture(textureID);
-            textureID = 0;
+            texture.Dispose();
         }
         #endregion
     }

@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\Texture.cs" />
+    <Compile Include="Drawing\TextureFormat.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />
     <Compile Include="Renderers\FrameRenderer.cs" />
     <Compile Include="Renderers\DelegatedRenderer.cs" />

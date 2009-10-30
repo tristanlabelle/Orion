@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,7 @@ namespace Orion.Commandment
         private readonly Faction faction;
         private Vector2 cursorPosition;
         private Vector2? selectionStartPosition;
-        private bool ctrlKeyPressed;
+        private bool shiftKeyPressed;
         #endregion
 
         #region Constructors
@@ -52,10 +52,10 @@ namespace Orion.Commandment
         /// <summary>
         /// Gets or sets if the control key is pressed or not;
         /// </summary>
-        public bool CtrlKeyPressed
+        public bool ShiftKeyPressed
         {
-            get { return ctrlKeyPressed; }
-            set { ctrlKeyPressed = value; }
+            get { return shiftKeyPressed; }
+            set { shiftKeyPressed = value; }
         }
 
         /// <summary>
@@ -102,15 +102,18 @@ namespace Orion.Commandment
 
         public void SelectUnit(Unit unit)
         {
-            if(!ctrlKeyPressed) selectedUnits.Clear();
-            selectedUnits.Add(unit);
-            OnSelectionChange();
+            if(!shiftKeyPressed) selectedUnits.Clear();
+			if(!selectedUnits.Contains(unit))
+			{
+	            selectedUnits.Add(unit);
+	            OnSelectionChange();
+			}
         }
 
         public void SelectUnits(IEnumerable<Unit> units)
         {
-            if (!ctrlKeyPressed) selectedUnits.Clear();
-            selectedUnits.AddRange(units);
+            if (!shiftKeyPressed) selectedUnits.Clear();
+            selectedUnits.AddRange(units.Except(selectedUnits));
             OnSelectionChange();
         }
 
@@ -162,10 +165,10 @@ namespace Orion.Commandment
         /// <summary>
         /// Informs this <see cref="SelectionManager"/> that they control key state has changed.
         /// </summary>
-        /// <param name="ctrlKeyState">The source UnitRegistry</param>
-        public void OnCtrlKeyChanged(bool ctrlKeyState)
+        /// <param name="shiftKeyState">The source UnitRegistry</param>
+        public void OnShiftKeyChanged(bool shiftKeyState)
         {
-            CtrlKeyPressed = ctrlKeyState;
+            ShiftKeyPressed = shiftKeyState;
         }
 
         private void OnSelectionChange()

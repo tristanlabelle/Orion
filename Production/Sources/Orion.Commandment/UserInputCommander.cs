@@ -54,7 +54,7 @@ namespace Orion.Commandment
         public void OnMouseButton(Vector2 position, MouseButton button, bool pressed)
         {
             selectionManager.OnMouseButton(position, button, pressed);
-            if (button == MouseButton.Right && selectionManager.CtrlKeyPressed && pressed)
+            if (button == MouseButton.Right && selectionManager.ShiftKeyPressed && pressed)
             {
                 HandleCtrlRightClick(position);
             }
@@ -63,7 +63,7 @@ namespace Orion.Commandment
             {
                 HandleMiddleClick(position);
             }
-            else if (button == MouseButton.Left && selectionManager.CtrlKeyPressed && pressed)
+            else if (button == MouseButton.Left && selectionManager.ShiftKeyPressed && pressed)
             {
                 HandleCtrlLeftClick(position);
             }
@@ -215,9 +215,9 @@ namespace Orion.Commandment
                     }
                 }
             }
-            else if (key == Keys.ControlKey)
+            else if (key == Keys.ShiftKey)
             {
-                selectionManager.OnCtrlKeyChanged(true);
+                selectionManager.OnShiftKeyChanged(true);
             }
         }
 
@@ -229,9 +229,9 @@ namespace Orion.Commandment
         /// </param>
         public void OnKeyUp(Keys key)
         {
-            if (key == Keys.ControlKey)
+            if (key == Keys.ShiftKey)
             {
-                selectionManager.OnCtrlKeyChanged(false);
+                selectionManager.OnShiftKeyChanged(false);
             }
         }
 

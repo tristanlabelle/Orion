@@ -23,6 +23,11 @@ namespace Orion.GameLogic.Tasks
         #region Constructors
         public Harvest(Unit harvester, ResourceNode node)
         {
+            Argument.EnsureNotNull(harvester, "harvester");
+            if (!harvester.HasSkill<Skills.Harvest>())
+                throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
+            Argument.EnsureNotNull(node, "node");
+
             this.harvester = harvester;
             this.node = node;
             this.move = new Move(harvester, node.Position);

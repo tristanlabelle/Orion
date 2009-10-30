@@ -11,17 +11,16 @@ namespace Orion.GameLogic.Tasks
     /// <summary>
     /// A <see cref="Task"/> which makes a<see cref="Unit"/> move to a location and attack enemies on it's way.
     /// </summary>
+    [Serializable]
     public sealed class ZoneAttack : Task
     {
         #region Fields
-
         private readonly Unit striker;
         private readonly Vector2 destination;
         private readonly float targetDistance;
         private Unit target = null;
         private Attack attack = null;
         private Move move;
-
         #endregion
 
         #region Constructors

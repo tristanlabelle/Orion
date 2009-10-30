@@ -10,6 +10,7 @@ namespace Orion.GameLogic.Tasks
     /// <summary>
     /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>
     /// </summary>
+    [Serializable]
     public sealed class Attack : Task
     {
         #region Fields
@@ -24,6 +25,8 @@ namespace Orion.GameLogic.Tasks
         public Attack(Unit attacker, Unit target)
         {
             Argument.EnsureNotNull(attacker, "attacker");
+            if (!attacker.HasSkill<Skills.Attack>())
+                throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
             this.attacker = attacker;

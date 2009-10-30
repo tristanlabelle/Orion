@@ -273,6 +273,18 @@ namespace Orion.GameLogic
 
         #region Methods
         /// <summary>
+        /// Tests if this <see cref="Unit"/> has a given <see cref="Skill"/>.
+        /// </summary>
+        /// <typeparam name="TSkill">
+        /// The <see cref="Skill"/> this <see cref="Unit"/> should have.
+        /// </typeparam>
+        /// <returns>True if this <see cref="Unit"/> has that <see cref="Skill"/>, false if not.</returns>
+        public bool HasSkill<TSkill>() where TSkill : Skill
+        {
+            return Type.Skills.Find<TSkill>() != null;
+        }
+
+        /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
         /// </summary>
         /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>

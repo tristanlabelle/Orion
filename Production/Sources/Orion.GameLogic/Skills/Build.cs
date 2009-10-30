@@ -10,11 +10,11 @@ namespace Orion.GameLogic.Skills
     /// A <see cref="Skill"/> which permits a <see cref="UnitType"/> to erect buildings.
     /// </summary>
     [Serializable]
-    [SkillDependency(typeof(Move))]
     public sealed class Build : Skill
     {
         #region Fields
         private readonly Func<UnitType, bool> predicate;
+        private readonly int speed;
         #endregion
 
         #region Constructors
@@ -23,10 +23,22 @@ namespace Orion.GameLogic.Skills
         /// that can be built.
         /// </summary>
         /// <param name="predicate">A predicate that matches <see cref="UnitType"/>s that can be built.</param>
-        public Build(Func<UnitType, bool> predicate)
+        public Build(Func<UnitType, bool> predicate, int speed)
         {
             Argument.EnsureNotNull(predicate, "predicate");
+            Argument.EnsureStrictlyPositive(speed, "speed");
             this.predicate = predicate;
+            this.speed = speed;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the building speed associated with this skill.
+        /// </summary>
+        public int Speed
+        {
+            get { return speed; }
         }
         #endregion
 
@@ -36,6 +48,12 @@ namespace Orion.GameLogic.Skills
             Argument.EnsureNotNull(unitType, "unitType");
             if (!unitType.IsBuilding) return false;
             return predicate(unitType);
+        }
+
+        public override int? TryGetBaseStat(UnitStat stat)
+        {
+            if (stat == UnitStat.BuildingSpeed) return speed;
+            return null;
         }
         #endregion
     }

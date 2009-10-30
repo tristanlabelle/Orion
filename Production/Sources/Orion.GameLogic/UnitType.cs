@@ -50,7 +50,7 @@ namespace Orion.GameLogic
             skills.Add(new MoveSkill(20));
             skills.Add(new AttackSkill(1, 2));
             skills.Add(new HarvestSkill(10));
-            skills.Add(new BuildSkill(unitType => true));
+            skills.Add(new BuildSkill(unitType => true, 5));
         }
         #endregion
 

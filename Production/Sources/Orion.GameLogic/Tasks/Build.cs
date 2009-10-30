@@ -6,23 +6,31 @@ using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
 {
+    /// <summary>
+    /// A <see cref="Task"/> which makes a <see cref="Unit"/> build a building of a given type.
+    /// </summary>
+    [Serializable]
     public sealed class Build : Task
     {
         #region Fields
         private readonly Unit builder;
-        private readonly UnitType unitTypeToBuild;
+        private readonly UnitType buildingType;
         private readonly Vector2 buildPosition;
-        private float secondsSpentBuilding = 0;
         private Move move;
-        private bool buildHaveBegin = false;
-        private bool unitConstructed = false;
+        private float secondsSpentBuilding = 0;
+        private bool hasBegunBuilding = false;
+        private bool hasEnded = false;
         #endregion
 
         #region Constructors
         public Build(Unit builder, Vector2 buildPosition, UnitType unitToBuild)
         {
+            Argument.EnsureNotNull(builder, "builder");
+            if (!builder.HasSkill<Skills.Build>())
+                throw new ArgumentException("Cannot build without the build skill.", "builder");
+
             this.builder = builder;
-            this.unitTypeToBuild = unitToBuild;
+            this.buildingType = unitToBuild;
             this.buildPosition = buildPosition;
             this.move = new Move(builder, this.buildPosition);
         }
@@ -36,66 +44,52 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get
-            {
-                return unitConstructed;
-            }
+            get { return hasEnded; }
         }
         #endregion
 
         #region Methods
         public override void Update(float timeDelta)
         {
-            if (move.HasEnded)
-            {
-                if (!buildHaveBegin)
-                {
-                    int aladdiumCost = builder.Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost);
-                    int alageneCost = builder.Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost);
+            if (hasEnded) return;
 
-                    if (builder.Faction.AladdiumAmount >= aladdiumCost
-                        && builder.Faction.AlageneAmount >= alageneCost)
-                    {
-                        builder.Faction.AladdiumAmount -= aladdiumCost;
-                        builder.Faction.AlageneAmount -= alageneCost;
-                        buildHaveBegin = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Not Enough Ressources");
-                        System.Diagnostics.Debug.Fail("Not Enough Ressources");
-                        return;
-                    }
-                }
-
-                if (buildHaveBegin)
-                {
-                    if (BuildingIsOver(timeDelta))
-                    {
-                        Unit unitBuilded = builder.faction.CreateUnit(unitTypeToBuild);
-                        unitBuilded.Position = buildPosition;
-                        unitConstructed = true;
-                        
-                    }
-                }
-            }
-            else
+            if (!move.HasEnded)
             {
                 move.Update(timeDelta);
+                return;
             }
-        }
 
-        private bool BuildingIsOver(float timeDelta)
-        {
-            float maxHealth = builder.Faction.GetStat(unitTypeToBuild, UnitStat.MaxHealth);
-            if (secondsSpentBuilding >= maxHealth)
+            if (!hasBegunBuilding)
             {
-                return true;
+                int aladdiumCost = builder.Faction.GetStat(buildingType, UnitStat.AladdiumCost);
+                int alageneCost = builder.Faction.GetStat(buildingType, UnitStat.AlageneCost);
+
+                if (builder.Faction.AladdiumAmount >= aladdiumCost
+                    && builder.Faction.AlageneAmount >= alageneCost)
+                {
+                    builder.Faction.AladdiumAmount -= aladdiumCost;
+                    builder.Faction.AlageneAmount -= alageneCost;
+                    hasBegunBuilding = true;
+                }
+                else
+                {
+                    Console.WriteLine("Not Enough Ressources");
+                    System.Diagnostics.Debug.Fail("Not Enough Ressources");
+                    return;
+                }
             }
-            else
+
+            if (hasBegunBuilding)
             {
                 secondsSpentBuilding += timeDelta;
-                return false;
+                float maxHealth = builder.Faction.GetStat(buildingType, UnitStat.MaxHealth);
+                float buildingSpeed = builder.GetStat(UnitStat.BuildingSpeed);
+                if (secondsSpentBuilding * buildingSpeed > maxHealth)
+                {
+                    Unit building = builder.faction.CreateUnit(buildingType);
+                    building.Position = buildPosition;
+                    hasEnded = true;
+                }
             }
         }
         #endregion

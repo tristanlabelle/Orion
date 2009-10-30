@@ -33,6 +33,8 @@ namespace Orion.GameLogic.Tasks
         public Follow(Unit unit, Unit target, float targetDistance)
         {
             Argument.EnsureNotNull(unit, "unit");
+            if (!unit.HasSkill<Skills.Move>())
+                throw new ArgumentException("Cannot follow without the move skill.", "unit");
             Argument.EnsureNotNull(target, "target");
             if (unit == target) throw new ArgumentException("Expected the follower and followee to be different.");
             Argument.EnsurePositive(targetDistance, "targetDistance");

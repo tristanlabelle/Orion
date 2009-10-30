@@ -32,6 +32,8 @@ namespace Orion.GameLogic.Tasks
         public Move(Unit unit, Vector2 destination)
         {
             Argument.EnsureNotNull(unit, "unit");
+            if (!unit.HasSkill<Skills.Move>())
+                throw new ArgumentException("Cannot move without the move skill.", "unit");
 
             this.unit = unit;
             this.destination = destination;

@@ -6,21 +6,28 @@ using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
 {
-    public class Train : Task
+    [Serializable]
+    public sealed class Train : Task
     {
         #region Fields
-        private readonly Unit building;
-        private readonly UnitType unitTypeToBuild;
+        private readonly Unit trainer;
+        private readonly UnitType traineeType;
         private float secondsSpentTraining = 0;
-        private bool trainHaveBegin = false;
+        private bool hasTrainingBegun = false;
         private bool trainingCompleted = false;
         #endregion
 
         #region Constructors
-        public Train(Unit building, UnitType unitToBuild)
+        public Train(Unit trainer, UnitType traineeType)
         {
-            this.building = building;
-            this.unitTypeToBuild = unitToBuild;
+            Argument.EnsureNotNull(trainer, "trainer");
+            if (!trainer.HasSkill<Skills.Harvest>())
+                throw new ArgumentException("Cannot train without the train skill.", "trainer");
+            Argument.EnsureNotNull(traineeType, "traineeType");
+            Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
+
+            this.trainer = trainer;
+            this.traineeType = traineeType;
         }
         #endregion
 
@@ -42,17 +49,17 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
-            if (!trainHaveBegin)
+            if (!hasTrainingBegun)
             {
-                int aladdiumCost = building.Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost);
-                int alageneCost = building.Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost);
+                int aladdiumCost = trainer.Faction.GetStat(traineeType, UnitStat.AladdiumCost);
+                int alageneCost = trainer.Faction.GetStat(traineeType, UnitStat.AlageneCost);
 
-                if (building.Faction.AladdiumAmount >= aladdiumCost
-                    && building.Faction.AlageneAmount >= alageneCost)
+                if (trainer.Faction.AladdiumAmount >= aladdiumCost
+                    && trainer.Faction.AlageneAmount >= alageneCost)
                 {
-                    building.Faction.AladdiumAmount -= aladdiumCost;
-                    building.Faction.AlageneAmount -= alageneCost;
-                    trainHaveBegin = true;
+                    trainer.Faction.AladdiumAmount -= aladdiumCost;
+                    trainer.Faction.AlageneAmount -= alageneCost;
+                    hasTrainingBegun = true;
                 }
                 else
                 {
@@ -62,19 +69,22 @@ namespace Orion.GameLogic.Tasks
                 }
             }
 
-            if (trainHaveBegin)
+            if (hasTrainingBegun)
             {
                 if (TrainingIsOver(timeDelta))
                 {
-                    Unit unitBuilded = building.faction.CreateUnit(unitTypeToBuild);
-                    Vector2 newPosition = new Vector2(building.Position.X + 2, building.Position.Y + 2);
+                    Unit trainee = trainer.faction.CreateUnit(traineeType);
+
+                    // TODO: Refactor to take building size into account and position unit intelligently.
+                    Vector2 newPosition = new Vector2(trainer.Position.X + 2, trainer.Position.Y + 2);
+
                     // If the new assigned position is unavalible put it over the building
-                    if (!building.World.IsWithinBounds(newPosition) || !building.World.Terrain.IsWalkable(newPosition))
-                        newPosition = building.Position;
+                    if (!trainer.World.IsWithinBounds(newPosition)
+                        || !trainer.World.Terrain.IsWalkable(newPosition))
+                        newPosition = trainer.Position;
 
-                    unitBuilded.Position = newPosition;
+                    trainee.Position = newPosition;
                     trainingCompleted = true;
-
                 }
             }
         }
@@ -83,7 +93,7 @@ namespace Orion.GameLogic.Tasks
 
         private bool TrainingIsOver(float timeDelta)
         {
-            float maxHealth = building.Faction.GetStat(unitTypeToBuild, UnitStat.MaxHealth);
+            float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             if (secondsSpentTraining >= maxHealth)
             {
                 return true;

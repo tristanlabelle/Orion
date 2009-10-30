@@ -8,7 +8,7 @@ namespace Orion.GameLogic.Tasks
 {
     public class Train : Task
     {
-   #region Fields
+        #region Fields
         private readonly Unit building;
         private readonly UnitType unitTypeToBuild;
         private float secondsSpentTraining = 0;
@@ -69,7 +69,7 @@ namespace Orion.GameLogic.Tasks
                     Unit unitBuilded = building.faction.CreateUnit(unitTypeToBuild);
                     Vector2 newPosition = new Vector2(building.Position.X + 2, building.Position.Y + 2);
                     // If the new assigned position is unavalible put it over the building
-                    if (building.World.IsWithinBounds(newPosition) && !building.World.Terrain.IsWalkable(newPosition))
+                    if (!building.World.IsWithinBounds(newPosition) || !building.World.Terrain.IsWalkable(newPosition))
                         newPosition = building.Position;
 
                     unitBuilded.Position = newPosition;

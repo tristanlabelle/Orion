@@ -56,7 +56,6 @@ namespace Orion.UserInterface
         #region Events
         public event GenericEventHandler<Responder, MouseEventArgs> MouseDown;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseUp;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseClicked;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseMoved;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseWheel;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseEntered;
@@ -74,7 +73,6 @@ namespace Orion.UserInterface
             base.Dispose();
             MouseDown = null;
             MouseUp = null;
-            MouseClicked = null;
             MouseMoved = null;
             MouseWheel = null;
             MouseEntered = null;
@@ -163,7 +161,6 @@ namespace Orion.UserInterface
             if (isDisposed) throw new ObjectDisposedException(null);
             switch (eventType)
             {
-                case MouseEventType.MouseClicked: return OnMouseClick(args);
                 case MouseEventType.MouseDown: return OnMouseDown(args);
                 case MouseEventType.MouseMoved: return OnMouseMove(args);
                 case MouseEventType.MouseUp: return OnMouseUp(args);
@@ -189,18 +186,6 @@ namespace Orion.UserInterface
         #region Event Handling
 
         #region Mouse Events
-        /// <summary>
-        /// Calls the event handler for mouse clicks.
-        /// </summary>
-        /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseClick(MouseEventArgs args)
-        {
-            InvokeEventHandlers(MouseClicked, args);
-            return true;
-        }
-
         /// <summary>
         /// Calls the event handler for mouse button pressing.
         /// </summary>

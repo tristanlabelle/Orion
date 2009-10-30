@@ -20,5 +20,23 @@ namespace Orion.UserInterface.Widgets
         public Frame(Rectangle frame, FrameRenderer renderer)
             : base(frame, renderer)
         { }
+
+        protected override bool OnMouseDown(MouseEventArgs args)
+        {
+            base.OnMouseDown(args);
+            return false;
+        }
+
+        protected override bool OnMouseUp(MouseEventArgs args)
+        {
+            base.OnMouseUp(args);
+            return false;
+        }
+
+        protected override bool OnMouseMove(MouseEventArgs args)
+        {
+            base.OnMouseMove(args);
+            return false;
+        }
     }
 }

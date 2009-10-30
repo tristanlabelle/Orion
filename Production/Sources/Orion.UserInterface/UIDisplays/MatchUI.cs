@@ -18,7 +18,6 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
-        private readonly WorldRenderer renderer;
         private readonly UserInputCommander userInputCommander;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -26,9 +25,12 @@ namespace Orion.UserInterface
         private readonly Frame minimapFrame;
         private UnitType selectedType;
 
-        #region Event Handling Delegates
+        #region Event Handling
         private GenericEventHandler<SelectionManager> selectionChanged;
         private GenericEventHandler<Responder, MouseEventArgs> minimapMouseDown;
+        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseMove;
+        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseUp;
+        private bool minimapLeftButtonDown;
         #endregion
         #endregion
 
@@ -78,6 +80,8 @@ namespace Orion.UserInterface
 
             selectionChanged = SelectionChanged;
             minimapMouseDown = MinimapMouseDown;
+            minimapMouseMove = MinimapMouseMove;
+            minimapMouseUp = MinimapMouseUp;
         }
 
         #endregion
@@ -123,6 +127,25 @@ namespace Orion.UserInterface
 
         private void MinimapMouseDown(Responder source, MouseEventArgs args)
         {
+            if (args.ButtonPressed == MouseButton.Left)
+            {
+                MoveWorldView(args.Position);
+                minimapLeftButtonDown = true;
+            }
+            else if (args.ButtonPressed == MouseButton.Right)
+            {
+                userInputCommander.OnMouseButton(args.Position, MouseButton.Right, true);
+            }
+        }
+
+        private void MinimapMouseMove(Responder source, MouseEventArgs args)
+        {
+            if (minimapLeftButtonDown) MoveWorldView(args.Position);
+        }
+
+        private void MinimapMouseUp(Responder source, MouseEventArgs args)
+        {
+            minimapLeftButtonDown = false;
         }
 
         private void SelectionChanged(SelectionManager selectionManager)
@@ -156,7 +179,8 @@ namespace Orion.UserInterface
 
             if (selectionFrame.Children.Count == 0)
                 selectedType = null;
-            else if (selectedType == null)
+            else if (selectedType == null &&
+                selectionManager.SelectedUnits.Select(u => u.Type).Distinct().Count() == 1)
                 selectedType = selectionManager.SelectedUnits.First().Type;
         }
 
@@ -165,8 +189,13 @@ namespace Orion.UserInterface
             if (button.Renderer is UnitButtonRenderer)
             {
                 Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
-                if (unit.Type == selectedType)
+                IEnumerable<Unit> selectedUnits = userInputCommander.SelectionManager.SelectedUnits;
+                if (unit.Type == selectedType || selectedUnits.Count() == 1)
+                {
                     userInputCommander.SelectionManager.SelectUnit(unit);
+                    MoveWorldView(unit.Position);
+                    selectedType = null;
+                }
                 else
                 {
                     selectedType = unit.Type;
@@ -178,17 +207,36 @@ namespace Orion.UserInterface
                 }
             }
         }
+
+        private void MoveWorldView(Vector2 center)
+        {
+            Vector2 difference = worldView.Bounds.Origin - worldView.Bounds.Center;
+            Rectangle newBounds = worldView.Bounds.TranslateTo(center + difference);
+            float xDiff = worldView.FullBounds.MaxX - newBounds.MaxX;
+            float yDiff = worldView.FullBounds.MaxY - newBounds.MaxY;
+            if (xDiff < 0) newBounds = newBounds.TranslateX(xDiff);
+            if (yDiff < 0) newBounds = newBounds.TranslateY(yDiff);
+            if (newBounds.X < 0) newBounds = newBounds.TranslateTo(0, newBounds.Origin.Y);
+            if (newBounds.Y < 0) newBounds = newBounds.TranslateTo(newBounds.Origin.X, 0);
+            worldView.Bounds = newBounds;
+        }
         #endregion
 
         #region IUIDisplay Implementation
         internal override void OnEnter(RootView into)
         {
             userInputCommander.SelectionManager.SelectionChanged += selectionChanged;
+            minimapFrame.MouseDown += minimapMouseDown;
+            minimapFrame.MouseMoved += minimapMouseMove;
+            minimapFrame.MouseUp += minimapMouseUp;
         }
 
         internal override void OnShadow(RootView shadowedFrom)
         {
             userInputCommander.SelectionManager.SelectionChanged -= selectionChanged;
+            minimapFrame.MouseDown -= minimapMouseDown;
+            minimapFrame.MouseMoved -= minimapMouseMove;
+            minimapFrame.MouseUp -= minimapMouseUp;
             shadowedFrom.PopDisplay(this);
         }
         #endregion

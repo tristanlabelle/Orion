@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
-
+using System.Linq;
 using Orion.GameLogic;
-
 using AttackTask = Orion.GameLogic.Tasks.Attack;
-using System.Diagnostics;
 
 namespace Orion.Commandment.Commands
 {

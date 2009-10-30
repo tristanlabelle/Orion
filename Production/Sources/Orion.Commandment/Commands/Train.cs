@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.GameLogic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {

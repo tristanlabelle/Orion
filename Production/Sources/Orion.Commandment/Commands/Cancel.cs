@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using Orion.GameLogic;
-using Orion.GameLogic.Tasks;
 
 namespace Orion.Commandment.Commands
 {

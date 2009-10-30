@@ -1,14 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
-
-using System.Drawing;
-
-using OpenTK.Math;
 
 namespace Orion.Main
 {

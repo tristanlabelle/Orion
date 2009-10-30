@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Orion.Geometry;
+using Orion.Graphics;
 using Color = System.Drawing.Color;
 using Keys = System.Windows.Forms.Keys;
-
-using Orion.Geometry;
-using Orion.Graphics;
 
 namespace Orion.UserInterface.Widgets
 {

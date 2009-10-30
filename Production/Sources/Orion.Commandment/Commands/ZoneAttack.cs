@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
-
+using System.Linq;
 using OpenTK.Math;
-
 using Orion.GameLogic;
-
 using ZoneAttackTask = Orion.GameLogic.Tasks.ZoneAttack;
 
 namespace Orion.Commandment.Commands

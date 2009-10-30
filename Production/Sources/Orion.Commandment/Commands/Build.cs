@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.GameLogic;
-using OpenTK.Math;
 using System.IO;
+using OpenTK.Math;
+using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {

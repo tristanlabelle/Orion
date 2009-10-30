@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using MoveSkill = Orion.GameLogic.Skills.Move;
 using AttackSkill = Orion.GameLogic.Skills.Attack;
-using HarvestSkill = Orion.GameLogic.Skills.Harvest;
 using BuildSkill = Orion.GameLogic.Skills.Build;
+using HarvestSkill = Orion.GameLogic.Skills.Harvest;
+using MoveSkill = Orion.GameLogic.Skills.Move;
 
 namespace Orion.GameLogic
 {

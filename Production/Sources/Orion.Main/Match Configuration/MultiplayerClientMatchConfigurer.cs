@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Linq;
-using System.Text;
-using Color = System.Drawing.Color;
-
-using Orion.Networking;
-using Orion.Graphics;
-using Orion.GameLogic;
+using System.Net;
 using Orion.Commandment;
+using Orion.GameLogic;
+using Orion.Networking;
+using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {

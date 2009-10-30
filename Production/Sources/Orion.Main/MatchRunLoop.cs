@@ -1,10 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.Windows.Forms;
 
 using Orion.GameLogic;
 using Orion.UserInterface;
-using Orion.Commandment;
 
 namespace Orion.Main
 {

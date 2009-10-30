@@ -1,7 +1,5 @@
 using System;
 
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Math;
 
 namespace Orion.Geometry

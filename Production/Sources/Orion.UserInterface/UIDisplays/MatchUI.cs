@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-using Color = System.Drawing.Color;
-
+using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
-
-using OpenTK.Math;
+using Color = System.Drawing.Color;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface
 {

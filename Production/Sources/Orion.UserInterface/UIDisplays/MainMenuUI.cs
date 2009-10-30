@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Color = System.Drawing.Color;
-
+﻿
 using Orion.Geometry;
 using Orion.UserInterface.Widgets;
 

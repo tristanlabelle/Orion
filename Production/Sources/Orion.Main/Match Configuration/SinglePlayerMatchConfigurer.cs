@@ -1,11 +1,7 @@
 using System;
-using Color = System.Drawing.Color;
-
-using OpenTK.Math;
-
-using Orion.Graphics;
-using Orion.GameLogic;
 using Orion.Commandment;
+using Orion.GameLogic;
+using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {

@@ -1,16 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-
-using OpenTK.Math;
-
 using Orion.Geometry;
-using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using Point = System.Drawing.Point;
 
 namespace Orion.UserInterface
 {

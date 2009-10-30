@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {

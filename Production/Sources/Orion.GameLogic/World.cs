@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-
 using OpenTK.Math;
-
-using Orion.Geometry;
 using Orion.GameLogic.Pathfinding;
-
+using Orion.Geometry;
 using Color = System.Drawing.Color;
 
 namespace Orion.GameLogic

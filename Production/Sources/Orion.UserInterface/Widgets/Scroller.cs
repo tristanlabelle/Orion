@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
+﻿using OpenTK.Math;
 using Orion.Geometry;
-using OpenTK.Math;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Widgets
 {

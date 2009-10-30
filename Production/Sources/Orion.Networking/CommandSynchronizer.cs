@@ -1,13 +1,11 @@
 using System;
-using System.IO;
-using System.Net;
-using System.Linq;
-using System.Threading;
 using System.Collections.Generic;
-
-using Orion.GameLogic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
 using Orion.Commandment;
-using Orion.Commandment.Commands;
+using Orion.GameLogic;
 
 namespace Orion.Networking
 {

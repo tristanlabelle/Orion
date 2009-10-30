@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.Geometry;
-using OpenTK.Graphics;
 using System.ComponentModel;
+using OpenTK.Graphics;
 
 namespace Orion.Graphics
 {

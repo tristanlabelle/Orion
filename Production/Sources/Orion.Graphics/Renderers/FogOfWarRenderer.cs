@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Color = System.Drawing.Color;
+﻿
 using Orion.GameLogic;
-using OpenTK.Math;
 using Orion.Geometry;
+using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {

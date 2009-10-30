@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.GameLogic;
+﻿using System.Drawing;
 using OpenTK.Math;
-using System.Drawing;
+using Orion.GameLogic;
 
 namespace Orion.Graphics
 {

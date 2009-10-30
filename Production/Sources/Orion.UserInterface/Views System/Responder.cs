@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-
-using Orion.Geometry;
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.UserInterface
 {

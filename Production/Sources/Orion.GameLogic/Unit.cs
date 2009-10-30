@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using OpenTK.Math;
 using System.Diagnostics;
+using System.Linq;
+using OpenTK.Math;
 using Orion.Geometry;
 
 namespace Orion.GameLogic

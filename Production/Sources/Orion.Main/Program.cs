@@ -1,20 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using System.Diagnostics;
 using System.Net;
-using System.Threading;
-
-using OpenTK.Math;
-
-using Orion.Graphics;
-using Orion.GameLogic;
-using Orion.Commandment;
+using System.Windows.Forms;
 using Orion.Networking;
 using Orion.UserInterface;
 
-using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Orion.Commandment;
-using Orion.Geometry;
 using Orion.GameLogic;
+using Orion.Geometry;
 
 namespace Orion.UserInterface
 {

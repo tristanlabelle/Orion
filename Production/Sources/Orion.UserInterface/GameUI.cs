@@ -1,13 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-using Orion.Commandment;
-using Orion.GameLogic;
-using Orion.Geometry;
 
-using OpenTK.Math;
 
 namespace Orion.UserInterface
 {

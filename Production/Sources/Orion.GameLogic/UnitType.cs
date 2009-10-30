@@ -5,7 +5,7 @@ using System.Text;
 
 using MoveSkill = Orion.GameLogic.Skills.Move;
 using AttackSkill = Orion.GameLogic.Skills.Attack;
-using HarvestAladdiumSkill = Orion.GameLogic.Skills.HarvestAladdium;
+using HarvestSkill = Orion.GameLogic.Skills.Harvest;
 using BuildSkill = Orion.GameLogic.Skills.Build;
 
 namespace Orion.GameLogic
@@ -49,7 +49,7 @@ namespace Orion.GameLogic
             // Temporarly hard-coded for backward compatibility.
             skills.Add(new MoveSkill(20));
             skills.Add(new AttackSkill(1, 2));
-            skills.Add(new HarvestAladdiumSkill(10));
+            skills.Add(new HarvestSkill(10));
             skills.Add(new BuildSkill(unitType => true));
         }
         #endregion

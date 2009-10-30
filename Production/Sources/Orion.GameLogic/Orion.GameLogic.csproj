@@ -76,9 +76,10 @@
     <Compile Include="SkillDependencyAttribute.cs" />
     <Compile Include="Skills\Attack.cs" />
     <Compile Include="Skills\Build.cs" />
-    <Compile Include="Skills\HarvestAladdium.cs" />
+    <Compile Include="Skills\Harvest.cs" />
     <Compile Include="Skills\Move.cs" />
     <Compile Include="Skills\Research.cs" />
+    <Compile Include="Skills\StoreResources.cs" />
     <Compile Include="Skills\Train.cs" />
     <Compile Include="TagSet.cs" />
     <Compile Include="Task.cs" />

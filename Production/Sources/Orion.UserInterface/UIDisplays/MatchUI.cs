@@ -15,6 +15,8 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
+        private const int visibleBorderWidth = 2;
+
         private readonly UserInputManager userInputManager;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -46,7 +48,10 @@ namespace Orion.UserInterface
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Units.UnitDied += userInputManager.SelectionManager.UnitDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
-            worldView = new ClippedView(worldFrame, world.Bounds.Translate(-2, -2).Resize(4,4), matchRenderer);
+            Rectangle visibleWorldBounds = new Rectangle(-visibleBorderWidth, -visibleBorderWidth,
+                world.Width + visibleBorderWidth * 2, world.Height + visibleBorderWidth * 2);
+            worldView = new ClippedView(worldFrame, visibleWorldBounds, matchRenderer);
+            worldView = new ClippedView(worldFrame, visibleWorldBounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 

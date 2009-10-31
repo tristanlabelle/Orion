@@ -87,7 +87,7 @@ namespace Orion.UserInterface
 
         protected internal override void Render()
         {
-            GL.ClearColor(Color.Pink); // pink!
+            GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();
 

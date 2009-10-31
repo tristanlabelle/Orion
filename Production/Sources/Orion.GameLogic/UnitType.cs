@@ -94,6 +94,16 @@ namespace Orion.GameLogic
         {
             get { return height; }
         }
+
+        public int AladdiumCost
+        {
+            get { return aladdiumCost; }
+        }
+
+        public int AlageneCost
+        {
+            get { return alageneCost; }
+        }
         #endregion
 
         #region Methods

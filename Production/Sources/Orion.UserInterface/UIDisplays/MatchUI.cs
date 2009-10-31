@@ -46,7 +46,7 @@ namespace Orion.UserInterface
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Units.UnitDied += userInputManager.SelectionManager.UnitDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
-            worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
+            worldView = new ClippedView(worldFrame, world.Bounds.Translate(-2, -2).Resize(4,4), matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 

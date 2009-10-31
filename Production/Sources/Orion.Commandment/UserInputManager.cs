@@ -193,28 +193,34 @@ namespace Orion.Commandment
         #region Launching individual commands
         private void LaunchAttack(Unit target)
         {
-            IEnumerable<Unit> selection = selectionManager.SelectedUnits;
+            IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
+            // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(unit => unit.HasSkill<Skills.Attack>()), target);
             commander.LaunchMove(selection.Where(unit => !unit.HasSkill<Skills.Attack>() && unit.HasSkill<Skills.Move>()), target.Position);
         }
 
         private void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits.Where(unit => unit.HasSkill<Skills.Move>());
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+            // Those who can attack do so, the others simply move to the destination
             commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<Skills.Attack>()), destination);
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Attack>()), destination);
         }
 
         private void LaunchHarvest(ResourceNode node)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits.Where(unit => unit.HasSkill<Skills.Move>());
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+            // Those who can harvest do so, the others simply move to the resource's position
             commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<Skills.Harvest>()), node);
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Harvest>()), node.Position);
         }
 
         private void LaunchMove(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits.Where(unit => unit.HasSkill<Skills.Move>());
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
             commander.LaunchMove(movableUnits, destination);
         }
         #endregion

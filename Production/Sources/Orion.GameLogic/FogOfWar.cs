@@ -7,22 +7,17 @@ namespace Orion.GameLogic
     public sealed class FogOfWar
     {
         #region Fields
-
-        //private BitArray2D tiles;
-        private short[,] tiles;
-
+        private ushort[,] tiles;
         #endregion
         
         #region Constructors
-        
         public FogOfWar(int width, int height, Faction faction)
         {
-            this.tiles = new short[width, height];
+            this.tiles = new ushort[width, height];
             for (int i = 0; i < width; i++)
                 for (int j = 0; j < height; j++)
-                    this.tiles[i, j] = short.MaxValue; 
+                    this.tiles[i, j] = ushort.MaxValue; 
         }
-
         #endregion
 
         #region Properties
@@ -96,11 +91,11 @@ namespace Orion.GameLogic
                     if (sight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
                     {
                         if (addOrRemove)
-                            if (tiles[i, j] == short.MaxValue)
+                            if (tiles[i, j] == ushort.MaxValue)
                                 tiles[i, j] = 1;
                             else
                             {
-                                System.Diagnostics.Debug.Assert(tiles[i, j] != short.MaxValue - 1);
+                                System.Diagnostics.Debug.Assert(tiles[i, j] != ushort.MaxValue - 1);
                                 tiles[i, j]++;
                             }
                         else
@@ -145,9 +140,7 @@ namespace Orion.GameLogic
         /// <returns>A boolean value from the fog of war field.</returns>
         public bool HasSeenTile(int x, int y)
         {
-            if (tiles[x, y] == short.MaxValue)
-                return false;
-            return true;
+            return tiles[x, y] != ushort.MaxValue;
         }
 
         public bool HasSeenTile(Vector2 position)
@@ -168,9 +161,7 @@ namespace Orion.GameLogic
         /// <returns>A boolean value from the fog of war field.</returns>
         public bool SeesTileCurrently(int x, int y)
         {
-            if (tiles[x, y] == 0 || tiles[x, y] == short.MaxValue)
-                return false;
-            return true;
+            return tiles[x, y] != 0 && tiles[x, y] != ushort.MaxValue;
         }
 
         public bool SeesTileCurrently(Vector2 position)
@@ -184,7 +175,5 @@ namespace Orion.GameLogic
         }
         
         #endregion
-
-
     }
 }

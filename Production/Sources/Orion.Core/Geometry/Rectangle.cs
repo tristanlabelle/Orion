@@ -281,7 +281,7 @@ namespace Orion.Geometry
         /// </returns>
         public bool Intersects(Rectangle otherRect)
         {
-            return ContainsPoint(otherRect.origin) || otherRect.ContainsPoint(this.origin);
+            return OnewayIntersects(otherRect) || otherRect.OnewayIntersects(this);
         }
         
         /// <summary>
@@ -296,10 +296,10 @@ namespace Orion.Geometry
         /// </returns>
         public Rectangle? Intersection(Rectangle otherRect)
         {
-            if (ContainsPoint(otherRect.origin))
+            if (OnewayIntersects(otherRect))
                 return OnewayIntersection(otherRect);
             
-            if (otherRect.ContainsPoint(this.origin))
+            if (otherRect.OnewayIntersects(this))
                 return otherRect.OnewayIntersection(this);
 
             return null;
@@ -505,9 +505,20 @@ namespace Orion.Geometry
         #region Private
         private Rectangle OnewayIntersection(Rectangle otherRect)
         {
-            if (otherRect.MaxX < MaxX && otherRect.MaxY < MaxY)
-                return otherRect;
-            return otherRect.ResizeTo(otherRect.size + origin - otherRect.origin);
+            float x = X > otherRect.X ? X : otherRect.X;
+            float y = Y > otherRect.Y ? Y : otherRect.Y;
+            float maxX = MaxX < otherRect.MaxX ? MaxX : otherRect.MaxX;
+            float maxY = MaxY < otherRect.MaxY ? MaxY : otherRect.MaxY;
+
+            Vector2 origin = new Vector2(x, y);
+            Vector2 max = new Vector2(maxX, maxY);
+            return new Rectangle(origin, max - origin);
+        }
+
+        private bool OnewayIntersects(Rectangle otherRect)
+        {
+            return ContainsPoint(otherRect.Origin) || ContainsPoint(new Vector2(otherRect.X, otherRect.MaxY))
+                || ContainsPoint(new Vector2(otherRect.MaxX, otherRect.Y)) || ContainsPoint(new Vector2(otherRect.Max));
         }
         #endregion
         #endregion

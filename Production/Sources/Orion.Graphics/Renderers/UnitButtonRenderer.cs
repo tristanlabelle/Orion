@@ -25,8 +25,8 @@ namespace Orion.Graphics
 
         public override void RenderInto(GraphicsContext context)
         {
-            context.StrokeColor = Color.Black;
-            context.FillColor = hasFocus ? Color.Gray : Color.Gainsboro;
+            context.StrokeColor = hasFocus ?Color.White : Color.Black;
+            context.FillColor = hasFocus ? Color.FromArgb(75,75,75) : Color.Black;
             context.Fill(context.CoordinateSystem);
             context.Stroke(context.CoordinateSystem);
 

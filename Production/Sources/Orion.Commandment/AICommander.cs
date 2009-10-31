@@ -127,7 +127,7 @@ namespace Orion.Commandment
 
         private void BuildMainCommandCenter()
         {
-            Unit builder = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding && unit.IsIdle).ToList().First();
+            Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.IsBuilding && unit.IsIdle);
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.Circle.Diameter), (startingNode.Position.Y + startingNode.Circle.Diameter));
             
             if (!World.Bounds.ContainsPoint(position))

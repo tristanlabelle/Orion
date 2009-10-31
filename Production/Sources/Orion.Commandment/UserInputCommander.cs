@@ -48,6 +48,11 @@ namespace Orion.Commandment
             if (units.Count() > 0) GenerateCommand(new Move(Faction, units, destination));
         }
 
+        public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
+        {
+            if (units.Count() > 0) GenerateCommand(new Repair(Faction, units, repairedUnit));
+        }
+
         public void LaunchTrain(IEnumerable<Unit> buildings, UnitType trainedType)
         {
             if (buildings.Count() > 0) GenerateCommand(new Train(buildings, trainedType, Faction));

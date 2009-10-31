@@ -15,8 +15,6 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
-        private const int visibleBorderWidth = 2;
-
         private readonly UserInputManager userInputManager;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -48,10 +46,7 @@ namespace Orion.UserInterface
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Units.UnitDied += userInputManager.SelectionManager.UnitDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
-            Rectangle visibleWorldBounds = new Rectangle(-visibleBorderWidth, -visibleBorderWidth,
-                world.Width + visibleBorderWidth * 2, world.Height + visibleBorderWidth * 2);
-            worldView = new ClippedView(worldFrame, visibleWorldBounds, matchRenderer);
-            worldView = new ClippedView(worldFrame, visibleWorldBounds, matchRenderer);
+            worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 
@@ -86,6 +81,7 @@ namespace Orion.UserInterface
             worldView.MouseDown += userInputManager.HandleMouseDown;
             worldView.KeyDown += userInputManager.HandleKeyDown;
             worldView.KeyUp += userInputManager.HandleKeyUp;
+            //worldView.BoundsChanged += WorldViewBoundsChanged;
 
             selectionChanged = SelectionChanged;
             minimapMouseDown = MinimapMouseDown;
@@ -123,6 +119,13 @@ namespace Orion.UserInterface
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
             userInputManager.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             return base.OnMouseUp(args);
+        }
+
+        private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
+        {
+            Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
+            worldView.FullBounds = userInputManager.Commander.Faction.World.Bounds
+                .Translate(-boundsHalfsize.X, -boundsHalfsize.Y).Resize(newBounds.Width, newBounds.Height);
         }
 
         private void MinimapMouseDown(Responder source, MouseEventArgs args)

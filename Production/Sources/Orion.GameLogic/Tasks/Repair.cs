@@ -3,9 +3,6 @@
 
 namespace Orion.GameLogic.Tasks
 {
-    /// <summary>
-    /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>
-    /// </summary>
     [Serializable]
     public sealed class Repair : Task
     {
@@ -23,15 +20,14 @@ namespace Orion.GameLogic.Tasks
         public Repair(Unit unit, Unit building)
         {
             Argument.EnsureNotNull(unit, "unit");
-            /*if(!unit.HasSkill<Skills.Repair>())
-                throw new ArgumentException("Cannot repair without the repair skill.", "unit");*/
             Argument.EnsureNotNull(building, "building");
-            if(!building.Type.IsBuilding)
-                throw new ArgumentException("Can only repair buildings.", "building");
-            if (building.Damage < 1)
-                throw new ArgumentException("Cannot repair undamaged buildings.", "building");
-            if(unit.Faction != building.Faction)
-                throw new ArgumentException("Cannot repair enemy buildings.", "building");
+            if (!unit.HasSkill<Skills.Repair>()) throw new ArgumentException("Cannot repair without the repair skill.", "unit");
+
+            // TODO: check against repairability itself instead of the Building type, since otherwise mechanical units can be repaired too
+            if (!building.Type.IsBuilding) throw new ArgumentException("Can only repair buildings.", "building");
+            if (building.Damage < 1) throw new ArgumentException("Cannot repair undamaged buildings.", "building");
+            if (unit.Faction != building.Faction) throw new ArgumentException("Cannot repair enemy buildings.", "building");
+
             this.unit = unit;
             this.building = building;
             this.follow = new Follow(unit, building, unit.GetStat(UnitStat.AttackRange));

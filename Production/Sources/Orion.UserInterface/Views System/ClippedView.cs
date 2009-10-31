@@ -7,12 +7,18 @@ namespace Orion.UserInterface
 {
     public class ClippedView : RenderedView
     {
-        public readonly Rectangle FullBounds;
+        private Rectangle fullBounds;
 
         public ClippedView(Rectangle frame, Rectangle fullBounds, IRenderer renderer)
             : base(frame, renderer)
         {
-            FullBounds = fullBounds;
+            this.fullBounds = fullBounds;
+        }
+
+        public Rectangle FullBounds
+        {
+            get { return fullBounds; }
+            set { fullBounds = value; }
         }
 
         public void Zoom(double factor)

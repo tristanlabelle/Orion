@@ -14,7 +14,7 @@ namespace Orion.Commandment
 {
     public enum MouseDrivenCommand
     {
-        Attack, Build, Harvest, Move, ZoneAttack
+        Attack, Build, Harvest, Move, Repair, ZoneAttack
     }
 
     public class UserInputManager
@@ -41,11 +41,12 @@ namespace Orion.Commandment
 
         static UserInputManager()
         {
-            keysMap = new Dictionary<Keys,MouseDrivenCommand?>();
+            keysMap = new Dictionary<Keys, MouseDrivenCommand?>();
             keysMap[Keys.A] = MouseDrivenCommand.Attack;
             keysMap[Keys.B] = MouseDrivenCommand.Build;
             keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
             keysMap[Keys.M] = MouseDrivenCommand.Move;
+            keysMap[Keys.R] = MouseDrivenCommand.Repair;
             keysMap[Keys.Escape] = null;
         }
         #endregion
@@ -78,7 +79,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-        #region Event Handling
+        #region Direct Event Handling
         public void HandleMouseDown(object responder, MouseEventArgs args)
         {
             if (mouseCommand.HasValue)
@@ -96,7 +97,7 @@ namespace Orion.Commandment
 
         public void HandleMouseUp(object responder, MouseEventArgs args)
         {
-            if(!selectionStart.HasValue) return;
+            if (!selectionStart.HasValue) return;
             if (args.ButtonPressed != MouseButton.Left) return;
 
             selectionEnd = args.Position;
@@ -139,7 +140,7 @@ namespace Orion.Commandment
         }
         #endregion
 
-        #region Launching commands from the UI
+        #region Launching dynamically chosen commands
         public void LaunchMouseCommand(Vector2 at)
         {
             Faction faction = commander.Faction;
@@ -162,7 +163,12 @@ namespace Orion.Commandment
                     LaunchHarvest(resource);
                     break;
 
-                case MouseDrivenCommand.Move: LaunchMove(at);  break;
+                case MouseDrivenCommand.Move: LaunchMove(at); break;
+
+                case MouseDrivenCommand.Repair:
+                    if (target == null || !target.Type.IsBuilding) break;
+                    LaunchRepair(target);
+                    break;
             }
 
             mouseCommand = null;
@@ -222,6 +228,13 @@ namespace Orion.Commandment
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
             commander.LaunchMove(movableUnits, destination);
+        }
+
+        private void LaunchRepair(Unit building)
+        {
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Repair>());
+            commander.LaunchRepair(targetUnits, building);
         }
         #endregion
         #endregion

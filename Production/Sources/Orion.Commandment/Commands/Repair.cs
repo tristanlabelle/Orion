@@ -20,16 +20,6 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="Attack"/> command from the faction which
-        /// created the command and a sequence of <see cref="Unit"/>s for which the
-        /// current <see cref="Task"/> should be attacked. 
-        /// </summary>
-        /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
-        /// <param name="attackers">
-        /// The <see cref="Unit"/>s of that <see cref="Faction"/> which should attack.
-        /// </param>
-        /// <param name="target">The target <see cref="Unit"/> to be attacked.</param>
         public Repair(Faction faction, IEnumerable<Unit> units, Unit building)
             : base(faction)
         {
@@ -91,7 +81,7 @@ namespace Orion.Commandment.Commands
 
         #region Serializer Class
         /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
+        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Repair"/> command.
         /// </summary>
         [Serializable]
         public sealed class Serializer : CommandSerializer<Repair>

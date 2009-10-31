@@ -1,8 +1,5 @@
 using System;
-using AttackSkill = Orion.GameLogic.Skills.Attack;
-using BuildSkill = Orion.GameLogic.Skills.Build;
-using HarvestSkill = Orion.GameLogic.Skills.Harvest;
-using MoveSkill = Orion.GameLogic.Skills.Move;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic
 {
@@ -42,11 +39,13 @@ namespace Orion.GameLogic
 
             this.name = name;
             this.id = id;
+
             // Temporarly hard-coded for backward compatibility.
-            skills.Add(new MoveSkill(20));
-            skills.Add(new AttackSkill(1, 2));
-            skills.Add(new HarvestSkill(10));
-            skills.Add(new BuildSkill(unitType => true, 5));
+            skills.Add(new Skills.Move(20));
+            skills.Add(new Skills.Attack(1, 2));
+            skills.Add(new Skills.Harvest(10));
+            skills.Add(new Skills.Build(unitType => true, 5));
+            skills.Add(new Skills.Repair());
         }
         #endregion
 

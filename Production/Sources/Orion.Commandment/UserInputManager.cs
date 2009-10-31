@@ -14,7 +14,7 @@ namespace Orion.Commandment
 {
     public enum MouseDrivenCommand
     {
-        Attack, Build, Harvest, Move, Repair, ZoneAttack
+        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Suicide
     }
 
     public class UserInputManager
@@ -46,7 +46,8 @@ namespace Orion.Commandment
             keysMap[Keys.B] = MouseDrivenCommand.Build;
             keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
             keysMap[Keys.M] = MouseDrivenCommand.Move;
-            keysMap[Keys.R] = MouseDrivenCommand.Repair;
+            keysMap[Keys.T] = MouseDrivenCommand.Train;
+            keysMap[Keys.S] = MouseDrivenCommand.Suicide;
             keysMap[Keys.Escape] = null;
         }
         #endregion
@@ -156,7 +157,8 @@ namespace Orion.Commandment
 
                 case MouseDrivenCommand.Build:
                     if (target != null) return;
-                    throw new NotImplementedException("Cannot create buildings at this stage of refactoring");
+                    LaunchBuild(at, commander.Faction.World.UnitTypes.First(unit => unit.IsBuilding));
+                    break;
 
                 case MouseDrivenCommand.Harvest:
                     ResourceNode resource = faction.World.ResourceNodes.Where(node => Intersection.Test(hitRect, node.Circle)).FirstOrDefault();
@@ -169,6 +171,10 @@ namespace Orion.Commandment
                     if (target == null || !target.Type.IsBuilding) break;
                     LaunchRepair(target);
                     break;
+                case MouseDrivenCommand.Train:
+                    LaunchTrain(commander.Faction.World.UnitTypes.FromName("Tank"));
+                    break;
+
             }
 
             mouseCommand = null;
@@ -197,6 +203,28 @@ namespace Orion.Commandment
         #endregion
 
         #region Launching individual commands
+
+        private void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
+        {
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                  .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+            // Those who can attack do so, the others simply move to the destination
+            Unit theBuilder = movableUnits.FirstOrDefault(unit =>
+            {
+                 Skills.Build build = unit.GetSkill<Skills.Build>();
+                if (build == null) return false;
+                return build.Supports(unitTypeToBuild);
+            });
+
+            if (theBuilder != null)
+            {
+                commander.LaunchBuild(theBuilder, unitTypeToBuild, destination);
+                commander.LaunchMove(movableUnits.Where(unit => unit != theBuilder), destination);
+            }
+            
+
+        }
+
         private void LaunchAttack(Unit target)
         {
             IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
@@ -235,6 +263,19 @@ namespace Orion.Commandment
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Build>());
             commander.LaunchRepair(targetUnits, building);
+        }
+
+        private void LaunchTrain(UnitType unitType)
+        {
+            IEnumerable<Unit> trainers = selectionManager.SelectedUnits
+                .Where(unit =>
+                {
+                    if (unit.Faction != commander.Faction) return false;
+                    Skills.Train train = unit.Type.GetSkill<Skills.Train>();
+                    if (train == null) return false;
+                    return train.Supports(unitType);
+                });
+            commander.LaunchTrain(trainers, unitType);
         }
         #endregion
         #endregion

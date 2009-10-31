@@ -18,7 +18,7 @@ namespace Orion.GameLogic.Tasks
         public Train(Unit trainer, UnitType traineeType)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            if (!trainer.HasSkill<Skills.Harvest>())
+            if (!trainer.HasSkill<Skills.Train>())
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");

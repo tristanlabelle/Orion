@@ -233,7 +233,7 @@ namespace Orion.Commandment
         private void LaunchRepair(Unit building)
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Repair>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Build>());
             commander.LaunchRepair(targetUnits, building);
         }
         #endregion

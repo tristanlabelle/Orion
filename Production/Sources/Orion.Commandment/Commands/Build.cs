@@ -3,30 +3,33 @@ using System.Collections.Generic;
 using System.IO;
 using OpenTK.Math;
 using Orion.GameLogic;
+using BuildTask = Orion.GameLogic.Tasks.Build;
 
 namespace Orion.Commandment.Commands
 {
-    class Build : Command
+    public sealed class Build : Command
     {
         #region Instance
         #region Fields
-        private readonly Unit constructor;
+        private readonly Unit builder;
         private readonly Vector2 position;
-        private readonly UnitType unitTobuild;
+        private readonly UnitType buildingType;
         #endregion
 
         #region Constructors
         /// <summary>
         /// Command implemented to build.
         /// </summary>
-        /// <param name="selectedUnit">The Builder</param>
+        /// <param name="builder">The Builder</param>
         /// <param name="position">Where To build</param>
-        /// <param name="unitTobuild">What to build</param>
-        public Build(Unit selectedUnit, Vector2 position, UnitType unitTobuild)
-            : base(selectedUnit.Faction)
+        /// <param name="buildingType">What to build</param>
+        public Build(Unit builder, Vector2 position, UnitType buildingType)
+            : base(builder.Faction)
         {
-            this.constructor = selectedUnit;
-            this.unitTobuild = unitTobuild;
+            Argument.EnsureNotNull(builder, "builder");
+            Argument.EnsureNotNull(buildingType, "buildingType");
+            this.builder = builder;
+            this.buildingType = buildingType;
             Argument.EnsureNotNull(position, "position");
             this.position = position;
         }
@@ -35,7 +38,7 @@ namespace Orion.Commandment.Commands
         #region Methods
         public override void Execute()
         {
-            constructor.Task = new Orion.GameLogic.Tasks.Build(constructor, position, unitTobuild);
+            builder.Task = new BuildTask(builder, position, buildingType);
         }
         #endregion
 
@@ -44,7 +47,7 @@ namespace Orion.Commandment.Commands
         {
             get
             {
-                yield return constructor;
+                yield return builder;
             }
         }
         #endregion
@@ -68,10 +71,10 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Build command, BinaryWriter writer)
             {
-                writer.Write(command.constructor.ID);
+                writer.Write(command.builder.ID);
                 writer.Write(command.position.X);
                 writer.Write(command.position.Y);
-                writer.Write(command.unitTobuild.ID);
+                writer.Write(command.buildingType.ID);
             }
 
             protected override Build DeserializeData(BinaryReader reader, World world)

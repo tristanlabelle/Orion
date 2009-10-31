@@ -21,7 +21,7 @@ namespace Orion.GameLogic.Tasks
         {
             Argument.EnsureNotNull(unit, "unit");
             Argument.EnsureNotNull(building, "building");
-            if (!unit.HasSkill<Skills.Repair>()) throw new ArgumentException("Cannot repair without the repair skill.", "unit");
+            if (!unit.HasSkill<Skills.Build>()) throw new ArgumentException("Cannot repair without the repair skill.", "unit");
 
             // TODO: check against repairability itself instead of the Building type, since otherwise mechanical units can be repaired too
             if (!building.Type.IsBuilding) throw new ArgumentException("Can only repair buildings.", "building");
@@ -31,8 +31,8 @@ namespace Orion.GameLogic.Tasks
             this.unit = unit;
             this.building = building;
             this.follow = new Follow(unit, building, unit.GetStat(UnitStat.AttackRange));
-            this.aladdiumCost = 1 / building.MaxHealth * building.Type.AladdiumCost;
-            this.alageneCost = 1 / building.MaxHealth * building.Type.AlageneCost;
+            this.aladdiumCost = building.GetStat(UnitStat.AladdiumCost) / building.MaxHealth;
+            this.alageneCost = building.GetStat(UnitStat.AlageneCost) / building.MaxHealth;
         }
         #endregion
 

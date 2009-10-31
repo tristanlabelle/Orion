@@ -251,9 +251,6 @@ namespace Orion.GameLogic
             get { return task; }
             set
             {
-                if (type.IsBuilding && (value is Tasks.Move || value is Tasks.Attack || value is Tasks.Follow || value is Tasks.Harvest))
-                    return;
-                
                 if (task != null) task.OnCancelled(this);
                 task = value;
             }
@@ -269,6 +266,19 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        #region Skills
+        /// <summary>
+        /// Tests if this <see cref="Unit"/> has a given <see cref="Skill"/>.
+        /// </summary>
+        /// <typeparam name="TSkill">
+        /// The <see cref="Skill"/> this <see cref="Unit"/> should have.
+        /// </typeparam>
+        /// <returns>True if this <see cref="Unit"/> has that <see cref="Skill"/>, false if not.</returns>
+        public TSkill GetSkill<TSkill>() where TSkill : Skill
+        {
+            return Type.GetSkill<TSkill>();
+        }
+
         /// <summary>
         /// Tests if this <see cref="Unit"/> has a given <see cref="Skill"/>.
         /// </summary>
@@ -278,8 +288,9 @@ namespace Orion.GameLogic
         /// <returns>True if this <see cref="Unit"/> has that <see cref="Skill"/>, false if not.</returns>
         public bool HasSkill<TSkill>() where TSkill : Skill
         {
-            return Type.Skills.Find<TSkill>() != null;
+            return Type.HasSkill<TSkill>();
         }
+        #endregion
 
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
@@ -312,7 +323,7 @@ namespace Orion.GameLogic
         /// </remarks>
         internal void Update(float timeDeltaInSeconds)
         {
-            if (task == null)
+            if (task == null && HasSkill<Skills.Attack>())
             {
                 Unit unitToAttack = World.Units.InArea(LineOfSight).FirstOrDefault(unit => unit.faction != faction);
                 if (unitToAttack != null) Task = new Tasks.Attack(this, unitToAttack);

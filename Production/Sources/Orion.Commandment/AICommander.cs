@@ -5,6 +5,7 @@ using OpenTK.Math;
 using Orion.Commandment.Commands;
 using Orion.GameLogic;
 using Orion.Geometry;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
@@ -78,7 +79,8 @@ namespace Orion.Commandment
             //If there is building fitting to the condition
             if (allBuildingIdleThatCanBuild != null)
             {
-                Command command = new Train(allBuildingIdleThatCanBuild, World.UnitTypes.FromName("Jedi"), Faction);
+                Command command = new Train(allBuildingIdleThatCanBuild,
+                    World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Move>()), Faction);
                 GenerateCommand(command);
             }
         }
@@ -135,7 +137,7 @@ namespace Orion.Commandment
 
             if (builder != null)
             {
-                Command command = new Build(builder, position, World.UnitTypes.FromName("Building"));
+                Command command = new Build(builder, position, World.UnitTypes.First(type => type.IsBuilding));
                 GenerateCommand(command);
                 commandCenterBuilt = true;
             }

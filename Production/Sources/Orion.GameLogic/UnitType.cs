@@ -1,51 +1,51 @@
 using System;
-using Skills = Orion.GameLogic.Skills;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using AttackSkill = Orion.GameLogic.Skills.Attack;
+using BuildSkill = Orion.GameLogic.Skills.Build;
+using HarvestSkill = Orion.GameLogic.Skills.Harvest;
+using MoveSkill = Orion.GameLogic.Skills.Move;
+using Size = System.Drawing.Size;
 
 namespace Orion.GameLogic
 {
     /// <summary>
     /// Describes a type of unit (including buildings and vehicles).
     /// </summary>
+    /// <remarks>
+    /// Instances can be created through a <see cref="UnitTypeBuilder"/>.
+    /// </remarks>
     [Serializable]
     public sealed class UnitType
     {
         #region Fields
-		
+        private readonly int id;
         private readonly string name;
-        private readonly TagSet tags = new TagSet();
-        private readonly SkillCollection skills = new SkillCollection();
+        private readonly ReadOnlyCollection<Skill> skills;
+        private readonly Size sizeInTiles;
 
-        // Base stats
         private readonly int aladdiumCost;
         private readonly int alageneCost;
         private readonly int maxHealth = 10;
         private readonly int sightRange = 10;
-
-        // Dimensions
-        private readonly int width = 1;
-        private readonly int height = 1;
-        private readonly int id;
-
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="UnitType"/> from its name.
-        /// </summary>
-        /// <param name="name">The name of this <see cref="UnitType"/>.</param>
-        public UnitType(string name, int id)
+        internal UnitType(int id, string name, UnitTypeBuilder builder)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
+            Argument.EnsureNotNull(builder, "builder");
 
             this.name = name;
             this.id = id;
+            this.skills = builder.Skills.ToList().AsReadOnly();
+            this.sizeInTiles = builder.SizeInTiles;
 
-            // Temporarly hard-coded for backward compatibility.
-            skills.Add(new Skills.Move(20));
-            skills.Add(new Skills.Attack(1, 2));
-            skills.Add(new Skills.Harvest(10));
-            skills.Add(new Skills.Build(unitType => true, 5));
-            skills.Add(new Skills.Repair());
+            this.aladdiumCost = builder.AladdiumCost;
+            this.alageneCost = builder.AlageneCost;
+            this.maxHealth = builder.MaxHealth;
+            this.sightRange = builder.SightRange;
         }
         #endregion
 
@@ -53,59 +53,59 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        #region Identification
         public int ID
         {
             get { return id; }
         } 
 
-        /// <summary>
-        /// Gets the name of this <see cref="UnitType"/>.
-        /// </summary>
         public string Name
         {
             get { return name; }
         }
+        #endregion
 
-        /// <summary>
-        /// Gets the set of tags associated with this <see cref="UnitType"/>.
-        /// </summary>
-        public TagSet Tags
-        {
-            get { return tags; }
-        }
-
-        public SkillCollection Skills
+        #region Skills
+        public ReadOnlyCollection<Skill> Skills
         {
             get { return skills; }
         }
 
         public bool IsBuilding
         {
-            get { return name == "Building"; }
-        }
-
-        public int Width
-        {
-            get { return width; }
-        }
-
-        public int Height
-        {
-            get { return height; }
-        }
-
-        public int AladdiumCost
-        {
-            get { return aladdiumCost; }
-        }
-
-        public int AlageneCost
-        {
-            get { return alageneCost; }
+            get { return !HasSkill<Skills.Move>(); }
         }
         #endregion
 
+        #region Size
+        public Size SizeInTiles
+        {
+            get { return sizeInTiles; }
+        }
+
+        public int WidthInTiles
+        {
+            get { return sizeInTiles.Width; }
+        }
+
+        public int HeightInTiles
+        {
+            get { return sizeInTiles.Height; }
+        }
+        #endregion
+        #endregion
+
         #region Methods
+        public TSkill GetSkill<TSkill>() where TSkill : Skill
+        {
+            return skills.OfType<TSkill>().FirstOrDefault();
+        }
+
+        public bool HasSkill<TSkill>() where TSkill : Skill
+        {
+            return GetSkill<TSkill>() != null;
+        }
+
         public int GetBaseStat(UnitStat stat)
         {
             if (stat == UnitStat.AladdiumCost) return aladdiumCost;

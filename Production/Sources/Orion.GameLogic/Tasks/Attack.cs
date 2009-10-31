@@ -1,4 +1,5 @@
 ﻿using System;
+using Orion.Geometry;
 
 
 namespace Orion.GameLogic.Tasks
@@ -11,10 +12,10 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit attacker;
-        private readonly Unit target; 
+        private readonly Unit target;
+        private readonly Follow follow;
         private const float hitDelayInSeconds = 1;
         private float timeSinceLastHitInSeconds = 0;
-        private Follow follow;
         #endregion
 
         #region Constructors
@@ -27,7 +28,7 @@ namespace Orion.GameLogic.Tasks
             
             this.attacker = attacker;
             this.target = target;
-            this.follow = new Follow(attacker, target, attacker.GetStat(UnitStat.AttackRange));
+            if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target, attacker.GetStat(UnitStat.AttackRange));
             timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion
@@ -64,17 +65,15 @@ namespace Orion.GameLogic.Tasks
             if (HasEnded)
                 return;
 
-            if (follow.IsInRange)
+            if (Circle.SignedDistance(attacker.Circle, target.Circle) <= attacker.GetStat(UnitStat.AttackRange))
             {
                 if (TryInflictDamage(timeDelta))
                     target.Damage += attacker.GetStat(UnitStat.AttackPower);
             }
-            else
+            else if (follow != null)
             {
                 follow.Update(timeDelta);
-
             }
-
         }
         
         /// <summary>

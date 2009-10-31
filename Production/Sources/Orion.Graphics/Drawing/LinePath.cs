@@ -41,8 +41,11 @@ namespace Orion.Graphics
 
         #region Static
         #region Fields
-        public static readonly LinePath UnitCircle = CreateCircle(1, 32);
+        public static readonly LinePath Circle = CreateCircle(1, 32);
         public static readonly LinePath Diamond = CreateCircle(1, 4);
+        public static readonly LinePath Pentagon = CreateCircle(1, 5);
+        public static readonly LinePath Square;
+        public static readonly LinePath Triangle = CreateCircle(1, 3);
         public static readonly LinePath Plus;
         public static readonly LinePath Cross;
         #endregion
@@ -50,6 +53,8 @@ namespace Orion.Graphics
         #region Constructor
         static LinePath()
         {
+            Square = LinePath.CreateLoop(new Vector2(-1, -1),
+                new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1));
             Plus = LinePath.FromLineSegments(
                 new LineSegment(-1, 0, 1, 0),
                 new LineSegment(0, -1, 0, 1));
@@ -109,6 +114,11 @@ namespace Orion.Graphics
             loopPoints.Add(loopPoints[0]);
 
             return CreateStrip(loopPoints);
+        }
+
+        public static LinePath CreateLoop(params Vector2[] points)
+        {
+            return CreateLoop((IEnumerable<Vector2>)points);
         }
 
         public static LinePath CreateCircle(float radius, int pointCount)

@@ -20,14 +20,15 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-        public Build(Unit builder, Vector2 buildPosition, UnitType unitToBuild)
+        public Build(Unit builder, Vector2 buildPosition, UnitType buildingType)
         {
             Argument.EnsureNotNull(builder, "builder");
             if (!builder.HasSkill<Skills.Build>())
                 throw new ArgumentException("Cannot build without the build skill.", "builder");
+            Argument.EnsureNotNull(buildingType, "buildingType");
 
             this.builder = builder;
-            this.buildingType = unitToBuild;
+            this.buildingType = buildingType;
             this.buildPosition = buildPosition;
             this.move = new Move(builder, this.buildPosition);
         }

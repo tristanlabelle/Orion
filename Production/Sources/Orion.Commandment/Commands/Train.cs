@@ -5,11 +5,11 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    public class Train:Command
+    public class Train : Command
     {
-          #region Fields
+        #region Fields
         private readonly List<Unit> identicalsBuildings;
-        private readonly UnitType unitToCreate;
+        private readonly UnitType unitType;
         #endregion
 
         #region Constructors
@@ -19,26 +19,28 @@ namespace Orion.Commandment.Commands
         /// <param name="selectedUnit">The Builder</param>
         /// <param name="position">Where To build</param>
         /// <param name="unitTobuild">What to build</param>
-        public Train(IEnumerable<Unit> selectedsSameBuilding,UnitType unitTobuild, Faction faction)
+        public Train(IEnumerable<Unit> selectedsSameBuilding, UnitType unitType, Faction faction)
             : base(faction)
         {
+            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(faction, "faction");
             this.identicalsBuildings = selectedsSameBuilding.ToList();
-            this.unitToCreate = unitTobuild;
+            this.unitType = unitType;
         }
         #endregion
 
         #region Methods
         public override void Execute()
         {
-            int aladiumCost = base.SourceFaction.GetStat(unitToCreate, UnitStat.AladdiumCost);
-            int alageneCost = base.SourceFaction.GetStat(unitToCreate, UnitStat.AlageneCost);
+            int aladiumCost = base.SourceFaction.GetStat(unitType, UnitStat.AladdiumCost);
+            int alageneCost = base.SourceFaction.GetStat(unitType, UnitStat.AlageneCost);
             for (int i = 0; i < identicalsBuildings.Count;i++ )
             {
                 // If we don't have enought money to continue the production we stop.
                 if (!(base.SourceFaction.AladdiumAmount >= (aladiumCost + aladiumCost * i)
                        && base.SourceFaction.AlageneAmount >= (alageneCost + alageneCost * i)))
                     break;
-                identicalsBuildings[i].Task = new Orion.GameLogic.Tasks.Train(identicalsBuildings[i], unitToCreate);
+                identicalsBuildings[i].Task = new Orion.GameLogic.Tasks.Train(identicalsBuildings[i], unitType);
             }
 
         }
@@ -72,7 +74,7 @@ namespace Orion.Commandment.Commands
                 writer.Write(command.identicalsBuildings.Count());
                 foreach (Unit unit in command.identicalsBuildings)
                     writer.Write(unit.ID);
-                writer.Write(command.unitToCreate.ID);
+                writer.Write(command.unitType.ID);
             }
 
             protected override Train DeserializeData(BinaryReader reader, World world)

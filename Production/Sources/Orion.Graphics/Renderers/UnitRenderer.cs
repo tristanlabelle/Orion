@@ -17,7 +17,7 @@ namespace Orion.Graphics
         #region Fields
         private readonly World world;
         private readonly Dictionary<string, LinePath> typeShapes = new Dictionary<string, LinePath>();
-        private readonly LinePath defaultShape = LinePath.UnitCircle;
+        private readonly LinePath defaultShape = LinePath.Circle;
         #endregion
 
         #region Constructors
@@ -26,8 +26,12 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
-            SetTypeShape("Archer", LinePath.Cross);
-            SetTypeShape("Jedi", LinePath.Diamond);
+            SetTypeShape("Harvester", LinePath.Circle);
+            SetTypeShape("Builder", LinePath.Diamond);
+            SetTypeShape("MeleeAttacker", LinePath.Triangle);
+            SetTypeShape("RangedAttacker", LinePath.Cross);
+            SetTypeShape("Factory", LinePath.Pentagon);
+            SetTypeShape("Tower", LinePath.Square);
         }
         #endregion
 
@@ -48,7 +52,7 @@ namespace Orion.Graphics
 
         public LinePath GetTypeShape(UnitType type)
         {
-            if (!typeShapes.ContainsKey(type.Name)) return LinePath.UnitCircle;
+            if (!typeShapes.ContainsKey(type.Name)) return LinePath.Circle;
             return typeShapes[type.Name];
         }
 
@@ -92,10 +96,7 @@ namespace Orion.Graphics
                 if (unit.Faction == null) graphics.FillColor = Color.White;
                 else graphics.FillColor = unit.Faction.Color;
 
-                if (unit.Type.IsBuilding)
-                    graphics.Fill(unit.Circle);
-                else
-                    graphics.Stroke(shape, unit.Position);
+                graphics.Stroke(shape, unit.Position);
             }
         }
 

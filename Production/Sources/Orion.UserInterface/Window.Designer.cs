@@ -30,9 +30,6 @@ namespace Orion.UserInterface
         /// </summary>
         private void InitializeComponent()
         {
-            //
-            // Controls
-            //
             this.glControl = new Orion.UserInterface.CustomGLControl();
             this.SuspendLayout();
             // 
@@ -41,29 +38,25 @@ namespace Orion.UserInterface
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
-            this.glControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.glControl.Name = "glControl";
-            this.glControl.Size = new System.Drawing.Size(615, 482);
+            this.glControl.Size = new System.Drawing.Size(792, 570);
             this.glControl.TabIndex = 0;
             this.glControl.VSync = true;
-            this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             this.glControl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseWheel);
-            this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
+            this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             this.glControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyUp);
+            this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
             // 
             // Window
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(615, 482);
+            this.ClientSize = new System.Drawing.Size(792, 570);
             this.Controls.Add(this.glControl);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Window";
             this.Text = "Window";
             this.ResumeLayout(false);
-            //
-            // OpenGL
-            //
-            GL.Enable(EnableCap.LineStipple);
 
         }
 

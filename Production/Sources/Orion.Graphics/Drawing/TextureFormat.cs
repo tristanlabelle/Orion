@@ -12,18 +12,18 @@ namespace Orion.Graphics
         /// Specifies that the texture uses one byte per pixel storing
         /// a luminance value.
         /// </summary>
-        Luminance,
+        Intensity,
 
         /// <summary>
         /// Specifies that the texture uses three bytes per pixel to store
         /// red, green and blue components.
         /// </summary>
-        Color,
+        Rgb,
 
         /// <summary>
         /// Specifies that the texture uses four bytes per pixel to store
         /// red, green, blue, and transparency components.
         /// </summary>
-        ColorAndAlpha
+        Rgba
     }
 }

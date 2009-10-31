@@ -3,6 +3,7 @@
 
 using Orion.GameLogic;
 using Orion.Geometry;
+using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
@@ -12,6 +13,9 @@ namespace Orion.Graphics
     public sealed class TerrainRenderer : IDisposable
     {
         #region Fields
+        public static readonly Color WalkableColor = Color.FromArgb(60, 50, 50);
+        public static readonly Color SolidColor = Color.FromArgb(255, 248, 233);
+
         private readonly Terrain terrain;
         private readonly Texture texture;
         #endregion
@@ -23,18 +27,28 @@ namespace Orion.Graphics
 
             this.terrain = terrain;
 
-            byte[] pixels = new byte[terrain.Width * terrain.Height];
+            byte[] pixels = new byte[terrain.Width * terrain.Height * 3];
             for (int y = 0; y < terrain.Height; ++y)
             {
                 for (int x = 0; x < terrain.Width; ++x)
                 {
                     int pixelIndex = y * terrain.Width + x;
-                    byte luminance = terrain.IsWalkable(x, y) ? (byte)0 : (byte)255;
-                    pixels[pixelIndex] = luminance;
+                    if (terrain.IsWalkable(x, y))
+                    {
+                        pixels[pixelIndex * 3 + 0] = WalkableColor.R;
+                        pixels[pixelIndex * 3 + 1] = WalkableColor.G;
+                        pixels[pixelIndex * 3 + 2] = WalkableColor.B;
+                    }
+                    else
+                    {
+                        pixels[pixelIndex * 3 + 0] = SolidColor.R;
+                        pixels[pixelIndex * 3 + 1] = SolidColor.G;
+                        pixels[pixelIndex * 3 + 2] = SolidColor.B;
+                    }
                 }
             }
 
-            this.texture = new Texture(terrain.Width, terrain.Height, TextureFormat.Luminance, pixels);
+            this.texture = new Texture(terrain.Width, terrain.Height, TextureFormat.Rgb, pixels);
         }
         #endregion
 

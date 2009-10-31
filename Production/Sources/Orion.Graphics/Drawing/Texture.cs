@@ -78,19 +78,19 @@ namespace Orion.Graphics
         private static void GetPixelFormatInfo(TextureFormat format, out int bytesPerPixel,
             out PixelFormat pixelFormat, out PixelInternalFormat pixelInternalFormat)
         {
-            if (format == TextureFormat.Luminance)
+            if (format == TextureFormat.Intensity)
             {
                 bytesPerPixel = 1;
                 pixelFormat = PixelFormat.Luminance;
                 pixelInternalFormat = PixelInternalFormat.Luminance;
             }
-            else if (format == TextureFormat.Color)
+            else if (format == TextureFormat.Rgb)
             {
                 bytesPerPixel = 3;
                 pixelFormat = PixelFormat.Rgb;
                 pixelInternalFormat = PixelInternalFormat.Rgb;
             }
-            else if (format == TextureFormat.ColorAndAlpha)
+            else if (format == TextureFormat.Rgba)
             {
                 bytesPerPixel = 4;
                 pixelFormat = PixelFormat.Rgba;

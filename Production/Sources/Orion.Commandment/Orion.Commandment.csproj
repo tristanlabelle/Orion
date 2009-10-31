@@ -70,6 +70,7 @@
     <Compile Include="Sinks\CommandOptimizer.cs" />
     <Compile Include="Sinks\CommandExecutor.cs" />
     <Compile Include="Sinks\CommandLogger.cs" />
+    <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">

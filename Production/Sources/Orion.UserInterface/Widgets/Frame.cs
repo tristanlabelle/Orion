@@ -21,17 +21,5 @@ namespace Orion.UserInterface.Widgets
             base.OnMouseDown(args);
             return false;
         }
-
-        protected override bool OnMouseUp(MouseEventArgs args)
-        {
-            base.OnMouseUp(args);
-            return false;
-        }
-
-        protected override bool OnMouseMove(MouseEventArgs args)
-        {
-            base.OnMouseMove(args);
-            return false;
-        }
     }
 }

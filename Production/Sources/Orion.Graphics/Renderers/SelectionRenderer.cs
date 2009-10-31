@@ -14,7 +14,7 @@ namespace Orion.Graphics
     {
         #region Instance
         #region Fields
-        private readonly SelectionManager selectionManager;
+        private readonly UserInputManager userInputManager;
         #endregion
 
         #region Constructors
@@ -26,10 +26,10 @@ namespace Orion.Graphics
         /// <param name="selectionManager">
         /// The <see cref="SelectionManager"/> which provides selection information.
         /// </param>
-        public SelectionRenderer(SelectionManager selectionManager)
+        public SelectionRenderer(UserInputManager manager)
         {
-            Argument.EnsureNotNull(selectionManager, "selectionManager");
-            this.selectionManager = selectionManager;
+            Argument.EnsureNotNull(manager, "manager");
+            userInputManager = manager;
         }
         #endregion
 
@@ -44,7 +44,7 @@ namespace Orion.Graphics
 
             graphics.StrokeStyle = StrokeStyle.Solid;
             graphics.StrokeColor = selectionMarkerColor;
-            foreach (Unit unit in selectionManager.SelectedUnits)
+            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
                 graphics.Stroke(new Circle(unit.Position, 1.5f));
         }
 
@@ -56,13 +56,14 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            if (selectionManager.IsSelecting)
+            if (userInputManager.SelectionRectangle.HasValue)
             {
+                Rectangle selectionRectangle = userInputManager.SelectionRectangle.Value;
                 graphics.StrokeStyle = StrokeStyle.Solid;
                 graphics.StrokeColor = selectionRectangleStrokeColor;
-                graphics.Stroke(selectionManager.SelectionRectangle.Value);
+                graphics.Stroke(selectionRectangle);
                 graphics.FillColor = selectionRectangleFillColor;
-                graphics.Fill(selectionManager.SelectionRectangle.Value);
+                graphics.Fill(selectionRectangle);
             }
         }
 
@@ -70,7 +71,7 @@ namespace Orion.Graphics
         {
             const float healthBarLength = 1;
 
-            foreach (Unit unit in selectionManager.SelectedUnits)
+            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
                 Circle circle = unit.Circle;
 

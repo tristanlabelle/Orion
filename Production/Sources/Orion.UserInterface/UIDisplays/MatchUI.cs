@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment;
@@ -14,19 +15,22 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
-        private readonly UserInputCommander userInputCommander;
+        private readonly UserInputManager userInputManager;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
-        private readonly Frame minimapFrame;
         private UnitType selectedType;
+
+        #region Minimap
+        private readonly Frame minimapFrame;
+        private bool mouseDownOnMinimap;
+        #endregion
 
         #region Event Handling
         private GenericEventHandler<SelectionManager> selectionChanged;
         private GenericEventHandler<Responder, MouseEventArgs> minimapMouseDown;
         private GenericEventHandler<Responder, MouseEventArgs> minimapMouseMove;
         private GenericEventHandler<Responder, MouseEventArgs> minimapMouseUp;
-        private bool minimapLeftButtonDown;
         #endregion
         #endregion
 
@@ -37,17 +41,17 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(commander, "commander");
 
-            userInputCommander = commander;
+            userInputManager = new UserInputManager(commander);
 
-            MatchRenderer matchRenderer = new MatchRenderer(world, commander);
-            world.Units.UnitDied += userInputCommander.SelectionManager.UnitDied;
+            MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
+            world.Units.UnitDied += userInputManager.SelectionManager.UnitDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 
             Rectangle resourceDisplayFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -Bounds.Height / 25);
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputCommander.Faction);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.Commander.Faction);
             Children.Add(resourceDisplay);
 
             hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkGray);
@@ -74,6 +78,10 @@ namespace Orion.UserInterface
             Children.Add(eastScroller);
             Children.Add(westScroller);
 
+            worldView.MouseDown += userInputManager.HandleMouseDown;
+            worldView.KeyDown += userInputManager.HandleKeyDown;
+            worldView.KeyUp += userInputManager.HandleKeyUp;
+
             selectionChanged = SelectionChanged;
             minimapMouseDown = MinimapMouseDown;
             minimapMouseMove = MinimapMouseMove;
@@ -93,55 +101,50 @@ namespace Orion.UserInterface
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            userInputCommander.OnMouseButton(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position), args.ButtonPressed, true);
+            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+            userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             return base.OnMouseDown(args);
-        }
-
-        protected override bool OnMouseUp(MouseEventArgs args)
-        {
-            userInputCommander.OnMouseButton(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position), args.ButtonPressed, false);
-            return base.OnMouseUp(args);
         }
 
         protected override bool OnMouseMove(MouseEventArgs args)
         {
-            userInputCommander.OnMouseMove(Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position));
+            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+            userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             return base.OnMouseMove(args);
         }
 
-        protected override bool OnKeyDown(KeyboardEventArgs args)
+        protected override bool OnMouseUp(MouseEventArgs args)
         {
-            userInputCommander.OnKeyDown(args.Key);
-            return base.OnKeyDown(args);
-        }
-
-        protected override bool OnKeyUp(KeyboardEventArgs args)
-        {
-            userInputCommander.OnKeyUp(args.Key);
-            return base.OnKeyUp(args);
+            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+            userInputManager.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            return base.OnMouseUp(args);
         }
 
         private void MinimapMouseDown(Responder source, MouseEventArgs args)
         {
             if (args.ButtonPressed == MouseButton.Left)
             {
-                MoveWorldView(args.Position);
-                minimapLeftButtonDown = true;
+                if (userInputManager.SelectedCommand.HasValue) userInputManager.LaunchMouseCommand(args.Position);
+                else
+                {
+                    MoveWorldView(args.Position);
+                    mouseDownOnMinimap = true;
+                }
             }
             else if (args.ButtonPressed == MouseButton.Right)
             {
-                userInputCommander.OnMouseButton(args.Position, MouseButton.Right, true);
+                userInputManager.LaunchDefaultCommand(args.Position);
             }
         }
 
         private void MinimapMouseMove(Responder source, MouseEventArgs args)
         {
-            if (minimapLeftButtonDown) MoveWorldView(args.Position);
+            if (mouseDownOnMinimap) MoveWorldView(args.Position);
         }
 
         private void MinimapMouseUp(Responder source, MouseEventArgs args)
         {
-            minimapLeftButtonDown = false;
+            mouseDownOnMinimap = false;
         }
 
         private void SelectionChanged(SelectionManager selectionManager)
@@ -185,10 +188,10 @@ namespace Orion.UserInterface
             if (button.Renderer is UnitButtonRenderer)
             {
                 Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
-                IEnumerable<Unit> selectedUnits = userInputCommander.SelectionManager.SelectedUnits;
+                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
                 if (unit.Type == selectedType || selectedUnits.Count() == 1)
                 {
-                    userInputCommander.SelectionManager.SelectUnit(unit);
+                    userInputManager.SelectionManager.SelectUnit(unit);
                     MoveWorldView(unit.Position);
                     selectedType = null;
                 }
@@ -221,7 +224,7 @@ namespace Orion.UserInterface
         #region IUIDisplay Implementation
         internal override void OnEnter(RootView into)
         {
-            userInputCommander.SelectionManager.SelectionChanged += selectionChanged;
+            userInputManager.SelectionManager.SelectionChanged += selectionChanged;
             minimapFrame.MouseDown += minimapMouseDown;
             minimapFrame.MouseMoved += minimapMouseMove;
             minimapFrame.MouseUp += minimapMouseUp;
@@ -229,7 +232,7 @@ namespace Orion.UserInterface
 
         internal override void OnShadow(RootView shadowedFrom)
         {
-            userInputCommander.SelectionManager.SelectionChanged -= selectionChanged;
+            userInputManager.SelectionManager.SelectionChanged -= selectionChanged;
             minimapFrame.MouseDown -= minimapMouseDown;
             minimapFrame.MouseMoved -= minimapMouseMove;
             minimapFrame.MouseUp -= minimapMouseUp;

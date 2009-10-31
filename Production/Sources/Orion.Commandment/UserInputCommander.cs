@@ -12,10 +12,6 @@ namespace Orion.Commandment
     /// </summary>
     public sealed class UserInputCommander : Commander
     {
-        #region Fields
-        private SelectionManager selectionManager;
-        #endregion
-
         #region Constructors
         /// <summary>
         /// Constructor For a commander that can listen input to create commands
@@ -23,158 +19,43 @@ namespace Orion.Commandment
         /// <param name="faction">the faction of the player.</param>
         public UserInputCommander(Faction faction)
             : base(faction)
-        {
-            this.selectionManager = new SelectionManager(faction);
-        }
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Gets the <see cref="SelectionManager"/> this <see cref="UserInputCommander"/>
-        /// uses internally to detect selection state.
-        /// </summary>
-        public SelectionManager SelectionManager
-        {
-            get { return selectionManager; }
-        }
+        { }
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Listen of Mouse Event, implemented the right click associated to the move task
-        /// </summary>
-        /// <param name="position">The location of the cursor when the click occured.</param>
-        /// <param name="button">The mouse button that was pressed or released.</param>
-        /// <param name="pressed">True if the button was pressed, false otherwise.</param>
-        public void OnMouseButton(Vector2 position, MouseButton button, bool pressed)
+        public void CancelCommands(IEnumerable<Unit> units)
         {
-            selectionManager.OnMouseButton(position, button, pressed);
-            if (button == MouseButton.Right && selectionManager.ShiftKeyPressed && pressed)
-            {
-                HandleCtrlRightClick(position);
-            }
-            
-            else if (button == MouseButton.Middle && pressed)
-            {
-                HandleMiddleClick(position);
-            }
-            else if (button == MouseButton.Left && selectionManager.ShiftKeyPressed && pressed)
-            {
-                HandleCtrlLeftClick(position);
-            }
-            else if (button == MouseButton.Right && pressed)
-            {
-                HandleRightClick(position);
-            }
-
+            if (units.Count() > 0) GenerateCommand(new Cancel(Faction, units));
         }
 
-        /// <summary>
-        /// The Function Called When a right mouse click happend
-        /// </summary>
-        /// <param name="position"></param>
-        private void HandleRightClick(Vector2 position)
+        public void LaunchAttack(IEnumerable<Unit> units, Unit target)
         {
-            if (selectionManager.SelectedUnits.Count() != 0)
-            {
-                List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                if (unitsToAssignTask.Count() != 0)
-                {
-                    Command command = null;
-                    if (unitsToAssignTask.All(unit => unit.Type.IsBuilding))
-                    {
-                        UnitType unitToCreate = World.UnitTypes.FromName("Jedi");
-                        if (unitToCreate == null) return;
-                        command = new Train(unitsToAssignTask, unitToCreate, unitsToAssignTask[0].Faction);
-
-                    }
-                    else if (unitsToAssignTask.All(unit => !unit.Type.IsBuilding))
-                    {
-                        Unit enemy = World.Units.FirstOrDefault(unit => unit.Circle.ContainsPoint(position));
-                        ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
-                        if (enemy != null && enemy.Faction != this.Faction)// TODO: CHECK IF Its Not Either an ally.
-                        {
-                            command = new Attack(Faction, unitsToAssignTask, enemy);
-                        }
-                        // Assigns a gathering task
-                        else if (node != null)
-                        {
-                            if (node.IsHarvestable)
-                                command = new Harvest(Faction, unitsToAssignTask, node);
-                        }
-                        else
-                        {
-                            command = new Move(Faction, unitsToAssignTask, position);
-                        }
-                    }
-                    else
-                    {
-                        //TO BE FILLED
-                    }
-                    if(command != null)
-                        GenerateCommand(command);
-                }
-            }
+            if (units.Count() > 0) GenerateCommand(new Attack(Faction, units, target));
         }
 
-        /// <summary>
-        /// The Function Called When a Middle mouse Click happend
-        /// </summary>
-        /// <param name="position"></param>
-        private void HandleMiddleClick(Vector2 position)
+        public void LaunchBuild(Unit builder, UnitType buildingType, Vector2 buildingPosition)
         {
-            if (selectionManager.SelectedUnits.Count() != 0)
-            {
-                List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                if (unitsToAssignTask.Count() != 0)
-                {
-                    GenerateCommand(new ZoneAttack(Faction, unitsToAssignTask, position));
-                }
-            }
+            GenerateCommand(new Build(builder, buildingPosition, buildingType));
         }
 
-        /// <summary>
-        /// The Function Called When a Ctrl + Left Click happend
-        /// </summary>
-        /// <param name="position"></param>
-        private void HandleCtrlLeftClick(Vector2 position)
-        { 
-            if (World.Terrain.IsWalkable((int)position.X, (int)position.Y))
-            {
-                Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.IsBuilding);
-                
-                if (builder != null)
-                {
-                    UnitType unitTypeToBuild = World.UnitTypes.FromName("Building");
-                    if (unitTypeToBuild == null) return;
-
-                    if (Faction.AladdiumAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AladdiumCost)
-                        && Faction.AlageneAmount >= Faction.GetStat(unitTypeToBuild, UnitStat.AlageneCost))
-                    {
-                        GenerateCommand(new Build(builder, position, unitTypeToBuild));
-                    }
-                }
-
-            }
+        public void LaunchHarvest(IEnumerable<Unit> units, ResourceNode node)
+        {
+            if (units.Count() > 0) GenerateCommand(new Harvest(Faction, units, node));
         }
 
-        private void HandleCtrlRightClick(Vector2 position)
+        public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
-            ResourceNode node = World.ResourceNodes.FirstOrDefault(resourceNode => resourceNode.Circle.ContainsPoint(position));
-            Unit builder = selectionManager.SelectedUnits.FirstOrDefault(unit => unit.Faction == Faction);
+            if (units.Count() > 0) GenerateCommand(new Move(Faction, units, destination));
+        }
 
-            if (builder != null && node != null
-                && node.ResourceType == ResourceType.Alagene
-                && !node.IsHarvestable)
-            {
-                UnitType extractor = World.UnitTypes.FromName("Extractor");
-                if (Faction.AladdiumAmount >= Faction.GetStat(extractor, UnitStat.AladdiumCost)
-                    && Faction.AlageneAmount >= Faction.GetStat(extractor, UnitStat.AlageneCost))
-                {
-                    GenerateCommand(new Build(builder, node.Circle.Center, extractor));
-                    node.IsHarvestable = true;
-                }
-            }
+        public void LaunchTrain(IEnumerable<Unit> buildings, UnitType trainedType)
+        {
+            if (buildings.Count() > 0) GenerateCommand(new Train(buildings, trainedType, Faction));
+        }
+
+        public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
+        {
+            if (units.Count() > 0) GenerateCommand(new ZoneAttack(Faction, units, destination));
         }
 
         public override void Update(float timeDelta)
@@ -189,59 +70,6 @@ namespace Orion.Commandment
             commandsEntryPoint = new CommandOptimizer(pipeline.UserCommandmentEntryPoint);
             commandsEntryPoint = new CommandAggregator(commandsEntryPoint);
         }
-
-        /// <summary>
-        /// Parses KeyDown events to capture those whose key has a special meaning.
-        /// </summary>
-        /// <param name="key">
-        /// The <see cref="Keys"/> that were pressedd
-        /// </param>
-        public void OnKeyDown(Keys key)
-        {
-            if (key == Keys.S)
-            {
-                if (selectionManager.SelectedUnits.Count() != 0)
-                {
-                    List<Unit> unitsToAssignTask = selectionManager.SelectedUnits.Where(unit => unit.Faction == Faction).ToList();
-                    if (unitsToAssignTask.Count() != 0)
-                    {
-                        Command command = new Cancel(Faction, unitsToAssignTask);
-                        GenerateCommand(command);
-                    }
-                }
-            }
-            else if (key == Keys.ShiftKey)
-            {
-                selectionManager.OnShiftKeyChanged(true);
-            }
-        }
-
-        /// <summary>
-        /// Parses KeyUp events to capture those whose key has a special meaning.
-        /// </summary>
-        /// <param name="key">
-        /// The <see cref="Keys"/> that were pressedd
-        /// </param>
-        public void OnKeyUp(Keys key)
-        {
-            if (key == Keys.ShiftKey)
-            {
-                selectionManager.OnShiftKeyChanged(false);
-            }
-        }
-
-        /// <summary>
-        /// Parses a MouseMove event.
-        /// </summary>
-        /// <param name="position">
-        /// The position in form of a <see cref="Vector2"/>
-        /// </param>
-        public void OnMouseMove(Vector2 position)
-        {
-            selectionManager.OnMouseMove(position);
-        }
         #endregion
-
-
     }
 }

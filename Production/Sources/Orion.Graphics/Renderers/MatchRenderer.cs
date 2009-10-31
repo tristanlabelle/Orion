@@ -37,10 +37,10 @@ namespace Orion.Graphics
         private Minimap minimap;
         #endregion
 
-        public MatchRenderer(World world, UserInputCommander commander)
+        public MatchRenderer(World world, UserInputManager inputManager)
         {
-            selectionRenderer = new SelectionRenderer(commander.SelectionManager);
-            worldRenderer = new WorldRenderer(world, commander.Faction.FogOfWar);
+            selectionRenderer = new SelectionRenderer(inputManager);
+            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction.FogOfWar);
             minimap = new Minimap(this);
         }
 

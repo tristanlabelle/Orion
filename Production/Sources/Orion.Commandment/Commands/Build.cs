@@ -6,7 +6,7 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    class Build: Command
+    class Build : Command
     {
         #region Instance
         #region Fields
@@ -22,7 +22,7 @@ namespace Orion.Commandment.Commands
         /// <param name="selectedUnit">The Builder</param>
         /// <param name="position">Where To build</param>
         /// <param name="unitTobuild">What to build</param>
-        public Build(Unit selectedUnit, Vector2 position,UnitType unitTobuild)
+        public Build(Unit selectedUnit, Vector2 position, UnitType unitTobuild)
             : base(selectedUnit.Faction)
         {
             this.constructor = selectedUnit;
@@ -35,8 +35,7 @@ namespace Orion.Commandment.Commands
         #region Methods
         public override void Execute()
         {
-           
-                constructor.Task = new Orion.GameLogic.Tasks.Build(constructor,position,unitTobuild);
+            constructor.Task = new Orion.GameLogic.Tasks.Build(constructor, position, unitTobuild);
         }
         #endregion
 
@@ -95,7 +94,5 @@ namespace Orion.Commandment.Commands
             #endregion
         }
         #endregion
-
-
     }
 }

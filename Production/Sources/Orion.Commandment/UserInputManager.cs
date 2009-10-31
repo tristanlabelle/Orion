@@ -14,7 +14,7 @@ namespace Orion.Commandment
 {
     public enum MouseDrivenCommand
     {
-        None, Attack, Build, Harvest, Move, ZoneAttack
+        Attack, Build, Harvest, Move, ZoneAttack
     }
 
     public class UserInputManager
@@ -22,7 +22,7 @@ namespace Orion.Commandment
         #region Fields
         // TODO
         // use unit skills for key mapping instead of a static keys map
-        private static Dictionary<Keys, MouseDrivenCommand> keysMap;
+        private static Dictionary<Keys, MouseDrivenCommand?> keysMap;
 
         private UserInputCommander commander;
         private SelectionManager selectionManager;
@@ -41,12 +41,12 @@ namespace Orion.Commandment
 
         static UserInputManager()
         {
-            keysMap = new Dictionary<Keys,MouseDrivenCommand>();
+            keysMap = new Dictionary<Keys,MouseDrivenCommand?>();
             keysMap[Keys.A] = MouseDrivenCommand.Attack;
             keysMap[Keys.B] = MouseDrivenCommand.Build;
             keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
             keysMap[Keys.M] = MouseDrivenCommand.Move;
-            keysMap[Keys.Escape] = MouseDrivenCommand.None;
+            keysMap[Keys.Escape] = null;
         }
         #endregion
 
@@ -165,7 +165,7 @@ namespace Orion.Commandment
                 case MouseDrivenCommand.Move: LaunchMove(at);  break;
             }
 
-            mouseCommand = MouseDrivenCommand.None;
+            mouseCommand = null;
         }
 
         public void LaunchDefaultCommand(Vector2 at)

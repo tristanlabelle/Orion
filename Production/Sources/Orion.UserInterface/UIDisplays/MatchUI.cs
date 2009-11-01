@@ -188,11 +188,16 @@ namespace Orion.UserInterface
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
+
             Label unitName = new Label(new Rectangle(150, 175, 200, 25), unit.Type.Name);
             unitName.Color = Color.White;
 
+            Label health = new Label(new Rectangle(150, 150, 130, 25), "HP: {0}/{1}".FormatInvariant(unit.Health, unit.MaxHealth));
+            health.Color = Color.White;
+
             unitButton.Pressed += ButtonPress;
             selectionFrame.Children.Add(unitButton);
+            selectionFrame.Children.Add(health);
             selectionFrame.Children.Add(unitName);
         }
 

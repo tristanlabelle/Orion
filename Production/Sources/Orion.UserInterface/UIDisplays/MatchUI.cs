@@ -25,13 +25,6 @@ namespace Orion.UserInterface
         private readonly Frame minimapFrame;
         private bool mouseDownOnMinimap;
         #endregion
-
-        #region Event Handling
-        private GenericEventHandler<SelectionManager> selectionChanged;
-        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseDown;
-        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseMove;
-        private GenericEventHandler<Responder, MouseEventArgs> minimapMouseUp;
-        #endregion
         #endregion
 
         #region Constructors
@@ -81,14 +74,27 @@ namespace Orion.UserInterface
             worldView.MouseDown += userInputManager.HandleMouseDown;
             worldView.KeyDown += userInputManager.HandleKeyDown;
             worldView.KeyUp += userInputManager.HandleKeyUp;
-            //worldView.BoundsChanged += WorldViewBoundsChanged;
+            worldView.BoundsChanged += WorldViewBoundsChanged;
 
-            selectionChanged = SelectionChanged;
-            minimapMouseDown = MinimapMouseDown;
-            minimapMouseMove = MinimapMouseMove;
-            minimapMouseUp = MinimapMouseUp;
+            userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
+            userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
+            minimapFrame.MouseDown += MinimapMouseDown;
+            minimapFrame.MouseMoved += MinimapMouseMove;
+            minimapFrame.MouseUp += MinimapMouseUp;
         }
 
+        #endregion
+
+        #region Properties
+        private UnitType SelectedType
+        {
+            get { return selectedType; }
+            set
+            {
+                selectedType = value;
+                UpdateSkillsPanel();
+            }
+        }
         #endregion
 
         #region Methods
@@ -155,6 +161,11 @@ namespace Orion.UserInterface
             mouseDownOnMinimap = false;
         }
 
+        private void SelectionCleared(SelectionManager selectionManager)
+        {
+            selectedType = null;
+        }
+
         private void SelectionChanged(SelectionManager selectionManager)
         {
             foreach (Button button in selectionFrame.Children)
@@ -162,6 +173,8 @@ namespace Orion.UserInterface
                 button.Dispose();
             }
             selectionFrame.Children.Clear();
+
+            if (SelectedType == null) SelectedType = selectionManager.SelectedUnits.First().Type;
 
             const float padding = 10;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
@@ -171,6 +184,7 @@ namespace Orion.UserInterface
             foreach (Unit unit in selectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
+                renderer.HasFocus = unit.Type == selectedType;
                 Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -183,12 +197,6 @@ namespace Orion.UserInterface
                 }
                 selectionFrame.Children.Add(unitButton);
             }
-
-            if (selectionFrame.Children.Count == 0)
-                selectedType = null;
-            else if (selectedType == null &&
-                selectionManager.SelectedUnits.Select(u => u.Type).Distinct().Count() == 1)
-                selectedType = selectionManager.SelectedUnits.First().Type;
         }
 
         private void ButtonPress(Button button)
@@ -215,6 +223,11 @@ namespace Orion.UserInterface
             }
         }
 
+        private void UpdateSkillsPanel()
+        {
+
+        }
+
         private void MoveWorldView(Vector2 center)
         {
             Vector2 difference = worldView.Bounds.Origin - worldView.Bounds.Center;
@@ -230,20 +243,11 @@ namespace Orion.UserInterface
         #endregion
 
         #region IUIDisplay Implementation
-        internal override void OnEnter(RootView into)
-        {
-            userInputManager.SelectionManager.SelectionChanged += selectionChanged;
-            minimapFrame.MouseDown += minimapMouseDown;
-            minimapFrame.MouseMoved += minimapMouseMove;
-            minimapFrame.MouseUp += minimapMouseUp;
-        }
+        internal override void OnEnter(RootView enterOn)
+        { }
 
         internal override void OnShadow(RootView shadowedFrom)
         {
-            userInputManager.SelectionManager.SelectionChanged -= selectionChanged;
-            minimapFrame.MouseDown -= minimapMouseDown;
-            minimapFrame.MouseMoved -= minimapMouseMove;
-            minimapFrame.MouseUp -= minimapMouseUp;
             shadowedFrom.PopDisplay(this);
         }
         #endregion

@@ -517,8 +517,10 @@ namespace Orion.Geometry
 
         private bool OnewayIntersects(Rectangle otherRect)
         {
-            return ContainsPoint(otherRect.Origin) || ContainsPoint(new Vector2(otherRect.X, otherRect.MaxY))
-                || ContainsPoint(new Vector2(otherRect.MaxX, otherRect.Y)) || ContainsPoint(new Vector2(otherRect.Max));
+            return ContainsPoint(otherRect.Origin)
+                || ContainsPoint(otherRect.Max)
+                || ContainsPoint(new Vector2(otherRect.X, otherRect.MaxY))
+                || ContainsPoint(new Vector2(otherRect.MaxX, otherRect.Y));
         }
         #endregion
         #endregion

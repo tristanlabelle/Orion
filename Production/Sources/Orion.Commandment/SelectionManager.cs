@@ -34,6 +34,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Events
+        public event GenericEventHandler<SelectionManager> SelectionCleared;
         public event GenericEventHandler<SelectionManager> SelectionChanged;
         #endregion
 
@@ -50,13 +51,13 @@ namespace Orion.Commandment
         #region Methods
         public void SelectUnit(Unit unit)
         {
-            selectedUnits.Clear();
+            ClearSelection();
             AppendToSelection(unit);
         }
 
         public void SelectUnits(IEnumerable<Unit> units)
         {
-            selectedUnits.Clear();
+            ClearSelection();
             AppendToSelection(units);
         }
 
@@ -73,6 +74,13 @@ namespace Orion.Commandment
         {
             selectedUnits.AddRange(units.Except(selectedUnits));
             OnSelectionChange();
+        }
+
+        public void ClearSelection()
+        {
+            selectedUnits.Clear();
+            GenericEventHandler<SelectionManager> selectionCleared = SelectionCleared;
+            if (selectionCleared != null) selectionCleared(this);
         }
 
         /// <summary>

@@ -8,6 +8,7 @@ using Orion.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
 using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface
@@ -168,20 +169,41 @@ namespace Orion.UserInterface
 
         private void SelectionChanged(SelectionManager selectionManager)
         {
-            foreach (Button button in selectionFrame.Children)
-            {
-                button.Dispose();
-            }
+            foreach (Button button in selectionFrame.Children.OfType<Button>()) button.Dispose();
             selectionFrame.Children.Clear();
 
-            if (SelectedType == null) SelectedType = selectionManager.SelectedUnits.First().Type;
+            IEnumerable<Unit> selection = selectionManager.SelectedUnits;
+            int selectionCount = selection.Count();
+            if (SelectedType == null && selectionCount > 0) SelectedType = selection.First().Type;
 
+            if (selectionCount == 1) CreateSingleUnitSelectionPanel();
+            else CreateMultipleUnitsSelectionPanel();
+        }
+
+        private void CreateSingleUnitSelectionPanel()
+        {
+            UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
+            Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
+            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
+            Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
+            float aspectRatio = Bounds.Width / Bounds.Height;
+            unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
+            Label unitName = new Label(new Rectangle(150, 175, 200, 25), unit.Type.Name);
+            unitName.Color = Color.White;
+
+            unitButton.Pressed += ButtonPress;
+            selectionFrame.Children.Add(unitButton);
+            selectionFrame.Children.Add(unitName);
+        }
+
+        private void CreateMultipleUnitsSelectionPanel()
+        {
             const float padding = 10;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
             float currentX = padding + selectionFrame.Bounds.X;
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
             UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
-            foreach (Unit unit in selectionManager.SelectedUnits)
+            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
                 renderer.HasFocus = unit.Type == selectedType;

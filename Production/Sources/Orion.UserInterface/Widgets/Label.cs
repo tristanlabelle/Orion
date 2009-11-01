@@ -1,6 +1,7 @@
 ﻿using Orion.Geometry;
 using Orion.Graphics;
 using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface.Widgets
 {

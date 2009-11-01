@@ -172,7 +172,7 @@ namespace Orion.Commandment
                     LaunchRepair(target);
                     break;
                 case MouseDrivenCommand.Train:
-                    LaunchTrain(commander.Faction.World.UnitTypes.FromName("Tank"));
+                    LaunchTrain(commander.Faction.World.UnitTypes.First(unit => !unit.IsBuilding));
                     break;
 
             }

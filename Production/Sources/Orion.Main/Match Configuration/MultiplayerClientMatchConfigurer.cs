@@ -19,7 +19,7 @@ namespace Orion.Main
 
         public override void CreateNetworkConfiguration()
         {
-            IPEndPoint admin = new IPEndPoint(Host, transporter.Port);
+            IPEndPoint admin = new IPEndPoint(Host, Program.DefaultPort);
             using (NetworkSetupClient client = new NetworkSetupClient(transporter))
             {
                 client.Join(admin);

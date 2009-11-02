@@ -9,6 +9,7 @@ namespace Orion.Main
 {
     internal static class Program
     {
+        public const int DefaultPort = 41223;
         /// <summary>
         /// Main entry point for the program.
         /// </summary>
@@ -38,7 +39,7 @@ namespace Orion.Main
 
         private static void HostGame()
         {
-            using (Transporter transporter = new Transporter(41223))
+            using (Transporter transporter = new Transporter(DefaultPort))
             {
                 MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
                 RunMultiplayerGame(configurer);
@@ -47,12 +48,24 @@ namespace Orion.Main
 
         private static void JoinGame(IPAddress host)
         {
-            using (Transporter transporter = new Transporter(41223))
+            int port = DefaultPort;
+            Transporter transporter;
+
+            do
             {
-                MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter);
-                configurer.Host = host;
-                RunMultiplayerGame(configurer);
-            }
+                try
+                {
+                    transporter = new Transporter(port);
+                    break;
+                }
+                catch { port++; }
+            } while (true);
+
+            MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter);
+            configurer.Host = host;
+            RunMultiplayerGame(configurer);
+
+            transporter.Dispose();
         }
 
         private static void RunMultiplayerGame(MultiplayerMatchConfigurer configurer)

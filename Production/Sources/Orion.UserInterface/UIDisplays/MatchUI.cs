@@ -205,7 +205,7 @@ namespace Orion.UserInterface
         {
             const float padding = 10;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
-            float currentX = padding + selectionFrame.Bounds.X;
+            float currentX = padding + selectionFrame.Bounds.MinX;
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
             UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
@@ -220,7 +220,7 @@ namespace Orion.UserInterface
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
                 {
                     currentY -= frame.Height + padding;
-                    currentX = padding + selectionFrame.Bounds.X;
+                    currentX = padding + selectionFrame.Bounds.MinX;
                 }
                 selectionFrame.Children.Add(unitButton);
             }
@@ -257,14 +257,14 @@ namespace Orion.UserInterface
 
         private void MoveWorldView(Vector2 center)
         {
-            Vector2 difference = worldView.Bounds.Origin - worldView.Bounds.Center;
+            Vector2 difference = worldView.Bounds.Min - worldView.Bounds.Center;
             Rectangle newBounds = worldView.Bounds.TranslateTo(center + difference);
             float xDiff = worldView.FullBounds.MaxX - newBounds.MaxX;
             float yDiff = worldView.FullBounds.MaxY - newBounds.MaxY;
             if (xDiff < 0) newBounds = newBounds.TranslateX(xDiff);
             if (yDiff < 0) newBounds = newBounds.TranslateY(yDiff);
-            if (newBounds.X < 0) newBounds = newBounds.TranslateTo(0, newBounds.Origin.Y);
-            if (newBounds.Y < 0) newBounds = newBounds.TranslateTo(newBounds.Origin.X, 0);
+            if (newBounds.MinX < 0) newBounds = newBounds.TranslateTo(0, newBounds.Min.Y);
+            if (newBounds.MinY < 0) newBounds = newBounds.TranslateTo(newBounds.Min.X, 0);
             worldView.Bounds = newBounds;
         }
         #endregion

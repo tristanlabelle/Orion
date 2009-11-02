@@ -84,9 +84,9 @@ namespace Orion.GameLogic
             //addOrRemove : true = add  false = remove
             Rectangle tilesRectangle = CreateTilesRectangle(sight.BoundingRectangle);
 
-            for (int i = (int)tilesRectangle.X; i < tilesRectangle.MaxX; i++)
+            for (int i = (int)tilesRectangle.MinX; i < tilesRectangle.MaxX; i++)
             {
-                for (int j = (int)tilesRectangle.Y; j < tilesRectangle.MaxY; j++)
+                for (int j = (int)tilesRectangle.MinY; j < tilesRectangle.MaxY; j++)
                 {
                     if (sight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
                     {
@@ -107,8 +107,8 @@ namespace Orion.GameLogic
 
         private Rectangle CreateTilesRectangle(Rectangle boundingRectangle)
         {
-            float X = (float)Math.Floor(boundingRectangle.X);
-            float Y = (float)Math.Floor(boundingRectangle.Y);
+            float X = (float)Math.Floor(boundingRectangle.MinX);
+            float Y = (float)Math.Floor(boundingRectangle.MinY);
             float MaxX = (float)Math.Ceiling(boundingRectangle.MaxX);
             float MaxY = (float)Math.Ceiling(boundingRectangle.MaxY);
 
@@ -116,7 +116,7 @@ namespace Orion.GameLogic
             {
                 MaxX = Width;
             }
-            if (Math.Floor(boundingRectangle.X) < 0)
+            if (Math.Floor(boundingRectangle.MinX) < 0)
             {
                 X = 0;
             }
@@ -124,7 +124,7 @@ namespace Orion.GameLogic
             {
                 MaxY = Height;
             }
-            if (Math.Floor(boundingRectangle.Y) < 0)
+            if (Math.Floor(boundingRectangle.MinY) < 0)
             {
                 Y = 0;
             }

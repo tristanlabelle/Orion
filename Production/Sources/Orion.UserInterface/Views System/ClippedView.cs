@@ -30,7 +30,7 @@ namespace Orion.UserInterface
         {
             Vector2 scale = new Vector2((float)factor, (float)factor);
             Vector2 newSize = Bounds.Size;
-            Vector2 newOrigin = Bounds.Origin;
+            Vector2 newOrigin = Bounds.Min;
             newSize.Scale(scale);
 
             if (newSize.X > FullBounds.Size.X)
@@ -71,14 +71,14 @@ namespace Orion.UserInterface
         public void ScrollBy(Vector2 direction)
         {
             Rectangle newBounds = Bounds.Translate(direction);
-            Vector2 newOrigin = newBounds.Origin;
+            Vector2 newOrigin = newBounds.Min;
             Vector2 newSize = newBounds.Size;
 
-            if (newOrigin.X < FullBounds.X)
-                newOrigin.X = FullBounds.X;
+            if (newOrigin.X < FullBounds.MinX)
+                newOrigin.X = FullBounds.MinX;
 
-            if (newOrigin.Y < FullBounds.Y)
-                newOrigin.Y = FullBounds.Y;
+            if (newOrigin.Y < FullBounds.MinY)
+                newOrigin.Y = FullBounds.MinY;
 
             if (newBounds.MaxX > FullBounds.MaxX)
                 newOrigin.X -= newBounds.MaxX - FullBounds.MaxX;

@@ -350,10 +350,10 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Unit"/>s in that area.</returns>
         public IEnumerable<Unit> InArea(Rectangle area)
         {
-            if (!world.Bounds.Intersects(area))
+            if (!Rectangle.Instersects(world.Bounds, area))
                 yield break;
 
-            Point minZoneCoords = GetClampedZoneCoords(area.Origin);
+            Point minZoneCoords = GetClampedZoneCoords(area.Min);
             Point maxZoneCoords = GetClampedZoneCoords(area.Max);
 
             for (int x = minZoneCoords.X; x <= maxZoneCoords.X; ++x)
@@ -383,7 +383,7 @@ namespace Orion.GameLogic
 
             Rectangle rectangle = area.BoundingRectangle;
 
-            Point minZoneCoords = GetClampedZoneCoords(rectangle.Origin);
+            Point minZoneCoords = GetClampedZoneCoords(rectangle.Min);
             Point maxZoneCoords = GetClampedZoneCoords(rectangle.Max);
 
             for (int x = minZoneCoords.X; x <= maxZoneCoords.X; ++x)

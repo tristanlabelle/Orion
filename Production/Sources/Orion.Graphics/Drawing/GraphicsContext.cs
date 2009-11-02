@@ -126,9 +126,9 @@ namespace Orion.Graphics
         {
             GL.PushMatrix();
 
-            GL.Translate(parentSystem.Origin.X, parentSystem.Origin.Y, 0);
+            GL.Translate(parentSystem.Min.X, parentSystem.Min.Y, 0);
             GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
-            GL.Translate(-CoordinateSystem.Origin.X, -CoordinateSystem.Origin.Y, 0);
+            GL.Translate(-CoordinateSystem.Min.X, -CoordinateSystem.Min.Y, 0);
 
             readyForDrawing = true;
         }
@@ -210,10 +210,10 @@ namespace Orion.Graphics
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
-            GL.Vertex2(rectangle.X, rectangle.Y);
-            GL.Vertex2(rectangle.X, rectangle.MaxY);
+            GL.Vertex2(rectangle.MinX, rectangle.MinY);
+            GL.Vertex2(rectangle.MinX, rectangle.MaxY);
             GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
-            GL.Vertex2(rectangle.MaxX, rectangle.Y);
+            GL.Vertex2(rectangle.MaxX, rectangle.MinY);
         }
         #endregion
 
@@ -336,7 +336,7 @@ namespace Orion.Graphics
         public void DrawText(string text, Rectangle fitInto)
         {
             GL.PushMatrix();
-            GL.Translate(fitInto.X, fitInto.Y, 0);
+            GL.Translate(fitInto.MinX, fitInto.MinY, 0);
             GL.Scale(1, -1, 1);
             printer.Print(text, font, fillColor, new System.Drawing.RectangleF(0, 0, fitInto.Width, fitInto.Height));
             GL.PopMatrix();
@@ -354,13 +354,13 @@ namespace Orion.Graphics
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(0, 0);
-            GL.Vertex2(rectangle.X, rectangle.Y);
+            GL.Vertex2(rectangle.MinX, rectangle.MinY);
             GL.TexCoord2(0, 1);
-            GL.Vertex2(rectangle.X, rectangle.MaxY);
+            GL.Vertex2(rectangle.MinX, rectangle.MaxY);
             GL.TexCoord2(1, 1);
             GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(1, 0);
-            GL.Vertex2(rectangle.MaxX, rectangle.Y);
+            GL.Vertex2(rectangle.MaxX, rectangle.MinY);
             GL.End();
             GL.Disable(EnableCap.Texture2D);
         }

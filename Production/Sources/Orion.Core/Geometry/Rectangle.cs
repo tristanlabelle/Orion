@@ -20,7 +20,7 @@ namespace Orion.Geometry
         /// Encapsulated as <see cref="Vector2"/> is not immutable,
         /// and <c>readonly</c> sadly cannot change this fact.
         /// </remarks>
-        private readonly Vector2 origin;
+        private readonly Vector2 min;
 
         /// <summary>
         /// The size of the rectangle (X is the width, and Y is the height).
@@ -97,50 +97,71 @@ namespace Orion.Geometry
             }
 
             this.size = size;
-            this.origin = position;
+            this.min = position;
         }
         #endregion
 
         #region Properties
         #region Coordinates
+        #region Minimum
         /// <summary>
-        /// Gets the origin of this <see cref="Rectangle"/>.
+        /// Gets the point with the minimum coordinates of this <see cref="Rectangle"/>.
         /// </summary>
-        public Vector2 Origin
+        public Vector2 Min
         {
-            get { return origin; }
+            get { return min; }
         }
 
         /// <summary>
-        /// Gets the origin abscissa of the rectangle.
+        /// Gets the minimum x coordinate of this <see cref="Rectangle"/>.
         /// </summary>
-        public float X
+        public float MinX
         {
-            get { return origin.X; }
+            get { return min.X; }
         }
 
         /// <summary>
-        /// Gets the origin ordinate of the rectangle.
+        /// Gets the minimum y coordinate of this <see cref="Rectangle"/>.
         /// </summary>
-        public float Y
+        public float MinY
         {
-            get { return origin.Y; }
+            get { return min.Y; }
         }
+        #endregion
 
+        #region Center
         /// <summary>
         /// Gets the coordinates of the center of this <see cref="Rectangle"/>.
         /// </summary>
         public Vector2 Center
         {
-            get { return origin + Extent; }
+            get { return min + Extent; }
         }
 
+        /// <summary>
+        /// Gets the X coordinate of the center of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float CenterX
+        {
+            get { return MinX + Width * 0.5f; }
+        }
+
+        /// <summary>
+        /// Gets the Y coordinate of the center of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float CenterY
+        {
+            get { return MinY + Height * 0.5f; }
+        }
+        #endregion
+
+        #region Maximum
         /// <summary>
         /// Gets the coordinates of the corner of this <see cref="Rectangle"/> at the opposite of its origin.
         /// </summary>
         public Vector2 Max
         {
-            get { return origin + size; }
+            get { return min + size; }
         }
 
         /// <summary>
@@ -148,7 +169,7 @@ namespace Orion.Geometry
         /// </summary>
         public float MaxX
         {
-            get { return X + Width; }
+            get { return MinX + Width; }
         }
 
         /// <summary>
@@ -156,8 +177,9 @@ namespace Orion.Geometry
         /// </summary>
         public float MaxY
         {
-            get { return Y + Height; }
+            get { return MinY + Height; }
         }
+        #endregion
         #endregion
 
         #region Size
@@ -209,8 +231,8 @@ namespace Orion.Geometry
         /// </returns>
         public bool ContainsPoint(Vector2 point)
         {
-            return point.X >= X && point.X <= MaxX
-                && point.Y >= Y && point.Y <= MaxY;
+            return point.X >= MinX && point.X <= MaxX
+                && point.Y >= MinY && point.Y <= MaxY;
         }
         #endregion
 
@@ -222,10 +244,10 @@ namespace Orion.Geometry
         /// <returns>The closest image of that point within this <see cref="Rectangle"/>.</returns>
         public Vector2 ClosestPointInside(Vector2 point)
         {
-            if (point.X < X) point.X = X;
+            if (point.X < MinX) point.X = MinX;
             else if (point.X > MaxX) point.X = MaxX;
 
-            if (point.Y < Y) point.Y = Y;
+            if (point.Y < MinY) point.Y = MinY;
             else if (point.Y > MaxY) point.Y = MaxY;
 
             return point;
@@ -247,7 +269,7 @@ namespace Orion.Geometry
         /// </returns>
         public Vector2 ParentToLocal(Vector2 point)
         {
-            return new Vector2((point.X - X) / Width, (point.Y - Y) / Height);
+            return new Vector2((point.X - MinX) / Width, (point.Y - MinY) / Height);
         }
 
         /// <summary>
@@ -265,44 +287,7 @@ namespace Orion.Geometry
         /// </returns>
         public Vector2 LocalToParent(Vector2 point)
         {
-            return new Vector2(point.X * Width + X, point.Y * Height + Y);
-        }
-        #endregion
-
-        #region Intersection
-        /// <summary>
-        /// Indicates if this rectangle intersects with another one.
-        /// </summary>
-        /// <param name="otherRect">
-        /// The <see cref="Rectangle"/> we want to test for intersection
-        /// </param>
-        /// <returns>
-        /// true if the rectangle intersects with this one; false otherwise
-        /// </returns>
-        public bool Intersects(Rectangle otherRect)
-        {
-            return OnewayIntersects(otherRect) || otherRect.OnewayIntersects(this);
-        }
-        
-        /// <summary>
-        /// Returns the intersection of two rectangles
-        /// </summary>
-        /// <param name="otherRect">
-        /// The <see cref="Rectangle"/> with which we want this rectangle to intersect
-        /// </param>
-        /// <returns>
-        /// The intersection <see cref="Rectangle"/> of both rectangles,
-        /// or <c>null</c> if they do not intersect.
-        /// </returns>
-        public Rectangle? Intersection(Rectangle otherRect)
-        {
-            if (OnewayIntersects(otherRect))
-                return OnewayIntersection(otherRect);
-            
-            if (otherRect.OnewayIntersects(this))
-                return otherRect.OnewayIntersection(this);
-
-            return null;
+            return new Vector2(point.X * Width + MinX, point.Y * Height + MinY);
         }
         #endregion
         
@@ -335,7 +320,7 @@ namespace Orion.Geometry
         /// </returns>
         public Rectangle Translate(Vector2 direction)
         {
-            return TranslateTo(origin + direction);
+            return TranslateTo(min + direction);
         }
         
         /// <summary>
@@ -486,7 +471,7 @@ namespace Orion.Geometry
         /// </returns>
         public Rectangle ResizeTo(Vector2 newSize)
         {
-            return new Rectangle(origin, newSize);
+            return new Rectangle(min, newSize);
         }
         #endregion
 
@@ -497,31 +482,9 @@ namespace Orion.Geometry
         /// <returns>A string representation of this <see cref="Rectangle"/> with the form {{X,Y}, WxH}.</returns>
         public override string ToString()
         {
-            return string.Format("{{{0}, {1}x{2}}}", origin, size.X, size.Y);
+            return string.Format("{{{0}, {1}x{2}}}", min, size.X, size.Y);
         }
         #endregion
-        #endregion
-
-        #region Private
-        private Rectangle OnewayIntersection(Rectangle otherRect)
-        {
-            float x = X > otherRect.X ? X : otherRect.X;
-            float y = Y > otherRect.Y ? Y : otherRect.Y;
-            float maxX = MaxX < otherRect.MaxX ? MaxX : otherRect.MaxX;
-            float maxY = MaxY < otherRect.MaxY ? MaxY : otherRect.MaxY;
-
-            Vector2 origin = new Vector2(x, y);
-            Vector2 max = new Vector2(maxX, maxY);
-            return new Rectangle(origin, max - origin);
-        }
-
-        private bool OnewayIntersects(Rectangle otherRect)
-        {
-            return ContainsPoint(otherRect.Origin)
-                || ContainsPoint(otherRect.Max)
-                || ContainsPoint(new Vector2(otherRect.X, otherRect.MaxY))
-                || ContainsPoint(new Vector2(otherRect.MaxX, otherRect.Y));
-        }
         #endregion
         #endregion
         #endregion
@@ -535,6 +498,17 @@ namespace Orion.Geometry
         #endregion
 
         #region Methods
+        #region Factory
+        public static Rectangle FromMinMax(float minX, float minY, float maxX, float maxY)
+        {
+            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        }
+
+        public static Rectangle FromMinMax(Vector2 min, Vector2 max)
+        {
+            return new Rectangle(min, max - min);
+        }
+
         /// <summary>
         /// Creates a new <see cref="Rectangle"/> from its center and extent.
         /// </summary>
@@ -556,13 +530,47 @@ namespace Orion.Geometry
         {
             return new Rectangle(point1, point2 - point1);
         }
+        #endregion
 
         public static Vector2 ConvertPoint(Rectangle from, Rectangle to, Vector2 point)
         {
-            point -= from.Origin;
+            point -= from.Min;
             point.Scale(to.Width / from.Width, to.Height / from.Height);
-            return point + to.Origin;
+            return point + to.Min;
         }
+
+        #region Boolean operations
+        /// <summary>
+        /// Computes the rectangle formed by this intersection of two rectangles.
+        /// </summary>
+        /// <param name="a">The first rectangle.</param>
+        /// <param name="b">The second rectangle.</param>
+        /// <param name="result">Outputs the intersection rectangle, negative if they do not intersect.</param>
+        /// <returns>The intersection of the rectangles, or <c>null</c> if they do not intersect.</returns>
+        public static Rectangle? Intersection(Rectangle a, Rectangle b)
+        {
+            Rectangle result = Rectangle.FromMinMax(
+                Math.Max(a.MinX, b.MinX), Math.Max(a.MinY, b.MinY),
+                Math.Min(a.MaxX, b.MaxX), Math.Min(a.MaxX, b.MaxY));
+
+            if (result.Extent.X < 0.0f || result.Extent.Y < 0.0f)
+                return null;
+
+            return result;
+        }
+
+        public static bool Instersects(Rectangle a, Rectangle b)
+        {
+            return Intersection(a, b).HasValue;
+        }
+
+        public static Rectangle Union(Rectangle a, Rectangle b)
+        {
+            return new Rectangle(
+                Math.Min(a.MinX, b.MinX), Math.Min(a.MinY, b.MinY),
+                Math.Max(a.MaxX, b.MaxX), Math.Max(a.MaxY, b.MaxY));
+        }
+        #endregion
         #endregion
         #endregion
     }

@@ -26,7 +26,8 @@ namespace Orion.Graphics
                 terrain.Draw(context);
                 units.DrawMiniature(context);
                 context.StrokeColor = Color.Orange;
-                context.Stroke(context.CoordinateSystem.Intersection(VisibleRect).GetValueOrDefault());
+                Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
+                context.Stroke(intersection.GetValueOrDefault());
             }
         }
         #endregion

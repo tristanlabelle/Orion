@@ -63,9 +63,9 @@ namespace Orion.UserInterface
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             Vector2 coords = args.Position;
-            coords -= Frame.Origin;
+            coords -= Frame.Min;
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
-            coords += Bounds.Origin;
+            coords += Bounds.Min;
 
             return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }

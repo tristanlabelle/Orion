@@ -133,6 +133,12 @@ namespace Orion.UserInterface
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
             worldView.FullBounds = userInputManager.Commander.Faction.World.Bounds
                 .Translate(-boundsHalfsize.X, -boundsHalfsize.Y).Resize(newBounds.Width, newBounds.Height);
+
+            if (worldView.IsMouseOver)
+            {
+                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, worldView.MousePosition.Value);
+                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
+            }
         }
 
         private void MinimapMouseDown(Responder source, MouseEventArgs args)

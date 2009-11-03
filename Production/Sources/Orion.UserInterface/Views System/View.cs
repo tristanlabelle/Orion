@@ -38,7 +38,7 @@ namespace Orion.UserInterface
                 context.CoordinateSystem = value;
                 if (IsMouseOver)
                 {
-                    Vector2 position = CursorPosition.Value;
+                    Vector2 position = MousePosition.Value;
                     PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position.X, position.Y, MouseButton.None, 0, 0));
                 }
                 GenericEventHandler<View, Rectangle> boundsEvent = BoundsChanged;

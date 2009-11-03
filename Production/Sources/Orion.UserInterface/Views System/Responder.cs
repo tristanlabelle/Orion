@@ -26,7 +26,7 @@ namespace Orion.UserInterface
         public virtual Rectangle Frame { get; set; }
         public virtual Rectangle Bounds { get; set; }
 
-        public Vector2? CursorPosition
+        public Vector2? MousePosition
         {
             get
             {
@@ -101,14 +101,14 @@ namespace Orion.UserInterface
                         {
                             child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
                         }
-                        child.CursorPosition = args.Position;
+                        child.MousePosition = args.Position;
                         eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
                 }
                 else if (child.IsMouseOver)
                 {
                     child.DispatchMouseEvent(MouseEventType.MouseExited, args);
-                    child.CursorPosition = null;
+                    child.MousePosition = null;
                 }
             }
 

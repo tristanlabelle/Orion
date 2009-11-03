@@ -8,7 +8,7 @@ namespace Orion.Geometry
     /// Defines a 2d circle as a central point and a radius
     /// </summary>
     [Serializable]
-    public struct Circle
+    public struct Circle : IEquatable<Circle>
     {
         #region Instance
         #region Fields
@@ -142,6 +142,22 @@ namespace Orion.Geometry
         #endregion
 
         #region Object Model
+        public bool Equals(Circle other)
+        {
+            return center == other.center && radius == other.radius;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Circle)) return false;
+            return Equals((Circle)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return center.GetHashCode() ^ radius.GetHashCode();
+        }
+
         public override string ToString()
         {
             return "center: " + center.ToString() + ", radius: " + radius.ToStringInvariant();
@@ -195,6 +211,25 @@ namespace Orion.Geometry
                 - circle1.radius - circle2.radius;
         }
         #endregion
+
+        #region Object Model
+        public static bool Equals(Circle first, Circle second)
+        {
+            return first.Equals(second);
+        }
+        #endregion
+        #endregion
+
+        #region Operators
+        public static bool operator ==(Circle lhs, Circle rhs)
+        {
+            return Equals(lhs, rhs);
+        }
+
+        public static bool operator !=(Circle lhs, Circle rhs)
+        {
+            return !Equals(lhs, rhs);
+        }
         #endregion
         #endregion
     }

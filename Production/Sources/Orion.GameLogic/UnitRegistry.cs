@@ -100,7 +100,7 @@ namespace Orion.GameLogic
         private readonly List<Unit> units = new List<Unit>();
         private readonly Zone[,] zones;
         private readonly Dictionary<Unit, Event> events = new Dictionary<Unit, Event>();
-        private readonly GenericEventHandler<Unit> unitDiedEventHandler;
+        private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly ValueChangedEventHandler<Unit, Vector2> unitMovedEventHandler;
         private int nextUnitID;
         #endregion
@@ -122,7 +122,7 @@ namespace Orion.GameLogic
 
             this.world = world;
             this.zones = new Zone[columnCount, rowCount];
-            this.unitDiedEventHandler = OnUnitDied;
+            this.entityDiedEventHandler = OnEntityDied;
             this.unitMovedEventHandler = OnUnitMoved;
         }
         #endregion
@@ -182,9 +182,10 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Event Handlers
-        private void OnUnitDied(Unit unit)
+        private void OnEntityDied(Entity entity)
         {
-            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureNotNull(entity, "entity");
+            Unit unit = (Unit)entity;
             events[unit] = Event.Died;
         }
 
@@ -216,7 +217,7 @@ namespace Orion.GameLogic
         {
             Unit unit = new Unit(nextUnitID++, type, faction);
             unit.Moved += unitMovedEventHandler;
-            unit.Died += unitDiedEventHandler;
+            unit.Died += entityDiedEventHandler;
 
             events.Add(unit, Event.Created);
 

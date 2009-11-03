@@ -104,9 +104,9 @@ namespace Orion.Graphics
             {
                 if (Intersection.Test(bounds, node.Circle))
                 {
-                    if (node.ResourceType == ResourceType.Alladium)
+                    if (node.Type == ResourceType.Aladdium)
                         graphics.FillColor = Color.LightBlue;
-                    else if (node.ResourceType == ResourceType.Alagene)
+                    else if (node.Type == ResourceType.Alagene)
                         graphics.FillColor = Color.Green;
                     else continue;
 

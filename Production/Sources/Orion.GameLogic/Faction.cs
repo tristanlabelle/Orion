@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Color = System.Drawing.Color;
+using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
@@ -136,9 +138,11 @@ namespace Orion.GameLogic
         private readonly string name;
         private readonly Color color;
         private readonly UnitCollection units;
+        private readonly FogOfWar fogOfWar;
+        private readonly ValueChangedEventHandler<Unit, Vector2> unitMovedEventHandler;
+        private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private int aladdiumAmount;
         private int alageneAmount;
-        private FogOfWar fogOfWar;
         #endregion
 
         #region Constructors
@@ -160,6 +164,8 @@ namespace Orion.GameLogic
             this.color = color;
             this.units = new UnitCollection(this);
             this.fogOfWar = new FogOfWar(world.Width, world.Height, this);
+            this.unitMovedEventHandler = OnUnitMoved;
+            this.entityDiedEventHandler = OnEntityDied;
         }
         #endregion
 
@@ -207,6 +213,11 @@ namespace Orion.GameLogic
             get { return units; }
         }
 
+        public FogOfWar FogOfWar
+        {
+            get { return fogOfWar; }
+        }
+
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.
         /// </summary>
@@ -232,16 +243,6 @@ namespace Orion.GameLogic
                 alageneAmount = value;
             }
         }
-
-        public FogOfWar FogOfWar
-        {
-            get { return fogOfWar; }
-            set 
-            {
-                Argument.EnsureNotNull(value, "FogOfWar");
-                fogOfWar = value;    
-            }
-        }
         #endregion
 
         #region Methods
@@ -259,10 +260,28 @@ namespace Orion.GameLogic
         public Unit CreateUnit(UnitType type)
         {
             Unit unit = world.Units.Create(type, this);
-            fogOfWar.UnitCreated(unit);
-            unit.Moved += new ValueChangedEventHandler<Unit, OpenTK.Math.Vector2>(fogOfWar.UnitMoved);
-            unit.Died += new GenericEventHandler<Unit>(fogOfWar.UnitDied);
+            unit.Moved += unitMovedEventHandler;
+            unit.Died += entityDiedEventHandler;
+            fogOfWar.AddLineOfSight(unit.LineOfSight);
             return unit;
+        }
+
+        private void OnUnitMoved(Unit unit, ValueChangedEventArgs<Vector2> eventArgs)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            float sightRange = unit.GetStat(UnitStat.SightRange);
+            Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
+            Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
+            fogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
+        }
+
+        private void OnEntityDied(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            Unit unit = (Unit)entity;
+            fogOfWar.RemoveLineOfSight(unit.LineOfSight);
+            unit.Died -= entityDiedEventHandler;
         }
 
         public override string ToString()

@@ -44,20 +44,20 @@ namespace Orion.GameLogic.Tasks
             {
                 if (harvestingIsOver(timeDelta))
                 {
-                    if(node.ResourcesLeft != 0)
+                    if(node.AmountRemaining != 0)
                     {
                         //determines the amount of resources to be harvested and substracts that amount to the node
-                        if (node.ResourcesLeft >= amountToHarvest)
+                        if (node.AmountRemaining >= amountToHarvest)
                             amountToHarvest = defaultAmountToHarvest;
                         else
-                            amountToHarvest = node.ResourcesLeft;
+                            amountToHarvest = node.AmountRemaining;
 
                         node.Harvest(amountToHarvest);
 
                         //adds the resources to the unit's faction
-                        if (node.ResourceType == ResourceType.Alladium)
+                        if (node.Type == ResourceType.Aladdium)
                             harvester.Faction.AladdiumAmount += amountToHarvest;
-                        else if (node.ResourceType == ResourceType.Alagene)
+                        else if (node.Type == ResourceType.Alagene)
                             harvester.Faction.AlageneAmount += amountToHarvest;
 
                         //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAlagene: " + harvester.Faction.AlageneAmount);

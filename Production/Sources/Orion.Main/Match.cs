@@ -57,10 +57,8 @@ namespace Orion.Main
                 {
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
                 } while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y));
-                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Alladium : ResourceType.Alagene;
-                ResourceNode node = new ResourceNode(i, resourceType, 500, position, world);
-
-                world.ResourceNodes.Add(node);
+                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
+                ResourceNode node = world.CreateResourceNode(resourceType, 500, position);
             }
             #endregion
         }

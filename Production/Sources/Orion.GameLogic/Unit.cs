@@ -11,10 +11,9 @@ namespace Orion.GameLogic
     /// depending on its <see cref="UnitType"/>.
     /// </summary>
     [Serializable]
-    public sealed class Unit
+    public sealed class Unit : Entity
     {
         #region Fields
-        private readonly int id;
         private readonly UnitType type;
         internal Faction faction;
 
@@ -42,11 +41,11 @@ namespace Orion.GameLogic
         /// </param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
         internal Unit(int id, UnitType type, Faction faction)
+            : base(faction.World, id)
         {
             Argument.EnsureNotNull(type, "type");
             Argument.EnsureNotNull(faction, "faction");
 
-            this.id = id;
             this.type = type;
             this.faction = faction;
         }
@@ -57,6 +56,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Unit"/> moves.
         /// </summary>
+        [Obsolete("Superseded by BoundingRectangleChanged")]
         public event ValueChangedEventHandler<Unit, Vector2> Moved;
 
         private void OnMoved(Vector2 oldPosition, Vector2 newPosition)
@@ -76,30 +76,10 @@ namespace Orion.GameLogic
             if (DamageChanged != null) DamageChanged(this);
         }
         #endregion
-
-        #region Died
-        /// <summary>
-        /// Raised when this <see cref="Unit"/> has died.
-        /// </summary>
-        public event GenericEventHandler<Unit> Died;
-
-        private void OnDied()
-        {
-            if (Died != null) Died(this);
-        }
-        #endregion
         #endregion
 
         #region Properties
         #region Identification
-        /// <summary>
-        /// Gets the unique identifier of this <see cref="Unit"/>.
-        /// </summary>
-        public int ID
-        {
-            get { return id; }
-        }
-
         /// <summary>
         /// Gets the <see cref="UnitType"/> of this <see cref="Unit"/>.
         /// </summary>
@@ -163,14 +143,22 @@ namespace Orion.GameLogic
                 }
 
                 Vector2 oldValue = position;
+                Rectangle oldBoundingRectangle = BoundingRectangle;
                 position = value;
                 OnMoved(oldValue, position);
+                OnBoundingRectangleChanged(oldBoundingRectangle, BoundingRectangle);
             }
+        }
+
+        public override Rectangle BoundingRectangle
+        {
+            get { return Rectangle.FromCenterSize(position.X, position.Y, type.WidthInTiles, type.HeightInTiles); }
         }
 
         /// <summary>
         /// Gets the bounding <see cref="Circle"/> of this <see cref="Unit"/>.
         /// </summary>
+        [Obsolete("Units are not circles anymore, use BoundingRectangle.")]
         public Circle Circle
         {
             get { return new Circle(position, 0.5f); }
@@ -334,11 +322,6 @@ namespace Orion.GameLogic
                 task.Update(timeDeltaInSeconds);
                 if (task.HasEnded) Task = null;
             }
-        }
-
-        public override int GetHashCode()
-        {
-            return id;
         }
 
         public override string ToString()

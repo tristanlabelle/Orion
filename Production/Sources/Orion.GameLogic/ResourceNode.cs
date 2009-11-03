@@ -1,66 +1,52 @@
 ﻿
 using OpenTK.Math;
 using Orion.Geometry;
+using System;
 
 namespace Orion.GameLogic
 {
-    public enum ResourceType
-    {
-        Alladium = 1,
-        Alagene = 2
-    }
-
-    public class ResourceNode
+    /// <summary>
+    /// Represents a location from which resources can be harvested.
+    /// </summary>
+    [Serializable]
+    public sealed class ResourceNode : Entity
     {
         #region Fields
-
-        private readonly int id;
-        private readonly ResourceType resourceType;
-        private readonly int totalResources;
-        private int resourcesLeft;
+        private readonly ResourceType type;
+        private readonly int totalAmount;
         private readonly Vector2 position;
-        private World world;
-        private bool isHarvestable = true;
-
+        private int amountRemaining;
         #endregion
 
         #region Constructors
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="resourceType">Can only take the values "Allagene" or "Alladium" or the node will not be displayed</param>
-        /// <param name="amountOfResources"></param>
-        /// <param name="position"></param>
-        public ResourceNode(int id, ResourceType resourceType, int amountOfResources, Vector2 position, World world)
+        internal ResourceNode(World world, int id, ResourceType type, int amount, Vector2 position)
+            : base(world, id)
         {
-            this.id = id;
-            this.resourceType = resourceType;
-            this.totalResources = amountOfResources;
-            this.resourcesLeft = amountOfResources;
+            Argument.EnsureDefined(type, "type");
+            Argument.EnsureStrictlyPositive(amount, "amount");
+
+            this.type = type;
+            this.totalAmount = amount;
+            this.amountRemaining = amount;
             this.position = position;
-            this.world = world;
-            if (resourceType == ResourceType.Alagene)
-                isHarvestable = false;
         }
         #endregion
 
         #region Properties
-        public ResourceType ResourceType
+        public ResourceType Type
         {
-            get { return resourceType; }
+            get { return type; }
         }
 
-        public int TotalResources
+        public int TotalAmount
         {
-            get { return totalResources; }
+            get { return totalAmount; }
         }
 
-        public int ResourcesLeft
+        public int AmountRemaining
         {
-            get { return resourcesLeft; }
-            set { resourcesLeft = value; }
+            get { return amountRemaining; }
+            set { amountRemaining = value; }
         }
 
         public Vector2 Position
@@ -68,6 +54,12 @@ namespace Orion.GameLogic
             get { return position; }
         }
 
+        public override Rectangle BoundingRectangle
+        {
+            get { return Rectangle.FromCenterSize(position.X, position.Y, 1, 1); }
+        }
+
+        [Obsolete("Resources are not circles anymore, use BoundingRectangle.")]
         public Circle Circle
         {
             get { return new Circle(position, 2); }
@@ -75,27 +67,27 @@ namespace Orion.GameLogic
 
         public bool IsHarvestable
         {
-            get { return isHarvestable; }
-            set { this.isHarvestable = value; }
+            get { return type == ResourceType.Alagene; }
         }
-        public int ID
-        {
-            get { return id; }
-        }
-
         #endregion
 
         #region Methods
-
         public void Harvest(int amount)
         {
-            resourcesLeft -= amount;
-            if (resourcesLeft == 0)
+            if (amount > amountRemaining)
             {
-                world.ResourceNodes.Remove(this);
+                throw new ArgumentException(
+                    "Cannot harvest {0} points when only {1} remain."
+                    .FormatInvariant(amount, amountRemaining), "amount");
+            }
+
+            amountRemaining -= amount;
+            if (amountRemaining <= 0)
+            {
+                amountRemaining = 0;
+                OnDied();
             }
         }
-
         #endregion
     }
 }

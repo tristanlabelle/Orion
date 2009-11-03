@@ -4,6 +4,7 @@ using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
+    [Serializable]
     public sealed class FogOfWar
     {
         #region Fields
@@ -40,46 +41,39 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
-
-        public void UnitMoved(Unit unit, ValueChangedEventArgs<OpenTK.Math.Vector2> eventArgs)
+        public void UpdateLineOfSight(Circle oldLineOfSight, Circle newLineOfSight)
         {
-            Vector2 newRoundedPosition = new Vector2(
-                (float)Math.Floor(unit.Position.X),
-                (float)Math.Floor(unit.Position.Y));
+            Circle roundedOldLineOfSight = RoundLineOfSight(oldLineOfSight);
+            Circle roundedNewLineOfSight = RoundLineOfSight(newLineOfSight);
 
-            Vector2 oldRoundedPosition = new Vector2(
-                (float)Math.Floor(eventArgs.OldValue.X),
-                (float)Math.Floor(eventArgs.OldValue.Y));
-
-            if (newRoundedPosition == oldRoundedPosition)
+            if (roundedNewLineOfSight == roundedOldLineOfSight)
                 return;
 
-            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
-            Circle oldCircle = new Circle(oldRoundedPosition, unit.GetStat(UnitStat.SightRange));
-
-            ModifyUnitSight(newCircle, true);
-            ModifyUnitSight(oldCircle, false);
+            ModifyLineOfSight(roundedOldLineOfSight, false);
+            ModifyLineOfSight(roundedNewLineOfSight, true);
         }
 
-        public void UnitCreated(Unit unit)
+        public void AddLineOfSight(Circle lineOfSight)
         {
-            Vector2 newRoundedPosition = new Vector2(
-                (float)Math.Floor(unit.Position.X),
-                (float)Math.Floor(unit.Position.Y));
-            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
-            ModifyUnitSight(newCircle, true);
+            Circle roundedCircle = RoundLineOfSight(lineOfSight);
+            ModifyLineOfSight(roundedCircle, true);
         }
 
-        public void UnitDied(Unit unit)
+        public void RemoveLineOfSight(Circle lineOfSight)
         {
-            Vector2 newRoundedPosition = new Vector2(
-                (float)Math.Floor(unit.Position.X),
-                (float)Math.Floor(unit.Position.Y));
-            Circle newCircle = new Circle(newRoundedPosition, unit.GetStat(UnitStat.SightRange));
-            ModifyUnitSight(newCircle, false);
+            Circle roundedCircle = RoundLineOfSight(lineOfSight);
+            ModifyLineOfSight(roundedCircle, false);
         }
 
-        private void ModifyUnitSight(Circle sight, bool addOrRemove)
+        private Circle RoundLineOfSight(Circle lineOfSight)
+        {
+            return new Circle(
+                (float)Math.Floor(lineOfSight.Center.X),
+                (float)Math.Floor(lineOfSight.Center.Y),
+                lineOfSight.Radius);
+        }
+
+        private void ModifyLineOfSight(Circle sight, bool addOrRemove)
         {
             //addOrRemove : true = add  false = remove
             Rectangle tilesRectangle = CreateTilesRectangle(sight.BoundingRectangle);

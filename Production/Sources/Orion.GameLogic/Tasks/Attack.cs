@@ -56,16 +56,14 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        /// <summary>
-        /// At each update it check if the striker is near enough to strike if not he reupdate the follow.update method.
-        /// </summary>
-        /// <param name="timeDelta"></param>
         public override void Update(float timeDelta)
         {
             if (HasEnded)
                 return;
 
-            if (Circle.SignedDistance(attacker.Circle, target.Circle) <= attacker.GetStat(UnitStat.AttackRange))
+            float squaredDistanceToTarget = (target.Position - attacker.Position).LengthSquared;
+            float attackRange = attacker.GetStat(UnitStat.AttackRange);
+            if (squaredDistanceToTarget <= attackRange * attackRange)
             {
                 if (TryInflictDamage(timeDelta))
                     target.Damage += attacker.GetStat(UnitStat.AttackPower);

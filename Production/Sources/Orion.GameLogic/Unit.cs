@@ -91,14 +91,6 @@ namespace Orion.GameLogic
 
         #region Affiliation
         /// <summary>
-        /// Gets the <see cref="World"/> containing this <see cref="Unit"/>.
-        /// </summary>
-        public World World
-        {
-            get { return faction.World; }
-        }
-
-        /// <summary>
         /// Accesses the <see cref="Faction"/> which this <see cref="Unit"/> is a member of.
         /// </summary>
         public Faction Faction
@@ -299,7 +291,8 @@ namespace Orion.GameLogic
         /// </returns>
         public bool CanSee(Unit unit)
         {
-            return Circle.SignedDistance(Circle, unit.Circle) <= GetStat(UnitStat.SightRange);
+            Argument.EnsureNotNull(unit, "unit");
+            return LineOfSight.ContainsPoint(unit.position);
         }
 
         /// <summary>

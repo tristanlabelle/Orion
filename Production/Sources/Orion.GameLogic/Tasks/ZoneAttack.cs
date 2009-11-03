@@ -13,7 +13,7 @@ namespace Orion.GameLogic.Tasks
     public sealed class ZoneAttack : Task
     {
         #region Fields
-        private readonly Unit striker;
+        private readonly Unit attacker;
         private readonly Vector2 destination;
         private readonly float targetDistance;
         private Unit target = null;
@@ -33,7 +33,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(striker, "striker");
             Argument.EnsureNotNull(destination, "destination");
             
-            this.striker = striker;
+            this.attacker = striker;
             this.destination = destination;
             this.targetDistance = striker.GetStat(UnitStat.AttackRange);
             this.move = new Move(striker, destination);
@@ -44,16 +44,7 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get
-            {
-                if (move.HasEnded)
-                    if (attack == null)
-                        return true;
-                    else
-                        if (attack.HasEnded)
-                            return true;
-                return false;
-            }
+            get { return move.HasEnded && (attack == null || attack.HasEnded); }
         }
 
         public override string Description
@@ -67,7 +58,7 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public float CurrentDistance
         {
-            get { return Circle.SignedDistance(striker.Circle, target.Circle); }
+            get { return (target.Position - attacker.Position).Length; }
         }
 
         /// <summary>
@@ -130,12 +121,12 @@ namespace Orion.GameLogic.Tasks
 
         public bool TryAttack()
         {
-            Unit target = striker.World.Units
-                .InArea(striker.LineOfSight)
-                .Where(unit => unit.Faction != striker.Faction)
+            Unit target = attacker.World.Units
+                .InArea(attacker.LineOfSight)
+                .Where(unit => unit.Faction != attacker.Faction)
                 .FirstOrDefault();
 
-            if (target != null) attack = new Attack(striker, target);
+            if (target != null) attack = new Attack(attacker, target);
             return target != null;
         }
         #endregion

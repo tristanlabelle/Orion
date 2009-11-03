@@ -12,7 +12,7 @@ namespace Orion.GameLogic.Tasks
     public sealed class Follow : Task
     {
         #region Fields
-        private readonly Unit unit;
+        private readonly Unit follower;
         private readonly Unit target;
         private readonly float targetDistance;
         #endregion
@@ -27,16 +27,16 @@ namespace Orion.GameLogic.Tasks
         /// <param name="targetDistance">
         /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
         /// </param>
-        public Follow(Unit unit, Unit target, float targetDistance)
+        public Follow(Unit follower, Unit target, float targetDistance)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            if (!unit.HasSkill<Skills.Move>())
-                throw new ArgumentException("Cannot follow without the move skill.", "unit");
+            Argument.EnsureNotNull(follower, "follower");
+            if (!follower.HasSkill<Skills.Move>())
+                throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
-            if (unit == target) throw new ArgumentException("Expected the follower and followee to be different.");
+            if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
             Argument.EnsurePositive(targetDistance, "targetDistance");
 
-            this.unit = unit;
+            this.follower = follower;
             this.target = target;
             this.targetDistance = targetDistance;
         }
@@ -48,7 +48,7 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public Unit Follower
         {
-            get { return unit; }
+            get { return follower; }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public float CurrentDistance
         {
-            get { return Circle.SignedDistance(unit.Circle, target.Circle); }
+            get { return (target.Position - follower.Position).Length; }
         }
 
         /// <summary>
@@ -105,13 +105,13 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
-            Vector2 delta = target.Position - unit.Position;
+            Vector2 delta = target.Position - follower.Position;
             float distanceRemaining = CurrentDistance - targetDistance;
             if (distanceRemaining <= 0) return;
 
             Vector2 direction = Vector2.Normalize(delta);
 
-            float movementDistance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
+            float movementDistance = follower.GetStat(UnitStat.MovementSpeed) * timeDelta;
             if (movementDistance > distanceRemaining)
             {
                 // Move just a little more than needed,
@@ -119,7 +119,7 @@ namespace Orion.GameLogic.Tasks
                 movementDistance = distanceRemaining + 0.01f;
             }
 
-            unit.Position += direction * movementDistance;
+            follower.Position += direction * movementDistance;
         }
         #endregion
     }

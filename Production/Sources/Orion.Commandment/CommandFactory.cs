@@ -28,7 +28,12 @@ namespace Orion.Commandment
                 Move.Serializer.Instance,
                 Attack.Serializer.Instance,
                 Cancel.Serializer.Instance,
-                ZoneAttack.Serializer.Instance
+                ZoneAttack.Serializer.Instance,
+                Build.Serializer.Instance,
+                Train.Serializer.Instance,
+                Harvest.Serializer.Instance,
+                Repair.Serializer.Instance
+
             };
 
             if (serializers.Select(serializer => serializer.ID).Distinct().Count() != serializers.Count)

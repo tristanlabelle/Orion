@@ -175,6 +175,9 @@ namespace Orion.Commandment
                     LaunchTrain(commander.Faction.World.UnitTypes.First(unit => !unit.IsBuilding));
                     break;
 
+                case MouseDrivenCommand.Suicide:
+                    LaunchSuicide();
+                    break;
             }
 
             mouseCommand = null;
@@ -276,6 +279,13 @@ namespace Orion.Commandment
                     return train.Supports(unitType);
                 });
             commander.LaunchTrain(trainers, unitType);
+        }
+
+        private void LaunchSuicide()
+        {
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction);
+            commander.LaunchSuicide(targetUnits);
         }
         #endregion
         #endregion

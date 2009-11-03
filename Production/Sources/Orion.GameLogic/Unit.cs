@@ -321,6 +321,11 @@ namespace Orion.GameLogic
         {
             return "{0} {1}".FormatInvariant(type, faction);
         }
+
+        public void Suicide()
+        {
+            this.Health = 0;
+        }
         #endregion
     }
 }

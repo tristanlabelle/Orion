@@ -119,7 +119,7 @@ namespace Orion.GameLogic.Tasks
                 movementDistance = distanceRemaining + 0.01f;
             }
 
-            follower.Position += direction * movementDistance;
+            follower.Position = follower.World.Bounds.ClosestPointInside(follower.Position + direction * movementDistance);
         }
         #endregion
     }

@@ -351,7 +351,7 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Unit"/>s in that area.</returns>
         public IEnumerable<Unit> InArea(Rectangle area)
         {
-            if (!Rectangle.Instersects(world.Bounds, area))
+            if (!Rectangle.Intersects(world.Bounds, area))
                 yield break;
 
             Point minZoneCoords = GetClampedZoneCoords(area.Min);

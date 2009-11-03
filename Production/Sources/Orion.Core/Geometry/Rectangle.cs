@@ -566,17 +566,16 @@ namespace Orion.Geometry
         /// <returns>The intersection of the rectangles, or <c>null</c> if they do not intersect.</returns>
         public static Rectangle? Intersection(Rectangle a, Rectangle b)
         {
-            Rectangle result = Rectangle.FromMinMax(
-                Math.Max(a.MinX, b.MinX), Math.Max(a.MinY, b.MinY),
-                Math.Min(a.MaxX, b.MaxX), Math.Min(a.MaxX, b.MaxY));
+            float minX = Math.Max(a.MinX, b.MinX);
+            float minY = Math.Max(a.MinY, b.MinY);
+            float maxX = Math.Min(a.MaxX, b.MaxX);
+            float maxY = Math.Min(a.MaxY, b.MaxY);
 
-            if (result.Extent.X < 0.0f || result.Extent.Y < 0.0f)
-                return null;
-
-            return result;
+            if (minX > maxX || minY > maxY) return null;
+            return Rectangle.FromMinMax(minX, minY, maxX, maxY);
         }
 
-        public static bool Instersects(Rectangle a, Rectangle b)
+        public static bool Intersects(Rectangle a, Rectangle b)
         {
             return Intersection(a, b).HasValue;
         }

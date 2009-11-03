@@ -81,7 +81,6 @@ namespace Orion.UserInterface
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
-            minimapFrame.MouseUp += MinimapMouseUp;
         }
 
         #endregion
@@ -125,6 +124,7 @@ namespace Orion.UserInterface
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
             userInputManager.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            mouseDownOnMinimap = false;
             return base.OnMouseUp(args);
         }
 
@@ -161,11 +161,6 @@ namespace Orion.UserInterface
         private void MinimapMouseMove(Responder source, MouseEventArgs args)
         {
             if (mouseDownOnMinimap) MoveWorldView(args.Position);
-        }
-
-        private void MinimapMouseUp(Responder source, MouseEventArgs args)
-        {
-            mouseDownOnMinimap = false;
         }
 
         private void SelectionCleared(SelectionManager selectionManager)

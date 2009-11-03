@@ -39,7 +39,7 @@ namespace Orion.UserInterface
         /// </summary>
         public override void Refresh()
         {
-            if (!glControl.IsDisposed && !IsDisposed)
+            if (Form.ActiveForm == this && !glControl.IsDisposed && !IsDisposed)
                 CheckMouseEvents();
 
             glControl.Refresh();

@@ -29,7 +29,7 @@ namespace Orion.Graphics
 
         public FilledFrameRenderer()
         {
-            FillColor = Color.DarkBlue;
+            FillColor = Color.DarkGray;
         }
 
         public FilledFrameRenderer(Color fillColor)

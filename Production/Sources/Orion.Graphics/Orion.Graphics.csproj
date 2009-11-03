@@ -64,6 +64,7 @@
     <Compile Include="Drawing\LinePath.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\UnitButtonRenderer.cs" />
+    <Compile Include="Renderers\UnitFrameRenderer.cs" />
     <Compile Include="Renderers\UnitRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="Drawing\GraphicsContext.cs" />

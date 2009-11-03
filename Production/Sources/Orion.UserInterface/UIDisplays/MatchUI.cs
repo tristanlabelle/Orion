@@ -179,30 +179,27 @@ namespace Orion.UserInterface
             if (selectionCount == 1) CreateSingleUnitSelectionPanel();
             else CreateMultipleUnitsSelectionPanel();
         }
+        #endregion
+
+        #region Methods
 
         private void CreateSingleUnitSelectionPanel()
         {
             UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
+            selectionFrame.Renderer = new UnitFrameRenderer(unit);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
 
-            Label unitName = new Label(new Rectangle(150, 175, 200, 25), unit.Type.Name);
-            unitName.Color = Color.White;
-
-            Label health = new Label(new Rectangle(150, 150, 130, 25), "HP: {0}/{1}".FormatInvariant(unit.Health, unit.MaxHealth));
-            health.Color = Color.White;
-
             unitButton.Pressed += ButtonPress;
             selectionFrame.Children.Add(unitButton);
-            selectionFrame.Children.Add(health);
-            selectionFrame.Children.Add(unitName);
         }
 
         private void CreateMultipleUnitsSelectionPanel()
         {
+            selectionFrame.Renderer = new FilledFrameRenderer(Color.DarkGray, Color.Gray);
             const float padding = 10;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
             float currentX = padding + selectionFrame.Bounds.MinX;

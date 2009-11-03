@@ -102,7 +102,7 @@ namespace Orion.Graphics
             Rectangle bounds = graphics.CoordinateSystem;
             foreach (ResourceNode node in world.ResourceNodes)
             {
-                if (Intersection.Test(bounds, node.Circle))
+                if (Rectangle.Instersects(bounds, node.BoundingRectangle))
                 {
                     if (node.Type == ResourceType.Aladdium)
                         graphics.FillColor = Color.LightBlue;
@@ -110,7 +110,7 @@ namespace Orion.Graphics
                         graphics.FillColor = Color.Green;
                     else continue;
 
-                    graphics.Fill(node.Circle);
+                    graphics.Fill(node.BoundingRectangle);
                 }
             }
         }

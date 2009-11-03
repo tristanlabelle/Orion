@@ -73,9 +73,9 @@ namespace Orion.Graphics
 
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                Circle circle = unit.Circle;
+                Rectangle bounds = unit.BoundingRectangle;
 
-                Vector2 healthBarCenter = circle.Center + Vector2.UnitY * (circle.Radius + 0.5f);
+                Vector2 healthBarCenter = bounds.Center + Vector2.UnitY * (bounds.Extent.Y + 0.5f);
                 Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
                 Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
 

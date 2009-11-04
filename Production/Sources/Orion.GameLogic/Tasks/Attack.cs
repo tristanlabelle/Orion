@@ -44,6 +44,16 @@ namespace Orion.GameLogic.Tasks
             get { return target; }
         }
 
+        public bool IsTargetInRange
+        {
+            get
+            {
+                float squaredDistanceToTarget = (target.Position - attacker.Position).LengthSquared;
+                float attackRange = attacker.GetStat(UnitStat.AttackRange);
+                return squaredDistanceToTarget <= attackRange * attackRange;
+            }
+        }
+
         public override string Description
         {
             get { return "attacking"; }
@@ -51,45 +61,33 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return !target.IsAlive; }
+            get
+            {
+                if (!attacker.HasSkill<Skills.Move>() && !IsTargetInRange)
+                    return true;
+
+                return !target.IsAlive;
+            }
         }
         #endregion
 
         #region Methods
         public override void Update(float timeDelta)
         {
-            if (HasEnded)
-                return;
+            if (HasEnded) return;
 
-            float squaredDistanceToTarget = (target.Position - attacker.Position).LengthSquared;
-            float attackRange = attacker.GetStat(UnitStat.AttackRange);
-            if (squaredDistanceToTarget <= attackRange * attackRange)
+            if (IsTargetInRange)
             {
-                if (TryInflictDamage(timeDelta))
+                timeSinceLastHitInSeconds += timeDelta;
+                if (timeSinceLastHitInSeconds > hitDelayInSeconds)
+                {
                     target.Damage += attacker.GetStat(UnitStat.AttackPower);
+                    timeSinceLastHitInSeconds = 0;
+                }
             }
             else if (follow != null)
             {
                 follow.Update(timeDelta);
-            }
-        }
-        
-        /// <summary>
-        /// Calculates the number of time elapsed in seconds and 
-        /// inflicts damage to the enemy; dependant of the constant 
-        /// named "secondsToHitEnemy". 
-        /// </summary>
-        private bool TryInflictDamage(float timeDelta)
-        {
-            if (timeSinceLastHitInSeconds >= hitDelayInSeconds)
-            {
-                timeSinceLastHitInSeconds = 0;
-                return true;
-            }
-            else
-            {
-                timeSinceLastHitInSeconds += timeDelta;
-                return false;
             }
         }
         #endregion

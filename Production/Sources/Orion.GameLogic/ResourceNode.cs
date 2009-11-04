@@ -59,12 +59,6 @@ namespace Orion.GameLogic
             get { return Rectangle.FromCenterSize(position.X, position.Y, 1, 1); }
         }
 
-        [Obsolete("Resources are not circles anymore, use BoundingRectangle.")]
-        public Circle Circle
-        {
-            get { return new Circle(position, 2); }
-        }
-
         public bool IsHarvestable
         {
             get { return type == ResourceType.Alagene; }

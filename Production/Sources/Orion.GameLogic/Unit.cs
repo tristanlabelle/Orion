@@ -52,19 +52,6 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
-        #region Moved
-        /// <summary>
-        /// Raised when this <see cref="Unit"/> moves.
-        /// </summary>
-        [Obsolete("Superseded by BoundingRectangleChanged")]
-        public event ValueChangedEventHandler<Unit, Vector2> Moved;
-
-        private void OnMoved(Vector2 oldPosition, Vector2 newPosition)
-        {
-            if (Moved != null) Moved(this, new ValueChangedEventArgs<Vector2>(oldPosition, newPosition));
-        }
-        #endregion
-
         #region DamageChanged
         /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
@@ -96,24 +83,6 @@ namespace Orion.GameLogic
         public Faction Faction
         {
             get { return faction; }
-            set
-            {
-                if (value == faction) return;
-
-                if (faction != null)
-                {
-                    faction.Units.Remove(this);
-                    Debug.Assert(faction == null,
-                        "Removing a unit from a faction should have set its faction to null.");
-                }
-
-                if (value != null)
-                {
-                    value.Units.Add(this);
-                    Debug.Assert(faction == value,
-                        "Adding a unit to a faction should have set its faction that faction.");
-                }
-            }
         }
         #endregion
 
@@ -134,10 +103,8 @@ namespace Orion.GameLogic
                         "Position");
                 }
 
-                Vector2 oldValue = position;
                 Rectangle oldBoundingRectangle = BoundingRectangle;
                 position = value;
-                OnMoved(oldValue, position);
                 OnBoundingRectangleChanged(oldBoundingRectangle, BoundingRectangle);
             }
         }
@@ -145,15 +112,6 @@ namespace Orion.GameLogic
         public override Rectangle BoundingRectangle
         {
             get { return Rectangle.FromCenterSize(position.X, position.Y, type.WidthInTiles, type.HeightInTiles); }
-        }
-
-        /// <summary>
-        /// Gets the bounding <see cref="Circle"/> of this <see cref="Unit"/>.
-        /// </summary>
-        [Obsolete("Units are not circles anymore, use BoundingRectangle.")]
-        public Circle Circle
-        {
-            get { return new Circle(position, 0.5f); }
         }
 
         /// <summary>

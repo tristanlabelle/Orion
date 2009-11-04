@@ -130,10 +130,16 @@ namespace Orion.Commandment
         private void BuildMainCommandCenter()
         {
             Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.IsBuilding && unit.IsIdle);
-            Vector2 position = new Vector2((startingNode.Position.X + startingNode.Circle.Diameter), (startingNode.Position.Y + startingNode.Circle.Diameter));
-            
+            Vector2 position = new Vector2(
+                (startingNode.Position.X + startingNode.BoundingRectangle.Width),
+                (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
+
             if (!World.Bounds.ContainsPoint(position))
-                position = new Vector2((startingNode.Position.X - startingNode.Circle.Diameter), (startingNode.Position.Y - startingNode.Circle.Diameter));
+            {
+                position = new Vector2(
+                    (startingNode.Position.X - startingNode.BoundingRectangle.Width),
+                    (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
+            }
 
             if (builder != null)
             {
@@ -148,10 +154,16 @@ namespace Orion.Commandment
             startingNode = World.ResourceNodes.First();
             regions.Add(new Circle(startingNode.Position, 10));
 
-            Vector2 position = new Vector2((startingNode.Position.X + startingNode.Circle.Diameter), (startingNode.Position.Y + startingNode.Circle.Diameter));
-            
-            if(!World.Bounds.ContainsPoint(position))
-                position = new Vector2((startingNode.Position.X - startingNode.Circle.Diameter), (startingNode.Position.Y - startingNode.Circle.Diameter));
+            Vector2 position = new Vector2(
+                (startingNode.Position.X + startingNode.BoundingRectangle.Width),
+                (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
+
+            if (!World.Bounds.ContainsPoint(position))
+            {
+                position = new Vector2(
+                    (startingNode.Position.X - startingNode.BoundingRectangle.Width),
+                    (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
+            }
 
             List<Unit> unitsToMeet = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding).ToList();
 

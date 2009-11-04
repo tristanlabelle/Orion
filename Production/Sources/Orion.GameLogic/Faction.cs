@@ -139,7 +139,7 @@ namespace Orion.GameLogic
         private readonly Color color;
         private readonly UnitCollection units;
         private readonly FogOfWar fogOfWar;
-        private readonly ValueChangedEventHandler<Unit, Vector2> unitMovedEventHandler;
+        private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private int aladdiumAmount;
         private int alageneAmount;
@@ -164,7 +164,7 @@ namespace Orion.GameLogic
             this.color = color;
             this.units = new UnitCollection(this);
             this.fogOfWar = new FogOfWar(world.Width, world.Height, this);
-            this.unitMovedEventHandler = OnUnitMoved;
+            this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
             this.entityDiedEventHandler = OnEntityDied;
         }
         #endregion
@@ -246,6 +246,13 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
+        /// for a unit of this <see cref="Faction"/> by its <see cref="UnitType"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="UnitType"/> of the unit for which the stat is to be retrieved.</param>
+        /// <param name="stat">The <see cref="UnitStat"/> to be retrieved.</param>
+        /// <returns>The value of that stat for the specified <see cref="UnitType"/>.</returns>
         public int GetStat(UnitType type, UnitStat stat)
         {
             Argument.EnsureNotNull(type, "type");
@@ -260,24 +267,26 @@ namespace Orion.GameLogic
         public Unit CreateUnit(UnitType type)
         {
             Unit unit = world.Units.Create(type, this);
-            unit.Moved += unitMovedEventHandler;
+            unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
             return unit;
         }
 
-        private void OnUnitMoved(Unit unit, ValueChangedEventArgs<Vector2> eventArgs)
+        private void OnEntityBoundingRectangleChanged(Entity entity, ValueChangedEventArgs<Rectangle> eventArgs)
         {
-            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
+
+            Unit unit = (Unit)entity;
             float sightRange = unit.GetStat(UnitStat.SightRange);
-            Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
-            Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
+            Circle oldLineOfSight = new Circle(eventArgs.OldValue.Center, sightRange);
+            Circle newLineOfSight = new Circle(eventArgs.NewValue.Center, sightRange);
             fogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
         private void OnEntityDied(Entity entity)
         {
-            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
             Unit unit = (Unit)entity;
             fogOfWar.RemoveLineOfSight(unit.LineOfSight);

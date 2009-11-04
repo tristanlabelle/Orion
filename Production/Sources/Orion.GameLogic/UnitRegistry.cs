@@ -101,7 +101,7 @@ namespace Orion.GameLogic
         private readonly Zone[,] zones;
         private readonly Dictionary<Unit, Event> events = new Dictionary<Unit, Event>();
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
-        private readonly ValueChangedEventHandler<Unit, Vector2> unitMovedEventHandler;
+        private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
         private int nextUnitID;
         #endregion
 
@@ -117,13 +117,14 @@ namespace Orion.GameLogic
         /// <param name="rowCount">The number of spatial subdivisions along the y axis.</param>
         internal UnitRegistry(World world, int columnCount, int rowCount)
         {
+            Argument.EnsureNotNull(world, "world");
             Argument.EnsureStrictlyPositive(columnCount, "columnCount");
             Argument.EnsureStrictlyPositive(rowCount, "rowCount");
 
             this.world = world;
             this.zones = new Zone[columnCount, rowCount];
             this.entityDiedEventHandler = OnEntityDied;
-            this.unitMovedEventHandler = OnUnitMoved;
+            this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
         }
         #endregion
 
@@ -184,14 +185,16 @@ namespace Orion.GameLogic
         #region Event Handlers
         private void OnEntityDied(Entity entity)
         {
-            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
             Unit unit = (Unit)entity;
             events[unit] = Event.Died;
         }
 
-        private void OnUnitMoved(Unit unit, ValueChangedEventArgs<Vector2> eventArgs)
+        private void OnEntityBoundingRectangleChanged(Entity entity, ValueChangedEventArgs<Rectangle> eventArgs)
         {
-            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
+
+            Unit unit = (Unit)entity;
 
             Event @event = Event.Moved;
             if (events.TryGetValue(unit, out @event))
@@ -216,7 +219,7 @@ namespace Orion.GameLogic
         internal Unit Create(UnitType type, Faction faction)
         {
             Unit unit = new Unit(nextUnitID++, type, faction);
-            unit.Moved += unitMovedEventHandler;
+            unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
             unit.Died += entityDiedEventHandler;
 
             events.Add(unit, Event.Created);

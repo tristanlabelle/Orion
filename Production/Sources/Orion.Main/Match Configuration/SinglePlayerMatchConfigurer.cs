@@ -9,7 +9,7 @@ namespace Orion.Main
     {
         public SinglePlayerMatchConfigurer()
         {
-            seed = (int)Environment.TickCount;
+            seed =(int)Environment.TickCount;
         }
 
         public override Match Start()

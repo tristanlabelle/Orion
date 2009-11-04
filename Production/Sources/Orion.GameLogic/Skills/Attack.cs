@@ -50,6 +50,7 @@ namespace Orion.GameLogic.Skills
         public override int? TryGetBaseStat(UnitStat stat)
         {
             if (stat == UnitStat.AttackPower) return power;
+            if (stat == UnitStat.AttackRange) return maxRange;
             return null;
         }
         #endregion

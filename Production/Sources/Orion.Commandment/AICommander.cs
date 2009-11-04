@@ -74,13 +74,13 @@ namespace Orion.Commandment
         private void TrainUnits()
         {
             // Select all building idle that can train warrior, TODO: Need to select a same type of building and check what type of unit they can train.
-            List<Unit> allBuildingIdleThatCanBuild = World.Units.Where(unit => unit.Faction == Faction && unit.Type.IsBuilding && unit.IsIdle).ToList();
+            List<Unit> allBuildingIdleThatCanBuild = World.Units.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Train>() && unit.IsIdle).ToList();
 
             //If there is building fitting to the condition
             if (allBuildingIdleThatCanBuild != null)
             {
                 Command command = new Train(allBuildingIdleThatCanBuild,
-                    World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Move>()), Faction);
+                    World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Attack>()), Faction);
                 GenerateCommand(command);
             }
         }

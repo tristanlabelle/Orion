@@ -57,7 +57,7 @@ namespace Orion.GameLogic
             builder.SightRange = 6;
             builder.MaxHealth = 30;
             builder.Skills.Add(new Skills.Move(10));
-            builder.Skills.Add(new Skills.Attack(4, 0));
+            builder.Skills.Add(new Skills.Attack(4, 1)); // to avoid unit to alwals do fallow and never attack
             builder.Skills.Add(new Skills.Harvest(10));
             Register(builder, "MeleeAttacker");
         }
@@ -91,7 +91,7 @@ namespace Orion.GameLogic
             builder.SightRange = 10;
             builder.MaxHealth = 30;
             builder.Skills.Add(new Skills.Attack(4, 7));
-            builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
+            //builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
             Register(builder, "Tower");
         }
         #endregion

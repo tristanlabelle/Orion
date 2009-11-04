@@ -9,12 +9,13 @@ using Orion.GameLogic;
 using Skills = Orion.GameLogic.Skills;
 
 using OpenTK.Math;
+using Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
     public enum MouseDrivenCommand
     {
-        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Suicide
+        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Suicide, Cancel
     }
 
     public class UserInputManager
@@ -48,6 +49,7 @@ namespace Orion.Commandment
             keysMap[Keys.M] = MouseDrivenCommand.Move;
             keysMap[Keys.T] = MouseDrivenCommand.Train;
             keysMap[Keys.S] = MouseDrivenCommand.Suicide;
+            keysMap[Keys.C] = MouseDrivenCommand.Cancel;
             keysMap[Keys.Escape] = null;
         }
         #endregion
@@ -172,11 +174,14 @@ namespace Orion.Commandment
                     LaunchRepair(target);
                     break;
                 case MouseDrivenCommand.Train:
-                    LaunchTrain(commander.Faction.World.UnitTypes.First(unit => !unit.IsBuilding));
+                    LaunchTrain(commander.Faction.World.UnitTypes.First(unit => unit.HasSkill <Attack>()));
                     break;
 
                 case MouseDrivenCommand.Suicide:
                     LaunchSuicide();
+                    break;
+                case MouseDrivenCommand.Cancel:
+                    LaunchCancel();
                     break;
             }
 
@@ -286,6 +291,12 @@ namespace Orion.Commandment
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchSuicide(targetUnits);
+        }
+        private void LaunchCancel()
+        {
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction);
+            commander.CancelCommands(targetUnits);
         }
         #endregion
         #endregion

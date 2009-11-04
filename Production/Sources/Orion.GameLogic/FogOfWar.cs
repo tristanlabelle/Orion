@@ -21,6 +21,15 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Events
+        public event GenericEventHandler<FogOfWar> Changed;
+
+        private void OnChanged()
+        {
+            if (Changed != null) Changed(this);
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the width of this terrain, in tiles.
@@ -49,8 +58,8 @@ namespace Orion.GameLogic
             if (roundedNewLineOfSight == roundedOldLineOfSight)
                 return;
 
-            ModifyLineOfSight(roundedOldLineOfSight, false);
             ModifyLineOfSight(roundedNewLineOfSight, true);
+            ModifyLineOfSight(roundedOldLineOfSight, false);
         }
 
         public void AddLineOfSight(Circle lineOfSight)
@@ -93,10 +102,14 @@ namespace Orion.GameLogic
                                 tiles[i, j]++;
                             }
                         else
+                        {
+                            System.Diagnostics.Debug.Assert(tiles[i, j] != ushort.MaxValue);
                             tiles[i, j]--;
+                        }
                     }
                 }
             }
+            OnChanged();
         }
 
         private Rectangle CreateTilesRectangle(Rectangle boundingRectangle)

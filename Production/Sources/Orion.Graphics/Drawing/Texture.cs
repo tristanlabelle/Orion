@@ -105,6 +105,11 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
+        public bool HasAlphaChannel
+        {
+            get { return format == TextureFormat.Rgba; }
+        }
+
         public bool IsDisposed
         {
             get { return id == 0; }

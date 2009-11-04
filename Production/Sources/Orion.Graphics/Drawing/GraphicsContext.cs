@@ -352,6 +352,11 @@ namespace Orion.Graphics
             GL.Color3(1f, 1f, 1f);
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
+            if (texture.HasAlphaChannel)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            }
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(0, 0);
             GL.Vertex2(rectangle.MinX, rectangle.MinY);
@@ -362,6 +367,7 @@ namespace Orion.Graphics
             GL.TexCoord2(1, 0);
             GL.Vertex2(rectangle.MaxX, rectangle.MinY);
             GL.End();
+            if (texture.HasAlphaChannel) GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.Texture2D);
         }
         #endregion

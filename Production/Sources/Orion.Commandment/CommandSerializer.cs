@@ -48,7 +48,7 @@ namespace Orion.Commandment
         /// <returns>The <see cref="Command"/> that was deserialized.</returns>
         public abstract Command Deserialize(BinaryReader reader, World world);
 
-        protected Faction ReadFaction(BinaryReader reader, World world)
+        protected static Faction ReadFaction(BinaryReader reader, World world)
         {
             int factionID = reader.ReadInt32();
             Faction faction = world.FindFactionWithID(factionID);
@@ -56,14 +56,29 @@ namespace Orion.Commandment
             return faction;
         }
 
-        protected Unit ReadUnit(BinaryReader reader, World world)
+        protected static Entity ReadEntity(BinaryReader reader, World world)
         {
-            int unitID = reader.ReadInt32();
-            Unit unit = world.Units.FindFromID(unitID);
-            if (unit == null) throw new InvalidDataException("Invalid unit identifier.");
+            int entityID = reader.ReadInt32();
+            Entity entity = world.Entities.FindFromID(entityID);
+            if (entity == null) throw new InvalidDataException("Invalid entity identifier.");
+            return entity;
+        }
+
+        protected static Unit ReadUnit(BinaryReader reader, World world)
+        {
+            Unit unit = ReadEntity(reader, world) as Unit;
+            if (unit == null) throw new InvalidDataException("Entity identifier doesn't refer to an unit.");
             return unit;
         }
-        protected UnitType ReadUnitType(BinaryReader reader, World world)
+
+        protected static ResourceNode ReadResourceNode(BinaryReader reader, World world)
+        {
+            ResourceNode node = ReadEntity(reader, world) as ResourceNode;
+            if (node == null) throw new InvalidDataException("Entity identifier doesn't refer to a resource node.");
+            return node;
+        }
+
+        protected static UnitType ReadUnitType(BinaryReader reader, World world)
         {
             int unitTypeID = reader.ReadInt32();
             UnitType unitType = world.UnitTypes.FromID(unitTypeID);
@@ -71,7 +86,7 @@ namespace Orion.Commandment
             return unitType;
         }
 
-        protected Unit[] ReadLengthPrefixedUnitArray(BinaryReader reader, World world)
+        protected static Unit[] ReadLengthPrefixedUnitArray(BinaryReader reader, World world)
         {
             int unitCount = reader.ReadInt32();
             if (unitCount <= 0)

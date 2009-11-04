@@ -79,15 +79,12 @@ namespace Orion.Main
                     harvester.Position = new Vector2(position.X, position.Y + i);
                 }
                
-                ResourceNode nodeAladdium = world.CreateResourceNode
+                ResourceNode nodeAladdium = world.Entities.CreateResourceNode
                     (ResourceType.Aladdium, 500, new Vector2(position.X - (campSize / 2), position.Y - 1));
 
-                ResourceNode nodeAlagene = world.CreateResourceNode
+                ResourceNode nodeAlagene = world.Entities.CreateResourceNode
                     (ResourceType.Alagene, 500, new Vector2(position.X - (campSize / 2), position.Y + 1));
             }
-               
-
-            
             #endregion
 
             #region Resource Nodes
@@ -99,7 +96,7 @@ namespace Orion.Main
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
                 } while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y));
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.CreateResourceNode(resourceType, 500, position);
+                ResourceNode node = world.Entities.CreateResourceNode(resourceType, 500, position);
             }
             #endregion
         }

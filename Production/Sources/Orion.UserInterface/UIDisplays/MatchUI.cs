@@ -38,7 +38,7 @@ namespace Orion.UserInterface
             userInputManager = new UserInputManager(commander);
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
-            world.Units.UnitDied += userInputManager.SelectionManager.UnitDied;
+            world.Entities.Died += userInputManager.SelectionManager.EntityDied;
             Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);

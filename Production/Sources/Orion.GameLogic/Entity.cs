@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Geometry;
+using OpenTK.Math;
 
 namespace Orion.GameLogic
 {
@@ -85,6 +86,8 @@ namespace Orion.GameLogic
         {
             return "Entity #{0}".FormatInvariant(id);
         }
+
+        internal virtual void Update(float timeDeltaInSeconds) { }
         #endregion
     }
 }

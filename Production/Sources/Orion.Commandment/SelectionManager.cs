@@ -84,13 +84,14 @@ namespace Orion.Commandment
         }
 
         /// <summary>
-        /// Informs this <see cref="SelectionManager"/> that a unit died.
+        /// Informs this <see cref="SelectionManager"/> that an entity died.
         /// </summary>
-        /// <param name="source">The source UnitRegistry</param>
-        /// <param name="unit">The killed unit</param>
-        public void UnitDied(UnitRegistry source, Unit unit)
+        /// <param name="source">The source EntityRegistry</param>
+        /// <param name="entity">The entity that died</param>
+        public void EntityDied(EntityRegistry source, Entity entity)
         {
-            if (selectedUnits.Contains(unit))
+            Unit unit = entity as Unit;
+            if (unit != null && selectedUnits.Contains(unit))
             {
                 selectedUnits.Remove(unit);
                 OnSelectionChange();

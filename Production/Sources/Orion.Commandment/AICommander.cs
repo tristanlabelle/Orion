@@ -77,7 +77,9 @@ namespace Orion.Commandment
         private void TrainUnits()
         {
             // Select all building idle that can train warrior, TODO: Need to select a same type of building and check what type of unit they can train.
-            List<Unit> allBuildingIdleThatCanBuild = World.Units.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Train>() && unit.IsIdle).ToList();
+            List<Unit> allBuildingIdleThatCanBuild = Faction.Units
+                .Where(unit => unit.Type.HasSkill<Skills.Train>() && unit.IsIdle)
+                .ToList();
 
             //If there is building fitting to the condition
             if (allBuildingIdleThatCanBuild.Count != 0)
@@ -90,7 +92,9 @@ namespace Orion.Commandment
 
         private void DispatchHarvesters(ResourceNode node)
         {
-            List<Unit> harvesters = World.Units.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Harvest>()).ToList();
+            List<Unit> harvesters = Faction.Units
+                .Where(unit => unit.Type.HasSkill<Skills.Harvest>())
+                .ToList();
 
             if (harvesters.Count() != 0)
             {
@@ -106,8 +110,11 @@ namespace Orion.Commandment
 
         private void Attack()
         {
-            List<Unit> potentialAttackers = World.Units.Where(unit => unit.Faction == Faction 
-                && !(unit.Task is Orion.GameLogic.Tasks.Harvest) && !(unit.Task is Orion.GameLogic.Tasks.Build) && unit.Type.HasSkill<Skills.Attack>()).ToList();
+            List<Unit> potentialAttackers = Faction.Units
+                .Where(unit => !(unit.Task is Orion.GameLogic.Tasks.Harvest)
+                    && !(unit.Task is Orion.GameLogic.Tasks.Build)
+                    && unit.Type.HasSkill<Skills.Attack>())
+                .ToList();
 
             int amountOfAttackers = (int)Math.Ceiling(0.75 * potentialAttackers.Count);
             List<Unit> attackers = new List<Unit>();
@@ -141,7 +148,8 @@ namespace Orion.Commandment
 
         private void BuildMainCommandCenter()
         {
-            Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Build>() && unit.IsIdle);
+            Unit builder = Faction.Units
+                .FirstOrDefault(unit => unit.Type.HasSkill<Skills.Build>() && unit.IsIdle);
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.BoundingRectangle.Width), (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
             
             if (!World.Bounds.ContainsPoint(position))
@@ -157,21 +165,32 @@ namespace Orion.Commandment
 
         private void Meet()
         {
-            startingNode = World.ResourceNodes.First();
+            startingNode = World.Entities.OfType<ResourceNode>().First();
             
-            foreach (ResourceNode node in World.ResourceNodes.Where(node => node.Type == ResourceType.Aladdium))
+            foreach (ResourceNode node in World.Entities.OfType<ResourceNode>().Where(node => node.Type == ResourceType.Aladdium))
             {
                 Circle effectiveRange = new Circle(node.Position, 20);
-                
-                int enemyUnits = World.Units.Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position)).ToList().Count;
-                int alliedUnits = World.Units.Where(unit => unit.Faction == Faction && effectiveRange.ContainsPoint(unit.Position)).ToList().Count;
+
+                int enemyUnits = World.Entities
+                    .OfType<Unit>()
+                    .Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position))
+                    .Count();
+
+                int alliedUnits = Faction.Units
+                    .Where(unit => effectiveRange.ContainsPoint(unit.Position))
+                    .Count();
 
                 int unitScore = alliedUnits - enemyUnits;
 
                 Circle currentRange = new Circle(startingNode.Position, 20);
 
-                int currentEnemyUnits = World.Units.Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).ToList().Count;
-                int currentAlliedUnits = World.Units.Where(unit => unit.Faction == Faction && currentRange.ContainsPoint(unit.Position)).ToList().Count;
+                int currentEnemyUnits = World.Entities
+                    .OfType<Unit>()
+                    .Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).Count();
+                
+                int currentAlliedUnits = Faction.Units
+                    .Where(unit => currentRange.ContainsPoint(unit.Position))
+                    .Count();
 
                 int currentScore = currentAlliedUnits - currentEnemyUnits;
 
@@ -186,7 +205,7 @@ namespace Orion.Commandment
             if(!World.Bounds.ContainsPoint(position))
                 position = new Vector2((startingNode.Position.X - startingNode.BoundingRectangle.Width), (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
 
-            List<Unit> unitsToMeet = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding).ToList();
+            List<Unit> unitsToMeet = Faction.Units.Where(unit => !unit.Type.IsBuilding).ToList();
 
             if (unitsToMeet.Count != 0)
             {

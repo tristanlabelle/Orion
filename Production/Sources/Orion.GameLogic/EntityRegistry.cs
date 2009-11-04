@@ -13,30 +13,30 @@ using Point = System.Drawing.Point;
 namespace Orion.GameLogic
 {
     /// <summary>
-    /// A collection of <see cref="Unit"/>s optimized for spatial queries.
+    /// A collection of <see cref="Entity">entities</see> optimized for spatial queries.
     /// </summary>
     [Serializable]
-    public sealed class UnitRegistry : IEnumerable<Unit>
+    public sealed class EntityRegistry : IEnumerable<Entity>
     {
         #region Nested Types
         /// <summary>
-        /// Represents a rectangular spatial subdivision used to group nearby <see cref="Unit"/>s.
+        /// Represents a rectangular spatial subdivision used to group nearby <see cref="Entity"/>s.
         /// </summary>
         [DebuggerDisplay("Count = {Count}")]
         private struct Zone
         {
             #region Fields
-            public Unit[] Units;
+            public Entity[] Units;
             public int Count;
             #endregion
 
             #region Indexers
             /// <summary>
-            /// Gets a <see cref="Unit"/> from this <see cref="Zone"/> by its index.
+            /// Gets a <see cref="Entity"/> from this <see cref="Zone"/> by its index.
             /// </summary>
-            /// <param name="index">The index of the <see cref="Unit"/> to be retrieved.</param>
-            /// <returns>The <see cref="Unit"/> at that index.</returns>
-            public Unit this[int index]
+            /// <param name="index">The index of the <see cref="Entity"/> to be retrieved.</param>
+            /// <returns>The <see cref="Entity"/> at that index.</returns>
+            public Entity this[int index]
             {
                 get { return Units[index]; }
             }
@@ -44,15 +44,15 @@ namespace Orion.GameLogic
 
             #region Methods
             /// <summary>
-            /// Removes a <see cref="Unit"/> from this zone.
+            /// Removes a <see cref="Entity"/> from this zone.
             /// </summary>
-            /// <param name="item">The <see cref="Unit"/> to be removed.</param>
-            /// <returns><c>True</c> if an <see cref="Unit"/> was removed, <c>false</c> if it wasn't found.</returns>
-            public bool Remove(Unit unit)
+            /// <param name="item">The <see cref="Entity"/> to be removed.</param>
+            /// <returns><c>True</c> if an <see cref="Entity"/> was removed, <c>false</c> if it wasn't found.</returns>
+            public bool Remove(Entity entity)
             {
                 for (int i = 0; i < Count; ++i)
                 {
-                    if (Units[i] == unit)
+                    if (Units[i] == entity)
                     {
                         if (i < Count - 1) Units[i] = Units[Count - 1];
                         Units[Count - 1] = null;
@@ -65,57 +65,54 @@ namespace Orion.GameLogic
             }
 
             /// <summary>
-            /// Adds a <see cref="Unit"/> to this <see cref="Zone"/>
-            /// The <see cref="Unit"/> is assumed to be absent.
+            /// Adds a <see cref="Entity"/> to this <see cref="Zone"/>
+            /// The <see cref="Entity"/> is assumed to be absent.
             /// </summary>
-            /// <param name="item">The <see cref="Unit"/> to be added.</param>
-            public void Add(Unit unit)
+            /// <param name="item">The <see cref="Entity"/> to be added.</param>
+            public void Add(Entity entity)
             {
-                if (Units == null) Units = new Unit[16];
+                if (Units == null) Units = new Entity[16];
                 else if (Count == Units.Length)
                 {
-                    Unit[] newItems = new Unit[Units.Length * 2];
+                    Entity[] newItems = new Entity[Units.Length * 2];
                     Array.Copy(Units, newItems, Units.Length);
                     Units = newItems;
                 }
 
-                Units[Count] = unit;
+                Units[Count] = entity;
                 ++Count;
             }
             #endregion
-        }
-
-        [Flags]
-        private enum Event
-        {
-            Created = 1,
-            Moved = 2,
-            Died = 4
         }
         #endregion
 
         #region Instance
         #region Fields
         private readonly World world;
-        private readonly List<Unit> units = new List<Unit>();
+        private readonly List<Entity> entities = new List<Entity>();
         private readonly Zone[,] zones;
-        private readonly Dictionary<Unit, Event> events = new Dictionary<Unit, Event>();
+
+        // Temporary collections used to defer modification of "entities"
+        private readonly HashSet<Entity> entitiesToAdd = new HashSet<Entity>();
+        private readonly Dictionary<Entity, Rectangle> entitiesToMove = new Dictionary<Entity, Rectangle>();
+        private readonly HashSet<Entity> entitiesToRemove = new HashSet<Entity>();
+
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
-        private int nextUnitID;
+        private int nextID;
         #endregion
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="SpatialCollection{Unit}"/> from the spatial
+        /// Initializes a new <see cref="SpatialCollection{Entity}"/> from the spatial
         /// bounds of the container and its number of subdivision along the axes.
         /// </summary>
         /// <param name="world">
-        /// The <see cref="World"/> that to which the <see cref="Unit"/>s in this <see cref="UnitRegistry"/> belong.
+        /// The <see cref="World"/> that to which the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> belong.
         /// </param>
         /// <param name="columnCount">The number of spatial subdivisions along the x axis.</param>
         /// <param name="rowCount">The number of spatial subdivisions along the y axis.</param>
-        internal UnitRegistry(World world, int columnCount, int rowCount)
+        internal EntityRegistry(World world, int columnCount, int rowCount)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureStrictlyPositive(columnCount, "columnCount");
@@ -129,12 +126,10 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
-
         /// <summary>
-        /// The event triggered when a unit dies.
+        /// Raised when an entity dies.
         /// </summary>
-        public event GenericEventHandler<UnitRegistry, Unit> UnitDied;
-
+        public event GenericEventHandler<EntityRegistry, Entity> Died;
         #endregion
 
         #region Properties
@@ -185,66 +180,70 @@ namespace Orion.GameLogic
         #region Event Handlers
         private void OnEntityDied(Entity entity)
         {
-            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
-            Unit unit = (Unit)entity;
-            events[unit] = Event.Died;
+            Argument.EnsureNotNull(entity, "entity");
+            entitiesToRemove.Add(entity);
         }
 
         private void OnEntityBoundingRectangleChanged(Entity entity, ValueChangedEventArgs<Rectangle> eventArgs)
         {
-            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
+            Argument.EnsureNotNull(entity, "entity");
 
-            Unit unit = (Unit)entity;
+            if (!entitiesToMove.ContainsKey(entity))
+                entitiesToMove.Add(entity, eventArgs.OldValue);
+        }
+        #endregion
 
-            Event @event = Event.Moved;
-            if (events.TryGetValue(unit, out @event))
-            {
-                if ((@event & Event.Moved) != Event.Moved)
-                    events[unit] = @event | Event.Moved;
-            }
-            else
-            {
-                events.Add(unit, Event.Moved);
-            }
+        #region Entity Creation
+        /// <summary>
+        /// Used by <see cref="Faction"/> to create new <see cref="Entity"/>
+        /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Entity"/> to be created.</param>
+        /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Entity"/>.</param>
+        /// <returns>The newly created <see cref="Entity"/>.</returns>
+        internal Unit CreateUnit(UnitType type, Faction faction)
+        {
+            Unit unit = new Unit(nextID, type, faction);
+            ++nextID;
+            InitializeEntity(unit);
+            return unit;
+        }
+
+        public ResourceNode CreateResourceNode(ResourceType type, int amount, Vector2 position)
+        {
+            ResourceNode node = new ResourceNode(world, nextID, type, amount, position);
+            ++nextID;
+            InitializeEntity(node);
+            return node;
+        }
+
+        private void InitializeEntity(Entity entity)
+        {
+            entity.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
+            entity.Died += entityDiedEventHandler;
+
+            entitiesToAdd.Add(entity);
         }
         #endregion
 
         /// <summary>
-        /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
-        /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
+        /// Gets a <see cref="Entity"/> of this <see cref="UnitRegistry"/> from its unique identifier.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
-        /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
-        /// <returns>The newly created <see cref="Unit"/>.</returns>
-        internal Unit Create(UnitType type, Faction faction)
-        {
-            Unit unit = new Unit(nextUnitID++, type, faction);
-            unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
-            unit.Died += entityDiedEventHandler;
-
-            events.Add(unit, Event.Created);
-
-            return unit;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Unit"/> of this <see cref="UnitRegistry"/> from its unique identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Unit"/> to be found.</param>
+        /// <param name="id">The unique identifier of the <see cref="Entity"/> to be found.</param>
         /// <returns>
-        /// The <see cref="Unit"/> with that identifier, or <c>null</c> if the identifier is invalid.
+        /// The <see cref="Entity"/> with that identifier, or <c>null</c> if the identifier is invalid.
         /// </returns>
-        public Unit FindFromID(int id)
+        public Entity FindFromID(int id)
         {
-            for (int i = 0; i < units.Count; ++i)
-                if (units[i].ID == id)
-                    return units[i];
+            for (int i = 0; i < entities.Count; ++i)
+                if (entities[i].ID == id)
+                    return entities[i];
 
             return null;
         }
 
         /// <summary>
-        /// Updates the <see cref="Unit"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
+        /// Updates the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
         /// <remarks>
@@ -252,71 +251,67 @@ namespace Orion.GameLogic
         /// </remarks>
         public void Update(float timeDeltaInSeconds)
         {
-            foreach (KeyValuePair<Unit, Event> @event in events)
-            {
-                bool hasBeenCreated = ((@event.Value & Event.Created) == Event.Created);
-                bool hasMoved = ((@event.Value & Event.Moved) == Event.Moved);
-                bool hasDied = ((@event.Value & Event.Died) == Event.Died);
+            CommitDeferredCollectionChanges();
 
-                if (hasDied)
-                {
-                    if (!hasBeenCreated) Remove(@event.Key);
-                    continue;
-                }
-
-                if (hasBeenCreated) Add(@event.Key);
-                if (hasMoved) UpdateZone(@event.Key);
-            }
-
-            events.Clear();
-
-            for (int i = 0; i < units.Count; ++i)
-                units[i].Update(timeDeltaInSeconds);
+            for (int i = 0; i < entities.Count; ++i)
+                entities[i].Update(timeDeltaInSeconds);
         }
 
         #region Private Collection Modification
-        private void Add(Unit unit)
+        private void CommitDeferredCollectionChanges()
         {
-            units.Add(unit);
-            AddToZone(unit);
+            foreach (Entity entity in entitiesToAdd)
+                Add(entity);
+            entitiesToAdd.Clear();
+
+            foreach (var pair in entitiesToMove)
+                UpdateZone(pair.Key, pair.Value);
+            entitiesToMove.Clear();
+
+            foreach (Entity entity in entitiesToRemove)
+                Remove(entity);
+            entitiesToRemove.Clear();
         }
 
-        private void AddToZone(Unit unit)
+        private void Add(Entity entity)
         {
-            Point zoneCoords = GetClampedZoneCoords(unit.Position);
-            zones[zoneCoords.X, zoneCoords.Y].Add(unit);
-            unit.lastKnownPosition = unit.Position;
+            entities.Add(entity);
+            AddToZone(entity);
         }
 
-        private void Remove(Unit unit)
+        private void AddToZone(Entity entity)
         {
-            units.Remove(unit);
-            RemoveFromZone(unit);
-            GenericEventHandler<UnitRegistry, Unit> handler = UnitDied;
+            Point zoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            zones[zoneCoords.X, zoneCoords.Y].Add(entity);
+        }
+
+        private void Remove(Entity entity)
+        {
+            entities.Remove(entity);
+            RemoveFromZone(entity);
+            GenericEventHandler<EntityRegistry, Entity> handler = Died;
             if (handler != null)
             {
-                handler(this, unit);
+                handler(this, entity);
             }
         }
 
-        private void RemoveFromZone(Unit unit)
+        private void RemoveFromZone(Entity entity)
         {
-            Point zoneCoords = GetClampedZoneCoords(unit.lastKnownPosition);
-            zones[zoneCoords.X, zoneCoords.Y].Remove(unit);
+            Point zoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            zones[zoneCoords.X, zoneCoords.Y].Remove(entity);
         }
 
-        private void UpdateZone(Unit unit)
+        private void UpdateZone(Entity entity, Rectangle oldRectangle)
         {
-            Point oldZoneCoords = GetClampedZoneCoords(unit.lastKnownPosition);
-            Point newZoneCoords = GetClampedZoneCoords(unit.Position);
+            Point oldZoneCoords = GetClampedZoneCoords(oldRectangle.Center);
+            Point newZoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
 
             if (newZoneCoords != oldZoneCoords)
             {
-                zones[oldZoneCoords.X, oldZoneCoords.Y].Remove(unit);
-                zones[newZoneCoords.X, newZoneCoords.Y].Add(unit);
+                zones[oldZoneCoords.X, oldZoneCoords.Y].Remove(entity);
+                zones[newZoneCoords.X, newZoneCoords.Y].Add(entity);
             }
-
-            unit.lastKnownPosition = unit.Position;
         }
         #endregion
 
@@ -339,20 +334,20 @@ namespace Orion.GameLogic
 
         #region Enumeration
         /// <summary>
-        /// Gets an enumerator that iterates over the <see cref="Unit"/>s in this registry.
+        /// Gets an enumerator that iterates over the <see cref="Entity"/>s in this registry.
         /// </summary>
-        /// <returns>A new <see cref="Unit"/> enumerator.</returns>
-        public List<Unit>.Enumerator GetEnumerator()
+        /// <returns>A new <see cref="Entity"/> enumerator.</returns>
+        public List<Entity>.Enumerator GetEnumerator()
         {
-            return units.GetEnumerator();
+            return entities.GetEnumerator();
         }
 
         /// <summary>
-        /// Gets the <see cref="Unit"/>s which are in a given rectangular area.
+        /// Gets the <see cref="Entity"/>s which are in a given rectangular area.
         /// </summary>
         /// <param name="area">The area in which to check.</param>
-        /// <returns>A sequence of <see cref="Unit"/>s in that area.</returns>
-        public IEnumerable<Unit> InArea(Rectangle area)
+        /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
+        public IEnumerable<Entity> InArea(Rectangle area)
         {
             if (!Rectangle.Intersects(world.Bounds, area))
                 yield break;
@@ -367,20 +362,20 @@ namespace Orion.GameLogic
                     Zone zone = zones[x, y];
                     for (int i = 0; i < zone.Count; ++i)
                     {
-                        Unit unit = zone[i];
-                        if (area.ContainsPoint(unit.lastKnownPosition))
-                            yield return unit;
+                        Entity entity = zone[i];
+                        if (area.ContainsPoint(entity.BoundingRectangle.Center))
+                            yield return entity;
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Gets the <see cref="Unit"/>s which are in a given circular area.
+        /// Gets the <see cref="Entity"/>s which are in a given circular area.
         /// </summary>
         /// <param name="area">The area in which to check.</param>
-        /// <returns>A sequence of <see cref="Unit"/>s in that area.</returns>
-        public IEnumerable<Unit> InArea(Circle area)
+        /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
+        public IEnumerable<Entity> InArea(Circle area)
         {
             if (!Intersection.Test(world.Bounds, area))
                 yield break;
@@ -397,9 +392,9 @@ namespace Orion.GameLogic
                     Zone zone = zones[x, y];
                     for (int i = 0; i < zone.Count; ++i)
                     {
-                        Unit unit = zone[i];
-                        if (area.ContainsPoint(unit.lastKnownPosition))
-                            yield return unit;
+                        Entity entity = zone[i];
+                        if (area.ContainsPoint(entity.BoundingRectangle.Center))
+                            yield return entity;
                     }
                 }
             }
@@ -408,8 +403,8 @@ namespace Orion.GameLogic
         #endregion
 
         #region Explicit Members
-        #region IEnumerable<Unit> Members
-        IEnumerator<Unit> IEnumerable<Unit>.GetEnumerator()
+        #region IEnumerable<Entity> Members
+        IEnumerator<Entity> IEnumerable<Entity>.GetEnumerator()
         {
             return GetEnumerator();
         }

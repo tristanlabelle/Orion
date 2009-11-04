@@ -70,7 +70,7 @@ namespace Orion.GameLogic.Tasks
             {
                 if (TrainingIsOver(timeDelta))
                 {
-                    Unit trainee = trainer.faction.CreateUnit(traineeType);
+                    Unit trainee = trainer.Faction.CreateUnit(traineeType);
 
                     // TODO: Refactor to take building size into account and position unit intelligently.
                     Vector2 newPosition = new Vector2(trainer.Position.X + 2, trainer.Position.Y + 2);

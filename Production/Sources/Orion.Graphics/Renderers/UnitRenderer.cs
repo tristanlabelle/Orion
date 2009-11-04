@@ -73,7 +73,7 @@ namespace Orion.Graphics
         private void DrawMiniatureUnits(GraphicsContext context)
         {
             Rectangle unitRect = new Rectangle(3, 3);
-            foreach (Unit unit in world.Units)
+            foreach (Unit unit in world.Entities.OfType<Unit>())
             {
                 context.FillColor = unit.Faction.Color;
                 context.Fill(unitRect.Translate(unit.Position));
@@ -82,7 +82,7 @@ namespace Orion.Graphics
 
         private void DrawUnits(GraphicsContext graphics)
         {
-            foreach (Unit unit in world.Units)
+            foreach (Unit unit in world.Entities.OfType<Unit>())
             {
                 string unitTypeName = unit.Type.Name;
 
@@ -102,7 +102,9 @@ namespace Orion.Graphics
 
         private void DrawPaths(GraphicsContext graphics)
         {
-            var paths = world.Units.Select(unit => unit.Task)
+            var paths = world.Entities
+                .OfType<Unit>()
+                .Select(unit => unit.Task)
                 .OfType<Move>()
                 .Select(task => task.Path)
                 .Where(path => path != null);
@@ -127,7 +129,10 @@ namespace Orion.Graphics
 
         private void DrawAttackLines(GraphicsContext graphics)
         {
-            var attacks = world.Units.Select(unit => unit.Task).OfType<Attack>();
+            var attacks = world.Entities
+                .OfType<Unit>()
+                .Select(unit => unit.Task)
+                .OfType<Attack>();
 
             graphics.StrokeColor = Color.Orange;
             foreach (Attack attack in attacks)

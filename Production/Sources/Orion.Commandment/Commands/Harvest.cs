@@ -62,7 +62,6 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Harvest command, BinaryWriter writer)
             {
-               
                 writer.Write(command.SourceFaction.ID);
                 writer.Write(command.node.ID);
                 writer.Write(command.harvesters.Count());
@@ -74,8 +73,7 @@ namespace Orion.Commandment.Commands
             {
                 Faction sourceFaction = ReadFaction(reader, world);
                 int nodeID = reader.ReadInt32();
-                ResourceNode node = world.ResourceNodes.FirstOrDefault(aNode => aNode.ID == nodeID);
-                if(node == null) throw new NullReferenceException();
+                ResourceNode node = ReadResourceNode(reader, world);
                 Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
                 return new Harvest(sourceFaction, units, node);
             }

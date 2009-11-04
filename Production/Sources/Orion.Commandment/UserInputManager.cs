@@ -103,7 +103,10 @@ namespace Orion.Commandment
             selectionEnd = args.Position;
             Faction faction = commander.Faction;
             Rectangle selection = SelectionRectangle.Value;
-            List<Unit> selectedUnits = faction.World.Units.Where(unit => Rectangle.Intersects(selection, unit.BoundingRectangle)).ToList();
+            List<Unit> selectedUnits = faction.World.Entities
+                .OfType<Unit>()
+                .Where(unit => Rectangle.Intersects(selection, unit.BoundingRectangle))
+                .ToList();
 
             // Filter out buildings
             bool containsNonBuildingUnits = selectedUnits.Any(unit => !unit.Type.IsBuilding);
@@ -150,7 +153,11 @@ namespace Orion.Commandment
         {
             Faction faction = commander.Faction;
             Rectangle hitRect = new Rectangle(at.X, at.Y, 1, 1);
-            Unit target = faction.World.Units.Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle)).FirstOrDefault();
+            Unit target = faction.World.Entities
+                .OfType<Unit>()
+                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle))
+                .FirstOrDefault();
+
             switch (mouseCommand)
             {
                 case MouseDrivenCommand.Attack:
@@ -165,7 +172,9 @@ namespace Orion.Commandment
                     break;
 
                 case MouseDrivenCommand.Harvest:
-                    ResourceNode resource = faction.World.ResourceNodes.Where(node => Rectangle.Intersects(hitRect, node.BoundingRectangle)).FirstOrDefault();
+                    ResourceNode resource = faction.World.Entities
+                        .OfType<ResourceNode>()
+                        .FirstOrDefault(node => Rectangle.Intersects(hitRect, node.BoundingRectangle));
                     LaunchHarvest(resource);
                     break;
 
@@ -185,11 +194,16 @@ namespace Orion.Commandment
         {
             Faction faction = commander.Faction;
             Rectangle hitRect = new Rectangle(at.X, at.Y, 1, 1);
-            Unit target = faction.World.Units.Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle)).FirstOrDefault();
+            Unit target = faction.World.Entities
+                .OfType<Unit>()
+                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle))
+                .FirstOrDefault();
 
             if (target == null)
             {
-                ResourceNode node = faction.World.ResourceNodes.Where(n => Rectangle.Intersects(hitRect, n.BoundingRectangle)).FirstOrDefault();
+                ResourceNode node = faction.World.Entities
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
                 if (node != null) LaunchHarvest(node);
                 else LaunchMove(at);
             }

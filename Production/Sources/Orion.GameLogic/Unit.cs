@@ -15,14 +15,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly UnitType type;
-        internal Faction faction;
-
-        /// <summary>
-        /// The last position as stored in the <see cref="UnitRegistry"/>.
-        /// Do not modify.
-        /// </summary>
-        internal Vector2 lastKnownPosition;
-
+        private readonly Faction faction;
         private Vector2 position;
         private float angle;
         private float damage;
@@ -260,12 +253,17 @@ namespace Orion.GameLogic
         /// <remarks>
         /// Used by <see cref="UnitRegistry"/>.
         /// </remarks>
-        internal void Update(float timeDeltaInSeconds)
+        internal override void Update(float timeDeltaInSeconds)
         {
             if (task == null && HasSkill<Skills.Attack>())
             {
-                Unit unitToAttack = World.Units.InArea(LineOfSight).FirstOrDefault(unit => unit.faction != faction);
-                if (unitToAttack != null) Task = new Tasks.Attack(this, unitToAttack);
+                Unit unitToAttack = World.Entities
+                    .InArea(LineOfSight)
+                    .OfType<Unit>()
+                    .FirstOrDefault(unit => unit.Faction != faction);
+
+                if (unitToAttack != null)
+                    Task = new Tasks.Attack(this, unitToAttack);
             }
 
             if (task != null)

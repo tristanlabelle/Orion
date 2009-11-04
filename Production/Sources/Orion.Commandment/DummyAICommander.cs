@@ -31,7 +31,11 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
-            List<Unit> unitsToMove = World.Units.Where(unit => unit.Faction == Faction && unit.IsIdle).ToList();
+            List<Unit> unitsToMove = World.Entities
+                .OfType<Unit>()
+                .Where(unit => unit.Faction == Faction && unit.IsIdle)
+                .ToList();
+
             if (unitsToMove.Count != 0)
             {
                 Command command = new Move(Faction, unitsToMove,

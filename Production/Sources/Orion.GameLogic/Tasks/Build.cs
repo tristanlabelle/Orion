@@ -84,7 +84,7 @@ namespace Orion.GameLogic.Tasks
                 float buildingSpeed = builder.GetStat(UnitStat.BuildingSpeed);
                 if (secondsSpentBuilding * buildingSpeed > maxHealth)
                 {
-                    Unit building = builder.faction.CreateUnit(buildingType);
+                    Unit building = builder.Faction.CreateUnit(buildingType);
                     building.Position = buildPosition;
                     hasEnded = true;
                 }

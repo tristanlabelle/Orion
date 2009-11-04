@@ -1,6 +1,5 @@
 ﻿using System;
-
-
+using System.Linq;
 using Orion.GameLogic;
 using Orion.Geometry;
 
@@ -105,7 +104,7 @@ namespace Orion.Graphics
         public void DrawResources(GraphicsContext graphics)
         {
             Rectangle bounds = graphics.CoordinateSystem;
-            foreach (ResourceNode node in world.ResourceNodes)
+            foreach (ResourceNode node in world.Entities.OfType<ResourceNode>())
             {
                 if (Rectangle.Intersects(bounds, node.BoundingRectangle))
                 {

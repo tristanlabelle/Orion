@@ -38,7 +38,7 @@ namespace Orion.Networking
 
         private CommandFactory serializer;
 
-        private GenericEventHandler<UnitRegistry, Unit> unitDied;
+        private GenericEventHandler<EntityRegistry, Entity> entityDied;
         #endregion
 
         #region Constructors
@@ -55,8 +55,8 @@ namespace Orion.Networking
                 peersCompleted[endpoint] = true;
             }
 
-            unitDied = UnitDied;
-            world.Units.UnitDied += unitDied;
+            entityDied = EntityDied;
+            world.Entities.Died += entityDied;
 
             transporterReceived = new GenericEventHandler<Transporter, NetworkEventArgs>(TransporterReceived);
             transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
@@ -195,11 +195,11 @@ namespace Orion.Networking
             }
         }
 
-        private void UnitDied(UnitRegistry registry, Unit deadUnit)
+        private void EntityDied(EntityRegistry registry, Entity deadEntity)
         {
-            deadUnits.Add(deadUnit);
+            Unit deadUnit = deadEntity as Unit;
+            if (deadUnit != null) deadUnits.Add(deadUnit);
         }
-
         #endregion
         #endregion
     }

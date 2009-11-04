@@ -16,11 +16,9 @@ namespace Orion.GameLogic
         #region Fields
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
-        private readonly UnitRegistry units;
+        private readonly EntityRegistry units;
         private readonly UnitTypeRegistry unitTypes;
-        private readonly List<ResourceNode> resourceNodes = new List<ResourceNode>();
-        private int nextResourceNodeID = 0;
-        private readonly Pathfinder pathFinder;
+        private readonly Pathfinder pathfinder;
         #endregion
 
         #region Constructors
@@ -32,9 +30,9 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
-            units = new UnitRegistry(this, 5, 5);
+            units = new EntityRegistry(this, 5, 5);
             unitTypes = new UnitTypeRegistry();
-            pathFinder = new Pathfinder(this);
+            pathfinder = new Pathfinder(this);
         }
         #endregion
 
@@ -48,9 +46,9 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the <see cref="UnitRegistry"/> containing the <see cref="Unit"/>s of this <see cref="World"/>.
+        /// Gets the <see cref="EntityRegistry"/> containing the <see cref="Entities"/>s of this <see cref="World"/>.
         /// </summary>
-        public UnitRegistry Units
+        public EntityRegistry Entities
         {
             get { return units; }
         }
@@ -58,11 +56,6 @@ namespace Orion.GameLogic
         public UnitTypeRegistry UnitTypes
         {
             get { return unitTypes; }
-        }
-
-        public IEnumerable<ResourceNode> ResourceNodes
-        {
-            get { return resourceNodes; }
         }
 
         /// <summary>
@@ -96,7 +89,7 @@ namespace Orion.GameLogic
 
         public Pathfinder PathFinder
         {
-            get { return pathFinder; }
+            get { return pathfinder; }
         }
 
         #endregion
@@ -129,14 +122,6 @@ namespace Orion.GameLogic
             return faction;
         }
         #endregion
-
-        public ResourceNode CreateResourceNode(ResourceType type, int amount, Vector2 position)
-        {
-            ResourceNode node = new ResourceNode(this, nextResourceNodeID, type, amount, position);
-            resourceNodes.Add(node);
-            ++nextResourceNodeID;
-            return node;
-        }
 
         public bool IsWithinBounds(Point16 point)
         {

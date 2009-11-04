@@ -99,7 +99,7 @@
     <Compile Include="TechnologyRequirements.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Unit.cs" />
-    <Compile Include="UnitRegistry.cs" />
+    <Compile Include="EntityRegistry.cs" />
     <Compile Include="UnitStat.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />

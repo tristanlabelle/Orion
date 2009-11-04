@@ -20,6 +20,7 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
+        private readonly ActionFrame actions;
         private UnitType selectedType;
 
         #region Minimap
@@ -51,8 +52,11 @@ namespace Orion.UserInterface
             hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkGray);
             Children.Add(hudFrame);
 
-            selectionFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, 0, hudFrame.Bounds.Width / 2, hudFrame.Frame.Height), Color.DarkGray);
+            selectionFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, 0, hudFrame.Bounds.Width / 2, hudFrame.Bounds.Height), Color.DarkGray);
             hudFrame.Children.Add(selectionFrame);
+
+            actions = new ActionFrame(new Rectangle(hudFrame.Bounds.Width / 4 * 3, 0, hudFrame.Bounds.Width / 4, hudFrame.Bounds.Height));
+            hudFrame.Children.Add(actions);
 
             minimapFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, hudFrame.Bounds.Height), matchRenderer.MinimapRenderer);
             minimapFrame.Bounds = world.Bounds;
@@ -250,7 +254,11 @@ namespace Orion.UserInterface
 
         private void UpdateSkillsPanel()
         {
-
+            actions.ClearStack();
+            if (selectedType != null)
+            {
+                actions.Push(new UnitTypeActionProvider(userInputManager, actions, selectedType));
+            }
         }
 
         private void MoveWorldView(Vector2 center)

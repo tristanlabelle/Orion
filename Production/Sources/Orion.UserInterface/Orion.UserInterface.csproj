@@ -51,11 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionButton.cs" />
+    <Compile Include="Actions\ActionButton.cs" />
+    <Compile Include="Actions\ActionFrame.cs" />
+    <Compile Include="Actions\UnitTypeActionProvider.cs" />
     <Compile Include="CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GameUI.cs" />
+    <Compile Include="Actions\IActionProvider.cs" />
     <Compile Include="MatchSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>

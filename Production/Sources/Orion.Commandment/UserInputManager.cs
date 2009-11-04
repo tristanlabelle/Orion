@@ -15,7 +15,7 @@ namespace Orion.Commandment
 {
     public enum MouseDrivenCommand
     {
-        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Suicide, Cancel
+        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Cancel
     }
 
     public class UserInputManager
@@ -47,6 +47,8 @@ namespace Orion.Commandment
             keysMap[Keys.B] = MouseDrivenCommand.Build;
             keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
             keysMap[Keys.M] = MouseDrivenCommand.Move;
+            keysMap[Keys.T] = MouseDrivenCommand.Train;
+            keysMap[Keys.C] = MouseDrivenCommand.Cancel;
             keysMap[Keys.Escape] = null;
         }
         #endregion
@@ -75,6 +77,7 @@ namespace Orion.Commandment
         public MouseDrivenCommand? SelectedCommand
         {
             get { return mouseCommand; }
+            set { mouseCommand = value; }
         }
         #endregion
 
@@ -219,6 +222,11 @@ namespace Orion.Commandment
 
         #region Launching individual commands
 
+        public void Cancel()
+        {
+            commander.CancelCommands(selectionManager.SelectedUnits);
+        }
+
         private void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
@@ -226,7 +234,7 @@ namespace Orion.Commandment
             // Those who can attack do so, the others simply move to the destination
             Unit theBuilder = movableUnits.FirstOrDefault(unit =>
             {
-                 Skills.Build build = unit.GetSkill<Skills.Build>();
+                Skills.Build build = unit.GetSkill<Skills.Build>();
                 if (build == null) return false;
                 return build.Supports(unitTypeToBuild);
             });
@@ -236,8 +244,6 @@ namespace Orion.Commandment
                 commander.LaunchBuild(theBuilder, unitTypeToBuild, destination);
                 commander.LaunchMove(movableUnits.Where(unit => unit != theBuilder), destination);
             }
-            
-
         }
 
         private void LaunchAttack(Unit target)

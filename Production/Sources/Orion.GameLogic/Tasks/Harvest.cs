@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+
+using OpenTK.Math;
 
 
 namespace Orion.GameLogic.Tasks
@@ -10,10 +13,14 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit harvester;
         private readonly ResourceNode node;
         private const float secondsToHarvest = 5;
+        private const float secondsToGiveRessource = 0;
         private const int defaultAmountToHarvest = 5;
         private int amountToHarvest = 0;
         private float secondsSpentHarvesting = 0;
+        private float secondsGivingRessource = 0;
         private Move move;
+        private Unit commandCenter;
+        private bool extractingOrDelivering = true; //true = extracting, false = delivering
         #endregion
 
         #region Constructors
@@ -27,6 +34,8 @@ namespace Orion.GameLogic.Tasks
             this.harvester = harvester;
             this.node = node;
             this.move = new Move(harvester, node.Position);
+            this.commandCenter = FindClosestCommandCenter(node.Position);
+            
         }
         #endregion
 
@@ -42,26 +51,41 @@ namespace Orion.GameLogic.Tasks
         {
             if (move.HasEnded)
             {
-                if (harvestingIsOver(timeDelta))
+                if (extractingOrDelivering) //true = extracting, false = delivering
                 {
-                    if(node.AmountRemaining != 0)
+                    if (harvestingIsOver(timeDelta))
                     {
-                        //determines the amount of resources to be harvested and substracts that amount to the node
-                        if (node.AmountRemaining >= amountToHarvest)
-                            amountToHarvest = defaultAmountToHarvest;
-                        else
-                            amountToHarvest = node.AmountRemaining;
+                    
+                        if (node.AmountRemaining != 0)
+                        {
+                            //determines the amount of resources to be harvested and substracts that amount to the node
+                            if (node.AmountRemaining >= amountToHarvest)
+                                amountToHarvest = defaultAmountToHarvest;
+                            else
+                                amountToHarvest = node.AmountRemaining;
 
-                        node.Harvest(amountToHarvest);
+                            node.Harvest(amountToHarvest);
+                            move = new Move(harvester, commandCenter.Position);
+                            extractingOrDelivering = false;
 
+                            
+
+                            //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAlagene: " + harvester.Faction.AlageneAmount);
+                            secondsSpentHarvesting = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    if (visitingCommandCenterIsOver(timeDelta))
+                    {
+                        move = new Move(harvester, node.Position);
+                        extractingOrDelivering = true;
                         //adds the resources to the unit's faction
                         if (node.Type == ResourceType.Aladdium)
                             harvester.Faction.AladdiumAmount += amountToHarvest;
                         else if (node.Type == ResourceType.Alagene)
                             harvester.Faction.AlageneAmount += amountToHarvest;
-
-                        //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAlagene: " + harvester.Faction.AlageneAmount);
-                        secondsSpentHarvesting = 0;
                     }
                 }
             }
@@ -69,6 +93,36 @@ namespace Orion.GameLogic.Tasks
             {
                 move.Update(timeDelta);
             }
+        }
+
+        private Unit FindClosestCommandCenter(Vector2 nodePosition)
+        {
+            Unit closestCommandCenter = null;
+            float shortestDistance = -1;
+            foreach (Unit unit in harvester.Faction.World.Entities.OfType<Unit>())
+            {
+                if (unit.Faction == harvester.Faction && unit.HasSkill<Skills.Train>())
+                {
+                    float distance = (unit.Position - nodePosition).LengthSquared;
+                    if (distance < shortestDistance || shortestDistance == -1)
+                    {
+                        shortestDistance = distance;
+                        closestCommandCenter = unit;
+                    }
+                }
+            }
+
+            if (closestCommandCenter == null)
+                throw new ArgumentException("There is no command center in this unit's faction", "harvester");
+            else
+                closestCommandCenter.Died += new GenericEventHandler<Entity>(CommandCenterDestroyed);
+
+            return closestCommandCenter;
+        }
+
+        void CommandCenterDestroyed(Entity sender)
+        {
+            commandCenter = FindClosestCommandCenter(node.Position);
         }
 
         private bool harvestingIsOver(float timeDelta)
@@ -83,6 +137,20 @@ namespace Orion.GameLogic.Tasks
                 return false;
             }
         }
+
+        private bool visitingCommandCenterIsOver(float timeDelta)
+        {
+            if (secondsGivingRessource >= secondsToGiveRessource)
+            {
+                return true;
+            }
+            else
+            {
+                secondsGivingRessource += timeDelta;
+                return false;
+            }
+        }
+
         #endregion
     }
 }

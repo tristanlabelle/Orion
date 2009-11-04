@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Action.cs" />
+    <Compile Include="ActionButton.cs" />
     <Compile Include="CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

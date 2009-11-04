@@ -21,22 +21,20 @@ namespace Orion.UserInterface.Widgets
         public Color Color { get; set; }
 
         /// <summary>
-        /// Constructs a Label with a given frame.
-        /// </summary>
-        /// <param name="frame">The frame rectangle</param>
-        public Label(Rectangle frame)
-            : base(frame)
-        { }
-
-        /// <summary>
         /// Constructs a Label with a given frame and text content.
         /// </summary>
         /// <param name="frame"></param>
         /// <param name="caption"></param>
-        public Label(Rectangle frame, string caption)
+        public Label(string caption, Rectangle frame)
             : base(frame)
         {
             Text = new Text(caption);
+        }
+
+        public Label(Text text)
+            : base(text.Frame)
+        {
+            Text = text;
         }
 
         protected internal override void Draw(GraphicsContext context)

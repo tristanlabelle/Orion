@@ -72,7 +72,6 @@ namespace Orion.Commandment.Commands
             protected override Harvest DeserializeData(BinaryReader reader, World world)
             {
                 Faction sourceFaction = ReadFaction(reader, world);
-                int nodeID = reader.ReadInt32();
                 ResourceNode node = ReadResourceNode(reader, world);
                 Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
                 return new Harvest(sourceFaction, units, node);

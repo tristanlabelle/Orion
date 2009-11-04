@@ -12,11 +12,13 @@ namespace Orion.Graphics
         {
             private TerrainRenderer terrain;
             private UnitRenderer units;
+            private FogOfWarRenderer fogOfWar;
 
             internal Minimap(MatchRenderer renderer)
             {
                 terrain = renderer.worldRenderer.TerrainRenderer;
                 units = renderer.worldRenderer.UnitRenderer;
+                fogOfWar = renderer.worldRenderer.FogOfWarRenderer;
             }
 
             internal Rectangle VisibleRect { get; set; }
@@ -25,6 +27,8 @@ namespace Orion.Graphics
             {
                 terrain.Draw(context);
                 units.DrawMiniature(context);
+                fogOfWar.Draw(context);
+                
                 context.StrokeColor = Color.Orange;
                 Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
                 context.Stroke(intersection.GetValueOrDefault());

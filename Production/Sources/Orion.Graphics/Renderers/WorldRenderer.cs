@@ -57,6 +57,11 @@ namespace Orion.Graphics
         {
             get { return unitRenderer; }
         }
+
+        public FogOfWarRenderer FogOfWarRenderer
+        {
+            get { return fogOfWarRenderer; }
+        }
         #endregion
 
         #region Methods

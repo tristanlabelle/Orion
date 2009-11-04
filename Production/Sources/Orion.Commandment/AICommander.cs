@@ -90,17 +90,7 @@ namespace Orion.Commandment
 
         private void DispatchHarvesters(ResourceNode node)
         {
-            // Eventually all Harvesting units will be dispatched.  As of now, only 20% of all units are.
-
-            float amountOfHarvesters = World.Units.Where(unit => unit.Faction == Faction).Count()*0.2f;
-            int roundedHarvesters = (int)Math.Ceiling(amountOfHarvesters);
-
-            List<Unit> units = World.Units.Where(unit => unit.Faction == Faction).ToList();
-            List<Unit> harvesters = new List<Unit>();
-            for (int i = 0; i < roundedHarvesters; i++)
-            {
-                harvesters.Add(units.ElementAt(i));
-            }
+            List<Unit> harvesters = World.Units.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Harvest>()).ToList();
 
             if (harvesters.Count() != 0)
             {

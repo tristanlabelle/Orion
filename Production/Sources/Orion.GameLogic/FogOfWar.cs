@@ -9,6 +9,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         private ushort[,] tiles;
+        private bool blackSheepWall = false;
         #endregion
         
         #region Constructors
@@ -84,6 +85,9 @@ namespace Orion.GameLogic
 
         private void ModifyLineOfSight(Circle sight, bool addOrRemove)
         {
+            if (blackSheepWall)
+                return;
+
             //addOrRemove : true = add  false = remove
             Rectangle tilesRectangle = CreateTilesRectangle(sight.BoundingRectangle);
 
@@ -180,7 +184,16 @@ namespace Orion.GameLogic
         {
             return SeesTileCurrently(point.X, point.Y);
         }
-        
+
+        public void BlackSheepWall()
+        {
+            blackSheepWall = true;
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    this.tiles[i, j] = 1;
+            OnChanged();
+        }
+
         #endregion
     }
 }

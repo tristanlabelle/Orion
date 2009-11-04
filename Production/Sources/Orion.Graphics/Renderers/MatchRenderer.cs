@@ -27,7 +27,7 @@ namespace Orion.Graphics
             {
                 terrain.Draw(context);
                 units.DrawMiniature(context);
-                //fogOfWar.Draw(context);
+                fogOfWar.Draw(context);
                 
                 context.StrokeColor = Color.Orange;
                 Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
@@ -72,7 +72,7 @@ namespace Orion.Graphics
             worldRenderer.DrawResources(context);
             worldRenderer.DrawEntities(context);
             selectionRenderer.DrawHealthBars(context);
-            //worldRenderer.DrawFogOfWar(context);
+            worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }
     }

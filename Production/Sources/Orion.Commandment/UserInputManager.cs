@@ -136,6 +136,7 @@ namespace Orion.Commandment
 
         public void HandleKeyDown(object responder, KeyboardEventArgs args)
         {
+            if (args.Key == Keys.F12) commander.Faction.FogOfWar.BlackSheepWall();
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = true;
             if (args.Key == Keys.Delete) LaunchSuicide();
             if (args.Key == Keys.C) LaunchCancel();

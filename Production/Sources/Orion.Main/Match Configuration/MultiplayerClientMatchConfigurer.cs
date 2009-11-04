@@ -13,7 +13,9 @@ namespace Orion.Main
     {
         public MultiplayerClientMatchConfigurer(Transporter transporter)
             : base(transporter)
-        { }
+        {
+            seed = 545845;
+        }
 
         public IPAddress Host { get; set; }
 

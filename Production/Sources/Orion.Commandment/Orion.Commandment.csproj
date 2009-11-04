@@ -60,7 +60,6 @@
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
-    <Compile Include="DummyAICommander.cs" />
     <Compile Include="Pipelines\CommandPipeline.cs" />
     <Compile Include="Pipelines\SinglePlayerCommandPipeline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

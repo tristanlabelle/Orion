@@ -82,6 +82,11 @@ namespace Orion.GameLogic
                 OnDied();
             }
         }
+
+        public override string ToString()
+        {
+            return "{0} resource node".FormatInvariant(type);
+        }
         #endregion
     }
 }

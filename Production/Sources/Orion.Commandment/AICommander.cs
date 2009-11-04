@@ -141,7 +141,7 @@ namespace Orion.Commandment
 
         private void BuildMainCommandCenter()
         {
-            Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.HasSkill<Skills.Build>() && unit.IsIdle);
+            Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Build>() && unit.IsIdle);
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.BoundingRectangle.Width), (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
             
             if (!World.Bounds.ContainsPoint(position))

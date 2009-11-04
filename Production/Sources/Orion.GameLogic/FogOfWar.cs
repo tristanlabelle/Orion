@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenTK.Math;
 using Orion.Geometry;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -8,13 +10,17 @@ namespace Orion.GameLogic
     public sealed class FogOfWar
     {
         #region Fields
-        private ushort[,] tiles;
+        private readonly ushort[,] tiles;
+        private readonly Dictionary<int, BitArray2D> cachedCircleBitmaps = new Dictionary<int, BitArray2D>();
         private bool blackSheepWall = false;
         #endregion
         
         #region Constructors
-        public FogOfWar(int width, int height, Faction faction)
+        public FogOfWar(int width, int height)
         {
+            Argument.EnsureStrictlyPositive(width, "width");
+            Argument.EnsureStrictlyPositive(height, "height");
+
             this.tiles = new ushort[width, height];
             for (int i = 0; i < width; i++)
                 for (int j = 0; j < height; j++)
@@ -23,6 +29,9 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when this fog of war changes.
+        /// </summary>
         public event GenericEventHandler<FogOfWar> Changed;
 
         private void OnChanged()
@@ -33,7 +42,7 @@ namespace Orion.GameLogic
 
         #region Properties
         /// <summary>
-        /// Gets the width of this terrain, in tiles.
+        /// Gets the width of the terrain, in tiles.
         /// </summary>
         public int Width
         {
@@ -41,13 +50,12 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the height of this terrain, in tiles.
+        /// Gets the height of the terrain, in tiles.
         /// </summary>
         public int Height
         {
             get { return tiles.GetLength(1); }
         }
-
         #endregion
 
         #region Methods
@@ -80,36 +88,68 @@ namespace Orion.GameLogic
             return new Circle(
                 (float)Math.Floor(lineOfSight.Center.X),
                 (float)Math.Floor(lineOfSight.Center.Y),
-                lineOfSight.Radius);
+                (float)Math.Round(lineOfSight.Radius));
         }
 
-        private void ModifyLineOfSight(Circle sight, bool addOrRemove)
+        private BitArray2D GetCircleBitmap(int radius)
         {
-            if (blackSheepWall)
-                return;
+            BitArray2D bitmap;
+            if (cachedCircleBitmaps.TryGetValue(radius, out bitmap))
+                return bitmap;
 
-            //addOrRemove : true = add  false = remove
-            Rectangle tilesRectangle = CreateTilesRectangle(sight.BoundingRectangle);
-
-            for (int i = (int)tilesRectangle.MinX; i < tilesRectangle.MaxX; i++)
+            Circle circle = new Circle(radius, radius, radius);
+            bitmap = new BitArray2D(radius * 2, radius * 2);
+            for (int x = 0; x < radius * 2; ++x)
             {
-                for (int j = (int)tilesRectangle.MinY; j < tilesRectangle.MaxY; j++)
+                for (int y = 0; y < radius * 2; ++y)
                 {
-                    if (sight.ContainsPoint(new Vector2((float)(i + 0.5), (float)(j + 0.5))))
+                    Vector2 point = new Vector2(x + 0.5f, y + 0.5f);
+                    bitmap[x, y] = circle.ContainsPoint(point);
+                }
+            }
+
+            cachedCircleBitmaps.Add(radius, bitmap);
+
+            return bitmap;
+        }
+
+        private void ModifyLineOfSight(Circle lineOfSight, bool addOrRemove)
+        {
+            if (blackSheepWall) return;
+
+            int roundedRadius = (int)Math.Round(lineOfSight.Radius);
+            BitArray2D bitmap = GetCircleBitmap(roundedRadius);
+
+            int minX = (int)Math.Floor(lineOfSight.Center.X - bitmap.ColumnCount * 0.5f);
+            int minY = (int)Math.Floor(lineOfSight.Center.Y - bitmap.RowCount * 0.5f);
+            int maxX = minX + bitmap.ColumnCount;
+            int maxY = minY + bitmap.RowCount;
+
+            for (int x = minX; x < maxX; x++)
+            {
+                if (x < 0 || x >= Width) continue;
+                for (int y = minY; y < maxY; y++)
+                {
+                    if (y < 0 || y >= Height) continue;
+
+                    if (!bitmap[x - minX, y - minY]) continue;
+
+                    if (addOrRemove)
                     {
-                        if (addOrRemove)
-                            if (tiles[i, j] == ushort.MaxValue)
-                                tiles[i, j] = 1;
-                            else
-                            {
-                                System.Diagnostics.Debug.Assert(tiles[i, j] != ushort.MaxValue - 1);
-                                tiles[i, j]++;
-                            }
+                        if (tiles[x, y] == ushort.MaxValue)
+                        {
+                            tiles[x, y] = 1;
+                        }
                         else
                         {
-                            System.Diagnostics.Debug.Assert(tiles[i, j] != ushort.MaxValue);
-                            tiles[i, j]--;
+                            Debug.Assert(tiles[x, y] != ushort.MaxValue - 1);
+                            tiles[x, y]++;
                         }
+                    }
+                    else
+                    {
+                        Debug.Assert(tiles[x, y] != ushort.MaxValue);
+                        tiles[x, y]--;
                     }
                 }
             }

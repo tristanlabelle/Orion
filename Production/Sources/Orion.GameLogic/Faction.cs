@@ -44,7 +44,7 @@ namespace Orion.GameLogic
             this.world = world;
             this.name = name;
             this.color = color;
-            this.fogOfWar = new FogOfWar(world.Width, world.Height, this);
+            this.fogOfWar = new FogOfWar(world.Width, world.Height);
             this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
             this.entityDiedEventHandler = OnEntityDied;
         }

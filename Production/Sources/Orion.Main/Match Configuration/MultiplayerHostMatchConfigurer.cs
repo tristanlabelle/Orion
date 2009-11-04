@@ -13,7 +13,9 @@ namespace Orion.Main
     {
         public MultiplayerHostMatchConfigurer(Transporter transporter)
             : base(transporter)
-        { }
+        {
+            seed = 545845;
+        }
 
         public override void CreateNetworkConfiguration()
         {

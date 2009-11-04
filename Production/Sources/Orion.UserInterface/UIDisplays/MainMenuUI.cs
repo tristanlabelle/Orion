@@ -1,5 +1,4 @@
-﻿
-using Orion.Geometry;
+﻿using Orion.Geometry;
 using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface

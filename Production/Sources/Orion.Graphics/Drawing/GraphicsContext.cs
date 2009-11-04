@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RectangleF = System.Drawing.RectangleF;
 
 using OpenTK.Graphics;
 using OpenTK.Math;
@@ -49,7 +50,6 @@ namespace Orion.Graphics
         private Color strokeColor = Color.Black;
         private StrokeStyle strokeStyle = StrokeStyle.Solid;
         private Font font = new Font("Consolas", 12);
-        private TextPrinter printer;
         private bool readyForDrawing;
         #endregion
 
@@ -64,7 +64,6 @@ namespace Orion.Graphics
         {
             coordinateSystem = bounds;
             strokeStyle = StrokeStyle.Solid;
-            printer = new TextPrinter();
         }
         #endregion
 
@@ -309,9 +308,9 @@ namespace Orion.Graphics
         /// Printes text, using this context's defined font and color, to the view at the origin coordinates
         /// </summary>
         /// <param name="text">The text to print</param>
-        public void DrawText(string text)
+        public void Draw(string text)
         {
-            DrawText(text, new Vector2(0, 0));
+            Draw(text, new Vector2(0, 0));
         }
 
         /// <summary>
@@ -319,26 +318,28 @@ namespace Orion.Graphics
         /// </summary>
         /// <param name="text">The <see cref="System.String"/> to print</param>
         /// <param name="position">The position at which to print the string</param>
-        public void DrawText(string text, Vector2 position)
+        public void Draw(string text, Vector2 position)
         {
-            GL.PushMatrix();
-            GL.Translate(position.X, position.Y, 0);
-            GL.Scale(1, -1, 1);
-            printer.Print(text, font, fillColor);
-            GL.PopMatrix();
+            Draw(new Text(text), position);
         }
 
-        /// <summary>
-        /// Prints text, fitting it into a specified rectangle, using this context's defined font and color.
-        /// </summary>
-        /// <param name="text">The text to print</param>
-        /// <param name="fitInto">The rectangle in which the text must fit</param>
-        public void DrawText(string text, Rectangle fitInto)
+        public void Draw(Text text)
+        {
+            Draw(text, text.Frame);
+        }
+
+        public void Draw(Text text, Vector2 position)
+        {
+            Draw(text, text.Frame.Translate(position));
+        }
+
+        public void Draw(Text text, Rectangle drawInto)
         {
             GL.PushMatrix();
-            GL.Translate(fitInto.MinX, fitInto.MinY, 0);
+            GL.Translate(drawInto.MinX, drawInto.MinY, 0);
             GL.Scale(1, -1, 1);
-            printer.Print(text, font, fillColor, new System.Drawing.RectangleF(0, 0, fitInto.Width, fitInto.Height));
+            RectangleF renderInto = new RectangleF(0, -drawInto.Height, drawInto.Width, drawInto.Height);
+            Text.defaultTextPrinter.Print(text.Value, text.Font, fillColor, renderInto);
             GL.PopMatrix();
         }
 

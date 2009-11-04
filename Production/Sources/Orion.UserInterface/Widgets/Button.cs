@@ -37,8 +37,8 @@ namespace Orion.UserInterface.Widgets
 
         public string Caption
         {
-            get { return caption.Text; }
-            set { caption.Text = value; }
+            get { return caption.Text.Value; }
+            set { caption.Text = new Text(value); }
         }
 
         public Keys HotKey

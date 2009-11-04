@@ -13,7 +13,7 @@ namespace Orion.UserInterface.Widgets
         /// <summary>
         /// Accesses this object's text contents.
         /// </summary>
-        public virtual string Text { get; set; }
+        public virtual Text Text { get; set; }
 
         /// <summary>
         /// Accesses this object's text color.
@@ -36,13 +36,13 @@ namespace Orion.UserInterface.Widgets
         public Label(Rectangle frame, string caption)
             : base(frame)
         {
-            Text = caption;
+            Text = new Text(caption);
         }
 
         protected internal override void Draw(GraphicsContext context)
         {
             context.FillColor = Color;
-            context.DrawText(Text, Bounds);
+            context.Draw(Text, Bounds);
         }
     }
 }

@@ -22,8 +22,8 @@ namespace Orion.Graphics
         {
             string hp = "HP: {0}/{1}".FormatInvariant(unit.Health, unit.MaxHealth);
             context.FillColor = Color.DarkBlue;
-            context.DrawText(unit.Type.Name, new Vector2(150, 175));
-            context.DrawText(hp, new Vector2(150, 150));
+            context.Draw(unit.Type.Name, new Vector2(150, 155));
+            context.Draw(hp, new Vector2(150, 130));
             base.RenderInto(context);
         }
     }

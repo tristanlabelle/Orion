@@ -24,11 +24,11 @@ namespace Orion.UserInterface
         #region Methods
         protected internal override void Draw(GraphicsContext context)
         {
-            string resources = "Aladdium: " + faction.AladdiumAmount + "  Alagene: " + faction.AlageneAmount;
+            Text text = new Text("Aladdium: {0}    Alagene: {1}".FormatInvariant(faction.AladdiumAmount, faction.AlageneAmount));
             context.FillColor = Color.Blue;
             context.Fill(Bounds);
             context.FillColor = Color.White;
-            context.DrawText(resources, new Vector2(0, Bounds.Height));
+            context.Draw(text);
         }
         #endregion
     }

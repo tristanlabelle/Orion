@@ -47,9 +47,6 @@ namespace Orion.Commandment
             keysMap[Keys.B] = MouseDrivenCommand.Build;
             keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
             keysMap[Keys.M] = MouseDrivenCommand.Move;
-            keysMap[Keys.T] = MouseDrivenCommand.Train;
-            keysMap[Keys.S] = MouseDrivenCommand.Suicide;
-            keysMap[Keys.C] = MouseDrivenCommand.Cancel;
             keysMap[Keys.Escape] = null;
         }
         #endregion
@@ -134,6 +131,11 @@ namespace Orion.Commandment
         public void HandleKeyDown(object responder, KeyboardEventArgs args)
         {
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = true;
+            if (args.Key == Keys.Delete) LaunchSuicide();
+            if (args.Key == Keys.C) LaunchCancel();
+            if (args.Key == Keys.T)
+                LaunchTrain(commander.Faction.World.UnitTypes.First
+                    (unit => unit.HasSkill<Attack>()));
             if (keysMap.ContainsKey(args.Key)) mouseCommand = keysMap[args.Key];
         }
 
@@ -173,16 +175,7 @@ namespace Orion.Commandment
                     if (target == null || !target.Type.IsBuilding) break;
                     LaunchRepair(target);
                     break;
-                case MouseDrivenCommand.Train:
-                    LaunchTrain(commander.Faction.World.UnitTypes.First(unit => unit.HasSkill <Attack>()));
-                    break;
 
-                case MouseDrivenCommand.Suicide:
-                    LaunchSuicide();
-                    break;
-                case MouseDrivenCommand.Cancel:
-                    LaunchCancel();
-                    break;
             }
 
             mouseCommand = null;

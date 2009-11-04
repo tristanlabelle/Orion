@@ -9,7 +9,7 @@ namespace Orion.Main
     {
         #region Fields
         private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
-
+        private const short campSize = 6;
         private Random random;
         private Terrain terrain;
 
@@ -30,27 +30,68 @@ namespace Orion.Main
             #region Units & Buildings Creation
             // this really, really sucks
             // we have to do something better
+
+            // Find a Spot To place a base 10 by 10 
+            //if there less that 10% non walkable we will use this spot
+            //for a base
             foreach (Faction faction in world.Factions)
             {
-                    foreach (UnitType type in World.UnitTypes)
+                Point16 position = new Point16(0, 0) ;
+                int tries = 0;
+                bool allWalkable = false;
+                while(!allWalkable)
+                {
+                    allWalkable = true;
+                    ++tries;
+                    if(tries ==100) throw new Exception("FAIL to find camp site");
+
+                    position = new Point16((short)random.Next(world.Width), (short)random.Next(world.Height));
+
+                    for (short ligne = 0; ligne < campSize; ligne++)
                     {
-                        for (int i = 0; i < 10; i++)
+                        if(!allWalkable) break;
+
+                        for (short colonne = 0; colonne < campSize; colonne++)
                         {
-                            Vector2 position;
-                            do
+                            Point16 testedPoint = new Point16((short)(position.X + colonne), (short)(position.Y + ligne));
+                            if (!world.IsWithinBounds(testedPoint) || !world.Terrain.IsWalkable(testedPoint)) 
                             {
-                                position = new Vector2(random.Next(world.Width), random.Next(world.Height));
-                            } while (!terrain.IsWalkable(position));
-                            Unit unit = faction.CreateUnit(type);
-                            unit.Position = position;
+                                allWalkable = false;
+                                break;
+                            }
+                            
                         }
-                        
                     }
+                }
+                
+                // creation of the command center in the center of the area
+                position = new Point16((short)(position.X + campSize / 2), (short)(position.Y + campSize / 2));
+             
+                Unit factory = faction.CreateUnit(world.UnitTypes.FromName("Factory"));
+                factory.Position = new Vector2(position.X, position.Y);
+                
+                //creation of the builder and the harvester
+                for(short i = 1 ;i<=2;i++)
+                {
+                    Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"));
+                    Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"));
+                    builder.Position = new Vector2(position.X + i, position.Y);
+                    harvester.Position = new Vector2(position.X, position.Y + i);
+                }
+               
+                ResourceNode nodeAladdium = world.CreateResourceNode
+                    (ResourceType.Aladdium, 500, new Vector2(position.X - (campSize / 2), position.Y - 1));
+
+                ResourceNode nodeAlagene = world.CreateResourceNode
+                    (ResourceType.Alagene, 500, new Vector2(position.X - (campSize / 2), position.Y + 1));
             }
+               
+
+            
             #endregion
 
             #region Resource Nodes
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 6; i++)
             {
                 Vector2 position;
                 do

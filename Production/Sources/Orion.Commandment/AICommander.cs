@@ -69,6 +69,9 @@ namespace Orion.Commandment
 
             if (Faction.AladdiumAmount >= 50 && hasBuilding)
                 TrainUnits();
+
+            if (commandCenterBuilt)
+                Attack();
         }
 
         private void TrainUnits()
@@ -77,7 +80,7 @@ namespace Orion.Commandment
             List<Unit> allBuildingIdleThatCanBuild = World.Units.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Train>() && unit.IsIdle).ToList();
 
             //If there is building fitting to the condition
-            if (allBuildingIdleThatCanBuild != null)
+            if (allBuildingIdleThatCanBuild.Count != 0)
             {
                 Command command = new Train(allBuildingIdleThatCanBuild,
                     World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Attack>()), Faction);
@@ -113,6 +116,25 @@ namespace Orion.Commandment
 
         private void Attack()
         {
+            List<Unit> potentialAttackers = World.Units.Where(unit => unit.Faction == Faction 
+                && !(unit.Task is Orion.GameLogic.Tasks.Harvest) && !(unit.Task is Orion.GameLogic.Tasks.Build) && unit.Type.HasSkill<Skills.Attack>()).ToList();
+
+            int amountOfAttackers = (int)Math.Ceiling(0.75 * potentialAttackers.Count);
+            List<Unit> attackers = new List<Unit>();
+
+            for (int i = 0; i < amountOfAttackers; i++)
+                attackers.Add(potentialAttackers.ElementAt(i));
+            
+            Faction factionToAttack = World.Factions.First();
+
+            if(factionToAttack == Faction)
+                factionToAttack = World.Factions.ElementAt(1);
+
+            if (attackers.Count != 0)
+            {
+                Command command = new Attack(Faction, attackers, factionToAttack.Units.First());
+                GenerateCommand(command);
+            }
         }
 
         private void DevelopTechnology()
@@ -130,20 +152,14 @@ namespace Orion.Commandment
         private void BuildMainCommandCenter()
         {
             Unit builder = World.Units.FirstOrDefault(unit => unit.Faction == Faction && !unit.Type.IsBuilding && unit.IsIdle);
-            Vector2 position = new Vector2(
-                (startingNode.Position.X + startingNode.BoundingRectangle.Width),
-                (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
-
+            Vector2 position = new Vector2((startingNode.Position.X + startingNode.BoundingRectangle.Width), (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
+            
             if (!World.Bounds.ContainsPoint(position))
-            {
-                position = new Vector2(
-                    (startingNode.Position.X - startingNode.BoundingRectangle.Width),
-                    (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
-            }
+                position = new Vector2((startingNode.Position.X - startingNode.BoundingRectangle.Width), (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
 
             if (builder != null)
             {
-                Command command = new Build(builder, position, World.UnitTypes.First(type => type.IsBuilding));
+                Command command = new Build(builder, position, builder.World.UnitTypes.FromName("Factory"));
                 GenerateCommand(command);
                 commandCenterBuilt = true;
             }
@@ -152,18 +168,33 @@ namespace Orion.Commandment
         private void Meet()
         {
             startingNode = World.ResourceNodes.First();
+            
+            foreach (ResourceNode node in World.ResourceNodes.Where(node => node.Type == ResourceType.Aladdium))
+            {
+                Circle effectiveRange = new Circle(node.Position, 20);
+                
+                int enemyUnits = World.Units.Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position)).ToList().Count;
+                int alliedUnits = World.Units.Where(unit => unit.Faction == Faction && effectiveRange.ContainsPoint(unit.Position)).ToList().Count;
+
+                int unitScore = alliedUnits - enemyUnits;
+
+                Circle currentRange = new Circle(startingNode.Position, 20);
+
+                int currentEnemyUnits = World.Units.Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).ToList().Count;
+                int currentAlliedUnits = World.Units.Where(unit => unit.Faction == Faction && currentRange.ContainsPoint(unit.Position)).ToList().Count;
+
+                int currentScore = currentAlliedUnits - currentEnemyUnits;
+
+                if (unitScore > currentScore)
+                    startingNode = node;
+
+            }
             regions.Add(new Circle(startingNode.Position, 10));
 
-            Vector2 position = new Vector2(
-                (startingNode.Position.X + startingNode.BoundingRectangle.Width),
-                (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
-
-            if (!World.Bounds.ContainsPoint(position))
-            {
-                position = new Vector2(
-                    (startingNode.Position.X - startingNode.BoundingRectangle.Width),
-                    (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
-            }
+            Vector2 position = new Vector2((startingNode.Position.X + startingNode.BoundingRectangle.Width), (startingNode.Position.Y + startingNode.BoundingRectangle.Height));
+            
+            if(!World.Bounds.ContainsPoint(position))
+                position = new Vector2((startingNode.Position.X - startingNode.BoundingRectangle.Width), (startingNode.Position.Y - startingNode.BoundingRectangle.Height));
 
             List<Unit> unitsToMeet = World.Units.Where(unit => unit.Faction == Faction && !unit.Type.IsBuilding).ToList();
 

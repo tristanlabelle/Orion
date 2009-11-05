@@ -70,7 +70,7 @@ namespace Orion.UserInterface
 
         public void ScrollBy(Vector2 direction)
         {
-            Rectangle newBounds = Bounds.Translate(direction);
+            Rectangle newBounds = Bounds.TranslatedBy(direction);
             Vector2 newOrigin = newBounds.Min;
             Vector2 newSize = newBounds.Size;
 

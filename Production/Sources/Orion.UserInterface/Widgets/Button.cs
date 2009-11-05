@@ -20,7 +20,7 @@ namespace Orion.UserInterface.Widgets
         public Button(Rectangle frame, string caption, FrameRenderer renderer)
             : base(frame, renderer)
         {
-            this.caption = new Label(caption, Bounds.Translate(2, 2).Resize(-2, -2));
+            this.caption = new Label(caption, Bounds.TranslatedBy(2, 2).ResizedBy(-2, -2));
             this.caption.Color = Color.White;
             Children.Add(this.caption);
         }

@@ -330,7 +330,7 @@ namespace Orion.Graphics
 
         public void Draw(Text text, Vector2 position)
         {
-            Draw(text, text.Frame.Translate(position));
+            Draw(text, text.Frame.TranslatedBy(position));
         }
 
         public void Draw(Text text, Rectangle drawInto)

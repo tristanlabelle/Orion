@@ -145,7 +145,7 @@ namespace Orion.UserInterface
             base.OnResize(e);
             if (rootView != null)
             {
-                rootView.Frame = rootView.Frame.ResizeTo(glControl.Width, glControl.Height);
+                rootView.Frame = rootView.Frame.ResizedTo(glControl.Width, glControl.Height);
                 glControl.Refresh();
             }
         }

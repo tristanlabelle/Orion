@@ -40,7 +40,7 @@ namespace Orion.UserInterface
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Entities.Died += userInputManager.SelectionManager.EntityDied;
-            Rectangle worldFrame = Bounds.Resize(0, -Bounds.Height / 25).Resize(0, -Bounds.Height / 4).Translate(0, Bounds.Height / 4);
+            Rectangle worldFrame = Bounds.ResizedBy(0, -Bounds.Height / 25).ResizedBy(0, -Bounds.Height / 4).TranslatedBy(0, Bounds.Height / 4);
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
@@ -136,7 +136,7 @@ namespace Orion.UserInterface
         {
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
             worldView.FullBounds = userInputManager.Commander.Faction.World.Bounds
-                .Translate(-boundsHalfsize.X, -boundsHalfsize.Y).Resize(newBounds.Width, newBounds.Height);
+                .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y).ResizedBy(newBounds.Width, newBounds.Height);
 
             if (worldView.IsMouseOver)
             {
@@ -214,7 +214,7 @@ namespace Orion.UserInterface
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
                 renderer.HasFocus = unit.Type == selectedType;
-                Button unitButton = new Button(frame.TranslateTo(currentX, currentY), "", renderer);
+                Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
                 unitButton.Pressed += ButtonPress;
@@ -264,13 +264,13 @@ namespace Orion.UserInterface
         private void MoveWorldView(Vector2 center)
         {
             Vector2 difference = worldView.Bounds.Min - worldView.Bounds.Center;
-            Rectangle newBounds = worldView.Bounds.TranslateTo(center + difference);
+            Rectangle newBounds = worldView.Bounds.TranslatedTo(center + difference);
             float xDiff = worldView.FullBounds.MaxX - newBounds.MaxX;
             float yDiff = worldView.FullBounds.MaxY - newBounds.MaxY;
-            if (xDiff < 0) newBounds = newBounds.TranslateX(xDiff);
-            if (yDiff < 0) newBounds = newBounds.TranslateY(yDiff);
-            if (newBounds.MinX < 0) newBounds = newBounds.TranslateTo(0, newBounds.Min.Y);
-            if (newBounds.MinY < 0) newBounds = newBounds.TranslateTo(newBounds.Min.X, 0);
+            if (xDiff < 0) newBounds = newBounds.TranslatedXBy(xDiff);
+            if (yDiff < 0) newBounds = newBounds.TranslatedYBy(yDiff);
+            if (newBounds.MinX < 0) newBounds = newBounds.TranslatedTo(0, newBounds.Min.Y);
+            if (newBounds.MinY < 0) newBounds = newBounds.TranslatedTo(newBounds.Min.X, 0);
             worldView.Bounds = newBounds;
         }
         #endregion

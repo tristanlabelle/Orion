@@ -16,7 +16,7 @@ namespace Orion.UserInterface
         #region Fields
         private string name;
         private string hotkey;
-        private Frame tooltipFrame;
+        private Frame tooltipContainer;
 
         #endregion
 
@@ -28,12 +28,13 @@ namespace Orion.UserInterface
             this.hotkey = hotkey;
             Pressed += action;
 
-            Text tooltip = new Text("{0} ({1})".FormatInvariant(name, hotkey));
-            tooltipFrame = new Frame(new Rectangle(-0.45f, 0.9f, 0.9f, 0.3f), new FilledFrameRenderer());
-            tooltipFrame.Bounds = tooltip.Frame.Translate(-3, -3).Resize(6, 6);
-            Label tooltipLabel = new Label(tooltip);
-            tooltipFrame.Frame = tooltipFrame.Frame.TranslateTo(-tooltipFrame.Frame.CenterX, Bounds.MaxY * 1.1f);
-            tooltipLabel.Frame = tooltipLabel.Frame.Translate(3, 3);
+            Text tooltipText = new Text("{0} ({1})".FormatInvariant(name, hotkey));
+            Rectangle tooltipTextRect = tooltipText.Frame;
+            Rectangle tooltipRect = tooltipTextRect.ScaledBy(0.4f / tooltipTextRect.Height);
+
+            tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f), new FilledFrameRenderer());
+            tooltipContainer.Bounds = tooltipTextRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
+            tooltipContainer.Children.Add(new Label(tooltipText));
         }
         #endregion
 
@@ -53,13 +54,13 @@ namespace Orion.UserInterface
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            Children.Add(tooltipFrame);
+            Children.Add(tooltipContainer);
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            Children.Remove(tooltipFrame);
+            Children.Remove(tooltipContainer);
             return base.OnMouseExit(args);
         }
 

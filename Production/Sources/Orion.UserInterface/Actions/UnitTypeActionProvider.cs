@@ -27,10 +27,10 @@ namespace Orion.UserInterface
             Texture defaultTexture = null;// new Texture(40, 40, TextureFormat.Rgb, new byte[40 * 40 * 3]);
 
             // Harcode Paradise!
-            buttons[0, 0] = new ActionButton(defaultTexture, "Cancel", "c", CancelAction);
-            if (type.HasSkill<Skills.Move>()) buttons[0, 1] = new ActionButton(defaultTexture, "Move", "m", AssignMove);
+            buttons[0, 3] = new ActionButton(defaultTexture, "Cancel", "c", CancelAction);
+            if (type.HasSkill<Skills.Move>()) buttons[1, 3] = new ActionButton(defaultTexture, "Move", "m", AssignMove);
             if (type.HasSkill<Skills.Attack>()) buttons[0, 2] = new ActionButton(defaultTexture, "Attack", "a", AssignAttack);
-            if (type.HasSkill<Skills.Harvest>()) buttons[1, 0] = new ActionButton(defaultTexture, "Harvest", "h", AssignHarvest);
+            if (type.HasSkill<Skills.Harvest>()) buttons[1, 2] = new ActionButton(defaultTexture, "Harvest", "h", AssignHarvest);
             if (type.HasSkill<Skills.Build>())
             {
                 buttons[1, 1] = new ActionButton(defaultTexture, "Repair", "r", AssignRepair);

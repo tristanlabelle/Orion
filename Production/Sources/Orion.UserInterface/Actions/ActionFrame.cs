@@ -58,7 +58,7 @@ namespace Orion.UserInterface
                         ActionButton button = provider[x, y];
                         if (button != null)
                         {
-                            button.Frame = templateSize.Translate(origin);
+                            button.Frame = templateSize.TranslatedBy(origin);
                             Children.Add(button);
                         }
                         origin.Y += 1;

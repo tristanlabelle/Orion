@@ -28,7 +28,7 @@ namespace Orion.Graphics
         }
         #endregion
 
-        #region Methods
+        #region Properties
         public Rectangle Frame
         {
             get
@@ -37,6 +37,15 @@ namespace Orion.Graphics
                 return new Rectangle(extents.X, 0, extents.Width, extents.Height);
             }
         }
+        #endregion
+
+        #region Methods
+        #region Object Model
+        public override string ToString()
+        {
+            return Value;
+        }
+        #endregion
         #endregion
     }
 }

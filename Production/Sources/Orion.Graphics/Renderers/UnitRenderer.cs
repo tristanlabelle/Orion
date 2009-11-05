@@ -76,7 +76,7 @@ namespace Orion.Graphics
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
                 context.FillColor = unit.Faction.Color;
-                context.Fill(unitRect.Translate(unit.Position));
+                context.Fill(unitRect.TranslatedBy(unit.Position));
             }
         }
 

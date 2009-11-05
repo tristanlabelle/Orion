@@ -304,9 +304,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> based on this one whose origin is translated by the specified units
         /// </returns>
-        public Rectangle Translate(float x, float y)
+        public Rectangle TranslatedBy(float x, float y)
         {
-            return Translate(new Vector2(x, y));
+            return TranslatedBy(new Vector2(x, y));
         }
         
         /// <summary>
@@ -318,9 +318,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> based on this one, whose origin is translated by the specified vector
         /// </returns>
-        public Rectangle Translate(Vector2 direction)
+        public Rectangle TranslatedBy(Vector2 direction)
         {
-            return TranslateTo(min + direction);
+            return TranslatedTo(min + direction);
         }
         
         /// <summary>
@@ -332,9 +332,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> based on this one, whose origin abscissa is translated by the specified units
         /// </returns>
-        public Rectangle TranslateX(float x)
+        public Rectangle TranslatedXBy(float x)
         {
-            return Translate(x, 0);
+            return TranslatedBy(x, 0);
         }
         
         /// <summary>
@@ -346,9 +346,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> based on this one, whose origin ordinate is translated by the specified units 
         /// </returns>
-        public Rectangle TranslateY(float y)
+        public Rectangle TranslatedYBy(float y)
         {
-            return Translate(0, y);
+            return TranslatedBy(0, y);
         }
         
         /// <summary>
@@ -363,9 +363,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the size of this one but the specified origin
         /// </returns>
-        public Rectangle TranslateTo(float x, float y)
+        public Rectangle TranslatedTo(float x, float y)
         {
-            return TranslateTo(new Vector2(x, y));
+            return TranslatedTo(new Vector2(x, y));
         }
         
         /// <summary>
@@ -377,13 +377,28 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the same size as this one but the specified origin
         /// </returns>
-        public Rectangle TranslateTo(Vector2 origin)
+        public Rectangle TranslatedTo(Vector2 origin)
         {
             return new Rectangle(origin, size);
         }
         #endregion
         
         #region Resizing
+        public Rectangle ScaledBy(float factor)
+        {
+            return ScaledBy(new Vector2(factor, factor));
+        }
+
+        public Rectangle ScaledBy(float xFactor, float yFactor)
+        {
+            return ScaledBy(new Vector2(xFactor, yFactor));
+        }
+
+        public Rectangle ScaledBy(Vector2 scaleVector)
+        {
+            return ResizedTo(Width * scaleVector.X, Height * scaleVector.Y);
+        }
+
         /// <summary>
         /// Creates a new rectangle resized by the specified values.
         /// </summary>
@@ -396,9 +411,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the modified size
         /// </returns>
-        public Rectangle Resize(float width, float height)
+        public Rectangle ResizedBy(float width, float height)
         {
-            return Resize(new Vector2(width, height));
+            return ResizedBy(new Vector2(width, height));
         }
         
         /// <summary>
@@ -410,9 +425,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the modified size
         /// </returns>
-        public Rectangle Resize(Vector2 sizeChange)
+        public Rectangle ResizedBy(Vector2 sizeChange)
         {
-            return ResizeTo(size + sizeChange);
+            return ResizedTo(size + sizeChange);
         }
         
         /// <summary>
@@ -424,9 +439,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the modified width
         /// </returns>
-        public Rectangle ResizeWidth(float width)
+        public Rectangle ResizedWidthBy(float width)
         {
-            return Resize(width, 0);
+            return ResizedBy(width, 0);
         }
         
         /// <summary>
@@ -438,9 +453,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the modified height
         /// </returns>
-        public Rectangle ResizeHeight(float height)
+        public Rectangle ResizedHeightBy(float height)
         {
-            return Resize(0, height);
+            return ResizedBy(0, height);
         }
         
         /// <summary>
@@ -455,9 +470,9 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> at the same origin but with a different size
         /// </returns>
-        public Rectangle ResizeTo(float width, float height)
+        public Rectangle ResizedTo(float width, float height)
         {
-            return ResizeTo(new Vector2(width, height));
+            return ResizedTo(new Vector2(width, height));
         }
         
         /// <summary>
@@ -469,7 +484,7 @@ namespace Orion.Geometry
         /// <returns>
         /// A new <see cref="Rectangle"/> with the same origin as this rectangle's one but a different size
         /// </returns>
-        public Rectangle ResizeTo(Vector2 newSize)
+        public Rectangle ResizedTo(Vector2 newSize)
         {
             return new Rectangle(min, newSize);
         }

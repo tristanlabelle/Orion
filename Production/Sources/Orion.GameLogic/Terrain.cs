@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic
 {
@@ -72,6 +73,86 @@ namespace Orion.GameLogic
         public bool IsWalkable(Point16 point)
         {
             return IsWalkable(point.X, point.Y);
+        }
+
+        public bool IsWalkableAndWithinBounds(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= Width || y >= Height)
+                return false;
+            return IsWalkable(x, y);
+        }
+
+        public bool IsWalkable(LineSegment lineSegment, int width)
+        {
+            Argument.EnsureStrictlyPositive(width, "width");
+
+            // Bresenham's line algorithm
+            // Source: http://en.wikipedia.org/wiki/Bresenham's_line_algorithm
+
+            Vector2 normal = lineSegment.Delta.PerpendicularLeft;
+            normal.Normalize();
+
+            for (int i = 0; i < width; ++i)
+            {
+                Vector2 displacement = normal * (i - width * 0.5f);
+
+                Vector2 p1 = lineSegment.EndPoint1 + displacement;
+                Vector2 p2 = lineSegment.EndPoint2 + displacement;
+
+                int x0 = (int)lineSegment.EndPoint1.X;
+                int x1 = (int)lineSegment.EndPoint2.X;
+                int y0 = (int)lineSegment.EndPoint1.Y;
+                int y1 = (int)lineSegment.EndPoint2.Y;
+
+                if (!IsLineWalkable(x0, x1, y0, y1))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool IsLineWalkable(int x0, int x1, int y0, int y1)
+        {
+            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
+            if (steep)
+            {
+                Swap(ref x0, ref y0);
+                Swap(ref x1, ref y1);
+            }
+
+            if (x0 > x1)
+            {
+                Swap(ref x0, ref x1);
+                Swap(ref y0, ref y1);
+            }
+
+            int deltaX = x1 - x0;
+            int deltaY = Math.Abs(y1 - y0);
+            int error = deltaX / 2;
+            int yStep = (y0 < y1) ? 1 : -1;
+            int y = y0;
+
+            for (int x = x0; x < x1; ++x)
+            {
+                bool isWalkable = steep ? IsWalkableAndWithinBounds(y, x) : IsWalkableAndWithinBounds(x, y);
+                if (!isWalkable) return false;
+
+                error = error - deltaY;
+                if (error < 0)
+                {
+                    y += yStep;
+                    error += deltaX;
+                }
+            }
+
+            return true;
+        }
+
+        private void Swap(ref int a, ref int b)
+        {
+            int temp = a;
+            a = b;
+            b = temp;
         }
         #endregion
         #endregion

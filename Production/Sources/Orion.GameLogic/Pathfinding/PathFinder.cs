@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic.Pathfinding
 {
@@ -68,7 +69,24 @@ namespace Orion.GameLogic.Pathfinding
             if (destinationNode == null) destinationNode = FindClosedNodeNearestToDestination();
 
             FindPathPointsTo(destinationNode);
+            OptimizePathPoints();
             return new Path(world, source, destination, points);
+        }
+
+        private void OptimizePathPoints()
+        {
+            for (int i = 0; i < points.Count - 2; ++i)
+            {
+                Point16 sourcePoint = points[i];
+                while (i != points.Count - 2)
+                {
+                    Point16 destinationPoint = points[i + 2];
+                    LineSegment lineSegment = new LineSegment(sourcePoint, destinationPoint);
+                    if (!world.Terrain.IsWalkable(lineSegment, 1))
+                        break;
+                    points.RemoveAt(i + 1);
+                }
+            }
         }
 
         private void CleanUp()

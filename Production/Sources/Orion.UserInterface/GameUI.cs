@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 
 
@@ -12,6 +13,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly Window mainWindow;
+        private readonly FrameRateCounter frameRateCounter = new FrameRateCounter();
         #endregion
 
         #region Constructors
@@ -44,7 +46,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-
         public void Display(UIDisplay display)
         {
             mainWindow.rootView.PushDisplay(display);
@@ -64,9 +65,11 @@ namespace Orion.UserInterface
         /// <param name="delta">
         /// A <see cref="System.Single"/> representing how many seconds elapsed since the last update event
         /// </param>
-        public void Update(float delta)
+        public void Update(float timeDeltaInSeconds)
         {
-            mainWindow.rootView.Update(delta);
+            mainWindow.rootView.Update(timeDeltaInSeconds);
+            frameRateCounter.Update();
+            mainWindow.Text = frameRateCounter.ToString();
         }
 
         /// <summary>

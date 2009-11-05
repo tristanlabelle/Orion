@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Argument.cs" />
     <Compile Include="BitArray2D.cs" />
+    <Compile Include="FrameRateCounter.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Ellipse.cs" />
     <Compile Include="Formatting.cs" />

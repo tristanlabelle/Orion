@@ -13,21 +13,18 @@ using Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
-    public enum MouseDrivenCommand
+    public abstract class UserInputCommand
     {
-        Attack, Build, Harvest, Move, Repair, ZoneAttack, Train, Cancel
+        public abstract void Target(Entity entity);
+        public abstract void Target(Vector2 point);
     }
 
     public class UserInputManager
     {
         #region Fields
-        // TODO
-        // use unit skills for key mapping instead of a static keys map
-        private static Dictionary<Keys, MouseDrivenCommand?> keysMap;
-
         private UserInputCommander commander;
         private SelectionManager selectionManager;
-        private MouseDrivenCommand? mouseCommand;
+        private UserInputCommand mouseCommand;
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
         private bool shiftKeyPressed;
@@ -39,6 +36,10 @@ namespace Orion.Commandment
             commander = userCommander;
             selectionManager = new SelectionManager(userCommander.Faction);
         }
+        #endregion
+
+        #region Events
+        public event GenericEventHandler<UserInputManager> AssignedCommand;
         #endregion
 
         #region Properties
@@ -62,7 +63,7 @@ namespace Orion.Commandment
             }
         }
 
-        public MouseDrivenCommand? SelectedCommand
+        public UserInputCommand SelectedCommand
         {
             get { return mouseCommand; }
             set { mouseCommand = value; }
@@ -73,7 +74,7 @@ namespace Orion.Commandment
         #region Direct Event Handling
         public void HandleMouseDown(object responder, MouseEventArgs args)
         {
-            if (mouseCommand.HasValue)
+            if (mouseCommand != null)
             {
                 if (args.ButtonPressed == MouseButton.Left) LaunchMouseCommand(args.Position);
             }
@@ -153,51 +154,15 @@ namespace Orion.Commandment
         {
             Faction faction = commander.Faction;
             Rectangle hitRect = new Rectangle(at.X, at.Y, 1, 1);
-            Unit target = faction.World.Entities
-                .OfType<Unit>()
-                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle))
-                .FirstOrDefault();
+            Entity target = faction.World.Entities
+                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle)).FirstOrDefault();
 
-            switch (mouseCommand)
-            {
-                case MouseDrivenCommand.Attack:
-                    // if a unit can move *and* attack, then it's probably capable of ZoneAttack'ing.
-                    if (target == null) LaunchZoneAttack(at);
-                    else LaunchAttack(target);
-                    break;
-
-                case MouseDrivenCommand.Build:
-
-                    /*ResourceNode alagene = faction.World.Entities
-                        .OfType<ResourceNode>()
-                        .FirstOrDefault(node => Rectangle.Intersects(hitRect, node.BoundingRectangle)
-                                        && node.Type == ResourceType.Alagene);
-                    if (alagene != null)
-                    {
-                        LaunchBuild(alagene.Position, commander.Faction.World.UnitTypes.First(unit => unit.HasSkill<Skills.ExtractAlagene>()));
-                        break;
-                    }*/
-                    if (target != null) return;
-                    LaunchBuild(at, commander.Faction.World.UnitTypes.First(unit => unit.IsBuilding));
-                    break;
-
-                case MouseDrivenCommand.Harvest:
-                    ResourceNode resource = faction.World.Entities
-                        .OfType<ResourceNode>()
-                        .FirstOrDefault(node => Rectangle.Intersects(hitRect, node.BoundingRectangle));
-                    LaunchHarvest(resource);
-                    break;
-
-                case MouseDrivenCommand.Move: LaunchMove(at); break;
-
-                case MouseDrivenCommand.Repair:
-                    if (target == null || !target.Type.IsBuilding) break;
-                    LaunchRepair(target);
-                    break;
-
-            }
+            if (target == null) mouseCommand.Target(at);
+            else mouseCommand.Target(target);
 
             mouseCommand = null;
+            GenericEventHandler<UserInputManager> handler = AssignedCommand;
+            if (handler != null) handler(this);
         }
 
         public void LaunchDefaultCommand(Vector2 at)
@@ -211,54 +176,18 @@ namespace Orion.Commandment
 
             if (target == null)
             {
-                bool listOfRally=false; 
-                ResourceNode node = faction.World.Entities.OfType<ResourceNode>().FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
-
-                if (node != null)
-                    if (node.Type == ResourceType.Aladdium)
-                        LaunchHarvest(node);
-                    else
-                        LaunchBuild(node.Position, commander.Faction.World.UnitTypes.First(unit => unit.HasSkill<Skills.ExtractAlagene>()));
-                else
-                    LaunchMove(at);
-                foreach (Unit unit in selectionManager.SelectedUnits)
-                {
-                    if (unit.HasSkill<Skills.Train>())
-                    { 
-                        listOfRally = true;
-                        break; 
-                    }
-                }
-                if (listOfRally)
-                {
-                    List<Unit> unitsToRallyTo = selectionManager.SelectedUnits.Where(unit => unit.HasSkill<Skills.Train>()).ToList();
-                    foreach (Unit unit in unitsToRallyTo)
-                    {
-                        unit.Type.RallyPoint = at; 
-                    }
-                }
-                
+                ResourceNode node = faction.World.Entities
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
+                if (node != null) LaunchHarvest(node);
+                else LaunchMove(at);
             }
             else
             {
-                Unit alageneExtractor = faction.World.Entities
-                            .OfType<Unit>()
-                            .FirstOrDefault(unit => Rectangle.Intersects(hitRect, unit.BoundingRectangle)
-                                            && unit.HasSkill<Skills.ExtractAlagene>()
-                                            && unit.Faction == commander.Faction);
-                if (alageneExtractor != null)
-                {
-                    ResourceNode alageneNode = faction.World.Entities
-                        .OfType<ResourceNode>()
-                        .First(node => node.Position == alageneExtractor.Position);
-                    LaunchHarvest(alageneNode);
-                }
-
                 // TODO
                 // implement friendlyness checks more elaborate than this
-                else 
-                    if (target.Faction == commander.Faction) LaunchMove(target.Position);
-                    else LaunchAttack(target);
+                if (target.Faction == commander.Faction) LaunchMove(target.Position);
+                else LaunchAttack(target);
             }
         }
         #endregion
@@ -270,7 +199,7 @@ namespace Orion.Commandment
             commander.CancelCommands(selectionManager.SelectedUnits);
         }
 
-        private void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
+        public void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                   .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
@@ -289,7 +218,7 @@ namespace Orion.Commandment
             }
         }
 
-        private void LaunchAttack(Unit target)
+        public void LaunchAttack(Unit target)
         {
             IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
@@ -297,7 +226,7 @@ namespace Orion.Commandment
             commander.LaunchMove(selection.Where(unit => !unit.HasSkill<Skills.Attack>() && unit.HasSkill<Skills.Move>()), target.Position);
         }
 
-        private void LaunchZoneAttack(Vector2 destination)
+        public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
@@ -306,7 +235,7 @@ namespace Orion.Commandment
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Attack>()), destination);
         }
 
-        private void LaunchHarvest(ResourceNode node)
+        public void LaunchHarvest(ResourceNode node)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
@@ -315,21 +244,21 @@ namespace Orion.Commandment
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Harvest>()), node.Position);
         }
 
-        private void LaunchMove(Vector2 destination)
+        public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
             commander.LaunchMove(movableUnits, destination);
         }
 
-        private void LaunchRepair(Unit building)
+        public void LaunchRepair(Unit building)
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Build>());
             commander.LaunchRepair(targetUnits, building);
         }
 
-        private void LaunchTrain(UnitType unitType)
+        public void LaunchTrain(UnitType unitType)
         {
             IEnumerable<Unit> trainers = selectionManager.SelectedUnits
                 .Where(unit =>
@@ -342,13 +271,14 @@ namespace Orion.Commandment
             commander.LaunchTrain(trainers, unitType);
         }
 
-        private void LaunchSuicide()
+        public void LaunchSuicide()
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchSuicide(targetUnits);
         }
-        private void LaunchCancel()
+
+        public void LaunchCancel()
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);

@@ -4,29 +4,30 @@ using System.Linq;
 using System.Text;
 using Keys = System.Windows.Forms.Keys;
 
-using OpenTK.Math;
-
-using Orion.Geometry;
 using Orion.Graphics;
+using Orion.Geometry;
+using Orion.Commandment;
 using Orion.UserInterface.Widgets;
 
-namespace Orion.UserInterface
+namespace Orion.UserInterface.Actions
 {
-    public class ActionButton : Button
+    public abstract class ActionButton : Button, IActionProvider
     {
         #region Fields
         private string name;
+        protected ActionFrame container;
+        protected UserInputManager inputManager;
         private Frame tooltipContainer;
-
         #endregion
 
         #region Constructors
-        public ActionButton(Texture texture, string name, Keys hotkey, GenericEventHandler<Button> action)
-            : base(new Rectangle(0.9f, 0.9f), "", new FilledFrameRenderer())
+        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
+            : base(new Rectangle(1,1), "")
         {
             this.name = name;
-            Pressed += action;
             HotKey = hotkey;
+            container = frame;
+            inputManager = manager;
 
             Text tooltipText = new Text("{0} ({1})".FormatInvariant(name, hotkey));
             Rectangle tooltipTextRect = tooltipText.Frame;
@@ -38,10 +39,15 @@ namespace Orion.UserInterface
         }
         #endregion
 
-        #region Properties
-        public string Name
+        #region Indexers
+        public virtual ActionButton this[int x, int y]
         {
-            get { return name; }
+            get
+            {
+                if (x == 3 && y == 0)
+                    return new CancelButton(container, inputManager);
+                return null;
+            }
         }
         #endregion
 
@@ -57,6 +63,11 @@ namespace Orion.UserInterface
         {
             Children.Remove(tooltipContainer);
             return base.OnMouseExit(args);
+        }
+
+        protected override void OnPress()
+        {
+            container.Push(this);
         }
 
         #endregion

@@ -7,6 +7,8 @@ using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
+using Orion.UserInterface.Actions;
+using Orion.UserInterface.Actions.Enablers;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Keys = System.Windows.Forms.Keys;
@@ -16,6 +18,7 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
+        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly UserInputManager userInputManager;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -84,6 +87,12 @@ namespace Orion.UserInterface
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
+            userInputManager.AssignedCommand += InputManagerAssignedCommand;
+
+            enablers.Add(new AttackEnabler(userInputManager, actions));
+            enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes));
+            enablers.Add(new HarvestEnabler(userInputManager, actions));
+            enablers.Add(new MoveEnabler(userInputManager, actions));
         }
 
         #endregion
@@ -148,7 +157,7 @@ namespace Orion.UserInterface
         {
             if (args.ButtonPressed == MouseButton.Left)
             {
-                if (userInputManager.SelectedCommand.HasValue) userInputManager.LaunchMouseCommand(args.Position);
+                if (userInputManager.SelectedCommand != null) userInputManager.LaunchMouseCommand(args.Position);
                 else
                 {
                     MoveWorldView(args.Position);
@@ -182,6 +191,11 @@ namespace Orion.UserInterface
 
             if (selectionCount == 1) CreateSingleUnitSelectionPanel();
             else CreateMultipleUnitsSelectionPanel();
+        }
+
+        private void InputManagerAssignedCommand(UserInputManager inputManager)
+        {
+            actions.Restore();
         }
         #endregion
 
@@ -253,11 +267,8 @@ namespace Orion.UserInterface
 
         private void UpdateSkillsPanel()
         {
-            actions.ClearStack();
-            if (selectedType != null)
-            {
-                actions.Push(new UnitTypeActionProvider(userInputManager, actions, selectedType));
-            }
+            actions.Clear();
+            if (selectedType != null) actions.Push(new UnitTypeActionProvider(enablers, selectedType));
         }
 
         private void MoveWorldView(Vector2 center)

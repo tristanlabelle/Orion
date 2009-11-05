@@ -297,6 +297,18 @@ namespace Orion.UserInterface
         }
         #endregion
 
+        #region Hierarchy Events
+        protected internal override void OnRemoveFromParent(ViewContainer parent)
+        {
+            if (cursorPosition.HasValue)
+            {
+                cursorPosition = null;
+                PropagateMouseEvent(MouseEventType.MouseExited, new MouseEventArgs());
+            }
+            base.OnRemoveFromParent(parent);
+        }
+        #endregion
+
         #endregion
 
         public override void Dispose()

@@ -78,7 +78,7 @@ namespace Orion.UserInterface.Widgets
         protected override bool OnMouseUp(MouseEventArgs args)
         {
             caption.Color = Color.Cyan;
-            Click();
+            OnPress();
             base.OnMouseUp(args);
             return false;
         }
@@ -87,14 +87,14 @@ namespace Orion.UserInterface.Widgets
         {
             if (args.Key == hotKey)
             {
-                Click();
+                OnPress();
                 base.OnKeyDown(args);
                 return false;
             }
             return base.OnKeyDown(args);
         }
 
-        private void Click()
+        protected virtual void OnPress()
         {
             GenericEventHandler<Button> handler = Pressed;
             if (handler != null) handler(this);

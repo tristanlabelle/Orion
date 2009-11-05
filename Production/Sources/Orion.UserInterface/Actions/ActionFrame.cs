@@ -7,23 +7,23 @@ using OpenTK.Math;
 using Orion.Geometry;
 using Orion.UserInterface.Widgets;
 
-namespace Orion.UserInterface
+namespace Orion.UserInterface.Actions
 {
     public class ActionFrame : Frame
     {
-        #region Fields
         private Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
-        #endregion
 
-        #region Constructors
         public ActionFrame(Rectangle frame)
             : base(frame)
         {
             Bounds = new Rectangle(4, 4);
         }
-        #endregion
 
-        #region Methods
+        public void Pop()
+        {
+            actionProviders.Pop();
+            ResetActions();
+        }
 
         public void Push(IActionProvider provider)
         {
@@ -31,14 +31,14 @@ namespace Orion.UserInterface
             ResetActions();
         }
 
-        public void ClearStack()
+        public void Clear()
         {
             actionProviders.Clear();
         }
 
-        public void Pop()
+        public void Restore()
         {
-            actionProviders.Pop();
+            while (actionProviders.Count > 1) actionProviders.Pop();
             ResetActions();
         }
 
@@ -66,7 +66,5 @@ namespace Orion.UserInterface
                 }
             }
         }
-
-        #endregion
     }
 }

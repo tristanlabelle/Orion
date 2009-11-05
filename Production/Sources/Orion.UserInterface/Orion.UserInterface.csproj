@@ -53,12 +53,21 @@
   <ItemGroup>
     <Compile Include="Actions\ActionButton.cs" />
     <Compile Include="Actions\ActionFrame.cs" />
+    <Compile Include="Actions\BuildingConstructionActionButton.cs" />
+    <Compile Include="Actions\CancelButton.cs" />
+    <Compile Include="Actions\Enablers\ActionEnabler.cs" />
+    <Compile Include="Actions\Enablers\AttackEnabler.cs" />
+    <Compile Include="Actions\BuildActionButton.cs" />
+    <Compile Include="Actions\Enablers\BuildEnabler.cs" />
+    <Compile Include="Actions\Enablers\HarvestEnabler.cs" />
+    <Compile Include="Actions\Enablers\MoveEnabler.cs" />
+    <Compile Include="Actions\GenericActionButton.cs" />
+    <Compile Include="Actions\IActionProvider.cs" />
     <Compile Include="Actions\UnitTypeActionProvider.cs" />
     <Compile Include="CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GameUI.cs" />
-    <Compile Include="Actions\IActionProvider.cs" />
     <Compile Include="MatchSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>

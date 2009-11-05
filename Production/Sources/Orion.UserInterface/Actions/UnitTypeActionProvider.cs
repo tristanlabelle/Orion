@@ -15,9 +15,15 @@ namespace Orion.UserInterface
     public class UnitTypeActionProvider : IActionProvider
     {
         #region Fields
+        private static Dictionary<UnitType, UnitTypeActionProvider> cachedProviders = new Dictionary<UnitType, UnitTypeActionProvider>();
+
         private ActionButton[,] buttons = new ActionButton[4, 4];
         private UserInputManager inputManager;
         private ActionFrame container;
+        #endregion
+
+        #region Building
+
         #endregion
 
         #region Constructors

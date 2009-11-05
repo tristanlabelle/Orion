@@ -41,11 +41,11 @@ namespace Orion.Graphics
 
         #region Static
         #region Fields
-        public static readonly LinePath Circle = CreateCircle(1, 32);
-        public static readonly LinePath Diamond = CreateCircle(1, 4);
-        public static readonly LinePath Pentagon = CreateCircle(1, 5);
+        public static readonly LinePath Circle = CreateCircle(0.5f, 32);
+        public static readonly LinePath Diamond = CreateCircle(0.5f, 4);
+        public static readonly LinePath Pentagon = CreateCircle(0.5f, 5);
         public static readonly LinePath Square;
-        public static readonly LinePath Triangle = CreateCircle(1, 3);
+        public static readonly LinePath Triangle = CreateCircle(0.5f, 3);
         public static readonly LinePath Plus;
         public static readonly LinePath Cross;
         #endregion
@@ -53,14 +53,14 @@ namespace Orion.Graphics
         #region Constructor
         static LinePath()
         {
-            Square = LinePath.CreateLoop(new Vector2(-1, -1),
-                new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1));
+            Square = LinePath.CreateLoop(new Vector2(-0.5f, -0.5f),
+                new Vector2(-0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, -0.5f));
             Plus = LinePath.FromLineSegments(
-                new LineSegment(-1, 0, 1, 0),
-                new LineSegment(0, -1, 0, 1));
+                new LineSegment(-0.5f, 0, 0.5f, 0),
+                new LineSegment(0, -0.5f, 0, 0.5f));
             Cross = LinePath.FromLineSegments(
-                new LineSegment(-1, -1, 1, 1),
-                new LineSegment(-1, 1, 1, -1));
+                new LineSegment(-0.5f, -0.5f, 0.5f, 0.5f),
+                new LineSegment(-0.5f, 0.5f, 0.5f, -0.5f));
         }
         #endregion
 
@@ -130,8 +130,8 @@ namespace Orion.Graphics
             for (int i = 0; i < points.Length; ++i)
             {
                 double angle = angleIncrement * i;
-                double x = Math.Cos(angle);
-                double y = Math.Sin(angle);
+                double x = Math.Cos(angle) * radius;
+                double y = Math.Sin(angle) * radius;
                 points[i] = new Vector2((float)x, (float)y);
             }
 

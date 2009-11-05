@@ -10,9 +10,10 @@ namespace Orion.Main
         public const float targetFramesPerSecond = 60;
         public const float targetSecondsPerFrame = 1.0f / targetFramesPerSecond;
 
-        private Stopwatch stopwatch;
-        private Match match;
-        private World world;
+        private readonly Stopwatch stopwatch;
+        private readonly Match match;
+        private readonly World world;
+        private readonly FrameRateCounter frameRateCounter = new FrameRateCounter();
 
         public MatchRunLoop(GameUI ui, World world, Match match)
             : base(ui)
@@ -40,6 +41,9 @@ namespace Orion.Main
                     match.Pipeline.Update(targetFramesPerSecond);
                     world.Update(targetSecondsPerFrame);
                     userInterface.Update(targetSecondsPerFrame);
+
+                    frameRateCounter.Update();
+                    userInterface.WindowTitle = frameRateCounter.ToString();
 
                     timeDeltaInSeconds -= targetSecondsPerFrame;
                 } while (timeDeltaInSeconds >= targetSecondsPerFrame);

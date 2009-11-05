@@ -13,7 +13,6 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly Window mainWindow;
-        private readonly FrameRateCounter frameRateCounter = new FrameRateCounter();
         #endregion
 
         #region Constructors
@@ -36,6 +35,12 @@ namespace Orion.UserInterface
         public bool IsWindowCreated
         {
             get { return mainWindow.Created; }
+        }
+
+        public string WindowTitle
+        {
+            get { return mainWindow.Text; }
+            set { mainWindow.Text = value; }
         }
 
         public ViewContainer RootView
@@ -68,8 +73,6 @@ namespace Orion.UserInterface
         public void Update(float timeDeltaInSeconds)
         {
             mainWindow.rootView.Update(timeDeltaInSeconds);
-            frameRateCounter.Update();
-            mainWindow.Text = frameRateCounter.ToString();
         }
 
         /// <summary>

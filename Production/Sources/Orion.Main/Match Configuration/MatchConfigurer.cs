@@ -21,7 +21,7 @@ namespace Orion.Main
         protected void CreateMap()
         {
             random = new MersenneTwister(seed);
-            terrain = Terrain.Generate(128, 128, random);
+            terrain = Terrain.Generate(256, 256, random);
             world = new World(terrain);
         }
 

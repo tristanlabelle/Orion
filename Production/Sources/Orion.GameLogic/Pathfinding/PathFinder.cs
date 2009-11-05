@@ -16,7 +16,7 @@ namespace Orion.GameLogic.Pathfinding
         private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
-        private readonly List<Point16> points = new List<Point16>();
+        private readonly List<Vector2> points = new List<Vector2>();
         private Point16 destinationPoint;
         #endregion
 
@@ -77,10 +77,10 @@ namespace Orion.GameLogic.Pathfinding
         {
             for (int i = 0; i < points.Count - 2; ++i)
             {
-                Point16 sourcePoint = points[i];
+                Vector2 sourcePoint = points[i];
                 while (i != points.Count - 2)
                 {
-                    Point16 destinationPoint = points[i + 2];
+                    Vector2 destinationPoint = points[i + 2];
                     LineSegment lineSegment = new LineSegment(sourcePoint, destinationPoint);
                     if (!world.Terrain.IsWalkable(lineSegment, 1))
                         break;
@@ -116,7 +116,7 @@ namespace Orion.GameLogic.Pathfinding
             PathNode currentNode = destinationNode;
             while (currentNode != null)
             {
-                points.Add(currentNode.Position);
+                points.Add(currentNode.Position + new Vector2(0.5f, 0.5f));
                 currentNode = currentNode.ParentNode;
             }
 

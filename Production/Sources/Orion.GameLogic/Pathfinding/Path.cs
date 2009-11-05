@@ -11,11 +11,11 @@ namespace Orion.GameLogic.Pathfinding
         private readonly World world;
         private readonly Vector2 source;
         private readonly Vector2 destination;
-        private readonly ReadOnlyCollection<Point16> points;
+        private readonly ReadOnlyCollection<Vector2> points;
         #endregion
 
         #region Constructor
-        internal Path(World world, Vector2 source, Vector2 destination, IEnumerable<Point16> points)
+        internal Path(World world, Vector2 source, Vector2 destination, IEnumerable<Vector2> points)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(points, "points");
@@ -23,7 +23,7 @@ namespace Orion.GameLogic.Pathfinding
             this.world = world;
             this.source = source;
             this.destination = destination;
-            this.points = new ReadOnlyCollection<Point16>(points.ToList());
+            this.points = new ReadOnlyCollection<Vector2>(points.ToList());
         }
         #endregion
 
@@ -47,7 +47,7 @@ namespace Orion.GameLogic.Pathfinding
         /// <summary>
         /// Gets the sequence of points that trace this path.
         /// </summary>
-        public ReadOnlyCollection<Point16> Points
+        public ReadOnlyCollection<Vector2> Points
         {
             get { return points; }
         }

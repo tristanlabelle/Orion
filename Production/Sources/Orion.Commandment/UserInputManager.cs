@@ -167,6 +167,16 @@ namespace Orion.Commandment
                     break;
 
                 case MouseDrivenCommand.Build:
+
+                    /*ResourceNode alagene = faction.World.Entities
+                        .OfType<ResourceNode>()
+                        .FirstOrDefault(node => Rectangle.Intersects(hitRect, node.BoundingRectangle)
+                                        && node.Type == ResourceType.Alagene);
+                    if (alagene != null)
+                    {
+                        LaunchBuild(alagene.Position, commander.Faction.World.UnitTypes.First(unit => unit.HasSkill<Skills.ExtractAlagene>()));
+                        break;
+                    }*/
                     if (target != null) return;
                     LaunchBuild(at, commander.Faction.World.UnitTypes.First(unit => unit.IsBuilding));
                     break;
@@ -204,15 +214,35 @@ namespace Orion.Commandment
                 ResourceNode node = faction.World.Entities
                     .OfType<ResourceNode>()
                     .FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
-                if (node != null) LaunchHarvest(node);
-                else LaunchMove(at);
+
+                if (node != null)
+                    if (node.Type == ResourceType.Aladdium)
+                        LaunchHarvest(node);
+                    else
+                        LaunchBuild(node.Position, commander.Faction.World.UnitTypes.First(unit => unit.HasSkill<Skills.ExtractAlagene>()));
+                else
+                    LaunchMove(at);
             }
             else
             {
+                Unit alageneExtractor = faction.World.Entities
+                            .OfType<Unit>()
+                            .FirstOrDefault(unit => Rectangle.Intersects(hitRect, unit.BoundingRectangle)
+                                            && unit.HasSkill<Skills.ExtractAlagene>()
+                                            && unit.Faction == commander.Faction);
+                if (alageneExtractor != null)
+                {
+                    ResourceNode alageneNode = faction.World.Entities
+                        .OfType<ResourceNode>()
+                        .First(node => node.Position == alageneExtractor.Position);
+                    LaunchHarvest(alageneNode);
+                }
+
                 // TODO
                 // implement friendlyness checks more elaborate than this
-                if (target.Faction == commander.Faction) LaunchMove(target.Position);
-                else LaunchAttack(target);
+                else 
+                    if (target.Faction == commander.Faction) LaunchMove(target.Position);
+                    else LaunchAttack(target);
             }
         }
         #endregion

@@ -22,6 +22,7 @@ namespace Orion.GameLogic
             RegisterRangedAttacker();
             RegisterFactory();
             RegisterTower();
+            RegisterAlageneExtractor();
         }
         #endregion
 

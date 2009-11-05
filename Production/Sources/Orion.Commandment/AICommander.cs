@@ -17,11 +17,12 @@ namespace Orion.Commandment
         private bool hasBuilding;
         private ResourceNode startingNode;
         private List<Circle> regions = new List<Circle>();
+        private Random random;
         #endregion
 
         #region Contructors
 
-        public AICommander(Faction faction)
+        public AICommander(Faction faction, Random random)
             : base(faction)
         {
             baseStarted = false;
@@ -33,6 +34,8 @@ namespace Orion.Commandment
                 else
                     hasBuilding = false;
             }
+
+            this.random = random;
         }
 
         #endregion
@@ -68,10 +71,32 @@ namespace Orion.Commandment
                 BuildMainCommandCenter();
 
             if (Faction.AladdiumAmount >= 50 && hasBuilding)
+            {
                 TrainUnits();
+                BuildFactories();
+            }
 
             if (commandCenterBuilt)
                 Attack();
+        }
+
+        private void BuildFactories()
+        {
+            List<Unit> builders = Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Build>() && !(unit.Task is Orion.GameLogic.Tasks.Build)).ToList();
+
+            for (int i = 0; i < builders.Count; i++)
+            {
+                Vector2 position = new Vector2();
+
+                do
+                {
+                    position.X = random.Next((int)World.Bounds.Width);
+                    position.Y = random.Next((int)World.Bounds.Height);
+                } while (!World.Terrain.IsWalkable(position) || !World.IsWithinBounds(position));
+
+                Command command = new Build(builders.ElementAt(i), position, World.UnitTypes.FromName("Factory"));
+                GenerateCommand(command);
+            }
         }
 
         private void TrainUnits()
@@ -127,7 +152,7 @@ namespace Orion.Commandment
             if(factionToAttack == Faction)
                 factionToAttack = World.Factions.ElementAt(1);
 
-            if (attackers.Count != 0)
+            if (attackers.Count != 0 && factionToAttack.Units.Count() > 0)
             {
                 Command command = new Attack(Faction, attackers, factionToAttack.Units.First());
                 GenerateCommand(command);

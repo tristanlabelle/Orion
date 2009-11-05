@@ -2,6 +2,8 @@ using System;
 using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Orion.Main
 {
@@ -9,13 +11,14 @@ namespace Orion.Main
     {
         #region Fields
         private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
-        private const short campSize = 6;
+        private const short campSize = 20;
+        private const int DistanceBetweenTwoCamps = 60;
         private Random random;
         private Terrain terrain;
-
         public readonly UserInputCommander UserCommander;
         public readonly World World;
         public readonly CommandPipeline Pipeline;
+        private List<Vector2> positionOfOthersBases = new List<Vector2>();
         #endregion
 
         #region Constructors
@@ -39,52 +42,66 @@ namespace Orion.Main
                 Point16 position = new Point16(0, 0) ;
                 int tries = 0;
                 bool allWalkable = false;
-                while(!allWalkable)
+                while (!allWalkable)
                 {
                     allWalkable = true;
                     ++tries;
-                    if(tries ==100) throw new Exception("FAIL to find camp site");
+                    if (tries == 100) throw new Exception("FAIL to find camp site");
 
                     position = new Point16((short)random.Next(world.Width), (short)random.Next(world.Height));
 
                     for (short ligne = 0; ligne < campSize; ligne++)
                     {
-                        if(!allWalkable) break;
+                        if (!allWalkable) break;
 
                         for (short colonne = 0; colonne < campSize; colonne++)
                         {
                             Point16 testedPoint = new Point16((short)(position.X + colonne), (short)(position.Y + ligne));
-                            if (!world.IsWithinBounds(testedPoint) || !world.Terrain.IsWalkable(testedPoint)) 
+                            if (!world.IsWithinBounds(testedPoint) || !world.Terrain.IsWalkable(testedPoint))
                             {
                                 allWalkable = false;
                                 break;
                             }
+
                         }
                     }
-                }
-                
-                // creation of the command center in the center of the area
-                position = new Point16((short)(position.X + campSize / 2), (short)(position.Y + campSize / 2));
 
-                faction.CreateUnit(world.UnitTypes.FromName("Factory"), position);
+                    //finally check if there is another command center in a range of 40 pixel
+                    if (allWalkable)
+                    {
+                        // creation of the command center in the center of the area
+                        position = new Point16((short)(position.X + campSize / 2), (short)(position.Y + campSize / 2));
+                        foreach (Vector2 positionOfAFaction in positionOfOthersBases)
+                        {
+                            
+                                if ((positionOfAFaction - position).Length < DistanceBetweenTwoCamps)
+                                {
+                                    allWalkable = false;
+                                    break;
+                                }
+
+                        }
+
+                    }
+
+                }
+
+                positionOfOthersBases.Add(position);
+                Unit factory = faction.CreateUnit(world.UnitTypes.FromName("Factory"),new Vector2(position.X, position.Y));
                 
                 //creation of the builder and the harvester
                 for(short i = 1 ;i<=2;i++)
                 {
-                    Unit builder = faction.CreateUnit(
-                        world.UnitTypes.FromName("Builder"),
-                        new Vector2(position.X + i, position.Y));
+                    Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"), new Vector2(position.X + i * 4, position.Y));
+                    Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"), new Vector2(position.X, position.Y + i * 4));
 
-                    Unit harvester = faction.CreateUnit(
-                        world.UnitTypes.FromName("Harvester"),
-                        new Vector2(position.X, position.Y + i));
                 }
                
                 ResourceNode nodeAladdium = world.Entities.CreateResourceNode
-                    (ResourceType.Aladdium, 500, new Vector2(position.X - (campSize / 2), position.Y - 1));
+                    (ResourceType.Aladdium, 500, new Vector2(position.X - (campSize / 4), position.Y - 1));
 
                 ResourceNode nodeAlagene = world.Entities.CreateResourceNode
-                    (ResourceType.Alagene, 500, new Vector2(position.X - (campSize / 2), position.Y + 1));
+                    (ResourceType.Alagene, 500, new Vector2(position.X - (campSize / 4), position.Y + 1));
             }
             #endregion
 

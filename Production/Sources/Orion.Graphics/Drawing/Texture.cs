@@ -17,39 +17,37 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
-        public Texture(int width, int height, TextureFormat format, byte[] data)
+        internal Texture(TextureBuilder builder)
         {
-            Argument.EnsureStrictlyPositive(width, "width");
-            Argument.EnsureStrictlyPositive(height, "height");
-            Argument.EnsureDefined(format, "format");
+            Argument.EnsureNotNull(builder, "builder");
 
             int lastID;
             GL.GetInteger(GetPName.Texture2D, out lastID);
 
             this.id = GL.GenTexture();
-            this.width = width;
-            this.height = height;
-            this.format = format;
+            this.width = builder.Width;
+            this.height = builder.Height;
+            this.format = builder.Format;
 
             try
             {
                 GL.BindTexture(TextureTarget.Texture2D, id);
 
-                if (data != null) ValidatePixelBufferSize(data);
+                if (builder.PixelData != null) ValidatePixelBufferSize(builder.PixelData);
 
                 GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.format),
                     this.width, this.height, 0, GetGLPixelFormat(this.format), PixelType.UnsignedByte,
-                    data);
+                    builder.PixelData);
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                    (int)TextureMinFilter.Nearest);
+                    (int)(builder.UseSmoothing ? TextureMinFilter.Linear : TextureMinFilter.Nearest));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                    (int)TextureMagFilter.Nearest);
+                    (int)(builder.UseSmoothing ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-                    (int)TextureWrapMode.Repeat);
+                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.Clamp));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-                    (int)TextureWrapMode.Repeat);
+                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.Clamp));
 
                 GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
                     (int)TextureEnvMode.Modulate);

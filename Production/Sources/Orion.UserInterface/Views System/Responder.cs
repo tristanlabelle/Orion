@@ -64,21 +64,6 @@ namespace Orion.UserInterface
 
         #region Methods
 
-        public override void Dispose()
-        {
-            if (isDisposed) throw new ObjectDisposedException(null);
-            base.Dispose();
-            MouseDown = null;
-            MouseUp = null;
-            MouseMoved = null;
-            MouseWheel = null;
-            MouseEntered = null;
-            MouseExited = null;
-            KeyDown = null;
-            KeyUp = null;
-            Updated = null;
-        }
-
         #region Event Propagation
         /// <summary>Propagates a mouse event to the child views.</summary>
         /// <remarks>
@@ -107,7 +92,7 @@ namespace Orion.UserInterface
                 }
                 else if (child.IsMouseOver)
                 {
-                    child.DispatchMouseEvent(MouseEventType.MouseExited, args);
+                    child.PropagateMouseEvent(MouseEventType.MouseExited, args);
                     child.MousePosition = null;
                 }
             }
@@ -132,6 +117,7 @@ namespace Orion.UserInterface
             // for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
             foreach (Responder child in Enumerable.Reverse(Children))
             {
+                child.PropagateKeyboardEvent(type, args);
                 child.DispatchKeyboardEvent(type, args);
             }
 
@@ -312,6 +298,22 @@ namespace Orion.UserInterface
         #endregion
 
         #endregion
+
+        public override void Dispose()
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
+
+            MouseDown = null;
+            MouseUp = null;
+            MouseMoved = null;
+            MouseWheel = null;
+            MouseEntered = null;
+            MouseExited = null;
+            KeyDown = null;
+            KeyUp = null;
+            Updated = null;
+            base.Dispose();
+        }
 
         #endregion
     }

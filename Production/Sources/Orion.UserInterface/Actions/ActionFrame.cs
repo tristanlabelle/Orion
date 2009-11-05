@@ -50,10 +50,10 @@ namespace Orion.UserInterface
                 IActionProvider provider = actionProviders.Peek();
                 Rectangle templateSize = new Rectangle(0.8f, 0.8f);
 
-                for (byte x = 0; x < 4; x++)
+                for (int y = 3; y >= 0; y--)
                 {
-                    Vector2 origin = new Vector2(0.1f + x, 0.1f);
-                    for (byte y = 0; y < 4; y++)
+                    Vector2 origin = new Vector2(0.1f, 0.1f + y);
+                    for (int x = 0; x < 4; x++)
                     {
                         ActionButton button = provider[x, y];
                         if (button != null)
@@ -61,7 +61,7 @@ namespace Orion.UserInterface
                             button.Frame = templateSize.TranslatedBy(origin);
                             Children.Add(button);
                         }
-                        origin.Y += 1;
+                        origin.X += 1;
                     }
                 }
             }

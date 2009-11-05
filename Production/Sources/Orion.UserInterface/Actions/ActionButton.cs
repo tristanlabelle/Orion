@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Keys = System.Windows.Forms.Keys;
 
 using OpenTK.Math;
 
@@ -15,18 +16,17 @@ namespace Orion.UserInterface
     {
         #region Fields
         private string name;
-        private string hotkey;
         private Frame tooltipContainer;
 
         #endregion
 
         #region Constructors
-        public ActionButton(Texture texture, string name, string hotkey, GenericEventHandler<Button> action)
+        public ActionButton(Texture texture, string name, Keys hotkey, GenericEventHandler<Button> action)
             : base(new Rectangle(0.9f, 0.9f), "", new FilledFrameRenderer())
         {
             this.name = name;
-            this.hotkey = hotkey;
             Pressed += action;
+            HotKey = hotkey;
 
             Text tooltipText = new Text("{0} ({1})".FormatInvariant(name, hotkey));
             Rectangle tooltipTextRect = tooltipText.Frame;
@@ -42,11 +42,6 @@ namespace Orion.UserInterface
         public string Name
         {
             get { return name; }
-        }
-
-        public string Hotkey
-        {
-            get { return hotkey; }
         }
         #endregion
 

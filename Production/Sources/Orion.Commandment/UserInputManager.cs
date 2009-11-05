@@ -39,18 +39,6 @@ namespace Orion.Commandment
             commander = userCommander;
             selectionManager = new SelectionManager(userCommander.Faction);
         }
-
-        static UserInputManager()
-        {
-            keysMap = new Dictionary<Keys, MouseDrivenCommand?>();
-            keysMap[Keys.A] = MouseDrivenCommand.Attack;
-            keysMap[Keys.B] = MouseDrivenCommand.Build;
-            keysMap[Keys.G] = MouseDrivenCommand.Harvest; // "G"ather
-            keysMap[Keys.M] = MouseDrivenCommand.Move;
-            keysMap[Keys.T] = MouseDrivenCommand.Train;
-            keysMap[Keys.C] = MouseDrivenCommand.Cancel;
-            keysMap[Keys.Escape] = null;
-        }
         #endregion
 
         #region Properties
@@ -136,17 +124,22 @@ namespace Orion.Commandment
 
         public void HandleKeyDown(object responder, KeyboardEventArgs args)
         {
-            if (args.Key == Keys.F11) commander.Faction.FogOfWar.Reveal();
-            if (args.Key == Keys.F12) commander.Faction.FogOfWar.Disable();
-            if (args.Key == Keys.ShiftKey) shiftKeyPressed = true;
-            if (args.Key == Keys.Delete) LaunchSuicide();
-            if (args.Key == Keys.C) LaunchCancel();
-            if (args.Key == Keys.T)
+            switch (args.Key)
             {
-                LaunchTrain(commander.Faction.World.UnitTypes.First
-                    (unit => unit.HasSkill<Attack>()));
+                case Keys.Escape: mouseCommand = null; break;
+                case Keys.ShiftKey: shiftKeyPressed = true; break;
+                case Keys.Delete: LaunchSuicide(); break;
+
+                // cheats
+                case Keys.F11: commander.Faction.FogOfWar.Reveal(); break;
+                case Keys.F12: commander.Faction.FogOfWar.Disable(); break;
+
+                // should be refactored out
+                case Keys.T:
+                    LaunchTrain(commander.Faction.World.UnitTypes
+                        .First(unit => unit.HasSkill<Attack>()));
+                    break;
             }
-            if (keysMap.ContainsKey(args.Key)) mouseCommand = keysMap[args.Key];
         }
 
         public void HandleKeyUp(object responder, KeyboardEventArgs args)

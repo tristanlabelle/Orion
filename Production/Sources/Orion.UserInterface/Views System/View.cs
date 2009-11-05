@@ -70,11 +70,6 @@ namespace Orion.UserInterface
             return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }
 
-        protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
-        {
-            return base.PropagateKeyboardEvent(type, args);
-        }
-
         protected internal override sealed void Render()
         {
             context.SetUpGLContext(Frame);

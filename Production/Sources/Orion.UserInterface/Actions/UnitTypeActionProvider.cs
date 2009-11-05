@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Keys = System.Windows.Forms.Keys;
 
 using Orion.Graphics;
 using Orion.GameLogic;
@@ -27,14 +28,14 @@ namespace Orion.UserInterface
             Texture defaultTexture = null;// new Texture(40, 40, TextureFormat.Rgb, new byte[40 * 40 * 3]);
 
             // Harcode Paradise!
-            buttons[0, 3] = new ActionButton(defaultTexture, "Cancel", "c", CancelAction);
-            if (type.HasSkill<Skills.Move>()) buttons[1, 3] = new ActionButton(defaultTexture, "Move", "m", AssignMove);
-            if (type.HasSkill<Skills.Attack>()) buttons[0, 2] = new ActionButton(defaultTexture, "Attack", "a", AssignAttack);
-            if (type.HasSkill<Skills.Harvest>()) buttons[1, 2] = new ActionButton(defaultTexture, "Harvest", "h", AssignHarvest);
+            buttons[0, 3] = new ActionButton(defaultTexture, "Cancel", Keys.C, CancelAction);
+            if (type.HasSkill<Skills.Move>()) buttons[1, 3] = new ActionButton(defaultTexture, "Move", Keys.M, AssignMove);
+            if (type.HasSkill<Skills.Attack>()) buttons[0, 2] = new ActionButton(defaultTexture, "Attack", Keys.A, AssignAttack);
+            if (type.HasSkill<Skills.Harvest>()) buttons[1, 2] = new ActionButton(defaultTexture, "Harvest", Keys.H, AssignHarvest);
             if (type.HasSkill<Skills.Build>())
             {
-                buttons[1, 1] = new ActionButton(defaultTexture, "Repair", "r", AssignRepair);
-                buttons[3, 0] = new ActionButton(defaultTexture, "Build", "b", AssignBuild);
+                buttons[1, 1] = new ActionButton(defaultTexture, "Repair", Keys.R, AssignRepair);
+                buttons[0, 0] = new ActionButton(defaultTexture, "Build", Keys.B, AssignBuild);
             }
         }
         #endregion

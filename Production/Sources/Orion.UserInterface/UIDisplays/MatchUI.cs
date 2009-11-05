@@ -76,7 +76,6 @@ namespace Orion.UserInterface
             Children.Add(eastScroller);
             Children.Add(westScroller);
 
-            worldView.MouseDown += userInputManager.HandleMouseDown;
             worldView.KeyDown += userInputManager.HandleKeyDown;
             worldView.KeyUp += userInputManager.HandleKeyUp;
             worldView.BoundsChanged += WorldViewBoundsChanged;
@@ -234,15 +233,15 @@ namespace Orion.UserInterface
             {
                 Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (unit.Type == selectedType || selectedUnits.Count() == 1)
+                if (unit.Type == SelectedType || selectedUnits.Count() == 1)
                 {
                     userInputManager.SelectionManager.SelectUnit(unit);
                     MoveWorldView(unit.Position);
-                    selectedType = null;
+                    SelectedType = null;
                 }
                 else
                 {
-                    selectedType = unit.Type;
+                    SelectedType = unit.Type;
                     foreach (Button unitButton in selectionFrame.Children)
                     {
                         UnitButtonRenderer renderer = unitButton.Renderer as UnitButtonRenderer;

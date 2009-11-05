@@ -63,7 +63,7 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
-            Vector2 destination = path.Points[nextPointIndex];
+            Vector2 destination = path.Points[nextPointIndex] + new Vector2(0.5f, 0.5f);
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 

@@ -195,15 +195,16 @@ namespace Orion.GameLogic
 
         #region Entity Creation
         /// <summary>
-        /// Used by <see cref="Faction"/> to create new <see cref="Entity"/>
+        /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
         /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Entity"/> to be created.</param>
-        /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Entity"/>.</param>
+        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
+        /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
+        /// <param name="position">The initial positino of the <see cref="Unit"/> to be created.</param>
         /// <returns>The newly created <see cref="Entity"/>.</returns>
-        internal Unit CreateUnit(UnitType type, Faction faction)
+        internal Unit CreateUnit(UnitType type, Faction faction, Vector2 position)
         {
-            Unit unit = new Unit(nextID, type, faction);
+            Unit unit = new Unit(nextID, type, faction, position);
             ++nextID;
             InitializeEntity(unit);
             return unit;

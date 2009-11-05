@@ -59,24 +59,25 @@ namespace Orion.Main
                                 allWalkable = false;
                                 break;
                             }
-                            
                         }
                     }
                 }
                 
                 // creation of the command center in the center of the area
                 position = new Point16((short)(position.X + campSize / 2), (short)(position.Y + campSize / 2));
-             
-                Unit factory = faction.CreateUnit(world.UnitTypes.FromName("Factory"));
-                factory.Position = new Vector2(position.X, position.Y);
+
+                faction.CreateUnit(world.UnitTypes.FromName("Factory"), position);
                 
                 //creation of the builder and the harvester
                 for(short i = 1 ;i<=2;i++)
                 {
-                    Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"));
-                    Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"));
-                    builder.Position = new Vector2(position.X + i, position.Y);
-                    harvester.Position = new Vector2(position.X, position.Y + i);
+                    Unit builder = faction.CreateUnit(
+                        world.UnitTypes.FromName("Builder"),
+                        new Vector2(position.X + i, position.Y));
+
+                    Unit harvester = faction.CreateUnit(
+                        world.UnitTypes.FromName("Harvester"),
+                        new Vector2(position.X, position.Y + i));
                 }
                
                 ResourceNode nodeAladdium = world.Entities.CreateResourceNode

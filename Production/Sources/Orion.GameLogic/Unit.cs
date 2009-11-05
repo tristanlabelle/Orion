@@ -32,8 +32,9 @@ namespace Orion.GameLogic
         /// The <see cref="UnitType"/> which determines
         /// the stats and capabilities of this <see cref="Unit"/>
         /// </param>
+        /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
-        internal Unit(int id, UnitType type, Faction faction)
+        internal Unit(int id, UnitType type, Faction faction, Vector2 position)
             : base(faction.World, id)
         {
             Argument.EnsureNotNull(type, "type");
@@ -41,6 +42,7 @@ namespace Orion.GameLogic
 
             this.type = type;
             this.faction = faction;
+            this.position = position;
         }
         #endregion
 

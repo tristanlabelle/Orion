@@ -14,7 +14,6 @@ namespace Orion.GameLogic
     [Serializable]
     public sealed class Faction
     {
-        #region Instance
         #region Fields
         private readonly int id;
         private readonly World world;
@@ -149,10 +148,11 @@ namespace Orion.GameLogic
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>
         /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
+        /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
         /// <returns>The newly created <see cref="Unit"/>.</returns>
-        public Unit CreateUnit(UnitType type)
+        public Unit CreateUnit(UnitType type, Vector2 position)
         {
-            Unit unit = world.Entities.CreateUnit(type, this);
+            Unit unit = world.Entities.CreateUnit(type, this, position);
             unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
@@ -183,7 +183,6 @@ namespace Orion.GameLogic
         {
             return name;
         }
-        #endregion
         #endregion
     }
 }

@@ -7,7 +7,7 @@ namespace Orion.Main
 {
     class MatchRunLoop : RunLoop
     {
-        public const float targetFramesPerSecond = 30;
+        public const float targetFramesPerSecond = 60;
         public const float targetSecondsPerFrame = 1.0f / targetFramesPerSecond;
 
         private Stopwatch stopwatch;

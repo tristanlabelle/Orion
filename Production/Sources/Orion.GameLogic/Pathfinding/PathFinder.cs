@@ -119,7 +119,7 @@ namespace Orion.GameLogic.Pathfinding
         /// <returns>The destination node, if a path is found getting to it.</returns>
         private PathNode FindPathNodes(Point16 sourcePoint)
         {
-            float estimatedCostFromSourceToDestination = EstimateCostToDestination(sourcePoint);
+            float estimatedCostFromSourceToDestination = GetMovementCost(sourcePoint, destinationPoint);
             PathNode sourceNode = GetPathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
 
             PathNode currentNode = sourceNode;
@@ -142,37 +142,38 @@ namespace Orion.GameLogic.Pathfinding
         {
             PathNode cheapestNode = openNodes.First().Value;
             foreach (PathNode openNode in openNodes.Values)
-                if (openNode.EstimatedCostToDestination < cheapestNode.EstimatedCostToDestination)
+                if (openNode.TotalCost < cheapestNode.TotalCost)
                     cheapestNode = openNode;
             return cheapestNode;
         }
 
-        private float EstimateCostToDestination(Point16 currentPoint)
-        {
-            return Math.Abs(currentPoint.X - destinationPoint.X) + Math.Abs(currentPoint.Y - destinationPoint.Y);
-        }
-
         private float GetMovementCost(Point16 a, Point16 b)
         {
-            int deltaX = a.X - b.X;
-            int deltaY = a.Y - b.Y;
-            int stepsAway = Math.Abs(deltaX) + Math.Abs(deltaY);
-            return movementCostFromSteps[stepsAway];
+            return ((Vector2)a - (Vector2)b).LengthFast;
         }
 
         private void AddNearbyNodes(PathNode currentNode)
         {
-            AddNearbyNode(currentNode, -1, -1);
-            AddNearbyNode(currentNode, 0, -1);
-            AddNearbyNode(currentNode, 1, -1);
-            AddNearbyNode(currentNode, -1, 0);
-            AddNearbyNode(currentNode, 1, 0);
-            AddNearbyNode(currentNode, -1, 1);
-            AddNearbyNode(currentNode, 0, 1);
-            AddNearbyNode(currentNode, 1, 1);
+            AddDiagonalAdjacentNode(currentNode, -1, -1);
+            AddAdjacentNode(currentNode, 0, -1);
+            AddDiagonalAdjacentNode(currentNode, 1, -1);
+            AddAdjacentNode(currentNode, -1, 0);
+            AddAdjacentNode(currentNode, 1, 0);
+            AddDiagonalAdjacentNode(currentNode, -1, 1);
+            AddAdjacentNode(currentNode, 0, 1);
+            AddDiagonalAdjacentNode(currentNode, 1, 1);
         }
 
-        private void AddNearbyNode(PathNode currentNode, short offsetX, short offsetY)
+        private void AddDiagonalAdjacentNode(PathNode currentNode, short offsetX, short offsetY)
+        {
+            if (!IsOpenable(new Point16((short)(currentNode.Position.X + offsetX), currentNode.Position.Y))
+                || !IsOpenable(new Point16(currentNode.Position.X, (short)(currentNode.Position.Y + offsetY))))
+                return;
+
+            AddAdjacentNode(currentNode, offsetX, offsetY);
+        }
+
+        private void AddAdjacentNode(PathNode currentNode, short offsetX, short offsetY)
         {
             int x = currentNode.Position.X + offsetX;
             int y = currentNode.Position.Y + offsetY;
@@ -200,14 +201,14 @@ namespace Orion.GameLogic.Pathfinding
                 if (costFromSource < nearbyNode.CostFromSource)
                 {
                     // If it is a better choice to pass through the current node, overwrite the parent and the move cost
-                    float estimatedCostToDestination = EstimateCostToDestination(nearbyPoint);
+                    float estimatedCostToDestination = GetMovementCost(nearbyPoint, destinationPoint);
                     nearbyNode.SetCosts(currentNode, costFromSource, estimatedCostToDestination);
                 }
             }
             else
             {
                 // Add the node to the open list
-                float estimatedCostToDestination = EstimateCostToDestination(nearbyPoint);
+                float estimatedCostToDestination = GetMovementCost(nearbyPoint, destinationPoint);
                 nearbyNode = GetPathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
                 openNodes.Add(nearbyPoint, nearbyNode);
             }

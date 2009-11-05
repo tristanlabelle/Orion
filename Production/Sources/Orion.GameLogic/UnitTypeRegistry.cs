@@ -81,6 +81,7 @@ namespace Orion.GameLogic
             builder.SightRange = 4;
             builder.MaxHealth = 40;
             builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
+            builder.Skills.Add(new Skills.StoreResources());
             Register(builder, "Factory");
         }
 
@@ -94,6 +95,16 @@ namespace Orion.GameLogic
             //builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
             Register(builder, "Tower");
         }
+
+        public void RegisterAlageneExtractor()
+        {
+            UnitTypeBuilder builder = new UnitTypeBuilder();
+            builder.SizeInTiles = new Size(2, 2);
+            builder.SightRange = 4;
+            builder.MaxHealth = 25;
+            builder.Skills.Add(new Skills.ExtractAlagene());
+            Register(builder, "AlageneExtractor");
+        } 
         #endregion
 
         public UnitType Register(UnitTypeBuilder builder, string name)

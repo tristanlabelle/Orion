@@ -101,7 +101,7 @@ namespace Orion.GameLogic.Tasks
             float shortestDistance = -1;
             foreach (Unit unit in harvester.Faction.World.Entities.OfType<Unit>())
             {
-                if (unit.Faction == harvester.Faction && unit.HasSkill<Skills.Train>())
+                if (unit.Faction == harvester.Faction && unit.HasSkill<Skills.StoreResources>())
                 {
                     float distance = (unit.Position - nodePosition).LengthSquared;
                     if (distance < shortestDistance || shortestDistance == -1)

@@ -70,15 +70,22 @@ namespace Orion.GameLogic.Tasks
             {
                 if (TrainingIsOver(timeDelta))
                 {
-                    // TODO: Refactor to take building size into account and position unit intelligently.
+                    // TODO: Refactor to take building size into account and position unit intelligently
                     Vector2 newPosition = new Vector2(trainer.Position.X + 2, trainer.Position.Y + 2);
+                    
 
                     // If the new assigned position is unavalible put it over the building
                     if (!trainer.World.IsWithinBounds(newPosition)
                         || !trainer.World.Terrain.IsWalkable(newPosition))
                         newPosition = trainer.Position;
 
-                    trainer.Faction.CreateUnit(traineeType, newPosition);
+                    
+                    Unit unitCreated = trainer.Faction.CreateUnit(traineeType, newPosition);
+                    if (trainer.Type.RallyPoint != null)
+                    {
+                        unitCreated.Task = new Move(unitCreated, trainer.Type.RallyPoint); 
+                    }
+                  
                     trainingCompleted = true;
                 }
             }

@@ -5,6 +5,7 @@ using System.Linq;
 using Color = System.Drawing.Color;
 using OpenTK.Math;
 using Orion.Geometry;
+using Orion.GameLogic.Tasks; 
 
 namespace Orion.GameLogic
 {
@@ -153,9 +154,11 @@ namespace Orion.GameLogic
         public Unit CreateUnit(UnitType type, Vector2 position)
         {
             Unit unit = world.Entities.CreateUnit(type, this, position);
+
             unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
+            
             return unit;
         }
 

@@ -211,9 +211,8 @@ namespace Orion.Commandment
 
             if (target == null)
             {
-                ResourceNode node = faction.World.Entities
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
+                bool listOfRally=false; 
+                ResourceNode node = faction.World.Entities.OfType<ResourceNode>().FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
 
                 if (node != null)
                     if (node.Type == ResourceType.Aladdium)
@@ -222,6 +221,23 @@ namespace Orion.Commandment
                         LaunchBuild(node.Position, commander.Faction.World.UnitTypes.First(unit => unit.HasSkill<Skills.ExtractAlagene>()));
                 else
                     LaunchMove(at);
+                foreach (Unit unit in selectionManager.SelectedUnits)
+                {
+                    if (unit.HasSkill<Skills.Train>())
+                    { 
+                        listOfRally = true;
+                        break; 
+                    }
+                }
+                if (listOfRally)
+                {
+                    List<Unit> unitsToRallyTo = selectionManager.SelectedUnits.Where(unit => unit.HasSkill<Skills.Train>()).ToList();
+                    foreach (Unit unit in unitsToRallyTo)
+                    {
+                        unit.Type.RallyPoint = at; 
+                    }
+                }
+                
             }
             else
             {

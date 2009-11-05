@@ -7,9 +7,6 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Commandment
 {
-    /// <summary>
-    /// A <see cref="Commander"/> which gives <see cref="Command"/>s based on user input.
-    /// </summary>
     public sealed class UserInputCommander : Commander
     {
         #region Constructors

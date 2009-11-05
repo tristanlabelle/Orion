@@ -7,6 +7,7 @@ using System.Linq;
 using OpenTK.Math;
 
 using Orion.Geometry;
+using Orion.GameLogic.Tasks;
 
 using Point = System.Drawing.Point;
 

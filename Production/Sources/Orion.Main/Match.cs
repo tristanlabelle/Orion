@@ -11,8 +11,8 @@ namespace Orion.Main
     {
         #region Fields
         private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
-        private const short campSize = 20;
-        private const int DistanceBetweenTwoCamps = 60;
+        private const short campSize = 15;
+        private int DistanceBetweenTwoCamps = 175;
         private Random random;
         private Terrain terrain;
         public readonly UserInputCommander UserCommander;
@@ -31,12 +31,8 @@ namespace Orion.Main
             Pipeline = pipeline;
 
             #region Units & Buildings Creation
-            // this really, really sucks
-            // we have to do something better
 
-            // Find a Spot To place a base 10 by 10 
-            //if there less that 10% non walkable we will use this spot
-            //for a base
+            // Find a Spot To place a base
             foreach (Faction faction in world.Factions)
             {
                 Point16 position = new Point16(0, 0) ;
@@ -46,7 +42,11 @@ namespace Orion.Main
                 {
                     allWalkable = true;
                     ++tries;
-                    if (tries == 100) throw new Exception("FAIL to find camp site");
+                    if (tries == 750)
+                    {
+                        DistanceBetweenTwoCamps = (int)((float)DistanceBetweenTwoCamps *0.80f);
+                        tries = 0;
+                    }
 
                     position = new Point16((short)random.Next(world.Width), (short)random.Next(world.Height));
 
@@ -66,7 +66,7 @@ namespace Orion.Main
                         }
                     }
 
-                    //finally check if there is another command center in a range of 40 pixel
+                    //finally check if there is another command center near
                     if (allWalkable)
                     {
                         // creation of the command center in the center of the area
@@ -92,8 +92,8 @@ namespace Orion.Main
                 //creation of the builder and the harvester
                 for(short i = 1 ;i<=2;i++)
                 {
-                    Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"), new Vector2(position.X + i * 4, position.Y));
-                    Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"), new Vector2(position.X, position.Y + i * 4));
+                    Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"), new Vector2(position.X + i * 2, position.Y));
+                    Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"), new Vector2(position.X, position.Y + i * 2));
 
                 }
                

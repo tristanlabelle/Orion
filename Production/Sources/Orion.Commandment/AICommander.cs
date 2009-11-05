@@ -18,6 +18,7 @@ namespace Orion.Commandment
         private ResourceNode startingNode;
         private List<Circle> regions = new List<Circle>();
         private Random random;
+        private List<ResourceNode> usedNodes = new List<ResourceNode>();
         #endregion
 
         #region Contructors
@@ -77,7 +78,77 @@ namespace Orion.Commandment
             }
 
             if (commandCenterBuilt)
+            {
                 Attack();
+                dispatchIdleHarvesters();
+            }
+        }
+
+        private void dispatchIdleHarvesters()
+        {
+            List<Unit> harvesters = Faction.Units.Where(unit => unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
+            ResourceNode node = startingNode;
+            int tries = 0;
+            if (harvesters.Count != 0)
+            {
+                    node = findIdealNode();
+
+                if (node == null)
+                    return;
+
+                usedNodes.Add(node);
+            }
+            
+
+            if (harvesters.Count != 0)
+            {
+                Harvest command = new Harvest(Faction, harvesters, node);
+                GenerateCommand(command);
+            }
+
+        }
+
+        private ResourceNode findIdealNode()
+        {
+            ResourceNode bestNode = World.Entities.OfType<ResourceNode>().First();
+
+            foreach (ResourceNode node in World.Entities.OfType<ResourceNode>().Where(node => node.Type == ResourceType.Aladdium && !usedNodes.Contains(node)))
+            {
+                if (node != null)
+                {
+                    Circle effectiveRange = new Circle(node.Position, 20);
+
+                    int enemyUnits = World.Entities
+                        .OfType<Unit>()
+                        .Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position))
+                        .Count();
+
+                    int alliedUnits = Faction.Units
+                        .Where(unit => effectiveRange.ContainsPoint(unit.Position))
+                        .Count();
+
+                    int unitScore = alliedUnits - enemyUnits;
+
+                    Circle currentRange = new Circle(bestNode.Position, 20);
+
+                    int currentEnemyUnits = World.Entities
+                        .OfType<Unit>()
+                        .Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).Count();
+
+                    int currentAlliedUnits = Faction.Units
+                        .Where(unit => currentRange.ContainsPoint(unit.Position))
+                        .Count();
+
+                    int currentScore = currentAlliedUnits - currentEnemyUnits;
+
+                    if (unitScore > currentScore)
+                        bestNode = node;
+                }
+                else
+                    return null;
+            }
+
+            return bestNode;
         }
 
         private void BuildFactories()
@@ -112,6 +183,12 @@ namespace Orion.Commandment
                 Command command = new Train(allBuildingIdleThatCanBuild,
                     World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Attack>()), Faction);
                 GenerateCommand(command);
+
+                List<Unit> harvesterTrainer = new List<Unit>();
+                harvesterTrainer.Add(Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Train>()).First());
+
+                Command harvesterTrainingCommand = new Train(harvesterTrainer, World.UnitTypes.FromName("Harvester"), Faction);
+                GenerateCommand(harvesterTrainingCommand);
             }
         }
 
@@ -190,39 +267,10 @@ namespace Orion.Commandment
 
         private void Meet()
         {
-            startingNode = World.Entities.OfType<ResourceNode>().First();
+            startingNode = findIdealNode();
+
+            usedNodes.Add(startingNode);
             
-            foreach (ResourceNode node in World.Entities.OfType<ResourceNode>().Where(node => node.Type == ResourceType.Aladdium))
-            {
-                Circle effectiveRange = new Circle(node.Position, 20);
-
-                int enemyUnits = World.Entities
-                    .OfType<Unit>()
-                    .Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position))
-                    .Count();
-
-                int alliedUnits = Faction.Units
-                    .Where(unit => effectiveRange.ContainsPoint(unit.Position))
-                    .Count();
-
-                int unitScore = alliedUnits - enemyUnits;
-
-                Circle currentRange = new Circle(startingNode.Position, 20);
-
-                int currentEnemyUnits = World.Entities
-                    .OfType<Unit>()
-                    .Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).Count();
-                
-                int currentAlliedUnits = Faction.Units
-                    .Where(unit => currentRange.ContainsPoint(unit.Position))
-                    .Count();
-
-                int currentScore = currentAlliedUnits - currentEnemyUnits;
-
-                if (unitScore > currentScore)
-                    startingNode = node;
-
-            }
             regions.Add(new Circle(startingNode.Position, 10));
 
             Vector2 position = new Vector2((startingNode.Position.X + startingNode.BoundingRectangle.Width), (startingNode.Position.Y + startingNode.BoundingRectangle.Height));

@@ -10,9 +10,14 @@ namespace Orion.GameLogic
     public sealed class FogOfWar
     {
         #region Fields
+        /// <summary>
+        /// Holds the reference count of each tile in the fog of war.
+        /// Indexed by [x, y]. A value of <see cref="ushort.MaxValue"/>
+        /// indicates that the tile has never been seen.
+        /// </summary>
         private readonly ushort[,] tiles;
         private readonly Dictionary<int, BitArray2D> cachedCircleBitmaps = new Dictionary<int, BitArray2D>();
-        private bool blackSheepWall = false;
+        private bool isEnabled = true;
         #endregion
         
         #region Constructors
@@ -56,9 +61,19 @@ namespace Orion.GameLogic
         {
             get { return tiles.GetLength(1); }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this fog of war is enabled.
+        /// </summary>
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+        }
         #endregion
 
         #region Methods
+        #region Updating
+        #region Public Interface
         public void UpdateLineOfSight(Circle oldLineOfSight, Circle newLineOfSight)
         {
             Circle roundedOldLineOfSight = RoundLineOfSight(oldLineOfSight);
@@ -82,7 +97,9 @@ namespace Orion.GameLogic
             Circle roundedCircle = RoundLineOfSight(lineOfSight);
             ModifyLineOfSight(roundedCircle, false);
         }
+        #endregion
 
+        #region Private Implementation
         private Circle RoundLineOfSight(Circle lineOfSight)
         {
             return new Circle(
@@ -115,7 +132,7 @@ namespace Orion.GameLogic
 
         private void ModifyLineOfSight(Circle lineOfSight, bool addOrRemove)
         {
-            if (blackSheepWall) return;
+            if (!isEnabled) return;
 
             int roundedRadius = (int)Math.Round(lineOfSight.Radius);
             BitArray2D bitmap = GetCircleBitmap(roundedRadius);
@@ -155,85 +172,66 @@ namespace Orion.GameLogic
             }
             OnChanged();
         }
+        #endregion
+        #endregion
 
-        private Rectangle CreateTilesRectangle(Rectangle boundingRectangle)
-        {
-            float X = (float)Math.Floor(boundingRectangle.MinX);
-            float Y = (float)Math.Floor(boundingRectangle.MinY);
-            float MaxX = (float)Math.Ceiling(boundingRectangle.MaxX);
-            float MaxY = (float)Math.Ceiling(boundingRectangle.MaxY);
-
-            if (Math.Ceiling(boundingRectangle.MaxX) > Width)
-            {
-                MaxX = Width;
-            }
-            if (Math.Floor(boundingRectangle.MinX) < 0)
-            {
-                X = 0;
-            }
-            if (Math.Ceiling(boundingRectangle.MaxY) > Height)
-            {
-                MaxY = Height;
-            }
-            if (Math.Floor(boundingRectangle.MinY) < 0)
-            {
-                Y = 0;
-            }
-
-            return new Rectangle(X, Y, MaxX - X, MaxY - Y);
-        }
-
+        #region Testing
         /// <summary>
-        /// Indicates if the tile was seen at the specified coordinate.
+        /// Gets the visibility status of a tile at the specified coordinates.
         /// </summary>
-        /// <param name="x">The x coordinate in the field.</param>
-        /// <param name="y">The y coordinate in the field.</param>
-        /// <returns>A boolean value from the fog of war field.</returns>
-        public bool HasSeenTile(int x, int y)
+        /// <param name="x">The x coordinate of the tile in the field.</param>
+        /// <param name="y">The y coordinate of the tile in the field.</param>
+        /// <returns>A flag indicating the visibility state of that tile..</returns>
+        public TileVisibility GetTileVisibility(int x, int y)
         {
-            return tiles[x, y] != ushort.MaxValue;
+            ushort value = tiles[x, y];
+            if (value == ushort.MaxValue) return TileVisibility.Undiscovered;
+            return value == 0 ? TileVisibility.Discovered : TileVisibility.Visible;
         }
 
-        public bool HasSeenTile(Vector2 position)
+        public TileVisibility GetTileVisibility(Vector2 position)
         {
-            return HasSeenTile((int)position.X, (int)position.Y);
+            return GetTileVisibility((int)position.X, (int)position.Y);
         }
 
-        public bool HasSeenTile(Point16 point)
+        public TileVisibility GetTileVisibility(Point16 point)
         {
-            return HasSeenTile(point.X, point.Y);
+            return GetTileVisibility(point.X, point.Y);
         }
+        #endregion
 
+        #region Cheats
         /// <summary>
-        /// Indicates if the tile at the specified coordinate in currently in the sight of a unit.
+        /// Reveals the map, as if the player had seen every tile at least once.
         /// </summary>
-        /// <param name="x">The x coordinate in the field.</param>
-        /// <param name="y">The y coordinate in the field.</param>
-        /// <returns>A boolean value from the fog of war field.</returns>
-        public bool SeesTileCurrently(int x, int y)
+        public void Reveal()
         {
-            return tiles[x, y] != 0 && tiles[x, y] != ushort.MaxValue;
-        }
+            if (!isEnabled) return;
 
-        public bool SeesTileCurrently(Vector2 position)
-        {
-            return SeesTileCurrently((int)position.X, (int)position.Y);
-        }
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                    if (tiles[x, y] == ushort.MaxValue)
+                        tiles[x, y] = 0;
 
-        public bool SeesTileCurrently(Point16 point)
-        {
-            return SeesTileCurrently(point.X, point.Y);
-        }
-
-        public void BlackSheepWall()
-        {
-            blackSheepWall = true;
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    this.tiles[i, j] = 1;
             OnChanged();
         }
 
+        /// <summary>
+        /// Disables the fog of war, as if there were always units seeing every tile.
+        /// </summary>
+        public void Disable()
+        {
+            if (!isEnabled) return;
+
+            isEnabled = false;
+
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                    tiles[x, y] = 1;
+
+            OnChanged();
+        }
+        #endregion
         #endregion
     }
 }

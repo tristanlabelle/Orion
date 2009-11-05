@@ -136,13 +136,16 @@ namespace Orion.Commandment
 
         public void HandleKeyDown(object responder, KeyboardEventArgs args)
         {
-            if (args.Key == Keys.F12) commander.Faction.FogOfWar.BlackSheepWall();
+            if (args.Key == Keys.F11) commander.Faction.FogOfWar.Reveal();
+            if (args.Key == Keys.F12) commander.Faction.FogOfWar.Disable();
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = true;
             if (args.Key == Keys.Delete) LaunchSuicide();
             if (args.Key == Keys.C) LaunchCancel();
             if (args.Key == Keys.T)
+            {
                 LaunchTrain(commander.Faction.World.UnitTypes.First
                     (unit => unit.HasSkill<Attack>()));
+            }
             if (keysMap.ContainsKey(args.Key)) mouseCommand = keysMap[args.Key];
         }
 

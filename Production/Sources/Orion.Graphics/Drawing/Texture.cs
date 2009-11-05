@@ -35,7 +35,11 @@ namespace Orion.Graphics
             {
                 GL.BindTexture(TextureTarget.Texture2D, id);
 
-                SetPixels(data);
+                if (data != null) ValidatePixelBufferSize(data);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.format),
+                    this.width, this.height, 0, GetGLPixelFormat(this.format), PixelType.UnsignedByte,
+                    data);
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
                     (int)TextureMinFilter.Nearest);
@@ -61,46 +65,57 @@ namespace Orion.Graphics
         public void SetPixels(byte[] data)
         {
             EnsureNotDisposed();
+            Argument.EnsureNotNull(data, "data");
+            ValidatePixelBufferSize(data);
 
-            PixelFormat pixelFormat;
-            PixelInternalFormat pixelInternalFormat;
-            int bytesPerPixel;
-            GetPixelFormatInfo(this.format, out bytesPerPixel, out pixelFormat, out pixelInternalFormat);
+            int lastID;
+            GL.GetInteger(GetPName.Texture2D, out lastID);
 
-            if (data != null && data.Length < (this.width * this.height * bytesPerPixel))
-                throw new ArgumentException("Pixel data buffer too small!", "data");
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat,
-                this.width, this.height, 0, pixelFormat, PixelType.UnsignedByte,
-                data);
+            try
+            {
+                GL.BindTexture(TextureTarget.Texture2D, id);
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0,
+                    0, 0,  width, height,
+                    GetGLPixelFormat(format), PixelType.UnsignedByte,
+                    data);
+            }
+            finally
+            {
+                GL.BindTexture(TextureTarget.Texture2D, lastID);
+            }
         }
 
-        private static void GetPixelFormatInfo(TextureFormat format, out int bytesPerPixel,
-            out PixelFormat pixelFormat, out PixelInternalFormat pixelInternalFormat)
+        private void ValidatePixelBufferSize(byte[] buffer)
         {
-            if (format == TextureFormat.Intensity)
-            {
-                bytesPerPixel = 1;
-                pixelFormat = PixelFormat.Luminance;
-                pixelInternalFormat = PixelInternalFormat.Luminance;
-            }
-            else if (format == TextureFormat.Rgb)
-            {
-                bytesPerPixel = 3;
-                pixelFormat = PixelFormat.Rgb;
-                pixelInternalFormat = PixelInternalFormat.Rgb;
-            }
-            else if (format == TextureFormat.Rgba)
-            {
-                bytesPerPixel = 4;
-                pixelFormat = PixelFormat.Rgba;
-                pixelInternalFormat = PixelInternalFormat.Rgba;
-            }
-            else
-            {
-                throw new InvalidEnumArgumentException(
-                    "Invalid texture format: {0}.".FormatInvariant(format));
-            }
+            if (buffer != null && buffer.Length < (width * height * GetBytesPerPixel(format)))
+                throw new ArgumentException("Pixel data buffer too small!", "data");
+        }
+
+        private static int GetBytesPerPixel(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return 1;
+            if (format == TextureFormat.Rgb) return 3;
+            if (format == TextureFormat.Rgba) return 4;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
+        }
+
+        private static PixelFormat GetGLPixelFormat(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return PixelFormat.Luminance;
+            if (format == TextureFormat.Rgb) return PixelFormat.Rgb;
+            if (format == TextureFormat.Rgba) return PixelFormat.Rgba;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
+        }
+
+        private static PixelInternalFormat GetGLInternalPixelFormat(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return PixelInternalFormat.Luminance;
+            if (format == TextureFormat.Rgb) return PixelInternalFormat.Rgb;
+            if (format == TextureFormat.Rgba) return PixelInternalFormat.Rgba;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
         }
         #endregion
 

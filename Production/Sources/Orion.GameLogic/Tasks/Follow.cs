@@ -13,8 +13,9 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit follower;
+        private Vector2 oldPositionTarget;
         private readonly Unit target;
-        private readonly float targetDistance;
+        private  Move moveTask;
         #endregion
 
         #region Constructors
@@ -27,18 +28,18 @@ namespace Orion.GameLogic.Tasks
         /// <param name="targetDistance">
         /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
         /// </param>
-        public Follow(Unit follower, Unit target, float targetDistance)
+        public Follow(Unit follower, Unit target)
         {
             Argument.EnsureNotNull(follower, "follower");
             if (!follower.HasSkill<Skills.Move>())
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
-            Argument.EnsurePositive(targetDistance, "targetDistance");
 
             this.follower = follower;
             this.target = target;
-            this.targetDistance = targetDistance;
+            this.oldPositionTarget = target.Position;
+            moveTask = new Move(follower, target.Position);
         }
         #endregion
 
@@ -59,15 +60,10 @@ namespace Orion.GameLogic.Tasks
             get { return target; }
         }
 
-        /// <summary>
-        /// Gets the distance between the <see cref="Unit"/> accomplishing this <see cref="Task"/>
-        /// and the target <see cref="Unit"/> when to stop.
-        /// </summary>
-        public float TargetDistance
+        public bool IsInRange
         {
-            get { return targetDistance; }
+            get { return (target.Position - follower.Position).Length <= 1;}
         }
-
         /// <summary>
         /// Gets the current distance remaining between this <see cref="Unit"/>
         /// and the followed <see cref="Unit"/>.
@@ -81,18 +77,14 @@ namespace Orion.GameLogic.Tasks
         /// Gets a value indicating if the following <see cref="Unit"/>
         /// is within the target range of its <see cref="target"/>.
         /// </summary>
-        public bool IsInRange
-        {
-            get { return CurrentDistance <= targetDistance; }
-        }
-
+       
         public override bool HasEnded
         {
             get
             {
                 // This task never ends as even if we get in range at one point in time,
                 // the target may move again later.
-                return false;
+                return target == null || !target.IsAlive;
             }
         }
 
@@ -105,21 +97,14 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
-            Vector2 delta = target.Position - follower.Position;
-            float distanceRemaining = CurrentDistance - targetDistance;
-            if (distanceRemaining <= 0) return;
-
-            Vector2 direction = Vector2.Normalize(delta);
-
-            float movementDistance = follower.GetStat(UnitStat.MovementSpeed) * timeDelta;
-            if (movementDistance > distanceRemaining)
+            /*if (oldPositionTarget != target.Position)
             {
-                // Move just a little more than needed,
-                // this saves us from floating point inaccuracies.
-                movementDistance = distanceRemaining + 0.01f;
-            }
+                this.moveTask = new Move(follower, target.Position);
+                oldPositionTarget = target.Position;
+            }/*/
+            moveTask.Update(timeDelta);
+           
 
-            follower.Position = follower.World.Bounds.ClosestPointInside(follower.Position + direction * movementDistance);
         }
         #endregion
     }

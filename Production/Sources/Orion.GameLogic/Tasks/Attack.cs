@@ -28,7 +28,7 @@ namespace Orion.GameLogic.Tasks
             
             this.attacker = attacker;
             this.target = target;
-            if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target, attacker.GetStat(UnitStat.AttackRange));
+            if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target);
             timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion

@@ -56,6 +56,11 @@ namespace Orion.GameLogic.Tasks
                 move.Update(timeDelta);
                 return;
             }
+            else if ((builder.Position - buildPosition).Length > 1)
+            {
+                hasEnded = true;
+                return;
+            }
 
             if (!hasBegunBuilding)
             {

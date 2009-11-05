@@ -21,6 +21,7 @@ namespace Orion.GameLogic.Tasks
         private Move move;
         private Unit commandCenter;
         private bool extractingOrDelivering = true; //true = extracting, false = delivering
+        private bool hasEnded = false;
         #endregion
 
         #region Constructors
@@ -44,6 +45,10 @@ namespace Orion.GameLogic.Tasks
         {
             get { return "harvesting"; }
         }
+        public override bool HasEnded
+        {
+            get { return hasEnded; }
+        }
         #endregion
 
         #region Methods
@@ -65,7 +70,12 @@ namespace Orion.GameLogic.Tasks
                                 amountToHarvest = node.AmountRemaining;
 
                             node.Harvest(amountToHarvest);
-                            move = new Move(harvester, commandCenter.Position);
+                            if (commandCenter != null)
+                                move = new Move(harvester, commandCenter.Position);
+                            else
+                            {
+                                hasEnded = true;
+                            }
                             extractingOrDelivering = false;
 
                             
@@ -113,7 +123,9 @@ namespace Orion.GameLogic.Tasks
             }
 
             if (closestCommandCenter == null)
-                throw new ArgumentException("There is no command center in this unit's faction", "harvester");
+            {
+                return null;
+            }
             else
                 closestCommandCenter.Died += new GenericEventHandler<Entity>(CommandCenterDestroyed);
 

@@ -30,7 +30,7 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.building = building;
-            this.follow = new Follow(unit, building, unit.GetStat(UnitStat.AttackRange));
+            this.follow = new Follow(unit, building);
             this.aladdiumCost = building.GetStat(UnitStat.AladdiumCost) / building.MaxHealth;
             this.alageneCost = building.GetStat(UnitStat.AlageneCost) / building.MaxHealth;
         }

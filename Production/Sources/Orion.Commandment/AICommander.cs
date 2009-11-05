@@ -215,7 +215,8 @@ namespace Orion.Commandment
             List<Unit> potentialAttackers = Faction.Units
                 .Where(unit => !(unit.Task is Orion.GameLogic.Tasks.Harvest)
                     && !(unit.Task is Orion.GameLogic.Tasks.Build)
-                    && unit.Type.HasSkill<Skills.Attack>())
+                    && unit.Type.HasSkill<Skills.Attack>()
+                    && !(unit.Task is Orion.GameLogic.Tasks.Attack))
                 .ToList();
 
             int amountOfAttackers = (int)Math.Ceiling(0.75 * potentialAttackers.Count);

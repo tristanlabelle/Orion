@@ -45,9 +45,9 @@ namespace Orion.Graphics
                     (int)(builder.UseSmoothing ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.Clamp));
+                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.Clamp));
+                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
 
                 GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
                     (int)TextureEnvMode.Modulate);

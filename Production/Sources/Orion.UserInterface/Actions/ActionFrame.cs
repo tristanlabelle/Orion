@@ -34,6 +34,7 @@ namespace Orion.UserInterface.Actions
         public void Clear()
         {
             actionProviders.Clear();
+            ResetActions();
         }
 
         public void Restore()
@@ -44,6 +45,7 @@ namespace Orion.UserInterface.Actions
 
         private void ResetActions()
         {
+            foreach (ViewContainer container in Children) container.Dispose();
             Children.Clear();
             if (actionProviders.Count > 0)
             {

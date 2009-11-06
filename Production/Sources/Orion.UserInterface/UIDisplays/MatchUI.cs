@@ -269,7 +269,9 @@ namespace Orion.UserInterface
         private void UpdateSkillsPanel()
         {
             actions.Clear();
-            if (selectedType != null) actions.Push(new UnitActionProvider(enablers, selectedType));
+            IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
+            if (selectedType != null && selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
+                actions.Push(new UnitActionProvider(enablers, selectedType));
         }
 
         private void MoveWorldView(Vector2 center)

@@ -3,13 +3,17 @@ using System.Net;
 using System.Windows.Forms;
 using Orion.Networking;
 using Orion.UserInterface;
+using System.Diagnostics;
 
 
 namespace Orion.Main
 {
     internal static class Program
     {
+        public const float TargetFramesPerSecond = 60;
+        public const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
         public const int DefaultPort = 41223;
+
         /// <summary>
         /// Main entry point for the program.
         /// </summary>
@@ -89,11 +93,44 @@ namespace Orion.Main
             // todo: use a root menu UI instead of the match display here
             using (GameUI ui = new GameUI())
             {
-                MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
-                MatchRunLoop runLoop = new MatchRunLoop(ui, match.World, match);
-                match.World.Entities.Update(0);
-                ui.Display(matchUI);
-                while (ui.IsWindowCreated) runLoop.RunOnce();
+                RunMatch(match, ui);
+            }
+        }
+
+        private static void RunMatch(Match match, GameUI ui)
+        {
+            Argument.EnsureNotNull(match, "match");
+            Argument.EnsureNotNull(ui, "ui");
+
+            MatchUI matchUI = new MatchUI(match.world, match.userCommander);
+
+            match.world.Update(0);
+            ui.Display(matchUI);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            FrameRateCounter frameRateCounter = new FrameRateCounter();
+            while (ui.IsWindowCreated)
+            {
+                Application.DoEvents();
+                ui.Refresh();
+
+                float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
+                if (timeDeltaInSeconds >= TargetSecondsPerFrame)
+                {
+                    stopwatch.Reset();
+                    stopwatch.Start();
+
+                    do
+                    {
+                        match.Update(TargetSecondsPerFrame);
+
+                        ui.Update(TargetSecondsPerFrame);
+                        frameRateCounter.Update();
+                        ui.WindowTitle = frameRateCounter.ToString();
+
+                        timeDeltaInSeconds -= TargetSecondsPerFrame;
+                    } while (timeDeltaInSeconds >= TargetSecondsPerFrame);
+                }
             }
         }
     }

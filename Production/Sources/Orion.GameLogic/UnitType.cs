@@ -30,7 +30,6 @@ namespace Orion.GameLogic
         private readonly int alageneCost;
         private readonly int maxHealth = 10;
         private readonly int sightRange = 10;
-        private Vector2 rallyPoint; 
         #endregion
 
         #region Constructors
@@ -92,11 +91,6 @@ namespace Orion.GameLogic
         public int HeightInTiles
         {
             get { return sizeInTiles.Height; }
-        }
-        public Vector2 RallyPoint
-        {
-            get { return rallyPoint; }
-            set { rallyPoint= value; }
         }
         #endregion
         #endregion

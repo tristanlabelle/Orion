@@ -81,10 +81,7 @@ namespace Orion.GameLogic.Tasks
 
                     
                     Unit unitCreated = trainer.Faction.CreateUnit(traineeType, newPosition);
-                    if (trainer.Type.RallyPoint != null)
-                    {
-                        unitCreated.Task = new Move(unitCreated, trainer.Type.RallyPoint); 
-                    }
+                    unitCreated.Task = new Move(unitCreated, trainer.Position + trainer.RallyPoint); 
                   
                     trainingCompleted = true;
                 }

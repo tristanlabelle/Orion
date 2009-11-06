@@ -62,8 +62,6 @@
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <Compile Include="RunLoop.cs" />
-    <Compile Include="MatchRunLoop.cs" />
     <Compile Include="Match Configuration\SinglePlayerMatchConfigurer.cs" />
   </ItemGroup>
   <ItemGroup>

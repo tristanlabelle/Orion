@@ -7,29 +7,28 @@ using System.Collections.Generic;
 
 namespace Orion.Main
 {
-    class Match
+    public sealed class Match
     {
         #region Fields
-        private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
         private const short campSize = 15;
 
-        private int DistanceBetweenTwoCamps = 175;
         private readonly Random random;
-        public readonly UserInputCommander UserCommander;
-        public readonly World World;
-        public readonly CommandPipeline Pipeline;
-        private List<Vector2> positionOfOthersBases = new List<Vector2>();
+        public readonly UserInputCommander userCommander;
+        public readonly World world;
+        public readonly CommandPipeline pipeline;
         #endregion
 
         #region Constructors
-        internal Match(Random randomGenerator, World world, UserInputCommander userCommander, CommandPipeline pipeline)
+        internal Match(Random random, World world, UserInputCommander userCommander, CommandPipeline pipeline)
         {
-            random = randomGenerator;
-            UserCommander = userCommander;
-            World = world;
-            Pipeline = pipeline;
+            this.random = random;
+            this.userCommander = userCommander;
+            this.world = world;
+            this.pipeline = pipeline;
 
             #region Units & Buildings Creation
+            List<Vector2> positionOfOthersBases = new List<Vector2>();
+            int DistanceBetweenTwoCamps = 175;
 
             // Find a Spot To place a base
             foreach (Faction faction in world.Factions)
@@ -72,13 +71,11 @@ namespace Orion.Main
                         position = new Point16((short)(position.X + campSize / 2), (short)(position.Y + campSize / 2));
                         foreach (Vector2 positionOfAFaction in positionOfOthersBases)
                         {
-                            
-                                if ((positionOfAFaction - position).Length < DistanceBetweenTwoCamps)
-                                {
-                                    allWalkable = false;
-                                    break;
-                                }
-
+                            if ((positionOfAFaction - position).Length < DistanceBetweenTwoCamps)
+                            {
+                                allWalkable = false;
+                                break;
+                            }
                         }
 
                     }
@@ -93,7 +90,6 @@ namespace Orion.Main
                 {
                     Unit builder = faction.CreateUnit(world.UnitTypes.FromName("Builder"), new Vector2(position.X + i * 2, position.Y));
                     Unit harvester = faction.CreateUnit(world.UnitTypes.FromName("Harvester"), new Vector2(position.X, position.Y + i * 2));
-
                 }
                
                 ResourceNode nodeAladdium = world.Entities.CreateResourceNode
@@ -126,8 +122,8 @@ namespace Orion.Main
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
         public void Update(float timeDeltaInSeconds)
         {
-            Pipeline.Update(timeDeltaInSeconds);
-            World.Update(timeDeltaInSeconds);
+            pipeline.Update(timeDeltaInSeconds);
+            world.Update(timeDeltaInSeconds);
         }
         #endregion
     }

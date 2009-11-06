@@ -16,7 +16,7 @@ namespace Orion.GameLogic
         #region Fields
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
-        private readonly EntityRegistry units;
+        private readonly EntityRegistry entities;
         private readonly UnitTypeRegistry unitTypes;
         private readonly Pathfinder pathfinder;
         #endregion
@@ -30,7 +30,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
-            units = new EntityRegistry(this, 5, 5);
+            entities = new EntityRegistry(this, 5, 5);
             unitTypes = new UnitTypeRegistry();
             pathfinder = new Pathfinder(this);
         }
@@ -50,7 +50,7 @@ namespace Orion.GameLogic
         /// </summary>
         public EntityRegistry Entities
         {
-            get { return units; }
+            get { return entities; }
         }
 
         public UnitTypeRegistry UnitTypes
@@ -160,7 +160,7 @@ namespace Orion.GameLogic
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
         public void Update(float timeDeltaInSeconds)
         {
-            units.Update(timeDeltaInSeconds);
+            entities.Update(timeDeltaInSeconds);
         }
         #endregion
     }

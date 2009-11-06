@@ -29,7 +29,7 @@ namespace Orion.Main
                 aiCommander.AddToPipeline(pipeline);
             }
 
-            return new Match(random, terrain, world, userCommander, pipeline);
+            return new Match(random, world, userCommander, pipeline);
         }
     }
 }

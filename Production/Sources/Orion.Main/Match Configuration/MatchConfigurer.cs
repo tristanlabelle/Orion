@@ -16,12 +16,12 @@ namespace Orion.Main
         protected int seed;
         protected World world;
         protected Random random;
-        protected Terrain terrain;
 
         protected void CreateMap()
         {
             random = new MersenneTwister(seed);
-            terrain = Terrain.Generate(256, 256, random);
+
+            Terrain terrain = Terrain.Generate(256, 256, random);
             world = new World(terrain);
         }
 

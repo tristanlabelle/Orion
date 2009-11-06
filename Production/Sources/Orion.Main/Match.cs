@@ -12,9 +12,9 @@ namespace Orion.Main
         #region Fields
         private static DateTime unixEpochStart = new DateTime(1970, 1, 1);
         private const short campSize = 15;
+
         private int DistanceBetweenTwoCamps = 175;
-        private Random random;
-        private Terrain terrain;
+        private readonly Random random;
         public readonly UserInputCommander UserCommander;
         public readonly World World;
         public readonly CommandPipeline Pipeline;
@@ -22,10 +22,9 @@ namespace Orion.Main
         #endregion
 
         #region Constructors
-        internal Match(Random randomGenerator, Terrain terrain, World world, UserInputCommander userCommander, CommandPipeline pipeline)
+        internal Match(Random randomGenerator, World world, UserInputCommander userCommander, CommandPipeline pipeline)
         {
             random = randomGenerator;
-            this.terrain = terrain;
             UserCommander = userCommander;
             World = world;
             Pipeline = pipeline;
@@ -120,6 +119,16 @@ namespace Orion.Main
         }
         #endregion
 
-        //public abstract void Start();
+        #region Methods
+        /// <summary>
+        /// Updates this <see cref="Match"/> for the duration of a frame.
+        /// </summary>
+        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
+        public void Update(float timeDeltaInSeconds)
+        {
+            Pipeline.Update(timeDeltaInSeconds);
+            World.Update(timeDeltaInSeconds);
+        }
+        #endregion
     }
 }

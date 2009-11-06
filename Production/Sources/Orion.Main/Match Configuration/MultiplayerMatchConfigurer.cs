@@ -25,7 +25,7 @@ namespace Orion.Main
             UserInputCommander userCommander;
             AssignFactions(out userCommander);
             userCommander.AddToPipeline(pipeline);
-            return new Match(random, terrain, world, userCommander, pipeline);
+            return new Match(random, world, userCommander, pipeline);
         }
     }
 }

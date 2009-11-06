@@ -15,6 +15,7 @@ namespace Orion.GameLogic
         BuildingSpeed,
         MaxHealth,
         MovementSpeed,
-        SightRange
+        SightRange,
+        TrainingSpeed
     }
 }

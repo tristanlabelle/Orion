@@ -137,6 +137,10 @@ namespace Orion.Commandment
                 case Keys.Delete: LaunchSuicide(); break;
 
                 // cheats
+                case Keys.F10:
+                    commander.Faction.AladdiumAmount = 10000;
+                    commander.Faction.AlageneAmount = 10000;
+                    break;
                 case Keys.F11: commander.Faction.FogOfWar.Reveal(); break;
                 case Keys.F12: commander.Faction.FogOfWar.Disable(); break;
 

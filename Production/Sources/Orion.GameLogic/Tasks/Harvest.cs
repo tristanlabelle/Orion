@@ -12,11 +12,11 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit harvester;
         private readonly ResourceNode node;
         private const float secondsToHarvest = 5;
-        private const float secondsToGiveRessource = 0;
+        private const float secondsToGiveResource = 0;
         private const int defaultAmountToHarvest = 5;
         private int amountToHarvest = 0;
         private float secondsSpentHarvesting = 0;
-        private float secondsGivingRessource = 0;
+        private float secondsGivingResource = 0;
         private Move move;
         private Unit commandCenter;
         private bool extractingOrDelivering = true; //true = extracting, false = delivering
@@ -151,13 +151,13 @@ namespace Orion.GameLogic.Tasks
 
         private bool visitingCommandCenterIsOver(float timeDelta)
         {
-            if (secondsGivingRessource >= secondsToGiveRessource)
+            if (secondsGivingResource >= secondsToGiveResource)
             {
                 return true;
             }
             else
             {
-                secondsGivingRessource += timeDelta;
+                secondsGivingResource += timeDelta;
                 return false;
             }
         }

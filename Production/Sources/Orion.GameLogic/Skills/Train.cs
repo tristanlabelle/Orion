@@ -10,6 +10,7 @@ namespace Orion.GameLogic.Skills
     {
         #region Fields
         private readonly Func<UnitType, bool> predicate;
+        private readonly int speed;
         #endregion
 
         #region Constructors
@@ -18,10 +19,23 @@ namespace Orion.GameLogic.Skills
         /// that can be trained.
         /// </summary>
         /// <param name="predicate">A predicate that matches <see cref="UnitType"/>s that can be built.</param>
-        public Train(Func<UnitType, bool> predicate)
+        /// <param name="speed">The training speed, in health points per second.</param>
+        public Train(Func<UnitType, bool> predicate, int speed)
         {
             Argument.EnsureNotNull(predicate, "predicate");
+            Argument.EnsureStrictlyPositive(speed, "speed");
             this.predicate = predicate;
+            this.speed = speed;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the speed at which units are trained, in health points per second.
+        /// </summary>
+        public int Speed
+        {
+            get { return speed; }
         }
         #endregion
 
@@ -31,6 +45,12 @@ namespace Orion.GameLogic.Skills
             Argument.EnsureNotNull(unitType, "unitType");
             if (unitType.IsBuilding) return false;
             return predicate(unitType);
+        }
+
+        public override int? TryGetBaseStat(UnitStat stat)
+        {
+            if (stat == UnitStat.TrainingSpeed) return speed;
+            return null;
         }
         #endregion
     }

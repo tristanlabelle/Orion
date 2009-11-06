@@ -14,7 +14,7 @@ namespace Orion.GameLogic.Tasks
         private readonly UnitType buildingType;
         private readonly Vector2 buildPosition;
         private Move move;
-        private float secondsSpentBuilding = 0;
+        private float heathPointsBuilt = 0;
         private bool hasBegunBuilding = false;
         private bool hasEnded = false;
         #endregion
@@ -76,7 +76,7 @@ namespace Orion.GameLogic.Tasks
                 }
                 else
                 {
-                    Console.WriteLine("Not Enough Ressources");
+                    Console.WriteLine("Not Enough Resources");
                     hasEnded = true;
                     return;
                 }
@@ -84,10 +84,10 @@ namespace Orion.GameLogic.Tasks
 
             if (hasBegunBuilding)
             {
-                secondsSpentBuilding += timeDelta;
                 float maxHealth = builder.Faction.GetStat(buildingType, UnitStat.MaxHealth);
                 float buildingSpeed = builder.GetStat(UnitStat.BuildingSpeed);
-                if (secondsSpentBuilding * buildingSpeed > maxHealth)
+                heathPointsBuilt += buildingSpeed * timeDelta;
+                if (heathPointsBuilt >= maxHealth)
                 {
                     builder.Faction.CreateUnit(buildingType, buildPosition);
                     hasEnded = true;

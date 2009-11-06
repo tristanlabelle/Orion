@@ -9,9 +9,9 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit trainer;
         private readonly UnitType traineeType;
-        private float secondsSpentTraining = 0;
+        private float healthPointsTrained = 0;
         private bool hasTrainingBegun = false;
-        private bool trainingCompleted = false;
+        private bool hasEnded = false;
         #endregion
 
         #region Constructors
@@ -38,7 +38,7 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                return trainingCompleted;
+                return hasEnded;
             }
         }
         #endregion
@@ -46,6 +46,8 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
+            if (HasEnded) return;
+
             if (!hasTrainingBegun)
             {
                 int aladdiumCost = trainer.Faction.GetStat(traineeType, UnitStat.AladdiumCost);
@@ -60,47 +62,32 @@ namespace Orion.GameLogic.Tasks
                 }
                 else
                 {
-                    Console.WriteLine("Not Enough Ressources");
-                    System.Diagnostics.Debug.Fail("Not Enough Ressources");
+                    Console.WriteLine("Not Enough Resources");
+                    hasEnded = true;
                     return;
                 }
             }
 
             if (hasTrainingBegun)
             {
-                if (TrainingIsOver(timeDelta))
+                float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+                float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);
+                healthPointsTrained += trainingSpeed * timeDelta;
+                if (healthPointsTrained >= maxHealth)
                 {
                     // TODO: Refactor to take building size into account and position unit intelligently
                     Vector2 newPosition = new Vector2(trainer.Position.X + 2, trainer.Position.Y + 2);
-                    
 
                     // If the new assigned position is unavalible put it over the building
                     if (!trainer.World.IsWithinBounds(newPosition)
                         || !trainer.World.Terrain.IsWalkable(newPosition))
                         newPosition = trainer.Position;
-
                     
                     Unit unitCreated = trainer.Faction.CreateUnit(traineeType, newPosition);
                     unitCreated.Task = new Move(unitCreated, trainer.Position + trainer.RallyPoint); 
                   
-                    trainingCompleted = true;
+                    hasEnded = true;
                 }
-            }
-        }
-           
-        
-
-        private bool TrainingIsOver(float timeDelta)
-        {
-            float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
-            if (secondsSpentTraining >= maxHealth)
-            {
-                return true;
-            }
-            else
-            {
-                secondsSpentTraining += timeDelta;
-                return false;
             }
         }
         #endregion

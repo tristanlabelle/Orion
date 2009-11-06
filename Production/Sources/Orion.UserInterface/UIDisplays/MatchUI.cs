@@ -93,6 +93,7 @@ namespace Orion.UserInterface
             enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes));
             enablers.Add(new HarvestEnabler(userInputManager, actions));
             enablers.Add(new MoveEnabler(userInputManager, actions));
+            enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes));
         }
 
         #endregion
@@ -268,7 +269,7 @@ namespace Orion.UserInterface
         private void UpdateSkillsPanel()
         {
             actions.Clear();
-            if (selectedType != null) actions.Push(new UnitTypeActionProvider(enablers, selectedType));
+            if (selectedType != null) actions.Push(new UnitActionProvider(enablers, selectedType));
         }
 
         private void MoveWorldView(Vector2 center)

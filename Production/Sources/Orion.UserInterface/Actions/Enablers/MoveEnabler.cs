@@ -25,12 +25,12 @@ namespace Orion.UserInterface.Actions.Enablers
                 inputManager = manager;
             }
 
-            public override void Target(Entity entity)
+            public override void Execute(Entity entity)
             {
-                Target(entity.BoundingRectangle.Center);
+                Execute(entity.BoundingRectangle.Center);
             }
 
-            public override void Target(Vector2 point)
+            public override void Execute(Vector2 point)
             {
                 inputManager.LaunchMove(point);
             }

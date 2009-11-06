@@ -25,12 +25,12 @@ namespace Orion.UserInterface.Actions
                 inputManager = manager;
             }
 
-            public override void Target(Entity entity)
+            public override void Execute(Entity entity)
             {
                 // todo: don't silently fail
             }
 
-            public override void Target(Vector2 at)
+            public override void Execute(Vector2 at)
             {
                 inputManager.LaunchBuild(at, buildingType);
             }

@@ -25,13 +25,13 @@ namespace Orion.UserInterface.Actions.Enablers
                 inputManager = manager;
             }
 
-            public override void Target(Entity entity)
+            public override void Execute(Entity entity)
             {
                 if (entity is Unit) inputManager.LaunchAttack((Unit)entity);
-                else Target(entity.BoundingRectangle.Center);
+                else Execute(entity.BoundingRectangle.Center);
             }
 
-            public override void Target(Vector2 point)
+            public override void Execute(Vector2 point)
             {
                 inputManager.LaunchZoneAttack(point);
             }

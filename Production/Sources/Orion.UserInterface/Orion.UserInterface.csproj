@@ -61,9 +61,11 @@
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
     <Compile Include="Actions\Enablers\HarvestEnabler.cs" />
     <Compile Include="Actions\Enablers\MoveEnabler.cs" />
+    <Compile Include="Actions\Enablers\TrainEnabler.cs" />
     <Compile Include="Actions\GenericActionButton.cs" />
     <Compile Include="Actions\IActionProvider.cs" />
-    <Compile Include="Actions\UnitTypeActionProvider.cs" />
+    <Compile Include="Actions\ImmediateActionButton.cs" />
+    <Compile Include="Actions\UnitActionProvider.cs" />
     <Compile Include="CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

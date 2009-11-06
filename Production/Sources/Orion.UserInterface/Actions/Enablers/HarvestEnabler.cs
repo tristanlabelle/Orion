@@ -25,12 +25,12 @@ namespace Orion.UserInterface.Actions.Enablers
                 inputManager = manager;
             }
 
-            public override void Target(Entity entity)
+            public override void Execute(Entity entity)
             {
                 if (entity is ResourceNode) inputManager.LaunchHarvest((ResourceNode)entity);
             }
 
-            public override void Target(Vector2 point)
+            public override void Execute(Vector2 point)
             {
                 // todo: don't silently fail
             }

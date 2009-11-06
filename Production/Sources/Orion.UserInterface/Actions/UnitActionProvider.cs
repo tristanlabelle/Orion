@@ -8,11 +8,11 @@ using Orion.UserInterface.Actions.Enablers;
 
 namespace Orion.UserInterface.Actions
 {
-    public class UnitTypeActionProvider : IActionProvider
+    public class UnitActionProvider : IActionProvider
     {
         private readonly ActionButton[,] actionButtons = new ActionButton[4, 4];
 
-        public UnitTypeActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType type)
+        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType type)
         {
             foreach (ActionEnabler enabler in actionEnablers) enabler.LetFill(type, actionButtons);
         }

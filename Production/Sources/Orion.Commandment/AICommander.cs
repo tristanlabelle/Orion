@@ -80,18 +80,18 @@ namespace Orion.Commandment
             if (commandCenterBuilt)
             {
                 Attack();
-                dispatchIdleHarvesters();
+                DispatchIdleHarvesters();
             }
         }
 
-        private void dispatchIdleHarvesters()
+        private void DispatchIdleHarvesters()
         {
             List<Unit> harvesters = Faction.Units.Where(unit => unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
             ResourceNode node = startingNode;
             int tries = 0;
             if (harvesters.Count != 0)
             {
-                    node = findIdealNode();
+                    node = FindIdealNode();
 
                 if (node == null)
                     return;
@@ -108,7 +108,7 @@ namespace Orion.Commandment
 
         }
 
-        private ResourceNode findIdealNode()
+        private ResourceNode FindIdealNode()
         {
             ResourceNode bestNode = World.Entities.OfType<ResourceNode>().First();
 
@@ -268,7 +268,7 @@ namespace Orion.Commandment
 
         private void Meet()
         {
-            startingNode = findIdealNode();
+            startingNode = FindIdealNode();
 
             usedNodes.Add(startingNode);
             

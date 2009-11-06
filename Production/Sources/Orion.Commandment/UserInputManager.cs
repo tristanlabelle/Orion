@@ -15,8 +15,13 @@ namespace Orion.Commandment
 {
     public abstract class UserInputCommand
     {
-        public abstract void Target(Entity entity);
-        public abstract void Target(Vector2 point);
+        public abstract void Execute(Entity entity);
+        public abstract void Execute(Vector2 point);
+    }
+
+    public abstract class ImmediateUserCommand
+    {
+        public abstract void Execute();
     }
 
     public class UserInputManager
@@ -157,8 +162,8 @@ namespace Orion.Commandment
             Entity target = faction.World.Entities
                 .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle)).FirstOrDefault();
 
-            if (target == null) mouseCommand.Target(at);
-            else mouseCommand.Target(target);
+            if (target == null) mouseCommand.Execute(at);
+            else mouseCommand.Execute(target);
 
             mouseCommand = null;
             GenericEventHandler<UserInputManager> handler = AssignedCommand;
@@ -189,6 +194,9 @@ namespace Orion.Commandment
                 if (target.Faction == commander.Faction) LaunchMove(target.Position);
                 else LaunchAttack(target);
             }
+
+            GenericEventHandler<UserInputManager> handler = AssignedCommand;
+            if (handler != null) handler(this);
         }
         #endregion
 

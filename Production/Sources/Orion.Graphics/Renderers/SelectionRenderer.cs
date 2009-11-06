@@ -45,7 +45,13 @@ namespace Orion.Graphics
             graphics.StrokeStyle = StrokeStyle.Solid;
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
-                graphics.Stroke(new Circle(unit.Position, unit.BoundingRectangle.Extent.Length));
+            {
+                Rectangle selectionRectangle = Rectangle.FromCenterExtent(
+                    unit.Position.X, unit.Position.Y,
+                    unit.BoundingRectangle.Extent.X + 0.15f,
+                    unit.BoundingRectangle.Extent.Y + 0.15f);
+                graphics.Stroke(selectionRectangle);
+            }
         }
 
         /// <summary>

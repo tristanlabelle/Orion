@@ -93,10 +93,10 @@ namespace Orion.Main
                 }
                
                 ResourceNode nodeAladdium = world.Entities.CreateResourceNode
-                    (ResourceType.Aladdium, 500, new Vector2(position.X - (campSize / 4), position.Y - 1));
+                    (ResourceType.Aladdium, 5000, new Vector2(position.X - (campSize / 4), position.Y - 1));
 
                 ResourceNode nodeAlagene = world.Entities.CreateResourceNode
-                    (ResourceType.Alagene, 500, new Vector2(position.X - (campSize / 4), position.Y + 1));
+                    (ResourceType.Alagene, 5000, new Vector2(position.X - (campSize / 4), position.Y + 1));
             }
             #endregion
 

@@ -13,6 +13,7 @@ namespace Orion.Main
         public const float TargetFramesPerSecond = 60;
         public const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
         public const int DefaultPort = 41223;
+        public const int MaxSuccessiveUpdates = 5;
 
         /// <summary>
         /// Main entry point for the program.
@@ -120,6 +121,7 @@ namespace Orion.Main
                     stopwatch.Reset();
                     stopwatch.Start();
 
+                    int successiveUpdateCount = 0;
                     do
                     {
                         match.Update(TargetSecondsPerFrame);
@@ -129,7 +131,9 @@ namespace Orion.Main
                         ui.WindowTitle = frameRateCounter.ToString();
 
                         timeDeltaInSeconds -= TargetSecondsPerFrame;
-                    } while (timeDeltaInSeconds >= TargetSecondsPerFrame);
+                        ++successiveUpdateCount;
+                    } while (timeDeltaInSeconds >= TargetSecondsPerFrame
+                        && successiveUpdateCount < MaxSuccessiveUpdates);
                 }
             }
         }

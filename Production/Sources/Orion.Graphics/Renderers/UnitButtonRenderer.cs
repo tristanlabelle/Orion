@@ -23,7 +23,7 @@ namespace Orion.Graphics
             set { hasFocus = value; }
         }
 
-        public override void RenderInto(GraphicsContext context)
+        public override void Draw(GraphicsContext context)
         {
             context.StrokeColor = hasFocus ?Color.White : Color.Black;
             context.FillColor = hasFocus ? Color.FromArgb(75,75,75) : Color.Black;

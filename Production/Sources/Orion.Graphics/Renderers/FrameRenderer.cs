@@ -16,7 +16,7 @@ namespace Orion.Graphics
             StrokeColor = strokeColor;
         }
 
-        public virtual void RenderInto(GraphicsContext context)
+        public virtual void Draw(GraphicsContext context)
         {
             context.StrokeColor = StrokeColor;
             context.Stroke(context.CoordinateSystem);
@@ -43,11 +43,11 @@ namespace Orion.Graphics
             FillColor = fillColor;
         }
 
-        public override void RenderInto(GraphicsContext context)
+        public override void Draw(GraphicsContext context)
         {
             context.FillColor = FillColor;
             context.Fill(context.CoordinateSystem);
-            base.RenderInto(context);
+            base.Draw(context);
         }
     }
 
@@ -68,10 +68,10 @@ namespace Orion.Graphics
             Texture = texture;
         }
 
-        public override void RenderInto(GraphicsContext context)
+        public override void Draw(GraphicsContext context)
         {
             context.FillTextured(context.CoordinateSystem, Texture);
-            base.RenderInto(context);
+            base.Draw(context);
         }
     }
 }

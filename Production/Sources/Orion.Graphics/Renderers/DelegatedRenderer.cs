@@ -12,7 +12,7 @@ namespace Orion.Graphics.Renderers
             RenderingDelegate = renderingDelegate;
         }
 
-        public void RenderInto(GraphicsContext context)
+        public void Draw(GraphicsContext context)
         {
             RenderingDelegate(context);
         }

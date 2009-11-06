@@ -13,6 +13,9 @@ namespace Orion.Graphics
     public sealed class WorldRenderer : IDisposable
     {
         #region Fields
+        private static readonly Color AladdiumColor = Color.LightBlue;
+        private static readonly Color AlageneColor = Color.Green;
+
         private readonly World world;
         private readonly TerrainRenderer terrainRenderer;
         private readonly UnitRenderer unitRenderer;
@@ -47,19 +50,9 @@ namespace Orion.Graphics
             }
         }
 
-        public TerrainRenderer TerrainRenderer
-        {
-            get { return terrainRenderer; }
-        }
-
         public UnitRenderer UnitRenderer
         {
             get { return unitRenderer; }
-        }
-
-        public FogOfWarRenderer FogOfWarRenderer
-        {
-            get { return fogOfWarRenderer; }
         }
         #endregion
 
@@ -75,14 +68,12 @@ namespace Orion.Graphics
         public void DrawTerrain(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-
             terrainRenderer.Draw(graphics);
         }
 
         public void DrawFogOfWar(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-
             fogOfWarRenderer.Draw(graphics);
         }
 
@@ -94,7 +85,7 @@ namespace Orion.Graphics
         /// A <see cref="Rectangle"/>, in world units, which specifies the parts of the
         /// <see cref="World"/> which have to be drawn.
         /// </param>
-        public void DrawEntities(GraphicsContext graphics)
+        public void DrawUnits(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
@@ -103,19 +94,21 @@ namespace Orion.Graphics
 
         public void DrawResources(GraphicsContext graphics)
         {
-            Rectangle bounds = graphics.CoordinateSystem;
-            foreach (ResourceNode node in world.Entities.OfType<ResourceNode>())
-            {
-                if (Rectangle.Intersects(bounds, node.BoundingRectangle))
-                {
-                    if (node.Type == ResourceType.Aladdium)
-                        graphics.FillColor = Color.LightBlue;
-                    else if (node.Type == ResourceType.Alagene)
-                        graphics.FillColor = Color.Green;
-                    else continue;
+            Argument.EnsureNotNull(graphics, "graphics");
 
-                    graphics.Fill(node.BoundingRectangle);
-                }
+            Rectangle bounds = graphics.CoordinateSystem;
+            var resourceNodes = world.Entities
+                .OfType<ResourceNode>()
+                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
+            foreach (ResourceNode node in resourceNodes)
+            {
+                if (node.Type == ResourceType.Aladdium)
+                    graphics.FillColor = AladdiumColor;
+                else if (node.Type == ResourceType.Alagene)
+                    graphics.FillColor = AlageneColor;
+                else continue;
+
+                graphics.Fill(node.BoundingRectangle);
             }
         }
 

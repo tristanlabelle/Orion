@@ -18,13 +18,13 @@ namespace Orion.Graphics
             this.unit = unit;
         }
 
-        public override void RenderInto(GraphicsContext context)
+        public override void Draw(GraphicsContext context)
         {
             string hp = "HP: {0}/{1}".FormatInvariant(unit.Health, unit.MaxHealth);
             context.FillColor = Color.DarkBlue;
             context.Draw(unit.Type.Name, new Vector2(150, 155));
             context.Draw(hp, new Vector2(150, 130));
-            base.RenderInto(context);
+            base.Draw(context);
         }
     }
 }

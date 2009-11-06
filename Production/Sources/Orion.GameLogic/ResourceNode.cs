@@ -12,6 +12,9 @@ namespace Orion.GameLogic
     public sealed class ResourceNode : Entity
     {
         #region Fields
+        private const int Width = 2;
+        private const int Height = 2;
+
         private readonly ResourceType type;
         private readonly int totalAmount;
         private readonly Vector2 position;
@@ -56,7 +59,7 @@ namespace Orion.GameLogic
 
         public override Rectangle BoundingRectangle
         {
-            get { return Rectangle.FromCenterSize(position.X, position.Y, 1, 1); }
+            get { return Rectangle.FromCenterSize(position.X, position.Y, Width, Height); }
         }
 
         public bool IsHarvestable

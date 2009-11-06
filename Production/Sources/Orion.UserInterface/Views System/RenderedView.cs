@@ -16,7 +16,7 @@ namespace Orion.UserInterface
 
         protected internal sealed override void Draw(GraphicsContext context)
         {
-            if(Renderer != null) Renderer.RenderInto(context);
+            if(Renderer != null) Renderer.Draw(context);
         }
     }
 }

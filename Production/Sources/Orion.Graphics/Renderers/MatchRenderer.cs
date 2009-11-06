@@ -10,24 +10,22 @@ namespace Orion.Graphics
         #region Nested Types
         public class Minimap : FrameRenderer
         {
-            private TerrainRenderer terrain;
-            private UnitRenderer units;
-            private FogOfWarRenderer fogOfWar;
+            private WorldRenderer worldRenderer;
 
-            internal Minimap(MatchRenderer renderer)
+            internal Minimap(WorldRenderer worldRenderer)
             {
-                terrain = renderer.worldRenderer.TerrainRenderer;
-                units = renderer.worldRenderer.UnitRenderer;
-                fogOfWar = renderer.worldRenderer.FogOfWarRenderer;
+                Argument.EnsureNotNull(worldRenderer, "worldRenderer");
+                this.worldRenderer = worldRenderer;
             }
 
             internal Rectangle VisibleRect { get; set; }
 
-            public override void RenderInto(GraphicsContext context)
+            public override void Draw(GraphicsContext context)
             {
-                terrain.Draw(context);
-                units.DrawMiniature(context);
-                fogOfWar.Draw(context);
+                worldRenderer.DrawTerrain(context);
+                worldRenderer.DrawResources(context);
+                worldRenderer.UnitRenderer.DrawMiniature(context);
+                worldRenderer.DrawFogOfWar(context);
                 
                 context.StrokeColor = Color.Orange;
                 Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
@@ -46,9 +44,12 @@ namespace Orion.Graphics
 
         public MatchRenderer(World world, UserInputManager inputManager)
         {
+            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(inputManager, "inputManager");
+
             selectionRenderer = new SelectionRenderer(inputManager);
             worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction.FogOfWar);
-            minimap = new Minimap(this);
+            minimap = new Minimap(worldRenderer);
         }
 
         public Minimap MinimapRenderer
@@ -61,18 +62,15 @@ namespace Orion.Graphics
             get { return worldRenderer; }
         }
 
-        public SelectionRenderer SelectionRenderer
+        public void Draw(GraphicsContext context)
         {
-            get { return selectionRenderer; }
-        }
+            Argument.EnsureNotNull(context, "context");
 
-        public void RenderInto(GraphicsContext context)
-        {
             minimap.VisibleRect = context.CoordinateSystem;
             worldRenderer.DrawTerrain(context);
             selectionRenderer.DrawSelectionMarkers(context);
             worldRenderer.DrawResources(context);
-            worldRenderer.DrawEntities(context);
+            worldRenderer.DrawUnits(context);
             selectionRenderer.DrawHealthBars(context);
             worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);

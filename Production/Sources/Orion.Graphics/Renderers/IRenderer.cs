@@ -4,6 +4,6 @@ namespace Orion.Graphics
 {
     public interface IRenderer
     {
-        void RenderInto(GraphicsContext context);
+        void Draw(GraphicsContext context);
     }
 }

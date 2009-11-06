@@ -71,6 +71,7 @@
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="GraphicsContext.cs" />
+    <Compile Include="Transform.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

@@ -96,7 +96,10 @@ namespace Orion.Graphics
                 if (unit.Faction == null) graphics.FillColor = Color.White;
                 else graphics.FillColor = unit.Faction.Color;
 
-                graphics.Stroke(shape, unit.Position);
+                using (graphics.Transform(new Transform(unit.Position, unit.Angle, unit.BoundingRectangle.Size)))
+                {
+                    graphics.Stroke(shape, Vector2.Zero);
+                }
             }
         }
 

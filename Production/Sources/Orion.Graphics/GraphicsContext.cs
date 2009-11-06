@@ -17,6 +17,16 @@ namespace Orion.Graphics
     /// </summary>
     public sealed class GraphicsContext
     {
+        #region Nested Types
+        public struct TransformHandle : IDisposable
+        {
+            public void Dispose()
+            {
+                GL.PopMatrix();
+            }
+        }
+        #endregion
+
         #region Instance
         #region Fields
         private Rectangle coordinateSystem;
@@ -93,6 +103,15 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
+        public TransformHandle Transform(Transform transform)
+        {
+            GL.PushMatrix();
+            GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
+            GL.Rotate(transform.Rotation, Vector3.UnitZ);
+            GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
+            return new TransformHandle();
+        }
+
         #region OpenGL Context
 
         public void SetUpGLContext(Rectangle parentSystem)

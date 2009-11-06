@@ -13,9 +13,8 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit follower;
-        private Vector2 oldPositionTarget;
         private readonly Unit target;
-        private  Move moveTask;
+        private Move moveTask;
         #endregion
 
         #region Constructors
@@ -38,7 +37,6 @@ namespace Orion.GameLogic.Tasks
 
             this.follower = follower;
             this.target = target;
-            this.oldPositionTarget = target.Position;
             moveTask = new Move(follower, target.Position);
         }
         #endregion
@@ -64,6 +62,7 @@ namespace Orion.GameLogic.Tasks
         {
             get { return (target.Position - follower.Position).Length <= 1;}
         }
+
         /// <summary>
         /// Gets the current distance remaining between this <see cref="Unit"/>
         /// and the followed <see cref="Unit"/>.
@@ -77,14 +76,13 @@ namespace Orion.GameLogic.Tasks
         /// Gets a value indicating if the following <see cref="Unit"/>
         /// is within the target range of its <see cref="target"/>.
         /// </summary>
-       
         public override bool HasEnded
         {
             get
             {
                 // This task never ends as even if we get in range at one point in time,
                 // the target may move again later.
-                return target == null || !target.IsAlive;
+                return target == null || moveTask.Path == null || !target.IsAlive;
             }
         }
 
@@ -97,14 +95,14 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
-            /*if (oldPositionTarget != target.Position)
-            {
-                this.moveTask = new Move(follower, target.Position);
-                oldPositionTarget = target.Position;
-            }/*/
-            moveTask.Update(timeDelta);
-           
+            if (HasEnded) return;
 
+            float targetDisplacementLength = (target.Position - moveTask.Path.Destination).LengthFast;
+            float distanceToTarget = (target.Position - follower.Position).LengthFast;
+            if (targetDisplacementLength > distanceToTarget * 0.1f)
+                moveTask = new Move(follower, target.Position);
+
+            moveTask.Update(timeDelta);
         }
         #endregion
     }

@@ -101,7 +101,7 @@ namespace Orion.Main
             #endregion
 
             #region Resource Nodes
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 25; i++)
             {
                 Vector2 position;
                 do
@@ -109,7 +109,7 @@ namespace Orion.Main
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
                 } while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y));
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.Entities.CreateResourceNode(resourceType, 500, position);
+                ResourceNode node = world.Entities.CreateResourceNode(resourceType, 5000, position);
             }
             #endregion
         }

@@ -73,8 +73,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Move(10));
-            builder.Skills.Add(new Skills.Attack(4, 1)); // to avoid unit to alwals do fallow and never attack
-            builder.Skills.Add(new Skills.Harvest(10));
+            builder.Skills.Add(new Skills.Attack(4, 1));
             Register(builder);
         }
 
@@ -91,7 +90,6 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Attack(4, 7));
-            builder.Skills.Add(new Skills.Harvest(10));
             Register(builder);
         }
 

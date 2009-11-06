@@ -431,34 +431,6 @@ namespace Orion.Geometry
         }
         
         /// <summary>
-        /// Creates a new rectangle with the width resized by a specified value
-        /// </summary>
-        /// <param name="width">
-        /// A <see cref="System.Single"/> representing the width increment or decrement to the current size
-        /// </param>
-        /// <returns>
-        /// A new <see cref="Rectangle"/> with the modified width
-        /// </returns>
-        public Rectangle ResizedWidthBy(float width)
-        {
-            return ResizedBy(width, 0);
-        }
-        
-        /// <summary>
-        /// Creates a new rectangle with the height resized by a specified value
-        /// </summary>
-        /// <param name="height">
-        /// A <see cref="System.Single"/> representing the height increment or decrement to apply to the current size
-        /// </param>
-        /// <returns>
-        /// A new <see cref="Rectangle"/> with the modified height
-        /// </returns>
-        public Rectangle ResizedHeightBy(float height)
-        {
-            return ResizedBy(0, height);
-        }
-        
-        /// <summary>
         /// Creates a new rectangle at the same origin but a different size
         /// </summary>
         /// <param name="width">

@@ -3,7 +3,6 @@ using System.Linq;
 
 using OpenTK.Math;
 
-
 namespace Orion.GameLogic.Tasks
 {
     [Serializable]

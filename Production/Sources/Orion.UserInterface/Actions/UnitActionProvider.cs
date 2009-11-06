@@ -17,9 +17,9 @@ namespace Orion.UserInterface.Actions
             foreach (ActionEnabler enabler in actionEnablers) enabler.LetFill(type, actionButtons);
         }
 
-        public ActionButton this[int x, int y]
+        public ActionButton GetButtonAt(int x, int y)
         {
-            get { return actionButtons[x, y]; }
+            return actionButtons[x, y];
         }
     }
 }

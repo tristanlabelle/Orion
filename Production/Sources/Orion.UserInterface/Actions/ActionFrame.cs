@@ -57,7 +57,7 @@ namespace Orion.UserInterface.Actions
                     Vector2 origin = new Vector2(0.1f, 0.1f + y);
                     for (int x = 0; x < 4; x++)
                     {
-                        ActionButton button = provider[x, y];
+                        ActionButton button = provider.GetButtonAt(x, y);
                         if (button != null)
                         {
                             button.Frame = templateSize.TranslatedBy(origin);

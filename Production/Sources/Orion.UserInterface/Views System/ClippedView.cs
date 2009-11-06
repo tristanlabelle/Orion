@@ -52,8 +52,8 @@ namespace Orion.UserInterface
             originDifference.Scale(0.5f, 0.5f);
             newOrigin += originDifference;
 
-            if (newOrigin.X < 0) newOrigin.X = 0;
-            if (newOrigin.Y < 0) newOrigin.Y = 0;
+            if (newOrigin.X < FullBounds.MinX) newOrigin.X = FullBounds.MinX;
+            if (newOrigin.Y < FullBounds.MinY) newOrigin.Y = FullBounds.MinY;
 
             newBounds = new Rectangle(newOrigin, newSize);
 

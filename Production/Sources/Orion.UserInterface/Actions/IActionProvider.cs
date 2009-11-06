@@ -7,9 +7,6 @@ namespace Orion.UserInterface.Actions
 {
     public interface IActionProvider
     {
-        ActionButton this[int x, int y]
-        {
-            get;
-        }
+        ActionButton GetButtonAt(int x, int y);
     }
 }

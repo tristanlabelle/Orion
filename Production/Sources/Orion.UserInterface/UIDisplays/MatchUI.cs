@@ -204,7 +204,7 @@ namespace Orion.UserInterface
 
         private void CreateSingleUnitSelectionPanel()
         {
-            UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
+            UnitsRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
             selectionFrame.Renderer = new UnitFrameRenderer(unit);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);
@@ -223,7 +223,7 @@ namespace Orion.UserInterface
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
             float currentX = padding + selectionFrame.Bounds.MinX;
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
-            UnitRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
+            UnitsRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer.GetTypeShape(unit.Type), unit);

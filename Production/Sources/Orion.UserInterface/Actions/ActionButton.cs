@@ -8,6 +8,7 @@ using Orion.Graphics;
 using Orion.Geometry;
 using Orion.Commandment;
 using Orion.UserInterface.Widgets;
+using Orion.UserInterface.Actions.Enablers;
 
 namespace Orion.UserInterface.Actions
 {
@@ -15,14 +16,14 @@ namespace Orion.UserInterface.Actions
     {
         #region Fields
         private string name;
-        protected ActionFrame container;
-        protected UserInputManager inputManager;
+        protected readonly ActionFrame container;
+        protected readonly UserInputManager inputManager;
         private Frame tooltipContainer;
         #endregion
 
         #region Constructors
         protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
-            : base(new Rectangle(1,1), "")
+            : base(new Rectangle(1, 1), "")
         {
             this.name = name;
             HotKey = hotkey;
@@ -39,19 +40,13 @@ namespace Orion.UserInterface.Actions
         }
         #endregion
 
-        #region Indexers
-        public virtual ActionButton this[int x, int y]
-        {
-            get
-            {
-                if (x == 3 && y == 0)
-                    return new CancelButton(container, inputManager);
-                return null;
-            }
-        }
-        #endregion
-
         #region Methods
+        public virtual ActionButton GetButtonAt(int x, int y)
+        {
+            if (x == 3 && y == 0)
+                return new CancelButton(container, inputManager);
+            return null;
+        }
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {

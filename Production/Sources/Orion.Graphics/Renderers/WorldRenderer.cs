@@ -18,7 +18,7 @@ namespace Orion.Graphics
 
         private readonly World world;
         private readonly TerrainRenderer terrainRenderer;
-        private readonly UnitRenderer unitRenderer;
+        private readonly UnitsRenderer unitRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
 
@@ -33,7 +33,7 @@ namespace Orion.Graphics
 
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
-            this.unitRenderer = new UnitRenderer(world);
+            this.unitRenderer = new UnitsRenderer(world);
             this.fogOfWarRenderer = new FogOfWarRenderer(world, fogOfWar);
         }
         #endregion
@@ -50,7 +50,7 @@ namespace Orion.Graphics
             }
         }
 
-        public UnitRenderer UnitRenderer
+        public UnitsRenderer UnitRenderer
         {
             get { return unitRenderer; }
         }

@@ -39,10 +39,10 @@ namespace Orion.UserInterface.Actions
         }
         #endregion
 
-        #region Indexers
-        public override ActionButton this[int x, int y]
+        #region Methods
+        public override ActionButton GetButtonAt(int x, int y)
         {
-            get { return buildingButtons[x, y]; }
+            return buildingButtons[x, y];
         }
         #endregion
     }

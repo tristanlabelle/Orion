@@ -65,18 +65,14 @@ namespace Orion.Graphics
             DrawAttackLines(graphics);
         }
 
-        public void DrawMiniature(GraphicsContext context)
+        public void DrawMiniature(GraphicsContext graphics)
         {
-            DrawMiniatureUnits(context);
-        }
+            Argument.EnsureNotNull(graphics, "graphics");
 
-        private void DrawMiniatureUnits(GraphicsContext context)
-        {
-            Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                context.FillColor = unit.Faction.Color;
-                context.Fill(unitRect.TranslatedBy(unit.Position));
+                graphics.FillColor = unit.Faction.Color;
+                graphics.Fill(unit.BoundingRectangle);
             }
         }
 

@@ -8,7 +8,7 @@ namespace Orion.Graphics
     public class MatchRenderer : IRenderer
     {
         #region Nested Types
-        public class Minimap : FrameRenderer
+        public sealed class Minimap : FrameRenderer
         {
             private WorldRenderer worldRenderer;
 

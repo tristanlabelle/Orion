@@ -77,7 +77,7 @@ namespace Orion.GameLogic.Tasks
                 else
                 {
                     Console.WriteLine("Not Enough Ressources");
-                    System.Diagnostics.Debug.Fail("Not Enough Ressources");
+                    hasEnded = true;
                     return;
                 }
             }

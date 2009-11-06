@@ -48,14 +48,13 @@ namespace Orion.Graphics
                 }
             }
 
-            var textureBuilder = new TextureBuilder
+            texture = new TextureBuilder
             {
                 Width = terrain.Width,
                 Height = terrain.Height,
                 Format = TextureFormat.Rgb,
                 PixelData = pixels
-            };
-            this.texture = textureBuilder.Build();
+            }.Build();
         }
         #endregion
 

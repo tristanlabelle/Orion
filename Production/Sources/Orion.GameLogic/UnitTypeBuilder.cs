@@ -14,6 +14,7 @@ namespace Orion.GameLogic
     public sealed class UnitTypeBuilder
     {
         #region Fields
+        private string name;
         private SkillCollection skills = new SkillCollection();
         private int aladdiumCost;
         private int alageneCost;
@@ -30,6 +31,16 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        public string Name
+        {
+            get { return name; }
+            set
+            {
+                Argument.EnsureNotNullNorBlank(value, "Name");
+                this.name = value;
+            }
+        }
+
         public SkillCollection Skills
         {
             get { return skills; }
@@ -93,6 +104,7 @@ namespace Orion.GameLogic
         /// </summary>
         public void Reset()
         {
+            name = null;
             skills.Clear();
             aladdiumCost = 0;
             alageneCost = 0;
@@ -101,9 +113,10 @@ namespace Orion.GameLogic
             sizeInTiles = new Size(1, 1);
         }
 
-        public UnitType Build(int id, string name)
+        public UnitType Build(int id)
         {
-            return new UnitType(id, name, this);
+            if (name == null) throw new InvalidOperationException("Cannot create a new UnitType until a name is set.");
+            return new UnitType(id, this);
         }
         #endregion
     }

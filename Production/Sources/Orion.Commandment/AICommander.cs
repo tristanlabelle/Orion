@@ -88,7 +88,7 @@ namespace Orion.Commandment
         {
             List<Unit> harvesters = Faction.Units.Where(unit => unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
             ResourceNode node = startingNode;
-            int tries = 0;
+
             if (harvesters.Count != 0)
             {
                     node = FindIdealNode();

@@ -30,88 +30,122 @@ namespace Orion.GameLogic
         #region Hard-Coded UnitTypes
         public void RegisterHarvester()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(1, 1);
-            builder.SightRange = 8;
-            builder.MaxHealth = 5;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Harvester",
+                SizeInTiles = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 5,
+                AladdiumCost = 20,
+                AlageneCost = 0
+            };
             builder.Skills.Add(new Skills.Move(15));
             builder.Skills.Add(new Skills.Harvest(10));
-            Register(builder, "Harvester");
+            Register(builder);
         }
 
         public void RegisterBuilder()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(1, 1);
-            builder.SightRange = 6;
-            builder.MaxHealth = 8;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Builder",
+                SizeInTiles = new Size(1, 1),
+                SightRange = 6,
+                MaxHealth = 8,
+                AladdiumCost = 40,
+                AlageneCost = 0
+            };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 10));
             builder.Skills.Add(new Skills.Harvest(10));
-            Register(builder, "Builder");
+            Register(builder);
         }
 
         public void RegisterMeleeAttacker()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(1, 1);
-            builder.SightRange = 6;
-            builder.MaxHealth = 30;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "MeleeAttacker",
+                SizeInTiles = new Size(1, 1),
+                SightRange = 6,
+                MaxHealth = 30,
+                AladdiumCost = 50,
+                AlageneCost = 0
+            };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Attack(4, 1)); // to avoid unit to alwals do fallow and never attack
             builder.Skills.Add(new Skills.Harvest(10));
-            Register(builder, "MeleeAttacker");
+            Register(builder);
         }
 
         public void RegisterRangedAttacker()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(1, 1);
-            builder.SightRange = 10;
-            builder.MaxHealth = 30;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "RangedAttacker",
+                SizeInTiles = new Size(1, 1),
+                SightRange = 10,
+                MaxHealth = 30,
+                AladdiumCost = 50,
+                AlageneCost = 10
+            };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Attack(4, 7));
             builder.Skills.Add(new Skills.Harvest(10));
-            Register(builder, "RangedAttacker");
+            Register(builder);
         }
 
         public void RegisterFactory()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(3, 3);
-            builder.SightRange = 4;
-            builder.MaxHealth = 40;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Factory",
+                SizeInTiles = new Size(3, 3),
+                SightRange = 4,
+                MaxHealth = 40,
+                AladdiumCost = 100,
+                AlageneCost = 50
+            };
             builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
             builder.Skills.Add(new Skills.StoreResources());
-            Register(builder, "Factory");
+            Register(builder);
         }
 
         public void RegisterTower()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(2, 2);
-            builder.SightRange = 10;
-            builder.MaxHealth = 30;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Tower",
+                SizeInTiles = new Size(2, 2),
+                SightRange = 10,
+                MaxHealth = 30,
+                AladdiumCost = 80,
+                AlageneCost = 20
+            };
             builder.Skills.Add(new Skills.Attack(4, 7));
-            //builder.Skills.Add(new Skills.Train(type => !type.IsBuilding));
-            Register(builder, "Tower");
+            Register(builder);
         }
 
         public void RegisterAlageneExtractor()
         {
-            UnitTypeBuilder builder = new UnitTypeBuilder();
-            builder.SizeInTiles = new Size(2, 2);
-            builder.SightRange = 4;
-            builder.MaxHealth = 25;
+            var builder = new UnitTypeBuilder
+            {
+                Name = "AlageneExtractor",
+                SizeInTiles = new Size(2, 2),
+                SightRange = 4,
+                MaxHealth = 25,
+                AladdiumCost = 75,
+                AlageneCost = 0
+            };
             builder.Skills.Add(new Skills.ExtractAlagene());
-            Register(builder, "AlageneExtractor");
+            Register(builder);
         } 
         #endregion
 
-        public UnitType Register(UnitTypeBuilder builder, string name)
+        public UnitType Register(UnitTypeBuilder builder)
         {
             Argument.EnsureNotNull(builder, "builder");
-            UnitType unitType = builder.Build(types.Count, name);
+            UnitType unitType = builder.Build(types.Count);
             types.Add(unitType.Name, unitType);
             return unitType;
         }

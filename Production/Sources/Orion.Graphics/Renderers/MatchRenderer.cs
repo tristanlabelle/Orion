@@ -32,6 +32,8 @@ namespace Orion.Graphics
                 context.StrokeColor = Color.Orange;
                 Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
                 context.Stroke(intersection.GetValueOrDefault());
+                context.StrokeColor = Color.Gray;
+                context.Stroke(context.CoordinateSystem);
             }
         }
         #endregion

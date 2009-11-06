@@ -34,13 +34,12 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        internal UnitType(int id, string name, UnitTypeBuilder builder)
+        internal UnitType(int id, UnitTypeBuilder builder)
         {
-            Argument.EnsureNotNullNorBlank(name, "name");
             Argument.EnsureNotNull(builder, "builder");
 
-            this.name = name;
             this.id = id;
+            this.name = builder.Name;
             this.skills = builder.Skills.ToList().AsReadOnly();
             this.sizeInTiles = builder.SizeInTiles;
 

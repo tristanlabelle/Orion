@@ -65,15 +65,14 @@ namespace Orion.Graphics
 
             if (texture == null)
             {
-                var textureBuilder = new TextureBuilder
+                texture = new TextureBuilder
                 {
                     Width = world.Width,
                     Height = world.Height,
                     Format = TextureFormat.Rgba,
                     PixelData = pixels,
                     UseSmoothing = true
-                };
-                texture = textureBuilder.Build();
+                }.Build();
             }
             else
                 texture.SetPixels(pixels);

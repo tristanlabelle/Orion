@@ -52,10 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\Text.cs" />
-    <Compile Include="Drawing\Texture.cs" />
-    <Compile Include="Drawing\TextureBuilder.cs" />
-    <Compile Include="Drawing\TextureFormat.cs" />
+    <Compile Include="StrokeStyle.cs" />
+    <Compile Include="Text.cs" />
+    <Compile Include="Texture.cs" />
+    <Compile Include="TextureBuilder.cs" />
+    <Compile Include="TextureFormat.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />
     <Compile Include="Renderers\FrameRenderer.cs" />
     <Compile Include="Renderers\DelegatedRenderer.cs" />
@@ -63,13 +64,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\MatchRenderer.cs" />
     <Compile Include="Renderers\SelectionRenderer.cs" />
-    <Compile Include="Drawing\LinePath.cs" />
+    <Compile Include="LinePath.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\UnitButtonRenderer.cs" />
     <Compile Include="Renderers\UnitFrameRenderer.cs" />
     <Compile Include="Renderers\UnitRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
-    <Compile Include="Drawing\GraphicsContext.cs" />
+    <Compile Include="GraphicsContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">

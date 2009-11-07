@@ -26,11 +26,9 @@ namespace Orion.Main
             {
                 client.Join(admin);
                 client.WaitForPeers();
-
-                List<IPEndPoint> unsortedPeers = client.Peers.ToList();
-                unsortedPeers.Sort(new Comparison<IPEndPoint>((a, b) =>
-                    BitConverter.ToInt32(a.Address.GetAddressBytes(), 0) - BitConverter.ToInt32(b.Address.GetAddressBytes(), 0)));
-                peers = unsortedPeers;
+                peers = client.Peers
+                    .OrderBy(ipEndPoint => BitConverter.ToUInt32(ipEndPoint.Address.GetAddressBytes(), 0))
+                    .ToList();
             }
         }
 

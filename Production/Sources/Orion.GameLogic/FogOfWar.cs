@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Math;
 using Orion.Geometry;
 using System.Diagnostics;
+using OpenTK.Graphics;
 
 namespace Orion.GameLogic
 {
@@ -37,11 +38,16 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this fog of war changes.
         /// </summary>
-        public event GenericEventHandler<FogOfWar> Changed;
+        public event GenericEventHandler<FogOfWar, Region> Changed;
+
+        private void OnChanged(Region dirtyRectangle)
+        {
+            if (Changed != null) Changed(this, dirtyRectangle);
+        }
 
         private void OnChanged()
         {
-            if (Changed != null) Changed(this);
+            OnChanged(new Region(0, 0, Width, Height));
         }
         #endregion
 
@@ -139,13 +145,13 @@ namespace Orion.GameLogic
 
             int minX = (int)Math.Floor(lineOfSight.Center.X - bitmap.ColumnCount * 0.5f);
             int minY = (int)Math.Floor(lineOfSight.Center.Y - bitmap.RowCount * 0.5f);
-            int maxX = minX + bitmap.ColumnCount;
-            int maxY = minY + bitmap.RowCount;
+            int exclusiveMaxX = minX + bitmap.ColumnCount;
+            int exclusiveMaxY = minY + bitmap.RowCount;
 
-            for (int x = minX; x < maxX; x++)
+            for (int x = minX; x < exclusiveMaxX; x++)
             {
                 if (x < 0 || x >= Width) continue;
-                for (int y = minY; y < maxY; y++)
+                for (int y = minY; y < exclusiveMaxY; y++)
                 {
                     if (y < 0 || y >= Height) continue;
 
@@ -170,7 +176,11 @@ namespace Orion.GameLogic
                     }
                 }
             }
-            OnChanged();
+
+            Region dirtyRectangle = Region.FromMinExclusiveMax(
+                Math.Max(minX, 0), Math.Max(minY, 0),
+                Math.Min(exclusiveMaxX, Width), Math.Min(exclusiveMaxY, Height));
+            OnChanged(dirtyRectangle);
         }
         #endregion
         #endregion

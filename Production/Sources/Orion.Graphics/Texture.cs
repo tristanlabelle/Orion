@@ -33,8 +33,9 @@ namespace Orion.Graphics
             {
                 GL.BindTexture(TextureTarget.Texture2D, id);
 
-                if (builder.PixelData != null) ValidatePixelBufferSize(builder.PixelData);
+                if (builder.PixelData != null) ValidatePixelBufferSize(builder.PixelData, width * height, format);
 
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                 GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.format),
                     this.width, this.height, 0, GetGLPixelFormat(this.format), PixelType.UnsignedByte,
                     builder.PixelData);
@@ -60,11 +61,17 @@ namespace Orion.Graphics
             }
         }
 
-        public void SetPixels(byte[] data)
+        public void SetPixels(Region region, byte[] data)
         {
             EnsureNotDisposed();
+
+            if (region.MinX < 0 || region.MinY < 0
+                || region.Width < 0 || region.Height < 0
+                || region.ExclusiveMaxX > width || region.ExclusiveMaxY > height)
+                throw new ArgumentException("Invalid pixel region.");
             Argument.EnsureNotNull(data, "data");
-            ValidatePixelBufferSize(data);
+
+            ValidatePixelBufferSize(data, region.Area, format);
 
             int lastID;
             GL.GetInteger(GetPName.Texture2D, out lastID);
@@ -72,8 +79,10 @@ namespace Orion.Graphics
             try
             {
                 GL.BindTexture(TextureTarget.Texture2D, id);
+
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                 GL.TexSubImage2D(TextureTarget.Texture2D, 0,
-                    0, 0,  width, height,
+                    region.MinX, region.MinY, region.Width, region.Height,
                     GetGLPixelFormat(format), PixelType.UnsignedByte,
                     data);
             }
@@ -83,44 +92,17 @@ namespace Orion.Graphics
             }
         }
 
-        private void ValidatePixelBufferSize(byte[] buffer)
+        public void SetPixels(byte[] data)
         {
-            if (buffer != null && buffer.Length < (width * height * GetBytesPerPixel(format)))
-                throw new ArgumentException("Pixel data buffer too small!", "data");
-        }
-
-        private static int GetBytesPerPixel(TextureFormat format)
-        {
-            if (format == TextureFormat.Intensity) return 1;
-            if (format == TextureFormat.Rgb) return 3;
-            if (format == TextureFormat.Rgba) return 4;
-            throw new InvalidEnumArgumentException(
-                "Invalid texture format: {0}.".FormatInvariant(format));
-        }
-
-        private static PixelFormat GetGLPixelFormat(TextureFormat format)
-        {
-            if (format == TextureFormat.Intensity) return PixelFormat.Luminance;
-            if (format == TextureFormat.Rgb) return PixelFormat.Rgb;
-            if (format == TextureFormat.Rgba) return PixelFormat.Rgba;
-            throw new InvalidEnumArgumentException(
-                "Invalid texture format: {0}.".FormatInvariant(format));
-        }
-
-        private static PixelInternalFormat GetGLInternalPixelFormat(TextureFormat format)
-        {
-            if (format == TextureFormat.Intensity) return PixelInternalFormat.Luminance;
-            if (format == TextureFormat.Rgb) return PixelInternalFormat.Rgb;
-            if (format == TextureFormat.Rgba) return PixelInternalFormat.Rgba;
-            throw new InvalidEnumArgumentException(
-                "Invalid texture format: {0}.".FormatInvariant(format));
+            Region region = new Region(0, 0, (short)width, (short)height);
+            SetPixels(region, data);
         }
         #endregion
 
         #region Properties
         public bool HasAlphaChannel
         {
-            get { return format == TextureFormat.Rgba; }
+            get { return format == TextureFormat.Rgba || format == TextureFormat.Alpha; }
         }
 
         public bool IsDisposed
@@ -152,6 +134,43 @@ namespace Orion.Graphics
         private void EnsureNotDisposed()
         {
             if (IsDisposed) throw new ObjectDisposedException(null);
+        }
+
+        private static void ValidatePixelBufferSize(byte[] buffer, int pixelCount, TextureFormat format)
+        {
+            Argument.EnsureNotNull(buffer, "buffer");
+            if (buffer.Length < (pixelCount * GetBytesPerPixel(format)))
+                throw new ArgumentException("Pixel data buffer too small!", "data");
+        }
+
+        private static int GetBytesPerPixel(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return 1;
+            if (format == TextureFormat.Alpha) return 1;
+            if (format == TextureFormat.Rgb) return 3;
+            if (format == TextureFormat.Rgba) return 4;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
+        }
+
+        private static PixelFormat GetGLPixelFormat(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return PixelFormat.Luminance;
+            if (format == TextureFormat.Alpha) return PixelFormat.Alpha;
+            if (format == TextureFormat.Rgb) return PixelFormat.Rgb;
+            if (format == TextureFormat.Rgba) return PixelFormat.Rgba;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
+        }
+
+        private static PixelInternalFormat GetGLInternalPixelFormat(TextureFormat format)
+        {
+            if (format == TextureFormat.Intensity) return PixelInternalFormat.Luminance;
+            if (format == TextureFormat.Alpha) return PixelInternalFormat.Alpha;
+            if (format == TextureFormat.Rgb) return PixelInternalFormat.Rgb;
+            if (format == TextureFormat.Rgba) return PixelInternalFormat.Rgba;
+            throw new InvalidEnumArgumentException(
+                "Invalid texture format: {0}.".FormatInvariant(format));
         }
         #endregion
     }

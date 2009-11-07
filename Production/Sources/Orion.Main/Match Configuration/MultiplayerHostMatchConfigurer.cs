@@ -22,12 +22,9 @@ namespace Orion.Main
             using (NetworkSetupHost host = new NetworkSetupHost(transporter))
             {
                 host.WaitForPeers();
-
-                List<IPEndPoint> unsortedPeers = host.Peers.ToList();
-
-                unsortedPeers.Sort(new Comparison<IPEndPoint>((a, b) =>
-                    BitConverter.ToInt32(a.Address.GetAddressBytes(), 0) - BitConverter.ToInt32(b.Address.GetAddressBytes(), 0)));
-                peers = unsortedPeers;
+                peers = host.Peers
+                    .OrderBy(ipEndPoint => BitConverter.ToUInt32(ipEndPoint.Address.GetAddressBytes(), 0))
+                    .ToList();
             }
         }
 

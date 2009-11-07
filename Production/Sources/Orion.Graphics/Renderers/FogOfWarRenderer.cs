@@ -7,86 +7,96 @@ namespace Orion.Graphics
 {
     public sealed class FogOfWarRenderer
     {
-        private readonly FogOfWar fogOfWar;
-        private readonly World world;
-        private Texture texture;
-        public static readonly Color VisibleTileColor = Color.FromArgb(0, 0, 0, 0);
-        public static readonly Color DiscoveredTileColor = Color.FromArgb(153, 0, 0, 0);
-        public static readonly Color UndiscoveredTileColor = Color.FromArgb(255, 0, 0, 0);
-        private readonly byte[] pixels;
-        private bool hasFogOfWarChanged = true;
+        #region Fields
+        private const float FogTransparency = 0.5f;
 
-        public FogOfWarRenderer(World world, FogOfWar fogOfWar)
+        private readonly FogOfWar fogOfWar;
+        private readonly Texture texture;
+        private readonly byte[] pixelBuffer;
+        private Region? dirtyRegion;
+        #endregion
+
+        #region Constructors
+        public FogOfWarRenderer(FogOfWar fogOfWar)
         {
             Argument.EnsureNotNull(fogOfWar, "fogOfWar");
+
             this.fogOfWar = fogOfWar;
-            this.world = world;
-            pixels = new byte[world.Width * world.Height * 4];
-            fogOfWar.Changed += OnChanged;
-            UpdateTexture();
-        }
+            this.fogOfWar.Changed += OnChanged;
 
-        private void OnChanged(FogOfWar fogOfWar)
-        {
-            hasFogOfWarChanged = true;
-        }
+            pixelBuffer = new byte[fogOfWar.Width * fogOfWar.Height];
+            UpdatePixelBuffer();
 
-        private void UpdateTexture()
-        {
-            for (int y = 0; y < world.Height; ++y)
+            texture = new TextureBuilder
             {
-                for (int x = 0; x < world.Width; ++x)
-                {
-                    int pixelIndex = y * world.Width + x;
-                    TileVisibility visibility = fogOfWar.GetTileVisibility(x, y);
-                    if (visibility == TileVisibility.Undiscovered)
-                    {
-                        pixels[pixelIndex * 4 + 0] = UndiscoveredTileColor.R;
-                        pixels[pixelIndex * 4 + 1] = UndiscoveredTileColor.G;
-                        pixels[pixelIndex * 4 + 2] = UndiscoveredTileColor.B;
-                        pixels[pixelIndex * 4 + 3] = UndiscoveredTileColor.A;
-                    }
-                    else if (visibility == TileVisibility.Discovered)
-                    {
-                        pixels[pixelIndex * 4 + 0] = DiscoveredTileColor.R;
-                        pixels[pixelIndex * 4 + 1] = DiscoveredTileColor.G;
-                        pixels[pixelIndex * 4 + 2] = DiscoveredTileColor.B;
-                        pixels[pixelIndex * 4 + 3] = DiscoveredTileColor.A;
-                    }
-                    else if (visibility == TileVisibility.Visible)
-                    {
-                        pixels[pixelIndex * 4 + 0] = VisibleTileColor.R;
-                        pixels[pixelIndex * 4 + 1] = VisibleTileColor.G;
-                        pixels[pixelIndex * 4 + 2] = VisibleTileColor.B;
-                        pixels[pixelIndex * 4 + 3] = VisibleTileColor.A;
-                    }
-                }
-            }
-
-            if (texture == null)
-            {
-                texture = new TextureBuilder
-                {
-                    Width = world.Width,
-                    Height = world.Height,
-                    Format = TextureFormat.Rgba,
-                    PixelData = pixels,
-                    UseSmoothing = true
-                }.Build();
-            }
-            else
-                texture.SetPixels(pixels);
+                Width = fogOfWar.Width,
+                Height = fogOfWar.Height,
+                Format = TextureFormat.Alpha,
+                PixelData = pixelBuffer,
+                UseSmoothing = true
+            }.Build();
         }
+        #endregion
 
+        #region Properties
+        public bool IsDirty
+        {
+            get { return dirtyRegion.HasValue; }
+        }
+        #endregion
+
+        #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            if (hasFogOfWarChanged)
-            { 
-                UpdateTexture();
-                hasFogOfWarChanged = false;
+            if (IsDirty)
+            {
+                UpdateTexture(dirtyRegion.Value);
+                dirtyRegion = null;
             }
-            Rectangle terrainBounds = new Rectangle(0, 0, world.Width, world.Height);
-            graphics.FillTextured(terrainBounds, texture);
+
+            Rectangle terrainBounds = new Rectangle(0, 0, fogOfWar.Width, fogOfWar.Height);
+            graphics.Fill(terrainBounds, texture, Color.Black);
         }
+
+        private void OnChanged(FogOfWar fogOfWar, Region region)
+        {
+            if (dirtyRegion.HasValue)
+                dirtyRegion = Region.Union(dirtyRegion.Value, region);
+            else
+                dirtyRegion = region;
+        }
+
+        private void UpdatePixelBuffer(Region region)
+        {
+            byte fogAlpha = (byte)(FogTransparency * 255.99f);
+
+            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+            {
+                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                {
+                    int pixelIndex = (y - region.MinY) * region.Width + (x - region.MinX);
+                    TileVisibility visibility = fogOfWar.GetTileVisibility(x, y);
+                    if (visibility == TileVisibility.Undiscovered)
+                        pixelBuffer[pixelIndex] = 255;
+                    else if (visibility == TileVisibility.Discovered)
+                        pixelBuffer[pixelIndex] = fogAlpha;
+                    else if (visibility == TileVisibility.Visible)
+                        pixelBuffer[pixelIndex] = 0;
+                }
+            }
+        }
+
+        private void UpdatePixelBuffer()
+        {
+            Region region = new Region(0, 0, fogOfWar.Width, fogOfWar.Height);
+            UpdatePixelBuffer(region);
+        }
+
+        private void UpdateTexture(Region area)
+        {
+            UpdatePixelBuffer(area);
+            texture.SetPixels(area, pixelBuffer);
+        }
+        #endregion
     }
 }

@@ -15,6 +15,12 @@ namespace Orion.Graphics
         Intensity,
 
         /// <summary>
+        /// Specifies that the texture uses one byte per pixel storing
+        /// a transparency value.
+        /// </summary>
+        Alpha,
+
+        /// <summary>
         /// Specifies that the texture uses three bytes per pixel to store
         /// red, green and blue components.
         /// </summary>

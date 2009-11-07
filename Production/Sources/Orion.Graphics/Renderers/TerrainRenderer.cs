@@ -62,7 +62,7 @@ namespace Orion.Graphics
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-            graphics.FillTextured(terrainBounds, texture);
+            graphics.Fill(terrainBounds, texture);
         }
 
         public void Dispose()

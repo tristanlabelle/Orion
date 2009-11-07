@@ -73,6 +73,16 @@ namespace Orion.Commandment
             get { return mouseCommand; }
             set { mouseCommand = value; }
         }
+
+        private Faction Faction
+        {
+            get { return commander.Faction; }
+        }
+
+        private World World
+        {
+            get { return Faction.World; }
+        }
         #endregion
 
         #region Methods
@@ -161,13 +171,11 @@ namespace Orion.Commandment
         #region Launching dynamically chosen commands
         public void LaunchMouseCommand(Vector2 at)
         {
-            Faction faction = commander.Faction;
-            Rectangle hitRect = new Rectangle(at.X, at.Y, 1, 1);
-            Entity target = faction.World.Entities
-                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle)).FirstOrDefault();
+            Entity intersectedEntity = World.Entities
+                .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
 
-            if (target == null) mouseCommand.Execute(at);
-            else mouseCommand.Execute(target);
+            if (intersectedEntity == null) mouseCommand.Execute(at);
+            else mouseCommand.Execute(intersectedEntity);
 
             mouseCommand = null;
             GenericEventHandler<UserInputManager> handler = AssignedCommand;
@@ -176,27 +184,23 @@ namespace Orion.Commandment
 
         public void LaunchDefaultCommand(Vector2 at)
         {
-            Faction faction = commander.Faction;
-            Rectangle hitRect = new Rectangle(at.X, at.Y, 1, 1);
-            Unit target = faction.World.Entities
-                .OfType<Unit>()
-                .Where(u => Rectangle.Intersects(hitRect, u.BoundingRectangle))
-                .FirstOrDefault();
+            Entity intersectedEntity = World.Entities
+                .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
 
-            if (target == null)
+            if (intersectedEntity is Unit)
             {
-                ResourceNode node = faction.World.Entities
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault(n => Rectangle.Intersects(hitRect, n.BoundingRectangle));
-                if (node != null) LaunchHarvest(node);
-                else LaunchMove(at);
+                // TODO: implement friendlyness checks more elaborate than this
+                Unit intersectedUnit = (Unit)intersectedEntity;
+                if (intersectedUnit.Faction == commander.Faction) LaunchMove(intersectedUnit.Position);
+                else LaunchAttack(intersectedUnit);
+            }
+            else if (intersectedEntity is ResourceNode)
+            {
+                LaunchHarvest((ResourceNode)intersectedEntity);
             }
             else
             {
-                // TODO
-                // implement friendlyness checks more elaborate than this
-                if (target.Faction == commander.Faction) LaunchMove(target.Position);
-                else LaunchAttack(target);
+                LaunchMove(at);
             }
 
             GenericEventHandler<UserInputManager> handler = AssignedCommand;

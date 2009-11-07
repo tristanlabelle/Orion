@@ -70,7 +70,7 @@ namespace Orion.Graphics
 
         public override void Draw(GraphicsContext context)
         {
-            context.FillTextured(context.CoordinateSystem, Texture);
+            context.Fill(context.CoordinateSystem, Texture);
             base.Draw(context);
         }
     }

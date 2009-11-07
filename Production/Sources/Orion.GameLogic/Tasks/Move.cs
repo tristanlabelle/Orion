@@ -13,6 +13,8 @@ namespace Orion.GameLogic.Tasks
     public sealed class Move : Task
     {
         #region Fields
+        private const float angularVelocity = (float)Math.PI * 2;
+
         private readonly Unit unit;
         private readonly Vector2 destination;
         private readonly Path path;
@@ -66,6 +68,8 @@ namespace Orion.GameLogic.Tasks
             Vector2 destination = path.Points[nextPointIndex];
             Vector2 delta = destination - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
+
+            unit.Angle = (float)Math.Atan2(direction.X, direction.Y);
 
             float distance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
             if (distance < delta.Length)

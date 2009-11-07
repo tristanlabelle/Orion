@@ -103,15 +103,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public TransformHandle Transform(Transform transform)
-        {
-            GL.PushMatrix();
-            GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
-            GL.Rotate(transform.Rotation, Vector3.UnitZ);
-            GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
-            return new TransformHandle();
-        }
-
         #region OpenGL Context
 
         public void SetUpGLContext(Rectangle parentSystem)
@@ -130,6 +121,26 @@ namespace Orion.Graphics
             GL.PopMatrix();
 
             readyForDrawing = false;
+        }
+        #endregion
+
+        #region Geometric Transformation
+        /// <summary>
+        /// Applies a temporary geometric transformation.
+        /// This method is best called in a C# <c>using</c> statement.
+        /// </summary>
+        /// <param name="transform">The geometric transformation to be applied.</param>
+        /// <returns>
+        /// A handle that should be disposed when the scope of the transformation ends.
+        /// </returns>
+        public TransformHandle Transform(Transform transform)
+        {
+            GL.PushMatrix();
+            GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
+            float rotationAngleInDegrees = (float)(transform.Rotation * 180 / Math.PI);
+            GL.Rotate(rotationAngleInDegrees, Vector3.UnitZ);
+            GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
+            return new TransformHandle();
         }
         #endregion
 

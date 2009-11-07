@@ -109,11 +109,13 @@ namespace Orion.Main
             ui.Display(matchUI);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
-            FrameRateCounter frameRateCounter = new FrameRateCounter();
+            FrameRateCounter updateRateCounter = new FrameRateCounter();
+            FrameRateCounter drawRateCounter = new FrameRateCounter();
             while (ui.IsWindowCreated)
             {
                 Application.DoEvents();
                 ui.Refresh();
+                drawRateCounter.Update();
 
                 float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
                 if (timeDeltaInSeconds >= TargetSecondsPerFrame)
@@ -127,8 +129,9 @@ namespace Orion.Main
                         match.Update(TargetSecondsPerFrame);
 
                         ui.Update(TargetSecondsPerFrame);
-                        frameRateCounter.Update();
-                        ui.WindowTitle = frameRateCounter.ToString();
+                        updateRateCounter.Update();
+                        ui.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
+                            .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
 
                         timeDeltaInSeconds -= TargetSecondsPerFrame;
                         ++successiveUpdateCount;

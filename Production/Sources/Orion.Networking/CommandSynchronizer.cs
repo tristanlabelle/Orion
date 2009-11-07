@@ -67,7 +67,6 @@ namespace Orion.Networking
         #endregion
 
         #region Properties
-
         private bool ReadyToContinue
         {
             get { return ReceivedFromAllPeers && AllPeersReady; }
@@ -75,44 +74,30 @@ namespace Orion.Networking
 
         private bool ReceivedFromAllPeers
         {
-            get { return receivedFromPeers.Select(pair => pair.Value).Where(i => i == false).Count() == 0; }
+            get { return receivedFromPeers.Values.All(received => received); }
         }
 
         private bool AllPeersReady
         {
-            get { return peersCompleted.Select(pair => pair.Value).Where(i => i == false).Count() == 0; }
+            get { return peersCompleted.Values.All(completed => completed); }
         }
-
         #endregion
 
         #region Methods
         #region Public
-
         public void Update()
         {
             frameCounter++;
 
             if (frameCounter % frameModulo == 0)
             {
-                while (!ReadyToContinue)
-                {
-                    // no choice but to wait
-                    Thread.Sleep(10);
-                    transporter.Poll();
-                }
-
+                if (!ReadyToContinue) WaitForPeers();
                 Flush();
-
-                foreach (IPEndPoint peer in peers)
-                {
-                    receivedFromPeers[peer] = false;
-                    peersCompleted[peer] = false;
-                }
+                ResetPeerStatuses();
             }
         }
 
-        public override void EndFeed()
-        { }
+        public override void EndFeed() { }
 
         public void Dispose()
         {
@@ -121,7 +106,7 @@ namespace Orion.Networking
 
         public override void Flush()
         {
-            if (Recipient == null) throw new NullReferenceException("Sink's recipient must not be null when Flush() is called");
+            if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
 
             Recipient.BeginFeed();
 
@@ -150,10 +135,26 @@ namespace Orion.Networking
 
             Recipient.EndFeed();
         }
-
         #endregion
 
         #region Private
+        private void WaitForPeers()
+        {
+            do
+            {
+                Thread.Sleep(0);
+                transporter.Poll();
+            } while (!ReadyToContinue);
+        }
+
+        private void ResetPeerStatuses()
+        {
+            foreach (IPEndPoint peer in peers)
+            {
+                receivedFromPeers[peer] = false;
+                peersCompleted[peer] = false;
+            }
+        }
 
         private void TransporterReceived(Transporter source, NetworkEventArgs args)
         {

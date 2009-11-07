@@ -41,7 +41,7 @@ namespace Orion.UserInterface
             this.glControl.Name = "glControl";
             this.glControl.Size = new System.Drawing.Size(792, 570);
             this.glControl.TabIndex = 0;
-            this.glControl.VSync = false;
+            this.glControl.VSync = true;
             this.glControl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseWheel);
             this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             this.glControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyUp);

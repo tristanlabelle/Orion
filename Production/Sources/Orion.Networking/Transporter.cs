@@ -176,7 +176,7 @@ namespace Orion.Networking
         #region Methods
 
         #region Private Methods
-        private void ValidateObjectState()
+        private void EnsureNotDisposed()
         {
             if (isDisposed) throw new ObjectDisposedException(null);
         }
@@ -408,7 +408,7 @@ namespace Orion.Networking
         /// </param>
         public void SendTo(byte[] data, IPEndPoint remoteAddress)
         {
-            ValidateObjectState();
+            EnsureNotDisposed();
 
             uint sid = nextSessionId;
             nextSessionId++;
@@ -431,7 +431,7 @@ namespace Orion.Networking
         /// <remarks>Events are not triggered until you call this method.</remarks>
         public void Poll()
         {
-            ValidateObjectState();
+            EnsureNotDisposed();
 
             GenericEventHandler<Transporter, NetworkEventArgs> receptionHandler = Received;
             if (receptionHandler != null)
@@ -463,6 +463,8 @@ namespace Orion.Networking
         /// </summary>
         public void Dispose()
         {
+            EnsureNotDisposed();
+
             isDisposed = true;
 
             socketSemaphore.WaitOne();

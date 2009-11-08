@@ -66,7 +66,6 @@
     <Compile Include="SelectionManager.cs" />
     <Compile Include="Sinks\ICommandSink.cs" />
     <Compile Include="UserInputCommander.cs" />
-    <Compile Include="Sinks\CommandAggregator.cs" />
     <Compile Include="Sinks\CommandSink.cs" />
     <Compile Include="Sinks\CommandOptimizer.cs" />
     <Compile Include="Sinks\CommandExecutor.cs" />

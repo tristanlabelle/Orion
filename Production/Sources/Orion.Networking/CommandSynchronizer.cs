@@ -109,8 +109,6 @@ namespace Orion.Networking
         {
             if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
 
-            Recipient.BeginFeed();
-
             // The order here is important because synchronizedCommands is accessed in both methods.
             FeedSynchronizedCommandsToRecipient();
             BeginSynchronizationOfAccumulatedCommands();

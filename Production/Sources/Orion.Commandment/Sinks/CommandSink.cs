@@ -30,9 +30,6 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-        public virtual void BeginFeed()
-        { }
-
         public virtual void Feed(Command command)
         {
             Argument.EnsureNotNull(command, "command");
@@ -47,8 +44,6 @@ namespace Orion.Commandment
         public virtual void Flush()
         {
             if (recipient == null) throw new NullReferenceException("Sink's recipient must not be null when Flush() is called");
-
-            recipient.BeginFeed();
 
             foreach (Command accumulatedCommand in accumulatedCommands)
                 recipient.Feed(accumulatedCommand);

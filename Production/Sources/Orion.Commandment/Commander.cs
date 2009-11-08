@@ -18,10 +18,9 @@ namespace Orion.Commandment
         /// Initializes a new <see cref="Commander"/> from the <see cref="Faction"/> it controls.
         /// </summary>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Commander"/> controls.</param>
-        public Commander(Faction faction)
+        protected Commander(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-
             this.faction = faction;
         }
         #endregion
@@ -68,8 +67,7 @@ namespace Orion.Commandment
         /// to flush its local pipeline.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public virtual void Update(float timeDelta)
-        { }
+        public virtual void Update(float timeDelta) { }
 
         public override string ToString()
         {

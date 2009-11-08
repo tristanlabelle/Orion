@@ -65,7 +65,7 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
-            (commandsEntryPoint as CommandSink).Flush();
+            ((CommandSink)commandsEntryPoint).Flush();
         }
 
         public override void AddToPipeline(CommandPipeline pipeline)
@@ -73,7 +73,6 @@ namespace Orion.Commandment
             pipeline.AddCommander(this);
 
             commandsEntryPoint = new CommandOptimizer(pipeline.UserCommandmentEntryPoint);
-            commandsEntryPoint = new CommandAggregator(commandsEntryPoint);
         }
         #endregion
     }

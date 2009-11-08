@@ -75,17 +75,8 @@ namespace Orion.GameLogic.Tasks
                 healthPointsTrained += trainingSpeed * timeDelta;
                 if (healthPointsTrained >= maxHealth)
                 {
-                    // TODO: Refactor to take building size into account and position unit intelligently
-                    Vector2 newPosition = new Vector2(trainer.Position.X + 2, trainer.Position.Y + 2);
-
-                    // If the new assigned position is unavalible put it over the building
-                    if (!trainer.World.IsWithinBounds(newPosition)
-                        || !trainer.World.Terrain.IsWalkable(newPosition))
-                        newPosition = trainer.Position;
-                    
-                    Unit unitCreated = trainer.Faction.CreateUnit(traineeType, newPosition);
+                    Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
                     unitCreated.Task = new Move(unitCreated, trainer.Position + trainer.RallyPoint); 
-                  
                     hasEnded = true;
                 }
             }

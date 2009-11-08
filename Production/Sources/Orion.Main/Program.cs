@@ -103,9 +103,7 @@ namespace Orion.Main
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(ui, "ui");
 
-            MatchUI matchUI = new MatchUI(match.world, match.userCommander);
-
-            match.world.Update(0);
+            MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
             ui.Display(matchUI);
 
             Stopwatch stopwatch = Stopwatch.StartNew();

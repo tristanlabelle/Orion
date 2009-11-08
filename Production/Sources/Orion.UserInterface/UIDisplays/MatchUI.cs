@@ -65,19 +65,7 @@ namespace Orion.UserInterface
             minimapFrame.Bounds = world.Bounds;
             hudFrame.Children.Add(minimapFrame);
 
-            Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
-            Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
-            Rectangle eastFrame = new Rectangle(Bounds.Width, 0, -20, Bounds.Height);
-            Rectangle westFrame = new Rectangle(0, 0, 20, Bounds.Height);
-            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), Keys.Up);
-            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
-            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);
-            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), Keys.Left);
-
-            Children.Add(northScroller);
-            Children.Add(southScroller);
-            Children.Add(eastScroller);
-            Children.Add(westScroller);
+            CreateScrollers();
 
             worldView.KeyDown += userInputManager.HandleKeyDown;
             worldView.KeyUp += userInputManager.HandleKeyUp;
@@ -85,9 +73,9 @@ namespace Orion.UserInterface
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
+            userInputManager.CommandAssigned += InputManagerAssignedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
-            userInputManager.AssignedCommand += InputManagerAssignedCommand;
 
             enablers.Add(new AttackEnabler(userInputManager, actions));
             enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes));
@@ -111,6 +99,25 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
+        #region Initialization
+        private void CreateScrollers()
+        {
+            Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
+            Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
+            Rectangle eastFrame = new Rectangle(Bounds.Width, 0, -20, Bounds.Height);
+            Rectangle westFrame = new Rectangle(0, 0, 20, Bounds.Height);
+            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), Keys.Up);
+            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
+            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);
+            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), Keys.Left);
+
+            Children.Add(northScroller);
+            Children.Add(southScroller);
+            Children.Add(eastScroller);
+            Children.Add(westScroller);
+        }
+        #endregion
+
         #region Event Handling
         protected override bool OnMouseWheel(MouseEventArgs args)
         {

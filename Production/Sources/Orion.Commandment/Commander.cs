@@ -27,6 +27,18 @@ namespace Orion.Commandment
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when this <see cref="Commander"/> generates a <see cref="Command"/>.
+        /// </summary>
+        public event GenericEventHandler<Commander, Command> CommandGenerated;
+
+        private void OnCommandGenerated(Command command)
+        {
+            if (CommandGenerated != null) CommandGenerated(this, command);
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the <see cref="Faction"/> that this <see cref="Commander"/> is in control of.
@@ -59,6 +71,7 @@ namespace Orion.Commandment
             Argument.EnsureNotNull(command, "command");
 
             commandsEntryPoint.Feed(command);
+            OnCommandGenerated(command);
         }
 
         /// <summary>

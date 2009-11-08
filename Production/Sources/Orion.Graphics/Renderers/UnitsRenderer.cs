@@ -60,9 +60,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            DrawPaths(graphics);
             DrawUnits(graphics);
-            DrawAttackLines(graphics);
         }
 
         public void DrawMiniature(GraphicsContext context)

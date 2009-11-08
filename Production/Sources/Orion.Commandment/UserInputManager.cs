@@ -44,7 +44,12 @@ namespace Orion.Commandment
         #endregion
 
         #region Events
-        public event GenericEventHandler<UserInputManager> AssignedCommand;
+        public event GenericEventHandler<UserInputManager> CommandAssigned;
+
+        private void OnCommandAssigned()
+        {
+            if (CommandAssigned != null) CommandAssigned(this);
+        }
         #endregion
 
         #region Properties
@@ -92,14 +97,13 @@ namespace Orion.Commandment
             if (mouseCommand != null)
             {
                 if (args.ButtonPressed == MouseButton.Left) LaunchMouseCommand(args.Position);
+                mouseCommand = null;
             }
             else
             {
                 if (args.ButtonPressed == MouseButton.Left) selectionStart = args.Position;
                 else if (args.ButtonPressed == MouseButton.Right) LaunchDefaultCommand(args.Position);
             }
-
-            mouseCommand = null;
         }
 
         public void HandleMouseUp(object responder, MouseEventArgs args)
@@ -178,18 +182,20 @@ namespace Orion.Commandment
             else mouseCommand.Execute(intersectedEntity);
 
             mouseCommand = null;
-            GenericEventHandler<UserInputManager> handler = AssignedCommand;
-            if (handler != null) handler(this);
+            OnCommandAssigned();
         }
 
         public void LaunchDefaultCommand(Vector2 at)
         {
+            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != Faction);
+            if (otherFactionOnlySelection) return;
+
             Entity intersectedEntity = World.Entities
                 .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
 
             if (intersectedEntity is Unit)
             {
-                // TODO: implement friendlyness checks more elaborate than this
+                // TODO: implement friendliness checks more elaborate than this
                 Unit intersectedUnit = (Unit)intersectedEntity;
                 if (intersectedUnit.Faction == commander.Faction) LaunchMove(intersectedUnit.Position);
                 else LaunchAttack(intersectedUnit);
@@ -203,8 +209,7 @@ namespace Orion.Commandment
                 LaunchMove(at);
             }
 
-            GenericEventHandler<UserInputManager> handler = AssignedCommand;
-            if (handler != null) handler(this);
+            OnCommandAssigned();
         }
         #endregion
 
@@ -219,18 +224,18 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                   .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
-            // Those who can attack do so, the others simply move to the destination
-            Unit theBuilder = movableUnits.FirstOrDefault(unit =>
+
+            Unit builder = movableUnits.FirstOrDefault(unit =>
             {
                 Skills.Build build = unit.GetSkill<Skills.Build>();
                 if (build == null) return false;
                 return build.Supports(unitTypeToBuild);
             });
 
-            if (theBuilder != null)
+            if (builder != null)
             {
-                commander.LaunchBuild(theBuilder, unitTypeToBuild, destination);
-                commander.LaunchMove(movableUnits.Where(unit => unit != theBuilder), destination);
+                commander.LaunchBuild(builder, unitTypeToBuild, destination);
+                commander.LaunchMove(movableUnits.Where(unit => unit != builder), destination);
             }
         }
 

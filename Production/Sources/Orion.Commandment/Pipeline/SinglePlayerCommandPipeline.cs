@@ -1,5 +1,5 @@
 
-namespace Orion.Commandment
+namespace Orion.Commandment.Pipeline
 {
     public class SinglePlayerCommandPipeline : CommandPipeline
     {

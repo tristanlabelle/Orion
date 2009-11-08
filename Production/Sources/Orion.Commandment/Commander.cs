@@ -1,4 +1,6 @@
+using System;
 using Orion.GameLogic;
+using Orion.Commandment.Pipeline;
 
 namespace Orion.Commandment
 {
@@ -52,7 +54,10 @@ namespace Orion.Commandment
         /// <param name="command">The <see cref="Command"/> that was generated.</param>
         protected void GenerateCommand(Command command)
         {
+            if (commandsEntryPoint == null)
+                throw new InvalidOperationException("Cannot generate a command without a pipeline entry point.");
             Argument.EnsureNotNull(command, "command");
+
             commandsEntryPoint.Feed(command);
         }
 

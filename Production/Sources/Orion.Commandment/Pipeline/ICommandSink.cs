@@ -1,5 +1,6 @@
+using System;
 
-namespace Orion.Commandment
+namespace Orion.Commandment.Pipeline
 {
     public interface ICommandSink
     {

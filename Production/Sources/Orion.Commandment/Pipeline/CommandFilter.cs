@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Orion.Commandment
+namespace Orion.Commandment.Pipeline
 {
     /// <summary>
     /// Base class for command sinks which do operations on commands

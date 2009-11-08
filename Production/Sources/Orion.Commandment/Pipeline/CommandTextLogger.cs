@@ -1,7 +1,7 @@
 using System.IO;
 using System.Diagnostics;
 
-namespace Orion.Commandment
+namespace Orion.Commandment.Pipeline
 {
     /// <summary>
     /// A command filter which logs to a text file the commands which pass through it.

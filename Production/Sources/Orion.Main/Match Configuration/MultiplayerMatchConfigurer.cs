@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using Orion.Commandment;
+using Orion.Commandment.Pipeline;
 using Orion.Networking;
 
 namespace Orion.Main

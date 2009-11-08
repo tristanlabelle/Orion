@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
+using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
 using Keys = System.Windows.Forms.Keys;
 
@@ -71,8 +72,7 @@ namespace Orion.Commandment
         public override void AddToPipeline(CommandPipeline pipeline)
         {
             pipeline.AddCommander(this);
-
-            commandsEntryPoint = new CommandOptimizer(pipeline.UserCommandmentEntryPoint);
+            commandsEntryPoint = pipeline.UserCommandmentEntryPoint;
         }
         #endregion
     }

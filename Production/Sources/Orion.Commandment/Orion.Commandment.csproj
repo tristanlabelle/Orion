@@ -60,16 +60,15 @@
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
-    <Compile Include="Pipelines\CommandPipeline.cs" />
-    <Compile Include="Pipelines\SinglePlayerCommandPipeline.cs" />
+    <Compile Include="Pipeline\CommandPipeline.cs" />
+    <Compile Include="Pipeline\SinglePlayerCommandPipeline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />
-    <Compile Include="Sinks\ICommandSink.cs" />
+    <Compile Include="Pipeline\ICommandSink.cs" />
     <Compile Include="UserInputCommander.cs" />
-    <Compile Include="Sinks\CommandFilter.cs" />
-    <Compile Include="Sinks\CommandOptimizer.cs" />
-    <Compile Include="Sinks\CommandExecutor.cs" />
-    <Compile Include="Sinks\CommandTextLogger.cs" />
+    <Compile Include="Pipeline\CommandFilter.cs" />
+    <Compile Include="Pipeline\CommandExecutor.cs" />
+    <Compile Include="Pipeline\CommandTextLogger.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>

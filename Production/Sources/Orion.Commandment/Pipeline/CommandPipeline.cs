@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 
-namespace Orion.Commandment
+namespace Orion.Commandment.Pipeline
 {
     /// <summary>
     /// Encapsulates the process by which commands go from their source to their destination.

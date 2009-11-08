@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="StrokeStyle.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Texture.cs" />

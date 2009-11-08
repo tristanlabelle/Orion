@@ -264,15 +264,14 @@ namespace Orion.Networking
 
             while (true)
             {
-                if (isDisposed) break;
-                socketSemaphore.WaitOne();
-
                 try
                 {
                     while (true)
                     {
                         try
                         {
+                            if (isDisposed) break;
+                            socketSemaphore.WaitOne();
                             udpSocket.ReceiveFrom(packet, ref endpoint);
                             break;
                         }

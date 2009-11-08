@@ -70,7 +70,7 @@
     <Compile Include="Sinks\CommandSink.cs" />
     <Compile Include="Sinks\CommandOptimizer.cs" />
     <Compile Include="Sinks\CommandExecutor.cs" />
-    <Compile Include="Sinks\CommandLogger.cs" />
+    <Compile Include="Sinks\CommandDebugLogger.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -34,7 +34,8 @@ namespace Orion.Networking
         private Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
 
         private List<Unit> deadUnits = new List<Unit>();
-        private Queue<Command> readyCommands = new Queue<Command>();
+
+        private List<Command> synchronizedCommands = new List<Command>();
 
         private CommandFactory serializer;
 
@@ -110,30 +111,41 @@ namespace Orion.Networking
 
             Recipient.BeginFeed();
 
+            // The order here is important because synchronizedCommands is accessed in both methods.
+            FeedSynchronizedCommandsToRecipient();
+            BeginSynchronizationOfAccumulatedCommands();
+
+            Recipient.EndFeed();
+        }
+
+        private void FeedSynchronizedCommandsToRecipient()
+        {
+            // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
+            synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
+            foreach (Command command in synchronizedCommands)
+                Recipient.Feed(command);
+            synchronizedCommands.Clear();
+        }
+
+        private void BeginSynchronizationOfAccumulatedCommands()
+        {
             using (MemoryStream stream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
                     writer.Write((byte)GameMessageType.Commands);
-                    while (commands.Count > 0)
+                    foreach (Command accumulatedCommand in accumulatedCommands)
                     {
-                        Command command = commands.Dequeue();
-                        if (command.UnitsInvolved.Intersect(deadUnits).Count() > 0) continue;
-
-                        Recipient.Feed(command);
-                        serializer.Serialize(command, writer);
+                        if (accumulatedCommand.UnitsInvolved.Intersect(deadUnits).Any()) continue;
+                        serializer.Serialize(accumulatedCommand, writer);
                     }
                 }
                 deadUnits.Clear();
                 transporter.SendTo(stream.ToArray(), peers);
             }
 
-            while (readyCommands.Count > 0)
-            {
-                Recipient.Feed(readyCommands.Dequeue());
-            }
-
-            Recipient.EndFeed();
+            synchronizedCommands.AddRange(accumulatedCommands);
+            accumulatedCommands.Clear();
         }
         #endregion
 
@@ -190,7 +202,7 @@ namespace Orion.Networking
                 {
                     while (stream.Position != stream.Length)
                     {
-                        readyCommands.Enqueue(serializer.Deserialize(reader));
+                        synchronizedCommands.Add(serializer.Deserialize(reader));
                     }
                 }
             }

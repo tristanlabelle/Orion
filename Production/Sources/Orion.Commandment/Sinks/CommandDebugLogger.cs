@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Orion.Commandment
 {
-    public sealed class CommandLogger : CommandSink
+    public sealed class CommandDegugLogger : CommandSink
     {
         #region Fields
         private readonly TextWriter writer = new StreamWriter("command log.txt");
@@ -12,9 +12,9 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-        public CommandLogger() { }
+        public CommandDegugLogger() { }
 
-        public CommandLogger(ICommandSink recipient)
+        public CommandDegugLogger(ICommandSink recipient)
             : base(recipient)
         { }
         #endregion

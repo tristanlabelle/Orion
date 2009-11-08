@@ -104,6 +104,11 @@ namespace Orion.Networking
         private const byte DataPacket = 0;
         private const byte AcknowledgePacket = 1;
         private const long DefaultPing = 100;
+
+        /// <summary>
+        /// Winsock error raised if the socket didn't receive anything before it timed out.
+        /// </summary>
+        private const int WSAETIMEDOUT = 10060;
         #endregion
 
         private uint nextSessionId;
@@ -277,9 +282,7 @@ namespace Orion.Networking
                         }
                         catch (SocketException e)
                         {
-                            // 10060: WSAETIMEDOUT: the socket didn't receive anything before it timed out
-                            // this is normal; proceed
-                            if (e.ErrorCode != 10060) throw;
+                            if (e.ErrorCode != WSAETIMEDOUT) throw;
                         }
                     }
 

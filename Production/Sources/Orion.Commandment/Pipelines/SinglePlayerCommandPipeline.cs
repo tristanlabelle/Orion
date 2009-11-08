@@ -4,7 +4,7 @@ namespace Orion.Commandment
     public class SinglePlayerCommandPipeline : CommandPipeline
     {
         #region Fields
-        private CommandLogger logger = new CommandLogger();
+        private CommandDegugLogger logger = new CommandDegugLogger();
         #endregion
 
         #region Constructors
@@ -22,7 +22,7 @@ namespace Orion.Commandment
 
         public override ICommandSink AICommandmentEntryPoint
         {
-            get { return executor; }
+            get { return logger; }
         }
         #endregion
     }

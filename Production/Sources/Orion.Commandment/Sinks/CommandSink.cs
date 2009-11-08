@@ -8,7 +8,7 @@ namespace Orion.Commandment
         #region Fields
         private ICommandSink recipient;
 
-        protected Queue<Command> commands = new Queue<Command>();
+        protected List<Command> accumulatedCommands = new List<Command>();
         #endregion
 
         #region Constructors
@@ -36,7 +36,7 @@ namespace Orion.Commandment
         public virtual void Feed(Command command)
         {
             Argument.EnsureNotNull(command, "command");
-            commands.Enqueue(command);
+            accumulatedCommands.Add(command);
         }
 
         public virtual void EndFeed()
@@ -49,10 +49,11 @@ namespace Orion.Commandment
             if (recipient == null) throw new NullReferenceException("Sink's recipient must not be null when Flush() is called");
 
             recipient.BeginFeed();
-            while (commands.Count > 0)
-            {
-                recipient.Feed(commands.Dequeue());
-            }
+
+            foreach (Command accumulatedCommand in accumulatedCommands)
+                recipient.Feed(accumulatedCommand);
+            accumulatedCommands.Clear();
+
             recipient.EndFeed();
         }
         #endregion

@@ -9,7 +9,7 @@ namespace Orion.Networking
     {
         #region Fields
         private CommandSynchronizer synchronizer;
-        private CommandLogger logger;
+        private CommandDegugLogger logger;
 
         private Transporter transporter;
         #endregion
@@ -22,7 +22,7 @@ namespace Orion.Networking
             Argument.EnsureNotNull(peers, "peers");
 
             this.transporter = transporter;
-            logger = new CommandLogger(executor);
+            logger = new CommandDegugLogger(executor);
             synchronizer = new CommandSynchronizer(world, transporter, peers);
             synchronizer.Recipient = logger;
         }
@@ -31,7 +31,7 @@ namespace Orion.Networking
         #region Properties
         public override ICommandSink AICommandmentEntryPoint
         {
-            get { return executor; }
+            get { return logger; }
         }
 
         public override ICommandSink UserCommandmentEntryPoint

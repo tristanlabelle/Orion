@@ -161,7 +161,7 @@ namespace Orion.Networking
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            //udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
 

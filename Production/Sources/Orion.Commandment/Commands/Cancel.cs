@@ -65,6 +65,11 @@ namespace Orion.Commandment.Commands
             foreach (Unit unit in units)
                 unit.Task = null;
         }
+
+        public override string ToString()
+        {
+            return "[{0}] cancel".FormatInvariant(units.ToCommaSeparatedValues());
+        }
         #endregion
         #endregion
 
@@ -76,13 +81,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<Cancel>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 2; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Cancel command, BinaryWriter writer)
             {

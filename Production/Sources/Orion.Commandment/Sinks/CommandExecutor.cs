@@ -1,17 +1,24 @@
+using System;
 
 namespace Orion.Commandment
 {
-    public class CommandExecutor : ICommandSink
+    public sealed class CommandExecutor : ICommandSink
     {
-        public void BeginFeed()
-        { }
+        #region Fields
+        private int commandIndex = 0;
+        #endregion
 
-        public void EndFeed()
-        { }
-
+        #region Methods
         public void Feed(Command command)
         {
+            Argument.EnsureNotNull(command, "command");
             command.Execute();
         }
+        #endregion
+
+        #region Explicit Members
+        void ICommandSink.BeginFeed() { }
+        void ICommandSink.EndFeed() { }
+        #endregion
     }
 }

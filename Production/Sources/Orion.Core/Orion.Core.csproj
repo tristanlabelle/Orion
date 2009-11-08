@@ -64,6 +64,7 @@
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="KeyboardEventArgs.cs" />
     <Compile Include="Region.cs" />
+    <Compile Include="Sequence.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
     <Compile Include="ValueChangedEventArgs.cs" />

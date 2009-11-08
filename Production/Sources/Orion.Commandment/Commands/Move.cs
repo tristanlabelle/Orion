@@ -74,6 +74,11 @@ namespace Orion.Commandment.Commands
             foreach (Unit unit in units)
                 unit.Task = new MoveTask(unit, destination);
         }
+
+        public override string ToString()
+        {
+            return "[{0}] move to {1}".FormatInvariant(units.ToCommaSeparatedValues(), destination);
+        }
         #endregion
         #endregion
 
@@ -85,13 +90,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<Move>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 0; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Move command, BinaryWriter writer)
             {

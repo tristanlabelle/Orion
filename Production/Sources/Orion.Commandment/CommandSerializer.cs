@@ -20,11 +20,6 @@ namespace Orion.Commandment
         /// represented by this type.
         /// </summary>
         public abstract Type Type { get; }
-
-        /// <summary>
-        /// Gets the id associated with this <see cref="CommandType"/>.
-        /// </summary>
-        public abstract byte ID { get; }
         #endregion
 
         #region Methods
@@ -34,7 +29,7 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="command">The <see cref="Command"/> to be serialized.</param>
         /// <param name="writer">A binary writer to be used to write serialized data.</param>
-        public abstract void Serialize(Command command, BinaryWriter writer);
+        internal abstract void Serialize(Command command, BinaryWriter writer);
         #endregion
 
         #region Deserialization
@@ -46,7 +41,7 @@ namespace Orion.Commandment
         /// The <see cref="World"/> that is the context of the deserialized <see cref="Command"/>.
         /// </param>
         /// <returns>The <see cref="Command"/> that was deserialized.</returns>
-        public abstract Command Deserialize(BinaryReader reader, World world);
+        internal abstract Command Deserialize(BinaryReader reader, World world);
 
         protected static Faction ReadFaction(BinaryReader reader, World world)
         {
@@ -102,13 +97,6 @@ namespace Orion.Commandment
             return units;
         }
         #endregion
-
-        #region Object Model
-        public sealed override string ToString()
-        {
-            return "{0} (#{1})".FormatInvariant(Type.FullName, ID);
-        }
-        #endregion
         #endregion
     }
 
@@ -129,16 +117,15 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-        public sealed override void Serialize(Command command, BinaryWriter writer)
+        internal sealed override void Serialize(Command command, BinaryWriter writer)
         {
             Argument.EnsureBaseType(command, Type, "command");
             Argument.EnsureNotNull(writer, "writer");
 
-            writer.Write(ID);
             SerializeData((TCommand)command, writer);
         }
 
-        public sealed override Command Deserialize(BinaryReader reader, World world)
+        internal sealed override Command Deserialize(BinaryReader reader, World world)
         {
             Argument.EnsureNotNull(reader, "reader");
             Argument.EnsureNotNull(world, "world");

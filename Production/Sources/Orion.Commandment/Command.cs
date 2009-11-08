@@ -43,6 +43,8 @@ namespace Orion.Commandment
         /// Executes this <see cref="Command"/>.
         /// </summary>
         public abstract void Execute();
+
+        public abstract override string ToString();
         #endregion
     }
 }

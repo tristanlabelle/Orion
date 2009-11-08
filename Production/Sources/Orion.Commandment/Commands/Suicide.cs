@@ -6,10 +6,10 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    class Suicide : Command
+    public sealed class Suicide : Command
     {
         #region Fields
-        List<Unit> suiciders;
+        private readonly List<Unit> suiciders;
         #endregion
 
         #region Constructor
@@ -21,7 +21,6 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
-
         #region Methods
         public override void Execute()
         {
@@ -29,6 +28,11 @@ namespace Orion.Commandment.Commands
             {
                 suicider.Suicide();
             }
+        }
+
+        public override string ToString()
+        {
+            return "[{0}] suicide".FormatInvariant(suiciders.ToCommaSeparatedValues());
         }
         #endregion
     }

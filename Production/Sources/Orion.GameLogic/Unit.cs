@@ -291,7 +291,7 @@ namespace Orion.GameLogic
 
         public override string ToString()
         {
-            return "{0} {1}".FormatInvariant(type, faction);
+            return "#{0} {1} ({2})".FormatInvariant(ID, type, faction);
         }
 
         public void Suicide()

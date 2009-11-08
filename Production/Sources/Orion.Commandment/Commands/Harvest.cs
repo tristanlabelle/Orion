@@ -23,16 +23,6 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
-        #region Methods
-        public override void Execute()
-        {
-            foreach (Unit harvester in harvesters)
-            {
-                harvester.Task = new HarvestTask(harvester, node);
-            }
-        }
-        #endregion
-
         #region Proprieties
         public override IEnumerable<Unit> UnitsInvolved
         {
@@ -44,6 +34,21 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
+        #region Methods
+        public override void Execute()
+        {
+            foreach (Unit harvester in harvesters)
+            {
+                harvester.Task = new HarvestTask(harvester, node);
+            }
+        }
+
+        public override string ToString()
+        {
+            return "[{0}] harvest {1}".FormatInvariant(harvesters.ToCommaSeparatedValues(), node);
+        }
+        #endregion
+
         #region Serializer Class
         /// <summary>
         /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Cancel"/> command.
@@ -52,13 +57,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<Harvest>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 4; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Harvest command, BinaryWriter writer)
             {

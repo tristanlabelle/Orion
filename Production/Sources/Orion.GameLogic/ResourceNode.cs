@@ -88,7 +88,7 @@ namespace Orion.GameLogic
 
         public override string ToString()
         {
-            return "{0} resource node".FormatInvariant(type);
+            return "#{0} {1} node".FormatInvariant(ID, type);
         }
         #endregion
     }

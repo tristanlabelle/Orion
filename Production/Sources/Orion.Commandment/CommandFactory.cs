@@ -33,15 +33,8 @@ namespace Orion.Commandment
                 Train.Serializer.Instance,
                 Harvest.Serializer.Instance,
                 Repair.Serializer.Instance
-
             };
-
-            if (serializers.Select(serializer => serializer.ID).Distinct().Count() != serializers.Count)
-                throw new Exception("Two or more CommandSerializers have the same ID.");
         }
-        #endregion
-
-        #region Properties
         #endregion
 
         #region Methods
@@ -54,9 +47,9 @@ namespace Orion.Commandment
         {
             Argument.EnsureNotNull(reader, "reader");
 
-            byte commandID = reader.ReadByte();
-            CommandSerializer serializer = serializers.FirstOrDefault(s => s.ID == commandID);
-            if (serializer == null) throw new InvalidDataException("Unknown command identifier.");
+            byte serializerIndex = reader.ReadByte();
+            if (serializerIndex >= serializers.Count) throw new InvalidDataException("Unknown command type identifier.");
+            CommandSerializer serializer = serializers[serializerIndex];
             
             return serializer.Deserialize(reader, world);
         }
@@ -72,14 +65,16 @@ namespace Orion.Commandment
             Argument.EnsureNotNull(writer, "writer");
 
             Type commandType = command.GetType();
-            CommandSerializer serializer = serializers.FirstOrDefault(s => s.Type == commandType);
-            if (serializer == null)
+            int serializerIndex = serializers.FindIndex(s => s.Type == commandType);
+            if (serializerIndex < 0)
             {
                 throw new ArgumentException(
                     "No registered command serializer can handle commands of type {0}."
                     .FormatInvariant(commandType.FullName));
             }
 
+            CommandSerializer serializer = serializers[serializerIndex];
+            writer.Write((byte)serializerIndex);
             serializer.Serialize(command, writer);
         }
         #endregion

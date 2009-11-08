@@ -35,13 +35,6 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
-        #region Methods
-        public override void Execute()
-        {
-            builder.Task = new BuildTask(builder, position, buildingType);
-        }
-        #endregion
-
         #region Proprieties
         public override IEnumerable<Unit> UnitsInvolved
         {
@@ -49,6 +42,18 @@ namespace Orion.Commandment.Commands
             {
                 yield return builder;
             }
+        }
+        #endregion
+
+        #region Methods
+        public override void Execute()
+        {
+            builder.Task = new BuildTask(builder, position, buildingType);
+        }
+
+        public override string ToString()
+        {
+            return "{0} build {1} at {2}".FormatInvariant(builder, buildingType, position);
         }
         #endregion
         #endregion
@@ -61,13 +66,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<Build>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 3; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Build command, BinaryWriter writer)
             {

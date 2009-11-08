@@ -5,8 +5,9 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    public class Train : Command
+    public sealed class Train : Command
     {
+        #region Instance
         #region Fields
         private readonly List<Unit> identicalsBuildings;
         private readonly UnitType unitType;
@@ -42,7 +43,12 @@ namespace Orion.Commandment.Commands
                     break;
                 identicalsBuildings[i].Task = new Orion.GameLogic.Tasks.Train(identicalsBuildings[i], unitType);
             }
+        }
 
+        public override string ToString()
+        {
+            return "[{0}] build {1}"
+                .FormatInvariant(identicalsBuildings.ToCommaSeparatedValues(), unitType);
         }
         #endregion
 
@@ -56,17 +62,12 @@ namespace Orion.Commandment.Commands
             }
         }
         #endregion
+        #endregion
 
+        #region Serializer
         public sealed class Serializer : CommandSerializer<Train>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 5; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Train command, BinaryWriter writer)
             {
@@ -96,6 +97,6 @@ namespace Orion.Commandment.Commands
             #endregion
             #endregion
         }
-
+        #endregion
     }
 }

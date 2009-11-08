@@ -76,6 +76,11 @@ namespace Orion.Commandment.Commands
             foreach (Unit unit in units)
                 unit.Task = new RepairTask(unit, building);
         }
+
+        public override string ToString()
+        {
+            return "[{0}] repair {1}".FormatInvariant(units.ToCommaSeparatedValues(), building);
+        }
         #endregion
         #endregion
 
@@ -87,13 +92,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<Repair>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 7; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(Repair command, BinaryWriter writer)
             {

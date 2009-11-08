@@ -83,13 +83,16 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        
         public override void Execute()
         {
-            foreach (Unit striker in attackers)
-                striker.Task = new ZoneAttackTask(striker, destination);
+            foreach (Unit attacker in attackers)
+                attacker.Task = new ZoneAttackTask(attacker, destination);
         }
-        
+
+        public override string ToString()
+        {
+            return "[{0}] zone attack to {1}".FormatInvariant(attackers.ToCommaSeparatedValues(), destination);
+        }
         #endregion
         #endregion
 
@@ -101,13 +104,6 @@ namespace Orion.Commandment.Commands
         public sealed class Serializer : CommandSerializer<ZoneAttack>
         {
             #region Instance
-            #region Properties
-            public override byte ID
-            {
-                get { return 6; }
-            }
-            #endregion
-
             #region Methods
             protected override void SerializeData(ZoneAttack command, BinaryWriter writer)
             {

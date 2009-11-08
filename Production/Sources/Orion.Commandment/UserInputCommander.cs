@@ -65,7 +65,7 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
-            ((CommandSink)commandsEntryPoint).Flush();
+            ((CommandFilter)commandsEntryPoint).Flush();
         }
 
         public override void AddToPipeline(CommandPipeline pipeline)

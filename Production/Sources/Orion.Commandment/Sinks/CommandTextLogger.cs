@@ -3,18 +3,21 @@ using System.Diagnostics;
 
 namespace Orion.Commandment
 {
-    public sealed class CommandDegugLogger : CommandSink
+    /// <summary>
+    /// A command filter which logs to a text file the commands which pass through it.
+    /// </summary>
+    public sealed class CommandTextLogger : CommandFilter
     {
         #region Fields
-        private readonly TextWriter writer = new StreamWriter("command log.txt");
+        private readonly TextWriter writer = new StreamWriter("Command Log.txt");
         private int commandIndex = 0;
         private int frameIndex = 0;
         #endregion
 
         #region Constructors
-        public CommandDegugLogger() { }
+        public CommandTextLogger() { }
 
-        public CommandDegugLogger(ICommandSink recipient)
+        public CommandTextLogger(ICommandSink recipient)
             : base(recipient)
         { }
         #endregion

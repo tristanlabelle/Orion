@@ -120,7 +120,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 80,
                 AlageneCost = 20
             };
-            builder.Skills.Add(new Skills.Attack(4, 7));
+            builder.Skills.Add(new Skills.Attack(8, 7));
             Register(builder);
         }
 

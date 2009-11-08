@@ -4,7 +4,7 @@ namespace Orion.Commandment
     public class SinglePlayerCommandPipeline : CommandPipeline
     {
         #region Fields
-        private CommandDegugLogger logger = new CommandDegugLogger();
+        private CommandTextLogger logger = new CommandTextLogger();
         #endregion
 
         #region Constructors

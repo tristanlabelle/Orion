@@ -15,15 +15,13 @@ namespace Orion.Networking
         Done
     }
 
-    public class CommandSynchronizer : CommandSink, IDisposable
+    public class CommandSynchronizer : CommandFilter, IDisposable
     {
         #region Fields
         #region Static
-        private static int frameModulo = 6;
+        private const int frameModulo = 6;
         private static readonly byte[] doneMessage = { (byte)GameMessageType.Done };
         #endregion
-
-        private uint frameCounter;
 
         private GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
         private GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
@@ -86,11 +84,9 @@ namespace Orion.Networking
 
         #region Methods
         #region Public
-        public void Update()
+        public void Update(int frameNumber)
         {
-            frameCounter++;
-
-            if (frameCounter % frameModulo == 0)
+            if (frameNumber % frameModulo == 0)
             {
                 if (!ReadyToContinue) WaitForPeers();
                 Flush();

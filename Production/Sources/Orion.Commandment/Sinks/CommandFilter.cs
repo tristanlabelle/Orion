@@ -3,7 +3,11 @@ using System.Collections.Generic;
 
 namespace Orion.Commandment
 {
-    public abstract class CommandSink : ICommandSink
+    /// <summary>
+    /// Base class for command sinks which do operations on commands
+    /// before transmitting them to a destination sink.
+    /// </summary>
+    public abstract class CommandFilter : ICommandSink
     {
         #region Fields
         private ICommandSink recipient;
@@ -12,10 +16,10 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-        public CommandSink()
+        public CommandFilter()
         { }
 
-        public CommandSink(ICommandSink recipient)
+        public CommandFilter(ICommandSink recipient)
         {
             this.recipient = recipient;
         }

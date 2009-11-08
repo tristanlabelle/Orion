@@ -9,7 +9,7 @@ namespace Orion.Networking
     {
         #region Fields
         private CommandSynchronizer synchronizer;
-        private CommandDegugLogger logger;
+        private CommandTextLogger logger;
 
         private Transporter transporter;
         #endregion
@@ -22,7 +22,7 @@ namespace Orion.Networking
             Argument.EnsureNotNull(peers, "peers");
 
             this.transporter = transporter;
-            logger = new CommandDegugLogger(executor);
+            logger = new CommandTextLogger(executor);
             synchronizer = new CommandSynchronizer(world, transporter, peers);
             synchronizer.Recipient = logger;
         }
@@ -41,11 +41,11 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-        public override void Update(float frameDuration)
+        public override void Update(int frameNumber, float frameDuration)
         {
-            base.Update(frameDuration);
+            UpdateCommanders(frameDuration);
             transporter.Poll();
-            synchronizer.Update();
+            synchronizer.Update(frameNumber);
         }
         #endregion
     }

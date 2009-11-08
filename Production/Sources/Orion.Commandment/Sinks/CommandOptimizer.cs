@@ -2,7 +2,7 @@
 namespace Orion.Commandment
 {
     // just be a regular sink for now
-    public class CommandOptimizer : CommandSink
+    public class CommandOptimizer : CommandFilter
     {
         public CommandOptimizer()
         { }

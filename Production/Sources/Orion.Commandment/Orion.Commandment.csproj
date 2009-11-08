@@ -66,10 +66,10 @@
     <Compile Include="SelectionManager.cs" />
     <Compile Include="Sinks\ICommandSink.cs" />
     <Compile Include="UserInputCommander.cs" />
-    <Compile Include="Sinks\CommandSink.cs" />
+    <Compile Include="Sinks\CommandFilter.cs" />
     <Compile Include="Sinks\CommandOptimizer.cs" />
     <Compile Include="Sinks\CommandExecutor.cs" />
-    <Compile Include="Sinks\CommandDebugLogger.cs" />
+    <Compile Include="Sinks\CommandTextLogger.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -17,14 +17,13 @@ namespace Orion.Main
             seed = 545845;
         }
 
-        public IPAddress Host { get; set; }
+        public IPEndPoint Host { get; set; }
 
         public override void CreateNetworkConfiguration()
         {
-            IPEndPoint admin = new IPEndPoint(Host, Program.DefaultPort);
             using (NetworkSetupClient client = new NetworkSetupClient(transporter))
             {
-                client.Join(admin);
+                client.Join(Host);
                 client.WaitForPeers();
                 peers = client.Peers
                     .OrderBy(ipEndPoint => BitConverter.ToUInt32(ipEndPoint.Address.GetAddressBytes(), 0))
@@ -34,7 +33,7 @@ namespace Orion.Main
 
         protected override void AssignFactions(out UserInputCommander userCommander)
         {
-            Faction redFaction = world.CreateFaction("Red", Color.Red);
+            world.CreateFaction("Red", Color.Red);
             Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
             userCommander = new UserInputCommander(blueFaction);
         }

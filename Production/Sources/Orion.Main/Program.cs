@@ -10,10 +10,11 @@ namespace Orion.Main
 {
     internal static class Program
     {
-        public const float TargetFramesPerSecond = 60;
-        public const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
-        public const int DefaultPort = 41223;
-        public const int MaxSuccessiveUpdates = 5;
+        private const float TargetFramesPerSecond = 60;
+        private const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
+        private const int DefaultHostPort = 41223;
+        private const int DefaultClientPort = 41224;
+        private const int MaxSuccessiveUpdates = 5;
 
         /// <summary>
         /// Main entry point for the program.
@@ -44,16 +45,16 @@ namespace Orion.Main
 
         private static void HostGame()
         {
-            using (Transporter transporter = new Transporter(DefaultPort))
+            using (Transporter transporter = new Transporter(DefaultHostPort))
             {
                 MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
                 RunMultiplayerGame(configurer);
             }
         }
 
-        private static void JoinGame(IPAddress host)
+        private static void JoinGame(IPAddress hostAddress)
         {
-            int port = DefaultPort;
+            int port = DefaultClientPort;
             Transporter transporter;
 
             do
@@ -67,7 +68,7 @@ namespace Orion.Main
             } while (true);
 
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter);
-            configurer.Host = host;
+            configurer.Host = new IPEndPoint(hostAddress, DefaultHostPort);
             RunMultiplayerGame(configurer);
 
             transporter.Dispose();

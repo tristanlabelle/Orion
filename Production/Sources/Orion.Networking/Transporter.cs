@@ -16,27 +16,26 @@ namespace Orion.Networking
     public sealed class Transporter : IDisposable
     {
         #region Nested Types
-
-        private struct PacketId
+        private struct PacketID
         {
             public readonly IPEndPoint RemoteHost;
             public readonly uint SessionId;
 
-            public PacketId(uint sid, IPEndPoint host)
+            public PacketID(uint sessionID, IPEndPoint host)
             {
                 RemoteHost = host;
-                SessionId = sid;
+                SessionId = sessionID;
             }
         }
 
         private struct PacketData
         {
-            public readonly PacketId Id;
+            public readonly PacketID ID;
             public readonly byte[] Data;
 
-            public PacketData(PacketId id, byte[] data)
+            public PacketData(PacketID id, byte[] data)
             {
-                Id = id;
+                ID = id;
                 Data = data;
             }
         }
@@ -50,10 +49,10 @@ namespace Orion.Networking
             private DateTime whenToResend;
             private byte[] fullPacket;
 
-            public readonly PacketId Id;
+            public readonly PacketID Id;
             public readonly byte[] Data;
 
-            public PacketSession(PacketId id, byte[] data)
+            public PacketSession(PacketID id, byte[] data)
             {
                 timeToReceive = new Stopwatch();
                 creationTime = DateTime.UtcNow;
@@ -117,9 +116,9 @@ namespace Orion.Networking
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
         private readonly Dictionary<IPEndPoint, Queue<long>> pings = new Dictionary<IPEndPoint, Queue<long>>();
-        private readonly List<PacketId> answeredPackets = new List<PacketId>();
+        private readonly List<PacketID> answeredPackets = new List<PacketID>();
 
-        private readonly Dictionary<PacketId, PacketSession> packetsToSend = new Dictionary<PacketId, PacketSession>();
+        private readonly Dictionary<PacketID, PacketSession> packetsToSend = new Dictionary<PacketID, PacketSession>();
 
         private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
@@ -128,7 +127,6 @@ namespace Orion.Networking
         private readonly Thread receiverThread;
 
         private bool isDisposed;
-
         #endregion
 
         #region Public
@@ -265,29 +263,16 @@ namespace Orion.Networking
             answer[0] = AcknowledgePacket;
 
             byte[] packet = new byte[1024];
-            EndPoint endpoint = new IPEndPoint(0, 0);
 
             while (true)
             {
                 try
                 {
-                    while (true)
-                    {
-                        try
-                        {
-                            if (isDisposed) break;
-                            socketSemaphore.WaitOne();
-                            udpSocket.ReceiveFrom(packet, ref endpoint);
-                            break;
-                        }
-                        catch (SocketException e)
-                        {
-                            if (e.ErrorCode != WSAETIMEDOUT) throw;
-                        }
-                    }
+                    IPEndPoint endPoint = WaitForConnection(packet);
+                    if (endPoint == null) break;
 
                     uint sessionId = BitConverter.ToUInt32(packet, 1);
-                    PacketId id = new PacketId(sessionId, endpoint as IPEndPoint);
+                    PacketID id = new PacketID(sessionId, endPoint as IPEndPoint);
 
                     if (packet[0] == DataPacket)
                     {
@@ -296,7 +281,16 @@ namespace Orion.Networking
                             answer[i] = packet[i];
 
                         // it is always necessary to send an answer to data packets
-                        udpSocket.SendTo(answer, endpoint);
+                        socketSemaphore.WaitOne();
+                        try
+                        {
+                            if (isDisposed) break;
+                            udpSocket.SendTo(answer, endPoint);
+                        }
+                        finally
+                        {
+                            socketSemaphore.Release();
+                        }
 
                         lock (answeredPackets)
                         {
@@ -329,12 +323,35 @@ namespace Orion.Networking
                     Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
                     break;
                 }
+
+                Array.Clear(packet, 0, packet.Length);
+            }
+        }
+
+        private IPEndPoint WaitForConnection(byte[] packet)
+        {
+            EndPoint endpoint = new IPEndPoint(0, 0);
+
+            while (true)
+            {
+                try
+                {
+                    if (isDisposed) return null;
+
+                    socketSemaphore.WaitOne();
+                    udpSocket.ReceiveFrom(packet, ref endpoint);
+                    return endpoint as IPEndPoint;
+                }
+                catch (SocketException e)
+                {
+                    if (e.ErrorCode != WSAETIMEDOUT) throw;
+                }
                 finally
                 {
-                    Array.Clear(packet, 0, packet.Length);
                     socketSemaphore.Release();
                 }
             }
+
         }
 
         private void SenderThread()
@@ -417,7 +434,7 @@ namespace Orion.Networking
 
             lock (packetsToSend)
             {
-                PacketId id = new PacketId(sid, remoteAddress);
+                PacketID id = new PacketID(sid, remoteAddress);
                 packetsToSend[id] = new PacketSession(id, data);
             }
         }

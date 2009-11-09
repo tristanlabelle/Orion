@@ -14,6 +14,28 @@ namespace Orion.Graphics
     /// </summary>
     public sealed class UnitsRenderer
     {
+        #region Static
+
+        #region Fields
+        private static readonly Color lowLifeColor = Color.Red;
+        private static readonly Color middleLifeColor = Color.Yellow;
+        private static readonly Color fullLifeColor = Color.ForestGreen;
+        #endregion
+
+        #region Methods
+
+        private static Color Interpolate(Color first, Color second, float completion)
+        {
+            float opposite = 1 - completion;
+            return Color.FromArgb(
+                (int)(first.R * opposite + second.R * completion),
+                (int)(first.G * opposite + second.G * completion),
+                (int)(first.B * opposite + second.B * completion));
+        }
+
+        #endregion
+        #endregion
+
         #region Fields
         private readonly World world;
         private readonly Dictionary<string, LinePath> typeShapes = new Dictionary<string, LinePath>();
@@ -35,7 +57,12 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Properties
+        public bool DrawHealthBars { get; set; }
+        #endregion
+
         #region Methods
+
         public void SetTypeShape(string typeName, LinePath shape)
         {
             Argument.EnsureNotNullNorEmpty(typeName, "typeName");
@@ -98,7 +125,49 @@ namespace Orion.Graphics
                 {
                     graphics.Stroke(shape, Vector2.Zero);
                 }
+
+                if (!DrawHealthBars) DrawHealthBar(graphics, unit);
             }
+        }
+
+        public void DrawHealthBar(GraphicsContext context, Unit unit)
+        {
+            float healthbarWidth = unit.MaxHealth * 0.1f;
+            float y = unit.BoundingRectangle.CenterY + unit.BoundingRectangle.Height * 0.75f;
+            float x = unit.BoundingRectangle.CenterX - healthbarWidth / 2f;
+
+            DrawHealthBar(context, unit, new Vector2(x, y));
+        }
+
+        public void DrawHealthBar(GraphicsContext context, Unit unit, Vector2 origin)
+        {
+            float healthbarWidth = unit.MaxHealth * 0.1f;
+            float leftHealthWidth = unit.Health * 0.1f;
+
+            DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
+        }
+
+        public void DrawHealthBar(GraphicsContext context, Unit unit, Rectangle into)
+        {
+            float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
+            Vector2 origin = into.Min;
+
+            if (unit.Health > unit.MaxHealth / 2)
+            {
+                float lifeFraction = (unit.Health - unit.MaxHealth / 2f) / (unit.MaxHealth / 2f);
+                context.FillColor = Interpolate(middleLifeColor, fullLifeColor, lifeFraction);
+            }
+            else
+            {
+                float lifeFraction = unit.Health / (unit.MaxHealth / 2f);
+                context.FillColor = Interpolate(lowLifeColor, middleLifeColor, lifeFraction);
+            }
+
+            Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
+            context.Fill(lifeRect);
+            Rectangle damageRect = new Rectangle(origin.X + leftHealthWidth, origin.Y, into.Width - leftHealthWidth, into.Height);
+            context.FillColor = Color.DarkGray;
+            context.Fill(damageRect);
         }
 
         private void DrawPaths(GraphicsContext graphics)

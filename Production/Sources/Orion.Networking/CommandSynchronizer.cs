@@ -58,13 +58,13 @@ namespace Orion.Networking
             Argument.EnsureNotNull(peerEndPoints, "peerEndPoints");
 
             this.transporter = transporter;
-            if (this.peers.Count == 0)
-                throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
             this.serializer = new CommandFactory(world);
 
             foreach (IPEndPoint peerEndPoint in peerEndPoints)
                 peers.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
+            if (peers.Count == 0)
+                throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
             entityDied = EntityDied;
             world.Entities.Died += entityDied;

@@ -66,7 +66,7 @@ namespace Orion.Networking
                 throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
             foreach (IPEndPoint peerEndPoint in this.peerEndPoints)
-                peerStates.Add(peerEndPoint, PeerState.None);
+                peerStates.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
 
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
@@ -81,12 +81,12 @@ namespace Orion.Networking
         #region Properties
         private bool ReceivedFromAllPeers
         {
-            get { return peerStates.Values.All(state => (state | PeerState.ReceivedCommands) != 0); }
+            get { return peerStates.Values.All(state => (state & PeerState.ReceivedCommands) != 0); }
         }
 
         private bool AllPeersDone
         {
-            get { return peerStates.Values.All(state => (state | PeerState.ReceivedDone) != 0); }
+            get { return peerStates.Values.All(state => (state & PeerState.ReceivedDone) != 0); }
         }
         #endregion
 
@@ -97,8 +97,8 @@ namespace Orion.Networking
             if (frameNumber % frameModulo == 0)
             {
                 WaitForPeerCommands();
+                ResetPeerStates();
                 Flush();
-                ResetPeerStatuses();
             }
         }
 
@@ -166,7 +166,7 @@ namespace Orion.Networking
             }
         }
 
-        private void ResetPeerStatuses()
+        private void ResetPeerStates()
         {
             foreach (IPEndPoint peerEndPoint in peerEndPoints)
                 peerStates[peerEndPoint] = PeerState.None;
@@ -194,10 +194,6 @@ namespace Orion.Networking
                 if ((oldPeerState & PeerState.ReceivedCommands) != 0)
                     throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
-            }
-            else
-            {
-                throw new InvalidDataException("Invalid game message type.");
             }
         }
 

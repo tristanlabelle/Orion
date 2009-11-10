@@ -7,13 +7,13 @@ namespace Orion.Networking
 {
     public enum SetupMessageType : byte
     {
-        JoinRequest,
-        AcceptJoinRequest,
-        RefuseJoinRequest,
-        AddPeer,
-        KickPeer,
-        LeaveGame,
-        Seed
+        JoinRequest = 101,
+        AcceptJoinRequest = 102,
+        RefuseJoinRequest = 103,
+        AddPeer = 104,
+        KickPeer = 105,
+        LeaveGame = 106,
+        Seed = 107
     }
 
     public abstract class NetworkSetupHelper : IDisposable

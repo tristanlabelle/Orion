@@ -13,11 +13,11 @@ namespace Orion.Networking
         /// <summary>
         /// Identifies a packet as containing client data.
         /// </summary>
-        Data = 0,
+        Data = 203,
 
         /// <summary>
         /// Identifies a packet as being an acknowledgement of the reception of a data packet.
         /// </summary>
-        Acknowledgement = 1
+        Acknowledgement = 204
     }
 }

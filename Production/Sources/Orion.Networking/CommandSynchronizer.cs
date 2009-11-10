@@ -13,8 +13,8 @@ namespace Orion.Networking
 {
     public enum GameMessageType : byte
     {
-        Commands,
-        Done
+        Commands = 42,
+        Done = 43
     }
 
     [Flags]
@@ -51,7 +51,6 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-
         public CommandSynchronizer(World world, SafeTransporter transporter, IEnumerable<IPEndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
@@ -67,7 +66,7 @@ namespace Orion.Networking
                 throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
             foreach (IPEndPoint peerEndPoint in this.peerEndPoints)
-                peerStates.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
+                peerStates.Add(peerEndPoint, PeerState.None);
 
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
@@ -195,6 +194,10 @@ namespace Orion.Networking
                 if ((oldPeerState & PeerState.ReceivedCommands) != 0)
                     throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
+            }
+            else
+            {
+                throw new InvalidDataException("Invalid game message type.");
             }
         }
 

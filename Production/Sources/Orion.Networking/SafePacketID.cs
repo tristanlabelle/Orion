@@ -11,6 +11,7 @@ namespace Orion.Networking
     /// </summary>
     internal struct SafePacketID : IEquatable<SafePacketID>
     {
+        #region Instance
         #region Fields
         private readonly IPEndPoint remoteHost;
         private readonly uint sessionID;
@@ -41,7 +42,9 @@ namespace Orion.Networking
         #region Methods
         public bool Equals(SafePacketID other)
         {
-            return other.remoteHost == remoteHost && other.sessionID == sessionID;
+            return other.remoteHost.Address.GetAddressBytes().SequenceEqual(remoteHost.Address.GetAddressBytes())
+                && other.remoteHost.Port == remoteHost.Port
+                && other.sessionID == sessionID;
         }
 
         public override bool Equals(object obj)
@@ -54,6 +57,46 @@ namespace Orion.Networking
         {
             return "#{0} to host {1}".FormatInvariant(sessionID, remoteHost);
         }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        /// <summary>
+        /// Tests two instances for equality.
+        /// </summary>
+        /// <param name="a">The first instance.</param>
+        /// <param name="b">The second instance.</param>
+        /// <returns>True they are equal, false otherwise.</returns>
+        public static bool Equals(SafePacketID a, SafePacketID b)
+        {
+            return a.Equals(b);
+        }
+        #endregion
+
+        #region Operators
+        /// <summary>
+        /// Tests two instances for equality.
+        /// </summary>
+        /// <param name="a">The first instance.</param>
+        /// <param name="b">The second instance.</param>
+        /// <returns>True they are equal, false otherwise.</returns>
+        public static bool operator ==(SafePacketID a, SafePacketID b)
+        {
+            return Equals(a, b);
+        }
+
+        /// <summary>
+        /// Tests two instances for inequality.
+        /// </summary>
+        /// <param name="a">The first instance.</param>
+        /// <param name="b">The second instance.</param>
+        /// <returns>True they are different, false otherwise.</returns>
+        public static bool operator !=(SafePacketID a, SafePacketID b)
+        {
+            return !Equals(a, b);
+        }
+        #endregion
         #endregion
     }
 }

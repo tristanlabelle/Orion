@@ -13,8 +13,8 @@ namespace Orion.Networking
 {
     public enum GameMessageType : byte
     {
-        Commands = 42,
-        Done = 43
+        Commands = 0xC0,
+        Done = 0xD0
     }
 
     [Flags]
@@ -191,7 +191,7 @@ namespace Orion.Networking
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                if ((oldPeerState & PeerState.ReceivedCommands) != 0)
+                if ((oldPeerState & PeerState.ReceivedDone) != 0)
                     throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
             }

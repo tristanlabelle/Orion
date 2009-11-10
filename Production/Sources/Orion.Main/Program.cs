@@ -45,7 +45,7 @@ namespace Orion.Main
 
         private static void HostGame()
         {
-            using (Transporter transporter = new Transporter(DefaultHostPort))
+            using (SafeTransporter transporter = new SafeTransporter(DefaultHostPort))
             {
                 MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
                 RunMultiplayerGame(configurer);
@@ -55,13 +55,13 @@ namespace Orion.Main
         private static void JoinGame(IPAddress hostAddress)
         {
             int port = DefaultClientPort;
-            Transporter transporter;
+            SafeTransporter transporter;
 
             do
             {
                 try
                 {
-                    transporter = new Transporter(port);
+                    transporter = new SafeTransporter(port);
                     break;
                 }
                 catch { port++; }

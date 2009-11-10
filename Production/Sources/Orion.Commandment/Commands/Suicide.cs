@@ -42,7 +42,7 @@ namespace Orion.Commandment.Commands
         {
             foreach (Unit suicider in units)
             {
-                suicider.Suicide();
+                suicider.Kill();
             }
         }
 

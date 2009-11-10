@@ -72,37 +72,6 @@ namespace Orion.Graphics
                 graphics.Fill(selectionRectangle);
             }
         }
-
-        public void DrawHealthBars(GraphicsContext graphics)
-        {
-            const float healthBarLength = 1;
-
-            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
-            {
-                Rectangle bounds = unit.BoundingRectangle;
-
-                Vector2 healthBarCenter = bounds.Center + Vector2.UnitY * (bounds.Extent.Y + 0.5f);
-                Vector2 healthBarStart = healthBarCenter - Vector2.UnitX * healthBarLength * 0.5f;
-                Vector2 healthBarEnd = healthBarStart + Vector2.UnitX * healthBarLength;
-
-                float healthRatio = unit.Health / unit.MaxHealth;
-
-                DrawHealthBar(graphics, healthBarStart, healthBarEnd, healthRatio);
-            }
-        }
-
-        private void DrawHealthBar(GraphicsContext graphics,
-            Vector2 start, Vector2 end, float ratio)
-        {
-            float length = (end - start).Length;
-
-            Vector2 healthBarLevelPosition = start + Vector2.UnitX * ratio * length;
-
-            graphics.StrokeColor = Color.Lime;
-            graphics.StrokeLineStrip(start, healthBarLevelPosition);
-            graphics.StrokeColor = Color.Red;
-            graphics.StrokeLineStrip(healthBarLevelPosition, end);
-        }
         #endregion
         #endregion
 

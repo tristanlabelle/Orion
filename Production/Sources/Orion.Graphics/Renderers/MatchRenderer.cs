@@ -26,7 +26,7 @@ namespace Orion.Graphics
                 worldRenderer.DrawResources(context);
                 worldRenderer.UnitRenderer.DrawMiniature(context);
                 worldRenderer.DrawFogOfWar(context);
-                
+
                 context.StrokeColor = Color.Orange;
                 Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
                 context.Stroke(intersection.GetValueOrDefault());
@@ -37,16 +37,18 @@ namespace Orion.Graphics
         #endregion
 
         #region Fields
-        private SelectionRenderer selectionRenderer;
-        private WorldRenderer worldRenderer;
-        private Minimap minimap;
+        private readonly UserInputManager inputManager;
+        private readonly SelectionRenderer selectionRenderer;
+        private readonly WorldRenderer worldRenderer;
+        private readonly Minimap minimap;
         #endregion
 
-        public MatchRenderer(World world, UserInputManager inputManager)
+        public MatchRenderer(World world, UserInputManager manager)
         {
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(manager, "manager");
 
+            inputManager = manager;
             selectionRenderer = new SelectionRenderer(inputManager);
             worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction.FogOfWar);
             minimap = new Minimap(worldRenderer);
@@ -62,6 +64,12 @@ namespace Orion.Graphics
             get { return worldRenderer; }
         }
 
+        public bool DrawAllHealthBars
+        {
+            get { return worldRenderer.UnitRenderer.DrawHealthBars; }
+            set { worldRenderer.UnitRenderer.DrawHealthBars = value; }
+        }
+
         public void Draw(GraphicsContext context)
         {
             Argument.EnsureNotNull(context, "context");
@@ -71,7 +79,11 @@ namespace Orion.Graphics
             selectionRenderer.DrawSelectionMarkers(context);
             worldRenderer.DrawResources(context);
             worldRenderer.DrawUnits(context);
-            selectionRenderer.DrawHealthBars(context);
+
+            if (inputManager.SelectionManager.HoveredUnit != null)
+            {
+                worldRenderer.UnitRenderer.DrawHealthBar(context, inputManager.SelectionManager.HoveredUnit);
+            }
             worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }

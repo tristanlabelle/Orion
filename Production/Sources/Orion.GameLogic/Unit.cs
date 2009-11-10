@@ -291,10 +291,10 @@ namespace Orion.GameLogic
 
         public override string ToString()
         {
-            return "#{0} {1} ({2})".FormatInvariant(ID, type, faction);
+            return "#{0} {2} {1}".FormatInvariant(ID, type, faction);
         }
 
-        public void Suicide()
+        public void Kill()
         {
             this.Health = 0;
         }

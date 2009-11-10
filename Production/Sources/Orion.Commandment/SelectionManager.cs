@@ -16,6 +16,7 @@ namespace Orion.Commandment
         #region Fields
         public const int MaxSelectedUnits = 16;
 
+        private Unit hoveredUnit;
         private readonly List<Unit> selectedUnits = new List<Unit>();
         private readonly Faction faction;
         #endregion
@@ -45,6 +46,12 @@ namespace Orion.Commandment
         public IEnumerable<Unit> SelectedUnits
         {
             get { return selectedUnits; }
+        }
+
+        public Unit HoveredUnit
+        {
+            get { return hoveredUnit; }
+            set { hoveredUnit = value; }
         }
         #endregion
 

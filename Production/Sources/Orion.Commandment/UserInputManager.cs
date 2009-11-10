@@ -140,6 +140,13 @@ namespace Orion.Commandment
         public void HandleMouseMove(object responder, MouseEventArgs args)
         {
             if (selectionStart.HasValue) selectionEnd = args.Position;
+            else
+            {
+                int x = (int)args.X;
+                int y = (int)args.Y;
+                Rectangle gridPosition = new Rectangle(x, y, 1, 1);
+                SelectionManager.HoveredUnit = Faction.World.Entities.InArea(gridPosition).OfType<Unit>().FirstOrDefault();
+            }
         }
 
         public void HandleKeyDown(object responder, KeyboardEventArgs args)

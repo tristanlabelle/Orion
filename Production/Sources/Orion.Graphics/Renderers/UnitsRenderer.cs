@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
@@ -40,6 +41,7 @@ namespace Orion.Graphics
         private readonly World world;
         private readonly Dictionary<string, LinePath> typeShapes = new Dictionary<string, LinePath>();
         private readonly LinePath defaultShape = LinePath.Circle;
+        private bool drawHealthBars;
         #endregion
 
         #region Constructors
@@ -58,7 +60,15 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-        public bool DrawHealthBars { get; set; }
+        public bool DrawHealthBars
+        {
+            get { return drawHealthBars; }
+            set
+            {
+                Console.WriteLine("Drawing: {0}", value);
+                drawHealthBars = value;
+            }
+        }
         #endregion
 
         #region Methods
@@ -126,7 +136,10 @@ namespace Orion.Graphics
                     graphics.Stroke(shape, Vector2.Zero);
                 }
 
-                if (!DrawHealthBars) DrawHealthBar(graphics, unit);
+                if (DrawHealthBars)
+                {
+                    DrawHealthBar(graphics, unit);
+                }
             }
         }
 

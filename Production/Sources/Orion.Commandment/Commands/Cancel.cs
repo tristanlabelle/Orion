@@ -49,13 +49,9 @@ namespace Orion.Commandment.Commands
             get { return units; }
         }
 
-        public override IEnumerable<Unit> UnitsInvolved
+        public override IEnumerable<Entity> EntitiesInvolved
         {
-            get
-            {
-                foreach(Unit unit in units)
-                    yield return unit;
-            }
+            get { return units.Cast<Entity>(); }
         }
         #endregion
 

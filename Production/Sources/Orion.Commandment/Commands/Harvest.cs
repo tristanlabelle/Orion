@@ -9,6 +9,7 @@ namespace Orion.Commandment.Commands
 {
     public sealed class Harvest : Command
     {
+        #region Instance
         #region Fields
         private readonly List<Unit> harvesters;
         private readonly ResourceNode node;
@@ -23,13 +24,14 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
-        #region Proprieties
-        public override IEnumerable<Unit> UnitsInvolved
+        #region Properties
+        public override IEnumerable<Entity> EntitiesInvolved
         {
             get
             {
                 foreach (Unit unit in harvesters)
                     yield return unit;
+                yield return node;
             }
         }
         #endregion
@@ -47,6 +49,7 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] harvest {1}".FormatInvariant(harvesters.ToCommaSeparatedValues(), node);
         }
+        #endregion
         #endregion
 
         #region Serializer Class

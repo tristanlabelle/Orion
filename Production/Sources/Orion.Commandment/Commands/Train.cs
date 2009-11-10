@@ -9,7 +9,7 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> identicalsBuildings;
+        private readonly List<Unit> buildings;
         private readonly UnitType unitType;
         #endregion
 
@@ -25,8 +25,15 @@ namespace Orion.Commandment.Commands
         {
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(faction, "faction");
-            this.identicalsBuildings = selectedsSameBuilding.ToList();
+            this.buildings = selectedsSameBuilding.ToList();
             this.unitType = unitType;
+        }
+        #endregion
+
+        #region Properties
+        public override IEnumerable<Entity> EntitiesInvolved
+        {
+            get { return buildings.Cast<Entity>(); }
         }
         #endregion
 
@@ -35,31 +42,20 @@ namespace Orion.Commandment.Commands
         {
             int aladiumCost = base.SourceFaction.GetStat(unitType, UnitStat.AladdiumCost);
             int alageneCost = base.SourceFaction.GetStat(unitType, UnitStat.AlageneCost);
-            for (int i = 0; i < identicalsBuildings.Count;i++ )
+            for (int i = 0; i < buildings.Count;i++ )
             {
                 // If we don't have enought money to continue the production we stop.
                 if (!(base.SourceFaction.AladdiumAmount >= (aladiumCost + aladiumCost * i)
                        && base.SourceFaction.AlageneAmount >= (alageneCost + alageneCost * i)))
                     break;
-                identicalsBuildings[i].Task = new Orion.GameLogic.Tasks.Train(identicalsBuildings[i], unitType);
+                buildings[i].Task = new Orion.GameLogic.Tasks.Train(buildings[i], unitType);
             }
         }
 
         public override string ToString()
         {
             return "[{0}] build {1}"
-                .FormatInvariant(identicalsBuildings.ToCommaSeparatedValues(), unitType);
-        }
-        #endregion
-
-        #region Proprieties
-        public override IEnumerable<Unit> UnitsInvolved
-        {
-            get
-            {
-                foreach (Unit unit in identicalsBuildings)
-                    yield return unit;
-            }
+                .FormatInvariant(buildings.ToCommaSeparatedValues(), unitType);
         }
         #endregion
         #endregion
@@ -72,8 +68,8 @@ namespace Orion.Commandment.Commands
             protected override void SerializeData(Train command, BinaryWriter writer)
             {
                 writer.Write(command.SourceFaction.ID);
-                writer.Write(command.identicalsBuildings.Count());
-                foreach (Unit unit in command.identicalsBuildings)
+                writer.Write(command.buildings.Count());
+                foreach (Unit unit in command.buildings)
                     writer.Write(unit.ID);
                 writer.Write(command.unitType.ID);
             }

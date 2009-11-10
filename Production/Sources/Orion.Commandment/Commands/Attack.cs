@@ -72,7 +72,7 @@ namespace Orion.Commandment.Commands
             get { return target; }
         }
 
-        public override IEnumerable<Unit> UnitsInvolved
+        public override IEnumerable<Entity> EntitiesInvolved
         {
             get
             {

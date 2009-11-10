@@ -13,10 +13,7 @@ namespace Orion.GameLogic
         /// Gets a value indicating if this <see cref="Task"/> has terminated its execution,
         /// rendering the unit idle.
         /// </summary>
-        public virtual bool HasEnded
-        {
-            get { return false; }
-        }
+        public abstract bool HasEnded { get; }
 
         /// <summary>
         /// Gets a human-readable string describing this <see cref="Task"/>.

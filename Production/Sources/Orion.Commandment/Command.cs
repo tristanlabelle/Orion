@@ -32,10 +32,10 @@ namespace Orion.Commandment
             get { return sourceFaction; }
         }
 
-        public virtual IEnumerable<Unit> UnitsInvolved
-        {
-            get { throw new NotImplementedException(); }
-        }
+        /// <summary>
+        /// Gets a sequence of <see cref="Entity">entities</see> which participate in this command.
+        /// </summary>
+        public abstract IEnumerable<Entity> EntitiesInvolved { get; }
         #endregion
 
         #region Methods

@@ -35,13 +35,10 @@ namespace Orion.Commandment.Commands
         }
         #endregion
 
-        #region Proprieties
-        public override IEnumerable<Unit> UnitsInvolved
+        #region Properties
+        public override IEnumerable<Entity> EntitiesInvolved
         {
-            get
-            {
-                yield return builder;
-            }
+            get { yield return builder; }
         }
         #endregion
 

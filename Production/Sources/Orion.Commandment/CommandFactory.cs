@@ -32,7 +32,8 @@ namespace Orion.Commandment
                 Build.Serializer.Instance,
                 Train.Serializer.Instance,
                 Harvest.Serializer.Instance,
-                Repair.Serializer.Instance
+                Repair.Serializer.Instance,
+                Suicide.Serializer.Instance
             };
         }
         #endregion

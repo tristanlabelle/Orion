@@ -32,7 +32,7 @@ namespace Orion.Networking
         private Dictionary<IPEndPoint, bool> receivedFromPeers = new Dictionary<IPEndPoint, bool>();
         private Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
 
-        private List<Unit> deadUnits = new List<Unit>();
+        private List<Entity> deadEntities = new List<Entity>();
 
         private List<Command> synchronizedCommands = new List<Command>();
 
@@ -131,11 +131,11 @@ namespace Orion.Networking
                     writer.Write((byte)GameMessageType.Commands);
                     foreach (Command accumulatedCommand in accumulatedCommands)
                     {
-                        if (accumulatedCommand.UnitsInvolved.Intersect(deadUnits).Any()) continue;
+                        if (accumulatedCommand.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
                         serializer.Serialize(accumulatedCommand, writer);
                     }
                 }
-                deadUnits.Clear();
+                deadEntities.Clear();
                 transporter.SendTo(stream.ToArray(), peers);
             }
 
@@ -206,7 +206,7 @@ namespace Orion.Networking
         private void EntityDied(EntityRegistry registry, Entity deadEntity)
         {
             Unit deadUnit = deadEntity as Unit;
-            if (deadUnit != null) deadUnits.Add(deadUnit);
+            if (deadUnit != null) deadEntities.Add(deadUnit);
         }
         #endregion
         #endregion

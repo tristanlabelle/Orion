@@ -233,7 +233,7 @@ namespace Orion.GameLogic.Pathfinding
         }
         #endregion
 
-        #region Proprieties
+        #region Properties
         public World World
         {
             get { return world; }

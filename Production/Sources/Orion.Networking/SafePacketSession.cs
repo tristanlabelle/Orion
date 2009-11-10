@@ -61,6 +61,11 @@ namespace Orion.Networking
                 return DateTime.UtcNow - lastSendTime;
             }
         }
+
+        public bool WasSent
+        {
+            get { return lastSendTime.HasValue; }
+        }
         #endregion
 
         #region Methods

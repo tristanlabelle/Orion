@@ -301,7 +301,7 @@ namespace Orion.Networking
                         }
 
                         TimeSpan resendDelay = AveragePing(session.ID.RemoteHost) + StandardDeviationForPings(session.ID.RemoteHost);
-                        if (session.TimeElapsedSinceLastSend >= resendDelay)
+                        if (!session.WasSent || session.TimeElapsedSinceLastSend >= resendDelay)
                             session.Send(udpSocket);
                     }
 

@@ -13,36 +13,42 @@ namespace Orion
     public sealed class BufferPool<T>
     {
         #region Fields
-        private const int DefaultMinimumAllocationLength = 16;
+        private static readonly Func<int, T[]> DefaultAllocator = (length => new T[length]);
 
         /// <remarks>
         /// Ideally those should be sorted but it shouldn't be a big deal if they're not.
         /// </remarks>
         private readonly List<T[]> buffers = new List<T[]>();
-        private readonly int minimumAllocationLength;
+        private readonly Func<int, T[]> allocator;
         #endregion
 
         #region Constructors
-        public BufferPool(int minimumAllocationLength)
+        public BufferPool(Func<int, T[]> allocator)
         {
-            Argument.EnsurePositive(minimumAllocationLength, "minimumAllocationLength");
-            this.minimumAllocationLength = minimumAllocationLength;
+            Argument.EnsureNotNull(allocator, "allocator");
+            this.allocator = allocator;
         }
 
-        public BufferPool() : this(DefaultMinimumAllocationLength) { }
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Gets the minimum length of buffers allocated by this pool.
-        /// </summary>
-        public int MinimumAllocationLength
-        {
-            get { return minimumAllocationLength; }
-        }
+        public BufferPool() : this(DefaultAllocator) { }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Allocates a new buffer using this pool's internal allocator.
+        /// </summary>
+        /// <param name="minimumLength">The minimum length of the buffer to allocate.</param>
+        /// <returns>The buffer that was allocated.</returns>
+        public T[] Allocate(int minimumLength)
+        {
+            Argument.EnsurePositive(minimumLength, "length");
+
+            T[] buffer = allocator(minimumLength);
+            if (buffer == null || buffer.Length < minimumLength)
+                throw new InvalidOperationException("Buffer allocator did not return a valid buffer.");
+
+            return buffer;
+        }
+        
         /// <summary>
         /// Gets and removes a buffer from this pool from a minimum length,
         /// or creates one if none are big enough.
@@ -53,18 +59,33 @@ namespace Orion
         {
             Argument.EnsurePositive(minimumLength, "length");
 
-            for (int i = 0; i < buffers.Count; ++i)
+            int bestFitBufferIndex = GetBestFitPooledBufferIndex(minimumLength);
+            if (bestFitBufferIndex != -1)
             {
-                T[] buffer = buffers[i];
-                if (buffer.Length >= minimumLength)
-                {
-                    buffers.RemoveAt(i);
-                    return buffer;
-                }
+                T[] bestFitBuffer = buffers[bestFitBufferIndex];
+                buffers.RemoveAt(bestFitBufferIndex);
+                return bestFitBuffer;
             }
 
-            int bufferLength = Math.Max(minimumLength, minimumAllocationLength);
-            return new T[bufferLength];
+            return Allocate(minimumLength);
+        }
+
+        private int GetBestFitPooledBufferIndex(int minimumLength)
+        {
+            int index = -1;
+            for (int i = 0; i < buffers.Count; ++i)
+            {
+                if (buffers[i].Length < minimumLength) continue;
+
+                if (index == -1 || buffers[i].Length < buffers[index].Length)
+                {
+                    index = i;
+
+                    if (buffers[index].Length == minimumLength)
+                        break;
+                }
+            }
+            return index;
         }
 
         /// <summary>

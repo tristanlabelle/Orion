@@ -16,7 +16,7 @@ namespace Orion.Networking
         Done
     }
 
-    public class CommandSynchronizer : CommandFilter, IDisposable
+    public sealed class CommandSynchronizer : CommandFilter, IDisposable
     {
         #region Fields
         #region Static
@@ -24,30 +24,36 @@ namespace Orion.Networking
         private static readonly byte[] doneMessage = { (byte)GameMessageType.Done };
         #endregion
 
-        private GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
-        private GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
-        private Transporter transporter;
+        private readonly Transporter transporter;
+        private readonly GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
+        private readonly GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
 
-        private List<IPEndPoint> peers;
-        private Dictionary<IPEndPoint, bool> receivedFromPeers = new Dictionary<IPEndPoint, bool>();
-        private Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
+        private readonly List<IPEndPoint> peers;
+        private readonly Dictionary<IPEndPoint, bool> receivedFromPeers = new Dictionary<IPEndPoint, bool>();
+        private readonly Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
 
-        private List<Entity> deadEntities = new List<Entity>();
+        private readonly List<Entity> deadEntities = new List<Entity>();
 
-        private List<Command> synchronizedCommands = new List<Command>();
+        private readonly List<Command> synchronizedCommands = new List<Command>();
 
-        private CommandFactory serializer;
+        private readonly CommandFactory serializer;
 
-        private GenericEventHandler<EntityRegistry, Entity> entityDied;
+        private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
         #endregion
 
         #region Constructors
 
-        public CommandSynchronizer(World world, Transporter transporter, IEnumerable<IPEndPoint> endpoints)
+        public CommandSynchronizer(World world, Transporter transporter, IEnumerable<IPEndPoint> peers)
         {
+            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(transporter, "transporter");
+            Argument.EnsureNotNull(peers, "peers");
+
             this.transporter = transporter;
-            peers = new List<IPEndPoint>(endpoints);
-            serializer = new CommandFactory(world);
+            this.peers = peers.ToList();
+            if (this.peers.Count == 0) throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
+
+            this.serializer = new CommandFactory(world);
 
             foreach (IPEndPoint endpoint in peers)
             {
@@ -59,8 +65,8 @@ namespace Orion.Networking
             world.Entities.Died += entityDied;
 
             transporterReceived = new GenericEventHandler<Transporter, NetworkEventArgs>(TransporterReceived);
-            transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
             transporter.Received += transporterReceived;
+            transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
             transporter.TimedOut += transporterTimeout;
         }
 
@@ -89,7 +95,7 @@ namespace Orion.Networking
         {
             if (frameNumber % frameModulo == 0)
             {
-                if (!ReadyToContinue) WaitForPeers();
+                WaitForPeerCommands();
                 Flush();
                 ResetPeerStatuses();
             }
@@ -100,6 +106,7 @@ namespace Orion.Networking
         public void Dispose()
         {
             transporter.Received -= transporterReceived;
+            transporter.TimedOut -= transporterTimeout;
         }
 
         public override void Flush()
@@ -107,8 +114,8 @@ namespace Orion.Networking
             if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
 
             // The order here is important because synchronizedCommands is accessed in both methods.
-            FeedSynchronizedCommandsToRecipient();
             BeginSynchronizationOfAccumulatedCommands();
+            FeedSynchronizedCommandsToRecipient();
 
             Recipient.EndFeed();
         }
@@ -145,13 +152,17 @@ namespace Orion.Networking
         #endregion
 
         #region Private
-        private void WaitForPeers()
+        private void WaitForPeerCommands()
         {
-            do
+            if (!ReadyToContinue)
             {
-                Thread.Sleep(0);
                 transporter.Poll();
-            } while (!ReadyToContinue);
+                while (!ReadyToContinue)
+                {
+                    Thread.Sleep(0);
+                    transporter.Poll();
+                }
+            }
         }
 
         private void ResetPeerStatuses()

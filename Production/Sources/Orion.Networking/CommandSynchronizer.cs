@@ -37,7 +37,8 @@ namespace Orion.Networking
         private readonly GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
         private readonly GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
 
-        private readonly Dictionary<IPEndPoint, PeerState> peers
+        private readonly List<IPEndPoint> peerEndPoints = new List<IPEndPoint>();
+        private readonly Dictionary<IPEndPoint, PeerState> peerStatuses
             = new Dictionary<IPEndPoint, PeerState>();
 
         private readonly List<Entity> deadEntities = new List<Entity>();
@@ -61,10 +62,12 @@ namespace Orion.Networking
 
             this.serializer = new CommandFactory(world);
 
-            foreach (IPEndPoint peerEndPoint in peerEndPoints)
-                peers.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
-            if (peers.Count == 0)
+            this.peerEndPoints = peerEndPoints.ToList();
+            if (this.peerEndPoints.Count == 0)
                 throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
+
+            foreach (IPEndPoint peerEndPoint in this.peerEndPoints)
+                peerStatuses.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
 
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
@@ -79,12 +82,12 @@ namespace Orion.Networking
         #region Properties
         private bool ReceivedFromAllPeers
         {
-            get { return peers.Values.All(state => (state | PeerState.ReceivedCommands) != 0); }
+            get { return peerStatuses.Values.All(state => (state | PeerState.ReceivedCommands) != 0); }
         }
 
         private bool AllPeersDone
         {
-            get { return peers.Values.All(state => (state | PeerState.ReceivedDone) != 0); }
+            get { return peerStatuses.Values.All(state => (state | PeerState.ReceivedDone) != 0); }
         }
         #endregion
 
@@ -142,7 +145,7 @@ namespace Orion.Networking
                     }
                 }
                 deadEntities.Clear();
-                transporter.SendTo(stream.ToArray(), peers.Keys);
+                transporter.SendTo(stream.ToArray(), peerStatuses.Keys);
             }
 
             synchronizedCommands.AddRange(accumulatedCommands);
@@ -166,8 +169,8 @@ namespace Orion.Networking
 
         private void ResetPeerStatuses()
         {
-            foreach (IPEndPoint peerEndPoint in peers.Keys)
-                peers[peerEndPoint] = PeerState.None;
+            foreach (IPEndPoint peerEndPoint in peerEndPoints)
+                peerStatuses[peerEndPoint] = PeerState.None;
         }
 
         private void TransporterReceived(Transporter source, NetworkEventArgs args)
@@ -176,22 +179,22 @@ namespace Orion.Networking
             if (messageType == (byte)GameMessageType.Commands)
             {
                 Deserialize(args.Data.Skip(1).ToArray());
-                peers[args.Host] |= PeerState.ReceivedCommands;
+                peerStatuses[args.Host] |= PeerState.ReceivedCommands;
                 if (ReceivedFromAllPeers)
                 {
-                    transporter.SendTo(doneMessage, peers.Keys);
+                    transporter.SendTo(doneMessage, peerEndPoints);
                 }
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                peers[args.Host] |= PeerState.ReceivedDone;
+                peerStatuses[args.Host] |= PeerState.ReceivedDone;
             }
         }
 
         private void TransporterTimedOut(Transporter source, NetworkTimeoutEventArgs args)
         {
             MessageBox.Show("Lost connection to {0}!".FormatInvariant(args.Host));
-            peers.Remove(args.Host);
+            peerStatuses.Remove(args.Host);
         }
 
         private void Deserialize(byte[] array)

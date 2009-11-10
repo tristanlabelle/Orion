@@ -9,7 +9,7 @@ namespace Orion.Networking
     /// <summary>
     /// Uniquely identifies a packet of data sent to a specific remote host.
     /// </summary>
-    internal struct PacketID
+    internal struct SafePacketID
     {
         #region Fields
         private readonly IPEndPoint remoteHost;
@@ -17,7 +17,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public PacketID(IPEndPoint host, uint sessionID)
+        public SafePacketID(IPEndPoint host, uint sessionID)
         {
             Argument.EnsureNotNull(host, "host");
 

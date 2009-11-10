@@ -18,19 +18,19 @@ namespace Orion.Networking
 
     public abstract class NetworkSetupHelper : IDisposable
     {
-        private GenericEventHandler<Transporter, NetworkEventArgs> receptionDelegate;
+        private GenericEventHandler<SafeTransporter, NetworkEventArgs> receptionDelegate;
 
         protected int seed;
-        protected Transporter transporter;
+        protected SafeTransporter transporter;
         protected List<IPEndPoint> peers;
 
-        public NetworkSetupHelper(Transporter transporter)
+        public NetworkSetupHelper(SafeTransporter transporter)
         {
             Argument.EnsureNotNull(transporter, "transporter");
             this.transporter = transporter;
             peers = new List<IPEndPoint>();
 
-            receptionDelegate = new GenericEventHandler<Transporter, NetworkEventArgs>(TransporterReceived);
+            receptionDelegate = new GenericEventHandler<SafeTransporter, NetworkEventArgs>(TransporterReceived);
             transporter.Received += receptionDelegate;
         }
 
@@ -39,7 +39,7 @@ namespace Orion.Networking
             get { return peers; }
         }
 
-        protected abstract void TransporterReceived(Transporter source, NetworkEventArgs args);
+        protected abstract void TransporterReceived(SafeTransporter source, NetworkEventArgs args);
 
         public void WaitForPeers()
         {

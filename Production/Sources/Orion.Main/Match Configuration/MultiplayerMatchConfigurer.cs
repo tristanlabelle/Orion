@@ -8,10 +8,10 @@ namespace Orion.Main
 {
     abstract class MultiplayerMatchConfigurer : MatchConfigurer
     {
-        protected Transporter transporter;
+        protected SafeTransporter transporter;
         protected IEnumerable<IPEndPoint> peers;
 
-        public MultiplayerMatchConfigurer(Transporter transporter)
+        public MultiplayerMatchConfigurer(SafeTransporter transporter)
         {
             this.transporter = transporter;
         }

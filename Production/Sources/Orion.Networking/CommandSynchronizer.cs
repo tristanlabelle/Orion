@@ -33,9 +33,9 @@ namespace Orion.Networking
         private static readonly byte[] doneMessage = { (byte)GameMessageType.Done };
         #endregion
 
-        private readonly Transporter transporter;
-        private readonly GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
-        private readonly GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
+        private readonly SafeTransporter transporter;
+        private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> transporterReceived;
+        private readonly GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs> transporterTimeout;
 
         private readonly List<IPEndPoint> peerEndPoints = new List<IPEndPoint>();
         private readonly Dictionary<IPEndPoint, PeerState> peerStatuses
@@ -52,7 +52,7 @@ namespace Orion.Networking
 
         #region Constructors
 
-        public CommandSynchronizer(World world, Transporter transporter, IEnumerable<IPEndPoint> peerEndPoints)
+        public CommandSynchronizer(World world, SafeTransporter transporter, IEnumerable<IPEndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");
@@ -72,9 +72,9 @@ namespace Orion.Networking
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
 
-            transporterReceived = new GenericEventHandler<Transporter, NetworkEventArgs>(TransporterReceived);
+            transporterReceived = new GenericEventHandler<SafeTransporter, NetworkEventArgs>(TransporterReceived);
             transporter.Received += transporterReceived;
-            transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
+            transporterTimeout = new GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
             transporter.TimedOut += transporterTimeout;
         }
         #endregion
@@ -173,7 +173,7 @@ namespace Orion.Networking
                 peerStatuses[peerEndPoint] = PeerState.None;
         }
 
-        private void TransporterReceived(Transporter source, NetworkEventArgs args)
+        private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
             byte messageType = args.Data[0];
             if (messageType == (byte)GameMessageType.Commands)
@@ -191,7 +191,7 @@ namespace Orion.Networking
             }
         }
 
-        private void TransporterTimedOut(Transporter source, NetworkTimeoutEventArgs args)
+        private void TransporterTimedOut(SafeTransporter source, NetworkTimeoutEventArgs args)
         {
             MessageBox.Show("Lost connection to {0}!".FormatInvariant(args.Host));
             peerStatuses.Remove(args.Host);

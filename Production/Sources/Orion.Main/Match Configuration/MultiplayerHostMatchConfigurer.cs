@@ -11,7 +11,7 @@ namespace Orion.Main
 {
     sealed class MultiplayerHostMatchConfigurer : MultiplayerMatchConfigurer
     {
-        public MultiplayerHostMatchConfigurer(Transporter transporter)
+        public MultiplayerHostMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
             seed = 545845;

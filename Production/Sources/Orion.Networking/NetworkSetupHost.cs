@@ -5,13 +5,13 @@ namespace Orion.Networking
 {
     public class NetworkSetupHost : NetworkSetupHelper
     {
-        public NetworkSetupHost(Transporter transporter)
+        public NetworkSetupHost(SafeTransporter transporter)
             : base(transporter)
         {
             seed = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
         }
 
-        protected override void TransporterReceived(Transporter source, NetworkEventArgs args)
+        protected override void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
             switch ((SetupMessageType)args.Data[0])
             {

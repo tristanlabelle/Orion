@@ -12,11 +12,11 @@ namespace Orion.Networking
         private CommandSynchronizer synchronizer;
         private CommandTextLogger logger;
 
-        private Transporter transporter;
+        private SafeTransporter transporter;
         #endregion
 
         #region Constructors
-        public MultiplayerCommandPipeline(World world, Transporter transporter, IEnumerable<IPEndPoint> peers)
+        public MultiplayerCommandPipeline(World world, SafeTransporter transporter, IEnumerable<IPEndPoint> peers)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");

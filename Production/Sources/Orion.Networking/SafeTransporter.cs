@@ -14,11 +14,13 @@ namespace Orion.Networking
     /// The order of arrival is not garanteed.
     /// It creates a single UDP socket for communication to various hosts. The remote host must use a Transporter as well for reception.
     /// </summary>
-    public sealed class Transporter : IDisposable
+    public sealed class SafeTransporter : IDisposable
     {
         #region Fields
         #region Private
         #region Constants
+        private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
+        private static readonly TimeSpan PacketResendDelay = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
@@ -33,9 +35,9 @@ namespace Orion.Networking
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
         private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
-        private readonly List<PacketID> acknowledgedPackets = new List<PacketID>();
+        private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
-        private readonly Dictionary<PacketID, PacketSession> packetsToSend = new Dictionary<PacketID, PacketSession>();
+        private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend = new Dictionary<SafePacketID, SafePacketSession>();
 
         private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
@@ -59,13 +61,13 @@ namespace Orion.Networking
         /// Raised when a packet arrives.
         /// </summary>
         /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
-        public event GenericEventHandler<Transporter, NetworkEventArgs> Received;
+        public event GenericEventHandler<SafeTransporter, NetworkEventArgs> Received;
 
         /// <summary>
         /// Raised when a packet cannot reach its destination.
         /// </summary>
         /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
-        public event GenericEventHandler<Transporter, NetworkTimeoutEventArgs> TimedOut;
+        public event GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs> TimedOut;
 
         private void OnReceived(NetworkEventArgs eventArgs)
         {
@@ -85,7 +87,7 @@ namespace Orion.Networking
         /// <param name="port">
         /// The port on which to bind
         /// </param>
-        public Transporter(int port)
+        public SafeTransporter(int port)
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -187,7 +189,7 @@ namespace Orion.Networking
                     if (endPoint == null) break;
 
                     uint sessionID = BitConverter.ToUInt32(packet, 1);
-                    PacketID id = new PacketID(endPoint, sessionID);
+                    SafePacketID id = new SafePacketID(endPoint, sessionID);
 
                     if (packet[0] == (byte)PacketType.Data)
                     {
@@ -227,7 +229,7 @@ namespace Orion.Networking
                         {
                             if (packetsToSend.ContainsKey(id))
                             {
-                                AddPing(id.RemoteHost, packetsToSend[id].Acknowledge());
+                                AddPing(id.RemoteHost, packetsToSend[id].TimeElapsedSinceCreation);
                                 packetsToSend.Remove(id);
                             }
                         }
@@ -272,8 +274,8 @@ namespace Orion.Networking
         #region Sender Thread
         private void SenderThread()
         {
-            List<PacketSession> trash = new List<PacketSession>();
-            List<PacketSession> sessions = new List<PacketSession>();
+            List<SafePacketSession> trash = new List<SafePacketSession>();
+            List<SafePacketSession> sessions = new List<SafePacketSession>();
             while (true)
             {
                 if (isDisposed) break;
@@ -287,9 +289,9 @@ namespace Orion.Networking
                         sessions.AddRange(packetsToSend.Values);
                     }
 
-                    foreach (PacketSession session in sessions)
+                    foreach (SafePacketSession session in sessions)
                     {
-                        if (session.HasTimedOut)
+                        if (session.TimeElapsedSinceCreation > PacketSessionTimeout)
                         {
                             trash.Add(session);
                             lock (timedOut)
@@ -298,16 +300,14 @@ namespace Orion.Networking
                             }
                         }
 
-                        if (session.NeedsResend)
-                        {
-                            session.SendThrough(udpSocket);
-                            session.ResetSendTime(AveragePing(session.ID.RemoteHost) + StandardDeviationForPings(session.ID.RemoteHost));
-                        }
+                        TimeSpan resendDelay = AveragePing(session.ID.RemoteHost) + StandardDeviationForPings(session.ID.RemoteHost);
+                        if (session.TimeElapsedSinceLastSend >= resendDelay)
+                            session.Send(udpSocket);
                     }
 
                     lock (packetsToSend)
                     {
-                        foreach (PacketSession session in trash)
+                        foreach (SafePacketSession session in trash)
                             packetsToSend.Remove(session.ID);
 
                         trash.Clear();
@@ -349,8 +349,8 @@ namespace Orion.Networking
 
             lock (packetsToSend)
             {
-                PacketID id = new PacketID(remoteHost, sessionID);
-                packetsToSend[id] = new PacketSession(id, data);
+                SafePacketID id = new SafePacketID(remoteHost, sessionID);
+                packetsToSend[id] = new SafePacketSession(id, data);
             }
         }
 

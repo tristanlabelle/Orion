@@ -7,7 +7,7 @@ namespace Orion.Networking
     {
         private IPEndPoint server;
 
-        public NetworkSetupClient(Transporter transporter)
+        public NetworkSetupClient(SafeTransporter transporter)
             : base(transporter)
         { }
 
@@ -21,7 +21,7 @@ namespace Orion.Networking
             transporter.SendTo(packet, host);
         }
 
-        protected override void TransporterReceived(Transporter source, NetworkEventArgs args)
+        protected override void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
             switch ((SetupMessageType)args.Data[0])
             {

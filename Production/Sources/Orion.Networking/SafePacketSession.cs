@@ -43,6 +43,11 @@ namespace Orion.Networking
             get { return creationTime; }
         }
 
+        public TimeSpan TimeElapsedSinceCreation
+        {
+            get { return DateTime.UtcNow - creationTime; }
+        }
+
         public DateTime? LastSendTime
         {
             get { return lastSendTime; }
@@ -55,11 +60,6 @@ namespace Orion.Networking
                 if (!lastSendTime.HasValue) return null;
                 return DateTime.UtcNow - lastSendTime;
             }
-        }
-
-        public TimeSpan TimeElapsedSinceCreation
-        {
-            get { return DateTime.UtcNow - creationTime; }
         }
         #endregion
 

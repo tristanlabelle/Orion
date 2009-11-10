@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace Orion.Networking
 {
@@ -20,7 +21,7 @@ namespace Orion.Networking
         #region Private
         #region Constants
         private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
-        private static readonly TimeSpan PacketResendDelay = TimeSpan.FromMilliseconds(100);
+        private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(20);
         private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
@@ -29,7 +30,7 @@ namespace Orion.Networking
         private const int WSAETIMEDOUT = 10060;
         #endregion
 
-        private uint nextSessionId;
+        private uint nextSessionID;
 
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
@@ -37,7 +38,8 @@ namespace Orion.Networking
         private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
-        private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend = new Dictionary<SafePacketID, SafePacketSession>();
+        private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend
+            = new Dictionary<SafePacketID, SafePacketSession>();
 
         private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
@@ -223,7 +225,7 @@ namespace Orion.Networking
                             readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packetData));
                         }
                     }
-                    else
+                    else if (packet[0] == (byte)PacketType.Acknowledgement)
                     {
                         lock (packetsToSend)
                         {
@@ -233,6 +235,10 @@ namespace Orion.Networking
                                 packetsToSend.Remove(id);
                             }
                         }
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("Unexpected packet type received.");
                     }
                 }
                 catch (SocketException e)
@@ -300,7 +306,7 @@ namespace Orion.Networking
                             }
                         }
 
-                        TimeSpan resendDelay = AveragePing(session.ID.RemoteHost) + StandardDeviationForPings(session.ID.RemoteHost);
+                        TimeSpan resendDelay = GetResendDelay(session.ID.RemoteHost);
                         if (!session.WasSent || session.TimeElapsedSinceLastSend >= resendDelay)
                             session.Send(udpSocket);
                     }
@@ -326,6 +332,12 @@ namespace Orion.Networking
                 Thread.Sleep(10);
             }
         }
+
+        private TimeSpan GetResendDelay(IPEndPoint remoteEndPoint)
+        {
+            TimeSpan resendDelay = AveragePing(remoteEndPoint) + StandardDeviationForPings(remoteEndPoint);
+            return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
+        }
         #endregion
 
         #region Sending
@@ -344,8 +356,8 @@ namespace Orion.Networking
             Argument.EnsureNotNull(data, "data");
             Argument.EnsureNotNull(remoteHost, "remoteHost");
 
-            uint sessionID = nextSessionId;
-            nextSessionId++;
+            uint sessionID = nextSessionID;
+            ++nextSessionID;
 
             lock (packetsToSend)
             {

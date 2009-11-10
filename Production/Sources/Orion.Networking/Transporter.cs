@@ -9,100 +9,17 @@ using System.Threading;
 namespace Orion.Networking
 {
     /// <summary>
-    /// A Transporter is responsible for safely transporting UDP packets over a network. It guarantees that packets are going to arrive, and that they will have
-    /// been properly transported. The only guarantee not provided is the order in which they arrive.
+    /// A Transporter is responsible for safely transporting UDP packets over a network.
+    /// It guarantees that packets are going to arrive without loss or duplication and as sent.
+    /// The order of arrival is not garanteed.
     /// It creates a single UDP socket for communication to various hosts. The remote host must use a Transporter as well for reception.
     /// </summary>
     public sealed class Transporter : IDisposable
     {
-        #region Nested Types
-        private struct PacketID
-        {
-            public readonly IPEndPoint RemoteHost;
-            public readonly uint SessionId;
-
-            public PacketID(uint sessionID, IPEndPoint host)
-            {
-                RemoteHost = host;
-                SessionId = sessionID;
-            }
-        }
-
-        private struct PacketData
-        {
-            public readonly PacketID ID;
-            public readonly byte[] Data;
-
-            public PacketData(PacketID id, byte[] data)
-            {
-                ID = id;
-                Data = data;
-            }
-        }
-
-        private class PacketSession
-        {
-            private static readonly TimeSpan expiration = new TimeSpan(0, 0, 5);
-
-            private readonly DateTime creationTime;
-            private Stopwatch timeToReceive;
-            private DateTime whenToResend;
-            private byte[] fullPacket;
-
-            public readonly PacketID Id;
-            public readonly byte[] Data;
-
-            public PacketSession(PacketID id, byte[] data)
-            {
-                timeToReceive = new Stopwatch();
-                creationTime = DateTime.UtcNow;
-                whenToResend = creationTime;
-                Id = id;
-                Data = data;
-
-                fullPacket = new byte[data.Length + 7];
-                fullPacket[0] = DataPacket;
-                BitConverter.GetBytes(id.SessionId).CopyTo(fullPacket, 1);
-                BitConverter.GetBytes((ushort)Data.Length).CopyTo(fullPacket, 1 + sizeof(uint));
-                Data.CopyTo(fullPacket, 1 + sizeof(uint) + sizeof(ushort));
-            }
-
-            public void SendThrough(Socket udpSocket)
-            {
-                timeToReceive.Reset();
-                udpSocket.SendTo(fullPacket, Id.RemoteHost);
-            }
-
-            public void ResetSendTime(long milliseconds)
-            {
-                whenToResend = DateTime.UtcNow + new TimeSpan(0, 0, 0, 0, (int)milliseconds);
-            }
-
-            public bool NeedsResend
-            {
-                get { return DateTime.UtcNow >= whenToResend; }
-            }
-
-            public bool HasTimedOut
-            {
-                get { return whenToResend - creationTime > expiration; }
-            }
-
-            public long Acknowledge()
-            {
-                timeToReceive.Stop();
-                return timeToReceive.ElapsedMilliseconds;
-            }
-        }
-
-        #endregion
-
         #region Fields
         #region Private
         #region Constants
-        private const byte DataPacket = 0;
-        private const byte AcknowledgePacket = 1;
-        private const long DefaultPing = 100;
+        private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.
@@ -115,7 +32,7 @@ namespace Orion.Networking
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
-        private readonly Dictionary<IPEndPoint, Queue<long>> pings = new Dictionary<IPEndPoint, Queue<long>>();
+        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
         private readonly List<PacketID> answeredPackets = new List<PacketID>();
 
         private readonly Dictionary<PacketID, PacketSession> packetsToSend = new Dictionary<PacketID, PacketSession>();
@@ -138,19 +55,27 @@ namespace Orion.Networking
         #endregion
 
         #region Events
-
         /// <summary>
-        /// The event triggered when a packet arrives.
+        /// Raised when a packet arrives.
         /// </summary>
-        /// <remarks>This event is only triggered when the method <see cref="M:Poll"/> is called.</remarks>
+        /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
         public event GenericEventHandler<Transporter, NetworkEventArgs> Received;
 
         /// <summary>
-        /// The event triggered when a packet cannot reach its destination.
+        /// Raised when a packet cannot reach its destination.
         /// </summary>
-        /// <remarks>This event is only triggered when the method <see cref="M:Poll"/> is called.</remarks>
+        /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
         public event GenericEventHandler<Transporter, NetworkTimeoutEventArgs> TimedOut;
 
+        private void OnReceived(NetworkEventArgs eventArgs)
+        {
+            if (Received != null) Received(this, eventArgs);
+        }
+
+        private void OnTimedOut(NetworkTimeoutEventArgs eventArgs)
+        {
+            if (TimedOut != null) TimedOut(this, eventArgs);
+        }
         #endregion
 
         #region Constructor
@@ -177,29 +102,22 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-
-        #region Private Methods
-        private void EnsureNotDisposed()
-        {
-            if (isDisposed) throw new ObjectDisposedException(null);
-        }
-
         #region Ping calculation methods
-        private void AddPing(IPEndPoint host, long milliseconds)
+        private void AddPing(IPEndPoint host, TimeSpan timeSpan)
         {
-            Queue<long> hostPings;
+            Queue<TimeSpan> hostPings;
             lock (pings)
             {
                 if (!pings.ContainsKey(host))
                 {
-                    pings[host] = new Queue<long>();
+                    pings[host] = new Queue<TimeSpan>();
                 }
                 hostPings = pings[host];
             }
 
             lock (hostPings)
             {
-                hostPings.Enqueue(milliseconds);
+                hostPings.Enqueue(timeSpan);
                 if (hostPings.Count > 50)
                 {
                     hostPings.Dequeue();
@@ -207,50 +125,48 @@ namespace Orion.Networking
             }
         }
 
-        private long AveragePing(IPEndPoint host)
+        private TimeSpan AveragePing(IPEndPoint host)
         {
-            Queue<long> hostPings;
+            Queue<TimeSpan> hostPings;
             lock (pings)
             {
                 if (!pings.ContainsKey(host))
                 {
-                    pings[host] = new Queue<long>();
+                    pings[host] = new Queue<TimeSpan>();
                 }
                 hostPings = pings[host];
             }
 
             lock (hostPings)
             {
-                if (hostPings.Count == 0)
-                    return DefaultPing;
-                return (long)hostPings.Average();
+                if (hostPings.Count == 0) return DefaultPing;
+
+                long averageTicks = (long)hostPings.Average(timeSpan => timeSpan.Ticks);
+                return TimeSpan.FromTicks(averageTicks);
             }
         }
 
-        private long StandardDeviationForPings(IPEndPoint host)
+        private TimeSpan StandardDeviationForPings(IPEndPoint host)
         {
-            long deviation = 0;
-            Queue<long> hostPings;
+            long deviationInTicks = 0;
+            Queue<TimeSpan> hostPings;
             lock (pings)
             {
                 hostPings = pings[host];
             }
 
-            if (hostPings.Count == 0)
-                return 50;
+            if (hostPings.Count == 0) return TimeSpan.FromMilliseconds(50);
 
-            long average = AveragePing(host);
+            TimeSpan average = AveragePing(host);
             lock (hostPings)
             {
-                foreach (long ping in hostPings)
-                {
-                    long pingDeviation = average - ping;
-                    deviation += (long)Math.Sqrt(pingDeviation * pingDeviation);
-                }
-                deviation /= hostPings.Count();
+                foreach (TimeSpan ping in hostPings)
+                    deviationInTicks += Math.Abs(average.Ticks - ping.Ticks);
+                
+                deviationInTicks /= hostPings.Count;
             }
 
-            return deviation;
+            return TimeSpan.FromTicks(deviationInTicks);
         }
 
         #endregion
@@ -259,7 +175,7 @@ namespace Orion.Networking
         private void ReceiverThread()
         {
             byte[] answer = new byte[5];
-            answer[0] = AcknowledgePacket;
+            answer[0] = (byte)PacketType.Acknowledgement;
 
             byte[] packet = new byte[1024];
 
@@ -270,10 +186,10 @@ namespace Orion.Networking
                     IPEndPoint endPoint = WaitForConnection(packet);
                     if (endPoint == null) break;
 
-                    uint sessionId = BitConverter.ToUInt32(packet, 1);
-                    PacketID id = new PacketID(sessionId, endPoint as IPEndPoint);
+                    uint sessionID = BitConverter.ToUInt32(packet, 1);
+                    PacketID id = new PacketID(endPoint, sessionID);
 
-                    if (packet[0] == DataPacket)
+                    if (packet[0] == (byte)PacketType.Acknowledgement)
                     {
                         // copy the session id
                         for (int i = 1; i < 5; i++)
@@ -378,21 +294,21 @@ namespace Orion.Networking
                             trash.Add(session);
                             lock (timedOut)
                             {
-                                timedOut.Enqueue(new NetworkTimeoutEventArgs(session.Id.RemoteHost, session.Data));
+                                timedOut.Enqueue(new NetworkTimeoutEventArgs(session.ID.RemoteHost, session.Data));
                             }
                         }
 
                         if (session.NeedsResend)
                         {
                             session.SendThrough(udpSocket);
-                            session.ResetSendTime(AveragePing(session.Id.RemoteHost) + StandardDeviationForPings(session.Id.RemoteHost));
+                            session.ResetSendTime(AveragePing(session.ID.RemoteHost) + StandardDeviationForPings(session.ID.RemoteHost));
                         }
                     }
 
                     lock (packetsToSend)
                     {
                         foreach (PacketSession session in trash)
-                            packetsToSend.Remove(session.Id);
+                            packetsToSend.Remove(session.ID);
 
                         trash.Clear();
                     }
@@ -412,38 +328,44 @@ namespace Orion.Networking
         }
         #endregion
 
-        #endregion
-
-        #region Public methods
-
+        #region Sending
         /// <summary>
         /// Sends data to a specified host.
         /// </summary>
         /// <param name="data">
-        /// The data to send
+        /// The data to send.
         /// </param>
-        /// <param name="remoteAddress">
-        /// The host to which the data is addressed
+        /// <param name="remoteHost">
+        /// The host to which the data is addressed.
         /// </param>
-        public void SendTo(byte[] data, IPEndPoint remoteAddress)
+        public void SendTo(byte[] data, IPEndPoint remoteHost)
         {
             EnsureNotDisposed();
+            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(remoteHost, "remoteHost");
 
-            uint sid = nextSessionId;
+            uint sessionID = nextSessionId;
             nextSessionId++;
 
             lock (packetsToSend)
             {
-                PacketID id = new PacketID(sid, remoteAddress);
+                PacketID id = new PacketID(remoteHost, sessionID);
                 packetsToSend[id] = new PacketSession(id, data);
             }
         }
 
         public void SendTo(byte[] data, IEnumerable<IPEndPoint> remoteAddresses)
         {
-            foreach (IPEndPoint endPoint in remoteAddresses) SendTo(data, endPoint);
-        }
+            EnsureNotDisposed();
+            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(remoteAddresses, "remoteAddresses");
 
+            foreach (IPEndPoint endPoint in remoteAddresses)
+                SendTo(data, endPoint);
+        }
+        #endregion
+
+        #region Polling
         /// <summary>
         /// Triggers any pending packet reception event.
         /// </summary>
@@ -452,31 +374,34 @@ namespace Orion.Networking
         {
             EnsureNotDisposed();
 
-            GenericEventHandler<Transporter, NetworkEventArgs> receptionHandler = Received;
-            if (receptionHandler != null)
-            {
-                lock (readyData)
-                {
-                    while (readyData.Count > 0)
-                    {
-                        receptionHandler(this, readyData.Dequeue());
-                    }
-                }
-            }
+            RaiseReceivedEvents();
+            RaiseTimedOutEvents();
+        }
 
-            GenericEventHandler<Transporter, NetworkTimeoutEventArgs> timeoutHandler = TimedOut;
-            if (timeoutHandler != null)
+        private void RaiseReceivedEvents()
+        {
+            lock (readyData)
             {
-                lock (timedOut)
+                while (readyData.Count > 0)
                 {
-                    while (timedOut.Count > 0)
-                    {
-                        timeoutHandler(this, timedOut.Dequeue());
-                    }
+                    OnReceived(readyData.Dequeue());
                 }
             }
         }
 
+        private void RaiseTimedOutEvents()
+        {
+            lock (timedOut)
+            {
+                while (timedOut.Count > 0)
+                {
+                    OnTimedOut(timedOut.Dequeue());
+                }
+            }
+        }
+        #endregion
+
+        #region Object Model
         /// <summary>
         /// Disposes of this object.
         /// </summary>
@@ -492,17 +417,19 @@ namespace Orion.Networking
             udpSocket.Shutdown(SocketShutdown.Both);
             udpSocket.Close();
 
-            socketSemaphore.Release();
-            socketSemaphore.Release();
+            socketSemaphore.Release(2);
+        }
+
+        private void EnsureNotDisposed()
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
         }
 
         public override string ToString()
         {
             return string.Format("{{Transporter:{0}}}", Port);
         }
-
         #endregion
-
         #endregion
     }
 }

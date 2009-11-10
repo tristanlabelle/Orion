@@ -108,6 +108,7 @@ namespace Orion.UserInterface
 
         private void glControl_KeyDown(object sender, KeyEventArgs args)
         {
+            if (args.Alt) args.Handled = true;
             TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
         }
 

@@ -55,6 +55,7 @@ namespace Orion.UserInterface
             this.Controls.Add(this.glControl);
             this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Window";
+            this.ShowIcon = false;
             this.Text = "Window";
             this.ResumeLayout(false);
 

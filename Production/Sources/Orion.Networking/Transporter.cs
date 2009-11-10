@@ -33,7 +33,7 @@ namespace Orion.Networking
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
         private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
-        private readonly List<PacketID> answeredPackets = new List<PacketID>();
+        private readonly List<PacketID> acknowledgedPackets = new List<PacketID>();
 
         private readonly Dictionary<PacketID, PacketSession> packetsToSend = new Dictionary<PacketID, PacketSession>();
 
@@ -207,10 +207,10 @@ namespace Orion.Networking
                             socketSemaphore.Release();
                         }
 
-                        lock (answeredPackets)
+                        lock (acknowledgedPackets)
                         {
-                            if (answeredPackets.Contains(id)) continue;
-                            answeredPackets.Add(id);
+                            if (acknowledgedPackets.Contains(id)) continue;
+                            acknowledgedPackets.Add(id);
                         }
 
                         lock (readyData)
@@ -417,7 +417,8 @@ namespace Orion.Networking
             udpSocket.Shutdown(SocketShutdown.Both);
             udpSocket.Close();
 
-            socketSemaphore.Release(2);
+            socketSemaphore.Release();
+            socketSemaphore.Release();
         }
 
         private void EnsureNotDisposed()

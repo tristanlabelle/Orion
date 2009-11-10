@@ -7,6 +7,7 @@ using System.Threading;
 using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
+using System.Windows.Forms;
 
 namespace Orion.Networking
 {
@@ -14,6 +15,14 @@ namespace Orion.Networking
     {
         Commands,
         Done
+    }
+
+    [Flags]
+    internal enum PeerState
+    {
+        None = 0,
+        ReceivedCommands = 1,
+        ReceivedDone = 2
     }
 
     public sealed class CommandSynchronizer : CommandFilter, IDisposable
@@ -28,9 +37,8 @@ namespace Orion.Networking
         private readonly GenericEventHandler<Transporter, NetworkEventArgs> transporterReceived;
         private readonly GenericEventHandler<Transporter, NetworkTimeoutEventArgs> transporterTimeout;
 
-        private readonly List<IPEndPoint> peers;
-        private readonly Dictionary<IPEndPoint, bool> receivedFromPeers = new Dictionary<IPEndPoint, bool>();
-        private readonly Dictionary<IPEndPoint, bool> peersCompleted = new Dictionary<IPEndPoint, bool>();
+        private readonly Dictionary<IPEndPoint, PeerState> peers
+            = new Dictionary<IPEndPoint, PeerState>();
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
@@ -43,23 +51,20 @@ namespace Orion.Networking
 
         #region Constructors
 
-        public CommandSynchronizer(World world, Transporter transporter, IEnumerable<IPEndPoint> peers)
+        public CommandSynchronizer(World world, Transporter transporter, IEnumerable<IPEndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");
-            Argument.EnsureNotNull(peers, "peers");
+            Argument.EnsureNotNull(peerEndPoints, "peerEndPoints");
 
             this.transporter = transporter;
-            this.peers = peers.ToList();
-            if (this.peers.Count == 0) throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
+            if (this.peers.Count == 0)
+                throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
             this.serializer = new CommandFactory(world);
 
-            foreach (IPEndPoint endpoint in peers)
-            {
-                receivedFromPeers[endpoint] = true;
-                peersCompleted[endpoint] = true;
-            }
+            foreach (IPEndPoint peerEndPoint in peerEndPoints)
+                peers.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
 
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
@@ -69,23 +74,17 @@ namespace Orion.Networking
             transporterTimeout = new GenericEventHandler<Transporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
             transporter.TimedOut += transporterTimeout;
         }
-
         #endregion
 
         #region Properties
-        private bool ReadyToContinue
-        {
-            get { return ReceivedFromAllPeers && AllPeersReady; }
-        }
-
         private bool ReceivedFromAllPeers
         {
-            get { return receivedFromPeers.Values.All(received => received); }
+            get { return peers.Values.All(state => (state | PeerState.ReceivedCommands) != 0); }
         }
 
-        private bool AllPeersReady
+        private bool AllPeersDone
         {
-            get { return peersCompleted.Values.All(completed => completed); }
+            get { return peers.Values.All(state => (state | PeerState.ReceivedDone) != 0); }
         }
         #endregion
 
@@ -114,8 +113,8 @@ namespace Orion.Networking
             if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
 
             // The order here is important because synchronizedCommands is accessed in both methods.
-            BeginSynchronizationOfAccumulatedCommands();
             FeedSynchronizedCommandsToRecipient();
+            BeginSynchronizationOfAccumulatedCommands();
 
             Recipient.EndFeed();
         }
@@ -143,7 +142,7 @@ namespace Orion.Networking
                     }
                 }
                 deadEntities.Clear();
-                transporter.SendTo(stream.ToArray(), peers);
+                transporter.SendTo(stream.ToArray(), peers.Keys);
             }
 
             synchronizedCommands.AddRange(accumulatedCommands);
@@ -154,10 +153,10 @@ namespace Orion.Networking
         #region Private
         private void WaitForPeerCommands()
         {
-            if (!ReadyToContinue)
+            if (!ReceivedFromAllPeers || !AllPeersDone)
             {
                 transporter.Poll();
-                while (!ReadyToContinue)
+                while (!ReceivedFromAllPeers || !AllPeersDone)
                 {
                     Thread.Sleep(0);
                     transporter.Poll();
@@ -167,11 +166,8 @@ namespace Orion.Networking
 
         private void ResetPeerStatuses()
         {
-            foreach (IPEndPoint peer in peers)
-            {
-                receivedFromPeers[peer] = false;
-                peersCompleted[peer] = false;
-            }
+            foreach (IPEndPoint peerEndPoint in peers.Keys)
+                peers[peerEndPoint] = PeerState.None;
         }
 
         private void TransporterReceived(Transporter source, NetworkEventArgs args)
@@ -180,24 +176,22 @@ namespace Orion.Networking
             if (messageType == (byte)GameMessageType.Commands)
             {
                 Deserialize(args.Data.Skip(1).ToArray());
-                receivedFromPeers[args.Host] = true;
+                peers[args.Host] |= PeerState.ReceivedCommands;
                 if (ReceivedFromAllPeers)
                 {
-                    transporter.SendTo(doneMessage, peers);
+                    transporter.SendTo(doneMessage, peers.Keys);
                 }
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                peersCompleted[args.Host] = true;
+                peers[args.Host] |= PeerState.ReceivedDone;
             }
         }
 
         private void TransporterTimedOut(Transporter source, NetworkTimeoutEventArgs args)
         {
-            Console.WriteLine("*** Lost connection to {0}", args.Host);
+            MessageBox.Show("Lost connection to {0}!".FormatInvariant(args.Host));
             peers.Remove(args.Host);
-            peersCompleted.Remove(args.Host);
-            receivedFromPeers.Remove(args.Host);
         }
 
         private void Deserialize(byte[] array)

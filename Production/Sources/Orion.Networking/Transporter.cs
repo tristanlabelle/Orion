@@ -255,8 +255,7 @@ namespace Orion.Networking
 
         #endregion
 
-        #region Threading methods
-
+        #region Receiver Thread
         private void ReceiverThread()
         {
             byte[] answer = new byte[5];
@@ -351,12 +350,14 @@ namespace Orion.Networking
                     socketSemaphore.Release();
                 }
             }
-
         }
+        #endregion
 
+        #region Sender Thread
         private void SenderThread()
         {
             List<PacketSession> trash = new List<PacketSession>();
+            List<PacketSession> sessions = new List<PacketSession>();
             while (true)
             {
                 if (isDisposed) break;
@@ -364,10 +365,10 @@ namespace Orion.Networking
 
                 try
                 {
-                    List<PacketSession> sessions;
+                    sessions.Clear();
                     lock (packetsToSend)
                     {
-                        sessions = packetsToSend.Values.ToList();
+                        sessions.AddRange(packetsToSend.Values);
                     }
 
                     foreach (PacketSession session in sessions)
@@ -391,9 +392,9 @@ namespace Orion.Networking
                     lock (packetsToSend)
                     {
                         foreach (PacketSession session in trash)
-                        {
                             packetsToSend.Remove(session.Id);
-                        }
+
+                        trash.Clear();
                     }
                 }
                 catch (SocketException e)
@@ -409,7 +410,6 @@ namespace Orion.Networking
                 Thread.Sleep(10);
             }
         }
-
         #endregion
 
         #endregion

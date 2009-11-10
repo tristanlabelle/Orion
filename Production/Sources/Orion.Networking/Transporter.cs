@@ -183,13 +183,13 @@ namespace Orion.Networking
             {
                 try
                 {
-                    IPEndPoint endPoint = WaitForConnection(packet);
+                    IPEndPoint endPoint = WaitForPacket(packet);
                     if (endPoint == null) break;
 
                     uint sessionID = BitConverter.ToUInt32(packet, 1);
                     PacketID id = new PacketID(endPoint, sessionID);
 
-                    if (packet[0] == (byte)PacketType.Acknowledgement)
+                    if (packet[0] == (byte)PacketType.Data)
                     {
                         // copy the session id
                         for (int i = 1; i < 5; i++)
@@ -243,7 +243,7 @@ namespace Orion.Networking
             }
         }
 
-        private IPEndPoint WaitForConnection(byte[] packet)
+        private IPEndPoint WaitForPacket(byte[] packet)
         {
             EndPoint endpoint = new IPEndPoint(0, 0);
 

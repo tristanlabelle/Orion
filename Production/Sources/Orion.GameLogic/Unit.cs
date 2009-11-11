@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
+using System.Collections.Generic; 
 
 namespace Orion.GameLogic
 {
@@ -44,6 +45,7 @@ namespace Orion.GameLogic
             this.type = type;
             this.faction = faction;
             this.position = position;
+            this.rallyPoint = SetDefaultRallyPoint(position);
         }
         #endregion
 
@@ -298,6 +300,41 @@ namespace Orion.GameLogic
         {
             this.Health = 0;
         }
+        private Vector2 SetDefaultRallyPoint(Vector2 startingPosition)
+        {
+            Vector2 newRallyPoint = new Vector2();
+            if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y))
+            {
+                if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y - 1))
+                {
+                    //Dispatch units South
+                    newRallyPoint.Y = startingPosition.Y - 1;
+                    newRallyPoint.X = startingPosition.X;
+                }
+                else if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y + 1))
+                {
+                    //Dispatch units North
+                    newRallyPoint.Y = startingPosition.Y + 1;
+                    newRallyPoint.X = startingPosition.X;
+                
+                }
+                else if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X + 1, (int)startingPosition.Y))
+                {
+                    //Dispatch units Est
+                    newRallyPoint.Y = startingPosition.Y;
+                    newRallyPoint.X = startingPosition.X + 1;
+                }
+                else
+                {
+                    //Dispatch units West
+                    newRallyPoint.Y = startingPosition.Y;
+                    newRallyPoint.X = startingPosition.X - 1;
+                }
+            }
+   
+            return newRallyPoint;
+        }
         #endregion
     }
 }
+

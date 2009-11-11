@@ -20,6 +20,9 @@ namespace Orion.Commandment
         private List<Circle> regions = new List<Circle>();
         private Random random;
         private List<ResourceNode> usedNodes = new List<ResourceNode>();
+        private bool extractorBuilt = false;
+        private ResourceNode alageneStartingNode;
+        private int costThreshold = 500;
         #endregion
 
         #region Contructors
@@ -69,19 +72,56 @@ namespace Orion.Commandment
             if (!baseStarted)
                 BuildBase();
 
-            if (!commandCenterBuilt && Faction.AladdiumAmount > 50)
-                BuildMainCommandCenter();
+            /*if (!commandCenterBuilt && Faction.AladdiumAmount > 50)
+                BuildMainCommandCenter();*/
 
-            if (Faction.AladdiumAmount >= 50 && hasBuilding)
+            if (Faction.AladdiumAmount >= 75 && !extractorBuilt)
             {
-                TrainUnits();
-                BuildFactories();
+                //BuildExtractor();
+                DispatchIdleHarvesters();
             }
 
-            if (commandCenterBuilt)
+            if (Faction.AladdiumAmount > 100 && Faction.AlageneAmount > 50)
             {
-                Attack();
+                BuildFactories();
+
                 DispatchIdleHarvesters();
+            }
+
+            if (Faction.AladdiumAmount > 20 && Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count < 15)
+            {
+                TrainUnits();
+
+                DispatchIdleHarvesters();
+            }
+
+            if (Faction.AladdiumAmount > costThreshold)
+            {
+                TrainUnits();
+
+                DispatchIdleHarvesters();
+            }
+
+            Attack();
+            
+        }
+
+        private void BuildExtractor()
+        {
+            ResourceNode alageneNode = FindIdealNode(ResourceType.Alagene);
+
+            List<Unit> builders = Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Build>() && unit.IsIdle).ToList();
+
+            if (builders.Count == 0)
+            {
+                builders = Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Build>() && unit.Task is Orion.GameLogic.Tasks.Harvest).ToList();
+            }
+
+            if (builders.Count > 0)
+            {
+                Build command = new Build(builders.First(), alageneNode.Position, World.UnitTypes.FromName("AlageneExtractor"));
+                GenerateCommand(command);
+                usedNodes.Add(alageneNode);
             }
         }
 
@@ -92,14 +132,21 @@ namespace Orion.Commandment
 
             if (harvesters.Count != 0)
             {
-                    node = FindIdealNode();
+                if (Faction.AlageneAmount == 0)
+                {
+                    node = alageneStartingNode;
+                }
+                else
+                {
+                    if (Faction.AladdiumAmount > Faction.AlageneAmount)
+                        node = alageneStartingNode;
+                    else
+                        node = startingNode;
+                }
 
                 if (node == null)
                     return;
-
-                usedNodes.Add(node);
             }
-            
 
             if (harvesters.Count != 0)
             {
@@ -109,11 +156,11 @@ namespace Orion.Commandment
 
         }
 
-        private ResourceNode FindIdealNode()
+        private ResourceNode FindIdealNode(ResourceType type)
         {
             ResourceNode bestNode = World.Entities.OfType<ResourceNode>().First();
 
-            foreach (ResourceNode node in World.Entities.OfType<ResourceNode>().Where(node => node.Type == ResourceType.Aladdium && !usedNodes.Contains(node)))
+            foreach (ResourceNode node in World.Entities.OfType<ResourceNode>().Where(node => node.Type == type && !usedNodes.Contains(node)))
             {
                 if (node != null)
                 {
@@ -156,7 +203,7 @@ namespace Orion.Commandment
         {
             List<Unit> builders = Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Build>() && !(unit.Task is Orion.GameLogic.Tasks.Build)).ToList();
 
-            for (int i = 0; i < builders.Count; i++)
+            if(builders.Count != 0)
             {
                 Vector2 position = new Vector2();
 
@@ -166,8 +213,16 @@ namespace Orion.Commandment
                     position.Y = random.Next((int)World.Bounds.Height);
                 } while (!World.Terrain.IsWalkable(position) || !World.IsWithinBounds(position));
 
-                Command command = new Build(builders.ElementAt(i), position, World.UnitTypes.FromName("Factory"));
+                Command command = new Build(builders.First(), position, World.UnitTypes.FromName("Factory"));
                 GenerateCommand(command);
+
+                int amountOfFactories = Faction.Units.Where(unit => unit.Type.Name == "Factory").ToList().Count;
+                int amountOfOtherUnits = Faction.Units.Where(unit => unit.Type.Name != "Factory").ToList().Count;
+
+                if (amountOfFactories * 12 <= amountOfOtherUnits)
+                    costThreshold = 300;
+                else
+                    costThreshold = 60;
             }
         }
 
@@ -185,15 +240,18 @@ namespace Orion.Commandment
                     World.UnitTypes.First(type => !type.IsBuilding && type.HasSkill<Skills.Attack>()), Faction);
                 GenerateCommand(command);
 
-                List<Unit> harvesterTrainer = new List<Unit>();
-                harvesterTrainer.Add(Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Train>()).First());
+                if (Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count <= 15)
+                {
+                    List<Unit> harvesterTrainer = new List<Unit>();
+                    harvesterTrainer.Add(Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Train>()).First());
 
-                Command harvesterTrainingCommand = new Train(harvesterTrainer, World.UnitTypes.FromName("Harvester"), Faction);
-                GenerateCommand(harvesterTrainingCommand);
+                    Command harvesterTrainingCommand = new Train(harvesterTrainer, World.UnitTypes.FromName("Harvester"), Faction);
+                    GenerateCommand(harvesterTrainingCommand);
+                }
             }
         }
 
-        private void DispatchHarvesters(ResourceNode node)
+        private void DispatchHarvesters(ResourceNode node, ResourceNode alageneNode)
         {
             List<Unit> harvesters = Faction.Units
                 .Where(unit => unit.Type.HasSkill<Skills.Harvest>())
@@ -204,6 +262,12 @@ namespace Orion.Commandment
                 Command command = new Harvest(Faction, harvesters, node);
                 GenerateCommand(command);
                 baseStarted = true;
+
+                List<Unit> alageneHarvesters = new List<Unit>();
+                alageneHarvesters.Add(harvesters.First());
+
+                Harvest command2 = new Harvest(Faction, alageneHarvesters, alageneNode);
+                GenerateCommand(command2);
             }
         }
 
@@ -247,7 +311,7 @@ namespace Orion.Commandment
             //All units will meet near an Alladium node to start a base there
             Meet();
             //The AI then dispatches Harvesting units to start gathering resources from that node
-            DispatchHarvesters(startingNode);
+            DispatchHarvesters(startingNode, alageneStartingNode);
         }
 
         private void BuildMainCommandCenter()
@@ -269,9 +333,11 @@ namespace Orion.Commandment
 
         private void Meet()
         {
-            startingNode = FindIdealNode();
+            startingNode = FindIdealNode(ResourceType.Aladdium);
+            alageneStartingNode = FindIdealNode(ResourceType.Alagene);
 
             usedNodes.Add(startingNode);
+            usedNodes.Add(alageneStartingNode);
             
             regions.Add(new Circle(startingNode.Position, 10));
 

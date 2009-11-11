@@ -77,7 +77,7 @@ namespace Orion.Commandment
 
             if (Faction.AladdiumAmount >= 75 && !extractorBuilt)
             {
-                //BuildExtractor();
+                BuildExtractor();
                 DispatchIdleHarvesters();
             }
 
@@ -88,7 +88,7 @@ namespace Orion.Commandment
                 DispatchIdleHarvesters();
             }
 
-            if (Faction.AladdiumAmount > 20 && Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count < 15)
+            if (Faction.AladdiumAmount > 20 && Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count < 15 && extractorBuilt)
             {
                 TrainUnits();
 
@@ -108,7 +108,7 @@ namespace Orion.Commandment
 
         private void BuildExtractor()
         {
-            ResourceNode alageneNode = FindIdealNode(ResourceType.Alagene);
+            ResourceNode alageneNode = alageneStartingNode;
 
             List<Unit> builders = Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Build>() && unit.IsIdle).ToList();
 
@@ -122,6 +122,7 @@ namespace Orion.Commandment
                 Build command = new Build(builders.First(), alageneNode.Position, World.UnitTypes.FromName("AlageneExtractor"));
                 GenerateCommand(command);
                 usedNodes.Add(alageneNode);
+                extractorBuilt = true;
             }
         }
 
@@ -249,6 +250,14 @@ namespace Orion.Commandment
                     GenerateCommand(harvesterTrainingCommand);
                 }
             }
+
+            int amountOfFactories = Faction.Units.Where(unit => unit.Type.Name == "Factory").ToList().Count;
+            int amountOfOtherUnits = Faction.Units.Where(unit => unit.Type.Name != "Factory").ToList().Count;
+
+            if (amountOfFactories * 12 <= amountOfOtherUnits)
+                costThreshold = 300;
+            else
+                costThreshold = 60;
         }
 
         private void DispatchHarvesters(ResourceNode node, ResourceNode alageneNode)

@@ -53,6 +53,11 @@ namespace Orion.Networking
             return Equals((SafePacketID)obj);
         }
 
+        public override int GetHashCode()
+        {
+            return (int)sessionID;
+        }
+
         public override string ToString()
         {
             return "#{0} to host {1}".FormatInvariant(sessionID, remoteHost);

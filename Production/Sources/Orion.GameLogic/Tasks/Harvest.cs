@@ -53,6 +53,11 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         public override void Update(float timeDelta)
         {
+            if (!node.IsHarvestableByFaction(harvester.Faction))
+            {
+                hasEnded = true;
+                return;
+            }
             if (move.HasEnded)
             {
                 if (extractingOrDelivering) //true = extracting, false = delivering

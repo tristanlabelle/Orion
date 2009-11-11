@@ -155,6 +155,15 @@ namespace Orion.GameLogic
         {
             Unit unit = world.Entities.CreateUnit(type, this, position);
 
+            if (type.HasSkill<Skills.ExtractAlagene>())
+            {
+                ResourceNode alageneNode = World.Entities
+                                .OfType<ResourceNode>()
+                                .First(node => node.Position == position
+                                && node.Type == ResourceType.Alagene);
+
+                alageneNode.Extractor = unit;
+            }
             unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);

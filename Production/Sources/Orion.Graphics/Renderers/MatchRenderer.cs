@@ -76,9 +76,9 @@ namespace Orion.Graphics
 
             minimap.VisibleRect = context.CoordinateSystem;
             worldRenderer.DrawTerrain(context);
-            selectionRenderer.DrawSelectionMarkers(context);
             worldRenderer.DrawResources(context);
             worldRenderer.DrawUnits(context);
+            selectionRenderer.DrawSelectionMarkers(context);
 
             if (inputManager.SelectionManager.HoveredUnit != null)
             {

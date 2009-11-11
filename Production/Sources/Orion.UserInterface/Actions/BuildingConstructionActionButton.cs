@@ -27,7 +27,10 @@ namespace Orion.UserInterface.Actions
 
             public override void Execute(Entity entity)
             {
-                // todo: don't silently fail
+                if (entity is ResourceNode && buildingType.HasSkill<Skills.ExtractAlagene>())
+                    if (((ResourceNode)entity).Type == ResourceType.Alagene)
+                        inputManager.LaunchBuild(((ResourceNode)entity).Position, buildingType);
+
             }
 
             public override void Execute(Vector2 at)

@@ -27,7 +27,18 @@ namespace Orion.UserInterface.Actions.Enablers
 
             public override void Execute(Entity entity)
             {
-                if (entity is ResourceNode) inputManager.LaunchHarvest((ResourceNode)entity);
+                if (entity is ResourceNode) 
+                    inputManager.LaunchHarvest((ResourceNode)entity);
+                else
+                    if(entity is Unit)
+                    if (((Unit)entity).HasSkill<Skills.ExtractAlagene>())
+                    {
+                        ResourceNode alageneNode = inputManager.Commander.Faction.World.Entities
+                            .OfType<ResourceNode>()
+                            .First(node => node.Position == ((Unit)entity).Position);
+                        if (alageneNode.IsHarvestableByFaction(inputManager.Commander.Faction))
+                            inputManager.LaunchHarvest(alageneNode);
+                    }
             }
 
             public override void Execute(Vector2 point)

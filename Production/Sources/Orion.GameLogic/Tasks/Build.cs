@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
@@ -31,6 +32,23 @@ namespace Orion.GameLogic.Tasks
             this.buildingType = buildingType;
             this.buildPosition = buildPosition;
             this.move = new Move(builder, this.buildPosition);
+
+            if (buildingType.HasSkill<Skills.ExtractAlagene>())
+            {
+                ResourceNode alageneNode = builder.World.Entities
+                            .OfType<ResourceNode>()
+                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(buildPosition)
+                            && node.Type == ResourceType.Alagene);
+
+                bool extractorAlreadyThere = builder.World.Entities
+                    .OfType<Unit>()
+                    .Any(unit => unit.BoundingRectangle.ContainsPoint(buildPosition));
+
+                if (!extractorAlreadyThere && alageneNode != null)
+                    buildPosition = alageneNode.Position;
+                else
+                    hasEnded = true;
+            }
         }
         #endregion
 

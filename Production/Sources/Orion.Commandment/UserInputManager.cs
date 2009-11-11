@@ -204,12 +204,27 @@ namespace Orion.Commandment
             {
                 // TODO: implement friendliness checks more elaborate than this
                 Unit intersectedUnit = (Unit)intersectedEntity;
-                if (intersectedUnit.Faction == commander.Faction) LaunchMove(intersectedUnit.Position);
+                if (intersectedUnit.Faction == commander.Faction)
+                {
+                    if (intersectedUnit.HasSkill<Skills.ExtractAlagene>())
+                    {
+                        ResourceNode alageneNode = World.Entities
+                            .OfType<ResourceNode>()
+                            .First(node => node.Position == intersectedUnit.Position);
+                        if(alageneNode.IsHarvestableByFaction(this.Faction))
+                            LaunchHarvest(alageneNode);
+                    }
+                    else
+                        LaunchMove(intersectedUnit.Position);
+                }
                 else LaunchAttack(intersectedUnit);
             }
             else if (intersectedEntity is ResourceNode)
             {
-                LaunchHarvest((ResourceNode)intersectedEntity);
+                if (((ResourceNode)intersectedEntity).IsHarvestableByFaction(this.Faction))
+                    LaunchHarvest((ResourceNode)intersectedEntity);
+                else
+                    LaunchMove(((ResourceNode)intersectedEntity).Position);
             }
             else
             {

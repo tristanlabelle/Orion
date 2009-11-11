@@ -19,6 +19,7 @@ namespace Orion.GameLogic
         private readonly int totalAmount;
         private readonly Vector2 position;
         private int amountRemaining;
+        private Unit extractor = null;
         #endregion
 
         #region Constructors
@@ -62,10 +63,16 @@ namespace Orion.GameLogic
             get { return Rectangle.FromCenterSize(position.X, position.Y, Width, Height); }
         }
 
-        public bool IsHarvestable
+        public Unit Extractor
         {
-            get { return type == ResourceType.Alagene; }
+            get { return extractor; }
+            set 
+            { 
+                extractor = value;
+                extractor.Died += new GenericEventHandler<Entity>(ExtractorDied);
+            }
         }
+
         #endregion
 
         #region Methods
@@ -90,6 +97,30 @@ namespace Orion.GameLogic
         {
             return "#{0} {1} node".FormatInvariant(ID, type);
         }
+
+        public bool IsHarvestableByFaction(Faction faction)
+        {
+            if (type == ResourceType.Alagene)
+            {
+                if (extractor == null)
+                    return false;
+                else
+                {
+                    if (extractor.Faction == faction)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            else
+                return true;
+        }
+
+        private void ExtractorDied(Entity sender)
+        {
+            extractor = null;
+        }
+
         #endregion
     }
 }

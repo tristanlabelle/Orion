@@ -42,14 +42,16 @@ namespace Orion.Graphics
         private readonly Dictionary<string, LinePath> typeShapes = new Dictionary<string, LinePath>();
         private readonly LinePath defaultShape = LinePath.Circle;
         private bool drawHealthBars;
+        private FogOfWar fogOfWar;
         #endregion
 
         #region Constructors
-        public UnitsRenderer(World world)
+        public UnitsRenderer(World world, FogOfWar fogOfWar)
         {
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
+            this.fogOfWar = fogOfWar;
             SetTypeShape("Harvester", LinePath.Circle);
             SetTypeShape("Builder", LinePath.Diamond);
             SetTypeShape("MeleeAttacker", LinePath.Triangle);
@@ -110,8 +112,11 @@ namespace Orion.Graphics
             Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                context.FillColor = unit.Faction.Color;
-                context.Fill(unitRect.TranslatedBy(unit.Position));
+                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+                {
+                    context.FillColor = unit.Faction.Color;
+                    context.Fill(unitRect.TranslatedBy(unit.Position));
+                }
             }
         }
 
@@ -119,26 +124,29 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                string unitTypeName = unit.Type.Name;
-
-                LinePath shape;
-                if (!typeShapes.TryGetValue(unitTypeName, out shape))
-                    shape = defaultShape;
-
-                if (unit.Faction == null) graphics.StrokeColor = Color.White;
-                else graphics.StrokeColor = unit.Faction.Color;
-
-                if (unit.Faction == null) graphics.FillColor = Color.White;
-                else graphics.FillColor = unit.Faction.Color;
-
-                using (graphics.Transform(new Transform(unit.Position, unit.Angle, unit.BoundingRectangle.Size)))
+                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
                 {
-                    graphics.Stroke(shape, Vector2.Zero);
-                }
+                    string unitTypeName = unit.Type.Name;
 
-                if (DrawHealthBars)
-                {
-                    DrawHealthBar(graphics, unit);
+                    LinePath shape;
+                    if (!typeShapes.TryGetValue(unitTypeName, out shape))
+                        shape = defaultShape;
+
+                    if (unit.Faction == null) graphics.StrokeColor = Color.White;
+                    else graphics.StrokeColor = unit.Faction.Color;
+
+                    if (unit.Faction == null) graphics.FillColor = Color.White;
+                    else graphics.FillColor = unit.Faction.Color;
+
+                    using (graphics.Transform(new Transform(unit.Position, unit.Angle, unit.BoundingRectangle.Size)))
+                    {
+                        graphics.Stroke(shape, Vector2.Zero);
+                    }
+
+                    if (DrawHealthBars)
+                    {
+                        DrawHealthBar(graphics, unit);
+                    }
                 }
             }
         }
@@ -149,7 +157,10 @@ namespace Orion.Graphics
             float y = unit.BoundingRectangle.CenterY + unit.BoundingRectangle.Height * 0.75f;
             float x = unit.BoundingRectangle.CenterX - healthbarWidth / 2f;
 
-            DrawHealthBar(context, unit, new Vector2(x, y));
+            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+            {
+                DrawHealthBar(context, unit, new Vector2(x, y));
+            }
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit, Vector2 origin)
@@ -157,7 +168,10 @@ namespace Orion.Graphics
             float healthbarWidth = unit.MaxHealth * 0.1f;
             float leftHealthWidth = unit.Health * 0.1f;
 
-            DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
+            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+            {
+                DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
+            }
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit, Rectangle into)
@@ -165,22 +179,25 @@ namespace Orion.Graphics
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            if (unit.Health > unit.MaxHealth / 2)
+            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
             {
-                float lifeFraction = (unit.Health - unit.MaxHealth / 2f) / (unit.MaxHealth / 2f);
-                context.FillColor = Interpolate(middleLifeColor, fullLifeColor, lifeFraction);
-            }
-            else
-            {
-                float lifeFraction = unit.Health / (unit.MaxHealth / 2f);
-                context.FillColor = Interpolate(lowLifeColor, middleLifeColor, lifeFraction);
-            }
+                if (unit.Health > unit.MaxHealth / 2)
+                {
+                    float lifeFraction = (unit.Health - unit.MaxHealth / 2f) / (unit.MaxHealth / 2f);
+                    context.FillColor = Interpolate(middleLifeColor, fullLifeColor, lifeFraction);
+                }
+                else
+                {
+                    float lifeFraction = unit.Health / (unit.MaxHealth / 2f);
+                    context.FillColor = Interpolate(lowLifeColor, middleLifeColor, lifeFraction);
+                }
 
-            Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
-            context.Fill(lifeRect);
-            Rectangle damageRect = new Rectangle(origin.X + leftHealthWidth, origin.Y, into.Width - leftHealthWidth, into.Height);
-            context.FillColor = Color.DarkGray;
-            context.Fill(damageRect);
+                Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
+                context.Fill(lifeRect);
+                Rectangle damageRect = new Rectangle(origin.X + leftHealthWidth, origin.Y, into.Width - leftHealthWidth, into.Height);
+                context.FillColor = Color.DarkGray;
+                context.Fill(damageRect);
+            }
         }
 
         private void DrawPaths(GraphicsContext graphics)

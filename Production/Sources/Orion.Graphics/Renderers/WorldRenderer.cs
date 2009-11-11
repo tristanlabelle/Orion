@@ -33,7 +33,7 @@ namespace Orion.Graphics
 
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
-            this.unitRenderer = new UnitsRenderer(world);
+            this.unitRenderer = new UnitsRenderer(world, fogOfWar);
             this.fogOfWarRenderer = new FogOfWarRenderer(fogOfWar);
         }
         #endregion

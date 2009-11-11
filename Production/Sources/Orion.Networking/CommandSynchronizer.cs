@@ -30,7 +30,6 @@ namespace Orion.Networking
         #region Fields
         #region Static
         private const int frameModulo = 6;
-        private static readonly byte[] doneMessage = { (byte)GameMessageType.Done };
         #endregion
 
         private readonly SafeTransporter transporter;
@@ -48,6 +47,9 @@ namespace Orion.Networking
         private readonly CommandFactory serializer;
 
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
+        // The number of update frame and not the number of command frame
+        private int frameNumber;
+        private List<NetworkEventArgs> futuresCommands = new List<NetworkEventArgs>();
         #endregion
 
         #region Constructors
@@ -98,6 +100,7 @@ namespace Orion.Networking
             {
                 WaitForPeerCommands();
                 ResetPeerStates();
+                this.frameNumber = frameNumber;
                 Flush();
             }
         }
@@ -124,6 +127,16 @@ namespace Orion.Networking
         private void FeedSynchronizedCommandsToRecipient()
         {
             // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
+            for (int i = (futuresCommands.Count - 1); i >= 0;--i)
+            {
+                NetworkEventArgs command = futuresCommands.ElementAt(i);
+                int frameOfCurrentCommand = BitConverter.ToInt32(command.Data, 1);
+                if (frameOfCurrentCommand == frameNumber)
+                {
+                    DeserializeGameMessage(command);
+                    futuresCommands.RemoveAt(i);
+                }
+            }
             synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
             foreach (Command command in synchronizedCommands)
                 Recipient.Feed(command);
@@ -137,6 +150,7 @@ namespace Orion.Networking
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
                     writer.Write((byte)GameMessageType.Commands);
+                    writer.Write(frameNumber);
                     foreach (Command accumulatedCommand in accumulatedCommands)
                     {
                         if (accumulatedCommand.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
@@ -174,11 +188,26 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
+            
+            int receviedFrameNumber = BitConverter.ToInt32(args.Data, 1);
+            
+            if (receviedFrameNumber > frameNumber)
+            {
+                futuresCommands.Add(args);
+            }
+            else if (receviedFrameNumber == frameNumber)
+            {
+                DeserializeGameMessage(args);
+            }
+        }
+
+        private void DeserializeGameMessage(NetworkEventArgs args)
+        {
             byte messageType = args.Data[0];
             PeerState oldPeerState = peerStates[args.Host];
             if (messageType == (byte)GameMessageType.Commands)
             {
-                Deserialize(args.Data.Skip(1).ToArray());
+                Deserialize(args.Data.Skip(1 + sizeof(Int32)).ToArray());
 
                 if ((oldPeerState & PeerState.ReceivedCommands) != 0)
                     throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
@@ -186,6 +215,10 @@ namespace Orion.Networking
 
                 if (ReceivedFromAllPeers)
                 {
+                    byte[] doneMessage = new byte[5];
+                    doneMessage[0] = (byte) GameMessageType.Done;
+                    BitConverter.GetBytes(frameNumber).CopyTo(doneMessage,1);
+                    
                     transporter.SendTo(doneMessage, peerEndPoints);
                 }
             }

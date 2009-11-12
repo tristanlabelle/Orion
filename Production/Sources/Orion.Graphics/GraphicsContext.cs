@@ -179,7 +179,7 @@ namespace Orion.Graphics
                 Vector2 unitCirclePoint = unitCirclePoints[i];
                 float x = ellipse.Center.X + unitCirclePoint.X * ellipse.Radii.X;
                 float y = ellipse.Center.Y + unitCirclePoint.Y * ellipse.Radii.Y;
-                GL.Vertex2(x, y);
+                DrawVertex(x, y);
             }
         }
         #endregion
@@ -213,10 +213,10 @@ namespace Orion.Graphics
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
-            GL.Vertex2(rectangle.MinX, rectangle.MinY);
-            GL.Vertex2(rectangle.MinX, rectangle.MaxY);
-            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
-            GL.Vertex2(rectangle.MaxX, rectangle.MinY);
+            DrawVertex(rectangle.MinX, rectangle.MinY);
+            DrawVertex(rectangle.MinX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
         }
         #endregion
 
@@ -249,9 +249,9 @@ namespace Orion.Graphics
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
-            GL.Vertex2(triangle.Vertex1);
-            GL.Vertex2(triangle.Vertex2);
-            GL.Vertex2(triangle.Vertex3);
+            DrawVertex(triangle.Vertex1);
+            DrawVertex(triangle.Vertex2);
+            DrawVertex(triangle.Vertex3);
         }
         #endregion
 
@@ -278,7 +278,7 @@ namespace Orion.Graphics
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             foreach (Vector2 point in points)
-                GL.Vertex2(point);
+                DrawVertex(point);
         }
 
         /// <summary>
@@ -300,8 +300,8 @@ namespace Orion.Graphics
 
             foreach (LineSegment lineSegment in lineSegments)
             {
-                GL.Vertex2(lineSegment.EndPoint1 + position);
-                GL.Vertex2(lineSegment.EndPoint2 + position);
+                DrawVertex(lineSegment.EndPoint1 + position);
+                DrawVertex(lineSegment.EndPoint2 + position);
             }
         }
         #endregion
@@ -366,13 +366,13 @@ namespace Orion.Graphics
 
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(0, 0);
-            GL.Vertex2(rectangle.MinX, rectangle.MinY);
+            DrawVertex(rectangle.MinX, rectangle.MinY);
             GL.TexCoord2(0, 1);
-            GL.Vertex2(rectangle.MinX, rectangle.MaxY);
+            DrawVertex(rectangle.MinX, rectangle.MaxY);
             GL.TexCoord2(1, 1);
-            GL.Vertex2(rectangle.MaxX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(1, 0);
-            GL.Vertex2(rectangle.MaxX, rectangle.MinY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
             GL.End();
 
             if (texture.HasAlphaChannel) GL.Disable(EnableCap.Blend);
@@ -387,6 +387,20 @@ namespace Orion.Graphics
         #endregion
 
         #region Non-Public
+        private void DrawVertex(Vector2 vector)
+        {
+            GL.Vertex2(vector);
+        }
+
+        private void DrawVertex(float x, float y)
+        {
+            // A profile session and some reflection found out that OpenTK
+            // does locking and sanity checks on GL.Vertex2(float, float),
+            // but not on GL.Vertex2(Vector2), so we can save performance
+            // by calling that overload instead. Silly huh?
+            DrawVertex(new Vector2(x, y));
+        }
+
         /// <summary>
         /// Commits any changes to <see cref="FillColor"/> to OpenGL.
         /// </summary>

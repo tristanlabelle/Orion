@@ -23,6 +23,7 @@ namespace Orion.Commandment
         private bool extractorBuilt = false;
         private ResourceNode alageneStartingNode;
         private int costThreshold = 500;
+        private List<Unit> allUnits = new List<Unit>();
         #endregion
 
         #region Contructors
@@ -57,53 +58,50 @@ namespace Orion.Commandment
 
         public override void Update(float timeDelta)
         {
-            foreach (Unit unit in Faction.Units)
+            allUnits = Faction.Units.ToList();
+
+            int[] proportions = Evaluate();
+
+            int alageneHarvesters = proportions[0];
+            int harvesterTrainers = proportions[1];
+            int factoryBuilders = proportions[2];
+            int extractorBuilders = proportions[3];
+
+            List<Unit> harvesters = allUnits.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList();
+            List<Unit> builders = allUnits.Where(unit => unit.Type.HasSkill<Skills.Build>()).ToList();
+            List<Unit> trainers = allUnits.Where(unit => unit.Type.HasSkill<Skills.Train>()).ToList();
+
+            for (int i = 0; i < (harvesters.Count - alageneHarvesters); i++)
             {
-                if (unit.Type.IsBuilding)
+                if(harvesters.ElementAt(i).Task.Description == "harvesting Alagene")
                 {
-                    hasBuilding = true;
-                    break; 
+                    //Harvest command = new Harvest(Faction, harvesters.ElementAt(i), startingNode);
                 }
-                else
-                    hasBuilding = false;
             }
+        }
 
-            //When no base has been started, start one
-            if (!baseStarted)
-                BuildBase();
+        private int [] Evaluate()
+        {
+            int[] proportions = new int[4];
+            proportions[0] = 0;
+            proportions[1] = 0;
+            proportions[2] = 0;
+            proportions[3] = 0;
 
-            /*if (!commandCenterBuilt && Faction.AladdiumAmount > 50)
-                BuildMainCommandCenter();*/
-
-            if (Faction.AladdiumAmount >= 75 && !extractorBuilt)
+            if (!extractorBuilt)
             {
-                BuildExtractor();
-                DispatchIdleHarvesters();
+                proportions[3] = 1;
             }
-
-            if (Faction.AladdiumAmount > 100 && Faction.AlageneAmount > 50)
+            else
             {
-                BuildFactories();
-
-                DispatchIdleHarvesters();
+                proportions[0] = (int)Math.Ceiling((double)((allUnits.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count) / 4));
             }
 
-            if (Faction.AladdiumAmount > 20 && Faction.Units.Where(unit => unit.Type.HasSkill<Skills.Harvest>()).ToList().Count < 15 && extractorBuilt)
-            {
-                TrainUnits();
+            proportions[2] = allUnits.Where(unit => unit.HasSkill<Skills.Harvest>()).ToList().Count - proportions[3];
 
-                DispatchIdleHarvesters();
-            }
+            proportions[1] = 1;
 
-            if (Faction.AladdiumAmount > costThreshold)
-            {
-                TrainUnits();
-
-                DispatchIdleHarvesters();
-            }
-
-            Attack();
-            
+            return proportions;
         }
 
         private void BuildExtractor()
@@ -136,13 +134,20 @@ namespace Orion.Commandment
                 if (Faction.AlageneAmount == 0)
                 {
                     node = alageneStartingNode;
+                    Console.WriteLine("pas d'alagene");
                 }
                 else
                 {
                     if (Faction.AladdiumAmount > Faction.AlageneAmount)
+                    {
                         node = alageneStartingNode;
+                        Console.WriteLine("pas d'alagene2");
+                    }
                     else
+                    {
                         node = startingNode;
+                        Console.WriteLine("alagene");
+                    }
                 }
 
                 if (node == null)
@@ -153,6 +158,7 @@ namespace Orion.Commandment
             {
                 Harvest command = new Harvest(Faction, harvesters, node);
                 GenerateCommand(command);
+                Console.WriteLine("commande creee");
             }
 
         }

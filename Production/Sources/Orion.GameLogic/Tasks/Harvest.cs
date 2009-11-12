@@ -42,7 +42,7 @@ namespace Orion.GameLogic.Tasks
         #region Properties
         public override string Description
         {
-            get { return "harvesting"; }
+            get { return "harvesting " + node.Type; }
         }
         public override bool HasEnded
         {

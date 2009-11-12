@@ -71,13 +71,13 @@ namespace Orion.Commandment
             List<Unit> builders = allUnits.Where(unit => unit.Type.HasSkill<Skills.Build>()).ToList();
             List<Unit> trainers = allUnits.Where(unit => unit.Type.HasSkill<Skills.Train>()).ToList();
 
-            for (int i = 0; i < (harvesters.Count - alageneHarvesters); i++)
-            {
-                if(harvesters.ElementAt(i).Task.Description == "harvesting Alagene")
-                {
-                    //Harvest command = new Harvest(Faction, harvesters.ElementAt(i), startingNode);
-                }
-            }
+            //for (int i = 0; i < (harvesters.Count - alageneHarvesters); i++)
+            //{
+            //    if(harvesters.ElementAt(i).Task.Description == "harvesting Alagene")
+            //    {
+            //        Harvest command = new Harvest(Faction, harvesters.ElementAt(i), startingNode);
+            //    }
+            //}
         }
 
         private int [] Evaluate()

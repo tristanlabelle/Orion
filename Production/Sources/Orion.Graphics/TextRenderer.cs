@@ -13,24 +13,28 @@ using SysGraphics = System.Drawing.Graphics;
 
 namespace Orion.Graphics
 {
-    public sealed class TextRenderer
+    public sealed class TextRenderer : IDisposable
     {
         #region Fields
+        private readonly Dictionary<char, Rectangle> characterTextureRectangles
+            = new Dictionary<char, Rectangle>();
         private readonly Texture texture;
         #endregion
 
         #region Constructors
         public TextRenderer()
         {
-            using (Bitmap fontImage = new Bitmap(128, 128, PixelFormat.Format32bppArgb))
+            using (Bitmap fontImage = new Bitmap(256, 256, PixelFormat.Format32bppArgb))
             {
                 using (SysGraphics graphics = SysGraphics.FromImage(fontImage))
                 {
+                    graphics.Clear(Color.Black);
+
                     using (Font font = new Font("Calibri", 16, GraphicsUnit.Pixel))
                     {
                         Vector2 position = Vector2.Zero;
                         float maxHeight = 0;
-                        for (char character = 'A'; character < 'Z'; ++character)
+                        for (char character = ' '; character < (char)126; ++character)
                         {
                             string characterString = character.ToString();
                             SizeF characterSizeF = graphics.MeasureString(characterString, font);
@@ -41,15 +45,21 @@ namespace Orion.Graphics
                                 position.Y += font.Height;
                             }
 
+                            Rectangle characterTextureRectangle = new Rectangle(
+                                position.X / fontImage.Width,
+                                position.Y / fontImage.Height,
+                                characterSizeF.Width / fontImage.Width,
+                                characterSizeF.Height / fontImage.Height);
+                            characterTextureRectangles.Add(character, characterTextureRectangle);
+
                             graphics.DrawString(characterString, font, Brushes.White, position.X, position.Y);
                             position.X += characterSizeF.Width;
                         }
                     }
-
-                    graphics.Flush(System.Drawing.Drawing2D.FlushIntention.Flush);
                 }
 
-                fontImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                //fontImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                fontImage.Save("foo.bmp");
 
                 const int pixelSizeInBytes = 4;
                 byte[] pixelData = new byte[fontImage.Width * fontImage.Height * pixelSizeInBytes];
@@ -103,9 +113,24 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public void DrawString(GraphicsContext graphics)
+        public void DrawString(GraphicsContext graphics, string text)
         {
-            graphics.Fill(new Rectangle(0, 0, 10, 10), texture);
+            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(text, "text");
+
+            float x = 0;
+            foreach (char character in text)
+            {
+                Rectangle textureRectangle = characterTextureRectangles[character];
+                Rectangle rectangle = new Rectangle(x, 0, textureRectangle.Width * 100, textureRectangle.Height * 100);
+                graphics.Fill(rectangle, texture, textureRectangle);
+                x += textureRectangle.Width * 100;
+            }
+        }
+
+        public void Dispose()
+        {
+            texture.Dispose();
         }
 
         private static string GetStringFromCharacterRange(char first, char last)

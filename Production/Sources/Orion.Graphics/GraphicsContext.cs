@@ -350,7 +350,7 @@ namespace Orion.Graphics
         #endregion
 
         #region Textured
-        public void Fill(Rectangle rectangle, Texture texture, Color modulation)
+        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle, Color modulation)
         {
             Argument.EnsureNotNull(texture, "texture");
 
@@ -365,13 +365,13 @@ namespace Orion.Graphics
             }
 
             GL.Begin(BeginMode.Quads);
-            GL.TexCoord2(0, 0);
+            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            GL.TexCoord2(0, 1);
+            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
             DrawVertex(rectangle.MinX, rectangle.MaxY);
-            GL.TexCoord2(1, 1);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
             DrawVertex(rectangle.MaxX, rectangle.MaxY);
-            GL.TexCoord2(1, 0);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
             DrawVertex(rectangle.MaxX, rectangle.MinY);
             GL.End();
 
@@ -379,9 +379,19 @@ namespace Orion.Graphics
             GL.Disable(EnableCap.Texture2D);
         }
 
+        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle)
+        {
+            Fill(rectangle, texture, textureRectangle, Color.White);
+        }
+
+        public void Fill(Rectangle rectangle, Texture texture, Color modulation)
+        {
+            Fill(rectangle, texture, Rectangle.Unit, modulation);
+        }
+
         public void Fill(Rectangle rectangle, Texture texture)
         {
-            Fill(rectangle, texture, Color.White);
+            Fill(rectangle, texture, Rectangle.Unit, Color.White);
         }
         #endregion
         #endregion

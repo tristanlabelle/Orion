@@ -482,6 +482,11 @@ namespace Orion.Geometry
         /// An empty rectangle (origin, width and height are all zeroed).
         /// </summary>
         public static readonly Rectangle Empty = new Rectangle(0, 0, 0, 0);
+
+        /// <summary>
+        /// An unit square (zero min, sizes of one).
+        /// </summary>
+        public static readonly Rectangle Unit = new Rectangle(0, 0, 1, 1);
         #endregion
 
         #region Methods

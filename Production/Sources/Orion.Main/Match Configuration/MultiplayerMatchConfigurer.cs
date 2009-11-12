@@ -9,7 +9,7 @@ namespace Orion.Main
     abstract class MultiplayerMatchConfigurer : MatchConfigurer
     {
         protected SafeTransporter transporter;
-        protected IEnumerable<IPEndPoint> peers;
+        protected IEnumerable<Ipv4EndPoint> peerEndPoints;
 
         public MultiplayerMatchConfigurer(SafeTransporter transporter)
         {
@@ -22,7 +22,7 @@ namespace Orion.Main
         public override Match Start()
         {
             CreateMap();
-            CommandPipeline pipeline = new MultiplayerCommandPipeline(world, transporter, peers);
+            CommandPipeline pipeline = new MultiplayerCommandPipeline(world, transporter, peerEndPoints);
             UserInputCommander userCommander;
             AssignFactions(out userCommander);
             userCommander.AddToPipeline(pipeline);

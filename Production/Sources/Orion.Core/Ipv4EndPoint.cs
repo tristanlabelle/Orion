@@ -4,7 +4,7 @@ using System.Net;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace Orion.Networking
+namespace Orion
 {
     /// <summary>
     /// Represents an end point of an IPV4 connection.
@@ -48,23 +48,23 @@ namespace Orion.Networking
         /// <summary>
         /// Initializes a new <see cref="Ipv4EndPoint"/> from the octets of its address and a port number.
         /// </summary>
-        /// <param name="x">The first octet of the address.</param>
-        /// <param name="y">The second octet of the address.</param>
-        /// <param name="z">The third octet of the address.</param>
-        /// <param name="w">The fourth octet of the address.</param>
+        /// <param name="w">The first octet of the address.</param>
+        /// <param name="x">The second octet of the address.</param>
+        /// <param name="y">The third octet of the address.</param>
+        /// <param name="z">The fourth octet of the address.</param>
         /// <param name="port">The port of the end point.</param>
-        public Ipv4EndPoint(byte x, byte y, byte z, byte w, ushort port)
+        public Ipv4EndPoint(byte w, byte x, byte y, byte z, ushort port)
             : this(new Ipv4Address(x, y, z, w), port) { }
 
         /// <summary>
         /// Initializes a new <see cref="Ipv4EndPoint"/> from the octets of its address and a port number.
         /// </summary>
-        /// <param name="x">The first octet of the address.</param>
-        /// <param name="y">The second octet of the address.</param>
-        /// <param name="z">The third octet of the address.</param>
-        /// <param name="w">The fourth octet of the address.</param>
+        /// <param name="w">The first octet of the address.</param>
+        /// <param name="x">The second octet of the address.</param>
+        /// <param name="y">The third octet of the address.</param>
+        /// <param name="z">The fourth octet of the address.</param>
         /// <param name="port">The port of the end point.</param>
-        public Ipv4EndPoint(byte x, byte y, byte z, byte w, int port)
+        public Ipv4EndPoint(byte w, byte x, byte y, byte z, int port)
             : this(new Ipv4Address(x, y, z, w), port) { }
         #endregion
 
@@ -102,6 +102,26 @@ namespace Orion.Networking
         public IPEndPoint ToIPEndPoint()
         {
             return new IPEndPoint(address, port);
+        }
+
+        /// <summary>
+        /// Copies the bytes that form the binary representation of this <see cref="Ipv4EndPoint"/> to a byte buffer.
+        /// </summary>
+        /// <param name="buffer">The buffer to which the bytes are to be written.</param>
+        /// <param name="startIndex">The index where to start copying into the buffer.</param>
+        /// <remarks>
+        /// The serialization puts both the address octets and the port bytes in big endian byte ordering.
+        /// </remarks>
+        public void CopyBytes(byte[] buffer, int startIndex)
+        {
+            ValidateBufferSize(buffer, startIndex);
+
+            buffer[startIndex] = address.W;
+            buffer[startIndex + 1] = address.X;
+            buffer[startIndex + 2] = address.Y;
+            buffer[startIndex + 3] = address.Z;
+            buffer[startIndex + 4] = (byte)(port >> 8);
+            buffer[startIndex + 5] = (byte)port;
         }
 
         #region Object Model
@@ -190,6 +210,33 @@ namespace Orion.Networking
                 throw new FormatException("Invalid IPV4 EndPoint format, a port number between 0 and 65535.");
 
             return new Ipv4EndPoint(address, port);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Ipv4EndPoint"/> from its binary representation serialized in an byte buffer.
+        /// </summary>
+        /// <param name="buffer">The buffer from which to read.</param>
+        /// <param name="startIndex">The index at which the reading should begin.</param>
+        /// <returns>The <see cref="Ipv4EndPoint"/> that was deserialized.</returns>
+        /// <remarks>
+        /// The serialization expects both the address octets and the port bytes in big endian byte ordering.
+        /// </remarks>
+        public static Ipv4EndPoint FromBytes(byte[] buffer, int startIndex)
+        {
+            ValidateBufferSize(buffer, startIndex);
+
+            Ipv4Address address = new Ipv4Address(
+                buffer[startIndex], buffer[startIndex + 1],
+                buffer[startIndex + 2], buffer[startIndex + 3]);
+            ushort port = (ushort)(((int)buffer[startIndex + 4] << 8) | (int)buffer[startIndex + 5]);
+            return new Ipv4EndPoint(address, port);
+        }
+
+        private static void ValidateBufferSize(byte[] buffer, int startIndex)
+        {
+            Argument.EnsureNotNull(buffer, "buffer");
+            Argument.EnsureStrictlyPositive(startIndex, "startIndex");
+            if (startIndex + 6 > buffer.Length) throw new ArgumentOutOfRangeException("startIndex");
         }
         #endregion
 

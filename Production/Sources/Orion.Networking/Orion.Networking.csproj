@@ -42,10 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameMessageType.cs" />
-    <Compile Include="IPEndPointEqualityComparer.cs" />
-    <Compile Include="IPEndPointSerialization.cs" />
-    <Compile Include="Ipv4Address.cs" />
-    <Compile Include="Ipv4EndPoint.cs" />
     <Compile Include="MultiplayerCommandPipeline.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="SafePacketID.cs" />

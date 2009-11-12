@@ -16,15 +16,15 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public MultiplayerCommandPipeline(World world, SafeTransporter transporter, IEnumerable<IPEndPoint> peers)
+        public MultiplayerCommandPipeline(World world, SafeTransporter transporter, IEnumerable<Ipv4EndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");
-            Argument.EnsureNotNull(peers, "peers");
+            Argument.EnsureNotNull(peerEndPoints, "peerEndPoints");
 
             this.transporter = transporter;
             logger = new CommandTextLogger(executor);
-            synchronizer = new CommandSynchronizer(world, transporter, peers);
+            synchronizer = new CommandSynchronizer(world, transporter, peerEndPoints);
             synchronizer.Recipient = logger;
         }
         #endregion

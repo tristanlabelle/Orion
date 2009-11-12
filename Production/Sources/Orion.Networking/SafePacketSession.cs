@@ -75,7 +75,7 @@ namespace Orion.Networking
         {
             Argument.EnsureNotNull(udpSocket, "udpSocket");
 
-            udpSocket.SendTo(fullPacket, ID.RemoteHost);
+            udpSocket.SendTo(fullPacket, ID.HostEndPoint);
 
             bool firstTimeSent = !lastSendTime.HasValue;
             lastSendTime = DateTime.UtcNow;

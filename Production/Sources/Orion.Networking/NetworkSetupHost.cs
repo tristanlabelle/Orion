@@ -23,37 +23,37 @@ namespace Orion.Networking
             }
         }
 
-        private void ProcessJoinRequest(IPEndPoint host)
+        private void ProcessJoinRequest(Ipv4EndPoint hostEndPoint)
         {
-            Console.WriteLine("Received a join request from {0}", host);
+            Console.WriteLine("Received a join request from {0}", hostEndPoint);
             byte[] accept = new byte[1];
             accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
-            transporter.SendTo(accept, host);
+            transporter.SendTo(accept, hostEndPoint);
 
             byte[] seeder = new byte[5];
             seeder[0] = (byte)SetupMessageType.Seed;
             BitConverter.GetBytes(seed).CopyTo(seeder, 1);
-            transporter.SendTo(seeder, host);
+            transporter.SendTo(seeder, hostEndPoint);
 
             byte[] addPeerHostBytes = new byte[7];
             addPeerHostBytes[0] = (byte)SetupMessageType.AddPeer;
-            host.CopyTo(addPeerHostBytes, 1);
+            hostEndPoint.CopyBytes(addPeerHostBytes, 1);
 
             byte[] addPeerBytes = new byte[7];
             addPeerBytes[0] = (byte)SetupMessageType.AddPeer;
-            foreach (IPEndPoint peer in peers)
+            foreach (Ipv4EndPoint peerEndPoint in peerEndPoints)
             {
-                peer.CopyTo(addPeerBytes, 1);
+                peerEndPoint.CopyBytes(addPeerBytes, 1);
 
-                transporter.SendTo(addPeerHostBytes, peer);
-                transporter.SendTo(addPeerBytes, host);
+                transporter.SendTo(addPeerHostBytes, peerEndPoint);
+                transporter.SendTo(addPeerBytes, hostEndPoint);
             }
-            peers.Add(host);
+            peerEndPoints.Add(hostEndPoint);
         }
 
-        private void ProcessLeaveGame(IPEndPoint host)
+        private void ProcessLeaveGame(Ipv4EndPoint host)
         {
-            peers.Remove(host);
+            peerEndPoints.Remove(host);
         }
         #endregion
     }

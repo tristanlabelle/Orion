@@ -9,24 +9,29 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
-    class MultiplayerClientMatchConfigurer : MultiplayerMatchConfigurer
+    sealed class MultiplayerClientMatchConfigurer : MultiplayerMatchConfigurer
     {
+        #region Constructors
         public MultiplayerClientMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
             seed = 545845;
         }
+        #endregion
 
-        public IPEndPoint Host { get; set; }
+        #region Properties
+        public Ipv4EndPoint HostEndPoint { get; set; }
+        #endregion
 
+        #region Methods
         public override void CreateNetworkConfiguration()
         {
             using (NetworkSetupClient client = new NetworkSetupClient(transporter))
             {
-                client.Join(Host);
+                client.Join(HostEndPoint);
                 client.WaitForPeers();
-                peers = client.Peers
-                    .OrderBy(ipEndPoint => BitConverter.ToUInt32(ipEndPoint.Address.GetAddressBytes(), 0))
+                base.peerEndPoints = client.PeerEndPoints
+                    .OrderBy(endPoint => endPoint)
                     .ToList();
             }
         }
@@ -37,5 +42,6 @@ namespace Orion.Main
             Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
             userCommander = new UserInputCommander(blueFaction);
         }
+        #endregion
     }
 }

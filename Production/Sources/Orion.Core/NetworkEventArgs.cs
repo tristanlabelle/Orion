@@ -4,13 +4,18 @@ namespace Orion
 {
     public struct NetworkEventArgs
     {
-        public readonly IPEndPoint Host;
+        #region Fields
+        public readonly Ipv4EndPoint Host;
         public readonly byte[] Data;
+        #endregion
 
-        public NetworkEventArgs(IPEndPoint host, byte[] data)
+        #region Constructors
+        public NetworkEventArgs(Ipv4EndPoint host, byte[] data)
         {
+            Argument.EnsureNotNull(data, "data");
             Host = host;
             Data = data;
         }
+        #endregion
     }
 }

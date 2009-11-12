@@ -4,13 +4,17 @@ namespace Orion
 {
     public struct NetworkTimeoutEventArgs
     {
-        public readonly IPEndPoint Host;
+        #region Fields
+        public readonly Ipv4EndPoint Host;
         public readonly byte[] Data;
+        #endregion
 
-        public NetworkTimeoutEventArgs(IPEndPoint host, byte[] data)
+        #region Constructors
+        public NetworkTimeoutEventArgs(Ipv4EndPoint host, byte[] data)
         {
             Host = host;
             Data = data;
         }
+        #endregion
     }
 }

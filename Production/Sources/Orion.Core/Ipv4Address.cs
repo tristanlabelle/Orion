@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace Orion.Networking
+namespace Orion
 {
     /// <summary>
     /// Represents an IP address in the IPV4 protocol.
@@ -242,6 +242,17 @@ namespace Orion.Networking
             }
 
             return new Ipv4Address(x, y, z, w);
+        }
+
+        /// <summary>
+        /// Attempts to create a new <see cref="Ipv4Address"/> by parsing it from a string in format '#.#.#.#'.
+        /// </summary>
+        /// <param name="addressString">An address string to be parsed.</param>
+        /// <returns>The corresponding <see cref="Ipv4Address"/>, or <c>null</c> if the string failed to be parsed.</returns>
+        public static Ipv4Address? TryParse(string addressString)
+        {
+            try { return Parse(addressString); }
+            catch (FormatException) { return null; }
         }
         #endregion
 

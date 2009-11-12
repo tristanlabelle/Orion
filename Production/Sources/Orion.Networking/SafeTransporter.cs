@@ -21,6 +21,7 @@ namespace Orion.Networking
         #region Private
         #region Constants
         private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
+        private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(20);
         private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
 
@@ -35,8 +36,8 @@ namespace Orion.Networking
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
-        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings
-            = new Dictionary<IPEndPoint, Queue<TimeSpan>>(IPEndPointEqualityComparer.Instance);
+        private readonly Dictionary<Ipv4EndPoint, Queue<TimeSpan>> pings
+            = new Dictionary<Ipv4EndPoint, Queue<TimeSpan>>();
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
         private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend
@@ -108,16 +109,16 @@ namespace Orion.Networking
 
         #region Methods
         #region Ping calculation methods
-        private void AddPing(IPEndPoint host, TimeSpan timeSpan)
+        private void AddPing(Ipv4EndPoint hostEndPoint, TimeSpan timeSpan)
         {
             Queue<TimeSpan> hostPings;
             lock (pings)
             {
-                if (!pings.ContainsKey(host))
+                if (!pings.ContainsKey(hostEndPoint))
                 {
-                    pings[host] = new Queue<TimeSpan>();
+                    pings[hostEndPoint] = new Queue<TimeSpan>();
                 }
-                hostPings = pings[host];
+                hostPings = pings[hostEndPoint];
             }
 
             lock (hostPings)
@@ -130,16 +131,16 @@ namespace Orion.Networking
             }
         }
 
-        private TimeSpan AveragePing(IPEndPoint host)
+        private TimeSpan AveragePing(Ipv4EndPoint hostEndPoint)
         {
             Queue<TimeSpan> hostPings;
             lock (pings)
             {
-                if (!pings.ContainsKey(host))
+                if (!pings.ContainsKey(hostEndPoint))
                 {
-                    pings[host] = new Queue<TimeSpan>();
+                    pings[hostEndPoint] = new Queue<TimeSpan>();
                 }
-                hostPings = pings[host];
+                hostPings = pings[hostEndPoint];
             }
 
             lock (hostPings)
@@ -151,18 +152,18 @@ namespace Orion.Networking
             }
         }
 
-        private TimeSpan StandardDeviationForPings(IPEndPoint host)
+        private TimeSpan StandardDeviationForPings(Ipv4EndPoint hostEndPoint)
         {
             long deviationInTicks = 0;
             Queue<TimeSpan> hostPings;
             lock (pings)
             {
-                hostPings = pings[host];
+                hostPings = pings[hostEndPoint];
             }
 
             if (hostPings.Count == 0) return TimeSpan.FromMilliseconds(50);
 
-            TimeSpan average = AveragePing(host);
+            TimeSpan average = AveragePing(hostEndPoint);
             lock (hostPings)
             {
                 foreach (TimeSpan ping in hostPings)
@@ -188,11 +189,12 @@ namespace Orion.Networking
             {
                 try
                 {
-                    IPEndPoint endPoint = WaitForPacket(packet);
-                    if (endPoint == null) break;
+                    Ipv4EndPoint? hostEndPoint;
+                    int packetSizeInBytes = WaitForPacket(packet, out hostEndPoint);
+                    if (!hostEndPoint.HasValue) break;
 
                     uint sessionID = BitConverter.ToUInt32(packet, 1);
-                    SafePacketID id = new SafePacketID(endPoint, sessionID);
+                    SafePacketID id = new SafePacketID(hostEndPoint.Value, sessionID);
 
                     if (packet[0] == (byte)PacketType.Data)
                     {
@@ -205,7 +207,7 @@ namespace Orion.Networking
                         try
                         {
                             if (isDisposed) break;
-                            udpSocket.SendTo(answer, endPoint);
+                            udpSocket.SendTo(answer, hostEndPoint);
                         }
                         finally
                         {
@@ -223,7 +225,7 @@ namespace Orion.Networking
                             ushort packetLength = BitConverter.ToUInt16(packet, 1 + sizeof(uint));
                             byte[] packetData = new byte[packetLength];
                             Array.Copy(packet, 1 + sizeof(uint) + sizeof(ushort), packetData, 0, packetLength);
-                            readyData.Enqueue(new NetworkEventArgs(id.RemoteHost, packetData));
+                            readyData.Enqueue(new NetworkEventArgs(id.HostEndPoint, packetData));
                         }
                     }
                     else if (packet[0] == (byte)PacketType.Acknowledgement)
@@ -232,7 +234,7 @@ namespace Orion.Networking
                         {
                             if (packetsToSend.ContainsKey(id))
                             {
-                                AddPing(id.RemoteHost, packetsToSend[id].TimeElapsedSinceCreation);
+                                AddPing(id.HostEndPoint, packetsToSend[id].TimeElapsedSinceCreation);
                                 packetsToSend.Remove(id);
                             }
                         }
@@ -252,19 +254,21 @@ namespace Orion.Networking
             }
         }
 
-        private IPEndPoint WaitForPacket(byte[] packet)
+        private int WaitForPacket(byte[] packet, out Ipv4EndPoint? hostEndPoint)
         {
-            EndPoint endpoint = new IPEndPoint(0, 0);
+            EndPoint endPoint = new IPEndPoint(0, 0);
+            hostEndPoint = null;
 
             while (true)
             {
                 try
                 {
-                    if (isDisposed) return null;
+                    if (isDisposed) return -1;
 
                     socketSemaphore.WaitOne();
-                    udpSocket.ReceiveFrom(packet, ref endpoint);
-                    return endpoint as IPEndPoint;
+                    int packetSizeInBytes = udpSocket.ReceiveFrom(packet, ref endPoint);
+                    hostEndPoint = (Ipv4EndPoint)(IPEndPoint)endPoint;
+                    return packetSizeInBytes;
                 }
                 catch (SocketException e)
                 {
@@ -303,11 +307,11 @@ namespace Orion.Networking
                             trash.Add(session);
                             lock (timedOut)
                             {
-                                timedOut.Enqueue(new NetworkTimeoutEventArgs(session.ID.RemoteHost, session.Data));
+                                timedOut.Enqueue(new NetworkTimeoutEventArgs(session.ID.HostEndPoint, session.Data));
                             }
                         }
 
-                        TimeSpan resendDelay = GetResendDelay(session.ID.RemoteHost);
+                        TimeSpan resendDelay = GetResendDelay(session.ID.HostEndPoint);
                         if (!session.WasSent || session.TimeElapsedSinceLastSend >= resendDelay)
                             session.Send(udpSocket);
                     }
@@ -334,9 +338,10 @@ namespace Orion.Networking
             }
         }
 
-        private TimeSpan GetResendDelay(IPEndPoint remoteEndPoint)
+        private TimeSpan GetResendDelay(Ipv4EndPoint hostEndPoint)
         {
-            TimeSpan resendDelay = AveragePing(remoteEndPoint) + StandardDeviationForPings(remoteEndPoint);
+            if (pings.Count == 0) return DefaultPacketResendDelay;
+            TimeSpan resendDelay = AveragePing(hostEndPoint) + StandardDeviationForPings(hostEndPoint);
             return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
         }
         #endregion
@@ -351,29 +356,29 @@ namespace Orion.Networking
         /// <param name="remoteHost">
         /// The host to which the data is addressed.
         /// </param>
-        public void SendTo(byte[] data, IPEndPoint remoteHost)
+        public void SendTo(byte[] data, Ipv4EndPoint hostEndPoint)
         {
             EnsureNotDisposed();
             Argument.EnsureNotNull(data, "data");
-            Argument.EnsureNotNull(remoteHost, "remoteHost");
+            Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
 
             uint sessionID = nextSessionID;
             ++nextSessionID;
 
             lock (packetsToSend)
             {
-                SafePacketID id = new SafePacketID(remoteHost, sessionID);
+                SafePacketID id = new SafePacketID(hostEndPoint, sessionID);
                 packetsToSend[id] = new SafePacketSession(id, data);
             }
         }
 
-        public void SendTo(byte[] data, IEnumerable<IPEndPoint> remoteAddresses)
+        public void SendTo(byte[] data, IEnumerable<Ipv4EndPoint> hostEndPoints)
         {
             EnsureNotDisposed();
             Argument.EnsureNotNull(data, "data");
-            Argument.EnsureNotNull(remoteAddresses, "remoteAddresses");
+            Argument.EnsureNotNull(hostEndPoints, "hostEndPoints");
 
-            foreach (IPEndPoint endPoint in remoteAddresses)
+            foreach (Ipv4EndPoint endPoint in hostEndPoints)
                 SendTo(data, endPoint);
         }
         #endregion

@@ -76,6 +76,7 @@
     <Compile Include="MatchSettingsDialog.Designer.cs">
       <DependentUpon>MatchSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="MatchStartType.cs" />
     <Compile Include="ResourceDisplay.cs" />
     <Compile Include="SelectionDisplay.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />

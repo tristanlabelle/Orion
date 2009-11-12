@@ -13,24 +13,24 @@ namespace Orion.Networking
     {
         #region Instance
         #region Fields
-        private readonly IPEndPoint remoteHost;
+        private readonly Ipv4EndPoint hostEndPoint;
         private readonly uint sessionID;
         #endregion
 
         #region Constructors
-        public SafePacketID(IPEndPoint host, uint sessionID)
+        public SafePacketID(Ipv4EndPoint hostEndPoint, uint sessionID)
         {
-            Argument.EnsureNotNull(host, "host");
+            Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
 
-            this.remoteHost = host;
+            this.hostEndPoint = hostEndPoint;
             this.sessionID = sessionID;
         }
         #endregion
 
         #region Properties
-        public IPEndPoint RemoteHost
+        public Ipv4EndPoint HostEndPoint
         {
-            get { return remoteHost; }
+            get { return hostEndPoint; }
         }
 
         public uint SessionID
@@ -42,8 +42,8 @@ namespace Orion.Networking
         #region Methods
         public bool Equals(SafePacketID other)
         {
-            return IPEndPointEqualityComparer.Instance.Equals(other.remoteHost, remoteHost)
-                && other.sessionID == sessionID;
+            return hostEndPoint == other.hostEndPoint
+                && sessionID == other.sessionID;
         }
 
         public override bool Equals(object obj)
@@ -59,7 +59,7 @@ namespace Orion.Networking
 
         public override string ToString()
         {
-            return "#{0} to host {1}".FormatInvariant(sessionID, remoteHost);
+            return "#{0} to host {1}".FormatInvariant(sessionID, hostEndPoint);
         }
         #endregion
         #endregion

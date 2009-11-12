@@ -4,32 +4,6 @@ using System.Windows.Forms;
 
 namespace Orion.UserInterface
 {
-    /// <summary>
-    /// Describes the way a user decides to start a match.
-    /// </summary>
-    public enum MatchStartType
-    {
-        /// <summary>
-        /// Specifies that no start type has been selected.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Specifies that a solo match should be started.
-        /// </summary>
-        Solo,
-
-        /// <summary>
-        /// Specifies that a multiplayer match should be hosted.
-        /// </summary>
-        Host,
-
-        /// <summary>
-        /// Specifies that a multiplayer match should be joined.
-        /// </summary>
-        Join
-    }
-
     public sealed partial class MatchSettingsDialog : Form
     {
         #region Fields
@@ -55,13 +29,9 @@ namespace Orion.UserInterface
         /// <summary>
         /// Gets the address of the host to which to connect. 
         /// </summary>
-        public IPAddress Host
+        public Ipv4Address? HostAddress
         {
-            get
-            {
-                IPAddress address;
-                return IPAddress.TryParse(multiplayerHostTextBox.Text, out address) ? address : null;
-            }
+            get { return Ipv4Address.TryParse(multiplayerHostTextBox.Text); }
         }
         #endregion
 
@@ -82,9 +52,8 @@ namespace Orion.UserInterface
 
         private void joinMultiplayerGameButton_Click(object sender, EventArgs e)
         {
-            IPAddress address;
-            IPAddress.TryParse(multiplayerHostTextBox.Text, out address);
-            if (address == null || address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+            Ipv4Address? address = Ipv4Address.TryParse(multiplayerHostTextBox.Text);
+            if (!address.HasValue)
             {
                 MessageBox.Show("Invalid host IPV4 Address.", "Error!");
                 return;

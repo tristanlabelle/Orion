@@ -12,7 +12,7 @@ namespace Orion.Networking
 
         protected int seed;
         protected SafeTransporter transporter;
-        protected List<IPEndPoint> peers = new List<IPEndPoint>();
+        protected List<Ipv4EndPoint> peerEndPoints = new List<Ipv4EndPoint>();
         #endregion
 
         #region Constructors
@@ -27,9 +27,9 @@ namespace Orion.Networking
         #endregion
 
         #region Properties
-        public IEnumerable<IPEndPoint> Peers
+        public IEnumerable<Ipv4EndPoint> PeerEndPoints
         {
-            get { return peers; }
+            get { return peerEndPoints; }
         }
         #endregion
 
@@ -44,7 +44,7 @@ namespace Orion.Networking
             {
                 Thread.Sleep(10);
                 transporter.Poll();
-            } while (peers.Count == 0);
+            } while (peerEndPoints.Count == 0);
         }
 
         public void Dispose()

@@ -22,8 +22,8 @@ namespace Orion.Main
             using (NetworkSetupHost host = new NetworkSetupHost(transporter))
             {
                 host.WaitForPeers();
-                peers = host.Peers
-                    .OrderBy(ipEndPoint => BitConverter.ToUInt32(ipEndPoint.Address.GetAddressBytes(), 0))
+                peerEndPoints = host.PeerEndPoints
+                    .OrderBy(endPoint => endPoint)
                     .ToList();
             }
         }

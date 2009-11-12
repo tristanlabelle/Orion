@@ -35,7 +35,8 @@ namespace Orion.Networking
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
-        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings = new Dictionary<IPEndPoint, Queue<TimeSpan>>();
+        private readonly Dictionary<IPEndPoint, Queue<TimeSpan>> pings
+            = new Dictionary<IPEndPoint, Queue<TimeSpan>>(IPEndPointEqualityComparer.Instance);
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
         private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend

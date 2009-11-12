@@ -5,40 +5,35 @@ using System.Threading;
 
 namespace Orion.Networking
 {
-    public enum SetupMessageType : byte
+    public abstract class NetworkSetup : IDisposable
     {
-        JoinRequest = 101,
-        AcceptJoinRequest = 102,
-        RefuseJoinRequest = 103,
-        AddPeer = 104,
-        KickPeer = 105,
-        LeaveGame = 106,
-        Seed = 107
-    }
-
-    public abstract class NetworkSetupHelper : IDisposable
-    {
+        #region Fields
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> receptionDelegate;
 
         protected int seed;
         protected SafeTransporter transporter;
-        protected List<IPEndPoint> peers;
+        protected List<IPEndPoint> peers = new List<IPEndPoint>();
+        #endregion
 
-        public NetworkSetupHelper(SafeTransporter transporter)
+        #region Constructors
+        public NetworkSetup(SafeTransporter transporter)
         {
             Argument.EnsureNotNull(transporter, "transporter");
             this.transporter = transporter;
-            peers = new List<IPEndPoint>();
 
             receptionDelegate = new GenericEventHandler<SafeTransporter, NetworkEventArgs>(TransporterReceived);
             transporter.Received += receptionDelegate;
         }
+        #endregion
 
+        #region Properties
         public IEnumerable<IPEndPoint> Peers
         {
             get { return peers; }
         }
+        #endregion
 
+        #region Methods
         protected abstract void TransporterReceived(SafeTransporter source, NetworkEventArgs args);
 
         public void WaitForPeers()
@@ -56,24 +51,6 @@ namespace Orion.Networking
         {
             transporter.Received -= receptionDelegate;
         }
-    }
-
-    internal static class IPEndPointSerialization
-    {
-        public static void CopyTo(this IPEndPoint endpoint, byte[] array, long index)
-        {
-            byte[] addressBytes = endpoint.Address.GetAddressBytes();
-            addressBytes.CopyTo(array, index);
-            ushort port = (ushort)endpoint.Port;
-            array[index + addressBytes.Length] = (byte)(port & 0xFF);
-            array[index + addressBytes.Length + 1] = (byte)(port >> 8);
-        }
-
-        public static IPEndPoint Deserialize(byte[] array, int index)
-        {
-            long address = BitConverter.ToInt32(array, index);
-            int port = BitConverter.ToUInt16(array, index + 4);
-            return new IPEndPoint(new IPAddress(address), port);
-        }
+        #endregion
     }
 }

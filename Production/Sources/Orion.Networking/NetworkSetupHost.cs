@@ -3,14 +3,17 @@ using System.Net;
 
 namespace Orion.Networking
 {
-    public class NetworkSetupHost : NetworkSetupHelper
+    public sealed class NetworkSetupHost : NetworkSetup
     {
+        #region Constructors
         public NetworkSetupHost(SafeTransporter transporter)
             : base(transporter)
         {
             seed = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
         }
+        #endregion
 
+        #region Methods
         protected override void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
             switch ((SetupMessageType)args.Data[0])
@@ -52,5 +55,6 @@ namespace Orion.Networking
         {
             peers.Remove(host);
         }
+        #endregion
     }
 }

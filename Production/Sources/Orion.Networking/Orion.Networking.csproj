@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameMessageType.cs" />
+    <Compile Include="IPEndPointEqualityComparer.cs" />
+    <Compile Include="IPEndPointSerialization.cs" />
     <Compile Include="MultiplayerCommandPipeline.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="SafePacketID.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="NetworkSetup.cs" />
     <Compile Include="NetworkSetupClient.cs" />
     <Compile Include="CommandSynchronizer.cs" />
+    <Compile Include="SetupMessageType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">

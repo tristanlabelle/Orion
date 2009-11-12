@@ -3,14 +3,18 @@ using System.Net;
 
 namespace Orion.Networking
 {
-    public class NetworkSetupClient : NetworkSetupHelper
+    public sealed class NetworkSetupClient : NetworkSetup
     {
+        #region Fields
         private IPEndPoint server;
+        #endregion
 
+        #region Constructors
         public NetworkSetupClient(SafeTransporter transporter)
-            : base(transporter)
-        { }
+            : base(transporter) { }
+        #endregion
 
+        #region Methods
         public void Join(IPEndPoint host)
         {
             Argument.EnsureNotNull(host, "host");
@@ -74,5 +78,6 @@ namespace Orion.Networking
                 peers.Remove(host);
             }
         }
+        #endregion
     }
 }

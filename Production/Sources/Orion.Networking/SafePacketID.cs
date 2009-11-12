@@ -42,8 +42,7 @@ namespace Orion.Networking
         #region Methods
         public bool Equals(SafePacketID other)
         {
-            return other.remoteHost.Address.GetAddressBytes().SequenceEqual(remoteHost.Address.GetAddressBytes())
-                && other.remoteHost.Port == remoteHost.Port
+            return IPEndPointEqualityComparer.Instance.Equals(other.remoteHost, remoteHost)
                 && other.sessionID == sessionID;
         }
 

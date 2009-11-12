@@ -99,8 +99,8 @@ namespace Orion.Networking
             senderThread = new Thread(SenderThread);
             receiverThread = new Thread(ReceiverThread);
 
-            senderThread.Name = string.Format("Sender Thread for {0}", this);
-            receiverThread.Name = string.Format("Receiver Thread for {0}", this);
+            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
+            receiverThread.Name = "Receiver Thread for {0}".FormatInvariant(this);
 
             receiverThread.Start();
             senderThread.Start();
@@ -239,14 +239,10 @@ namespace Orion.Networking
                             }
                         }
                     }
-                    else
-                    {
-                        throw new InvalidDataException("Unexpected packet type received.");
-                    }
                 }
-                catch (SocketException e)
+                catch (SocketException exception)
                 {
-                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
+                    Debug.Fail("Unexpected socket exception {0}: {1}".FormatInvariant(exception.ErrorCode, exception));
                     break;
                 }
 
@@ -290,8 +286,8 @@ namespace Orion.Networking
             while (true)
             {
                 if (isDisposed) break;
-                socketSemaphore.WaitOne();
 
+                socketSemaphore.WaitOne();
                 try
                 {
                     sessions.Clear();
@@ -324,9 +320,9 @@ namespace Orion.Networking
                         trash.Clear();
                     }
                 }
-                catch (SocketException e)
+                catch (SocketException exception)
                 {
-                    Console.WriteLine("Broke from socket exception {0}: {1}", e.ErrorCode, e);
+                    Debug.Fail("Unexpected socket exception {0}: {1}".FormatInvariant(exception.ErrorCode, exception));
                     break;
                 }
                 finally
@@ -334,7 +330,7 @@ namespace Orion.Networking
                     socketSemaphore.Release();
                 }
 
-                Thread.Sleep(10);
+                Thread.Sleep(0);
             }
         }
 

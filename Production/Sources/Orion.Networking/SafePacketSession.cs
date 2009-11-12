@@ -34,8 +34,6 @@ namespace Orion.Networking
             BitConverter.GetBytes(id.SessionID).CopyTo(fullPacket, 1);
             BitConverter.GetBytes((ushort)Data.Length).CopyTo(fullPacket, 1 + sizeof(uint));
             Data.CopyTo(fullPacket, 1 + sizeof(uint) + sizeof(ushort));
-
-            Console.WriteLine("Packet #{0} created at {1}:{2}", ID, creationTime, creationTime.Millisecond);
         }
         #endregion
 
@@ -79,9 +77,6 @@ namespace Orion.Networking
 
             bool firstTimeSent = !lastSendTime.HasValue;
             lastSendTime = DateTime.UtcNow;
-            Console.WriteLine("Packet #{0} {1} at {2}:{3}", ID,
-                firstTimeSent ? "sent" : "resent",
-                lastSendTime, lastSendTime.Value.Millisecond);
         }
         #endregion
     }

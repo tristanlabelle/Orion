@@ -65,11 +65,7 @@ namespace Orion.Graphics
         public bool DrawHealthBars
         {
             get { return drawHealthBars; }
-            set
-            {
-                Console.WriteLine("Drawing: {0}", value);
-                drawHealthBars = value;
-            }
+            set { drawHealthBars = value; }
         }
         #endregion
 

@@ -38,11 +38,14 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameMessageType.cs" />
     <Compile Include="MultiplayerCommandPipeline.cs" />
+    <Compile Include="PeerLink.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="SafePacketID.cs" />
     <Compile Include="SafePacketSession.cs" />

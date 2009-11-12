@@ -23,7 +23,7 @@ namespace Orion.Networking
         private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
         private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(20);
-        private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
+        
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.
@@ -32,13 +32,13 @@ namespace Orion.Networking
         #endregion
 
         private uint nextSessionID;
-
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
 
-        private readonly Dictionary<Ipv4EndPoint, Queue<TimeSpan>> pings
-            = new Dictionary<Ipv4EndPoint, Queue<TimeSpan>>();
+       
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
+
+        private readonly Dictionary<Ipv4EndPoint, PeerLink> peers = new Dictionary<Ipv4EndPoint, PeerLink>();
 
         private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend
             = new Dictionary<SafePacketID, SafePacketSession>();
@@ -108,74 +108,19 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-        #region Ping calculation methods
-        private void AddPing(Ipv4EndPoint hostEndPoint, TimeSpan timeSpan)
+        private PeerLink GetPeerLink(Ipv4EndPoint ipEndPoint)
         {
-            Queue<TimeSpan> hostPings;
-            lock (pings)
+            lock (peers)
             {
-                if (!pings.ContainsKey(hostEndPoint))
+                PeerLink peer;
+                if (!peers.TryGetValue(ipEndPoint, out peer))
                 {
-                    pings[hostEndPoint] = new Queue<TimeSpan>();
+                    peer = new PeerLink(ipEndPoint);
+                    peers.Add(ipEndPoint, peer);
                 }
-                hostPings = pings[hostEndPoint];
-            }
-
-            lock (hostPings)
-            {
-                hostPings.Enqueue(timeSpan);
-                if (hostPings.Count > 50)
-                {
-                    hostPings.Dequeue();
-                }
+                return peer;
             }
         }
-
-        private TimeSpan AveragePing(Ipv4EndPoint hostEndPoint)
-        {
-            Queue<TimeSpan> hostPings;
-            lock (pings)
-            {
-                if (!pings.ContainsKey(hostEndPoint))
-                {
-                    pings[hostEndPoint] = new Queue<TimeSpan>();
-                }
-                hostPings = pings[hostEndPoint];
-            }
-
-            lock (hostPings)
-            {
-                if (hostPings.Count == 0) return DefaultPing;
-
-                long averageTicks = (long)hostPings.Average(timeSpan => timeSpan.Ticks);
-                return TimeSpan.FromTicks(averageTicks);
-            }
-        }
-
-        private TimeSpan StandardDeviationForPings(Ipv4EndPoint hostEndPoint)
-        {
-            long deviationInTicks = 0;
-            Queue<TimeSpan> hostPings;
-            lock (pings)
-            {
-                hostPings = pings[hostEndPoint];
-            }
-
-            if (hostPings.Count == 0) return TimeSpan.FromMilliseconds(50);
-
-            TimeSpan average = AveragePing(hostEndPoint);
-            lock (hostPings)
-            {
-                foreach (TimeSpan ping in hostPings)
-                    deviationInTicks += Math.Abs(average.Ticks - ping.Ticks);
-                
-                deviationInTicks /= hostPings.Count;
-            }
-
-            return TimeSpan.FromTicks(deviationInTicks);
-        }
-
-        #endregion
 
         #region Receiver Thread
         private void ReceiverThread()
@@ -234,7 +179,9 @@ namespace Orion.Networking
                         {
                             if (packetsToSend.ContainsKey(id))
                             {
-                                AddPing(id.HostEndPoint, packetsToSend[id].TimeElapsedSinceCreation);
+                               
+                             
+                                GetPeerLink(hostEndPoint.Value).AddPing(packetsToSend[id].TimeElapsedSinceCreation);
                                 packetsToSend.Remove(id);
                             }
                         }
@@ -336,8 +283,9 @@ namespace Orion.Networking
 
         private TimeSpan GetResendDelay(Ipv4EndPoint hostEndPoint)
         {
-            if (pings.Count == 0) return DefaultPacketResendDelay;
-            TimeSpan resendDelay = AveragePing(hostEndPoint) + StandardDeviationForPings(hostEndPoint);
+            PeerLink peer = GetPeerLink(hostEndPoint);
+            if (!peer.HasPingData) return DefaultPacketResendDelay;
+            TimeSpan resendDelay = peer.AveragePing + peer.StandardDeviationForPings;
             return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
         }
         #endregion

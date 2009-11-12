@@ -11,20 +11,6 @@ using System.Windows.Forms;
 
 namespace Orion.Networking
 {
-    public enum GameMessageType : byte
-    {
-        Commands = 0xC0,
-        Done = 0xD0
-    }
-
-    [Flags]
-    internal enum PeerState
-    {
-        None = 0,
-        ReceivedCommands = 1,
-        ReceivedDone = 2
-    }
-
     public sealed class CommandSynchronizer : CommandFilter, IDisposable
     {
         #region Fields
@@ -209,8 +195,8 @@ namespace Orion.Networking
             {
                 Deserialize(args.Data.Skip(1 + sizeof(Int32)).ToArray());
 
-                if ((oldPeerState & PeerState.ReceivedCommands) != 0)
-                    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
+                //if ((oldPeerState & PeerState.ReceivedCommands) != 0)
+                //    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedCommands;
 
                 if (ReceivedFromAllPeers)
@@ -224,8 +210,8 @@ namespace Orion.Networking
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                if ((oldPeerState & PeerState.ReceivedDone) != 0)
-                    throw new InvalidDataException("Received multiple done from the same peer in a frame.");
+                //if ((oldPeerState & PeerState.ReceivedDone) != 0)
+                //    throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
             }
         }

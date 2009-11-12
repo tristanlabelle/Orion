@@ -41,7 +41,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameMessageType.cs" />
     <Compile Include="MultiplayerCommandPipeline.cs" />
+    <Compile Include="PeerState.cs" />
     <Compile Include="SafePacketID.cs" />
     <Compile Include="SafePacketSession.cs" />
     <Compile Include="PacketType.cs" />

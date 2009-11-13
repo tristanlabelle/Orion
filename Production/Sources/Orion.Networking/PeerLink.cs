@@ -12,22 +12,23 @@ namespace Orion.Networking
     public sealed class PeerLink
     {
         #region Fields
-        private readonly Queue<TimeSpan> pings
-               = new  Queue<TimeSpan>();
-
-        private readonly Ipv4EndPoint ipEndPoint;
-        
-        private static readonly TimeSpan DefaultPing = TimeSpan.FromMilliseconds(100);
+        private readonly Ipv4EndPoint endPoint;
+        private readonly Queue<TimeSpan> pings = new  Queue<TimeSpan>();
         #endregion
 
         #region Construstor
-        public PeerLink(Ipv4EndPoint ipEndPoint)
+        public PeerLink(Ipv4EndPoint endPoint)
         {
-            this.ipEndPoint = ipEndPoint;
+            this.endPoint = endPoint;
         }
         #endregion
 
         #region Proprieties
+        public Ipv4EndPoint EndPoint
+        {
+            get { return endPoint; }
+        }
+
         public bool HasPingData
         {
             get { return pings.Count > 0; }
@@ -39,53 +40,48 @@ namespace Orion.Networking
             {
                 lock (pings)
                 {
-                    if (pings.Count == 0) return DefaultPing;
-
-                    long averageTicks = (long)pings.Average(timeSpan => timeSpan.Ticks);
-                    return TimeSpan.FromTicks(averageTicks);
+                    if (pings.Count == 0) return TimeSpan.Zero;
+                    return LocklessAveragePing;
                 }
             }
         }
 
-        public TimeSpan StandardDeviationForPings
+        private TimeSpan LocklessAveragePing
         {
             get
             {
+                long averageTicks = (long)pings.Average(timeSpan => timeSpan.Ticks);
+                return TimeSpan.FromTicks(averageTicks);
+            }
+        }
 
-                long deviationInTicks = 0;
-
-                if (pings.Count == 0) return TimeSpan.FromMilliseconds(50);
-
-                TimeSpan average = AveragePing;
+        public TimeSpan AveragePingDeviation
+        {
+            get
+            {
                 lock (pings)
                 {
-                    foreach (TimeSpan ping in pings)
-                        deviationInTicks += Math.Abs(average.Ticks - ping.Ticks);
+                    if (pings.Count == 0) return TimeSpan.Zero;
 
-                    deviationInTicks /= pings.Count;
+                    TimeSpan averagePing = LocklessAveragePing;
+
+                    long deviationSumInTicks = pings.Sum(ping => Math.Abs(averagePing.Ticks - ping.Ticks));
+                    long averageDeviationInTicks = deviationSumInTicks / pings.Count;
+                    return TimeSpan.FromTicks(averageDeviationInTicks);
                 }
-
-                return TimeSpan.FromTicks(deviationInTicks);
             }
         }
         #endregion
 
         #region Methods
-        #region Ping calculation methods
         public void AddPing(TimeSpan timeSpan)
         {
-            
-
             lock (pings)
             {
                 pings.Enqueue(timeSpan);
-                if (pings.Count > 50)
-                {
-                    pings.Dequeue();
-                }
+                if (pings.Count > 50) pings.Dequeue();
             }
         }
-        #endregion
         #endregion
     }
 }

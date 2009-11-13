@@ -60,6 +60,31 @@ namespace Orion.Networking
         #endregion
         #endregion
 
+        #region Constructor
+        /// <summary>
+        /// Creates a new Transporter whose UDP socket is bound to a specified port on all interfaces.
+        /// </summary>
+        /// <param name="port">
+        /// The port on which to bind
+        /// </param>
+        public SafeTransporter(int port)
+        {
+            Port = port;
+            udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
+
+            senderThread = new Thread(SenderThreadEntryPoint);
+            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
+            senderThread.IsBackground = true;
+            receiverThread = new Thread(ReceiverThreadEntryPoint);
+            receiverThread.Name = "Receiver Thread for {0}".FormatInvariant(this);
+            receiverThread.IsBackground = true;
+
+            receiverThread.Start();
+            senderThread.Start();
+        }
+        #endregion
+
         #region Events
         /// <summary>
         /// Raised when a packet arrives.
@@ -84,29 +109,6 @@ namespace Orion.Networking
         }
         #endregion
 
-        #region Constructor
-        /// <summary>
-        /// Creates a new Transporter whose UDP socket is bound to a specified port on all interfaces.
-        /// </summary>
-        /// <param name="port">
-        /// The port on which to bind
-        /// </param>
-        public SafeTransporter(int port)
-        {
-            Port = port;
-            udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
-            senderThread = new Thread(SenderThread);
-            receiverThread = new Thread(ReceiverThread);
-
-            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
-            receiverThread.Name = "Receiver Thread for {0}".FormatInvariant(this);
-
-            receiverThread.Start();
-            senderThread.Start();
-        }
-        #endregion
-
         #region Methods
         private PeerLink GetPeerLink(Ipv4EndPoint ipEndPoint)
         {
@@ -123,7 +125,7 @@ namespace Orion.Networking
         }
 
         #region Receiver Thread
-        private void ReceiverThread()
+        private void ReceiverThreadEntryPoint()
         {
             byte[] answer = new byte[5];
             answer[0] = (byte)PacketType.Acknowledgement;
@@ -226,14 +228,12 @@ namespace Orion.Networking
         #endregion
 
         #region Sender Thread
-        private void SenderThread()
+        private void SenderThreadEntryPoint()
         {
             List<SafePacketSession> trash = new List<SafePacketSession>();
             List<SafePacketSession> sessions = new List<SafePacketSession>();
-            while (true)
+            while (!isDisposed)
             {
-                if (isDisposed) break;
-
                 socketSemaphore.WaitOne();
                 try
                 {
@@ -285,7 +285,7 @@ namespace Orion.Networking
         {
             PeerLink peer = GetPeerLink(hostEndPoint);
             if (!peer.HasPingData) return DefaultPacketResendDelay;
-            TimeSpan resendDelay = peer.AveragePing + peer.StandardDeviationForPings;
+            TimeSpan resendDelay = peer.AveragePing + peer.AveragePingDeviation;
             return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
         }
         #endregion

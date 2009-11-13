@@ -13,7 +13,8 @@ namespace Orion.Networking
     /// A Transporter is responsible for safely transporting UDP packets over a network.
     /// It guarantees that packets are going to arrive without loss or duplication and as sent.
     /// The order of arrival is not garanteed.
-    /// It creates a single UDP socket for communication to various hosts. The remote host must use a Transporter as well for reception.
+    /// It creates a single UDP socket for communication to various hosts.
+    /// The remote host must use a Transporter as well for reception.
     /// </summary>
     public sealed class SafeTransporter : IDisposable
     {
@@ -31,10 +32,8 @@ namespace Orion.Networking
         private const int WSAETIMEDOUT = 10060;
         #endregion
 
-        private uint nextSessionID;
         private readonly Queue<NetworkEventArgs> readyData = new Queue<NetworkEventArgs>();
         private readonly Queue<NetworkTimeoutEventArgs> timedOut = new Queue<NetworkTimeoutEventArgs>();
-
        
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
@@ -49,7 +48,8 @@ namespace Orion.Networking
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
 
-        private bool isDisposed;
+        private volatile uint nextSessionID;
+        private volatile bool isDisposed;
         #endregion
 
         #region Public

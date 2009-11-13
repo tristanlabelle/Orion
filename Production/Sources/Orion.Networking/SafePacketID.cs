@@ -13,12 +13,12 @@ namespace Orion.Networking
     {
         #region Instance
         #region Fields
-        private readonly Ipv4EndPoint hostEndPoint;
+        private readonly IPv4EndPoint hostEndPoint;
         private readonly uint sessionID;
         #endregion
 
         #region Constructors
-        public SafePacketID(Ipv4EndPoint hostEndPoint, uint sessionID)
+        public SafePacketID(IPv4EndPoint hostEndPoint, uint sessionID)
         {
             Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
 
@@ -28,7 +28,7 @@ namespace Orion.Networking
         #endregion
 
         #region Properties
-        public Ipv4EndPoint HostEndPoint
+        public IPv4EndPoint HostEndPoint
         {
             get { return hostEndPoint; }
         }

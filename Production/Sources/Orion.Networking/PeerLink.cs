@@ -12,19 +12,19 @@ namespace Orion.Networking
     public sealed class PeerLink
     {
         #region Fields
-        private readonly Ipv4EndPoint endPoint;
+        private readonly IPv4EndPoint endPoint;
         private readonly Queue<TimeSpan> pings = new  Queue<TimeSpan>();
         #endregion
 
         #region Construstor
-        public PeerLink(Ipv4EndPoint endPoint)
+        public PeerLink(IPv4EndPoint endPoint)
         {
             this.endPoint = endPoint;
         }
         #endregion
 
         #region Proprieties
-        public Ipv4EndPoint EndPoint
+        public IPv4EndPoint EndPoint
         {
             get { return endPoint; }
         }

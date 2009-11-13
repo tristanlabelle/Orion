@@ -29,9 +29,9 @@ namespace Orion.UserInterface
         /// <summary>
         /// Gets the address of the host to which to connect. 
         /// </summary>
-        public Ipv4Address? HostAddress
+        public IPv4Address? HostAddress
         {
-            get { return Ipv4Address.TryParse(multiplayerHostTextBox.Text); }
+            get { return IPv4Address.TryParse(multiplayerHostTextBox.Text); }
         }
         #endregion
 
@@ -52,7 +52,7 @@ namespace Orion.UserInterface
 
         private void joinMultiplayerGameButton_Click(object sender, EventArgs e)
         {
-            Ipv4Address? address = Ipv4Address.TryParse(multiplayerHostTextBox.Text);
+            IPv4Address? address = IPv4Address.TryParse(multiplayerHostTextBox.Text);
             if (!address.HasValue)
             {
                 MessageBox.Show("Invalid host IPV4 Address.", "Error!");

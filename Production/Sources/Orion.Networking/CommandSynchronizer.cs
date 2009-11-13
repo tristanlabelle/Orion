@@ -22,8 +22,8 @@ namespace Orion.Networking
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> transporterReceived;
         private readonly GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs> transporterTimeout;
 
-        private readonly List<Ipv4EndPoint> peerEndPoints;
-        private readonly Dictionary<Ipv4EndPoint, PeerState> peerStates = new Dictionary<Ipv4EndPoint, PeerState>();
+        private readonly List<IPv4EndPoint> peerEndPoints;
+        private readonly Dictionary<IPv4EndPoint, PeerState> peerStates = new Dictionary<IPv4EndPoint, PeerState>();
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
@@ -38,7 +38,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public CommandSynchronizer(World world, SafeTransporter transporter, IEnumerable<Ipv4EndPoint> peerEndPoints)
+        public CommandSynchronizer(World world, SafeTransporter transporter, IEnumerable<IPv4EndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");
@@ -52,7 +52,7 @@ namespace Orion.Networking
             if (this.peerEndPoints.Count == 0)
                 throw new ArgumentException("Cannot create a CommandSynchronizer without peers.", "peers");
 
-            foreach (Ipv4EndPoint peerEndPoint in this.peerEndPoints)
+            foreach (IPv4EndPoint peerEndPoint in this.peerEndPoints)
                 peerStates.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
 
             entityDied = EntityDied;
@@ -167,7 +167,7 @@ namespace Orion.Networking
 
         private void ResetPeerStates()
         {
-            foreach (Ipv4EndPoint peerEndPoint in peerEndPoints)
+            foreach (IPv4EndPoint peerEndPoint in peerEndPoints)
                 peerStates[peerEndPoint] = PeerState.None;
         }
 

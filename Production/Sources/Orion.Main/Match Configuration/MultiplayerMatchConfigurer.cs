@@ -9,7 +9,7 @@ namespace Orion.Main
     abstract class MultiplayerMatchConfigurer : MatchConfigurer
     {
         protected SafeTransporter transporter;
-        protected IEnumerable<Ipv4EndPoint> peerEndPoints;
+        protected IEnumerable<IPv4EndPoint> peerEndPoints;
 
         public MultiplayerMatchConfigurer(SafeTransporter transporter)
         {

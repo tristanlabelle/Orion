@@ -23,7 +23,7 @@ namespace Orion.Networking
             }
         }
 
-        private void ProcessJoinRequest(Ipv4EndPoint hostEndPoint)
+        private void ProcessJoinRequest(IPv4EndPoint hostEndPoint)
         {
             Console.WriteLine("Received a join request from {0}", hostEndPoint);
             byte[] accept = new byte[1];
@@ -41,7 +41,7 @@ namespace Orion.Networking
 
             byte[] addPeerBytes = new byte[7];
             addPeerBytes[0] = (byte)SetupMessageType.AddPeer;
-            foreach (Ipv4EndPoint peerEndPoint in peerEndPoints)
+            foreach (IPv4EndPoint peerEndPoint in peerEndPoints)
             {
                 peerEndPoint.CopyBytes(addPeerBytes, 1);
 
@@ -51,7 +51,7 @@ namespace Orion.Networking
             peerEndPoints.Add(hostEndPoint);
         }
 
-        private void ProcessLeaveGame(Ipv4EndPoint host)
+        private void ProcessLeaveGame(IPv4EndPoint host)
         {
             peerEndPoints.Remove(host);
         }

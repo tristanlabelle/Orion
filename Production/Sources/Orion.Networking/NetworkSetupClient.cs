@@ -6,7 +6,7 @@ namespace Orion.Networking
     public sealed class NetworkSetupClient : NetworkSetup
     {
         #region Fields
-        private Ipv4EndPoint server;
+        private IPv4EndPoint server;
         #endregion
 
         #region Constructors
@@ -15,7 +15,7 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-        public void Join(Ipv4EndPoint hostEndPoint)
+        public void Join(IPv4EndPoint hostEndPoint)
         {
             Argument.EnsureNotNull(hostEndPoint, "host");
             Console.WriteLine("Asking {0} to join the game", hostEndPoint);
@@ -39,7 +39,7 @@ namespace Orion.Networking
             throw new NotImplementedException("A network host should never get messages of setup type {0}".FormatInvariant(args.Data[0]));
         }
 
-        private void ProcessAcceptJoinRequest(Ipv4EndPoint host)
+        private void ProcessAcceptJoinRequest(IPv4EndPoint host)
         {
             Console.WriteLine("Server accepted our join request");
             server = host;
@@ -48,10 +48,10 @@ namespace Orion.Networking
 
         private void ProcessAddPeer(byte[] data)
         {
-            AddPeer(Ipv4EndPoint.FromBytes(data, 1));
+            AddPeer(IPv4EndPoint.FromBytes(data, 1));
         }
 
-        private void AddPeer(Ipv4EndPoint host)
+        private void AddPeer(IPv4EndPoint host)
         {
             if (!peerEndPoints.Contains(host))
             {
@@ -59,11 +59,11 @@ namespace Orion.Networking
             }
         }
 
-        private void ProcessKickPeer(Ipv4EndPoint host, byte[] data)
+        private void ProcessKickPeer(IPv4EndPoint host, byte[] data)
         {
             if (server == host)
             {
-                Ipv4EndPoint target = Ipv4EndPoint.FromBytes(data, 1);
+                IPv4EndPoint target = IPv4EndPoint.FromBytes(data, 1);
                 if (peerEndPoints.Contains(target))
                 {
                     peerEndPoints.Remove(target);
@@ -71,7 +71,7 @@ namespace Orion.Networking
             }
         }
 
-        private void ProcessLeaveGame(Ipv4EndPoint host)
+        private void ProcessLeaveGame(IPv4EndPoint host)
         {
             if (peerEndPoints.Contains(host))
             {

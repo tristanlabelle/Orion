@@ -26,7 +26,7 @@ namespace Orion.Main
             Application.SetCompatibleTextRenderingDefault(false);
 
             MatchStartType gameType;
-            Ipv4Address? enteredHostAddress;
+            IPv4Address? enteredHostAddress;
             using (MatchSettingsDialog dialog = new MatchSettingsDialog())
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
@@ -52,7 +52,7 @@ namespace Orion.Main
             }
         }
 
-        private static void JoinGame(Ipv4Address hostAddress)
+        private static void JoinGame(IPv4Address hostAddress)
         {
             int port = DefaultClientPort;
             SafeTransporter transporter;
@@ -68,7 +68,7 @@ namespace Orion.Main
             } while (true);
 
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter);
-            configurer.HostEndPoint = new Ipv4EndPoint(hostAddress, DefaultHostPort);
+            configurer.HostEndPoint = new IPv4EndPoint(hostAddress, DefaultHostPort);
             RunMultiplayerGame(configurer);
 
             transporter.Dispose();

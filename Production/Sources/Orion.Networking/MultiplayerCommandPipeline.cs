@@ -16,7 +16,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public MultiplayerCommandPipeline(World world, SafeTransporter transporter, IEnumerable<Ipv4EndPoint> peerEndPoints)
+        public MultiplayerCommandPipeline(World world, SafeTransporter transporter, IEnumerable<IPv4EndPoint> peerEndPoints)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(transporter, "transporter");

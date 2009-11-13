@@ -37,7 +37,7 @@ namespace Orion.Networking
        
         private readonly List<SafePacketID> acknowledgedPackets = new List<SafePacketID>();
 
-        private readonly Dictionary<Ipv4EndPoint, PeerLink> peers = new Dictionary<Ipv4EndPoint, PeerLink>();
+        private readonly Dictionary<IPv4EndPoint, PeerLink> peers = new Dictionary<IPv4EndPoint, PeerLink>();
 
         private readonly Dictionary<SafePacketID, SafePacketSession> packetsToSend
             = new Dictionary<SafePacketID, SafePacketSession>();
@@ -110,7 +110,7 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-        private PeerLink GetPeerLink(Ipv4EndPoint ipEndPoint)
+        private PeerLink GetPeerLink(IPv4EndPoint ipEndPoint)
         {
             lock (peers)
             {
@@ -136,7 +136,7 @@ namespace Orion.Networking
             {
                 try
                 {
-                    Ipv4EndPoint? hostEndPoint;
+                    IPv4EndPoint? hostEndPoint;
                     int packetSizeInBytes = WaitForPacket(packet, out hostEndPoint);
                     if (!hostEndPoint.HasValue) break;
 
@@ -199,7 +199,7 @@ namespace Orion.Networking
             }
         }
 
-        private int WaitForPacket(byte[] packet, out Ipv4EndPoint? hostEndPoint)
+        private int WaitForPacket(byte[] packet, out IPv4EndPoint? hostEndPoint)
         {
             EndPoint endPoint = new IPEndPoint(0, 0);
             hostEndPoint = null;
@@ -212,7 +212,7 @@ namespace Orion.Networking
 
                     socketSemaphore.WaitOne();
                     int packetSizeInBytes = udpSocket.ReceiveFrom(packet, ref endPoint);
-                    hostEndPoint = (Ipv4EndPoint)(IPEndPoint)endPoint;
+                    hostEndPoint = (IPv4EndPoint)(IPEndPoint)endPoint;
                     return packetSizeInBytes;
                 }
                 catch (SocketException e)
@@ -281,7 +281,7 @@ namespace Orion.Networking
             }
         }
 
-        private TimeSpan GetResendDelay(Ipv4EndPoint hostEndPoint)
+        private TimeSpan GetResendDelay(IPv4EndPoint hostEndPoint)
         {
             PeerLink peer = GetPeerLink(hostEndPoint);
             if (!peer.HasPingData) return DefaultPacketResendDelay;
@@ -300,7 +300,7 @@ namespace Orion.Networking
         /// <param name="remoteHost">
         /// The host to which the data is addressed.
         /// </param>
-        public void SendTo(byte[] data, Ipv4EndPoint hostEndPoint)
+        public void SendTo(byte[] data, IPv4EndPoint hostEndPoint)
         {
             EnsureNotDisposed();
             Argument.EnsureNotNull(data, "data");
@@ -316,13 +316,13 @@ namespace Orion.Networking
             }
         }
 
-        public void SendTo(byte[] data, IEnumerable<Ipv4EndPoint> hostEndPoints)
+        public void SendTo(byte[] data, IEnumerable<IPv4EndPoint> hostEndPoints)
         {
             EnsureNotDisposed();
             Argument.EnsureNotNull(data, "data");
             Argument.EnsureNotNull(hostEndPoints, "hostEndPoints");
 
-            foreach (Ipv4EndPoint endPoint in hostEndPoints)
+            foreach (IPv4EndPoint endPoint in hostEndPoints)
                 SendTo(data, endPoint);
         }
         #endregion

@@ -20,7 +20,7 @@ namespace Orion.Main
         #endregion
 
         #region Properties
-        public Ipv4EndPoint HostEndPoint { get; set; }
+        public IPv4EndPoint HostEndPoint { get; set; }
         #endregion
 
         #region Methods

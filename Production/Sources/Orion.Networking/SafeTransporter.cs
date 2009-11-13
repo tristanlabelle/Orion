@@ -24,17 +24,12 @@ namespace Orion.Networking
         private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
         private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(20);
-        
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.
         /// </summary>
         private const int WSAETIMEDOUT = 10060;
         #endregion
-
-
-
-
 
         private readonly List<PeerLink> peers = new List<PeerLink>();
 
@@ -44,7 +39,7 @@ namespace Orion.Networking
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
 
-        
+
         private volatile bool isDisposed;
         #endregion
 
@@ -67,6 +62,7 @@ namespace Orion.Networking
         {
             Port = port;
             udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
             udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
 
             senderThread = new Thread(SenderThreadEntryPoint);
@@ -123,19 +119,17 @@ namespace Orion.Networking
         #region Receiver Thread
         private void ReceiverThreadEntryPoint()
         {
-
             byte[] packet = new byte[1024];
 
             while (true)
             {
-                
                 try
                 {
                     IPv4EndPoint? hostEndPoint;
                     int packetSizeInBytes = WaitForPacket(packet, out hostEndPoint);
                     if (!hostEndPoint.HasValue) break;
-                    
-                    PeerLink peer= GetPeerLink(hostEndPoint.Value);
+
+                    PeerLink peer = GetPeerLink(hostEndPoint.Value);
                     if (peer.HasTimedOut)
                     {
                         Debug.Fail(
@@ -164,6 +158,11 @@ namespace Orion.Networking
                             socketSemaphore.Release();
                         }
                         #endregion
+                    }
+                    else
+                    {
+                        // we don't want the game to crash on us if we receive something malformed from a potentially unknown host
+                        Console.WriteLine("*** Safe Transporter received an unknown packet of type {0}", packet[0]);
                     }
                 }
                 catch (SocketException exception)
@@ -232,7 +231,7 @@ namespace Orion.Networking
                         }
 
 
-                        
+
                     }
 
                 }
@@ -275,7 +274,7 @@ namespace Orion.Networking
             Argument.EnsureNotNull(data, "data");
             Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
             PeerLink peer = GetPeerLink(hostEndPoint);
- 
+
         }
 
         public void SendTo(byte[] data, IEnumerable<IPv4EndPoint> hostEndPoints)
@@ -286,6 +285,33 @@ namespace Orion.Networking
 
             foreach (IPv4EndPoint endPoint in hostEndPoints)
                 SendTo(data, endPoint);
+        }
+
+        /// <summary>
+        /// Broadcasts data using the standard packet format to all listening safe transporters.
+        /// </summary>
+        /// <remarks>
+        /// Broadcasted packets inherently cannot be tracked. Consequently, they must be sent only once,
+        /// and do not imply an acknowledge from any host. Hosts willing to answer must initiate a new
+        /// controlled session through the standard SendTo method with this host's address.
+        /// </remarks>
+        /// <param name="data">The data to broadcast</param>
+        /// <param name="port">The port on which to broadcast</param>
+        public void Broadcast(byte[] data, int port)
+        {
+            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureWithin(port, 1, ushort.MaxValue, "port");
+
+            // This was the implementation before Mathieu trashed away SendTo (and thus invalidated this code).
+            // Please fix me!
+            
+            /*
+            IPv4EndPoint broadcastAddress = new IPv4EndPoint((IPv4Address)IPAddress.Broadcast, port);
+            SafePacketID id = new SafePacketID(broadcastAddress, 0);
+            SafePacketSession broadcastSession = new SafePacketSession(id, PacketType.Broadcast, data);
+
+            broadcastSession.Send(udpSocket);
+            */
         }
         #endregion
 

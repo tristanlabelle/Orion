@@ -18,6 +18,11 @@ namespace Orion.Networking
         /// <summary>
         /// Identifies a packet as being an acknowledgement of the reception of a data packet.
         /// </summary>
-        Acknowledgement = 204
+        Acknowledgement = 203,
+
+        /// <summary>
+        /// Identifies a packet as being broadcasted, and thus does not implies an acknowledge.
+        /// </summary>
+        Broadcast = 204
     }
 }

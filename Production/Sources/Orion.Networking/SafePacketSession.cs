@@ -23,6 +23,10 @@ namespace Orion.Networking
 
         #region Constructors
         public SafePacketSession(SafePacketID id, byte[] data)
+            : this(id, PacketType.Data, data)
+        { }
+
+        public SafePacketSession(SafePacketID id, PacketType type, byte[] data)
         {
             Argument.EnsureNotNull(data, "data");
 
@@ -30,7 +34,7 @@ namespace Orion.Networking
             this.Data = data;
 
             fullPacket = new byte[data.Length + 7];
-            fullPacket[0] = (byte)PacketType.Data;
+            fullPacket[0] = (byte)type;
             BitConverter.GetBytes(id.SessionID).CopyTo(fullPacket, 1);
             BitConverter.GetBytes((ushort)Data.Length).CopyTo(fullPacket, 1 + sizeof(uint));
             Data.CopyTo(fullPacket, 1 + sizeof(uint) + sizeof(ushort));

@@ -13,6 +13,9 @@ namespace Orion.Networking
         AddPeer = 104,
         KickPeer = 105,
         LeaveGame = 106,
-        Seed = 107
+        Seed = 107,
+        Explore = 108,
+        Advertise = 109,
+        GameStarted = 110
     }
 }

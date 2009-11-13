@@ -24,8 +24,6 @@ namespace Orion.Networking
         private readonly Dictionary<uint,SafePacketSession> packetsToSend
            = new Dictionary<uint, SafePacketSession>();
 
-
-
         #endregion
 
         #region Constructor
@@ -126,13 +124,10 @@ namespace Orion.Networking
         #region Recieve Functions
         public void HandlePacket(byte[] packet)
         {
-           
-
             uint sessionID = BitConverter.ToUInt32(packet, 1);
 
             if (packet[0] == (byte)PacketType.Data)
             {
-
                 lock (acknowledgedPackets)
                 {
                     if (!acknowledgedPackets.Contains(sessionID))
@@ -158,6 +153,18 @@ namespace Orion.Networking
                         AddPing(packetsToSend[sessionID].TimeElapsedSinceCreation);
                         packetsToSend.Remove(sessionID);
                     }
+                }
+            }
+            else if (packet[0] == (byte)PacketType.Broadcast)
+            {
+                lock (readyData)
+                {
+                    ushort packetLength = BitConverter.ToUInt16(packet, 1 + sizeof(uint));
+
+                    byte[] packetData = new byte[packetLength];
+                    Array.Copy(packet, 1 + sizeof(uint) + sizeof(ushort), packetData, 0, packetLength);
+
+                    readyData.Add(sessionID, packetData);
                 }
             }
         }

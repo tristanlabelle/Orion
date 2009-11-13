@@ -20,7 +20,7 @@ namespace Orion.Networking
 
         private readonly SafeTransporter transporter;
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> transporterReceived;
-        private readonly GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs> transporterTimeout;
+        private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> transporterTimeout;
 
         private readonly List<IPv4EndPoint> peerEndPoints;
         private readonly Dictionary<IPv4EndPoint, PeerState> peerStates = new Dictionary<IPv4EndPoint, PeerState>();
@@ -58,9 +58,9 @@ namespace Orion.Networking
             entityDied = EntityDied;
             world.Entities.Died += entityDied;
 
-            transporterReceived = new GenericEventHandler<SafeTransporter, NetworkEventArgs>(TransporterReceived);
+            transporterReceived = TransporterReceived;
             transporter.Received += transporterReceived;
-            transporterTimeout = new GenericEventHandler<SafeTransporter, NetworkTimeoutEventArgs>(TransporterTimedOut);
+            transporterTimeout = TransporterTimedOut;
             transporter.TimedOut += transporterTimeout;
         }
         #endregion
@@ -215,10 +215,10 @@ namespace Orion.Networking
             }
         }
 
-        private void TransporterTimedOut(SafeTransporter source, NetworkTimeoutEventArgs args)
+        private void TransporterTimedOut(SafeTransporter source, IPv4EndPoint endPoint)
         {
-            MessageBox.Show("Lost connection to {0}!".FormatInvariant(args.Host));
-            peerStates.Remove(args.Host);
+            MessageBox.Show("Lost connection to {0}!".FormatInvariant(endPoint));
+            peerStates.Remove(endPoint);
         }
 
         private void Deserialize(byte[] array)

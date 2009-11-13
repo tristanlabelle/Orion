@@ -30,7 +30,7 @@ namespace Orion.Graphics
                 {
                     graphics.Clear(Color.Black);
 
-                    using (Font font = new Font("Calibri", 16, GraphicsUnit.Pixel))
+                    using (Font font = new Font("Calibri", 24, FontStyle.Bold, GraphicsUnit.Pixel))
                     {
                         Vector2 position = Vector2.Zero;
                         float maxHeight = 0;
@@ -47,18 +47,19 @@ namespace Orion.Graphics
 
                             Rectangle characterTextureRectangle = new Rectangle(
                                 position.X / fontImage.Width,
-                                position.Y / fontImage.Height,
+                                1 - position.Y / fontImage.Height - characterSizeF.Height / fontImage.Height,
                                 characterSizeF.Width / fontImage.Width,
                                 characterSizeF.Height / fontImage.Height);
                             characterTextureRectangles.Add(character, characterTextureRectangle);
 
-                            graphics.DrawString(characterString, font, Brushes.White, position.X, position.Y);
+                            if (!char.IsWhiteSpace(character)) graphics.DrawString(characterString, font, Brushes.White, position.X, position.Y);
                             position.X += characterSizeF.Width;
                         }
                     }
                 }
 
-                //fontImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                fontImage.SetPixel(0, 0, Color.Khaki);
+                fontImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
                 fontImage.Save("foo.bmp");
 
                 const int pixelSizeInBytes = 4;
@@ -80,19 +81,17 @@ namespace Orion.Graphics
                     fontImage.UnlockBits(fontBitmapData);
                 }
 
-                // XRGB -> RGBA
+                // BGRA -> RGBA
                 for (int rowIndex = 0; rowIndex < fontImage.Height; ++rowIndex)
                 {
                     for (int columnIndex = 0; columnIndex < fontImage.Width; ++columnIndex)
                     {
-                        int pixelIndex = rowIndex * fontBitmapData.Width + rowIndex;
+                        int pixelIndex = rowIndex * fontImage.Width + columnIndex;
                         int pixelDataOffset = pixelIndex * pixelSizeInBytes;
 
-                        byte alpha = pixelData[pixelDataOffset + 3];
-                        pixelData[pixelDataOffset] = pixelData[pixelDataOffset + 1];
-                        pixelData[pixelDataOffset + 1] = pixelData[pixelDataOffset + 2];
-                        pixelData[pixelDataOffset + 2] = pixelData[pixelDataOffset + 3];
-                        pixelData[pixelDataOffset + 3] = alpha;
+                        byte blue = pixelData[pixelDataOffset];
+                        pixelData[pixelDataOffset] = pixelData[pixelDataOffset + 2];
+                        pixelData[pixelDataOffset + 2] = blue;
                     }
                 }
 
@@ -119,11 +118,14 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(text, "text");
 
             float x = 0;
+            graphics.StrokeColor = Color.Red;
             foreach (char character in text)
             {
                 Rectangle textureRectangle = characterTextureRectangles[character];
                 Rectangle rectangle = new Rectangle(x, 0, textureRectangle.Width * 100, textureRectangle.Height * 100);
-                graphics.Fill(rectangle, texture, textureRectangle);
+
+                if (!char.IsWhiteSpace(character)) graphics.Fill(rectangle, texture, textureRectangle);
+
                 x += textureRectangle.Width * 100;
             }
         }

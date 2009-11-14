@@ -130,6 +130,7 @@ namespace Orion.UserInterface
                     throw new ArgumentException("Cannot add an ancestor as a child.");
 
                 base.InsertItem(index, item);
+                item.Parent = parent;
                 item.OnAddToParent(parent);
                 parent.OnAddChild(item);
             }
@@ -223,6 +224,16 @@ namespace Orion.UserInterface
             }
         }
 
+        public ViewContainer Root
+        {
+            get
+            {
+                ViewContainer container = this;
+                while (container.Parent != null) container = container.Parent;
+                return container;
+            }
+        }
+
         /// <summary>
         /// Gets the parent ViewContainer of this container.
         /// </summary>
@@ -233,7 +244,7 @@ namespace Orion.UserInterface
                 if (isDisposed) throw new ObjectDisposedException(null);
                 return parent;
             }
-            set
+            private set
             {
                 if (isDisposed) throw new ObjectDisposedException(null);
                 parent = value;
@@ -271,6 +282,9 @@ namespace Orion.UserInterface
             }
         }
 
+        #endregion
+
+        #region Methods
         /// <summary>
         /// Tests if this <see cref="View"/> is within the children of another <see cref="View"/>,
         /// recursively.
@@ -317,9 +331,6 @@ namespace Orion.UserInterface
             if (Parent != null) Parent.Children.Remove(this);
         }
 
-        #endregion
-
-        #region Methods
         public virtual void Dispose()
         {
             if (isDisposed) throw new ObjectDisposedException(null);

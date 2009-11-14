@@ -14,6 +14,11 @@ namespace Orion.UserInterface
 
         public IRenderer Renderer { get; set; }
 
+        protected internal sealed override void Render()
+        {
+            base.Render();
+        }
+
         protected internal sealed override void Draw(GraphicsContext context)
         {
             if(Renderer != null) Renderer.Draw(context);

@@ -130,11 +130,8 @@ namespace Orion.UserInterface
         protected internal virtual void PropagateUpdateEvent(UpdateEventArgs args)
         {
             if (isDisposed) throw new ObjectDisposedException(null);
-            foreach (Responder child in Enumerable.Reverse(Children))
-            {
-                child.PropagateUpdateEvent(args);
-                child.OnUpdate(args);
-            }
+            foreach (Responder child in Enumerable.Reverse(Children)) child.PropagateUpdateEvent(args);
+            OnUpdate(args);
         }
         #endregion
 

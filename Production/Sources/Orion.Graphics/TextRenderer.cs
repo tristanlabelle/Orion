@@ -10,6 +10,7 @@ using OpenTK.Math;
 using Rectangle = Orion.Geometry.Rectangle;
 using SysRectangle = System.Drawing.Rectangle;
 using SysGraphics = System.Drawing.Graphics;
+using System.Diagnostics;
 
 namespace Orion.Graphics
 {
@@ -58,9 +59,7 @@ namespace Orion.Graphics
                     }
                 }
 
-                fontImage.SetPixel(0, 0, Color.Khaki);
                 fontImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                fontImage.Save("foo.bmp");
 
                 const int pixelSizeInBytes = 4;
                 byte[] pixelData = new byte[fontImage.Width * fontImage.Height * pixelSizeInBytes];
@@ -121,7 +120,15 @@ namespace Orion.Graphics
             graphics.StrokeColor = Color.Red;
             foreach (char character in text)
             {
-                Rectangle textureRectangle = characterTextureRectangles[character];
+                Rectangle textureRectangle;
+                if (!characterTextureRectangles.TryGetValue(character, out textureRectangle))
+                {
+                    Debug.Fail(
+                        "Failed to retrieve texture rectangle for character '{0}'."
+                        .FormatInvariant(character));
+                    continue;
+                }
+
                 Rectangle rectangle = new Rectangle(x, 0, textureRectangle.Width * 100, textureRectangle.Height * 100);
 
                 if (!char.IsWhiteSpace(character)) graphics.Fill(rectangle, texture, textureRectangle);

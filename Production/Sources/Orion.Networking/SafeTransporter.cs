@@ -19,11 +19,15 @@ namespace Orion.Networking
     public sealed class SafeTransporter : IDisposable
     {
         #region Fields
-        #region Private
         #region Constants
-        private static readonly TimeSpan PacketSessionTimeout = new TimeSpan(0, 0, 30);
+        private static readonly TimeSpan SafePacketTimeout = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(100);
-        private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(20);
+        private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(1);
+
+        /// <summary>
+        /// The amount of time to block in Socket.ReceiveFrom calls.
+        /// </summary>
+        private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.
@@ -33,22 +37,13 @@ namespace Orion.Networking
 
         private readonly List<PeerLink> peers = new List<PeerLink>();
 
-        private readonly Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
 
         private readonly Thread senderThread;
         private readonly Thread receiverThread;
 
-
         private volatile bool isDisposed;
-        #endregion
-
-        #region Public
-        /// <summary>
-        /// The port on which the UDP socket is bound.
-        /// </summary>
-        public readonly int Port;
-        #endregion
         #endregion
 
         #region Constructor
@@ -60,20 +55,20 @@ namespace Orion.Networking
         /// </param>
         public SafeTransporter(int port)
         {
-            Port = port;
-            udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 500);
-
+            socket.Bind(new IPEndPoint(IPAddress.Any, port));
+            socket.SetSocketOption(SocketOptionLevel.Socket,
+                SocketOptionName.Broadcast, true);
+            socket.SetSocketOption(SocketOptionLevel.Socket,
+                SocketOptionName.ReceiveTimeout, ReceiveTimeout.TotalMilliseconds);
+            
             senderThread = new Thread(SenderThreadEntryPoint);
-            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
-            senderThread.IsBackground = true;
             receiverThread = new Thread(ReceiverThreadEntryPoint);
+            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
             receiverThread.Name = "Receiver Thread for {0}".FormatInvariant(this);
+            senderThread.IsBackground = true;
             receiverThread.IsBackground = true;
-
-            receiverThread.Start();
             senderThread.Start();
+            receiverThread.Start();
         }
         #endregion
 
@@ -101,95 +96,95 @@ namespace Orion.Networking
         }
         #endregion
 
-        #region Methods
-        private PeerLink GetPeerLink(IPv4EndPoint ipEndPoint)
+        #region Properties
+        /// <summary>
+        /// Gets the port to which this transporter is locally bound.
+        /// </summary>
+        public int Port
         {
-            lock (peers)
-            {
-                PeerLink peer = peers.FirstOrDefault(p => p.EndPoint == ipEndPoint);
-                if (peer == null)
-                {
-                    peer = new PeerLink(ipEndPoint);
-                    peers.Add(peer);
-                }
-                return peer;
-            }
+            get { return ((IPEndPoint)socket.LocalEndPoint).Port; }
         }
+        #endregion
+
+        #region Methods
+        #region Peer Link Management
+        private PeerLink GetOrCreatePeerLink(IPv4EndPoint ipEndPoint)
+        {
+            PeerLink peer = peers.FirstOrDefault(p => p.EndPoint == ipEndPoint);
+            if (peer == null)
+            {
+                peer = new PeerLink(ipEndPoint);
+                peers.Add(peer);
+            }
+            return peer;
+        }
+        #endregion
 
         #region Receiver Thread
         private void ReceiverThreadEntryPoint()
         {
-            byte[] packet = new byte[1024];
+            byte[] packetData = new byte[1024];
 
-            while (true)
+            while (!isDisposed)
             {
                 try
                 {
-                    IPv4EndPoint? hostEndPoint;
-                    int packetSizeInBytes = WaitForPacket(packet, out hostEndPoint);
-                    if (!hostEndPoint.HasValue) break;
+                    IPv4EndPoint hostEndPoint;
+                    int packetLength = WaitForPacket(packetData, out hostEndPoint);
+                    if (isDisposed) break;
 
-                    PeerLink peer = GetPeerLink(hostEndPoint.Value);
-                    if (peer.HasTimedOut)
+                    if (Protocol.IsForeign(packetData))
                     {
-                        Debug.Fail(
-                            "Timed out peer {0} has revived."
-                            .FormatInvariant(hostEndPoint.Value));
+                        Debug.Fail("Foreign packet received.");
                         continue;
                     }
 
-                    peer.HandlePacket(packet);
-                    if (packet[0] == (byte)PacketType.Data)
+                    lock (peers)
                     {
-                        // it is always necessary to send an answer to data packets
-                        #region Send The Ack back
-                        byte[] answer = new byte[5];
-                        answer[0] = (byte)PacketType.Acknowledgement;
-                        for (int i = 1; i < 5; i++)
-                            answer[i] = packet[i];
-                        socketSemaphore.WaitOne();
-                        try
+                        PeerLink peer = GetOrCreatePeerLink(hostEndPoint);
+                        if (peer.HasTimedOut)
                         {
-                            if (isDisposed) break;
-                            udpSocket.SendTo(answer, hostEndPoint);
+                            Debug.Fail(
+                                "Received a packet from timed out peer {0}."
+                                .FormatInvariant(hostEndPoint));
+                            continue;
                         }
-                        finally
-                        {
-                            socketSemaphore.Release();
-                        }
-                        #endregion
+
+                        peer.HandlePacket(packetData, packetLength);
                     }
-                    else
+
+                    // Send the ack, this should really not be here but as
+                    // PeerLinks have no access to the socket, it is...
+                    if (Protocol.GetPacketType(packetData) == PacketType.Data)
                     {
-                        // we don't want the game to crash on us if we receive something malformed from a potentially unknown host
-                        Console.WriteLine("*** Safe Transporter received an unknown packet of type {0}", packet[0]);
+                        uint packetNumber = Protocol.GetDataPacketNumber(packetData);
+                        SendAcknowledgement(hostEndPoint, packetNumber);
                     }
                 }
                 catch (SocketException exception)
                 {
-                    Debug.Fail("Unexpected socket exception {0}: {1}".FormatInvariant(exception.ErrorCode, exception));
+                    Debug.Fail(
+                        "Unexpected socket exception {0}: {1}"
+                        .FormatInvariant(exception.ErrorCode, exception));
                     break;
                 }
-
-                Array.Clear(packet, 0, packet.Length);
             }
         }
 
-        private int WaitForPacket(byte[] packet, out IPv4EndPoint? hostEndPoint)
+        private int WaitForPacket(byte[] data, out IPv4EndPoint hostEndPoint)
         {
             EndPoint endPoint = new IPEndPoint(0, 0);
-            hostEndPoint = null;
+            hostEndPoint = IPv4EndPoint.Any;
 
-            while (true)
+            while (!isDisposed)
             {
+                socketSemaphore.WaitOne();
                 try
                 {
-                    if (isDisposed) return -1;
-
-                    socketSemaphore.WaitOne();
-                    int packetSizeInBytes = udpSocket.ReceiveFrom(packet, ref endPoint);
+                    if (isDisposed) break;
+                    int packetLength = socket.ReceiveFrom(data, ref endPoint);
                     hostEndPoint = (IPv4EndPoint)(IPEndPoint)endPoint;
-                    return packetSizeInBytes;
+                    return packetLength;
                 }
                 catch (SocketException e)
                 {
@@ -200,6 +195,24 @@ namespace Orion.Networking
                     socketSemaphore.Release();
                 }
             }
+
+            return -1;
+        }
+
+        private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint packetNumber)
+        {
+            byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(packetNumber);
+
+            socketSemaphore.WaitOne();
+            try
+            {
+                if (isDisposed) return;
+                socket.SendTo(acknowledgementPacketData, hostEndPoint);
+            }
+            finally
+            {
+                socketSemaphore.Release();
+            }
         }
         #endregion
 
@@ -208,50 +221,44 @@ namespace Orion.Networking
         {
             while (!isDisposed)
             {
-                socketSemaphore.WaitOne();
-                try
+                lock (peers)
                 {
-                    lock (peers)
+                    foreach (PeerLink peer in peers)
                     {
-                        foreach (PeerLink peer in peers)
-                        {
-                            if (peer.HasTimedOut) continue;
-                            foreach (SafePacketSession session in peer.PacketsToSend)
-                            {
-                                if (session.TimeElapsedSinceCreation > PacketSessionTimeout)
-                                {
-                                    peer.MarkAsTimedOut();
-                                    break;
-                                }
+                        if (peer.HasTimedOut) continue;
 
-                                TimeSpan resendDelay = GetResendDelay(session.ID.HostEndPoint);
-                                if (!session.WasSent || session.TimeElapsedSinceLastSend >= resendDelay)
-                                    session.Send(udpSocket);
+                        foreach (SafePacket packet in peer.PacketsToSend)
+                        {
+                            if (packet.TimeElapsedSinceCreation > SafePacketTimeout)
+                            {
+                                peer.MarkAsTimedOut();
+                                break;
+                            }
+
+                            TimeSpan resendDelay = GetResendDelay(peer);
+                            if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
+                            {
+                                socketSemaphore.WaitOne();
+                                try
+                                {
+                                    if (isDisposed) return;
+                                    socket.SendTo(packet.Data, peer.EndPoint);
+                                }
+                                finally
+                                {
+                                    socketSemaphore.Release();
+                                }
                             }
                         }
-
-
-
                     }
-
-                }
-                catch (SocketException exception)
-                {
-                    Debug.Fail("Unexpected socket exception {0}: {1}".FormatInvariant(exception.ErrorCode, exception));
-                    break;
-                }
-                finally
-                {
-                    socketSemaphore.Release();
                 }
 
                 Thread.Sleep(0);
             }
         }
 
-        private TimeSpan GetResendDelay(IPv4EndPoint hostEndPoint)
+        private TimeSpan GetResendDelay(PeerLink peer)
         {
-            PeerLink peer = GetPeerLink(hostEndPoint);
             if (!peer.HasPingData) return DefaultPacketResendDelay;
             TimeSpan resendDelay = peer.AveragePing + peer.AveragePingDeviation;
             return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
@@ -260,58 +267,55 @@ namespace Orion.Networking
 
         #region Sending
         /// <summary>
-        /// Sends data to a specified host.
+        /// Sends a message to a specified host.
         /// </summary>
-        /// <param name="data">
-        /// The data to send.
+        /// <param name="message">
+        /// The message to be sent.
         /// </param>
         /// <param name="remoteHost">
-        /// The host to which the data is addressed.
+        /// The host to which the message is addressed.
         /// </param>
-        public void SendTo(byte[] data, IPv4EndPoint hostEndPoint)
+        public void SendTo(byte[] message, IPv4EndPoint hostEndPoint)
         {
             EnsureNotDisposed();
-            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(message, "message");
             Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
-            PeerLink peer = GetPeerLink(hostEndPoint);
 
+            PeerLink peer = GetOrCreatePeerLink(hostEndPoint);
+            peer.CreatePacket(message);
         }
 
-        public void SendTo(byte[] data, IEnumerable<IPv4EndPoint> hostEndPoints)
+        public void SendTo(byte[] message, IEnumerable<IPv4EndPoint> hostEndPoints)
         {
             EnsureNotDisposed();
-            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(message, "message");
             Argument.EnsureNotNull(hostEndPoints, "hostEndPoints");
 
             foreach (IPv4EndPoint endPoint in hostEndPoints)
-                SendTo(data, endPoint);
+                SendTo(message, endPoint);
         }
 
         /// <summary>
-        /// Broadcasts data using the standard packet format to all listening safe transporters.
+        /// Broadcasts a message using to all listening safe transporters.
         /// </summary>
-        /// <remarks>
-        /// Broadcasted packets inherently cannot be tracked. Consequently, they must be sent only once,
-        /// and do not imply an acknowledge from any host. Hosts willing to answer must initiate a new
-        /// controlled session through the standard SendTo method with this host's address.
-        /// </remarks>
-        /// <param name="data">The data to broadcast</param>
+        /// <param name="message">The message to broadcast</param>
         /// <param name="port">The port on which to broadcast</param>
-        public void Broadcast(byte[] data, int port)
+        /// <remarks>
+        /// Broadcasted packets are inherently unreliable as it is impossible to know who didn't receive them.
+        /// Consequently, they are sent only once with only integrity being garanteed.
+        /// </remarks>
+        public void Broadcast(byte[] message, int port)
         {
-            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(message, "message");
             Argument.EnsureWithin(port, 1, ushort.MaxValue, "port");
 
-            // This was the implementation before Mathieu trashed away SendTo (and thus invalidated this code).
-            // Please fix me!
-            
-            /*
-            IPv4EndPoint broadcastAddress = new IPv4EndPoint((IPv4Address)IPAddress.Broadcast, port);
-            SafePacketID id = new SafePacketID(broadcastAddress, 0);
-            SafePacketSession broadcastSession = new SafePacketSession(id, PacketType.Broadcast, data);
+            IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
+            byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            broadcastSession.Send(udpSocket);
-            */
+            lock (socket)
+            {
+                socket.SendTo(packetData, SocketFlags.Broadcast, broadcastEndPoint);
+            }
         }
         #endregion
 
@@ -336,7 +340,7 @@ namespace Orion.Networking
                 {
                     while (!peer.HasReadyData) continue;
                     {
-                        OnReceived(new NetworkEventArgs(peer.EndPoint, peer.getNextReadyData()));
+                        OnReceived(new NetworkEventArgs(peer.EndPoint, peer.GetNextReadyMessage()));
                     }
                 }
             }
@@ -365,8 +369,8 @@ namespace Orion.Networking
             socketSemaphore.WaitOne();
             socketSemaphore.WaitOne();
 
-            udpSocket.Shutdown(SocketShutdown.Both);
-            udpSocket.Close();
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
 
             socketSemaphore.Release();
             socketSemaphore.Release();

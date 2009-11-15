@@ -21,8 +21,8 @@ namespace Orion.Networking
         private volatile uint nextPacketNumber;
         private volatile bool hasTimedOut;
 
-        private readonly Dictionary<uint,SafePacketSession> packetsToSend
-           = new Dictionary<uint, SafePacketSession>();
+        private readonly Dictionary<uint,SafePacket> packetsToSend
+           = new Dictionary<uint, SafePacket>();
 
         #endregion
 
@@ -34,31 +34,20 @@ namespace Orion.Networking
         #endregion
 
         #region Proprieties
-
         public bool HasTimedOut
         {
             get { return hasTimedOut; }
         }
+
         public bool HasReadyData
         {
             get { return readyData.Count>0 && readyData.Keys.First() == expectedPacketNumber; }
         }
 
-        public IEnumerable<SafePacketSession> PacketsToSend
+        public IEnumerable<SafePacket> PacketsToSend
         {
             get { return packetsToSend.Values; }
         } 
-
-
-        public uint NextPacketNumber
-        {
-            get { return nextPacketNumber; }
-        }
-
-        public uint ExpectedPacketNumber
-        {
-            get { return expectedPacketNumber; }
-        }
 
         public IPv4EndPoint EndPoint
         {
@@ -122,65 +111,57 @@ namespace Orion.Networking
         #endregion
 
         #region Recieve Functions
-        public void HandlePacket(byte[] packet)
+        public void HandlePacket(byte[] data, int dataLength)
         {
-            uint sessionID = BitConverter.ToUInt32(packet, 1);
-
-            if (packet[0] == (byte)PacketType.Data)
+            PacketType type = Protocol.GetPacketType(data);
+            if (type == PacketType.Data)
             {
+                uint packetNumber = Protocol.GetDataPacketNumber(data);
+
                 lock (acknowledgedPackets)
                 {
-                    if (!acknowledgedPackets.Contains(sessionID))
-                        acknowledgedPackets.Add(sessionID);
+                    if (!acknowledgedPackets.Contains(packetNumber))
+                        acknowledgedPackets.Add(packetNumber);
                 }
+
+                byte[] message = Protocol.GetDataPacketMessage(data, dataLength);
 
                 lock (readyData)
                 {
-                    ushort packetLength = BitConverter.ToUInt16(packet, 1 + sizeof(uint));
-
-                    byte[] packetData = new byte[packetLength];
-                    Array.Copy(packet, 1 + sizeof(uint) + sizeof(ushort), packetData, 0, packetLength);
-
-                    readyData.Add(sessionID, packetData);
+                    readyData.Add(packetNumber, message);
                 }
             }
-            else if (packet[0] == (byte)PacketType.Acknowledgement)
+            else if (type == PacketType.Acknowledgement)
             {
+                uint packetNumber = Protocol.GetAcknowledgementPacketNumber(data);
+
                 lock (packetsToSend)
                 {
-                    if (packetsToSend.ContainsKey(sessionID))
+                    if (packetsToSend.ContainsKey(packetNumber))
                     {
-                        AddPing(packetsToSend[sessionID].TimeElapsedSinceCreation);
-                        packetsToSend.Remove(sessionID);
+                        AddPing(packetsToSend[packetNumber].TimeElapsedSinceCreation);
+                        packetsToSend.Remove(packetNumber);
                     }
                 }
             }
-            else if (packet[0] == (byte)PacketType.Broadcast)
+            else if (type == PacketType.Broadcast)
             {
-                lock (readyData)
-                {
-                    ushort packetLength = BitConverter.ToUInt16(packet, 1 + sizeof(uint));
-
-                    byte[] packetData = new byte[packetLength];
-                    Array.Copy(packet, 1 + sizeof(uint) + sizeof(ushort), packetData, 0, packetLength);
-
-                    readyData.Add(sessionID, packetData);
-                }
+                byte[] message = Protocol.GetBroadcastPacketMessage(data, dataLength);
+                throw new NotImplementedException("Handling of broadcast packets, they cannot be put in readyData.");
             }
         }
         #endregion
 
-        public SafePacketSession CreatePacketSession(byte[] data)
+        public SafePacket CreatePacket(byte[] data)
         {
             uint packetNumber = nextPacketNumber;
             ++nextPacketNumber;
 
             lock (packetsToSend)
             {
-                SafePacketID id = new SafePacketID(endPoint, packetNumber);
-                SafePacketSession session = new SafePacketSession(id, data);
-                packetsToSend.Add(packetNumber,session);
-                return session;
+                SafePacket packet = new SafePacket(packetNumber, data);
+                packetsToSend.Add(packetNumber, packet);
+                return packet;
             }
         }
 
@@ -193,7 +174,7 @@ namespace Orion.Networking
             acknowledgedPackets.Clear();
         }
 
-        public byte[] getNextReadyData()
+        public byte[] GetNextReadyMessage()
         {
             byte[] nextReadyData = readyData.First().Value;
             ++expectedPacketNumber;

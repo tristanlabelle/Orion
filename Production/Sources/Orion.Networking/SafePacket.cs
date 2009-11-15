@@ -10,38 +10,34 @@ namespace Orion.Networking
     /// <summary>
     /// Holds all data needed to garantee the delivery of a packet of data.
     /// </summary>
-    internal sealed class SafePacketSession
+    internal sealed class SafePacket
     {
         #region Fields
         private readonly DateTime creationTime = DateTime.UtcNow;
+        private readonly byte[] data;
         private DateTime? lastSendTime;
-        private readonly byte[] fullPacket;
-
-        public readonly SafePacketID ID;
-        public readonly byte[] Data;
         #endregion
 
         #region Constructors
-        public SafePacketSession(SafePacketID id, byte[] data)
-            : this(id, PacketType.Data, data)
-        { }
-
-        public SafePacketSession(SafePacketID id, PacketType type, byte[] data)
+        public SafePacket(uint number, byte[] message)
         {
-            Argument.EnsureNotNull(data, "data");
+            Argument.EnsureNotNull(message, "message");
 
-            this.ID = id;
-            this.Data = data;
-
-            fullPacket = new byte[data.Length + 7];
-            fullPacket[0] = (byte)type;
-            BitConverter.GetBytes(id.SessionID).CopyTo(fullPacket, 1);
-            BitConverter.GetBytes((ushort)Data.Length).CopyTo(fullPacket, 1 + sizeof(uint));
-            Data.CopyTo(fullPacket, 1 + sizeof(uint) + sizeof(ushort));
+            this.data = Protocol.CreateDataPacket(message, number);
         }
         #endregion
 
         #region Properties
+        public uint Number
+        {
+            get { return Protocol.GetDataPacketNumber(data); }
+        }
+
+        public byte[] Data
+        {
+            get { return data; }
+        }
+
         public DateTime CreationTime
         {
             get { return creationTime; }
@@ -73,13 +69,8 @@ namespace Orion.Networking
         #endregion
 
         #region Methods
-        public void Send(Socket udpSocket)
+        public void UpdateSendTime()
         {
-            Argument.EnsureNotNull(udpSocket, "udpSocket");
-
-            udpSocket.SendTo(fullPacket, ID.HostEndPoint);
-
-            bool firstTimeSent = !lastSendTime.HasValue;
             lastSendTime = DateTime.UtcNow;
         }
         #endregion

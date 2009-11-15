@@ -21,7 +21,7 @@ namespace Orion.Networking
         Acknowledgement = 203,
 
         /// <summary>
-        /// Identifies a packet as being broadcasted, and thus does not implies an acknowledge.
+        /// Identifies a packet as being broadcasted, and thus does not implies an acknowledgement.
         /// </summary>
         Broadcast = 204
     }

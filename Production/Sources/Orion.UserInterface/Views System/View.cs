@@ -70,7 +70,7 @@ namespace Orion.UserInterface
             return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
         }
 
-        protected internal override sealed void Render()
+        protected internal override void Render()
         {
             context.SetUpGLContext(Frame);
 

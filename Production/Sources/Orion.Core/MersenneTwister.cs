@@ -205,11 +205,6 @@ namespace Orion
 
         private static readonly Vector128 maskVector = new Vector128(0xdfffffef, 0xddfecb7f, 0xbffaffff, 0xbffffff6);
         private static readonly Vector128 parityVector = new Vector128(0x00000001, 0x00000000, 0x00000000, 0x13C9E684);
-
-        /// <summary>
-        /// The time of the beginning of the UNIX Epoch.
-        /// </summary>
-        private static readonly DateTime unixEpochStart = new DateTime(1970, 1, 1);
         #endregion
         #endregion
 
@@ -237,7 +232,7 @@ namespace Orion
         /// Constructs a new Mersenne Twister, using the current number of seconds since the beginning of the Unix Epoch as the seed.
         /// </summary>
         public MersenneTwister()
-            : this((int)(DateTime.UtcNow - unixEpochStart).TotalSeconds)
+            : this(Environment.TickCount)
         { }
 
         /// <summary>

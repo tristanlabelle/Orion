@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Orion.Networking
 {
@@ -14,8 +15,8 @@ namespace Orion.Networking
         #region Fields
         private readonly IPv4EndPoint endPoint;
         private readonly Queue<TimeSpan> pings = new  Queue<TimeSpan>();
-        private readonly SortedList<uint, byte[]> readyData = new SortedList<uint, byte[]>();
-        private readonly SortedList<uint, NetworkTimeoutEventArgs> timedOut = new SortedList<uint, NetworkTimeoutEventArgs>();
+        private readonly Queue<byte[]> receivedBroadcastMessages = new Queue<byte[]>();
+        private readonly SortedList<uint, byte[]> receivedSequencialMessages = new SortedList<uint, byte[]>();
         private readonly List<uint> acknowledgedPackets = new List<uint>();
         private volatile uint expectedPacketNumber;
         private volatile uint nextPacketNumber;
@@ -41,7 +42,12 @@ namespace Orion.Networking
 
         public bool HasReadyData
         {
-            get { return readyData.Count>0 && readyData.Keys.First() == expectedPacketNumber; }
+            get
+            {
+                return receivedBroadcastMessages.Count > 0
+                    || (receivedSequencialMessages.Count > 0
+                    && receivedSequencialMessages.Keys.First() == expectedPacketNumber);
+            }
         }
 
         public IEnumerable<SafePacket> PacketsToSend
@@ -117,6 +123,11 @@ namespace Orion.Networking
             if (type == PacketType.Data)
             {
                 uint packetNumber = Protocol.GetDataPacketNumber(data);
+                if (packetNumber < expectedPacketNumber || receivedSequencialMessages.ContainsKey(packetNumber))
+                {
+                    Debug.Fail("Received the same packet twice.");
+                    return;
+                }
 
                 lock (acknowledgedPackets)
                 {
@@ -126,28 +137,20 @@ namespace Orion.Networking
 
                 byte[] message = Protocol.GetDataPacketMessage(data, dataLength);
 
-                lock (readyData)
+                lock (receivedSequencialMessages)
                 {
-                    readyData.Add(packetNumber, message);
+                    receivedSequencialMessages.Add(packetNumber, message);
                 }
             }
             else if (type == PacketType.Acknowledgement)
             {
                 uint packetNumber = Protocol.GetAcknowledgementPacketNumber(data);
-
-                lock (packetsToSend)
-                {
-                    if (packetsToSend.ContainsKey(packetNumber))
-                    {
-                        AddPing(packetsToSend[packetNumber].TimeElapsedSinceCreation);
-                        packetsToSend.Remove(packetNumber);
-                    }
-                }
+                AcknowledgePacket(packetNumber);
             }
             else if (type == PacketType.Broadcast)
             {
                 byte[] message = Protocol.GetBroadcastPacketMessage(data, dataLength);
-                throw new NotImplementedException("Handling of broadcast packets, they cannot be put in readyData.");
+                receivedBroadcastMessages.Enqueue(message);
             }
         }
         #endregion
@@ -165,20 +168,33 @@ namespace Orion.Networking
             }
         }
 
+        public void AcknowledgePacket(uint number)
+        {
+            if (packetsToSend.ContainsKey(number))
+            {
+                AddPing(packetsToSend[number].TimeElapsedSinceCreation);
+                packetsToSend.Remove(number);
+            }
+        }
+
         public void MarkAsTimedOut()
         {
             hasTimedOut = true;
             packetsToSend.Clear();
-            readyData.Clear();
+            receivedSequencialMessages.Clear();
             pings.Clear();
             acknowledgedPackets.Clear();
         }
 
-        public byte[] GetNextReadyMessage()
+        public byte[] PopNextReadyMessage()
         {
-            byte[] nextReadyData = readyData.First().Value;
+            if (receivedBroadcastMessages.Count > 0)
+                return receivedBroadcastMessages.Dequeue();
+
+            var pair = receivedSequencialMessages.First();
+            receivedSequencialMessages.Remove(pair.Key);
             ++expectedPacketNumber;
-            return nextReadyData;
+            return pair.Value;
         }
         #endregion
     }

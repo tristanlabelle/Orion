@@ -59,7 +59,7 @@ namespace Orion.Networking
             socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.Broadcast, true);
             socket.SetSocketOption(SocketOptionLevel.Socket,
-                SocketOptionName.ReceiveTimeout, ReceiveTimeout.TotalMilliseconds);
+                SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
             
             senderThread = new Thread(SenderThreadEntryPoint);
             receiverThread = new Thread(ReceiverThreadEntryPoint);
@@ -281,8 +281,11 @@ namespace Orion.Networking
             Argument.EnsureNotNull(message, "message");
             Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
 
-            PeerLink peer = GetOrCreatePeerLink(hostEndPoint);
-            peer.CreatePacket(message);
+            lock (peers)
+            {
+                PeerLink peer = GetOrCreatePeerLink(hostEndPoint);
+                peer.CreatePacket(message);
+            }
         }
 
         public void SendTo(byte[] message, IEnumerable<IPv4EndPoint> hostEndPoints)
@@ -306,15 +309,22 @@ namespace Orion.Networking
         /// </remarks>
         public void Broadcast(byte[] message, int port)
         {
+            EnsureNotDisposed();
             Argument.EnsureNotNull(message, "message");
             Argument.EnsureWithin(port, 1, ushort.MaxValue, "port");
 
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            lock (socket)
+            socketSemaphore.WaitOne();
+            try
             {
-                socket.SendTo(packetData, SocketFlags.Broadcast, broadcastEndPoint);
+                if (isDisposed) return;
+                socket.SendTo(packetData, broadcastEndPoint);
+            }
+            finally
+            {
+                socketSemaphore.Release();
             }
         }
         #endregion
@@ -338,9 +348,9 @@ namespace Orion.Networking
             {
                 foreach (PeerLink peer in peers)
                 {
-                    while (!peer.HasReadyData) continue;
+                    while (peer.HasReadyData)
                     {
-                        OnReceived(new NetworkEventArgs(peer.EndPoint, peer.GetNextReadyMessage()));
+                        OnReceived(new NetworkEventArgs(peer.EndPoint, peer.PopNextReadyMessage()));
                     }
                 }
             }

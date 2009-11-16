@@ -28,18 +28,15 @@ namespace Orion.Networking
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
-        /// <summary>
-        /// Accumulates commands that will be executed at the end of the frame.
-        /// </summary>
         private readonly List<Command> currentFrameCommands = new List<Command>();
         private readonly List<Command> lastFrameLocalCommands = new List<Command>();
+        private readonly List<NetworkEventArgs> futureFramePackets = new List<NetworkEventArgs>();
 
         private readonly CommandFactory serializer;
 
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
 
-        private int commandFrameNumber;
-        private List<NetworkEventArgs> futureCommands = new List<NetworkEventArgs>();
+        private int commandFrameNumber = -1;
         #endregion
 
         #region Constructors
@@ -110,15 +107,16 @@ namespace Orion.Networking
             ++commandFrameNumber;
             currentFrameCommands.Clear();
 
+            SynchronizeLocalCommands();
+
             ResetPeerStates();
             DeserializeNeededFuturePackets();
-            WaitForPeerCommands();
+            if (commandFrameNumber > 0) WaitForPeerCommands();
             currentFrameCommands.AddRange(lastFrameLocalCommands);
             lastFrameLocalCommands.Clear();
             ExecuteCurrentFrameCommands();
             currentFrameCommands.Clear();
 
-            SynchronizeLocalCommands();
             lastFrameLocalCommands.AddRange(LocalCommands);
             LocalCommands.Clear();
         }
@@ -134,15 +132,15 @@ namespace Orion.Networking
 
         private void DeserializeNeededFuturePackets()
         {
-            for (int i = (futureCommands.Count - 1); i >= 0; --i)
+            for (int i = (futureFramePackets.Count - 1); i >= 0; --i)
             {
-                NetworkEventArgs packet = futureCommands[i];
+                NetworkEventArgs packet = futureFramePackets[i];
                 int packetCommandFrameNumber = BitConverter.ToInt32(packet.Data, 1);
                 if (packetCommandFrameNumber < commandFrameNumber)
                 {
                     Debug.Assert(packetCommandFrameNumber == commandFrameNumber - 1);
                     DeserializeGameMessage(packet);
-                    futureCommands.RemoveAt(i);
+                    futureFramePackets.RemoveAt(i);
                 }
             }
         }
@@ -155,10 +153,10 @@ namespace Orion.Networking
                 {
                     writer.Write((byte)GameMessageType.Commands);
                     writer.Write(commandFrameNumber);
-                    foreach (Command accumulatedCommand in accumulatedCommands)
+                    foreach (Command command in LocalCommands)
                     {
-                        if (accumulatedCommand.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
-                        serializer.Serialize(accumulatedCommand, writer);
+                        if (command.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
+                        serializer.Serialize(command, writer);
                     }
                 }
                 deadEntities.Clear();
@@ -197,7 +195,7 @@ namespace Orion.Networking
             }
             else
             {
-                futureCommands.Add(args);
+                futureFramePackets.Add(args);
             }
         }
 

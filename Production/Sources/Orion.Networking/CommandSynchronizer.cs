@@ -28,7 +28,11 @@ namespace Orion.Networking
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
-        private readonly List<Command> synchronizedCommands = new List<Command>();
+        /// <summary>
+        /// Accumulates commands that will be executed at the end of the frame.
+        /// </summary>
+        private readonly List<Command> currentFrameCommands = new List<Command>();
+        private readonly List<Command> lastFrameLocalCommands = new List<Command>();
 
         private readonly CommandFactory serializer;
 
@@ -76,6 +80,11 @@ namespace Orion.Networking
         {
             get { return peerStates.Values.All(state => (state & PeerState.ReceivedDone) != 0); }
         }
+
+        private List<Command> LocalCommands
+        {
+            get { return accumulatedCommands; }
+        }
         #endregion
 
         #region Methods
@@ -83,18 +92,7 @@ namespace Orion.Networking
         public void Update(int frameNumber)
         {
             if (frameNumber % frameModulo == 0)
-            {
-                foreach (Command command in accumulatedCommands)
-                {
-                    command.commandFrameNumber = commandFrameNumber + 1;
-                    command.isLocal = true;
-                }
-
-                WaitForPeerCommands();
-                ResetPeerStates();
-                ++commandFrameNumber;
-                Flush();
-            }
+                RunCommandFrame();
         }
 
         public override void EndFeed() { }
@@ -105,20 +103,37 @@ namespace Orion.Networking
             transporter.TimedOut -= transporterTimeout;
         }
 
-        public override void Flush()
+        public override void Flush() { }
+
+        public void RunCommandFrame()
         {
-            if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
+            ++commandFrameNumber;
 
-            // The order here is important because synchronizedCommands is accessed in both methods.
-            FeedSynchronizedCommandsToRecipient();
-            BeginSynchronizationOfAccumulatedCommands();
+            ResetPeerStates();
+            currentFrameCommands.Clear();
+            DeserializeNeededFuturePackets();
+            WaitForPeerCommands();
+            currentFrameCommands.AddRange(lastFrameLocalCommands);
+            lastFrameLocalCommands.Clear();
+            ExecuteCurrentFrameCommands();
 
+            SynchronizeLocalCommands();
+            lastFrameLocalCommands.AddRange(LocalCommands);
+            LocalCommands.Clear();
+        }
+
+        private void ExecuteCurrentFrameCommands()
+        {
+            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
+            currentFrameCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
+            foreach (Command command in currentFrameCommands)
+                Recipient.Feed(command);
             Recipient.EndFeed();
         }
 
-        private void FeedSynchronizedCommandsToRecipient()
+        private void DeserializeNeededFuturePackets()
         {
-            for (int i = (futureCommands.Count - 1); i >= 0;--i)
+            for (int i = (futureCommands.Count - 1); i >= 0; --i)
             {
                 NetworkEventArgs packet = futureCommands[i];
                 int packetCommandFrameNumber = BitConverter.ToInt32(packet.Data, 1);
@@ -129,18 +144,9 @@ namespace Orion.Networking
                     futureCommands.RemoveAt(i);
                 }
             }
-
-            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
-            if (synchronizedCommands.Any(command => command.commandFrameNumber != commandFrameNumber - 1))
-                Debug.Fail("Executing a command that isn't from the previous command frame.");
-
-            synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
-            foreach (Command command in synchronizedCommands)
-                Recipient.Feed(command);
-            synchronizedCommands.Clear();
         }
 
-        private void BeginSynchronizationOfAccumulatedCommands()
+        private void SynchronizeLocalCommands()
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -157,9 +163,6 @@ namespace Orion.Networking
                 deadEntities.Clear();
                 transporter.SendTo(stream.ToArray(), peerStates.Keys);
             }
-
-            synchronizedCommands.AddRange(accumulatedCommands);
-            accumulatedCommands.Clear();
         }
         #endregion
 
@@ -186,14 +189,14 @@ namespace Orion.Networking
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
             int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
-            
-            if (packetCommandFrameNumber > commandFrameNumber)
+            if (packetCommandFrameNumber < commandFrameNumber)
+            {
+                Debug.Assert(packetCommandFrameNumber == commandFrameNumber - 1);
+                DeserializeGameMessage(args);
+            }
+            else
             {
                 futureCommands.Add(args);
-            }
-            else if (packetCommandFrameNumber == commandFrameNumber)
-            {
-                DeserializeGameMessage(args);
             }
         }
 
@@ -243,10 +246,7 @@ namespace Orion.Networking
                     while (stream.Position != stream.Length)
                     {
                         Command deserializedCommand = serializer.Deserialize(reader);
-                        deserializedCommand.commandFrameNumber = BitConverter.ToInt32(array, 1);
-                        deserializedCommand.deserializeCommandFrameNumber = commandFrameNumber;
-                        deserializedCommand.isLocal = false;
-                        synchronizedCommands.Add(deserializedCommand);
+                        currentFrameCommands.Add(deserializedCommand);
                     }
                 }
             }

@@ -130,7 +130,7 @@ namespace Orion.UserInterface
                     throw new ArgumentException("Cannot add an ancestor as a child.");
 
                 base.InsertItem(index, item);
-                item.Parent = parent;
+                //item.Parent = parent;
                 item.OnAddToParent(parent);
                 parent.OnAddChild(item);
             }

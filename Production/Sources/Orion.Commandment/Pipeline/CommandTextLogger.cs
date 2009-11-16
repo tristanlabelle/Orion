@@ -54,19 +54,24 @@ namespace Orion.Commandment.Pipeline
             // filename variations.
             try
             {
-                return File.OpenWrite("Command Log.txt");
+                return OpenFileStream("Command Log.txt");
             }
             catch (IOException)
             {
                 for (int i = 2; i < 10; ++i)
                 {
                     string fileName = "Command Log {0}.txt".FormatInvariant(i);
-                    try { return File.OpenWrite(fileName); }
+                    try { return OpenFileStream(fileName); }
                     catch (IOException) { }
                 }
 
                 return null;
             }
+        }
+
+        private static Stream OpenFileStream(string path)
+        {
+            return new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read);
         }
         #endregion
     }

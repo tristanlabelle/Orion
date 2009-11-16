@@ -25,7 +25,7 @@ namespace Orion.Networking
             Argument.EnsureNotNull(message, "message");
             byte[] packetData = new byte[6 + message.Length];
             packetData[0] = MagicIdentifier;
-            packetData[1] = (byte)PacketType.Data;
+            packetData[1] = (byte)PacketType.Message;
             BitConverter.GetBytes(number).CopyTo(packetData, 2);
             message.CopyTo(packetData, 6);
             return packetData;

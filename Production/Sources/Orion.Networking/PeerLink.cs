@@ -16,15 +16,14 @@ namespace Orion.Networking
         private readonly IPv4EndPoint endPoint;
         private readonly Queue<TimeSpan> pings = new  Queue<TimeSpan>();
         private readonly Queue<byte[]> receivedBroadcastMessages = new Queue<byte[]>();
-        private readonly SortedList<uint, byte[]> receivedSequencialMessages = new SortedList<uint, byte[]>();
-        private readonly List<uint> acknowledgedPackets = new List<uint>();
-        private volatile uint expectedPacketNumber;
-        private volatile uint nextPacketNumber;
-        private volatile bool hasTimedOut;
+        private readonly SortedList<uint, byte[]> receivedSequencialMessages
+            = new SortedList<uint, byte[]>();
+        private uint expectedPacketNumber;
+        private uint nextPacketNumber;
+        private bool hasTimedOut;
 
         private readonly Dictionary<uint,SafePacket> packetsToSend
            = new Dictionary<uint, SafePacket>();
-
         #endregion
 
         #region Constructor
@@ -69,18 +68,6 @@ namespace Orion.Networking
         {
             get
             {
-                lock (pings)
-                {
-                    if (pings.Count == 0) return TimeSpan.Zero;
-                    return LocklessAveragePing;
-                }
-            }
-        }
-
-        private TimeSpan LocklessAveragePing
-        {
-            get
-            {
                 long averageTicks = (long)pings.Average(timeSpan => timeSpan.Ticks);
                 return TimeSpan.FromTicks(averageTicks);
             }
@@ -94,7 +81,7 @@ namespace Orion.Networking
                 {
                     if (pings.Count == 0) return TimeSpan.Zero;
 
-                    TimeSpan averagePing = LocklessAveragePing;
+                    TimeSpan averagePing = AveragePing;
 
                     long deviationSumInTicks = pings.Sum(ping => Math.Abs(averagePing.Ticks - ping.Ticks));
                     long averageDeviationInTicks = deviationSumInTicks / pings.Count;
@@ -116,45 +103,6 @@ namespace Orion.Networking
         }
         #endregion
 
-        #region Recieve Functions
-        public void HandlePacket(byte[] data, int dataLength)
-        {
-            PacketType type = Protocol.GetPacketType(data);
-            if (type == PacketType.Data)
-            {
-                uint packetNumber = Protocol.GetDataPacketNumber(data);
-                if (packetNumber < expectedPacketNumber || receivedSequencialMessages.ContainsKey(packetNumber))
-                {
-                    Debug.Fail("Received the same packet twice.");
-                    return;
-                }
-
-                lock (acknowledgedPackets)
-                {
-                    if (!acknowledgedPackets.Contains(packetNumber))
-                        acknowledgedPackets.Add(packetNumber);
-                }
-
-                byte[] message = Protocol.GetDataPacketMessage(data, dataLength);
-
-                lock (receivedSequencialMessages)
-                {
-                    receivedSequencialMessages.Add(packetNumber, message);
-                }
-            }
-            else if (type == PacketType.Acknowledgement)
-            {
-                uint packetNumber = Protocol.GetAcknowledgementPacketNumber(data);
-                AcknowledgePacket(packetNumber);
-            }
-            else if (type == PacketType.Broadcast)
-            {
-                byte[] message = Protocol.GetBroadcastPacketMessage(data, dataLength);
-                receivedBroadcastMessages.Enqueue(message);
-            }
-        }
-        #endregion
-
         public SafePacket CreatePacket(byte[] data)
         {
             uint packetNumber = nextPacketNumber;
@@ -168,12 +116,42 @@ namespace Orion.Networking
             }
         }
 
-        public void AcknowledgePacket(uint number)
+        public bool HasReceivedMessage(uint number)
+        {
+            return number < expectedPacketNumber
+                || receivedSequencialMessages.ContainsKey(number);
+        }
+
+        public void AddReceivedMessage(uint number, byte[] message)
+        {
+            if (HasReceivedMessage(number))
+            {
+                throw new InvalidOperationException(
+                    "Message #{0} received twice.".FormatInvariant(number));
+            }
+
+            receivedSequencialMessages.Add(number, message);
+        }
+
+        public void AddReceivedBroadcastMessage(byte[] message)
+        {
+            receivedBroadcastMessages.Enqueue(message);
+        }
+
+        public void MarkMessageAsAcknowledged(uint number)
         {
             if (packetsToSend.ContainsKey(number))
             {
                 AddPing(packetsToSend[number].TimeElapsedSinceCreation);
                 packetsToSend.Remove(number);
+            }
+            else if (number < nextPacketNumber)
+            {
+                Console.WriteLine("Received a second ack for message #{0}.".FormatInvariant(number));
+            }
+            else
+            {
+                Debug.Fail("Received an acknowledgement for an unsent message.");
             }
         }
 
@@ -183,7 +161,6 @@ namespace Orion.Networking
             packetsToSend.Clear();
             receivedSequencialMessages.Clear();
             pings.Clear();
-            acknowledgedPackets.Clear();
         }
 
         public byte[] PopNextReadyMessage()

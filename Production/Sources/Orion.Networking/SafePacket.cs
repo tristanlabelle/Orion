@@ -58,7 +58,7 @@ namespace Orion.Networking
             get
             {
                 if (!lastSendTime.HasValue) return null;
-                return DateTime.UtcNow - lastSendTime;
+                return DateTime.UtcNow - lastSendTime.Value;
             }
         }
 

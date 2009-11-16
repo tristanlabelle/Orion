@@ -129,37 +129,10 @@ namespace Orion.Networking
             {
                 try
                 {
-                    IPv4EndPoint hostEndPoint;
-                    int packetLength = WaitForPacket(packetData, out hostEndPoint);
+                    IPv4EndPoint senderEndPoint;
+                    int packetLength = WaitForPacket(packetData, out senderEndPoint);
                     if (isDisposed) break;
-
-                    if (Protocol.IsForeign(packetData))
-                    {
-                        Debug.Fail("Foreign packet received.");
-                        continue;
-                    }
-
-                    lock (peers)
-                    {
-                        PeerLink peer = GetOrCreatePeerLink(hostEndPoint);
-                        if (peer.HasTimedOut)
-                        {
-                            Debug.Fail(
-                                "Received a packet from timed out peer {0}."
-                                .FormatInvariant(hostEndPoint));
-                            continue;
-                        }
-
-                        peer.HandlePacket(packetData, packetLength);
-                    }
-
-                    // Send the ack, this should really not be here but as
-                    // PeerLinks have no access to the socket, it is...
-                    if (Protocol.GetPacketType(packetData) == PacketType.Data)
-                    {
-                        uint packetNumber = Protocol.GetDataPacketNumber(packetData);
-                        SendAcknowledgement(hostEndPoint, packetNumber);
-                    }
+                    HandlePacket(senderEndPoint, packetData, packetLength);
                 }
                 catch (SocketException exception)
                 {
@@ -167,6 +140,54 @@ namespace Orion.Networking
                         "Unexpected socket exception {0}: {1}"
                         .FormatInvariant(exception.ErrorCode, exception));
                     break;
+                }
+            }
+        }
+
+        private void HandlePacket(IPv4EndPoint senderEndPoint, byte[] data, int length)
+        {
+            if (Protocol.IsForeign(data))
+            {
+                Debug.Fail("Foreign packet received.");
+                return;
+            }
+
+            lock (peers)
+            {
+                PeerLink peer = GetOrCreatePeerLink(senderEndPoint);
+                if (peer.HasTimedOut)
+                {
+                    Debug.Fail(
+                        "Received a packet from timed out peer {0}."
+                        .FormatInvariant(senderEndPoint));
+                    return;
+                }
+
+                PacketType type = Protocol.GetPacketType(data);
+                if (type == PacketType.Message)
+                {
+                    uint number = Protocol.GetDataPacketNumber(data);
+                    if (!peer.HasReceivedMessage(number))
+                    {
+                        byte[] message = Protocol.GetDataPacketMessage(data, length);
+                        peer.AddReceivedMessage(number, message);
+                    }
+
+                    SendAcknowledgement(senderEndPoint, number);
+                }
+                else if (type == PacketType.Acknowledgement)
+                {
+                    uint number = Protocol.GetAcknowledgementPacketNumber(data);
+                    peer.MarkMessageAsAcknowledged(number);
+                }
+                else if (type == PacketType.Broadcast)
+                {
+                    byte[] message = Protocol.GetBroadcastPacketMessage(data, length);
+                    peer.AddReceivedBroadcastMessage(message);
+                }
+                else
+                {
+                    Debug.Fail("Received packet with unknown type.");
                 }
             }
         }
@@ -199,9 +220,9 @@ namespace Orion.Networking
             return -1;
         }
 
-        private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint packetNumber)
+        private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint number)
         {
-            byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(packetNumber);
+            byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(number);
 
             socketSemaphore.WaitOne();
             try
@@ -238,6 +259,14 @@ namespace Orion.Networking
                             TimeSpan resendDelay = GetResendDelay(peer);
                             if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
                             {
+                                if (packet.WasSent)
+                                {
+                                    Console.WriteLine(
+                                        "Message #{0} resent after {1}."
+                                        .FormatInvariant(packet.Number,
+                                        packet.TimeElapsedSinceLastSend.Value));
+                                }
+
                                 socketSemaphore.WaitOne();
                                 try
                                 {
@@ -248,6 +277,7 @@ namespace Orion.Networking
                                 {
                                     socketSemaphore.Release();
                                 }
+                                packet.UpdateSendTime();
                             }
                         }
                     }

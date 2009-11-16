@@ -13,7 +13,7 @@ namespace Orion.Main
         private const float TargetFramesPerSecond = 60;
         private const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
         private const int DefaultHostPort = 41223;
-        private const int DefaultClientPort = 41223;
+        private const int DefaultClientPort = 41224;
         private const int MaxSuccessiveUpdates = 5;
 
         /// <summary>

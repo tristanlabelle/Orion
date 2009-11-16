@@ -1,5 +1,6 @@
 using System.IO;
 using System.Diagnostics;
+using System;
 
 namespace Orion.Commandment.Pipeline
 {
@@ -9,7 +10,7 @@ namespace Orion.Commandment.Pipeline
     public sealed class CommandTextLogger : CommandFilter
     {
         #region Fields
-        private readonly TextWriter writer = new StreamWriter("Command Log.txt");
+        private readonly TextWriter writer = GetTextWriter();
         private int commandIndex = 0;
         private int frameIndex = 0;
         #endregion
@@ -37,6 +38,35 @@ namespace Orion.Commandment.Pipeline
         {
             ++frameIndex;
             base.Flush();
+        }
+
+        private static TextWriter GetTextWriter()
+        {
+            Stream stream = GetLoggingStream();
+            if (stream == null) return Console.Out;
+            return new StreamWriter(stream);
+        }
+
+        private static Stream GetLoggingStream()
+        {
+            // Attempt to open the default file. If not possible,
+            // assume it's locked by another game process and try
+            // filename variations.
+            try
+            {
+                return File.OpenWrite("Command Log.txt");
+            }
+            catch (IOException)
+            {
+                for (int i = 2; i < 10; ++i)
+                {
+                    string fileName = "Command Log {0}.txt".FormatInvariant(i);
+                    try { return File.OpenWrite(fileName); }
+                    catch (IOException) { }
+                }
+
+                return null;
+            }
         }
         #endregion
     }

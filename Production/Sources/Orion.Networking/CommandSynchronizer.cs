@@ -107,17 +107,22 @@ namespace Orion.Networking
             ++commandFrameNumber;
             SendLocalCommands();
 
-            if (commandFrameNumber > 0)
+            if (commandFrameNumber == 0)
             {
-                currentFrameCommands.Clear();
+                // Don't execute commands in the first command frame as no commands are ready yet.
+                SendDone();
+            }
+            else
+            {
                 ResetPeerStates();
                 DeserializeNeededFuturePackets();
                 WaitForPeerCommands();
                 currentFrameCommands.AddRange(lastFrameLocalCommands);
                 lastFrameLocalCommands.Clear();
-                ExecuteCurrentFrameCommands();
-                currentFrameCommands.Clear();
             }
+
+            ExecuteCurrentFrameCommands();
+            currentFrameCommands.Clear();
 
             lastFrameLocalCommands.AddRange(LocalCommands);
             LocalCommands.Clear();

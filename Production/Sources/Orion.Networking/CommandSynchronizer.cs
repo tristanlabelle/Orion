@@ -83,9 +83,9 @@ namespace Orion.Networking
         {
             if (frameNumber % frameModulo == 0)
             {
-                ++commandFrameNumber;
                 WaitForPeerCommands();
                 ResetPeerStates();
+                ++commandFrameNumber;
                 Flush();
             }
         }
@@ -98,17 +98,18 @@ namespace Orion.Networking
             transporter.TimedOut -= transporterTimeout;
         }
 
-        private void FeedSynchronizedCommandsToRecipient()
+        public override void Flush()
         {
-            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
-            synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
-            foreach (Command command in synchronizedCommands)
-                Recipient.Feed(command);
+            if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
 
-            synchronizedCommands.Clear();
+            // The order here is important because synchronizedCommands is accessed in both methods.
+            FeedSynchronizedCommandsToRecipient();
+            BeginSynchronizationOfAccumulatedCommands();
+
+            Recipient.EndFeed();
         }
 
-        private void DeserializeNeededFuturePackets()
+        private void FeedSynchronizedCommandsToRecipient()
         {
             // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
             for (int i = (futureCommands.Count - 1); i >= 0;--i)
@@ -127,7 +128,7 @@ namespace Orion.Networking
             synchronizedCommands.Clear();
         }
 
-        private void SynchronizeLocalCommands()
+        private void BeginSynchronizationOfAccumulatedCommands()
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -172,13 +173,13 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            int packetFrameNumber = BitConverter.ToInt32(args.Data, 1);
+            int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
             
-            if (packetFrameNumber > commandFrameNumber)
+            if (packetCommandFrameNumber > commandFrameNumber)
             {
                 futureCommands.Add(args);
             }
-            else if (packetFrameNumber == commandFrameNumber)
+            else if (packetCommandFrameNumber == commandFrameNumber)
             {
                 DeserializeGameMessage(args);
             }

@@ -122,20 +122,14 @@ namespace Orion.Main
                     stopwatch.Reset();
                     stopwatch.Start();
 
-                    int successiveUpdateCount = 0;
-                    do
-                    {
-                        match.Update(TargetSecondsPerFrame);
+                    match.Update(TargetSecondsPerFrame);
 
-                        ui.Update(TargetSecondsPerFrame);
-                        updateRateCounter.Update();
-                        ui.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
-                            .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
+                    ui.Update(TargetSecondsPerFrame);
+                    updateRateCounter.Update();
+                    ui.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
+                        .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
 
-                        timeDeltaInSeconds -= TargetSecondsPerFrame;
-                        ++successiveUpdateCount;
-                    } while (timeDeltaInSeconds >= TargetSecondsPerFrame
-                        && successiveUpdateCount < MaxSuccessiveUpdates);
+                    timeDeltaInSeconds -= TargetSecondsPerFrame;
                 }
             }
         }

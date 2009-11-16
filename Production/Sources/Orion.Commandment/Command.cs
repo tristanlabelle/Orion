@@ -13,6 +13,9 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction sourceFaction;
+        public int commandFrameNumber;
+        public int deserializeCommandFrameNumber;
+        public bool isLocal;
         #endregion
 
         #region Constructors

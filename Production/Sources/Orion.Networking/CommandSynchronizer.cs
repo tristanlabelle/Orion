@@ -8,6 +8,7 @@ using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Orion.Networking
 {
@@ -83,6 +84,12 @@ namespace Orion.Networking
         {
             if (frameNumber % frameModulo == 0)
             {
+                foreach (Command command in accumulatedCommands)
+                {
+                    command.commandFrameNumber = commandFrameNumber + 1;
+                    command.isLocal = true;
+                }
+
                 WaitForPeerCommands();
                 ResetPeerStates();
                 ++commandFrameNumber;
@@ -111,7 +118,6 @@ namespace Orion.Networking
 
         private void FeedSynchronizedCommandsToRecipient()
         {
-            // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
             for (int i = (futureCommands.Count - 1); i >= 0;--i)
             {
                 NetworkEventArgs packet = futureCommands.ElementAt(i);
@@ -122,6 +128,11 @@ namespace Orion.Networking
                     futureCommands.RemoveAt(i);
                 }
             }
+
+            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
+            if (synchronizedCommands.Any(command => command.commandFrameNumber != commandFrameNumber - 1))
+                Debug.Fail("Executing a command that isn't from the previous command frame.");
+
             synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
             foreach (Command command in synchronizedCommands)
                 Recipient.Feed(command);
@@ -191,20 +202,13 @@ namespace Orion.Networking
             PeerState oldPeerState = peerStates[args.Host];
             if (messageType == (byte)GameMessageType.Commands)
             {
-                Deserialize(args.Data.Skip(1 + sizeof(Int32)).ToArray());
+                Deserialize(args.Data, 1 + sizeof(int));
 
                 //if ((oldPeerState & PeerState.ReceivedCommands) != 0)
                 //    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedCommands;
 
-                if (ReceivedFromAllPeers)
-                {
-                    byte[] doneMessage = new byte[5];
-                    doneMessage[0] = (byte) GameMessageType.Done;
-                    BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage,1);
-                    
-                    transporter.SendTo(doneMessage, peerEndPoints);
-                }
+                if (ReceivedFromAllPeers) SendDone();
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
@@ -214,21 +218,34 @@ namespace Orion.Networking
             }
         }
 
+        private void SendDone()
+        {
+            byte[] doneMessage = new byte[5];
+            doneMessage[0] = (byte)GameMessageType.Done;
+            BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage, 1);
+
+            transporter.SendTo(doneMessage, peerEndPoints);
+        }
+
         private void TransporterTimedOut(SafeTransporter source, IPv4EndPoint endPoint)
         {
             MessageBox.Show("Lost connection to {0}!".FormatInvariant(endPoint));
             peerStates.Remove(endPoint);
         }
 
-        private void Deserialize(byte[] array)
+        private void Deserialize(byte[] array, int startIndex)
         {
-            using (MemoryStream stream = new MemoryStream(array))
+            using (MemoryStream stream = new MemoryStream(array, startIndex, array.Length - startIndex))
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
                     while (stream.Position != stream.Length)
                     {
-                        synchronizedCommands.Add(serializer.Deserialize(reader));
+                        Command deserializedCommand = serializer.Deserialize(reader);
+                        deserializedCommand.commandFrameNumber = BitConverter.ToInt32(array, 1);
+                        deserializedCommand.deserializeCommandFrameNumber = commandFrameNumber;
+                        deserializedCommand.isLocal = false;
+                        synchronizedCommands.Add(deserializedCommand);
                     }
                 }
             }

@@ -26,7 +26,6 @@ namespace Orion.GameLogic.Tasks
 
             this.trainer = trainer;
             this.traineeType = traineeType;
-
         }
         #endregion
 

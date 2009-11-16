@@ -27,14 +27,15 @@ namespace Orion.Networking
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
-        private readonly List<NetworkEventArgs> receivedPackets = new List<NetworkEventArgs>();
         private readonly List<Command> synchronizedCommands = new List<Command>();
 
         private readonly CommandFactory serializer;
 
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
         
-        private int updateFrameNumber;
+        private int commandFrameNumber;
+
+        private List<NetworkEventArgs> futurePackets = new List<NetworkEventArgs>();
         #endregion
 
         #region Constructors
@@ -83,10 +84,14 @@ namespace Orion.Networking
         {
             if (frameNumber % frameModulo == 0)
             {
-                updateFrameNumber = frameNumber;
-                WaitForPeerCommands();
+                ++commandFrameNumber;
+
                 ResetPeerStates();
-                Flush();
+                DeserializeNeededFuturePackets();
+                WaitForPeerCommands();
+                FeedSynchronizedCommandsToRecipient();
+                SynchronizeLocalCommands();
+                Recipient.EndFeed();
             }
         }
 
@@ -98,30 +103,8 @@ namespace Orion.Networking
             transporter.TimedOut -= transporterTimeout;
         }
 
-        public override void Flush()
-        {
-            if (Recipient == null) throw new InvalidOperationException("Sink's recipient must not be null when Flush() is called");
-
-            // The order here is important because synchronizedCommands is accessed in both methods.
-            FeedSynchronizedCommandsToRecipient();
-            BeginSynchronizationOfAccumulatedCommands();
-
-            Recipient.EndFeed();
-        }
-
         private void FeedSynchronizedCommandsToRecipient()
         {
-            for (int i = receivedPackets.Count - 1; i >= 0;--i)
-            {
-                NetworkEventArgs packet = receivedPackets[i];
-                int commandFrame = BitConverter.ToInt32(packet.Data, 1);
-                if (commandFrame < updateFrameNumber)
-                {
-                    DeserializeGameMessage(packet);
-                    receivedPackets.RemoveAt(i);
-                }
-            }
-
             // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
             synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
             foreach (Command command in synchronizedCommands)
@@ -130,14 +113,28 @@ namespace Orion.Networking
             synchronizedCommands.Clear();
         }
 
-        private void BeginSynchronizationOfAccumulatedCommands()
+        private void DeserializeNeededFuturePackets()
+        {
+            for (int i = futurePackets.Count - 1; i >= 0; --i)
+            {
+                NetworkEventArgs packet = futurePackets[i];
+                int commandFrame = BitConverter.ToInt32(packet.Data, 1);
+                if (commandFrame < commandFrameNumber)
+                {
+                    DeserializeGameMessage(packet);
+                    futurePackets.RemoveAt(i);
+                }
+            }
+        }
+
+        private void SynchronizeLocalCommands()
         {
             using (MemoryStream stream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
                     writer.Write((byte)GameMessageType.Commands);
-                    writer.Write(updateFrameNumber);
+                    writer.Write(commandFrameNumber);
                     foreach (Command accumulatedCommand in accumulatedCommands)
                     {
                         if (accumulatedCommand.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
@@ -175,7 +172,16 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            receivedPackets.Add(args);
+            int packetFrameNumber = BitConverter.ToInt32(args.Data, 1);
+            
+            if (packetFrameNumber > commandFrameNumber)
+            {
+                futurePackets.Add(args);
+            }
+            else if (packetFrameNumber == commandFrameNumber)
+            {
+                DeserializeGameMessage(args);
+            }
         }
 
         private void DeserializeGameMessage(NetworkEventArgs args)
@@ -192,7 +198,7 @@ namespace Orion.Networking
                 {
                     byte[] doneMessage = new byte[5];
                     doneMessage[0] = (byte)GameMessageType.Done;
-                    BitConverter.GetBytes(updateFrameNumber).CopyTo(doneMessage, 1);
+                    BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage, 1);
                     
                     transporter.SendTo(doneMessage, peerEndPoints);
                 }

@@ -120,10 +120,11 @@ namespace Orion.Networking
         {
             for (int i = (futureCommands.Count - 1); i >= 0;--i)
             {
-                NetworkEventArgs packet = futureCommands.ElementAt(i);
+                NetworkEventArgs packet = futureCommands[i];
                 int packetCommandFrameNumber = BitConverter.ToInt32(packet.Data, 1);
-                if (packetCommandFrameNumber == commandFrameNumber)
+                if (packetCommandFrameNumber < commandFrameNumber)
                 {
+                    Debug.Assert(packetCommandFrameNumber == commandFrameNumber - 1);
                     DeserializeGameMessage(packet);
                     futureCommands.RemoveAt(i);
                 }

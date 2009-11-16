@@ -32,10 +32,9 @@ namespace Orion.Networking
         private readonly CommandFactory serializer;
 
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
-        
-        private int commandFrameNumber;
 
-        private List<NetworkEventArgs> futurePackets = new List<NetworkEventArgs>();
+        private int commandFrameNumber;
+        private List<NetworkEventArgs> futureCommands = new List<NetworkEventArgs>();
         #endregion
 
         #region Constructors
@@ -85,13 +84,9 @@ namespace Orion.Networking
             if (frameNumber % frameModulo == 0)
             {
                 ++commandFrameNumber;
-
-                ResetPeerStates();
-                DeserializeNeededFuturePackets();
                 WaitForPeerCommands();
-                FeedSynchronizedCommandsToRecipient();
-                SynchronizeLocalCommands();
-                Recipient.EndFeed();
+                ResetPeerStates();
+                Flush();
             }
         }
 
@@ -115,16 +110,21 @@ namespace Orion.Networking
 
         private void DeserializeNeededFuturePackets()
         {
-            for (int i = futurePackets.Count - 1; i >= 0; --i)
+            // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
+            for (int i = (futureCommands.Count - 1); i >= 0;--i)
             {
-                NetworkEventArgs packet = futurePackets[i];
-                int commandFrame = BitConverter.ToInt32(packet.Data, 1);
-                if (commandFrame < commandFrameNumber)
+                NetworkEventArgs packet = futureCommands.ElementAt(i);
+                int packetCommandFrameNumber = BitConverter.ToInt32(packet.Data, 1);
+                if (packetCommandFrameNumber == commandFrameNumber)
                 {
                     DeserializeGameMessage(packet);
-                    futurePackets.RemoveAt(i);
+                    futureCommands.RemoveAt(i);
                 }
             }
+            synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
+            foreach (Command command in synchronizedCommands)
+                Recipient.Feed(command);
+            synchronizedCommands.Clear();
         }
 
         private void SynchronizeLocalCommands()
@@ -176,7 +176,7 @@ namespace Orion.Networking
             
             if (packetFrameNumber > commandFrameNumber)
             {
-                futurePackets.Add(args);
+                futureCommands.Add(args);
             }
             else if (packetFrameNumber == commandFrameNumber)
             {
@@ -190,21 +190,25 @@ namespace Orion.Networking
             PeerState oldPeerState = peerStates[args.Host];
             if (messageType == (byte)GameMessageType.Commands)
             {
-                DeserializeCommands(args.Data);
+                Deserialize(args.Data.Skip(1 + sizeof(Int32)).ToArray());
 
+                //if ((oldPeerState & PeerState.ReceivedCommands) != 0)
+                //    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedCommands;
 
                 if (ReceivedFromAllPeers)
                 {
                     byte[] doneMessage = new byte[5];
-                    doneMessage[0] = (byte)GameMessageType.Done;
-                    BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage, 1);
+                    doneMessage[0] = (byte) GameMessageType.Done;
+                    BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage,1);
                     
                     transporter.SendTo(doneMessage, peerEndPoints);
                 }
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
+                //if ((oldPeerState & PeerState.ReceivedDone) != 0)
+                //    throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
             }
         }
@@ -215,9 +219,9 @@ namespace Orion.Networking
             peerStates.Remove(endPoint);
         }
 
-        private void DeserializeCommands(byte[] array)
+        private void Deserialize(byte[] array)
         {
-            using (MemoryStream stream = new MemoryStream(array, 1, array.Length - 1))
+            using (MemoryStream stream = new MemoryStream(array))
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {

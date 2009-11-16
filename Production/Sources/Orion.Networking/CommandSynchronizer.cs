@@ -105,7 +105,7 @@ namespace Orion.Networking
         public void RunCommandFrame()
         {
             ++commandFrameNumber;
-            SynchronizeLocalCommands();
+            SendLocalCommands();
 
             if (commandFrameNumber > 0)
             {
@@ -147,7 +147,7 @@ namespace Orion.Networking
             }
         }
 
-        private void SynchronizeLocalCommands()
+        private void SendLocalCommands()
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -234,7 +234,7 @@ namespace Orion.Networking
 
         private void TransporterTimedOut(SafeTransporter source, IPv4EndPoint endPoint)
         {
-            MessageBox.Show("Lost connection to {0}!".FormatInvariant(endPoint));
+            Debug.Fail("Lost connection to {0}!".FormatInvariant(endPoint));
             peerStates.Remove(endPoint);
         }
 

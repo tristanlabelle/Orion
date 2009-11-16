@@ -108,14 +108,15 @@ namespace Orion.Networking
         public void RunCommandFrame()
         {
             ++commandFrameNumber;
+            currentFrameCommands.Clear();
 
             ResetPeerStates();
-            currentFrameCommands.Clear();
             DeserializeNeededFuturePackets();
             WaitForPeerCommands();
             currentFrameCommands.AddRange(lastFrameLocalCommands);
             lastFrameLocalCommands.Clear();
             ExecuteCurrentFrameCommands();
+            currentFrameCommands.Clear();
 
             SynchronizeLocalCommands();
             lastFrameLocalCommands.AddRange(LocalCommands);

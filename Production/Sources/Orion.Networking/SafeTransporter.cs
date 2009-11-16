@@ -36,6 +36,7 @@ namespace Orion.Networking
         #endregion
 
         private readonly List<PeerLink> peers = new List<PeerLink>();
+        private readonly HashSet<IPv4EndPoint> timedOutPeerEndPoints = new HashSet<IPv4EndPoint>();
 
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
@@ -85,9 +86,9 @@ namespace Orion.Networking
         /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
         public event GenericEventHandler<SafeTransporter, IPv4EndPoint> TimedOut;
 
-        private void OnReceived(NetworkEventArgs eventArgs)
+        private void OnReceived(IPv4EndPoint hostEndPoint, byte[] message)
         {
-            if (Received != null) Received(this, eventArgs);
+            if (Received != null) Received(this, new NetworkEventArgs(hostEndPoint, message));
         }
 
         private void OnTimedOut(IPv4EndPoint endPoint)
@@ -253,6 +254,7 @@ namespace Orion.Networking
                             if (packet.TimeElapsedSinceCreation > SafePacketTimeout)
                             {
                                 peer.MarkAsTimedOut();
+                                timedOutPeerEndPoints.Add(peer.EndPoint);
                                 break;
                             }
 
@@ -372,15 +374,40 @@ namespace Orion.Networking
             RaiseTimedOutEvents();
         }
 
+        /// <summary>
+        /// Triggers reception and time out events for a given host.
+        /// </summary>
+        /// <param name="endPoint">The end point of the host to be polled.</param>
+        public void Poll(IPv4EndPoint endPoint)
+        {
+            EnsureNotDisposed();
+
+            lock (peers)
+            {
+                if (timedOutPeerEndPoints.Remove(endPoint))
+                {
+                    OnTimedOut(endPoint);
+                }
+                else
+                {
+                    PeerLink peer = peers.FirstOrDefault(p => p.EndPoint == endPoint);
+                    if (peer != null && peer.HasAvailableMessage)
+                    {
+                        OnReceived(peer.EndPoint, peer.PopNextAvailableMessage());
+                    }
+                }
+            }
+        }
+
         private void RaiseReceivedEvents()
         {
             lock (peers)
             {
                 foreach (PeerLink peer in peers)
                 {
-                    while (peer.HasReadyData)
+                    while (peer.HasAvailableMessage)
                     {
-                        OnReceived(new NetworkEventArgs(peer.EndPoint, peer.PopNextReadyMessage()));
+                        OnReceived(peer.EndPoint, peer.PopNextAvailableMessage());
                     }
                 }
             }
@@ -390,8 +417,10 @@ namespace Orion.Networking
         {
             lock (peers)
             {
-                foreach (PeerLink peer in peers.Where(p => p.HasTimedOut))
-                    OnTimedOut(peer.EndPoint);
+                foreach (IPv4EndPoint peerEndPoint in timedOutPeerEndPoints)
+                    OnTimedOut(peerEndPoint);
+
+                timedOutPeerEndPoints.Clear();
             }
         }
         #endregion

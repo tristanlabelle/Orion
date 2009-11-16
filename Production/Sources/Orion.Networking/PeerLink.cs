@@ -39,7 +39,7 @@ namespace Orion.Networking
             get { return hasTimedOut; }
         }
 
-        public bool HasReadyData
+        public bool HasAvailableMessage
         {
             get
             {
@@ -163,7 +163,7 @@ namespace Orion.Networking
             pings.Clear();
         }
 
-        public byte[] PopNextReadyMessage()
+        public byte[] PopNextAvailableMessage()
         {
             if (receivedBroadcastMessages.Count > 0)
                 return receivedBroadcastMessages.Dequeue();

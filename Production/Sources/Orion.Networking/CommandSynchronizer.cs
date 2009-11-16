@@ -27,14 +27,14 @@ namespace Orion.Networking
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
+        private readonly List<NetworkEventArgs> receivedPackets = new List<NetworkEventArgs>();
         private readonly List<Command> synchronizedCommands = new List<Command>();
 
         private readonly CommandFactory serializer;
 
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
-        // The number of update frame and not the number of command frame
-        private int frameNumber;
-        private List<NetworkEventArgs> futuresCommands = new List<NetworkEventArgs>();
+        
+        private int updateFrameNumber;
         #endregion
 
         #region Constructors
@@ -83,9 +83,9 @@ namespace Orion.Networking
         {
             if (frameNumber % frameModulo == 0)
             {
+                updateFrameNumber = frameNumber;
                 WaitForPeerCommands();
                 ResetPeerStates();
-                this.frameNumber = frameNumber;
                 Flush();
             }
         }
@@ -111,20 +111,22 @@ namespace Orion.Networking
 
         private void FeedSynchronizedCommandsToRecipient()
         {
-            // FIXME: This sorting might not be flawless. And stable-sorting migth not be garanteed by List.
-            for (int i = (futuresCommands.Count - 1); i >= 0;--i)
+            for (int i = receivedPackets.Count - 1; i >= 0;--i)
             {
-                NetworkEventArgs command = futuresCommands.ElementAt(i);
-                int frameOfCurrentCommand = BitConverter.ToInt32(command.Data, 1);
-                if (frameOfCurrentCommand == frameNumber)
+                NetworkEventArgs packet = receivedPackets[i];
+                int commandFrame = BitConverter.ToInt32(packet.Data, 1);
+                if (commandFrame < updateFrameNumber)
                 {
-                    DeserializeGameMessage(command);
-                    futuresCommands.RemoveAt(i);
+                    DeserializeGameMessage(packet);
+                    receivedPackets.RemoveAt(i);
                 }
             }
+
+            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
             synchronizedCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
             foreach (Command command in synchronizedCommands)
                 Recipient.Feed(command);
+
             synchronizedCommands.Clear();
         }
 
@@ -135,7 +137,7 @@ namespace Orion.Networking
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
                     writer.Write((byte)GameMessageType.Commands);
-                    writer.Write(frameNumber);
+                    writer.Write(updateFrameNumber);
                     foreach (Command accumulatedCommand in accumulatedCommands)
                     {
                         if (accumulatedCommand.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
@@ -173,17 +175,7 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            
-            int receviedFrameNumber = BitConverter.ToInt32(args.Data, 1);
-            
-            if (receviedFrameNumber > frameNumber)
-            {
-                futuresCommands.Add(args);
-            }
-            else if (receviedFrameNumber == frameNumber)
-            {
-                DeserializeGameMessage(args);
-            }
+            receivedPackets.Add(args);
         }
 
         private void DeserializeGameMessage(NetworkEventArgs args)
@@ -192,25 +184,21 @@ namespace Orion.Networking
             PeerState oldPeerState = peerStates[args.Host];
             if (messageType == (byte)GameMessageType.Commands)
             {
-                Deserialize(args.Data.Skip(1 + sizeof(Int32)).ToArray());
+                DeserializeCommands(args.Data);
 
-                //if ((oldPeerState & PeerState.ReceivedCommands) != 0)
-                //    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedCommands;
 
                 if (ReceivedFromAllPeers)
                 {
                     byte[] doneMessage = new byte[5];
-                    doneMessage[0] = (byte) GameMessageType.Done;
-                    BitConverter.GetBytes(frameNumber).CopyTo(doneMessage,1);
+                    doneMessage[0] = (byte)GameMessageType.Done;
+                    BitConverter.GetBytes(updateFrameNumber).CopyTo(doneMessage, 1);
                     
                     transporter.SendTo(doneMessage, peerEndPoints);
                 }
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                //if ((oldPeerState & PeerState.ReceivedDone) != 0)
-                //    throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
             }
         }
@@ -221,9 +209,9 @@ namespace Orion.Networking
             peerStates.Remove(endPoint);
         }
 
-        private void Deserialize(byte[] array)
+        private void DeserializeCommands(byte[] array)
         {
-            using (MemoryStream stream = new MemoryStream(array))
+            using (MemoryStream stream = new MemoryStream(array, 1, array.Length - 1))
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {

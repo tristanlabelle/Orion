@@ -144,8 +144,11 @@ namespace Orion.Commandment
             {
                 int x = (int)args.X;
                 int y = (int)args.Y;
-                Rectangle gridPosition = new Rectangle(x, y, 1, 1);
-                SelectionManager.HoveredUnit = Faction.World.Entities.InArea(gridPosition).OfType<Unit>().FirstOrDefault();
+                Rectangle gridPosition = Rectangle.FromCenterSize(x, y, 10, 10);
+                SelectionManager.HoveredUnit = Faction.World.Entities
+                    .InArea(gridPosition)
+                    .OfType<Unit>()
+                    .FirstOrDefault(unit => unit.BoundingRectangle.ContainsPoint(gridPosition.Center));
             }
         }
 

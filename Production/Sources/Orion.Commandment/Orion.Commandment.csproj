@@ -52,6 +52,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="Commands\Attack.cs" />
     <Compile Include="Commands\Build.cs" />
+    <Compile Include="Commands\ChangeDiplomacy.cs" />
     <Compile Include="Commands\Harvest.cs" />
     <Compile Include="Commands\Cancel.cs" />
     <Compile Include="Commands\Move.cs" />

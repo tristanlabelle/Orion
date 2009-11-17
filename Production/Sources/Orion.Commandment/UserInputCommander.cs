@@ -59,6 +59,12 @@ namespace Orion.Commandment
         {
             if (units.Count() > 0) GenerateCommand(new Suicide(Faction, units));
         }
+        public void LaunchChangeDimplomacy(Faction otherFaction)
+        {
+            if (otherFaction == null) return;
+            if(Faction.AlliesID.Contains(otherFaction.ID)) GenerateCommand(new ChangeDiplomacy(Faction,otherFaction,"Ennemy"));
+            else GenerateCommand(new ChangeDiplomacy(Faction,otherFaction,"Ally"));
+        }
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             if (units.Count() > 0) GenerateCommand(new ZoneAttack(Faction, units, destination));

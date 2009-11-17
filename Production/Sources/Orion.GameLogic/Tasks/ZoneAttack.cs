@@ -124,7 +124,7 @@ namespace Orion.GameLogic.Tasks
             Unit target = attacker.World.Entities
                 .InArea(attacker.LineOfSight)
                 .OfType<Unit>()
-                .Where(unit => unit.Faction != attacker.Faction)
+                .Where(unit => attacker.Faction.IsEnemy(unit))
                 .FirstOrDefault();
 
             if (target != null) attack = new Attack(attacker, target);

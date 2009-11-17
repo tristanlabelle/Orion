@@ -278,7 +278,7 @@ namespace Orion.GameLogic
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)
                     .OfType<Unit>()
-                    .FirstOrDefault(unit => unit.Faction != faction);
+                    .FirstOrDefault(unit => Faction.IsEnemy(unit));
 
                 if (unitToAttack != null)
                     Task = new Tasks.Attack(this, unitToAttack);

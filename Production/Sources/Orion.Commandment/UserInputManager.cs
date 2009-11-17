@@ -173,6 +173,9 @@ namespace Orion.Commandment
                     LaunchTrain(commander.Faction.World.UnitTypes
                         .First(unit => unit.HasSkill<Attack>()));
                     break;
+                case Keys.F9: 
+                    LaunchChangeDimplomacy();
+                    break;
             }
         }
 
@@ -322,6 +325,13 @@ namespace Orion.Commandment
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchSuicide(targetUnits);
+        }
+
+        public void LaunchChangeDimplomacy()
+        {
+            // For Now I just Test Ally
+            Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
+            commander.LaunchChangeDimplomacy(otherFaction);
         }
 
         public void LaunchCancel()

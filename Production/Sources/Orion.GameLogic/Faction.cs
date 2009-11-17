@@ -25,6 +25,8 @@ namespace Orion.GameLogic
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private int aladdiumAmount;
         private int alageneAmount;
+        private List<int> alliesID = new List<int>();
+      
         #endregion
 
         #region Constructors
@@ -129,6 +131,11 @@ namespace Orion.GameLogic
                 alageneAmount = value;
             }
         }
+
+        public List<int> AlliesID
+        {
+            get { return alliesID; }
+        }
         #endregion
 
         #region Methods
@@ -144,7 +151,6 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(type, "type");
             return type.GetBaseStat(stat);
         }
-
         /// <summary>
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>
@@ -191,6 +197,26 @@ namespace Orion.GameLogic
             unit.Died -= entityDiedEventHandler;
         }
 
+        public void addAlly(int factionID)
+        {
+            Argument.EnsureNotNull(factionID, "factionID");
+            if (alliesID.Contains(factionID)) return;//throw new Exception("{0} is already an ally".FormatInvariant(faction));
+            alliesID.Add(factionID);
+        }
+
+        public void addEnemy(int factionID)
+        {
+            Argument.EnsureNotNull(factionID, "factionID");
+            if (!alliesID.Contains(factionID)) return;//throw new NullReferenceException("impossible to disally to an enemy...Need to be an ally first!");
+
+            alliesID.Remove(factionID);
+
+        }
+
+        public bool IsEnemy(Unit unit)
+        {
+            return !alliesID.Contains(unit.Faction.ID) && this.id != unit.Faction.ID;
+        }
         public override string ToString()
         {
             return name;

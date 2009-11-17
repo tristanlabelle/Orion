@@ -1,28 +1,32 @@
 
+using Orion.GameLogic;
 namespace Orion.Commandment.Pipeline
 {
-    public class SinglePlayerCommandPipeline : CommandPipeline
+    public sealed class SinglePlayerCommandPipeline : CommandPipeline
     {
         #region Fields
-        private CommandTextLogger logger = new CommandTextLogger();
+        private readonly CommandTextLogger textLogger = new CommandTextLogger();
+        private readonly CommandReplayLogger replayLogger;
         #endregion
 
         #region Constructors
-        public SinglePlayerCommandPipeline()
+        public SinglePlayerCommandPipeline(World world)
         {
-            logger.Recipient = executor;
+            replayLogger = new CommandReplayLogger("replay.foo", world);
+            textLogger.Recipient = replayLogger;
+            replayLogger.Recipient = executor;
         }
         #endregion
 
         #region Properties
         public override ICommandSink UserCommandmentEntryPoint
         {
-            get { return logger; }
+            get { return textLogger; }
         }
 
         public override ICommandSink AICommandmentEntryPoint
         {
-            get { return logger; }
+            get { return textLogger; }
         }
         #endregion
     }

@@ -61,6 +61,7 @@
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
     <Compile Include="Pipeline\CommandPipeline.cs" />
+    <Compile Include="Pipeline\CommandReplayLogger.cs" />
     <Compile Include="Pipeline\SinglePlayerCommandPipeline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />

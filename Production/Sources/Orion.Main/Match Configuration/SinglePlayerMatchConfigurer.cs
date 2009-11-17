@@ -17,7 +17,7 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new SinglePlayerCommandPipeline();
+            CommandPipeline pipeline = new SinglePlayerCommandPipeline(world);
 
             Faction redFaction = world.CreateFaction("Red", Color.Red);
             UserInputCommander userCommander = new UserInputCommander(redFaction);

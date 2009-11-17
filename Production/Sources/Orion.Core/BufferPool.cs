@@ -59,18 +59,27 @@ namespace Orion
         {
             Argument.EnsurePositive(minimumLength, "length");
 
-            int bestFitBufferIndex = GetBestFitPooledBufferIndex(minimumLength);
-            if (bestFitBufferIndex != -1)
-            {
-                T[] bestFitBuffer = buffers[bestFitBufferIndex];
-                buffers.RemoveAt(bestFitBufferIndex);
-                return bestFitBuffer;
-            }
-
-            return Allocate(minimumLength);
+            return GetPooled(minimumLength) ?? Allocate(minimumLength);
         }
 
-        private int GetBestFitPooledBufferIndex(int minimumLength)
+        /// <summary>
+        /// Gets and removes a buffer from this pool from a minimum length.
+        /// </summary>
+        /// <param name="minimumLength">The minimum length of the buffer that is needed.</param>
+        /// <returns>A buffer with at least the specified length, or <c>null</c> if none was big enough.</returns>
+        public T[] GetPooled(int minimumLength)
+        {
+            Argument.EnsurePositive(minimumLength, "length");
+
+            int index = GetBestFitPooledIndex(minimumLength);
+            if (index == -1) return null;
+            
+            T[] buffer = buffers[index];
+            buffers.RemoveAt(index);
+            return buffer;
+        }
+
+        private int GetBestFitPooledIndex(int minimumLength)
         {
             int index = -1;
             for (int i = 0; i < buffers.Count; ++i)
@@ -99,6 +108,8 @@ namespace Orion
         {
             Argument.EnsureNotNull(buffer, "buffer");
 
+            // Clear the buffer as we don't want dangling references.
+            Array.Clear(buffer, 0, buffer.Length);
             if (!buffers.Contains(buffer))
                 buffers.Add(buffer);
         }

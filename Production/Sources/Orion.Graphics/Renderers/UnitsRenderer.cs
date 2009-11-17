@@ -54,6 +54,7 @@ namespace Orion.Graphics
             this.fogOfWar = fogOfWar;
             SetTypeShape("Harvester", LinePath.Circle);
             SetTypeShape("Builder", LinePath.Diamond);
+            SetTypeShape("Scout", LinePath.CreateCircle(0.5f, 8));
             SetTypeShape("MeleeAttacker", LinePath.Triangle);
             SetTypeShape("RangedAttacker", LinePath.Cross);
             SetTypeShape("Factory", LinePath.Pentagon);

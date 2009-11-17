@@ -18,6 +18,7 @@ namespace Orion.GameLogic
         {
             RegisterHarvester();
             RegisterBuilder();
+            RegisterScout();
             RegisterMeleeAttacker();
             RegisterRangedAttacker();
             RegisterFactory();
@@ -36,7 +37,7 @@ namespace Orion.GameLogic
                 SizeInTiles = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 5,
-                AladdiumCost = 20,
+                AladdiumCost = 25,
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Move(15));
@@ -58,6 +59,21 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 10));
             builder.Skills.Add(new Skills.Harvest(10));
+            Register(builder);
+        }
+
+        public void RegisterScout()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Scout",
+                SizeInTiles = new Size(1, 1),
+                SightRange = 10,
+                MaxHealth = 4,
+                AladdiumCost = 75,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new Skills.Move(25));
             Register(builder);
         }
 

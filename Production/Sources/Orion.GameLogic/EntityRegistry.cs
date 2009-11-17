@@ -24,11 +24,30 @@ namespace Orion.GameLogic
         /// Represents a rectangular spatial subdivision used to group nearby <see cref="Entity"/>s.
         /// </summary>
         [DebuggerDisplay("Count = {Count}")]
-        private struct Zone
+        private sealed class Zone
         {
             #region Fields
-            public Entity[] Units;
-            public int Count;
+            private readonly BufferPool<Entity> bufferPool;
+            private Entity[] unitBuffer;
+            private int count;
+            #endregion
+
+            #region Constructors
+            public Zone(BufferPool<Entity> bufferPool)
+            {
+                Argument.EnsureNotNull(bufferPool, "bufferPool");
+                this.bufferPool = bufferPool;
+            }
+            #endregion
+
+            #region Properties
+            /// <summary>
+            /// Gets the number of units in this zone.
+            /// </summary>
+            public int Count
+            {
+                get { return count; }
+            }
             #endregion
 
             #region Indexers
@@ -39,7 +58,7 @@ namespace Orion.GameLogic
             /// <returns>The <see cref="Entity"/> at that index.</returns>
             public Entity this[int index]
             {
-                get { return Units[index]; }
+                get { return unitBuffer[index]; }
             }
             #endregion
 
@@ -51,18 +70,35 @@ namespace Orion.GameLogic
             /// <returns><c>True</c> if an <see cref="Entity"/> was removed, <c>false</c> if it wasn't found.</returns>
             public bool Remove(Entity entity)
             {
-                for (int i = 0; i < Count; ++i)
-                {
-                    if (Units[i] == entity)
-                    {
-                        if (i < Count - 1) Units[i] = Units[Count - 1];
-                        Units[Count - 1] = null;
-                        --Count;
-                        return true;
-                    }
-                }
+                int index = IndexOf(entity);
+                if (index == -1) return false;
+                RemoveAt(index);
+                return true;
+            }
 
-                return false;
+            /// <summary>
+            /// Gets the index of the first (and hopefully only) occurance
+            /// of an <see cref="Entity"/> in this <see cref="Zone"/>.
+            /// </summary>
+            /// <param name="entity">The <see cref="Entity"/> to be found.</param>
+            /// <returns>The index of <paramref name="entity"/>, or <c>-1</c> if it wasn't found.</returns>
+            public int IndexOf(Entity entity)
+            {
+                for (int i = 0; i < count; ++i)
+                    if (unitBuffer[i] == entity)
+                        return i;
+                return -1;
+            }
+
+            /// <summary>
+            /// Removes an <see cref="Entity"/> at an index in this <see cref="Zone"/>
+            /// </summary>
+            /// <param name="index">The index of the entity to be removed.</param>
+            public void RemoveAt(int index)
+            {
+                if (index < count - 1) unitBuffer[index] = unitBuffer[count - 1];
+                unitBuffer[count - 1] = null;
+                --count;
             }
 
             /// <summary>
@@ -72,16 +108,20 @@ namespace Orion.GameLogic
             /// <param name="item">The <see cref="Entity"/> to be added.</param>
             public void Add(Entity entity)
             {
-                if (Units == null) Units = new Entity[16];
-                else if (Count == Units.Length)
+                if (unitBuffer == null)
                 {
-                    Entity[] newItems = new Entity[Units.Length * 2];
-                    Array.Copy(Units, newItems, Units.Length);
-                    Units = newItems;
+                    unitBuffer = bufferPool.Get(1);
+                }
+                else if (count == unitBuffer.Length)
+                {
+                    Entity[] newUnitBuffer = bufferPool.Get(unitBuffer.Length + 1);
+                    Array.Copy(unitBuffer, newUnitBuffer, unitBuffer.Length);
+                    bufferPool.Add(unitBuffer);
+                    unitBuffer = newUnitBuffer;
                 }
 
-                Units[Count] = entity;
-                ++Count;
+                unitBuffer[count] = entity;
+                ++count;
             }
             #endregion
         }
@@ -92,6 +132,7 @@ namespace Orion.GameLogic
         private readonly World world;
         private readonly List<Entity> entities = new List<Entity>();
         private readonly Zone[,] zones;
+        private readonly BufferPool<Entity> bufferPool = CreateBufferPool();
 
         // Temporary collections used to defer modification of "entities"
         private readonly HashSet<Entity> entitiesToAdd = new HashSet<Entity>();
@@ -120,7 +161,7 @@ namespace Orion.GameLogic
             Argument.EnsureStrictlyPositive(rowCount, "rowCount");
 
             this.world = world;
-            this.zones = new Zone[columnCount, rowCount];
+            this.zones = CreateZones(columnCount, rowCount, bufferPool);
             this.entityDiedEventHandler = OnEntityDied;
             this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
         }
@@ -178,6 +219,46 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        #region Initialization
+        private static Zone[,] CreateZones(int columnCount, int rowCount, BufferPool<Entity> bufferPool)
+        {
+            Zone[,] zones = new Zone[columnCount, rowCount];
+            for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex)
+                for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex)
+                    zones[columnIndex, rowIndex] = new Zone(bufferPool);
+            return zones;
+        }
+
+        private static BufferPool<Entity> CreateBufferPool()
+        {
+            BufferPool<Entity> pool = new BufferPool<Entity>(AllocateBuffer);
+            // Pre-allocate some buffers here.
+            return pool;
+        }
+
+        private static Entity[] AllocateBuffer(int minimumSize)
+        {
+            Argument.EnsurePositive(minimumSize, "minimumSize");
+
+            uint allocationSize = CeilingPowerOfTwo((uint)minimumSize);
+            if (allocationSize < 16) allocationSize = 16;
+            return new Entity[allocationSize];
+        }
+
+        private static uint CeilingPowerOfTwo(uint value)
+        {
+            // Source: http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2Float
+            // Edge case 0 is handled by under and overflowing.
+            --value;
+            value |= value >> 1;
+            value |= value >> 2;
+            value |= value >> 4;
+            value |= value >> 8;
+            value |= value >> 16;
+            return value + 1;
+        }
+        #endregion
+
         #region Event Handlers
         private void OnEntityDied(Entity entity)
         {
@@ -284,6 +365,11 @@ namespace Orion.GameLogic
         private void AddToZone(Entity entity)
         {
             Point zoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            AddToZone(entity, zoneCoords);
+        }
+
+        private void AddToZone(Entity entity, Point zoneCoords)
+        {
             zones[zoneCoords.X, zoneCoords.Y].Add(entity);
         }
 

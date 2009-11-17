@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity.cs" />
+    <Compile Include="EntityZone.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />
     <Compile Include="Pathfinding\Path.cs" />

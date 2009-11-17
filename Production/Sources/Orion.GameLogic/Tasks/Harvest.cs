@@ -2,6 +2,7 @@
 using System.Linq;
 
 using OpenTK.Math;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -105,6 +106,9 @@ namespace Orion.GameLogic.Tasks
             {
                 if (amountCarrying >= maxCarryingAmount || amountCarrying >= node.AmountRemaining)
                 {
+                    if (commandCenter != null)
+                        commandCenter.Died -= commandCenterDestroyedEventHandler;
+
                     commandCenter = FindClosestCommandCenter();
                     if (commandCenter == null)
                     {
@@ -134,6 +138,7 @@ namespace Orion.GameLogic.Tasks
 
         private void OnCommandCenterDestroyed(Entity sender)
         {
+            Debug.Assert(sender == commandCenter);
             commandCenter.Died -= commandCenterDestroyedEventHandler;
             commandCenter = null;
 

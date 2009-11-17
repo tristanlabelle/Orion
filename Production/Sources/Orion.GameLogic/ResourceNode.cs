@@ -12,6 +12,8 @@ namespace Orion.GameLogic
     public sealed class ResourceNode : Entity
     {
         #region Fields
+        public const int DefaultTotalAmount = 1000;
+
         private const int Width = 2;
         private const int Height = 2;
 

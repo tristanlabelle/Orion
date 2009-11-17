@@ -8,19 +8,29 @@ namespace Orion.GameLogic.Tasks
     [Serializable]
     public sealed class Harvest : Task
     {
+        #region Nested Types
+        private enum Mode
+        {
+            Extracting,
+            Delivering
+        }
+        #endregion
+
+        #region Instance
         #region Fields
+        private const float harvestDuration = 5;
+        private const float depositingDuration = 0;
+
         private readonly Unit harvester;
         private readonly ResourceNode node;
-        private const float secondsToHarvest = 5;
-        private const float secondsToGiveResource = 0;
-        private const int defaultAmountToHarvest = 5;
-        private int amountToHarvest = 0;
-        private float secondsSpentHarvesting = 0;
-        private float secondsGivingResource = 0;
+        private readonly GenericEventHandler<Entity> commandCenterDestroyedEventHandler;
+        private int amountCarrying;
+        private float amountAccumulator;
+        private float secondsGivingResource;
         private Move move;
         private Unit commandCenter;
-        private bool extractingOrDelivering = true; //true = extracting, false = delivering
-        private bool hasEnded = false;
+        private Mode mode = Mode.Extracting;
+        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -33,9 +43,8 @@ namespace Orion.GameLogic.Tasks
 
             this.harvester = harvester;
             this.node = node;
+            this.commandCenterDestroyedEventHandler = OnCommandCenterDestroyed;
             this.move = new Move(harvester, node.Position);
-            this.commandCenter = FindClosestCommandCenter(node.Position);
-            
         }
         #endregion
 
@@ -58,48 +67,25 @@ namespace Orion.GameLogic.Tasks
                 hasEnded = true;
                 return;
             }
+
             if (move.HasEnded)
             {
-                if (extractingOrDelivering) //true = extracting, false = delivering
+                if (mode == Mode.Extracting)
                 {
-                    if (harvestingIsOver(timeDelta))
-                    {
-                    
-                        if (node.AmountRemaining != 0)
-                        {
-                            //determines the amount of resources to be harvested and substracts that amount to the node
-                            if (node.AmountRemaining >= amountToHarvest)
-                                amountToHarvest = defaultAmountToHarvest;
-                            else
-                                amountToHarvest = node.AmountRemaining;
-
-                            node.Harvest(amountToHarvest);
-                            if (commandCenter != null)
-                                move = new Move(harvester, commandCenter.Position);
-                            else
-                            {
-                                hasEnded = true;
-                            }
-                            extractingOrDelivering = false;
-
-                            
-
-                            //System.Console.Write("\nAlladium: " + harvester.Faction.AladdiumAmount + "\tAlagene: " + harvester.Faction.AlageneAmount);
-                            secondsSpentHarvesting = 0;
-                        }
-                    }
+                    UpdateExtracting(timeDelta);
                 }
                 else
                 {
-                    if (visitingCommandCenterIsOver(timeDelta))
+                    if (VisitingCommandCenterIsOver(timeDelta))
                     {
                         move = new Move(harvester, node.Position);
-                        extractingOrDelivering = true;
+                        mode = Mode.Extracting;
                         //adds the resources to the unit's faction
                         if (node.Type == ResourceType.Aladdium)
-                            harvester.Faction.AladdiumAmount += amountToHarvest;
+                            harvester.Faction.AladdiumAmount += amountCarrying;
                         else if (node.Type == ResourceType.Alagene)
-                            harvester.Faction.AlageneAmount += amountToHarvest;
+                            harvester.Faction.AlageneAmount += amountCarrying;
+                        amountCarrying = 0;
                     }
                 }
             }
@@ -109,54 +95,59 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private Unit FindClosestCommandCenter(Vector2 nodePosition)
+        private void UpdateExtracting(float timeDelta)
         {
-            Unit closestCommandCenter = null;
-            float shortestDistance = -1;
-            foreach (Unit unit in harvester.Faction.World.Entities.OfType<Unit>())
+            float extractingSpeed = harvester.GetStat(UnitStat.ExtractingSpeed);
+            amountAccumulator += extractingSpeed * timeDelta;
+            
+            int maxCarryingAmount = harvester.GetSkill<Skills.Harvest>().MaxCarryingAmount;
+            while (amountAccumulator >= 1)
             {
-                if (unit.Faction == harvester.Faction && unit.HasSkill<Skills.StoreResources>())
+                if (amountCarrying >= maxCarryingAmount || amountCarrying >= node.AmountRemaining)
                 {
-                    float distance = (unit.Position - nodePosition).LengthSquared;
-                    if (distance < shortestDistance || shortestDistance == -1)
+                    commandCenter = FindClosestCommandCenter();
+                    if (commandCenter == null)
                     {
-                        shortestDistance = distance;
-                        closestCommandCenter = unit;
+                        hasEnded = true;
                     }
+                    else
+                    {
+                        commandCenter.Died += commandCenterDestroyedEventHandler;
+                        move = new Move(harvester, commandCenter.Position);
+                        mode = Mode.Delivering;
+                    }
+                    return;
                 }
-            }
-
-            if (closestCommandCenter == null)
-            {
-                return null;
-            }
-            else
-                closestCommandCenter.Died += new GenericEventHandler<Entity>(CommandCenterDestroyed);
-
-            return closestCommandCenter;
-        }
-
-        void CommandCenterDestroyed(Entity sender)
-        {
-            commandCenter = FindClosestCommandCenter(node.Position);
-        }
-
-        private bool harvestingIsOver(float timeDelta)
-        {
-            if (secondsSpentHarvesting >= secondsToHarvest)
-            {
-                return true;
-            }
-            else
-            {
-                secondsSpentHarvesting += timeDelta;
-                return false;
+                
+                --amountAccumulator;
+                ++amountCarrying;
             }
         }
 
-        private bool visitingCommandCenterIsOver(float timeDelta)
+        private Unit FindClosestCommandCenter()
         {
-            if (secondsGivingResource >= secondsToGiveResource)
+            return harvester.World.Entities
+                .OfType<Unit>()
+                .Where(unit => unit.Faction == harvester.Faction && unit.HasSkill<Skills.StoreResources>())
+                .WithMinOrDefault(unit => (unit.Position - node.Position).LengthSquared);
+        }
+
+        private void OnCommandCenterDestroyed(Entity sender)
+        {
+            commandCenter.Died -= commandCenterDestroyedEventHandler;
+            commandCenter = null;
+
+            if (mode == Mode.Delivering)
+            {
+                commandCenter = FindClosestCommandCenter();
+                commandCenter.Died += commandCenterDestroyedEventHandler;
+                move = new Move(harvester, commandCenter.Position);
+            }
+        }
+
+        private bool VisitingCommandCenterIsOver(float timeDelta)
+        {
+            if (secondsGivingResource >= depositingDuration)
             {
                 return true;
             }
@@ -166,7 +157,7 @@ namespace Orion.GameLogic.Tasks
                 return false;
             }
         }
-
+        #endregion
         #endregion
     }
 }

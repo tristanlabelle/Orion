@@ -162,7 +162,7 @@ namespace Orion.Main
                     position = new Vector2(random.Next(world.Width), random.Next(world.Height));
                 } while (!world.Terrain.IsWalkable((int)position.X, (int)position.Y));
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.Entities.CreateResourceNode(resourceType, 5000, position);
+                ResourceNode node = world.Entities.CreateResourceNode(resourceType, position);
             }
         }
 
@@ -178,10 +178,10 @@ namespace Orion.Main
 
         private void CreateCampResourceNodes(Vector2 campCenter)
         {
-            world.Entities.CreateResourceNode(ResourceType.Aladdium, 5000,
+            world.Entities.CreateResourceNode(ResourceType.Aladdium,
                 campCenter + new Vector2(campSize / -4f, campSize / -4f));
 
-            world.Entities.CreateResourceNode(ResourceType.Alagene, 5000,
+            world.Entities.CreateResourceNode(ResourceType.Alagene,
                 campCenter + new Vector2(campSize / -4f, campSize / 4f));
         }
         #endregion

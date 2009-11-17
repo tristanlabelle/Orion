@@ -41,7 +41,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Move(15));
-            builder.Skills.Add(new Skills.Harvest(10));
+            builder.Skills.Add(new Skills.Harvest(1, 10));
             Register(builder);
         }
 
@@ -58,7 +58,7 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 10));
-            builder.Skills.Add(new Skills.Harvest(10));
+            builder.Skills.Add(new Skills.Harvest(1, 10));
             Register(builder);
         }
 

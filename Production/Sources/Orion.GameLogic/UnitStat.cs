@@ -13,6 +13,8 @@ namespace Orion.GameLogic
         AttackRange,
         AttackPower,
         BuildingSpeed,
+        ExtractingSpeed,
+        MaxCarryingAmount,
         MaxHealth,
         MovementSpeed,
         SightRange,

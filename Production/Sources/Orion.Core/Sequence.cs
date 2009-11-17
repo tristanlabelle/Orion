@@ -269,8 +269,8 @@ namespace Orion
         }
         #endregion
 
-        #region Best/Worse
-        #region Best
+        #region WithMin/WithMax
+        #region WithMax
         /// <summary>
         /// Finds the element of a sequence that best matches a condition.
         /// </summary>
@@ -279,7 +279,7 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The best element.</returns>
-        public static TElement Best<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMax<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, IComparer<TScore> scoreComparer)
         {
             Argument.EnsureNotNull(sequence, "sequence");
@@ -315,14 +315,14 @@ namespace Orion
         /// <param name="sequence">The sequence of elements.</param>
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <returns>The best element.</returns>
-        public static TElement Best<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMax<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator)
         {
-            return Best(sequence, evaluator, null);
+            return WithMax(sequence, evaluator, null);
         }
         #endregion
 
-        #region BestOrDefault
+        #region WithMaxOrDefault
         /// <summary>
         /// Finds the element of a sequence that best matches a condition.
         /// </summary>
@@ -332,7 +332,7 @@ namespace Orion
         /// <param name="defaultValue">The value to be returned if the sequence was empty.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The best element, or <paramref name="defaultValue"/> if the sequence was empty.</returns>
-        public static TElement BestOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMaxOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, TElement defaultValue, IComparer<TScore> scoreComparer)
         {
             Argument.EnsureNotNull(sequence, "sequence");
@@ -368,10 +368,10 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="defaultValue">The value to be returned if the sequence was empty.</param>
         /// <returns>The best element, or <paramref name="defaultValue"/> if the sequence was empty.</returns>
-        public static TElement BestOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMaxOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, TElement defaultValue)
         {
-            return BestOrDefault(sequence, evaluator, defaultValue, null);
+            return WithMaxOrDefault(sequence, evaluator, defaultValue, null);
         }
 
         /// <summary>
@@ -382,10 +382,10 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The best element, or the default value if the sequence was empty.</returns>
-        public static TElement BestOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMaxOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, IComparer<TScore> scoreComparer)
         {
-            return BestOrDefault(sequence, evaluator, default(TElement), scoreComparer);
+            return WithMaxOrDefault(sequence, evaluator, default(TElement), scoreComparer);
         }
 
         /// <summary>
@@ -395,14 +395,14 @@ namespace Orion
         /// <param name="sequence">The sequence of elements.</param>
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <returns>The best element, or the default value if the sequence was empty.</returns>
-        public static TElement BestOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMaxOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator)
         {
-            return BestOrDefault(sequence, evaluator, default(TElement), null);
+            return WithMaxOrDefault(sequence, evaluator, default(TElement), null);
         }
         #endregion
 
-        #region Worst
+        #region WithMin
         /// <summary>
         /// Finds the element of a sequence that worst matches a condition.
         /// </summary>
@@ -411,7 +411,7 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The worst element.</returns>
-        public static TElement Worst<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMin<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, IComparer<TScore> scoreComparer)
         {
             Argument.EnsureNotNull(sequence, "sequence");
@@ -447,14 +447,14 @@ namespace Orion
         /// <param name="sequence">The sequence of elements.</param>
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <returns>The worst element.</returns>
-        public static TElement Worst<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMin<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator)
         {
-            return Worst(sequence, evaluator, null);
+            return WithMin(sequence, evaluator, null);
         }
         #endregion
 
-        #region WorstOrDefault
+        #region WithMinOrDefault
         /// <summary>
         /// Finds the element of a sequence that worst matches a condition.
         /// </summary>
@@ -464,7 +464,7 @@ namespace Orion
         /// <param name="defaultValue">The value to be returned if the sequence was empty.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The worst element, or <paramref name="defaultValue"/> if the sequence was empty.</returns>
-        public static TElement WorstOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMinOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, TElement defaultValue, IComparer<TScore> scoreComparer)
         {
             Argument.EnsureNotNull(sequence, "sequence");
@@ -500,10 +500,10 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="defaultValue">The value to be returned if the sequence was empty.</param>
         /// <returns>The worst element, or <paramref name="defaultValue"/> if the sequence was empty.</returns>
-        public static TElement WorstOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMinOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, TElement defaultValue)
         {
-            return WorstOrDefault(sequence, evaluator, defaultValue, null);
+            return WithMinOrDefault(sequence, evaluator, defaultValue, null);
         }
 
         /// <summary>
@@ -514,10 +514,10 @@ namespace Orion
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <param name="scoreComparer">A comparer for score values, or null for the default comparer.</param>
         /// <returns>The worst element, or the default value if the sequence was empty.</returns>
-        public static TElement WorstOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMinOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator, IComparer<TScore> scoreComparer)
         {
-            return WorstOrDefault(sequence, evaluator, default(TElement), scoreComparer);
+            return WithMinOrDefault(sequence, evaluator, default(TElement), scoreComparer);
         }
 
         /// <summary>
@@ -527,10 +527,10 @@ namespace Orion
         /// <param name="sequence">The sequence of elements.</param>
         /// <param name="evaluator">An evaluator that gives a score to each element.</param>
         /// <returns>The worst element, or the default value if the sequence was empty.</returns>
-        public static TElement WorstOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
+        public static TElement WithMinOrDefault<TElement, TScore>(this IEnumerable<TElement> sequence,
             Func<TElement, TScore> evaluator)
         {
-            return WorstOrDefault(sequence, evaluator, default(TElement), null);
+            return WithMinOrDefault(sequence, evaluator, default(TElement), null);
         }
         #endregion
         #endregion

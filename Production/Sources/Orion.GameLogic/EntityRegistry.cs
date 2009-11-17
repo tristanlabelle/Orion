@@ -184,9 +184,9 @@ namespace Orion.GameLogic
             return unit;
         }
 
-        public ResourceNode CreateResourceNode(ResourceType type, int amount, Vector2 position)
+        public ResourceNode CreateResourceNode(ResourceType type, Vector2 position)
         {
-            ResourceNode node = new ResourceNode(world, nextID, type, amount, position);
+            ResourceNode node = new ResourceNode(world, nextID, type, ResourceNode.DefaultTotalAmount, position);
             ++nextID;
             InitializeEntity(node);
             return node;

@@ -33,13 +33,22 @@ namespace Orion.Commandment
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
         private bool shiftKeyPressed;
+        private List<Unit>[] groups;
         #endregion
 
         #region Constructors
         public UserInputManager(UserInputCommander userCommander)
         {
+            Argument.EnsureNotNull(userCommander, "userCommander");
             commander = userCommander;
+            commander.Faction.World.Entities.Died += OnEntityDied;
             selectionManager = new SelectionManager(userCommander.Faction);
+
+            groups = new List<Unit>[10];
+            for (int i = 0; i < groups.Length;i++ )
+            {
+                groups[i] = new List<Unit>();
+            }
         }
         #endregion
 
@@ -91,6 +100,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
+
         #region Direct Event Handling
         public void HandleMouseDown(object responder, MouseEventArgs args)
         {
@@ -176,12 +186,36 @@ namespace Orion.Commandment
                 case Keys.F9: 
                     LaunchChangeDimplomacy();
                     break;
+
+                
+            }
+            if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
+            {
+                int groupNumer = args.Key - Keys.D0;
+                if (args.HasControl)
+                {
+                    groups[groupNumer] = selectionManager.SelectedUnits.ToList();
+                }
+                else if (groups[groupNumer].Count > 0)
+                {
+                    selectionManager.SelectUnits(groups[groupNumer]);
+                }
             }
         }
 
         public void HandleKeyUp(object responder, KeyboardEventArgs args)
         {
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
+        }
+
+        private void OnEntityDied(EntityRegistry sender, Entity args)
+        {
+            Unit unit = args as Unit;
+            if (unit == null) return;
+            for (int i = 0; i < groups.Length; i++)
+            {
+                groups[i].Remove(unit);
+            }
         }
         #endregion
 

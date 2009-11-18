@@ -112,12 +112,12 @@ namespace Orion.UserInterface
 
         private void UpdateGamesList()
         {
-            while(Children.Count > 0) Children[0].Dispose();
-
-            Rectangle buttonFrame = new Rectangle(10, gamesFrame.Bounds.MaxY - 10, gamesFrame.Bounds.MaxX - 20, 30);
+            while (gamesFrame.Children.Count > 0) gamesFrame.Children[0].Dispose();
+            
+            Rectangle buttonFrame = new Rectangle(10, gamesFrame.Bounds.MaxY - 40, gamesFrame.Bounds.MaxX - 20, 30);
             foreach (KeyValuePair<IPv4EndPoint, int> game in hostedGames)
             {
-                Button button = new Button(buttonFrame, "{0} ({1} players)".FormatInvariant(game.Key, game.Value));
+                Button button = new Button(buttonFrame, "{0} ({1} places left)".FormatInvariant(game.Key, game.Value));
                 button.Pressed += delegate(Button source) { AskJoinGame(game.Key); };
                 gamesFrame.Children.Add(button);
                 buttonFrame = buttonFrame.TranslatedBy(0, -(buttonFrame.Height + 10));

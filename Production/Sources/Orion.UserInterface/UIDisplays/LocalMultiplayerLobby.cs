@@ -80,7 +80,7 @@ namespace Orion.UserInterface
             switch ((SetupMessageType)args.Data[0])
             {
                 case SetupMessageType.Advertise:
-                    hostedGames[args.Host] = BitConverter.ToInt32(args.Data, 1);
+                    hostedGames[args.Host] = args.Data[1];
                     UpdateGamesList();
                     break;
 

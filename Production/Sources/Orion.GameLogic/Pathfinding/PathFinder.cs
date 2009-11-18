@@ -12,7 +12,9 @@ namespace Orion.GameLogic.Pathfinding
         #region Fields
         private static readonly float[] movementCostFromSteps = new[] { 0f, 1f, (float)Math.Sqrt(2) };
 
-        private readonly World world;
+        private readonly int width;
+        private readonly int height;
+        private readonly Func<int, int, bool> isWalkable;
         private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
@@ -25,10 +27,14 @@ namespace Orion.GameLogic.Pathfinding
         /// Initializes a new <see cref="Pathfinder"/> that from the <see cref="World"/> in which it operates.
         /// </summary>
         /// <param name="world">The <see cref="World"/> in which paths are to be found.</param>
-        public Pathfinder(World world)
+        public Pathfinder(int width, int height, Func<int, int, bool> isWalkable)
         {
-            Argument.EnsureNotNull(world, "world");
-            this.world = world;
+            Argument.EnsureNotNull(width, "width");
+            Argument.EnsureNotNull(height, "height");
+            Argument.EnsureNotNull(isWalkable, "isWalkable");
+            this.width = width;
+            this.height = height;
+            this.isWalkable = isWalkable;
         }
         #endregion
 
@@ -42,20 +48,25 @@ namespace Orion.GameLogic.Pathfinding
         {
             get { return closedNodes.Values; }
         }
+
+        private Rectangle Terrain
+        {
+            get { return new Rectangle(width, height); }
+        }
         #endregion
 
         #region Methods
         public Path FindPath(Vector2 source, Vector2 destination)
         {
-            if (!world.Bounds.ContainsPoint(source))
+            if (!Terrain.ContainsPoint(source))
                 throw new ArgumentOutOfRangeException("The source of the path is out of world bounds.", "source");
-            
-            destination = world.Bounds.ClosestPointInside(destination);
 
-            Point16 sourcePoint = world.GetClampedTileCoordinates(source);
-            destinationPoint = world.GetClampedTileCoordinates(destination);
+            destination = Terrain.ClosestPointInside(destination);
 
-            if (!world.Terrain.IsWalkable(destinationPoint))
+            Point16 sourcePoint = GetClampedTileCoordinates(source);
+            destinationPoint = GetClampedTileCoordinates(destination);
+
+            if (!isWalkable(destinationPoint.X, destinationPoint.Y))
             {
                 // Abandon finding a path if we know it's going to fail.
                 // Hopefully this can be removed once more optimizations are in.
@@ -70,7 +81,7 @@ namespace Orion.GameLogic.Pathfinding
 
             FindPathPointsTo(destinationNode);
             OptimizePathPoints();
-            return new Path(world, source, destination, points);
+            return new Path(source, destination, points);
         }
 
         private void OptimizePathPoints()
@@ -82,7 +93,7 @@ namespace Orion.GameLogic.Pathfinding
                 {
                     Vector2 destinationPoint = points[i + 2];
                     LineSegment lineSegment = new LineSegment(sourcePoint, destinationPoint);
-                    if (!world.Terrain.IsWalkable(lineSegment, 1))
+                    if (!Bresenham.All(lineSegment, 1, isWalkable))
                         break;
                     points.RemoveAt(i + 1);
                 }
@@ -201,9 +212,9 @@ namespace Orion.GameLogic.Pathfinding
 
         private bool IsOpenable(Point16 nearbyPoint)
         {
-            return world.IsWithinBounds(nearbyPoint)
+            return Terrain.ContainsPoint(nearbyPoint)
                 && !closedNodes.ContainsKey(nearbyPoint)
-                && world.Terrain.IsWalkable(nearbyPoint);
+                && isWalkable(nearbyPoint.X, nearbyPoint.Y);
         }
 
         private void AddNearbyNode(PathNode currentNode, Point16 nearbyPoint)
@@ -231,12 +242,19 @@ namespace Orion.GameLogic.Pathfinding
                 openNodes.Add(nearbyPoint, nearbyNode);
             }
         }
-        #endregion
 
-        #region Properties
-        public World World
+        private Point16 GetClampedTileCoordinates(Vector2 point)
         {
-            get { return world; }
+            int x = (int)point.X;
+            int y = (int)point.Y;
+
+            if (x < 0) x = 0;
+            else if (x >= width) x = width - 1;
+
+            if (y < 0) y = 0;
+            else if (y >= height) y = height - 1;
+
+            return new Point16((short)x, (short)y);
         }
         #endregion
     }

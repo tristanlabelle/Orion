@@ -8,19 +8,16 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class Path
     {
         #region Fields
-        private readonly World world;
         private readonly Vector2 source;
         private readonly Vector2 destination;
         private readonly ReadOnlyCollection<Vector2> points;
         #endregion
 
         #region Constructor
-        internal Path(World world, Vector2 source, Vector2 destination, IEnumerable<Vector2> points)
+        internal Path(Vector2 source, Vector2 destination, IEnumerable<Vector2> points)
         {
-            Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(points, "points");
 
-            this.world = world;
             this.source = source;
             this.destination = destination;
             this.points = new ReadOnlyCollection<Vector2>(points.ToList());

@@ -18,7 +18,7 @@ namespace Orion.GameLogic
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityRegistry entities;
         private readonly UnitTypeRegistry unitTypes;
-        private readonly Pathfinder pathfinder;
+
         #endregion
 
         #region Constructors
@@ -32,7 +32,7 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             entities = new EntityRegistry(this, 5, 5);
             unitTypes = new UnitTypeRegistry();
-            pathfinder = new Pathfinder(this);
+
         }
         #endregion
 
@@ -85,11 +85,6 @@ namespace Orion.GameLogic
         public Terrain Terrain
         {
             get { return terrain; }
-        }
-
-        public Pathfinder PathFinder
-        {
-            get { return pathfinder; }
         }
 
         #endregion

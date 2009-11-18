@@ -5,7 +5,8 @@ using System.Linq;
 using Color = System.Drawing.Color;
 using OpenTK.Math;
 using Orion.Geometry;
-using Orion.GameLogic.Tasks; 
+using Orion.GameLogic.Tasks;
+using Orion.GameLogic.Pathfinding;
 
 namespace Orion.GameLogic
 {
@@ -26,6 +27,7 @@ namespace Orion.GameLogic
         private int aladdiumAmount;
         private int alageneAmount;
         private List<int> alliesID = new List<int>();
+        private Pathfinder pathfinder;
         #endregion
 
         #region Constructors
@@ -48,6 +50,7 @@ namespace Orion.GameLogic
             this.fogOfWar = new FogOfWar(world.Width, world.Height);
             this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
             this.entityDiedEventHandler = OnEntityDied;
+            this.pathfinder = new Pathfinder(world.Width, world.Height, IsPathable);
         }
         #endregion
 
@@ -134,6 +137,11 @@ namespace Orion.GameLogic
         public List<int> AlliesID
         {
             get { return alliesID; }
+        }
+
+        public Pathfinder PathFinder
+        {
+            get { return pathfinder; }
         }
         #endregion
 
@@ -244,6 +252,15 @@ namespace Orion.GameLogic
         public override string ToString()
         {
             return name;
+        }
+
+        private bool IsPathable(int x, int y)
+        {
+            if (!world.IsWithinBounds(new Vector2(x, y)))
+                return false;
+            /*if (fogOfWar.GetTileVisibility(x, y) == TileVisibility.Undiscovered)
+                return true;*/
+            return world.Terrain.IsWalkable(x, y);
         }
         #endregion
     }

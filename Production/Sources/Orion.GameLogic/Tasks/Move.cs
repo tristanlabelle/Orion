@@ -17,7 +17,7 @@ namespace Orion.GameLogic.Tasks
 
         private readonly Unit unit;
         private readonly Vector2 destination;
-        private readonly Path path;
+        private Path path;
         private int nextPointIndex = 1;
         #endregion
 
@@ -72,16 +72,27 @@ namespace Orion.GameLogic.Tasks
             unit.Angle = (float)Math.Atan2(direction.X, direction.Y);
 
             float distance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
+            Vector2 targetPosition;
             if (distance < delta.Length)
             {
-                // Unit walks along a segment of the path within this frame.
-                unit.Position += direction * distance;
+                targetPosition = unit.Position + (direction * distance);
             }
             else
             {
                 // Unit will reach destination within this frame
-                unit.Position = destination;
+                targetPosition = destination;
                 ++nextPointIndex;
+            }
+
+            if (unit.World.Terrain.IsWalkable(targetPosition))
+            {
+                // Unit walks along a segment of the path within this frame.
+                unit.Position = targetPosition;
+            }
+            else
+            {
+                path = unit.Faction.PathFinder.FindPath(unit.Position, destination);
+                nextPointIndex = 1;
             }
         }
         #endregion

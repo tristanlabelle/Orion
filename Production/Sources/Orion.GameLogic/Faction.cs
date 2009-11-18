@@ -258,8 +258,8 @@ namespace Orion.GameLogic
         {
             if (!world.IsWithinBounds(new Vector2(x, y)))
                 return false;
-            /*if (fogOfWar.GetTileVisibility(x, y) == TileVisibility.Undiscovered)
-                return true;*/
+            if (fogOfWar.GetTileVisibility(x, y) == TileVisibility.Undiscovered)
+                return true;
             return world.Terrain.IsWalkable(x, y);
         }
         #endregion

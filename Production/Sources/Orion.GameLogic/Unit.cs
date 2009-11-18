@@ -3,7 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System.Collections;
 
 namespace Orion.GameLogic
 {
@@ -21,7 +22,8 @@ namespace Orion.GameLogic
         private float angle;
         private float damage;
         private Task task = null;
-        private Vector2 rallyPoint; 
+        private Vector2 rallyPoint;
+        private Queue queuedUnits;
         #endregion
 
         #region Constructors
@@ -41,11 +43,12 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(type, "type");
             Argument.EnsureNotNull(faction, "faction");
-
+           
             this.type = type;
             this.faction = faction;
             this.position = position;
             this.rallyPoint = SetDefaultRallyPoint(position);
+            this.queuedUnits = new Queue(); 
         }
         #endregion
 
@@ -211,6 +214,11 @@ namespace Orion.GameLogic
             get { return rallyPoint; }
             set { rallyPoint = value; }
         }
+        public Queue UnitsQueue
+        {
+            get { return queuedUnits; }
+            set { queuedUnits = value; }
+        }
         #endregion
         #endregion
 
@@ -289,6 +297,12 @@ namespace Orion.GameLogic
                 task.Update(timeDeltaInSeconds);
                 if (task.HasEnded) Task = null;
             }
+            if(task == null && HasSkill<Skills.Train>() && this.UnitsQueue.Count!=0)
+            {
+                Unit unitTobeDequeued = (Unit)UnitsQueue.Peek();
+                Task = new Tasks.Train(this, unitTobeDequeued.type);
+            }
+            
         }
 
         public override string ToString()
@@ -334,6 +348,11 @@ namespace Orion.GameLogic
    
             return newRallyPoint;
         }
+        public void AddUnitToQueue(int id, UnitType type,Faction faction, Vector2 position)
+        {
+           queuedUnits.Enqueue(new Unit(id, type, faction, position)); 
+        }
+        
         #endregion
     }
 }

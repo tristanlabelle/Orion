@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Orion.GameLogic;
 
+
 namespace Orion.Commandment.Commands
 {
     public sealed class Train : Command
@@ -27,6 +28,10 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(faction, "faction");
             this.buildings = selectedsSameBuilding.ToList();
             this.unitType = unitType;
+            foreach (Unit unit in buildings)
+            {
+                unit.AddUnitToQueue(unit.ID, unitType, faction, unit.Position); 
+            }
         }
         #endregion
 

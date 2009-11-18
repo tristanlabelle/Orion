@@ -79,6 +79,10 @@ namespace Orion.Main
                 return;
             }
 
+            byte[] accept = new byte[1];
+            accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
+            transporter.SendTo(accept, host);
+
             byte[] seedMessage = new byte[5];
             seedMessage[0] = (byte)SetupMessageType.SetSeed;
             BitConverter.GetBytes(Seed).CopyTo(seedMessage, 1);

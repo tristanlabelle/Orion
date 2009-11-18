@@ -125,11 +125,24 @@ namespace Orion.Commandment
         }
 
         /// <summary>
+        /// This unit will create Move commands for the specified units to the specified position.
+        /// </summary>
+        /// <param name="units">Units to be moved</param>
+        /// <param name="position">Point to which the units will move</param>
+        public void Move(List<Unit> units, Vector2 position)
+        {
+            List<Unit> unitsToMove = units.Where(unit => unit.IsIdle).ToList();
+
+            if(unitsToMove.Count > 0)
+                commands.Add(new Move(Faction, units, position));
+        }
+
+        /// <summary>
         /// This method initiates the training of units from the specified type.  If the specified units can't be trained due to lack of training buildings available or required technology, this will not create any command.
         /// </summary>
         /// <param name="unitTypeName">The name of the type of units to be trained</param>
         /// <param name="amountToBeTrained">The amount of the specified units to be trained</param>
-        public void initiateTraining(string unitTypeName, int amountToBeTrained)
+        public void InitiateTraining(string unitTypeName, int amountToBeTrained)
         {
             int amountOfTrains;
             List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.Train>()).ToList();

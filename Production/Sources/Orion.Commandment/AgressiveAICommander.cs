@@ -37,7 +37,11 @@ namespace Orion.Commandment
                 int amountOfAttackers = Evaluate("MeleeAttacker", 1);
 
                 DispatchHarvesters(amountOfHarvesters, startingNode);
-                initiateTraining("MeleeAttacker", 1);
+                InitiateTraining("MeleeAttacker", 1);
+
+                //TODO: remove this part when the AI is sandboxed as it is only here to test the behavior of the AI
+                if(World.Factions.First().Units.Count() != 0)
+                    DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 
             base.Update(timeDelta);

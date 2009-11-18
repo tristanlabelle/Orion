@@ -51,7 +51,7 @@ namespace Orion.Main
                     commander = userCommander;
                 }
                 else if (slot is AIPlayerSlot)
-                    commander = new AICommander(faction, random);
+                    commander = new AgressiveAICommander(faction, random);
                 else
                     throw new InvalidOperationException("Local games only support local players and AI players");
 

@@ -15,12 +15,13 @@ namespace Orion.Main
         private static readonly byte[] advertizeGameMessage = new byte[] { (byte)SetupMessageType.Advertise };
         private static readonly byte[] refuseJoinGameMessage = new byte[] { (byte)SetupMessageType.RefuseJoinRequest };
 
-        private MultiplayerHostMatchConfigurationUI ui = new MultiplayerHostMatchConfigurationUI();
+        private MultiplayerHostMatchConfigurationUI ui;
 
         public MultiplayerHostMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
             Seed = (int)Environment.TickCount;
+            ui = new MultiplayerHostMatchConfigurationUI(transporter);
             ui.PressedExit += ExitGame;
         }
 

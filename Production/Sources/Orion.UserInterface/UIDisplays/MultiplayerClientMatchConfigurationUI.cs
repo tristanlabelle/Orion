@@ -10,6 +10,12 @@ namespace Orion.UserInterface
 {
     public class MultiplayerClientMatchConfigurationUI : MultiplayerMatchConfigurationUI
     {
+        #region Constructors
+        public MultiplayerClientMatchConfigurationUI(SafeTransporter transporter)
+            : base(transporter)
+        { }
+        #endregion
+
         #region Methods
         protected override void InitializeSlots()
         {

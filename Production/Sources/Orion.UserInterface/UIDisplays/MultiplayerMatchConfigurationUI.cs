@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orion.Networking;
 using Orion.Commandment;
 using Orion.UserInterface.Widgets;
 
@@ -9,9 +10,15 @@ namespace Orion.UserInterface
 {
     public abstract class MultiplayerMatchConfigurationUI : MatchConfigurationUI
     {
+        #region Fields
+        private SafeTransporter transporter;
+        #endregion
+
         #region Constructors
-        public MultiplayerMatchConfigurationUI()
-        { }
+        public MultiplayerMatchConfigurationUI(SafeTransporter transporter)
+        {
+            this.transporter = transporter;
+        }
         #endregion
 
         #region Properties
@@ -74,6 +81,12 @@ namespace Orion.UserInterface
         private void SelectSlot<T>(int slot) where T : PlayerSlot
         {
             playerSlots[slot].SelectedItem = playerSlots[slot].Items.OfType<T>().First();
+        }
+
+        protected override void OnUpdate(UpdateEventArgs args)
+        {
+            transporter.Poll();
+            base.OnUpdate(args);
         }
         #endregion
     }

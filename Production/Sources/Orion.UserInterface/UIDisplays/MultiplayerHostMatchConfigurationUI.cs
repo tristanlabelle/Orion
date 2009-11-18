@@ -10,6 +10,12 @@ namespace Orion.UserInterface
 {
     public sealed class MultiplayerHostMatchConfigurationUI : MultiplayerMatchConfigurationUI
     {
+        #region Constructors
+        public MultiplayerHostMatchConfigurationUI(SafeTransporter transporter)
+            : base(transporter)
+        { }
+        #endregion
+
         #region Events
 
         public event GenericEventHandler<int, PlayerSlot> SlotOccupationChanged;

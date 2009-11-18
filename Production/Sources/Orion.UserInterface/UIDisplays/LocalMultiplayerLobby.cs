@@ -67,6 +67,7 @@ namespace Orion.UserInterface
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
+            transporter.Poll();
             frameCounter++;
             if (frameCounter % repollAfterFrames == 0)
                 transporter.Broadcast(explorePacket, port);
@@ -107,7 +108,6 @@ namespace Orion.UserInterface
 
         private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
         {
-            Console.WriteLine("Peer {0} timed out!", host);
         }
 
         private void UpdateGamesList()

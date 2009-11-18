@@ -27,8 +27,6 @@ namespace Orion.Commandment
         public AICommander(Faction faction, Random random)
             : base(faction)
         {
-            allUnits = Faction.Units.ToList();
-
             this.random = random;
         }
 
@@ -73,7 +71,7 @@ namespace Orion.Commandment
 
             units = allUnits.Where(unit => unit.Faction == Faction && unit.Type.Name == typeName).ToList();
 
-            return (int)Math.Ceiling(units.Count / proportion);
+            return (int)Math.Ceiling(units.Count * proportion);
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace Orion.Commandment
 
             if (allUnits.Count > 0)
             {
-                int amountOfHarvesters = Evaluate("Harvester", 1);
+                int amountOfHarvesters = Evaluate("Harvester", 0.5f);
                 int amountOfAttackers = Evaluate("MeleeAttacker", 1);
 
                 DispatchHarvesters(amountOfHarvesters, startingNode);

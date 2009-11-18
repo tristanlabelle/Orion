@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiplomaticsStands.cs" />
+    <Compile Include="DiplomaticStance.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityZone.cs" />
     <Compile Include="Faction.cs" />

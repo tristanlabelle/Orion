@@ -58,6 +58,7 @@
     <Compile Include="Commands\Move.cs" />
     <Compile Include="CommandSerializer.cs" />
     <Compile Include="Commands\Repair.cs" />
+    <Compile Include="Commands\SendRessources.cs" />
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />

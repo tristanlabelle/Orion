@@ -171,7 +171,6 @@ namespace Orion.UserInterface
         public override void Dispose()
         {
             transporter.Received -= receptionDelegate;
-            transporter.Dispose();
             HostedGame = null;
             JoinedGame = null;
             base.Dispose();

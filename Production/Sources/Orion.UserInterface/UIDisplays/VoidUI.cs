@@ -7,10 +7,5 @@ namespace Orion.UserInterface
 {
     public class VoidUI : UIDisplay
     {
-        internal override void OnEnter(RootView enterOn)
-        { }
-
-        internal override void OnShadow(RootView hiddenOf)
-        { }
     }
 }

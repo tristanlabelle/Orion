@@ -60,10 +60,8 @@ namespace Orion.UserInterface
             transporter.Received += receptionDelegate;
             transporter.TimedOut += timeoutDelegate;
             transporter.Broadcast(explorePacket, port);
+            base.OnEnter(enterOn);
         }
-
-        internal override void OnShadow(RootView hiddenOf)
-        { }
 
         protected override void OnUpdate(UpdateEventArgs args)
         {

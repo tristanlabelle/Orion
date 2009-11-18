@@ -23,8 +23,8 @@ namespace Orion.Main
         {
             this.gameHost = host;
             ui = new MultiplayerClientMatchConfigurationUI(transporter);
-            ui.UsePlayerForSlot(0, host);
             ui.PressedExit += ExitGame;
+            ui.Entered += EnterRootView;
         }
         #endregion
 
@@ -56,6 +56,11 @@ namespace Orion.Main
                 case SetupMessageType.StartGame: StartGame(); break;
                 case SetupMessageType.Exit: ForceExit(); break;
             }
+        }
+
+        private void EnterRootView(UIDisplay uiDisplay, RootView root)
+        {
+            ui.UsePlayerForSlot(0, gameHost);
         }
 
         protected override void ExitGame(MatchConfigurationUI ui)

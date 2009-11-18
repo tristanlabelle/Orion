@@ -88,12 +88,14 @@ namespace Orion.Networking
 
         private void OnReceived(IPv4EndPoint hostEndPoint, byte[] message)
         {
-            if (Received != null) Received(this, new NetworkEventArgs(hostEndPoint, message));
+            GenericEventHandler<SafeTransporter, NetworkEventArgs> handler = Received;
+            if (handler != null) handler(this, new NetworkEventArgs(hostEndPoint, message));
         }
 
         private void OnTimedOut(IPv4EndPoint endPoint)
         {
-            if (TimedOut != null) TimedOut(this, endPoint);
+            GenericEventHandler<SafeTransporter, IPv4EndPoint> handler = TimedOut;
+            if (handler != null) handler(this, endPoint);
         }
         #endregion
 

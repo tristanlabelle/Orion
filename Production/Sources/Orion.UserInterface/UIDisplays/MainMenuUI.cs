@@ -20,11 +20,5 @@ namespace Orion.UserInterface
         {
             base.Render();
         }
-
-        internal override void OnEnter(RootView enterOn)
-        { }
-
-        internal override void OnShadow(RootView hiddenOf)
-        { }
     }
 }

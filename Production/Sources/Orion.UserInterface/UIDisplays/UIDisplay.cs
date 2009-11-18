@@ -9,6 +9,9 @@ namespace Orion.UserInterface
             Bounds = Frame;
         }
 
+        public event GenericEventHandler<UIDisplay, RootView> Entered;
+        public event GenericEventHandler<UIDisplay, RootView> Shadowed;
+
         public new ViewChildrenCollection Children
         {
             get { return base.Children as ViewChildrenCollection; }
@@ -19,7 +22,23 @@ namespace Orion.UserInterface
             get { return base.Parent as RootView; }
         }
 
-        internal abstract void OnEnter(RootView enterOn);
-        internal abstract void OnShadow(RootView hiddenOf);
+        internal virtual void OnEnter(RootView enterOn)
+        {
+            GenericEventHandler<UIDisplay, RootView> handler = Entered;
+            if (handler != null) handler(this, enterOn);
+        }
+
+        internal virtual void OnShadow(RootView hiddenOf)
+        {
+            GenericEventHandler<UIDisplay, RootView> handler = Shadowed;
+            if (handler != null) handler(this, hiddenOf);
+        }
+
+        public override void Dispose()
+        {
+            Entered = null;
+            Shadowed = null;
+            base.Dispose();
+        }
     }
 }

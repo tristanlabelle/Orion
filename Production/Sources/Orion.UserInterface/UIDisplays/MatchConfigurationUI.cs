@@ -121,6 +121,7 @@ namespace Orion.UserInterface
             InitializeSlots();
             exitButton.Pressed += exitPanel;
             startButton.Pressed += startGame;
+            base.OnEnter(enterOn);
         }
 
         internal override void OnShadow(RootView hiddenOf)
@@ -128,6 +129,7 @@ namespace Orion.UserInterface
             exitButton.Pressed -= exitPanel;
             startButton.Pressed -= startGame;
             foreach (DropdownList<PlayerSlot> list in playerSlots) list.Dispose();
+            base.OnShadow(hiddenOf);
         }
         #endregion
         #endregion

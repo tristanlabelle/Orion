@@ -13,22 +13,21 @@ namespace Orion.Commandment.Commands
        #region Instance
         #region Fields
         private readonly Faction faction;
-        private readonly Faction impliedOtherFaction;
-        private readonly string changeDone;
+        private readonly int  impliedOtherFactionID;
+        private readonly DiplomaticStance diplomaticStance;
         #endregion
 
         #region Constructors
-       
-        public ChangeDiplomacy(Faction faction, Faction impliedOtherFaction, string changeDone)
+
+        public ChangeDiplomacy(Faction faction, int otherFactionID, DiplomaticStance diplomaticStance)
             : base(faction)
         {
-            Argument.EnsureNotNull(impliedOtherFaction, "newAlly");
+            Argument.EnsureNotNull(otherFactionID, "otherFactionID");
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(changeDone, "changeDone");
-            Debug.Assert(changeDone == "Ally" || changeDone == "Ennemy");
+            Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
             this.faction = faction;
-            this.impliedOtherFaction = impliedOtherFaction;
-            this.changeDone = changeDone;
+            this.impliedOtherFactionID = otherFactionID;
+            this.diplomaticStance = diplomaticStance;
         }
         #endregion
 
@@ -44,13 +43,15 @@ namespace Orion.Commandment.Commands
         #region Methods
         public override void Execute()
         {
-            if(changeDone == "Ally")faction.addAlly(impliedOtherFaction.ID);
-            if (changeDone == "Ennemy") faction.addEnemy(impliedOtherFaction.ID);
+            if (diplomaticStance == DiplomaticStance.Ally)
+                faction.AddAlly(impliedOtherFactionID);
+            if (diplomaticStance == DiplomaticStance.Enemy)
+                faction.AddEnemy(impliedOtherFactionID);
         }
 
         public override string ToString()
         {
-            return "[{0}] {2} to {1}".FormatInvariant(faction, changeDone,impliedOtherFaction);
+            return "[{0}] {2} to {1}".FormatInvariant(faction, diplomaticStance, impliedOtherFactionID);
         }
         #endregion
         #endregion
@@ -67,16 +68,17 @@ namespace Orion.Commandment.Commands
             protected override void SerializeData(ChangeDiplomacy command, BinaryWriter writer)
             {
                 writer.Write(command.SourceFaction.ID);
-                writer.Write(command.impliedOtherFaction.ID);
-                writer.Write(command.changeDone);
+                writer.Write(command.impliedOtherFactionID);
+                writer.Write((byte)command.diplomaticStance);
             }
 
             protected override ChangeDiplomacy DeserializeData(BinaryReader reader, World world)
             {
                 Faction sourceFaction = ReadFaction(reader, world);
-                Faction impliedOtherFaction = ReadFaction(reader, world);
-                string changeDone = reader.ReadString();
-                return new ChangeDiplomacy(sourceFaction, impliedOtherFaction, changeDone);
+                int impliedOtherFactionId = reader.ReadInt32();
+                DiplomaticStance newStance = (DiplomaticStance) reader.ReadByte();
+
+                return new ChangeDiplomacy(sourceFaction, impliedOtherFactionId, newStance);
             }
             #endregion
             #endregion

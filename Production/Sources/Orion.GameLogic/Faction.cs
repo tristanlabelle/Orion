@@ -26,7 +26,6 @@ namespace Orion.GameLogic
         private int aladdiumAmount;
         private int alageneAmount;
         private List<int> alliesID = new List<int>();
-      
         #endregion
 
         #region Constructors
@@ -197,26 +196,51 @@ namespace Orion.GameLogic
             unit.Died -= entityDiedEventHandler;
         }
 
-        public void addAlly(int factionID)
+        #region Diplomacy
+        public void AddAlly(int factionID)
         {
             Argument.EnsureNotNull(factionID, "factionID");
             if (alliesID.Contains(factionID)) return;//throw new Exception("{0} is already an ally".FormatInvariant(faction));
             alliesID.Add(factionID);
         }
 
-        public void addEnemy(int factionID)
+        public void AddAlly(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+            AddAlly(faction.id);
+        }
+
+        public void AddEnemy(int factionID)
         {
             Argument.EnsureNotNull(factionID, "factionID");
             if (!alliesID.Contains(factionID)) return;//throw new NullReferenceException("impossible to disally to an enemy...Need to be an ally first!");
 
             alliesID.Remove(factionID);
+        }
 
+        public void AddEnemy(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+            AddEnemy(faction.id);
+        }
+
+        public DiplomaticStance GetDiplomaticStance(int factionID)
+        {
+            return alliesID.Contains(factionID) ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
+        }
+
+        public DiplomaticStance GetDiplomaticStance(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+            return GetDiplomaticStance(faction.ID);
         }
 
         public bool IsEnemy(Unit unit)
         {
             return !alliesID.Contains(unit.Faction.ID) && this.id != unit.Faction.ID;
         }
+        #endregion
+
         public override string ToString()
         {
             return name;

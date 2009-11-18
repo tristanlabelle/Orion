@@ -8,9 +8,9 @@ using System.IO;
 
 namespace Orion.Commandment.Commands
 {
-    class ChangeDiplomacy: Command
+    public sealed class ChangeDiplomacy: Command
     {
-       #region Instance
+        #region Instance
         #region Fields
         private readonly Faction faction;
         private readonly int  impliedOtherFactionID;
@@ -32,12 +32,10 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Properties
-        
         public override IEnumerable<Entity> EntitiesInvolved
         {
-            get { return new List<Entity>(); }
+            get { yield break; }
         }
-
         #endregion
 
         #region Methods

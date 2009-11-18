@@ -7,55 +7,55 @@ using System.IO;
 
 namespace Orion.Commandment.Commands
 {
-    class SendRessources : Command
+    public sealed class SendRessources : Command
     { 
         #region Instance
         #region Fields
-        private readonly Faction faction;
-        private readonly Faction impliedOtherFaction;
-        private readonly  int AladdiumAmount;
-        private readonly int AlageneAmount;
+        private readonly Faction sender;
+        private readonly Faction receiver;
+        private readonly int aladdiumAmount;
+        private readonly int alageneAmount;
         #endregion
 
         #region Constructors
-
-        public SendRessources(Faction faction, Faction otherFaction, int AladdiumAmount, int AlageneAmount)
-            : base(faction)
+        public SendRessources(Faction sender, Faction receiver,
+            int aladdiumAmount, int alageneAmount)
+            : base(sender)
         {
-            Argument.EnsureNotNull(otherFaction, "otherFaction");
-            Argument.EnsureNotNull(faction, "faction");
-            this.faction = faction;
-            this.impliedOtherFaction = otherFaction;
-            this.AladdiumAmount = AladdiumAmount;
-            this.AlageneAmount = AlageneAmount;
+            Argument.EnsureNotNull(sender, "sender");
+            Argument.EnsureNotNull(receiver, "receiver");
+            Argument.EnsurePositive(aladdiumAmount, "aladdiumAmount");
+            Argument.EnsurePositive(alageneAmount, "alageneAmount");
+            this.sender = sender;
+            this.receiver = receiver;
+            this.aladdiumAmount = aladdiumAmount;
+            this.alageneAmount = alageneAmount;
         }
         #endregion
 
         #region Properties
-        
         public override IEnumerable<Entity> EntitiesInvolved
         {
-            get { return new List<Entity>(); }
+            get { yield break; }
         }
-
         #endregion
 
         #region Methods
         public override void Execute()
         {
-            if(faction.AladdiumAmount >= AladdiumAmount 
-                && faction.AlageneAmount >= AlageneAmount)
+            if(sender.AladdiumAmount >= aladdiumAmount 
+                && sender.AlageneAmount >= alageneAmount)
             {
-                faction.AladdiumAmount -= AladdiumAmount;
-                faction.AlageneAmount -= AlageneAmount;
-                impliedOtherFaction.AladdiumAmount += AladdiumAmount;
-                impliedOtherFaction.AlageneAmount += AlageneAmount;
+                sender.AladdiumAmount -= aladdiumAmount;
+                sender.AlageneAmount -= alageneAmount;
+                receiver.AladdiumAmount += aladdiumAmount;
+                receiver.AlageneAmount += alageneAmount;
             }
         }
 
         public override string ToString()
         {
-            return "[{0}] send {2} of Aladdium and {3} of Alagene to {1}".FormatInvariant(faction.Name, impliedOtherFaction.Name, AladdiumAmount, AlageneAmount);
+            return "[{0}] send {2} of Aladdium and {3} of Alagene to {1}".FormatInvariant(sender.Name, receiver.Name, aladdiumAmount, alageneAmount);
         }
         #endregion
         #endregion
@@ -72,19 +72,20 @@ namespace Orion.Commandment.Commands
             protected override void SerializeData(SendRessources command, BinaryWriter writer)
             {
                 writer.Write(command.SourceFaction.ID);
-                writer.Write(command.impliedOtherFaction.ID);
-                writer.Write(command.AladdiumAmount);
-                writer.Write(command.AlageneAmount);
+                writer.Write(command.receiver.ID);
+                writer.Write(command.aladdiumAmount);
+                writer.Write(command.alageneAmount);
             }
 
             protected override SendRessources DeserializeData(BinaryReader reader, World world)
             {
                 Faction sourceFaction = ReadFaction(reader, world);
-                Faction receverFaction = ReadFaction(reader,world);
-                int AladdiumAmount = reader.ReadInt32();
-                int AlageneAmount = reader.ReadInt32();
+                Faction receiverFaction = ReadFaction(reader, world);
+                int aladdiumAmount = reader.ReadInt32();
+                int alageneAmount = reader.ReadInt32();
 
-                return new SendRessources(sourceFaction, receverFaction,AladdiumAmount,AlageneAmount);
+                return new SendRessources(sourceFaction, receiverFaction,
+                    aladdiumAmount, alageneAmount);
             }
             #endregion
             #endregion

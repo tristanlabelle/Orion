@@ -113,6 +113,7 @@ namespace Orion.Main
                     port++;
                 }
             } while (true);
+            Console.WriteLine("Listening on port {0}", transporter.Port);
             LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
             lobby.HostedGame += BeginHostMultiplayerGame;
             lobby.JoinedGame += JoinedMultiplayerGame;

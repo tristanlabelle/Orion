@@ -16,6 +16,7 @@ namespace Orion.UserInterface
         private const int repollAfterFrames = 250;
 
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> receptionDelegate;
+        private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> timeoutDelegate;
         private readonly Dictionary<IPv4EndPoint, int> hostedGames = new Dictionary<IPv4EndPoint, int>();
         private readonly int port;
         private SafeTransporter transporter;
@@ -31,6 +32,7 @@ namespace Orion.UserInterface
             port = transporter.Port;
             this.transporter = transporter;
             receptionDelegate = OnReceive;
+            timeoutDelegate = OnTimeout;
 
             Rectangle gamesFrameRect = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
             gamesFrame = new Frame(gamesFrameRect);
@@ -56,6 +58,7 @@ namespace Orion.UserInterface
         internal override void OnEnter(RootView enterOn)
         {
             transporter.Received += receptionDelegate;
+            transporter.TimedOut += timeoutDelegate;
             transporter.Broadcast(explorePacket, port);
         }
 
@@ -100,6 +103,11 @@ namespace Orion.UserInterface
                     }
                     break;
             }
+        }
+
+        private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
+        {
+            Console.WriteLine("Peer {0} timed out!", host);
         }
 
         private void UpdateGamesList()

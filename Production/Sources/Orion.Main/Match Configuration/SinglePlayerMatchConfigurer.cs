@@ -3,14 +3,29 @@ using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
 using Color = System.Drawing.Color;
+using Orion.UserInterface;
 
 namespace Orion.Main
 {
     sealed class SinglePlayerMatchConfigurer : MatchConfigurer
     {
+        private SinglePlayerMatchConfigurationUI ui;
+
         public SinglePlayerMatchConfigurer()
         {
-            seed =(int)Environment.TickCount;
+            ui = new SinglePlayerMatchConfigurationUI();
+            ui.PressedStartGame += PressStart;
+            Seed = (int)Environment.TickCount;
+        }
+
+        private void PressStart(MatchConfigurationUI ui)
+        {
+            StartGame();
+        }
+
+        protected override MatchConfigurationUI AbstractUserInterface
+        {
+            get { return ui; }
         }
 
         public override Match Start()
@@ -18,16 +33,29 @@ namespace Orion.Main
             CreateMap();
 
             CommandPipeline pipeline = new SinglePlayerCommandPipeline(world);
+            UserInputCommander userCommander = null;
 
-            Faction redFaction = world.CreateFaction("Red", Color.Red);
-            UserInputCommander userCommander = new UserInputCommander(redFaction);
-            userCommander.AddToPipeline(pipeline);
-
-            for (int i = 1; i < numberOfPlayers; i++)
+            int colorIndex = 0;
+            foreach (PlayerSlot slot in UserInterface.Players)
             {
-                Faction aiFaction = world.CreateFaction(playerColors[i].Name, playerColors[i]);
-                AICommander aiCommander = new AICommander(aiFaction, random);
-                aiCommander.AddToPipeline(pipeline);
+                if (slot is ClosedPlayerSlot) continue;
+
+                Commander commander;
+                Color color = playerColors[colorIndex];
+                Faction faction = world.CreateFaction(color.Name, color);
+                colorIndex++;
+
+                if (slot is LocalPlayerSlot)
+                {
+                    userCommander = new UserInputCommander(faction);
+                    commander = userCommander;
+                }
+                else if (slot is AIPlayerSlot)
+                    commander = new AICommander(faction, random);
+                else
+                    throw new InvalidOperationException("Local games only support local players and AI players");
+
+                commander.AddToPipeline(pipeline);
             }
 
             return new Match(random, world, userCommander, pipeline);

@@ -10,12 +10,16 @@ namespace Orion.Networking
         JoinRequest = 101,
         AcceptJoinRequest = 102,
         RefuseJoinRequest = 103,
-        AddPeer = 104,
-        KickPeer = 105,
-        LeaveGame = 106,
-        Seed = 107,
-        Explore = 108,
-        Advertise = 109,
-        GameStarted = 110
+        LeaveGame = 104,
+
+        Explore = 105,
+        Advertise = 106,
+
+        SetPeer = 107,
+        SetSlot = 108,
+        SetSeed = 109,
+
+        StartGame = 110,
+        Exit = 111
     }
 }

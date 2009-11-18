@@ -117,6 +117,11 @@ namespace Orion.UserInterface
             TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
         }
 
+        private void glControl_KeyPress(object sender, KeyPressEventArgs args)
+        {
+            rootView.PropagateKeyPressEvent(args.KeyChar);
+        }
+
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
         {
             KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);

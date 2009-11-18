@@ -43,7 +43,7 @@ namespace Orion.UserInterface
             set { mainWindow.Text = value; }
         }
 
-        public ViewContainer RootView
+        public RootView RootView
         {
             get { return mainWindow.rootView; }
         }

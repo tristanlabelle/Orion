@@ -59,6 +59,7 @@ namespace Orion.UserInterface
         public event GenericEventHandler<Responder, MouseEventArgs> MouseExited;
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyDown;
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyUp;
+        public event GenericEventHandler<Responder, char> KeyPress;
         public event GenericEventHandler<Responder, UpdateEventArgs> Updated;
         #endregion
 
@@ -114,14 +115,29 @@ namespace Orion.UserInterface
         protected internal virtual bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
             if (isDisposed) throw new ObjectDisposedException(null);
-            // for now, just propagate keyboard events to everyone, since more precise handling will require a focus system
             foreach (Responder child in Enumerable.Reverse(Children))
             {
-                child.PropagateKeyboardEvent(type, args);
-                child.DispatchKeyboardEvent(type, args);
+                bool keepPropagating = child.PropagateKeyboardEvent(type, args);
+                if (keepPropagating)
+                    child.DispatchKeyboardEvent(type, args);
+                else return false;
             }
 
             return DispatchKeyboardEvent(type, args);
+        }
+
+        protected internal virtual bool PropagateKeyPressEvent(char character)
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
+            foreach (Responder child in Enumerable.Reverse(Children))
+            {
+                bool keepPropagating = child.PropagateKeyPressEvent(character);
+                if (keepPropagating)
+                    child.DispatchKeyPressEvent(character);
+                else return false;
+            }
+
+            return DispatchKeyPressEvent(character);
         }
 
         /// <summary>Propagates an update event to the child views.</summary>
@@ -149,6 +165,12 @@ namespace Orion.UserInterface
                 case MouseEventType.MouseWheel: return OnMouseWheel(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
+        }
+
+        protected internal bool DispatchKeyPressEvent(char character)
+        {
+            if (isDisposed) throw new ObjectDisposedException(null);
+            return OnKeyPress(character);
         }
 
         protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
@@ -272,13 +294,20 @@ namespace Orion.UserInterface
             return true;
         }
 
+        protected virtual bool OnKeyPress(char character)
+        {
+            InvokeEventHandlers(KeyPress, character);
+            return true;
+        }
+
         private void InvokeEventHandlers(GenericEventHandler<Responder, KeyboardEventArgs> handler, KeyboardEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
-            if (handler != null)
-            {
-                handler(this, args);
-            }
+            if (handler != null) handler(this, args);
+        }
+
+        private void InvokeEventHandlers(GenericEventHandler<Responder, char> handler, char arg)
+        {
+            if (handler != null) handler(this, arg);
         }
         #endregion
 
@@ -320,6 +349,7 @@ namespace Orion.UserInterface
             MouseExited = null;
             KeyDown = null;
             KeyUp = null;
+            KeyPress = null;
             Updated = null;
             base.Dispose();
         }

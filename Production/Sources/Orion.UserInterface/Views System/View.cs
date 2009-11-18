@@ -15,12 +15,14 @@ namespace Orion.UserInterface
         public View(Rectangle rectangle)
         {
             context = new GraphicsContext(new Rectangle(rectangle.Size));
-            Frame = rectangle;
+            base.Frame = rectangle;
         }
         #endregion
 
+        #region Events
         public event GenericEventHandler<View, Rectangle> BoundsChanged;
         public event GenericEventHandler<View, Rectangle> FrameChanged;
+        #endregion
 
         #region Properties
 

@@ -1,5 +1,6 @@
 ﻿using Orion.Geometry;
 using Orion.Graphics;
+using OpenTK.Math;
 using Color = System.Drawing.Color;
 using Keys = System.Windows.Forms.Keys;
 
@@ -10,9 +11,14 @@ namespace Orion.UserInterface.Widgets
         #region Fields
         private Label caption;
         private Keys hotKey;
+        private bool enabled;
         #endregion
 
         #region Constructors
+        public Button(Rectangle frame)
+            : this(frame, "", new FilledFrameRenderer())
+        { }
+
         public Button(Rectangle frame, string caption)
             : this(frame, caption, new FilledFrameRenderer())
         { }
@@ -20,8 +26,10 @@ namespace Orion.UserInterface.Widgets
         public Button(Rectangle frame, string caption, FrameRenderer renderer)
             : base(frame, renderer)
         {
-            this.caption = new Label(caption, Bounds.TranslatedBy(2, 2).ResizedBy(-2, -2));
+            this.caption = new Label(caption);
             this.caption.Color = Color.White;
+            enabled = true;
+            AlignCaption();
             Children.Add(this.caption);
         }
         #endregion
@@ -35,16 +43,26 @@ namespace Orion.UserInterface.Widgets
 
         #region Properties
 
-        public string Caption
+        public Text Caption
         {
-            get { return caption.Text.Value; }
-            set { caption.Text = new Text(value); }
+            get { return caption.Text; }
+            set
+            {
+                caption.Text = value;
+                AlignCaption();
+            }
         }
 
         public Keys HotKey
         {
             get { return hotKey; }
             set { hotKey = value; }
+        }
+
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { enabled = value; }
         }
 
         #endregion
@@ -58,26 +76,26 @@ namespace Orion.UserInterface.Widgets
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            caption.Color = Color.Cyan;
+            if(enabled) caption.Color = Color.Cyan;
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            caption.Color = Color.White;
+            if (enabled) caption.Color = Color.White;
             return base.OnMouseExit(args);
         }
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            caption.Color = Color.Orange;
+            if (enabled) caption.Color = Color.Orange;
             base.OnMouseDown(args);
             return false;
         }
 
         protected override bool OnMouseUp(MouseEventArgs args)
         {
-            caption.Color = Color.Cyan;
+            if (enabled) caption.Color = Color.Cyan;
             OnPress();
             base.OnMouseUp(args);
             return false;
@@ -96,9 +114,26 @@ namespace Orion.UserInterface.Widgets
 
         protected virtual void OnPress()
         {
-            GenericEventHandler<Button> handler = Pressed;
-            if (handler != null) handler(this);
+            if (enabled)
+            {
+                GenericEventHandler<Button> handler = Pressed;
+                if (handler != null) handler(this);
+            }
         }
+
+        private void AlignCaption()
+        {
+            Rectangle textFrame = caption.Text.Frame;
+            Vector2 captionOrigin = Bounds.Center - textFrame.Center;
+            caption.Frame = caption.Frame.TranslatedTo(captionOrigin);
+        }
+
+        #region Object Model
+        public override string ToString()
+        {
+            return "Button \"{0}\"".FormatInvariant(caption.Text.Value);
+        }
+        #endregion
         #endregion
     }
 }

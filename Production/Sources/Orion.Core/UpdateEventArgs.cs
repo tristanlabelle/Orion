@@ -19,5 +19,10 @@ namespace Orion
         {
             Delta = delta;
         }
+
+        public override string ToString()
+        {
+            return "Update Event Args delta={0}".FormatInvariant(Delta);
+        }
     }
 }

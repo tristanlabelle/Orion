@@ -160,6 +160,11 @@ namespace Orion.UserInterface
             return base.OnKeyUp(args);
         }
 
+        protected override void OnUpdate(UpdateEventArgs args)
+        {
+            base.OnUpdate(args);
+        }
+
         private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
         {
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
@@ -202,7 +207,7 @@ namespace Orion.UserInterface
 
         private void SelectionChanged(SelectionManager selectionManager)
         {
-            foreach (Button button in selectionFrame.Children.OfType<Button>()) button.Dispose();
+            while (selectionFrame.Children.Count > 0) selectionFrame.Children[0].Dispose();
             selectionFrame.Children.Clear();
 
             IEnumerable<Unit> selection = selectionManager.SelectedUnits;
@@ -216,6 +221,16 @@ namespace Orion.UserInterface
         private void InputManagerAssignedCommand(UserInputManager inputManager)
         {
             actions.Restore();
+        }
+        #endregion
+
+        #region IUIDisplay Implementation
+        internal override void OnEnter(RootView enterOn)
+        { }
+
+        internal override void OnShadow(RootView shadowedFrom)
+        {
+            shadowedFrom.PopDisplay(this);
         }
         #endregion
 
@@ -271,7 +286,6 @@ namespace Orion.UserInterface
                 {
                     userInputManager.SelectionManager.SelectUnit(unit);
                     MoveWorldView(unit.Position);
-                    SelectedType = null;
                 }
                 else
                 {
@@ -288,9 +302,12 @@ namespace Orion.UserInterface
         private void UpdateSkillsPanel()
         {
             actions.Clear();
-            IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-            if (SelectedType != null && selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
-                actions.Push(new UnitActionProvider(enablers, SelectedType));
+            if (SelectedType != null)
+            {
+                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
+                if (selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
+                    actions.Push(new UnitActionProvider(enablers, SelectedType));
+            }
         }
 
         private void MoveWorldView(Vector2 center)
@@ -304,16 +321,6 @@ namespace Orion.UserInterface
             if (newBounds.MinX < 0) newBounds = newBounds.TranslatedTo(0, newBounds.Min.Y);
             if (newBounds.MinY < 0) newBounds = newBounds.TranslatedTo(newBounds.Min.X, 0);
             worldView.Bounds = newBounds;
-        }
-        #endregion
-
-        #region IUIDisplay Implementation
-        internal override void OnEnter(RootView enterOn)
-        { }
-
-        internal override void OnShadow(RootView shadowedFrom)
-        {
-            shadowedFrom.PopDisplay(this);
         }
         #endregion
         #endregion

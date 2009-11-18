@@ -57,8 +57,8 @@ namespace Orion.Networking
         public SafeTransporter(int port)
         {
             socket.Bind(new IPEndPoint(IPAddress.Any, port));
-            socket.SetSocketOption(SocketOptionLevel.Socket,
-                SocketOptionName.Broadcast, true);
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
             socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
             

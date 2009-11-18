@@ -53,9 +53,10 @@
   <ItemGroup>
     <Compile Include="Match Configuration\MultiplayerClientMatchConfigurer.cs" />
     <Compile Include="Match Configuration\MultiplayerHostMatchConfigurer.cs" />
-    <Compile Include="Match.cs" />
     <Compile Include="Match Configuration\MatchConfigurer.cs" />
     <Compile Include="Match Configuration\MultiplayerMatchConfigurer.cs" />
+    <Compile Include="Match Configuration\SlotType.cs" />
+    <Compile Include="Match.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

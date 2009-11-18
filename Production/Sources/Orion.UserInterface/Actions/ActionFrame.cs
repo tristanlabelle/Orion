@@ -45,7 +45,7 @@ namespace Orion.UserInterface.Actions
 
         private void ResetActions()
         {
-            foreach (ViewContainer container in Children) container.Dispose();
+            while (Children.Count > 0) Children[0].Dispose();
             Children.Clear();
             if (actionProviders.Count > 0)
             {

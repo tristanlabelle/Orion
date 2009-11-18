@@ -20,7 +20,10 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
-        public Text(string text) : this(text, DefaultFont) { }
+        public Text(string text)
+            : this(text, DefaultFont)
+        { }
+
         public Text(string text, Font font)
         {
             Value = text;

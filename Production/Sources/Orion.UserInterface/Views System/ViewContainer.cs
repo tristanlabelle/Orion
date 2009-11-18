@@ -130,7 +130,7 @@ namespace Orion.UserInterface
                     throw new ArgumentException("Cannot add an ancestor as a child.");
 
                 base.InsertItem(index, item);
-                //item.Parent = parent;
+                item.Parent = parent;
                 item.OnAddToParent(parent);
                 parent.OnAddChild(item);
             }
@@ -196,6 +196,7 @@ namespace Orion.UserInterface
         public event GenericEventHandler<ViewContainer, ViewContainer> RemovedFromParent;
         public event GenericEventHandler<ViewContainer, ViewContainer> AddedChild;
         public event GenericEventHandler<ViewContainer, ViewContainer> RemovedChild;
+        public event GenericEventHandler<ViewContainer, ViewContainer> AncestryChanged;
 
         #endregion
 
@@ -335,7 +336,8 @@ namespace Orion.UserInterface
         {
             if (isDisposed) throw new ObjectDisposedException(null);
             RemoveFromParent();
-            foreach (ViewContainer child in children) child.Dispose();
+            while (children.Count > 0) children[0].Dispose();
+            AncestryChanged = null;
             AddedToParent = null;
             RemovedFromParent = null;
             AddedChild = null;
@@ -356,25 +358,29 @@ namespace Orion.UserInterface
 
         protected internal virtual void OnAddToParent(ViewContainer parent)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(AddedToParent, parent);
+            PropagateAncestryChangedEvent(parent);
         }
 
         protected internal virtual void OnRemoveFromParent(ViewContainer parent)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(RemovedFromParent, parent);
+            PropagateAncestryChangedEvent(parent);
+        }
+
+        protected internal virtual void OnAncestryChange(ViewContainer ancestor)
+        {
+            TriggerEvent(AncestryChanged, ancestor);
+            PropagateAncestryChangedEvent(ancestor);
         }
 
         protected internal virtual void OnAddChild(ViewContainer child)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(AddedChild, child);
         }
 
         protected internal virtual void OnRemoveChild(ViewContainer child)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
             TriggerEvent(RemovedChild, child);
         }
 
@@ -382,6 +388,12 @@ namespace Orion.UserInterface
         {
             if (isDisposed) throw new ObjectDisposedException(null);
             if (eventHandler != null) eventHandler(this, argument);
+        }
+
+        protected internal virtual void PropagateAncestryChangedEvent(ViewContainer changingAncestor)
+        {
+            foreach (ViewContainer container in Children)
+                container.OnAncestryChange(changingAncestor);
         }
 
         #endregion

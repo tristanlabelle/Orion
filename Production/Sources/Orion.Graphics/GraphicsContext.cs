@@ -329,20 +329,31 @@ namespace Orion.Graphics
 
         public void Draw(Text text)
         {
-            Draw(text, text.Frame);
+            Draw(text, Vector2.Zero);
+        }
+
+        public void Draw(Text text, Rectangle clippingRect)
+        {
+            Draw(text, Vector2.Zero, clippingRect);
         }
 
         public void Draw(Text text, Vector2 position)
         {
-            Draw(text, text.Frame.TranslatedBy(position));
+            Draw(text, position, text.Frame);
         }
 
-        public void Draw(Text text, Rectangle drawInto)
+        /// <summary>
+        /// Draws a Text object inside a clipping rectangle.
+        /// </summary>
+        /// <remarks>Words or lines not fitting in the rectangle will be completely trimmed.</remarks>
+        /// <param name="text">The <see cref="Text"/> object to draw</param>
+        /// <param name="clippingRect">The rectangle clipping the text</param>
+        public void Draw(Text text, Vector2 origin, Rectangle clippingRect)
         {
             GL.PushMatrix();
-            GL.Translate(drawInto.MinX, drawInto.MinY, 0);
+            GL.Translate(origin.X, origin.Y, 0);
             GL.Scale(1, -1, 1);
-            RectangleF renderInto = new RectangleF(0, -drawInto.Height, drawInto.Width, drawInto.Height);
+            RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
             Text.defaultTextPrinter.Print(text.Value, text.Font, fillColor, renderInto);
             GL.PopMatrix();
         }

@@ -57,5 +57,10 @@ namespace Orion
             HasShift = shift;
             Key = key;
         }
+
+        public override string ToString()
+        {
+            return "Keyboard Event Args keys={0} alt={0} ctrl={0} shift={0}".FormatInvariant(Key, HasAlt, HasControl, HasShift);
+        }
     }
 }

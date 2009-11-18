@@ -70,29 +70,32 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GameUI.cs" />
-    <Compile Include="MatchSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MatchSettingsDialog.Designer.cs">
-      <DependentUpon>MatchSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MatchStartType.cs" />
     <Compile Include="ResourceDisplay.cs" />
     <Compile Include="SelectionDisplay.cs" />
+    <Compile Include="UIDisplays\LocalMultiplayerLobby.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />
+    <Compile Include="UIDisplays\MatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MatchUI.cs" />
+    <Compile Include="UIDisplays\MultiplayerClientMatchConfigurationUI.cs" />
+    <Compile Include="UIDisplays\MultiplayerHostMatchConfigurationUI.cs" />
+    <Compile Include="UIDisplays\MultiplayerMatchConfigurationUI.cs" />
+    <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />
+    <Compile Include="UIDisplays\VoidUI.cs" />
     <Compile Include="Views System\ClippedView.cs" />
     <Compile Include="Views System\RenderedView.cs" />
     <Compile Include="Views System\Responder.cs" />
     <Compile Include="Views System\RootView.cs" />
     <Compile Include="Widgets\Button.cs" />
+    <Compile Include="Widgets\DropdownList.cs" />
     <Compile Include="Widgets\Frame.cs" />
+    <Compile Include="Widgets\Instant.cs" />
     <Compile Include="Widgets\Label.cs" />
     <Compile Include="Widgets\Scroller.cs" />
     <Compile Include="UIDisplays\UIDisplay.cs" />
     <Compile Include="Views System\View.cs" />
     <Compile Include="Views System\ViewContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Widgets\TextField.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,6 +119,10 @@
     <ProjectReference Include="..\Orion.Graphics\Orion.Graphics.csproj">
       <Project>{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}</Project>
       <Name>Orion.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.Networking\Orion.Networking.csproj">
+      <Project>{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}</Project>
+      <Name>Orion.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

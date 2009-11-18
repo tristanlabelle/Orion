@@ -213,17 +213,12 @@ namespace Orion.Networking
             if (messageType == (byte)GameMessageType.Commands)
             {
                 Deserialize(args.Data, 1 + sizeof(int));
-
-                //if ((oldPeerState & PeerState.ReceivedCommands) != 0)
-                //    throw new InvalidDataException("Received multiple commands from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedCommands;
 
                 if (ReceivedFromAllPeers) SendDone();
             }
             else if (messageType == (byte)GameMessageType.Done)
             {
-                //if ((oldPeerState & PeerState.ReceivedDone) != 0)
-                //    throw new InvalidDataException("Received multiple done from the same peer in a frame.");
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
             }
         }

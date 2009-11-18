@@ -28,7 +28,7 @@ namespace Orion.UserInterface
             Bounds = bounds;
             Frame = frame;
             displays = new Stack<UIDisplay>();
-            displays.Push(new MainMenuUI());
+            displays.Push(new VoidUI());
         }
         #endregion
 
@@ -55,6 +55,7 @@ namespace Orion.UserInterface
             }
 
             displays.Push(display);
+            Children.Add(display);
             display.OnEnter(this);
         }
 
@@ -64,12 +65,14 @@ namespace Orion.UserInterface
             if (displays.Peek() != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
 
             displays.Pop();
+            display.Dispose();
             displays.Peek().OnEnter(this);
         }
 
         public void Update(float delta)
         {
-            displays.Peek().PropagateUpdateEvent(new UpdateEventArgs(delta));
+            UIDisplay topmostDisplay = displays.Peek();
+            topmostDisplay.PropagateUpdateEvent(new UpdateEventArgs(delta));
         }
 
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
@@ -77,7 +80,11 @@ namespace Orion.UserInterface
             Vector2 coords = args.Position;
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
-            return displays.Peek().PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            bool canSink = displays.Peek().PropagateMouseEvent(eventType,
+                new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+
+            if (canSink) return DispatchMouseEvent(eventType, args);
+            return false;
         }
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)

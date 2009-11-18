@@ -65,6 +65,7 @@
     <Compile Include="Pipeline\CommandPipeline.cs" />
     <Compile Include="Pipeline\CommandReplayLogger.cs" />
     <Compile Include="Pipeline\SinglePlayerCommandPipeline.cs" />
+    <Compile Include="PlayerSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionManager.cs" />
     <Compile Include="Pipeline\ICommandSink.cs" />

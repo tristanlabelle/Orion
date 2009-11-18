@@ -5,42 +5,94 @@ using System.Net;
 using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Networking;
+using Orion.UserInterface;
 using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
     sealed class MultiplayerClientMatchConfigurer : MultiplayerMatchConfigurer
     {
+        #region Fields
+        private IPv4EndPoint gameHost;
+        private MultiplayerClientMatchConfigurationUI ui = new MultiplayerClientMatchConfigurationUI();
+        #endregion
+
         #region Constructors
-        public MultiplayerClientMatchConfigurer(SafeTransporter transporter)
+        public MultiplayerClientMatchConfigurer(SafeTransporter transporter, IPv4EndPoint host)
             : base(transporter)
         {
-            seed = 545845;
+            this.gameHost = host;
+            ui.UsePlayerForSlot(0, host);
+            ui.PressedExit += ExitGame;
         }
         #endregion
 
         #region Properties
-        public IPv4EndPoint HostEndPoint { get; set; }
+
+        public new MultiplayerClientMatchConfigurationUI UserInterface
+        {
+            get { return ui; }
+        }
+
+        protected override MatchConfigurationUI AbstractUserInterface
+        {
+            get { return ui; }
+        }
+        
         #endregion
 
         #region Methods
-        public override void CreateNetworkConfiguration()
+        protected override void Received(SafeTransporter source, NetworkEventArgs args)
         {
-            using (NetworkSetupClient client = new NetworkSetupClient(transporter))
+            if (args.Host != gameHost) return;
+
+            byte[] data = args.Data;
+            switch ((SetupMessageType)data[0])
             {
-                client.Join(HostEndPoint);
-                client.WaitForPeers();
-                base.peerEndPoints = client.PeerEndPoints
-                    .OrderBy(endPoint => endPoint)
-                    .ToList();
+                case SetupMessageType.SetPeer: SetPeer(data); break;
+                case SetupMessageType.SetSlot: SetSlot(data); break;
+                case SetupMessageType.SetSeed: SetSeed(data); break;
+                case SetupMessageType.StartGame: StartGame(); break;
+                case SetupMessageType.Exit: ForceExit(); break;
             }
         }
 
-        protected override void AssignFactions(out UserInputCommander userCommander)
+        protected override void ExitGame(MatchConfigurationUI ui)
         {
-            world.CreateFaction("Red", Color.Red);
-            Faction blueFaction = world.CreateFaction("Blue", Color.Cyan);
-            userCommander = new UserInputCommander(blueFaction);
+            byte[] quitMessage = new byte[1];
+            quitMessage[0] = (byte)SetupMessageType.LeaveGame;
+            transporter.SendTo(quitMessage, gameHost);
+        }
+
+        private void SetPeer(byte[] bytes)
+        {
+            uint address = BitConverter.ToUInt32(bytes, 2);
+            ushort port = BitConverter.ToUInt16(bytes, 2 + sizeof(uint));
+            IPv4EndPoint peer = new IPv4EndPoint(new IPv4Address(address), port);
+            UserInterface.UsePlayerForSlot(bytes[1], peer);
+        }
+
+        private void SetSlot(byte[] bytes)
+        {
+            switch ((SlotType)bytes[1])
+            {
+                case SlotType.Closed: UserInterface.CloseSlot(bytes[0]); break;
+                case SlotType.Open: UserInterface.OpenSlot(bytes[0]); break;
+                case SlotType.AI: UserInterface.UseAIForSlot(bytes[0]); break;
+                case SlotType.Local: UserInterface.SetLocalPlayerForSlot(bytes[0]); break;
+            }
+        }
+
+        private void SetSeed(byte[] bytes)
+        {
+            Seed = BitConverter.ToInt32(bytes, 1);
+        }
+
+        private void ForceExit()
+        {
+            ui.Root.PopDisplay(ui);
+            ui.Dispose();
+            Dispose();
         }
         #endregion
     }

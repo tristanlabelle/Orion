@@ -6,7 +6,7 @@ using Font = System.Drawing.Font;
 namespace Orion.UserInterface.Widgets
 {
     /// <summary>
-    /// A Label is a visible immutable text field.
+    /// A Label is a visible readonly text field.
     /// </summary>
     public class Label : View
     {
@@ -20,16 +20,21 @@ namespace Orion.UserInterface.Widgets
         /// </summary>
         public Color Color { get; set; }
 
-        /// <summary>
-        /// Constructs a Label with a given frame and text content.
-        /// </summary>
-        /// <param name="frame"></param>
-        /// <param name="caption"></param>
-        public Label(string caption, Rectangle frame)
+        public Label(Rectangle frame)
+            : base(frame)
+        {
+            Text = new Text("");
+        }
+
+        public Label(Rectangle frame, string caption)
             : base(frame)
         {
             Text = new Text(caption);
         }
+
+        public Label(string caption)
+            : this(new Text(caption))
+        { }
 
         public Label(Text text)
             : base(text.Frame)

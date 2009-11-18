@@ -96,5 +96,10 @@ namespace Orion
             Clicks = clicks;
             WheelDelta = delta;
         }
+
+        public override string ToString()
+        {
+            return "Mouse Event Args position={0}, button={1}, delta={2}".FormatInvariant(Position, ButtonPressed, WheelDelta);
+        }
     }
 }

@@ -3,6 +3,7 @@ using OpenTK.Math;
 using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
+using Orion.UserInterface;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -70,8 +71,9 @@ namespace Orion.Main
         /// Updates this <see cref="Match"/> for the duration of a frame.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        public void Update(float timeDeltaInSeconds)
+        public void Update(Responder source, UpdateEventArgs args)
         {
+            float timeDeltaInSeconds = args.Delta;
             int frameNumber = lastFrameNumber + 1;
 
             pipeline.Update(frameNumber, timeDeltaInSeconds);

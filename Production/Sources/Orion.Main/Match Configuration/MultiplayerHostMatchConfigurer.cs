@@ -22,6 +22,7 @@ namespace Orion.Main
         {
             Seed = (int)Environment.TickCount;
             ui = new MultiplayerHostMatchConfigurationUI(transporter);
+            ui.PressedStartGame += PressStartGame;
             ui.PressedExit += ExitGame;
             ui.SlotOccupationChanged += SlotChanged;
             ui.KickedPlayer += KickedPlayer;
@@ -89,6 +90,14 @@ namespace Orion.Main
             {
                 transporter.SendTo(exitMessage, peer);
             }
+        }
+
+        private void PressStartGame(MatchConfigurationUI ui)
+        {
+            byte[] startGameMessage = new byte[1];
+            startGameMessage[0] = (byte)SetupMessageType.StartGame;
+            transporter.SendTo(startGameMessage, UserInterface.PlayerAddresses);
+            StartGame();
         }
 
         private void Advertise(IPv4EndPoint host)

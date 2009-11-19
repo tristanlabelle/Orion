@@ -73,6 +73,7 @@ namespace Orion.Main
         {
             gameUi.RootView.PopDisplay(sender);
             MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
+            configurer.GameStarted += StartGame;
             gameUi.RootView.PushDisplay(configurer.UserInterface);
         }
 

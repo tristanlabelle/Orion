@@ -281,26 +281,28 @@ namespace Orion.GameLogic
         /// </remarks>
         internal override void Update(float timeDeltaInSeconds)
         {
-            if (task == null && HasSkill<Skills.Attack>())
+            if (IsIdle && HasSkill<Skills.Attack>())
             {
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)
                     .OfType<Unit>()
                     .FirstOrDefault(unit => Faction.IsEnemy(unit));
 
-                if (unitToAttack != null)
+                if (!IsIdle)
                     Task = new Tasks.Attack(this, unitToAttack);
             }
 
-            if (task != null)
+            if (!IsIdle)
             {
                 task.Update(timeDeltaInSeconds);
                 if (task.HasEnded) Task = null;
             }
-            if(task == null && HasSkill<Skills.Train>() && this.UnitsQueue.Count!=0)
+            if (IsIdle && HasSkill<Skills.Train>() && this.UnitsQueue.Count != 0)
             {
-                Unit unitTobeDequeued = (Unit)UnitsQueue.Peek();
-                Task = new Tasks.Train(this, unitTobeDequeued.type);
+                //Those units are already paid in the command Train
+                Unit DequeueUnit = (Unit)UnitsQueue.Dequeue();
+                Task = new Tasks.Train(this, DequeueUnit.Type);
+
             }
             
         }

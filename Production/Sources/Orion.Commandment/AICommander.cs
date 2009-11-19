@@ -137,6 +137,17 @@ namespace Orion.Commandment
         public void InitiateTraining(string unitTypeName, int amountToBeTrained)
         {
             int amountOfTrains;
+            UnitType toTrain = World.UnitTypes.FromName(unitTypeName);
+            //Train the Max depending of the ressources
+            amountToBeTrained =Math.Min(amountToBeTrained, 
+                                        Math.Min(
+                                            (int)(Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost)),
+                                            (int)(Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost))
+                                        )
+                                );
+
+
+
             List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.Train>()).ToList();
             List<Unit> trainers = new List<Unit>();
 
@@ -155,7 +166,7 @@ namespace Orion.Commandment
             }
 
             if (trainers.Count > 0)
-                commands.Add(new Train(trainers, World.UnitTypes.FromName(unitTypeName), Faction));
+                commands.Add(new Train(trainers, toTrain, Faction));
         }
 
         /// <summary>
@@ -165,7 +176,11 @@ namespace Orion.Commandment
         /// <param name="target">Target of the attack</param>
         public void DispatchAttackers(int amountOfAttackers, Unit target)
         {
-            List<Unit> potentialAttackers = allUnits.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Attack>()).ToList();
+            List<Unit> potentialAttackers = 
+                allUnits.Where(unit => unit.Faction == Faction 
+                && unit.Type.HasSkill<Skills.Attack>() 
+                && unit.IsIdle
+                ).ToList();
             List<Unit> attackers = new List<Unit>();
 
             if (potentialAttackers.Count > 0)

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Orion.GameLogic;
+using System;
 
 
 namespace Orion.Commandment.Commands
@@ -28,10 +29,32 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(faction, "faction");
             this.buildings = selectedsSameBuilding.ToList();
             this.unitType = unitType;
+            int AlageneTotalCost = 0;
+            int AladdiumTotalCost = 0;
             foreach (Unit unit in buildings)
             {
-                unit.AddUnitToQueue(unit.ID, unitType, faction, unit.Position); 
+                AlageneTotalCost += unitType.GetBaseStat(UnitStat.AlageneCost);
+                AladdiumTotalCost += unitType.GetBaseStat(UnitStat.AladdiumCost);
+                if (AlageneTotalCost <= faction.AlageneAmount
+                   && AladdiumTotalCost <= faction.AladdiumAmount)
+                {
+                    unit.AddUnitToQueue(unit.ID, unitType, faction, unit.Position);
+
+                }
+                else
+                {
+                    // We delete the cost of the last tried unit to build because we didn't
+                    // have enough money and the last tested unit will not be created
+                    AladdiumTotalCost -= unitType.GetBaseStat(UnitStat.AladdiumCost);
+                    AlageneTotalCost -= unitType.GetBaseStat(UnitStat.AlageneCost);
+                    Console.WriteLine("Not Enough Ressource to Train all wished units");
+                    break;
+                }
             }
+            // Now we take the cost out of all queued units!
+            faction.AlageneAmount -= AlageneTotalCost;
+            faction.AladdiumAmount -= AladdiumTotalCost;
+
         }
         #endregion
 

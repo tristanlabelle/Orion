@@ -51,22 +51,10 @@ namespace Orion.GameLogic.Tasks
 
             if (!hasTrainingBegun)
             {
-                int aladdiumCost = trainer.Faction.GetStat(traineeType, UnitStat.AladdiumCost);
-                int alageneCost = trainer.Faction.GetStat(traineeType, UnitStat.AlageneCost);
+                // We will eventually need to check the limit of population
+                // The ressource check is done when the command is executed
+                hasTrainingBegun = true;
 
-                if (trainer.Faction.AladdiumAmount >= aladdiumCost
-                    && trainer.Faction.AlageneAmount >= alageneCost)
-                {
-                    trainer.Faction.AladdiumAmount -= aladdiumCost;
-                    trainer.Faction.AlageneAmount -= alageneCost;
-                    hasTrainingBegun = true;
-                }
-                else
-                {
-                    Console.WriteLine("Not Enough Resources");
-                    hasEnded = true;
-                    return;
-                }
             }
 
             if (hasTrainingBegun)
@@ -76,9 +64,8 @@ namespace Orion.GameLogic.Tasks
                 healthPointsTrained += trainingSpeed * timeDelta;
                 if (healthPointsTrained >= maxHealth)
                 {
-                    
+
                     Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
-                    trainer.UnitsQueue.Dequeue();
                     unitCreated.Task = new Move(unitCreated, trainer.RallyPoint);
                     hasEnded = true;
                 }

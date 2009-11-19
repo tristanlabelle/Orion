@@ -8,7 +8,7 @@ namespace Orion
     /// </summary>
     public enum MouseEventType
     {
-        None, MouseDown, MouseUp, MouseMoved, MouseEntered, MouseExited, MouseWheel
+        None, MouseDown, MouseUp, MouseMoved, MouseEntered, MouseExited, MouseWheel, DoubleClick
     }
 
     /// <summary>

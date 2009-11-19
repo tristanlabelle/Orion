@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Orion.Geometry;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using Point = System.Drawing.Point;
+using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace Orion.UserInterface
 {
@@ -92,18 +93,38 @@ namespace Orion.UserInterface
                     mouseButton, 1, 0);
             }
         }
+
+        private void glControl_MouseWheel(object sender, SysMouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.MouseWheel,
+                args.X, args.Y, args.Button, args.Clicks, args.Delta);
+        }
+
+        private void glControl_MouseDoubleClick(object sender, SysMouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.DoubleClick,
+                args.X, args.Y, args.Button, args.Clicks, args.Delta);
+        }
+
+        private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks, int delta)
+        {
+            MouseButton pressedButton = MouseButton.None;
+            switch (argsButton)
+            {
+                case MouseButtons.Left: pressedButton = MouseButton.Left; break;
+                case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
+                case MouseButtons.Right: pressedButton = MouseButton.Right; break;
+            }
+
+            rootView.PropagateMouseEvent(type,
+                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
+        }
         #endregion
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
             rootView.Render();
             glControl.SwapBuffers();
-        }
-
-        private void glControl_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs args)
-        {
-            TriggerMouseEvent(MouseEventType.MouseWheel,
-                args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 
         private void glControl_KeyDown(object sender, KeyEventArgs args)
@@ -126,20 +147,6 @@ namespace Orion.UserInterface
         {
             KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
             rootView.PropagateKeyboardEvent(type, args);
-        }
-
-        private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks, int delta)
-        {
-            MouseButton pressedButton = MouseButton.None;
-            switch (argsButton)
-            {
-                case MouseButtons.Left: pressedButton = MouseButton.Left; break;
-                case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
-                case MouseButtons.Right: pressedButton = MouseButton.Right; break;
-            }
-
-            rootView.PropagateMouseEvent(type,
-                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
         }
 
         /// <summary>

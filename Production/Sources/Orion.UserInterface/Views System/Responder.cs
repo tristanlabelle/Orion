@@ -57,6 +57,7 @@ namespace Orion.UserInterface
         public event GenericEventHandler<Responder, MouseEventArgs> MouseWheel;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseEntered;
         public event GenericEventHandler<Responder, MouseEventArgs> MouseExited;
+        public event GenericEventHandler<Responder, MouseEventArgs> DoubleClick;
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyDown;
         public event GenericEventHandler<Responder, KeyboardEventArgs> KeyUp;
         public event GenericEventHandler<Responder, char> KeyPress;
@@ -163,6 +164,7 @@ namespace Orion.UserInterface
                 case MouseEventType.MouseEntered: return OnMouseEnter(args);
                 case MouseEventType.MouseExited: return OnMouseExit(args);
                 case MouseEventType.MouseWheel: return OnMouseWheel(args);
+                case MouseEventType.DoubleClick: return OnDoubleClick(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
@@ -259,6 +261,19 @@ namespace Orion.UserInterface
             InvokeEventHandlers(MouseExited, args);
             return true;
         }
+
+        /// <summary>
+        /// Calls the event handler for mouse Double click. 
+        /// </summary>
+        /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
+        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
+        /// <returns>True if event sinking is allowed; false otherwise</returns>
+        protected virtual bool OnDoubleClick(MouseEventArgs args)
+        {
+            InvokeEventHandlers(DoubleClick, args);
+            return true;
+        }
+
 
         private void InvokeEventHandlers(GenericEventHandler<Responder, MouseEventArgs> handler, MouseEventArgs args)
         {

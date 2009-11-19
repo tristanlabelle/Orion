@@ -107,6 +107,11 @@ namespace Orion.Commandment
             }
         }
 
+
+        public void HandeMouseDoubleClick(object responder, MouseEventArgs args)
+        {
+
+        }
         public void HandleMouseUp(object responder, MouseEventArgs args)
         {
             if (!selectionStart.HasValue) return;

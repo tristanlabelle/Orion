@@ -152,7 +152,6 @@ namespace Orion.UserInterface
             mouseDownOnMinimap = false;
             return base.OnMouseUp(args);
         }
-
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
@@ -181,6 +180,13 @@ namespace Orion.UserInterface
             {
                 return base.OnKeyDown(args);
             }
+        }
+
+        protected override bool OnDoubleClick(MouseEventArgs args)
+        {
+            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+            userInputManager.HandeMouseDoubleClick(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            return base.OnDoubleClick(args);
         }
 
         protected override bool OnKeyUp(KeyboardEventArgs args)

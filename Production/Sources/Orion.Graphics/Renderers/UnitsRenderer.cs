@@ -16,7 +16,6 @@ namespace Orion.Graphics
     public sealed class UnitsRenderer
     {
         #region Static
-
         #region Fields
         private static readonly Color lowLifeColor = Color.Red;
         private static readonly Color middleLifeColor = Color.Yellow;
@@ -71,7 +70,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-
         public void SetTypeShape(string typeName, LinePath shape)
         {
             Argument.EnsureNotNullNorEmpty(typeName, "typeName");

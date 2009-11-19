@@ -21,24 +21,19 @@ namespace Orion
 
             for (int i = 0; i < width; ++i)
             {
-                Vector2 displacement = normal * (i - width * 0.5f);
+                Vector2 displacement = normal * (i - width * 0.5f + 0.5f);
 
-                Vector2 p1 = lineSegment.EndPoint1 + displacement;
-                Vector2 p2 = lineSegment.EndPoint2 + displacement;
+                Vector2 p0 = lineSegment.EndPoint1 + displacement;
+                Vector2 p1 = lineSegment.EndPoint2 + displacement;
 
-                int x0 = (int)lineSegment.EndPoint1.X;
-                int x1 = (int)lineSegment.EndPoint2.X;
-                int y0 = (int)lineSegment.EndPoint1.Y;
-                int y1 = (int)lineSegment.EndPoint2.Y;
-
-                if (!All(x0, x1, y0, y1, predicate))
+                if (!All((int)p0.X, (int)p0.Y, (int)p1.X, (int)p1.Y, predicate))
                     return false;
             }
 
             return true;
         }
 
-        private static bool All(int x0, int x1, int y0, int y1, Func<int, int, bool> predicate)
+        private static bool All(int x0, int y0, int x1, int y1, Func<int, int, bool> predicate)
         {
             bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
             if (steep)

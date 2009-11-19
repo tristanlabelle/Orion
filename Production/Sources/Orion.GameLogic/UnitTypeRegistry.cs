@@ -116,7 +116,7 @@ namespace Orion.GameLogic
                 Name = "Factory",
                 SizeInTiles = new Size(3, 3),
                 SightRange = 4,
-                MaxHealth = 40,
+                MaxHealth = 400,
                 AladdiumCost = 100,
                 AlageneCost = 50
             };
@@ -136,7 +136,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 80,
                 AlageneCost = 20
             };
-            builder.Skills.Add(new Skills.Attack(8, 7));
+            builder.Skills.Add(new Skills.Attack(10, 7));
             Register(builder);
         }
 

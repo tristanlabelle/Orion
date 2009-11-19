@@ -10,7 +10,7 @@ namespace Orion.Main
 {
     internal class Program : IDisposable
     {
-        private const float TargetFramesPerSecond = 60;
+        private const float TargetFramesPerSecond = 40;
         private const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
         private const int DefaultHostPort = 41223;
         private const int DefaultClientPort = 41224;
@@ -61,18 +61,10 @@ namespace Orion.Main
                     stopwatch.Reset();
                     stopwatch.Start();
 
-                    int successiveUpdateCount = 0;
-                    do
-                    {
-                        gameUi.Update(TargetSecondsPerFrame);
-                        updateRateCounter.Update();
-                        gameUi.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
-                            .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
-
-                        timeDeltaInSeconds -= TargetSecondsPerFrame;
-                        ++successiveUpdateCount;
-                    } while (timeDeltaInSeconds >= TargetSecondsPerFrame
-                        && successiveUpdateCount < MaxSuccessiveUpdates);
+                    gameUi.Update(TargetSecondsPerFrame);
+                    updateRateCounter.Update();
+                    gameUi.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
+                        .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
                 }
             }
         }

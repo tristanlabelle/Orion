@@ -49,6 +49,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        #region IsWalkable
         /// <summary>
         /// Indicates if the tile at a specified coordinate is walkable.
         /// </summary>
@@ -74,7 +75,9 @@ namespace Orion.GameLogic
         {
             return IsWalkable(point.X, point.Y);
         }
+        #endregion
 
+        #region IsWalkable
         public bool IsWalkableAndWithinBounds(int x, int y)
         {
             if (x < 0 || y < 0 || x >= Width || y >= Height)
@@ -82,7 +85,16 @@ namespace Orion.GameLogic
             return IsWalkable(x, y);
         }
 
-        
+        public bool IsWalkableAndWithinBounds(float x, float y)
+        {
+            return IsWalkableAndWithinBounds((int)x, (int)y);
+        }
+
+        public bool IsWalkableAndWithinBounds(Vector2 position)
+        {
+            return IsWalkableAndWithinBounds(position.X, position.Y);
+        }
+        #endregion
         #endregion
         #endregion
 

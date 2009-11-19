@@ -47,7 +47,7 @@ namespace Orion.GameLogic
             this.type = type;
             this.faction = faction;
             this.position = position;
-            this.rallyPoint = SetDefaultRallyPoint(position);
+            this.rallyPoint = GetDefaultRallyPoint();
             this.queuedUnits = new Queue(); 
         }
         #endregion
@@ -331,35 +331,35 @@ namespace Orion.GameLogic
             this.Health = 0;
         }
 
-        private Vector2 SetDefaultRallyPoint(Vector2 startingPosition)
+        private Vector2 GetDefaultRallyPoint()
         {
             Vector2 newRallyPoint = new Vector2();
-            if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y))
+            if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y))
             {
-                if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y - 1))
+                if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y - 1))
                 {
                     //Dispatch units South
-                    newRallyPoint.Y = startingPosition.Y - 1;
-                    newRallyPoint.X = startingPosition.X;
+                    newRallyPoint.Y = position.Y - 1;
+                    newRallyPoint.X = position.X;
                 }
-                else if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X, (int)startingPosition.Y + 1))
+                else if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y + 1))
                 {
                     //Dispatch units North
-                    newRallyPoint.Y = startingPosition.Y + 1;
-                    newRallyPoint.X = startingPosition.X;
+                    newRallyPoint.Y = position.Y + 1;
+                    newRallyPoint.X = position.X;
                 
                 }
-                else if (World.Terrain.IsWalkableAndWithinBounds((int)startingPosition.X + 1, (int)startingPosition.Y))
+                else if (World.Terrain.IsWalkableAndWithinBounds(position.X + 1, position.Y))
                 {
                     //Dispatch units Est
-                    newRallyPoint.Y = startingPosition.Y;
-                    newRallyPoint.X = startingPosition.X + 1;
+                    newRallyPoint.Y = position.Y;
+                    newRallyPoint.X = position.X + 1;
                 }
                 else
                 {
                     //Dispatch units West
-                    newRallyPoint.Y = startingPosition.Y;
-                    newRallyPoint.X = startingPosition.X - 1;
+                    newRallyPoint.Y = position.Y;
+                    newRallyPoint.X = position.X - 1;
                 }
             }
    

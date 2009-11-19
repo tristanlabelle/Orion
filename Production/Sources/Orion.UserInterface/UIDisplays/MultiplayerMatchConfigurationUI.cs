@@ -65,12 +65,6 @@ namespace Orion.UserInterface
             ((RemotePlayerSlot)playerSlots[slot].SelectedItem).RemoteHost = host;
         }
 
-        protected override void InitializeSlots()
-        {
-            foreach (DropdownList<PlayerSlot> dropdownList in playerSlots)
-                dropdownList.SelectionChanged += SelectionChanged;
-        }
-
         private void SelectionChanged(DropdownList<PlayerSlot> sender, PlayerSlot newValue)
         {
             GenericEventHandler<int, PlayerSlot> handler = SlotChanged;

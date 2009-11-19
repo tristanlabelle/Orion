@@ -15,7 +15,6 @@ namespace Orion.Main
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> received;
         private GenericEventHandler<SafeTransporter, IPv4EndPoint> timedOut;
         protected SafeTransporter transporter;
-        protected List<IPv4EndPoint> peers = new List<IPv4EndPoint>();
 
         public MultiplayerMatchConfigurer(SafeTransporter transporter)
         {
@@ -43,7 +42,7 @@ namespace Orion.Main
             pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
             CommandTextLogger textLogger = new CommandTextLogger();
             pipeline.AddFilter(textLogger);
-            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, peers);
+            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
             pipeline.AddFilter(synchronizer);
 
             UserInputCommander userCommander = null;

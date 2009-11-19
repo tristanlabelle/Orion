@@ -19,6 +19,7 @@ namespace Orion.UserInterface
         #region Events
 
         public event GenericEventHandler<int, PlayerSlot> SlotOccupationChanged;
+        public event GenericEventHandler<IPv4EndPoint> KickedPlayer;
 
         #endregion
 
@@ -31,21 +32,26 @@ namespace Orion.UserInterface
 
             for (int i = 1; i < playerSlots.Length; i++)
             {
-                DropdownList<PlayerSlot> slotList = playerSlots[i];
-                slotList.AddItem(new AIPlayerSlot());
-                slotList.AddItem(new ClosedPlayerSlot());
-                slotList.AddItem(new RemotePlayerSlot());
-                slotList.SelectedItem = slotList.Items.Last();
-                slotList.SelectionChanged += SelectionChanged;
+                DropdownList<PlayerSlot> dropdownList = playerSlots[i];
+                dropdownList.AddItem(new AIPlayerSlot());
+                dropdownList.AddItem(new ClosedPlayerSlot());
+                dropdownList.AddItem(new RemotePlayerSlot());
+                dropdownList.SelectedItem = dropdownList.Items.Last();
+                dropdownList.SelectionChanged += SelectionChanged;
             }
-            base.InitializeSlots();
         }
 
         private void SelectionChanged(DropdownList<PlayerSlot> slot, PlayerSlot value)
         {
+            RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
+            if (remoteSlot.RemoteHost.HasValue)
+            {
+                GenericEventHandler<IPv4EndPoint> kickHandler = KickedPlayer;
+                if (kickHandler != null) kickHandler(remoteSlot.RemoteHost.Value);
+                remoteSlot.RemoteHost = null;
+            }
             GenericEventHandler<int, PlayerSlot> handler = SlotOccupationChanged;
-            if (handler != null)
-                handler(playerSlots.IndexOf(slot), value);
+            if (handler != null) handler(playerSlots.IndexOf(slot), value);
         }
 
         public override void Dispose()

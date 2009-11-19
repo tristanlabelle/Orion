@@ -23,6 +23,8 @@ namespace Orion.Main
             Seed = (int)Environment.TickCount;
             ui = new MultiplayerHostMatchConfigurationUI(transporter);
             ui.PressedExit += ExitGame;
+            ui.SlotOccupationChanged += SlotChanged;
+            ui.KickedPlayer += KickedPlayer;
         }
 
         public new MultiplayerHostMatchConfigurationUI UserInterface
@@ -56,14 +58,34 @@ namespace Orion.Main
 
         protected override void TimedOut(SafeTransporter source, IPv4EndPoint host)
         {
-            if (peers.Contains(host)) TryLeave(host);
+            if (UserInterface.PlayerAddresses.Contains(host)) TryLeave(host);
+        }
+
+        private void SlotChanged(int slotNumber, PlayerSlot newValue)
+        {
+            byte[] setSlotMessage = new byte[3];
+            setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
+            setSlotMessage[1] = (byte)slotNumber;
+            if (newValue is RemotePlayerSlot) setSlotMessage[2] = (byte)SlotType.Open;
+            else if (newValue is AIPlayerSlot) setSlotMessage[2] = (byte)SlotType.AI;
+            else if (newValue is ClosedPlayerSlot) setSlotMessage[2] = (byte)SlotType.Closed;
+            else throw new InvalidOperationException("Unknown slot type selected");
+
+            transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
+        }
+
+        private void KickedPlayer(IPv4EndPoint peer)
+        {
+            byte[] kickMessage = new byte[1];
+            kickMessage[0] = (byte)SetupMessageType.Exit;
+            transporter.SendTo(kickMessage, peer);
         }
 
         protected override void ExitGame(MatchConfigurationUI ui)
         {
             byte[] exitMessage = new byte[1];
             exitMessage[0] = (byte)SetupMessageType.Exit;
-            foreach (IPv4EndPoint peer in peers)
+            foreach (IPv4EndPoint peer in UserInterface.PlayerAddresses)
             {
                 transporter.SendTo(exitMessage, peer);
             }
@@ -94,7 +116,7 @@ namespace Orion.Main
             transporter.SendTo(seedMessage, host);
 
             int newPeerSlotNumber = (byte)ui.NextAvailableSlot;
-            
+
             byte[] setSlotMessage = new byte[3];
             setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
             byte[] addPeerMessage = new byte[8];
@@ -102,7 +124,7 @@ namespace Orion.Main
             addPeerMessage[1] = (byte)newPeerSlotNumber;
             BitConverter.GetBytes(host.Address.Value).CopyTo(addPeerMessage, 2);
             BitConverter.GetBytes(host.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
-            foreach (IPv4EndPoint peer in peers)
+            foreach (IPv4EndPoint peer in ui.PlayerAddresses)
             {
                 transporter.SendTo(addPeerMessage, peer);
             }
@@ -149,21 +171,20 @@ namespace Orion.Main
                 }
             }
 
-            setSlotMessage[1] = (byte)SlotType.Local;
-            setSlotMessage[2] = (byte)newPeerSlotNumber;
+            setSlotMessage[1] = (byte)newPeerSlotNumber;
+            setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);
-            peers.Add(host);
         }
 
         private void TryLeave(IPv4EndPoint host)
         {
-            if(!peers.Contains(host)) return;
+            if (!UserInterface.PlayerAddresses.Contains(host)) return;
 
             int slotNumber = ui.Players.IndexOf(delegate(PlayerSlot slot)
             {
-                if(!(slot is RemotePlayerSlot)) return false;
+                if (!(slot is RemotePlayerSlot)) return false;
                 RemotePlayerSlot remote = (RemotePlayerSlot)slot;
                 return remote.RemoteHost.HasValue && remote.RemoteHost.Value == host;
             });
@@ -172,7 +193,7 @@ namespace Orion.Main
             setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
             setSlotMessage[1] = (byte)slotNumber;
             setSlotMessage[2] = (byte)SlotType.Open;
-            foreach(IPv4EndPoint peer in peers)
+            foreach (IPv4EndPoint peer in UserInterface.PlayerAddresses)
             {
                 transporter.SendTo(setSlotMessage, peer);
             }

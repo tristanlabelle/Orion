@@ -29,7 +29,6 @@ namespace Orion.UserInterface
                 slotList.AddItem(new LocalPlayerSlot());
                 slotList.Enabled = false;
             }
-            base.InitializeSlots();
         }
         #endregion
     }

@@ -65,8 +65,8 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
-            Vector2 destination = path.Points[nextPointIndex];
-            Vector2 delta = destination - unit.Position;
+            Vector2 targetPathPoint = path.Points[nextPointIndex];
+            Vector2 delta = targetPathPoint - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
             unit.Angle = (float)Math.Atan2(direction.X, direction.Y);
@@ -80,7 +80,7 @@ namespace Orion.GameLogic.Tasks
             else
             {
                 // Unit will reach destination within this frame
-                targetPosition = destination;
+                targetPosition = targetPathPoint;
                 ++nextPointIndex;
             }
 

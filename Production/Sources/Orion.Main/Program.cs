@@ -27,6 +27,7 @@ namespace Orion.Main
                 try
                 {
                     transporter = new SafeTransporter(port);
+                    Console.WriteLine("Listening on port {0}", transporter.Port);
                     break;
                 }
                 catch
@@ -34,7 +35,6 @@ namespace Orion.Main
                     port++;
                 }
             } while (true);
-            Console.WriteLine("Listening on port {0}", transporter.Port);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

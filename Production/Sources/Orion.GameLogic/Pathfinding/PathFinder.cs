@@ -86,18 +86,18 @@ namespace Orion.GameLogic.Pathfinding
 
         private void OptimizePathPoints()
         {
-            for (int i = 0; i < points.Count - 2; ++i)
-            {
-                Vector2 sourcePoint = points[i];
-                while (i != points.Count - 2)
-                {
-                    Vector2 destinationPoint = points[i + 2];
-                    LineSegment lineSegment = new LineSegment(sourcePoint, destinationPoint);
-                    if (!Bresenham.All(lineSegment, 1, isWalkable))
-                        break;
-                    points.RemoveAt(i + 1);
-                }
-            }
+            //for (int i = 0; i < points.Count - 2; ++i)
+            //{
+            //    Vector2 sourcePoint = points[i];
+            //    while (i != points.Count - 2)
+            //    {
+            //        Vector2 destinationPoint = points[i + 2];
+            //        LineSegment lineSegment = new LineSegment(sourcePoint, destinationPoint);
+            //        if (!Bresenham.All(lineSegment, 1, isWalkable))
+            //            break;
+            //        points.RemoveAt(i + 1);
+            //    }
+            //}
         }
 
         private void CleanUp()

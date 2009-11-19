@@ -13,6 +13,8 @@ namespace Orion.UserInterface
             : base(frame, renderer)
         {
             this.fullBounds = fullBounds;
+            MinimumVisibleBounds = FullBounds.ScaledBy(0.01f);
+            MaximumVisibleBounds = FullBounds;
         }
 
         public Rectangle FullBounds
@@ -20,6 +22,10 @@ namespace Orion.UserInterface
             get { return fullBounds; }
             set { fullBounds = value; }
         }
+
+        public Rectangle MinimumVisibleBounds { get; set; }
+
+        public Rectangle MaximumVisibleBounds { get; set; }
 
         public void Zoom(double factor)
         {
@@ -33,16 +39,29 @@ namespace Orion.UserInterface
             Vector2 newOrigin = Bounds.Min;
             newSize.Scale(scale);
 
-            if (newSize.X > FullBounds.Size.X)
+            if (newSize.X > MaximumVisibleBounds.Width)
             {
                 float ratio = Bounds.Size.Y / Bounds.Size.X;
-                newSize.X = FullBounds.Size.X;
+                newSize.X = MaximumVisibleBounds.Width;
                 newSize.Y = newSize.X * ratio;
             }
-            if (newSize.Y > FullBounds.Size.Y)
+            if (newSize.Y > MaximumVisibleBounds.Height)
             {
                 float ratio = Bounds.Size.X / Bounds.Size.Y;
+                newSize.Y = MaximumVisibleBounds.Height;
+                newSize.X = newSize.Y * ratio;
+            }
+
+            if (newSize.X < MinimumVisibleBounds.Width)
+            {
+                float ratio = Bounds.Size.Y / Bounds.Size.X;
+                newSize.X = MinimumVisibleBounds.Width;
                 newSize.Y = newSize.X * ratio;
+            }
+            if (newSize.Y < MinimumVisibleBounds.Height)
+            {
+                float ratio = Bounds.Size.X / Bounds.Size.Y;
+                newSize.Y = MinimumVisibleBounds.Height;
                 newSize.X = newSize.Y * ratio;
             }
 

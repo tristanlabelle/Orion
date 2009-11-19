@@ -22,21 +22,47 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Constructors
-        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
-            : base(new Rectangle(1, 1), "")
+        protected ActionButton(ActionFrame frame, UserInputManager manager, Keys hotkey)
+            : base(new Rectangle(1,1), "")
         {
-            this.name = name;
             HotKey = hotkey;
             container = frame;
             inputManager = manager;
+            tooltipContainer = new Frame(new Rectangle(0, 0));
+        }
 
-            Text tooltipText = new Text("{0} ({1})".FormatInvariant(name, hotkey));
-            Rectangle tooltipTextRect = tooltipText.Frame;
-            Rectangle tooltipRect = tooltipTextRect.ScaledBy(0.4f / tooltipTextRect.Height);
+        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
+            : this(frame, manager, hotkey)
+        {
+            Name = name;
+        }
+        #endregion
 
-            tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f), new FilledFrameRenderer());
-            tooltipContainer.Bounds = tooltipTextRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
-            tooltipContainer.Children.Add(new Label(tooltipText));
+        #region Properties
+        public string Name
+        {
+            get { return name; }
+            protected set
+            {
+                const float defaultFontSize = 28;
+                name = value;
+                tooltipContainer.Dispose();
+                IEnumerable<Text> lines = value.Split('\n').Select(str => new Text(str));
+                Rectangle tooltipFrameRect =
+                    new Rectangle(lines.Max(t => t.Frame.Width), lines.Count() * defaultFontSize);
+                Rectangle tooltipRect = tooltipFrameRect.ScaledBy(0.4f / defaultFontSize);
+                tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f));
+                tooltipContainer.Bounds = tooltipFrameRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
+
+                int i = 0;
+                foreach (Text text in lines.Reverse())
+                {
+                    Label tooltipLabel = new Label(text);
+                    tooltipLabel.Frame = tooltipLabel.Frame.TranslatedBy(0, tooltipLabel.Frame.Height * i);
+                    tooltipContainer.Children.Add(tooltipLabel);
+                    i++;
+                }
+            }
         }
         #endregion
 

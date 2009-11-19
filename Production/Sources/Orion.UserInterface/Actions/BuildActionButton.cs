@@ -26,7 +26,7 @@ namespace Orion.UserInterface.Actions
             int y = 3;
             foreach (UnitType unitType in registry.Where(u => buildingSkill.Supports(u)))
             {
-                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType);
+                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction);
                 x++;
                 if (x == 4)
                 {

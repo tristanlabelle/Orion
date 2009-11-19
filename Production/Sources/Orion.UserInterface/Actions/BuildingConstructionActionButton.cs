@@ -45,10 +45,13 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Constructor
-        public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager, UnitType builtType)
-            : base(frame, manager, builtType.Name, Keys.None)
+        public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager, UnitType builtType, Faction faction)
+            : base(frame, manager, Keys.None)
         {
             this.builtType = builtType;
+            int aladdium = faction.GetStat(builtType, UnitStat.AladdiumCost);
+            int alagene = faction.GetStat(builtType, UnitStat.AlageneCost);
+            Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(builtType.Name, aladdium, alagene);
         }
         #endregion
 

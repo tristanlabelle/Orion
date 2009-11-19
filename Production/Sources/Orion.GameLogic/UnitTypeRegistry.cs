@@ -57,7 +57,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Move(10));
-            builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 10));
+            builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
             builder.Skills.Add(new Skills.Harvest(1, 10));
             Register(builder);
         }
@@ -84,7 +84,7 @@ namespace Orion.GameLogic
                 Name = "MeleeAttacker",
                 Size = new Size(1, 1),
                 SightRange = 6,
-                MaxHealth = 30,
+                MaxHealth = 15,
                 AladdiumCost = 50,
                 AlageneCost = 0
             };
@@ -100,7 +100,7 @@ namespace Orion.GameLogic
                 Name = "RangedAttacker",
                 Size = new Size(1, 1),
                 SightRange = 10,
-                MaxHealth = 30,
+                MaxHealth = 15,
                 AladdiumCost = 50,
                 AlageneCost = 10
             };

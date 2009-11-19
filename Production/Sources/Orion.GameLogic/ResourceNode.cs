@@ -25,8 +25,8 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        internal ResourceNode(World world, int id, ResourceType type, int amount, Vector2 position)
-            : base(world, id)
+        internal ResourceNode(World world, Handle handle, ResourceType type, int amount, Vector2 position)
+            : base(world, handle)
         {
             Argument.EnsureDefined(type, "type");
             Argument.EnsureStrictlyPositive(amount, "amount");
@@ -97,7 +97,7 @@ namespace Orion.GameLogic
 
         public override string ToString()
         {
-            return "#{0} {1} node".FormatInvariant(ID, type);
+            return "{0} {1} node".FormatInvariant(Handle, type);
         }
 
         public bool IsHarvestableByFaction(Faction faction)

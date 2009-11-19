@@ -13,20 +13,19 @@ namespace Orion.Commandment.Commands
         #region Instance
         #region Fields
         private readonly Faction faction;
-        private readonly int  impliedOtherFactionID;
+        private readonly Faction otherFaction;
         private readonly DiplomaticStance diplomaticStance;
         #endregion
 
         #region Constructors
-
-        public ChangeDiplomacy(Faction faction, int otherFactionID, DiplomaticStance diplomaticStance)
+        public ChangeDiplomacy(Faction faction, Faction otherFaction, DiplomaticStance diplomaticStance)
             : base(faction)
         {
-            Argument.EnsureNotNull(otherFactionID, "otherFactionID");
             Argument.EnsureNotNull(faction, "faction");
+            Argument.EnsureNotNull(otherFaction, "otherFaction");
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
             this.faction = faction;
-            this.impliedOtherFactionID = otherFactionID;
+            this.otherFaction = otherFaction;
             this.diplomaticStance = diplomaticStance;
         }
         #endregion
@@ -41,15 +40,12 @@ namespace Orion.Commandment.Commands
         #region Methods
         public override void Execute()
         {
-            if (diplomaticStance == DiplomaticStance.Ally)
-                faction.AddAlly(impliedOtherFactionID);
-            if (diplomaticStance == DiplomaticStance.Enemy)
-                faction.AddEnemy(impliedOtherFactionID);
+            faction.SetDiplomaticStance(faction, diplomaticStance);
         }
 
         public override string ToString()
         {
-            return "[{0}] {2} to {1}".FormatInvariant(faction, diplomaticStance, impliedOtherFactionID);
+            return "[{0}] {2} to {1}".FormatInvariant(faction, diplomaticStance, otherFaction);
         }
         #endregion
         #endregion
@@ -65,18 +61,18 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(ChangeDiplomacy command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
-                writer.Write(command.impliedOtherFactionID);
+                writer.Write(command.SourceFaction.Handle.Value);
+                writer.Write(command.otherFaction.Handle.Value);
                 writer.Write((byte)command.diplomaticStance);
             }
 
             protected override ChangeDiplomacy DeserializeData(BinaryReader reader, World world)
             {
                 Faction sourceFaction = ReadFaction(reader, world);
-                int impliedOtherFactionId = reader.ReadInt32();
-                DiplomaticStance newStance = (DiplomaticStance) reader.ReadByte();
+                Faction otherFaction = ReadFaction(reader, world);
+                DiplomaticStance newStance = (DiplomaticStance)reader.ReadByte();
 
-                return new ChangeDiplomacy(sourceFaction, impliedOtherFactionId, newStance);
+                return new ChangeDiplomacy(sourceFaction, otherFaction, newStance);
             }
             #endregion
             #endregion

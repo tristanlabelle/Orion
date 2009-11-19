@@ -64,8 +64,10 @@ namespace Orion.Commandment
         public void LaunchChangeDimplomacy(Faction otherFaction)
         {
             if (otherFaction == null) return;
-            if(Faction.AlliesID.Contains(otherFaction.ID)) GenerateCommand(new ChangeDiplomacy(Faction,otherFaction.ID,DiplomaticStance.Enemy));
-            else GenerateCommand(new ChangeDiplomacy(Faction, otherFaction.ID, DiplomaticStance.Ally));
+            if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
+                GenerateCommand(new ChangeDiplomacy(Faction, otherFaction, DiplomaticStance.Enemy));
+            else
+                GenerateCommand(new ChangeDiplomacy(Faction, otherFaction, DiplomaticStance.Ally));
         }
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)

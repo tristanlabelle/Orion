@@ -95,11 +95,11 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Repair command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.SourceFaction.Handle.Value);
                 writer.Write(command.UnitsCount);
                 foreach (Unit unit in command.Units)
-                    writer.Write(unit.ID);
-                writer.Write(command.Building.ID);
+                    writer.Write(unit.Handle.Value);
+                writer.Write(command.Building.Handle.Value);
             }
 
             protected override Repair DeserializeData(BinaryReader reader, World world)

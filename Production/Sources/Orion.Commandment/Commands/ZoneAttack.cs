@@ -101,10 +101,10 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(ZoneAttack command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.SourceFaction.Handle.Value);
                 writer.Write(command.AttackerCount);
                 foreach (Unit unit in command.Attackers)
-                    writer.Write(unit.ID);
+                    writer.Write(unit.Handle.Value);
                 writer.Write(command.Destination.X);
                 writer.Write(command.Destination.Y);
             }

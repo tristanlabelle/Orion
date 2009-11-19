@@ -15,15 +15,15 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly World world;
-        private readonly int id;
+        private readonly Handle handle;
         #endregion
 
         #region Constructors
-        protected Entity(World world, int id)
+        protected Entity(World world, Handle handle)
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
-            this.id = id;
+            this.handle = handle;
         }
         #endregion
 
@@ -61,13 +61,13 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the unique identifier of this <see cref="Entity"/>.
+        /// Gets the handle of this <see cref="Entity"/>.
         /// This should be the same for all representations
-        /// of this <see cref="Entity"/> in network games.
+        /// of this <see cref="Entity"/> across network games.
         /// </summary>
-        public int ID
+        public Handle Handle
         {
-            get { return id; }
+            get { return handle; }
         }
 
         /// <summary>
@@ -79,12 +79,12 @@ namespace Orion.GameLogic
         #region Methods
         public sealed override int GetHashCode()
         {
-            return id;
+            return handle.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "Entity #{0}".FormatInvariant(id);
+            return "Entity {0}".FormatInvariant(handle);
         }
 
         internal virtual void Update(float timeDeltaInSeconds) { }

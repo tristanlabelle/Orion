@@ -89,10 +89,10 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Move command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
-                writer.Write(command.Units.Count());
+                writer.Write(command.SourceFaction.Handle.Value);
+                writer.Write(command.units.Count);
                 foreach (Unit unit in command.Units)
-                    writer.Write(unit.ID);
+                    writer.Write(unit.Handle.Value);
                 writer.Write(command.Destination.X);
                 writer.Write(command.Destination.Y);
             }

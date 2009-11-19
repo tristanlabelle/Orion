@@ -66,7 +66,7 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Build command, BinaryWriter writer)
             {
-                writer.Write(command.builder.ID);
+                writer.Write(command.builder.Handle.Value);
                 writer.Write(command.position.X);
                 writer.Write(command.position.Y);
                 writer.Write(command.buildingType.ID);

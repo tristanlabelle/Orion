@@ -19,11 +19,11 @@ namespace Orion.GameLogic
     [Serializable]
     public sealed class EntityRegistry : IEnumerable<Entity>
     {
-        #region Instance
         #region Fields
         private readonly World world;
-        private readonly List<Entity> entities = new List<Entity>();
+        private readonly Dictionary<Handle, Entity> entities = new Dictionary<Handle, Entity>();
         private readonly EntityZone[,] zones;
+        private readonly Func<Handle> uidGenerator;
         private readonly BufferPool<Entity> bufferPool = CreateBufferPool();
 
         // Temporary collections used to defer modification of "entities"
@@ -33,7 +33,6 @@ namespace Orion.GameLogic
 
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
-        private int nextID;
         #endregion
 
         #region Constructors
@@ -46,14 +45,17 @@ namespace Orion.GameLogic
         /// </param>
         /// <param name="columnCount">The number of spatial subdivisions along the x axis.</param>
         /// <param name="rowCount">The number of spatial subdivisions along the y axis.</param>
-        internal EntityRegistry(World world, int columnCount, int rowCount)
+        /// <param name="handleGenerator">A delegate to a method which generates unique identifiers.</param>
+        internal EntityRegistry(World world, int columnCount, int rowCount, Func<Handle> uidGenerator)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureStrictlyPositive(columnCount, "columnCount");
             Argument.EnsureStrictlyPositive(rowCount, "rowCount");
+            Argument.EnsureNotNull(uidGenerator, "uidGenerator");
 
             this.world = world;
             this.zones = CreateZones(columnCount, rowCount, bufferPool);
+            this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
             this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
         }
@@ -178,16 +180,16 @@ namespace Orion.GameLogic
         /// <returns>The newly created <see cref="Entity"/>.</returns>
         internal Unit CreateUnit(UnitType type, Faction faction, Vector2 position)
         {
-            Unit unit = new Unit(nextID, type, faction, position);
-            ++nextID;
+            Handle uid = uidGenerator();
+            Unit unit = new Unit(uid, type, faction, position);
             InitializeEntity(unit);
             return unit;
         }
 
         public ResourceNode CreateResourceNode(ResourceType type, Vector2 position)
         {
-            ResourceNode node = new ResourceNode(world, nextID, type, ResourceNode.DefaultTotalAmount, position);
-            ++nextID;
+            Handle uid = uidGenerator();
+            ResourceNode node = new ResourceNode(world, uid, type, ResourceNode.DefaultTotalAmount, position);
             InitializeEntity(node);
             return node;
         }
@@ -204,17 +206,16 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets a <see cref="Entity"/> of this <see cref="UnitRegistry"/> from its unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Entity"/> to be found.</param>
+        /// <param name="handle">The handle of the <see cref="Entity"/> to be found.</param>
         /// <returns>
-        /// The <see cref="Entity"/> with that identifier, or <c>null</c> if the identifier is invalid.
+        /// The <see cref="Entity"/> with that identifier,
+        /// or <c>null</c> if no <see cref="Entity"/> has this identifier.
         /// </returns>
-        public Entity FindFromID(int id)
+        public Entity FindFromHandle(Handle handle)
         {
-            for (int i = 0; i < entities.Count; ++i)
-                if (entities[i].ID == id)
-                    return entities[i];
-
-            return null;
+            Entity entity;
+            entities.TryGetValue(handle, out entity);
+            return entity;
         }
 
         /// <summary>
@@ -228,8 +229,8 @@ namespace Orion.GameLogic
         {
             CommitDeferredCollectionChanges();
 
-            for (int i = 0; i < entities.Count; ++i)
-                entities[i].Update(timeDeltaInSeconds);
+            foreach (Entity entity in entities.Values)
+                entity.Update(timeDeltaInSeconds);
         }
 
         #region Private Collection Modification
@@ -250,7 +251,7 @@ namespace Orion.GameLogic
 
         private void Add(Entity entity)
         {
-            entities.Add(entity);
+            entities.Add(entity.Handle, entity);
             AddToZone(entity);
         }
 
@@ -267,7 +268,7 @@ namespace Orion.GameLogic
 
         private void Remove(Entity entity)
         {
-            entities.Remove(entity);
+            entities.Remove(entity.Handle);
             RemoveFromZone(entity);
             GenericEventHandler<EntityRegistry, Entity> handler = Died;
             if (handler != null)
@@ -317,9 +318,9 @@ namespace Orion.GameLogic
         /// Gets an enumerator that iterates over the <see cref="Entity"/>s in this registry.
         /// </summary>
         /// <returns>A new <see cref="Entity"/> enumerator.</returns>
-        public List<Entity>.Enumerator GetEnumerator()
+        public Dictionary<Handle, Entity>.ValueCollection.Enumerator GetEnumerator()
         {
-            return entities.GetEnumerator();
+            return entities.Values.GetEnumerator();
         }
 
         /// <summary>
@@ -395,7 +396,6 @@ namespace Orion.GameLogic
         {
             return GetEnumerator();
         }
-        #endregion
         #endregion
         #endregion
     }

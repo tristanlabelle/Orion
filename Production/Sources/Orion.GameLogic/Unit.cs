@@ -31,15 +31,15 @@ namespace Orion.GameLogic
         /// Initializes a new <see cref="Unit"/> from its identifier,
         /// <see cref="UnitType"/> and <see cref="World"/>.
         /// </summary>
-        /// <param name="id">A hopefully unique identifier for this <see cref="Unit"/>.</param>
+        /// <param name="handle">A unique handle for this <see cref="Unit"/>.</param>
         /// <param name="type">
         /// The <see cref="UnitType"/> which determines
         /// the stats and capabilities of this <see cref="Unit"/>
         /// </param>
         /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
-        internal Unit(int id, UnitType type, Faction faction, Vector2 position)
-            : base(faction.World, id)
+        internal Unit(Handle handle, UnitType type, Faction faction, Vector2 position)
+            : base(faction.World, handle)
         {
             Argument.EnsureNotNull(type, "type");
             Argument.EnsureNotNull(faction, "faction");
@@ -214,6 +214,7 @@ namespace Orion.GameLogic
             get { return rallyPoint; }
             set { rallyPoint = value; }
         }
+
         public Queue UnitsQueue
         {
             get { return queuedUnits; }
@@ -248,6 +249,21 @@ namespace Orion.GameLogic
             return Type.HasSkill<TSkill>();
         }
         #endregion
+
+        /// <summary>
+        /// Gets the diplomatic stance of this <see cref="Unit"/> towards another one.
+        /// </summary>
+        /// <param name="other">
+        /// The <see cref="Unit"/> with regard to which the diplomatic stance is to be retrieved.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DiplomaticStance"/> with regard to that <see cref="Unit"/>.
+        /// </returns>
+        public DiplomaticStance GetDiplomaticStance(Unit other)
+        {
+            Argument.EnsureNotNull(other, "other");
+            return faction.GetDiplomaticStance(other.faction);
+        }
 
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
@@ -286,7 +302,7 @@ namespace Orion.GameLogic
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)
                     .OfType<Unit>()
-                    .FirstOrDefault(unit => Faction.IsEnemy(unit));
+                    .FirstOrDefault(unit => GetDiplomaticStance(unit) == DiplomaticStance.Enemy);
 
                 if (unitToAttack != null)
                     Task = new Tasks.Attack(this, unitToAttack);
@@ -309,13 +325,14 @@ namespace Orion.GameLogic
 
         public override string ToString()
         {
-            return "#{0} {2} {1}".FormatInvariant(ID, type, faction);
+            return "#{0} {2} {1}".FormatInvariant(Handle, type, faction);
         }
 
-        public void Kill()
+        public void Suicide()
         {
             this.Health = 0;
         }
+
         private Vector2 SetDefaultRallyPoint(Vector2 startingPosition)
         {
             Vector2 newRallyPoint = new Vector2();
@@ -350,11 +367,11 @@ namespace Orion.GameLogic
    
             return newRallyPoint;
         }
-        public void AddUnitToQueue(int id, UnitType type,Faction faction, Vector2 position)
+
+        public void AddUnitToQueue(Handle handle, UnitType type, Faction faction, Vector2 position)
         {
-           queuedUnits.Enqueue(new Unit(id, type, faction, position)); 
+            queuedUnits.Enqueue(new Unit(handle, type, faction, position)); 
         }
-        
         #endregion
     }
 }

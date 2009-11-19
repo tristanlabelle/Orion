@@ -108,11 +108,11 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Attack command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
+                writer.Write(command.SourceFaction.Handle.Value);
                 writer.Write(command.AttackerCount);
                 foreach (Unit attacker in command.Attackers)
-                    writer.Write(attacker.ID);
-                writer.Write(command.Target.ID);
+                    writer.Write(attacker.Handle.Value);
+                writer.Write(command.Target.Handle.Value);
             }
 
             protected override Attack DeserializeData(BinaryReader reader, World world)

@@ -17,33 +17,33 @@ namespace Orion.GameLogic
     public sealed class Faction
     {
         #region Fields
-        private readonly int id;
+        private readonly Handle handle;
         private readonly World world;
         private readonly string name;
         private readonly Color color;
         private readonly FogOfWar fogOfWar;
         private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
+        private readonly HashSet<Faction> allies = new HashSet<Faction>();
+        private readonly Pathfinder pathfinder;
         private int aladdiumAmount;
         private int alageneAmount;
-        private List<int> alliesID = new List<int>();
-        private Pathfinder pathfinder;
         #endregion
 
         #region Constructors
         /// <summary>
         /// Initializes a new <see cref="Faction"/> from its name and <see cref="Color"/>.
         /// </summary>
-        /// <param name="id">The unique identifier of this <see cref="Faction"/>.</param>
+        /// <param name="handle">The handle of this <see cref="Faction"/>.</param>
         /// <param name="world">The <see cref="World"/> hosting this <see cref="Faction"/>.</param>
         /// <param name="name">The name of this <see cref="Faction"/>.</param>
         /// <param name="color">The distinctive <see cref="Color"/> of this <see cref="Faction"/>'s units.</param>
-        internal Faction(int id, World world, string name, Color color)
+        internal Faction(Handle handle, World world, string name, Color color)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNullNorBlank(name, "name");
 
-            this.id = id;
+            this.handle = handle;
             this.world = world;
             this.name = name;
             this.color = color;
@@ -59,11 +59,11 @@ namespace Orion.GameLogic
 
         #region Properties
         /// <summary>
-        /// Gets the unique identifier of this <see cref="Faction"/>.
+        /// Gets the handle of this <see cref="Faction"/>.
         /// </summary>
-        public int ID
+        public Handle Handle
         {
-            get { return id; }
+            get { return handle; }
         }
 
         /// <summary>
@@ -134,11 +134,6 @@ namespace Orion.GameLogic
             }
         }
 
-        public List<int> AlliesID
-        {
-            get { return alliesID; }
-        }
-
         public Pathfinder PathFinder
         {
             get { return pathfinder; }
@@ -158,6 +153,8 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(type, "type");
             return type.GetBaseStat(stat);
         }
+
+        #region Units
         /// <summary>
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>
@@ -203,49 +200,42 @@ namespace Orion.GameLogic
             fogOfWar.RemoveLineOfSight(unit.LineOfSight);
             unit.Died -= entityDiedEventHandler;
         }
+        #endregion
 
         #region Diplomacy
-        public void AddAlly(int factionID)
+        /// <summary>
+        /// Changes the diplomatic stance of this <see cref="Faction"/>
+        /// in regard to another <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="other">
+        /// The <see cref="Faction"/> with which the diplomatic stance is to be changed.
+        /// </param>
+        /// <param name="stance">The new <see cref="DiplomaticStance"/> against that faction.</param>
+        public void SetDiplomaticStance(Faction other, DiplomaticStance stance)
         {
-            Argument.EnsureNotNull(factionID, "factionID");
-            if (alliesID.Contains(factionID)) return;//throw new Exception("{0} is already an ally".FormatInvariant(faction));
-            alliesID.Add(factionID);
+            Argument.EnsureNotNull(other, "other");
+            if (other == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
+            Argument.EnsureDefined(stance, "stance");
+
+            if (stance == DiplomaticStance.Ally)
+                allies.Add(other);
+            else
+                allies.Remove(other);
         }
 
-        public void AddAlly(Faction faction)
-        {
-            Argument.EnsureNotNull(faction, "faction");
-            AddAlly(faction.id);
-        }
-
-        public void AddEnemy(int factionID)
-        {
-            Argument.EnsureNotNull(factionID, "factionID");
-            if (!alliesID.Contains(factionID)) return;//throw new NullReferenceException("impossible to disally to an enemy...Need to be an ally first!");
-
-            alliesID.Remove(factionID);
-        }
-
-        public void AddEnemy(Faction faction)
-        {
-            Argument.EnsureNotNull(faction, "faction");
-            AddEnemy(faction.id);
-        }
-
-        public DiplomaticStance GetDiplomaticStance(int factionID)
-        {
-            return alliesID.Contains(factionID) ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
-        }
-
+        /// <summary>
+        /// Gets the diplomatic stance of this <see cref="Faction"/>
+        /// with regard to another one.
+        /// </summary>
+        /// <param name="faction">
+        /// The <see cref="Faction"/> in regard to which the diplomatic stance is to be retrieved.
+        /// </param>
+        /// <returns>The <see cref="DiplomaticStance"/> with regard to that faction.</returns>
         public DiplomaticStance GetDiplomaticStance(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            return GetDiplomaticStance(faction.ID);
-        }
-
-        public bool IsEnemy(Unit unit)
-        {
-            return !alliesID.Contains(unit.Faction.ID) && this.id != unit.Faction.ID;
+            if (faction == this) return DiplomaticStance.Ally;
+            return allies.Contains(faction) ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
         }
         #endregion
 

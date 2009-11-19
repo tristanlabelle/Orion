@@ -43,18 +43,24 @@ namespace Orion.Commandment
         /// <returns>The <see cref="Command"/> that was deserialized.</returns>
         internal abstract Command Deserialize(BinaryReader reader, World world);
 
+        protected static Handle ReadHandle(BinaryReader reader)
+        {
+            uint handleValue = reader.ReadUInt32();
+            return new Handle(handleValue);
+        }
+
         protected static Faction ReadFaction(BinaryReader reader, World world)
         {
-            int factionID = reader.ReadInt32();
-            Faction faction = world.FindFactionWithID(factionID);
+            Handle handle = ReadHandle(reader);
+            Faction faction = world.FindFactionFromHandle(handle);
             if (faction == null) throw new InvalidDataException("Invalid faction identifier.");
             return faction;
         }
 
         protected static Entity ReadEntity(BinaryReader reader, World world)
         {
-            int entityID = reader.ReadInt32();
-            Entity entity = world.Entities.FindFromID(entityID);
+            Handle handle = ReadHandle(reader);
+            Entity entity = world.Entities.FindFromHandle(handle);
             if (entity == null) throw new InvalidDataException("Invalid entity identifier.");
             return entity;
         }

@@ -42,7 +42,7 @@ namespace Orion.Commandment.Commands
         {
             foreach (Unit suicider in units)
             {
-                suicider.Kill();
+                suicider.Suicide();
             }
         }
 
@@ -64,9 +64,9 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Suicide command, BinaryWriter writer)
             {
-                writer.Write(command.units.Count());
+                writer.Write(command.units.Count);
                 foreach (Unit unit in command.units)
-                    writer.Write(unit.ID);
+                    writer.Write(unit.Handle.Value);
             }
 
             protected override Suicide DeserializeData(BinaryReader reader, World world)

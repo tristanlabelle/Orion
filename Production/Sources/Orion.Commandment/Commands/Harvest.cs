@@ -63,11 +63,11 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Harvest command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
-                writer.Write(command.node.ID);
-                writer.Write(command.harvesters.Count());
+                writer.Write(command.SourceFaction.Handle.Value);
+                writer.Write(command.node.Handle.Value);
+                writer.Write(command.harvesters.Count);
                 foreach (Unit unit in command.harvesters)
-                    writer.Write(unit.ID);
+                    writer.Write(unit.Handle.Value);
             }
 
             protected override Harvest DeserializeData(BinaryReader reader, World world)

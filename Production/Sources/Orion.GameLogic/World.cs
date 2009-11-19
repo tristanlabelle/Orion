@@ -4,6 +4,7 @@ using OpenTK.Math;
 using Orion.GameLogic.Pathfinding;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -18,7 +19,7 @@ namespace Orion.GameLogic
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityRegistry entities;
         private readonly UnitTypeRegistry unitTypes;
-
+        private uint nextUidValue;
         #endregion
 
         #region Constructors
@@ -30,7 +31,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(terrain, "terrain");
             this.terrain = terrain;
-            entities = new EntityRegistry(this, 5, 5);
+            entities = new EntityRegistry(this, 5, 5, GenerateUid);
             unitTypes = new UnitTypeRegistry();
 
         }
@@ -90,18 +91,30 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Generates a new unique identifier for objects of this world.
+        /// </summary>
+        /// <returns>The <see cref="Uid"/> that was generated.</returns>
+        public Handle GenerateUid()
+        {
+            Debug.Assert(nextUidValue < uint.MaxValue);
+            Handle uid = new Handle(nextUidValue);
+            ++nextUidValue;
+            return uid;
+        }
+
         #region Factions
         /// <summary>
         /// Gets a <see cref="Faction"/> of this <see cref="World"/> from its unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Faction"/> to be found.</param>
+        /// <param name="handle">The handle of the <see cref="Faction"/> to be found.</param>
         /// <returns>
-        /// The <see cref="Faction"/> with that identifier, or <c>null</c> if the identifier is invalid.
+        /// The <see cref="Faction"/> with that handle, or <c>null</c> if the identifier is invalid.
         /// </returns>
-        public Faction FindFactionWithID(int id)
+        public Faction FindFactionFromHandle(Handle handle)
         {
-            if (id < 0 || id >= factions.Count) return null;
-            return factions[id];
+            if (handle.Value < 0 || handle.Value >= factions.Count) return null;
+            return factions[(int)handle.Value];
         }
 
         /// <summary>
@@ -112,7 +125,8 @@ namespace Orion.GameLogic
         /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
         public Faction CreateFaction(string name, Color color)
         {
-            Faction faction = new Faction(factions.Count, this, name, color);
+            Handle handle = new Handle((uint)factions.Count);
+            Faction faction = new Faction(handle, this, name, color);
             factions.Add(faction);
             return faction;
         }

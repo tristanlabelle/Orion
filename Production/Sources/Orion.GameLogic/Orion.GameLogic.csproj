@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="DiplomaticStance.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="Handle.cs" />
     <Compile Include="EntityZone.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />

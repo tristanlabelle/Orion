@@ -38,7 +38,7 @@ namespace Orion.Commandment.Commands
                 if (AlageneTotalCost <= faction.AlageneAmount
                    && AladdiumTotalCost <= faction.AladdiumAmount)
                 {
-                    unit.AddUnitToQueue(unit.ID, unitType, faction, unit.Position);
+                    unit.AddUnitToQueue(unit.Handle, unitType, faction, unit.Position);
 
                 }
                 else
@@ -95,10 +95,10 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Train command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.ID);
-                writer.Write(command.buildings.Count());
+                writer.Write(command.SourceFaction.Handle.Value);
+                writer.Write(command.buildings.Count);
                 foreach (Unit unit in command.buildings)
-                    writer.Write(unit.ID);
+                    writer.Write(unit.Handle.Value);
                 writer.Write(command.unitType.ID);
             }
 

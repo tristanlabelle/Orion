@@ -314,6 +314,7 @@ namespace Orion.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message, "message");
             Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
+            Debug.Assert(message.Length < 512, "Warning: A network message exceeded 512 bytes.");
 
             lock (peers)
             {
@@ -346,6 +347,7 @@ namespace Orion.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message, "message");
             Argument.EnsureWithin(port, 1, ushort.MaxValue, "port");
+            Debug.Assert(message.Length < 512, "Warning: A network broadcast message exceeded 512 bytes.");
 
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);

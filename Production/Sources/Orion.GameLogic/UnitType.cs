@@ -24,7 +24,7 @@ namespace Orion.GameLogic
         private readonly int id;
         private readonly string name;
         private readonly ReadOnlyCollection<Skill> skills;
-        private readonly Size sizeInTiles;
+        private readonly Size size;
 
         private readonly int aladdiumCost;
         private readonly int alageneCost;
@@ -40,7 +40,7 @@ namespace Orion.GameLogic
             this.id = id;
             this.name = builder.Name;
             this.skills = builder.Skills.ToList().AsReadOnly();
-            this.sizeInTiles = builder.SizeInTiles;
+            this.size = builder.Size;
 
             this.aladdiumCost = builder.AladdiumCost;
             this.alageneCost = builder.AlageneCost;
@@ -78,19 +78,19 @@ namespace Orion.GameLogic
         #endregion
 
         #region Size
-        public Size SizeInTiles
+        public Size Size
         {
-            get { return sizeInTiles; }
+            get { return size; }
         }
 
-        public int WidthInTiles
+        public int Width
         {
-            get { return sizeInTiles.Width; }
+            get { return size.Width; }
         }
 
-        public int HeightInTiles
+        public int Height
         {
-            get { return sizeInTiles.Height; }
+            get { return size.Height; }
         }
         #endregion
         #endregion

@@ -87,7 +87,7 @@ namespace Orion.GameLogic.Tasks
             if (unit.World.Terrain.IsWalkable(targetPosition))
             {
                 // Unit walks along a segment of the path within this frame.
-                unit.Position = targetPosition;
+                unit.SetPosition(targetPosition);
             }
             else
             {

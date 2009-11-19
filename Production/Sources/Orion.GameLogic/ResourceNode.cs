@@ -14,9 +14,6 @@ namespace Orion.GameLogic
         #region Fields
         public const int DefaultTotalAmount = 1000;
 
-        private const int Width = 2;
-        private const int Height = 2;
-
         private readonly ResourceType type;
         private readonly int totalAmount;
         private readonly Vector2 position;
@@ -55,14 +52,19 @@ namespace Orion.GameLogic
             set { amountRemaining = value; }
         }
 
-        public Vector2 Position
+        public override int Width
         {
-            get { return position; }
+            get { return 2; }
         }
 
-        public override Rectangle BoundingRectangle
+        public override int Height
         {
-            get { return Rectangle.FromCenterSize(position.X, position.Y, Width, Height); }
+            get { return 2; }
+        }
+
+        public override Vector2 Position
+        {
+            get { return position; }
         }
 
         public Unit Extractor

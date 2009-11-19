@@ -22,7 +22,7 @@ namespace Orion.GameLogic
         private readonly string name;
         private readonly Color color;
         private readonly FogOfWar fogOfWar;
-        private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
+        private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
         private readonly Pathfinder pathfinder;
@@ -48,7 +48,7 @@ namespace Orion.GameLogic
             this.name = name;
             this.color = color;
             this.fogOfWar = new FogOfWar(world.Width, world.Height);
-            this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
+            this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
             this.pathfinder = new Pathfinder(world.Width, world.Height, IsPathable);
         }
@@ -174,21 +174,21 @@ namespace Orion.GameLogic
 
                 alageneNode.Extractor = unit;
             }
-            unit.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
+            unit.Moved += entityMovedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
             
             return unit;
         }
 
-        private void OnEntityBoundingRectangleChanged(Entity entity, ValueChangedEventArgs<Rectangle> eventArgs)
+        private void OnEntityMoved(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
         {
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
             Unit unit = (Unit)entity;
             float sightRange = unit.GetStat(UnitStat.SightRange);
-            Circle oldLineOfSight = new Circle(eventArgs.OldValue.Center, sightRange);
-            Circle newLineOfSight = new Circle(eventArgs.NewValue.Center, sightRange);
+            Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
+            Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
             fogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 

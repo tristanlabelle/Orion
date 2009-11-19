@@ -34,7 +34,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Harvester",
-                SizeInTiles = new Size(1, 1),
+                Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 5,
                 AladdiumCost = 25,
@@ -50,7 +50,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Builder",
-                SizeInTiles = new Size(1, 1),
+                Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 8,
                 AladdiumCost = 40,
@@ -67,7 +67,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Scout",
-                SizeInTiles = new Size(1, 1),
+                Size = new Size(1, 1),
                 SightRange = 10,
                 MaxHealth = 4,
                 AladdiumCost = 75,
@@ -82,7 +82,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "MeleeAttacker",
-                SizeInTiles = new Size(1, 1),
+                Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 30,
                 AladdiumCost = 50,
@@ -98,7 +98,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "RangedAttacker",
-                SizeInTiles = new Size(1, 1),
+                Size = new Size(1, 1),
                 SightRange = 10,
                 MaxHealth = 30,
                 AladdiumCost = 50,
@@ -114,7 +114,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Factory",
-                SizeInTiles = new Size(3, 3),
+                Size = new Size(3, 3),
                 SightRange = 4,
                 MaxHealth = 400,
                 AladdiumCost = 100,
@@ -130,7 +130,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Tower",
-                SizeInTiles = new Size(2, 2),
+                Size = new Size(2, 2),
                 SightRange = 10,
                 MaxHealth = 30,
                 AladdiumCost = 80,
@@ -145,7 +145,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "AlageneExtractor",
-                SizeInTiles = new Size(2, 2),
+                Size = new Size(2, 2),
                 SightRange = 4,
                 MaxHealth = 25,
                 AladdiumCost = 75,

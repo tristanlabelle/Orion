@@ -86,31 +86,19 @@ namespace Orion.GameLogic
         #endregion
 
         #region State
-        /// <summary>
-        /// Accesses the position of this <see cref="Unit"/>, in <see cref="World"/> coordinates.
-        /// </summary>
-        public Vector2 Position
+        public override int Width
         {
-            get { return position; }
-            set
-            {
-                if (value == position) return;
-                if (!World.Bounds.ContainsPoint(value))
-                {
-                    throw new ArgumentException(
-                        "Cannot set the position to a value outside of world bounds.",
-                        "Position");
-                }
-
-                Rectangle oldBoundingRectangle = BoundingRectangle;
-                position = value;
-                OnBoundingRectangleChanged(oldBoundingRectangle, BoundingRectangle);
-            }
+            get { return type.Width; }
         }
 
-        public override Rectangle BoundingRectangle
+        public override int Height
         {
-            get { return Rectangle.FromCenterSize(position.X, position.Y, type.WidthInTiles, type.HeightInTiles); }
+            get { return type.Height; }
+        }
+
+        public override Vector2 Position
+        {
+            get { return position; }
         }
 
         /// <summary>
@@ -260,6 +248,25 @@ namespace Orion.GameLogic
             return Type.HasSkill<TSkill>();
         }
         #endregion
+
+        /// <summary>
+        /// Changes the position of this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="value">A new world</param>
+        public void SetPosition(Vector2 value)
+        {
+            if (value == position) return;
+            if (!World.Bounds.ContainsPoint(value))
+            {
+                throw new ArgumentException(
+                    "Cannot set the position to a value outside of world bounds.",
+                    "Position");
+            }
+
+            Vector2 oldPosition = position;
+            position = value;
+            OnMoved(oldPosition, position);
+        }
 
         /// <summary>
         /// Gets the diplomatic stance of this <see cref="Unit"/> towards another one.

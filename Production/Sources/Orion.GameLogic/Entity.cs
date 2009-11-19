@@ -39,15 +39,17 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Raised when the bounding rectangle of this <see cref="Entity"/> changes.
+        /// Raised when the <see cref="Entity"/> moves.
         /// </summary>
-        public event ValueChangedEventHandler<Entity, Rectangle> BoundingRectangleChanged;
+        public event ValueChangedEventHandler<Entity, Vector2> Moved;
 
-        protected virtual void OnBoundingRectangleChanged(
-            Rectangle oldBoundingRectangle, Rectangle newBoundingRectangle)
+        protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
         {
-            if (BoundingRectangleChanged != null)
-                BoundingRectangleChanged(this, new ValueChangedEventArgs<Rectangle>(oldBoundingRectangle, newBoundingRectangle));
+            if (Moved != null)
+            {
+                var eventArgs = new ValueChangedEventArgs<Vector2>(oldPosition, newPosition);
+                Moved(this, eventArgs);
+            }
         }
         #endregion
 
@@ -71,9 +73,29 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the width of this <see cref="Entity"/>, in tiles.
+        /// This value is garantee to remain constant.
+        /// </summary>
+        public abstract int Width { get; }
+
+        /// <summary>
+        /// Gets the height of this <see cref="Entity"/>, in tiles.
+        /// This value is garantee to remain constant.
+        /// </summary>
+        public abstract int Height { get; }
+
+        /// <summary>
+        /// Gets the position of the center of this <see cref="Entity"/>.
+        /// </summary>
+        public abstract Vector2 Position { get; }
+
+        /// <summary>
         /// Gets a <see cref="Rectangle"/> that bounds the physical representation of this <see cref="Entity"/>.
         /// </summary>
-        public abstract Rectangle BoundingRectangle { get; }
+        public Rectangle BoundingRectangle
+        {
+            get { return Rectangle.FromCenterSize(Position.X, Position.Y, Width, Height); }
+        }
         #endregion
 
         #region Methods

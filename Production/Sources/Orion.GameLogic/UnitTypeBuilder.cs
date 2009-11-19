@@ -20,7 +20,7 @@ namespace Orion.GameLogic
         private int alageneCost;
         private int maxHealth;
         private int sightRange;
-        private Size sizeInTiles;
+        private Size size;
         #endregion
 
         #region Constructors
@@ -86,14 +86,14 @@ namespace Orion.GameLogic
             }
         }
 
-        public Size SizeInTiles
+        public Size Size
         {
-            get { return sizeInTiles; }
+            get { return size; }
             set
             {
-                Argument.EnsureStrictlyPositive(value.Width, "SizeInTiles.Width");
-                Argument.EnsureStrictlyPositive(value.Height, "SizeInTiles.Height");
-                this.sizeInTiles = value;
+                Argument.EnsureStrictlyPositive(value.Width, "Size.Width");
+                Argument.EnsureStrictlyPositive(value.Height, "Size.Height");
+                this.size = value;
             }
         }
         #endregion
@@ -110,7 +110,7 @@ namespace Orion.GameLogic
             alageneCost = 0;
             maxHealth = 1;
             sightRange = 1;
-            sizeInTiles = new Size(1, 1);
+            size = new Size(1, 1);
         }
 
         public UnitType Build(int id)

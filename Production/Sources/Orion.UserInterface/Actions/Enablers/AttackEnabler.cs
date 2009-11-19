@@ -28,7 +28,7 @@ namespace Orion.UserInterface.Actions.Enablers
             public override void Execute(Entity entity)
             {
                 if (entity is Unit) inputManager.LaunchAttack((Unit)entity);
-                else Execute(entity.BoundingRectangle.Center);
+                else Execute(entity.Position);
             }
 
             public override void Execute(Vector2 point)

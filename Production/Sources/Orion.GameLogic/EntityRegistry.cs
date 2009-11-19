@@ -28,11 +28,11 @@ namespace Orion.GameLogic
 
         // Temporary collections used to defer modification of "entities"
         private readonly HashSet<Entity> entitiesToAdd = new HashSet<Entity>();
-        private readonly Dictionary<Entity, Rectangle> entitiesToMove = new Dictionary<Entity, Rectangle>();
+        private readonly Dictionary<Entity, Vector2> entitiesToMove = new Dictionary<Entity, Vector2>();
         private readonly HashSet<Entity> entitiesToRemove = new HashSet<Entity>();
 
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
-        private readonly ValueChangedEventHandler<Entity, Rectangle> entityBoundingRectangleChangedEventHandler;
+        private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         #endregion
 
         #region Constructors
@@ -57,7 +57,7 @@ namespace Orion.GameLogic
             this.zones = CreateZones(columnCount, rowCount, bufferPool);
             this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
-            this.entityBoundingRectangleChangedEventHandler = OnEntityBoundingRectangleChanged;
+            this.entityMovedEventHandler = OnEntityMovedChanged;
         }
         #endregion
 
@@ -160,7 +160,7 @@ namespace Orion.GameLogic
             entitiesToRemove.Add(entity);
         }
 
-        private void OnEntityBoundingRectangleChanged(Entity entity, ValueChangedEventArgs<Rectangle> eventArgs)
+        private void OnEntityMovedChanged(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
         {
             Argument.EnsureNotNull(entity, "entity");
 
@@ -196,7 +196,7 @@ namespace Orion.GameLogic
 
         private void InitializeEntity(Entity entity)
         {
-            entity.BoundingRectangleChanged += entityBoundingRectangleChangedEventHandler;
+            entity.Moved += entityMovedEventHandler;
             entity.Died += entityDiedEventHandler;
 
             entitiesToAdd.Add(entity);
@@ -257,7 +257,7 @@ namespace Orion.GameLogic
 
         private void AddToZone(Entity entity)
         {
-            Point zoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            Point zoneCoords = GetClampedZoneCoords(entity.Position);
             AddToZone(entity, zoneCoords);
         }
 
@@ -279,14 +279,14 @@ namespace Orion.GameLogic
 
         private void RemoveFromZone(Entity entity)
         {
-            Point zoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            Point zoneCoords = GetClampedZoneCoords(entity.Position);
             zones[zoneCoords.X, zoneCoords.Y].Remove(entity);
         }
 
-        private void UpdateZone(Entity entity, Rectangle oldRectangle)
+        private void UpdateZone(Entity entity, Vector2 oldPosition)
         {
-            Point oldZoneCoords = GetClampedZoneCoords(oldRectangle.Center);
-            Point newZoneCoords = GetClampedZoneCoords(entity.BoundingRectangle.Center);
+            Point oldZoneCoords = GetClampedZoneCoords(oldPosition);
+            Point newZoneCoords = GetClampedZoneCoords(entity.Position);
 
             if (newZoneCoords != oldZoneCoords)
             {
@@ -344,7 +344,7 @@ namespace Orion.GameLogic
                     for (int i = 0; i < zone.Count; ++i)
                     {
                         Entity entity = zone[i];
-                        if (area.ContainsPoint(entity.BoundingRectangle.Center))
+                        if (area.ContainsPoint(entity.Position))
                             yield return entity;
                     }
                 }
@@ -374,7 +374,7 @@ namespace Orion.GameLogic
                     for (int i = 0; i < zone.Count; ++i)
                     {
                         Entity entity = zone[i];
-                        if (area.ContainsPoint(entity.BoundingRectangle.Center))
+                        if (area.ContainsPoint(entity.Position))
                             yield return entity;
                     }
                 }

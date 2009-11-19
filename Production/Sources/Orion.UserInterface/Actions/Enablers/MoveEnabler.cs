@@ -27,7 +27,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
             public override void Execute(Entity entity)
             {
-                Execute(entity.BoundingRectangle.Center);
+                Execute(entity.Position);
             }
 
             public override void Execute(Vector2 point)

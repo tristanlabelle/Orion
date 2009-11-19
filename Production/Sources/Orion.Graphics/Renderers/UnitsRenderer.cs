@@ -151,8 +151,8 @@ namespace Orion.Graphics
         public void DrawHealthBar(GraphicsContext context, Unit unit)
         {
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            float y = unit.BoundingRectangle.CenterY + unit.BoundingRectangle.Height * 0.75f;
-            float x = unit.BoundingRectangle.CenterX - healthbarWidth / 2f;
+            float y = unit.Position.Y + unit.BoundingRectangle.Height * 0.75f;
+            float x = unit.Position.X - healthbarWidth / 2f;
 
             if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
             {

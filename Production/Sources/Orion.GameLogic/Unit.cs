@@ -206,6 +206,14 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Return the whole queue of task
+        /// </summary>
+        public IEnumerable<Task> TaskQueue
+        {
+            get { return taskQueue; }
+        } 
+
+        /// <summary>
         /// get the value indicating if the unit does nothing
         /// </summary>
         public bool IsIdle

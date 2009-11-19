@@ -139,14 +139,17 @@ namespace Orion.Commandment
             int amountOfTrains;
             UnitType toTrain = World.UnitTypes.FromName(unitTypeName);
             //Train the Max depending of the ressources
-            amountToBeTrained =Math.Min(amountToBeTrained, 
-                                        Math.Min(
-                                            (int)(Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost)),
-                                            (int)(Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost))
-                                        )
-                                );
+            if (toTrain.GetBaseStat(UnitStat.AlageneCost) != 0
+                && Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost) < amountToBeTrained)
+            {
+                amountToBeTrained = Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost);
+            }
 
-
+            if (toTrain.GetBaseStat(UnitStat.AladdiumCost) != 0
+                && Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost) < amountToBeTrained)
+            {
+                amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost);
+            }
 
             List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.Train>()).ToList();
             List<Unit> trainers = new List<Unit>();
@@ -185,11 +188,8 @@ namespace Orion.Commandment
 
             if (potentialAttackers.Count > 0)
             {
-                for (int i = 0; i < amountOfAttackers; i++)
-                {
-                    attackers.Add(potentialAttackers.ElementAt(0));
-                    potentialAttackers.Remove(potentialAttackers.ElementAt(0));
-                }
+                attackers.AddRange(potentialAttackers);
+                potentialAttackers.Clear();
             }
 
             if (attackers.Count > 0 && target != null)

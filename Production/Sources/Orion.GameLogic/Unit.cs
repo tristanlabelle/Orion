@@ -288,7 +288,7 @@ namespace Orion.GameLogic
                     .OfType<Unit>()
                     .FirstOrDefault(unit => Faction.IsEnemy(unit));
 
-                if (!IsIdle)
+                if (unitToAttack != null)
                     Task = new Tasks.Attack(this, unitToAttack);
             }
 

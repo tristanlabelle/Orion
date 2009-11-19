@@ -148,7 +148,7 @@ namespace Orion.Main
             setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
 
-            ui.UsePlayerForSlot(slotNumber, host);
+            ui.UsePlayerForSlot(newPeerSlotNumber, host);
             peers.Add(host);
         }
 

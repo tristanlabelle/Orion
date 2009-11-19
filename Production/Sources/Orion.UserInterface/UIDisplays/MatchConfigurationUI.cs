@@ -77,7 +77,7 @@ namespace Orion.UserInterface
             {
                 RemotePlayerSlot firstEmpty = Players.OfType<RemotePlayerSlot>().Where(slot => !slot.NeedsFaction).First();
                 DropdownList<PlayerSlot> emptySlot = playerSlots.First(list => list.SelectedItem == firstEmpty);
-                return playerSlots.Reverse().IndexOf(emptySlot);
+                return playerSlots.IndexOf(emptySlot);
             }
         }
 

@@ -55,30 +55,22 @@ namespace Orion.Commandment
         {
             if (buildings.Count() > 0) GenerateCommand(new Train(buildings, trainedType, Faction));
         }
+
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
             if (units.Count() > 0) GenerateCommand(new Suicide(Faction, units));
         }
+
         public void LaunchChangeDimplomacy(Faction otherFaction)
         {
             if (otherFaction == null) return;
             if(Faction.AlliesID.Contains(otherFaction.ID)) GenerateCommand(new ChangeDiplomacy(Faction,otherFaction.ID,DiplomaticStance.Enemy));
             else GenerateCommand(new ChangeDiplomacy(Faction, otherFaction.ID, DiplomaticStance.Ally));
         }
+
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             if (units.Count() > 0) GenerateCommand(new ZoneAttack(Faction, units, destination));
-        }
-
-        public override void Update(float timeDelta)
-        {
-            ((CommandFilter)commandsEntryPoint).Flush();
-        }
-
-        public override void AddToPipeline(CommandPipeline pipeline)
-        {
-            pipeline.AddCommander(this);
-            commandsEntryPoint = pipeline.UserCommandmentEntryPoint;
         }
         #endregion
     }

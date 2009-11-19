@@ -12,7 +12,6 @@ namespace Orion.Commandment
     {
         #region Fields
         private readonly Faction faction;
-        protected ICommandSink commandsEntryPoint;
         #endregion
 
         #region Constructors
@@ -66,19 +65,9 @@ namespace Orion.Commandment
         /// <param name="command">The <see cref="Command"/> that was generated.</param>
         protected void GenerateCommand(Command command)
         {
-            if (commandsEntryPoint == null)
-                throw new InvalidOperationException("Cannot generate a command without a pipeline entry point.");
             Argument.EnsureNotNull(command, "command");
-
-            commandsEntryPoint.Feed(command);
             OnCommandGenerated(command);
         }
-
-        /// <summary>
-        /// Schedules the commander to be updated by a given pipeline on the run loop.
-        /// </summary>
-        /// <param name="pipeline">The pipeline on which to schedule this <see cref="Commander"/></param>
-        public abstract void AddToPipeline(CommandPipeline pipeline);
 
         /// <summary>
         /// Called by the pipeline to update this <see cref="Commander"/> for a frame, giving it a chance

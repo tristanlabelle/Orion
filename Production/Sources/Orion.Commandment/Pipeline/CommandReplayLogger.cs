@@ -9,10 +9,13 @@ namespace Orion.Commandment.Pipeline
 {
     public sealed class CommandReplayLogger : CommandFilter
     {
+        #region Fields
+        private readonly Queue<Command> commandQueue = new Queue<Command>();
         private readonly BinaryWriter writer;
         private readonly CommandFactory commandFactory;
-        private int commandFrameNumber = -1;
+        #endregion
 
+        #region Constructors
         public CommandReplayLogger(Stream stream, World world)
         {
             Argument.EnsureNotNull(stream, "stream");
@@ -23,18 +26,26 @@ namespace Orion.Commandment.Pipeline
 
         public CommandReplayLogger(string path, World world)
             : this(File.OpenWrite(path), world) { }
+        #endregion
 
-        public override void Flush()
+        #region Methods
+        public override void Handle(Command command)
         {
-            ++commandFrameNumber;
-            foreach (Command command in accumulatedCommands)
-            {  
-                writer.Write(commandFrameNumber);
+            Argument.EnsureNotNull(command, "command");
+            commandQueue.Enqueue(command);
+        }
+
+        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        {
+            while (commandQueue.Count > 0)
+            {
+                Command command = commandQueue.Dequeue();
+                writer.Write(updateNumber);
                 commandFactory.Serialize(command, writer);
                 writer.Flush();
+                Flush(command);
             }
-
-            base.Flush();
         }
+        #endregion
     }
 }

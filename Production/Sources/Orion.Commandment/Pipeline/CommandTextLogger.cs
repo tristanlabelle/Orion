@@ -1,6 +1,7 @@
 using System.IO;
 using System.Diagnostics;
 using System;
+using System.Collections.Generic;
 
 namespace Orion.Commandment.Pipeline
 {
@@ -10,34 +11,28 @@ namespace Orion.Commandment.Pipeline
     public sealed class CommandTextLogger : CommandFilter
     {
         #region Fields
+        private readonly Queue<Command> commandQueue = new Queue<Command>();
         private readonly TextWriter writer = GetTextWriter();
-        private int commandIndex = 0;
-        private int frameIndex = 0;
-        #endregion
-
-        #region Constructors
-        public CommandTextLogger() { }
-
-        public CommandTextLogger(ICommandSink recipient)
-            : base(recipient)
-        { }
+        private int commandNumber = 0;
         #endregion
 
         #region Methods
-        public override void Feed(Command command)
+        public override void Handle(Command command)
         {
-            writer.WriteLine("Command #{0}, Frame #{1}: {2}",
-                commandIndex, frameIndex, command.ToString());
-            ++commandIndex;
-            writer.Flush();
-
-            base.Feed(command);
+            Argument.EnsureNotNull(command, "command");
+            commandQueue.Enqueue(command);
         }
 
-        public override void Flush()
+        public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
-            ++frameIndex;
-            base.Flush();
+            while (commandQueue.Count > 0)
+            {
+                Command command = commandQueue.Dequeue();
+                writer.WriteLine("Command #{0}, Frame #{1}: {2}", commandNumber, updateNumber, command.ToString());
+                ++commandNumber;
+                writer.Flush();
+                Flush(command);
+            }
         }
 
         private static TextWriter GetTextWriter()

@@ -44,7 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameMessageType.cs" />
-    <Compile Include="MultiplayerCommandPipeline.cs" />
     <Compile Include="Protocol.cs" />
     <Compile Include="PeerLink.cs" />
     <Compile Include="PeerState.cs" />

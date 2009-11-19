@@ -54,8 +54,11 @@ namespace Orion.Graphics
                 dirtyRegion = null;
             }
 
-            Rectangle terrainBounds = new Rectangle(0, 0, fogOfWar.Width, fogOfWar.Height);
-            graphics.Fill(terrainBounds, texture, Color.Black);
+            if (fogOfWar.IsEnabled)
+            {
+                Rectangle terrainBounds = new Rectangle(0, 0, fogOfWar.Width, fogOfWar.Height);
+                graphics.Fill(terrainBounds, texture, Color.Black);
+            }
         }
 
         private void OnChanged(FogOfWar fogOfWar, Region region)

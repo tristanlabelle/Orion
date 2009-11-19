@@ -39,7 +39,13 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new MultiplayerCommandPipeline(world, transporter, UserInterface.PlayerAddresses);
+            CommandPipeline pipeline = new CommandPipeline();
+            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
+            CommandTextLogger textLogger = new CommandTextLogger();
+            pipeline.AddFilter(textLogger);
+            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, peers);
+            pipeline.AddFilter(synchronizer);
+
             UserInputCommander userCommander = null;
 
             int colorIndex = 0;
@@ -48,7 +54,6 @@ namespace Orion.Main
                 if (slot is ClosedPlayerSlot) continue;
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
 
-                Commander commander;
                 Color color = playerColors[colorIndex];
                 Faction faction = world.CreateFaction(color.Name, color);
                 colorIndex++;
@@ -56,13 +61,18 @@ namespace Orion.Main
                 if (slot is LocalPlayerSlot)
                 {
                     userCommander = new UserInputCommander(faction);
-                    commander = userCommander;
+                    pipeline.AddCommander(userCommander, synchronizer);
                 }
-                else if (slot is RemotePlayerSlot) continue; // no commanders for remote players
-                else if (slot is AIPlayerSlot) commander = new AICommander(faction, random);
-                else throw new InvalidOperationException("Multiplayer games only support remote, local and AI players");
-
-                commander.AddToPipeline(pipeline);
+                else if (slot is AIPlayerSlot)
+                {
+                    Commander commander = new AICommander(faction, random);
+                    // AIs bypass the synchronization filter as they are supposed to be fully deterministic
+                    pipeline.AddCommander(commander, textLogger);
+                }
+                else if (!(slot is RemotePlayerSlot)) // no commanders for remote players
+                {
+                    throw new InvalidOperationException("Multiplayer games only support remote, local and AI players");
+                }
             }
 
             return new Match(random, world, userCommander, pipeline);

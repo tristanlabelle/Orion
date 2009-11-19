@@ -36,12 +36,6 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-        public override void AddToPipeline(CommandPipeline pipeline)
-        {
-            pipeline.AddCommander(this);
-            commandsEntryPoint = pipeline.AICommandmentEntryPoint;
-        }
-
         public override void Update(float timeDelta)
         {
             if (!initialized && Faction.Units.Count() > 0)

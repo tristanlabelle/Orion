@@ -2,9 +2,12 @@ using System;
 
 namespace Orion.Commandment.Pipeline
 {
-    public interface ICommandSink
+    /// <summary>
+    /// Interface for objects which can handle commands and serve as an end point to a command pipeline.
+    /// </summary>
+    public interface ICommandSink : IDisposable
     {
-        void Feed(Command command);
-        void EndFeed();
+        void Handle(Command command);
+        void Update(int updateNumber, float timeDeltaInSeconds);
     }
 }

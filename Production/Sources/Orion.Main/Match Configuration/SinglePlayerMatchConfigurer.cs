@@ -32,7 +32,10 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new SinglePlayerCommandPipeline(world);
+            CommandPipeline pipeline = new CommandPipeline();
+            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
+            pipeline.AddFilter(new CommandTextLogger());
+
             UserInputCommander userCommander = null;
 
             int colorIndex = 0;
@@ -40,7 +43,6 @@ namespace Orion.Main
             {
                 if (slot is ClosedPlayerSlot) continue;
 
-                Commander commander;
                 Color color = playerColors[colorIndex];
                 Faction faction = world.CreateFaction(color.Name, color);
                 colorIndex++;
@@ -48,14 +50,17 @@ namespace Orion.Main
                 if (slot is LocalPlayerSlot)
                 {
                     userCommander = new UserInputCommander(faction);
-                    commander = userCommander;
+                    pipeline.AddCommander(userCommander);
                 }
                 else if (slot is AIPlayerSlot)
-                    commander = new AgressiveAICommander(faction, random);
+                {
+                    Commander commander = new AgressiveAICommander(faction, random);
+                    pipeline.AddCommander(commander);
+                }
                 else
+                {
                     throw new InvalidOperationException("Local games only support local players and AI players");
-
-                commander.AddToPipeline(pipeline);
+                }
             }
 
             return new Match(random, world, userCommander, pipeline);

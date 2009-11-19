@@ -12,7 +12,11 @@ using System.Diagnostics;
 
 namespace Orion.Networking
 {
-    public sealed class CommandSynchronizer : CommandFilter, IDisposable
+    /// <summary>
+    /// A command filter which synchronizes commands with other players
+    /// before passing them on.
+    /// </summary>
+    public sealed class CommandSynchronizer : CommandFilter
     {
         #region Fields
         #region Static
@@ -28,8 +32,27 @@ namespace Orion.Networking
 
         private readonly List<Entity> deadEntities = new List<Entity>();
 
-        private readonly List<Command> currentFrameCommands = new List<Command>();
+        /// <summary>
+        /// The commands that have been passed to this CommandSynchroniser by the pipeline.
+        /// </summary>
+        private readonly List<Command> localCommands = new List<Command>();
+
+        /// <summary>
+        /// An accumulator for commands that will be executed at the end of the frame.
+        /// Used in RunCommandFrame.
+        /// </summary>
+        private readonly List<Command> commandsToBeFlushed = new List<Command>();
+
+        /// <summary>
+        /// The commands that were generated locally during the last frame that will be
+        /// executed one frame later.
+        /// </summary>
         private readonly List<Command> lastFrameLocalCommands = new List<Command>();
+
+        /// <summary>
+        /// Packets which describes events related to future frames and that should not be
+        /// deserialized until then.
+        /// </summary>
         private readonly List<NetworkEventArgs> futureFramePackets = new List<NetworkEventArgs>();
 
         private readonly CommandFactory serializer;
@@ -77,30 +100,27 @@ namespace Orion.Networking
         {
             get { return peerStates.Values.All(state => (state & PeerState.ReceivedDone) != 0); }
         }
-
-        private List<Command> LocalCommands
-        {
-            get { return accumulatedCommands; }
-        }
         #endregion
 
         #region Methods
         #region Public
-        public void Update(int frameNumber)
+        public override void Handle(Command command)
         {
-            if (frameNumber % frameModulo == 0)
+            Argument.EnsureNotNull(command, "command");
+            localCommands.Add(command);
+        }
+
+        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        {
+            if (updateNumber % frameModulo == 0)
                 RunCommandFrame();
         }
 
-        public override void EndFeed() { }
-
-        public void Dispose()
+        public override void Dispose()
         {
             transporter.Received -= transporterReceived;
             transporter.TimedOut -= transporterTimeout;
         }
-
-        public override void Flush() { }
 
         public void RunCommandFrame()
         {
@@ -117,24 +137,24 @@ namespace Orion.Networking
                 ResetPeerStates();
                 DeserializeNeededFuturePackets();
                 WaitForPeerCommands();
-                currentFrameCommands.AddRange(lastFrameLocalCommands);
+                commandsToBeFlushed.AddRange(lastFrameLocalCommands);
                 lastFrameLocalCommands.Clear();
             }
 
             ExecuteCurrentFrameCommands();
-            currentFrameCommands.Clear();
+            commandsToBeFlushed.Clear();
 
-            lastFrameLocalCommands.AddRange(LocalCommands);
-            LocalCommands.Clear();
+            lastFrameLocalCommands.AddRange(localCommands);
+            localCommands.Clear();
         }
 
         private void ExecuteCurrentFrameCommands()
         {
             // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
-            currentFrameCommands.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
-            foreach (Command command in currentFrameCommands)
-                Recipient.Feed(command);
-            Recipient.EndFeed();
+            commandsToBeFlushed.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
+            foreach (Command command in commandsToBeFlushed)
+                Flush(command);
+            commandsToBeFlushed.Clear();
         }
 
         private void DeserializeNeededFuturePackets()
@@ -160,7 +180,7 @@ namespace Orion.Networking
                 {
                     writer.Write((byte)GameMessageType.Commands);
                     writer.Write(commandFrameNumber);
-                    foreach (Command command in LocalCommands)
+                    foreach (Command command in localCommands)
                     {
                         if (command.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
                         serializer.Serialize(command, writer);
@@ -247,7 +267,7 @@ namespace Orion.Networking
                     while (stream.Position != stream.Length)
                     {
                         Command deserializedCommand = serializer.Deserialize(reader);
-                        currentFrameCommands.Add(deserializedCommand);
+                        commandsToBeFlushed.Add(deserializedCommand);
                     }
                 }
             }

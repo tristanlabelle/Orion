@@ -82,6 +82,8 @@ namespace Orion.GameLogic
         #region Public Interface
         public void UpdateLineOfSight(Circle oldLineOfSight, Circle newLineOfSight)
         {
+            if (!isEnabled) return;
+
             Circle roundedOldLineOfSight = RoundLineOfSight(oldLineOfSight);
             Circle roundedNewLineOfSight = RoundLineOfSight(newLineOfSight);
 
@@ -94,12 +96,16 @@ namespace Orion.GameLogic
 
         public void AddLineOfSight(Circle lineOfSight)
         {
+            if (!isEnabled) return;
+
             Circle roundedCircle = RoundLineOfSight(lineOfSight);
             ModifyLineOfSight(roundedCircle, true);
         }
 
         public void RemoveLineOfSight(Circle lineOfSight)
         {
+            if (!isEnabled) return;
+
             Circle roundedCircle = RoundLineOfSight(lineOfSight);
             ModifyLineOfSight(roundedCircle, false);
         }

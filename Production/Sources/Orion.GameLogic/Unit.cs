@@ -318,14 +318,12 @@ namespace Orion.GameLogic
                 //Those units are already paid in the command Train
                 Unit DequeueUnit = (Unit)UnitsQueue.Dequeue();
                 Task = new Tasks.Train(this, DequeueUnit.Type);
-
             }
-            
         }
 
         public override string ToString()
         {
-            return "#{0} {2} {1}".FormatInvariant(Handle, type, faction);
+            return "{0} {2} {1}".FormatInvariant(Handle, type, faction);
         }
 
         public void Suicide()

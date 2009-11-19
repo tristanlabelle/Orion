@@ -56,6 +56,7 @@
     <Compile Include="Commands\ChangeDiplomacy.cs" />
     <Compile Include="Commands\Harvest.cs" />
     <Compile Include="Commands\Cancel.cs" />
+    <Compile Include="Commands\Message.cs" />
     <Compile Include="Commands\Move.cs" />
     <Compile Include="CommandSerializer.cs" />
     <Compile Include="Commands\Repair.cs" />

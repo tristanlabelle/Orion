@@ -103,9 +103,9 @@ namespace Orion.Networking
         /// <summary>
         /// Gets the port to which this transporter is locally bound.
         /// </summary>
-        public int Port
+        public ushort Port
         {
-            get { return ((IPEndPoint)socket.LocalEndPoint).Port; }
+            get { return (ushort)((IPEndPoint)socket.LocalEndPoint).Port; }
         }
         #endregion
 

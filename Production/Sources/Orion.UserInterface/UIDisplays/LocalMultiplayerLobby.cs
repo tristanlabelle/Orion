@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.Net.Sockets;
 using Orion.UserInterface.Widgets;
 using Orion.Networking;
 using Orion.Geometry;
@@ -115,7 +116,7 @@ namespace Orion.UserInterface
             Rectangle buttonFrame = new Rectangle(10, gamesFrame.Bounds.MaxY - 40, gamesFrame.Bounds.MaxX - 20, 30);
             foreach (KeyValuePair<IPv4EndPoint, int> game in hostedGames)
             {
-                Button button = new Button(buttonFrame, "{0} ({1} places left)".FormatInvariant(game.Key, game.Value));
+                Button button = new Button(buttonFrame, "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(game.Key), game.Value));
                 button.Pressed += delegate(Button source) { AskJoinGame(game.Key); };
                 gamesFrame.Children.Add(button);
                 buttonFrame = buttonFrame.TranslatedBy(0, -(buttonFrame.Height + 10));
@@ -143,7 +144,7 @@ namespace Orion.UserInterface
 
         private void PressJoinRemoteGame(Button sender)
         {
-            Instant.Prompt(this, "What is the address:port of the game you want to join?", JoinAddress);
+            Instant.Prompt(this, "What is the address of the game you want to join?", JoinAddress);
         }
 
         private void PressHostGame(Button sender)
@@ -154,16 +155,68 @@ namespace Orion.UserInterface
 
         private void JoinAddress(string address)
         {
+            IPv4Address hostAddress;
+            ushort port;
+
+            if (address.Contains(':'))
+            {
+                string[] parts = address.Split(':');
+                try
+                {
+                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])[0];
+                    port = ushort.Parse(parts[1]);
+                }
+                catch (FormatException)
+                {
+                    Instant.DisplayAlert(this, "Value {0} is an invalid port number.".FormatInvariant(parts[1]));
+                    return;
+                }
+                catch (SocketException)
+                {
+                    Instant.DisplayAlert(this, "Cannot resolve name or address {0}.".FormatInvariant(parts[0]));
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    hostAddress = (IPv4Address)Dns.GetHostAddresses(address)
+                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
+                    port = transporter.Port;
+                }
+                catch (SocketException)
+                {
+                    Instant.DisplayAlert(this, "Cannot resolve name or address {0}.".FormatInvariant(address));
+                    return;
+                }
+                catch (InvalidOperationException)
+                {
+                    Instant.DisplayAlert(this, "Could not find an IPv4 address for host {0}".FormatInvariant(address));
+                    return;
+                }
+            }
+
+            AskJoinGame(new IPv4EndPoint(hostAddress, port));
+        }
+
+        private string ResolveHostAddress(IPEndPoint endPoint)
+        {
+            string hostName;
             try
             {
-                IPv4EndPoint host = IPv4EndPoint.Parse(address);
-                AskJoinGame(host);
+                IPHostEntry hostEntry = Dns.GetHostEntry((IPAddress)endPoint.Address);
+                hostName = hostEntry.HostName;
             }
-            catch (FormatException)
+            catch (SocketException)
             {
-                string message = "\"{0}\" is not a valid IP address representation. Please use the format [IP address]:[port].".FormatInvariant(address);
-                Instant.DisplayAlert(this, message);
+                hostName = endPoint.Address.ToString();
             }
+            if (endPoint.Port != transporter.Port)
+            {
+                hostName += ":{0}".FormatInvariant(endPoint.Port);
+            }
+            return hostName;
         }
 
         public override void Dispose()

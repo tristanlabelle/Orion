@@ -23,6 +23,7 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
+        private readonly TextField chatInput;
         private readonly ActionFrame actions;
         private UnitType selectedType;
 
@@ -67,8 +68,11 @@ namespace Orion.UserInterface
 
             CreateScrollers();
 
-            worldView.KeyDown += userInputManager.HandleKeyDown;
-            worldView.KeyUp += userInputManager.HandleKeyUp;
+            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.3f), new Vector2(0.5f, 0.34f));
+            chatInput = new TextField(chatInputFrame);
+
+            KeyDown += userInputManager.HandleKeyDown;
+            KeyUp += userInputManager.HandleKeyUp;
             worldView.BoundsChanged += WorldViewBoundsChanged;
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
@@ -151,7 +155,30 @@ namespace Orion.UserInterface
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
-            return base.OnKeyDown(args);
+            if (args.Key == Keys.Enter)
+            {
+                if (!Children.Contains(chatInput))
+                    Children.Add(chatInput);
+                else
+                {
+                    // todo: generate command
+                    chatInput.Clear();
+                    Children.Remove(chatInput);
+                }
+            }
+            if (Children.Contains(chatInput))
+            {
+                if (args.Key == Keys.Escape)
+                {
+                    chatInput.Clear();
+                    Children.Remove(chatInput);
+                }
+                return false;
+            }
+            else
+            {
+                return base.OnKeyDown(args);
+            }
         }
 
         protected override bool OnKeyUp(KeyboardEventArgs args)

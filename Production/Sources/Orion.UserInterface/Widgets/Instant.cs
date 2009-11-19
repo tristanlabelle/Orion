@@ -10,7 +10,7 @@ namespace Orion.UserInterface.Widgets
 {
     public static class Instant
     {
-        private static Rectangle CreateComponentRectangle(Rectangle parentSystem, Vector2 originPoint, Vector2 topmostPoint)
+        public static Rectangle CreateComponentRectangle(Rectangle parentSystem, Vector2 originPoint, Vector2 topmostPoint)
         {
             Vector2 computedOrigin = new Vector2(originPoint.X * parentSystem.Size.X, originPoint.Y * parentSystem.Size.Y);
             Vector2 computedTopmost = new Vector2(topmostPoint.X * parentSystem.Size.X, topmostPoint.Y * parentSystem.Size.Y);

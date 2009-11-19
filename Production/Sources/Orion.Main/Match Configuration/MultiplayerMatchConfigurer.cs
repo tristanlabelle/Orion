@@ -80,6 +80,7 @@ namespace Orion.Main
         public virtual void Dispose()
         {
             transporter.Received -= received;
+            transporter.TimedOut -= timedOut;
         }
     }
 }

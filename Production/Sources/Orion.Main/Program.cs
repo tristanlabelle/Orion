@@ -21,6 +21,21 @@ namespace Orion.Main
 
         private void StartProgram()
         {
+            int port = DefaultHostPort;
+            do
+            {
+                try
+                {
+                    transporter = new SafeTransporter(port);
+                    break;
+                }
+                catch
+                {
+                    port++;
+                }
+            } while (true);
+            Console.WriteLine("Listening on port {0}", transporter.Port);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MainMenuUI menuUI = new MainMenuUI(ConfigureSinglePlayerGame, EnterMultiplayerLobby);
@@ -101,20 +116,6 @@ namespace Orion.Main
 
         private void EnterMultiplayerLobby(Button sender)
         {
-            int port = DefaultHostPort;
-            do
-            {
-                try
-                {
-                    transporter = new SafeTransporter(port);
-                    break;
-                }
-                catch
-                {
-                    port++;
-                }
-            } while (true);
-            Console.WriteLine("Listening on port {0}", transporter.Port);
             LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
             lobby.HostedGame += BeginHostMultiplayerGame;
             lobby.JoinedGame += JoinedMultiplayerGame;
@@ -124,6 +125,7 @@ namespace Orion.Main
         public void Dispose()
         {
             gameUi.Dispose();
+            transporter.Dispose();
         }
 
         /// <summary>

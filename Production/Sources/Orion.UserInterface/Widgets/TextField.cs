@@ -36,6 +36,11 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
+        public void Clear()
+        {
+            contents = new Text("");
+        }
+
         protected override bool OnKeyPress(char arg)
         {
             if (arg == '\b')

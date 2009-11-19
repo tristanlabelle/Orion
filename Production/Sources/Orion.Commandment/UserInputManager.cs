@@ -52,15 +52,6 @@ namespace Orion.Commandment
         }
         #endregion
 
-        #region Events
-        public event GenericEventHandler<UserInputManager> CommandAssigned;
-
-        private void OnCommandAssigned()
-        {
-            if (CommandAssigned != null) CommandAssigned(this);
-        }
-        #endregion
-
         #region Properties
         public UserInputCommander Commander
         {
@@ -229,7 +220,6 @@ namespace Orion.Commandment
             else mouseCommand.Execute(intersectedEntity);
 
             mouseCommand = null;
-            OnCommandAssigned();
         }
 
         public void LaunchDefaultCommand(Vector2 at)
@@ -270,8 +260,6 @@ namespace Orion.Commandment
             {
                 LaunchMove(at);
             }
-
-            OnCommandAssigned();
         }
         #endregion
 

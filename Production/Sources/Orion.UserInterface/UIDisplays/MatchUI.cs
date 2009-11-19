@@ -73,7 +73,7 @@ namespace Orion.UserInterface
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
-            userInputManager.CommandAssigned += InputManagerAssignedCommand;
+            commander.CommandGenerated += CommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
@@ -218,7 +218,7 @@ namespace Orion.UserInterface
             else CreateMultipleUnitsSelectionPanel();
         }
 
-        private void InputManagerAssignedCommand(UserInputManager inputManager)
+        private void CommanderGeneratedCommand(Commander commander, Command command)
         {
             actions.Restore();
         }

@@ -54,6 +54,11 @@ namespace Orion.Main
             }
         }
 
+        protected override void TimedOut(SafeTransporter source, IPv4EndPoint host)
+        {
+            if (peers.Contains(host)) TryLeave(host);
+        }
+
         protected override void ExitGame(MatchConfigurationUI ui)
         {
             byte[] exitMessage = new byte[1];
@@ -144,8 +149,8 @@ namespace Orion.Main
                 }
             }
 
-            setSlotMessage[1] = (byte)newPeerSlotNumber;
-            setSlotMessage[2] = (byte)SlotType.Local;
+            setSlotMessage[1] = (byte)SlotType.Local;
+            setSlotMessage[2] = (byte)newPeerSlotNumber;
             transporter.SendTo(setSlotMessage, host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);
@@ -166,10 +171,13 @@ namespace Orion.Main
             byte[] setSlotMessage = new byte[3];
             setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
             setSlotMessage[1] = (byte)slotNumber;
+            setSlotMessage[2] = (byte)SlotType.Open;
             foreach(IPv4EndPoint peer in peers)
             {
                 transporter.SendTo(setSlotMessage, peer);
             }
+
+            ui.OpenSlot(slotNumber);
         }
     }
 }

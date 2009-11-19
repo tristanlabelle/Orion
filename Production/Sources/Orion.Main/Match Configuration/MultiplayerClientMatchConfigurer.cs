@@ -6,6 +6,7 @@ using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
+using Orion.UserInterface.Widgets;
 using Color = System.Drawing.Color;
 
 namespace Orion.Main
@@ -58,6 +59,11 @@ namespace Orion.Main
             }
         }
 
+        protected override void TimedOut(SafeTransporter source, IPv4EndPoint host)
+        {
+            if(host == gameHost) ForceExit();
+        }
+
         private void EnterRootView(UIDisplay uiDisplay, RootView root)
         {
             ui.UsePlayerForSlot(0, gameHost);
@@ -80,12 +86,12 @@ namespace Orion.Main
 
         private void SetSlot(byte[] bytes)
         {
-            switch ((SlotType)bytes[1])
+            switch ((SlotType)bytes[2])
             {
-                case SlotType.Closed: UserInterface.CloseSlot(bytes[0]); break;
-                case SlotType.Open: UserInterface.OpenSlot(bytes[0]); break;
-                case SlotType.AI: UserInterface.UseAIForSlot(bytes[0]); break;
-                case SlotType.Local: UserInterface.SetLocalPlayerForSlot(bytes[0]); break;
+                case SlotType.Closed: UserInterface.CloseSlot(bytes[1]); break;
+                case SlotType.Open: UserInterface.OpenSlot(bytes[1]); break;
+                case SlotType.AI: UserInterface.UseAIForSlot(bytes[1]); break;
+                case SlotType.Local: UserInterface.SetLocalPlayerForSlot(bytes[1]); break;
             }
         }
 

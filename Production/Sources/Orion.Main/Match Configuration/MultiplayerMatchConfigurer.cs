@@ -13,6 +13,7 @@ namespace Orion.Main
     abstract class MultiplayerMatchConfigurer : MatchConfigurer, IDisposable
     {
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> received;
+        private GenericEventHandler<SafeTransporter, IPv4EndPoint> timedOut;
         protected SafeTransporter transporter;
         protected List<IPv4EndPoint> peers = new List<IPv4EndPoint>();
 
@@ -20,7 +21,9 @@ namespace Orion.Main
         {
             this.transporter = transporter;
             received = Received;
+            timedOut = TimedOut;
             transporter.Received += received;
+            transporter.TimedOut += timedOut;
         }
 
         public new MultiplayerMatchConfigurationUI UserInterface
@@ -28,6 +31,7 @@ namespace Orion.Main
             get { return (MultiplayerMatchConfigurationUI)AbstractUserInterface; }
         }
 
+        protected abstract void TimedOut(SafeTransporter source, IPv4EndPoint host);
         protected abstract void Received(SafeTransporter source, NetworkEventArgs args);
         protected abstract void ExitGame(MatchConfigurationUI ui);
 

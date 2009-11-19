@@ -11,7 +11,6 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit trainer;
         private readonly UnitType traineeType;
         private float healthPointsTrained = 0;
-        private bool hasTrainingBegun = false;
         private bool hasEnded = false;
         #endregion
 
@@ -49,26 +48,15 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
-            if (!hasTrainingBegun)
+            float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+            float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);
+            healthPointsTrained += trainingSpeed * timeDelta;
+            if (healthPointsTrained >= maxHealth)
             {
-                // We will eventually need to check the limit of population
-                // The ressource check is done when the command is executed
-                hasTrainingBegun = true;
 
-            }
-
-            if (hasTrainingBegun)
-            {
-                float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
-                float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);
-                healthPointsTrained += trainingSpeed * timeDelta;
-                if (healthPointsTrained >= maxHealth)
-                {
-
-                    Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
-                    unitCreated.Task = new Move(unitCreated, trainer.RallyPoint);
-                    hasEnded = true;
-                }
+                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
+                unitCreated.Task = new Move(unitCreated, trainer.RallyPoint);
+                hasEnded = true;
             }
         }
         #endregion

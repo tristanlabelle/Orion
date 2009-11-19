@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Orion.GameLogic;
-using System;
 
+using Orion.GameLogic;
+
+using TrainTask = Orion.GameLogic.Tasks.Train;
 
 namespace Orion.Commandment.Commands
 {
@@ -11,79 +13,60 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> buildings;
-        private readonly UnitType unitType;
+        private readonly List<Unit> trainers;
+        private readonly UnitType traineeType;
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Command implemented to build.
-        /// </summary>
-        /// <param name="selectedUnit">The Builder</param>
-        /// <param name="position">Where To build</param>
-        /// <param name="unitTobuild">What to build</param>
-        public Train(IEnumerable<Unit> selectedsSameBuilding, UnitType unitType, Faction faction)
+        public Train(IEnumerable<Unit> trainers, UnitType traineeType, Faction faction)
             : base(faction)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            Argument.EnsureNotNull(faction, "faction");
-            this.buildings = selectedsSameBuilding.ToList();
-            this.unitType = unitType;
-            int AlageneTotalCost = 0;
-            int AladdiumTotalCost = 0;
-            foreach (Unit unit in buildings)
-            {
-                AlageneTotalCost += unitType.GetBaseStat(UnitStat.AlageneCost);
-                AladdiumTotalCost += unitType.GetBaseStat(UnitStat.AladdiumCost);
-                if (AlageneTotalCost <= faction.AlageneAmount
-                   && AladdiumTotalCost <= faction.AladdiumAmount)
-                {
-                    unit.AddUnitToQueue(unit.Handle, unitType, faction, unit.Position);
-
-                }
-                else
-                {
-                    // We delete the cost of the last tried unit to build because we didn't
-                    // have enough money and the last tested unit will not be created
-                    AladdiumTotalCost -= unitType.GetBaseStat(UnitStat.AladdiumCost);
-                    AlageneTotalCost -= unitType.GetBaseStat(UnitStat.AlageneCost);
-                    Console.WriteLine("Not Enough Ressource to Train all wished units");
-                    break;
-                }
-            }
-            // Now we take the cost out of all queued units!
-            faction.AlageneAmount -= AlageneTotalCost;
-            faction.AladdiumAmount -= AladdiumTotalCost;
-
+            Argument.EnsureNotNull(traineeType, "traineeType");
+            this.trainers = trainers.ToList();
+            this.traineeType = traineeType;
         }
         #endregion
 
         #region Properties
         public override IEnumerable<Entity> EntitiesInvolved
         {
-            get { return buildings.Cast<Entity>(); }
+            get { return trainers.Cast<Entity>(); }
         }
         #endregion
 
         #region Methods
         public override void Execute()
         {
-            int aladiumCost = base.SourceFaction.GetStat(unitType, UnitStat.AladdiumCost);
-            int alageneCost = base.SourceFaction.GetStat(unitType, UnitStat.AlageneCost);
-            for (int i = 0; i < buildings.Count;i++ )
+            int alageneTotalCost = 0;
+            int aladdiumTotalCost = 0;
+            int alageneCost = traineeType.GetBaseStat(UnitStat.AlageneCost);
+            int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
+            foreach (Unit building in trainers)
             {
-                // If we don't have enought money to continue the production we stop.
-                if (!(base.SourceFaction.AladdiumAmount >= (aladiumCost + aladiumCost * i)
-                       && base.SourceFaction.AlageneAmount >= (alageneCost + alageneCost * i)))
+
+                if (alageneTotalCost + alageneCost <= base.SourceFaction.AlageneAmount
+                   && aladdiumTotalCost + aladdiumCost <= base.SourceFaction.AladdiumAmount)
+                {
+                    alageneTotalCost += alageneCost;
+                    aladdiumTotalCost += aladdiumCost;
+                    building.EnqueueTask(new TrainTask(building, traineeType));
+                }
+                else
+                {
+                    Console.WriteLine("Not Enough Ressource to Train all wished units");
                     break;
-                buildings[i].Task = new Orion.GameLogic.Tasks.Train(buildings[i], unitType);
+                }
             }
+
+            // Now we take the cost out for all queued units!
+            base.SourceFaction.AlageneAmount -= alageneTotalCost;
+            base.SourceFaction.AladdiumAmount -= aladdiumTotalCost;
         }
 
         public override string ToString()
         {
             return "[{0}] build {1}"
-                .FormatInvariant(buildings.ToCommaSeparatedValues(), unitType);
+                .FormatInvariant(trainers.ToCommaSeparatedValues(), traineeType);
         }
         #endregion
         #endregion
@@ -96,10 +79,10 @@ namespace Orion.Commandment.Commands
             protected override void SerializeData(Train command, BinaryWriter writer)
             {
                 writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.buildings.Count);
-                foreach (Unit unit in command.buildings)
+                writer.Write(command.trainers.Count);
+                foreach (Unit unit in command.trainers)
                     writer.Write(unit.Handle.Value);
-                writer.Write(command.unitType.ID);
+                writer.Write(command.traineeType.ID);
             }
 
             protected override Train DeserializeData(BinaryReader reader, World world)

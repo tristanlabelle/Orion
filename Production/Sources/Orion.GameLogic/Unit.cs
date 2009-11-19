@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace Orion.GameLogic
 {
@@ -16,14 +15,13 @@ namespace Orion.GameLogic
     public sealed class Unit : Entity
     {
         #region Fields
+        private readonly Queue<Task> taskQueue = new Queue<Task>();
         private readonly UnitType type;
         private readonly Faction faction;
         private Vector2 position;
         private float angle;
         private float damage;
-        private Task task = null;
         private Vector2 rallyPoint;
-        private Queue queuedUnits;
         #endregion
 
         #region Constructors
@@ -48,7 +46,7 @@ namespace Orion.GameLogic
             this.faction = faction;
             this.position = position;
             this.rallyPoint = GetDefaultRallyPoint();
-            this.queuedUnits = new Queue(); 
+            this.taskQueue = new Queue<Task>();
         }
         #endregion
 
@@ -188,11 +186,22 @@ namespace Orion.GameLogic
         /// </summary>
         public Task Task
         {
-            get { return task; }
+            get
+            {
+                if (taskQueue.Count == 0) return null;
+                return taskQueue.Peek();
+            }
             set
             {
-                if (task != null) task.OnCancelled(this);
-                task = value;
+                if (taskQueue.Count == 1)
+                {
+                    Task oldTask = taskQueue.Dequeue();
+                    oldTask.OnCancelled(this);
+                }
+
+                Debug.Assert(taskQueue.Count == 0);
+
+                if (value != null) taskQueue.Enqueue(value);
             }
         }
 
@@ -201,7 +210,7 @@ namespace Orion.GameLogic
         /// </summary>
         public bool IsIdle
         {
-            get { return task == null; }
+            get { return taskQueue.Count == 0; }
         }
         #endregion
 
@@ -213,12 +222,6 @@ namespace Orion.GameLogic
         {
             get { return rallyPoint; }
             set { rallyPoint = value; }
-        }
-
-        public Queue UnitsQueue
-        {
-            get { return queuedUnits; }
-            set { queuedUnits = value; }
         }
         #endregion
         #endregion
@@ -289,6 +292,16 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Enqueues a <see cref="Task"/> to be executed by this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be enqueued.</param>
+        public void EnqueueTask(Task task)
+        {
+            Argument.EnsureNotNull(task, "task");
+            taskQueue.Enqueue(task);
+        }
+
+        /// <summary>
         /// Updates this <see cref="Unit"/> for a frame.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
@@ -308,16 +321,11 @@ namespace Orion.GameLogic
                     Task = new Tasks.Attack(this, unitToAttack);
             }
 
-            if (!IsIdle)
+            if (taskQueue.Count > 0)
             {
+                Task task = taskQueue.Peek();
                 task.Update(timeDeltaInSeconds);
-                if (task.HasEnded) Task = null;
-            }
-            if (IsIdle && HasSkill<Skills.Train>() && this.UnitsQueue.Count != 0)
-            {
-                //Those units are already paid in the command Train
-                Unit DequeueUnit = (Unit)UnitsQueue.Dequeue();
-                Task = new Tasks.Train(this, DequeueUnit.Type);
+                if (task.HasEnded) taskQueue.Dequeue();
             }
         }
 
@@ -364,11 +372,6 @@ namespace Orion.GameLogic
             }
    
             return newRallyPoint;
-        }
-
-        public void AddUnitToQueue(Handle handle, UnitType type, Faction faction, Vector2 position)
-        {
-            queuedUnits.Enqueue(new Unit(handle, type, faction, position)); 
         }
         #endregion
     }

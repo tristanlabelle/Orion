@@ -26,6 +26,7 @@ namespace Orion.UserInterface
         private readonly TextField chatInput;
         private readonly ActionFrame actions;
         private UnitType selectedType;
+        private bool isSpaceDown;
 
         #region Minimap
         private readonly Frame minimapFrame;
@@ -155,6 +156,7 @@ namespace Orion.UserInterface
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
+            isSpaceDown = args.Key == Keys.Space;
             if (args.Key == Keys.Enter)
             {
                 if (!Children.Contains(chatInput))
@@ -184,11 +186,19 @@ namespace Orion.UserInterface
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
+            isSpaceDown = !(isSpaceDown && args.Key == Keys.Space);
             return base.OnKeyUp(args);
         }
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
+            if (isSpaceDown && SelectedType != null)
+            {
+                Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
+                Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
+                halfWorldBoundsSize.Scale(0.5f, 0.5f);
+                worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
+            }
             base.OnUpdate(args);
         }
 

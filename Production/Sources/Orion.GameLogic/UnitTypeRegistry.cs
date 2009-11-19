@@ -118,7 +118,7 @@ namespace Orion.GameLogic
                 SightRange = 4,
                 MaxHealth = 400,
                 AladdiumCost = 100,
-                AlageneCost = 50
+                AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Train(type => !type.IsBuilding, 10));
             builder.Skills.Add(new Skills.StoreResources());

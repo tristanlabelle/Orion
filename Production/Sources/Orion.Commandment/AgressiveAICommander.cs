@@ -27,10 +27,18 @@ namespace Orion.Commandment
 
             if (allUnits.Count > 0)
             {
-                int amountOfHarvesters = Evaluate("Harvester", 0.5f);
+                int amountOfHarvesters = Evaluate("Harvester", 1);
                 int amountOfAttackers = Evaluate("MeleeAttacker", 1);
 
-                DispatchHarvesters(amountOfHarvesters, startingNode);
+                DispatchHarvesters(amountOfHarvesters, startingNode, false);
+                List<Vector2> positions = new List<Vector2>();
+
+                /*if (startingNode != null)
+                {
+                    positions.Add(new Vector2(alageneStartingNode.Position.X + 2, alageneStartingNode.Position.Y + 2));
+                    DispatchBuilders("AlageneExtractor", positions);
+                }*/
+
                 InitiateTraining("MeleeAttacker", 1);
 
                 //TODO: remove this part when the AI is sandboxed as it is only here to test the behavior of the AI

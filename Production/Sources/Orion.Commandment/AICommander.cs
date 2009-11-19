@@ -16,7 +16,7 @@ namespace Orion.Commandment
         protected ResourceNode startingNode;
         protected ResourceNode alageneStartingNode;
         private List<Circle> regions = new List<Circle>();
-        private Random random;
+        protected Random random;
         protected List<Unit> allUnits = new List<Unit>();
         private List<Command> commands = new List<Command>();
         private bool initialized = false;
@@ -201,39 +201,61 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="amountOfHarvesters">The amount of harvesters to be assigned</param>
         /// <param name="node">The node to be harvested</param>
-        public void DispatchHarvesters(int amountOfHarvesters, ResourceNode node)
+        public void DispatchHarvesters(int amountOfHarvesters, ResourceNode node, bool includeBuilders)
         {
-            List<Unit> potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
-            List<Unit> harvesters = new List<Unit>();
-
-            if (potentialHarvesters.Count > 0)
+            if (node != null)
             {
-                for (int i = 0; i < amountOfHarvesters; i++)
-                {
-                    harvesters.Add(potentialHarvesters.ElementAt(0));
-                    potentialHarvesters.Remove(potentialHarvesters.ElementAt(0));
-                }
-            }
+                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.Task is Orion.GameLogic.Tasks.Harvest)).ToList();
+                int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.Task.Description == "harvesting " + node.Type).ToList().Count;
+                List<Unit> potentialHarvesters = new List<Unit>();
 
-            if (harvesters.Count > 0 && node != null)
-                commands.Add(new Commands.Harvest(Faction, harvesters, node));
+                if (includeBuilders)
+                    potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
+                else
+                    potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>() && !unit.Type.HasSkill<Skills.Build>()).ToList();
+                
+                List<Unit> harvesters = new List<Unit>();
+
+                amountOfHarvesters -= amountOfUnitsAlreadyHarvesting;
+
+                if (potentialHarvesters.Count > 0)
+                {
+                    for (int i = 0; i < amountOfHarvesters; i++)
+                    {
+                        harvesters.Add(potentialHarvesters.ElementAt(0));
+                        potentialHarvesters.Remove(potentialHarvesters.ElementAt(0));
+                    }
+                }
+
+                if (harvesters.Count > 0)
+                    commands.Add(new Commands.Harvest(Faction, harvesters, node));
+            }
         }
 
         /// <summary>
         /// This method creates Build commands to build buildings of the specified types at given positions.  If the faction has less builders than the amount of positions specified, it will create commands for the positions in order until there is no more available builders.
         /// </summary>
-        /// <param name="buildingType">Type of building to be built</param>
+        /// <param name="buildingType">name of the type of building to be built</param>
         /// <param name="Positions">Positions at which the buildings will be built</param>
-        public void DispatchBuilders(UnitType buildingType, List<Vector2> Positions)
+        public void DispatchBuilders(string typeName, List<Vector2> Positions)
         {
+            UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.Type.HasSkill<Skills.Build>() && unit.Type.HasSkill<Skills.Harvest>()).ToList();
+            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Build>()).ToList();
             List<Unit> builders = new List<Unit>();
 
             if (Positions.Count <= potentialBuilders.Count)
                 amountOfBuildings = Positions.Count;
             else
                 amountOfBuildings = potentialBuilders.Count;
+
+            if (toBuild.GetBaseStat(UnitStat.AladdiumCost) != 0
+                && amountOfBuildings > Faction.AladdiumAmount / toBuild.GetBaseStat(UnitStat.AladdiumCost))
+                    amountOfBuildings = Faction.AladdiumAmount / toBuild.GetBaseStat(UnitStat.AladdiumCost);
+
+            if (toBuild.GetBaseStat(UnitStat.AlageneCost) != 0
+                && amountOfBuildings > Faction.AlageneAmount / toBuild.GetBaseStat(UnitStat.AlageneCost))
+                amountOfBuildings = Faction.AlageneAmount / toBuild.GetBaseStat(UnitStat.AlageneCost);
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
@@ -243,7 +265,7 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                commands.Add(new Build(builders.ElementAt(i), Positions.ElementAt(i), buildingType));
+                commands.Add(new Build(builders.ElementAt(i), Positions.ElementAt(i), toBuild));
             }
         }
 
@@ -255,6 +277,7 @@ namespace Orion.Commandment
         {
             allUnits = Faction.Units.ToList();
             startingNode = FindIdealNode(ResourceType.Aladdium);
+            alageneStartingNode = FindIdealNode(ResourceType.Alagene);
 
             initialized = true;
         }

@@ -20,9 +20,9 @@ namespace Orion.Networking
     {
         #region Fields
         #region Static
-        private const int frameModulo = 6;
+        private const int frameTimesQueueLength = 50;
+        private const int initialFramesCount = 6;
         #endregion
-
         private readonly SafeTransporter transporter;
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> transporterReceived;
         private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> transporterTimeout;
@@ -60,6 +60,10 @@ namespace Orion.Networking
         private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
 
         private int commandFrameNumber = -1;
+        private int frameNumber = -1;
+        private int lastCommandFrame = -1;
+        private Queue<int> frameTimes = new Queue<int>();
+        private List<byte> receivedFrameTimes = new List<byte>();
         #endregion
 
         #region Constructors
@@ -87,6 +91,8 @@ namespace Orion.Networking
             transporter.Received += transporterReceived;
             transporterTimeout = TransporterTimedOut;
             transporter.TimedOut += transporterTimeout;
+
+            frameTimes.Enqueue(initialFramesCount);
         }
         #endregion
 
@@ -112,8 +118,13 @@ namespace Orion.Networking
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
+            int frameModulo = (int)(frameTimes.Average() + 0.5);
+            frameNumber = updateNumber;
             if (updateNumber % frameModulo == 0)
+            {
                 RunCommandFrame();
+                lastCommandFrame = updateNumber;
+            }
         }
 
         public override void Dispose()
@@ -140,6 +151,10 @@ namespace Orion.Networking
                 commandsToBeFlushed.AddRange(lastFrameLocalCommands);
                 lastFrameLocalCommands.Clear();
             }
+
+            frameTimes.Enqueue(receivedFrameTimes.Max());
+            if (frameTimes.Count > 50)
+                frameTimes.Dequeue();
 
             ExecuteCurrentFrameCommands();
             commandsToBeFlushed.Clear();
@@ -203,6 +218,7 @@ namespace Orion.Networking
                     Thread.Sleep(0);
                     transporter.Poll();
                 }
+                lastCommandFrame--;
             }
         }
 
@@ -240,14 +256,20 @@ namespace Orion.Networking
             else if (messageType == (byte)GameMessageType.Done)
             {
                 peerStates[args.Host] = oldPeerState | PeerState.ReceivedDone;
+                receivedFrameTimes.Add(args.Data[5]);
             }
         }
 
         private void SendDone()
         {
-            byte[] doneMessage = new byte[5];
+            byte framesNeeded = (byte)(frameNumber - lastCommandFrame);
+            lastCommandFrame = frameNumber;
+            receivedFrameTimes.Add(framesNeeded);
+
+            byte[] doneMessage = new byte[6];
             doneMessage[0] = (byte)GameMessageType.Done;
             BitConverter.GetBytes(commandFrameNumber).CopyTo(doneMessage, 1);
+            doneMessage[5] = framesNeeded;
 
             transporter.SendTo(doneMessage, peerEndPoints);
         }

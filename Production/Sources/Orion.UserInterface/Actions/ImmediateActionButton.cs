@@ -22,6 +22,10 @@ namespace Orion.UserInterface.Actions
             this.command = command;
         }
 
+        public ImmediateActionButton(ActionFrame frame, UserInputManager manager, Keys hotkey, ImmediateUserCommand command)
+            : this(frame, manager, "", hotkey, command)
+        { }
+
         protected override void OnPress()
         {
             command.Execute();

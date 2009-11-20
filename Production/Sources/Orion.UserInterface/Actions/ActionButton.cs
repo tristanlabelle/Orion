@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions
         public string Name
         {
             get { return name; }
-            protected set
+            internal set
             {
                 const float defaultFontSize = 28;
                 name = value;

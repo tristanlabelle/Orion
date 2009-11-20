@@ -46,6 +46,7 @@ namespace Orion.UserInterface.Actions.Enablers
                 Skills.Train train = type.GetSkill<Skills.Train>();
                 int x = 0;
                 int y = 3;
+                Faction playerFaction = inputManager.Commander.Faction;
                 foreach (UnitType unitType in registry.Where(t => !t.IsBuilding))
                 {
                     if (train.Supports(unitType))
@@ -61,7 +62,11 @@ namespace Orion.UserInterface.Actions.Enablers
                             }
                         }
                         ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                        buttonsArray[x, y] = new ImmediateActionButton(container, inputManager, unitType.Name, Keys.None, command);
+                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command);
+                        int aladdium = playerFaction.GetStat(unitType, UnitStat.AladdiumCost);
+                        int alagene = playerFaction.GetStat(unitType, UnitStat.AlageneCost);
+                        button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);
+                        buttonsArray[x, y] = button;
                     }
                 }
             }

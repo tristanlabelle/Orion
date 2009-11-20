@@ -192,7 +192,7 @@ namespace Orion.UserInterface
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
-            isSpaceDown = !(isSpaceDown && args.Key == Keys.Space);
+            isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
             return base.OnKeyUp(args);
         }
 
@@ -359,8 +359,8 @@ namespace Orion.UserInterface
             float yDiff = worldView.FullBounds.MaxY - newBounds.MaxY;
             if (xDiff < 0) newBounds = newBounds.TranslatedXBy(xDiff);
             if (yDiff < 0) newBounds = newBounds.TranslatedYBy(yDiff);
-            if (newBounds.MinX < 0) newBounds = newBounds.TranslatedTo(0, newBounds.Min.Y);
-            if (newBounds.MinY < 0) newBounds = newBounds.TranslatedTo(newBounds.Min.X, 0);
+            if (newBounds.MinX < -newBounds.Width / 2) newBounds = newBounds.TranslatedTo(-newBounds.Width / 2, newBounds.Min.Y);
+            if (newBounds.MinY < -newBounds.Height / 2) newBounds = newBounds.TranslatedTo(newBounds.Min.X, -newBounds.Height / 2);
             worldView.Bounds = newBounds;
         }
         #endregion

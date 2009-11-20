@@ -34,7 +34,7 @@ namespace Orion.UserInterface.Actions
         protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
             : this(frame, manager, hotkey)
         {
-            Name = name;
+            Name = "{0} ({1})".FormatInvariant(name, hotkey);
         }
         #endregion
 

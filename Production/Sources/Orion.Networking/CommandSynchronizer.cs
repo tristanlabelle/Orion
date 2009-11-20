@@ -20,7 +20,7 @@ namespace Orion.Networking
     {
         #region Fields
         #region Static
-        private const int frameTimesQueueLength = 50;
+        private const int frameTimesQueueLength = 0x50;
         private const int initialFramesCount = 6;
         #endregion
         private readonly SafeTransporter transporter;
@@ -153,7 +153,7 @@ namespace Orion.Networking
             }
 
             frameTimes.Enqueue(receivedFrameTimes.Max());
-            if (frameTimes.Count > 50)
+            if (frameTimes.Count > frameTimesQueueLength)
                 frameTimes.Dequeue();
 
             ExecuteCurrentFrameCommands();

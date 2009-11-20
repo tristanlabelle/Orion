@@ -48,12 +48,13 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
+            if (trainer.Faction.AvailableFood < traineeType.FoodCost) return;
+
             float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-                if (trainer.Faction.AvailableFood < traineeType.FoodCost) return;
                 Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
                 unitCreated.Task = new Move(unitCreated, trainer.RallyPoint);
                 hasEnded = true;

@@ -158,7 +158,7 @@ namespace Orion.Networking
                 frameTimes.Dequeue();
             int newFrameModulo = (int)(frameTimes.Average() + 0.5);
             if (newFrameModulo != oldFrameModulo)
-                Console.WriteLine("Command frame rate changed from {0} to {1}");
+                Console.WriteLine("Command frame rate changed from {0} to {1}", oldFrameModulo, newFrameModulo);
 
             ExecuteCurrentFrameCommands();
             commandsToBeFlushed.Clear();

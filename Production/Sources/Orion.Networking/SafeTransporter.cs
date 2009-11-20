@@ -263,14 +263,6 @@ namespace Orion.Networking
                             TimeSpan resendDelay = GetResendDelay(peer);
                             if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
                             {
-                                if (packet.WasSent)
-                                {
-                                    Console.WriteLine(
-                                        "Message #{0} resent after {1}."
-                                        .FormatInvariant(packet.Number,
-                                        packet.TimeElapsedSinceLastSend.Value));
-                                }
-
                                 socketSemaphore.WaitOne();
                                 try
                                 {

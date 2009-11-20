@@ -145,10 +145,6 @@ namespace Orion.Networking
                 AddPing(packetsToSend[number].TimeElapsedSinceCreation);
                 packetsToSend.Remove(number);
             }
-            else if (number < nextPacketNumber)
-            {
-                Console.WriteLine("Received a second ack for message #{0}.".FormatInvariant(number));
-            }
             else
             {
                 Debug.Fail("Received an acknowledgement for an unsent message.");

@@ -145,7 +145,7 @@ namespace Orion.Networking
                 AddPing(packetsToSend[number].TimeElapsedSinceCreation);
                 packetsToSend.Remove(number);
             }
-            else
+            else if (number >= nextPacketNumber)
             {
                 Debug.Fail("Received an acknowledgement for an unsent message.");
             }

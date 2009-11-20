@@ -234,15 +234,18 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
-            if (packetCommandFrameNumber < commandFrameNumber)
+            if (args.Data[1] == (byte)GameMessageType.Commands || args.Data[0] == (byte)GameMessageType.Done)
             {
-                Debug.Assert(packetCommandFrameNumber == commandFrameNumber - 1);
-                DeserializeGameMessage(args);
-            }
-            else
-            {
-                futureFramePackets.Add(args);
+                int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
+                if (packetCommandFrameNumber < commandFrameNumber)
+                {
+                    Debug.Assert(packetCommandFrameNumber == commandFrameNumber - 1);
+                    DeserializeGameMessage(args);
+                }
+                else
+                {
+                    futureFramePackets.Add(args);
+                }
             }
         }
 

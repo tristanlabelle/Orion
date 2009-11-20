@@ -187,7 +187,7 @@ namespace Orion.GameLogic
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
             usedFoodStock += type.FoodCost;
-            if (unit.Type.HasSkill<Skills.StoreResources>())
+            if (unit.Type.HasSkill<Skills.StoreFood>())
                 totalFoodStock += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             return unit;
         }

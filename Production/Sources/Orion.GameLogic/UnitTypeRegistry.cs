@@ -24,6 +24,7 @@ namespace Orion.GameLogic
             RegisterFactory();
             RegisterTower();
             RegisterAlageneExtractor();
+            RegisterSupplyDepot();
         }
         #endregion
 
@@ -159,7 +160,22 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new Skills.ExtractAlagene());
             Register(builder);
-        } 
+        }
+
+        public void RegisterSupplyDepot()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Supply",
+                Size = new Size(2, 2),
+                SightRange = 10,
+                MaxHealth = 70,
+                AladdiumCost = 50,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new Skills.StoreFood(10)); 
+            Register(builder);
+        }
         #endregion
 
         public UnitType Register(UnitTypeBuilder builder)

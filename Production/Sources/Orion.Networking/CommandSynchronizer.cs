@@ -20,7 +20,7 @@ namespace Orion.Networking
     {
         #region Fields
         #region Static
-        private const int frameTimesQueueLength = 0x50;
+        private const int frameTimesQueueLength = 0x20;
         private const int initialFramesCount = 6;
         #endregion
         private readonly SafeTransporter transporter;

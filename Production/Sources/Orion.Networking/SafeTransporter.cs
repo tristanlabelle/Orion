@@ -27,7 +27,7 @@ namespace Orion.Networking
         /// <summary>
         /// The amount of time to block in Socket.ReceiveFrom calls.
         /// </summary>
-        private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromMilliseconds(100);
+        private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromMilliseconds(500);
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.

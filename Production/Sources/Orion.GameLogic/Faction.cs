@@ -28,6 +28,9 @@ namespace Orion.GameLogic
         private readonly Pathfinder pathfinder;
         private int aladdiumAmount;
         private int alageneAmount;
+        private const int maxFoodStock = 200;
+        private int totalFoodStock = 0;
+        private int usedFoodStock = 0;
         #endregion
 
         #region Constructors
@@ -140,6 +143,12 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        public int AvailableFood
+        {
+
+            get { return (Math.Min((maxFoodStock - usedFoodStock), (totalFoodStock - usedFoodStock))); }
+        }
+
         #region Methods
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
@@ -177,7 +186,9 @@ namespace Orion.GameLogic
             unit.Moved += entityMovedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
-            
+            usedFoodStock += type.FoodCost;
+            if (unit.Type.HasSkill<Skills.StoreResources>())
+                totalFoodStock += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             return unit;
         }
 
@@ -198,7 +209,10 @@ namespace Orion.GameLogic
 
             Unit unit = (Unit)entity;
             fogOfWar.RemoveLineOfSight(unit.LineOfSight);
-            unit.Died -= entityDiedEventHandler;
+            usedFoodStock -= unit.Type.FoodCost;
+            if (unit.Type.HasSkill<Skills.StoreResources>())
+                totalFoodStock -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+            unit.Died -= entityDiedEventHandler;         
         }
         #endregion
 

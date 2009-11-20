@@ -53,7 +53,7 @@ namespace Orion.GameLogic.Tasks
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-
+                if (trainer.Faction.AvailableFood < traineeType.FoodCost) return;
                 Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
                 unitCreated.Task = new Move(unitCreated, trainer.RallyPoint);
                 hasEnded = true;

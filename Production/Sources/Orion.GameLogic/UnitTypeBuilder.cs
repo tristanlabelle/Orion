@@ -20,6 +20,7 @@ namespace Orion.GameLogic
         private int alageneCost;
         private int maxHealth;
         private int sightRange;
+        private int foodCost;
         private Size size;
         #endregion
 
@@ -96,6 +97,16 @@ namespace Orion.GameLogic
                 this.size = value;
             }
         }
+
+        public int FoodCost
+        {
+            get { return foodCost; }
+            set 
+            {
+                Argument.EnsureStrictlyPositive(value, "foodCost");
+                this.foodCost = value;
+            }
+        }
         #endregion
 
         #region Methods
@@ -110,6 +121,7 @@ namespace Orion.GameLogic
             alageneCost = 0;
             maxHealth = 1;
             sightRange = 1;
+            foodCost = 0;
             size = new Size(1, 1);
         }
 

@@ -85,6 +85,7 @@
     <Compile Include="Skills\Harvest.cs" />
     <Compile Include="Skills\Move.cs" />
     <Compile Include="Skills\Research.cs" />
+    <Compile Include="Skills\StoreFood.cs" />
     <Compile Include="Skills\StoreResources.cs" />
     <Compile Include="Skills\Train.cs" />
     <Compile Include="TagSet.cs" />

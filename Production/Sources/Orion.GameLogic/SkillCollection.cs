@@ -13,7 +13,7 @@ namespace Orion.GameLogic
     public sealed class SkillCollection : ICollection<Skill>
     {
         #region Fields
-        private readonly List<Skill> skills = new List<Skill>(8);
+        private readonly List<Skill> skills = new List<Skill>(9);
         #endregion
 
         #region Properties

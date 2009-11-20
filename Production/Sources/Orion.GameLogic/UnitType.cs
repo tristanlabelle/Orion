@@ -30,6 +30,7 @@ namespace Orion.GameLogic
         private readonly int alageneCost;
         private readonly int maxHealth = 10;
         private readonly int sightRange = 10;
+        private readonly int foodCost;
         #endregion
 
         #region Constructors
@@ -46,6 +47,7 @@ namespace Orion.GameLogic
             this.alageneCost = builder.AlageneCost;
             this.maxHealth = builder.MaxHealth;
             this.sightRange = builder.SightRange;
+            this.foodCost = builder.FoodCost;
         }
         #endregion
 
@@ -53,6 +55,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        public int FoodCost
+        {
+            get { return foodCost; }
+        }
+
         #region Identification
         public int ID
         {

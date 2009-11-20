@@ -38,7 +38,8 @@ namespace Orion.GameLogic
                 SightRange = 8,
                 MaxHealth = 5,
                 AladdiumCost = 25,
-                AlageneCost = 0
+                AlageneCost = 0,
+                FoodCost = 1
             };
             builder.Skills.Add(new Skills.Move(15));
             builder.Skills.Add(new Skills.Harvest(1, 10));
@@ -54,7 +55,8 @@ namespace Orion.GameLogic
                 SightRange = 6,
                 MaxHealth = 8,
                 AladdiumCost = 40,
-                AlageneCost = 0
+                AlageneCost = 0,
+                FoodCost = 1
             };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
@@ -71,7 +73,8 @@ namespace Orion.GameLogic
                 SightRange = 10,
                 MaxHealth = 4,
                 AladdiumCost = 75,
-                AlageneCost = 0
+                AlageneCost = 0,
+                FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(25));
             Register(builder);
@@ -86,7 +89,8 @@ namespace Orion.GameLogic
                 SightRange = 6,
                 MaxHealth = 15,
                 AladdiumCost = 50,
-                AlageneCost = 0
+                AlageneCost = 0,
+                FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Attack(4, 1));
@@ -102,7 +106,8 @@ namespace Orion.GameLogic
                 SightRange = 10,
                 MaxHealth = 15,
                 AladdiumCost = 50,
-                AlageneCost = 10
+                AlageneCost = 10,
+                FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Attack(4, 7));
@@ -122,6 +127,7 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new Skills.Train(type => !type.IsBuilding, 10));
             builder.Skills.Add(new Skills.StoreResources());
+            builder.Skills.Add(new Skills.StoreFood(10)); 
             Register(builder);
         }
 

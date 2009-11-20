@@ -1,0 +1,7 @@
+Command Center = Pyramid
+Builder/Harvester = Smurf
+Melee Attacker = Vicking
+Ranged Attacker = Ninja
+Flying unit = Flying Pig
+Mighty Flying Unit = UFO
+Jedi

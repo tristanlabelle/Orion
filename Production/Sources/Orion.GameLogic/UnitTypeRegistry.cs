@@ -181,14 +181,14 @@ namespace Orion.GameLogic
         public UnitType Register(UnitTypeBuilder builder)
         {
             Argument.EnsureNotNull(builder, "builder");
-            UnitType unitType = builder.Build(types.Count);
+            UnitType unitType = builder.Build(new Handle((uint)types.Count));
             types.Add(unitType.Name, unitType);
             return unitType;
         }
 
-        public UnitType FromID(int id)
+        public UnitType FromHandle(Handle handle)
         {
-            return types.Values.FirstOrDefault(unitType => unitType.ID == id);
+            return types.Values.FirstOrDefault(unitType => unitType.Handle == handle);
         }
 
         public UnitType FromName(string name)

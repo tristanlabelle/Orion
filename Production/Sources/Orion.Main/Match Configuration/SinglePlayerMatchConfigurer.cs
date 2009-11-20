@@ -32,7 +32,7 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new CommandPipeline();
+            CommandPipeline pipeline = new CommandPipeline(world);
             pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
             pipeline.AddFilter(new CommandTextLogger());
 

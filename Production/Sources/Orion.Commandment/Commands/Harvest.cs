@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Orion.GameLogic;
 using HarvestTask = Orion.GameLogic.Tasks.Harvest;
+using System.Collections.ObjectModel;
 
 namespace Orion.Commandment.Commands
 {
@@ -11,43 +12,43 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> harvesters;
-        private readonly ResourceNode node;
+        private readonly ReadOnlyCollection<Handle> harvesterHandles;
+        private readonly Handle resourceNodeHandle;
         #endregion
 
-        #region Contructors
-        public Harvest(Faction faction, IEnumerable<Unit> harvesters, ResourceNode node)
-            :base(faction)
+        #region Constructors
+        public Harvest(Handle factionHandle, IEnumerable<Handle> harvestersHandles, Handle resourceNodeHandle)
+            : base(factionHandle)
         {
-            this.harvesters = harvesters.Distinct().ToList();
-            this.node = node;
+            Argument.EnsureNotNull(harvestersHandles, "harvestersHandles");
+            this.harvesterHandles = harvestersHandles.Distinct().ToList().AsReadOnly();
+            this.resourceNodeHandle = resourceNodeHandle;
         }
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get
-            {
-                foreach (Unit unit in harvesters)
-                    yield return unit;
-                yield return node;
-            }
+            get { return harvesterHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit harvester in harvesters)
+            Argument.EnsureNotNull(world, "world");
+
+            ResourceNode resourceNode = (ResourceNode)world.Entities.FindFromHandle(resourceNodeHandle);
+            foreach (Handle harvesterHandle in harvesterHandles)
             {
-                harvester.Task = new HarvestTask(harvester, node);
+                Unit harvester = (Unit)world.Entities.FindFromHandle(harvesterHandle);
+                harvester.Task = new HarvestTask(harvester, resourceNode);
             }
         }
 
         public override string ToString()
         {
-            return "[{0}] harvest {1}".FormatInvariant(harvesters.ToCommaSeparatedValues(), node);
+            return "[{0}] harvest {1}".FormatInvariant(harvesterHandles.ToCommaSeparatedValues(), resourceNodeHandle);
         }
         #endregion
         #endregion
@@ -63,19 +64,17 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Harvest command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.node.Handle.Value);
-                writer.Write(command.harvesters.Count);
-                foreach (Unit unit in command.harvesters)
-                    writer.Write(unit.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.harvesterHandles);
+                WriteHandle(writer, command.resourceNodeHandle);
             }
 
-            protected override Harvest DeserializeData(BinaryReader reader, World world)
+            protected override Harvest DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                ResourceNode node = ReadResourceNode(reader, world);
-                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
-                return new Harvest(sourceFaction, units, node);
+                Handle factionHandle = ReadHandle(reader);
+                var harvesterHandles = ReadLengthPrefixedHandleArray(reader);
+                Handle resourceNodeHandle = ReadHandle(reader);
+                return new Harvest(factionHandle, harvesterHandles, resourceNodeHandle);
             }
             #endregion
             #endregion

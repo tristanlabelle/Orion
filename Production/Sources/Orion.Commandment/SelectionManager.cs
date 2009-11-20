@@ -107,13 +107,12 @@ namespace Orion.Commandment
 
         private void OnSelectionChange()
         {
-            selectedUnits.Sort((a, b) => a.Type.ID.CompareTo(b.Type.ID));
+            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
             if (selectedUnits.Count > MaxSelectedUnits)
                 selectedUnits.RemoveRange(MaxSelectedUnits, selectedUnits.Count - MaxSelectedUnits);
             GenericEventHandler<SelectionManager> handler = SelectionChanged;
             if (handler != null) handler(this);
         }
-
         #endregion
     }
 }

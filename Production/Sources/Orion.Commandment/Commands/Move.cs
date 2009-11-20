@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using OpenTK.Math;
@@ -17,63 +18,43 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> units;
+        private readonly ReadOnlyCollection<Handle> unitHandles;
         private readonly Vector2 destination;
         #endregion
         
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="Move"/> command from the <see cref="Faction"/> that
-        /// created the command, the <see cref="Unit"/>s involved and the destination to be reached.
-        /// </summary>
-        /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
-        /// <param name="units">A sequence of <see cref="Unit"/>s involved in this command.</param>
-        /// <param name="destination">The location of the destination of the movement.</param>
-        public Move(Faction faction, IEnumerable<Unit> units, Vector2 destination)
-            : base(faction)
+        public Move(Handle factionHandle, IEnumerable<Handle> unitHandles, Vector2 destination)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNullNorEmpty(units, "unitsToMove");
-            if (units.Any(unit => unit.Faction != base.SourceFaction))
-                throw new ArgumentException("Expected all units to be from the source faction.", "units");
-            
-            this.units = units.Distinct().ToList();
+            Argument.EnsureNotNullNorEmpty(unitHandles, "unitsToMove");
+
+            this.unitHandles = unitHandles.Distinct().ToList().AsReadOnly();
             this.destination = destination;
         }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the sequence of <see cref="Unit"/>s participating in this command.
-        /// </summary>
-        public IEnumerable<Unit> Units
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return units; }
-        }
-
-        /// <summary>
-        /// Gets the location of the destination of this movement.
-        /// </summary>
-        public Vector2 Destination
-        {
-            get { return destination; }
-        }
-
-        public override IEnumerable<Entity> EntitiesInvolved
-        {
-            get { return units.Cast<Entity>(); }
+            get { return unitHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit unit in units)
+            Argument.EnsureNotNull(world, "world");
+
+            foreach (Handle unitHandle in unitHandles)
+            {
+                Unit unit = (Unit)world.Entities.FindFromHandle(unitHandle);
                 unit.Task = new MoveTask(unit, destination);
+            }
         }
 
         public override string ToString()
         {
-            return "[{0}] move to {1}".FormatInvariant(units.ToCommaSeparatedValues(), destination);
+            return "[{0}] move to {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), destination);
         }
         #endregion
         #endregion
@@ -89,22 +70,20 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Move command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.units.Count);
-                foreach (Unit unit in command.Units)
-                    writer.Write(unit.Handle.Value);
-                writer.Write(command.Destination.X);
-                writer.Write(command.Destination.Y);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
+                writer.Write(command.destination.X);
+                writer.Write(command.destination.Y);
             }
 
-            protected override Move DeserializeData(BinaryReader reader, World world)
+            protected override Move DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
+                Handle factionHandle = ReadHandle(reader);
+                var unitHandles = ReadLengthPrefixedHandleArray(reader);
                 float x = reader.ReadSingle();
                 float y = reader.ReadSingle();
                 Vector2 destination = new Vector2(x, y);
-                return new Move(sourceFaction, units, destination);
+                return new Move(factionHandle, unitHandles, destination);
             }
             #endregion
             #endregion

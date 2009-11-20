@@ -126,7 +126,7 @@ namespace Orion.Commandment
             List<Unit> unitsToMove = units.Where(unit => unit.IsIdle).ToList();
 
             if(unitsToMove.Count > 0)
-                commands.Add(new Move(Faction, units, position));
+                commands.Add(new Move(Faction.Handle, units.Select(unit => unit.Handle), position));
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Orion.Commandment
             }
 
             if (trainers.Count > 0)
-                commands.Add(new Train(trainers, toTrain, Faction));
+                commands.Add(new Train(Faction.Handle, trainers.Select(unit => unit.Handle), toTrain.Handle));
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Orion.Commandment
             }
 
             if (attackers.Count > 0 && target != null)
-                commands.Add(new Commands.Attack(Faction, attackers, target));
+                commands.Add(new Commands.Attack(Faction.Handle, attackers.Select(unit => unit.Handle), target.Handle));
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Orion.Commandment
                 }
 
                 if (harvesters.Count > 0)
-                    commands.Add(new Commands.Harvest(Faction, harvesters, node));
+                    commands.Add(new Commands.Harvest(Faction.Handle, harvesters.Select(unit => unit.Handle), node.Handle));
             }
         }
 
@@ -265,7 +265,7 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                commands.Add(new Build(builders.ElementAt(i), Positions.ElementAt(i), toBuild));
+                commands.Add(new Build(Faction.Handle, builders[i].Handle, toBuild.Handle, Positions[i]));
             }
         }
 

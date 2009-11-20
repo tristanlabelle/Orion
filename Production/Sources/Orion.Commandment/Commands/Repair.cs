@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Orion.GameLogic;
@@ -15,71 +16,44 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> units;
-        private readonly Unit building;
+        private readonly ReadOnlyCollection<Handle> unitHandles;
+        private readonly Handle targetHandle;
         #endregion
 
         #region Constructors
-        public Repair(Faction faction, IEnumerable<Unit> units, Unit building)
-            : base(faction)
+        public Repair(Handle factionHandle, IEnumerable<Handle> units, Handle targetHandle)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(building, "building");
             Argument.EnsureNotNullNorEmpty(units, "units");
 
-            this.building = building;
-            this.units = units.Distinct().ToList();
-
-            if (this.units.Any(unit => unit.Faction != base.SourceFaction))
-                throw new ArgumentException("Expected all units to be from the source faction.", "units");
+            this.unitHandles = units.Distinct().ToList().AsReadOnly();
+            this.targetHandle = targetHandle;
         }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the number of <see cref="Unit"/>s.
-        /// </summary>
-        public int UnitsCount
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return units.Count; }
-        }
-
-        /// <summary>
-        /// Gets the sequence of <see cref="Unit"/>s participating in this command.
-        /// </summary>
-        public IEnumerable<Unit> Units
-        {
-            get { return units; }
-        }
-
-        /// <summary>
-        /// Gets the target <see cref="Unit"/> to be repaired.
-        /// </summary>
-        public Unit Building
-        {
-            get { return building; }
-        }
-
-        public override IEnumerable<Entity> EntitiesInvolved
-        {
-            get
-            {
-                foreach (Unit unit in units)
-                    yield return unit;
-                yield return building;
-            }
+            get { return unitHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit unit in units)
-                unit.Task = new RepairTask(unit, building);
+            Argument.EnsureNotNull(world, "world");
+
+            Unit target = (Unit)world.Entities.FindFromHandle(targetHandle);
+            foreach (Handle unitHandle in unitHandles)
+            {
+                Unit unit = (Unit)world.Entities.FindFromHandle(unitHandle);
+                unit.Task = new RepairTask(unit, target);
+            }
         }
 
         public override string ToString()
         {
-            return "[{0}] repair {1}".FormatInvariant(units.ToCommaSeparatedValues(), building);
+            return "[{0}] repair {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), targetHandle);
         }
         #endregion
         #endregion
@@ -95,19 +69,17 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Repair command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.UnitsCount);
-                foreach (Unit unit in command.Units)
-                    writer.Write(unit.Handle.Value);
-                writer.Write(command.Building.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
+                WriteHandle(writer, command.targetHandle);
             }
 
-            protected override Repair DeserializeData(BinaryReader reader, World world)
+            protected override Repair DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
-                Unit building = ReadUnit(reader, world);
-                return new Repair(sourceFaction, units, building);
+                Handle factionHandle = ReadHandle(reader);
+                var unitHandles = ReadLengthPrefixedHandleArray(reader);
+                Handle targetHandle = ReadHandle(reader);
+                return new Repair(factionHandle, unitHandles, targetHandle);
             }
             #endregion
             #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Orion.GameLogic;
@@ -15,84 +16,45 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> attackers;
-        private readonly Unit target; 
+        private readonly ReadOnlyCollection<Handle> attackerHandles;
+        private readonly Handle targetHandle; 
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="Attack"/> command from the faction which
-        /// created the command and a sequence of <see cref="Unit"/>s for which the
-        /// current <see cref="Task"/> should be attacked. 
-        /// </summary>
-        /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
-        /// <param name="attackers">
-        /// The <see cref="Unit"/>s of that <see cref="Faction"/> which should attack.
-        /// </param>
-        /// <param name="target">The target <see cref="Unit"/> to be attacked.</param>
-        public Attack(Faction faction, IEnumerable<Unit> attackers, Unit target)
-            : base(faction)
+        public Attack(Handle factionHandle, IEnumerable<Handle> attackerHandles, Handle targetHandle)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(target, "target");
-            Argument.EnsureNotNullNorEmpty(attackers, "attackers");
+            Argument.EnsureNotNull(attackerHandles, "attackerHandles");
 
-            this.target = target;
-            this.attackers = attackers.Distinct().ToList();
-
-            if (this.attackers.Any(unit => unit.Faction != base.SourceFaction))
-                throw new ArgumentException("Expected all units to be from the source faction.", "units");
-
-            if (this.attackers.Contains(target))
-                throw new ArgumentException("The attack target cannot be one of the attackers.", "target");
+            this.attackerHandles = attackerHandles.Distinct().ToList().AsReadOnly();
+            this.targetHandle = targetHandle;
         }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the number of attacking <see cref="Unit"/>s.
-        /// </summary>
-        public int AttackerCount
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return attackers.Count; }
-        }
-
-        /// <summary>
-        /// Gets the sequence of attacking <see cref="Unit"/>s.
-        /// </summary>
-        public IEnumerable<Unit> Attackers
-        {
-            get { return attackers; }
-        }
-
-        /// <summary>
-        /// Gets the target <see cref="Unit"/> to be attacked.
-        /// </summary>
-        public Unit Target
-        {
-            get { return target; }
-        }
-
-        public override IEnumerable<Entity> EntitiesInvolved
-        {
-            get
-            {
-                foreach (Unit attacker in attackers)
-                    yield return attacker;
-                yield return target;
-            }
+            get { return attackerHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit attacker in attackers)
+            Argument.EnsureNotNull(world, "world");
+
+            Unit target = (Unit)world.Entities.FindFromHandle(targetHandle);
+
+            foreach (Handle attackerHandle in attackerHandles)
+            {
+                Unit attacker = (Unit)world.Entities.FindFromHandle(attackerHandle);
                 attacker.Task = new AttackTask(attacker, target);
+            }
         }
 
         public override string ToString()
         {
-            return "[{0}] attack {1}".FormatInvariant(attackers.ToCommaSeparatedValues(), target);
+            return "[{0}] attack {1}".FormatInvariant(attackerHandles.ToCommaSeparatedValues(), targetHandle);
         }
         #endregion
         #endregion
@@ -108,19 +70,17 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Attack command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.AttackerCount);
-                foreach (Unit attacker in command.Attackers)
-                    writer.Write(attacker.Handle.Value);
-                writer.Write(command.Target.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.attackerHandles);
+                WriteHandle(writer, command.targetHandle);
             }
 
-            protected override Attack DeserializeData(BinaryReader reader, World world)
+            protected override Attack DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
-                Unit target = ReadUnit(reader, world);
-                return new Attack(sourceFaction, attackers, target);
+                Handle factionHandle = ReadHandle(reader);
+                var attackerHandles = ReadLengthPrefixedHandleArray(reader);
+                Handle targetHandle = ReadHandle(reader);
+                return new Attack(factionHandle, attackerHandles, targetHandle);
             }
             #endregion
             #endregion

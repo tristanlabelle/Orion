@@ -7,7 +7,7 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    public class Message : Command
+    public sealed class Message : Command
     {
         #region Instance
         #region Fields
@@ -15,8 +15,8 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Constructors
-        public Message(Faction source, string message)
-            : base(source)
+        public Message(Handle factionHandle, string message)
+            : base(factionHandle)
         {
             Argument.EnsureNotNull(message, "message");
             value = message;
@@ -24,21 +24,18 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
             get { yield break; }
         } 
         #endregion
 
         #region Methods
-        public override void Execute()
-        {
-
-        }
+        public override void Execute(World world) { }
 
         public override string ToString()
         {
-            return "<{0}> {1}".FormatInvariant(SourceFaction, value);
+            return "\"{1}\" message".FormatInvariant(value);
         }
         #endregion
         #endregion
@@ -51,14 +48,15 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Message command, BinaryWriter writer)
             {
+                WriteHandle(writer, command.FactionHandle);
                 writer.Write(command.value);
             }
 
-            protected override Message DeserializeData(BinaryReader reader, World world)
+            protected override Message DeserializeData(BinaryReader reader)
             {
-                // todo
-                // somehow obtain the faction from here
-                return new Message(null, reader.ReadString());
+                Handle factionHandle = ReadHandle(reader);
+                string text = reader.ReadString();
+                return new Message(factionHandle, text);
             }
             #endregion
             #endregion

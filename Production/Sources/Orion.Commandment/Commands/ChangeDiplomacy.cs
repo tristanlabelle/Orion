@@ -12,40 +12,40 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly Faction faction;
-        private readonly Faction otherFaction;
+        private readonly Handle otherFactionHandle;
         private readonly DiplomaticStance diplomaticStance;
         #endregion
 
         #region Constructors
-        public ChangeDiplomacy(Faction faction, Faction otherFaction, DiplomaticStance diplomaticStance)
-            : base(faction)
+        public ChangeDiplomacy(Handle factionHandle, Handle otherFactionHandle, DiplomaticStance diplomaticStance)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(otherFaction, "otherFaction");
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
-            this.faction = faction;
-            this.otherFaction = otherFaction;
+            this.otherFactionHandle = otherFactionHandle;
             this.diplomaticStance = diplomaticStance;
         }
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
             get { yield break; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            faction.SetDiplomaticStance(faction, diplomaticStance);
+            Argument.EnsureNotNull(world, "world");
+
+            Faction faction = world.FindFactionFromHandle(FactionHandle);
+            Faction otherFaction = world.FindFactionFromHandle(otherFactionHandle);
+            faction.SetDiplomaticStance(otherFaction, diplomaticStance);
         }
 
         public override string ToString()
         {
-            return "[{0}] {2} to {1}".FormatInvariant(faction, diplomaticStance, otherFaction);
+            return "[{0}] {2} to {1}".FormatInvariant(FactionHandle, diplomaticStance, otherFactionHandle);
         }
         #endregion
         #endregion
@@ -61,18 +61,18 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(ChangeDiplomacy command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.otherFaction.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteHandle(writer, command.otherFactionHandle);
                 writer.Write((byte)command.diplomaticStance);
             }
 
-            protected override ChangeDiplomacy DeserializeData(BinaryReader reader, World world)
+            protected override ChangeDiplomacy DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                Faction otherFaction = ReadFaction(reader, world);
-                DiplomaticStance newStance = (DiplomaticStance)reader.ReadByte();
+                Handle factionHandle = ReadHandle(reader);
+                Handle otherFactionHandle = ReadHandle(reader);
+                DiplomaticStance stance = (DiplomaticStance)reader.ReadByte();
 
-                return new ChangeDiplomacy(sourceFaction, otherFaction, newStance);
+                return new ChangeDiplomacy(factionHandle, otherFactionHandle, stance);
             }
             #endregion
             #endregion

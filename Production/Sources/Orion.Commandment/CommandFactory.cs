@@ -54,7 +54,7 @@ namespace Orion.Commandment
             if (serializerIndex >= serializers.Count) throw new InvalidDataException("Unknown command type identifier.");
             CommandSerializer serializer = serializers[serializerIndex];
             
-            return serializer.Deserialize(reader, world);
+            return serializer.Deserialize(reader);
         }
 
         /// <summary>

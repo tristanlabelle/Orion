@@ -21,7 +21,7 @@ namespace Orion.GameLogic
     public sealed class UnitType
     {
         #region Fields
-        private readonly int id;
+        private readonly Handle handle;
         private readonly string name;
         private readonly ReadOnlyCollection<Skill> skills;
         private readonly Size size;
@@ -34,11 +34,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        internal UnitType(int id, UnitTypeBuilder builder)
+        internal UnitType(Handle handle, UnitTypeBuilder builder)
         {
             Argument.EnsureNotNull(builder, "builder");
 
-            this.id = id;
+            this.handle = handle;
             this.name = builder.Name;
             this.skills = builder.Skills.ToList().AsReadOnly();
             this.size = builder.Size;
@@ -51,9 +51,6 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        #region Events
-        #endregion
-
         #region Properties
         public int FoodCost
         {
@@ -61,9 +58,9 @@ namespace Orion.GameLogic
         }
 
         #region Identification
-        public int ID
+        public Handle Handle
         {
-            get { return id; }
+            get { return handle; }
         } 
 
         public string Name

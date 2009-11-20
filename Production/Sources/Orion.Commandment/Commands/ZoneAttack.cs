@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using OpenTK.Math;
@@ -16,76 +17,43 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> attackers;
+        private readonly ReadOnlyCollection<Handle> attackerHandles;
         private readonly Vector2 destination; 
         #endregion
 
         #region Constructors
-
-        /// <summary>
-        /// Initializes a new <see cref="ZoneAttack"/> command from the faction which
-        /// created the command and a sequence of <see cref="Unit"/>s for which the
-        /// current <see cref="Task"/> should be attacked. 
-        /// </summary>
-        /// <param name="faction">The <see cref="Faction"/> that created this command.</param>
-        /// <param name="attackers">The <see cref="Unit"/>s of that <see cref="Faction"/> which should attack.</param>
-        /// <param name="destination">The location of the destination of the movement.</param>
-        public ZoneAttack(Faction faction, IEnumerable<Unit> attackers, Vector2 destination)
-            : base(faction)
+        public ZoneAttack(Handle factionHandle, IEnumerable<Handle> attackerHandles, Vector2 destination)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(destination, "destination");
-            Argument.EnsureNotNullNorEmpty(attackers, "attackers");
+            Argument.EnsureNotNullNorEmpty(attackerHandles, "attackerHandles");
 
+            this.attackerHandles = attackerHandles.Distinct().ToList().AsReadOnly();
             this.destination = destination;
-            this.attackers = attackers.Distinct().ToList();
-
-            if (this.attackers.Any(unit => unit.Faction != base.SourceFaction))
-                throw new ArgumentException("Expected all units to be from the source faction.", "units");
         }
-        
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the number of attacking <see cref="Unit"/>s.
-        /// </summary>
-        public int AttackerCount
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return attackers.Count; }
-        }
-
-        /// <summary>
-        /// Gets the sequence of attacking <see cref="Unit"/>s.
-        /// </summary>
-        public IEnumerable<Unit> Attackers
-        {
-            get { return attackers; }
-        }
-
-        /// <summary>
-        /// Gets the destination of this movement.
-        /// </summary>
-        public Vector2 Destination
-        {
-            get { return destination; }
-        }
-
-        public override IEnumerable<Entity> EntitiesInvolved
-        {
-            get { return attackers.Cast<Entity>(); }
+            get { return attackerHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit attacker in attackers)
+            Argument.EnsureNotNull(world, "world");
+
+            foreach (Handle attackerHandle in attackerHandles)
+            {
+                Unit attacker = (Unit)world.Entities.FindFromHandle(attackerHandle);
                 attacker.Task = new ZoneAttackTask(attacker, destination);
+            }
         }
 
         public override string ToString()
         {
-            return "[{0}] zone attack to {1}".FormatInvariant(attackers.ToCommaSeparatedValues(), destination);
+            return "[{0}] zone attack to {1}".FormatInvariant(attackerHandles.ToCommaSeparatedValues(), destination);
         }
         #endregion
         #endregion
@@ -101,22 +69,20 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(ZoneAttack command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.AttackerCount);
-                foreach (Unit unit in command.Attackers)
-                    writer.Write(unit.Handle.Value);
-                writer.Write(command.Destination.X);
-                writer.Write(command.Destination.Y);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.attackerHandles);
+                writer.Write(command.destination.X);
+                writer.Write(command.destination.Y);
             }
 
-            protected override ZoneAttack DeserializeData(BinaryReader reader, World world)
+            protected override ZoneAttack DeserializeData(BinaryReader reader)
             {
-                Faction sourceFaction = ReadFaction(reader, world);
-                Unit[] attackers = ReadLengthPrefixedUnitArray(reader, world);
+                Handle factionHandle = ReadHandle(reader);
+                var attackerHandles = ReadLengthPrefixedHandleArray(reader);
                 float x = reader.ReadSingle();
                 float y = reader.ReadSingle();
                 Vector2 destination = new Vector2(x, y);
-                return new ZoneAttack(sourceFaction, attackers, destination);
+                return new ZoneAttack(factionHandle, attackerHandles, destination);
             }
             #endregion
             #endregion

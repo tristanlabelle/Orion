@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Orion.GameLogic;
+using System.Diagnostics;
 
 namespace Orion.Commandment.Pipeline
 {
@@ -10,6 +12,15 @@ namespace Orion.Commandment.Pipeline
     {
         #region Fields
         private readonly Queue<Command> commandQueue = new Queue<Command>();
+        private readonly World world;
+        #endregion
+
+        #region Constructors
+        public CommandExecutor(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+            this.world = world;
+        }
         #endregion
 
         #region Methods
@@ -24,7 +35,14 @@ namespace Orion.Commandment.Pipeline
             while (commandQueue.Count > 0)
             {
                 Command command = commandQueue.Dequeue();
-                command.Execute();
+                try
+                {
+                    command.Execute(world);
+                }
+                catch
+                {
+                    Debug.Fail("A command failed to execute.");
+                }
             }
         }
         #endregion

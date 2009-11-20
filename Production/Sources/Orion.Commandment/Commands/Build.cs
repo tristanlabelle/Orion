@@ -11,46 +11,41 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly Unit builder;
+        private readonly Handle builderHandle;
         private readonly Vector2 position;
-        private readonly UnitType buildingType;
+        private readonly Handle buildingTypeHandle;
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Command implemented to build.
-        /// </summary>
-        /// <param name="builder">The Builder</param>
-        /// <param name="position">Where To build</param>
-        /// <param name="buildingType">What to build</param>
-        public Build(Unit builder, Vector2 position, UnitType buildingType)
-            : base(builder.Faction)
+        public Build(Handle factionHandle, Handle builderHandle, Handle buildingTypeHandle, Vector2 position)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(builder, "builder");
-            Argument.EnsureNotNull(buildingType, "buildingType");
-            this.builder = builder;
-            this.buildingType = buildingType;
-            Argument.EnsureNotNull(position, "position");
+            this.builderHandle = builderHandle;
+            this.buildingTypeHandle = buildingTypeHandle;
             this.position = position;
         }
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { yield return builder; }
+            get { yield return builderHandle; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            builder.Task = new BuildTask(builder, position, buildingType);
+            Argument.EnsureNotNull(world, "world");
+
+            Unit builder = (Unit)world.Entities.FindFromHandle(builderHandle);
+            UnitType buildingType = (UnitType)world.UnitTypes.FromHandle(buildingTypeHandle);
+            builder.Task = new BuildTask(builder, buildingType, position);
         }
 
         public override string ToString()
         {
-            return "{0} build {1} at {2}".FormatInvariant(builder, buildingType, position);
+            return "{0} build {1} at {2}".FormatInvariant(builderHandle, buildingTypeHandle, position);
         }
         #endregion
         #endregion
@@ -66,18 +61,22 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Build command, BinaryWriter writer)
             {
-                writer.Write(command.builder.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteHandle(writer, command.builderHandle);
+                WriteHandle(writer, command.buildingTypeHandle);
                 writer.Write(command.position.X);
                 writer.Write(command.position.Y);
-                writer.Write(command.buildingType.ID);
             }
 
-            protected override Build DeserializeData(BinaryReader reader, World world)
+            protected override Build DeserializeData(BinaryReader reader)
             {
-                Unit constructor = ReadUnit(reader, world);
-                Vector2 position = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                UnitType unitTobuild = ReadUnitType(reader, world);
-                return new Build(constructor, position, unitTobuild);
+                Handle factionHandle = ReadHandle(reader);
+                Handle builderHandle = ReadHandle(reader);
+                Handle buildingTypeHandle = ReadHandle(reader);
+                float x = reader.ReadSingle();
+                float y = reader.ReadSingle();
+                Vector2 position = new Vector2(x, y);
+                return new Build(factionHandle, builderHandle, buildingTypeHandle, position);
             }
             #endregion
             #endregion

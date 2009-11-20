@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System;
+using Orion.GameLogic;
 
 namespace Orion.Commandment.Pipeline
 {
@@ -28,11 +29,8 @@ namespace Orion.Commandment.Pipeline
             this.sink = sink;
         }
 
-        /// <summary>
-        /// Initializes a new <see cref="CommandPipeline"/>, assuming it ends with a <see cref="CommandExecutor"/>.
-        /// </summary>
-        public CommandPipeline()
-            : this(new CommandExecutor()) { }
+        public CommandPipeline(World world)
+            : this(new CommandExecutor(world)) { }
         #endregion
 
         #region Methods

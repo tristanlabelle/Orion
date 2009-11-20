@@ -125,10 +125,10 @@ namespace Orion.GameLogic
             size = new Size(1, 1);
         }
 
-        public UnitType Build(int id)
+        public UnitType Build(Handle handle)
         {
             if (name == null) throw new InvalidOperationException("Cannot create a new UnitType until a name is set.");
-            return new UnitType(id, this);
+            return new UnitType(handle, this);
         }
         #endregion
     }

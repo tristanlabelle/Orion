@@ -12,37 +12,37 @@ namespace Orion.Commandment
     public abstract class Command
     {
         #region Fields
-        private readonly Faction sourceFaction;
+        private readonly Handle factionHandle;
         #endregion
 
         #region Constructors
-        protected Command(Faction sourceFaction)
+        protected Command(Handle factionHandle)
         {
-            Argument.EnsureNotNull(sourceFaction, "sourceFaction");
-            this.sourceFaction = sourceFaction;
+            this.factionHandle = factionHandle;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the <see cref="Faction"/> that emitted this <see cref="Command"/>.
+        /// Gets the handle of the faction which created this command.
         /// </summary>
-        public Faction SourceFaction
+        public Handle FactionHandle
         {
-            get { return sourceFaction; }
+            get { return factionHandle; }
         }
 
         /// <summary>
-        /// Gets a sequence of <see cref="Entity">entities</see> which participate in this command.
+        /// Gets a sequence of handles to <see cref="Entity">entities</see> executing in this command.
         /// </summary>
-        public abstract IEnumerable<Entity> EntitiesInvolved { get; }
+        public abstract IEnumerable<Handle> ExecutingEntityHandles { get; }
         #endregion
 
         #region Methods
         /// <summary>
-        /// Executes this <see cref="Command"/>.
+        /// Executes this command.
         /// </summary>
-        public abstract void Execute();
+        /// <param name="world">The <see cref="World"/> in which the command should be executed.</param>
+        public abstract void Execute(World world);
 
         public abstract override string ToString();
         #endregion

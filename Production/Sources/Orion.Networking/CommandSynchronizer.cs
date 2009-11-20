@@ -23,14 +23,14 @@ namespace Orion.Networking
         private const int frameTimesQueueLength = 0x20;
         private const int initialFramesCount = 6;
         #endregion
+
+        private readonly World world;
         private readonly SafeTransporter transporter;
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> transporterReceived;
         private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> transporterTimeout;
 
         private readonly List<IPv4EndPoint> peerEndPoints;
         private readonly Dictionary<IPv4EndPoint, PeerState> peerStates = new Dictionary<IPv4EndPoint, PeerState>();
-
-        private readonly List<Entity> deadEntities = new List<Entity>();
 
         /// <summary>
         /// The commands that have been passed to this CommandSynchroniser by the pipeline.
@@ -57,8 +57,6 @@ namespace Orion.Networking
 
         private readonly CommandFactory serializer;
 
-        private readonly GenericEventHandler<EntityRegistry, Entity> entityDied;
-
         private int commandFrameNumber = -1;
         private int frameNumber = -1;
         private int lastCommandFrame = -1;
@@ -73,6 +71,7 @@ namespace Orion.Networking
             Argument.EnsureNotNull(transporter, "transporter");
             Argument.EnsureNotNull(peerEndPoints, "peerEndPoints");
 
+            this.world = world;
             this.transporter = transporter;
 
             this.serializer = new CommandFactory(world);
@@ -83,9 +82,6 @@ namespace Orion.Networking
 
             foreach (IPv4EndPoint peerEndPoint in this.peerEndPoints)
                 peerStates.Add(peerEndPoint, PeerState.ReceivedCommands | PeerState.ReceivedDone);
-
-            entityDied = EntityDied;
-            world.Entities.Died += entityDied;
 
             transporterReceived = TransporterReceived;
             transporter.Received += transporterReceived;
@@ -170,10 +166,17 @@ namespace Orion.Networking
         private void ExecuteCurrentFrameCommands()
         {
             // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
-            commandsToBeFlushed.Sort((a, b) => a.SourceFaction.Name.CompareTo(b.SourceFaction.Name));
+            commandsToBeFlushed.Sort(CommandSortingComparer);
             foreach (Command command in commandsToBeFlushed)
                 Flush(command);
             commandsToBeFlushed.Clear();
+        }
+
+        private int CommandSortingComparer(Command a, Command b)
+        {
+            Faction factionA = world.FindFactionFromHandle(a.FactionHandle);
+            Faction factionB = world.FindFactionFromHandle(b.FactionHandle);
+            return factionA.Name.CompareTo(factionB.Name);
         }
 
         private void DeserializeNeededFuturePackets()
@@ -201,11 +204,9 @@ namespace Orion.Networking
                     writer.Write(commandFrameNumber);
                     foreach (Command command in localCommands)
                     {
-                        if (command.EntitiesInvolved.Intersect(deadEntities).Any()) continue;
                         serializer.Serialize(command, writer);
                     }
                 }
-                deadEntities.Clear();
                 transporter.SendTo(stream.ToArray(), peerStates.Keys);
             }
         }
@@ -300,12 +301,6 @@ namespace Orion.Networking
                     }
                 }
             }
-        }
-
-        private void EntityDied(EntityRegistry registry, Entity deadEntity)
-        {
-            Unit deadUnit = deadEntity as Unit;
-            if (deadUnit != null) deadEntities.Add(deadUnit);
         }
         #endregion
         #endregion

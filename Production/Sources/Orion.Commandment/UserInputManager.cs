@@ -107,11 +107,11 @@ namespace Orion.Commandment
             }
         }
 
-
-        public void HandeMouseDoubleClick(object responder, MouseEventArgs args)
+        public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
         {
 
         }
+
         public void HandleMouseUp(object responder, MouseEventArgs args)
         {
             if (!selectionStart.HasValue) return;
@@ -168,9 +168,10 @@ namespace Orion.Commandment
 
                 // cheats
                 case Keys.F10:
-                    commander.Faction.AladdiumAmount = 10000;
-                    commander.Faction.AlageneAmount = 10000;
+                    commander.Faction.AladdiumAmount += 10000;
+                    commander.Faction.AlageneAmount += 10000;
                     break;
+
                 case Keys.F11: commander.Faction.FogOfWar.Reveal(); break;
                 case Keys.F12: commander.Faction.FogOfWar.Disable(); break;
 

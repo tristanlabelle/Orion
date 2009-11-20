@@ -21,7 +21,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-        public Build(Unit builder, Vector2 buildPosition, UnitType buildingType)
+        public Build(Unit builder, UnitType buildingType, Vector2 buildPosition)
         {
             Argument.EnsureNotNull(builder, "builder");
             if (!builder.HasSkill<Skills.Build>())

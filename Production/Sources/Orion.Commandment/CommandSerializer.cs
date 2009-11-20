@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Orion.GameLogic;
 
 namespace Orion.Commandment
@@ -30,6 +32,18 @@ namespace Orion.Commandment
         /// <param name="command">The <see cref="Command"/> to be serialized.</param>
         /// <param name="writer">A binary writer to be used to write serialized data.</param>
         internal abstract void Serialize(Command command, BinaryWriter writer);
+
+        protected static void WriteHandle(BinaryWriter writer, Handle handle)
+        {
+            writer.Write(handle.Value);
+        }
+
+        protected static void WriteLengthPrefixedHandleArray(BinaryWriter writer, IEnumerable<Handle> handles)
+        {
+            writer.Write(handles.Count());
+            foreach (Handle handle in handles)
+                WriteHandle(writer, handle);
+        }
         #endregion
 
         #region Deserialization
@@ -41,7 +55,7 @@ namespace Orion.Commandment
         /// The <see cref="World"/> that is the context of the deserialized <see cref="Command"/>.
         /// </param>
         /// <returns>The <see cref="Command"/> that was deserialized.</returns>
-        internal abstract Command Deserialize(BinaryReader reader, World world);
+        internal abstract Command Deserialize(BinaryReader reader);
 
         protected static Handle ReadHandle(BinaryReader reader)
         {
@@ -49,45 +63,7 @@ namespace Orion.Commandment
             return new Handle(handleValue);
         }
 
-        protected static Faction ReadFaction(BinaryReader reader, World world)
-        {
-            Handle handle = ReadHandle(reader);
-            Faction faction = world.FindFactionFromHandle(handle);
-            if (faction == null) throw new InvalidDataException("Invalid faction identifier.");
-            return faction;
-        }
-
-        protected static Entity ReadEntity(BinaryReader reader, World world)
-        {
-            Handle handle = ReadHandle(reader);
-            Entity entity = world.Entities.FindFromHandle(handle);
-            if (entity == null) throw new InvalidDataException("Invalid entity identifier.");
-            return entity;
-        }
-
-        protected static Unit ReadUnit(BinaryReader reader, World world)
-        {
-            Unit unit = ReadEntity(reader, world) as Unit;
-            if (unit == null) throw new InvalidDataException("Entity identifier doesn't refer to an unit.");
-            return unit;
-        }
-
-        protected static ResourceNode ReadResourceNode(BinaryReader reader, World world)
-        {
-            ResourceNode node = ReadEntity(reader, world) as ResourceNode;
-            if (node == null) throw new InvalidDataException("Entity identifier doesn't refer to a resource node.");
-            return node;
-        }
-
-        protected static UnitType ReadUnitType(BinaryReader reader, World world)
-        {
-            int unitTypeID = reader.ReadInt32();
-            UnitType unitType = world.UnitTypes.FromID(unitTypeID);
-            if (unitType == null) throw new InvalidDataException("Invalid unitType identifier.");
-            return unitType;
-        }
-
-        protected static Unit[] ReadLengthPrefixedUnitArray(BinaryReader reader, World world)
+        protected static Handle[] ReadLengthPrefixedHandleArray(BinaryReader reader)
         {
             int unitCount = reader.ReadInt32();
             if (unitCount <= 0)
@@ -96,9 +72,9 @@ namespace Orion.Commandment
                     "Invalid number of units: {0}.".FormatInvariant(unitCount));
             }
 
-            Unit[] units = new Unit[unitCount];
+            Handle[] units = new Handle[unitCount];
             for (int i = 0; i < unitCount; ++i)
-                units[i] = ReadUnit(reader, world);
+                units[i] = ReadHandle(reader);
 
             return units;
         }
@@ -131,16 +107,14 @@ namespace Orion.Commandment
             SerializeData((TCommand)command, writer);
         }
 
-        internal sealed override Command Deserialize(BinaryReader reader, World world)
+        internal sealed override Command Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
-            Argument.EnsureNotNull(world, "world");
-
-            return DeserializeData(reader, world);
+            return DeserializeData(reader);
         }
 
         protected abstract void SerializeData(TCommand command, BinaryWriter writer);
-        protected abstract TCommand DeserializeData(BinaryReader reader, World world);
+        protected abstract TCommand DeserializeData(BinaryReader reader);
         #endregion
     }
 }

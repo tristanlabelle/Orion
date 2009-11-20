@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
@@ -11,44 +12,39 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> units;
+        private readonly ReadOnlyCollection<Handle> unitHandles;
         #endregion
 
         #region Constructor
-        public Suicide(Faction faction, IEnumerable<Unit> units)
-            : base(faction)
+        public Suicide(Handle factionHandle, IEnumerable<Handle> unitHandles)
+            : base(factionHandle)
         {
-            Argument.EnsureNoneNull(units, "units");
-            this.units = units.ToList();
-            Argument.EnsureNotNullNorEmpty(this.units, "units");
-            if (units.Any(unit => unit.Faction != faction))
-            {
-                throw new ArgumentException(
-                    "One suicided unit isn't part of the faction issuing the command.",
-                    "units");
-            }
+            Argument.EnsureNotNull(unitHandles, "unitHandles");
+            this.unitHandles = unitHandles.Distinct().ToList().AsReadOnly();
         }
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return units.Cast<Entity>(); }
+            get { return unitHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
-            foreach (Unit suicider in units)
+            Argument.EnsureNotNull(world, "world");
+            foreach (Handle unitHandle in unitHandles)
             {
-                suicider.Suicide();
+                Unit unit = (Unit)world.Entities.FindFromHandle(unitHandle);
+                unit.Suicide();
             }
         }
 
         public override string ToString()
         {
-            return "[{0}] suicide".FormatInvariant(units.ToCommaSeparatedValues());
+            return "[{0}] suicide".FormatInvariant(unitHandles.ToCommaSeparatedValues());
         }
         #endregion
         #endregion
@@ -64,15 +60,15 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Suicide command, BinaryWriter writer)
             {
-                writer.Write(command.units.Count);
-                foreach (Unit unit in command.units)
-                    writer.Write(unit.Handle.Value);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
             }
 
-            protected override Suicide DeserializeData(BinaryReader reader, World world)
+            protected override Suicide DeserializeData(BinaryReader reader)
             {
-                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
-                return new Suicide(units[0].Faction, units);
+                Handle factionHandle = ReadHandle(reader);
+                var unitHandles = ReadLengthPrefixedHandleArray(reader);
+                return new Suicide(factionHandle, unitHandles);
             }
             #endregion
             #endregion

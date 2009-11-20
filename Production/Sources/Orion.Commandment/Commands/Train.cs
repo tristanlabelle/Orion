@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -13,43 +14,49 @@ namespace Orion.Commandment.Commands
     {
         #region Instance
         #region Fields
-        private readonly List<Unit> trainers;
-        private readonly UnitType traineeType;
+        private readonly ReadOnlyCollection<Handle> trainerHandles;
+        private readonly Handle traineeTypeHandle;
         #endregion
 
         #region Constructors
-        public Train(IEnumerable<Unit> trainers, UnitType traineeType, Faction faction)
-            : base(faction)
+        public Train(Handle factionHandle, IEnumerable<Handle> trainerHandles, Handle traineeTypeHandle)
+            : base(factionHandle)
         {
-            Argument.EnsureNotNull(traineeType, "traineeType");
-            this.trainers = trainers.ToList();
-            this.traineeType = traineeType;
+            Argument.EnsureNotNull(trainerHandles, "trainerHandles");
+            this.trainerHandles = trainerHandles.Distinct().ToList().AsReadOnly();
+            this.traineeTypeHandle = traineeTypeHandle;
         }
         #endregion
 
         #region Properties
-        public override IEnumerable<Entity> EntitiesInvolved
+        public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { return trainers.Cast<Entity>(); }
+            get { return trainerHandles; }
         }
         #endregion
 
         #region Methods
-        public override void Execute()
+        public override void Execute(World world)
         {
+            Argument.EnsureNotNull(world, "world");
+
             int alageneTotalCost = 0;
             int aladdiumTotalCost = 0;
+
+            Faction faction = world.FindFactionFromHandle(FactionHandle);
+            UnitType traineeType = world.UnitTypes.FromHandle(traineeTypeHandle);
+
             int alageneCost = traineeType.GetBaseStat(UnitStat.AlageneCost);
             int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
-            foreach (Unit building in trainers)
+            foreach (Handle trainerHandle in trainerHandles)
             {
-
-                if (alageneTotalCost + alageneCost <= base.SourceFaction.AlageneAmount
-                   && aladdiumTotalCost + aladdiumCost <= base.SourceFaction.AladdiumAmount)
+                Unit trainer = (Unit)world.Entities.FindFromHandle(trainerHandle);
+                if (alageneTotalCost + alageneCost <= faction.AlageneAmount
+                   && aladdiumTotalCost + aladdiumCost <= faction.AladdiumAmount)
                 {
                     alageneTotalCost += alageneCost;
                     aladdiumTotalCost += aladdiumCost;
-                    building.EnqueueTask(new TrainTask(building, traineeType));
+                    trainer.EnqueueTask(new TrainTask(trainer, traineeType));
                 }
                 else
                 {
@@ -59,14 +66,14 @@ namespace Orion.Commandment.Commands
             }
 
             // Now we take the cost out for all queued units!
-            base.SourceFaction.AlageneAmount -= alageneTotalCost;
-            base.SourceFaction.AladdiumAmount -= aladdiumTotalCost;
+            faction.AlageneAmount -= alageneTotalCost;
+            faction.AladdiumAmount -= aladdiumTotalCost;
         }
 
         public override string ToString()
         {
             return "[{0}] build {1}"
-                .FormatInvariant(trainers.ToCommaSeparatedValues(), traineeType);
+                .FormatInvariant(trainerHandles.ToCommaSeparatedValues(), traineeTypeHandle);
         }
         #endregion
         #endregion
@@ -78,19 +85,17 @@ namespace Orion.Commandment.Commands
             #region Methods
             protected override void SerializeData(Train command, BinaryWriter writer)
             {
-                writer.Write(command.SourceFaction.Handle.Value);
-                writer.Write(command.trainers.Count);
-                foreach (Unit unit in command.trainers)
-                    writer.Write(unit.Handle.Value);
-                writer.Write(command.traineeType.ID);
+                WriteHandle(writer, command.FactionHandle);
+                WriteLengthPrefixedHandleArray(writer, command.trainerHandles);
+                WriteHandle(writer, command.traineeTypeHandle);
             }
 
-            protected override Train DeserializeData(BinaryReader reader, World world)
+            protected override Train DeserializeData(BinaryReader reader)
             {
-                Faction faction = ReadFaction(reader,world);
-                Unit[] units = ReadLengthPrefixedUnitArray(reader, world);
-                UnitType unitToCreate = ReadUnitType(reader, world);
-                return new Train(units, unitToCreate,faction);
+                Handle factionHandle = ReadHandle(reader);
+                var trainerHandles = ReadLengthPrefixedHandleArray(reader);
+                Handle traineeTypeHandle = ReadHandle(reader);
+                return new Train(factionHandle, trainerHandles, traineeTypeHandle);
             }
             #endregion
             #endregion

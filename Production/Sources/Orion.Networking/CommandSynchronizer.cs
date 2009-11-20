@@ -234,7 +234,7 @@ namespace Orion.Networking
 
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            if (args.Data[1] == (byte)GameMessageType.Commands || args.Data[0] == (byte)GameMessageType.Done)
+            if (args.Data[0] == (byte)GameMessageType.Commands || args.Data[0] == (byte)GameMessageType.Done)
             {
                 int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
                 if (packetCommandFrameNumber < commandFrameNumber)

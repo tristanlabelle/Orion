@@ -90,6 +90,7 @@ namespace Orion.Main
             {
                 transporter.SendTo(exitMessage, peer);
             }
+            Dispose();
         }
 
         private void PressStartGame(MatchConfigurationUI ui)

@@ -48,6 +48,11 @@ namespace Orion.UserInterface
             Button joinRemoteButton = new Button(joinRemoteFrame, "Join with IP...");
             joinRemoteButton.Pressed += PressJoinRemoteGame;
             Children.Add(joinRemoteButton);
+
+            Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
+            Button backButton = new Button(backButtonFrame, "Back");
+            backButton.Pressed += PressBack;
+            Children.Add(backButton);
         }
         #endregion
 
@@ -151,6 +156,12 @@ namespace Orion.UserInterface
         {
             GenericEventHandler<LocalMultiplayerLobby> handler = HostedGame;
             if (handler != null) handler(this);
+        }
+
+        private void PressBack(Button sender)
+        {
+            Parent.PopDisplay(this);
+            Dispose();
         }
 
         private void JoinAddress(string address)

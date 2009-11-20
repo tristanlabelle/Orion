@@ -33,6 +33,11 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
+        public UIDisplay TopmostDisplay
+        {
+            get { return displays.Peek(); }
+        }
+
         public override Rectangle Frame
         {
             get { return frame; }
@@ -62,17 +67,16 @@ namespace Orion.UserInterface
         public void PopDisplay(UIDisplay display)
         {
             if (displays.Count < 2) throw new InvalidOperationException("Cannot pop the initial display from the stack");
-            if (displays.Peek() != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
+            if (TopmostDisplay != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
 
             displays.Pop();
             display.Dispose();
-            displays.Peek().OnEnter(this);
+            TopmostDisplay.OnEnter(this);
         }
 
         public void Update(float delta)
         {
-            UIDisplay topmostDisplay = displays.Peek();
-            topmostDisplay.PropagateUpdateEvent(new UpdateEventArgs(delta));
+            TopmostDisplay.PropagateUpdateEvent(new UpdateEventArgs(delta));
         }
 
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
@@ -80,7 +84,7 @@ namespace Orion.UserInterface
             Vector2 coords = args.Position;
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
-            bool canSink = displays.Peek().PropagateMouseEvent(eventType,
+            bool canSink = TopmostDisplay.PropagateMouseEvent(eventType,
                 new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
 
             if (canSink) return DispatchMouseEvent(eventType, args);
@@ -89,7 +93,7 @@ namespace Orion.UserInterface
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            return displays.Peek().PropagateKeyboardEvent(type, args);
+            return TopmostDisplay.PropagateKeyboardEvent(type, args);
         }
 
         protected internal override void Render()

@@ -78,7 +78,6 @@ namespace Orion.Main
 
         private void BeginHostMultiplayerGame(LocalMultiplayerLobby sender)
         {
-            gameUi.RootView.PopDisplay(sender);
             MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
             configurer.GameStarted += StartGame;
             gameUi.RootView.PushDisplay(configurer.UserInterface);
@@ -86,7 +85,6 @@ namespace Orion.Main
 
         private void JoinedMultiplayerGame(LocalMultiplayerLobby lobby, IPv4EndPoint host)
         {
-            gameUi.RootView.PopDisplay(lobby);
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
             configurer.GameStarted += StartGame;
             gameUi.RootView.PushDisplay(configurer.UserInterface);

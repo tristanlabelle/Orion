@@ -102,9 +102,11 @@ namespace Orion.Main
 
         private void ForceExit()
         {
+            RootView root = ui.Root;
             ui.Root.PopDisplay(ui);
             ui.Dispose();
             Dispose();
+            Instant.DisplayAlert(root.TopmostDisplay, "You've been disconnected.");
         }
         #endregion
     }

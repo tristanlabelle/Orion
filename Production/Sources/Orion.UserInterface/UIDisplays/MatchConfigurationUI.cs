@@ -14,8 +14,8 @@ namespace Orion.UserInterface
         #region Fields
         private GenericEventHandler<Button> exitPanel;
         private GenericEventHandler<Button> startGame;
-        private Button startButton;
-        private Button exitButton;
+        protected Button startButton;
+        protected Button exitButton;
 
         protected Random random;
         protected DropdownList<PlayerSlot>[] playerSlots = new DropdownList<PlayerSlot>[12];
@@ -97,9 +97,9 @@ namespace Orion.UserInterface
 
         protected virtual void OnPressedExit(Button button)
         {
-            Parent.PopDisplay(this);
             GenericEventHandler<MatchConfigurationUI> handler = PressedExit;
             if (handler != null) handler(this);
+            Parent.PopDisplay(this);
         }
 
         protected virtual void OnPressedStartGame(Button button)

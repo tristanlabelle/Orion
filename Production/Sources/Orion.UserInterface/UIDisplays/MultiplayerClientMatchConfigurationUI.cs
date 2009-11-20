@@ -13,7 +13,9 @@ namespace Orion.UserInterface
         #region Constructors
         public MultiplayerClientMatchConfigurationUI(SafeTransporter transporter)
             : base(transporter)
-        { }
+        {
+            Children.Remove(startButton);
+        }
         #endregion
 
         #region Methods

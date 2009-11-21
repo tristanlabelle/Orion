@@ -16,7 +16,7 @@ namespace Orion.Main
         private const int DefaultClientPort = 41224;
         private const int MaxSuccessiveUpdates = 5;
 
-        private GameUI gameUi;
+        private GameUI gameUI;
         private SafeTransporter transporter;
 
         private void StartProgram()
@@ -39,8 +39,8 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MainMenuUI menuUI = new MainMenuUI(ConfigureSinglePlayerGame, EnterMultiplayerLobby);
-            gameUi = new GameUI();
-            gameUi.Display(menuUI);
+            gameUI = new GameUI();
+            gameUI.Display(menuUI);
         }
 
         private void Run()
@@ -49,23 +49,34 @@ namespace Orion.Main
             FrameRateCounter updateRateCounter = new FrameRateCounter();
             FrameRateCounter drawRateCounter = new FrameRateCounter();
 
-            while (gameUi.IsWindowCreated)
+            // This run loop uses a fixed time step for the updates and manages
+            // situations where either the rendering or the updating is slow.
+            // Source: http://gafferongames.com/game-physics/fix-your-timestep/
+            float gameTime = 0.0f;
+
+            float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
+            float timeAccumulator = 0.0f;
+
+            while (gameUI.IsWindowCreated)
             {
-                Application.DoEvents();
-                gameUi.Refresh();
-                drawRateCounter.Update();
+                float newTime = (float)stopwatch.Elapsed.TotalSeconds;
+                timeAccumulator += newTime - oldTime;
+                oldTime = newTime;
 
-                float timeDeltaInSeconds = (float)stopwatch.Elapsed.TotalSeconds;
-                if (timeDeltaInSeconds >= TargetSecondsPerFrame)
+                while (timeAccumulator >= TargetSecondsPerFrame)
                 {
-                    stopwatch.Reset();
-                    stopwatch.Start();
-
-                    gameUi.Update(TargetSecondsPerFrame);
+                    gameUI.Update(TargetSecondsPerFrame);
                     updateRateCounter.Update();
-                    gameUi.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
-                        .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
+
+                    gameTime += TargetSecondsPerFrame;
+                    timeAccumulator -= TargetSecondsPerFrame;
                 }
+
+                Application.DoEvents();
+                gameUI.Refresh();
+                gameUI.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
+                    .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
+                drawRateCounter.Update();
             }
         }
 
@@ -73,26 +84,26 @@ namespace Orion.Main
         {
             MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
             configurer.GameStarted += StartGame;
-            gameUi.Display(configurer.UserInterface);
+            gameUI.Display(configurer.UserInterface);
         }
 
         private void BeginHostMultiplayerGame(LocalMultiplayerLobby sender)
         {
             MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
             configurer.GameStarted += StartGame;
-            gameUi.RootView.PushDisplay(configurer.UserInterface);
+            gameUI.RootView.PushDisplay(configurer.UserInterface);
         }
 
         private void JoinedMultiplayerGame(LocalMultiplayerLobby lobby, IPv4EndPoint host)
         {
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
             configurer.GameStarted += StartGame;
-            gameUi.RootView.PushDisplay(configurer.UserInterface);
+            gameUI.RootView.PushDisplay(configurer.UserInterface);
         }
 
         private void StartGame(MatchConfigurer configurer)
         {
-            gameUi.RootView.PopDisplay(configurer.UserInterface);
+            gameUI.RootView.PopDisplay(configurer.UserInterface);
             BeginMatch(configurer.Start());
         }
 
@@ -101,7 +112,7 @@ namespace Orion.Main
             MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
             matchUI.Updated += match.Update;
 
-            gameUi.Display(matchUI);
+            gameUI.Display(matchUI);
         }
 
         private void EnterMultiplayerLobby(Button sender)
@@ -109,12 +120,12 @@ namespace Orion.Main
             LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
             lobby.HostedGame += BeginHostMultiplayerGame;
             lobby.JoinedGame += JoinedMultiplayerGame;
-            gameUi.Display(lobby);
+            gameUI.Display(lobby);
         }
 
         public void Dispose()
         {
-            gameUi.Dispose();
+            gameUI.Dispose();
             transporter.Dispose();
         }
 

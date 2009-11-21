@@ -109,7 +109,26 @@ namespace Orion.Commandment
 
         public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
         {
+            selectionStart = args.Position;
+            selectionEnd = args.Position;
+            Faction faction = commander.Faction;
+            Rectangle selection = SelectionRectangle.Value;
+            //TO BE OPTIMIZED
+            Unit selectedUnit = faction.World.Entities
+                .OfType<Unit>()
+                .FirstOrDefault(unit => Rectangle.Intersects(selection, unit.BoundingRectangle));
 
+            if (selectedUnit == null) return;
+            
+            IEnumerable<Unit> selectedUnits = faction.World.Entities
+                .OfType<Unit>()
+                .Where(unit => (unit.Position - args.Position).Length < 10 
+                        && unit.Type == selectedUnit.Type);
+            selectionManager.SelectUnits(selectedUnits);
+
+            selectionStart = null;
+            selectionEnd = null;
+            
         }
 
         public void HandleMouseUp(object responder, MouseEventArgs args)

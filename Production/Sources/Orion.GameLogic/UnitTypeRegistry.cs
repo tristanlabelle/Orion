@@ -17,7 +17,7 @@ namespace Orion.GameLogic
         public UnitTypeRegistry()
         {
             RegisterSmurfs();
-            RegisterPirate();
+            RegisterPirates();
             RegisterNinjas();
             RegisterVikings();
             RegisterJedis();
@@ -52,7 +52,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterPirate()
+        public void RegisterPirates()
         {
             var builder = new UnitTypeBuilder
             {

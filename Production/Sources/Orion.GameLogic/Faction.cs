@@ -157,6 +157,11 @@ namespace Orion.GameLogic
         public int UsedFoodStock
         {
             get { return usedFoodStock; }
+            set 
+            {
+                Argument.EnsureNotNull(value, "usedFoodStock");
+                usedFoodStock = value;
+            }
         }
 
         #region Methods

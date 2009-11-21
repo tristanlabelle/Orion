@@ -50,7 +50,7 @@ namespace Orion.Main
         public UserInputCommander UserCommander
         {
             get { return userCommander; }
-        } 
+        }
 
         public World World
         {
@@ -173,8 +173,7 @@ namespace Orion.Main
             faction.CreateUnit(world.UnitTypes.FromName("Factory"), campCenter);
             for (int i = 1; i <= 2; i++)
             {
-                faction.CreateUnit(world.UnitTypes.FromName("Builder"), campCenter + new Vector2(i * campSize / 8f, 0));
-                faction.CreateUnit(world.UnitTypes.FromName("Harvester"), campCenter + new Vector2(0, i * campSize / 8f));
+                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 0));
             }
         }
 

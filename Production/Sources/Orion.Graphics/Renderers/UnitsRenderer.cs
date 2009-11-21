@@ -51,13 +51,14 @@ namespace Orion.Graphics
 
             this.world = world;
             this.fogOfWar = fogOfWar;
-            SetTypeShape("Harvester", LinePath.Circle);
-            SetTypeShape("Builder", LinePath.Diamond);
-            SetTypeShape("Scout", LinePath.CreateCircle(0.5f, 8));
-            SetTypeShape("MeleeAttacker", LinePath.Triangle);
-            SetTypeShape("RangedAttacker", LinePath.Cross);
+            SetTypeShape("Schtroumpf", LinePath.Circle);
+            SetTypeShape("Pirate", LinePath.Diamond);
+            SetTypeShape("Ninja", LinePath.Pentagon);
+            SetTypeShape("Viking", LinePath.Triangle);
+            SetTypeShape("Jedi", LinePath.Cross);
             SetTypeShape("Factory", LinePath.Pentagon);
             SetTypeShape("Tower", LinePath.Square);
+            SetTypeShape("AlageneExtractor", LinePath.Cross);
         }
         #endregion
 
@@ -107,7 +108,8 @@ namespace Orion.Graphics
             Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible || 
+                    (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Discovered && unit.Type.IsBuilding))
                 {
                     context.FillColor = unit.Faction.Color;
                     context.Fill(unitRect.TranslatedBy(unit.Position));
@@ -119,7 +121,8 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible ||
+                    (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Discovered && unit.Type.IsBuilding))
                 {
                     string unitTypeName = unit.Type.Name;
 

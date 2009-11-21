@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 using OpenTK.Math;
 
@@ -19,6 +22,7 @@ namespace Orion.GameLogic.Tasks
         private readonly Vector2 destination;
         private Path path;
         private int nextPointIndex = 1;
+        private bool canFly;
         #endregion
 
         #region Constructors
@@ -36,7 +40,19 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.destination = destination;
-            this.path = unit.Faction.PathFinder.FindPath(unit.Position, destination);
+            if (unit.GetStat(UnitStat.CanFly) == 1)
+            {
+                List<Vector2> points = new List<Vector2>();
+                points.Add(this.unit.Position);
+                points.Add(this.destination);
+                this.path = new Path(this.unit.Position, this.destination, points);
+                canFly = true;
+            }
+            else
+            {
+                this.path = unit.Faction.PathFinder.FindPath(unit.Position, destination);
+                canFly = false;
+            }
         }
         #endregion
 
@@ -84,7 +100,7 @@ namespace Orion.GameLogic.Tasks
                 ++nextPointIndex;
             }
 
-            if (unit.World.Terrain.IsWalkable(targetPosition))
+            if (unit.World.Terrain.IsWalkable(targetPosition) || canFly)
             {
                 // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);

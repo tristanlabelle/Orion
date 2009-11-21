@@ -16,11 +16,14 @@ namespace Orion.GameLogic
         #region Constructors
         public UnitTypeRegistry()
         {
-            RegisterHarvester();
-            RegisterBuilder();
-            RegisterScout();
-            RegisterMeleeAttacker();
-            RegisterRangedAttacker();
+            RegisterSmurfs();
+            RegisterPirate();
+            RegisterNinjas();
+            RegisterVikings();
+            RegisterJedis();
+            RegisterSwineFlu();
+            RegisterUFO();
+            RegisterFlyingCarpet();
             RegisterFactory();
             RegisterTower();
             RegisterAlageneExtractor();
@@ -30,88 +33,140 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Hard-Coded UnitTypes
-        public void RegisterHarvester()
+        public void RegisterSmurfs()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Harvester",
+                Name = "Schtroumpf",
                 Size = new Size(1, 1),
-                SightRange = 8,
-                MaxHealth = 5,
+                SightRange = 5,
+                MaxHealth = 15,
                 AladdiumCost = 25,
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new Skills.Move(15));
+            builder.Skills.Add(new Skills.Move(10, false));
+            builder.Skills.Add(new Skills.Attack(1, 1, 5));
             builder.Skills.Add(new Skills.Harvest(1, 10));
-            Register(builder);
-        }
-
-        public void RegisterBuilder()
-        {
-            var builder = new UnitTypeBuilder
-            {
-                Name = "Builder",
-                Size = new Size(1, 1),
-                SightRange = 6,
-                MaxHealth = 8,
-                AladdiumCost = 40,
-                AlageneCost = 0,
-                FoodCost = 1
-            };
-            builder.Skills.Add(new Skills.Move(10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
-            builder.Skills.Add(new Skills.Harvest(1, 10));
             Register(builder);
         }
 
-        public void RegisterScout()
+        public void RegisterPirate()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Scout",
-                Size = new Size(1, 1),
-                SightRange = 10,
-                MaxHealth = 4,
-                AladdiumCost = 75,
-                AlageneCost = 0,
-                FoodCost = 2
-            };
-            builder.Skills.Add(new Skills.Move(25));
-            Register(builder);
-        }
-
-        public void RegisterMeleeAttacker()
-        {
-            var builder = new UnitTypeBuilder
-            {
-                Name = "MeleeAttacker",
+                Name = "Pirate",
                 Size = new Size(1, 1),
                 SightRange = 6,
-                MaxHealth = 15,
+                MaxHealth = 45,
                 AladdiumCost = 50,
                 AlageneCost = 0,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.Move(10));
-            builder.Skills.Add(new Skills.Attack(4, 1));
+            builder.Skills.Add(new Skills.Move(12, false));
+            builder.Skills.Add(new Skills.Attack(3, 1, 3));
             Register(builder);
         }
 
-        public void RegisterRangedAttacker()
+        public void RegisterNinjas()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "RangedAttacker",
+                Name = "Ninja",
                 Size = new Size(1, 1),
-                SightRange = 10,
-                MaxHealth = 15,
+                SightRange = 8,
+                MaxHealth = 30,
                 AladdiumCost = 50,
-                AlageneCost = 10,
+                AlageneCost = 25,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.Move(10));
-            builder.Skills.Add(new Skills.Attack(4, 7));
+            builder.Skills.Add(new Skills.Move(16, false));
+            builder.Skills.Add(new Skills.Attack(2, 5, 2));
+            Register(builder);
+        }
+
+        public void RegisterVikings()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Viking",
+                Size = new Size(1, 1),
+                SightRange = 6,
+                MaxHealth = 75,
+                AladdiumCost = 100,
+                AlageneCost = 0,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new Skills.Move(10, false));
+            builder.Skills.Add(new Skills.Attack(8, 1, 5));
+            Register(builder);
+        }
+
+        public void RegisterJedis()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Jedi",
+                Size = new Size(1, 1),
+                SightRange = 6,
+                MaxHealth = 50,
+                AladdiumCost = 75,
+                AlageneCost = 50,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new Skills.Move(14, false));
+            builder.Skills.Add(new Skills.Attack(4, 10, 3));
+            Register(builder);
+        }
+
+        public void RegisterSwineFlu()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Grippe A(H1N1)",
+                Size = new Size(1, 1),
+                SightRange = 6,
+                MaxHealth = 35,
+                AladdiumCost = 0,
+                AlageneCost = 0,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new Skills.Move(18, true));
+            builder.Skills.Add(new Skills.Attack(1, 8, 1));
+            Register(builder);
+        }
+
+        public void RegisterUFO()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "OVNI",
+                Size = new Size(2, 2),
+                SightRange = 8,
+                MaxHealth = 80,
+                AladdiumCost = 125,
+                AlageneCost = 75,
+                FoodCost = 5
+            };
+            builder.Skills.Add(new Skills.Move(8, true));
+            builder.Skills.Add(new Skills.Attack(18, 12, 8));
+            Register(builder);
+        }
+
+        public void RegisterFlyingCarpet()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Tapis Volant",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 45,
+                AladdiumCost = 50,
+                AlageneCost = 25,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new Skills.Move(14, true));
             Register(builder);
         }
 
@@ -121,9 +176,9 @@ namespace Orion.GameLogic
             {
                 Name = "Factory",
                 Size = new Size(3, 3),
-                SightRange = 4,
+                SightRange = 8,
                 MaxHealth = 400,
-                AladdiumCost = 100,
+                AladdiumCost = 250,
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.Train(type => !type.IsBuilding, 10));
@@ -138,12 +193,12 @@ namespace Orion.GameLogic
             {
                 Name = "Tower",
                 Size = new Size(2, 2),
-                SightRange = 10,
+                SightRange = 12,
                 MaxHealth = 30,
                 AladdiumCost = 80,
                 AlageneCost = 20
             };
-            builder.Skills.Add(new Skills.Attack(10, 7));
+            builder.Skills.Add(new Skills.Attack(6, 8, 4));
             Register(builder);
         }
 
@@ -153,7 +208,7 @@ namespace Orion.GameLogic
             {
                 Name = "AlageneExtractor",
                 Size = new Size(2, 2),
-                SightRange = 4,
+                SightRange = 6,
                 MaxHealth = 25,
                 AladdiumCost = 75,
                 AlageneCost = 0
@@ -168,7 +223,7 @@ namespace Orion.GameLogic
             {
                 Name = "Supply",
                 Size = new Size(2, 2),
-                SightRange = 10,
+                SightRange = 6,
                 MaxHealth = 70,
                 AladdiumCost = 50,
                 AlageneCost = 0

@@ -14,7 +14,7 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit attacker;
         private readonly Unit target;
         private readonly Follow follow;
-        private const float hitDelayInSeconds = 1;
+        private float hitDelayInSeconds;
         private float timeSinceLastHitInSeconds = 0;
         #endregion
 
@@ -29,6 +29,7 @@ namespace Orion.GameLogic.Tasks
             this.attacker = attacker;
             this.target = target;
             if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target);
+            hitDelayInSeconds = attacker.GetStat(UnitStat.AttackDelay);
             timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion

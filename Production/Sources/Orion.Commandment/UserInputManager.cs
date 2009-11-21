@@ -170,6 +170,7 @@ namespace Orion.Commandment
                 case Keys.F10:
                     commander.Faction.AladdiumAmount += 10000;
                     commander.Faction.AlageneAmount += 10000;
+                    commander.Faction.UsedFoodStock -= 2000;
                     break;
 
                 case Keys.F11: commander.Faction.FogOfWar.Reveal(); break;

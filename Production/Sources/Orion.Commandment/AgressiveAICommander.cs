@@ -27,8 +27,8 @@ namespace Orion.Commandment
 
             if (allUnits.Count > 0)
             {
-                int amountOfHarvesters = Evaluate("Harvester", 1);
-                int amountOfAttackers = Evaluate("MeleeAttacker", 1);
+                int amountOfHarvesters = Evaluate("Schtroumpf", 1);
+                int amountOfAttackers = Evaluate("Viking", 1);
 
                 DispatchHarvesters(amountOfHarvesters, startingNode, false);
                 List<Vector2> positions = new List<Vector2>();
@@ -39,7 +39,7 @@ namespace Orion.Commandment
                     DispatchBuilders("AlageneExtractor", positions);
                 }*/
 
-                InitiateTraining("MeleeAttacker", 1);
+                InitiateTraining("Viking", 1);
 
                 //TODO: remove this part when the AI is sandboxed as it is only here to test the behavior of the AI
                 if(World.Factions.First().Units.Where

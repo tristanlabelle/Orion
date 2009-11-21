@@ -12,6 +12,7 @@ namespace Orion.GameLogic
         AladdiumCost,
         AttackRange,
         AttackPower,
+        AttackDelay,
         BuildingSpeed,
         ExtractingSpeed,
         MaxCarryingAmount,
@@ -19,6 +20,7 @@ namespace Orion.GameLogic
         MovementSpeed,
         SightRange,
         TrainingSpeed,
-        FoodStorageCapacity
+        FoodStorageCapacity, 
+        CanFly
     }
 }

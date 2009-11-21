@@ -11,16 +11,19 @@ namespace Orion.GameLogic.Skills
         #region Fields
         private readonly int power;
         private readonly int maxRange;
+        private readonly int delay;
         #endregion
 
         #region Constructors
-        public Attack(int power, int maxRange)
+        public Attack(int power, int maxRange, int delay)
         {
             Argument.EnsureStrictlyPositive(power, "power");
             Argument.EnsurePositive(maxRange, "maxRange");
+            Argument.EnsureStrictlyPositive(delay, "delay");
 
             this.power = power;
             this.maxRange = maxRange;
+            this.delay = delay;
         }
         #endregion
 
@@ -33,6 +36,11 @@ namespace Orion.GameLogic.Skills
         public int MaxRange
         {
             get { return maxRange; }
+        }
+
+        public int Delay
+        {
+            get { return delay; }
         }
 
         public bool IsMelee
@@ -51,6 +59,7 @@ namespace Orion.GameLogic.Skills
         {
             if (stat == UnitStat.AttackPower) return power;
             if (stat == UnitStat.AttackRange) return maxRange;
+            if (stat == UnitStat.AttackDelay) return delay;
             return null;
         }
         #endregion

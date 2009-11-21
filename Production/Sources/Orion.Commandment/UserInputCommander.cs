@@ -46,6 +46,7 @@ namespace Orion.Commandment
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
+            destination = World.Bounds.ClosestPointInside(destination);
             if (units.Count() > 0)
                 GenerateCommand(new Move(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }

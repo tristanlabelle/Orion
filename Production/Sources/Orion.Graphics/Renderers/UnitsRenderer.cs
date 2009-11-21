@@ -108,8 +108,8 @@ namespace Orion.Graphics
             Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible || 
-                    (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Discovered && unit.Type.IsBuilding))
+                TileVisibility tileVisibility = fogOfWar.GetTileVisibility(unit.Position);
+                if (tileVisibility == TileVisibility.Visible)
                 {
                     context.FillColor = unit.Faction.Color;
                     context.Fill(unitRect.TranslatedBy(unit.Position));
@@ -122,8 +122,7 @@ namespace Orion.Graphics
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
                 TileVisibility tileVisibility = fogOfWar.GetTileVisibility(unit.Position);
-                if (tileVisibility == TileVisibility.Visible ||
-                    (tileVisibility == TileVisibility.Discovered && unit.Type.IsBuilding))
+                if (tileVisibility == TileVisibility.Visible)
                 {
                     string unitTypeName = unit.Type.Name;
 

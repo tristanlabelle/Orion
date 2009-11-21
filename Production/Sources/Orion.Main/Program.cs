@@ -75,8 +75,8 @@ namespace Orion.Main
 
                 Application.DoEvents();
                 gameUI.Refresh();
-                gameUI.WindowTitle = "{0:F2} updates, {1:F2} draws per second"
-                    .FormatInvariant(updateRateCounter.FramesPerSecond, drawRateCounter.FramesPerSecond);
+                gameUI.WindowTitle = "{0:F2} ms / update, {1:F2} ms / draw"
+                    .FormatInvariant(updateRateCounter.MillisecondsPerFrame, drawRateCounter.MillisecondsPerFrame);
                 drawRateCounter.Update();
             }
         }

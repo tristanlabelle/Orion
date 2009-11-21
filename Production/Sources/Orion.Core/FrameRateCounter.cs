@@ -23,6 +23,11 @@ namespace Orion
             get { return secondsPerFrame; }
         }
 
+        public float MillisecondsPerFrame
+        {
+            get { return secondsPerFrame * 1000; }
+        }
+
         public float FramesPerSecond
         {
             get { return (secondsPerFrame == 0) ? 0 : 1 / secondsPerFrame; }

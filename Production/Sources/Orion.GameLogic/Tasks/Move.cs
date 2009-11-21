@@ -37,6 +37,8 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(unit, "unit");
             if (!unit.HasSkill<Skills.Move>())
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
+            if (!unit.World.IsWithinBounds(destination))
+                throw new ArgumentOutOfRangeException("destination");
 
             this.unit = unit;
             this.destination = destination;

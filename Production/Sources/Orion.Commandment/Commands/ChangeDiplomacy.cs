@@ -34,12 +34,12 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            Faction faction = world.FindFactionFromHandle(FactionHandle);
-            Faction otherFaction = world.FindFactionFromHandle(otherFactionHandle);
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
+            Faction otherFaction = match.World.FindFactionFromHandle(otherFactionHandle);
             faction.SetDiplomaticStance(otherFaction, diplomaticStance);
         }
 

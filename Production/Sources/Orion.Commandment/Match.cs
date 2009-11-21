@@ -18,24 +18,20 @@ namespace Orion.Commandment
         private const int initialMinimumDistanceBetweenCamps = 175;
 
         private readonly Random random;
-        private readonly UserInputCommander userCommander;
         private readonly World world;
-        private readonly CommandPipeline pipeline;
+        private readonly UserInputCommander userCommander;
         private int lastFrameNumber = 0;
         #endregion
 
         #region Constructors
-        public Match(Random random, World world, UserInputCommander userCommander, CommandPipeline pipeline)
+        public Match(Random random, World world, UserInputCommander commander)
         {
             Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(userCommander, "userCommander");
-            Argument.EnsureNotNull(pipeline, "pipeline");
 
             this.random = random;
-            this.userCommander = userCommander;
             this.world = world;
-            this.pipeline = pipeline;
+            userCommander = commander;
 
             CreateFactionCamps();
             CreateResourceNodes();
@@ -43,6 +39,10 @@ namespace Orion.Commandment
             // Update the world once to force committing the entity collection operations.
             world.Update(0);
         }
+        #endregion
+
+        #region Events
+        public event GenericEventHandler<Match, UpdateEventArgs> Updated;
         #endregion
 
         #region Properties
@@ -73,11 +73,11 @@ namespace Orion.Commandment
         {
             float timeDeltaInSeconds = args.Delta;
             int frameNumber = lastFrameNumber + 1;
-
-            pipeline.Update(frameNumber, timeDeltaInSeconds);
             world.Update(timeDeltaInSeconds);
 
             lastFrameNumber = frameNumber;
+            GenericEventHandler<Match, UpdateEventArgs> handler = Updated;
+            if (handler != null) handler(this, args);
         }
 
         #region Private Camp Creation

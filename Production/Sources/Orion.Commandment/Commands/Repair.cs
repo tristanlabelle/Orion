@@ -39,14 +39,14 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            Unit target = (Unit)world.Entities.FindFromHandle(targetHandle);
+            Unit target = (Unit)match.World.Entities.FindFromHandle(targetHandle);
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)world.Entities.FindFromHandle(unitHandle);
+                Unit unit = (Unit)match.World.Entities.FindFromHandle(unitHandle);
                 unit.Task = new RepairTask(unit, target);
             }
         }

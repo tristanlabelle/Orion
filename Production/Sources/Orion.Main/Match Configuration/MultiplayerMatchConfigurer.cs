@@ -38,15 +38,8 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new CommandPipeline(world);
-            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
-            CommandTextLogger textLogger = new CommandTextLogger();
-            pipeline.AddFilter(textLogger);
-            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
-            pipeline.AddFilter(synchronizer);
-
             UserInputCommander userCommander = null;
-
+            List<Commander> aiCommanders = new List<Commander>();
             int colorIndex = 0;
             foreach (PlayerSlot slot in UserInterface.Players)
             {
@@ -60,13 +53,12 @@ namespace Orion.Main
                 if (slot is LocalPlayerSlot)
                 {
                     userCommander = new UserInputCommander(faction);
-                    pipeline.AddCommander(userCommander, synchronizer);
                 }
                 else if (slot is AIPlayerSlot)
                 {
                     Commander commander = new AICommander(faction, random);
                     // AIs bypass the synchronization filter as they are supposed to be fully deterministic
-                    pipeline.AddCommander(commander, textLogger);
+                    aiCommanders.Add(commander);
                 }
                 else if (!(slot is RemotePlayerSlot)) // no commanders for remote players
                 {
@@ -74,7 +66,21 @@ namespace Orion.Main
                 }
             }
 
-            return new Match(random, world, userCommander, pipeline);
+            Match match = new Match(random, world, userCommander);
+
+            CommandPipeline pipeline = new CommandPipeline(match);
+            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
+            CommandTextLogger textLogger = new CommandTextLogger();
+            pipeline.AddFilter(textLogger);
+            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
+            pipeline.AddFilter(synchronizer);
+
+            aiCommanders.ForEach(commander => pipeline.AddCommander(commander, textLogger));
+            pipeline.AddCommander(userCommander, synchronizer);
+
+            match.Updated += pipeline.Update;
+
+            return match;
         }
 
         public virtual void Dispose()

@@ -32,26 +32,28 @@ namespace Orion.Main
         {
             CreateMap();
 
-            CommandPipeline pipeline = new CommandPipeline(world);
+            Color color = playerColors[0];
+            Faction userFaction = world.CreateFaction(color.Name, color);
+            UserInputCommander userCommander = new UserInputCommander(userFaction);
+
+            Match match = new Match(random, world, userCommander);
+
+            CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
             pipeline.AddFilter(new CommandTextLogger());
 
-            UserInputCommander userCommander = null;
+            pipeline.AddCommander(userCommander);
 
-            int colorIndex = 0;
+            int colorIndex = 1;
             foreach (PlayerSlot slot in UserInterface.Players)
             {
                 if (slot is ClosedPlayerSlot) continue;
 
-                Color color = playerColors[colorIndex];
+                color = playerColors[colorIndex];
                 Faction faction = world.CreateFaction(color.Name, color);
                 colorIndex++;
 
-                if (slot is LocalPlayerSlot)
-                {
-                    userCommander = new UserInputCommander(faction);
-                    pipeline.AddCommander(userCommander);
-                }
+                if (slot is LocalPlayerSlot) continue;
                 else if (slot is AIPlayerSlot)
                 {
                     Commander commander = new AgressiveAICommander(faction, random);
@@ -63,7 +65,9 @@ namespace Orion.Main
                 }
             }
 
-            return new Match(random, world, userCommander, pipeline);
+            match.Updated += pipeline.Update;
+
+            return match;
         }
     }
 }

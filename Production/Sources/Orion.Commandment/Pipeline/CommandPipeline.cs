@@ -29,8 +29,8 @@ namespace Orion.Commandment.Pipeline
             this.sink = sink;
         }
 
-        public CommandPipeline(World world)
-            : this(new CommandExecutor(world)) { }
+        public CommandPipeline(Match match)
+            : this(new CommandExecutor(match)) { }
         #endregion
 
         #region Methods
@@ -94,9 +94,14 @@ namespace Orion.Commandment.Pipeline
         /// Updates this <see cref="CommandPipeline"/> and its <see cref="Commander"/>s
         /// for a game frame.
         /// </summary>
-        /// <param name="frameNumber">The number of the frame.</param>
-        /// <param name="timeDeltaInSeconds">The number of time elapsed since the last frame, in seconds.</param>
-        public void Update(int frameNumber, float timeDeltaInSeconds)
+        /// <param name="match">The match to update</param>
+        /// <param name="args">The update event arguments, holding the time delta</param>
+        public void Update(Match match, UpdateEventArgs args)
+        {
+            Update(match.LastFrameNumber, args.Delta);
+        }
+
+        private void Update(int frameNumber, float timeDeltaInSeconds)
         {
             foreach (Commander commander in commanders.Keys)
                 commander.Update(timeDeltaInSeconds);

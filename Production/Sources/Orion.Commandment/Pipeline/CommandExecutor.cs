@@ -12,14 +12,14 @@ namespace Orion.Commandment.Pipeline
     {
         #region Fields
         private readonly Queue<Command> commandQueue = new Queue<Command>();
-        private readonly World world;
+        private readonly Match match;
         #endregion
 
         #region Constructors
-        public CommandExecutor(World world)
+        public CommandExecutor(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
-            this.world = world;
+            Argument.EnsureNotNull(match, "match");
+            this.match = match;
         }
         #endregion
 
@@ -37,7 +37,7 @@ namespace Orion.Commandment.Pipeline
                 Command command = commandQueue.Dequeue();
                 try
                 {
-                    command.Execute(world);
+                    command.Execute(match);
                 }
                 catch
                 {

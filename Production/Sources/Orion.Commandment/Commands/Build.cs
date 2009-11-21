@@ -34,12 +34,12 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            Unit builder = (Unit)world.Entities.FindFromHandle(builderHandle);
-            UnitType buildingType = (UnitType)world.UnitTypes.FromHandle(buildingTypeHandle);
+            Unit builder = (Unit)match.World.Entities.FindFromHandle(builderHandle);
+            UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
             builder.Task = new BuildTask(builder, buildingType, position);
         }
 

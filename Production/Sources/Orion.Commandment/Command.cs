@@ -41,8 +41,8 @@ namespace Orion.Commandment
         /// <summary>
         /// Executes this command.
         /// </summary>
-        /// <param name="world">The <see cref="World"/> in which the command should be executed.</param>
-        public abstract void Execute(World world);
+        /// <param name="match">The <see cref="Match"/> in which the command should be executed.</param>
+        public abstract void Execute(Match match);
 
         public abstract override string ToString();
         #endregion

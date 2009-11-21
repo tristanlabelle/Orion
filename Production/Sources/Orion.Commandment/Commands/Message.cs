@@ -31,7 +31,10 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world) { }
+        public override void Execute(Match match)
+        {
+            Argument.EnsureNotNull(match, "match");
+        }
 
         public override string ToString()
         {

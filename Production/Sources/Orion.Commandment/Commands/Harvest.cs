@@ -34,14 +34,14 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            ResourceNode resourceNode = (ResourceNode)world.Entities.FindFromHandle(resourceNodeHandle);
+            ResourceNode resourceNode = (ResourceNode)match.World.Entities.FindFromHandle(resourceNodeHandle);
             foreach (Handle harvesterHandle in harvesterHandles)
             {
-                Unit harvester = (Unit)world.Entities.FindFromHandle(harvesterHandle);
+                Unit harvester = (Unit)match.World.Entities.FindFromHandle(harvesterHandle);
                 harvester.Task = new HarvestTask(harvester, resourceNode);
             }
         }

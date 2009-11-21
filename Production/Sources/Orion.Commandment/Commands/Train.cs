@@ -36,21 +36,21 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
             int alageneTotalCost = 0;
             int aladdiumTotalCost = 0;
 
-            Faction faction = world.FindFactionFromHandle(FactionHandle);
-            UnitType traineeType = world.UnitTypes.FromHandle(traineeTypeHandle);
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
+            UnitType traineeType = match.World.UnitTypes.FromHandle(traineeTypeHandle);
 
             int alageneCost = traineeType.GetBaseStat(UnitStat.AlageneCost);
             int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
             foreach (Handle trainerHandle in trainerHandles)
             {
-                Unit trainer = (Unit)world.Entities.FindFromHandle(trainerHandle);
+                Unit trainer = (Unit)match.World.Entities.FindFromHandle(trainerHandle);
                 if (alageneTotalCost + alageneCost <= faction.AlageneAmount
                    && aladdiumTotalCost + aladdiumCost <= faction.AladdiumAmount)
                 {

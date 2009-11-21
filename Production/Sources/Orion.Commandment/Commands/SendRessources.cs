@@ -35,12 +35,12 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
-        public override void Execute(World world)
+        public override void Execute(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            Faction sendingFaction = world.FindFactionFromHandle(FactionHandle);
-            Faction receivingFaction = world.FindFactionFromHandle(targetFactionHandle);
+            Faction sendingFaction = match.World.FindFactionFromHandle(FactionHandle);
+            Faction receivingFaction = match.World.FindFactionFromHandle(targetFactionHandle);
 
             if (sendingFaction.AladdiumAmount >= aladdiumAmount 
                 && sendingFaction.AlageneAmount >= alageneAmount)

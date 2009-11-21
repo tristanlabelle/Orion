@@ -121,8 +121,9 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible ||
-                    (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Discovered && unit.Type.IsBuilding))
+                TileVisibility tileVisibility = fogOfWar.GetTileVisibility(unit.Position);
+                if (tileVisibility == TileVisibility.Visible ||
+                    (tileVisibility == TileVisibility.Discovered && unit.Type.IsBuilding))
                 {
                     string unitTypeName = unit.Type.Name;
 

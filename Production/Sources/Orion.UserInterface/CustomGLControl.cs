@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
 
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace Orion.UserInterface
 {
@@ -10,22 +11,37 @@ namespace Orion.UserInterface
     /// </summary>
     public sealed class CustomGLControl : GLControl
     {
-        /// <summary>Indicates if a character should generate a keyboard evet.</summary>
-        /// <param name="charCode">The resulting <see cref="System.Char"/> of the previous keystrokes</param>
-        /// <returns>Always true</returns>
+        public CustomGLControl()
+            : base(GetGraphicsMode(), 2, 0, GetGraphicsContextFlags()) { }
+
         protected override bool IsInputChar(char charCode)
         {
             return true;
         }
 
-        /// <summary>
-        /// Indicates if a specific key should trigger a keyboard event.
-        /// </summary>
-        /// <param name="keyData">A <see cref="Keys"/></param>
-        /// <returns>Always true</returns>
         protected override bool IsInputKey(Keys keyData)
         {
             return true;
+        }
+
+        private static GraphicsMode GetGraphicsMode()
+        {
+            return new GraphicsMode(
+                new ColorFormat(8, 8, 8, 0), // Color BPP
+                0, 0, // Depth, stencil BPP
+                0, // Antialiasing samples
+                new ColorFormat(0), // Accum buffer BPP
+                2, // Backbuffer count
+                false); // Stereo rendering
+        }
+
+        private static GraphicsContextFlags GetGraphicsContextFlags()
+        {
+#if DEBUG
+            return GraphicsContextFlags.Debug;
+#else
+            return GraphicsContextFlags.Default;
+#endif
         }
     }
 }

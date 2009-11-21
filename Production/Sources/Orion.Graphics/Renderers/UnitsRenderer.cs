@@ -216,13 +216,13 @@ namespace Orion.Graphics
         {
             graphics.StrokeColor = Color.Yellow;
             foreach (PathNode node in pathfinder.ClosedNodes)
-                if (node.ParentNode != null)
-                    graphics.StrokeLineStrip(node.ParentNode.Position, node.Position);
+                if (node.Source != null)
+                    graphics.StrokeLineStrip(node.Source.Point, node.Point);
 
             graphics.StrokeColor = Color.Lime;
             foreach (PathNode node in pathfinder.OpenNodes)
-                if (node.ParentNode != null)
-                    graphics.StrokeLineStrip(node.ParentNode.Position, node.Position);
+                if (node.Source != null)
+                    graphics.StrokeLineStrip(node.Source.Point, node.Point);
         }
 
         private void DrawAttackLines(GraphicsContext graphics)

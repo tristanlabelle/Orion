@@ -5,21 +5,21 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class PathNode
     {
         #region Fields
-        private PathNode parentNode;
-        private Point16 position;
+        private PathNode source;
+        private Point16 point;
         private float costFromSource;
         private float totalCost; // Stored instead of costToDestination as it is most often accessed.
         #endregion
 
         #region Properties
-        public PathNode ParentNode
+        public PathNode Source
         {
-            get { return parentNode; }
+            get { return source; }
         }
 
-        public Point16 Position
+        public Point16 Point
         {
-            get { return position; }
+            get { return point; }
         }
 
         public float CostFromSource
@@ -39,18 +39,18 @@ namespace Orion.GameLogic.Pathfinding
         #endregion
 
         #region Methods
-        internal void Reset(PathNode parentNode, Point16 position,
+        internal void Reset(PathNode source, Point16 point,
             float costFromSource, float estimatedCostToDestination)
         {
-            this.parentNode = parentNode;
-            this.position = position;
+            this.source = source;
+            this.point = point;
             this.costFromSource = costFromSource;
             this.totalCost = costFromSource + estimatedCostToDestination;
         }
 
-        internal void SetCosts(PathNode parentNode, float costFromSource, float estimatedCostToDestination)
+        internal void ChangeSource(PathNode source, float costFromSource, float estimatedCostToDestination)
         {
-            this.parentNode = parentNode;
+            this.source = source;
             this.costFromSource = costFromSource;
             this.totalCost = costFromSource + estimatedCostToDestination;
         }

@@ -50,7 +50,7 @@ namespace Orion.GameLogic.Tasks
             }
             else
             {
-                this.path = unit.Faction.PathFinder.FindPath(unit.Position, destination);
+                this.path = unit.Faction.FindPath(unit.Position, destination);
                 canFly = false;
             }
         }
@@ -100,14 +100,14 @@ namespace Orion.GameLogic.Tasks
                 ++nextPointIndex;
             }
 
-            if (unit.World.Terrain.IsWalkable(targetPosition) || canFly)
+            if (canFly || unit.World.Terrain.IsWalkable(targetPosition))
             {
                 // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);
             }
             else
             {
-                path = unit.Faction.PathFinder.FindPath(unit.Position, destination);
+                path = unit.Faction.FindPath(unit.Position, destination);
                 nextPointIndex = 1;
             }
         }

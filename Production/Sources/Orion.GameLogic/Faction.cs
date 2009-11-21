@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-
-using Color = System.Drawing.Color;
 using OpenTK.Math;
-using Orion.Geometry;
-using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Pathfinding;
+using Orion.GameLogic.Tasks;
+using Orion.Geometry;
+using Color = System.Drawing.Color;
 
 namespace Orion.GameLogic
 {
@@ -17,6 +17,8 @@ namespace Orion.GameLogic
     public sealed class Faction
     {
         #region Fields
+        private const int maxFoodStock = 200;
+
         private readonly Handle handle;
         private readonly World world;
         private readonly string name;
@@ -25,10 +27,8 @@ namespace Orion.GameLogic
         private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
-        private readonly Pathfinder pathfinder;
         private int aladdiumAmount;
         private int alageneAmount;
-        private const int maxFoodStock = 200;
         private int totalFoodStock = 0;
         private int usedFoodStock = 0;
         #endregion
@@ -53,7 +53,6 @@ namespace Orion.GameLogic
             this.fogOfWar = new FogOfWar(world.Width, world.Height);
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
-            this.pathfinder = new Pathfinder(world.Width, world.Height, IsPathable);
         }
         #endregion
 
@@ -111,6 +110,7 @@ namespace Orion.GameLogic
             get { return fogOfWar; }
         }
 
+        #region Resources
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.
         /// </summary>
@@ -137,12 +137,6 @@ namespace Orion.GameLogic
             }
         }
 
-        public Pathfinder PathFinder
-        {
-            get { return pathfinder; }
-        }
-        #endregion
-
         public int MaxFoodStock
         {
             get { return Math.Min(maxFoodStock, totalFoodStock); }
@@ -150,7 +144,6 @@ namespace Orion.GameLogic
 
         public int AvailableFood
         {
-
             get { return MaxFoodStock - usedFoodStock; }
         }
 
@@ -163,6 +156,8 @@ namespace Orion.GameLogic
                 usedFoodStock = value;
             }
         }
+        #endregion
+        #endregion
 
         #region Methods
         /// <summary>
@@ -176,6 +171,17 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(type, "type");
             return type.GetBaseStat(stat);
+        }
+
+        /// <summary>
+        /// Finds a path from a source to a destination.
+        /// </summary>
+        /// <param name="source">The position where the path should start.</param>
+        /// <param name="destination">The position the path should reach.</param>
+        /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
+        public Path FindPath(Vector2 source, Vector2 destination)
+        {
+            return world.FindPath(source, destination, IsPathable);
         }
 
         #region Units
@@ -275,7 +281,7 @@ namespace Orion.GameLogic
 
         private bool IsPathable(int x, int y)
         {
-            if (!world.IsWithinBounds(new Vector2(x, y)))
+            if (!world.IsWithinBounds(x, y))
                 return false;
             if (fogOfWar.GetTileVisibility(x, y) == TileVisibility.Undiscovered)
                 return true;

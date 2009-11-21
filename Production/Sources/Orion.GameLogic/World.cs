@@ -18,8 +18,9 @@ namespace Orion.GameLogic
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityRegistry entities;
-        private readonly UnitTypeRegistry unitTypes;
-        private uint nextUidValue;
+        private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
+        private readonly Pathfinder pathfinder;
+        private uint nextHandleValue;
         #endregion
 
         #region Constructors
@@ -30,14 +31,20 @@ namespace Orion.GameLogic
         public World(Terrain terrain)
         {
             Argument.EnsureNotNull(terrain, "terrain");
-            this.terrain = terrain;
-            entities = new EntityRegistry(this, 5, 5, GenerateUid);
-            unitTypes = new UnitTypeRegistry();
 
+            this.terrain = terrain;
+            entities = new EntityRegistry(this, 5, 5, GenerateHandle);
+            pathfinder = new Pathfinder();
+            pathfinder.MaxNodesToVisit = Math.Max(4000, terrain.Width * terrain.Height / 8);
         }
         #endregion
 
         #region Properties
+        public Terrain Terrain
+        {
+            get { return terrain; }
+        }
+
         /// <summary>
         /// Gets the sequence of <see cref="Faction"/>s part of this <see cref="World"/>.
         /// </summary>
@@ -83,24 +90,55 @@ namespace Orion.GameLogic
             get { return new Rectangle(0, 0, Width, Height); }
         }
 
-        public Terrain Terrain
+        public Pathfinder Pathfinder
         {
-            get { return terrain; }
+            get { return pathfinder; }
         }
-
         #endregion
 
         #region Methods
+        #region Pathfinding
         /// <summary>
-        /// Generates a new unique identifier for objects of this world.
+        /// Finds a path from a source to a destination.
         /// </summary>
-        /// <returns>The <see cref="Uid"/> that was generated.</returns>
-        public Handle GenerateUid()
+        /// <param name="source">The position where the path should start.</param>
+        /// <param name="destination">The position the path should reach.</param>
+        /// <param name="isWalkable">A delegate to a method that tests if tiles are walkable.</param>
+        /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
+        public Path FindPath(Vector2 source, Vector2 destination, Func<int, int, bool> isWalkable)
         {
-            Debug.Assert(nextUidValue < uint.MaxValue);
-            Handle uid = new Handle(nextUidValue);
-            ++nextUidValue;
-            return uid;
+            Argument.EnsureNotNull(isWalkable, "isWalkable");
+
+            if (!Bounds.ContainsPoint(source))
+                throw new ArgumentOutOfRangeException("source");
+
+            destination = Bounds.ClosestPointInside(destination);
+
+            return pathfinder.Find(source, destination, isWalkable);
+        }
+
+        /// <summary>
+        /// Finds a path from a source to a destination.
+        /// </summary>
+        /// <param name="source">The position where the path should start.</param>
+        /// <param name="destination">The position the path should reach.</param>
+        /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
+        public Path FindPath(Vector2 source, Vector2 destination)
+        {
+            return FindPath(source, destination, terrain.IsWalkableAndWithinBounds);
+        }
+        #endregion
+
+        /// <summary>
+        /// Generates a new handle for an object of this world.
+        /// </summary>
+        /// <returns>The <see cref="Handle"/> that was generated.</returns>
+        public Handle GenerateHandle()
+        {
+            Debug.Assert(nextHandleValue < uint.MaxValue);
+            Handle handle = new Handle(nextHandleValue);
+            ++nextHandleValue;
+            return handle;
         }
 
         #region Factions
@@ -132,10 +170,10 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        public bool IsWithinBounds(Point16 point)
+        public bool IsWithinBounds(int x, int y)
         {
-            return point.X >= 0 && point.Y >= 0
-                && point.X < Width && point.Y < Height;
+            return x >= 0 && y >= 0
+                && x < Width && y < Height;
         }
 
         public bool IsWithinBounds(Vector2 point)

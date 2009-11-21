@@ -330,7 +330,8 @@ namespace Orion.GameLogic
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)
                     .OfType<Unit>()
-                    .FirstOrDefault(unit => GetDiplomaticStance(unit) == DiplomaticStance.Enemy);
+                    .Where(unit => GetDiplomaticStance(unit) == DiplomaticStance.Enemy)
+                    .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
                 if (unitToAttack != null)
                     Task = new Tasks.Attack(this, unitToAttack);

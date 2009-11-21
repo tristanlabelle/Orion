@@ -24,7 +24,8 @@ namespace Orion.UserInterface
         #region Methods
         protected internal override void Draw(GraphicsContext context)
         {
-            Text text = new Text("Aladdium: {0}    Alagene: {1}".FormatInvariant(faction.AladdiumAmount, faction.AlageneAmount));
+            Text text = new Text("Aladdium: {0}    Alagene: {1}    Population: {2}/{3}"
+                                .FormatInvariant(faction.AladdiumAmount, faction.AlageneAmount, faction.UsedFoodStock, faction.MaxFoodStock));
             context.FillColor = Color.Blue;
             context.Fill(Bounds);
             context.FillColor = Color.White;

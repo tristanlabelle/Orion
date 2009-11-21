@@ -143,10 +143,20 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        public int MaxFoodStock
+        {
+            get { return Math.Min(maxFoodStock, totalFoodStock); }
+        }
+
         public int AvailableFood
         {
 
-            get { return (Math.Min((maxFoodStock - usedFoodStock), (totalFoodStock - usedFoodStock))); }
+            get { return MaxFoodStock - usedFoodStock; }
+        }
+
+        public int UsedFoodStock
+        {
+            get { return usedFoodStock; }
         }
 
         #region Methods

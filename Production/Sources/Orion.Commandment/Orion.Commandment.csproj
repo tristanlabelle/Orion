@@ -64,6 +64,7 @@
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
+    <Compile Include="Match.cs" />
     <Compile Include="Pipeline\CommandPipeline.cs" />
     <Compile Include="Pipeline\CommandReplayLogger.cs" />
     <Compile Include="PlayerSlot.cs" />

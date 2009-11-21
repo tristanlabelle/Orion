@@ -3,11 +3,10 @@ using OpenTK.Math;
 using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
-using Orion.UserInterface;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Orion.Main
+namespace Orion.Commandment
 {
     /// <summary>
     /// Represents a match that is played between a number of commanders in a world.
@@ -26,7 +25,7 @@ namespace Orion.Main
         #endregion
 
         #region Constructors
-        internal Match(Random random, World world, UserInputCommander userCommander, CommandPipeline pipeline)
+        public Match(Random random, World world, UserInputCommander userCommander, CommandPipeline pipeline)
         {
             Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
@@ -70,8 +69,7 @@ namespace Orion.Main
         /// <summary>
         /// Updates this <see cref="Match"/> for the duration of a frame.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        public void Update(Responder source, UpdateEventArgs args)
+        public void Update(UpdateEventArgs args)
         {
             float timeDeltaInSeconds = args.Delta;
             int frameNumber = lastFrameNumber + 1;

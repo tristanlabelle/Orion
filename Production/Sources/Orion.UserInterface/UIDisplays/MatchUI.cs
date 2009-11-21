@@ -19,6 +19,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
+        private readonly Match match;
         private readonly UserInputManager userInputManager;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
@@ -36,12 +37,13 @@ namespace Orion.UserInterface
 
         #region Constructors
 
-        public MatchUI(World world, UserInputCommander commander)
+        public MatchUI(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(commander, "commander");
+            Argument.EnsureNotNull(match, "match");
 
-            userInputManager = new UserInputManager(commander);
+            this.match = match;
+            userInputManager = new UserInputManager(match.UserCommander);
+            World world = match.World;
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Entities.Died += userInputManager.SelectionManager.EntityDied;
@@ -78,7 +80,7 @@ namespace Orion.UserInterface
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
-            commander.CommandGenerated += CommanderGeneratedCommand;
+            match.UserCommander.CommandGenerated += CommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
@@ -205,6 +207,7 @@ namespace Orion.UserInterface
                 halfWorldBoundsSize.Scale(0.5f, 0.5f);
                 worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
             }
+            match.Update(args);
             base.OnUpdate(args);
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Windows.Forms;
+using Orion.Commandment;
 using Orion.Networking;
 using Orion.UserInterface;
 using System.Diagnostics;
@@ -109,8 +110,7 @@ namespace Orion.Main
 
         private void BeginMatch(Match match)
         {
-            MatchUI matchUI = new MatchUI(match.World, match.UserCommander);
-            matchUI.Updated += match.Update;
+            MatchUI matchUI = new MatchUI(match);
 
             gameUI.Display(matchUI);
         }

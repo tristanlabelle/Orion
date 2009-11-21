@@ -1,6 +1,7 @@
 using System;
 using Orion.UserInterface;
 using Orion.GameLogic;
+using Orion.Commandment;
 using Color = System.Drawing.Color;
 
 namespace Orion.Main

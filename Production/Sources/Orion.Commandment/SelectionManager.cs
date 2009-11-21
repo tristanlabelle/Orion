@@ -97,11 +97,15 @@ namespace Orion.Commandment
         /// <param name="entity">The entity that died</param>
         public void EntityDied(EntityRegistry source, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit != null && selectedUnits.Contains(unit))
+            if (entity is Unit)
             {
-                selectedUnits.Remove(unit);
-                OnSelectionChange();
+                Unit unit = (Unit)entity ;
+                if (selectedUnits.Contains(unit))
+                {
+                    selectedUnits.Remove(unit);
+                    OnSelectionChange();
+                }
+                if (hoveredUnit == unit) hoveredUnit = null;
             }
         }
 

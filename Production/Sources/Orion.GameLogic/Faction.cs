@@ -31,6 +31,7 @@ namespace Orion.GameLogic
         private int alageneAmount;
         private int totalFoodStock = 0;
         private int usedFoodStock = 0;
+        private FactionStatus status = FactionStatus.Undefeated;
         #endregion
 
         #region Constructors
@@ -110,6 +111,15 @@ namespace Orion.GameLogic
             get { return fogOfWar; }
         }
 
+        public FactionStatus Status
+        {
+            get { return status; }
+            set 
+            {
+                Argument.EnsureNotNull(value, "status");
+                status = value;
+            }
+        }
         #region Resources
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.

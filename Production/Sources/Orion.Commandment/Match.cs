@@ -154,9 +154,8 @@ namespace Orion.Commandment
         {
             Argument.EnsureNotNull(unitType, "unitType");
 
-            return unitType.HasSkill<Skills.Attack>()
-                || unitType.HasSkill<Skills.Train>()
-                || unitType.HasSkill<Skills.Build>();
+            return (unitType.HasSkill<Skills.Attack>() && !unitType.IsBuilding)
+                || unitType.HasSkill<Skills.Train>();
         }
 
         private void OnEntityDied(EntityRegistry sender, Entity args)
@@ -166,13 +165,17 @@ namespace Orion.Commandment
             Unit unit = (Unit)args;
             Faction faction = unit.Faction;
 
-            if (IsFactionDefeated(faction))
+            if (faction.Status == FactionStatus.Undefeated)
             {
-                OnFactionDefeated(faction);
-                faction.FogOfWar.Disable();
-                // Even if the faction is defeated, we don't have to kill all of its members
-                // as they are harmless anyways and it can be fun to see the remains of your
-                // base once you're dead. However, it might be good to disable their commanders.
+                if (IsFactionDefeated(faction))
+                {
+                    faction.Status = FactionStatus.Defeated;
+                    OnFactionDefeated(faction);
+                    faction.FogOfWar.Disable();
+                    // Even if the faction is defeated, we don't have to kill all of its members
+                    // as they are harmless anyways and it can be fun to see the remains of your
+                    // base once you're dead. However, it might be good to disable their commanders.
+                }
             }
         }
         #endregion

@@ -79,9 +79,13 @@ namespace Orion.UserInterface.Widgets
             context.StrokeColor = Color.Gray;
             context.Fill(Bounds);
             context.Stroke(Bounds);
-
             context.FillColor = Color.Black;
-            context.Draw(contents, new Vector2(4, -5), Bounds);
+
+            Text text;
+            if (contents.Value.Length == 1) text = new Text(contents.Value + " ");
+            else text = contents;
+            Rectangle textBounds = new Rectangle(Bounds.Width, Math.Min(Bounds.Height, text.Frame.Height));
+            context.Draw(text, textBounds);
             if ((updateCounter / cursorBlinkFrequency) % 2 == 0)
             {
                 Rectangle textFrame = contents.Frame;

@@ -55,6 +55,7 @@
     <Compile Include="Match Configuration\MultiplayerHostMatchConfigurer.cs" />
     <Compile Include="Match Configuration\MatchConfigurer.cs" />
     <Compile Include="Match Configuration\MultiplayerMatchConfigurer.cs" />
+    <Compile Include="Match Configuration\ReplayMatchConfigurer.cs" />
     <Compile Include="Match Configuration\SlotType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

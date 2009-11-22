@@ -62,6 +62,7 @@ namespace Orion.Main
             }
 
             Match match = new Match(random, world, userCommander);
+            match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.PushFilter(new CheatCodeFilter(match));

@@ -28,7 +28,12 @@ namespace Orion.UserInterface.Widgets
             scrolledView = view;
             this.direction = direction;
             this.keyboardTrigger = keyboardTrigger;
+            Enabled = true;
         }
+        #endregion
+
+        #region Properties
+        public bool Enabled { get; set; }
         #endregion
 
         #region Methods
@@ -65,7 +70,7 @@ namespace Orion.UserInterface.Widgets
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (mouseTriggered || keyboardTriggered)
+            if ((mouseTriggered || keyboardTriggered) && Enabled)
             {
                 scrolledView.ScrollBy(direction * args.TimeDelta * 40);
             }

@@ -63,14 +63,15 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public CommandSynchronizer(World world, SafeTransporter transporter, IEnumerable<IPv4EndPoint> peerEndPoints)
+        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<IPv4EndPoint> peerEndPoints)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(transporter, "transporter");
             Argument.EnsureNotNull(peerEndPoints, "peerEndPoints");
 
-            this.world = world;
+            world = match.World;
             this.transporter = transporter;
+            match.QuitGame += SafeQuit;
 
             this.peerEndPoints = peerEndPoints.ToList();
             if (this.peerEndPoints.Count == 0)
@@ -158,6 +159,15 @@ namespace Orion.Networking
             lastFrameLocalCommands.AddRange(localCommands);
             localCommands.Clear();
         }
+        #endregion
+
+        #region Private
+        private void SafeQuit(Match match)
+        {
+            byte[] quitPacket = new byte[1] { (byte)GameMessageType.Quit };
+            transporter.SendTo(quitPacket, peerStates.Keys);
+            Dispose();
+        }
 
         private void ExecuteCurrentFrameCommands()
         {
@@ -204,9 +214,7 @@ namespace Orion.Networking
                 transporter.SendTo(stream.ToArray(), peerStates.Keys);
             }
         }
-        #endregion
 
-        #region Private
         private void WaitForPeerCommands()
         {
             if (!ReceivedFromAllPeers || !AllPeersDone)
@@ -227,9 +235,16 @@ namespace Orion.Networking
                 peerStates[peerEndPoint] = PeerState.None;
         }
 
+        private void RemoveFromPeers(IPv4EndPoint host)
+        {
+            peerEndPoints.Remove(host);
+            peerStates.Remove(host);
+        }
+
         private void TransporterReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            if (args.Data[0] == (byte)GameMessageType.Commands || args.Data[0] == (byte)GameMessageType.Done)
+            if (args.Data[0] == (byte)GameMessageType.Commands ||
+                args.Data[0] == (byte)GameMessageType.Done)
             {
                 int packetCommandFrameNumber = BitConverter.ToInt32(args.Data, 1);
                 if (packetCommandFrameNumber < commandFrameNumber)
@@ -241,6 +256,10 @@ namespace Orion.Networking
                 {
                     futureFramePackets.Add(args);
                 }
+            }
+            else if (args.Data[0] == (byte)GameMessageType.Quit)
+            {
+                RemoveFromPeers(args.Host);
             }
         }
 

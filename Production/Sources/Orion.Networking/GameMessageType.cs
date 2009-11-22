@@ -15,5 +15,6 @@ namespace Orion.Networking
     {
         Commands = 0xC0,
         Done = 0xD0,
+        Quit = 0xE0
     }
 }

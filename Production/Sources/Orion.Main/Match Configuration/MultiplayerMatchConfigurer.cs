@@ -69,9 +69,8 @@ namespace Orion.Main
 
             Match match = new Match(random, world, userCommander);
 
-
             CommandTextLogger textLogger = new CommandTextLogger();
-            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
+            CommandSynchronizer synchronizer = new CommandSynchronizer(match, transporter, UserInterface.PlayerAddresses);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushReplayRecorderToPipeline(pipeline);

@@ -22,7 +22,7 @@ namespace Orion.UserInterface
         private static readonly TimeSpan messageTimeToLive = new TimeSpan(0, 0, 10);
         private readonly TextField chatInput;
         private readonly TransparentFrame chatMessages;
-        private readonly Dictionary<Label, DateTime> messagesExpiration = new Dictionary<Label,DateTime>();
+        private readonly Dictionary<Label, DateTime> messagesExpiration = new Dictionary<Label, DateTime>();
         private readonly List<Label> messagesToDelete = new List<Label>();
         #endregion
 
@@ -30,6 +30,10 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
+        #endregion
+
+        #region Pause
+        private readonly Frame pausePanel;
         #endregion
 
         #region Minimap
@@ -52,6 +56,7 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(match, "match");
 
             this.match = match;
+            match.QuitGame += Quit;
             userInputManager = new UserInputManager(match.UserCommander);
             World world = match.World;
 
@@ -90,6 +95,20 @@ namespace Orion.UserInterface
             Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.35f), new Vector2(0.5f, 0.8f));
             chatMessages = new TransparentFrame(messagesFrame);
             Children.Add(chatMessages);
+
+            Rectangle pausePanelRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
+            pausePanel = new Frame(pausePanelRectangle);
+
+            Rectangle quitGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
+            Button quitGame = new Button(quitGameRectangle, "Quit");
+            quitGame.Triggered += button => match.Quit();
+
+            Rectangle resumeGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
+            Button resumeGame = new Button(resumeGameRectangle, match.IsPausable ? "Resume" : "Return");
+            resumeGame.Triggered += button => HidePausePanel();
+
+            pausePanel.Children.Add(quitGame);
+            pausePanel.Children.Add(resumeGame);
 
             KeyDown += userInputManager.HandleKeyDown;
             KeyUp += userInputManager.HandleKeyUp;
@@ -186,24 +205,15 @@ namespace Orion.UserInterface
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
-            isSpaceDown = args.Key == Keys.Space;
-            if (args.Key == Keys.Enter)
+            if (Children.Contains(chatInput))
             {
-                if (!Children.Contains(chatInput))
-                {
-                    chatInput.Clear();
-                    Children.Add(chatInput);
-                }
-                else
+                if (args.Key == Keys.Enter)
                 {
                     UserInputCommander commander = userInputManager.Commander;
                     commander.SendMessage(chatInput.Contents);
                     Children.Remove(chatInput);
                 }
-            }
-            if (Children.Contains(chatInput))
-            {
-                if (args.Key == Keys.Escape)
+                else if (args.Key == Keys.Escape)
                 {
                     chatInput.Clear();
                     Children.Remove(chatInput);
@@ -212,8 +222,20 @@ namespace Orion.UserInterface
             }
             else
             {
-                return base.OnKeyDown(args);
+                isSpaceDown = args.Key == Keys.Space;
+                if (args.Key == Keys.Enter)
+                {
+                    chatInput.Clear();
+                    Children.Add(chatInput);
+                    return false;
+                }
+                else if (args.Key == Keys.F9)
+                {
+                    DisplayPausePanel();
+                    return false;
+                }
             }
+            return base.OnKeyDown(args);
         }
 
         protected override bool OnDoubleClick(MouseEventArgs args)
@@ -232,7 +254,7 @@ namespace Orion.UserInterface
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (isSpaceDown && SelectedType != null && !Children.Contains(chatInput))
+            if (isSpaceDown && SelectedType != null)
             {
                 Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
                 Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
@@ -250,6 +272,11 @@ namespace Orion.UserInterface
 
             match.Update(args);
             base.OnUpdate(args);
+        }
+
+        private void Quit(Match sender)
+        {
+            Parent.PopDisplay(this);
         }
 
         private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
@@ -406,6 +433,27 @@ namespace Orion.UserInterface
             if (newBounds.MinX < -newBounds.Width / 2) newBounds = newBounds.TranslatedTo(-newBounds.Width / 2, newBounds.Min.Y);
             if (newBounds.MinY < -newBounds.Height / 2) newBounds = newBounds.TranslatedTo(newBounds.Min.X, -newBounds.Height / 2);
             worldView.Bounds = newBounds;
+        }
+
+        private void DisplayPausePanel()
+        {
+            if (!Children.Contains(pausePanel))
+            {
+                match.TryPause();
+                if (!match.IsRunning)
+                    foreach (Scroller scroller in Children.OfType<Scroller>()) scroller.Enabled = false;
+                Children.Add(pausePanel);
+            }
+        }
+
+        private void HidePausePanel()
+        {
+            foreach (Scroller scroller in Children.OfType<Scroller>())
+            {
+                scroller.Enabled = true;
+            }
+            Children.Remove(pausePanel);
+            match.TryResume();
         }
         #endregion
         #endregion

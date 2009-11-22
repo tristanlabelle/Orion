@@ -32,6 +32,7 @@ namespace Orion.Commandment
             this.random = random;
             this.world = world;
             userCommander = commander;
+            IsRunning = true;
 
             CreateFactionCamps();
             CreateResourceNodes();
@@ -44,6 +45,7 @@ namespace Orion.Commandment
         #region Events
         public event GenericEventHandler<Match, UpdateEventArgs> Updated;
         public event GenericEventHandler<Faction, string> ReceivedMessage;
+        public event GenericEventHandler<Match> QuitGame;
         #endregion
 
         #region Properties
@@ -56,6 +58,10 @@ namespace Orion.Commandment
         {
             get { return world; }
         }
+
+        public bool IsPausable { get; set; }
+
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Gets the number of the last frame that was ran.
@@ -72,19 +78,38 @@ namespace Orion.Commandment
         /// </summary>
         public void Update(UpdateEventArgs args)
         {
-            float timeDeltaInSeconds = args.TimeDelta;
-            int frameNumber = lastFrameNumber + 1;
-            world.Update(timeDeltaInSeconds);
+            if (IsRunning)
+            {
+                float timeDeltaInSeconds = args.TimeDelta;
+                int frameNumber = lastFrameNumber + 1;
+                world.Update(timeDeltaInSeconds);
 
-            lastFrameNumber = frameNumber;
-            GenericEventHandler<Match, UpdateEventArgs> handler = Updated;
-            if (handler != null) handler(this, args);
+                lastFrameNumber = frameNumber;
+                GenericEventHandler<Match, UpdateEventArgs> handler = Updated;
+                if (handler != null) handler(this, args);
+            }
         }
 
         public void PostMessage(Faction origin, string message)
         {
             GenericEventHandler<Faction, string> handler = ReceivedMessage;
             if (handler != null) handler(origin, message);
+        }
+
+        public void Quit()
+        {
+            GenericEventHandler<Match> handler = QuitGame;
+            if (handler != null) handler(this);
+        }
+
+        public void TryPause()
+        {
+            if (IsPausable) IsRunning = false;
+        }
+
+        public void TryResume()
+        {
+            if (IsPausable) IsRunning = true;
         }
 
         #region Private Camp Creation

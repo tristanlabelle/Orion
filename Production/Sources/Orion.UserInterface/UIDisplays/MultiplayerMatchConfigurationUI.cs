@@ -12,6 +12,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         private SafeTransporter transporter;
+        protected ListFrame chatMessages;
         #endregion
 
         #region Constructors

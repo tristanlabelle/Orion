@@ -14,8 +14,8 @@ namespace Orion.Main
         #region Fields
         protected static Color[] playerColors = new Color[]
         {
-            Color.Red, Color.Cyan, Color.Purple, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.Tan, Color.Turquoise, Color.Brown, Color.LightGray
+            Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
+            Color.Green, Color.Pink, Color.Tan, Color.Turquoise
         };
 
         private int seed;

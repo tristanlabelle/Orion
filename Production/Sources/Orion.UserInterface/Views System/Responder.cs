@@ -23,9 +23,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
-        public virtual Rectangle Frame { get; set; }
-        public virtual Rectangle Bounds { get; set; }
-
         public Vector2? MousePosition
         {
             get

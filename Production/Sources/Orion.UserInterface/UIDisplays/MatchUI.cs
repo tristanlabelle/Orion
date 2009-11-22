@@ -184,8 +184,13 @@ namespace Orion.UserInterface
         public void DisplayDefeatMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-
             DisplayMessage("{0} was defeated.".FormatInvariant(faction.Name), faction.Color);
+
+            if (faction == match.UserCommander.Faction)
+            {
+                match.TryPause();
+                Instant.DisplayAlert(this, "You have lost the match.", () => Parent.PopDisplay(this));
+            }
         }
 
         public void DisplayVictoryMessage(Faction faction)

@@ -79,6 +79,7 @@
     <Compile Include="UIDisplays\MultiplayerClientMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MultiplayerHostMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MultiplayerMatchConfigurationUI.cs" />
+    <Compile Include="UIDisplays\ReplayLoadingUI.cs" />
     <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\VoidUI.cs" />
     <Compile Include="Views System\ClippedView.cs" />

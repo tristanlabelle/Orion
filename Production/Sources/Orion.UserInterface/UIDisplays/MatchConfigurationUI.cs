@@ -18,7 +18,8 @@ namespace Orion.UserInterface
         protected Button exitButton;
 
         protected Random random;
-        protected DropdownList<PlayerSlot>[] playerSlots = new DropdownList<PlayerSlot>[12];
+        protected DropdownList<PlayerSlot>[] playerSlots = new DropdownList<PlayerSlot>[8];
+        protected Frame backgroundFrame;
         #endregion
 
         #region Constructors
@@ -28,7 +29,7 @@ namespace Orion.UserInterface
 
         public MatchConfigurationUI(bool enableStartGame)
         {
-            Frame backgroundFrame = new Frame(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
+            backgroundFrame = new Frame(Bounds.TranslatedBy(10, 375).ResizedBy(-20, -385));
             Children.Add(backgroundFrame);
             Rectangle dropdownListRect = new Rectangle(10, backgroundFrame.Bounds.MaxY - 40, 200, 30);
             for (int i = 0; i < playerSlots.Length; i++)

@@ -8,6 +8,8 @@ using Orion.Geometry;
 
 namespace Orion.UserInterface.Widgets
 {
+    public delegate void AlertAction();
+
     public static class Instant
     {
         public static Rectangle CreateComponentRectangle(Rectangle parentSystem, Vector2 originPoint, Vector2 topmostPoint)
@@ -18,6 +20,11 @@ namespace Orion.UserInterface.Widgets
         }
 
         public static void DisplayAlert(Responder parent, string message)
+        {
+            DisplayAlert(parent, message, null);
+        }
+
+        public static void DisplayAlert(Responder parent, string message, AlertAction action)
         {
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
@@ -30,7 +37,7 @@ namespace Orion.UserInterface.Widgets
             Frame container = new Frame(frameRect);
             Label displayedMessage = new Label(labelRect, message);
             Button okButton = new Button(buttonRect, "Ok");
-            okButton.Triggered += delegate(Button sender) { container.Dispose(); };
+            okButton.Triggered += button => { container.Dispose(); if(action != null) action(); };
 
             container.Children.Add(displayedMessage);
             container.Children.Add(okButton);

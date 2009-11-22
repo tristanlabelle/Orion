@@ -19,7 +19,9 @@ namespace Orion.Networking
         SetSlot = 108,
         SetSeed = 109,
 
-        StartGame = 110,
-        Exit = 111
+        Message = 110,
+
+        StartGame = 111,
+        Exit = 112
     }
 }

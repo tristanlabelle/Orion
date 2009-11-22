@@ -26,11 +26,11 @@ namespace Orion.UserInterface.Widgets
 
         protected internal override void OnAddChild(ViewContainer child)
         {
-            View childAsView = child as View;
-            if (childAsView != null)
+            if (child != null)
             {
-                childAsView.Frame = itemFrame
-                   .TranslatedBy(padding.X, Bounds.MaxY - (itemFrame.Height + padding.Y) * Children.Count - padding.Y);
+                float yPos = Bounds.MaxY - (itemFrame.Height + padding.Y) * Children.Count - padding.Y;
+                child.Frame = itemFrame.TranslatedBy(padding.X, yPos);
+                if (yPos < 0) Bounds = Bounds.TranslatedBy(0, -yPos);
             }
             base.OnAddChild(child);
         }

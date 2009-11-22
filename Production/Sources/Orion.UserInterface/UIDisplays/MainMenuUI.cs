@@ -1,5 +1,6 @@
 ﻿using Orion.Geometry;
 using Orion.UserInterface.Widgets;
+using OpenTK.Math;
 
 namespace Orion.UserInterface
 {
@@ -7,18 +8,34 @@ namespace Orion.UserInterface
     {
         public MainMenuUI(GenericEventHandler<Button> beginSinglePlayerGameDelegate, GenericEventHandler<Button> beginMultiplayerGameDelegate)
         {
-            Button singleplayerGame = new Button(new Rectangle(300, 400, 400, 100), "Single Player Game");
+            Rectangle singlePlayerButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.165f, 0.505f), new Vector2(0.475f, 0.66f));
+            Button singleplayerGame = new Button(singlePlayerButtonRect, "Single Player Game");
             singleplayerGame.Triggered += beginSinglePlayerGameDelegate;
             Children.Add(singleplayerGame);
 
-            Button multiplayerGame = new Button(new Rectangle(300, 250, 400, 100), "Multiplayer Game");
+            Rectangle multiplayerButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.525f, 0.505f), new Vector2(0.835f, 0.66f));
+            Button multiplayerGame = new Button(multiplayerButtonRect, "Multiplayer Game");
             multiplayerGame.Triggered += beginMultiplayerGameDelegate;
             Children.Add(multiplayerGame);
+
+            Rectangle viewReplayButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.345f, 0.33f), new Vector2(0.655f, 0.485f));
+            Button replayGame = new Button(viewReplayButtonRect, "View Replay");
+            Children.Add(replayGame);
         }
 
-        protected internal override void Render()
+        public event GenericEventHandler<MainMenuUI> LaunchedSinglePlayerGame;
+        public event GenericEventHandler<MainMenuUI> LaunchedMultiplayerGame;
+        public event GenericEventHandler<MainMenuUI> LaunchedReplayViewer;
+
+        private void BeginSinglePlayer(Button sender)
         {
-            base.Render();
+            if (LaunchedSinglePlayerGame != null)
+                LaunchedSinglePlayerGame(this);
+        }
+
+        private void BeginMultiplayerGame(Button sender)
+        {
+
         }
     }
 }

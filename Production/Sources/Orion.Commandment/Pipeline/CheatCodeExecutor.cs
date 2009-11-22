@@ -72,6 +72,8 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
             cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
             cheatCodes["itsover9000"] = AccelerateUnitDevelopment;
+            cheatCodes["brinformatique"] = InstantDefeat;
+            cheatCodes["falconpunch"] = InstantVictory;
         }
         #endregion
 
@@ -104,6 +106,22 @@ namespace Orion.Commandment.Pipeline
                 if (type.HasSkill<Skills.Train>()) type.GetSkill<Skills.Train>().Speed *= 50;
                 if (type.HasSkill<Skills.Build>()) type.GetSkill<Skills.Build>().Speed *= 50;
             }
+        }
+
+        private static void InstantVictory(Match match)
+        {
+            Faction userFaction = match.UserCommander.Faction;
+            IEnumerable<Unit> enemyBuildings = match.World.Entities
+                .OfType<Unit>().Where(u => u.Faction != userFaction);
+            foreach (Unit building in enemyBuildings) building.Suicide();
+        }
+
+        private static void InstantDefeat(Match match)
+        {
+            Faction userFaction = match.UserCommander.Faction;
+            IEnumerable<Unit> userBuildings = match.World.Entities
+                .OfType<Unit>().Where(u => u.Faction == userFaction);
+            foreach (Unit building in userBuildings) building.Suicide();
         }
         #endregion
         #endregion

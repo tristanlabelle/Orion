@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Orion.Geometry;
 
 namespace Orion.UserInterface
 {
@@ -201,6 +202,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
+        public virtual Rectangle Frame { get; set; }
+        public virtual Rectangle Bounds { get; set; }
+
         public IEnumerable<ViewContainer> Ancestors
         {
             get
@@ -352,6 +356,7 @@ namespace Orion.UserInterface
             if (isDisposed) throw new ObjectDisposedException(null);
             foreach (ViewContainer container in Children)
             {
+                if (!Rectangle.Intersects(Bounds, container.Frame)) continue;
                 container.Render();
             }
         }

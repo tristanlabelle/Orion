@@ -6,20 +6,66 @@ using Orion.Commandment.Commands;
 
 namespace Orion.Commandment.Pipeline
 {
-    public delegate void CheatEffect(Match match);
-
-    public class CheatCodeFilter : CommandFilter
+    public sealed class CheatCodeFilter : CommandFilter
     {
-        #region Static
-        private static readonly Dictionary<string, CheatEffect> cheatCodes = new Dictionary<string, CheatEffect>();
+        #region Instance
+        #region Fields
+        private Match match;
+        private Queue<Command> commandQueue = new Queue<Command>();
+        #endregion
 
+        #region Constructors
+        public CheatCodeFilter(Match match)
+        {
+            Argument.EnsureNotNull(match, "match");
+            this.match = match;
+        }
+        #endregion
+
+        #region Methods
+        public override void Handle(Command command)
+        {
+            Argument.EnsureNotNull(command, "command");
+            commandQueue.Enqueue(command);
+        }
+
+        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        {
+            while (commandQueue.Count > 0)
+            {
+                Command command = commandQueue.Dequeue();
+                Message message = command as Message;
+                if (message != null)
+                {
+                    Action<Match> cheatCode;
+                    if (cheatCodes.TryGetValue(message.Value, out cheatCode))
+                    {
+                        cheatCode(match);
+                        command = new Message(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Value));
+                    }
+                }
+                Flush(command);
+            }
+        }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Fields
+        private static readonly Dictionary<string, Action<Match>> cheatCodes
+            = new Dictionary<string, Action<Match>>();
+        #endregion
+
+        #region Constructor
         static CheatCodeFilter()
         {
             cheatCodes["colorlessdeepfog"] = DisableFogOfWar;
             cheatCodes["magiclamp"] = IncreaseResources;
             cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
         }
+        #endregion
 
+        #region Methods
         private static void DisableFogOfWar(Match match)
         {
             match.UserCommander.Faction.FogOfWar.Disable();
@@ -35,41 +81,7 @@ namespace Orion.Commandment.Pipeline
         {
             match.UserCommander.Faction.UsedFoodStock -= 100;
         }
-
         #endregion
-
-        #region Instance
-        private Match match;
-        private Queue<Command> commandQueue = new Queue<Command>();
-
-        public CheatCodeFilter(Match match)
-        {
-            this.match = match;
-        }
-
-        public override void Handle(Command command)
-        {
-            Argument.EnsureNotNull(command, "command");
-            commandQueue.Enqueue(command);
-        }
-
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
-        {
-            while (commandQueue.Count > 0)
-            {
-                Command command = commandQueue.Dequeue();
-                if (command is Message)
-                {
-                    Message messageCommand = (Message)command;
-                    if (cheatCodes.ContainsKey(messageCommand.Value))
-                    {
-                        cheatCodes[messageCommand.Value](match);
-                        command = new Message(messageCommand.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(messageCommand.Value));
-                    }
-                }
-                Flush(command);
-            }
-        }
         #endregion
     }
 }

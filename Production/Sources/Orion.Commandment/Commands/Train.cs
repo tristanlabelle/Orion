@@ -12,7 +12,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class Train : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> trainerHandles;
         private readonly Handle traineeTypeHandle;
@@ -75,40 +74,25 @@ namespace Orion.Commandment.Commands
             return "[{0}] build {1}"
                 .FormatInvariant(trainerHandles.ToCommaSeparatedValues(), traineeTypeHandle);
         }
-        #endregion
-        #endregion
-
-        #region Serializer
-        public sealed class Serializer : CommandSerializer<Train>
+        
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Train command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.trainerHandles);
-                WriteHandle(writer, command.traineeTypeHandle);
-            }
-
-            protected override Train DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var trainerHandles = ReadLengthPrefixedHandleArray(reader);
-                Handle traineeTypeHandle = ReadHandle(reader);
-                return new Train(factionHandle, trainerHandles, traineeTypeHandle);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, trainerHandles);
+            WriteHandle(writer, traineeTypeHandle);
         }
+
+        public static Train DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var trainerHandles = ReadLengthPrefixedHandleArray(reader);
+            Handle traineeTypeHandle = ReadHandle(reader);
+            return new Train(factionHandle, trainerHandles, traineeTypeHandle);
+        }
+        #endregion
         #endregion
     }
 }

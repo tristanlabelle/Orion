@@ -16,7 +16,6 @@ namespace Orion.Commandment.Commands
     [Serializable]
     public sealed class Move : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
         private readonly Vector2 destination;
@@ -56,47 +55,28 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] move to {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), destination);
         }
-        #endregion
-        #endregion
-
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Move"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Move>
+                
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Move command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
-                writer.Write(command.destination.X);
-                writer.Write(command.destination.Y);
-            }
-
-            protected override Move DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var unitHandles = ReadLengthPrefixedHandleArray(reader);
-                float x = reader.ReadSingle();
-                float y = reader.ReadSingle();
-                Vector2 destination = new Vector2(x, y);
-                return new Move(factionHandle, unitHandles, destination);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, unitHandles);
+            writer.Write(destination.X);
+            writer.Write(destination.Y);
         }
+
+        public static Move DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var unitHandles = ReadLengthPrefixedHandleArray(reader);
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+            Vector2 destination = new Vector2(x, y);
+            return new Move(factionHandle, unitHandles, destination);
+        }
+        #endregion
         #endregion
     }
 }

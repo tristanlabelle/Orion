@@ -69,7 +69,7 @@ namespace Orion.Main
             Match match = new Match(random, world, userCommander);
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
+            pipeline.AddFilter(new CommandReplayLogger("replay.foo"));
             CommandTextLogger textLogger = new CommandTextLogger();
             pipeline.AddFilter(textLogger);
             CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);

@@ -14,7 +14,6 @@ namespace Orion.Commandment.Commands
     [Serializable]
     public sealed class Cancel : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
         #endregion
@@ -50,42 +49,23 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] cancel".FormatInvariant(unitHandles.ToCommaSeparatedValues());
         }
-        #endregion
-        #endregion
 
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Cancel"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Cancel>
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Cancel command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
-            }
-
-            protected override Cancel DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var unitHandles = ReadLengthPrefixedHandleArray(reader);
-                return new Cancel(factionHandle, unitHandles);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, unitHandles);
         }
+
+        public static Cancel DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var unitHandles = ReadLengthPrefixedHandleArray(reader);
+            return new Cancel(factionHandle, unitHandles);
+        }
+        #endregion
         #endregion
     }
 }

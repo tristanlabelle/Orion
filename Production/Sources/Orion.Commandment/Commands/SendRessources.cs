@@ -9,7 +9,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class SendRessources : Command
     { 
-        #region Instance
         #region Fields
         private readonly Handle targetFactionHandle;
         private readonly int aladdiumAmount;
@@ -57,48 +56,29 @@ namespace Orion.Commandment.Commands
             return "Faction {0} send {2} Aladdium and {3} Alagene to {1}."
                 .FormatInvariant(FactionHandle, targetFactionHandle, aladdiumAmount, alageneAmount);
         }
-        #endregion
-        #endregion
 
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<SendRessources>
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(SendRessources command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteHandle(writer, command.targetFactionHandle);
-                writer.Write(command.aladdiumAmount);
-                writer.Write(command.alageneAmount);
-            }
-
-            protected override SendRessources DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                Handle targetFactionHandle = ReadHandle(reader);
-                int aladdiumAmount = reader.ReadInt32();
-                int alageneAmount = reader.ReadInt32();
-
-                return new SendRessources(factionHandle, targetFactionHandle,
-                    aladdiumAmount, alageneAmount);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteHandle(writer, targetFactionHandle);
+            writer.Write(aladdiumAmount);
+            writer.Write(alageneAmount);
         }
+
+        public static SendRessources DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            Handle targetFactionHandle = ReadHandle(reader);
+            int aladdiumAmount = reader.ReadInt32();
+            int alageneAmount = reader.ReadInt32();
+
+            return new SendRessources(factionHandle, targetFactionHandle,
+                aladdiumAmount, alageneAmount);
+        }
+        #endregion
         #endregion
     }
 }

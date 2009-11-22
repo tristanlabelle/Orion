@@ -15,7 +15,6 @@ namespace Orion.Commandment.Commands
     /// </summary>
     public sealed class ZoneAttack : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> attackerHandles;
         private readonly Vector2 destination; 
@@ -55,47 +54,28 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] zone attack to {1}".FormatInvariant(attackerHandles.ToCommaSeparatedValues(), destination);
         }
-        #endregion
-        #endregion
-
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="ZoneAttack"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<ZoneAttack>
+                
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(ZoneAttack command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.attackerHandles);
-                writer.Write(command.destination.X);
-                writer.Write(command.destination.Y);
-            }
-
-            protected override ZoneAttack DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var attackerHandles = ReadLengthPrefixedHandleArray(reader);
-                float x = reader.ReadSingle();
-                float y = reader.ReadSingle();
-                Vector2 destination = new Vector2(x, y);
-                return new ZoneAttack(factionHandle, attackerHandles, destination);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, attackerHandles);
+            writer.Write(destination.X);
+            writer.Write(destination.Y);
         }
+
+        public static ZoneAttack DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var attackerHandles = ReadLengthPrefixedHandleArray(reader);
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+            Vector2 destination = new Vector2(x, y);
+            return new ZoneAttack(factionHandle, attackerHandles, destination);
+        }
+        #endregion
         #endregion
     }
 }

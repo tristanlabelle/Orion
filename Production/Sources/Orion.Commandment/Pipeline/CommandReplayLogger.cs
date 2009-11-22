@@ -12,20 +12,17 @@ namespace Orion.Commandment.Pipeline
         #region Fields
         private readonly Queue<Command> commandQueue = new Queue<Command>();
         private readonly BinaryWriter writer;
-        private readonly CommandFactory commandFactory;
         #endregion
 
         #region Constructors
-        public CommandReplayLogger(Stream stream, World world)
+        public CommandReplayLogger(Stream stream)
         {
             Argument.EnsureNotNull(stream, "stream");
-            Argument.EnsureNotNull(world, "world");
             writer = new BinaryWriter(stream);
-            commandFactory = new CommandFactory(world);
         }
 
-        public CommandReplayLogger(string path, World world)
-            : this(File.OpenWrite(path), world) { }
+        public CommandReplayLogger(string path)
+            : this(File.OpenWrite(path)) { }
         #endregion
 
         #region Methods
@@ -41,7 +38,7 @@ namespace Orion.Commandment.Pipeline
             {
                 Command command = commandQueue.Dequeue();
                 writer.Write(updateNumber);
-                commandFactory.Serialize(command, writer);
+                command.Serialize(writer);
                 writer.Flush();
                 Flush(command);
             }

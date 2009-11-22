@@ -9,7 +9,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class Build : Command
     {
-        #region Instance
         #region Fields
         private readonly Handle builderHandle;
         private readonly Vector2 position;
@@ -47,49 +46,30 @@ namespace Orion.Commandment.Commands
         {
             return "{0} build {1} at {2}".FormatInvariant(builderHandle, buildingTypeHandle, position);
         }
-        #endregion
-        #endregion
 
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Build>
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Build command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteHandle(writer, command.builderHandle);
-                WriteHandle(writer, command.buildingTypeHandle);
-                writer.Write(command.position.X);
-                writer.Write(command.position.Y);
-            }
-
-            protected override Build DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                Handle builderHandle = ReadHandle(reader);
-                Handle buildingTypeHandle = ReadHandle(reader);
-                float x = reader.ReadSingle();
-                float y = reader.ReadSingle();
-                Vector2 position = new Vector2(x, y);
-                return new Build(factionHandle, builderHandle, buildingTypeHandle, position);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteHandle(writer, builderHandle);
+            WriteHandle(writer, buildingTypeHandle);
+            writer.Write(position.X);
+            writer.Write(position.Y);
         }
+
+        public static Build DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            Handle builderHandle = ReadHandle(reader);
+            Handle buildingTypeHandle = ReadHandle(reader);
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+            Vector2 position = new Vector2(x, y);
+            return new Build(factionHandle, builderHandle, buildingTypeHandle, position);
+        }
+        #endregion
         #endregion
     }
 }

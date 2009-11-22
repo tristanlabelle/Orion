@@ -10,7 +10,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class Harvest : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> harvesterHandles;
         private readonly Handle resourceNodeHandle;
@@ -50,44 +49,25 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] harvest {1}".FormatInvariant(harvesterHandles.ToCommaSeparatedValues(), resourceNodeHandle);
         }
-        #endregion
-        #endregion
-
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Cancel"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Harvest>
+        
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Harvest command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.harvesterHandles);
-                WriteHandle(writer, command.resourceNodeHandle);
-            }
-
-            protected override Harvest DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var harvesterHandles = ReadLengthPrefixedHandleArray(reader);
-                Handle resourceNodeHandle = ReadHandle(reader);
-                return new Harvest(factionHandle, harvesterHandles, resourceNodeHandle);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, harvesterHandles);
+            WriteHandle(writer, resourceNodeHandle);
         }
+
+        public static Harvest DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var harvesterHandles = ReadLengthPrefixedHandleArray(reader);
+            Handle resourceNodeHandle = ReadHandle(reader);
+            return new Harvest(factionHandle, harvesterHandles, resourceNodeHandle);
+        }
+        #endregion
         #endregion
     }
 }

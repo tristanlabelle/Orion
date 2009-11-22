@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="AgressiveAICommander.cs" />
     <Compile Include="AICommander.cs" />
-    <Compile Include="CommandFactory.cs" />
     <Compile Include="Commander.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Commands\Attack.cs" />
@@ -58,7 +57,6 @@
     <Compile Include="Commands\Cancel.cs" />
     <Compile Include="Commands\Message.cs" />
     <Compile Include="Commands\Move.cs" />
-    <Compile Include="CommandSerializer.cs" />
     <Compile Include="Commands\Repair.cs" />
     <Compile Include="Commands\SendRessources.cs" />
     <Compile Include="Commands\Suicide.cs" />

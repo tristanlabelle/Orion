@@ -63,7 +63,7 @@ namespace Orion.Main
             Match match = new Match(random, world, userCommander);
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
+            pipeline.AddFilter(new CommandReplayLogger("replay.foo"));
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);

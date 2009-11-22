@@ -10,7 +10,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class ChangeDiplomacy: Command
     {
-        #region Instance
         #region Fields
         private readonly Handle otherFactionHandle;
         private readonly DiplomaticStance diplomaticStance;
@@ -47,45 +46,26 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] {2} to {1}".FormatInvariant(FactionHandle, diplomaticStance, otherFactionHandle);
         }
-        #endregion
-        #endregion
 
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<ChangeDiplomacy>
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(ChangeDiplomacy command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteHandle(writer, command.otherFactionHandle);
-                writer.Write((byte)command.diplomaticStance);
-            }
-
-            protected override ChangeDiplomacy DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                Handle otherFactionHandle = ReadHandle(reader);
-                DiplomaticStance stance = (DiplomaticStance)reader.ReadByte();
-
-                return new ChangeDiplomacy(factionHandle, otherFactionHandle, stance);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteHandle(writer, otherFactionHandle);
+            writer.Write((byte)diplomaticStance);
         }
+
+        public static ChangeDiplomacy DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            Handle otherFactionHandle = ReadHandle(reader);
+            DiplomaticStance stance = (DiplomaticStance)reader.ReadByte();
+
+            return new ChangeDiplomacy(factionHandle, otherFactionHandle, stance);
+        }
+        #endregion
         #endregion
     }
 }

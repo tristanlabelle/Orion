@@ -14,7 +14,6 @@ namespace Orion.Commandment.Commands
     /// </summary>
     public sealed class Repair : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
         private readonly Handle targetHandle;
@@ -55,44 +54,25 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] repair {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), targetHandle);
         }
-        #endregion
-        #endregion
-
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Repair"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Repair>
+                        
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Repair command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
-                WriteHandle(writer, command.targetHandle);
-            }
-
-            protected override Repair DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var unitHandles = ReadLengthPrefixedHandleArray(reader);
-                Handle targetHandle = ReadHandle(reader);
-                return new Repair(factionHandle, unitHandles, targetHandle);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, unitHandles);
+            WriteHandle(writer, targetHandle);
         }
+
+        public static Repair DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var unitHandles = ReadLengthPrefixedHandleArray(reader);
+            Handle targetHandle = ReadHandle(reader);
+            return new Repair(factionHandle, unitHandles, targetHandle);
+        }
+        #endregion
         #endregion
     }
 }

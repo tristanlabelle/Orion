@@ -55,8 +55,6 @@ namespace Orion.Networking
         /// </summary>
         private readonly List<NetworkEventArgs> futureFramePackets = new List<NetworkEventArgs>();
 
-        private readonly CommandFactory serializer;
-
         private int commandFrameNumber = -1;
         private int frameNumber = -1;
         private int lastCommandFrame = -1;
@@ -73,8 +71,6 @@ namespace Orion.Networking
 
             this.world = world;
             this.transporter = transporter;
-
-            this.serializer = new CommandFactory(world);
 
             this.peerEndPoints = peerEndPoints.ToList();
             if (this.peerEndPoints.Count == 0)
@@ -203,9 +199,7 @@ namespace Orion.Networking
                     writer.Write((byte)GameMessageType.Commands);
                     writer.Write(commandFrameNumber);
                     foreach (Command command in localCommands)
-                    {
-                        serializer.Serialize(command, writer);
-                    }
+                        command.Serialize(writer);
                 }
                 transporter.SendTo(stream.ToArray(), peerStates.Keys);
             }
@@ -296,7 +290,7 @@ namespace Orion.Networking
                 {
                     while (stream.Position != stream.Length)
                     {
-                        Command deserializedCommand = serializer.Deserialize(reader);
+                        Command deserializedCommand = Command.Deserialize(reader);
                         commandsToBeFlushed.Add(deserializedCommand);
                     }
                 }

@@ -14,7 +14,6 @@ namespace Orion.Commandment.Commands
     /// </summary>
     public sealed class Attack : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> attackerHandles;
         private readonly Handle targetHandle; 
@@ -56,44 +55,25 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] attack {1}".FormatInvariant(attackerHandles.ToCommaSeparatedValues(), targetHandle);
         }
-        #endregion
-        #endregion
-
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Attack"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Attack>
+        
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Attack command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.attackerHandles);
-                WriteHandle(writer, command.targetHandle);
-            }
-
-            protected override Attack DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var attackerHandles = ReadLengthPrefixedHandleArray(reader);
-                Handle targetHandle = ReadHandle(reader);
-                return new Attack(factionHandle, attackerHandles, targetHandle);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, attackerHandles);
+            WriteHandle(writer, targetHandle);
         }
+
+        public static Attack DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var attackerHandles = ReadLengthPrefixedHandleArray(reader);
+            Handle targetHandle = ReadHandle(reader);
+            return new Attack(factionHandle, attackerHandles, targetHandle);
+        }
+        #endregion
         #endregion
     }
 }

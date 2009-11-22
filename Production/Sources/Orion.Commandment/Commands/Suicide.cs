@@ -10,7 +10,6 @@ namespace Orion.Commandment.Commands
 {
     public sealed class Suicide : Command
     {
-        #region Instance
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
         #endregion
@@ -46,42 +45,23 @@ namespace Orion.Commandment.Commands
         {
             return "[{0}] suicide".FormatInvariant(unitHandles.ToCommaSeparatedValues());
         }
-        #endregion
-        #endregion
 
-        #region Serializer Class
-        /// <summary>
-        /// A <see cref="CommandSerializer"/> that provides serialization to the <see cref="Suicide"/> command.
-        /// </summary>
-        [Serializable]
-        public sealed class Serializer : CommandSerializer<Suicide>
+        #region Serialization
+        protected override void SerializeSpecific(BinaryWriter writer)
         {
-            #region Instance
-            #region Methods
-            protected override void SerializeData(Suicide command, BinaryWriter writer)
-            {
-                WriteHandle(writer, command.FactionHandle);
-                WriteLengthPrefixedHandleArray(writer, command.unitHandles);
-            }
-
-            protected override Suicide DeserializeData(BinaryReader reader)
-            {
-                Handle factionHandle = ReadHandle(reader);
-                var unitHandles = ReadLengthPrefixedHandleArray(reader);
-                return new Suicide(factionHandle, unitHandles);
-            }
-            #endregion
-            #endregion
-
-            #region Static
-            #region Fields
-            /// <summary>
-            /// A globally available static instance of this class.
-            /// </summary>
-            public static readonly Serializer Instance = new Serializer();
-            #endregion
-            #endregion
+            WriteHandle(writer, FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, unitHandles);
         }
+
+        public static Suicide DeserializeSpecific(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            Handle factionHandle = ReadHandle(reader);
+            var unitHandles = ReadLengthPrefixedHandleArray(reader);
+            return new Suicide(factionHandle, unitHandles);
+        }
+        #endregion
         #endregion
     }
 }

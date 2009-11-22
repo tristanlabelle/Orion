@@ -18,21 +18,31 @@ namespace Orion.UserInterface
     public class MatchUI : UIDisplay
     {
         #region Fields
-        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly Match match;
-        private readonly UserInputManager userInputManager;
+        #region Chat
+        private static readonly TimeSpan messageTimeToLive = new TimeSpan(0, 0, 10);
+        private readonly TextField chatInput;
+        private readonly TransparentFrame chatMessages;
+        private readonly Dictionary<Label, DateTime> messagesExpiration = new Dictionary<Label,DateTime>();
+        private readonly List<Label> messagesToDelete = new List<Label>();
+        #endregion
+
+        #region General UI
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
-        private readonly TextField chatInput;
-        private readonly ActionFrame actions;
-        private UnitType selectedType;
-        private bool isSpaceDown;
+        #endregion
 
         #region Minimap
         private readonly Frame minimapFrame;
         private bool mouseDownOnMinimap;
         #endregion
+
+        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
+        private readonly Match match;
+        private readonly UserInputManager userInputManager;
+        private readonly ActionFrame actions;
+        private UnitType selectedType;
+        private bool isSpaceDown;
         #endregion
 
         #region Constructors
@@ -73,6 +83,9 @@ namespace Orion.UserInterface
 
             Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.3f), new Vector2(0.5f, 0.34f));
             chatInput = new TextField(chatInputFrame);
+            Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.35f), new Vector2(0.5f, 0.8f));
+            chatMessages = new TransparentFrame(messagesFrame);
+            Children.Add(chatMessages);
 
             KeyDown += userInputManager.HandleKeyDown;
             KeyUp += userInputManager.HandleKeyUp;
@@ -126,6 +139,17 @@ namespace Orion.UserInterface
         #endregion
 
         #region Event Handling
+        public void DisplayMessage(Faction origin, string message)
+        {
+            Label messageLabel = new Label("{0}: {1}".FormatInvariant(origin.Name, message));
+            messageLabel.Color = origin.Color;
+            messagesExpiration[messageLabel] = DateTime.UtcNow + messageTimeToLive;
+            float height = messageLabel.Frame.Height;
+            foreach (Label writtenMessage in chatMessages.Children)
+                writtenMessage.Frame = writtenMessage.Frame.TranslatedBy(0, height);
+            chatMessages.Children.Add(messageLabel);
+        }
+
         protected override bool OnMouseWheel(MouseEventArgs args)
         {
             double scale = 1 - (args.WheelDelta / 600.0);
@@ -164,7 +188,8 @@ namespace Orion.UserInterface
                     Children.Add(chatInput);
                 else
                 {
-                    // todo: generate command
+                    UserInputCommander commander = userInputManager.Commander;
+                    commander.SendMessage(chatInput.Contents);
                     chatInput.Clear();
                     Children.Remove(chatInput);
                 }
@@ -207,6 +232,15 @@ namespace Orion.UserInterface
                 halfWorldBoundsSize.Scale(0.5f, 0.5f);
                 worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
             }
+            DateTime now = DateTime.UtcNow;
+            messagesToDelete.AddRange(messagesExpiration.Where(pair => pair.Value <= now).Select(pair => pair.Key));
+            foreach (Label toDelete in messagesToDelete)
+            {
+                messagesExpiration.Remove(toDelete);
+                toDelete.Dispose();
+            }
+            messagesToDelete.Clear();
+
             match.Update(args);
             base.OnUpdate(args);
         }

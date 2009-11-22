@@ -111,6 +111,7 @@ namespace Orion.Main
         private void BeginMatch(Match match)
         {
             MatchUI matchUI = new MatchUI(match);
+            match.ReceivedMessage += matchUI.DisplayMessage;
 
             gameUI.Display(matchUI);
         }

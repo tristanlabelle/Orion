@@ -96,6 +96,7 @@
     <Compile Include="Views System\ViewContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Widgets\TextField.cs" />
+    <Compile Include="Widgets\TransparentFrame.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -43,6 +43,7 @@ namespace Orion.Commandment
 
         #region Events
         public event GenericEventHandler<Match, UpdateEventArgs> Updated;
+        public event GenericEventHandler<Faction, string> ReceivedMessage;
         #endregion
 
         #region Properties
@@ -78,6 +79,12 @@ namespace Orion.Commandment
             lastFrameNumber = frameNumber;
             GenericEventHandler<Match, UpdateEventArgs> handler = Updated;
             if (handler != null) handler(this, args);
+        }
+
+        public void PostMessage(Faction origin, string message)
+        {
+            GenericEventHandler<Faction, string> handler = ReceivedMessage;
+            if (handler != null) handler(origin, message);
         }
 
         #region Private Camp Creation

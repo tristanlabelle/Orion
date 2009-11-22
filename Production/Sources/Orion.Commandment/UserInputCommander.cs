@@ -21,6 +21,11 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
+        public void SendMessage(string message)
+        {
+            GenerateCommand(new Message(Faction.Handle, message));
+        }
+
         public void CancelCommands(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)

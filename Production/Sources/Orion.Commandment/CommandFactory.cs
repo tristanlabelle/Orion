@@ -35,7 +35,8 @@ namespace Orion.Commandment
                 Repair.Serializer.Instance,
                 Suicide.Serializer.Instance,
                 ChangeDiplomacy.Serializer.Instance,
-                SendRessources.Serializer.Instance
+                SendRessources.Serializer.Instance,
+                Message.Serializer.Instance
             };
         }
         #endregion

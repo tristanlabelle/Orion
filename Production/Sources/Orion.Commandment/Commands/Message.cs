@@ -12,14 +12,17 @@ namespace Orion.Commandment.Commands
         #region Instance
         #region Fields
         private readonly string value;
+        private readonly Handle originatingFaction;
         #endregion
 
         #region Constructors
         public Message(Handle factionHandle, string message)
             : base(factionHandle)
         {
+            Argument.EnsureNotNull(factionHandle, "factionHandle");
             Argument.EnsureNotNull(message, "message");
             value = message;
+            originatingFaction = factionHandle;
         }
         #endregion
 
@@ -34,11 +37,12 @@ namespace Orion.Commandment.Commands
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
+            match.PostMessage(match.World.FindFactionFromHandle(originatingFaction), value);
         }
 
         public override string ToString()
         {
-            return "\"{1}\" message".FormatInvariant(value);
+            return "\"{0}\" message".FormatInvariant(value);
         }
         #endregion
         #endregion

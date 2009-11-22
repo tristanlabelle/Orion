@@ -7,22 +7,22 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Pipeline
 {
-    public sealed class CommandReplayLogger : CommandFilter
+    /// <summary>
+    /// A command filter which records commands passing trough it in a replay.
+    /// </summary>
+    public sealed class ReplayRecorder : CommandFilter
     {
         #region Fields
         private readonly Queue<Command> commandQueue = new Queue<Command>();
-        private readonly BinaryWriter writer;
+        private readonly ReplayWriter writer;
         #endregion
 
         #region Constructors
-        public CommandReplayLogger(Stream stream)
+        public ReplayRecorder(ReplayWriter writer)
         {
-            Argument.EnsureNotNull(stream, "stream");
-            writer = new BinaryWriter(stream);
+            Argument.EnsureNotNull(writer, "writer");
+            this.writer = writer;
         }
-
-        public CommandReplayLogger(string path)
-            : this(File.OpenWrite(path)) { }
         #endregion
 
         #region Methods
@@ -37,9 +37,7 @@ namespace Orion.Commandment.Pipeline
             while (commandQueue.Count > 0)
             {
                 Command command = commandQueue.Dequeue();
-                writer.Write(updateNumber);
-                command.Serialize(writer);
-                writer.Flush();
+                writer.WriteCommand(updateNumber, command);
                 Flush(command);
             }
         }

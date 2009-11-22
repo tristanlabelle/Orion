@@ -65,9 +65,13 @@
     <Compile Include="Match.cs" />
     <Compile Include="Pipeline\CheatCodeFilter.cs" />
     <Compile Include="Pipeline\CommandPipeline.cs" />
-    <Compile Include="Pipeline\CommandReplayLogger.cs" />
+    <Compile Include="Pipeline\ReplayRecorder.cs" />
+    <Compile Include="Pipeline\ReplayPlayer.cs" />
     <Compile Include="PlayerSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplayCommand.cs" />
+    <Compile Include="ReplayReader.cs" />
+    <Compile Include="ReplayWriter.cs" />
     <Compile Include="SelectionManager.cs" />
     <Compile Include="Pipeline\ICommandSink.cs" />
     <Compile Include="UserInputCommander.cs" />

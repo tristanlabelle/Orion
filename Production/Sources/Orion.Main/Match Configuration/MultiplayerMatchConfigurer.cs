@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using Color = System.Drawing.Color;
-using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Commandment.Pipeline;
+using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
+using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
@@ -68,8 +69,12 @@ namespace Orion.Main
 
             Match match = new Match(random, world, userCommander);
 
+            ReplayWriter replayWriter = new ReplayWriter("replay.foo");
+            replayWriter.AutoFlush = true;
+            replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
+
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddFilter(new CommandReplayLogger("replay.foo"));
+            pipeline.AddFilter(new ReplayRecorder(replayWriter));
             CommandTextLogger textLogger = new CommandTextLogger();
             pipeline.AddFilter(textLogger);
             CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);

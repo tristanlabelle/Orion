@@ -185,15 +185,17 @@ namespace Orion.UserInterface
         {
             Argument.EnsureNotNull(faction, "faction");
 
-            DisplayMessage("{0} defeated".FormatInvariant(faction.Name), faction.Color);
+            DisplayMessage("{0} was defeated.".FormatInvariant(faction.Name), faction.Color);
         }
 
         public void DisplayVictoryMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-
-            DisplayMessage("{0} has won".FormatInvariant(faction.Name), faction.Color);
-            Parent.PopDisplay(this);
+            if (faction == match.UserCommander.Faction)
+            {
+                match.TryPause();
+                Instant.DisplayAlert(this, "You have won the match!", () => Parent.PopDisplay(this));
+            }
         }
         #endregion
 

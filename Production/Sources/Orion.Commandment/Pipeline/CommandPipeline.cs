@@ -86,6 +86,9 @@ namespace Orion.Commandment.Pipeline
 
         private void OnCommandGenerated(Commander commander, Command command)
         {
+            Argument.EnsureNotNull(commander, "commander");
+            Argument.EnsureNotNull(command, "command");
+
             commanders[commander].Handle(command);
         }
         #endregion

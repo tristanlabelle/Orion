@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
@@ -94,7 +95,7 @@ namespace Orion.GameLogic.Tasks
                 }
                 else
                 {
-                    Console.WriteLine("Not Enough Resources");
+                    Debug.WriteLine("Not Enough Resources");
                     hasEnded = true;
                     return;
                 }

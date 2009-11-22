@@ -59,6 +59,30 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
+        #region Validation
+        /// <summary>
+        /// Checks if the handles referenced in this <see cref="Command"/> are still valid.
+        /// </summary>
+        /// <param name="world">The <see cref="World"/> providing a context in which to test the handles.</param>
+        /// <returns><c>True</c> if all handles of this <see cref="Command"/> are still valid, false otherwise.</returns>
+        public abstract bool ValidateHandles(World world);
+
+        protected bool IsValidFactionHandle(World world, Handle handle)
+        {
+            return world.FindFactionFromHandle(handle) != null;
+        }
+
+        protected bool IsValidEntityHandle(World world, Handle handle)
+        {
+            return world.Entities.FromHandle(handle) != null;
+        }
+
+        protected bool IsValidUnitTypeHandle(World world, Handle handle)
+        {
+            return world.UnitTypes.FromHandle(handle) != null;
+        }
+        #endregion
+
         /// <summary>
         /// Executes this command.
         /// </summary>

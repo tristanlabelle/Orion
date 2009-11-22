@@ -7,7 +7,10 @@ using System.IO;
 
 namespace Orion.Commandment.Commands
 {
-    public sealed class SendRessources : Command
+    /// <summary>
+    /// A <see cref="Command"/> which causes resources to be given to another <see cref="Faction"/>.
+    /// </summary>
+    public sealed class SendResources : Command
     { 
         #region Fields
         private readonly Handle targetFactionHandle;
@@ -16,7 +19,7 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Constructors
-        public SendRessources(Handle factionHandle, Handle targetFactionHandle,
+        public SendResources(Handle factionHandle, Handle targetFactionHandle,
             int aladdiumAmount, int alageneAmount)
             : base(factionHandle)
         {
@@ -34,6 +37,14 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && IsValidFactionHandle(world, targetFactionHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
@@ -66,7 +77,7 @@ namespace Orion.Commandment.Commands
             writer.Write(alageneAmount);
         }
 
-        public static SendRessources DeserializeSpecific(BinaryReader reader)
+        public static SendResources DeserializeSpecific(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 
@@ -75,7 +86,7 @@ namespace Orion.Commandment.Commands
             int aladdiumAmount = reader.ReadInt32();
             int alageneAmount = reader.ReadInt32();
 
-            return new SendRessources(factionHandle, targetFactionHandle,
+            return new SendResources(factionHandle, targetFactionHandle,
                 aladdiumAmount, alageneAmount);
         }
         #endregion

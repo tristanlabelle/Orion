@@ -8,6 +8,10 @@ using System.Collections.ObjectModel;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>
+    /// to be assigned to some <see cref="Unit"/>s.
+    /// </summary>
     public sealed class Harvest : Command
     {
         #region Fields
@@ -33,14 +37,23 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && harvesterHandles.All(handle => IsValidEntityHandle(world, handle))
+                && IsValidEntityHandle(world, resourceNodeHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
 
-            ResourceNode resourceNode = (ResourceNode)match.World.Entities.FindFromHandle(resourceNodeHandle);
+            ResourceNode resourceNode = (ResourceNode)match.World.Entities.FromHandle(resourceNodeHandle);
             foreach (Handle harvesterHandle in harvesterHandles)
             {
-                Unit harvester = (Unit)match.World.Entities.FindFromHandle(harvesterHandle);
+                Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);
                 harvester.Task = new HarvestTask(harvester, resourceNode);
             }
         }

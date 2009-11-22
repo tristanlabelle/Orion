@@ -35,13 +35,14 @@ namespace Orion.Commandment.Pipeline
             while (commandQueue.Count > 0)
             {
                 Command command = commandQueue.Dequeue();
-                try
+
+                if (command.ValidateHandles(match.World))
                 {
                     command.Execute(match);
                 }
-                catch
+                else
                 {
-                    Debug.Fail("A command failed to execute.");
+                    Debug.WriteLine("A command had invalid handles: {0}");
                 }
             }
         }

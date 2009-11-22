@@ -23,7 +23,7 @@ namespace Orion.Commandment
         #region Methods
         public void SendMessage(string message)
         {
-            GenerateCommand(new Message(Faction.Handle, message));
+            GenerateCommand(new SendMessage(Faction.Handle, message));
         }
 
         public void CancelCommands(IEnumerable<Unit> units)
@@ -83,9 +83,9 @@ namespace Orion.Commandment
         {
             if (otherFaction == null) return;
             if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
-                GenerateCommand(new ChangeDiplomacy(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
+                GenerateCommand(new ChangeDiplomaticStance(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
             else
-                GenerateCommand(new ChangeDiplomacy(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
+                GenerateCommand(new ChangeDiplomaticStance(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)

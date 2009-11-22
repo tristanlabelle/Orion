@@ -10,14 +10,14 @@ namespace Orion.Commandment.Commands
     /// <summary>
     /// A command which encapsulates some textual message sent by a <see cref="Faction"/>.
     /// </summary>
-    public sealed class Message : Command
+    public sealed class SendMessage : Command
     {
         #region Fields
         private readonly string text;
         #endregion
 
         #region Constructors
-        public Message(Handle factionHandle, string text)
+        public SendMessage(Handle factionHandle, string text)
             : base(factionHandle)
         {
             Argument.EnsureNotNull(factionHandle, "factionHandle");
@@ -39,6 +39,13 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
@@ -60,13 +67,13 @@ namespace Orion.Commandment.Commands
             writer.Write(text);
         }
 
-        public static Message DeserializeSpecific(BinaryReader reader)
+        public static SendMessage DeserializeSpecific(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 
             Handle factionHandle = ReadHandle(reader);
             string text = reader.ReadString();
-            return new Message(factionHandle, text);
+            return new SendMessage(factionHandle, text);
         }
         #endregion
         #endregion

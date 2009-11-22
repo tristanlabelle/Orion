@@ -42,14 +42,14 @@ namespace Orion.Commandment.Pipeline
             while (accumulatedCommands.Count > 0)
             {
                 Command command = accumulatedCommands.Dequeue();
-                Message message = command as Message;
+                SendMessage message = command as SendMessage;
                 if (message != null)
                 {
                     Action<Match> cheatCode;
                     if (cheatCodes.TryGetValue(message.Text, out cheatCode))
                     {
                         cheatCode(match);
-                        command = new Message(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
+                        command = new SendMessage(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
                     }
                 }
                 Flush(command);
@@ -73,7 +73,7 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
             cheatCodes["turboturbo"] = AccelerateUnitDevelopment;
             cheatCodes["brinformatique"] = InstantDefeat;
-            cheatCodes["falconpunch"] = InstantVictory;
+            cheatCodes["itsover9000"] = InstantVictory;
         }
         #endregion
 
@@ -96,7 +96,8 @@ namespace Orion.Commandment.Pipeline
 
         private static void SpawnHeroUnit(Match match)
         { 
-            match.UserCommander.Faction.CreateUnit(match.World.UnitTypes.FromName("Chuck Norris"), match.World.Bounds.Center);
+            UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
+            match.UserCommander.Faction.CreateUnit(heroUnitType, match.World.Bounds.Center);
         }
 
         private static void AccelerateUnitDevelopment(Match match)
@@ -112,7 +113,8 @@ namespace Orion.Commandment.Pipeline
         {
             Faction userFaction = match.UserCommander.Faction;
             IEnumerable<Unit> enemyBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction != userFaction);
+                .OfType<Unit>()
+                .Where(u => u.Faction != userFaction);
             foreach (Unit building in enemyBuildings) building.Suicide();
         }
 

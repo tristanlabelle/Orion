@@ -8,7 +8,11 @@ using System.IO;
 
 namespace Orion.Commandment.Commands
 {
-    public sealed class ChangeDiplomacy: Command
+    /// <summary>
+    /// A <see cref="Command"/> which causes a <see cref="Faction"/> to change its
+    /// diplomatic stance with regard to another <see cref="Faction"/>.
+    /// </summary>
+    public sealed class ChangeDiplomaticStance: Command
     {
         #region Fields
         private readonly Handle otherFactionHandle;
@@ -16,7 +20,7 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Constructors
-        public ChangeDiplomacy(Handle factionHandle, Handle otherFactionHandle, DiplomaticStance diplomaticStance)
+        public ChangeDiplomaticStance(Handle factionHandle, Handle otherFactionHandle, DiplomaticStance diplomaticStance)
             : base(factionHandle)
         {
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
@@ -33,6 +37,13 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
@@ -55,7 +66,7 @@ namespace Orion.Commandment.Commands
             writer.Write((byte)diplomaticStance);
         }
 
-        public static ChangeDiplomacy DeserializeSpecific(BinaryReader reader)
+        public static ChangeDiplomaticStance DeserializeSpecific(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 
@@ -63,7 +74,7 @@ namespace Orion.Commandment.Commands
             Handle otherFactionHandle = ReadHandle(reader);
             DiplomaticStance stance = (DiplomaticStance)reader.ReadByte();
 
-            return new ChangeDiplomacy(factionHandle, otherFactionHandle, stance);
+            return new ChangeDiplomaticStance(factionHandle, otherFactionHandle, stance);
         }
         #endregion
         #endregion

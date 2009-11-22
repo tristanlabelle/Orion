@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using Orion.UserInterface.Widgets;
-using Orion.Networking;
-using Orion.Geometry;
+using System.Text;
 using OpenTK.Math;
+using Orion.Geometry;
+using Orion.Networking;
+using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface
 {
@@ -142,7 +143,7 @@ namespace Orion.UserInterface
 
         private void AskJoinGame(IPv4EndPoint host)
         {
-            Console.WriteLine("Asking {0} to join the game", host);
+            Debug.WriteLine("Asking {0} to join the game.".FormatInvariant(host));
 
             byte[] packet = new byte[1];
             packet[0] = (byte)SetupMessageType.JoinRequest;

@@ -155,17 +155,6 @@ namespace Orion.GameLogic
             get { return MaxHealth - damage; }
             set { Damage = MaxHealth - value; }
         }
-
-        /// <summary>
-        /// Gets a value indicating if this <see cref="Unit"/> is alive.
-        /// </summary>
-        /// <remarks>
-        /// Dead <see cref="Unit"/>s get garbage collected.
-        /// </remarks>
-        public bool IsAlive
-        {
-            get { return Health > 0; }
-        }
         #endregion
 
         #region Task

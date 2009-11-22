@@ -8,6 +8,9 @@ using System.IO;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.
+    /// </summary>
     public sealed class Suicide : Command
     {
         #region Fields
@@ -31,12 +34,20 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && unitHandles.All(handle => IsValidEntityHandle(world, handle));
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FindFromHandle(unitHandle);
+                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
                 unit.Suicide();
             }
         }

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
 using Orion.GameLogic;
-
 using TrainTask = Orion.GameLogic.Tasks.Train;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which causes the <see cref="TrainTask"/> task
+    /// to be assigned to some <see cref="Unit"/>s.
+    /// </summary>
     public sealed class Train : Command
     {
         #region Fields
@@ -35,6 +38,15 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && trainerHandles.All(handle => IsValidEntityHandle(world, handle))
+                && IsValidUnitTypeHandle(world, traineeTypeHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
@@ -49,7 +61,7 @@ namespace Orion.Commandment.Commands
             int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
             foreach (Handle trainerHandle in trainerHandles)
             {
-                Unit trainer = (Unit)match.World.Entities.FindFromHandle(trainerHandle);
+                Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
                 if (alageneTotalCost + alageneCost <= faction.AlageneAmount
                    && aladdiumTotalCost + aladdiumCost <= faction.AladdiumAmount)
                 {
@@ -59,7 +71,7 @@ namespace Orion.Commandment.Commands
                 }
                 else
                 {
-                    Console.WriteLine("Not Enough Ressource to Train all wished units");
+                    Debug.WriteLine("Not Enough Ressource to Train all wished units");
                     break;
                 }
             }

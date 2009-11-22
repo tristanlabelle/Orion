@@ -211,7 +211,7 @@ namespace Orion.GameLogic
         /// The <see cref="Entity"/> with that identifier,
         /// or <c>null</c> if no <see cref="Entity"/> has this identifier.
         /// </returns>
-        public Entity FindFromHandle(Handle handle)
+        public Entity FromHandle(Handle handle)
         {
             Entity entity;
             entities.TryGetValue(handle, out entity);

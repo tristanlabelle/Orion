@@ -1,11 +1,12 @@
 using System;
-using System.Linq;
-using Orion.UserInterface;
-using Orion.GameLogic;
-using Orion.Commandment;
-using Color = System.Drawing.Color;
-using Orion.Commandment.Pipeline;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using Orion.Commandment;
+using Orion.Commandment.Pipeline;
+using Orion.GameLogic;
+using Orion.UserInterface;
+using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
@@ -59,7 +60,7 @@ namespace Orion.Main
 
         protected void CreateMap()
         {
-            Console.WriteLine("Mersenne Twister Seed: {0}", seed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(seed));
             random = new MersenneTwister(seed);
             Terrain terrain = Terrain.Generate(128, 128, random);
             world = new World(terrain);

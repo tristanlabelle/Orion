@@ -145,13 +145,7 @@ namespace Orion.Networking
                 lastFrameLocalCommands.Clear();
             }
 
-            int oldFrameModulo = (int)(frameTimes.Average() + 0.5);
-            frameTimes.Enqueue(receivedFrameTimes.Max());
-            if (frameTimes.Count > frameTimesQueueLength)
-                frameTimes.Dequeue();
-            int newFrameModulo = (int)(frameTimes.Average() + 0.5);
-            if (newFrameModulo != oldFrameModulo)
-                Console.WriteLine("Command frame rate changed from {0} to {1}", oldFrameModulo, newFrameModulo);
+            AdaptFrameModulo();
 
             ExecuteCurrentFrameCommands();
             commandsToBeFlushed.Clear();
@@ -162,6 +156,17 @@ namespace Orion.Networking
         #endregion
 
         #region Private
+        private void AdaptFrameModulo()
+        {
+            int oldFrameModulo = (int)(frameTimes.Average() + 0.5);
+            frameTimes.Enqueue(receivedFrameTimes.Max());
+            if (frameTimes.Count > frameTimesQueueLength)
+                frameTimes.Dequeue();
+            int newFrameModulo = (int)(frameTimes.Average() + 0.5);
+            if (newFrameModulo != oldFrameModulo)
+                Debug.WriteLine("Command frame modulo changed from {0} to {1}".FormatInvariant(oldFrameModulo, newFrameModulo));
+        }
+
         private void SafeQuit(Match match)
         {
             byte[] quitPacket = new byte[1] { (byte)GameMessageType.Quit };

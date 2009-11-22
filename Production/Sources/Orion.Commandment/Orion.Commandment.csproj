@@ -52,13 +52,13 @@
     <Compile Include="Command.cs" />
     <Compile Include="Commands\Attack.cs" />
     <Compile Include="Commands\Build.cs" />
-    <Compile Include="Commands\ChangeDiplomacy.cs" />
+    <Compile Include="Commands\ChangeDiplomaticStance.cs" />
     <Compile Include="Commands\Harvest.cs" />
     <Compile Include="Commands\Cancel.cs" />
-    <Compile Include="Commands\Message.cs" />
+    <Compile Include="Commands\SendMessage.cs" />
     <Compile Include="Commands\Move.cs" />
     <Compile Include="Commands\Repair.cs" />
-    <Compile Include="Commands\SendRessources.cs" />
+    <Compile Include="Commands\SendResources.cs" />
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />

@@ -39,13 +39,21 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && attackerHandles.All(handle => IsValidEntityHandle(world, handle));
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
 
             foreach (Handle attackerHandle in attackerHandles)
             {
-                Unit attacker = (Unit)match.World.Entities.FindFromHandle(attackerHandle);
+                Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
                 attacker.Task = new ZoneAttackTask(attacker, destination);
             }
         }

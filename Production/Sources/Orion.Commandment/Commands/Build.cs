@@ -7,6 +7,10 @@ using BuildTask = Orion.GameLogic.Tasks.Build;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which causes a <see cref="Unit"/>
+    /// to be assigned the <see cref="BuildTask"/> task.
+    /// </summary>
     public sealed class Build : Command
     {
         #region Fields
@@ -33,11 +37,20 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public override bool ValidateHandles(World world)
+        {
+            Argument.EnsureNotNull(world, "world");
+
+            return IsValidFactionHandle(world, FactionHandle)
+                && IsValidEntityHandle(world, builderHandle)
+                && IsValidUnitTypeHandle(world, buildingTypeHandle);
+        }
+
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit builder = (Unit)match.World.Entities.FindFromHandle(builderHandle);
+            Unit builder = (Unit)match.World.Entities.FromHandle(builderHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
             builder.Task = new BuildTask(builder, buildingType, position);
         }

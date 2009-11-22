@@ -28,7 +28,7 @@ namespace Orion.Main
                 try
                 {
                     transporter = new SafeTransporter(port);
-                    Console.WriteLine("Listening on port {0}", transporter.Port);
+                    Debug.WriteLine("Listening on port {0}.".FormatInvariant(transporter.Port));
                     break;
                 }
                 catch

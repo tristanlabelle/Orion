@@ -57,25 +57,29 @@ namespace Orion.UserInterface
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
             world.Entities.Died += userInputManager.SelectionManager.EntityDied;
-            Rectangle worldFrame = Bounds.ResizedBy(0, -Bounds.Height / 25).ResizedBy(0, -Bounds.Height / 4).TranslatedBy(0, Bounds.Height / 4);
+            Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.25f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
 
-            Rectangle resourceDisplayFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -Bounds.Height / 25);
+            Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.Commander.Faction);
             Children.Add(resourceDisplay);
 
-            hudFrame = new Frame(new Rectangle(Bounds.Width, Bounds.Height / 4), Color.DarkGray);
+            Rectangle hudRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
+            hudFrame = new Frame(hudRectangle);
             Children.Add(hudFrame);
 
-            selectionFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, 0, hudFrame.Bounds.Width / 2, hudFrame.Bounds.Height), Color.DarkGray);
+            Rectangle selectionFrameRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.25f, 0), new Vector2(0.75f, 1));
+            selectionFrame = new Frame(selectionFrameRectangle, Color.DarkGray);
             hudFrame.Children.Add(selectionFrame);
 
-            actions = new ActionFrame(new Rectangle(hudFrame.Bounds.Width / 4 * 3, 0, hudFrame.Bounds.Width / 4, hudFrame.Bounds.Height));
+            Rectangle actionsRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.75f, 0), new Vector2(1, 1));
+            actions = new ActionFrame(actionsRectangle);
             hudFrame.Children.Add(actions);
 
-            minimapFrame = new Frame(new Rectangle(hudFrame.Bounds.Width / 4, hudFrame.Bounds.Height), matchRenderer.MinimapRenderer);
+            Rectangle minimapRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.02f, 0.08f), new Vector2(0.23f, 0.92f));
+            minimapFrame = new Frame(minimapRectangle, matchRenderer.MinimapRenderer);
             minimapFrame.Bounds = world.Bounds;
             hudFrame.Children.Add(minimapFrame);
 
@@ -122,10 +126,10 @@ namespace Orion.UserInterface
         #region Initialization
         private void CreateScrollers()
         {
-            Rectangle northFrame = new Rectangle(0, Bounds.Height, Bounds.Width, -20);
-            Rectangle southFrame = new Rectangle(0, 0, Bounds.Width, 20);
-            Rectangle eastFrame = new Rectangle(Bounds.Width, 0, -20, Bounds.Height);
-            Rectangle westFrame = new Rectangle(0, 0, 20, Bounds.Height);
+            Rectangle northFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.98f), new Vector2(1, 1));
+            Rectangle southFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.02f));
+            Rectangle eastFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.98f, 0), new Vector2(1, 1));
+            Rectangle westFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.02f, 1));
             Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), Keys.Up);
             Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
             Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);

@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using Orion.Commandment.Commands;
+using Orion.GameLogic;
+
+using OpenTK.Math;
 
 namespace Orion.Commandment.Pipeline
 {
@@ -62,6 +66,7 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["colorlessdeepfog"] = DisableFogOfWar;
             cheatCodes["magiclamp"] = IncreaseResources;
             cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
+            cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
         }
         #endregion
 
@@ -80,6 +85,11 @@ namespace Orion.Commandment.Pipeline
         private static void IncreaseAvailableFood(Match match)
         {
             match.UserCommander.Faction.UsedFoodStock -= 100;
+        }
+
+        private static void SpawnHeroUnit(Match match)
+        { 
+            match.UserCommander.Faction.CreateUnit(match.World.UnitTypes.First(type => type.Name == "Chuck Norris"), new Vector2(match.World.Width / 2, match.World.Height / 2));
         }
         #endregion
         #endregion

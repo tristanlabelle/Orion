@@ -28,6 +28,7 @@ namespace Orion.GameLogic
             RegisterTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
+            RegisterChuckNorris();
         }
         #endregion
 
@@ -181,7 +182,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 250,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.Train(type => !type.IsBuilding, 10));
+            builder.Skills.Add(new Skills.Train(type => !type.IsBuilding && type.Name != "Chuck Norris", 10));
             builder.Skills.Add(new Skills.StoreResources());
             builder.Skills.Add(new Skills.StoreFood(10)); 
             Register(builder);
@@ -229,6 +230,20 @@ namespace Orion.GameLogic
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.StoreFood(10)); 
+            Register(builder);
+        }
+
+        public void RegisterChuckNorris()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Chuck Norris",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 5000
+            };
+            builder.Skills.Add(new Skills.Move(25, true));
+            builder.Skills.Add(new Skills.Attack(100, 1, 2));
             Register(builder);
         }
         #endregion

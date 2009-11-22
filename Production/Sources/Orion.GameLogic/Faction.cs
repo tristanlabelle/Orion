@@ -58,23 +58,26 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when this <see cref="Faction"/> gets defeated.
+        /// </summary>
+        public event GenericEventHandler<Faction> Defeated;
+
+        private void OnDefeated()
+        {
+            var handler = Defeated;
+            if (handler != null) handler(this);
+        }
         #endregion
 
         #region Properties
+        #region Identification
         /// <summary>
         /// Gets the handle of this <see cref="Faction"/>.
         /// </summary>
         public Handle Handle
         {
             get { return handle; }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="World"/> which hosts this faction.
-        /// </summary>
-        public World World
-        {
-            get { return world; }
         }
 
         /// <summary>
@@ -91,6 +94,15 @@ namespace Orion.GameLogic
         public Color Color
         {
             get { return color; }
+        }
+        #endregion
+
+        /// <summary>
+        /// Gets the <see cref="World"/> which hosts this faction.
+        /// </summary>
+        public World World
+        {
+            get { return world; }
         }
 
         /// <summary>
@@ -111,15 +123,14 @@ namespace Orion.GameLogic
             get { return fogOfWar; }
         }
 
+        /// <summary>
+        /// Gets the status of this faction.
+        /// </summary>
         public FactionStatus Status
         {
             get { return status; }
-            set 
-            {
-                Argument.EnsureNotNull(value, "status");
-                status = value;
-            }
         }
+
         #region Resources
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.
@@ -243,9 +254,23 @@ namespace Orion.GameLogic
             usedFoodStock -= unit.Type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreResources>())
                 totalFoodStock -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
-            unit.Died -= entityDiedEventHandler;         
+            unit.Died -= entityDiedEventHandler;
+
+            CheckForDefeat();
         }
         #endregion
+
+        private void CheckForDefeat()
+        {
+            if (status == FactionStatus.Defeated) return;
+            
+            bool hasKeepAliveUnit = Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
+            if (!hasKeepAliveUnit)
+            {
+                status = FactionStatus.Defeated;
+                OnDefeated();
+            }
+        }
 
         #region Diplomacy
         /// <summary>

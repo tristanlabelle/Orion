@@ -52,11 +52,6 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
-        public int FoodCost
-        {
-            get { return foodCost; }
-        }
-
         #region Identification
         public Handle Handle
         {
@@ -97,6 +92,26 @@ namespace Orion.GameLogic
             get { return size.Height; }
         }
         #endregion
+
+        public int FoodCost
+        {
+            get { return foodCost; }
+        }
+        
+        /// <summary>
+        /// Gets a value indicating if this type of unit keeps its <see cref="Faction"/> alive,
+        /// that is, the <see cref="Faction"/> isn't defeated until all such units are dead.
+        /// </summary>
+        public bool KeepsFactionAlive
+        {
+            get
+            {
+                if (IsBuilding)
+                    return HasSkill<Skills.Train>();
+                else
+                    return HasSkill<BuildSkill>() || HasSkill<Skills.Attack>();
+            }
+        }
         #endregion
 
         #region Methods

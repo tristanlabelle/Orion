@@ -199,7 +199,7 @@ namespace Orion.UserInterface
             if (faction == match.UserCommander.Faction)
             {
                 match.TryPause();
-                Instant.DisplayAlert(this, "You have won the match!", () => Parent.PopDisplay(this));
+                //Instant.DisplayAlert(this, "You have won the match!", () => Parent.PopDisplay(this));
             }
         }
         #endregion

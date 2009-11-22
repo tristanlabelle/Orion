@@ -112,7 +112,7 @@ namespace Orion.Main
         {
             MatchUI matchUI = new MatchUI(match);
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
-            match.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
+            match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
             match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
 
             gameUI.Display(matchUI);

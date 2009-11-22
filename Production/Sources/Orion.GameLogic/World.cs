@@ -39,6 +39,19 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s has been defeated.
+        /// </summary>
+        public event GenericEventHandler<World, Faction> FactionDefeated;
+
+        private void RaiseFactionDefeated(Faction faction)
+        {
+            var handler = FactionDefeated;
+            if (handler != null) handler(this, faction);
+        }
+        #endregion
+
         #region Properties
         public Terrain Terrain
         {
@@ -143,6 +156,21 @@ namespace Orion.GameLogic
 
         #region Factions
         /// <summary>
+        /// Creates a new <see cref="Faction"/> and adds it to this <see cref="World"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
+        /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
+        /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
+        public Faction CreateFaction(string name, Color color)
+        {
+            Handle handle = new Handle((uint)factions.Count);
+            Faction faction = new Faction(handle, this, name, color);
+            faction.Defeated += RaiseFactionDefeated;
+            factions.Add(faction);
+            return faction;
+        }
+
+        /// <summary>
         /// Gets a <see cref="Faction"/> of this <see cref="World"/> from its unique identifier.
         /// </summary>
         /// <param name="handle">The handle of the <see cref="Faction"/> to be found.</param>
@@ -153,20 +181,6 @@ namespace Orion.GameLogic
         {
             if (handle.Value < 0 || handle.Value >= factions.Count) return null;
             return factions[(int)handle.Value];
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Faction"/> and adds it to this <see cref="World"/>.
-        /// </summary>
-        /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
-        /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
-        /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
-        public Faction CreateFaction(string name, Color color)
-        {
-            Handle handle = new Handle((uint)factions.Count);
-            Faction faction = new Faction(handle, this, name, color);
-            factions.Add(faction);
-            return faction;
         }
         #endregion
 

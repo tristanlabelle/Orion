@@ -16,6 +16,7 @@ namespace Orion.GameLogic
         #region Fields
         private readonly World world;
         private readonly Handle handle;
+        private bool isDead;
         #endregion
 
         #region Constructors
@@ -33,9 +34,10 @@ namespace Orion.GameLogic
         /// </summary>
         public event GenericEventHandler<Entity> Died;
 
-        protected virtual void OnDied()
+        private void OnDied()
         {
-            if (Died != null) Died(this);
+            var handler = Died;
+            if (handler != null) handler(this);
         }
 
         /// <summary>
@@ -72,6 +74,7 @@ namespace Orion.GameLogic
             get { return handle; }
         }
 
+        #region Location/Size
         /// <summary>
         /// Gets the width of this <see cref="Entity"/>, in tiles.
         /// This value is garantee to remain constant.
@@ -98,6 +101,15 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Entity"/> is alive.
+        /// </summary>
+        public bool IsAlive
+        {
+            get { return !isDead; }
+        }
+        #endregion
+
         #region Methods
         public sealed override int GetHashCode()
         {
@@ -107,6 +119,13 @@ namespace Orion.GameLogic
         public override string ToString()
         {
             return "Entity {0}".FormatInvariant(handle);
+        }
+
+        protected void Die()
+        {
+            if (isDead) return;
+            isDead = true;
+            OnDied();
         }
 
         internal virtual void Update(float timeDeltaInSeconds) { }

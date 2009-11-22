@@ -135,7 +135,7 @@ namespace Orion.GameLogic
                 damage = value;
 
                 OnDamageChanged();
-                if (damage == MaxHealth) OnDied();
+                if (damage == MaxHealth) Die();
             }
         }
 

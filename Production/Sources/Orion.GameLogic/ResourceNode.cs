@@ -93,7 +93,7 @@ namespace Orion.GameLogic
             if (amountRemaining <= 0)
             {
                 amountRemaining = 0;
-                OnDied();
+                Die();
             }
         }
 
@@ -104,20 +104,8 @@ namespace Orion.GameLogic
 
         public bool IsHarvestableByFaction(Faction faction)
         {
-            if (type == ResourceType.Alagene)
-            {
-                if (extractor == null)
-                    return false;
-                else
-                {
-                    if (extractor.Faction == faction)
-                        return true;
-                    else
-                        return false;
-                }
-            }
-            else
-                return true;
+            return (type != ResourceType.Alagene)
+                || (extractor != null && extractor.Faction == faction);
         }
 
         private void ExtractorDied(Entity sender)

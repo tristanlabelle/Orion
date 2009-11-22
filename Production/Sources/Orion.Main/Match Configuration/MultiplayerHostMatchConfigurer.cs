@@ -86,10 +86,8 @@ namespace Orion.Main
         {
             byte[] exitMessage = new byte[1];
             exitMessage[0] = (byte)SetupMessageType.Exit;
-            foreach (IPv4EndPoint peer in UserInterface.PlayerAddresses)
-            {
-                transporter.SendTo(exitMessage, peer);
-            }
+            transporter.SendTo(exitMessage, UserInterface.PlayerAddresses);
+            transporter.Broadcast(exitMessage, transporter.Port);
             Dispose();
         }
 
@@ -98,6 +96,7 @@ namespace Orion.Main
             byte[] startGameMessage = new byte[1];
             startGameMessage[0] = (byte)SetupMessageType.StartGame;
             transporter.SendTo(startGameMessage, UserInterface.PlayerAddresses);
+            transporter.Broadcast(startGameMessage, transporter.Port);
             StartGame();
         }
 

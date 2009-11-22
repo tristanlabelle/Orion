@@ -90,6 +90,7 @@
     <Compile Include="Widgets\Frame.cs" />
     <Compile Include="Widgets\Instant.cs" />
     <Compile Include="Widgets\Label.cs" />
+    <Compile Include="Widgets\ListFrame.cs" />
     <Compile Include="Widgets\Scroller.cs" />
     <Compile Include="UIDisplays\UIDisplay.cs" />
     <Compile Include="Views System\View.cs" />

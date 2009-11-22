@@ -145,9 +145,9 @@ namespace Orion.UserInterface
             {
                 ViewContainer child = Items[index];
                 Items[index].Parent = null;
-                base.RemoveItem(index);
                 parent.OnRemoveChild(child);
                 child.OnRemoveFromParent(parent);
+                base.RemoveItem(index);
             }
 
             /// <summary>

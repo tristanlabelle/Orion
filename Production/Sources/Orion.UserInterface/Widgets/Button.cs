@@ -43,12 +43,12 @@ namespace Orion.UserInterface.Widgets
 
         #region Properties
 
-        public Text Caption
+        public string Caption
         {
-            get { return caption.Text; }
+            get { return caption.Text.Value; }
             set
             {
-                caption.Text = value;
+                caption.Text = new Text(value);
                 AlignCaption();
             }
         }

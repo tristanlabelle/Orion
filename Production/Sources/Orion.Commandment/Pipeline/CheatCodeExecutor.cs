@@ -5,6 +5,7 @@ using System.Text;
 
 using Orion.Commandment.Commands;
 using Orion.GameLogic;
+using Skills = Orion.GameLogic.Skills;
 
 using OpenTK.Math;
 
@@ -70,6 +71,7 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["magiclamp"] = IncreaseResources;
             cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
             cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
+            cheatCodes["itsover9000"] = AccelerateUnitDevelopment;
         }
         #endregion
 
@@ -92,7 +94,16 @@ namespace Orion.Commandment.Pipeline
 
         private static void SpawnHeroUnit(Match match)
         { 
-            match.UserCommander.Faction.CreateUnit(match.World.UnitTypes.First(type => type.Name == "Chuck Norris"), new Vector2(match.World.Width / 2, match.World.Height / 2));
+            match.UserCommander.Faction.CreateUnit(match.World.UnitTypes.FromName("Chuck Norris"), match.World.Bounds.Center);
+        }
+
+        private static void AccelerateUnitDevelopment(Match match)
+        {
+            foreach (UnitType type in match.World.UnitTypes)
+            {
+                if (type.HasSkill<Skills.Train>()) type.GetSkill<Skills.Train>().Speed *= 50;
+                if (type.HasSkill<Skills.Build>()) type.GetSkill<Skills.Build>().Speed *= 50;
+            }
         }
         #endregion
         #endregion

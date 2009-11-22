@@ -10,7 +10,7 @@ namespace Orion.GameLogic.Skills
     {
         #region Fields
         private readonly Func<UnitType, bool> predicate;
-        private readonly int speed;
+        private int speed;
         #endregion
 
         #region Constructors
@@ -36,6 +36,7 @@ namespace Orion.GameLogic.Skills
         public int Speed
         {
             get { return speed; }
+            set { speed = value; }
         }
         #endregion
 

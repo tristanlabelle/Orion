@@ -83,6 +83,7 @@ namespace Orion.UserInterface.Widgets
         {
             #region Fields
             private readonly DropdownList<T> parent;
+            private bool isSelectedItem;
             public readonly T Value;
             #endregion
 
@@ -128,7 +129,7 @@ namespace Orion.UserInterface.Widgets
                     context.Fill(Bounds);
                 }
                 context.FillColor = Color.White;
-                context.Draw(Value.ToString());
+                parent.renderer.Draw(Value, context);
             }
             #endregion
         }
@@ -136,6 +137,7 @@ namespace Orion.UserInterface.Widgets
 
         #region Fields
         private readonly DropdownMenu menu;
+        private readonly DropdownListRowValueRenderer<T> renderer;
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
         private GenericEventHandler<Responder, MouseEventArgs> parentMouseUp;
@@ -144,8 +146,13 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public DropdownList(Rectangle frame)
+            : this(frame, new DropdownListRowValueRenderer<T>())
+        { }
+
+        public DropdownList(Rectangle frame, DropdownListRowValueRenderer<T> renderer)
             : base(frame)
         {
+            this.renderer = renderer;
             menu = new DropdownMenu(this);
             parentMouseUp = ParentMouseUp;
         }

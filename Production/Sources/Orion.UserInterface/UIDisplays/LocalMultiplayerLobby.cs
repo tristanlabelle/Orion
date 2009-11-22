@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using Orion.UserInterface.Widgets;
 using Orion.Networking;
 using Orion.Geometry;
+using OpenTK.Math;
 
 namespace Orion.UserInterface
 {
@@ -18,13 +19,13 @@ namespace Orion.UserInterface
 
         private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> receptionDelegate;
         private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> timeoutDelegate;
-        private readonly Dictionary<IPv4EndPoint, int> hostedGames = new Dictionary<IPv4EndPoint, int>();
+        private readonly Dictionary<IPv4EndPoint, Button> hostedGames = new Dictionary<IPv4EndPoint, Button>();
         private readonly int port;
         private SafeTransporter transporter;
-        private IPv4EndPoint requestedJoin;
+        private IPv4EndPoint? requestedJoin;
         private int frameCounter;
 
-        private readonly Frame gamesFrame;
+        private readonly ListFrame gamesFrame;
         #endregion
 
         #region Constructors
@@ -36,7 +37,7 @@ namespace Orion.UserInterface
             timeoutDelegate = OnTimeout;
 
             Rectangle gamesFrameRect = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            gamesFrame = new Frame(gamesFrameRect);
+            gamesFrame = new ListFrame(gamesFrameRect, new Rectangle(gamesFrameRect.Width - 20, 30), new Vector2(10,10));
             Children.Add(gamesFrame);
 
             Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
@@ -84,20 +85,18 @@ namespace Orion.UserInterface
             switch ((SetupMessageType)args.Data[0])
             {
                 case SetupMessageType.Advertise:
-                    hostedGames[args.Host] = args.Data[1];
-                    UpdateGamesList();
+                    ShowGame(args.Host, args.Data[1]);
                     break;
 
                 case SetupMessageType.StartGame:
-                    if (hostedGames.ContainsKey(args.Host))
-                        hostedGames.Remove(args.Host);
-                    UpdateGamesList();
+                case SetupMessageType.Exit:
+                    RemoveGame(args.Host);
                     break;
 
                 case SetupMessageType.AcceptJoinRequest:
-                    if (args.Host == requestedJoin)
+                    if (requestedJoin.HasValue && args.Host == requestedJoin.Value)
                     {
-                        JoinGame(requestedJoin);
+                        JoinGame(requestedJoin.Value);
                     }
                     break;
 
@@ -112,19 +111,32 @@ namespace Orion.UserInterface
 
         private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
         {
+            Instant.DisplayAlert(this, "Unable to reach {0}.".FormatInvariant(ResolveHostAddress(host)));
+            requestedJoin = null;
         }
 
-        private void UpdateGamesList()
+        private void ShowGame(IPv4EndPoint host, int numberOfPlacesLeft)
         {
-            while (gamesFrame.Children.Count > 0) gamesFrame.Children[0].Dispose();
-            
-            Rectangle buttonFrame = new Rectangle(10, gamesFrame.Bounds.MaxY - 40, gamesFrame.Bounds.MaxX - 20, 30);
-            foreach (KeyValuePair<IPv4EndPoint, int> game in hostedGames)
+            string caption = "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(host), numberOfPlacesLeft);
+            if (!hostedGames.ContainsKey(host))
             {
-                Button button = new Button(buttonFrame, "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(game.Key), game.Value));
-                button.Triggered += delegate(Button source) { AskJoinGame(game.Key); };
+                Button button = new Button(gamesFrame.ItemFrame, caption);
+                button.Triggered += b => { if (!requestedJoin.HasValue) AskJoinGame(host); };
                 gamesFrame.Children.Add(button);
-                buttonFrame = buttonFrame.TranslatedBy(0, -(buttonFrame.Height + 10));
+                hostedGames[host] = button;
+            }
+            else
+            {
+                hostedGames[host].Caption = caption;
+            }
+        }
+
+        private void RemoveGame(IPv4EndPoint host)
+        {
+            if (hostedGames.ContainsKey(host))
+            {
+                hostedGames[host].Dispose();
+                hostedGames.Remove(host);
             }
         }
 
@@ -149,19 +161,20 @@ namespace Orion.UserInterface
 
         private void PressJoinRemoteGame(Button sender)
         {
-            Instant.Prompt(this, "What is the address of the game you want to join?", JoinAddress);
+            if (!requestedJoin.HasValue)
+                Instant.Prompt(this, "What is the address of the game you want to join?", JoinAddress);
         }
 
         private void PressHostGame(Button sender)
         {
             GenericEventHandler<LocalMultiplayerLobby> handler = HostedGame;
-            if (handler != null) handler(this);
+            if (handler != null && !requestedJoin.HasValue) handler(this);
         }
 
         private void PressBack(Button sender)
         {
-            Parent.PopDisplay(this);
-            Dispose();
+            if (!requestedJoin.HasValue)
+                Parent.PopDisplay(this);
         }
 
         private void JoinAddress(string address)

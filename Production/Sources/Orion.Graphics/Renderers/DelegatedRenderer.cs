@@ -1,5 +1,5 @@
 ﻿
-namespace Orion.Graphics.Renderers
+namespace Orion.Graphics
 {
     public delegate void RenderingDelegate(GraphicsContext context);
 

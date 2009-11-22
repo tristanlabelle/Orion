@@ -29,7 +29,12 @@ namespace Orion.Commandment.Commands
         public override IEnumerable<Handle> ExecutingEntityHandles
         {
             get { yield break; }
-        } 
+        }
+
+        public string Value
+        {
+            get { return value; }
+        }
         #endregion
 
         #region Methods

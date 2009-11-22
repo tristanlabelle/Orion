@@ -49,7 +49,7 @@ namespace Orion.UserInterface.Widgets
                 if (value.Length > 0)
                     Contents = value.Remove(value.Length - 1);
             }
-            else
+            else if (arg != '\r')
                 Contents += arg;
             base.OnKeyPress(arg);
             return false;

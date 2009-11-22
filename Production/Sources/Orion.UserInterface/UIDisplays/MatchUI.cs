@@ -185,12 +185,14 @@ namespace Orion.UserInterface
             if (args.Key == Keys.Enter)
             {
                 if (!Children.Contains(chatInput))
+                {
+                    chatInput.Clear();
                     Children.Add(chatInput);
+                }
                 else
                 {
                     UserInputCommander commander = userInputManager.Commander;
                     commander.SendMessage(chatInput.Contents);
-                    chatInput.Clear();
                     Children.Remove(chatInput);
                 }
             }

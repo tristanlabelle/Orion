@@ -64,6 +64,8 @@ namespace Orion.Main
 
             CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.AddFilter(new CommandReplayLogger("replay.foo"));
+            CheatCodeFilter cheatCodes = new CheatCodeFilter(match);
+            pipeline.AddFilter(cheatCodes);
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);

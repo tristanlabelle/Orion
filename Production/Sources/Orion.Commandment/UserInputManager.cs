@@ -184,39 +184,22 @@ namespace Orion.Commandment
                 case Keys.Escape: mouseCommand = null; break;
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
+                case Keys.F9: LaunchChangeDimplomacy(); break;
 
-                // cheats
-                case Keys.F10:
-                    commander.Faction.AladdiumAmount += 10000;
-                    commander.Faction.AlageneAmount += 10000;
-                    commander.Faction.UsedFoodStock -= 2000;
+                case Keys.D0: case Keys.D1: case Keys.D2:
+                case Keys.D3: case Keys.D4: case Keys.D5:
+                case Keys.D6: case Keys.D7: case Keys.D8:
+                case Keys.D9:
+                    int groupNumer = args.Key - Keys.D0;
+                    if (args.HasControl)
+                    {
+                        groups[groupNumer] = selectionManager.SelectedUnits.ToList();
+                    }
+                    else if (groups[groupNumer].Count > 0)
+                    {
+                        selectionManager.SelectUnits(groups[groupNumer]);
+                    }
                     break;
-
-                case Keys.F11: commander.Faction.FogOfWar.Reveal(); break;
-                case Keys.F12: commander.Faction.FogOfWar.Disable(); break;
-
-                // should be refactored out
-                case Keys.T:
-                    LaunchTrain(commander.Faction.World.UnitTypes
-                        .First(unit => unit.HasSkill<Attack>()));
-                    break;
-                case Keys.F9: 
-                    LaunchChangeDimplomacy();
-                    break;
-
-                
-            }
-            if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
-            {
-                int groupNumer = args.Key - Keys.D0;
-                if (args.HasControl)
-                {
-                    groups[groupNumer] = selectionManager.SelectedUnits.ToList();
-                }
-                else if (groups[groupNumer].Count > 0)
-                {
-                    selectionManager.SelectUnits(groups[groupNumer]);
-                }
             }
         }
 

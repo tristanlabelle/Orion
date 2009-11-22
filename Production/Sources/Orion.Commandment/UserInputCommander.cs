@@ -51,7 +51,12 @@ namespace Orion.Commandment
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
+            // Clamp the destination within the world bounds.
+            // The world bounds maximums are be exclusive.
             destination = World.Bounds.ClosestPointInside(destination);
+            if (destination.X == World.Width) destination.X -= 0.0001f;
+            if (destination.Y == World.Height) destination.Y -= 0.0001f;
+
             if (units.Count() > 0)
                 GenerateCommand(new Move(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }

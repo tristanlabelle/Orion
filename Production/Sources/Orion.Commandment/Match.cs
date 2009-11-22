@@ -22,6 +22,7 @@ namespace Orion.Commandment
         private readonly World world;
         private readonly UserInputCommander userCommander;
         private int lastFrameNumber = 0;
+        private List<Faction> defeatedfactions;
         #endregion
 
         #region Constructors
@@ -41,7 +42,12 @@ namespace Orion.Commandment
             // Update the world once to force committing the entity collection operations.
             world.Update(0);
             world.Entities.Died += OnEntityDied;
+
+            defeatedfactions = new List<Faction>();
+
+            this.FactionDefeated += new GenericEventHandler<Match, Faction>(CheckForWorldConquered);
         }
+
         #endregion
 
         #region Events
@@ -59,6 +65,12 @@ namespace Orion.Commandment
         /// Raised when a <see cref="Faction"/> was defeated.
         /// </summary>
         public event GenericEventHandler<Match, Faction> FactionDefeated;
+
+        /// <summary>
+        /// Raised when all <see cref="Faction"/>s but one are defeated.
+        /// </summary>
+        public event GenericEventHandler<Match, Faction> WorldConquered;
+
         public event GenericEventHandler<Match> Quitting;
 
         private void OnUpdated(float timeDeltaInSeconds)
@@ -76,6 +88,12 @@ namespace Orion.Commandment
         private void OnFactionDefeated(Faction faction)
         {
             var handler = FactionDefeated;
+            if (handler != null) handler(this, faction);
+        }
+
+        private void OnWorldConquered(Faction faction)
+        {
+            var handler = WorldConquered;
             if (handler != null) handler(this, faction);
         }
 
@@ -137,7 +155,7 @@ namespace Orion.Commandment
             OnFactionMessageReceived(message);
         }
 
-        public bool IsFactionDefeated(Faction faction)
+        private bool IsFactionDefeated(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
             return !world.Entities.OfType<Unit>()
@@ -170,14 +188,25 @@ namespace Orion.Commandment
                 if (IsFactionDefeated(faction))
                 {
                     faction.Status = FactionStatus.Defeated;
+                    defeatedfactions.Add(faction);
                     OnFactionDefeated(faction);
                     faction.FogOfWar.Disable();
+ 
                     // Even if the faction is defeated, we don't have to kill all of its members
                     // as they are harmless anyways and it can be fun to see the remains of your
                     // base once you're dead. However, it might be good to disable their commanders.
                 }
             }
         }
+
+        private void CheckForWorldConquered(Match sender, Faction args)
+        {
+            if (world.Factions.ToList().Count - 1 == defeatedfactions.Count)
+                foreach (Faction faction in world.Factions)
+                    if (!defeatedfactions.Contains(faction))
+                        OnWorldConquered(faction);
+        }
+
         #endregion
 
         #region Pause/Resume/Quit

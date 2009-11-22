@@ -5,6 +5,7 @@ using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
 using System.Linq;
 using System.Collections.Generic;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
@@ -39,6 +40,19 @@ namespace Orion.Commandment
 
             // Update the world once to force committing the entity collection operations.
             world.Update(0);
+            world.Entities.Died += new GenericEventHandler<EntityRegistry, Entity>(EntityDied);
+        }
+
+        void EntityDied(EntityRegistry sender, Entity args)
+        {
+            Argument.EnsureBaseType(args, typeof(Unit), "args");
+            Unit unit = (Unit)args;
+
+            if (IsFactionDefeated(unit.Faction))
+            {
+                OnFactionDefeated(unit.Faction);
+                world.Entities.ClearFaction(unit.Faction);
+            }
         }
         #endregion
 
@@ -46,6 +60,12 @@ namespace Orion.Commandment
         public event GenericEventHandler<Match, UpdateEventArgs> Updated;
         public event GenericEventHandler<Faction, string> ReceivedMessage;
         public event GenericEventHandler<Match> QuitGame;
+        public event GenericEventHandler<Faction> FactionDefeated;
+
+        private void OnFactionDefeated(Faction faction)
+        {
+            if (FactionDefeated != null) FactionDefeated(faction);
+        }
         #endregion
 
         #region Properties
@@ -94,6 +114,11 @@ namespace Orion.Commandment
         {
             GenericEventHandler<Faction, string> handler = ReceivedMessage;
             if (handler != null) handler(origin, message);
+        }
+
+        public bool IsFactionDefeated(Faction faction)
+        {
+            return !world.Entities.OfType<Unit>().Any(unit => ((unit.HasSkill<Skills.Attack>() && !unit.Type.IsBuilding) || unit.HasSkill<Skills.Train>()) && unit.Faction == faction);
         }
 
         public void Quit()

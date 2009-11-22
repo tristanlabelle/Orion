@@ -233,6 +233,14 @@ namespace Orion.GameLogic
                 entity.Update(timeDeltaInSeconds);
         }
 
+        public void ClearFaction(Faction faction)
+        {
+            foreach (Entity entity in entities.Select(pair => pair.Value).OfType<Unit>().Where(unit => unit.Faction == faction))
+            {
+                entitiesToRemove.Add(entity); 
+            }
+        }
+
         #region Private Collection Modification
         private void CommitDeferredCollectionChanges()
         {
@@ -244,9 +252,13 @@ namespace Orion.GameLogic
                 UpdateZone(pair.Key, pair.Value);
             entitiesToMove.Clear();
 
-            foreach (Entity entity in entitiesToRemove)
-                Remove(entity);
-            entitiesToRemove.Clear();
+            try
+            {
+                foreach (Entity entity in entitiesToRemove)
+                    Remove(entity);
+                entitiesToRemove.Clear();
+            }
+            catch (InvalidOperationException) { }
         }
 
         private void Add(Entity entity)

@@ -187,6 +187,14 @@ namespace Orion.UserInterface
 
             DisplayMessage("{0} defeated".FormatInvariant(faction.Name), faction.Color);
         }
+
+        public void DisplayVictoryMessage(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+
+            DisplayMessage("{0} has won".FormatInvariant(faction.Name), faction.Color);
+            Parent.PopDisplay(this);
+        }
         #endregion
 
         #region Event Handling

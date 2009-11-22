@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Orion.Commandment;
 using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
@@ -32,38 +33,40 @@ namespace Orion.Main
         {
             CreateMap();
 
-            Color color = playerColors[0];
-            Faction userFaction = world.CreateFaction(color.Name, color);
-            UserInputCommander userCommander = new UserInputCommander(userFaction);
+            UserInputCommander userCommander = null;
+            List<Commander> aiCommanders = new List<Commander>();
+            int colorIndex = 0;
+            foreach (PlayerSlot slot in UserInterface.Players)
+            {
+                if (slot is ClosedPlayerSlot) continue;
+                if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
+
+                Color color = playerColors[colorIndex];
+                Faction faction = world.CreateFaction(color.Name, color);
+                colorIndex++;
+
+                if (slot is LocalPlayerSlot)
+                {
+                    userCommander = new UserInputCommander(faction);
+                }
+                else if (slot is AIPlayerSlot)
+                {
+                    Commander commander = new AICommander(faction, random);
+                    aiCommanders.Add(commander);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Multiplayer games only support remote, local and AI players");
+                }
+            }
 
             Match match = new Match(random, world, userCommander);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.AddFilter(new CommandReplayLogger("replay.foo", world));
-            pipeline.AddFilter(new CommandTextLogger());
 
+            aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);
-
-            int colorIndex = 1;
-            foreach (PlayerSlot slot in UserInterface.Players)
-            {
-                if (slot is ClosedPlayerSlot) continue;
-
-                color = playerColors[colorIndex];
-                Faction faction = world.CreateFaction(color.Name, color);
-                colorIndex++;
-
-                if (slot is LocalPlayerSlot) continue;
-                else if (slot is AIPlayerSlot)
-                {
-                    Commander commander = new AgressiveAICommander(faction, random);
-                    pipeline.AddCommander(commander);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Local games only support local players and AI players");
-                }
-            }
 
             match.Updated += pipeline.Update;
 

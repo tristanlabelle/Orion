@@ -71,7 +71,7 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["magiclamp"] = IncreaseResources;
             cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
             cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
-            cheatCodes["itsover9000"] = AccelerateUnitDevelopment;
+            cheatCodes["turboturbo"] = AccelerateUnitDevelopment;
             cheatCodes["brinformatique"] = InstantDefeat;
             cheatCodes["falconpunch"] = InstantVictory;
         }

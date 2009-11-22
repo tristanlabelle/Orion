@@ -62,8 +62,9 @@
     <Compile Include="Commands\Suicide.cs" />
     <Compile Include="Commands\Train.cs" />
     <Compile Include="Commands\ZoneAttack.cs" />
+    <Compile Include="FactionMessage.cs" />
     <Compile Include="Match.cs" />
-    <Compile Include="Pipeline\CheatCodeFilter.cs" />
+    <Compile Include="Pipeline\CheatCodeExecutor.cs" />
     <Compile Include="Pipeline\CommandPipeline.cs" />
     <Compile Include="Pipeline\ReplayRecorder.cs" />
     <Compile Include="Pipeline\ReplayPlayer.cs" />

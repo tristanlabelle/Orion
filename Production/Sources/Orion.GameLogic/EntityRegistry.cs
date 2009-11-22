@@ -233,14 +233,6 @@ namespace Orion.GameLogic
                 entity.Update(timeDeltaInSeconds);
         }
 
-        public void ClearFaction(Faction faction)
-        {
-            foreach (Entity entity in entities.Select(pair => pair.Value).OfType<Unit>().Where(unit => unit.Faction == faction))
-            {
-                entitiesToRemove.Add(entity); 
-            }
-        }
-
         #region Private Collection Modification
         private void CommitDeferredCollectionChanges()
         {

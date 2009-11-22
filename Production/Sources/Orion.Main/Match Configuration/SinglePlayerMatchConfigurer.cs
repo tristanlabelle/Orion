@@ -65,14 +65,14 @@ namespace Orion.Main
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.PushFilter(new CheatCodeFilter(match));
+            pipeline.PushFilter(new CheatCodeExecutor(match));
             TryPushReplayRecorderToPipeline(pipeline);
             pipeline.PushFilter(new CommandTextLogger());
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);
 
-            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDelta);
+            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
 
             return match;
         }

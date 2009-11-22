@@ -80,7 +80,7 @@ namespace Orion.Main
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, textLogger));
             pipeline.AddCommander(userCommander, synchronizer);
 
-            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDelta);
+            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
 
             return match;
         }

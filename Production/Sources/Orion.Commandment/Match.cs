@@ -40,31 +40,49 @@ namespace Orion.Commandment
 
             // Update the world once to force committing the entity collection operations.
             world.Update(0);
-            world.Entities.Died += new GenericEventHandler<EntityRegistry, Entity>(EntityDied);
-        }
-
-        void EntityDied(EntityRegistry sender, Entity args)
-        {
-            Argument.EnsureBaseType(args, typeof(Unit), "args");
-            Unit unit = (Unit)args;
-
-            if (IsFactionDefeated(unit.Faction))
-            {
-                OnFactionDefeated(unit.Faction);
-                world.Entities.ClearFaction(unit.Faction);
-            }
+            world.Entities.Died += OnEntityDied;
         }
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when this <see cref="Match"/> gets updated for a frame.
+        /// </summary>
         public event GenericEventHandler<Match, UpdateEventArgs> Updated;
-        public event GenericEventHandler<Faction, string> ReceivedMessage;
-        public event GenericEventHandler<Match> QuitGame;
-        public event GenericEventHandler<Faction> FactionDefeated;
+
+        /// <summary>
+        /// Raised when a message was received from a <see cref="Faction"/>.
+        /// </summary>
+        public event GenericEventHandler<Match, FactionMessage> FactionMessageReceived;
+
+        /// <summary>
+        /// Raised when a <see cref="Faction"/> was defeated.
+        /// </summary>
+        public event GenericEventHandler<Match, Faction> FactionDefeated;
+        public event GenericEventHandler<Match> Quitting;
+
+        private void OnUpdated(float timeDeltaInSeconds)
+        {
+            var handler = Updated;
+            if (handler != null) handler(this, new UpdateEventArgs(timeDeltaInSeconds));
+        }
+
+        private void OnFactionMessageReceived(FactionMessage message)
+        {
+            var handler = FactionMessageReceived;
+            if (handler != null) handler(this, message);
+        }
 
         private void OnFactionDefeated(Faction faction)
         {
-            if (FactionDefeated != null) FactionDefeated(faction);
+            var handler = FactionDefeated;
+            if (handler != null) handler(this, faction);
+        }
+
+        private void OnQuitting()
+        {
+            var handler = Quitting;
+            if (handler != null) handler(this);
         }
         #endregion
 
@@ -96,37 +114,69 @@ namespace Orion.Commandment
         /// <summary>
         /// Updates this <see cref="Match"/> for the duration of a frame.
         /// </summary>
-        public void Update(UpdateEventArgs args)
+        /// <param name="timeDelta">The time elapsed, in seconds, since the last frame.</param>
+        public void Update(float timeDeltaInSeconds)
         {
-            if (IsRunning)
-            {
-                float timeDeltaInSeconds = args.TimeDelta;
-                int frameNumber = lastFrameNumber + 1;
-                world.Update(timeDeltaInSeconds);
+            if (!IsRunning) return;
+            
+            int frameNumber = lastFrameNumber + 1;
+            world.Update(timeDeltaInSeconds);
 
-                lastFrameNumber = frameNumber;
-                GenericEventHandler<Match, UpdateEventArgs> handler = Updated;
-                if (handler != null) handler(this, args);
-            }
+            lastFrameNumber = frameNumber;
+            OnUpdated(timeDeltaInSeconds);
         }
 
-        public void PostMessage(Faction origin, string message)
+        #region Faction Stuff
+        /// <summary>
+        /// Notifies this <see cref="Match"/> that a message from a <see cref="Faction"/> has been received.
+        /// </summary>
+        /// <param name="message">The message that was received.</param>
+        public void PostFactionMessage(FactionMessage message)
         {
-            GenericEventHandler<Faction, string> handler = ReceivedMessage;
-            if (handler != null) handler(origin, message);
+            Argument.EnsureNotNull(message, "message");
+            OnFactionMessageReceived(message);
         }
 
         public bool IsFactionDefeated(Faction faction)
         {
-            return !world.Entities.OfType<Unit>().Any(unit => ((unit.HasSkill<Skills.Attack>() && !unit.Type.IsBuilding) || unit.HasSkill<Skills.Train>()) && unit.Faction == faction);
+            Argument.EnsureNotNull(faction, "faction");
+            return !world.Entities.OfType<Unit>()
+                .Where(unit => unit.Faction == faction)
+                .Any(unit => KeepsAliveFaction(unit.Type));
         }
 
-        public void Quit()
+        /// <summary>
+        /// Determines if a type of unit keeps a <see cref="Faction"/> alive.
+        /// </summary>
+        /// <param name="unitType">The type of unit to be tested.</param>
+        /// <returns><c>True</c> if it should keep its <see cref="Faction"/> alive, <c>false</c> if not.</returns>
+        private bool KeepsAliveFaction(UnitType unitType)
         {
-            GenericEventHandler<Match> handler = QuitGame;
-            if (handler != null) handler(this);
+            Argument.EnsureNotNull(unitType, "unitType");
+
+            return unitType.HasSkill<Skills.Attack>()
+                || unitType.HasSkill<Skills.Train>()
+                || unitType.HasSkill<Skills.Build>();
         }
 
+        private void OnEntityDied(EntityRegistry sender, Entity args)
+        {
+            Argument.EnsureBaseType(args, typeof(Unit), "args");
+
+            Unit unit = (Unit)args;
+            Faction faction = unit.Faction;
+
+            if (IsFactionDefeated(faction))
+            {
+                OnFactionDefeated(faction);
+                // Even if the faction is defeated, we don't have to kill all of its members
+                // as they are harmless anyways and it can be fun to see the remains of your
+                // base once you're dead. However, it might be good to disable their commanders.
+            }
+        }
+        #endregion
+
+        #region Pause/Resume/Quit
         public void TryPause()
         {
             if (IsPausable) IsRunning = false;
@@ -136,6 +186,12 @@ namespace Orion.Commandment
         {
             if (IsPausable) IsRunning = true;
         }
+
+        public void Quit()
+        {
+            OnQuitting();
+        }
+        #endregion
 
         #region Private Camp Creation
         private void CreateFactionCamps()

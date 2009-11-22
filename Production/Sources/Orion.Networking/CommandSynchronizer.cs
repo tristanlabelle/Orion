@@ -71,7 +71,7 @@ namespace Orion.Networking
 
             world = match.World;
             this.transporter = transporter;
-            match.QuitGame += SafeQuit;
+            match.Quitting += SafeQuit;
 
             this.peerEndPoints = peerEndPoints.ToList();
             if (this.peerEndPoints.Count == 0)

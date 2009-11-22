@@ -6,6 +6,9 @@ using Size = System.Drawing.Size;
 
 namespace Orion.GameLogic
 {
+    /// <summary>
+    /// Keeps the collection of registered <see cref="UnitType"/>s.
+    /// </summary>
     [Serializable]
     public sealed class UnitTypeRegistry : IEnumerable<UnitType>
     {
@@ -16,13 +19,13 @@ namespace Orion.GameLogic
         #region Constructors
         public UnitTypeRegistry()
         {
-            RegisterSmurfs();
-            RegisterPirates();
-            RegisterNinjas();
-            RegisterVikings();
-            RegisterJedis();
+            RegisterSmurf();
+            RegisterPirate();
+            RegisterNinja();
+            RegisterViking();
+            RegisterJedi();
             RegisterSwineFlu();
-            RegisterUFO();
+            RegisterUfo();
             RegisterFlyingCarpet();
             RegisterFactory();
             RegisterTower();
@@ -34,7 +37,7 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Hard-Coded UnitTypes
-        public void RegisterSmurfs()
+        public void RegisterSmurf()
         {
             var builder = new UnitTypeBuilder
             {
@@ -53,7 +56,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterPirates()
+        public void RegisterPirate()
         {
             var builder = new UnitTypeBuilder
             {
@@ -70,7 +73,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterNinjas()
+        public void RegisterNinja()
         {
             var builder = new UnitTypeBuilder
             {
@@ -87,7 +90,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterVikings()
+        public void RegisterViking()
         {
             var builder = new UnitTypeBuilder
             {
@@ -104,7 +107,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterJedis()
+        public void RegisterJedi()
         {
             var builder = new UnitTypeBuilder
             {
@@ -138,7 +141,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterUFO()
+        public void RegisterUfo()
         {
             var builder = new UnitTypeBuilder
             {
@@ -238,12 +241,12 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Chuck Norris",
-                Size = new Size(1, 1),
-                SightRange = 8,
+                Size = new Size(5, 5),
+                SightRange = 20,
                 MaxHealth = 5000
             };
             builder.Skills.Add(new Skills.Move(25, true));
-            builder.Skills.Add(new Skills.Attack(100, 1, 2));
+            builder.Skills.Add(new Skills.Attack(100, 1, 1));
             Register(builder);
         }
         #endregion

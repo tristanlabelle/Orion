@@ -72,7 +72,7 @@ namespace Orion.UserInterface.Widgets
         {
             if ((mouseTriggered || keyboardTriggered) && Enabled)
             {
-                scrolledView.ScrollBy(direction * args.TimeDelta * 40);
+                scrolledView.ScrollBy(direction * args.TimeDeltaInSeconds * 40);
             }
         }
 

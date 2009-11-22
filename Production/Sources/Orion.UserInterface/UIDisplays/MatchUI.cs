@@ -50,13 +50,12 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-
         public MatchUI(Match match)
         {
             Argument.EnsureNotNull(match, "match");
 
             this.match = match;
-            match.QuitGame += Quit;
+            match.Quitting += Quit;
             userInputManager = new UserInputManager(match.UserCommander);
             World world = match.World;
 
@@ -126,7 +125,6 @@ namespace Orion.UserInterface
             enablers.Add(new MoveEnabler(userInputManager, actions));
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes));
         }
-
         #endregion
 
         #region Properties
@@ -161,11 +159,21 @@ namespace Orion.UserInterface
         }
         #endregion
 
-        #region Event Handling
-        public void DisplayMessage(Faction origin, string message)
+        #region Messages
+        public void DisplayMessage(FactionMessage message)
         {
-            Label messageLabel = new Label("{0}: {1}".FormatInvariant(origin.Name, message));
-            messageLabel.Color = origin.Color;
+            Argument.EnsureNotNull(message, "message");
+
+            string text = "{0}: {1}".FormatInvariant(message.Faction.Name, message.Text);
+            DisplayMessage(text, message.Faction.Color);
+        }
+
+        public void DisplayMessage(string text, Color color)
+        {
+            Argument.EnsureNotNull(text, "text");
+
+            Label messageLabel = new Label(text);
+            messageLabel.Color = color;
             messagesExpiration[messageLabel] = DateTime.UtcNow + messageTimeToLive;
             float height = messageLabel.Frame.Height;
             foreach (Label writtenMessage in chatMessages.Children)
@@ -173,6 +181,15 @@ namespace Orion.UserInterface
             chatMessages.Children.Add(messageLabel);
         }
 
+        public void DisplayDefeatMessage(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+
+            DisplayMessage("{0} defeated".FormatInvariant(faction.Name), faction.Color);
+        }
+        #endregion
+
+        #region Event Handling
         protected override bool OnMouseWheel(MouseEventArgs args)
         {
             double scale = 1 - (args.WheelDelta / 600.0);
@@ -270,7 +287,7 @@ namespace Orion.UserInterface
             }
             messagesToDelete.Clear();
 
-            match.Update(args);
+            match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);
         }
 

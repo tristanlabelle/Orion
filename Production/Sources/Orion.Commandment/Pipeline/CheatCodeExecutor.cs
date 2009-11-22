@@ -10,16 +10,19 @@ using OpenTK.Math;
 
 namespace Orion.Commandment.Pipeline
 {
-    public sealed class CheatCodeFilter : CommandFilter
+    /// <summary>
+    /// A command filter which executes cheat codes if messages match them.
+    /// </summary>
+    public sealed class CheatCodeExecutor : CommandFilter
     {
         #region Instance
         #region Fields
-        private Match match;
-        private Queue<Command> commandQueue = new Queue<Command>();
+        private readonly Match match;
+        private readonly Queue<Command> accumulatedCommands = new Queue<Command>();
         #endregion
 
         #region Constructors
-        public CheatCodeFilter(Match match)
+        public CheatCodeExecutor(Match match)
         {
             Argument.EnsureNotNull(match, "match");
             this.match = match;
@@ -30,22 +33,22 @@ namespace Orion.Commandment.Pipeline
         public override void Handle(Command command)
         {
             Argument.EnsureNotNull(command, "command");
-            commandQueue.Enqueue(command);
+            accumulatedCommands.Enqueue(command);
         }
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
-            while (commandQueue.Count > 0)
+            while (accumulatedCommands.Count > 0)
             {
-                Command command = commandQueue.Dequeue();
+                Command command = accumulatedCommands.Dequeue();
                 Message message = command as Message;
                 if (message != null)
                 {
                     Action<Match> cheatCode;
-                    if (cheatCodes.TryGetValue(message.Value, out cheatCode))
+                    if (cheatCodes.TryGetValue(message.Text, out cheatCode))
                     {
                         cheatCode(match);
-                        command = new Message(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Value));
+                        command = new Message(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
                     }
                 }
                 Flush(command);
@@ -61,7 +64,7 @@ namespace Orion.Commandment.Pipeline
         #endregion
 
         #region Constructor
-        static CheatCodeFilter()
+        static CheatCodeExecutor()
         {
             cheatCodes["colorlessdeepfog"] = DisableFogOfWar;
             cheatCodes["magiclamp"] = IncreaseResources;

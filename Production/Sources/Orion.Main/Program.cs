@@ -111,7 +111,8 @@ namespace Orion.Main
         private void BeginMatch(Match match)
         {
             MatchUI matchUI = new MatchUI(match);
-            match.ReceivedMessage += matchUI.DisplayMessage;
+            match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
+            match.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
 
             gameUI.Display(matchUI);
         }

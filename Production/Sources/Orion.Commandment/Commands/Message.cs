@@ -7,21 +7,22 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A command which encapsulates some textual message sent by a <see cref="Faction"/>.
+    /// </summary>
     public sealed class Message : Command
     {
         #region Fields
-        private readonly string value;
-        private readonly Handle originatingFaction;
+        private readonly string text;
         #endregion
 
         #region Constructors
-        public Message(Handle factionHandle, string message)
+        public Message(Handle factionHandle, string text)
             : base(factionHandle)
         {
             Argument.EnsureNotNull(factionHandle, "factionHandle");
-            Argument.EnsureNotNull(message, "message");
-            value = message;
-            originatingFaction = factionHandle;
+            Argument.EnsureNotNull(text, "text");
+            this.text = text;
         }
         #endregion
 
@@ -31,9 +32,9 @@ namespace Orion.Commandment.Commands
             get { yield break; }
         }
 
-        public string Value
+        public string Text
         {
-            get { return value; }
+            get { return text; }
         }
         #endregion
 
@@ -41,19 +42,22 @@ namespace Orion.Commandment.Commands
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
-            match.PostMessage(match.World.FindFactionFromHandle(originatingFaction), value);
+
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
+            FactionMessage factionMessage = new FactionMessage(faction, text);
+            match.PostFactionMessage(factionMessage);
         }
 
         public override string ToString()
         {
-            return "\"{0}\" message".FormatInvariant(value);
+            return "{0} says \"{0}\"".FormatInvariant(FactionHandle, text);
         }
         
         #region Serialization
         protected override void SerializeSpecific(BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
-            writer.Write(value);
+            writer.Write(text);
         }
 
         public static Message DeserializeSpecific(BinaryReader reader)

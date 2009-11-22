@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
 using Orion.UserInterface;
 using Orion.GameLogic;
 using Orion.Commandment;
 using Color = System.Drawing.Color;
+using Orion.Commandment.Pipeline;
+using System.IO;
 
 namespace Orion.Main
 {
@@ -60,6 +63,19 @@ namespace Orion.Main
             random = new MersenneTwister(seed);
             Terrain terrain = Terrain.Generate(128, 128, random);
             world = new World(terrain);
+        }
+
+        protected void TryPushReplayRecorderToPipeline(CommandPipeline pipeline)
+        {
+            Argument.EnsureNotNull(pipeline, "pipeline");
+
+            ReplayWriter replayWriter = ReplayWriter.TryCreate();
+            if (replayWriter == null) return;
+
+            replayWriter.AutoFlush = true;
+            replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
+
+            pipeline.PushFilter(new ReplayRecorder(replayWriter));
         }
 
         public abstract Match Start();

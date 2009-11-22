@@ -69,21 +69,19 @@ namespace Orion.Main
 
             Match match = new Match(random, world, userCommander);
 
-            ReplayWriter replayWriter = new ReplayWriter("replay.foo");
-            replayWriter.AutoFlush = true;
-            replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
+
+            CommandTextLogger textLogger = new CommandTextLogger();
+            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddFilter(new ReplayRecorder(replayWriter));
-            CommandTextLogger textLogger = new CommandTextLogger();
-            pipeline.AddFilter(textLogger);
-            CommandSynchronizer synchronizer = new CommandSynchronizer(world, transporter, UserInterface.PlayerAddresses);
-            pipeline.AddFilter(synchronizer);
+            TryPushReplayRecorderToPipeline(pipeline);
+            pipeline.PushFilter(textLogger);
+            pipeline.PushFilter(synchronizer);
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, textLogger));
             pipeline.AddCommander(userCommander, synchronizer);
 
-            match.Updated += pipeline.Update;
+            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDelta);
 
             return match;
         }

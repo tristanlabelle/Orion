@@ -40,7 +40,7 @@ namespace Orion.Commandment.Pipeline
         /// making it the first filter to process <see cref="Command"/>s.
         /// </summary>
         /// <param name="filter">A <see cref="CommandFilter"/> to be added.</param>
-        public void AddFilter(CommandFilter filter)
+        public void PushFilter(CommandFilter filter)
         {
             Argument.EnsureNotNull(filter, "filter");
             filter.Flushed += OnFilterFlushed;
@@ -90,18 +90,7 @@ namespace Orion.Commandment.Pipeline
         }
         #endregion
 
-        /// <summary>
-        /// Updates this <see cref="CommandPipeline"/> and its <see cref="Commander"/>s
-        /// for a game frame.
-        /// </summary>
-        /// <param name="match">The match to update</param>
-        /// <param name="args">The update event arguments, holding the time delta</param>
-        public void Update(Match match, UpdateEventArgs args)
-        {
-            Update(match.LastFrameNumber, args.Delta);
-        }
-
-        private void Update(int frameNumber, float timeDeltaInSeconds)
+        public void Update(int frameNumber, float timeDeltaInSeconds)
         {
             foreach (Commander commander in commanders.Keys)
                 commander.Update(timeDeltaInSeconds);

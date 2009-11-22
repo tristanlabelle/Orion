@@ -72,7 +72,7 @@ namespace Orion.Commandment
         /// </summary>
         public void Update(UpdateEventArgs args)
         {
-            float timeDeltaInSeconds = args.Delta;
+            float timeDeltaInSeconds = args.TimeDelta;
             int frameNumber = lastFrameNumber + 1;
             world.Update(timeDeltaInSeconds);
 

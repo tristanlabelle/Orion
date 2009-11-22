@@ -63,19 +63,15 @@ namespace Orion.Main
 
             Match match = new Match(random, world, userCommander);
 
-            ReplayWriter replayWriter = new ReplayWriter("replay.foo");
-            replayWriter.AutoFlush = true;
-            replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
-
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddFilter(new ReplayRecorder(replayWriter));
-            CheatCodeFilter cheatCodes = new CheatCodeFilter(match);
-            pipeline.AddFilter(cheatCodes);
+            pipeline.PushFilter(new CheatCodeFilter(match));
+            TryPushReplayRecorderToPipeline(pipeline);
+            pipeline.PushFilter(new CommandTextLogger());
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);
 
-            match.Updated += pipeline.Update;
+            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDelta);
 
             return match;
         }

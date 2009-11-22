@@ -11,6 +11,7 @@ namespace Orion.Commandment
     /// </summary>
     public sealed class ReplayWriter : IDisposable
     {
+        #region Instance
         #region Fields
         private readonly BinaryWriter writer;
         private bool autoFlush = true;
@@ -103,6 +104,51 @@ namespace Orion.Commandment
         {
             writer.Close();
         }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Fields
+        private static readonly DirectoryInfo directory = new DirectoryInfo("Replays");
+        #endregion
+
+        #region Methods
+        public static ReplayWriter TryCreate()
+        {
+            Stream stream = TryOpenFileStream();
+            if (stream == null) return null;
+
+            return new ReplayWriter(stream);
+        }
+
+        private static Stream TryOpenFileStream()
+        {
+            if (!directory.Exists)
+            {
+                try { directory.Create(); }
+                catch (IOException) { return null; }
+            }
+
+            DateTime now = DateTime.Now;
+
+            string dateString = "{0:D4}-{1:D2}-{2:D2} {3:D2}.{4:D2}.{5:D2}"
+                .FormatInvariant(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                string filePath = dateString;
+                if (i > 0) filePath += " ({0})".FormatInvariant(i + 1);
+                filePath += ".replay";
+
+                filePath = Path.Combine(directory.Name, filePath);
+
+                try { return new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read); }
+                catch (IOException) { }
+            }
+
+            return null;
+        }
+        #endregion
         #endregion
     }
 }

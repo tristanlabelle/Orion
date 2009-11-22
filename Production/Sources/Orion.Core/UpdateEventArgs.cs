@@ -9,20 +9,20 @@ namespace Orion
         /// <summary>
         /// The time, in seconds, since the last Update event was triggered
         /// </summary>
-        public readonly float Delta;
+        public readonly float TimeDelta;
 
         /// <summary>
         /// Constructs a new Update event arguments structure with a given time delta.
         /// </summary>
-        /// <param name="delta">The time in seconds since the last Update event was triggered.</param>
-        public UpdateEventArgs(float delta)
+        /// <param name="timeDelta">The time in seconds since the last Update event was triggered.</param>
+        public UpdateEventArgs(float timeDelta)
         {
-            Delta = delta;
+            TimeDelta = timeDelta;
         }
 
         public override string ToString()
         {
-            return "Update Event Args delta={0}".FormatInvariant(Delta);
+            return "Update Event Args delta={0}".FormatInvariant(TimeDelta);
         }
     }
 }

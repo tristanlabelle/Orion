@@ -27,6 +27,13 @@ namespace Orion.UserInterface.Widgets
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Triggered when the Return key is pressed.
+        /// </summary>
+        public event GenericEventHandler<TextField> Triggered;
+        #endregion
+
         #region Properties
         public string Contents
         {
@@ -49,8 +56,13 @@ namespace Orion.UserInterface.Widgets
                 if (value.Length > 0)
                     Contents = value.Remove(value.Length - 1);
             }
-            else if (arg != '\r')
-                Contents += arg;
+            else if (arg == '\r')
+            {
+                GenericEventHandler<TextField> handler = Triggered;
+                if (handler != null) handler(this);
+            }
+            else Contents += arg;
+
             base.OnKeyPress(arg);
             return false;
         }
@@ -69,7 +81,7 @@ namespace Orion.UserInterface.Widgets
             context.Stroke(Bounds);
 
             context.FillColor = Color.Black;
-            context.Draw(contents);
+            context.Draw(contents, new Vector2(4, -5), Bounds);
             if ((updateCounter / cursorBlinkFrequency) % 2 == 0)
             {
                 Rectangle textFrame = contents.Frame;

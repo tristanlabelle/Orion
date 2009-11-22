@@ -8,11 +8,11 @@ namespace Orion.UserInterface
         public MainMenuUI(GenericEventHandler<Button> beginSinglePlayerGameDelegate, GenericEventHandler<Button> beginMultiplayerGameDelegate)
         {
             Button singleplayerGame = new Button(new Rectangle(300, 400, 400, 100), "Single Player Game");
-            singleplayerGame.Pressed += beginSinglePlayerGameDelegate;
+            singleplayerGame.Triggered += beginSinglePlayerGameDelegate;
             Children.Add(singleplayerGame);
 
             Button multiplayerGame = new Button(new Rectangle(300, 250, 400, 100), "Multiplayer Game");
-            multiplayerGame.Pressed += beginMultiplayerGameDelegate;
+            multiplayerGame.Triggered += beginMultiplayerGameDelegate;
             Children.Add(multiplayerGame);
         }
 

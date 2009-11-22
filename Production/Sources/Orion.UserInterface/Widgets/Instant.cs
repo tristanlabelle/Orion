@@ -30,7 +30,7 @@ namespace Orion.UserInterface.Widgets
             Frame container = new Frame(frameRect);
             Label displayedMessage = new Label(labelRect, message);
             Button okButton = new Button(buttonRect, "Ok");
-            okButton.Pressed += delegate(Button sender) { container.Dispose(); };
+            okButton.Triggered += delegate(Button sender) { container.Dispose(); };
 
             container.Children.Add(displayedMessage);
             container.Children.Add(okButton);
@@ -55,12 +55,17 @@ namespace Orion.UserInterface.Widgets
             TextField input = new TextField(textFieldRect);
             Button okButton = new Button(okButtonRect, "Ok");
             Button cancelButton = new Button(cancelButtonRect, "Cancel");
-            okButton.Pressed += delegate(Button sender)
+
+            GenericEventHandler<Responder> accept = delegate(Responder sender)
             {
                 onClose(input.Contents);
                 container.Dispose();
             };
-            cancelButton.Pressed += delegate(Button sender)
+
+            okButton.Triggered += new GenericEventHandler<Button>(accept);
+            input.Triggered += new GenericEventHandler<TextField>(accept);
+
+            cancelButton.Triggered += delegate(Button sender)
             {
                 container.Dispose();
             };

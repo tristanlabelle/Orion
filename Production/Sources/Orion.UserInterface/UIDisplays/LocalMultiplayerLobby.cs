@@ -41,17 +41,17 @@ namespace Orion.UserInterface
 
             Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
             Button hostButton = new Button(hostFrame, "Host");
-            hostButton.Pressed += PressHostGame;
+            hostButton.Triggered += PressHostGame;
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
             Button joinRemoteButton = new Button(joinRemoteFrame, "Join with IP...");
-            joinRemoteButton.Pressed += PressJoinRemoteGame;
+            joinRemoteButton.Triggered += PressJoinRemoteGame;
             Children.Add(joinRemoteButton);
 
             Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
             Button backButton = new Button(backButtonFrame, "Back");
-            backButton.Pressed += PressBack;
+            backButton.Triggered += PressBack;
             Children.Add(backButton);
         }
         #endregion
@@ -122,7 +122,7 @@ namespace Orion.UserInterface
             foreach (KeyValuePair<IPv4EndPoint, int> game in hostedGames)
             {
                 Button button = new Button(buttonFrame, "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(game.Key), game.Value));
-                button.Pressed += delegate(Button source) { AskJoinGame(game.Key); };
+                button.Triggered += delegate(Button source) { AskJoinGame(game.Key); };
                 gamesFrame.Children.Add(button);
                 buttonFrame = buttonFrame.TranslatedBy(0, -(buttonFrame.Height + 10));
             }

@@ -38,7 +38,7 @@ namespace Orion.UserInterface.Widgets
         /// <summary>
         /// Triggered when the button is pressed or when its <see cref="P:HotKey"/> is pressed.
         /// </summary>
-        public event GenericEventHandler<Button> Pressed;
+        public event GenericEventHandler<Button> Triggered;
         #endregion
 
         #region Properties
@@ -70,7 +70,7 @@ namespace Orion.UserInterface.Widgets
         #region Methods
         public override void Dispose()
         {
-            Pressed = null;
+            Triggered = null;
             base.Dispose();
         }
 
@@ -116,7 +116,7 @@ namespace Orion.UserInterface.Widgets
         {
             if (enabled)
             {
-                GenericEventHandler<Button> handler = Pressed;
+                GenericEventHandler<Button> handler = Triggered;
                 if (handler != null) handler(this);
             }
         }

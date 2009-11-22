@@ -178,6 +178,7 @@ namespace Orion.UserInterface
             mouseDownOnMinimap = false;
             return base.OnMouseUp(args);
         }
+
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
@@ -326,7 +327,7 @@ namespace Orion.UserInterface
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
 
-            unitButton.Pressed += ButtonPress;
+            unitButton.Triggered += ButtonPress;
             selectionFrame.Children.Add(unitButton);
         }
 
@@ -345,7 +346,7 @@ namespace Orion.UserInterface
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
-                unitButton.Pressed += ButtonPress;
+                unitButton.Triggered += ButtonPress;
                 currentX += frame.Width + padding;
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
                 {

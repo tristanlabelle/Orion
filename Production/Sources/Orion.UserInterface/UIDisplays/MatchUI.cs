@@ -228,7 +228,7 @@ namespace Orion.UserInterface
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (isSpaceDown && SelectedType != null)
+            if (isSpaceDown && SelectedType != null && !Children.Contains(chatInput))
             {
                 Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
                 Vector2 halfWorldBoundsSize = worldView.Bounds.Size;

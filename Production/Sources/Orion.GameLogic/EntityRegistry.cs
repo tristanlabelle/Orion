@@ -244,13 +244,9 @@ namespace Orion.GameLogic
                 UpdateZone(pair.Key, pair.Value);
             entitiesToMove.Clear();
 
-            try
-            {
-                foreach (Entity entity in entitiesToRemove)
-                    Remove(entity);
-                entitiesToRemove.Clear();
-            }
-            catch (InvalidOperationException) { }
+            foreach (Entity entity in entitiesToRemove)
+                Remove(entity);
+            entitiesToRemove.Clear();
         }
 
         private void Add(Entity entity)

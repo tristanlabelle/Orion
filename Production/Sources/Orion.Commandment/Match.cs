@@ -169,6 +169,7 @@ namespace Orion.Commandment
             if (IsFactionDefeated(faction))
             {
                 OnFactionDefeated(faction);
+                faction.FogOfWar.Disable();
                 // Even if the faction is defeated, we don't have to kill all of its members
                 // as they are harmless anyways and it can be fun to see the remains of your
                 // base once you're dead. However, it might be good to disable their commanders.

@@ -17,7 +17,7 @@ namespace Orion.GameLogic
     public sealed class Faction
     {
         #region Fields
-        private const int maxFoodStock = 200;
+        private const int maxFoodAmount = 200;
 
         private readonly Handle handle;
         private readonly World world;
@@ -29,8 +29,8 @@ namespace Orion.GameLogic
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
         private int aladdiumAmount;
         private int alageneAmount;
-        private int totalFoodStock = 0;
-        private int usedFoodStock = 0;
+        private int totalFoodAmount = 0;
+        private int usedFoodAmount = 0;
         private FactionStatus status = FactionStatus.Undefeated;
         #endregion
 
@@ -153,28 +153,28 @@ namespace Orion.GameLogic
             get { return alageneAmount; }
             set
             {
-                Argument.EnsurePositive(value, "AllageneAmount");
+                Argument.EnsurePositive(value, "AlageneAmount");
                 alageneAmount = value;
             }
         }
 
-        public int MaxFoodStock
+        public int MaxFoodAmount
         {
-            get { return Math.Min(maxFoodStock, totalFoodStock); }
+            get { return Math.Min(maxFoodAmount, totalFoodAmount); }
         }
 
-        public int AvailableFood
+        public int RemainingFoodAmount
         {
-            get { return MaxFoodStock - usedFoodStock; }
+            get { return MaxFoodAmount - usedFoodAmount; }
         }
 
-        public int UsedFoodStock
+        public int UsedFoodAmount
         {
-            get { return usedFoodStock; }
+            get { return usedFoodAmount; }
             set 
             {
-                Argument.EnsureNotNull(value, "usedFoodStock");
-                usedFoodStock = value;
+                Argument.EnsurePositive(value, "UsedFoodAmount");
+                usedFoodAmount = value;
             }
         }
         #endregion
@@ -228,9 +228,9 @@ namespace Orion.GameLogic
             unit.Moved += entityMovedEventHandler;
             unit.Died += entityDiedEventHandler;
             fogOfWar.AddLineOfSight(unit.LineOfSight);
-            usedFoodStock += type.FoodCost;
+            usedFoodAmount += type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreFood>())
-                totalFoodStock += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+                totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             return unit;
         }
 
@@ -251,9 +251,9 @@ namespace Orion.GameLogic
 
             Unit unit = (Unit)entity;
             fogOfWar.RemoveLineOfSight(unit.LineOfSight);
-            usedFoodStock -= unit.Type.FoodCost;
+            usedFoodAmount -= unit.Type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreResources>())
-                totalFoodStock -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             unit.Died -= entityDiedEventHandler;
 
             CheckForDefeat();

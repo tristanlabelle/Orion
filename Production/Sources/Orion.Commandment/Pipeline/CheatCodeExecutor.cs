@@ -91,7 +91,7 @@ namespace Orion.Commandment.Pipeline
 
         private static void IncreaseAvailableFood(Match match)
         {
-            match.UserCommander.Faction.UsedFoodStock -= 100;
+            match.UserCommander.Faction.UsedFoodAmount -= 100;
         }
 
         private static void SpawnHeroUnit(Match match)

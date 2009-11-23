@@ -142,7 +142,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the maximum amount of health points this <see cref="Unit"/> can have.
         /// </summary>
-        public float MaxHealth
+        public int MaxHealth
         {
             get { return GetStat(UnitStat.MaxHealth); }
         }

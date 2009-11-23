@@ -48,7 +48,7 @@ namespace Orion.GameLogic.Tasks
         {
             if (HasEnded) return;
 
-            if (trainer.Faction.AvailableFood < traineeType.FoodCost) return;
+            if (trainer.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
 
             float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);

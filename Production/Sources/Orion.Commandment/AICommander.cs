@@ -85,8 +85,7 @@ namespace Orion.Commandment
 
                     int enemyUnits = World.Entities
                         .OfType<Unit>()
-                        .Where(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position))
-                        .Count();
+                        .Count(unit => unit.Faction != Faction && effectiveRange.ContainsPoint(unit.Position));
 
                     int alliedUnits = Faction.Units
                         .Where(unit => effectiveRange.ContainsPoint(unit.Position))
@@ -98,11 +97,10 @@ namespace Orion.Commandment
 
                     int currentEnemyUnits = World.Entities
                         .OfType<Unit>()
-                        .Where(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position)).Count();
+                        .Count(unit => unit.Faction != Faction && currentRange.ContainsPoint(unit.Position));
 
                     int currentAlliedUnits = Faction.Units
-                        .Where(unit => currentRange.ContainsPoint(unit.Position))
-                        .Count();
+                        .Count(unit => currentRange.ContainsPoint(unit.Position));
 
                     int currentScore = currentAlliedUnits - currentEnemyUnits;
 

@@ -356,7 +356,6 @@ namespace Orion.UserInterface
             if (isDisposed) throw new ObjectDisposedException(null);
             foreach (ViewContainer container in Children)
             {
-                if (!Rectangle.Intersects(Bounds, container.Frame)) continue;
                 container.Render();
             }
         }

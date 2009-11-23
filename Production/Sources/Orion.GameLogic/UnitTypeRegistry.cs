@@ -232,7 +232,8 @@ namespace Orion.GameLogic
                 AladdiumCost = 50,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.StoreFood(10)); 
+            builder.Skills.Add(new Skills.StoreFood(10));
+            builder.Skills.Add(new Skills.StoreResources());
             Register(builder);
         }
 

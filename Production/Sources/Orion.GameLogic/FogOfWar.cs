@@ -7,9 +7,152 @@ using OpenTK.Graphics;
 
 namespace Orion.GameLogic
 {
+    /// <summary>
+    /// Manages the visibility of world regions with regard to the viewpoint of a faction.
+    /// </summary>
     [Serializable]
     public sealed class FogOfWar
     {
+        #region Nested Types
+        private struct RoundedCircle : IEquatable<RoundedCircle>
+        {
+            #region Instance
+            #region Fields
+            private readonly int centerX;
+            private readonly int centerY;
+            private readonly int radius;
+            #endregion
+
+            #region Constructors
+            public RoundedCircle(Circle circle)
+            {
+                this.centerX = (int)Math.Floor(circle.Center.X);
+                this.centerY = (int)Math.Floor(circle.Center.Y);
+                this.radius = (int)Math.Round(circle.Radius);
+            }
+            #endregion
+
+            #region Properties
+            public int CenterX
+            {
+                get { return centerX; }
+            }
+
+            public int CenterY
+            {
+                get { return centerY; }
+            }
+
+            public int Radius
+            {
+                get { return radius; }
+            }
+            #endregion
+
+            #region Methods
+            public bool Equals(RoundedCircle other)
+            {
+                return centerX == other.centerX
+                    && centerY == other.centerY
+                    && radius == other.radius;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return base.Equals(obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return centerX ^ centerY ^ radius;
+            }
+            #endregion
+            #endregion
+
+            #region Static
+            #region Methods
+            public static bool Equals(RoundedCircle a, RoundedCircle b)
+            {
+                return a.Equals(b);
+            }
+            #endregion
+
+            #region Operators
+            public static bool operator ==(RoundedCircle lhs, RoundedCircle rhs)
+            {
+                return Equals(lhs, rhs);
+            }
+
+            public static bool operator !=(RoundedCircle lhs, RoundedCircle rhs)
+            {
+                return !Equals(lhs, rhs);
+            }
+            #endregion
+            #endregion
+        }
+
+        private struct CircleLookup
+        {
+            #region Fields
+            private readonly int minX;
+            private readonly int minY;
+            private readonly BitArray2D bitmap;
+            #endregion
+
+            #region Constructors
+            public CircleLookup(int minX, int minY, BitArray2D bitmap)
+            {
+                this.minX = minX;
+                this.minY = minY;
+                this.bitmap = bitmap;
+            }
+            #endregion
+
+            #region Properties
+            public int MinX
+            {
+                get { return minX; }
+            }
+
+            public int MinY
+            {
+                get { return minY; }
+            }
+
+            public int Width
+            {
+                get { return bitmap.ColumnCount; }
+            }
+
+            public int Height
+            {
+                get { return bitmap.RowCount; }
+            }
+
+            public int ExclusiveMaxX
+            {
+                get { return minX + Width; }
+            }
+
+            public int ExclusiveMaxY
+            {
+                get { return minY + Height; }
+            }
+            #endregion
+
+            #region Methods
+            public bool IsSet(int x, int y)
+            {
+                if (x < minX || y < minY || x >= ExclusiveMaxX || y >= ExclusiveMaxY)
+                    return false;
+
+                return bitmap[y - minY, x - minX];
+            }
+            #endregion
+        }
+        #endregion
+
+        #region Instance
         #region Fields
         /// <summary>
         /// Holds the reference count of each tile in the fog of war.
@@ -84,42 +227,33 @@ namespace Orion.GameLogic
         {
             if (!isEnabled) return;
 
-            Circle roundedOldLineOfSight = RoundLineOfSight(oldLineOfSight);
-            Circle roundedNewLineOfSight = RoundLineOfSight(newLineOfSight);
+            RoundedCircle roundedOldLineOfSight = new RoundedCircle(oldLineOfSight);
+            RoundedCircle roundedNewLineOfSight = new RoundedCircle(newLineOfSight);
 
-            if (roundedNewLineOfSight == roundedOldLineOfSight)
-                return;
+            if (roundedNewLineOfSight == roundedOldLineOfSight) return;
 
-            ModifyLineOfSight(roundedNewLineOfSight, true);
             ModifyLineOfSight(roundedOldLineOfSight, false);
+            ModifyLineOfSight(roundedNewLineOfSight, true);
         }
 
         public void AddLineOfSight(Circle lineOfSight)
         {
             if (!isEnabled) return;
 
-            Circle roundedCircle = RoundLineOfSight(lineOfSight);
-            ModifyLineOfSight(roundedCircle, true);
+            RoundedCircle roundedLineOfSight = new RoundedCircle(lineOfSight);
+            ModifyLineOfSight(roundedLineOfSight, true);
         }
 
         public void RemoveLineOfSight(Circle lineOfSight)
         {
             if (!isEnabled) return;
 
-            Circle roundedCircle = RoundLineOfSight(lineOfSight);
-            ModifyLineOfSight(roundedCircle, false);
+            RoundedCircle roundedLineOfSight = new RoundedCircle(lineOfSight);
+            ModifyLineOfSight(roundedLineOfSight, false);
         }
         #endregion
 
         #region Private Implementation
-        private Circle RoundLineOfSight(Circle lineOfSight)
-        {
-            return new Circle(
-                (float)Math.Floor(lineOfSight.Center.X),
-                (float)Math.Floor(lineOfSight.Center.Y),
-                (float)Math.Round(lineOfSight.Radius));
-        }
-
         private BitArray2D GetCircleBitmap(int radius)
         {
             BitArray2D bitmap;
@@ -142,26 +276,31 @@ namespace Orion.GameLogic
             return bitmap;
         }
 
-        private void ModifyLineOfSight(Circle lineOfSight, bool addOrRemove)
+        private CircleLookup GetCircleLookup(RoundedCircle circle)
+        {
+            BitArray2D bitmap = GetCircleBitmap(circle.Radius);
+
+            int minX = circle.CenterX - bitmap.ColumnCount / 2;
+            int minY = circle.CenterY - bitmap.RowCount / 2;
+
+            return new CircleLookup(minX, minY, bitmap);
+        }
+
+        private void ModifyLineOfSight(RoundedCircle lineOfSight, bool addOrRemove)
         {
             if (!isEnabled) return;
 
-            int roundedRadius = (int)Math.Round(lineOfSight.Radius);
-            BitArray2D bitmap = GetCircleBitmap(roundedRadius);
-
-            int minX = (int)Math.Floor(lineOfSight.Center.X - bitmap.ColumnCount * 0.5f);
-            int minY = (int)Math.Floor(lineOfSight.Center.Y - bitmap.RowCount * 0.5f);
-            int exclusiveMaxX = minX + bitmap.ColumnCount;
-            int exclusiveMaxY = minY + bitmap.RowCount;
+            CircleLookup lookup = GetCircleLookup(lineOfSight);
+            int minX = Math.Max(lookup.MinX, 0);
+            int minY = Math.Max(lookup.MinY, 0);
+            int exclusiveMaxX = Math.Min(lookup.ExclusiveMaxX, Width);
+            int exclusiveMaxY = Math.Min(lookup.ExclusiveMaxY, Height);
 
             for (int x = minX; x < exclusiveMaxX; x++)
             {
-                if (x < 0 || x >= Width) continue;
                 for (int y = minY; y < exclusiveMaxY; y++)
                 {
-                    if (y < 0 || y >= Height) continue;
-
-                    if (!bitmap[x - minX, y - minY]) continue;
+                    if (!lookup.IsSet(x, y)) continue;
 
                     if (addOrRemove)
                     {
@@ -247,6 +386,7 @@ namespace Orion.GameLogic
 
             OnChanged();
         }
+        #endregion
         #endregion
         #endregion
     }

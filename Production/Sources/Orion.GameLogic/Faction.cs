@@ -235,7 +235,7 @@ namespace Orion.GameLogic
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
             Unit unit = (Unit)entity;
-            float sightRange = unit.GetStat(UnitStat.SightRange);
+            int sightRange = unit.GetStat(UnitStat.SightRange);
             Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
             Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
             fogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);

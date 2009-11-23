@@ -46,7 +46,6 @@ namespace Orion.GameLogic
             this.faction = faction;
             this.position = position;
             this.rallyPoint = GetDefaultRallyPoint();
-            this.taskQueue = new Queue<Task>();
         }
         #endregion
 

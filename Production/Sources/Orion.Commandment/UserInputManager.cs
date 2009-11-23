@@ -118,12 +118,13 @@ namespace Orion.Commandment
                 .OfType<Unit>()
                 .FirstOrDefault(unit => Rectangle.Intersects(selection, unit.BoundingRectangle));
 
-            if (selectedUnit != null)
+            if (selectedUnit != null && selectedUnit.Faction == faction)
             {
                 IEnumerable<Unit> selectedUnits = faction.World.Entities
                     .OfType<Unit>()
                     .Where(unit => (unit.Position - args.Position).Length < 10
-                            && unit.Type == selectedUnit.Type);
+                            && unit.Type == selectedUnit.Type
+                            && unit.Faction == faction);
                 selectionManager.SelectUnits(selectedUnits);
             }
             selectionStart = null;

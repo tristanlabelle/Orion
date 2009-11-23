@@ -267,9 +267,20 @@ namespace Orion.Commandment
             }
             else
             {
+                if (World.Terrain.IsWalkableAndWithinBounds(at))
+                {
+                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.Train>()))
+                    {
+                        foreach (Unit unit in selectionManager.SelectedUnits)
+                        {
+                            unit.RallyPoint = at;
+                        }
+                    }
+                }
                 LaunchMove(at);
             }
         }
+
         #endregion
 
         #region Launching individual commands

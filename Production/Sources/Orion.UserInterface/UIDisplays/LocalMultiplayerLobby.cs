@@ -89,7 +89,7 @@ namespace Orion.UserInterface
                     ShowGame(args.Host, args.Data[1]);
                     break;
 
-                case SetupMessageType.StartGame:
+                case SetupMessageType.RemoveGame:
                 case SetupMessageType.Exit:
                     RemoveGame(args.Host);
                     break;

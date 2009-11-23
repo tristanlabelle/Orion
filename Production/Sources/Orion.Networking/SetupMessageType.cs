@@ -14,6 +14,7 @@ namespace Orion.Networking
 
         Explore = 105,
         Advertise = 106,
+        RemoveGame = 113,
 
         SetPeer = 107,
         SetSlot = 108,

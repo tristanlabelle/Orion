@@ -14,7 +14,7 @@ namespace Orion.UserInterface
 
         public IRenderer Renderer { get; set; }
 
-        protected internal sealed override void Render()
+        protected internal override void Render()
         {
             base.Render();
         }

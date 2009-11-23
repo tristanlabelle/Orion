@@ -1,4 +1,4 @@
-﻿
+﻿using OpenTK.Graphics;
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.Graphics;
@@ -106,6 +106,25 @@ namespace Orion.UserInterface
                 newOrigin.Y -= newBounds.MaxY - FullBounds.MaxY;
 
             Bounds = new Rectangle(newOrigin, newSize);
+        }
+
+        protected internal override void Render()
+        {
+            Vector2 origin = Frame.Min;
+            Vector2 end = Frame.Max;
+            ViewContainer parent = Parent;
+            while (parent != null)
+            {
+                origin = Rectangle.ConvertPoint(parent.Bounds, parent.Frame, origin);
+                end = Rectangle.ConvertPoint(parent.Bounds, parent.Frame, end);
+                parent = parent.Parent;
+            }
+            Vector2 size = end - origin;
+
+            GL.Scissor((int)origin.X, (int)origin.Y, (int)size.X, (int)size.Y);
+            GL.Enable(EnableCap.ScissorTest);
+            base.Render();
+            GL.Disable(EnableCap.ScissorTest);
         }
     }
 }

@@ -254,6 +254,10 @@ namespace Orion.Commandment
             {
                 faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 0));
             }
+            for (int i = 1; i <= 2; i++)
+            {
+                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 1));
+            }
         }
 
         private void CreateCampResourceNodes(Vector2 campCenter)

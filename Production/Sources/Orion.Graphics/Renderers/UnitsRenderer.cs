@@ -56,7 +56,12 @@ namespace Orion.Graphics
             SetTypeShape("Ninja", LinePath.Pentagon);
             SetTypeShape("Viking", LinePath.Triangle);
             SetTypeShape("Jedi", LinePath.Cross);
-            SetTypeShape("Factory", LinePath.Pentagon);
+            SetTypeShape("Grippe A(H1N1)", LinePath.Plus);
+            SetTypeShape("OVNI", LinePath.Circle);
+            SetTypeShape("Tapis Volant", LinePath.Square);
+            SetTypeShape("Pyramide", LinePath.Square);
+            SetTypeShape("Baraque", LinePath.Triangle);
+            SetTypeShape("Port Spatial", LinePath.Pentagon);
             SetTypeShape("Tower", LinePath.Square);
             SetTypeShape("AlageneExtractor", LinePath.Cross);
         }

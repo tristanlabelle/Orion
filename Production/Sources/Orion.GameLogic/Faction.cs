@@ -171,11 +171,7 @@ namespace Orion.GameLogic
         public int UsedFoodAmount
         {
             get { return usedFoodAmount; }
-            set 
-            {
-                Argument.EnsurePositive(value, "UsedFoodAmount");
-                usedFoodAmount = value;
-            }
+            set { usedFoodAmount = value; }
         }
         #endregion
         #endregion

@@ -249,7 +249,7 @@ namespace Orion.Commandment
 
         private void CreateCampUnits(Faction faction, Vector2 campCenter)
         {
-            faction.CreateUnit(world.UnitTypes.FromName("Factory"), campCenter);
+            faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), campCenter);
             for (int i = 1; i <= 2; i++)
             {
                 faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 0));

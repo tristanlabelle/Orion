@@ -27,7 +27,9 @@ namespace Orion.GameLogic
             RegisterSwineFlu();
             RegisterUfo();
             RegisterFlyingCarpet();
-            RegisterFactory();
+            RegisterPyramid();
+            RegisterBarack();
+            RegisterStarPort();
             RegisterTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
@@ -45,7 +47,7 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 5,
                 MaxHealth = 15,
-                AladdiumCost = 25,
+                AladdiumCost = 50,
                 AlageneCost = 0,
                 FoodCost = 1
             };
@@ -99,7 +101,7 @@ namespace Orion.GameLogic
                 SightRange = 6,
                 MaxHealth = 75,
                 AladdiumCost = 100,
-                AlageneCost = 0,
+                AlageneCost = 25,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(10, false));
@@ -115,8 +117,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 50,
-                AladdiumCost = 75,
-                AlageneCost = 50,
+                AladdiumCost = 50,
+                AlageneCost = 75,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(14, false));
@@ -132,8 +134,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 35,
-                AladdiumCost = 0,
-                AlageneCost = 0,
+                AladdiumCost = 75,
+                AlageneCost = 100,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(18, true));
@@ -149,8 +151,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 8,
                 MaxHealth = 80,
-                AladdiumCost = 125,
-                AlageneCost = 75,
+                AladdiumCost = 150,
+                AlageneCost = 200,
                 FoodCost = 5
             };
             builder.Skills.Add(new Skills.Move(8, true));
@@ -166,28 +168,58 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 45,
-                AladdiumCost = 50,
-                AlageneCost = 25,
+                AladdiumCost = 25,
+                AlageneCost = 50,
                 FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(14, true));
             Register(builder);
         }
 
-        public void RegisterFactory()
+        public void RegisterPyramid()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Factory",
+                Name = "Pyramide",
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 400,
                 AladdiumCost = 250,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.Train(type => !type.IsBuilding && type.Name != "Chuck Norris", 10));
+            builder.Skills.Add(new Skills.Train(type => type.Name == "Schtroumpf", 10));
             builder.Skills.Add(new Skills.StoreResources());
             builder.Skills.Add(new Skills.StoreFood(10)); 
+            Register(builder);
+        }
+
+        public void RegisterBarack()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Baraque",
+                Size = new Size(3, 3),
+                SightRange = 8,
+                MaxHealth = 200,
+                AladdiumCost = 150,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new Skills.Train(type => type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking" || type.Name == "Jedi", 10));
+            Register(builder);
+        }
+
+        public void RegisterStarPort()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Port Spatial",
+                Size = new Size(3, 3),
+                SightRange = 8,
+                MaxHealth = 250,
+                AladdiumCost = 200,
+                AlageneCost = 75
+            };
+            builder.Skills.Add(new Skills.Train(type => type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
             Register(builder);
         }
 
@@ -198,7 +230,7 @@ namespace Orion.GameLogic
                 Name = "Tower",
                 Size = new Size(2, 2),
                 SightRange = 12,
-                MaxHealth = 30,
+                MaxHealth = 50,
                 AladdiumCost = 80,
                 AlageneCost = 20
             };
@@ -212,8 +244,8 @@ namespace Orion.GameLogic
             {
                 Name = "AlageneExtractor",
                 Size = new Size(2, 2),
-                SightRange = 6,
-                MaxHealth = 25,
+                SightRange = 4,
+                MaxHealth = 12,
                 AladdiumCost = 75,
                 AlageneCost = 0
             };
@@ -227,13 +259,12 @@ namespace Orion.GameLogic
             {
                 Name = "Supply",
                 Size = new Size(2, 2),
-                SightRange = 6,
-                MaxHealth = 70,
+                SightRange = 4,
+                MaxHealth = 80,
                 AladdiumCost = 50,
                 AlageneCost = 0
             };
             builder.Skills.Add(new Skills.StoreFood(10));
-            builder.Skills.Add(new Skills.StoreResources());
             Register(builder);
         }
 
@@ -242,8 +273,8 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Chuck Norris",
-                Size = new Size(5, 5),
-                SightRange = 20,
+                Size = new Size(1, 1),
+                SightRange = 10,
                 MaxHealth = 5000
             };
             builder.Skills.Add(new Skills.Move(25, true));

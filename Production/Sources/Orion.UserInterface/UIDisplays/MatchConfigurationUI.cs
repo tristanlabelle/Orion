@@ -29,7 +29,7 @@ namespace Orion.UserInterface
 
         public MatchConfigurationUI(bool enableStartGame)
         {
-            backgroundFrame = new Frame(Bounds.TranslatedBy(10, 375).ResizedBy(-20, -385));
+            backgroundFrame = new Frame(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
             Children.Add(backgroundFrame);
             Rectangle dropdownListRect = new Rectangle(10, backgroundFrame.Bounds.MaxY - 40, 200, 30);
             for (int i = 0; i < playerSlots.Length; i++)

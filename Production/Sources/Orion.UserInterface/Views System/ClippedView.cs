@@ -141,6 +141,12 @@ namespace Orion.UserInterface
             base.Render();
             GL.Disable(EnableCap.ScissorTest);
         }
+
+        public override void Dispose()
+        {
+            FullBoundsChanged = null;
+            base.Dispose();
+        }
         #endregion
     }
 }

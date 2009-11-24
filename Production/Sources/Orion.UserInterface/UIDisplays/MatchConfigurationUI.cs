@@ -50,10 +50,8 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-
         public event GenericEventHandler<MatchConfigurationUI> PressedStartGame;
         public event GenericEventHandler<MatchConfigurationUI> PressedExit;
-
         #endregion
 
         #region Properties

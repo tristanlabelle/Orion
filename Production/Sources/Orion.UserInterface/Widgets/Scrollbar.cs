@@ -9,7 +9,7 @@ using OpenTK.Math;
 
 namespace Orion.UserInterface.Widgets
 {
-    public class Scrollbar : Responder
+    public class Scrollbar : Frame
     {
         #region Fields
         private static readonly Triangle upTriangle = new Triangle(new Vector2(0.2f, 0.2f), new Vector2(0.5f, 0.7f), new Vector2(0.8f, 0.2f));
@@ -26,6 +26,7 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public Scrollbar(Rectangle frame, ClippedView scrollee)
+            : base(frame, Color.FromArgb(0x80, Color.Gray))
         {
             Frame = frame;
             Scrollee = scrollee;
@@ -35,7 +36,7 @@ namespace Orion.UserInterface.Widgets
             topArrow = new Frame(arrowRect.TranslatedBy(0, frame.Height - frame.Width), new DelegatedRenderer(RenderTopArrow));
             topArrow.Bounds = new Rectangle(1, 1);
             bottomArrow.Bounds = new Rectangle(1, 1);
-            slider = new Frame(new Rectangle(frame.Width, 0));
+            slider = new Frame(new Rectangle(frame.Width, 1), Color.Orange);
 
             slider.MouseDown += SliderMouseDown;
             topArrow.MouseDown += MoveUp;
@@ -44,16 +45,23 @@ namespace Orion.UserInterface.Widgets
             Scrollee.BoundsChanged += RegenerateScrollbar;
             Scrollee.FullBoundsChanged += RegenerateScrollbar;
             RegenerateScrollbar();
+
+            Children.Add(bottomArrow);
+            Children.Add(topArrow);
+            Children.Add(slider);
         }
         #endregion
 
         #region Methods
         private void RegenerateScrollbar()
         {
+            float arrowsSize = topArrow.Frame.Height / Bounds.Height;
             float visiblePortionStart = Scrollee.Bounds.MaxY / Scrollee.FullBounds.Height;
             float sliderSize = Scrollee.Bounds.Height / Scrollee.FullBounds.Height;
-            Vector2 sliderOrigin = new Vector2(0, visiblePortionStart - sliderSize);
-            Vector2 sliderEnd = new Vector2(Bounds.Width, visiblePortionStart);
+            if (visiblePortionStart > 1) visiblePortionStart = 1;
+            if (sliderSize > 1) sliderSize = 1;
+            Vector2 sliderOrigin = new Vector2(0, visiblePortionStart - sliderSize + arrowsSize);
+            Vector2 sliderEnd = new Vector2(1, visiblePortionStart - arrowsSize);
             slider.Frame = Instant.CreateComponentRectangle(Bounds, sliderOrigin, sliderEnd);
         }
 
@@ -119,12 +127,12 @@ namespace Orion.UserInterface.Widgets
         private void DrawScrollbarEnd(GraphicsContext context, Triangle fillMe)
         {
             context.StrokeColor = Color.Black;
-            context.FillColor = Color.Blue;
+            context.FillColor = Color.Gray;
 
             context.Fill(context.CoordinateSystem);
             context.Stroke(context.CoordinateSystem);
 
-            context.FillColor = Color.Orange;
+            context.FillColor = Color.Black;
             context.Fill(fillMe);
         }
         #endregion

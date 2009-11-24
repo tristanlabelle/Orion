@@ -38,7 +38,7 @@ namespace Orion.UserInterface
             timeoutDelegate = OnTimeout;
 
             Rectangle gamesFrameRect = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            gamesFrame = new ListFrame(gamesFrameRect, new Rectangle(gamesFrameRect.Width - 20, 30), new Vector2(10,10));
+            gamesFrame = new ListFrame(gamesFrameRect, new Rectangle(gamesFrameRect.Width - 20, 30), new Vector2(10, 10));
             Children.Add(gamesFrame);
 
             Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
@@ -62,6 +62,8 @@ namespace Orion.UserInterface
         public event GenericEventHandler<LocalMultiplayerLobby> HostedGame;
         public event GenericEventHandler<LocalMultiplayerLobby, IPv4EndPoint> JoinedGame;
         #endregion
+
+        #region Methods
 
         internal override void OnEnter(RootView enterOn)
         {
@@ -251,5 +253,7 @@ namespace Orion.UserInterface
             JoinedGame = null;
             base.Dispose();
         }
+
+        #endregion
     }
 }

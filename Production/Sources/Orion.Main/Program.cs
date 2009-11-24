@@ -25,30 +25,47 @@ namespace Orion.Main
         #endregion
 
         #region Methods
-        private void StartProgram()
+
+        #region Main Menu Event Handlers
+        private void ConfigureSinglePlayerGame(MainMenuUI sender)
         {
-            int port = DefaultHostPort;
-            do
-            {
-                try
-                {
-                    transporter = new SafeTransporter(port);
-                    Debug.WriteLine("Listening on port {0}.".FormatInvariant(transporter.Port));
-                    break;
-                }
-                catch
-                {
-                    port++;
-                }
-            } while (true);
-
-            EnableLogging();
-
-            MainMenuUI menuUI = new MainMenuUI(ConfigureSinglePlayerGame, EnterMultiplayerLobby);
-            gameUI = new GameUI();
-            gameUI.Display(menuUI);
+            MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
+            configurer.GameStarted += StartGame;
+            gameUI.Display(configurer.UserInterface);
         }
 
+        private void EnterMultiplayerLobby(MainMenuUI sender)
+        {
+            LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
+            lobby.HostedGame += BeginHostMultiplayerGame;
+            lobby.JoinedGame += JoinedMultiplayerGame;
+            gameUI.Display(lobby);
+        }
+
+        private void EnterReplayViewer(MainMenuUI sender)
+        {
+            ReplayLoadingUI replayLoader = new ReplayLoadingUI();
+            gameUI.Display(replayLoader);
+        }
+        #endregion
+
+        #region Multiplayer Lobby Event Handlers
+        private void BeginHostMultiplayerGame(LocalMultiplayerLobby sender)
+        {
+            MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
+            configurer.GameStarted += StartGame;
+            gameUI.RootView.PushDisplay(configurer.UserInterface);
+        }
+
+        private void JoinedMultiplayerGame(LocalMultiplayerLobby lobby, IPv4EndPoint host)
+        {
+            MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
+            configurer.GameStarted += StartGame;
+            gameUI.RootView.PushDisplay(configurer.UserInterface);
+        }
+        #endregion
+
+        #region Logging Utilities
         private static void EnableLogging()
         {
             foreach (string logFileName in GetPossibleLogFileNames())
@@ -72,6 +89,49 @@ namespace Orion.Main
             yield return baseFileNameWithoutExtension + extension;
             for (int i = 2; i < 10; ++i)
                 yield return "{0} ({1}){2}".FormatInvariant(baseFileNameWithoutExtension, i, extension);
+        }
+        #endregion
+
+        #region Running the Game
+        private void StartProgram()
+        {
+            int port = DefaultHostPort;
+            do
+            {
+                try
+                {
+                    transporter = new SafeTransporter(port);
+                    Debug.WriteLine("Listening on port {0}.".FormatInvariant(transporter.Port));
+                    break;
+                }
+                catch
+                {
+                    port++;
+                }
+            } while (true);
+
+            EnableLogging();
+
+            MainMenuUI menuUI = new MainMenuUI();
+            menuUI.LaunchedSinglePlayerGame += ConfigureSinglePlayerGame;
+            menuUI.LaunchedMultiplayerGame += EnterMultiplayerLobby;
+            menuUI.LaunchedReplayViewer += EnterReplayViewer;
+            gameUI = new GameUI();
+            gameUI.Display(menuUI);
+        }
+
+        private void StartGame(MatchConfigurer configurer)
+        {
+            gameUI.RootView.PopDisplay(configurer.UserInterface);
+
+            Match match = configurer.Start();
+            MatchUI matchUI = new MatchUI(match);
+
+            match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
+            match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
+            match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
+
+            gameUI.Display(matchUI);
         }
 
         private void Run()
@@ -110,58 +170,17 @@ namespace Orion.Main
                 drawRateCounter.Update();
             }
         }
+        #endregion
 
-        private void ConfigureSinglePlayerGame(Button sender)
-        {
-            MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
-            configurer.GameStarted += StartGame;
-            gameUI.Display(configurer.UserInterface);
-        }
-
-        private void BeginHostMultiplayerGame(LocalMultiplayerLobby sender)
-        {
-            MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
-            configurer.GameStarted += StartGame;
-            gameUI.RootView.PushDisplay(configurer.UserInterface);
-        }
-
-        private void JoinedMultiplayerGame(LocalMultiplayerLobby lobby, IPv4EndPoint host)
-        {
-            MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
-            configurer.GameStarted += StartGame;
-            gameUI.RootView.PushDisplay(configurer.UserInterface);
-        }
-
-        private void StartGame(MatchConfigurer configurer)
-        {
-            gameUI.RootView.PopDisplay(configurer.UserInterface);
-            BeginMatch(configurer.Start());
-        }
-
-        private void BeginMatch(Match match)
-        {
-            MatchUI matchUI = new MatchUI(match);
-            match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
-            match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
-            match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
-
-            gameUI.Display(matchUI);
-        }
-
-        private void EnterMultiplayerLobby(Button sender)
-        {
-            LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
-            lobby.HostedGame += BeginHostMultiplayerGame;
-            lobby.JoinedGame += JoinedMultiplayerGame;
-            gameUI.Display(lobby);
-        }
-
+        #region Object Model
         public void Dispose()
         {
             gameUI.Dispose();
             transporter.Dispose();
         }
+        #endregion
 
+        #region Static
         /// <summary>
         /// Main entry point for the program.
         /// </summary>
@@ -177,6 +196,7 @@ namespace Orion.Main
                 program.Run();
             }
         }
+        #endregion
         #endregion
     }
 }

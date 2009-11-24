@@ -7,8 +7,11 @@ namespace Orion.UserInterface
 {
     public class ClippedView : RenderedView
     {
+        #region Fields
         private Rectangle fullBounds;
+        #endregion
 
+        #region Constructors
         public ClippedView(Rectangle frame, Rectangle fullBounds, IRenderer renderer)
             : base(frame, renderer)
         {
@@ -16,17 +19,29 @@ namespace Orion.UserInterface
             MinimumVisibleBounds = FullBounds.ScaledBy(0.01f);
             MaximumVisibleBounds = FullBounds;
         }
+        #endregion
 
+        #region Events
+        public event GenericEventHandler<ClippedView, Rectangle> FullBoundsChanged;
+        #endregion
+
+        #region Properties
         public Rectangle FullBounds
         {
             get { return fullBounds; }
-            set { fullBounds = value; }
+            set
+            {
+                fullBounds = value;
+                if (FullBoundsChanged != null) FullBoundsChanged(this, value);
+            }
         }
 
         public Rectangle MinimumVisibleBounds { get; set; }
 
         public Rectangle MaximumVisibleBounds { get; set; }
+        #endregion
 
+        #region Methods
         public void Zoom(double factor)
         {
             Zoom(factor, Bounds.Center);
@@ -126,5 +141,6 @@ namespace Orion.UserInterface
             base.Render();
             GL.Disable(EnableCap.ScissorTest);
         }
+        #endregion
     }
 }

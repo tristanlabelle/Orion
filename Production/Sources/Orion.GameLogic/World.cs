@@ -142,18 +142,6 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        /// <summary>
-        /// Generates a new handle for an object of this world.
-        /// </summary>
-        /// <returns>The <see cref="Handle"/> that was generated.</returns>
-        public Handle GenerateHandle()
-        {
-            Debug.Assert(nextHandleValue < uint.MaxValue);
-            Handle handle = new Handle(nextHandleValue);
-            ++nextHandleValue;
-            return handle;
-        }
-
         #region Factions
         /// <summary>
         /// Creates a new <see cref="Faction"/> and adds it to this <see cref="World"/>.
@@ -171,6 +159,21 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Creates a new <see cref="Faction"/> that will not interact with the game in any way.
+        /// For use with a <see cref="Spectator"/>.
+        /// </summary>
+        /// <returns>A newly created spectator faction.</returns>
+        public Faction CreateSpectatorFaction()
+        {
+            const string spectatorFactionName = "\rSpectator";
+            Color spectatorFactionColor = Color.Black;
+
+            Handle handle = new Handle(0xFFFFFFFF);
+            Faction faction = new Faction(handle, this, spectatorFactionName, spectatorFactionColor);
+            return faction;
+        }
+
+        /// <summary>
         /// Gets a <see cref="Faction"/> of this <see cref="World"/> from its unique identifier.
         /// </summary>
         /// <param name="handle">The handle of the <see cref="Faction"/> to be found.</param>
@@ -183,6 +186,18 @@ namespace Orion.GameLogic
             return factions[(int)handle.Value];
         }
         #endregion
+
+        /// <summary>
+        /// Generates a new handle for an object of this world.
+        /// </summary>
+        /// <returns>The <see cref="Handle"/> that was generated.</returns>
+        public Handle GenerateHandle()
+        {
+            Debug.Assert(nextHandleValue < uint.MaxValue);
+            Handle handle = new Handle(nextHandleValue);
+            ++nextHandleValue;
+            return handle;
+        }
 
         public bool IsWithinBounds(int x, int y)
         {

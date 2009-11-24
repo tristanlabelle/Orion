@@ -45,10 +45,10 @@ namespace Orion.Commandment.Pipeline
                 SendMessage message = command as SendMessage;
                 if (message != null)
                 {
-                    Action<Match> cheatCode;
+                    Action<Match, Faction> cheatCode;
                     if (cheatCodes.TryGetValue(message.Text, out cheatCode))
                     {
-                        cheatCode(match);
+                        cheatCode(match, match.World.FindFactionFromHandle(message.FactionHandle));
                         command = new SendMessage(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
                     }
                 }
@@ -60,8 +60,8 @@ namespace Orion.Commandment.Pipeline
 
         #region Static
         #region Fields
-        private static readonly Dictionary<string, Action<Match>> cheatCodes
-            = new Dictionary<string, Action<Match>>();
+        private static readonly Dictionary<string, Action<Match, Faction>> cheatCodes
+            = new Dictionary<string, Action<Match, Faction>>();
         #endregion
 
         #region Constructor
@@ -78,29 +78,29 @@ namespace Orion.Commandment.Pipeline
         #endregion
 
         #region Methods
-        private static void DisableFogOfWar(Match match)
+        private static void DisableFogOfWar(Match match, Faction faction)
         {
-            match.UserCommander.Faction.FogOfWar.Disable();
+            faction.FogOfWar.Disable();
         }
 
-        private static void IncreaseResources(Match match)
+        private static void IncreaseResources(Match match, Faction faction)
         {
-            match.UserCommander.Faction.AladdiumAmount += 5000;
-            match.UserCommander.Faction.AlageneAmount += 5000;
+            faction.AladdiumAmount += 5000;
+            faction.AlageneAmount += 5000;
         }
 
-        private static void IncreaseAvailableFood(Match match)
+        private static void IncreaseAvailableFood(Match match, Faction faction)
         {
-            match.UserCommander.Faction.UsedFoodAmount -= 100;
+            faction.UsedFoodAmount -= 100;
         }
 
-        private static void SpawnHeroUnit(Match match)
+        private static void SpawnHeroUnit(Match match, Faction faction)
         { 
             UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
-            match.UserCommander.Faction.CreateUnit(heroUnitType, match.World.Bounds.Center);
+            faction.CreateUnit(heroUnitType, match.World.Bounds.Center);
         }
 
-        private static void AccelerateUnitDevelopment(Match match)
+        private static void AccelerateUnitDevelopment(Match match, Faction faction)
         {
             foreach (UnitType type in match.World.UnitTypes)
             {
@@ -109,20 +109,18 @@ namespace Orion.Commandment.Pipeline
             }
         }
 
-        private static void InstantVictory(Match match)
+        private static void InstantVictory(Match match, Faction faction)
         {
-            Faction userFaction = match.UserCommander.Faction;
             IEnumerable<Unit> enemyBuildings = match.World.Entities
                 .OfType<Unit>()
-                .Where(u => u.Faction != userFaction);
+                .Where(u => u.Faction != faction);
             foreach (Unit building in enemyBuildings) building.Suicide();
         }
 
-        private static void InstantDefeat(Match match)
+        private static void InstantDefeat(Match match, Faction faction)
         {
-            Faction userFaction = match.UserCommander.Faction;
             IEnumerable<Unit> userBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction == userFaction);
+                .OfType<Unit>().Where(u => u.Faction == faction);
             foreach (Unit building in userBuildings) building.Suicide();
         }
         #endregion

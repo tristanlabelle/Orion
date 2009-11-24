@@ -45,8 +45,26 @@ namespace Orion.Main
         private void EnterReplayViewer(MainMenuUI sender)
         {
             ReplayLoadingUI replayLoader = new ReplayLoadingUI();
+            replayLoader.PressedStartReplay += ViewReplay;
             gameUI.Display(replayLoader);
         }
+        #endregion
+
+        #region Viewing Replays
+
+        private void ViewReplay(ReplayLoadingUI ui, string fileName)
+        {
+            MatchConfigurer replayConfigurer = new ReplayMatchConfigurer("Replays/" + fileName);
+            Match match = replayConfigurer.Start();
+            MatchUI matchUI = new MatchUI(match);
+
+            match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
+            match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
+            match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
+
+            gameUI.Display(matchUI);
+        }
+
         #endregion
 
         #region Multiplayer Lobby Event Handlers

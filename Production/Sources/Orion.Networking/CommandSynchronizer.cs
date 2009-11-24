@@ -176,9 +176,8 @@ namespace Orion.Networking
 
         private void ExecuteCurrentFrameCommands()
         {
-            // FIXME: This sorting might not be flawless. And stable-sorting might not be garanteed by List.
-            commandsToBeFlushed.Sort(CommandSortingComparer);
-            foreach (Command command in commandsToBeFlushed)
+            // OrderBy garantees stable-sorting: http://msdn.microsoft.com/en-us/library/bb534966.aspx
+            foreach (Command command in commandsToBeFlushed.OrderBy(c => c.FactionHandle.Value))
                 Flush(command);
             commandsToBeFlushed.Clear();
         }

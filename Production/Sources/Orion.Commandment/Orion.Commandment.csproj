@@ -78,7 +78,6 @@
     <Compile Include="UserInputCommander.cs" />
     <Compile Include="Pipeline\CommandFilter.cs" />
     <Compile Include="Pipeline\CommandExecutor.cs" />
-    <Compile Include="Pipeline\CommandTextLogger.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -157,6 +157,7 @@ namespace Orion.GameLogic
         private void OnEntityDied(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
+            Trace.WriteLine("{0} died.");
             entitiesToRemove.Add(entity);
         }
 
@@ -183,6 +184,7 @@ namespace Orion.GameLogic
             Handle uid = uidGenerator();
             Unit unit = new Unit(uid, type, faction, position);
             InitializeEntity(unit);
+            Trace.WriteLine("Created unit: {0} at {1}.".FormatInvariant(unit, position));
             return unit;
         }
 
@@ -191,6 +193,7 @@ namespace Orion.GameLogic
             Handle uid = uidGenerator();
             ResourceNode node = new ResourceNode(world, uid, type, ResourceNode.DefaultTotalAmount, position);
             InitializeEntity(node);
+            Trace.WriteLine("Created resource node: {0} at {1}.".FormatInvariant(node, position));
             return node;
         }
 

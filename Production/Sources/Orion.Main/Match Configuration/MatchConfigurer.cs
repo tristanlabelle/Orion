@@ -70,13 +70,19 @@ namespace Orion.Main
         {
             Argument.EnsureNotNull(pipeline, "pipeline");
 
+            ReplayRecorder replayRecorder = TryCreateReplayRecorder();
+            if (replayRecorder != null) pipeline.PushFilter(replayRecorder);
+        }
+
+        protected ReplayRecorder TryCreateReplayRecorder()
+        {
             ReplayWriter replayWriter = ReplayWriter.TryCreate();
-            if (replayWriter == null) return;
+            if (replayWriter == null) return null;
 
             replayWriter.AutoFlush = true;
             replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
 
-            pipeline.PushFilter(new ReplayRecorder(replayWriter));
+            return new ReplayRecorder(replayWriter);
         }
 
         public abstract Match Start();

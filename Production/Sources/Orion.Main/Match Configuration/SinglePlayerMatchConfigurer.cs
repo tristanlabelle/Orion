@@ -67,7 +67,6 @@ namespace Orion.Main
             CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.PushFilter(new CheatCodeExecutor(match));
             TryPushReplayRecorderToPipeline(pipeline);
-            pipeline.PushFilter(new CommandTextLogger());
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(userCommander);

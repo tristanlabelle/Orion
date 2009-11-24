@@ -61,7 +61,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] move to {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), destination);
+            return "Faction {0} moves {1} to {2}"
+                .FormatInvariant(FactionHandle, unitHandles.ToCommaSeparatedValues(), destination);
         }
                 
         #region Serialization

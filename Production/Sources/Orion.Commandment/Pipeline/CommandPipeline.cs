@@ -33,6 +33,20 @@ namespace Orion.Commandment.Pipeline
             : this(new CommandExecutor(match)) { }
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Gets the command sink that was last pushed on this pipeline.
+        /// </summary>
+        public ICommandSink TopMostSink
+        {
+            get
+            {
+                if (filters.Count == 0) return sink;
+                else return filters[0];
+            }
+        }
+        #endregion
+
         #region Methods
         #region Filters
         /// <summary>
@@ -80,8 +94,7 @@ namespace Orion.Commandment.Pipeline
         /// <param name="commander">A <see cref="Commander"/> to be added.</param>
         public void AddCommander(Commander commander)
         {
-            if (filters.Count == 0) AddCommander(commander, sink);
-            else AddCommander(commander, filters[0]);
+            AddCommander(commander, TopMostSink);
         }
 
         private void OnCommandGenerated(Commander commander, Command command)

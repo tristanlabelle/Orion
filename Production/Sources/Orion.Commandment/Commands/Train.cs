@@ -83,8 +83,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] build {1}"
-                .FormatInvariant(trainerHandles.ToCommaSeparatedValues(), traineeTypeHandle);
+            return "Faction {0} trains {1} with {2}"
+                .FormatInvariant(FactionHandle, traineeTypeHandle, trainerHandles.ToCommaSeparatedValues());
         }
         
         #region Serialization

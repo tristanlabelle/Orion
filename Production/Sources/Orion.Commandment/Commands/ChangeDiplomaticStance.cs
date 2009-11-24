@@ -15,16 +15,16 @@ namespace Orion.Commandment.Commands
     public sealed class ChangeDiplomaticStance: Command
     {
         #region Fields
-        private readonly Handle otherFactionHandle;
+        private readonly Handle targetFactionHandle;
         private readonly DiplomaticStance diplomaticStance;
         #endregion
 
         #region Constructors
-        public ChangeDiplomaticStance(Handle factionHandle, Handle otherFactionHandle, DiplomaticStance diplomaticStance)
+        public ChangeDiplomaticStance(Handle factionHandle, Handle targetFactionHandle, DiplomaticStance diplomaticStance)
             : base(factionHandle)
         {
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
-            this.otherFactionHandle = otherFactionHandle;
+            this.targetFactionHandle = targetFactionHandle;
             this.diplomaticStance = diplomaticStance;
         }
         #endregion
@@ -49,20 +49,21 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(match, "match");
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            Faction otherFaction = match.World.FindFactionFromHandle(otherFactionHandle);
+            Faction otherFaction = match.World.FindFactionFromHandle(targetFactionHandle);
             faction.SetDiplomaticStance(otherFaction, diplomaticStance);
         }
 
         public override string ToString()
         {
-            return "[{0}] {2} to {1}".FormatInvariant(FactionHandle, diplomaticStance, otherFactionHandle);
+            return "Faction {0} changes {1} to {2}"
+                .FormatInvariant(FactionHandle, targetFactionHandle, diplomaticStance);
         }
 
         #region Serialization
         protected override void SerializeSpecific(BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
-            WriteHandle(writer, otherFactionHandle);
+            WriteHandle(writer, targetFactionHandle);
             writer.Write((byte)diplomaticStance);
         }
 

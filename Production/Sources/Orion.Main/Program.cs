@@ -6,11 +6,14 @@ using Orion.Networking;
 using Orion.UserInterface;
 using System.Diagnostics;
 using Button = Orion.UserInterface.Widgets.Button;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Orion.Main
 {
     internal class Program : IDisposable
     {
+        #region Fields
         private const float TargetFramesPerSecond = 40;
         private const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
         private const int DefaultHostPort = 41223;
@@ -19,7 +22,9 @@ namespace Orion.Main
 
         private GameUI gameUI;
         private SafeTransporter transporter;
+        #endregion
 
+        #region Methods
         private void StartProgram()
         {
             int port = DefaultHostPort;
@@ -37,11 +42,36 @@ namespace Orion.Main
                 }
             } while (true);
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            EnableLogging();
+
             MainMenuUI menuUI = new MainMenuUI(ConfigureSinglePlayerGame, EnterMultiplayerLobby);
             gameUI = new GameUI();
             gameUI.Display(menuUI);
+        }
+
+        private static void EnableLogging()
+        {
+            foreach (string logFileName in GetPossibleLogFileNames())
+            {
+                try
+                {
+                    var stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.Read);
+                    var writer = new StreamWriter(stream);
+                    writer.AutoFlush = true;
+                    Trace.Listeners.Add(new TextWriterTraceListener(writer));
+                    break;
+                }
+                catch (IOException) { }
+            }
+        }
+
+        private static IEnumerable<string> GetPossibleLogFileNames()
+        {
+            const string baseFileNameWithoutExtension = "Log";
+            const string extension = ".txt";
+            yield return baseFileNameWithoutExtension + extension;
+            for (int i = 2; i < 10; ++i)
+                yield return "{0} ({1}){2}".FormatInvariant(baseFileNameWithoutExtension, i, extension);
         }
 
         private void Run()
@@ -138,11 +168,15 @@ namespace Orion.Main
         [STAThread]
         private static void Main()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             using (Program program = new Program())
             {
                 program.StartProgram();
                 program.Run();
             }
         }
+        #endregion
     }
 }

@@ -69,16 +69,13 @@ namespace Orion.Main
 
             Match match = new Match(random, world, userCommander);
 
-            CommandTextLogger textLogger = new CommandTextLogger();
-            CommandSynchronizer synchronizer = new CommandSynchronizer(match, transporter, UserInterface.PlayerAddresses);
-
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushReplayRecorderToPipeline(pipeline);
-            pipeline.PushFilter(textLogger);
-            pipeline.PushFilter(synchronizer);
+            ICommandSink aiCommandSink = pipeline.TopMostSink;
+            pipeline.PushFilter(new CommandSynchronizer(match, transporter, UserInterface.PlayerAddresses));
 
-            aiCommanders.ForEach(commander => pipeline.AddCommander(commander, textLogger));
-            pipeline.AddCommander(userCommander, synchronizer);
+            aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));
+            pipeline.AddCommander(userCommander);
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
 

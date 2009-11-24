@@ -54,7 +54,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] suicide".FormatInvariant(unitHandles.ToCommaSeparatedValues());
+            return "Faction {0} suicides {1}"
+                .FormatInvariant(FactionHandle, unitHandles.ToCommaSeparatedValues());
         }
 
         #region Serialization

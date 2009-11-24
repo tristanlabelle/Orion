@@ -64,8 +64,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "Faction {0} send {2} Aladdium and {3} Alagene to {1}."
-                .FormatInvariant(FactionHandle, targetFactionHandle, aladdiumAmount, alageneAmount);
+            return "Faction {0} sends {1} aladdium and {2} alagene to faction {3}"
+                .FormatInvariant(FactionHandle, aladdiumAmount, alageneAmount, targetFactionHandle);
         }
 
         #region Serialization

@@ -61,7 +61,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] repair {1}".FormatInvariant(unitHandles.ToCommaSeparatedValues(), targetHandle);
+            return "Faction {0} repairs {1} with {2}"
+                .FormatInvariant(FactionHandle, targetHandle, unitHandles.ToCommaSeparatedValues());
         }
                         
         #region Serialization

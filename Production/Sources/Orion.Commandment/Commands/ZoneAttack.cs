@@ -60,7 +60,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] zone attack to {1}".FormatInvariant(attackerHandles.ToCommaSeparatedValues(), destination);
+            return "Faction {0} zone attacks {1} to {2}"
+                .FormatInvariant(FactionHandle, attackerHandles.ToCommaSeparatedValues(), destination);
         }
                 
         #region Serialization

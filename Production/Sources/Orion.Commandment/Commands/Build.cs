@@ -57,7 +57,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "{0} build {1} at {2}".FormatInvariant(builderHandle, buildingTypeHandle, position);
+            return "Faction {0} builds {1} with {2} at {3}"
+                .FormatInvariant(FactionHandle, buildingTypeHandle, builderHandle, position);
         }
 
         #region Serialization

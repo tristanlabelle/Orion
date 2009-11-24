@@ -55,7 +55,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] cancel".FormatInvariant(unitHandles.ToCommaSeparatedValues());
+            return "Faction {0} cancels {1}"
+                .FormatInvariant(FactionHandle, unitHandles.ToCommaSeparatedValues());
         }
 
         #region Serialization

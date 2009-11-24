@@ -57,7 +57,7 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "{0} says \"{0}\"".FormatInvariant(FactionHandle, text);
+            return "Faction {0} says \"{1}\"".FormatInvariant(FactionHandle, text);
         }
         
         #region Serialization

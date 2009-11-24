@@ -60,7 +60,8 @@ namespace Orion.Commandment.Commands
 
         public override string ToString()
         {
-            return "[{0}] harvest {1}".FormatInvariant(harvesterHandles.ToCommaSeparatedValues(), resourceNodeHandle);
+            return "Faction {0} harvests {1} with {2}"
+                .FormatInvariant(FactionHandle, resourceNodeHandle, harvesterHandles.ToCommaSeparatedValues());
         }
         
         #region Serialization

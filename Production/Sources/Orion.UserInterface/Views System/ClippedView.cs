@@ -104,23 +104,37 @@ namespace Orion.UserInterface
 
         public void ScrollBy(Vector2 direction)
         {
-            Rectangle newBounds = Bounds.TranslatedBy(direction);
-            Vector2 newOrigin = newBounds.Min;
-            Vector2 newSize = newBounds.Size;
+            SetTranslatedBounds(Bounds.TranslatedBy(direction));
+        }
 
-            if (newOrigin.X < FullBounds.MinX)
-                newOrigin.X = FullBounds.MinX;
+        public void ScrollTo(double x, double y)
+        {
+            ScrollTo(new Vector2((float)x, (float)y));
+        }
 
-            if (newOrigin.Y < FullBounds.MinY)
-                newOrigin.Y = FullBounds.MinY;
+        public void ScrollTo(Vector2 position)
+        {
+            SetTranslatedBounds(Bounds.TranslatedTo(position));
+        }
 
-            if (newBounds.MaxX > FullBounds.MaxX)
-                newOrigin.X -= newBounds.MaxX - FullBounds.MaxX;
+        private void SetTranslatedBounds(Rectangle newBounds)
+        {
+            Vector2 min = newBounds.Min;
+            Vector2 max = newBounds.Max;
 
-            if (newBounds.MaxY > FullBounds.MaxY)
-                newOrigin.Y -= newBounds.MaxY - FullBounds.MaxY;
+            if (min.X < FullBounds.MinX)
+                min.X = FullBounds.MinX;
 
-            Bounds = new Rectangle(newOrigin, newSize);
+            if (min.Y < FullBounds.MinY)
+                min.Y = FullBounds.MinY;
+
+            if (max.X > FullBounds.MaxX)
+                min.X -= max.X - FullBounds.MaxX;
+
+            if (max.Y > FullBounds.MaxY)
+                min.Y -= max.Y - FullBounds.MaxY;
+
+            Bounds = newBounds.TranslatedTo(min);
         }
 
         protected internal override void Render()

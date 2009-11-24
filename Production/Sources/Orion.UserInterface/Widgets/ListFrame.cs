@@ -14,7 +14,7 @@ namespace Orion.UserInterface.Widgets
         private Vector2 padding;
 
         public ListFrame(Rectangle frame, Rectangle itemFrame, Vector2 padding)
-            : base(frame, new Rectangle(itemFrame.Width + padding.X * 2, padding.Y * 2), new FilledFrameRenderer())
+            : base(frame, new Rectangle(0, frame.Height - padding.Y * 2, itemFrame.Width + padding.X * 2, padding.Y * 2), new FilledFrameRenderer())
         {
             this.padding = padding;
             this.itemFrame = itemFrame;
@@ -29,11 +29,10 @@ namespace Orion.UserInterface.Widgets
         {
             if (child != null)
             {
-                float yPos = Bounds.MaxY - (itemFrame.Height + padding.Y) * Children.Count - padding.Y;
+                float yDelta = itemFrame.Height + padding.Y;
+                float yPos = Bounds.MaxY - padding.Y - yDelta * Children.Count;
                 child.Frame = itemFrame.TranslatedBy(padding.X, yPos);
-                if (yPos < 0)
-                    Bounds = Bounds.TranslatedBy(0, -yPos);
-                FullBounds = FullBounds.TranslatedBy(0, -yPos).ResizedBy(0, yPos);
+                FullBounds = FullBounds.TranslatedBy(0, -yDelta).ResizedBy(0, yDelta);
             }
             base.OnAddChild(child);
         }

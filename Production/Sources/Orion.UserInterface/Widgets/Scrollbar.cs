@@ -44,7 +44,7 @@ namespace Orion.UserInterface.Widgets
             Scrollee.MouseWheel += ScrolleeMouseWheel;
             Scrollee.BoundsChanged += RegenerateScrollbar;
             Scrollee.FullBoundsChanged += RegenerateScrollbar;
-            RegenerateScrollbar();
+            RegenerateScrollbarFrame();
 
             Children.Add(bottomArrow);
             Children.Add(topArrow);
@@ -53,27 +53,22 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-        private void RegenerateScrollbar()
+        private void RegenerateScrollbarFrame()
         {
-            float arrowsSize = topArrow.Frame.Height / Bounds.Height;
-            float visiblePortionStart = Scrollee.Bounds.MaxY / Scrollee.FullBounds.Height;
-            float sliderSize = Scrollee.Bounds.Height / Scrollee.FullBounds.Height;
-            if (visiblePortionStart > 1) visiblePortionStart = 1;
-            if (sliderSize > 1) sliderSize = 1;
-            Vector2 sliderOrigin = new Vector2(0, visiblePortionStart - sliderSize + arrowsSize);
-            Vector2 sliderEnd = new Vector2(1, visiblePortionStart - arrowsSize);
-            slider.Frame = Instant.CreateComponentRectangle(Bounds, sliderOrigin, sliderEnd);
+            float arrowHeight = topArrow.Frame.Height / Bounds.Height;
+            float maximumSliderHeight = 1 - arrowHeight * 2;
+            float invisibleHeight = Scrollee.Bounds.MinY - Scrollee.FullBounds.MinY;
+            float visibleHeight = Scrollee.Bounds.Height;
+
+            float sliderOrigin = arrowHeight + invisibleHeight / Scrollee.FullBounds.Height * maximumSliderHeight;
+            float sliderHeight = visibleHeight / Scrollee.FullBounds.Height * maximumSliderHeight;
+            slider.Frame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, sliderOrigin), new Vector2(1, sliderOrigin + sliderHeight));
         }
 
         #region Event Handling
         private void SliderMouseDown(Responder sender, MouseEventArgs args)
         {
             mouseDownPosition = args.Position.Y;
-        }
-
-        private void SliderMouseUp(Responder sender, MouseEventArgs args)
-        {
-            mouseDownPosition = null;
         }
 
         private void ScrolleeMouseWheel(Responder sender, MouseEventArgs args)
@@ -83,17 +78,23 @@ namespace Orion.UserInterface.Widgets
 
         private void RegenerateScrollbar(View sender, Rectangle newFullBounds)
         {
-            RegenerateScrollbar();
+            RegenerateScrollbarFrame();
         }
 
         private void MoveUp(Responder sender, MouseEventArgs args)
         {
-            ScrollBy(slider.Frame.Height / Frame.Height / 2);
+            ScrollBy(slider.Frame.Height / Frame.Height / 10);
         }
 
         private void MoveDown(Responder sender, MouseEventArgs args)
         {
-            ScrollBy(-slider.Frame.Height / Frame.Height / 2);
+            ScrollBy(-slider.Frame.Height / Frame.Height / 10);
+        }
+
+        protected override bool OnMouseUp(MouseEventArgs args)
+        {
+            mouseDownPosition = null;
+            return base.OnMouseUp(args);
         }
         
         protected override bool OnMouseMove(MouseEventArgs args)

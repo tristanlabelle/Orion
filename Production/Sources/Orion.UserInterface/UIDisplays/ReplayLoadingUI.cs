@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Orion.UserInterface.Widgets;
 using Orion.Geometry;
 using OpenTK.Math;
@@ -29,18 +30,40 @@ namespace Orion.UserInterface
             Children.Add(exitButton);
             Children.Add(replaysList);
             Children.Add(replaysScrollbar);
+
+            ShowReplayFiles();
         }
         #endregion
 
         #region Events
-        public event GenericEventHandler<ReplayLoadingUI> StartReplay;
+        public event GenericEventHandler<ReplayLoadingUI, string> PressedStartReplay;
         #endregion
 
         #region Methods
 
+        private void ShowReplayFiles()
+        {
+            DirectoryInfo replays = new DirectoryInfo("Replays");
+            if (replays.Exists)
+            {
+                foreach (FileInfo file in new DirectoryInfo("Replays").GetFiles("*.replay").OrderBy(file => file.Name))
+                {
+                    Button replayButton = new Button(replaysList.ItemFrame, file.Name);
+                    replayButton.Triggered += StartReplay;
+                    replaysList.Children.Add(replayButton);
+                }
+            }
+        }
+
         private void PressedExitButton(Button sender)
         {
             Parent.PopDisplay(this);
+        }
+
+        private void StartReplay(Button sender)
+        {
+            if (PressedStartReplay != null)
+                PressedStartReplay(this, sender.Caption);
         }
 
         #endregion

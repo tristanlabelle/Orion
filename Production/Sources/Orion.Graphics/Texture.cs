@@ -291,13 +291,13 @@ namespace Orion.Graphics
             return texture;
         }
 
-        public static Texture FromFile(string filePath, bool smooth, bool repeat)
+        public static Texture FromStream(Stream stream, bool smooth, bool repeat)
         {
-            Argument.EnsureNotNull(filePath, "filePath");
+            Argument.EnsureNotNull(stream, "stream");
 
             try
             {
-                using (SysImage image = SysImage.FromFile(filePath))
+                using (SysImage image = SysImage.FromStream(stream))
                 {
                     return FromDrawingImage(image, smooth, repeat);
                 }
@@ -307,6 +307,14 @@ namespace Orion.Graphics
                 // System.Drawing.Image.FromFile throws an OutOfMemoryException when it fails to decode an image.
                 throw new IOException(e.Message, e);
             }
+        }
+
+        public static Texture FromFile(string filePath, bool smooth, bool repeat)
+        {
+            Argument.EnsureNotNull(filePath, "filePath");
+
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                return FromStream(stream, smooth, repeat);
         }
 
         public static Texture FromDrawingImage(SysImage image, bool smooth, bool repeat)

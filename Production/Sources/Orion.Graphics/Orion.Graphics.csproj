@@ -52,13 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferedPixelSurface.cs" />
+    <Compile Include="IPixelSurface.cs" />
+    <Compile Include="RawPixelSurface.cs" />
     <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
     <Compile Include="StrokeStyle.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TextRenderer.cs" />
     <Compile Include="Texture.cs" />
-    <Compile Include="TextureBuilder.cs" />
-    <Compile Include="TextureFormat.cs" />
+    <Compile Include="PixelFormat.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />
     <Compile Include="Renderers\FrameRenderer.cs" />
     <Compile Include="Renderers\DelegatedRenderer.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="GraphicsContext.cs" />
+    <Compile Include="TextureManager.cs" />
     <Compile Include="Transform.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -34,7 +34,7 @@ namespace Orion.Main
 
         public override Match Start()
         {
-            CreateMap();
+            CreateWorld();
 
             Faction userFaction = world.CreateSpectatorFaction();
             userFaction.FogOfWar.Disable();

@@ -165,14 +165,13 @@ namespace Orion.GameLogic
         #endregion
         
         #region Constructors
-        public FogOfWar(int width, int height)
+        public FogOfWar(Size size)
         {
-            Argument.EnsureStrictlyPositive(width, "width");
-            Argument.EnsureStrictlyPositive(height, "height");
+            Argument.EnsureStrictlyPositive(size.Area, "size.Area");
 
-            this.tiles = new ushort[width, height];
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
+            this.tiles = new ushort[size.Width, size.Height];
+            for (int i = 0; i < size.Width; i++)
+                for (int j = 0; j < size.Height; j++)
                     this.tiles[i, j] = ushort.MaxValue; 
         }
         #endregion
@@ -190,25 +189,17 @@ namespace Orion.GameLogic
 
         private void OnChanged()
         {
-            OnChanged(new Region(0, 0, Width, Height));
+            OnChanged((Region)Size);
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the width of the terrain, in tiles.
+        /// Gets the size of the terrain, in tiles.
         /// </summary>
-        public int Width
+        public Size Size
         {
-            get { return tiles.GetLength(0); }
-        }
-
-        /// <summary>
-        /// Gets the height of the terrain, in tiles.
-        /// </summary>
-        public int Height
-        {
-            get { return tiles.GetLength(1); }
+            get { return new Size(tiles.GetLength(0), tiles.GetLength(1)); }
         }
 
         /// <summary>
@@ -291,14 +282,14 @@ namespace Orion.GameLogic
             if (!isEnabled) return;
 
             CircleLookup lookup = GetCircleLookup(lineOfSight);
-            int minX = Math.Max(lookup.MinX, 0);
-            int minY = Math.Max(lookup.MinY, 0);
-            int exclusiveMaxX = Math.Min(lookup.ExclusiveMaxX, Width);
-            int exclusiveMaxY = Math.Min(lookup.ExclusiveMaxY, Height);
+            Point min = new Point(Math.Max(lookup.MinX, 0), Math.Max(lookup.MinY, 0));
+            Point exclusiveMax = new Point(
+                Math.Min(lookup.ExclusiveMaxX, Size.Width),
+                Math.Min(lookup.ExclusiveMaxY, Size.Height));
 
-            for (int x = minX; x < exclusiveMaxX; x++)
+            for (int x = min.X; x < exclusiveMax.X; x++)
             {
-                for (int y = minY; y < exclusiveMaxY; y++)
+                for (int y = min.Y; y < exclusiveMax.Y; y++)
                 {
                     if (!lookup.IsSet(x, y)) continue;
 
@@ -322,9 +313,7 @@ namespace Orion.GameLogic
                 }
             }
 
-            Region dirtyRectangle = Region.FromMinExclusiveMax(
-                Math.Max(minX, 0), Math.Max(minY, 0),
-                Math.Min(exclusiveMaxX, Width), Math.Min(exclusiveMaxY, Height));
+            Region dirtyRectangle = Region.FromMinExclusiveMax(min, exclusiveMax);
             OnChanged(dirtyRectangle);
         }
         #endregion
@@ -334,24 +323,13 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the visibility status of a tile at the specified coordinates.
         /// </summary>
-        /// <param name="x">The x coordinate of the tile in the field.</param>
-        /// <param name="y">The y coordinate of the tile in the field.</param>
-        /// <returns>A flag indicating the visibility state of that tile..</returns>
-        public TileVisibility GetTileVisibility(int x, int y)
+        /// <param name="point">The point where to check.</param>
+        /// <returns>A flag indicating the visibility state of that tile.</returns>
+        public TileVisibility GetTileVisibility(Point point)
         {
-            ushort value = tiles[x, y];
+            ushort value = tiles[point.X, point.Y];
             if (value == ushort.MaxValue) return TileVisibility.Undiscovered;
             return value == 0 ? TileVisibility.Discovered : TileVisibility.Visible;
-        }
-
-        public TileVisibility GetTileVisibility(Vector2 position)
-        {
-            return GetTileVisibility((int)position.X, (int)position.Y);
-        }
-
-        public TileVisibility GetTileVisibility(Point16 point)
-        {
-            return GetTileVisibility(point.X, point.Y);
         }
         #endregion
 
@@ -363,8 +341,8 @@ namespace Orion.GameLogic
         {
             if (!isEnabled) return;
 
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Size.Width; x++)
+                for (int y = 0; y < Size.Height; y++)
                     if (tiles[x, y] == ushort.MaxValue)
                         tiles[x, y] = 0;
 
@@ -380,8 +358,8 @@ namespace Orion.GameLogic
 
             isEnabled = false;
 
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Size.Width; x++)
+                for (int y = 0; y < Size.Height; y++)
                     tiles[x, y] = 1;
 
             OnChanged();

@@ -51,7 +51,7 @@ namespace Orion.GameLogic
             this.world = world;
             this.name = name;
             this.color = color;
-            this.fogOfWar = new FogOfWar(world.Width, world.Height);
+            this.fogOfWar = new FogOfWar(world.Size);
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
         }
@@ -310,13 +310,13 @@ namespace Orion.GameLogic
             return name;
         }
 
-        private bool IsPathable(int x, int y)
+        private bool IsPathable(Point point)
         {
-            if (!world.IsWithinBounds(x, y))
+            if (!world.IsWithinBounds(point))
                 return false;
-            if (fogOfWar.GetTileVisibility(x, y) == TileVisibility.Undiscovered)
+            if (fogOfWar.GetTileVisibility(point) == TileVisibility.Undiscovered)
                 return true;
-            return world.Terrain.IsWalkable(x, y);
+            return world.Terrain.IsWalkable(point);
         }
         #endregion
     }

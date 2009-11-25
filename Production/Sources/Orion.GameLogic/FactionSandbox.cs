@@ -121,19 +121,11 @@ namespace Orion.GameLogic
 
         #region World Accessors
         /// <summary>
-        /// Gets the width of the world, in tiles.
+        /// Gets the size of the world, in tiles.
         /// </summary>
-        public int WorldWidth
+        public Size WorldSize
         {
-            get { return faction.World.Width; }
-        }
-
-        /// <summary>
-        /// Gets the heigth of the world, in tiles.
-        /// </summary>
-        public int WorldHeight
-        {
-            get { return faction.World.Height; }
+            get { return faction.World.Size; }
         }
 
         /// <summary>
@@ -170,7 +162,7 @@ namespace Orion.GameLogic
             {
                 return faction.World.Entities
                     .OfType<Unit>()
-                    .Where(unit => faction.FogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+                    .Where(unit => faction.FogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
                     .Select(unit => unit.Handle);
             }
         }
@@ -185,7 +177,7 @@ namespace Orion.GameLogic
             {
                 return faction.World.Entities
                     .OfType<ResourceNode>()
-                    .Where(node => faction.FogOfWar.GetTileVisibility(node.Position) == TileVisibility.Visible)
+                    .Where(node => faction.FogOfWar.GetTileVisibility((Point)node.Position) == TileVisibility.Visible)
                     .Select(node => node.Handle);
             }
         }
@@ -195,18 +187,18 @@ namespace Orion.GameLogic
         #region Methods
         #region Public Getters
         #region Terrain
-        public bool? IsTerrainWalkable(Vector2 position)
+        public bool? IsTerrainWalkable(Point point)
         {
-            if (faction.FogOfWar.GetTileVisibility(position) == TileVisibility.Undiscovered)
+            if (faction.FogOfWar.GetTileVisibility(point) == TileVisibility.Undiscovered)
                 return null;
-            return faction.World.Terrain.IsWalkableAndWithinBounds(position);
+            return faction.World.Terrain.IsWalkableAndWithinBounds(point);
         }
         #endregion
 
         #region Sandboxed Faction Getters
-        public TileVisibility GetTileVisibility(Vector2 position)
+        public TileVisibility GetTileVisibility(Point point)
         {
-            return faction.FogOfWar.GetTileVisibility(position);
+            return faction.FogOfWar.GetTileVisibility(point);
         }
 
         public DiplomaticStance GetDiplomaticStanceWith(Handle otherFaction)
@@ -289,7 +281,8 @@ namespace Orion.GameLogic
         {
             Entity entity = faction.World.Entities.FromHandle(handle);
             if (entity == null) return null;
-            if (faction.FogOfWar.GetTileVisibility(entity.Position) != TileVisibility.Visible) return null;
+            if (faction.FogOfWar.GetTileVisibility((Point)entity.Position) != TileVisibility.Visible)
+                return null;
             return entity;
         }
 

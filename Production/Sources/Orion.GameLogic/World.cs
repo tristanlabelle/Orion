@@ -35,7 +35,7 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             entities = new EntityRegistry(this, 5, 5, GenerateHandle);
             pathfinder = new Pathfinder();
-            pathfinder.MaxNodesToVisit = Math.Max(4000, terrain.Width * terrain.Height / 8);
+            pathfinder.MaxNodesToVisit = Math.Max(4000, terrain.Size.Area / 8);
         }
         #endregion
 
@@ -80,19 +80,11 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the width of this <see cref="World"/>, in tiles.
+        /// Gets the size of this <see cref="World"/>, in tiles.
         /// </summary>
-        public int Width
+        public Size Size
         {
-            get { return terrain.Width; }
-        }
-
-        /// <summary>
-        /// Gets the height of this <see cref="World"/>, in tiles.
-        /// </summary>
-        public int Height
-        {
-            get { return terrain.Height; }
+            get { return terrain.Size; }
         }
 
         /// <summary>
@@ -100,7 +92,7 @@ namespace Orion.GameLogic
         /// </summary>
         public Rectangle Bounds
         {
-            get { return new Rectangle(0, 0, Width, Height); }
+            get { return new Rectangle(0, 0, Size.Width, Size.Height); }
         }
 
         public Pathfinder Pathfinder
@@ -118,7 +110,7 @@ namespace Orion.GameLogic
         /// <param name="destination">The position the path should reach.</param>
         /// <param name="isWalkable">A delegate to a method that tests if tiles are walkable.</param>
         /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Vector2 source, Vector2 destination, Func<int, int, bool> isWalkable)
+        public Path FindPath(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable)
         {
             Argument.EnsureNotNull(isWalkable, "isWalkable");
 
@@ -199,16 +191,10 @@ namespace Orion.GameLogic
             return handle;
         }
 
-        public bool IsWithinBounds(int x, int y)
+        public bool IsWithinBounds(Point point)
         {
-            return x >= 0 && y >= 0
-                && x < Width && y < Height;
-        }
-
-        public bool IsWithinBounds(Vector2 point)
-        {
-            return point.X >= 0 && point.Y >= 0
-                && point.X < Width && point.Y < Height;
+            Region region = (Region)Size;
+            return region.Contains(point);
         }
 
         /// <summary>
@@ -222,10 +208,10 @@ namespace Orion.GameLogic
             int y = (int)point.Y;
 
             if (x < 0) x = 0;
-            else if (x >= Width) x = Width - 1;
+            else if (x >= Size.Width) x = Size.Width - 1;
 
             if (y < 0) y = 0;
-            else if (y >= Height) y = Height - 1;
+            else if (y >= Size.Height) y = Size.Height - 1;
 
             return new Point16((short)x, (short)y);
         }

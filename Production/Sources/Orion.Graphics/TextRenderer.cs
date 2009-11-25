@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -8,9 +9,9 @@ using System.Text;
 using OpenTK;
 using OpenTK.Math;
 using Rectangle = Orion.Geometry.Rectangle;
-using SysRectangle = System.Drawing.Rectangle;
 using SysGraphics = System.Drawing.Graphics;
-using System.Diagnostics;
+using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
+using SysRectangle = System.Drawing.Rectangle;
 
 namespace Orion.Graphics
 {
@@ -25,7 +26,7 @@ namespace Orion.Graphics
         #region Constructors
         public TextRenderer()
         {
-            using (Bitmap fontImage = new Bitmap(256, 256, PixelFormat.Format32bppArgb))
+            using (Bitmap fontImage = new Bitmap(256, 256, SysPixelFormat.Format32bppArgb))
             {
                 using (SysGraphics graphics = SysGraphics.FromImage(fontImage))
                 {
@@ -94,14 +95,8 @@ namespace Orion.Graphics
                     }
                 }
 
-                texture = new TextureBuilder
-                {
-                    Width = fontImage.Width,
-                    Height = fontImage.Height,
-                    Format = TextureFormat.Rgba,
-                    PixelData = pixelData,
-                    UseSmoothing = true
-                }.Build();
+                texture = Texture.FromBuffer(new Size(fontImage.Width, fontImage.Height),
+                    PixelFormat.Rgba, pixelData, true, false);
             }
         }
         #endregion

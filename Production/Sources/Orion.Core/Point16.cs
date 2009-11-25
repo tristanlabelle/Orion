@@ -14,19 +14,41 @@ namespace Orion
     {
         #region Instance
         #region Fields
-        public readonly short X;
-        public readonly short Y;
+        private readonly short x;
+        private readonly short y;
         #endregion
 
         #region Constructor
         public Point16(short x, short y)
         {
-            this.X = x;
-            this.Y = y;
+            this.x = x;
+            this.y = y;
+        }
+        #endregion
+
+        #region Properties
+        public short X
+        {
+            get { return x; }
+        }
+
+        public short Y
+        {
+            get { return y; }
         }
         #endregion
 
         #region Methods
+        public Point ToPoint()
+        {
+            return new Point(x, y);
+        }
+        
+        public Vector2 ToVector()
+        {
+            return new Vector2(x, y);
+        }
+
         #region Object Model
         /// <summary>
         /// Tests for equality with another <see cref="SmallPoint"/>.
@@ -35,7 +57,7 @@ namespace Orion
         /// <returns>True this <see name="SmallPoint"/> is equal to <paramref name="other"/>, false if not.</returns>
         public bool Equals(Point16 other)
         {
-            return X == other.X && Y == other.Y;
+            return x == other.x && y == other.y;
         }
 
         public override bool Equals(object obj)
@@ -46,12 +68,12 @@ namespace Orion
 
         public override int GetHashCode()
         {
-            return ((int)X << 16) | (int)(ushort)Y;
+            return ((int)x << 16) | (int)(ushort)y;
         }
 
         public override string ToString()
         {
-            return "({0}, {1})".FormatInvariant(X, Y);
+            return "({0}, {1})".FormatInvariant(x, y);
         }
         #endregion
         #endregion
@@ -66,6 +88,16 @@ namespace Orion
         #endregion
 
         #region Methods
+        public static Point16 Truncate(Vector2 vector)
+        {
+            return new Point16((short)vector.X, (short)vector.Y);
+        }
+
+        public static Point16 FromPoint(Point point)
+        {
+            return new Point16((short)point.X, (short)point.Y);
+        }
+
         #region Equality
         /// <summary>
         /// Tests two <see cref="SmallPoint"/> for equality.
@@ -112,7 +144,22 @@ namespace Orion
         #region Casting
         public static implicit operator Vector2(Point16 point)
         {
-            return new Vector2(point.X, point.Y);
+            return point.ToVector();
+        }
+
+        public static implicit operator Point(Point16 point)
+        {
+            return point.ToPoint();
+        }
+
+        public static explicit operator Point16(Vector2 vector)
+        {
+            return Truncate(vector);
+        }
+
+        public static explicit operator Point16(Point point)
+        {
+            return FromPoint(point);
         }
         #endregion
         #endregion

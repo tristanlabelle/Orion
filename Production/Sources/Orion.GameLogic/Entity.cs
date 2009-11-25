@@ -76,16 +76,10 @@ namespace Orion.GameLogic
 
         #region Location/Size
         /// <summary>
-        /// Gets the width of this <see cref="Entity"/>, in tiles.
+        /// Gets the size of this <see cref="Entity"/>, in tiles.
         /// This value is garantee to remain constant.
         /// </summary>
-        public abstract int Width { get; }
-
-        /// <summary>
-        /// Gets the height of this <see cref="Entity"/>, in tiles.
-        /// This value is garantee to remain constant.
-        /// </summary>
-        public abstract int Height { get; }
+        public abstract Size Size { get; }
 
         /// <summary>
         /// Gets the position of the center of this <see cref="Entity"/>.
@@ -97,7 +91,7 @@ namespace Orion.GameLogic
         /// </summary>
         public Rectangle BoundingRectangle
         {
-            get { return Rectangle.FromCenterSize(Position.X, Position.Y, Width, Height); }
+            get { return Rectangle.FromCenterSize(Position.X, Position.Y, Size.Width, Size.Height); }
         }
         #endregion
 

@@ -13,6 +13,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         public const int DefaultTotalAmount = 1000;
+        public static readonly Size DefaultSize = new Size(2, 2);
 
         private readonly ResourceType type;
         private readonly int totalAmount;
@@ -52,14 +53,9 @@ namespace Orion.GameLogic
             set { amountRemaining = value; }
         }
 
-        public override int Width
+        public override Size Size
         {
-            get { return 2; }
-        }
-
-        public override int Height
-        {
-            get { return 2; }
+            get { return DefaultSize; }
         }
 
         public override Vector2 Position

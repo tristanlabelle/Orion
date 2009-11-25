@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 using Orion.Geometry;
 using MouseButtons = System.Windows.Forms.MouseButtons;
-using Point = System.Drawing.Point;
+using SysPoint = System.Drawing.Point;
 using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace Orion.UserInterface
@@ -14,7 +14,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         internal readonly RootView rootView;
-        private Point lastGameMousePosition;
+        private SysPoint lastGameMousePosition;
         private MouseButtons lastMouseButtons;
         #endregion
 
@@ -47,9 +47,9 @@ namespace Orion.UserInterface
         }
 
         #region Mouse Stuff
-        private Point GetGameMousePosition()
+        private SysPoint GetGameMousePosition()
         {
-            Point mousePosition = glControl.PointToClient(Control.MousePosition);
+            SysPoint mousePosition = glControl.PointToClient(Control.MousePosition);
 
             if (mousePosition.X < 0) mousePosition.X = 0;
             if (mousePosition.X >= glControl.Width) mousePosition.X = glControl.Width - 1;
@@ -62,7 +62,7 @@ namespace Orion.UserInterface
 
         private void CheckMouseEvents()
         {
-            Point newGameMousePosition = GetGameMousePosition();
+            SysPoint newGameMousePosition = GetGameMousePosition();
             MouseButtons newMouseButtons = Control.MouseButtons;
 
             if (newGameMousePosition != lastGameMousePosition)

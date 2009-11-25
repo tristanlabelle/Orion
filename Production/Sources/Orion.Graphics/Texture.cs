@@ -1,110 +1,78 @@
 ﻿using System;
 using System.ComponentModel;
 using OpenTK.Graphics;
+using GLPixelFormat = OpenTK.Graphics.PixelFormat;
+using System.Runtime.InteropServices;
+using SysImage = System.Drawing.Image;
 
 namespace Orion.Graphics
 {
     /// <summary>
     /// Provides a representation of an image stored in the video memory.
     /// </summary>
-    public sealed class Texture : IDisposable
+    public sealed class Texture : IPixelSurface
     {
+        #region Instance
         #region Fields
+        private readonly Size size;
+        private readonly PixelFormat pixelFormat;
         private int id;
-        private readonly int width;
-        private readonly int height;
-        private readonly TextureFormat format;
         #endregion
 
         #region Constructors
-        internal Texture(TextureBuilder builder)
+        internal Texture(Size size, PixelFormat pixelFormat, IntPtr dataPointer)
         {
-            Argument.EnsureNotNull(builder, "builder");
+            Argument.EnsureStrictlyPositive(size.Area, "size.Area");
+            Argument.EnsureDefined(pixelFormat, "pixelFormat");
 
-            int lastID;
-            GL.GetInteger(GetPName.Texture2D, out lastID);
-
+            this.size = size;
+            this.pixelFormat = pixelFormat;
             this.id = GL.GenTexture();
-            this.width = builder.Width;
-            this.height = builder.Height;
-            this.format = builder.Format;
 
             try
             {
-                GL.BindTexture(TextureTarget.Texture2D, id);
+                BindWhile(() =>
+                {
+                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.pixelFormat),
+                        size.Width, size.Height, 0, GetGLPixelFormat(this.pixelFormat), PixelType.UnsignedByte,
+                        dataPointer);
 
-                if (builder.PixelData != null) ValidatePixelBufferSize(builder.PixelData, width * height, format);
-
-                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.format),
-                    this.width, this.height, 0, GetGLPixelFormat(this.format), PixelType.UnsignedByte,
-                    builder.PixelData);
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                    (int)(builder.UseSmoothing ? TextureMinFilter.Linear : TextureMinFilter.Nearest));
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                    (int)(builder.UseSmoothing ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS,
-                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
-                    (int)(builder.Repeats ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
-
-                GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
-                    (int)TextureEnvMode.Modulate);
+                    GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
+                        (int)TextureEnvMode.Modulate);
+                });
             }
             catch
             {
-                GL.BindTexture(TextureTarget.Texture2D, lastID);
                 GL.DeleteTexture(id);
                 throw;
             }
         }
 
-        public void SetPixels(Region region, byte[] data)
-        {
-            EnsureNotDisposed();
-
-            if (region.MinX < 0 || region.MinY < 0
-                || region.Width < 0 || region.Height < 0
-                || region.ExclusiveMaxX > width || region.ExclusiveMaxY > height)
-                throw new ArgumentException("Invalid pixel region.");
-            Argument.EnsureNotNull(data, "data");
-
-            ValidatePixelBufferSize(data, region.Area, format);
-
-            int lastID;
-            GL.GetInteger(GetPName.Texture2D, out lastID);
-
-            try
-            {
-                GL.BindTexture(TextureTarget.Texture2D, id);
-
-                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-                GL.TexSubImage2D(TextureTarget.Texture2D, 0,
-                    region.MinX, region.MinY, region.Width, region.Height,
-                    GetGLPixelFormat(format), PixelType.UnsignedByte,
-                    data);
-            }
-            finally
-            {
-                GL.BindTexture(TextureTarget.Texture2D, lastID);
-            }
-        }
-
-        public void SetPixels(byte[] data)
-        {
-            Region region = new Region(0, 0, (short)width, (short)height);
-            SetPixels(region, data);
-        }
+        internal Texture(Size size, PixelFormat pixelFormat)
+            : this(size, pixelFormat, IntPtr.Zero) { }
         #endregion
 
         #region Properties
-        public bool HasAlphaChannel
+        /// <summary>
+        /// Gets the size of this texture, in pixels.
+        /// </summary>
+        public Size Size
         {
-            get { return format == TextureFormat.Rgba || format == TextureFormat.Alpha; }
+            get { return size; }
         }
 
+        /// <summary>
+        /// Gets the format in which the pixels of this texture are stored.
+        /// </summary>
+        public PixelFormat PixelFormat
+        {
+            get { return pixelFormat; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this texture has been disposed.
+        /// </summary>
         public bool IsDisposed
         {
             get { return id == 0; }
@@ -124,6 +92,96 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
+        #region OpenGL Accessors
+        /// <summary>
+        /// Binds this <see cref="Texture"/> for the duration of an action
+        /// before reverting to the last bound texture.
+        /// </summary>
+        /// <param name="action">The action to be performed on the bound texture.</param>
+        internal void BindWhile(Action action)
+        {
+            Argument.EnsureNotNull(action, "action");
+
+            int lastID;
+            GL.GetInteger(GetPName.Texture2D, out lastID);
+
+            try
+            {
+                GL.BindTexture(TextureTarget.Texture2D, id);
+
+                action();
+            }
+            catch
+            {
+                GL.BindTexture(TextureTarget.Texture2D, lastID);
+                throw;
+            }
+        }
+
+        internal void SetParameter(TextureParameterName name, int value)
+        {
+            BindWhile(() => { GL.TexParameter(TextureTarget.Texture2D, name, value); });
+        }
+
+        internal void SetEnv(TextureEnvParameter param, int value)
+        {
+            BindWhile(() => { GL.TexEnv(TextureEnvTarget.TextureEnv, param, value); });
+        }
+
+        internal void SetSmooth(bool on)
+        {
+            SetParameter(TextureParameterName.TextureMinFilter,
+                (int)(on ? TextureMinFilter.Linear : TextureMinFilter.Nearest));
+            SetParameter(TextureParameterName.TextureMagFilter,
+                (int)(on ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
+        }
+
+        internal void SetRepeat(bool on)
+        {
+            SetParameter(TextureParameterName.TextureWrapS,
+                (int)(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
+            SetParameter(TextureParameterName.TextureWrapT,
+                (int)(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
+        }
+        #endregion
+
+        #region Blitting
+        public void Blit(Region region, byte[] pixelData)
+        {
+            EnsureNotDisposed();
+
+            if (region.ExclusiveMax.X > size.Width || region.ExclusiveMax.Y > size.Height)
+                throw new ArgumentException("Invalid pixel region.");
+            Argument.EnsureNotNull(pixelData, "data");
+
+            ValidatePixelBufferSize(pixelData, region.Size.Area, pixelFormat);
+
+            int lastID;
+            GL.GetInteger(GetPName.Texture2D, out lastID);
+
+            try
+            {
+                GL.BindTexture(TextureTarget.Texture2D, id);
+
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0,
+                    region.Min.X, region.Min.Y, region.Size.Width, region.Size.Height,
+                    GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte,
+                    pixelData);
+            }
+            finally
+            {
+                GL.BindTexture(TextureTarget.Texture2D, lastID);
+            }
+        }
+
+        public void Blit(byte[] pixelData)
+        {
+            Blit((Region)Size, pixelData);
+        }
+        #endregion
+
+        #region Object Model
         public void Dispose()
         {
             EnsureNotDisposed();
@@ -135,43 +193,121 @@ namespace Orion.Graphics
         {
             if (IsDisposed) throw new ObjectDisposedException(null);
         }
+        #endregion
 
-        private static void ValidatePixelBufferSize(byte[] buffer, int pixelCount, TextureFormat format)
+        private static void ValidatePixelBufferSize(byte[] buffer, int pixelCount, PixelFormat format)
         {
             Argument.EnsureNotNull(buffer, "buffer");
-            if (buffer.Length < (pixelCount * GetBytesPerPixel(format)))
+            if (buffer.Length < (pixelCount * format.GetBytesPerPixel()))
                 throw new ArgumentException("Pixel data buffer too small!", "data");
         }
 
-        private static int GetBytesPerPixel(TextureFormat format)
+        private static GLPixelFormat GetGLPixelFormat(PixelFormat format)
         {
-            if (format == TextureFormat.Intensity) return 1;
-            if (format == TextureFormat.Alpha) return 1;
-            if (format == TextureFormat.Rgb) return 3;
-            if (format == TextureFormat.Rgba) return 4;
+            if (format == PixelFormat.Intensity) return GLPixelFormat.Luminance;
+            if (format == PixelFormat.Alpha) return GLPixelFormat.Alpha;
+            if (format == PixelFormat.Rgb) return GLPixelFormat.Rgb;
+            if (format == PixelFormat.Rgba) return GLPixelFormat.Rgba;
             throw new InvalidEnumArgumentException(
                 "Invalid texture format: {0}.".FormatInvariant(format));
         }
 
-        private static PixelFormat GetGLPixelFormat(TextureFormat format)
+        private static PixelInternalFormat GetGLInternalPixelFormat(PixelFormat format)
         {
-            if (format == TextureFormat.Intensity) return PixelFormat.Luminance;
-            if (format == TextureFormat.Alpha) return PixelFormat.Alpha;
-            if (format == TextureFormat.Rgb) return PixelFormat.Rgb;
-            if (format == TextureFormat.Rgba) return PixelFormat.Rgba;
+            if (format == PixelFormat.Intensity) return PixelInternalFormat.Luminance;
+            if (format == PixelFormat.Alpha) return PixelInternalFormat.Alpha;
+            if (format == PixelFormat.Rgb) return PixelInternalFormat.Rgb;
+            if (format == PixelFormat.Rgba) return PixelInternalFormat.Rgba;
             throw new InvalidEnumArgumentException(
                 "Invalid texture format: {0}.".FormatInvariant(format));
+        }
+        #endregion
+
+        #region Explicit Members
+        Access IPixelSurface.AllowedAccess
+        {
+            get { return Access.None; } // Although that could be implemented.
         }
 
-        private static PixelInternalFormat GetGLInternalPixelFormat(TextureFormat format)
+        void IPixelSurface.Lock(Region region, Access access, Action<RawPixelSurface> accessor)
         {
-            if (format == TextureFormat.Intensity) return PixelInternalFormat.Luminance;
-            if (format == TextureFormat.Alpha) return PixelInternalFormat.Alpha;
-            if (format == TextureFormat.Rgb) return PixelInternalFormat.Rgb;
-            if (format == TextureFormat.Rgba) return PixelInternalFormat.Rgba;
-            throw new InvalidEnumArgumentException(
-                "Invalid texture format: {0}.".FormatInvariant(format));
+            throw new NotImplementedException();
         }
+
+        void IPixelSurface.LockToOverwrite(Region region, Action<RawPixelSurface> accessor)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        public static Texture CreateBlank(Size size, PixelFormat pixelFormat, bool smooth, bool repeat)
+        {
+            Texture texture = new Texture(size, pixelFormat);
+            texture.SetSmooth(smooth);
+            texture.SetRepeat(repeat);
+            return texture;
+        }
+
+        public static Texture FromPixelSurface(IPixelSurface surface, bool smooth, bool repeat)
+        {
+            Argument.EnsureNotNull(surface, "surface");
+
+            Texture texture = null;
+            surface.Lock((Region)surface.Size, Access.Read, rawImage =>
+                {
+                    texture = new Texture(rawImage.Size, rawImage.PixelFormat, rawImage.DataPointer);
+                });
+
+            texture.SetSmooth(smooth);
+            texture.SetRepeat(repeat);
+
+            return texture;
+        }
+
+        public static Texture FromBuffer(Size size, PixelFormat pixelFormat,
+            byte[] data, bool smooth, bool repeat)
+        {
+            Argument.EnsureNotNull(data, "data");
+
+            Texture texture = null;
+
+            GCHandle pinningHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
+            {
+                texture = new Texture(size, pixelFormat, pinningHandle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                pinningHandle.Free();
+            }
+
+            texture.SetSmooth(smooth);
+            texture.SetRepeat(repeat);
+
+            return texture;
+        }
+
+        public static Texture FromFile(string filePath, bool smooth, bool repeat)
+        {
+            Argument.EnsureNotNull(filePath, "filePath");
+
+            using (SysImage image = SysImage.FromFile(filePath))
+            {
+                return FromDrawingImage(image, smooth, repeat);
+            }
+        }
+
+        public static Texture FromDrawingImage(SysImage image, bool smooth, bool repeat)
+        {
+            Argument.EnsureNotNull(image, "image");
+
+            IPixelSurface surface = BufferedPixelSurface.FromDrawingImage(image);
+            return Texture.FromPixelSurface(surface, smooth, repeat);
+        }
+        #endregion
         #endregion
     }
 }

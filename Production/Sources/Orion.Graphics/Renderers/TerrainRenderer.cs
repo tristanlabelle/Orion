@@ -27,13 +27,13 @@ namespace Orion.Graphics
 
             this.terrain = terrain;
 
-            byte[] pixels = new byte[terrain.Width * terrain.Height * 3];
-            for (int y = 0; y < terrain.Height; ++y)
+            byte[] pixels = new byte[terrain.Size.Area * 3];
+            for (int y = 0; y < terrain.Size.Height; ++y)
             {
-                for (int x = 0; x < terrain.Width; ++x)
+                for (int x = 0; x < terrain.Size.Width; ++x)
                 {
-                    int pixelIndex = y * terrain.Width + x;
-                    if (terrain.IsWalkable(x, y))
+                    int pixelIndex = y * terrain.Size.Width + x;
+                    if (terrain.IsWalkable(new Point(x, y)))
                     {
                         pixels[pixelIndex * 3 + 0] = WalkableColor.R;
                         pixels[pixelIndex * 3 + 1] = WalkableColor.G;
@@ -48,20 +48,14 @@ namespace Orion.Graphics
                 }
             }
 
-            texture = new TextureBuilder
-            {
-                Width = terrain.Width,
-                Height = terrain.Height,
-                Format = TextureFormat.Rgb,
-                PixelData = pixels
-            }.Build();
+            texture = Texture.FromBuffer(terrain.Size, PixelFormat.Rgb, pixels, false, false);
         }
         #endregion
 
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
+            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Size.Width, terrain.Size.Height);
             graphics.Fill(terrainBounds, texture);
         }
 

@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
@@ -24,17 +24,10 @@ namespace Orion.Graphics
             this.fogOfWar = fogOfWar;
             this.fogOfWar.Changed += OnChanged;
 
-            pixelBuffer = new byte[fogOfWar.Width * fogOfWar.Height];
+            pixelBuffer = new byte[fogOfWar.Size.Area];
             UpdatePixelBuffer();
 
-            texture = new TextureBuilder
-            {
-                Width = fogOfWar.Width,
-                Height = fogOfWar.Height,
-                Format = TextureFormat.Alpha,
-                PixelData = pixelBuffer,
-                UseSmoothing = true
-            }.Build();
+            texture = Texture.FromBuffer(fogOfWar.Size, PixelFormat.Alpha, pixelBuffer, true, false);
         }
         #endregion
 
@@ -56,7 +49,7 @@ namespace Orion.Graphics
 
             if (fogOfWar.IsEnabled)
             {
-                Rectangle terrainBounds = new Rectangle(0, 0, fogOfWar.Width, fogOfWar.Height);
+                Rectangle terrainBounds = new Rectangle(0, 0, fogOfWar.Size.Width, fogOfWar.Size.Height);
                 graphics.Fill(terrainBounds, texture, Color.Black);
             }
         }
@@ -73,12 +66,12 @@ namespace Orion.Graphics
         {
             byte fogAlpha = (byte)(FogTransparency * 255.99f);
 
-            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+            for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
             {
-                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
                 {
-                    int pixelIndex = (y - region.MinY) * region.Width + (x - region.MinX);
-                    TileVisibility visibility = fogOfWar.GetTileVisibility(x, y);
+                    int pixelIndex = (y - region.Min.Y) * region.Size.Width + (x - region.Min.X);
+                    TileVisibility visibility = fogOfWar.GetTileVisibility(new Point(x, y));
                     if (visibility == TileVisibility.Undiscovered)
                         pixelBuffer[pixelIndex] = 255;
                     else if (visibility == TileVisibility.Discovered)
@@ -91,14 +84,14 @@ namespace Orion.Graphics
 
         private void UpdatePixelBuffer()
         {
-            Region region = new Region(0, 0, fogOfWar.Width, fogOfWar.Height);
+            Region region = (Region)fogOfWar.Size;
             UpdatePixelBuffer(region);
         }
 
         private void UpdateTexture(Region area)
         {
             UpdatePixelBuffer(area);
-            texture.SetPixels(area, pixelBuffer);
+            texture.Blit(area, pixelBuffer);
         }
         #endregion
     }

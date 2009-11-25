@@ -17,7 +17,7 @@ namespace Orion.GameLogic.Pathfinding
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
         private readonly List<Vector2> points = new List<Vector2>();
-        private Func<int, int, bool> isWalkable;
+        private Func<Point, bool> isWalkable;
         private Point16 destinationPoint;
         private int maxNodesToVisit = int.MaxValue;
         #endregion
@@ -53,7 +53,7 @@ namespace Orion.GameLogic.Pathfinding
         /// <param name="destination">The position the path should reach.</param>
         /// <param name="isWalkable">A delegate to a method which evaluates if a given tile is walkable.</param>
         /// <returns>The path that was found, or <c>null</c> is none was.</returns>
-        public Path Find(Vector2 source, Vector2 destination, Func<int, int, bool> isWalkable)
+        public Path Find(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable)
         {
             Argument.EnsureNotNull(isWalkable, "isWalkable");
 
@@ -202,7 +202,7 @@ namespace Orion.GameLogic.Pathfinding
         private bool IsOpenable(Point16 nearbyPoint)
         {
             return !closedNodes.ContainsKey(nearbyPoint)
-                && isWalkable(nearbyPoint.X, nearbyPoint.Y);
+                && isWalkable(nearbyPoint);
         }
 
         private void AddNearbyNode(PathNode currentNode, Point16 nearbyPoint)

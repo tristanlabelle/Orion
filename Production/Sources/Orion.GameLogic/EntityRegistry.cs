@@ -303,17 +303,12 @@ namespace Orion.GameLogic
         {
             Vector2 normalizedPosition = world.Bounds.ParentToLocal(position);
 
-            Point coords = new Point(
+            Point point = new Point(
                 (int)(normalizedPosition.X * ColumnCount),
                 (int)(normalizedPosition.Y * RowCount));
 
-            if (coords.X < 0) coords.X = 0;
-            else if (coords.X >= ColumnCount) coords.X = ColumnCount - 1;
-
-            if (coords.Y < 0) coords.Y = 0;
-            else if (coords.Y >= RowCount) coords.Y = RowCount - 1;
-
-            return coords;
+            Region region = (Region)new Size(ColumnCount, RowCount);
+            return region.Clamp(point);
         }
 
         #region Enumeration

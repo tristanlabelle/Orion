@@ -268,7 +268,7 @@ namespace Orion.Commandment
             }
             else
             {
-                if (World.Terrain.IsWalkableAndWithinBounds(at))
+                if (World.Terrain.IsWalkableAndWithinBounds((Point)at))
                 {
                     if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.Train>()))
                     {

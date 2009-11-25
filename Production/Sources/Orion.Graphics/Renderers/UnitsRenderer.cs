@@ -113,7 +113,7 @@ namespace Orion.Graphics
             Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = fogOfWar.GetTileVisibility(unit.Position);
+                TileVisibility tileVisibility = fogOfWar.GetTileVisibility((Point)unit.Position);
                 if (tileVisibility == TileVisibility.Visible)
                 {
                     context.FillColor = unit.Faction.Color;
@@ -126,7 +126,7 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = fogOfWar.GetTileVisibility(unit.Position);
+                TileVisibility tileVisibility = fogOfWar.GetTileVisibility((Point)unit.Position);
                 if (tileVisibility == TileVisibility.Visible)
                 {
                     string unitTypeName = unit.Type.Name;
@@ -160,7 +160,7 @@ namespace Orion.Graphics
             float y = unit.Position.Y + unit.BoundingRectangle.Height * 0.75f;
             float x = unit.Position.X - healthbarWidth / 2f;
 
-            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 DrawHealthBar(context, unit, new Vector2(x, y));
             }
@@ -171,7 +171,7 @@ namespace Orion.Graphics
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
             float leftHealthWidth = unit.Health * 0.1f;
 
-            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
             }
@@ -182,7 +182,7 @@ namespace Orion.Graphics
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            if (fogOfWar.GetTileVisibility(unit.Position) == TileVisibility.Visible)
+            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 if (unit.Health > unit.MaxHealth / 2)
                 {

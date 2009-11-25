@@ -9,7 +9,7 @@ namespace Orion
 {
     public static class Bresenham
     {
-        public static bool All(LineSegment lineSegment, int width, Func<int, int, bool> predicate)
+        public static bool All(LineSegment lineSegment, int width, Func<Point, bool> predicate)
         {
             Argument.EnsureStrictlyPositive(width, "width");
 
@@ -33,7 +33,7 @@ namespace Orion
             return true;
         }
 
-        private static bool All(int x0, int y0, int x1, int y1, Func<int, int, bool> predicate)
+        private static bool All(int x0, int y0, int x1, int y1, Func<Point, bool> predicate)
         {
             bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
             if (steep)
@@ -56,7 +56,7 @@ namespace Orion
 
             for (int x = x0; x < x1; ++x)
             {
-                bool isWalkable = steep ? predicate(y, x) : predicate(x, y);
+                bool isWalkable = steep ? predicate(new Point(y, x)) : predicate(new Point(x, y));
                 if (!isWalkable) return false;
 
                 error = error - deltaY;

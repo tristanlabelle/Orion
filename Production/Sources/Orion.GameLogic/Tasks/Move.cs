@@ -37,7 +37,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(unit, "unit");
             if (!unit.HasSkill<Skills.Move>())
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
-            if (!unit.World.IsWithinBounds(destination))
+            if (!unit.World.IsWithinBounds((Point)destination))
                 throw new ArgumentOutOfRangeException("destination");
 
             this.unit = unit;
@@ -102,7 +102,7 @@ namespace Orion.GameLogic.Tasks
                 ++nextPointIndex;
             }
 
-            if (canFly || unit.World.Terrain.IsWalkable(targetPosition))
+            if (canFly || unit.World.Terrain.IsWalkable((Point)targetPosition))
             {
                 // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);

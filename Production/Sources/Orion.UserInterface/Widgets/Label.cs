@@ -10,16 +10,7 @@ namespace Orion.UserInterface.Widgets
     /// </summary>
     public class Label : View
     {
-        /// <summary>
-        /// Accesses this object's text contents.
-        /// </summary>
-        public virtual Text Text { get; set; }
-
-        /// <summary>
-        /// Accesses this object's text color.
-        /// </summary>
-        public Color Color { get; set; }
-
+        #region Constructors
         public Label(Rectangle frame)
             : base(frame)
         {
@@ -41,11 +32,26 @@ namespace Orion.UserInterface.Widgets
         {
             Text = text;
         }
+        #endregion
 
+        #region Properties
+        /// <summary>
+        /// Accesses this object's text contents.
+        /// </summary>
+        public virtual Text Text { get; set; }
+
+        /// <summary>
+        /// Accesses this object's text color.
+        /// </summary>
+        public Color Color { get; set; }
+        #endregion
+
+        #region Methods
         protected internal override void Draw(GraphicsContext context)
         {
             context.FillColor = Color;
             context.Draw(Text, Bounds);
         }
+        #endregion
     }
 }

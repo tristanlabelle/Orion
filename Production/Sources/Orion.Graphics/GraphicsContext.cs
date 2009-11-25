@@ -369,7 +369,7 @@ namespace Orion.Graphics
 
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
-            if (texture.HasAlphaChannel)
+            if (texture.PixelFormat.HasAlphaChannel())
             {
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
@@ -386,7 +386,7 @@ namespace Orion.Graphics
             DrawVertex(rectangle.MaxX, rectangle.MinY);
             GL.End();
 
-            if (texture.HasAlphaChannel) GL.Disable(EnableCap.Blend);
+            if (texture.PixelFormat.HasAlphaChannel()) GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.Texture2D);
         }
 

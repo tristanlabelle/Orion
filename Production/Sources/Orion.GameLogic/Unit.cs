@@ -85,14 +85,9 @@ namespace Orion.GameLogic
         #endregion
 
         #region State
-        public override int Width
+        public override Size Size
         {
-            get { return type.Width; }
-        }
-
-        public override int Height
-        {
-            get { return type.Height; }
+            get { return type.Size; }
         }
 
         public override Vector2 Position
@@ -346,22 +341,22 @@ namespace Orion.GameLogic
         private Vector2 GetDefaultRallyPoint()
         {
             Vector2 newRallyPoint = new Vector2();
-            if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y))
+            if (World.Terrain.IsWalkableAndWithinBounds((Point)position))
             {
-                if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y - 1))
+                if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X, (int)position.Y - 1)))
                 {
                     //Dispatch units South
                     newRallyPoint.Y = position.Y - 1;
                     newRallyPoint.X = position.X;
                 }
-                else if (World.Terrain.IsWalkableAndWithinBounds(position.X, position.Y + 1))
+                else if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X, (int)position.Y + 1)))
                 {
                     //Dispatch units North
                     newRallyPoint.Y = position.Y + 1;
                     newRallyPoint.X = position.X;
                 
                 }
-                else if (World.Terrain.IsWalkableAndWithinBounds(position.X + 1, position.Y))
+                else if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X + 1, (int)position.Y)))
                 {
                     //Dispatch units Est
                     newRallyPoint.Y = position.Y;

@@ -4,6 +4,7 @@ using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
 using System.Runtime.InteropServices;
 using SysImage = System.Drawing.Image;
+using System.IO;
 
 namespace Orion.Graphics
 {
@@ -294,9 +295,17 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(filePath, "filePath");
 
-            using (SysImage image = SysImage.FromFile(filePath))
+            try
             {
-                return FromDrawingImage(image, smooth, repeat);
+                using (SysImage image = SysImage.FromFile(filePath))
+                {
+                    return FromDrawingImage(image, smooth, repeat);
+                }
+            }
+            catch (OutOfMemoryException e)
+            {
+                // System.Drawing.Image.FromFile throws an OutOfMemoryException when it fails to decode an image.
+                throw new IOException(e.Message, e);
             }
         }
 

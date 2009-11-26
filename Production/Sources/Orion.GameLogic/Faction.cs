@@ -32,6 +32,7 @@ namespace Orion.GameLogic
         private int totalFoodAmount = 0;
         private int usedFoodAmount = 0;
         private FactionStatus status = FactionStatus.Undefeated;
+        private List<Technology> technologies = new List<Technology>();
         #endregion
 
         #region Constructors
@@ -54,6 +55,11 @@ namespace Orion.GameLogic
             this.fogOfWar = new FogOfWar(world.Size);
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
+
+            List<TechnologyEffect> effect = new List<TechnologyEffect>();
+            effect.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 100));
+
+            technologies.Add(new Technology("hp boost", null, effect));
         }
         #endregion
 
@@ -116,6 +122,11 @@ namespace Orion.GameLogic
                     .OfType<Unit>()
                     .Where(unit => unit.Faction == this);
             }
+        }
+
+        public IEnumerable<Technology> Technologies
+        {
+            get { return technologies; }
         }
 
         public FogOfWar FogOfWar
@@ -189,7 +200,32 @@ namespace Orion.GameLogic
         public int GetStat(UnitType type, UnitStat stat)
         {
             Argument.EnsureNotNull(type, "type");
-            return type.GetBaseStat(stat);
+            return ApplyTechnologies(stat, type.GetBaseStat(stat));
+        }
+
+        /// <summary>
+        /// Applies the technology modifiers to the stats
+        /// </summary>
+        /// <param name="stat">Stat type</param>
+        /// <param name="baseStat">value of the unmodified stat</param>
+        /// <returns>modified stat value</returns>
+        public int ApplyTechnologies(UnitStat stat, int baseStat)
+        {
+            if (technologies.Count != 0)
+            {
+                foreach (Technology tech in technologies)
+                {
+                    foreach (TechnologyEffect effect in tech.Effects)
+                    {
+                        if (stat == effect.Stat)
+                        {
+                            return baseStat += effect.Value;
+                        }
+                    }
+                }
+            }
+
+            return baseStat;
         }
 
         /// <summary>

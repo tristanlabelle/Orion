@@ -30,7 +30,7 @@ namespace Orion.GameLogic
         public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
-            Argument.EnsureNotNull(requirements, "requirements");
+            //Argument.EnsureNotNull(requirements, "requirements");
             Argument.EnsureNotNull(effects, "effects");
 
             this.name = name;

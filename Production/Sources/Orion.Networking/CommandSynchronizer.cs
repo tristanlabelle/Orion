@@ -164,7 +164,7 @@ namespace Orion.Networking
                 frameTimes.Dequeue();
             int newFrameModulo = (int)(frameTimes.Average() + 0.5);
             if (newFrameModulo != oldFrameModulo)
-                Trace.WriteLine("Command frame modulo changed from {0} to {1}.".FormatInvariant(oldFrameModulo, newFrameModulo));
+                Debug.WriteLine("Command frame modulo changed from {0} to {1}.".FormatInvariant(oldFrameModulo, newFrameModulo));
         }
 
         private void SafeQuit(Match match)

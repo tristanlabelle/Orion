@@ -38,12 +38,12 @@ namespace Orion.Commandment.Pipeline
 
                 if (command.ValidateHandles(match.World))
                 {
-                    Trace.WriteLine("Update #{0}: {1}.".FormatInvariant(updateNumber, command));
+                    Debug.WriteLine("Update #{0}: {1}.".FormatInvariant(updateNumber, command));
                     command.Execute(match);
                 }
                 else
                 {
-                    Trace.WriteLine("Update #{0}: Discarding {1}.".FormatInvariant(updateNumber, command));
+                    Debug.WriteLine("Update #{0}: Discarding {1}.".FormatInvariant(updateNumber, command));
                 }
             }
         }

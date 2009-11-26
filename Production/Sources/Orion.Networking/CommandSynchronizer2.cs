@@ -15,6 +15,7 @@ namespace Orion.Networking
         #region Frame Rate Management
         private const int defaultUpdatesPerFrame = 6;
         private const int maxEnqueuedFrameDurations = 0x48;
+        private readonly List<int> updatesForCommandFrame = new List<int>();
         private readonly Queue<int> previousFramesDuration = new Queue<int>();
         private int updatesSinceLastCommandFrame = 0;
         private int commandFrameNumber = 0;
@@ -28,6 +29,7 @@ namespace Orion.Networking
         #region Commands
         private readonly Match match;
         private readonly List<Command> localCommands = new List<Command>();
+        private readonly List<Command> commandsToSend = new List<Command>();
         private readonly List<Command> commandsToExecute = new List<Command>();
         private bool needsToSendCommands;
         #endregion
@@ -73,48 +75,44 @@ namespace Orion.Networking
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
             updatesSinceLastCommandFrame++;
+
+            if (ReceivedFromAllPeers && updatesForCommandFrame.Count == 0)
+            {
+                updatesForCommandFrame.Add(updatesSinceLastCommandFrame);
+                peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
+            }
+
+            if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)
+            {
+                peers.ForEach(peer => peer.SendCommands(commandFrameNumber, commandsToSend));
+                commandsToExecute.AddRange(commandsToSend);
+                commandsToSend.Clear();
+                commandsToSend.AddRange(localCommands);
+                localCommands.Clear();
+            }
+
             if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame)
             {
-                if (!ReceivedFromAllPeers || !AllPeersDone)
+                if (!AllPeersDone || ReceivedFromAllPeers)
                 {
+                    Debug.WriteLine("Waiting for peers");
                     match.Pause();
                     return;
                 }
                 match.Resume();
 
-                foreach (PeerEndPoint peer in peers)
-                {
-                    commandsToExecute.AddRange(peer.GetCommandsForCommandFrame(commandFrameNumber));
-                    peer.SendDone(commandFrameNumber);
-                }
-                peers.ForEach(peer => peer.SendDone(commandFrameNumber));
                 AdaptUpdatesPerCommandFrame();
-
                 FlushCommands();
-                commandsToExecute.AddRange(localCommands);
-                localCommands.Clear();
-
-                if (needsToSendCommands)
-                {
-                    peers.ForEach(peer => peer.SendCommands(commandFrameNumber, localCommands));
-                    needsToSendCommands = false;
-                }
-
-                commandFrameNumber++;
-                needsToSendCommands = true;
             }
         }
 
         private void AdaptUpdatesPerCommandFrame()
         {
-            List<int> updates = new List<int>();
-            updates.Add(updatesSinceLastCommandFrame);
-            updates.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
-            previousFramesDuration.Enqueue(updates.Max());
+            updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
+            previousFramesDuration.Enqueue(updatesForCommandFrame.Max());
             if (previousFramesDuration.Count > maxEnqueuedFrameDurations)
-            {
                 previousFramesDuration.Dequeue();
-            }
+            updatesForCommandFrame.Clear();
         }
 
         private void FlushCommands()

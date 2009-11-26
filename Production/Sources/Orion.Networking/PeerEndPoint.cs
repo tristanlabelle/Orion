@@ -13,7 +13,7 @@ namespace Orion.Networking
     public class PeerEndPoint : IDisposable
     {
         #region Fields
-        private readonly byte[] doneMessage = new byte[] { (byte)GameMessageType.Done, 0, 0, 0, 0 };
+        private readonly byte[] doneMessage;
 
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> receive;
         private GenericEventHandler<SafeTransporter, IPv4EndPoint> timeout;
@@ -40,6 +40,8 @@ namespace Orion.Networking
 
             availableCommands[0] = new List<Command>();
             updatesForDone[0] = 6;
+            doneMessage = new byte[1 + sizeof(int) * 2];
+            doneMessage[0] = (byte)GameMessageType.Done;
         }
         #endregion
 
@@ -71,9 +73,10 @@ namespace Orion.Networking
             return availableCommands[commandFrame];
         }
 
-        public void SendDone(int commandFrame)
+        public void SendDone(int commandFrame, int numberOfUpdates)
         {
             BitConverter.GetBytes(commandFrame).CopyTo(doneMessage, 1);
+            BitConverter.GetBytes(numberOfUpdates).CopyTo(doneMessage, 1 + sizeof(int));
             transporter.SendTo(doneMessage, Host);
         }
 
@@ -107,7 +110,7 @@ namespace Orion.Networking
                 }
                 else if (args.Data[0] == (byte)GameMessageType.Done)
                 {
-                    int updates = BitConverter.ToInt32(args.Data, 1);
+                    int updates = BitConverter.ToInt32(args.Data, 1 + sizeof(int));
                     updatesForDone[commandFrame] = updates;
                 }
             }

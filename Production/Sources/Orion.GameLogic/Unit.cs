@@ -16,6 +16,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly Queue<Task> taskQueue = new Queue<Task>();
+        private bool isQueueFull; 
         private readonly UnitType type;
         private readonly Faction faction;
         private Vector2 position;
@@ -47,6 +48,7 @@ namespace Orion.GameLogic
             this.type = type;
             this.faction = faction;
             this.position = position;
+            this.isQueueFull = false; 
 
             if (type.HasSkill<Skills.Train>())
             {
@@ -190,6 +192,21 @@ namespace Orion.GameLogic
                 Debug.Assert(taskQueue.Count == 0);
 
                 if (value != null) taskQueue.Enqueue(value);
+            }
+        }
+        /// <summary>
+        /// Returns a boolean value that checks if the queueTask of that unit is full or not
+        /// </summary>
+        public bool QueueFull
+        {
+            get 
+            {
+                if (taskQueue.Count >= 8)
+                    isQueueFull = true;
+                else
+                    isQueueFull = false; 
+
+                return isQueueFull; 
             }
         }
 

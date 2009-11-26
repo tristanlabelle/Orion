@@ -9,11 +9,13 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit unit;
         private readonly Unit building;
+        private readonly GenericEventHandler<Entity> buildingDiedEventHandler;
         private Follow follow;
         private float aladdiumCost;
         private float alageneCost;
-        private float totalAladdiumCost = 0;
-        private float totalAlageneCost = 0;
+        private float totalAladdiumCost;
+        private float totalAlageneCost;
+        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -30,9 +32,12 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.building = building;
+            this.buildingDiedEventHandler = OnBuildingDied;
+            this.building.Died += buildingDiedEventHandler;
             this.follow = new Follow(unit, building);
             this.aladdiumCost = building.GetStat(UnitStat.AladdiumCost) / building.MaxHealth;
             this.alageneCost = building.GetStat(UnitStat.AlageneCost) / building.MaxHealth;
+ 
         }
         #endregion
 
@@ -54,7 +59,7 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return building.Damage < 1; }
+            get { return hasEnded; }
         }
         #endregion
 
@@ -70,9 +75,22 @@ namespace Orion.GameLogic.Tasks
 
             if (follow.IsInRange)
             {
-                if (unit.Faction.AladdiumAmount >= aladdiumCost && unit.Faction.AlageneAmount >= alageneCost)
+                
+                if (unit.UnderConstruction)
                 {
-                    building.Damage--;
+                    
+                    building.Build(unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
+
+                    if (!building.UnderConstruction)
+                    {
+                        hasEnded = true;
+                        building.Died -= buildingDiedEventHandler;
+                    }
+                        
+                }
+                else if (unit.Faction.AladdiumAmount >= aladdiumCost && unit.Faction.AlageneAmount >= alageneCost)
+                {
+                    building.Damage --;
                     totalAladdiumCost += aladdiumCost;
                     totalAlageneCost += alageneCost;
                     if (totalAladdiumCost > 1)
@@ -92,7 +110,18 @@ namespace Orion.GameLogic.Tasks
                 follow.Update(timeDelta);
 
             }
+            if (building.Health >= building.MaxHealth)
+            {
+                hasEnded = true; 
+                building.Died -= buildingDiedEventHandler;
+            }
 
+        }
+
+        private void OnBuildingDied(Entity entity)
+        {
+            hasEnded = true;
+            entity.Died -= buildingDiedEventHandler;
         }
         #endregion
     }

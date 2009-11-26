@@ -19,6 +19,7 @@ namespace Orion.GameLogic.Tasks
         private float heathPointsBuilt = 0;
         private bool hasBegunBuilding = false;
         private bool hasEnded = false;
+        Unit unit;
         #endregion
 
         #region Constructors
@@ -75,13 +76,14 @@ namespace Orion.GameLogic.Tasks
                 move.Update(timeDelta);
                 return;
             }
+                //Unable To reach Destination
             else if ((builder.Position - (Vector2)location).Length > 1)
             {
                 hasEnded = true;
                 return;
             }
 
-            if (!hasBegunBuilding)
+            if (unit == null)
             {
                 int aladdiumCost = builder.Faction.GetStat(buildingType, UnitStat.AladdiumCost);
                 int alageneCost = builder.Faction.GetStat(buildingType, UnitStat.AlageneCost);
@@ -91,7 +93,9 @@ namespace Orion.GameLogic.Tasks
                 {
                     builder.Faction.AladdiumAmount -= aladdiumCost;
                     builder.Faction.AlageneAmount -= alageneCost;
-                    hasBegunBuilding = true;
+                    unit = builder.Faction.CreateUnit(buildingType, location);
+                    unit.Health = 1;
+                    builder.Task = new Repair(builder, unit);
                 }
                 else
                 {
@@ -100,6 +104,7 @@ namespace Orion.GameLogic.Tasks
                     return;
                 }
             }
+            
 
             if (hasBegunBuilding)
             {
@@ -108,7 +113,7 @@ namespace Orion.GameLogic.Tasks
                 heathPointsBuilt += buildingSpeed * timeDelta;
                 if (heathPointsBuilt >= maxHealth)
                 {
-                    builder.Faction.CreateUnit(buildingType, location);
+                   
                     hasEnded = true;
                 }
             }

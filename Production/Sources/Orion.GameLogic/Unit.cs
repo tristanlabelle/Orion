@@ -22,6 +22,8 @@ namespace Orion.GameLogic
         private float angle;
         private float damage;
         private Vector2? rallyPoint;
+        private float totalHealthReceived;
+        private bool underConstruction;
         #endregion
 
         #region Constructors
@@ -50,6 +52,8 @@ namespace Orion.GameLogic
             {
                 this.rallyPoint = GetDefaultRallyPoint();
             }
+            if (type.IsBuilding)
+                underConstruction = true;
         }
         #endregion
 
@@ -108,6 +112,11 @@ namespace Orion.GameLogic
             get { return angle; }
             set { angle = value; }
         }
+
+        public bool UnderConstruction
+        {
+            get { return underConstruction; }
+        }
         #endregion
 
         /// <summary>
@@ -136,6 +145,8 @@ namespace Orion.GameLogic
 
                 OnDamageChanged();
                 if (damage == MaxHealth) Die();
+                else if (damage == 0 && UnderConstruction)
+                    underConstruction = false;
             }
         }
 
@@ -386,6 +397,15 @@ namespace Orion.GameLogic
             }
    
             return newRallyPoint;
+        }
+
+        public void Build(float health)
+        {
+            Argument.EnsurePositive(health, "health");
+            this.Health += health;
+            this.totalHealthReceived += health;
+            if (totalHealthReceived >= MaxHealth)
+                underConstruction = false;
         }
         #endregion
     }

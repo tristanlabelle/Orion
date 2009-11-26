@@ -23,9 +23,8 @@ namespace Orion.GameLogic
         private readonly World world;
         private readonly Dictionary<Handle, Entity> entities = new Dictionary<Handle, Entity>();
         private readonly EntityGrid grid;
-        private readonly EntityZone[,] zones;
+        private readonly EntityZoneManager zoneManager;
         private readonly Func<Handle> uidGenerator;
-        private readonly BufferPool<Entity> bufferPool = CreateBufferPool();
 
         // Temporary collections used to defer modification of "entities"
         private readonly HashSet<Entity> entitiesToAdd = new HashSet<Entity>();
@@ -56,7 +55,7 @@ namespace Orion.GameLogic
 
             this.world = world;
             this.grid = new EntityGrid(world.Terrain);
-            this.zones = CreateZones(columnCount, rowCount, bufferPool);
+            this.zoneManager = new EntityZoneManager(world.Size);
             this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
             this.entityMovedEventHandler = OnEntityMoved;
@@ -84,83 +83,9 @@ namespace Orion.GameLogic
         {
             get { return world.Bounds; }
         }
-
-        /// <summary>
-        /// Gets the number of zone columns this collection uses.
-        /// </summary>
-        public int ColumnCount
-        {
-            get { return zones.GetLength(0); }
-        }
-
-        /// <summary>
-        /// Gets the number of zone rows this collection uses.
-        /// </summary>
-        public int RowCount
-        {
-            get { return zones.GetLength(1); }
-        }
-
-        /// <summary>
-        /// Gets the size of a zone, in spatial units.
-        /// </summary>
-        public Vector2 ZoneSize
-        {
-            get
-            {
-                return new Vector2(
-                    Bounds.Width / ColumnCount,
-                    Bounds.Height / RowCount);
-            }
-        }
-
-        private int UnitsInZones
-        {
-            get { return zones.Cast<EntityZone>().Sum(zone => zone.Count); }
-        }
         #endregion
 
         #region Methods
-        #region Initialization
-        private static EntityZone[,] CreateZones(int columnCount, int rowCount, BufferPool<Entity> bufferPool)
-        {
-            EntityZone[,] zones = new EntityZone[columnCount, rowCount];
-            for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex)
-                for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex)
-                    zones[columnIndex, rowIndex] = new EntityZone(bufferPool);
-            return zones;
-        }
-
-        private static BufferPool<Entity> CreateBufferPool()
-        {
-            BufferPool<Entity> pool = new BufferPool<Entity>(AllocateBuffer);
-            // Pre-allocate some buffers here.
-            return pool;
-        }
-
-        private static Entity[] AllocateBuffer(int minimumSize)
-        {
-            Argument.EnsurePositive(minimumSize, "minimumSize");
-
-            uint allocationSize = CeilingPowerOfTwo((uint)minimumSize);
-            if (allocationSize < 16) allocationSize = 16;
-            return new Entity[allocationSize];
-        }
-
-        private static uint CeilingPowerOfTwo(uint value)
-        {
-            // Source: http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2Float
-            // Edge case 0 is handled by under and overflowing.
-            --value;
-            value |= value >> 1;
-            value |= value >> 2;
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            return value + 1;
-        }
-        #endregion
-
         #region Event Handlers
         private void OnEntityDied(Entity entity)
         {
@@ -251,86 +176,54 @@ namespace Orion.GameLogic
         /// </remarks>
         public void Update(float timeDeltaInSeconds)
         {
-            CommitDeferredCollectionChanges();
+            CommitDeferredChanges();
 
             foreach (Entity entity in entities.Values)
                 entity.Update(timeDeltaInSeconds);
         }
 
-        #region Private Collection Modification
-        private void CommitDeferredCollectionChanges()
+        #region Commit Deferred Changes
+        private void CommitDeferredChanges()
+        {
+            CommitDeferredAdds();
+            CommitDeferredMoves();
+            CommitDeferredRemoves();
+        }
+
+        private void CommitDeferredAdds()
         {
             foreach (Entity entity in entitiesToAdd)
-                Add(entity);
-            entitiesToAdd.Clear();
-
-            foreach (var pair in entitiesToMove)
-                UpdateZone(pair.Key, pair.Value);
-            entitiesToMove.Clear();
-
-            foreach (Entity entity in entitiesToRemove)
-                Remove(entity);
-            entitiesToRemove.Clear();
-        }
-
-        private void Add(Entity entity)
-        {
-            entities.Add(entity.Handle, entity);
-            AddToZone(entity);
-        }
-
-        private void AddToZone(Entity entity)
-        {
-            Point zoneCoords = GetClampedZoneCoords(entity.Position);
-            AddToZone(entity, zoneCoords);
-        }
-
-        private void AddToZone(Entity entity, Point zoneCoords)
-        {
-            zones[zoneCoords.X, zoneCoords.Y].Add(entity);
-        }
-
-        private void Remove(Entity entity)
-        {
-            entities.Remove(entity.Handle);
-            RemoveFromZone(entity);
-            OnDied(entity);
-        }
-
-        private void RemoveFromZone(Entity entity)
-        {
-            Point zoneCoords = GetClampedZoneCoords(entity.Position);
-            zones[zoneCoords.X, zoneCoords.Y].Remove(entity);
-        }
-
-        private void UpdateZone(Entity entity, Vector2 oldPosition)
-        {
-            Point oldZoneCoords = GetClampedZoneCoords(oldPosition);
-            Point newZoneCoords = GetClampedZoneCoords(entity.Position);
-
-            if (newZoneCoords != oldZoneCoords)
             {
-                zones[oldZoneCoords.X, oldZoneCoords.Y].Remove(entity);
-                zones[newZoneCoords.X, newZoneCoords.Y].Add(entity);
+                entities.Add(entity.Handle, entity);
+                zoneManager.Add(entity);
             }
+            entitiesToAdd.Clear();
         }
+
+       private void CommitDeferredMoves()
+       {
+           foreach (var pair in entitiesToMove)
+           {
+               zoneManager.UpdateZone(pair.Key, pair.Value);
+           }
+           entitiesToMove.Clear();
+       }
+
+       private void CommitDeferredRemoves()
+       {
+           foreach (Entity entity in entitiesToRemove)
+           {
+               entities.Remove(entity.Handle);
+               zoneManager.Remove(entity);
+               OnDied(entity);
+           }
+           entitiesToRemove.Clear();
+       }
         #endregion
 
         public Entity GetEntityAt(Point point)
         {
             return grid[point];
-        }
-
-        private Point GetClampedZoneCoords(Vector2 position)
-        {
-            Vector2 normalizedPosition = world.Bounds.ParentToLocal(position);
-
-            Point point = new Point(
-                (int)(normalizedPosition.X * ColumnCount),
-                (int)(normalizedPosition.Y * RowCount));
-
-            Region region = (Region)new Size(ColumnCount, RowCount);
-            return region.Clamp(point);
         }
 
         #region Enumeration
@@ -350,25 +243,7 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
         public IEnumerable<Entity> InArea(Rectangle area)
         {
-            if (!Rectangle.Intersects(world.Bounds, area))
-                yield break;
-
-            Point minZoneCoords = GetClampedZoneCoords(area.Min);
-            Point maxZoneCoords = GetClampedZoneCoords(area.Max);
-
-            for (int x = minZoneCoords.X; x <= maxZoneCoords.X; ++x)
-            {
-                for (int y = minZoneCoords.Y; y <= maxZoneCoords.Y; ++y)
-                {
-                    EntityZone zone = zones[x, y];
-                    for (int i = 0; i < zone.Count; ++i)
-                    {
-                        Entity entity = zone[i];
-                        if (area.ContainsPoint(entity.Position))
-                            yield return entity;
-                    }
-                }
-            }
+            return zoneManager.InArea(area);
         }
 
         /// <summary>
@@ -378,27 +253,8 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
         public IEnumerable<Entity> InArea(Circle area)
         {
-            if (!Intersection.Test(world.Bounds, area))
-                yield break;
-
-            Rectangle rectangle = area.BoundingRectangle;
-
-            Point minZoneCoords = GetClampedZoneCoords(rectangle.Min);
-            Point maxZoneCoords = GetClampedZoneCoords(rectangle.Max);
-
-            for (int x = minZoneCoords.X; x <= maxZoneCoords.X; ++x)
-            {
-                for (int y = minZoneCoords.Y; y <= maxZoneCoords.Y; ++y)
-                {
-                    EntityZone zone = zones[x, y];
-                    for (int i = 0; i < zone.Count; ++i)
-                    {
-                        Entity entity = zone[i];
-                        if (area.ContainsPoint(entity.Position))
-                            yield return entity;
-                    }
-                }
-            }
+            return zoneManager.InArea(area.BoundingRectangle)
+                .Where(entity => area.ContainsPoint(entity.Center));
         }
         #endregion
         #endregion

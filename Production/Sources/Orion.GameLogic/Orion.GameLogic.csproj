@@ -66,10 +66,10 @@
     <Compile Include="DiplomaticStance.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityGrid.cs" />
+    <Compile Include="EntityZoneManager.cs" />
     <Compile Include="FactionSandbox.cs" />
     <Compile Include="FactionStatus.cs" />
     <Compile Include="Handle.cs" />
-    <Compile Include="EntityZone.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />
     <Compile Include="Pathfinding\Path.cs" />

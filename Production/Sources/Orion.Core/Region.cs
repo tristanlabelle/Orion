@@ -144,6 +144,12 @@ namespace Orion
 
         #region Static
         #region Methods
+        public static Region FromMinInclusiveMax(Point min, Point inclusiveMax)
+        {
+            Size size = new Size(inclusiveMax.X - min.X + 1, inclusiveMax.Y - min.Y + 1);
+            return new Region(min, size);
+        }
+
         public static Region FromMinExclusiveMax(Point min, Point exclusiveMax)
         {
             Size size = new Size(exclusiveMax.X - min.X, exclusiveMax.Y - min.Y);

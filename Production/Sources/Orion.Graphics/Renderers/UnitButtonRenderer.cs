@@ -36,9 +36,9 @@ namespace Orion.Graphics
             context.StrokeColor = StrokeColor;
 
             float width = context.CoordinateSystem.Width/ 4 *3;
-            float height = context.CoordinateSystem.Width /2;
+            float height = context.CoordinateSystem.Height / 4*3;
             float x =  context.CoordinateSystem.Width / 8;
-            float y = context.CoordinateSystem.Width / 2;
+            float y = context.CoordinateSystem.Height / 4;
             context.Fill(new Rectangle(x,y , width, height), texture, unit.Faction.Color);
 
             float healthRatio = unit.Health / unit.MaxHealth;

@@ -80,7 +80,6 @@ namespace Orion.Networking
             {
                 updatesForCommandFrame.Add(updatesSinceLastCommandFrame);
                 peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
-                Debug.WriteLine("Received from everyone!");
             }
 
             if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)
@@ -90,7 +89,6 @@ namespace Orion.Networking
                 commandsToSend.Clear();
                 commandsToSend.AddRange(localCommands);
                 localCommands.Clear();
-                Debug.WriteLine("Sent commands to everyone!");
             }
 
             if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame)

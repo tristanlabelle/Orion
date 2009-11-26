@@ -88,8 +88,13 @@ namespace Orion.Networking
                 {
                     writer.Write((byte)GameMessageType.Commands);
                     writer.Write(commandFrame);
+                    int commandsCount = 0;
                     foreach (Command command in commands)
+                    {
                         command.Serialize(writer);
+                        commandsCount++;
+                    }
+                    Debug.WriteLine("Serialized {0} commands".FormatInvariant(commandsCount));
                 }
                 transporter.SendTo(stream.ToArray(), Host);
             }
@@ -141,7 +146,7 @@ namespace Orion.Networking
                         Command deserializedCommand = Command.Deserialize(reader);
                         commands.Add(deserializedCommand);
                     }
-
+                    Debug.WriteLine("Deserialized {0} commands".FormatInvariant(commands.Count));
                     return commands;
                 }
             }

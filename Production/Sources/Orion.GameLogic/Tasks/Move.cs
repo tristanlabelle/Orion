@@ -6,6 +6,8 @@ using System.Linq;
 using OpenTK.Math;
 
 using Orion.GameLogic.Pathfinding;
+using System.Diagnostics;
+using Orion.Geometry;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -22,7 +24,6 @@ namespace Orion.GameLogic.Tasks
         private readonly Vector2 destination;
         private Path path;
         private int nextPointIndex = 1;
-        private bool canFly;
         #endregion
 
         #region Constructors
@@ -42,18 +43,16 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.destination = destination;
-            if (unit.GetStat(UnitStat.CanFly) == 1)
+            if (unit.Type.IsAirborne)
             {
                 List<Vector2> points = new List<Vector2>();
                 points.Add(this.unit.Position);
                 points.Add(this.destination);
                 this.path = new Path(this.unit.Position, this.destination, points);
-                canFly = true;
             }
             else
             {
                 this.path = unit.Faction.FindPath(unit.Position, destination);
-                canFly = false;
             }
         }
         #endregion
@@ -102,7 +101,11 @@ namespace Orion.GameLogic.Tasks
                 ++nextPointIndex;
             }
 
-            if (canFly || unit.World.Terrain.IsWalkable((Point)targetPosition))
+            Rectangle targetBoundingRectangle = new Rectangle(
+                targetPosition.X, targetPosition.Y, unit.Size.Width, unit.Size.Height);
+            Rectangle targetCollisionRectangle = Entity.GetCollisionRectangle(targetBoundingRectangle);
+
+            if (unit.Type.IsAirborne || unit.World.Terrain.IsWalkable(targetCollisionRectangle))
             {
                 // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);

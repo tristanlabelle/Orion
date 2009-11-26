@@ -46,9 +46,6 @@ namespace Orion.GameLogic.Skills
         public override int? TryGetBaseStat(UnitStat stat)
         {
             if (stat == UnitStat.MovementSpeed) return speed;
-            if (stat == UnitStat.CanFly)
-                if (isAirborne) return 1;
-                else return 0;
             return null;
         }
         #endregion

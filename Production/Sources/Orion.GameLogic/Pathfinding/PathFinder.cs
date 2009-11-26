@@ -68,7 +68,6 @@ namespace Orion.GameLogic.Pathfinding
             if (destinationNode == null) destinationNode = FindClosedNodeNearestToDestination();
 
             FindPathPointsTo(destinationNode);
-            SmoothPathPoints();
             return new Path(source, destination, points);
         }
 

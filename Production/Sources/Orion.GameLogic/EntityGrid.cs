@@ -45,11 +45,6 @@ namespace Orion.GameLogic
         #region GetRegion
         public Region GetRegion(Rectangle rectangle)
         {
-            // Diminish the size of the rectangle a little to prevent floating point imprecision problems.
-            rectangle = Rectangle.FromCenterSize(
-                rectangle.CenterX, rectangle.CenterY,
-                rectangle.Width - 0.2f, rectangle.Height - 0.2f);
-
             int minX = Math.Max(0, (int)rectangle.MinX);
             int minY = Math.Max(0, (int)rectangle.MinY);
             int maxX = Math.Min(Size.Width - 1, (int)rectangle.MaxX);
@@ -61,7 +56,7 @@ namespace Orion.GameLogic
         public Region GetRegion(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            return GetRegion(entity.BoundingRectangle);
+            return GetRegion(entity.CollisionRectangle);
         }
         #endregion
 

@@ -13,6 +13,7 @@ namespace Orion.GameLogic
     [Serializable]
     public abstract class Entity
     {
+        #region Instance
         #region Fields
         private readonly World world;
         private readonly Handle handle;
@@ -101,6 +102,14 @@ namespace Orion.GameLogic
         {
             get { return new Rectangle(Position.X, Position.Y, Size.Width, Size.Height); }
         }
+
+        /// <summary>
+        /// Gets the rectangle representing the part of this entity that can be collided with.
+        /// </summary>
+        public Rectangle CollisionRectangle
+        {
+            get { return GetCollisionRectangle(BoundingRectangle); }
+        }
         #endregion
 
         /// <summary>
@@ -138,6 +147,18 @@ namespace Orion.GameLogic
         }
 
         internal virtual void Update(float timeDeltaInSeconds) { }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        public static Rectangle GetCollisionRectangle(Rectangle boundingRectangle)
+        {
+            return Rectangle.FromCenterSize(
+                boundingRectangle.CenterX, boundingRectangle.CenterY,
+                boundingRectangle.Width - 0.2f, boundingRectangle.Height - 0.2f);
+        }
+        #endregion
         #endregion
     }
 }

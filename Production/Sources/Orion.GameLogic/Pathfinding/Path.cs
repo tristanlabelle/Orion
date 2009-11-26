@@ -20,7 +20,7 @@ namespace Orion.GameLogic.Pathfinding
 
             this.source = source;
             this.destination = destination;
-            this.points = new ReadOnlyCollection<Vector2>(points.ToList());
+            this.points = points.ToList().AsReadOnly();
         }
         #endregion
 
@@ -48,10 +48,6 @@ namespace Orion.GameLogic.Pathfinding
         {
             get { return points; }
         }
-        #endregion
-
-        #region Methods
-        
         #endregion
     }
 }

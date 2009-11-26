@@ -44,6 +44,26 @@ namespace Orion.GameLogic
             return !tiles[point.X, point.Y];
         }
 
+        public bool IsWalkable(Rectangle rectangle)
+        {
+            int minX = Math.Max(0, (int)rectangle.MinX);
+            int minY = Math.Max(0, (int)rectangle.MinY);
+            int maxX = Math.Min(Size.Width - 1, (int)rectangle.MaxX);
+            int maxY = Math.Min(Size.Height - 1, (int)rectangle.MaxY);
+
+            Region region = Region.FromMinInclusiveMax(new Point(minX, minY), new Point(maxX, maxY));
+            return IsWalkable(region);
+        }
+
+        private bool IsWalkable(Region region)
+        {
+            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                    if (!IsWalkable(new Point(x, y)))
+                        return false;
+            return true;
+        }
+
         public bool IsWalkableAndWithinBounds(Point point)
         {
             Region region = (Region)Size;

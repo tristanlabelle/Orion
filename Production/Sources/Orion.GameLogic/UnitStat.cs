@@ -20,7 +20,6 @@ namespace Orion.GameLogic
         MovementSpeed,
         SightRange,
         TrainingSpeed,
-        FoodStorageCapacity, 
-        CanFly
+        FoodStorageCapacity
     }
 }

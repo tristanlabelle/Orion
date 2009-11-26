@@ -100,6 +100,7 @@ namespace Orion.Networking
                     needsToSendCommands = false;
                 }
 
+                commandFrameNumber++;
                 needsToSendCommands = true;
             }
         }

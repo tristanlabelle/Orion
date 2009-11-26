@@ -11,7 +11,7 @@ namespace Orion.GameLogic
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Size = sizeof(uint))]
-    public struct Handle : IEquatable<Handle>
+    public struct Handle : IEquatable<Handle>, IComparable<Handle>
     {
         #region Instance
         #region Fields
@@ -40,6 +40,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        public int CompareTo(Handle other)
+        {
+            return value.CompareTo(other.value);
+        }
+
         /// <summary>
         /// Tests for equality with another <see cref="Uid"/>.
         /// </summary>
@@ -80,6 +85,11 @@ namespace Orion.GameLogic
         {
             return first.Equals(second);
         }
+
+        public static int Compare(Handle first, Handle second)
+        {
+            return first.CompareTo(second);
+        }
         #endregion
 
         #region Operators
@@ -91,6 +101,26 @@ namespace Orion.GameLogic
         public static bool operator !=(Handle lhs, Handle rhs)
         {
             return !Equals(lhs, rhs);
+        }
+
+        public static bool operator <(Handle lhs, Handle rhs)
+        {
+            return Compare(lhs, rhs) < 0;
+        }
+
+        public static bool operator <=(Handle lhs, Handle rhs)
+        {
+            return Compare(lhs, rhs) <= 0;
+        }
+
+        public static bool operator >(Handle lhs, Handle rhs)
+        {
+            return Compare(lhs, rhs) > 0;
+        }
+
+        public static bool operator >=(Handle lhs, Handle rhs)
+        {
+            return Compare(lhs, rhs) >= 0;
         }
         #endregion
         #endregion

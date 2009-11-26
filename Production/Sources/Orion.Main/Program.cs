@@ -16,6 +16,7 @@ namespace Orion.Main
         #region Fields
         private const float TargetFramesPerSecond = 40;
         private const float TargetSecondsPerFrame = 1.0f / TargetFramesPerSecond;
+        private const float TimeSpeedMultiplier = 1;
         private const int DefaultHostPort = 41223;
         private const int DefaultClientPort = 41224;
         private const int MaxSuccessiveUpdates = 5;
@@ -25,7 +26,6 @@ namespace Orion.Main
         #endregion
 
         #region Methods
-
         #region Main Menu Event Handlers
         private void ConfigureSinglePlayerGame(MainMenuUI sender)
         {
@@ -171,7 +171,7 @@ namespace Orion.Main
                 float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                 float actualTimeDelta = newTime - oldTime;
                 if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
-                timeAccumulator += actualTimeDelta;
+                timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
                 oldTime = newTime;
 
                 while (timeAccumulator >= TargetSecondsPerFrame)

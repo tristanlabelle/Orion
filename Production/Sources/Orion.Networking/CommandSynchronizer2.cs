@@ -74,6 +74,7 @@ namespace Orion.Networking
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
+            transporter.Poll();
             updatesSinceLastCommandFrame++;
 
             if (ReceivedFromAllPeers && updatesForCommandFrame.Count == 0)
@@ -102,6 +103,7 @@ namespace Orion.Networking
 
                 AdaptUpdatesPerCommandFrame();
                 FlushCommands();
+                commandFrameNumber++;
             }
         }
 

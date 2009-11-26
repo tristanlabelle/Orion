@@ -80,6 +80,23 @@ namespace Orion.Networking
             transporter.SendTo(doneMessage, Host);
         }
 
+        private List<Command> DeserializeCommandDatagram(byte[] data, int startIndex)
+        {
+            using (MemoryStream stream = new MemoryStream(data, startIndex, data.Length - startIndex))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    List<Command> commands = new List<Command>();
+                    while (stream.Position != stream.Length)
+                    {
+                        Command deserializedCommand = Command.Deserialize(reader);
+                        commands.Add(deserializedCommand);
+                    }
+                    return commands;
+                }
+            }
+        }
+
         public void SendCommands(int commandFrame, IEnumerable<Command> commands)
         {
             using (MemoryStream stream = new MemoryStream())
@@ -88,13 +105,8 @@ namespace Orion.Networking
                 {
                     writer.Write((byte)GameMessageType.Commands);
                     writer.Write(commandFrame);
-                    int commandsCount = 0;
                     foreach (Command command in commands)
-                    {
                         command.Serialize(writer);
-                        commandsCount++;
-                    }
-                    Debug.WriteLine("Serialized {0} commands".FormatInvariant(commandsCount));
                 }
                 transporter.SendTo(stream.ToArray(), Host);
             }
@@ -131,25 +143,6 @@ namespace Orion.Networking
         private void OnLeaveGame()
         {
             if (LeftGame != null) LeftGame(this);
-        }
-
-        private List<Command> DeserializeCommandDatagram(byte[] data, int startIndex)
-        {
-            using (MemoryStream stream = new MemoryStream(data, startIndex, data.Length - startIndex))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    int commandFrame = reader.ReadInt32();
-                    List<Command> commands = new List<Command>();
-                    while (stream.Position != stream.Length)
-                    {
-                        Command deserializedCommand = Command.Deserialize(reader);
-                        commands.Add(deserializedCommand);
-                    }
-                    Debug.WriteLine("Deserialized {0} commands".FormatInvariant(commands.Count));
-                    return commands;
-                }
-            }
         }
 
         public void Dispose()

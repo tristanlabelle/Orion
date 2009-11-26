@@ -55,7 +55,7 @@ namespace Orion.Graphics
 
                 if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)
                 {
-                    graphics.StrokeLineStrip(unit.Position,unit.RallyPoint.Value);
+                    graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
                 }
             }
         }

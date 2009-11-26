@@ -87,6 +87,14 @@ namespace Orion.GameLogic
         public abstract Vector2 Position { get; }
 
         /// <summary>
+        /// Gets the position of the center of this <see cref="Entity"/>.
+        /// </summary>
+        public Vector2 Center
+        {
+            get { return new Vector2(Position.X + Size.Width * 0.5f, Position.Y + Size.Height * 0.5f); }
+        }
+
+        /// <summary>
         /// Gets a <see cref="Rectangle"/> that bounds the physical representation of this <see cref="Entity"/>.
         /// </summary>
         public Rectangle BoundingRectangle

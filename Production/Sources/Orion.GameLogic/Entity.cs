@@ -104,6 +104,13 @@ namespace Orion.GameLogic
         #endregion
 
         /// <summary>
+        /// Gets a value indicating if this <see cref="Entity"/> is solid.
+        /// Solid entities occupy grid space and cannot overlap with other
+        /// solid entities or with the terrain.
+        /// </summary>
+        public abstract bool IsSolid { get; }
+
+        /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> is alive.
         /// </summary>
         public bool IsAlive

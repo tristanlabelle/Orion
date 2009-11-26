@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using AttackSkill = Orion.GameLogic.Skills.Attack;
-using BuildSkill = Orion.GameLogic.Skills.Build;
-using HarvestSkill = Orion.GameLogic.Skills.Harvest;
-using MoveSkill = Orion.GameLogic.Skills.Move;
-using Size = System.Drawing.Size;
 using OpenTK.Math;
+using Orion.GameLogic.Skills;
+using Size = System.Drawing.Size;
 
 namespace Orion.GameLogic
 {
@@ -81,6 +78,15 @@ namespace Orion.GameLogic
             get { return size; }
         }
 
+        public bool IsAirborne
+        {
+            get
+            {
+                Move moveSkill = GetSkill<Move>();
+                return moveSkill != null && moveSkill.IsAirborne;
+            }
+        }
+
         public int FoodCost
         {
             get { return foodCost; }
@@ -95,9 +101,9 @@ namespace Orion.GameLogic
             get
             {
                 if (IsBuilding)
-                    return HasSkill<Skills.Train>();
+                    return HasSkill<Train>();
                 else
-                    return HasSkill<BuildSkill>() || HasSkill<Skills.Attack>();
+                    return HasSkill<Skill>() || HasSkill<Attack>();
             }
         }
         #endregion

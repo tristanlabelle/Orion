@@ -22,7 +22,7 @@ namespace Orion.GameLogic
         #region Fields
         private readonly World world;
         private readonly Dictionary<Handle, Entity> entities = new Dictionary<Handle, Entity>();
-        private readonly Entity[,] grid;
+        private readonly EntityGrid grid;
         private readonly EntityZone[,] zones;
         private readonly Func<Handle> uidGenerator;
         private readonly BufferPool<Entity> bufferPool = CreateBufferPool();
@@ -55,11 +55,11 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(uidGenerator, "uidGenerator");
 
             this.world = world;
+            this.grid = new EntityGrid(world.Terrain);
             this.zones = CreateZones(columnCount, rowCount, bufferPool);
-            this.grid = new Entity[world.Size.Width, world.Size.Height];
             this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
-            this.entityMovedEventHandler = OnEntityMovedChanged;
+            this.entityMovedEventHandler = OnEntityMoved;
         }
         #endregion
 
@@ -167,21 +167,25 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(entity, "entity");
             Debug.WriteLine("Entity {0} died.");
             entitiesToRemove.Add(entity);
-            RemoveFromGrid(entity.BoundingRectangle);
+            if (entity.IsSolid) grid.Remove(entity);
         }
 
-        private void OnEntityMovedChanged(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
+        private void OnEntityMoved(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
         {
             Argument.EnsureNotNull(entity, "entity");
 
             if (!entitiesToMove.ContainsKey(entity))
                 entitiesToMove.Add(entity, eventArgs.OldValue);
 
-            Rectangle oldBoundingRectangle = new Rectangle(
-                eventArgs.OldValue.X, eventArgs.OldValue.Y,
-                entity.Size.Width, entity.Size.Height);
-            RemoveFromGrid(oldBoundingRectangle);
-            AddToGrid(entity);
+            if (entity.IsSolid)
+            {
+                Rectangle oldBoundingRectangle = new Rectangle(
+                    eventArgs.OldValue.X, eventArgs.OldValue.Y,
+                    entity.Size.Width, entity.Size.Height);
+
+                grid.Remove(entity, oldBoundingRectangle);
+                grid.Add(entity);
+            }
         }
         #endregion
 
@@ -217,7 +221,7 @@ namespace Orion.GameLogic
             entity.Moved += entityMovedEventHandler;
             entity.Died += entityDiedEventHandler;
 
-            AddToGrid(entity);
+            if (entity.IsSolid) grid.Add(entity);
 
             entitiesToAdd.Add(entity);
         }
@@ -286,59 +290,6 @@ namespace Orion.GameLogic
             zones[zoneCoords.X, zoneCoords.Y].Add(entity);
         }
 
-        #region Grid
-        public Region GetGridRegion(Rectangle rectangle)
-        {
-            rectangle = Rectangle.FromCenterSize(
-                rectangle.CenterX, rectangle.CenterY,
-                rectangle.Width - 0.2f, rectangle.Height - 0.2f);
-
-            int minX = Math.Max(0, (int)rectangle.MinX);
-            int minY = Math.Max(0, (int)rectangle.MinY);
-            int maxX = Math.Min(world.Size.Width - 1, (int)rectangle.MaxX);
-            int maxY = Math.Min(world.Size.Height - 1, (int)rectangle.MaxY);
-
-            return Region.FromMinExclusiveMax(
-                new Point(minX, minY), new Point(maxX + 1, maxY + 1));
-        }
-
-        public Region GetGridRegion(Entity entity)
-        {
-            Argument.EnsureNotNull(entity, "entity");
-            return GetGridRegion(entity.BoundingRectangle);
-        }
-
-        private void AddToGrid(Entity entity)
-        {
-            Region region = GetGridRegion(entity.BoundingRectangle);
-
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
-            {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
-                {
-                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)), "Adding unit to non-walkable tile.");
-                    //Debug.Assert(grid[x, y] == null, "Overwriting {0}.".FormatInvariant(grid[x, y]));
-                    grid[x, y] = entity;
-                }
-            }
-        }
-
-        private void RemoveFromGrid(Rectangle boundingRectangle)
-        {
-            Region region = GetGridRegion(boundingRectangle);
-
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
-            {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
-                {
-                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)));
-                    //Debug.Assert(grid[x, y] != null, "There was no entity to remove.");
-                    grid[x, y] = null;
-                }
-            }
-        }
-        #endregion
-
         private void Remove(Entity entity)
         {
             entities.Remove(entity.Handle);
@@ -367,7 +318,7 @@ namespace Orion.GameLogic
 
         public Entity GetEntityAt(Point point)
         {
-            return grid[point.X, point.Y];
+            return grid[point];
         }
 
         private Point GetClampedZoneCoords(Vector2 position)

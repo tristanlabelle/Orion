@@ -89,6 +89,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region State
+        #region Physical
         public override Size Size
         {
             get { return type.Size; }
@@ -107,6 +108,7 @@ namespace Orion.GameLogic
             get { return angle; }
             set { angle = value; }
         }
+        #endregion
 
         /// <summary>
         /// Gets a circle representing the area of the world that is within
@@ -196,6 +198,15 @@ namespace Orion.GameLogic
             get { return taskQueue.Count == 0; }
         }
         #endregion
+
+        public override bool IsSolid
+        {
+            get
+            {
+                Skills.Move moveSkill = type.GetSkill<Skills.Move>();
+                return moveSkill != null && moveSkill.IsAirborne;
+            }
+        }
 
         /// <summary>
         /// Accesses the rally point of this <see cref="Unit"/>,

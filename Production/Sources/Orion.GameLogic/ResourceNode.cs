@@ -17,13 +17,13 @@ namespace Orion.GameLogic
 
         private readonly ResourceType type;
         private readonly int totalAmount;
-        private readonly Vector2 position;
+        private readonly Point position;
         private int amountRemaining;
         private Unit extractor = null;
         #endregion
 
         #region Constructors
-        internal ResourceNode(World world, Handle handle, ResourceType type, int amount, Vector2 position)
+        internal ResourceNode(World world, Handle handle, ResourceType type, int amount, Point position)
             : base(world, handle)
         {
             Argument.EnsureDefined(type, "type");
@@ -63,6 +63,11 @@ namespace Orion.GameLogic
             get { return position; }
         }
 
+        public override bool IsSolid
+        {
+            get { return type == ResourceType.Aladdium; }
+        }
+
         public Unit Extractor
         {
             get { return extractor; }
@@ -72,7 +77,6 @@ namespace Orion.GameLogic
                 extractor.Died += new GenericEventHandler<Entity>(ExtractorDied);
             }
         }
-
         #endregion
 
         #region Methods

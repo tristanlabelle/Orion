@@ -11,16 +11,16 @@ namespace Orion.GameLogic.Skills
     {
         #region Fields
         private readonly int speed;
-        private readonly bool canFly;
+        private readonly bool isAirborne;
         #endregion
 
         #region Constructors
-        public Move(int speed, bool canFly)
+        public Move(int speed, bool isAirborne)
         {
             Argument.EnsureStrictlyPositive(speed, "speed");
-            Argument.EnsureNotNull(canFly, "canFly");
+            Argument.EnsureNotNull(isAirborne, "isAirborne");
             this.speed = speed;
-            this.canFly = canFly;
+            this.isAirborne = isAirborne;
         }
         #endregion
 
@@ -33,9 +33,12 @@ namespace Orion.GameLogic.Skills
             get { return speed; }
         }
 
-        public bool CanFly
+        /// <summary>
+        /// Gets a value indicating if entities with this skill are airborne.
+        /// </summary>
+        public bool IsAirborne
         {
-            get { return canFly; }
+            get { return isAirborne; }
         }
         #endregion
 
@@ -44,7 +47,7 @@ namespace Orion.GameLogic.Skills
         {
             if (stat == UnitStat.MovementSpeed) return speed;
             if (stat == UnitStat.CanFly)
-                if (canFly) return 1;
+                if (isAirborne) return 1;
                 else return 0;
             return null;
         }

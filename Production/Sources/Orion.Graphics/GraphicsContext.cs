@@ -214,9 +214,9 @@ namespace Orion.Graphics
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
 
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            DrawVertex(rectangle.MinX, rectangle.MaxY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             DrawVertex(rectangle.MaxX, rectangle.MinY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            DrawVertex(rectangle.MinX, rectangle.MaxY);
         }
         #endregion
 
@@ -378,12 +378,12 @@ namespace Orion.Graphics
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MinX, rectangle.MaxY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
             DrawVertex(rectangle.MaxX, rectangle.MinY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MinX, rectangle.MaxY);
             GL.End();
 
             if (texture.PixelFormat.HasAlphaChannel()) GL.Disable(EnableCap.Blend);

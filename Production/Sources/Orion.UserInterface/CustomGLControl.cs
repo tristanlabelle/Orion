@@ -14,6 +14,13 @@ namespace Orion.UserInterface
         public CustomGLControl()
             : base(GetGraphicsMode(), 2, 0, GetGraphicsContextFlags()) { }
 
+        protected override void OnHandleCreated(System.EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+        }
+
         protected override bool IsInputChar(char charCode)
         {
             return true;

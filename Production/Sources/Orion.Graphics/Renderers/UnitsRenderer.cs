@@ -118,8 +118,8 @@ namespace Orion.Graphics
 
                     using (graphics.Transform(new Transform(unit.Position, unit.Angle)))
                     {
-                        graphics.Fill(Rectangle.FromCenterSize(0,0,unit.Size.Width,unit.Size.Height)
-                            , texture,unit.Faction.Color);
+                        graphics.Fill(Rectangle.FromCenterSize(0,0,unit.Size.Width,unit.Size.Height), texture, unit.Faction.Color);
+ 
                     }
 
                     if (DrawHealthBars)

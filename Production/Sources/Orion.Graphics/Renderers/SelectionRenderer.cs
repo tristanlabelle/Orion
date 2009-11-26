@@ -51,6 +51,11 @@ namespace Orion.Graphics
                     unit.BoundingRectangle.Extent.X + 0.15f,
                     unit.BoundingRectangle.Extent.Y + 0.15f);
                 graphics.Stroke(selectionRectangle);
+
+                if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)
+                {
+                    graphics.StrokeLineStrip(unit.Position,unit.RallyPoint.Value);
+                }
             }
         }
 

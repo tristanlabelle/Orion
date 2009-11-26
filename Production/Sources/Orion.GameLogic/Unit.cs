@@ -21,7 +21,7 @@ namespace Orion.GameLogic
         private Vector2 position;
         private float angle;
         private float damage;
-        private Vector2 rallyPoint;
+        private Vector2? rallyPoint;
         #endregion
 
         #region Constructors
@@ -41,11 +41,15 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(type, "type");
             Argument.EnsureNotNull(faction, "faction");
-           
+
             this.type = type;
             this.faction = faction;
             this.position = position;
-            this.rallyPoint = GetDefaultRallyPoint();
+
+            if (type.HasSkill<Skills.Train>())
+            {
+                this.rallyPoint = GetDefaultRallyPoint();
+            }
         }
         #endregion
 
@@ -197,7 +201,7 @@ namespace Orion.GameLogic
         /// Accesses the rally point of this <see cref="Unit"/>,
         /// relative to its position. This is used for buildings.
         /// </summary>
-        public Vector2 RallyPoint
+        public Vector2? RallyPoint
         {
             get { return rallyPoint; }
             set { rallyPoint = value; }

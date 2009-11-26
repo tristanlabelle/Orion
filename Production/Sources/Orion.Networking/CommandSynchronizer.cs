@@ -63,7 +63,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<IPv4EndPoint> peerEndPoints)
+        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<IPv4EndPoint> receivers)
         {
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(transporter, "transporter");

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandReceiver.cs" />
     <Compile Include="GameMessageType.cs" />
     <Compile Include="Protocol.cs" />
     <Compile Include="PeerLink.cs" />

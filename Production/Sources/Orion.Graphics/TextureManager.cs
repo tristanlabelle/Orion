@@ -33,7 +33,7 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(directoryPath, "directoryPath");
             directory = new DirectoryInfo(directoryPath);
-            Debug.Assert(directory.Exists);
+            Debug.Assert(directory.Exists, "The textures directory {0} does not exist.");
             defaulTexture =  GetTexture("Default") ;
         }
         #endregion
@@ -62,7 +62,7 @@ namespace Orion.Graphics
                 textures.Add(name, texture);
                 return texture;
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 textures.Add(name, null);
                 return defaulTexture;

@@ -206,17 +206,17 @@ namespace Orion.GameLogic
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>
         /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
-        /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
+        /// <param name="point">The initial position of the <see cref="Unit"/>.</param>
         /// <returns>The newly created <see cref="Unit"/>.</returns>
-        public Unit CreateUnit(UnitType type, Vector2 position)
+        public Unit CreateUnit(UnitType type, Point point)
         {
-            Unit unit = world.Entities.CreateUnit(type, this, position);
+            Unit unit = world.Entities.CreateUnit(type, this, point);
 
             if (type.HasSkill<Skills.ExtractAlagene>())
             {
                 ResourceNode alageneNode = World.Entities
                                 .OfType<ResourceNode>()
-                                .First(node => node.Position == position
+                                .First(node => node.Position == point
                                 && node.Type == ResourceType.Alagene);
 
                 alageneNode.Extractor = unit;

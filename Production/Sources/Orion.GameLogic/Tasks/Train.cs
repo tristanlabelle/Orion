@@ -55,7 +55,7 @@ namespace Orion.GameLogic.Tasks
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, trainer.Position);
+                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, (Point)trainer.Position);
                 unitCreated.Task = new Move(unitCreated, trainer.RallyPoint.Value);
                 hasEnded = true;
             }

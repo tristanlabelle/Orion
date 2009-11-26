@@ -46,10 +46,11 @@ namespace Orion.Graphics
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
+                Rectangle unitBoundingRectangle = unit.BoundingRectangle;
                 Rectangle selectionRectangle = Rectangle.FromCenterExtent(
-                    unit.Position.X, unit.Position.Y,
-                    unit.BoundingRectangle.Extent.X + 0.15f,
-                    unit.BoundingRectangle.Extent.Y + 0.15f);
+                    unitBoundingRectangle.CenterX, unitBoundingRectangle.CenterY,
+                    unitBoundingRectangle.Extent.X + 0.15f,
+                    unitBoundingRectangle.Extent.Y + 0.15f);
                 graphics.Stroke(selectionRectangle);
 
                 if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)

@@ -237,38 +237,40 @@ namespace Orion.Commandment
         {
             for (int i = 0; i < 25; i++)
             {
-                Vector2 position;
+                Point location;
                 do
                 {
-                    position = new Vector2(
-                        ResourceNode.DefaultSize.Width / 2.0f + (float)random.NextDouble() * (world.Size.Width - ResourceNode.DefaultSize.Width),
-                        ResourceNode.DefaultSize.Height / 2.0f + (float)random.NextDouble() * (world.Size.Height - ResourceNode.DefaultSize.Height));
-                } while (!world.Terrain.IsWalkable((Point)position));
+                    location = new Point(
+                        random.Next(world.Size.Width - ResourceNode.DefaultSize.Width),
+                        random.Next(world.Size.Height - ResourceNode.DefaultSize.Height));
+                } while (!world.Terrain.IsWalkable(location));
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.Entities.CreateResourceNode(resourceType, position);
+                ResourceNode node = world.Entities.CreateResourceNode(resourceType, location);
             }
         }
 
         private void CreateCampUnits(Faction faction, Vector2 campCenter)
         {
-            faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), campCenter);
+            faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
             for (int i = 1; i <= 2; i++)
             {
-                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 0));
+                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"),
+                    (Point)(campCenter + new Vector2(i * campSize / 8f, 0)));
             }
             for (int i = 1; i <= 2; i++)
             {
-                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"), campCenter + new Vector2(i * campSize / 8f, 1));
+                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"),
+                    (Point)(campCenter + new Vector2(i * campSize / 8f, 1)));
             }
         }
 
         private void CreateCampResourceNodes(Vector2 campCenter)
         {
             world.Entities.CreateResourceNode(ResourceType.Aladdium,
-                campCenter + new Vector2(campSize / -4f, campSize / -4f));
+                (Point)(campCenter + new Vector2(campSize / -4f, campSize / -4f)));
 
             world.Entities.CreateResourceNode(ResourceType.Alagene,
-                campCenter + new Vector2(campSize / -4f, campSize / 4f));
+                (Point)(campCenter + new Vector2(campSize / -4f, campSize / 4f)));
         }
         #endregion
         #endregion

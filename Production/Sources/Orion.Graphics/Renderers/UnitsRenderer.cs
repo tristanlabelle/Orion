@@ -38,7 +38,6 @@ namespace Orion.Graphics
 
         #region Fields
         private readonly World world;
-        private readonly Texture defaultTexture;
         private bool drawHealthBars;
         private FogOfWar fogOfWar;
         private TextureManager textureManager = new TextureManager(@"../../../Assets");
@@ -65,11 +64,8 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        
-
         public Texture GetTypeTexture(UnitType type)
         {
-
             return textureManager.GetTexture(type.Name) ;
         }
 
@@ -116,10 +112,10 @@ namespace Orion.Graphics
                     if (unit.Faction == null) graphics.FillColor = Color.White;
                     else graphics.FillColor = unit.Faction.Color;
 
-                    using (graphics.Transform(new Transform(unit.Position, unit.Angle)))
+                    Rectangle unitBoundingRectangle = unit.BoundingRectangle;
+                    using (graphics.Transform(new Transform(unitBoundingRectangle.Center, unit.Angle)))
                     {
-                        graphics.Fill(Rectangle.FromCenterSize(0,0,unit.Size.Width,unit.Size.Height), texture, unit.Faction.Color);
- 
+                        graphics.Fill(Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height), texture, unit.Faction.Color);
                     }
 
                     if (DrawHealthBars)
@@ -133,8 +129,9 @@ namespace Orion.Graphics
         public void DrawHealthBar(GraphicsContext context, Unit unit)
         {
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            float y = unit.Position.Y + unit.BoundingRectangle.Height * 0.75f;
-            float x = unit.Position.X - healthbarWidth / 2f;
+            Rectangle unitBoundingRectangle = unit.BoundingRectangle;
+            float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
+            float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
 
             if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {

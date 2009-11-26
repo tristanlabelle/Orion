@@ -116,7 +116,7 @@ namespace Orion.GameLogic.Pathfinding
             PathNode currentNode = destinationNode;
             while (currentNode != null)
             {
-                points.Add(currentNode.Point + new Vector2(0.5f, 0.5f));
+                points.Add(currentNode.Point);
                 currentNode = currentNode.Source;
             }
 

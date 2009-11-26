@@ -38,9 +38,9 @@ namespace Orion.Commandment
                 GenerateCommand(new Attack(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
         }
 
-        public void LaunchBuild(Unit builder, UnitType buildingType, Vector2 buildingPosition)
+        public void LaunchBuild(Unit builder, UnitType buildingType, Point point)
         {
-            GenerateCommand(new Build(Faction.Handle, builder.Handle, buildingType.Handle, buildingPosition));
+            GenerateCommand(new Build(Faction.Handle, builder.Handle, buildingType.Handle, point));
         }
 
         public void LaunchHarvest(IEnumerable<Unit> units, ResourceNode node)

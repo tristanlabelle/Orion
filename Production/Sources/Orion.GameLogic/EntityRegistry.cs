@@ -22,6 +22,7 @@ namespace Orion.GameLogic
         #region Fields
         private readonly World world;
         private readonly Dictionary<Handle, Entity> entities = new Dictionary<Handle, Entity>();
+        private readonly Entity[,] grid;
         private readonly EntityZone[,] zones;
         private readonly Func<Handle> uidGenerator;
         private readonly BufferPool<Entity> bufferPool = CreateBufferPool();
@@ -55,6 +56,7 @@ namespace Orion.GameLogic
 
             this.world = world;
             this.zones = CreateZones(columnCount, rowCount, bufferPool);
+            this.grid = new Entity[world.Size.Width, world.Size.Height];
             this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
             this.entityMovedEventHandler = OnEntityMovedChanged;
@@ -66,6 +68,12 @@ namespace Orion.GameLogic
         /// Raised when an entity dies.
         /// </summary>
         public event GenericEventHandler<EntityRegistry, Entity> Died;
+
+        private void OnDied(Entity entity)
+        {
+            GenericEventHandler<EntityRegistry, Entity> handler = Died;
+            if (handler != null) handler(this, entity);
+        }
         #endregion
 
         #region Properties
@@ -159,6 +167,7 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(entity, "entity");
             Trace.WriteLine("{0} died.");
             entitiesToRemove.Add(entity);
+            RemoveFromGrid(entity.BoundingRectangle);
         }
 
         private void OnEntityMovedChanged(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
@@ -167,6 +176,12 @@ namespace Orion.GameLogic
 
             if (!entitiesToMove.ContainsKey(entity))
                 entitiesToMove.Add(entity, eventArgs.OldValue);
+
+            Rectangle oldBoundingRectangle = new Rectangle(
+                eventArgs.OldValue.X, eventArgs.OldValue.Y,
+                entity.Size.Width, entity.Size.Height);
+            RemoveFromGrid(oldBoundingRectangle);
+            AddToGrid(entity);
         }
         #endregion
 
@@ -177,23 +192,23 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
         /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
-        /// <param name="position">The initial positino of the <see cref="Unit"/> to be created.</param>
+        /// <param name="point">The initial position of the <see cref="Unit"/> to be created.</param>
         /// <returns>The newly created <see cref="Entity"/>.</returns>
-        internal Unit CreateUnit(UnitType type, Faction faction, Vector2 position)
+        internal Unit CreateUnit(UnitType type, Faction faction, Point point)
         {
             Handle uid = uidGenerator();
-            Unit unit = new Unit(uid, type, faction, position);
+            Unit unit = new Unit(uid, type, faction, point);
             InitializeEntity(unit);
-            Trace.WriteLine("Created unit: {0} at {1}.".FormatInvariant(unit, position));
+            Trace.WriteLine("Created unit: {0} at {1}.".FormatInvariant(unit, point));
             return unit;
         }
 
-        public ResourceNode CreateResourceNode(ResourceType type, Vector2 position)
+        public ResourceNode CreateResourceNode(ResourceType type, Point point)
         {
             Handle uid = uidGenerator();
-            ResourceNode node = new ResourceNode(world, uid, type, ResourceNode.DefaultTotalAmount, position);
+            ResourceNode node = new ResourceNode(world, uid, type, ResourceNode.DefaultTotalAmount, point);
             InitializeEntity(node);
-            Trace.WriteLine("Created resource node: {0} at {1}.".FormatInvariant(node, position));
+            Trace.WriteLine("Created resource node: {0} at {1}.".FormatInvariant(node, point));
             return node;
         }
 
@@ -201,6 +216,8 @@ namespace Orion.GameLogic
         {
             entity.Moved += entityMovedEventHandler;
             entity.Died += entityDiedEventHandler;
+
+            AddToGrid(entity);
 
             entitiesToAdd.Add(entity);
         }
@@ -269,15 +286,64 @@ namespace Orion.GameLogic
             zones[zoneCoords.X, zoneCoords.Y].Add(entity);
         }
 
+        #region Grid
+        public Region GetGridRegion(Rectangle rectangle)
+        {
+            rectangle = Rectangle.FromCenterSize(
+                rectangle.CenterX, rectangle.CenterY,
+                rectangle.Width - 0.2f, rectangle.Height - 0.2f);
+
+            int minX = Math.Max(0, (int)rectangle.MinX);
+            int minY = Math.Max(0, (int)rectangle.MinY);
+            int maxX = Math.Min(world.Size.Width - 1, (int)rectangle.MaxX);
+            int maxY = Math.Min(world.Size.Height - 1, (int)rectangle.MaxY);
+
+            return Region.FromMinExclusiveMax(
+                new Point(minX, minY), new Point(maxX + 1, maxY + 1));
+        }
+
+        public Region GetGridRegion(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+            return GetGridRegion(entity.BoundingRectangle);
+        }
+
+        private void AddToGrid(Entity entity)
+        {
+            Region region = GetGridRegion(entity.BoundingRectangle);
+
+            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            {
+                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                {
+                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)), "Adding unit to non-walkable tile.");
+                    //Debug.Assert(grid[x, y] == null, "Overwriting {0}.".FormatInvariant(grid[x, y]));
+                    grid[x, y] = entity;
+                }
+            }
+        }
+
+        private void RemoveFromGrid(Rectangle boundingRectangle)
+        {
+            Region region = GetGridRegion(boundingRectangle);
+
+            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            {
+                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                {
+                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)));
+                    //Debug.Assert(grid[x, y] != null, "There was no entity to remove.");
+                    grid[x, y] = null;
+                }
+            }
+        }
+        #endregion
+
         private void Remove(Entity entity)
         {
             entities.Remove(entity.Handle);
             RemoveFromZone(entity);
-            GenericEventHandler<EntityRegistry, Entity> handler = Died;
-            if (handler != null)
-            {
-                handler(this, entity);
-            }
+            OnDied(entity);
         }
 
         private void RemoveFromZone(Entity entity)
@@ -298,6 +364,11 @@ namespace Orion.GameLogic
             }
         }
         #endregion
+
+        public Entity GetEntityAt(Point point)
+        {
+            return grid[point.X, point.Y];
+        }
 
         private Point GetClampedZoneCoords(Vector2 position)
         {

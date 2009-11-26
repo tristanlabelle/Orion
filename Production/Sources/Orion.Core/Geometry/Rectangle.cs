@@ -517,7 +517,7 @@ namespace Orion.Geometry
         }
         #endregion
 
-        #region FromCenterExtent
+        #region FromCenterSize
         public static Rectangle FromCenterSize(float centerX, float centerY, float width, float height)
         {
             return new Rectangle(centerX - width * 0.5f, centerY - height * 0.5f, width, height);

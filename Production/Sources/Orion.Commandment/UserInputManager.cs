@@ -168,13 +168,10 @@ namespace Orion.Commandment
             if (selectionStart.HasValue) selectionEnd = args.Position;
             else
             {
-                int x = (int)args.X;
-                int y = (int)args.Y;
-                Rectangle gridPosition = Rectangle.FromCenterSize(x, y, 10, 10);
+                Vector2 point = new Vector2(args.X, args.Y);
                 SelectionManager.HoveredUnit = Faction.World.Entities
-                    .InArea(gridPosition)
                     .OfType<Unit>()
-                    .FirstOrDefault(unit => unit.BoundingRectangle.ContainsPoint(gridPosition.Center));
+                    .FirstOrDefault(unit => unit.BoundingRectangle.ContainsPoint(point));
             }
         }
 
@@ -305,7 +302,7 @@ namespace Orion.Commandment
 
             if (builder != null)
             {
-                commander.LaunchBuild(builder, unitTypeToBuild, destination);
+                commander.LaunchBuild(builder, unitTypeToBuild, (Point)destination);
                 commander.LaunchMove(movableUnits.Where(unit => unit != builder), destination);
             }
         }

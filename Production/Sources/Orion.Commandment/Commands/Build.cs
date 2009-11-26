@@ -15,17 +15,17 @@ namespace Orion.Commandment.Commands
     {
         #region Fields
         private readonly Handle builderHandle;
-        private readonly Vector2 position;
         private readonly Handle buildingTypeHandle;
+        private readonly Point location;
         #endregion
 
         #region Constructors
-        public Build(Handle factionHandle, Handle builderHandle, Handle buildingTypeHandle, Vector2 position)
+        public Build(Handle factionHandle, Handle builderHandle, Handle buildingTypeHandle, Point location)
             : base(factionHandle)
         {
             this.builderHandle = builderHandle;
             this.buildingTypeHandle = buildingTypeHandle;
-            this.position = position;
+            this.location = location;
         }
         #endregion
 
@@ -52,13 +52,13 @@ namespace Orion.Commandment.Commands
 
             Unit builder = (Unit)match.World.Entities.FromHandle(builderHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
-            builder.Task = new BuildTask(builder, buildingType, position);
+            builder.Task = new BuildTask(builder, buildingType, location);
         }
 
         public override string ToString()
         {
             return "Faction {0} builds {1} with {2} at {3}"
-                .FormatInvariant(FactionHandle, buildingTypeHandle, builderHandle, position);
+                .FormatInvariant(FactionHandle, buildingTypeHandle, builderHandle, location);
         }
 
         #region Serialization
@@ -67,8 +67,8 @@ namespace Orion.Commandment.Commands
             WriteHandle(writer, FactionHandle);
             WriteHandle(writer, builderHandle);
             WriteHandle(writer, buildingTypeHandle);
-            writer.Write(position.X);
-            writer.Write(position.Y);
+            writer.Write((short)location.X);
+            writer.Write((short)location.Y);
         }
 
         public static Build DeserializeSpecific(BinaryReader reader)
@@ -78,10 +78,10 @@ namespace Orion.Commandment.Commands
             Handle factionHandle = ReadHandle(reader);
             Handle builderHandle = ReadHandle(reader);
             Handle buildingTypeHandle = ReadHandle(reader);
-            float x = reader.ReadSingle();
-            float y = reader.ReadSingle();
-            Vector2 position = new Vector2(x, y);
-            return new Build(factionHandle, builderHandle, buildingTypeHandle, position);
+            short x = reader.ReadInt16();
+            short y = reader.ReadInt16();
+            Point location = new Point(x, y);
+            return new Build(factionHandle, builderHandle, buildingTypeHandle, location);
         }
         #endregion
         #endregion

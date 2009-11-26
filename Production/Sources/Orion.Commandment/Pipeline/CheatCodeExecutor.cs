@@ -97,7 +97,7 @@ namespace Orion.Commandment.Pipeline
         private static void SpawnHeroUnit(Match match, Faction faction)
         { 
             UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
-            faction.CreateUnit(heroUnitType, match.World.Bounds.Center);
+            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
         }
 
         private static void AccelerateUnitDevelopment(Match match, Faction faction)

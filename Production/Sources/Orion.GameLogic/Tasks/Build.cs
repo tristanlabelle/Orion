@@ -14,7 +14,7 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit builder;
         private readonly UnitType buildingType;
-        private readonly Vector2 buildPosition;
+        private readonly Point location;
         private Move move;
         private float heathPointsBuilt = 0;
         private bool hasBegunBuilding = false;
@@ -22,7 +22,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-        public Build(Unit builder, UnitType buildingType, Vector2 buildPosition)
+        public Build(Unit builder, UnitType buildingType, Point location)
         {
             Argument.EnsureNotNull(builder, "builder");
             if (!builder.HasSkill<Skills.Build>())
@@ -31,22 +31,22 @@ namespace Orion.GameLogic.Tasks
 
             this.builder = builder;
             this.buildingType = buildingType;
-            this.buildPosition = buildPosition;
-            this.move = new Move(builder, this.buildPosition);
+            this.location = location;
+            this.move = new Move(builder, location);
 
             if (buildingType.HasSkill<Skills.ExtractAlagene>())
             {
                 ResourceNode alageneNode = builder.World.Entities
                             .OfType<ResourceNode>()
-                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(buildPosition)
+                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(location)
                             && node.Type == ResourceType.Alagene);
 
                 bool extractorAlreadyThere = builder.World.Entities
                     .OfType<Unit>()
-                    .Any(unit => unit.BoundingRectangle.ContainsPoint(buildPosition));
+                    .Any(unit => unit.BoundingRectangle.ContainsPoint(location));
 
                 if (!extractorAlreadyThere && alageneNode != null)
-                    buildPosition = alageneNode.Position;
+                    location = (Point)alageneNode.Position;
                 else
                     hasEnded = true;
             }
@@ -75,7 +75,7 @@ namespace Orion.GameLogic.Tasks
                 move.Update(timeDelta);
                 return;
             }
-            else if ((builder.Position - buildPosition).Length > 1)
+            else if ((builder.Position - (Vector2)location).Length > 1)
             {
                 hasEnded = true;
                 return;
@@ -108,7 +108,7 @@ namespace Orion.GameLogic.Tasks
                 heathPointsBuilt += buildingSpeed * timeDelta;
                 if (heathPointsBuilt >= maxHealth)
                 {
-                    builder.Faction.CreateUnit(buildingType, buildPosition);
+                    builder.Faction.CreateUnit(buildingType, location);
                     hasEnded = true;
                 }
             }

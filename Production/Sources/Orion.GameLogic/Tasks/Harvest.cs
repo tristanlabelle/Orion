@@ -106,6 +106,7 @@ namespace Orion.GameLogic.Tasks
             {
                 if (amountCarrying >= maxCarryingAmount || amountCarrying >= node.AmountRemaining)
                 {
+                    node.Harvest(amountCarrying);
                     if (commandCenter != null)
                         commandCenter.Died -= commandCenterDestroyedEventHandler;
 

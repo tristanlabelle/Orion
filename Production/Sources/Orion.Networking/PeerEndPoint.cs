@@ -120,13 +120,14 @@ namespace Orion.Networking
                 OnLeaveGame();
             else
             {
-                int commandFrame = BitConverter.ToInt32(args.Data, 1);
                 if (args.Data[0] == (byte)GameMessageType.Commands)
                 {
+                    int commandFrame = BitConverter.ToInt32(args.Data, 1);
                     availableCommands[commandFrame] = DeserializeCommandDatagram(args.Data, 1 + sizeof(int));
                 }
                 else if (args.Data[0] == (byte)GameMessageType.Done)
                 {
+                    int commandFrame = BitConverter.ToInt32(args.Data, 1);
                     int updates = BitConverter.ToInt32(args.Data, 1 + sizeof(int));
                     updatesForDone[commandFrame] = updates;
                 }

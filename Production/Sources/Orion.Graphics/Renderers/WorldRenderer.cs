@@ -27,14 +27,14 @@ namespace Orion.Graphics
         /// Initializes a new <see cref="WorldRenderer"/> from the <see cref="World"/> it is going to render.
         /// </summary>
         /// <param name="world">The <see cref="World"/> to be rendered.</param>
-        public WorldRenderer(World world, FogOfWar fogOfWar)
+        public WorldRenderer(World world, Faction faction)
         {
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
-            this.unitRenderer = new UnitsRenderer(world, fogOfWar);
-            this.fogOfWarRenderer = new FogOfWarRenderer(fogOfWar);
+            this.unitRenderer = new UnitsRenderer(world, faction);
+            this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
         #endregion
 

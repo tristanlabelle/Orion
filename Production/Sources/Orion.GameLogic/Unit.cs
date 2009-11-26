@@ -25,6 +25,7 @@ namespace Orion.GameLogic
         private Vector2? rallyPoint;
         private float totalHealthReceived;
         private bool underConstruction;
+        private float timeSinceLastHitInSeconds = 0;
         #endregion
 
         #region Constructors
@@ -233,6 +234,16 @@ namespace Orion.GameLogic
             {
                 Skills.Move moveSkill = type.GetSkill<Skills.Move>();
                 return moveSkill != null && moveSkill.IsAirborne;
+            }
+        }
+
+        public float TimeSinceLastHitInSeconds
+        {
+            get { return timeSinceLastHitInSeconds; }
+            set
+            {
+                Argument.EnsureNotNull(value, "timeSinceLastHitInSeconds");
+                timeSinceLastHitInSeconds = value;
             }
         }
 

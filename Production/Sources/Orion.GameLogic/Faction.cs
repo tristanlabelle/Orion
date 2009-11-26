@@ -286,7 +286,7 @@ namespace Orion.GameLogic
             Unit unit = (Unit)entity;
             fogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
-            if (unit.Type.HasSkill<Skills.StoreResources>())
+            if (unit.Type.HasSkill<Skills.StoreFood>())
                 totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             unit.Died -= entityDiedEventHandler;
 
@@ -352,9 +352,24 @@ namespace Orion.GameLogic
         {
             if (!world.IsWithinBounds(point))
                 return false;
-            if (fogOfWar.GetTileVisibility(point) == TileVisibility.Undiscovered)
+            if (this.GetTileVisibility(point) == TileVisibility.Undiscovered)
                 return true;
             return world.Terrain.IsWalkable(point);
+        }
+
+        public TileVisibility GetTileVisibility(Point point)
+        {
+            TileVisibility visibility = fogOfWar.GetTileVisibility(point);
+            if (visibility == TileVisibility.Visible)
+                return TileVisibility.Visible;
+            foreach (Faction faction in allies)
+            {
+                if (faction.fogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
+                    return TileVisibility.Visible;
+                else if (faction.fogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
+                    visibility = TileVisibility.Discovered;
+            }
+            return visibility;
         }
         #endregion
     }

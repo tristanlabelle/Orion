@@ -15,7 +15,6 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit target;
         private readonly Follow follow;
         private float hitDelayInSeconds;
-        private float timeSinceLastHitInSeconds = 0;
         #endregion
 
         #region Constructors
@@ -30,7 +29,6 @@ namespace Orion.GameLogic.Tasks
             this.target = target;
             if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target);
             hitDelayInSeconds = attacker.GetStat(UnitStat.AttackDelay);
-            timeSinceLastHitInSeconds = hitDelayInSeconds;
         }
         #endregion
 
@@ -79,11 +77,11 @@ namespace Orion.GameLogic.Tasks
 
             if (IsTargetInRange)
             {
-                timeSinceLastHitInSeconds += timeDelta;
-                if (timeSinceLastHitInSeconds > hitDelayInSeconds)
+                attacker.TimeSinceLastHitInSeconds += timeDelta;
+                if (attacker.TimeSinceLastHitInSeconds > hitDelayInSeconds)
                 {
                     target.Damage += attacker.GetStat(UnitStat.AttackPower);
-                    timeSinceLastHitInSeconds = 0;
+                    attacker.TimeSinceLastHitInSeconds = 0;
                 }
             }
             else if (follow != null)

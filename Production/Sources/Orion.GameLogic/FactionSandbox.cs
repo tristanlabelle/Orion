@@ -162,7 +162,7 @@ namespace Orion.GameLogic
             {
                 return faction.World.Entities
                     .OfType<Unit>()
-                    .Where(unit => faction.FogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+                    .Where(unit => faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
                     .Select(unit => unit.Handle);
             }
         }
@@ -177,7 +177,7 @@ namespace Orion.GameLogic
             {
                 return faction.World.Entities
                     .OfType<ResourceNode>()
-                    .Where(node => faction.FogOfWar.GetTileVisibility((Point)node.Position) == TileVisibility.Visible)
+                    .Where(node => faction.GetTileVisibility((Point)node.Position) == TileVisibility.Visible)
                     .Select(node => node.Handle);
             }
         }
@@ -189,7 +189,7 @@ namespace Orion.GameLogic
         #region Terrain
         public bool? IsTerrainWalkable(Point point)
         {
-            if (faction.FogOfWar.GetTileVisibility(point) == TileVisibility.Undiscovered)
+            if (faction.GetTileVisibility(point) == TileVisibility.Undiscovered)
                 return null;
             return faction.World.Terrain.IsWalkableAndWithinBounds(point);
         }
@@ -198,7 +198,7 @@ namespace Orion.GameLogic
         #region Sandboxed Faction Getters
         public TileVisibility GetTileVisibility(Point point)
         {
-            return faction.FogOfWar.GetTileVisibility(point);
+            return faction.GetTileVisibility(point);
         }
 
         public DiplomaticStance GetDiplomaticStanceWith(Handle otherFaction)
@@ -281,7 +281,7 @@ namespace Orion.GameLogic
         {
             Entity entity = faction.World.Entities.FromHandle(handle);
             if (entity == null) return null;
-            if (faction.FogOfWar.GetTileVisibility((Point)entity.Position) != TileVisibility.Visible)
+            if (faction.GetTileVisibility((Point)entity.Position) != TileVisibility.Visible)
                 return null;
             return entity;
         }

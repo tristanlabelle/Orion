@@ -50,7 +50,7 @@ namespace Orion.Graphics
 
             inputManager = manager;
             selectionRenderer = new SelectionRenderer(inputManager);
-            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction.FogOfWar);
+            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction);
             minimap = new Minimap(worldRenderer);
         }
 

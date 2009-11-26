@@ -39,17 +39,17 @@ namespace Orion.Graphics
         #region Fields
         private readonly World world;
         private bool drawHealthBars;
-        private FogOfWar fogOfWar;
+        private Faction faction;
         private TextureManager textureManager = new TextureManager(@"../../../Assets");
         #endregion
 
         #region Constructors
-        public UnitsRenderer(World world, FogOfWar fogOfWar)
+        public UnitsRenderer(World world, Faction faction)
         {
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
-            this.fogOfWar = fogOfWar;
+            this.faction = faction;
            
             
         }
@@ -86,7 +86,7 @@ namespace Orion.Graphics
             Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = fogOfWar.GetTileVisibility((Point)unit.Position);
+                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
                 if (tileVisibility == TileVisibility.Visible)
                 {
                     context.FillColor = unit.Faction.Color;
@@ -99,7 +99,7 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = fogOfWar.GetTileVisibility((Point)unit.Position);
+                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
                 if (tileVisibility == TileVisibility.Visible)
                 {
                     string unitTypeName = unit.Type.Name;
@@ -133,7 +133,7 @@ namespace Orion.Graphics
             float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
 
-            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 DrawHealthBar(context, unit, new Vector2(x, y));
             }
@@ -144,7 +144,7 @@ namespace Orion.Graphics
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
             float leftHealthWidth = unit.Health * 0.1f;
 
-            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
             }
@@ -155,7 +155,7 @@ namespace Orion.Graphics
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            if (fogOfWar.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
             {
                 if (unit.Health > unit.MaxHealth / 2)
                 {

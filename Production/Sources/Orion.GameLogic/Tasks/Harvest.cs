@@ -32,6 +32,7 @@ namespace Orion.GameLogic.Tasks
         private Unit commandCenter;
         private Mode mode = Mode.Extracting;
         private bool hasEnded;
+        private bool nodeIsDead = false;
         #endregion
 
         #region Constructors
@@ -46,7 +47,10 @@ namespace Orion.GameLogic.Tasks
             this.node = node;
             this.commandCenterDestroyedEventHandler = OnCommandCenterDestroyed;
             this.move = new Move(harvester, node.Position);
+            node.Died += new GenericEventHandler<Entity>(nodeDied);
+            commandCenter = FindClosestCommandCenter();
         }
+
         #endregion
 
         #region Properties
@@ -79,14 +83,20 @@ namespace Orion.GameLogic.Tasks
                 {
                     if (VisitingCommandCenterIsOver(timeDelta))
                     {
-                        move = new Move(harvester, node.Position);
-                        mode = Mode.Extracting;
                         //adds the resources to the unit's faction
                         if (node.Type == ResourceType.Aladdium)
                             harvester.Faction.AladdiumAmount += amountCarrying;
                         else if (node.Type == ResourceType.Alagene)
                             harvester.Faction.AlageneAmount += amountCarrying;
                         amountCarrying = 0;
+
+                        if (nodeIsDead)
+                        {
+                            hasEnded = true;
+                            return;
+                        }
+                        move = new Move(harvester, node.Position);
+                        mode = Mode.Extracting;
                     }
                 }
             }
@@ -104,9 +114,21 @@ namespace Orion.GameLogic.Tasks
             int maxCarryingAmount = harvester.GetSkill<Skills.Harvest>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
             {
-                if (amountCarrying >= maxCarryingAmount || amountCarrying >= node.AmountRemaining)
+                if (nodeIsDead)
                 {
-                    node.Harvest(amountCarrying);
+                    commandCenter.Died += commandCenterDestroyedEventHandler;
+                    move = new Move(harvester, commandCenter.Position);
+                    mode = Mode.Delivering;
+                    return;
+                }
+                if (node.AmountRemaining > 0)
+                {
+                    node.Harvest(1);
+                    --amountAccumulator;
+                    ++amountCarrying;
+                }
+                if (amountCarrying >= maxCarryingAmount)
+                {
                     if (commandCenter != null)
                         commandCenter.Died -= commandCenterDestroyedEventHandler;
 
@@ -123,9 +145,6 @@ namespace Orion.GameLogic.Tasks
                     }
                     return;
                 }
-                
-                --amountAccumulator;
-                ++amountCarrying;
             }
         }
 
@@ -162,6 +181,11 @@ namespace Orion.GameLogic.Tasks
                 secondsGivingResource += timeDelta;
                 return false;
             }
+        }
+
+        void nodeDied(Entity sender)
+        {
+            nodeIsDead = true;
         }
         #endregion
         #endregion

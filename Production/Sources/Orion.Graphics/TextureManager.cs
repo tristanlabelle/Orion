@@ -19,6 +19,8 @@ namespace Orion.Graphics
         private readonly DirectoryInfo directory;
         private readonly Dictionary<string, Texture> textures
             = new Dictionary<string, Texture>();
+
+        private readonly Texture defaulTexture;
         #endregion
 
         #region Constructors
@@ -32,6 +34,7 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(directoryPath, "directoryPath");
             directory = new DirectoryInfo(directoryPath);
             Debug.Assert(directory.Exists);
+            defaulTexture =  GetTexture("Default") ;
         }
         #endregion
 
@@ -42,10 +45,28 @@ namespace Orion.Graphics
 
             Texture texture;
             if (textures.TryGetValue(name, out texture))
-                return texture;
+            {
+                return texture ?? defaulTexture;
+            }
 
             string filePath = GetPath(name);
-            return Texture.FromFile(filePath, true, false);
+
+            if (filePath == null)
+            {
+                textures.Add(name, null);
+                return defaulTexture;
+            }
+            try
+            {
+                texture =  Texture.FromFile(filePath, true, false);
+                textures.Add(name, texture);
+                return texture;
+            }
+            catch (IOException e)
+            {
+                textures.Add(name, null);
+                return defaulTexture;
+            }
         }
 
         public void Dispose()
@@ -58,7 +79,7 @@ namespace Orion.Graphics
         private string GetPath(string name)
         {
             FileInfo[] candidateFiles = directory.GetFiles(name + ".*", SearchOption.TopDirectoryOnly);
-            if (candidateFiles.Length == 0) throw new IOException("Failed to find a texture named '{0}'.".FormatInvariant(name));
+            if (candidateFiles.Length == 0) return null;
             if (candidateFiles.Length > 1) Debug.Fail("Multiple textures named '{0}' found.".FormatInvariant(name));
             return candidateFiles[0].FullName;
         }

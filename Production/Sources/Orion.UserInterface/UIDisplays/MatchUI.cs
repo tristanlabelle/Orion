@@ -424,7 +424,7 @@ namespace Orion.UserInterface
         {
             if (button.Renderer is UnitButtonRenderer)
             {
-                Unit unit = (button.Renderer as UnitButtonRenderer).Unit;
+                Unit unit = (button.Renderer as UnitButtonRenderer).unit;
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
                 if (unit.Type == SelectedType || selectedUnits.Count() == 1)
                 {
@@ -437,7 +437,7 @@ namespace Orion.UserInterface
                     foreach (Button unitButton in selectionFrame.Children)
                     {
                         UnitButtonRenderer renderer = unitButton.Renderer as UnitButtonRenderer;
-                        renderer.HasFocus = renderer.Unit.Type == SelectedType;
+                        renderer.HasFocus = renderer.unit.Type == SelectedType;
                     }
                 }
             }

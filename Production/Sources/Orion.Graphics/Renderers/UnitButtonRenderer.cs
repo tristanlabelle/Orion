@@ -9,14 +9,14 @@ namespace Orion.Graphics
     {
         private readonly UnitsRenderer renderer;
         private bool hasFocus;
-        public readonly LinePath Shape;
-        public readonly Unit Unit;
+        public readonly Texture texture;
+        public readonly Unit unit;
 
         public UnitButtonRenderer(UnitsRenderer unitRenderer, Unit unit)
         {
             renderer = unitRenderer;
-            Shape = unitRenderer.GetTypeShape(unit.Type);
-            Unit = unit;
+            texture = unitRenderer.GetTypeTexture(unit.Type);
+            this.unit = unit;
             StrokeColor = unit.Faction.Color;
         }
 
@@ -35,15 +35,17 @@ namespace Orion.Graphics
 
             context.StrokeColor = StrokeColor;
 
-            float x = context.CoordinateSystem.Width / 2;
-            float y = context.CoordinateSystem.Height / 3 * 2;
-            context.Stroke(Shape, new Vector2(x, y));
+            float width = context.CoordinateSystem.Width/ 4 *3;
+            float height = context.CoordinateSystem.Width /2;
+            float x =  context.CoordinateSystem.Width / 8;
+            float y = context.CoordinateSystem.Width / 2;
+            context.Fill(new Rectangle(x,y , width, height), texture, unit.Faction.Color);
 
-            float healthRatio = Unit.Health / Unit.MaxHealth;
+            float healthRatio = unit.Health / unit.MaxHealth;
             float yHealth = context.CoordinateSystem.Height / 4;
             Vector2 start = new Vector2(context.CoordinateSystem.Width / 5, yHealth - 0.25f);
             Vector2 end = new Vector2(context.CoordinateSystem.Width / 5 * 4, yHealth + 0.25f);
-            renderer.DrawHealthBar(context, Unit, new Rectangle(start, end - start));
+            renderer.DrawHealthBar(context, unit, new Rectangle(start, end - start));
         }
     }
 }

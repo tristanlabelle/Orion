@@ -38,10 +38,10 @@ namespace Orion.Graphics
 
         #region Fields
         private readonly World world;
-        private readonly Dictionary<string, LinePath> typeShapes = new Dictionary<string, LinePath>();
-        private readonly LinePath defaultShape = LinePath.Circle;
+        private readonly Texture defaultTexture;
         private bool drawHealthBars;
         private FogOfWar fogOfWar;
+        private TextureManager textureManager = new TextureManager(@"../../../Assets");
         #endregion
 
         #region Constructors
@@ -51,19 +51,8 @@ namespace Orion.Graphics
 
             this.world = world;
             this.fogOfWar = fogOfWar;
-            SetTypeShape("Schtroumpf", LinePath.Circle);
-            SetTypeShape("Pirate", LinePath.Diamond);
-            SetTypeShape("Ninja", LinePath.Pentagon);
-            SetTypeShape("Viking", LinePath.Triangle);
-            SetTypeShape("Jedi", LinePath.Cross);
-            SetTypeShape("Grippe A(H1N1)", LinePath.Plus);
-            SetTypeShape("OVNI", LinePath.Circle);
-            SetTypeShape("Tapis Volant", LinePath.Square);
-            SetTypeShape("Pyramide", LinePath.Square);
-            SetTypeShape("Baraque", LinePath.Triangle);
-            SetTypeShape("Port Spatial", LinePath.Pentagon);
-            SetTypeShape("Tower", LinePath.Square);
-            SetTypeShape("AlageneExtractor", LinePath.Cross);
+           
+            
         }
         #endregion
 
@@ -76,24 +65,12 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public void SetTypeShape(string typeName, LinePath shape)
-        {
-            Argument.EnsureNotNullNorEmpty(typeName, "typeName");
-            Argument.EnsureNotNull(shape, "shape");
+        
 
-            typeShapes[typeName] = shape;
-        }
-
-        public void SetTypeShape(UnitType type, LinePath shape)
+        public Texture GetTypeTexture(UnitType type)
         {
-            Argument.EnsureNotNull(type, "type");
-            SetTypeShape(type.Name, shape);
-        }
 
-        public LinePath GetTypeShape(UnitType type)
-        {
-            if (!typeShapes.ContainsKey(type.Name)) return LinePath.Circle;
-            return typeShapes[type.Name];
+            return textureManager.GetTexture(type.Name) ;
         }
 
         public void Draw(GraphicsContext graphics)
@@ -131,9 +108,7 @@ namespace Orion.Graphics
                 {
                     string unitTypeName = unit.Type.Name;
 
-                    LinePath shape;
-                    if (!typeShapes.TryGetValue(unitTypeName, out shape))
-                        shape = defaultShape;
+                    Texture texture = textureManager.GetTexture(unit.Type.Name);
 
                     if (unit.Faction == null) graphics.StrokeColor = Color.White;
                     else graphics.StrokeColor = unit.Faction.Color;
@@ -141,9 +116,10 @@ namespace Orion.Graphics
                     if (unit.Faction == null) graphics.FillColor = Color.White;
                     else graphics.FillColor = unit.Faction.Color;
 
-                    using (graphics.Transform(new Transform(unit.Position, unit.Angle, unit.BoundingRectangle.Size)))
+                    using (graphics.Transform(new Transform(unit.Position, unit.Angle)))
                     {
-                        graphics.Stroke(shape, Vector2.Zero);
+                        graphics.Fill(Rectangle.FromCenterSize(0,0,unit.Size.Width,unit.Size.Height)
+                            , texture,unit.Faction.Color);
                     }
 
                     if (DrawHealthBars)

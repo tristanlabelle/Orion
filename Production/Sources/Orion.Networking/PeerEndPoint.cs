@@ -9,9 +9,11 @@ using Orion.Commandment;
 
 namespace Orion.Networking
 {
-    public class CommandReceiver : IDisposable
+    public class PeerEndPoint : IDisposable
     {
         #region Fields
+        private static readonly byte[] doneMessage = new byte[] { (byte)GameMessageType.Done, 0, 0, 0, 0 };
+
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> receive;
         private GenericEventHandler<SafeTransporter, IPv4EndPoint> timeout;
         private readonly SafeTransporter transporter;
@@ -19,23 +21,26 @@ namespace Orion.Networking
         private readonly Dictionary<int, List<Command>> availableCommands = new Dictionary<int, List<Command>>();
         private int lastDoneReceived = 0;
 
-        public readonly Faction Faction;
         public readonly IPv4EndPoint Host;
+        public readonly Faction Faction;
         #endregion
 
         #region Constructors
-        public CommandReceiver(SafeTransporter transporter, Faction faction, IPv4EndPoint host)
+        public PeerEndPoint(SafeTransporter transporter, Faction faction, IPv4EndPoint host)
         {
+            this.transporter = transporter;
             receive = OnReceived;
             timeout = OnTimedOut;
-            this.transporter = transporter;
+
+            transporter.Received += receive;
+            transporter.TimedOut += timeout;
             Faction = faction;
             Host = host;
         }
         #endregion
 
         #region Events
-        public event GenericEventHandler<CommandReceiver> HostLeftGame;
+        public event GenericEventHandler<PeerEndPoint> LeftGame;
         #endregion
 
         #region Methods
@@ -49,7 +54,7 @@ namespace Orion.Networking
             return availableCommands.ContainsKey(commandFrame);
         }
 
-        private List<Command> GetCommandsForCommandFrame(int commandFrame)
+        public List<Command> GetCommandsForCommandFrame(int commandFrame)
         {
             if (!HasCommandsForCommandFrame(commandFrame))
                 throw new InvalidOperationException("Did not receive commands for frame {0}".FormatInvariant(commandFrame));
@@ -57,14 +62,18 @@ namespace Orion.Networking
             return availableCommands[commandFrame];
         }
 
+        public void SendDone(int commandFrame)
+        {
+            BitConverter.GetBytes(commandFrame).CopyTo(doneMessage, 1);
+            transporter.SendTo(doneMessage, Host);
+        }
+
         private void OnReceived(SafeTransporter transporter, NetworkEventArgs args)
         {
             if (args.Host != Host) return;
 
             if (args.Data[0] == (byte)GameMessageType.Quit)
-            {
-                
-            }
+                OnLeaveGame();
             else
             {
                 int commandFrame = BitConverter.ToInt32(args.Data, 1);
@@ -90,7 +99,7 @@ namespace Orion.Networking
 
         private void OnLeaveGame()
         {
-            if (HostLeftGame != null) HostLeftGame(this);
+            if (LeftGame != null) LeftGame(this);
         }
 
         private List<Command> DeserializeCommandDatagram(byte[] data, int startIndex)
@@ -114,7 +123,8 @@ namespace Orion.Networking
 
         public void Dispose()
         {
-
+            transporter.Received -= receive;
+            transporter.TimedOut -= timeout;
         }
         #endregion
     }

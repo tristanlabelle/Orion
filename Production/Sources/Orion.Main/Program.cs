@@ -169,7 +169,9 @@ namespace Orion.Main
             while (gameUI.IsWindowCreated)
             {
                 float newTime = (float)stopwatch.Elapsed.TotalSeconds;
-                timeAccumulator += newTime - oldTime;
+                float actualTimeDelta = newTime - oldTime;
+                if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
+                timeAccumulator += actualTimeDelta;
                 oldTime = newTime;
 
                 while (timeAccumulator >= TargetSecondsPerFrame)

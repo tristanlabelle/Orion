@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
-using System.Runtime.InteropServices;
 using SysImage = System.Drawing.Image;
-using System.IO;
 
 namespace Orion.Graphics
 {
@@ -109,13 +110,11 @@ namespace Orion.Graphics
             try
             {
                 GL.BindTexture(TextureTarget.Texture2D, id);
-
                 action();
             }
-            catch
+            finally
             {
                 GL.BindTexture(TextureTarget.Texture2D, lastID);
-                throw;
             }
         }
 
@@ -182,6 +181,48 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Locking
+        public void Lock(Region region, Access access, Action<RawPixelSurface> accessor)
+        {
+            Lock(region, access, false, accessor);
+        }
+
+        public void LockToOverwrite(Region region, Action<RawPixelSurface> accessor)
+        {
+            Lock(region, Access.Write, true, accessor);
+        }
+
+        private void Lock(Region region, Access access, bool discard, Action<RawPixelSurface> accessor)
+        {
+            if (region.ExclusiveMax.X > size.Width || region.ExclusiveMax.Y > size.Height)
+                throw new ArgumentException("Invalid texture region.", "region");
+            Argument.EnsureDefined(access, "access");
+            Argument.EnsureNotNull(accessor, "accessor");
+
+            if (access == Access.None) return;
+            byte[] data = new byte[size.Area * pixelFormat.GetBytesPerPixel()];
+
+            BindWhile(() =>
+            {
+                if ((access & Access.Read) == Access.Read)
+                {
+                    GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
+                    GL.GetTexImage(TextureTarget.Texture2D, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
+                }
+
+                BufferedPixelSurface surface = new BufferedPixelSurface(region.Size, pixelFormat,
+                    new ArraySegment<byte>(data), access);
+                surface.Lock(region, access, accessor);
+
+                if ((access & Access.Write) == Access.Write)
+                {
+                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+                    throw new NotImplementedException("Texture locking to write.");
+                }
+            });
+        }
+        #endregion
+
         #region Object Model
         public void Dispose()
         {
@@ -227,17 +268,7 @@ namespace Orion.Graphics
         #region Explicit Members
         Access IPixelSurface.AllowedAccess
         {
-            get { return Access.None; } // Although that could be implemented.
-        }
-
-        void IPixelSurface.Lock(Region region, Access access, Action<RawPixelSurface> accessor)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IPixelSurface.LockToOverwrite(Region region, Action<RawPixelSurface> accessor)
-        {
-            throw new NotImplementedException();
+            get { return Access.ReadWrite; }
         }
         #endregion
         #endregion

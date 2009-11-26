@@ -93,6 +93,27 @@ namespace Orion.Graphics
             UpdatePixelBuffer(area);
             texture.Blit(area, pixelBuffer);
         }
+
+        private void DebugDumpToFile()
+        {
+            BufferedPixelSurface surface = new BufferedPixelSurface(fogOfWar.Size, PixelFormat.Alpha);
+            for (int x = 0; x < surface.Size.Width; ++x)
+            {
+                for (int y = 0; y < surface.Size.Height; ++y)
+                {
+                    int pixelIndex = y * surface.Size.Width + x;
+                    Point point = new Point(x, y);
+                    TileVisibility visibility = fogOfWar.GetTileVisibility(point);
+                    if (visibility == TileVisibility.Visible)
+                        surface.Data.Array[pixelIndex] = 0;
+                    else if (visibility == TileVisibility.Discovered)
+                        surface.Data.Array[pixelIndex] = (byte)(FogTransparency * 255);
+                    else
+                        surface.Data.Array[pixelIndex] = 255;
+                }
+            }
+            PixelSurface.SaveToFile(surface, "FogOfWar.png");
+        }
         #endregion
     }
 }

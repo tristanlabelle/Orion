@@ -55,13 +55,41 @@ namespace Orion
         }
         #endregion
 
+        #region Indexers
+        /// <summary>
+        /// Gets a point of this region from its relative coordinates.
+        /// </summary>
+        /// <param name="x">The relative x coordinate of the region's point.</param>
+        /// <param name="x">The relative y coordinate of the region's point.</param>
+        /// <returns>The point at that location in this region.</returns>
+        public Point this[int x, int y]
+        {
+            get { return new Point(min.X + x, min.Y + y); }
+        }
+
+        public Point this[Point point]
+        {
+            get { return this[point.X, point.Y]; }
+        }
+        #endregion
+
         #region Methods
+        /// <summary>
+        /// Tests if a point is within this region.
+        /// </summary>
+        /// <param name="point">The point to be tested.</param>
+        /// <returns>A value indicating if the point is within this region.</returns>
         public bool Contains(Point point)
         {
             return point.X >= min.X && point.Y >= min.Y
                 && point.X < ExclusiveMax.X && point.Y < ExclusiveMax.Y;
         }
 
+        /// <summary>
+        /// Clamps a point so its coordinates are within this region.
+        /// </summary>
+        /// <param name="point">The point to be clamped.</param>
+        /// <returns>The resulting clamped point.</returns>
         public Point Clamp(Point point)
         {
             int clampedX = point.X;

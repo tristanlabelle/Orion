@@ -67,7 +67,7 @@ namespace Orion.Graphics
         #region Methods
         public void Lock(Region region, Access access, Action<RawPixelSurface> accessor)
         {
-            if (region.ExclusiveMax.X >= size.Width || region.ExclusiveMax.Y >= size.Height)
+            if (region.ExclusiveMax.X > size.Width || region.ExclusiveMax.Y > size.Height)
                 throw new ArgumentException("The accessed region exceeds the image's bounds.", "region");
             Argument.EnsureDefined(access, "access");
             Argument.EnsureNotNull(accessor, "accessor");

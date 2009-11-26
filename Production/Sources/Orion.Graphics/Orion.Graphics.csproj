@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="BufferedPixelSurface.cs" />
     <Compile Include="IPixelSurface.cs" />
+    <Compile Include="PixelSurface.cs" />
     <Compile Include="RawPixelSurface.cs" />
     <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
     <Compile Include="StrokeStyle.cs" />

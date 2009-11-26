@@ -12,14 +12,14 @@ namespace Orion.Networking
     public class PeerEndPoint : IDisposable
     {
         #region Fields
-        private static readonly byte[] doneMessage = new byte[] { (byte)GameMessageType.Done, 0, 0, 0, 0 };
+        private readonly byte[] doneMessage = new byte[] { (byte)GameMessageType.Done, 0, 0, 0, 0 };
 
         private GenericEventHandler<SafeTransporter, NetworkEventArgs> receive;
         private GenericEventHandler<SafeTransporter, IPv4EndPoint> timeout;
         private readonly SafeTransporter transporter;
 
         private readonly Dictionary<int, List<Command>> availableCommands = new Dictionary<int, List<Command>>();
-        private int lastDoneReceived = 0;
+        private readonly Dictionary<int, int> updatesForDone = new Dictionary<int, int>();
 
         public readonly IPv4EndPoint Host;
         public readonly Faction Faction;
@@ -36,6 +36,9 @@ namespace Orion.Networking
             transporter.TimedOut += timeout;
             Faction = faction;
             Host = host;
+
+            availableCommands[0] = new List<Command>();
+            updatesForDone[0] = 6;
         }
         #endregion
 
@@ -46,7 +49,12 @@ namespace Orion.Networking
         #region Methods
         public bool IsDoneForFrame(int commandFrame)
         {
-            return commandFrame <= lastDoneReceived;
+            return updatesForDone.ContainsKey(commandFrame);
+        }
+
+        public int GetUpdatesForCommandFrame(int commandFrame)
+        {
+            return updatesForDone[commandFrame];
         }
 
         public bool HasCommandsForCommandFrame(int commandFrame)
@@ -68,6 +76,21 @@ namespace Orion.Networking
             transporter.SendTo(doneMessage, Host);
         }
 
+        public void SendCommands(int commandFrame, IEnumerable<Command> commands)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream))
+                {
+                    writer.Write((byte)GameMessageType.Commands);
+                    writer.Write(commandFrame);
+                    foreach (Command command in commands)
+                        command.Serialize(writer);
+                }
+                transporter.SendTo(stream.ToArray(), Host);
+            }
+        }
+
         private void OnReceived(SafeTransporter transporter, NetworkEventArgs args)
         {
             if (args.Host != Host) return;
@@ -80,13 +103,11 @@ namespace Orion.Networking
                 if (args.Data[0] == (byte)GameMessageType.Commands)
                 {
                     availableCommands[commandFrame] = DeserializeCommandDatagram(args.Data, 1 + sizeof(int));
-                    // remove older entries
-                    if (HasCommandsForCommandFrame(commandFrame - 2))
-                        availableCommands.Remove(commandFrame - 2);
                 }
                 else if (args.Data[0] == (byte)GameMessageType.Done)
                 {
-                    lastDoneReceived = commandFrame;
+                    int updates = BitConverter.ToInt32(args.Data, 1);
+                    updatesForDone[commandFrame] = updates;
                 }
             }
         }

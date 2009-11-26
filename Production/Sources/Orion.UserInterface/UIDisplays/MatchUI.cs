@@ -188,7 +188,8 @@ namespace Orion.UserInterface
 
             if (faction == match.UserCommander.Faction)
             {
-                match.TryPause();
+                if(match.IsPausable)
+                    match.Pause();
                 Instant.DisplayAlert(this, "You have lost the match.", () => Parent.PopDisplay(this));
             }
         }
@@ -198,7 +199,8 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(faction, "faction");
             if (faction == match.UserCommander.Faction)
             {
-                match.TryPause();
+                if(match.IsPausable)
+                    match.Pause();
                 Instant.DisplayAlert(this, "VICTORY!", () => Parent.PopDisplay(this));
             }
         }
@@ -471,7 +473,7 @@ namespace Orion.UserInterface
         {
             if (!Children.Contains(pausePanel))
             {
-                match.TryPause();
+                match.Pause();
                 if (!match.IsRunning)
                     foreach (Scroller scroller in Children.OfType<Scroller>()) scroller.Enabled = false;
                 Children.Add(pausePanel);
@@ -485,7 +487,7 @@ namespace Orion.UserInterface
                 scroller.Enabled = true;
             }
             Children.Remove(pausePanel);
-            match.TryResume();
+            match.Resume();
         }
         #endregion
         #endregion

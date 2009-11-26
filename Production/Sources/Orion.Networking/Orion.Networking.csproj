@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandSynchronizer2.cs" />
     <Compile Include="GameMessageType.cs" />
     <Compile Include="Protocol.cs" />
     <Compile Include="PeerEndPoint.cs" />

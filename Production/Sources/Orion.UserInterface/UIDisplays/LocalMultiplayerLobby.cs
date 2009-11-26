@@ -190,7 +190,8 @@ namespace Orion.UserInterface
                 string[] parts = address.Split(':');
                 try
                 {
-                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])[0];
+                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])
+                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
                     port = ushort.Parse(parts[1]);
                 }
                 catch (FormatException)

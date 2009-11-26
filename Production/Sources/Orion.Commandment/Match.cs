@@ -119,12 +119,12 @@ namespace Orion.Commandment
         /// <param name="timeDelta">The time elapsed, in seconds, since the last frame.</param>
         public void Update(float timeDeltaInSeconds)
         {
-            if (!IsRunning) return;
-            
-            int frameNumber = lastFrameNumber + 1;
-            world.Update(timeDeltaInSeconds);
+            if (IsRunning)
+            {
+                world.Update(timeDeltaInSeconds);
+            }
 
-            lastFrameNumber = frameNumber;
+            lastFrameNumber++;
             RaiseUpdated(timeDeltaInSeconds);
         }
 
@@ -152,14 +152,14 @@ namespace Orion.Commandment
         #endregion
 
         #region Pause/Resume/Quit
-        public void TryPause()
+        public void Pause()
         {
-            if (IsPausable) IsRunning = false;
+            IsRunning = false;
         }
 
-        public void TryResume()
+        public void Resume()
         {
-            if (IsPausable) IsRunning = true;
+            IsRunning = true;
         }
 
         public void Quit()

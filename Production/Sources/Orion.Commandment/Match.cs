@@ -40,6 +40,8 @@ namespace Orion.Commandment
 
             // Update the world once to force committing the entity collection operations.
             world.Update(0);
+
+            world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -127,6 +129,11 @@ namespace Orion.Commandment
         }
 
         #region Faction Stuff
+        private void OnFactionDefeated(World sender, Faction args)
+        {
+            CheckForWorldConquered();
+        }
+
         /// <summary>
         /// Notifies this <see cref="Match"/> that a message from a <see cref="Faction"/> has been received.
         /// </summary>
@@ -137,7 +144,7 @@ namespace Orion.Commandment
             RaiseFactionMessageReceived(message);
         }
 
-        private void CheckForWorldConquered(Match sender, Faction args)
+        private void CheckForWorldConquered()
         {
             var aliveFactions = world.Factions.Where(faction => faction.Status == FactionStatus.Undefeated);
             if (aliveFactions.Count() == 1) RaiseWorldConquered(aliveFactions.First());

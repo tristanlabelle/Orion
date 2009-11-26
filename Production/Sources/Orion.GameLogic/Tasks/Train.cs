@@ -20,6 +20,8 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(trainer, "trainer");
             if (!trainer.HasSkill<Skills.Train>())
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
+            if (trainer.UnderConstruction)
+                throw new ArgumentException("Cannot train with an Unit in Construction");
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
 

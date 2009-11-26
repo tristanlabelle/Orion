@@ -269,10 +269,7 @@ namespace Orion.Commandment
                 {
                     if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.Train>()))
                     {
-                        foreach (Unit unit in selectionManager.SelectedUnits)
-                        {
-                            unit.RallyPoint = at;
-                        }
+                        LaunchChangeRallyPoint(at);
                     }
                 }
                 LaunchMove(at);
@@ -338,6 +335,14 @@ namespace Orion.Commandment
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
             commander.LaunchMove(movableUnits, destination);
+        }
+
+        public void LaunchChangeRallyPoint(Vector2 at)
+        {
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Train>()
+                && unit.Type.IsBuilding);
+            commander.LaunchChangeRally(targetUnits, at);
         }
 
         public void LaunchRepair(Unit building)

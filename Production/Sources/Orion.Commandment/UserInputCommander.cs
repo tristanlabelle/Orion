@@ -61,6 +61,18 @@ namespace Orion.Commandment
                 GenerateCommand(new Move(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
+        public void LaunchChangeRally(IEnumerable<Unit> units, Vector2 destination)
+        {
+            // Clamp the destination within the world bounds.
+            // The world bounds maximums are be exclusive.
+            destination = World.Bounds.ClosestPointInside(destination);
+            if (destination.X == World.Size.Width) destination.X -= 0.0001f;
+            if (destination.Y == World.Size.Height) destination.Y -= 0.0001f;
+
+            if (units.Count() > 0)
+                GenerateCommand(new ChangeRallyPoint(Faction.Handle, units.Select(unit => unit.Handle), destination));
+        }
+
         public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
         {
             if (units.Count() > 0)

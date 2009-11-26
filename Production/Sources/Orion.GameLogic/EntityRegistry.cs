@@ -21,7 +21,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly World world;
-        private readonly Dictionary<Handle, Entity> entities = new Dictionary<Handle, Entity>();
+        private readonly SortedList<Handle, Entity> entities = new SortedList<Handle, Entity>();
         private readonly EntityGrid grid;
         private readonly EntityZoneManager zoneManager;
         private readonly Func<Handle> uidGenerator;
@@ -231,7 +231,7 @@ namespace Orion.GameLogic
         /// Gets an enumerator that iterates over the <see cref="Entity"/>s in this registry.
         /// </summary>
         /// <returns>A new <see cref="Entity"/> enumerator.</returns>
-        public Dictionary<Handle, Entity>.ValueCollection.Enumerator GetEnumerator()
+        public IEnumerator<Entity> GetEnumerator()
         {
             return entities.Values.GetEnumerator();
         }

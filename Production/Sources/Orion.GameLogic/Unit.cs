@@ -407,6 +407,11 @@ namespace Orion.GameLogic
             if (totalHealthReceived >= MaxHealth)
                 underConstruction = false;
         }
+        public void CompleteConstruction()
+        {
+            this.Health = MaxHealth;
+            this.underConstruction = false;
+        }
         #endregion
     }
 }

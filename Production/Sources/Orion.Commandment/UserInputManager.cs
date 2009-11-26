@@ -287,21 +287,18 @@ namespace Orion.Commandment
 
         public void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                  .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
-
-            Unit builder = movableUnits.FirstOrDefault(unit =>
+            IEnumerable<Unit> builders = selectionManager.SelectedUnits.Where(unit =>
             {
                 Skills.Build build = unit.GetSkill<Skills.Build>();
+                Skills.Move move = unit.GetSkill<Skills.Move>();
                 if (build == null) return false;
+                if (unit.Faction != commander.Faction) return false;
+                if (move == null) return false;
                 return build.Supports(unitTypeToBuild);
             });
 
-            if (builder != null)
-            {
-                commander.LaunchBuild(builder, unitTypeToBuild, (Point)destination);
-                commander.LaunchMove(movableUnits.Where(unit => unit != builder), destination);
-            }
+
+                commander.LaunchBuild(builders, unitTypeToBuild, (Point)destination);
         }
 
         public void LaunchAttack(Unit target)

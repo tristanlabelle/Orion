@@ -258,7 +258,8 @@ namespace Orion.Commandment
 
         private void CreateCampUnits(Faction faction, Vector2 campCenter)
         {
-            faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
+            Unit pyramide = faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
+            pyramide.CompleteConstruction();
             for (int i = 1; i <= 2; i++)
             {
                 faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"),

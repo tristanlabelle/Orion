@@ -75,7 +75,12 @@ namespace Orion.GameLogic.Tasks
 
             if (follow.IsInRange)
             {
-                
+                if (building.Health >= building.MaxHealth)
+                {
+                    hasEnded = true;
+                    building.Died -= buildingDiedEventHandler;
+                    return;
+                }
                 if (unit.UnderConstruction)
                 {
                     
@@ -85,6 +90,7 @@ namespace Orion.GameLogic.Tasks
                     {
                         hasEnded = true;
                         building.Died -= buildingDiedEventHandler;
+                        return;
                     }
                         
                 }
@@ -110,11 +116,7 @@ namespace Orion.GameLogic.Tasks
                 follow.Update(timeDelta);
 
             }
-            if (building.Health >= building.MaxHealth)
-            {
-                hasEnded = true; 
-                building.Died -= buildingDiedEventHandler;
-            }
+           
 
         }
 

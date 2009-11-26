@@ -263,7 +263,7 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                commands.Add(new Build(Faction.Handle, builders[i].Handle, toBuild.Handle, (Point)Positions[i]));
+                commands.Add(new Build(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)Positions[i]));
             }
         }
 

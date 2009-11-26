@@ -4,6 +4,8 @@ using System.IO;
 using OpenTK.Math;
 using Orion.GameLogic;
 using BuildTask = Orion.GameLogic.Tasks.Build;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Orion.Commandment.Commands
 {
@@ -14,16 +16,16 @@ namespace Orion.Commandment.Commands
     public sealed class Build : Command
     {
         #region Fields
-        private readonly Handle builderHandle;
+        private readonly ReadOnlyCollection<Handle> builderHandles;
         private readonly Handle buildingTypeHandle;
         private readonly Point location;
         #endregion
 
         #region Constructors
-        public Build(Handle factionHandle, Handle builderHandle, Handle buildingTypeHandle, Point location)
+        public Build(Handle factionHandle, IEnumerable<Handle> builderHandles, Handle buildingTypeHandle, Point location)
             : base(factionHandle)
         {
-            this.builderHandle = builderHandle;
+            this.builderHandles = builderHandles.ToList().AsReadOnly();
             this.buildingTypeHandle = buildingTypeHandle;
             this.location = location;
         }
@@ -32,7 +34,7 @@ namespace Orion.Commandment.Commands
         #region Properties
         public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { yield return builderHandle; }
+            get { return builderHandles; }
         }
         #endregion
 
@@ -42,7 +44,7 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(world, "world");
 
             return IsValidFactionHandle(world, FactionHandle)
-                && IsValidEntityHandle(world, builderHandle)
+                && builderHandles.All(builderHandle => IsValidEntityHandle(world, builderHandle))
                 && IsValidUnitTypeHandle(world, buildingTypeHandle);
         }
 
@@ -50,22 +52,29 @@ namespace Orion.Commandment.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit builder = (Unit)match.World.Entities.FromHandle(builderHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
-            builder.Task = new BuildTask(builder, buildingType, location);
+            BuildingPlan plan = new BuildingPlan(buildingType, location);
+
+
+            foreach (Handle unit in builderHandles)
+            {
+                Unit builder = (Unit)match.World.Entities.FromHandle(unit);
+                builder.Task = new BuildTask(builder, plan);
+            }
         }
 
         public override string ToString()
         {
             return "Faction {0} builds {1} with {2} at {3}"
-                .FormatInvariant(FactionHandle, buildingTypeHandle, builderHandle, location);
+                .FormatInvariant(FactionHandle, buildingTypeHandle,
+                builderHandles.ToCommaSeparatedValues(), location);
         }
 
         #region Serialization
         protected override void SerializeSpecific(BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
-            WriteHandle(writer, builderHandle);
+            WriteLengthPrefixedHandleArray(writer, builderHandles);
             WriteHandle(writer, buildingTypeHandle);
             writer.Write((short)location.X);
             writer.Write((short)location.Y);
@@ -76,12 +85,12 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(reader, "reader");
 
             Handle factionHandle = ReadHandle(reader);
-            Handle builderHandle = ReadHandle(reader);
+            IEnumerable<Handle> builderHandles = ReadLengthPrefixedHandleArray(reader);
             Handle buildingTypeHandle = ReadHandle(reader);
             short x = reader.ReadInt16();
             short y = reader.ReadInt16();
             Point location = new Point(x, y);
-            return new Build(factionHandle, builderHandle, buildingTypeHandle, location);
+            return new Build(factionHandle, builderHandles, buildingTypeHandle, location);
         }
         #endregion
         #endregion

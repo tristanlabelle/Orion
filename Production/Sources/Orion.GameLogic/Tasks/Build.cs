@@ -13,41 +13,36 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit builder;
-        private readonly UnitType buildingType;
-        private readonly Point location;
+        private readonly BuildingPlan buildingPlan;
         private Move move;
-        private float heathPointsBuilt = 0;
-        private bool hasBegunBuilding = false;
         private bool hasEnded = false;
-        Unit unit;
         #endregion
 
         #region Constructors
-        public Build(Unit builder, UnitType buildingType, Point location)
+        public Build(Unit builder, BuildingPlan buildingPlan)
         {
             Argument.EnsureNotNull(builder, "builder");
             if (!builder.HasSkill<Skills.Build>())
                 throw new ArgumentException("Cannot build without the build skill.", "builder");
-            Argument.EnsureNotNull(buildingType, "buildingType");
-
+            Argument.EnsureNotNull(buildingPlan, "buildingPlan");
+            this.buildingPlan = buildingPlan;
             this.builder = builder;
-            this.buildingType = buildingType;
-            this.location = location;
-            this.move = new Move(builder, location);
 
-            if (buildingType.HasSkill<Skills.ExtractAlagene>())
+            this.move = new Move(builder, buildingPlan.Position);
+
+            if (buildingPlan.BuildingType.HasSkill<Skills.ExtractAlagene>())
             {
                 ResourceNode alageneNode = builder.World.Entities
                             .OfType<ResourceNode>()
-                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(location)
+                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(buildingPlan.Position)
                             && node.Type == ResourceType.Alagene);
 
                 bool extractorAlreadyThere = builder.World.Entities
                     .OfType<Unit>()
-                    .Any(unit => unit.BoundingRectangle.ContainsPoint(location));
+                    .Any(unit => unit.BoundingRectangle.ContainsPoint(buildingPlan.Position));
 
                 if (!extractorAlreadyThere && alageneNode != null)
-                    location = (Point)alageneNode.Position;
+                    buildingPlan.Position = (Point)alageneNode.Position;
                 else
                     hasEnded = true;
             }
@@ -77,25 +72,25 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
                 //Unable To reach Destination
-            else if ((builder.Position - (Vector2)location).Length > 1)
+            else if ((builder.Position - (Vector2)buildingPlan.Position).Length > 1)
             {
                 hasEnded = true;
                 return;
             }
 
-            if (unit == null)
+            if (!buildingPlan.ConstructionBegan)
             {
-                int aladdiumCost = builder.Faction.GetStat(buildingType, UnitStat.AladdiumCost);
-                int alageneCost = builder.Faction.GetStat(buildingType, UnitStat.AlageneCost);
+                int aladdiumCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
+                int alageneCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
 
                 if (builder.Faction.AladdiumAmount >= aladdiumCost
                     && builder.Faction.AlageneAmount >= alageneCost)
                 {
                     builder.Faction.AladdiumAmount -= aladdiumCost;
                     builder.Faction.AlageneAmount -= alageneCost;
-                    unit = builder.Faction.CreateUnit(buildingType, location);
-                    unit.Health = 1;
-                    builder.Task = new Repair(builder, unit);
+                    buildingPlan.lauchCreationOfThisUnit(builder.Faction.CreateUnit(buildingPlan.BuildingType, buildingPlan.Position));
+                    
+                    builder.Task = new Repair(builder, buildingPlan.CreatedUnit);
                 }
                 else
                 {
@@ -106,16 +101,9 @@ namespace Orion.GameLogic.Tasks
             }
             
 
-            if (hasBegunBuilding)
+            else if(buildingPlan.ConstructionBegan)
             {
-                float maxHealth = builder.Faction.GetStat(buildingType, UnitStat.MaxHealth);
-                float buildingSpeed = builder.GetStat(UnitStat.BuildingSpeed);
-                heathPointsBuilt += buildingSpeed * timeDelta;
-                if (heathPointsBuilt >= maxHealth)
-                {
-                   
-                    hasEnded = true;
-                }
+                builder.Task = new Repair( builder, buildingPlan.CreatedUnit);
             }
         }
         #endregion

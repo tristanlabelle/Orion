@@ -62,6 +62,8 @@ namespace Orion.UserInterface.Widgets
 
             float sliderOrigin = arrowHeight + invisibleHeight / Scrollee.FullBounds.Height * maximumSliderHeight;
             float sliderHeight = visibleHeight / Scrollee.FullBounds.Height * maximumSliderHeight;
+            if (sliderOrigin < arrowHeight) sliderOrigin = arrowHeight;
+            if (sliderHeight > maximumSliderHeight) sliderHeight = maximumSliderHeight;
             slider.Frame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, sliderOrigin), new Vector2(1, sliderOrigin + sliderHeight));
         }
 

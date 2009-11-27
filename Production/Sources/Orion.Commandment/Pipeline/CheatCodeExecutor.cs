@@ -74,6 +74,7 @@ namespace Orion.Commandment.Pipeline
             cheatCodes["turboturbo"] = AccelerateUnitDevelopment;
             cheatCodes["brinformatique"] = InstantDefeat;
             cheatCodes["itsover9000"] = InstantVictory;
+            cheatCodes["catchmymohawk"] = MisterT;
             cheatCodes["!"] = MasterCheat;
         }
         #endregion
@@ -123,6 +124,12 @@ namespace Orion.Commandment.Pipeline
             IEnumerable<Unit> userBuildings = match.World.Entities
                 .OfType<Unit>().Where(u => u.Faction == faction);
             foreach (Unit building in userBuildings) building.Suicide();
+        }
+
+        private static void MisterT(Match match, Faction faction)
+        {
+            UnitType heroUnitType = match.World.UnitTypes.FromName("Mr T");
+            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
         }
 
         private static void MasterCheat(Match match, Faction faction)

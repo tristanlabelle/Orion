@@ -34,6 +34,7 @@ namespace Orion.GameLogic
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
             RegisterChuckNorris();
+            RegisterMrT();
         }
         #endregion
 
@@ -131,7 +132,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Grippe A(H1N1)",
-                Size = new Size(1, 1),
+                Size = new Size(2, 2),
                 SightRange = 6,
                 MaxHealth = 35,
                 AladdiumCost = 75,
@@ -165,7 +166,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Tapis Volant",
-                Size = new Size(1, 1),
+                Size = new Size(2, 2),
                 SightRange = 8,
                 MaxHealth = 45,
                 AladdiumCost = 25,
@@ -273,12 +274,26 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Chuck Norris",
-                Size = new Size(1, 1),
+                Size = new Size(5, 5),
                 SightRange = 10,
                 MaxHealth = 5000
             };
             builder.Skills.Add(new Skills.Move(25, true));
             builder.Skills.Add(new Skills.Attack(100, 1, 1));
+            Register(builder);
+        }
+
+        public void RegisterMrT()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Mr T",
+                Size = new Size(5, 5),
+                SightRange = 20,
+                MaxHealth = 1000
+            };
+            builder.Skills.Add(new Skills.Move(15, true));
+            builder.Skills.Add(new Skills.Attack(50, 20, 1));
             Register(builder);
         }
         #endregion

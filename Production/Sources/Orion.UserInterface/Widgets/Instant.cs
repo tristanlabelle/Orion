@@ -8,8 +8,6 @@ using Orion.Geometry;
 
 namespace Orion.UserInterface.Widgets
 {
-    public delegate void AlertAction();
-
     public static class Instant
     {
         public static Rectangle CreateComponentRectangle(Rectangle parentSystem, Vector2 originPoint, Vector2 topmostPoint)
@@ -24,7 +22,7 @@ namespace Orion.UserInterface.Widgets
             DisplayAlert(parent, message, null);
         }
 
-        public static void DisplayAlert(Responder parent, string message, AlertAction action)
+        public static void DisplayAlert(Responder parent, string message, Action action)
         {
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
@@ -45,7 +43,7 @@ namespace Orion.UserInterface.Widgets
             parent.Children.Add(container);
         }
 
-        public static void Prompt(Responder parent, string message, GenericEventHandler<string> onClose)
+        public static void Prompt(Responder parent, string message, Action<string> onClose)
         {
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
@@ -53,7 +51,7 @@ namespace Orion.UserInterface.Widgets
             Rectangle frameRect = CreateComponentRectangle(parent.Bounds, new Vector2(0.25f, 0.33f), new Vector2(0.75f, 0.66f));
             Rectangle frameBounds = new Rectangle(frameRect.Size);
             Rectangle labelRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
-            Rectangle textFieldRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.4f), new Vector2(0.9f, 0.5f));
+            Rectangle textFieldRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.38f), new Vector2(0.9f, 0.5f));
             Rectangle okButtonRect = CreateComponentRectangle(frameBounds, new Vector2(0.2f, 0.2f), new Vector2(0.4f, 0.3f));
             Rectangle cancelButtonRect = CreateComponentRectangle(frameBounds, new Vector2(0.5f, 0.2f), new Vector2(0.7f, 0.3f));
 

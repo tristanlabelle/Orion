@@ -55,6 +55,11 @@ namespace Orion.UserInterface
             Button backButton = new Button(backButtonFrame, "Back");
             backButton.Triggered += PressBack;
             Children.Add(backButton);
+
+            Rectangle pingButtonFrame = joinRemoteFrame.TranslatedBy(0, -joinRemoteFrame.Height - 10);
+            Button pingButton = new Button(pingButtonFrame, "Ping");
+            pingButton.Triggered += PressPing;
+            Children.Add(pingButton);
         }
         #endregion
 
@@ -245,6 +250,67 @@ namespace Orion.UserInterface
                 hostName += ":{0}".FormatInvariant(endPoint.Port);
             }
             return hostName;
+        }
+
+        private IPv4EndPoint? TryParseAddress(string address)
+        {
+            IPv4Address hostAddress;
+            ushort port;
+
+            if (address.Contains(':'))
+            {
+                string[] parts = address.Split(':');
+                try
+                {
+                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])
+                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
+                    port = ushort.Parse(parts[1]);
+                }
+                catch (FormatException)
+                {
+                    return null;
+                }
+                catch (SocketException)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                try
+                {
+                    hostAddress = (IPv4Address)Dns.GetHostAddresses(address)
+                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
+                    port = transporter.Port;
+                }
+                catch (SocketException)
+                {
+                    return null;
+                }
+                catch (InvalidOperationException)
+                {
+                    return null;
+                }
+            }
+
+            return new IPv4EndPoint(hostAddress, port);
+        }
+
+        private void PressPing(Button sender)
+        {
+            Instant.Prompt(this, "Enter the IP address to ping:", Ping);
+        }
+
+        private void Ping(string address)
+        {
+            IPv4EndPoint? endPoint = TryParseAddress(address);
+            if (!endPoint.HasValue)
+            {
+                Instant.DisplayAlert(this, "Unable to resolve {0}.".FormatInvariant(address));
+            }
+
+            transporter.Ping(endPoint.Value);
+            Instant.DisplayAlert(this, "{0} was successfully ping'ed.".FormatInvariant(endPoint.Value));
         }
 
         public override void Dispose()

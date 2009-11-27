@@ -49,6 +49,14 @@ namespace Orion.Networking
             message.CopyTo(packetData, 2);
             return packetData;
         }
+
+        public static byte[] CreatePingPacket()
+        {
+            byte[] packetData = new byte[2];
+            packetData[0] = MagicIdentifier;
+            packetData[1] = (byte)PacketType.Ping;
+            return packetData;
+        }
         #endregion
 
         #region Decoding

@@ -23,6 +23,11 @@ namespace Orion.Networking
         /// <summary>
         /// Identifies a packet as being broadcasted, and thus does not implies an acknowledgement.
         /// </summary>
-        Broadcast = 204
+        Broadcast = 204,
+
+        /// <summary>
+        /// Identifies a ping packet that should just be ignored.
+        /// </summary>
+        Ping = 205
     }
 }

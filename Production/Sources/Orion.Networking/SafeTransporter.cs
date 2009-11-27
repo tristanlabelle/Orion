@@ -188,6 +188,10 @@ namespace Orion.Networking
                     byte[] message = Protocol.GetBroadcastPacketMessage(data, length);
                     peer.AddReceivedBroadcastMessage(message);
                 }
+                else if (type == PacketType.Ping)
+                {
+                    Debug.WriteLine("SafeTransporter ping'ed by {0}".FormatInvariant(senderEndPoint));
+                }
                 else
                 {
                     Debug.Fail("Received packet with unknown type.");
@@ -354,6 +358,11 @@ namespace Orion.Networking
             {
                 socketSemaphore.Release();
             }
+        }
+
+        public void Ping(IPv4EndPoint endPoint)
+        {
+            socket.SendTo(Protocol.CreatePingPacket(), endPoint);
         }
         #endregion
 

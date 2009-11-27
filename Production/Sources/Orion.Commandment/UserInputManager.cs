@@ -342,8 +342,12 @@ namespace Orion.Commandment
 
         public void LaunchRepair(Unit building)
         {
+            if (!building.Type.IsBuilding) return;
+            if (building.Damage < 1) return;
+           
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Build>());
+            if (targetUnits.Any(unit => unit.Faction != building.Faction)) return;
             commander.LaunchRepair(targetUnits, building);
         }
 

@@ -3,6 +3,7 @@ using Orion.GameLogic;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 using Skills = Orion.GameLogic.Skills;
+using Orion.Graphics;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
@@ -12,10 +13,13 @@ namespace Orion.UserInterface.Actions.Enablers
             : base(manager, frame)
         { }
 
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
+        public override void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer)
         {
             if (type.HasSkill<Skills.Move>())
-                buttonsArray[0, 3] = new GenericActionButton(container, inputManager, "Move", Keys.M, new MoveUserCommand(inputManager));
+            {
+                buttonsArray[0, 3] = new GenericActionButton(container, inputManager,
+                    "Move", Keys.M, new MoveUserCommand(inputManager), null);
+            }
         }
     }
 }

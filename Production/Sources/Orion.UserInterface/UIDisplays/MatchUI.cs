@@ -140,6 +140,21 @@ namespace Orion.UserInterface
                 UpdateSkillsPanel();
             }
         }
+
+        private MatchRenderer MatchRenderer
+        {
+            get { return (MatchRenderer)worldView.Renderer; }
+        }
+
+        private WorldRenderer WorldRenderer
+        {
+            get { return MatchRenderer.WorldRenderer; }
+        }
+
+        private UnitsRenderer UnitRenderer
+        {
+            get { return WorldRenderer.UnitRenderer; }
+        }
         #endregion
 
         #region Methods
@@ -241,7 +256,7 @@ namespace Orion.UserInterface
 
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
-            (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
+            MatchRenderer.DrawAllHealthBars = args.HasAlt;
             if (Children.Contains(chatInput))
             {
                 if (args.Key == Keys.Enter)
@@ -392,10 +407,9 @@ namespace Orion.UserInterface
 
         private void CreateSingleUnitSelectionPanel()
         {
-            UnitsRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
             selectionFrame.Renderer = new UnitFrameRenderer(unit);
-            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unitRenderer, unit);
+            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(UnitRenderer, unit);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -411,10 +425,9 @@ namespace Orion.UserInterface
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
             float currentX = padding + selectionFrame.Bounds.MinX;
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
-            UnitsRenderer unitRenderer = (worldView.Renderer as MatchRenderer).WorldRenderer.UnitRenderer;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                UnitButtonRenderer renderer = new UnitButtonRenderer(unitRenderer, unit);
+                UnitButtonRenderer renderer = new UnitButtonRenderer(UnitRenderer, unit);
                 renderer.HasFocus = unit.Type == SelectedType;
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
@@ -446,7 +459,7 @@ namespace Orion.UserInterface
                     SelectedType = unit.Type;
                     foreach (Button unitButton in selectionFrame.Children)
                     {
-                        UnitButtonRenderer renderer = unitButton.Renderer as UnitButtonRenderer;
+                        UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
                         renderer.HasFocus = renderer.unit.Type == SelectedType;
                     }
                 }
@@ -460,7 +473,7 @@ namespace Orion.UserInterface
             {
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
                 if (selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
-                    actions.Push(new UnitActionProvider(enablers, SelectedType));
+                    actions.Push(new UnitActionProvider(enablers, SelectedType, UnitRenderer));
             }
         }
 

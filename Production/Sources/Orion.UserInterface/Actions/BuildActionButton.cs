@@ -8,6 +8,7 @@ using Skills = Orion.GameLogic.Skills;
 using Orion.Commandment;
 using Orion.GameLogic;
 using OpenTK.Math;
+using Orion.Graphics;
 
 namespace Orion.UserInterface.Actions
 {
@@ -18,7 +19,8 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Constructor
-        public BuildActionButton(ActionFrame frame, UserInputManager manager, UnitType type, UnitTypeRegistry registry)
+        public BuildActionButton(ActionFrame frame, UserInputManager manager, UnitType type,
+            UnitTypeRegistry registry, UnitsRenderer unitsRenderer)
             : base(frame, manager, "Build", Keys.B)
         {
             Skills.Build buildingSkill = type.GetSkill<Skills.Build>();
@@ -26,7 +28,8 @@ namespace Orion.UserInterface.Actions
             int y = 3;
             foreach (UnitType unitType in registry.Where(u => buildingSkill.Supports(u)))
             {
-                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction);
+                Texture texture = unitsRenderer.GetTypeTexture(unitType);
+                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction, texture);
                 x++;
                 if (x == 4)
                 {

@@ -4,6 +4,7 @@ using Orion.GameLogic;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 using Skills = Orion.GameLogic.Skills;
+using Orion.Graphics;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
@@ -17,7 +18,7 @@ namespace Orion.UserInterface.Actions.Enablers
             registry = typeRegistry;
         }
 
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
+        public override void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer)
         {
             if (type.HasSkill<Skills.Train>())
             {
@@ -39,8 +40,10 @@ namespace Orion.UserInterface.Actions.Enablers
                                 y--;
                             }
                         }
+
                         ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command);
+                        Texture texture = unitsRenderer.GetTypeTexture(unitType);
+                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command, texture);
                         int aladdium = playerFaction.GetStat(unitType, UnitStat.AladdiumCost);
                         int alagene = playerFaction.GetStat(unitType, UnitStat.AlageneCost);
                         button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);

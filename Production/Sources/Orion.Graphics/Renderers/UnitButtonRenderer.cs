@@ -5,27 +5,33 @@ using Orion.Geometry;
 
 namespace Orion.Graphics
 {
-    public class UnitButtonRenderer : FrameRenderer
+    public sealed class UnitButtonRenderer : FrameRenderer
     {
-        private readonly UnitsRenderer renderer;
+        #region Fields
+        private readonly UnitsRenderer unitRenderer;
         private bool hasFocus;
-        public readonly Texture texture;
         public readonly Unit unit;
+        #endregion
 
+        #region Constructors
         public UnitButtonRenderer(UnitsRenderer unitRenderer, Unit unit)
+            : base(unit.Faction.Color)
         {
-            renderer = unitRenderer;
-            texture = unitRenderer.GetTypeTexture(unit.Type);
+            this.unitRenderer = unitRenderer;
+            
             this.unit = unit;
-            StrokeColor = unit.Faction.Color;
         }
+        #endregion
 
+        #region Properties
         public bool HasFocus
         {
             get { return hasFocus; }
             set { hasFocus = value; }
         }
+        #endregion
 
+        #region Methods
         public override void Draw(GraphicsContext context)
         {
             context.StrokeColor = hasFocus ? Color.White : Color.Black;
@@ -39,13 +45,16 @@ namespace Orion.Graphics
             Rectangle rectangle = Rectangle.FromCenterSize(
                 context.CoordinateSystem.CenterX, context.CoordinateSystem.Height * 5 / 8,
                 size, size);
+
+            Texture texture = unitRenderer.GetTypeTexture(unit.Type);
             context.Fill(rectangle, texture, unit.Faction.Color);
 
             float healthRatio = unit.Health / unit.MaxHealth;
             float yHealth = context.CoordinateSystem.Height / 4;
             Vector2 start = new Vector2(context.CoordinateSystem.Width / 5, yHealth - 0.25f);
             Vector2 end = new Vector2(context.CoordinateSystem.Width / 5 * 4, yHealth + 0.25f);
-            renderer.DrawHealthBar(context, unit, new Rectangle(start, end - start));
+            unitRenderer.DrawHealthBar(context, unit, new Rectangle(start, end - start));
         }
+        #endregion
     }
 }

@@ -17,12 +17,16 @@ namespace Orion.UserInterface.Actions.Enablers
         protected readonly ActionFrame container;
         #endregion
 
+        #region Constructors
         public ActionEnabler(UserInputManager manager, ActionFrame frame)
         {
             inputManager = manager;
             container = frame;
         }
+        #endregion
 
-        public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray);
+        #region Methods
+        public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer);
+        #endregion
     }
 }

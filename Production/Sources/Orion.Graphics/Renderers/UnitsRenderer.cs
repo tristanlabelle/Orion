@@ -47,11 +47,10 @@ namespace Orion.Graphics
         public UnitsRenderer(World world, Faction faction)
         {
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(faction, "faction");
 
             this.world = world;
             this.faction = faction;
-           
-            
         }
         #endregion
 

@@ -57,6 +57,8 @@
     <Compile Include="PixelSurface.cs" />
     <Compile Include="RawPixelSurface.cs" />
     <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
+    <Compile Include="Renderers\FilledFrameRenderer.cs" />
+    <Compile Include="Renderers\TexturedFrameRenderer.cs" />
     <Compile Include="StrokeStyle.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TextRenderer.cs" />

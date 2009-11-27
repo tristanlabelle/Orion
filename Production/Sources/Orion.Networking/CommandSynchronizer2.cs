@@ -77,12 +77,6 @@ namespace Orion.Networking
             transporter.Poll();
             updatesSinceLastCommandFrame++;
 
-            if (ReceivedFromAllPeers && updatesForCommandFrame.Count == 0)
-            {
-                updatesForCommandFrame.Add(updatesSinceLastCommandFrame);
-                peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
-            }
-
             if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)
             {
                 peers.ForEach(peer => peer.SendCommands(commandFrameNumber, commandsToSend));
@@ -92,16 +86,24 @@ namespace Orion.Networking
                 localCommands.Clear();
             }
 
+            if (ReceivedFromAllPeers && updatesForCommandFrame.Count == 0)
+            {
+                updatesForCommandFrame.Add(updatesSinceLastCommandFrame);
+                peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
+            }
+
             if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame)
             {
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {
                     match.Pause();
+                    Debug.WriteLine("Pausing on frame {0}".FormatInvariant(commandFrameNumber));
                     return;
                 }
                 match.Resume();
 
                 AdaptUpdatesPerCommandFrame();
+                peers.ForEach(peer => commandsToExecute.AddRange(peer.GetCommandsForCommandFrame(commandFrameNumber)));
                 FlushCommands();
                 commandFrameNumber++;
             }

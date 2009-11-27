@@ -60,9 +60,9 @@ namespace Orion.GameLogic
             this.entityDiedEventHandler = OnEntityDied;
 
             List<TechnologyEffect> effect = new List<TechnologyEffect>();
-            effect.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 100));
+            //effect.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 100));
 
-            technologies.Add(new Technology("hp boost", null, effect));
+            //technologies.Add(new Technology("hp boost", null, effect));
         }
         #endregion
 

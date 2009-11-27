@@ -37,6 +37,7 @@ namespace Orion.Main
             CreateWorld();
 
             Faction userFaction = world.CreateSpectatorFaction();
+            userFaction.LocalFogOfWar.Disable();
             UserInputCommander viewer = new UserInputCommander(userFaction);
 
             int colorIndex = 0;

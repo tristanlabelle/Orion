@@ -139,6 +139,7 @@ namespace Orion.Commandment.Pipeline
             IncreaseAvailableFood(match, faction);
             SpawnHeroUnit(match, faction);
             AccelerateUnitDevelopment(match, faction);
+            MisterT(match, faction);
         }
         #endregion
         #endregion

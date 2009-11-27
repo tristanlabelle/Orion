@@ -37,8 +37,11 @@ namespace Orion.Main
 
         public override Match Start()
         {
-            if (true) return RegularStart();
-            else return CommandSynchronizer2Start();
+#if true
+            return RegularStart();
+#else
+            return CommandSynchronizer2Start();
+#endif
         }
 
         private Match RegularStart()

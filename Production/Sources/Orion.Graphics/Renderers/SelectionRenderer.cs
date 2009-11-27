@@ -49,8 +49,8 @@ namespace Orion.Graphics
                 Rectangle unitBoundingRectangle = unit.BoundingRectangle;
                 Rectangle selectionRectangle = Rectangle.FromCenterExtent(
                     unitBoundingRectangle.CenterX, unitBoundingRectangle.CenterY,
-                    unitBoundingRectangle.Extent.X + 0.15f,
-                    unitBoundingRectangle.Extent.Y + 0.15f);
+                    unitBoundingRectangle.Extent.X + 0.05f,
+                    unitBoundingRectangle.Extent.Y + 0.05f);
                 graphics.Stroke(selectionRectangle);
 
                 if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)

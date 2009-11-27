@@ -19,6 +19,60 @@ namespace Orion.GameLogic
     [Serializable]
     public sealed class EntityRegistry : IEnumerable<Entity>
     {
+        #region Nested Types
+        [Flags]
+        private enum DeferredChangeType
+        {
+            Add = 1,
+            Move = 2,
+            Remove = 4
+        }
+
+        private struct DeferredChange
+        {
+            #region Fields
+            private readonly DeferredChangeType types;
+            private readonly Vector2 oldPosition;
+            #endregion
+
+            #region Constructors
+            public DeferredChange(DeferredChangeType types, Vector2 oldPosition)
+            {
+                this.types = types;
+                this.oldPosition = oldPosition;
+            }
+
+            public DeferredChange(DeferredChangeType types)
+                : this(types, Vector2.Zero) { }
+            #endregion
+
+            #region Properties
+            public Vector2 OldPosition
+            {
+                get { return oldPosition; }
+            }
+            #endregion
+
+            #region Methods
+            public DeferredChange CreateCombined(DeferredChangeType type, Vector2 oldPosition)
+            {
+                return new DeferredChange(types | type, oldPosition);
+            }
+
+            public DeferredChange CreateCombined(DeferredChangeType type)
+            {
+                return CreateCombined(type, Vector2.Zero);
+            }
+
+            public bool HasType(DeferredChangeType type)
+            {
+                return (types & type) != 0;
+            }
+            #endregion
+        }
+        #endregion
+
+        #region Instance
         #region Fields
         private readonly World world;
         private readonly SortedList<Handle, Entity> entities = new SortedList<Handle, Entity>();
@@ -26,10 +80,9 @@ namespace Orion.GameLogic
         private readonly EntityZoneManager zoneManager;
         private readonly Func<Handle> uidGenerator;
 
-        // Temporary collections used to defer modification of "entities"
-        private readonly HashSet<Entity> entitiesToAdd = new HashSet<Entity>();
-        private readonly Dictionary<Entity, Vector2> entitiesToMove = new Dictionary<Entity, Vector2>();
-        private readonly HashSet<Entity> entitiesToRemove = new HashSet<Entity>();
+        // Used to defer modification of the "entities" collection.
+        private readonly Dictionary<Entity, DeferredChange> deferredChanges
+            = new Dictionary<Entity, DeferredChange>();
 
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
@@ -91,7 +144,13 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(entity, "entity");
             Debug.WriteLine("Entity {0} died.");
-            entitiesToRemove.Add(entity);
+
+            DeferredChange change;
+            deferredChanges.TryGetValue(entity, out change);
+            Debug.Assert(!change.HasType(DeferredChangeType.Remove), "An entity has died twice.");
+            change = change.CreateCombined(DeferredChangeType.Remove);
+            deferredChanges.Add(entity, change);
+
             if (entity.IsSolid) grid.Remove(entity);
         }
 
@@ -99,8 +158,13 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            if (!entitiesToMove.ContainsKey(entity))
-                entitiesToMove.Add(entity, eventArgs.OldValue);
+            DeferredChange change;
+            deferredChanges.TryGetValue(entity, out change);
+            if (!change.HasType(DeferredChangeType.Move))
+            {
+                change = change.CreateCombined(DeferredChangeType.Move, eventArgs.OldValue);
+                deferredChanges.Add(entity, change);
+            }
 
             if (entity.IsSolid)
             {
@@ -148,7 +212,7 @@ namespace Orion.GameLogic
 
             if (entity.IsSolid) grid.Add(entity);
 
-            entitiesToAdd.Add(entity);
+            deferredChanges.Add(entity, new DeferredChange(DeferredChangeType.Add, Vector2.Zero));
         }
         #endregion
 
@@ -185,40 +249,36 @@ namespace Orion.GameLogic
         #region Commit Deferred Changes
         private void CommitDeferredChanges()
         {
-            CommitDeferredAdds();
-            CommitDeferredMoves();
-            CommitDeferredRemoves();
-        }
-
-        private void CommitDeferredAdds()
-        {
-            foreach (Entity entity in entitiesToAdd)
+            foreach (KeyValuePair<Entity, DeferredChange> pair in deferredChanges)
             {
-                entities.Add(entity.Handle, entity);
-                zoneManager.Add(entity);
+                Entity entity = pair.Key;
+                DeferredChange change = pair.Value;
+                if (change.HasType(DeferredChangeType.Add))
+                {
+                    if (change.HasType(DeferredChangeType.Remove))
+                    {
+                        Debug.Fail("An entity has been both added and removed in the same frame, that's peculiar.");
+                        continue; // Nop, we're not going to add it to remove it thereafter
+                    }
+
+                    entities.Add(entity.Handle, entity);
+                    zoneManager.Add(entity);
+                }
+
+                if (change.HasType(DeferredChangeType.Move))
+                {
+                    zoneManager.UpdateZone(entity, change.OldPosition);
+                }
+
+                if (change.HasType(DeferredChangeType.Remove))
+                {
+                    entities.Remove(entity.Handle);
+                    zoneManager.Remove(entity);
+                    OnDied(entity);
+                }
             }
-            entitiesToAdd.Clear();
+            deferredChanges.Clear();
         }
-
-       private void CommitDeferredMoves()
-       {
-           foreach (var pair in entitiesToMove)
-           {
-               zoneManager.UpdateZone(pair.Key, pair.Value);
-           }
-           entitiesToMove.Clear();
-       }
-
-       private void CommitDeferredRemoves()
-       {
-           foreach (Entity entity in entitiesToRemove)
-           {
-               entities.Remove(entity.Handle);
-               zoneManager.Remove(entity);
-               OnDied(entity);
-           }
-           entitiesToRemove.Clear();
-       }
         #endregion
 
         public Entity GetEntityAt(Point point)
@@ -272,6 +332,7 @@ namespace Orion.GameLogic
         {
             return GetEnumerator();
         }
+        #endregion
         #endregion
         #endregion
     }

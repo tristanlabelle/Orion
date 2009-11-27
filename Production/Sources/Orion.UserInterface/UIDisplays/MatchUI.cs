@@ -246,8 +246,13 @@ namespace Orion.UserInterface
             {
                 if (args.Key == Keys.Enter)
                 {
-                    SlaveCommander commander = userInputManager.Commander;
-                    commander.SendMessage(chatInput.Contents);
+                    string text = chatInput.Contents;
+                    if (text.Length > 0)
+                    {
+                        SlaveCommander commander = userInputManager.Commander;
+                        commander.SendMessage(chatInput.Contents);
+                    }
+
                     Children.Remove(chatInput);
                 }
                 else if (args.Key == Keys.Escape)

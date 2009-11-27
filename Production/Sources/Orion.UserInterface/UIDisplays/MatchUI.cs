@@ -41,8 +41,9 @@ namespace Orion.UserInterface
         private bool mouseDownOnMinimap;
         #endregion
 
-        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly Match match;
+        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
+        private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
         private readonly ActionFrame actions;
         private UnitType selectedType;
@@ -50,13 +51,15 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public MatchUI(Match match)
+        public MatchUI(Match match, SlaveCommander localCommander)
         {
             Argument.EnsureNotNull(match, "match");
+            Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.match = match;
+            this.localCommander = localCommander;
             match.Quitting += Quit;
-            userInputManager = new UserInputManager(match.UserCommander);
+            userInputManager = new UserInputManager(localCommander);
             World world = match.World;
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
@@ -115,7 +118,7 @@ namespace Orion.UserInterface
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
-            match.UserCommander.CommandGenerated += CommanderGeneratedCommand;
+            localCommander.CommandGenerated += CommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
@@ -186,7 +189,7 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(faction, "faction");
             DisplayMessage("{0} was defeated.".FormatInvariant(faction.Name), faction.Color);
 
-            if (faction == match.UserCommander.Faction)
+            if (faction == localCommander.Faction)
             {
                 if(match.IsPausable)
                     match.Pause();
@@ -197,7 +200,7 @@ namespace Orion.UserInterface
         public void DisplayVictoryMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            if (faction == match.UserCommander.Faction)
+            if (faction == localCommander.Faction)
             {
                 if(match.IsPausable)
                     match.Pause();
@@ -243,7 +246,7 @@ namespace Orion.UserInterface
             {
                 if (args.Key == Keys.Enter)
                 {
-                    UserInputCommander commander = userInputManager.Commander;
+                    SlaveCommander commander = userInputManager.Commander;
                     commander.SendMessage(chatInput.Contents);
                     Children.Remove(chatInput);
                 }

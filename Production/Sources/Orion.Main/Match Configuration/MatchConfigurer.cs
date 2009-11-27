@@ -85,7 +85,7 @@ namespace Orion.Main
             return new ReplayRecorder(replayWriter);
         }
 
-        public abstract Match Start();
+        public abstract void Start(out Match match, out SlaveCommander commander);
         #endregion
     }
 }

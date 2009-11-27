@@ -51,12 +51,13 @@ namespace Orion.Main
         #endregion
 
         #region Viewing Replays
-
         private void ViewReplay(ReplayLoadingUI ui, string fileName)
         {
             MatchConfigurer replayConfigurer = new ReplayMatchConfigurer("Replays/" + fileName);
-            Match match = replayConfigurer.Start();
-            MatchUI matchUI = new MatchUI(match);
+            Match match;
+            SlaveCommander localCommander;
+            replayConfigurer.Start(out match, out localCommander);
+            MatchUI matchUI = new MatchUI(match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -64,7 +65,6 @@ namespace Orion.Main
 
             gameUI.Display(matchUI);
         }
-
         #endregion
 
         #region Multiplayer Lobby Event Handlers
@@ -142,8 +142,10 @@ namespace Orion.Main
         {
             gameUI.RootView.PopDisplay(configurer.UserInterface);
 
-            Match match = configurer.Start();
-            MatchUI matchUI = new MatchUI(match);
+            Match match;
+            SlaveCommander localCommander;
+            configurer.Start(out match, out localCommander);
+            MatchUI matchUI = new MatchUI(match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);

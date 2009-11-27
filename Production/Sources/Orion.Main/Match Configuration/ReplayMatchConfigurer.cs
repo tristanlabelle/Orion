@@ -32,13 +32,13 @@ namespace Orion.Main
             get { return null; }
         }
 
-        public override Match Start()
+        public override void Start(out Match match, out SlaveCommander localCommander)
         {
             CreateWorld();
 
             Faction userFaction = world.CreateSpectatorFaction();
             userFaction.LocalFogOfWar.Disable();
-            UserInputCommander viewer = new UserInputCommander(userFaction);
+            localCommander = new SlaveCommander(userFaction);
 
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)
@@ -47,7 +47,7 @@ namespace Orion.Main
                 colorIndex++;
             }
 
-            Match match = new Match(random, world, viewer);
+            match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
@@ -55,8 +55,6 @@ namespace Orion.Main
             pipeline.PushFilter(new ReplayPlayer(replay));
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
-
-            return match;
         }
     }
 }

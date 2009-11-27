@@ -35,20 +35,20 @@ namespace Orion.Main
         protected abstract void Received(SafeTransporter source, NetworkEventArgs args);
         protected abstract void ExitGame(MatchConfigurationUI ui);
 
-        public override Match Start()
+        public override void Start(out Match match, out SlaveCommander localCommander)
         {
 #if false
-            return RegularStart();
+            RegularStart(out match, out localCommander);
 #else
-            return CommandSynchronizer2Start();
+            CommandSynchronizer2Start(out match, out localCommander);
 #endif
         }
 
-        private Match RegularStart()
+        private void RegularStart(out Match match, out SlaveCommander localCommander)
         {
             CreateWorld();
 
-            UserInputCommander userCommander = null;
+            localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             List<PeerEndPoint> peers = new List<PeerEndPoint>();
             int colorIndex = 0;
@@ -63,7 +63,7 @@ namespace Orion.Main
 
                 if (slot is LocalPlayerSlot)
                 {
-                    userCommander = new UserInputCommander(faction);
+                    localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
@@ -77,7 +77,7 @@ namespace Orion.Main
                 }
             }
 
-            Match match = new Match(random, world, userCommander);
+            match = new Match(random, world);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushReplayRecorderToPipeline(pipeline);
@@ -85,18 +85,16 @@ namespace Orion.Main
             pipeline.PushFilter(new CommandSynchronizer(match, transporter, UserInterface.PlayerAddresses));
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));
-            pipeline.AddCommander(userCommander);
+            pipeline.AddCommander(localCommander);
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
-
-            return match;
         }
 
-        private Match CommandSynchronizer2Start()
+        private void CommandSynchronizer2Start(out Match match, out SlaveCommander localCommander)
         {
             CreateWorld();
 
-            UserInputCommander userCommander = null;
+            localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             List<PeerEndPoint> peers = new List<PeerEndPoint>();
             int colorIndex = 0;
@@ -111,7 +109,7 @@ namespace Orion.Main
 
                 if (slot is LocalPlayerSlot)
                 {
-                    userCommander = new UserInputCommander(faction);
+                    localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
@@ -131,7 +129,7 @@ namespace Orion.Main
                 }
             }
 
-            Match match = new Match(random, world, userCommander);
+            match = new Match(random, world);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushReplayRecorderToPipeline(pipeline);
@@ -139,11 +137,9 @@ namespace Orion.Main
             pipeline.PushFilter(new CommandSynchronizer2(match, transporter, peers));
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));
-            pipeline.AddCommander(userCommander);
+            pipeline.AddCommander(localCommander);
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
-
-            return match;
         }
 
         public virtual void Dispose()

@@ -8,14 +8,17 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Commandment
 {
-    public sealed class UserInputCommander : Commander
+    /// <summary>
+    /// A behaviorless commander which offers a public interface to create commands.
+    /// </summary>
+    public sealed class SlaveCommander : Commander
     {
         #region Constructors
         /// <summary>
         /// Constructor For a commander that can listen input to create commands
         /// </summary>
         /// <param name="faction">the faction of the player.</param>
-        public UserInputCommander(Faction faction)
+        public SlaveCommander(Faction faction)
             : base(faction)
         { }
         #endregion
@@ -23,10 +26,11 @@ namespace Orion.Commandment
         #region Methods
         public void SendMessage(string message)
         {
+            Argument.EnsureNotNull(message, "message");
             GenerateCommand(new SendMessage(Faction.Handle, message));
         }
 
-        public void CancelCommands(IEnumerable<Unit> units)
+        public void LaunchCancel(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
                 GenerateCommand(new Cancel(Faction.Handle, units.Select(unit => unit.Handle)));
@@ -52,24 +56,24 @@ namespace Orion.Commandment
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
-            // Clamp the destination within the world bounds.
-            // The world bounds maximums are be exclusive.
-            destination = World.Bounds.ClosestPointInside(destination);
-            if (destination.X == World.Size.Width) destination.X -= 0.0001f;
-            if (destination.Y == World.Size.Height) destination.Y -= 0.0001f;
-
+            destination = ClampPosition(destination);
             if (units.Count() > 0)
                 GenerateCommand(new Move(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
-        public void LaunchChangeRally(IEnumerable<Unit> units, Vector2 destination)
-        {
+        private Vector2 ClampPosition(Vector2 destination)
+        {  
             // Clamp the destination within the world bounds.
             // The world bounds maximums are be exclusive.
             destination = World.Bounds.ClosestPointInside(destination);
             if (destination.X == World.Size.Width) destination.X -= 0.0001f;
             if (destination.Y == World.Size.Height) destination.Y -= 0.0001f;
+            return destination;
+        }
 
+        public void LaunchChangeRallyPoint(IEnumerable<Unit> units, Vector2 destination)
+        {
+            destination = ClampPosition(destination);
             if (units.Count() > 0)
                 GenerateCommand(new ChangeRallyPoint(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
@@ -92,7 +96,7 @@ namespace Orion.Commandment
                 GenerateCommand(new Suicide(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
-        public void LaunchChangeDimplomacy(Faction otherFaction)
+        public void LaunchChangeDiplomacy(Faction otherFaction)
         {
             if (otherFaction == null) return;
             if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
@@ -103,6 +107,7 @@ namespace Orion.Commandment
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
+            destination = ClampPosition(destination);
             if (units.Count() > 0)
                 GenerateCommand(new ZoneAttack(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }

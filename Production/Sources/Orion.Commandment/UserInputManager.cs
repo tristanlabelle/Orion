@@ -27,7 +27,7 @@ namespace Orion.Commandment
     public class UserInputManager
     {
         #region Fields
-        private UserInputCommander commander;
+        private SlaveCommander commander;
         private SelectionManager selectionManager;
         private UserInputCommand mouseCommand;
         private Vector2? selectionStart;
@@ -37,7 +37,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Constructors
-        public UserInputManager(UserInputCommander userCommander)
+        public UserInputManager(SlaveCommander userCommander)
         {
             Argument.EnsureNotNull(userCommander, "userCommander");
             commander = userCommander;
@@ -53,7 +53,7 @@ namespace Orion.Commandment
         #endregion
 
         #region Properties
-        public UserInputCommander Commander
+        public SlaveCommander Commander
         {
             get { return commander; }
         }
@@ -91,7 +91,6 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
-
         #region Direct Event Handling
         public void HandleMouseDown(object responder, MouseEventArgs args)
         {
@@ -279,10 +278,9 @@ namespace Orion.Commandment
         #endregion
 
         #region Launching individual commands
-
         public void Cancel()
         {
-            commander.CancelCommands(selectionManager.SelectedUnits);
+            commander.LaunchCancel(selectionManager.SelectedUnits);
         }
 
         public void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
@@ -298,7 +296,7 @@ namespace Orion.Commandment
             });
 
 
-                commander.LaunchBuild(builders, unitTypeToBuild, (Point)destination);
+            commander.LaunchBuild(builders, unitTypeToBuild, (Point)destination);
         }
 
         public void LaunchAttack(Unit target)
@@ -339,7 +337,7 @@ namespace Orion.Commandment
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Train>()
                 && unit.Type.IsBuilding);
-            commander.LaunchChangeRally(targetUnits, at);
+            commander.LaunchChangeRallyPoint(targetUnits, at);
         }
 
         public void LaunchRepair(Unit building)
@@ -374,14 +372,14 @@ namespace Orion.Commandment
         {
             // For Now I just Test Ally
             Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
-            commander.LaunchChangeDimplomacy(otherFaction);
+            commander.LaunchChangeDiplomacy(otherFaction);
         }
 
         public void LaunchCancel()
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);
-            commander.CancelCommands(targetUnits);
+            commander.LaunchCancel(targetUnits);
         }
         #endregion
         #endregion

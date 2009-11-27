@@ -30,11 +30,11 @@ namespace Orion.Main
             get { return ui; }
         }
 
-        public override Match Start()
+        public override void Start(out Match match, out SlaveCommander localCommander)
         {
             CreateWorld();
 
-            UserInputCommander userCommander = null;
+            localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             int colorIndex = 0;
             foreach (PlayerSlot slot in UserInterface.Players)
@@ -48,7 +48,7 @@ namespace Orion.Main
 
                 if (slot is LocalPlayerSlot)
                 {
-                    userCommander = new UserInputCommander(faction);
+                    localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
@@ -61,7 +61,7 @@ namespace Orion.Main
                 }
             }
 
-            Match match = new Match(random, world, userCommander);
+            match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
@@ -69,11 +69,9 @@ namespace Orion.Main
             TryPushReplayRecorderToPipeline(pipeline);
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
-            pipeline.AddCommander(userCommander);
+            pipeline.AddCommander(localCommander);
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
-
-            return match;
         }
     }
 }

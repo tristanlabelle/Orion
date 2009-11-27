@@ -20,19 +20,17 @@ namespace Orion.Commandment
 
         private readonly Random random;
         private readonly World world;
-        private readonly UserInputCommander userCommander;
         private int lastFrameNumber = 0;
         #endregion
 
         #region Constructors
-        public Match(Random random, World world, UserInputCommander commander)
+        public Match(Random random, World world)
         {
             Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
 
             this.random = random;
             this.world = world;
-            userCommander = commander;
             IsRunning = true;
 
             CreateFactionCamps();
@@ -89,11 +87,6 @@ namespace Orion.Commandment
         #endregion
 
         #region Properties
-        public UserInputCommander UserCommander
-        {
-            get { return userCommander; }
-        }
-
         public World World
         {
             get { return world; }

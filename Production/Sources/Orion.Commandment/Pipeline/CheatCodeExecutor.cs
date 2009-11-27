@@ -81,7 +81,7 @@ namespace Orion.Commandment.Pipeline
         #region Methods
         private static void DisableFogOfWar(Match match, Faction faction)
         {
-            faction.FogOfWar.Disable();
+            faction.LocalFogOfWar.Disable();
         }
 
         private static void IncreaseResources(Match match, Faction faction)

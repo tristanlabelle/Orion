@@ -242,6 +242,12 @@ namespace Orion.GameLogic
             RoundedCircle roundedLineOfSight = new RoundedCircle(lineOfSight);
             ModifyLineOfSight(roundedLineOfSight, false);
         }
+
+        public void Discover(Point point)
+        {
+            if (tiles[point.X, point.Y] == ushort.MaxValue)
+                tiles[point.X, point.Y] = 0;
+        }
         #endregion
 
         #region Private Implementation

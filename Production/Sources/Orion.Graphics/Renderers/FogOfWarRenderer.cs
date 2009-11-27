@@ -22,14 +22,12 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
+            this.faction.VisibilityChanged += OnVisibilityChanged;
 
-            //ADD A NEW EVENT IN FACTION FOR THE FOG OF WAR OF ALL ALLIES
-            this.faction.FogOfWar.Changed += OnChanged;
-
-            pixelBuffer = new byte[faction.FogOfWar.Size.Area];
+            pixelBuffer = new byte[faction.LocalFogOfWar.Size.Area];
             UpdatePixelBuffer();
 
-            texture = Texture.FromBuffer(faction.FogOfWar.Size, PixelFormat.Alpha, pixelBuffer, true, false);
+            texture = Texture.FromBuffer(faction.LocalFogOfWar.Size, PixelFormat.Alpha, pixelBuffer, true, false);
         }
         #endregion
 
@@ -49,14 +47,14 @@ namespace Orion.Graphics
                 dirtyRegion = null;
             }
 
-            if (faction.FogOfWar.IsEnabled)
+            if (faction.LocalFogOfWar.IsEnabled)
             {
-                Rectangle terrainBounds = new Rectangle(0, 0, faction.FogOfWar.Size.Width, faction.FogOfWar.Size.Height);
+                Rectangle terrainBounds = new Rectangle(0, 0, faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
                 graphics.Fill(terrainBounds, texture, Color.Black);
             }
         }
 
-        private void OnChanged(FogOfWar fogOfWar, Region region)
+        private void OnVisibilityChanged(Faction faction, Region region)
         {
             if (dirtyRegion.HasValue)
                 dirtyRegion = Region.Union(dirtyRegion.Value, region);
@@ -86,7 +84,7 @@ namespace Orion.Graphics
 
         private void UpdatePixelBuffer()
         {
-            Region region = (Region)faction.FogOfWar.Size;
+            Region region = (Region)faction.LocalFogOfWar.Size;
             UpdatePixelBuffer(region);
         }
 
@@ -98,14 +96,14 @@ namespace Orion.Graphics
 
         private void DebugDumpToFile()
         {
-            BufferedPixelSurface surface = new BufferedPixelSurface(faction.FogOfWar.Size, PixelFormat.Alpha);
+            BufferedPixelSurface surface = new BufferedPixelSurface(faction.LocalFogOfWar.Size, PixelFormat.Alpha);
             for (int x = 0; x < surface.Size.Width; ++x)
             {
                 for (int y = 0; y < surface.Size.Height; ++y)
                 {
                     int pixelIndex = y * surface.Size.Width + x;
                     Point point = new Point(x, y);
-                    TileVisibility visibility = faction.FogOfWar.GetTileVisibility(point);
+                    TileVisibility visibility = faction.LocalFogOfWar.GetTileVisibility(point);
                     if (visibility == TileVisibility.Visible)
                         surface.Data.Array[pixelIndex] = 0;
                     else if (visibility == TileVisibility.Discovered)

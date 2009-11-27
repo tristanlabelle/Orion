@@ -23,7 +23,8 @@ namespace Orion.GameLogic
         private readonly World world;
         private readonly string name;
         private readonly Color color;
-        private readonly FogOfWar fogOfWar;
+        private readonly FogOfWar localFogOfWar;
+        private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
@@ -52,7 +53,9 @@ namespace Orion.GameLogic
             this.world = world;
             this.name = name;
             this.color = color;
-            this.fogOfWar = new FogOfWar(world.Size);
+            this.localFogOfWar = new FogOfWar(world.Size);
+            this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
+            this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
 
@@ -69,10 +72,21 @@ namespace Orion.GameLogic
         /// </summary>
         public event GenericEventHandler<Faction> Defeated;
 
-        private void OnDefeated()
+        /// <summary>
+        /// Raised when the area of the world that is visible by this faction changes.
+        /// </summary>
+        public event GenericEventHandler<Faction, Region> VisibilityChanged;
+
+        private void RaiseDefeated()
         {
             var handler = Defeated;
             if (handler != null) handler(this);
+        }
+
+        private void RaiseVisibilityChanged(Region region)
+        {
+            var handler = VisibilityChanged;
+            if (handler != null) handler(this, region);
         }
         #endregion
 
@@ -112,6 +126,14 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Gets the local fog of war of this faction, which does not take allies into account.
+        /// </summary>
+        public FogOfWar LocalFogOfWar
+        {
+            get { return localFogOfWar; }
+        }
+
+        /// <summary>
         /// Gets the collection of <see cref="Unit"/>s in this <see cref="Faction"/>.
         /// </summary>
         public IEnumerable<Unit> Units
@@ -127,11 +149,6 @@ namespace Orion.GameLogic
         public IEnumerable<Technology> Technologies
         {
             get { return technologies; }
-        }
-
-        public FogOfWar FogOfWar
-        {
-            get { return fogOfWar; }
         }
 
         /// <summary>
@@ -228,6 +245,7 @@ namespace Orion.GameLogic
             return baseStat;
         }
 
+        #region Pathfinding
         /// <summary>
         /// Finds a path from a source to a destination.
         /// </summary>
@@ -238,6 +256,13 @@ namespace Orion.GameLogic
         {
             return world.FindPath(source, destination, IsPathable);
         }
+
+        private bool IsPathable(Point point)
+        {
+            return world.IsWithinBounds(point)
+                && (GetTileVisibility(point) == TileVisibility.Undiscovered || world.Terrain.IsWalkable(point));
+        }
+        #endregion
 
         #region Units
         /// <summary>
@@ -261,7 +286,7 @@ namespace Orion.GameLogic
             }
             unit.Moved += entityMovedEventHandler;
             unit.Died += entityDiedEventHandler;
-            fogOfWar.AddLineOfSight(unit.LineOfSight);
+            localFogOfWar.AddLineOfSight(unit.LineOfSight);
             usedFoodAmount += type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreFood>())
                 totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
@@ -276,7 +301,7 @@ namespace Orion.GameLogic
             int sightRange = unit.GetStat(UnitStat.SightRange);
             Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
             Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
-            fogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
+            localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
         private void OnEntityDied(Entity entity)
@@ -284,7 +309,7 @@ namespace Orion.GameLogic
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
             Unit unit = (Unit)entity;
-            fogOfWar.RemoveLineOfSight(unit.LineOfSight);
+            localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreFood>())
                 totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
@@ -302,7 +327,7 @@ namespace Orion.GameLogic
             if (!hasKeepAliveUnit)
             {
                 status = FactionStatus.Defeated;
-                OnDefeated();
+                RaiseDefeated();
             }
         }
 
@@ -311,20 +336,25 @@ namespace Orion.GameLogic
         /// Changes the diplomatic stance of this <see cref="Faction"/>
         /// in regard to another <see cref="Faction"/>.
         /// </summary>
-        /// <param name="other">
+        /// <param name="target">
         /// The <see cref="Faction"/> with which the diplomatic stance is to be changed.
         /// </param>
         /// <param name="stance">The new <see cref="DiplomaticStance"/> against that faction.</param>
-        public void SetDiplomaticStance(Faction other, DiplomaticStance stance)
+        public void SetDiplomaticStance(Faction target, DiplomaticStance stance)
         {
-            Argument.EnsureNotNull(other, "other");
-            if (other == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
+            Argument.EnsureNotNull(target, "target");
+            if (target == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
             Argument.EnsureDefined(stance, "stance");
 
+            if (allies.Contains(target) == (stance == DiplomaticStance.Ally))
+                return;
+
             if (stance == DiplomaticStance.Ally)
-                allies.Add(other);
+                allies.Add(target);
             else
-                allies.Remove(other);
+                allies.Remove(target);
+
+            target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
 
         /// <summary>
@@ -341,35 +371,71 @@ namespace Orion.GameLogic
             if (faction == this) return DiplomaticStance.Ally;
             return allies.Contains(faction) ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
         }
+
+        private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
+        {
+            if (stance == DiplomaticStance.Ally)
+            {
+                // As another faction has set us as allies, so we see what they do.
+                source.localFogOfWar.Changed += fogOfWarChangedEventHandler;
+                DiscoverFromOtherFogOfWar(source.localFogOfWar, (Region)world.Size);
+            }
+            else
+            {
+                source.localFogOfWar.Changed -= fogOfWarChangedEventHandler;
+            }
+
+            // Invalidate the whole visibility to take into account new allies.
+            RaiseVisibilityChanged((Region)world.Size);
+        }
+        #endregion
+
+        #region FogOfWar
+        public TileVisibility GetTileVisibility(Point point)
+        {
+            TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
+            if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
+
+            foreach (Faction faction in world.Factions.Where(f => f.GetDiplomaticStance(this) == DiplomaticStance.Ally))
+            {
+                if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
+                    return TileVisibility.Visible;
+                else if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
+                    visibility = TileVisibility.Discovered;
+            }
+
+            return visibility;
+        }
+
+        private void OnFogOfWarChanged(FogOfWar sender, Region region)
+        {
+            if (sender != localFogOfWar)
+            {
+                // Another faction's fog of war was updated, the same regions should be discovered here,
+                // otherwise when the faction is an enemy again it'll be as if we never discovered those places.
+                DiscoverFromOtherFogOfWar(sender, region);
+            }
+
+            RaiseVisibilityChanged(region);
+        }
+
+        private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)
+        {
+            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            {
+                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                {
+                    Point point = new Point(x, y);
+                    if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
+                        localFogOfWar.Discover(point);
+                }
+            }
+        }
         #endregion
 
         public override string ToString()
         {
             return name;
-        }
-
-        private bool IsPathable(Point point)
-        {
-            if (!world.IsWithinBounds(point))
-                return false;
-            if (this.GetTileVisibility(point) == TileVisibility.Undiscovered)
-                return true;
-            return world.Terrain.IsWalkable(point);
-        }
-
-        public TileVisibility GetTileVisibility(Point point)
-        {
-            TileVisibility visibility = fogOfWar.GetTileVisibility(point);
-            if (visibility == TileVisibility.Visible)
-                return TileVisibility.Visible;
-            foreach (Faction faction in allies)
-            {
-                if (faction.fogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
-                    return TileVisibility.Visible;
-                else if (faction.fogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
-                    visibility = TileVisibility.Discovered;
-            }
-            return visibility;
         }
         #endregion
     }

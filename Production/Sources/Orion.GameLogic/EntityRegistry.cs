@@ -149,7 +149,7 @@ namespace Orion.GameLogic
             deferredChanges.TryGetValue(entity, out change);
             Debug.Assert(!change.HasType(DeferredChangeType.Remove), "An entity has died twice.");
             change = change.CreateCombined(DeferredChangeType.Remove);
-            deferredChanges.Add(entity, change);
+            deferredChanges[entity] = change;
 
             if (entity.IsSolid) grid.Remove(entity);
         }
@@ -163,7 +163,7 @@ namespace Orion.GameLogic
             if (!change.HasType(DeferredChangeType.Move))
             {
                 change = change.CreateCombined(DeferredChangeType.Move, eventArgs.OldValue);
-                deferredChanges.Add(entity, change);
+                deferredChanges[entity] = change;
             }
 
             if (entity.IsSolid)

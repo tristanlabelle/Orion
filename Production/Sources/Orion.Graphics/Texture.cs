@@ -35,6 +35,10 @@ namespace Orion.Graphics
             {
                 BindWhile(() =>
                 {
+                    // If the following line ever throws, just wrap it in a try-catch and ignore it,
+                    // those who do not support mipmaps will have to live without it.
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
+
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.pixelFormat),
                         size.Width, size.Height, 0, GetGLPixelFormat(this.pixelFormat), PixelType.UnsignedByte,
@@ -130,10 +134,13 @@ namespace Orion.Graphics
 
         internal void SetSmooth(bool on)
         {
-            SetParameter(TextureParameterName.TextureMinFilter,
-                (int)(on ? TextureMinFilter.Linear : TextureMinFilter.Nearest));
-            SetParameter(TextureParameterName.TextureMagFilter,
-                (int)(on ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
+            BindWhile(() =>
+            {
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                    (int)(on ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Nearest));
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                    (int)(on ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
+            });
         }
 
         internal void SetRepeat(bool on)

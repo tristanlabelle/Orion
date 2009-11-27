@@ -165,8 +165,16 @@ namespace Orion.GameLogic.Tasks
             if (mode == Mode.Delivering)
             {
                 commandCenter = FindClosestCommandCenter();
-                commandCenter.Died += commandCenterDestroyedEventHandler;
-                move = new Move(harvester, commandCenter.Position);
+                if (commandCenter == null)
+                {
+                    hasEnded = true;
+                    return;
+                }
+                else
+                {
+                    commandCenter.Died += commandCenterDestroyedEventHandler;
+                    move = new Move(harvester, commandCenter.Position);
+                }
             }
         }
 

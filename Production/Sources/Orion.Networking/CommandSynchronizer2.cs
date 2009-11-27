@@ -61,7 +61,12 @@ namespace Orion.Networking
 
         private int TargetUpdatesPerCommandFrame
         {
-            get { return (int)(previousFramesDuration.Average() + 0.5); }
+            get
+            {
+                int average = (int)(previousFramesDuration.Average() + 0.5);
+                int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
+                return average + deviation * 2;
+            }
         }
         #endregion
 
@@ -97,7 +102,6 @@ namespace Orion.Networking
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {
                     match.Pause();
-                    Debug.WriteLine("Pausing on frame {0}".FormatInvariant(commandFrameNumber));
                     return;
                 }
                 match.Resume();
@@ -105,18 +109,20 @@ namespace Orion.Networking
                 AdaptUpdatesPerCommandFrame();
                 peers.ForEach(peer => commandsToExecute.AddRange(peer.GetCommandsForCommandFrame(commandFrameNumber)));
                 FlushCommands();
+
                 commandFrameNumber++;
+                updatesSinceLastCommandFrame = 0;
             }
         }
 
         private void AdaptUpdatesPerCommandFrame()
         {
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
-            previousFramesDuration.Enqueue(updatesForCommandFrame.Max());
-            if (previousFramesDuration.Count > maxEnqueuedFrameDurations)
-                previousFramesDuration.Dequeue();
+            int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
+            previousFramesDuration.Enqueue(longestCommandFrame);
+            Debug.WriteLine("Enqueuing {0}; target frame rate is now {1}".FormatInvariant(longestCommandFrame, TargetUpdatesPerCommandFrame));
+            if (previousFramesDuration.Count > maxEnqueuedFrameDurations) previousFramesDuration.Dequeue();
             updatesForCommandFrame.Clear();
-            updatesSinceLastCommandFrame = 0;
         }
 
         private void FlushCommands()

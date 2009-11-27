@@ -16,7 +16,6 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly Queue<Task> taskQueue = new Queue<Task>();
-        private bool isQueueFull; 
         private readonly UnitType type;
         private readonly Faction faction;
         private Vector2 position;
@@ -49,12 +48,10 @@ namespace Orion.GameLogic
             this.type = type;
             this.faction = faction;
             this.position = position;
-            this.isQueueFull = false; 
 
             if (type.HasSkill<Skills.Train>())
-            {
                 this.rallyPoint = GetDefaultRallyPoint();
-            }
+            
             if (type.IsBuilding)
                 underConstruction = true;
         }
@@ -200,15 +197,7 @@ namespace Orion.GameLogic
         /// </summary>
         public bool QueueFull
         {
-            get 
-            {
-                if (taskQueue.Count >= 8)
-                    isQueueFull = true;
-                else
-                    isQueueFull = false; 
-
-                return isQueueFull; 
-            }
+            get { return taskQueue.Count >= 8; }
         }
 
         /// <summary>

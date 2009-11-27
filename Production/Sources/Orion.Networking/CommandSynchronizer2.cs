@@ -120,7 +120,6 @@ namespace Orion.Networking
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
             int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
             previousFramesDuration.Enqueue(longestCommandFrame);
-            Debug.WriteLine("Enqueuing {0}; target frame rate is now {1}".FormatInvariant(longestCommandFrame, TargetUpdatesPerCommandFrame));
             if (previousFramesDuration.Count > maxEnqueuedFrameDurations) previousFramesDuration.Dequeue();
             updatesForCommandFrame.Clear();
         }

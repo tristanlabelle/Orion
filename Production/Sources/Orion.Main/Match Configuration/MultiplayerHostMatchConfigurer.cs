@@ -94,10 +94,10 @@ namespace Orion.Main
         private void PressStartGame(MatchConfigurationUI ui)
         {
             byte[] startGameMessage = new byte[1];
-            startGameMessage[0] = (byte)SetupMessageType.StartGame;
-            transporter.SendTo(startGameMessage, UserInterface.PlayerAddresses);
             startGameMessage[0] = (byte)SetupMessageType.RemoveGame;
             transporter.Broadcast(startGameMessage, transporter.Port);
+            startGameMessage[0] = (byte)SetupMessageType.StartGame;
+            transporter.SendTo(startGameMessage, UserInterface.PlayerAddresses);
             StartGame();
         }
 

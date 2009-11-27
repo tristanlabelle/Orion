@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Orion.UserInterface
 {
-    public class VoidUI : UIDisplay
+    public sealed class NullUI : UIDisplay
     {
     }
 }

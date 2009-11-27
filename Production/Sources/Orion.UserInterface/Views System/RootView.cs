@@ -28,7 +28,7 @@ namespace Orion.UserInterface
             Bounds = bounds;
             Frame = frame;
             displays = new Stack<UIDisplay>();
-            displays.Push(new VoidUI());
+            displays.Push(new NullUI());
         }
         #endregion
 

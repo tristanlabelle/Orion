@@ -1,42 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
-using Skills = Orion.GameLogic.Skills;
+﻿using Orion.Commandment;
 using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Geometry;
-using Orion.Commandment;
-using OpenTK.Math;
+using Orion.UserInterface.Actions.UserCommands;
+using Keys = System.Windows.Forms.Keys;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
     public class MoveEnabler : ActionEnabler
     {
-        #region Nested Types
-        private class MoveUserCommand : UserInputCommand
-        {
-            private UserInputManager inputManager;
-
-            public MoveUserCommand(UserInputManager manager)
-            {
-                inputManager = manager;
-            }
-
-            public override void Execute(Entity entity)
-            {
-                Execute(entity.Position);
-            }
-
-            public override void Execute(Vector2 point)
-            {
-                inputManager.LaunchMove(point);
-            }
-        }
-        #endregion
-
         public MoveEnabler(UserInputManager manager, ActionFrame frame)
             : base(manager, frame)
         { }

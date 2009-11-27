@@ -1,43 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
-using Skills = Orion.GameLogic.Skills;
-using OpenTK.Math;
+﻿using Orion.Commandment;
 using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Geometry;
-using Orion.Commandment;
+using Orion.UserInterface.Actions.UserCommands;
+using Keys = System.Windows.Forms.Keys;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
     public class BuildEnabler : ActionEnabler
     {
-        #region Nested Types
-        private class RepairUserCommand : UserInputCommand
-        {
-            private UserInputManager inputManager;
-
-            public RepairUserCommand(UserInputManager manager)
-            {
-                inputManager = manager;
-            }
-
-            public override void Execute(Entity entity)
-            {
-                if (entity is Unit) inputManager.LaunchRepair((Unit)entity);
-                else Execute(entity.Position);
-            }
-
-            public override void Execute(Vector2 point)
-            {
-                // todo: don't fail silently
-            }
-        }
-        #endregion
-
         private UnitTypeRegistry registry;
 
         public BuildEnabler(UserInputManager manager, ActionFrame frame, UnitTypeRegistry entityRegistry)

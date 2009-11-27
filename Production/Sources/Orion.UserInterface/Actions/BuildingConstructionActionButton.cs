@@ -1,64 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
-using Skills = Orion.GameLogic.Skills;
-using Orion.Commandment;
+﻿using Orion.Commandment;
 using Orion.GameLogic;
-using OpenTK.Math;
+using Orion.UserInterface.Actions.UserCommands;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Actions
 {
-    public class BuildingConstructionActionButton : ActionButton
+    public sealed class BuildingConstructionActionButton : ActionButton
     {
-        #region Nested Types
-        private class BuildUserCommand : UserInputCommand
-        {
-            private UnitType buildingType;
-            private UserInputManager inputManager;
-
-            public BuildUserCommand(UserInputManager manager, UnitType type)
-            {
-                buildingType = type;
-                inputManager = manager;
-            }
-
-            public override void Execute(Entity entity)
-            {
-                if (entity is ResourceNode && buildingType.HasSkill<Skills.ExtractAlagene>())
-                    if (((ResourceNode)entity).Type == ResourceType.Alagene)
-                        inputManager.LaunchBuild(((ResourceNode)entity).Position, buildingType);
-
-            }
-
-            public override void Execute(Vector2 at)
-            {
-                inputManager.LaunchBuild(at, buildingType);
-            }
-        }
-        #endregion
-
         #region Fields
-        private UnitType builtType;
+        private readonly UnitType buildingType;
         #endregion
 
         #region Constructor
-        public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager, UnitType builtType, Faction faction)
+        public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager, UnitType buildingType, Faction faction)
             : base(frame, manager, Keys.None)
         {
-            this.builtType = builtType;
-            int aladdium = faction.GetStat(builtType, UnitStat.AladdiumCost);
-            int alagene = faction.GetStat(builtType, UnitStat.AlageneCost);
-            Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(builtType.Name, aladdium, alagene);
+            this.buildingType = buildingType;
+            int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
+            int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
+            Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
         }
         #endregion
 
         #region Methods
         protected override void OnPress()
         {
-            inputManager.SelectedCommand = new BuildUserCommand(inputManager, builtType);
+            inputManager.SelectedCommand = new BuildUserCommand(inputManager, buildingType);
             base.OnPress();
         }
         #endregion

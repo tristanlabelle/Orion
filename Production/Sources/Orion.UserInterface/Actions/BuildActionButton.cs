@@ -14,7 +14,7 @@ namespace Orion.UserInterface.Actions
     public class BuildActionButton : ActionButton
     {
         #region Fields
-        private ActionButton[,] buildingButtons = new ActionButton[4,4];
+        private ActionButton[,] buildingButtons = new ActionButton[4, 4];
         #endregion
 
         #region Constructor

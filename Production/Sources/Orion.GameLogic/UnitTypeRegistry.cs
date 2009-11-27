@@ -30,6 +30,7 @@ namespace Orion.GameLogic
             RegisterPyramid();
             RegisterBarack();
             RegisterStarPort();
+            RegisterTechCenter();
             RegisterTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
@@ -198,7 +199,7 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Baraque",
+                Name = "Temple de 2012",
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 200,
@@ -213,7 +214,7 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Port Spatial",
+                Name = "Portail Démoniaque",
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 250,
@@ -224,11 +225,26 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
+        public void RegisterTechCenter()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Maison de Tristan",
+                Size = new Size(2, 2),
+                SightRange = 4,
+                MaxHealth = 200,
+                AladdiumCost = 150,
+                AlageneCost = 50
+            };
+            builder.Skills.Add(new Skills.Research(technology => technology.Name == "hp boost"));
+            Register(builder);
+        }
+
         public void RegisterTower()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Tower",
+                Name = "Jean-Marc ?",
                 Size = new Size(2, 2),
                 SightRange = 12,
                 MaxHealth = 50,

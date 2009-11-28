@@ -39,14 +39,13 @@ namespace Orion.Networking
             Host = host;
 
             availableCommands[0] = new List<Command>();
-            updatesForDone[0] = 6;
             doneMessage = new byte[1 + sizeof(int) * 2];
             doneMessage[0] = (byte)GameMessageType.Done;
         }
         #endregion
 
         #region Events
-        public event GenericEventHandler<PeerEndPoint> LeftGame;
+        public event GenericEventHandler<PeerEndPoint> Disconnected;
         #endregion
 
         #region Methods
@@ -143,7 +142,7 @@ namespace Orion.Networking
 
         private void OnLeaveGame()
         {
-            if (LeftGame != null) LeftGame(this);
+            if (Disconnected != null) Disconnected(this);
         }
 
         public void Dispose()

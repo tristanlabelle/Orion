@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Orion.Commandment;
+using Orion.Commandment.Commands;
 using Orion.Commandment.Pipeline;
 using System.Diagnostics;
 
@@ -12,12 +13,12 @@ namespace Orion.Networking
     public class CommandSynchronizer2 : CommandFilter
     {
         #region Fields
-        #region Frame Rate Management
+        #region Updates Rate Management
         private const int defaultUpdatesPerFrame = 6;
         private const int maxEnqueuedFrameDurations = 0x48;
         private readonly List<int> updatesForCommandFrame = new List<int>();
         private readonly Queue<int> previousFramesDuration = new Queue<int>();
-        private int updatesSinceLastCommandFrame = 0;
+        private int updatesSinceLastCommandFrame = defaultUpdatesPerFrame - 1;
         private int commandFrameNumber = 0;
         #endregion
 
@@ -119,6 +120,7 @@ namespace Orion.Networking
         {
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
             int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
+            Debug.WriteLine("Current UPFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updatesForCommandFrame.Select(i => i.ToString()).ToArray()), longestCommandFrame));
             previousFramesDuration.Enqueue(longestCommandFrame);
             if (previousFramesDuration.Count > maxEnqueuedFrameDurations) previousFramesDuration.Dequeue();
             updatesForCommandFrame.Clear();

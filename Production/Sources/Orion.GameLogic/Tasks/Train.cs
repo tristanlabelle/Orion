@@ -59,16 +59,15 @@ namespace Orion.GameLogic.Tasks
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-                Point? spawnPoint = trainer.GridRegion.GetAdjacentPoints()
-                    .FirstOrNull(point => trainer.World.IsWithinBounds(point) && trainer.World.IsTileFree(point));
-
-                if (!spawnPoint.HasValue)
+                Point spawnPoint = (Point)trainer.Center;
+                if (!traineeType.IsAirborne)
                 {
-                    Debug.Fail("No free point to spawn unit.");
-                    spawnPoint = (Point)trainer.Position;
+                    spawnPoint = trainer.GridRegion.GetAdjacentPoints()
+                        .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsTileFree(point))
+                        .WithMin(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
                 }
 
-                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, spawnPoint.Value);
+                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, spawnPoint);
                 unitCreated.Task = new Move(unitCreated, trainer.RallyPoint.Value);
                 hasEnded = true;
             }

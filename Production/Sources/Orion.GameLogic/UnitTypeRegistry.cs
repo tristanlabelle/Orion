@@ -308,7 +308,7 @@ namespace Orion.GameLogic
                 SightRange = 20,
                 MaxHealth = 1000
             };
-            builder.Skills.Add(new Skills.Move(15, false));
+            builder.Skills.Add(new Skills.Move(15, true));
             builder.Skills.Add(new Skills.Attack(50, 20, 1));
             Register(builder);
         }

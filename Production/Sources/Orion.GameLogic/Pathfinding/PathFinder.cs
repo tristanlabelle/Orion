@@ -19,7 +19,7 @@ namespace Orion.GameLogic.Pathfinding
         private readonly List<Vector2> points = new List<Vector2>();
         private Func<Point, bool> isWalkable;
         private Point16 destinationPoint;
-        private int maxNodesToVisit = int.MaxValue;
+        private int maxNodesToVisit;
         #endregion
 
         #region Properties
@@ -32,16 +32,6 @@ namespace Orion.GameLogic.Pathfinding
         {
             get { return closedNodes.Values; }
         }
-
-        public int MaxNodesToVisit
-        {
-            get { return maxNodesToVisit; }
-            set
-            {
-                Argument.EnsureNotNull(maxNodesToVisit, "maxNodesToVisit");
-                maxNodesToVisit = value;
-            }
-        }
         #endregion
 
         #region Methods
@@ -52,8 +42,9 @@ namespace Orion.GameLogic.Pathfinding
         /// <param name="source">The position where the path starts.</param>
         /// <param name="destination">The position the path should reach.</param>
         /// <param name="isWalkable">A delegate to a method which evaluates if a given tile is walkable.</param>
+        /// <param name="maxNodesToVisit">The maximum number of nodes to visit before giving up.</param>
         /// <returns>The path that was found, or <c>null</c> is none was.</returns>
-        public Path Find(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable)
+        public Path Find(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable, int maxNodesToVisit)
         {
             Argument.EnsureNotNull(isWalkable, "isWalkable");
 
@@ -62,6 +53,7 @@ namespace Orion.GameLogic.Pathfinding
             this.isWalkable = isWalkable;
             Point16 sourcePoint = RoundCoordinates(source);
             this.destinationPoint = RoundCoordinates(destination);
+            this.maxNodesToVisit = maxNodesToVisit;
 
             PathNode destinationNode = FindPathNodes(sourcePoint);
 

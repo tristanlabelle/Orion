@@ -249,7 +249,7 @@ namespace Orion.GameLogic
         {
             if (!world.IsWithinBounds(point)) return false;
             if (GetTileVisibility(point) == TileVisibility.Undiscovered) return true;
-            return world.Terrain.IsWalkable(point);
+            return world.IsFree(point);
         }
         #endregion
 

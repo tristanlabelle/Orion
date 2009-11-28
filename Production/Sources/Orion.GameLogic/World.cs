@@ -35,7 +35,6 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             entities = new EntityRegistry(this, 5, 5, GenerateHandle);
             pathfinder = new Pathfinder();
-            pathfinder.MaxNodesToVisit = Math.Max(4000, terrain.Size.Area / 8);
         }
         #endregion
 
@@ -133,7 +132,11 @@ namespace Orion.GameLogic
 
             destination = Bounds.ClosestPointInside(destination);
 
-            return pathfinder.Find(source, destination, isWalkable);
+            int maxNumberOfNodes = (int)(source - destination).LengthFast * 40;
+            if (maxNumberOfNodes < 25) maxNumberOfNodes = 100;
+            if (maxNumberOfNodes > 5000) maxNumberOfNodes = 5000;
+
+            return pathfinder.Find(source, destination, isWalkable, maxNumberOfNodes);
         }
 
         /// <summary>

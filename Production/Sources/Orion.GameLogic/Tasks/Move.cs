@@ -109,7 +109,7 @@ namespace Orion.GameLogic.Tasks
             }
             else
             {
-                path = unit.Faction.FindPath(unit.Position, destination);
+                path = unit.Faction.FindPath(unit.GridRegion.Min, destination);
                 nextPointIndex = 1;
             }
         }
@@ -122,6 +122,8 @@ namespace Orion.GameLogic.Tasks
                 {
                     Point point = new Point(x, y);
                     if (!unit.World.Terrain.IsWalkable(point)) return false;
+                    Entity entity = unit.World.Entities.GetSolidEntityAt(point);
+                    if (entity != null && entity != unit) return false;
                 }
             }
             return true;

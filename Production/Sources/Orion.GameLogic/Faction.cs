@@ -61,7 +61,6 @@ namespace Orion.GameLogic
 
             List<TechnologyEffect> effect = new List<TechnologyEffect>();
             //effect.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 100));
-
             //technologies.Add(new Technology("hp boost", null, effect));
         }
         #endregion

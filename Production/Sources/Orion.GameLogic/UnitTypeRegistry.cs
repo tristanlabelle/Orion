@@ -230,7 +230,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Maison de Tristan",
-                Size = new Size(2, 2),
+                Size = new Size(3, 3),
                 SightRange = 4,
                 MaxHealth = 200,
                 AladdiumCost = 150,
@@ -244,14 +244,14 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Jean-Marc ?",
-                Size = new Size(2, 2),
+                Name = "Jean-Marc",
+                Size = new Size(3, 3),
                 SightRange = 12,
                 MaxHealth = 50,
                 AladdiumCost = 80,
                 AlageneCost = 20
             };
-            builder.Skills.Add(new Skills.Attack(6, 8, 4));
+            builder.Skills.Add(new Skills.Attack(17, 10, 2));
             Register(builder);
         }
 

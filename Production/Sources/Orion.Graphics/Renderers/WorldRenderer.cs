@@ -20,6 +20,7 @@ namespace Orion.Graphics
         private readonly TerrainRenderer terrainRenderer;
         private readonly UnitsRenderer unitRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
+        private TextureManager textureManager;
         #endregion
 
         #region Constructors
@@ -32,9 +33,11 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
+            this.textureManager = new TextureManager(@"../../../Assets");
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
-            this.unitRenderer = new UnitsRenderer(world, faction);
+            this.unitRenderer = new UnitsRenderer(world, faction, textureManager);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
+            ;
         }
         #endregion
 
@@ -100,15 +103,16 @@ namespace Orion.Graphics
             var resourceNodes = world.Entities
                 .OfType<ResourceNode>()
                 .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
+            Texture texture;
             foreach (ResourceNode node in resourceNodes)
             {
                 if (node.Type == ResourceType.Aladdium)
-                    graphics.FillColor = AladdiumColor;
+                    texture = textureManager.GetTexture("Aladdium");
                 else if (node.Type == ResourceType.Alagene)
-                    graphics.FillColor = AlageneColor;
-                else continue;
+                    texture = textureManager.GetTexture("Alagene");
+                else throw new Exception("Ressource Type Unknown");
 
-                graphics.Fill(node.BoundingRectangle);
+                graphics.Fill(node.BoundingRectangle, texture);
             }
         }
 

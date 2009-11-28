@@ -101,7 +101,7 @@ namespace Orion.GameLogic.Tasks
             }
             
 
-            else if(buildingPlan.ConstructionBegan)
+            else if(buildingPlan.ConstructionBegan && buildingPlan.CreatedUnit.Health < buildingPlan.CreatedUnit.MaxHealth)
             {
                 builder.Task = new Repair( builder, buildingPlan.CreatedUnit);
             }

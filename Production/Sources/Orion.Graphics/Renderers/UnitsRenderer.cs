@@ -40,15 +40,17 @@ namespace Orion.Graphics
         private readonly World world;
         private bool drawHealthBars;
         private Faction faction;
-        private TextureManager textureManager = new TextureManager(@"../../../Assets");
+        private TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public UnitsRenderer(World world, Faction faction)
+        public UnitsRenderer(World world, Faction faction, TextureManager textureManager)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(faction, "faction");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
+            this.textureManager = textureManager;
             this.world = world;
             this.faction = faction;
         }

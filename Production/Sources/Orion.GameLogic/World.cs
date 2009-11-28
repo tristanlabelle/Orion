@@ -103,6 +103,11 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Pathfinding
+        public bool IsTileFree(Point point)
+        {
+            return terrain.IsWalkable(point) && entities.GetEntityAt(point) == null;
+        }
+
         /// <summary>
         /// Finds a path from a source to a destination.
         /// </summary>

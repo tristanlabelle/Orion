@@ -39,19 +39,65 @@ namespace Orion
         #endregion
 
         #region Properties
+        #region Min
         public Point Min
         {
             get { return min; }
         }
 
+        public int MinX
+        {
+            get { return min.X; }
+        }
+
+        public int MinY
+        {
+            get { return min.Y; }
+        }
+        #endregion
+
+        #region Size
         public Size Size
         {
             get { return size; }
         }
 
+        public int Width
+        {
+            get { return size.Width; }
+        }
+
+        public int Height
+        {
+            get { return size.Height; }
+        }
+        #endregion
+
+        #region ExclusiveMax
+        public int ExclusiveMaxX
+        {
+            get { return MinX + Width; }
+        }
+
+        public int ExclusiveMaxY
+        {
+            get { return MinY + Height; }
+        }
+
         public Point ExclusiveMax
         {
-            get { return new Point(min.X + size.Width, min.Y + size.Height); }
+            get { return new Point(ExclusiveMaxX, ExclusiveMaxY); }
+        }
+        #endregion
+
+        public int Area
+        {
+            get { return size.Area; }
+        }
+
+        public int Perimeter
+        {
+            get { return size.Width * 2 + size.Height * 2; }
         }
         #endregion
 
@@ -81,8 +127,8 @@ namespace Orion
         /// <returns>A value indicating if the point is within this region.</returns>
         public bool Contains(Point point)
         {
-            return point.X >= min.X && point.Y >= min.Y
-                && point.X < ExclusiveMax.X && point.Y < ExclusiveMax.Y;
+            return point.X >= MinX && point.Y >= MinY
+                && point.X < ExclusiveMaxX && point.Y < ExclusiveMaxY;
         }
 
         /// <summary>
@@ -94,11 +140,25 @@ namespace Orion
         {
             int clampedX = point.X;
             int clampedY = point.Y;
-            if (point.X < min.X) clampedX = min.X;
-            else if (point.X >= ExclusiveMax.X) clampedX = ExclusiveMax.X - 1;
-            if (point.Y < min.Y) clampedY = min.Y;
-            else if (point.Y >= ExclusiveMax.Y) clampedY = ExclusiveMax.Y - 1;
+            if (point.X < MinX) clampedX = MinX;
+            else if (point.X >= ExclusiveMaxX) clampedX = ExclusiveMaxX - 1;
+            if (point.Y < MinY) clampedY = MinY;
+            else if (point.Y >= ExclusiveMaxY) clampedY = ExclusiveMaxY - 1;
             return new Point(clampedX, clampedY);
+        }
+
+        public Point[] GetAdjacentPoints()
+        {
+            Point[] points = new Point[Perimeter + 4];
+            for (int i = 0; i < Height; ++i)
+                points[i] = new Point(MinX - 1, MinY - 1 + i);
+            for (int i = 0; i < Width; ++i)
+                points[Height + i] = new Point(MinX - 1 + i, ExclusiveMaxY);
+            for (int i = 0; i < Height; ++i)
+                points[Height + Width + i] = new Point(ExclusiveMaxX, ExclusiveMaxY - i);
+            for (int i = 0; i < Width; ++i)
+                points[Height + Width + Height + i] = new Point(ExclusiveMaxX - i, MinY - 1);
+            return points;
         }
 
         /// <summary>

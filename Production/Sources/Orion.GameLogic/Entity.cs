@@ -80,6 +80,24 @@ namespace Orion.GameLogic
         public abstract Size Size { get; }
 
         /// <summary>
+        /// Gets the width of this <see cref="Entity"/>, in tiles.
+        /// This value is garantee to remain constant.
+        /// </summary>
+        public int Width
+        {
+            get { return Size.Width; }
+        }
+
+        /// <summary>
+        /// Gets the heigh tof this <see cref="Entity"/>, in tiles.
+        /// This value is garantee to remain constant.
+        /// </summary>
+        public int Height
+        {
+            get { return Size.Height; }
+        }
+
+        /// <summary>
         /// Gets the position of the origin of this <see cref="Entity"/>.
         /// </summary>
         public abstract Vector2 Position { get; }

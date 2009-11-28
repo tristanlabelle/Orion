@@ -219,11 +219,7 @@ namespace Orion.GameLogic
 
         public override bool IsSolid
         {
-            get
-            {
-                Skills.Move moveSkill = type.GetSkill<Skills.Move>();
-                return moveSkill != null && moveSkill.IsAirborne;
-            }
+            get { return !type.IsAirborne; }
         }
 
         public float TimeSinceLastHitInSeconds

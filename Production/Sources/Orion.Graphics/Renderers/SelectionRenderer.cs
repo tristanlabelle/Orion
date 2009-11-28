@@ -46,16 +46,14 @@ namespace Orion.Graphics
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                Rectangle unitBoundingRectangle = unit.BoundingRectangle;
-                Rectangle selectionRectangle = Rectangle.FromCenterExtent(
-                    unitBoundingRectangle.CenterX, unitBoundingRectangle.CenterY,
-                    unitBoundingRectangle.Extent.X + 0.05f,
-                    unitBoundingRectangle.Extent.Y + 0.05f);
-                graphics.Stroke(selectionRectangle);
+                graphics.Stroke(unit.BoundingRectangle);
 
-                if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)
+                if (unit.Faction == userInputManager.Commander.Faction)
                 {
-                    graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
+                    if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)
+                    {
+                        graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
+                    }
                 }
             }
         }

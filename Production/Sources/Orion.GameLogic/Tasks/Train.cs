@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -57,7 +59,16 @@ namespace Orion.GameLogic.Tasks
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, (Point)trainer.Position);
+                Point? spawnPoint = trainer.GridRegion.GetAdjacentPoints()
+                    .FirstOrNull(point => trainer.World.IsWithinBounds(point) && trainer.World.IsTileFree(point));
+
+                if (!spawnPoint.HasValue)
+                {
+                    Debug.Fail("No free point to spawn unit.");
+                    spawnPoint = (Point)trainer.Position;
+                }
+
+                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, spawnPoint.Value);
                 unitCreated.Task = new Move(unitCreated, trainer.RallyPoint.Value);
                 hasEnded = true;
             }

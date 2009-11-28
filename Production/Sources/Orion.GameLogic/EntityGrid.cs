@@ -50,14 +50,14 @@ namespace Orion.GameLogic
 
         public bool IsFree(Point point)
         {
-            return !terrain.IsWalkable(point) && this[point] == null;
+            return GetEntityAt(point) == null;
         }
 
         public bool IsFree(Region region)
         {
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
             {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
                     Point point = new Point(x, y);
                     if (!IsFree(point)) return false;
@@ -80,9 +80,9 @@ namespace Orion.GameLogic
 
             Region region = entity.GridRegion;
 
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
             {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
                     //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)), "Adding unit to non-walkable tile.");
                     //Debug.Assert(grid[x, y] == null, "Overwriting {0}.".FormatInvariant(grid[x, y]));
@@ -95,9 +95,9 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
             {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
                     //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)));
                     //Debug.Assert(grid[x, y] == entity, "There was no entity to remove.");

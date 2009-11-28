@@ -293,14 +293,14 @@ namespace Orion.GameLogic
             return unit;
         }
 
-        private void OnEntityMoved(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
+        private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
             Unit unit = (Unit)entity;
             int sightRange = unit.GetStat(UnitStat.SightRange);
-            Circle oldLineOfSight = new Circle(eventArgs.OldValue, sightRange);
-            Circle newLineOfSight = new Circle(eventArgs.NewValue, sightRange);
+            Circle oldLineOfSight = new Circle(oldPosition, sightRange);
+            Circle newLineOfSight = new Circle(newPosition, sightRange);
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 

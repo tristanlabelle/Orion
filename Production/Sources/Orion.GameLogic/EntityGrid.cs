@@ -42,24 +42,6 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
-        #region GetRegion
-        public Region GetRegion(Rectangle rectangle)
-        {
-            int minX = Math.Max(0, (int)rectangle.MinX);
-            int minY = Math.Max(0, (int)rectangle.MinY);
-            int maxX = Math.Min(Size.Width - 1, (int)rectangle.MaxX);
-            int maxY = Math.Min(Size.Height - 1, (int)rectangle.MaxY);
-
-            return Region.FromMinExclusiveMax(new Point(minX, minY), new Point(maxX + 1, maxY + 1));
-        }
-
-        public Region GetRegion(Entity entity)
-        {
-            Argument.EnsureNotNull(entity, "entity");
-            return GetRegion(entity.CollisionRectangle);
-        }
-        #endregion
-
         #region Queries
         public Entity GetEntityAt(Point point)
         {
@@ -96,7 +78,7 @@ namespace Orion.GameLogic
                     "entity");
             }
 
-            Region region = GetRegion(entity.BoundingRectangle);
+            Region region = entity.GridRegion;
 
             for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
             {
@@ -109,11 +91,9 @@ namespace Orion.GameLogic
             }
         }
 
-        public void Remove(Entity entity, Rectangle boundingRectangle)
+        public void Remove(Entity entity, Region region)
         {
             Argument.EnsureNotNull(entity, "entity");
-
-            Region region = GetRegion(boundingRectangle);
 
             for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
             {
@@ -129,7 +109,7 @@ namespace Orion.GameLogic
         public void Remove(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Remove(entity, entity.BoundingRectangle);
+            Remove(entity, entity.GridRegion);
         }
         #endregion
         #endregion

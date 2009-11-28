@@ -48,11 +48,8 @@ namespace Orion.GameLogic
 
         protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
         {
-            if (Moved != null)
-            {
-                var eventArgs = new ValueChangedEventArgs<Vector2>(oldPosition, newPosition);
-                Moved(this, eventArgs);
-            }
+            var handler = Moved;
+            if (handler != null) handler(this, oldPosition, newPosition);
         }
         #endregion
 
@@ -110,6 +107,11 @@ namespace Orion.GameLogic
         {
             get { return GetCollisionRectangle(BoundingRectangle); }
         }
+
+        public Region GridRegion
+        {
+            get { return GetGridRegion(Position, Size); }
+        }
         #endregion
 
         /// <summary>
@@ -152,6 +154,12 @@ namespace Orion.GameLogic
 
         #region Static
         #region Methods
+        public static Region GetGridRegion(Vector2 position, Size size)
+        {
+            Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
+            return new Region(min, size);
+        }
+
         public static Rectangle GetCollisionRectangle(Rectangle boundingRectangle)
         {
             return Rectangle.FromCenterSize(

@@ -154,7 +154,7 @@ namespace Orion.GameLogic
             if (entity.IsSolid) grid.Remove(entity);
         }
 
-        private void OnEntityMoved(Entity entity, ValueChangedEventArgs<Vector2> eventArgs)
+        private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
             Argument.EnsureNotNull(entity, "entity");
 
@@ -162,17 +162,14 @@ namespace Orion.GameLogic
             deferredChanges.TryGetValue(entity, out change);
             if (!change.HasType(DeferredChangeType.Move))
             {
-                change = change.CreateCombined(DeferredChangeType.Move, eventArgs.OldValue);
+                change = change.CreateCombined(DeferredChangeType.Move, oldPosition);
                 deferredChanges[entity] = change;
             }
 
             if (entity.IsSolid)
             {
-                Rectangle oldBoundingRectangle = new Rectangle(
-                    eventArgs.OldValue.X, eventArgs.OldValue.Y,
-                    entity.Size.Width, entity.Size.Height);
-
-                grid.Remove(entity, oldBoundingRectangle);
+                Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
+                grid.Remove(entity, oldRegion);
                 grid.Add(entity);
             }
         }

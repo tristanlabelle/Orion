@@ -75,7 +75,7 @@
     <Compile Include="Size.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
-    <Compile Include="ValueChangedEventArgs.cs" />
+    <Compile Include="ValueChangedEventHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

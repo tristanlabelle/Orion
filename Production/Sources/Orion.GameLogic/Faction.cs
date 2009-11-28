@@ -217,32 +217,20 @@ namespace Orion.GameLogic
         public int GetStat(UnitType type, UnitStat stat)
         {
             Argument.EnsureNotNull(type, "type");
-            return ApplyTechnologies(stat, type.GetBaseStat(stat));
+            return type.GetBaseStat(stat) + GetTechnologyBonuses(stat);
         }
 
         /// <summary>
-        /// Applies the technology modifiers to the stats
+        /// Gets the sum of the bonuses researched technologies offer to a stat.
         /// </summary>
-        /// <param name="stat">Stat type</param>
-        /// <param name="baseStat">value of the unmodified stat</param>
-        /// <returns>modified stat value</returns>
-        public int ApplyTechnologies(UnitStat stat, int baseStat)
+        /// <param name="stat">The stat type.</param>
+        /// <returns>The sum of the bonuses offered by technologies</returns>
+        public int GetTechnologyBonuses(UnitStat stat)
         {
-            if (technologies.Count != 0)
-            {
-                foreach (Technology tech in technologies)
-                {
-                    foreach (TechnologyEffect effect in tech.Effects)
-                    {
-                        if (stat == effect.Stat)
-                        {
-                            return baseStat += effect.Value;
-                        }
-                    }
-                }
-            }
-
-            return baseStat;
+            return technologies
+                .SelectMany(tech => tech.Effects)
+                .Where(effect => effect.Stat == stat)
+                .Sum(effect => effect.Value);
         }
 
         #region Pathfinding
@@ -259,8 +247,9 @@ namespace Orion.GameLogic
 
         private bool IsPathable(Point point)
         {
-            return world.IsWithinBounds(point)
-                && (GetTileVisibility(point) == TileVisibility.Undiscovered || world.Terrain.IsWalkable(point));
+            if (!world.IsWithinBounds(point)) return false;
+            if (GetTileVisibility(point) == TileVisibility.Undiscovered) return true;
+            return world.Terrain.IsWalkable(point);
         }
         #endregion
 
@@ -284,12 +273,16 @@ namespace Orion.GameLogic
 
                 alageneNode.Extractor = unit;
             }
+
+            localFogOfWar.AddLineOfSight(unit.LineOfSight);
             unit.Moved += entityMovedEventHandler;
             unit.Died += entityDiedEventHandler;
-            localFogOfWar.AddLineOfSight(unit.LineOfSight);
+
             usedFoodAmount += type.FoodCost;
+
             if (unit.Type.HasSkill<Skills.StoreFood>())
                 totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+
             return unit;
         }
 

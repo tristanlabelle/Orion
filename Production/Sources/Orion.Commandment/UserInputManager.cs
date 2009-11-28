@@ -142,6 +142,7 @@ namespace Orion.Commandment
             List<Unit> selectedUnits = faction.World.Entities
                 .OfType<Unit>()
                 .Where(unit => Rectangle.Intersects(selection, unit.BoundingRectangle))
+                .OrderBy(unit => (unit.Center - selectionStart.Value).LengthSquared)
                 .ToList();
 
             // Filter out buildings

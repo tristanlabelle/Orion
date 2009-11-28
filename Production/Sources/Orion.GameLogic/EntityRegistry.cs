@@ -278,7 +278,7 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        public Entity GetEntityAt(Point point)
+        public Entity GetSolidEntityAt(Point point)
         {
             return grid[point];
         }

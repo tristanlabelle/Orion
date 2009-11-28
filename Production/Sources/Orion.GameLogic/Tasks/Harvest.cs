@@ -81,23 +81,7 @@ namespace Orion.GameLogic.Tasks
                 }
                 else
                 {
-                    if (VisitingCommandCenterIsOver(timeDelta))
-                    {
-                        //adds the resources to the unit's faction
-                        if (node.Type == ResourceType.Aladdium)
-                            harvester.Faction.AladdiumAmount += amountCarrying;
-                        else if (node.Type == ResourceType.Alagene)
-                            harvester.Faction.AlageneAmount += amountCarrying;
-                        amountCarrying = 0;
-
-                        if (nodeIsDead)
-                        {
-                            hasEnded = true;
-                            return;
-                        }
-                        move = new Move(harvester, node.Position);
-                        mode = Mode.Extracting;
-                    }
+                    UpdateDelivering(timeDelta);
                 }
             }
             else
@@ -110,7 +94,7 @@ namespace Orion.GameLogic.Tasks
         {
             float extractingSpeed = harvester.GetStat(UnitStat.ExtractingSpeed);
             amountAccumulator += extractingSpeed * timeDelta;
-            
+
             int maxCarryingAmount = harvester.GetSkill<Skills.Harvest>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
             {
@@ -148,6 +132,29 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
+        private void UpdateDelivering(float timeDelta)
+        {
+            secondsGivingResource += timeDelta;
+            if (secondsGivingResource < depositingDuration)
+                return;
+            
+            //adds the resources to the unit's faction
+            if (node.Type == ResourceType.Aladdium)
+                harvester.Faction.AladdiumAmount += amountCarrying;
+            else if (node.Type == ResourceType.Alagene)
+                harvester.Faction.AlageneAmount += amountCarrying;
+            amountCarrying = 0;
+
+            if (nodeIsDead)
+            {
+                hasEnded = true;
+                return;
+            }
+
+            move = new Move(harvester, node.Position);
+            mode = Mode.Extracting;
+        }
+
         private Unit FindClosestCommandCenter()
         {
             return harvester.World.Entities
@@ -175,19 +182,6 @@ namespace Orion.GameLogic.Tasks
                     commandCenter.Died += commandCenterDestroyedEventHandler;
                     move = new Move(harvester, commandCenter.Position);
                 }
-            }
-        }
-
-        private bool VisitingCommandCenterIsOver(float timeDelta)
-        {
-            if (secondsGivingResource >= depositingDuration)
-            {
-                return true;
-            }
-            else
-            {
-                secondsGivingResource += timeDelta;
-                return false;
             }
         }
 

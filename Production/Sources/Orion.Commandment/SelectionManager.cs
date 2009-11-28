@@ -37,6 +37,18 @@ namespace Orion.Commandment
         #region Events
         public event GenericEventHandler<SelectionManager> SelectionCleared;
         public event GenericEventHandler<SelectionManager> SelectionChanged;
+
+        private void RaiseSelectionCleared()
+        {
+            var handler = SelectionCleared;
+            if (handler != null) handler(this);
+        }
+
+        private void RaiseSelectionChanged()
+        {
+            GenericEventHandler<SelectionManager> handler = SelectionChanged;
+            if (handler != null) handler(this);
+        }
         #endregion
 
         #region Properties
@@ -73,21 +85,20 @@ namespace Orion.Commandment
             if (!selectedUnits.Contains(unit))
             {
                 selectedUnits.Add(unit);
-                OnSelectionChange();
+                UpdateSelection();
             }
         }
 
         public void AppendToSelection(IEnumerable<Unit> units)
         {
             selectedUnits.AddRange(units.Except(selectedUnits));
-            OnSelectionChange();
+            UpdateSelection();
         }
 
         public void ClearSelection()
         {
             selectedUnits.Clear();
-            GenericEventHandler<SelectionManager> selectionCleared = SelectionCleared;
-            if (selectionCleared != null) selectionCleared(this);
+            RaiseSelectionCleared();
         }
 
         /// <summary>
@@ -103,19 +114,18 @@ namespace Orion.Commandment
                 if (selectedUnits.Contains(unit))
                 {
                     selectedUnits.Remove(unit);
-                    OnSelectionChange();
+                    UpdateSelection();
                 }
                 if (hoveredUnit == unit) hoveredUnit = null;
             }
         }
 
-        private void OnSelectionChange()
+        private void UpdateSelection()
         {
-            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
             if (selectedUnits.Count > MaxSelectedUnits)
                 selectedUnits.RemoveRange(MaxSelectedUnits, selectedUnits.Count - MaxSelectedUnits);
-            GenericEventHandler<SelectionManager> handler = SelectionChanged;
-            if (handler != null) handler(this);
+            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
+            RaiseSelectionChanged();
         }
         #endregion
     }

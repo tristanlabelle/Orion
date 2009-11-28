@@ -101,11 +101,8 @@ namespace Orion.GameLogic.Tasks
                 ++nextPointIndex;
             }
 
-            Rectangle targetBoundingRectangle = new Rectangle(
-                targetPosition.X, targetPosition.Y, unit.Size.Width, unit.Size.Height);
-            Rectangle targetCollisionRectangle = Entity.GetCollisionRectangle(targetBoundingRectangle);
-
-            if (unit.Type.IsAirborne || unit.World.Terrain.IsWalkable(targetCollisionRectangle))
+            Region targetRegion = Entity.GetGridRegion(targetPosition, unit.Size);
+            if (unit.Type.IsAirborne || CanWalkOn(targetRegion))
             {
                 // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);
@@ -115,6 +112,19 @@ namespace Orion.GameLogic.Tasks
                 path = unit.Faction.FindPath(unit.Position, destination);
                 nextPointIndex = 1;
             }
+        }
+
+        private bool CanWalkOn(Region targetRegion)
+        {
+            for (int x = targetRegion.MinX; x < targetRegion.ExclusiveMaxX; ++x)
+            {
+                for (int y = targetRegion.MinY; y < targetRegion.ExclusiveMaxY; ++y)
+                {
+                    Point point = new Point(x, y);
+                    if (!unit.World.Terrain.IsWalkable(point)) return false;
+                }
+            }
+            return true;
         }
         #endregion
     }

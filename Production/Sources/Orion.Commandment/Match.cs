@@ -251,18 +251,15 @@ namespace Orion.Commandment
 
         private void CreateCampUnits(Faction faction, Vector2 campCenter)
         {
-            Unit pyramide = faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
-            pyramide.CompleteConstruction();
-            for (int i = 1; i <= 2; i++)
-            {
-                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"),
-                    (Point)(campCenter + new Vector2(i * campSize / 8f, 0)));
-            }
-            for (int i = 1; i <= 2; i++)
-            {
-                faction.CreateUnit(world.UnitTypes.FromName("Schtroumpf"),
-                    (Point)(campCenter + new Vector2(i * campSize / 8f, 1)));
-            }
+            Unit building = faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
+            building.CompleteConstruction();
+            Region buildingRegion = building.GridRegion;
+
+            UnitType unitType = world.UnitTypes.FromName("Schtroumpf");
+            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
+            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
+            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));
+            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY + 1));
         }
 
         private void CreateCampResourceNodes(Vector2 campCenter)

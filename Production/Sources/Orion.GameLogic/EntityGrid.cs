@@ -84,7 +84,6 @@ namespace Orion.GameLogic
             {
                 for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
-                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)), "Adding unit to non-walkable tile.");
                     //Debug.Assert(grid[x, y] == null, "Overwriting {0}.".FormatInvariant(grid[x, y]));
                     grid[x, y] = entity;
                 }
@@ -99,7 +98,6 @@ namespace Orion.GameLogic
             {
                 for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
                 {
-                    //Debug.Assert(world.Terrain.IsWalkable(new Point(x, y)));
                     //Debug.Assert(grid[x, y] == entity, "There was no entity to remove.");
                     grid[x, y] = null;
                 }

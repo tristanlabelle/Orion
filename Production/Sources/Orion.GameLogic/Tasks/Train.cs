@@ -63,7 +63,7 @@ namespace Orion.GameLogic.Tasks
                 if (!traineeType.IsAirborne)
                 {
                     spawnPoint = trainer.GridRegion.GetAdjacentPoints()
-                        .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsTileFree(point))
+                        .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsFree(point))
                         .WithMin(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
                 }
 

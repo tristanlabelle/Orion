@@ -103,9 +103,18 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Pathfinding
-        public bool IsTileFree(Point point)
+        public bool IsFree(Point point)
         {
-            return terrain.IsWalkable(point) && entities.GetEntityAt(point) == null;
+            return terrain.IsWalkable(point) && entities.GetSolidEntityAt(point) == null;
+        }
+
+        public bool IsFree(Region region)
+        {
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                    if (!IsFree(new Point(x, y)))
+                        return false;
+            return true;
         }
 
         /// <summary>

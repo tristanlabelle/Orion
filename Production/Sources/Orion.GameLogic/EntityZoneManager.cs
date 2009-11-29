@@ -119,9 +119,9 @@ namespace Orion.GameLogic
 
         private void Add(Entity entity, Region zoneRegion)
         {
-            for (int x = zoneRegion.Min.X; x < zoneRegion.ExclusiveMax.X; ++x)
+            for (int x = zoneRegion.MinX; x < zoneRegion.ExclusiveMaxX; ++x)
             {
-                for (int y = zoneRegion.Min.Y; y < zoneRegion.ExclusiveMax.Y; ++y)
+                for (int y = zoneRegion.MinY; y < zoneRegion.ExclusiveMaxY; ++y)
                 {
                     Point point = new Point(x, y);
                     AddToZone(point, entity);
@@ -154,9 +154,9 @@ namespace Orion.GameLogic
 
         private void Remove(Entity entity, Region zoneRegion)
         {
-            for (int x = zoneRegion.Min.X; x < zoneRegion.ExclusiveMax.X; ++x)
+            for (int x = zoneRegion.MinX; x < zoneRegion.ExclusiveMaxX; ++x)
             {
-                for (int y = zoneRegion.Min.Y; y < zoneRegion.ExclusiveMax.Y; ++y)
+                for (int y = zoneRegion.MinY; y < zoneRegion.ExclusiveMaxY; ++y)
                 {
                     Point point = new Point(x, y);
                     RemoveFromZone(point, entity);
@@ -167,7 +167,7 @@ namespace Orion.GameLogic
         private void RemoveFromZone(Point point, Entity entity)
         {
             PooledList<Entity> zone = zones[point.X, point.Y];
-            Debug.Assert(zone.Contains(entity), "The does not contain that entity.");
+            Debug.Assert(zone.Contains(entity), "The zone does not contain that entity.");
             zone.Remove(entity);
         }
         #endregion

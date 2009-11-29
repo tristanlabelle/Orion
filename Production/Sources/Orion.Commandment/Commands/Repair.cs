@@ -55,7 +55,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.Task = new RepairTask(unit, target);
+                unit.CurrentTask = new RepairTask(unit, target);
             }
         }
 

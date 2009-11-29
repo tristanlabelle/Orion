@@ -259,12 +259,12 @@ namespace Orion.GameLogic
 
         public IEnumerable<Type> GetUnitTaskQueue(Handle unit)
         {
-            return GetUnit(unit).TaskQueue.Select(task => task.GetType());
+            return GetUnit(unit).QueuedTasks.Select(task => task.GetType());
         }
 
         public Type GetUnitTask(Handle unit)
         {
-            Task task = GetUnit(unit).Task;
+            Task task = GetUnit(unit).CurrentTask;
             if (task == null) return null;
             return task.GetType();
         }

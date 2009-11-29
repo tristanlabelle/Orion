@@ -6,6 +6,9 @@ using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
+    /// <summary>
+    /// A task which causes a unit (typically a building) to create a unit.
+    /// </summary>
     [Serializable]
     public sealed class Train : Task
     {
@@ -59,17 +62,38 @@ namespace Orion.GameLogic.Tasks
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
-                Point spawnPoint = (Point)trainer.Center;
-                if (!traineeType.IsAirborne)
+                Point? spawnPoint = GetSpawnPoint();
+                if (spawnPoint.HasValue)
                 {
-                    spawnPoint = trainer.GridRegion.GetAdjacentPoints()
-                        .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsFree(point))
-                        .WithMin(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
+                    Unit trainee = trainer.Faction.CreateUnit(traineeType, spawnPoint.Value);
+                    Vector2 traineeDelta = trainee.Center - trainer.Center;
+                    trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+                    if (trainer.HasRallyPoint) trainee.CurrentTask = new Move(trainee, trainer.RallyPoint.Value);
+                    hasEnded = true;
                 }
+                else
+                {
+                    Debug.WriteLine("No place to spawn a unit.");
+                }
+            }
+        }
 
-                Unit unitCreated = trainer.Faction.CreateUnit(traineeType, spawnPoint);
-                unitCreated.Task = new Move(unitCreated, trainer.RallyPoint.Value);
-                hasEnded = true;
+        private Point? GetSpawnPoint()
+        {
+            if (traineeType.IsAirborne) return (Point)trainer.Center;
+
+            var adjacentPoints = trainer.GridRegion.GetAdjacentPoints()
+                    .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsFree(point));
+            
+            if (trainer.HasRallyPoint)
+            {
+                return adjacentPoints
+                    .Select(point => (Point?)point)
+                    .WithMinOrDefault(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
+            }
+            else
+            {
+                return adjacentPoints.FirstOrNull();
             }
         }
         #endregion

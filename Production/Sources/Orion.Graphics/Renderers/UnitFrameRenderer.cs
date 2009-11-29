@@ -23,7 +23,7 @@ namespace Orion.Graphics
         public override void Draw(GraphicsContext context)
         {
             // If a baraque is selected and that it is currently executing a task. 
-            if (unit.Type.Name == "Baraque" && unit.Task != null)
+            if (unit.Type.Name == "Baraque" && unit.CurrentTask != null)
             {
                /*
                 //UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(, unit);

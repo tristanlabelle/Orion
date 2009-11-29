@@ -86,7 +86,7 @@ namespace Orion.GameLogic.Tasks
             Vector2 delta = targetPathPoint - unit.Position;
             Vector2 direction = Vector2.Normalize(delta);
 
-            unit.Angle = (float)Math.Atan2(direction.X, direction.Y);
+            unit.Angle = (float)Math.Atan2(direction.Y, direction.X);
 
             float distance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
             Vector2 targetPosition;

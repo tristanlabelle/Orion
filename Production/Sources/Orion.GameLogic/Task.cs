@@ -6,7 +6,7 @@ namespace Orion.GameLogic
     /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Unit"/> behavior.
     /// </summary>
     [Serializable]
-    public abstract class Task
+    public abstract class Task : IDisposable
     {
         #region Properties
         /// <summary>
@@ -29,10 +29,9 @@ namespace Orion.GameLogic
         public abstract void Update(float timeDelta);
 
         /// <summary>
-        /// Called when this <see cref="Task"/> has been cancelled by a <see cref="Unit"/> using it.
+        /// Releases all resources used by this <see cref="Task"/>.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> that cancelled this <see cref="Task"/>.</param>
-        internal virtual void OnCancelled(Unit unit) { }
+        public virtual void Dispose() { }
 
         public override sealed string ToString()
         {

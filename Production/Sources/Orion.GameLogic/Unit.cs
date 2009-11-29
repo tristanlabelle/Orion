@@ -15,15 +15,15 @@ namespace Orion.GameLogic
     public sealed class Unit : Entity
     {
         #region Fields
-        private readonly Queue<Task> taskQueue = new Queue<Task>();
         private readonly UnitType type;
         private readonly Faction faction;
+        private readonly Queue<Task> queuedTasks = new Queue<Task>();
         private Vector2 position;
         private float angle;
         private float damage;
         private Vector2? rallyPoint;
         private float totalHealthReceived;
-        private bool underConstruction;
+        private bool isUnderConstruction;
         private float timeSinceLastHitInSeconds = 0;
         #endregion
 
@@ -48,12 +48,8 @@ namespace Orion.GameLogic
             this.type = type;
             this.faction = faction;
             this.position = position;
-
-            if (type.HasSkill<Skills.Train>())
-                this.rallyPoint = GetDefaultRallyPoint();
             
-            if (type.IsBuilding)
-                underConstruction = true;
+            if (type.IsBuilding) isUnderConstruction = true;
         }
         #endregion
 
@@ -115,7 +111,7 @@ namespace Orion.GameLogic
 
         public bool UnderConstruction
         {
-            get { return underConstruction; }
+            get { return isUnderConstruction; }
         }
         #endregion
 
@@ -146,7 +142,7 @@ namespace Orion.GameLogic
                 OnDamageChanged();
                 if (damage == MaxHealth) Die();
                 else if (damage == 0 && UnderConstruction)
-                    underConstruction = false;
+                    isUnderConstruction = false;
             }
         }
 
@@ -170,50 +166,52 @@ namespace Orion.GameLogic
 
         #region Task
         /// <summary>
+        /// Gets the sequence of this unit's queued tasks, in the order they're to be executed.
+        /// </summary>
+        public IEnumerable<Task> QueuedTasks
+        {
+            get { return queuedTasks; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this unit's task queue is full.
+        /// </summary>
+        public bool IsTaskQueueFull
+        {
+            get { return queuedTasks.Count >= 8; }
+        }
+
+        /// <summary>
         /// Accesses the <see cref="Task"/> currently executed by this <see cref="Unit"/>.
         /// </summary>
-        public Task Task
+        public Task CurrentTask
         {
             get
             {
-                if (taskQueue.Count == 0) return null;
-                return taskQueue.Peek();
+                if (queuedTasks.Count == 0) return null;
+                return queuedTasks.Peek();
             }
             set
             {
-                if (taskQueue.Count == 1)
+                if (queuedTasks.Count == 1)
                 {
-                    Task oldTask = taskQueue.Dequeue();
-                    oldTask.OnCancelled(this);
+                    Task oldTask = queuedTasks.Dequeue();
+                    oldTask.Dispose();
                 }
 
-                Debug.Assert(taskQueue.Count == 0);
+                Debug.Assert(queuedTasks.Count == 0);
 
-                if (value != null) taskQueue.Enqueue(value);
+                if (value != null) queuedTasks.Enqueue(value);
             }
         }
-        /// <summary>
-        /// Returns a boolean value that checks if the queueTask of that unit is full or not
-        /// </summary>
-        public bool QueueFull
-        {
-            get { return taskQueue.Count >= 8; }
-        }
+
 
         /// <summary>
-        /// Return the whole queue of task
-        /// </summary>
-        public IEnumerable<Task> TaskQueue
-        {
-            get { return taskQueue; }
-        } 
-
-        /// <summary>
-        /// get the value indicating if the unit does nothing
+        /// Gets a value indicating if the unit does nothing.
         /// </summary>
         public bool IsIdle
         {
-            get { return taskQueue.Count == 0; }
+            get { return queuedTasks.Count == 0; }
         }
         #endregion
 
@@ -225,22 +223,32 @@ namespace Orion.GameLogic
         public float TimeSinceLastHitInSeconds
         {
             get { return timeSinceLastHitInSeconds; }
-            set
+            internal set
             {
                 Argument.EnsureNotNull(value, "timeSinceLastHitInSeconds");
                 timeSinceLastHitInSeconds = value;
             }
         }
 
+        #region Rally Point
         /// <summary>
-        /// Accesses the rally point of this <see cref="Unit"/>,
-        /// relative to its position. This is used for buildings.
+        /// Gets a value indicating if this <see cref="Unit"/> has a rally point.
+        /// </summary>
+        public bool HasRallyPoint
+        {
+            get { return rallyPoint.HasValue; }
+        }
+
+        /// <summary>
+        /// Accesses the rally point of this <see cref="Unit"/>, in absolute coordinates.
+        /// This is used for buildings.
         /// </summary>
         public Vector2? RallyPoint
         {
             get { return rallyPoint; }
             set { rallyPoint = value; }
         }
+        #endregion
         #endregion
         #endregion
 
@@ -335,7 +343,7 @@ namespace Orion.GameLogic
         public void EnqueueTask(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            taskQueue.Enqueue(task);
+            queuedTasks.Enqueue(task);
         }
 
         /// <summary>
@@ -356,14 +364,14 @@ namespace Orion.GameLogic
                     .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
                 if (unitToAttack != null)
-                    Task = new Tasks.Attack(this, unitToAttack);
+                    CurrentTask = new Tasks.Attack(this, unitToAttack);
             }
 
-            if (taskQueue.Count > 0)
+            if (queuedTasks.Count > 0)
             {
-                Task task = taskQueue.Peek();
+                Task task = queuedTasks.Peek();
                 task.Update(timeDeltaInSeconds);
-                if (task.HasEnded) taskQueue.Dequeue();
+                if (task.HasEnded) queuedTasks.Dequeue();
             }
         }
 
@@ -377,53 +385,19 @@ namespace Orion.GameLogic
             this.Health = 0;
         }
 
-        private Vector2 GetDefaultRallyPoint()
-        {
-            Vector2 newRallyPoint = new Vector2();
-            if (World.Terrain.IsWalkableAndWithinBounds((Point)position))
-            {
-                if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X, (int)position.Y - 1)))
-                {
-                    //Dispatch units South
-                    newRallyPoint.Y = position.Y - 1;
-                    newRallyPoint.X = position.X;
-                }
-                else if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X, (int)position.Y + 1)))
-                {
-                    //Dispatch units North
-                    newRallyPoint.Y = position.Y + 1;
-                    newRallyPoint.X = position.X;
-                
-                }
-                else if (World.Terrain.IsWalkableAndWithinBounds(new Point((int)position.X + 1, (int)position.Y)))
-                {
-                    //Dispatch units Est
-                    newRallyPoint.Y = position.Y;
-                    newRallyPoint.X = position.X + 1;
-                }
-                else
-                {
-                    //Dispatch units West
-                    newRallyPoint.Y = position.Y;
-                    newRallyPoint.X = position.X - 1;
-                }
-            }
-   
-            return newRallyPoint;
-        }
-
         public void Build(float health)
         {
             Argument.EnsurePositive(health, "health");
             this.Health += health;
             this.totalHealthReceived += health;
             if (totalHealthReceived >= MaxHealth)
-                underConstruction = false;
+                isUnderConstruction = false;
         }
+
         public void CompleteConstruction()
         {
             this.Health = MaxHealth;
-            this.underConstruction = false;
+            this.isUnderConstruction = false;
         }
         #endregion
     }

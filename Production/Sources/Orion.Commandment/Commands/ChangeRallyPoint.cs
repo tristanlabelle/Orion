@@ -9,23 +9,25 @@ using System.Collections.ObjectModel;
 
 namespace Orion.Commandment.Commands
 {
+    /// <summary>
+    /// A <see cref="Command"/> which causes the rally point of a <see cref="Unit"/> to be changed to a new value.
+    /// </summary>
     [Serializable]
     public sealed class ChangeRallyPoint : Command
     {
-
         #region Fields
         private readonly ReadOnlyCollection<Handle> buildingHandles;
-        private readonly Vector2 destination;
+        private readonly Vector2 position;
         #endregion
 
         #region Constructors
-        public ChangeRallyPoint(Handle factionHandle, IEnumerable<Handle> buildingHandles, Vector2 destination)
+        public ChangeRallyPoint(Handle factionHandle, IEnumerable<Handle> buildingHandles, Vector2 position)
             : base(factionHandle)
         {
             Argument.EnsureNotNullNorEmpty(buildingHandles, "BuildingChangeRally");
 
             this.buildingHandles = buildingHandles.Distinct().ToList().AsReadOnly();
-            this.destination = destination;
+            this.position = position;
         }
         #endregion
 
@@ -52,14 +54,14 @@ namespace Orion.Commandment.Commands
             foreach (Handle buildingHandle in buildingHandles)
             {
                 Unit building = (Unit)match.World.Entities.FromHandle(buildingHandle);
-                building.RallyPoint = destination;
+                building.RallyPoint = position;
             }
         }
 
         public override string ToString()
         {
             return "Faction {0} set Rally Point of  {1} to {2}"
-                .FormatInvariant(FactionHandle, buildingHandles.ToCommaSeparatedValues(), destination);
+                .FormatInvariant(FactionHandle, buildingHandles.ToCommaSeparatedValues(), position);
         }
 
         #region Serialization
@@ -67,8 +69,8 @@ namespace Orion.Commandment.Commands
         {
             WriteHandle(writer, FactionHandle);
             WriteLengthPrefixedHandleArray(writer, buildingHandles);
-            writer.Write(destination.X);
-            writer.Write(destination.Y);
+            writer.Write(position.X);
+            writer.Write(position.Y);
         }
 
         public static ChangeRallyPoint DeserializeSpecific(BinaryReader reader)

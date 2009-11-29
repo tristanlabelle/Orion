@@ -137,7 +137,7 @@ namespace Orion.Graphics
         {
             GL.PushMatrix();
             GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
-            float rotationAngleInDegrees = (float)(transform.Rotation * 180 / -Math.PI);
+            float rotationAngleInDegrees = (float)(transform.Rotation * 180 / Math.PI);
             GL.Rotate(rotationAngleInDegrees, Vector3.UnitZ);
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
             return new TransformHandle();

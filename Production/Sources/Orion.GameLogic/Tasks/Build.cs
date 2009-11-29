@@ -90,7 +90,7 @@ namespace Orion.GameLogic.Tasks
                     builder.Faction.AlageneAmount -= alageneCost;
                     buildingPlan.lauchCreationOfThisUnit(builder.Faction.CreateUnit(buildingPlan.BuildingType, buildingPlan.Position));
                     
-                    builder.Task = new Repair(builder, buildingPlan.CreatedUnit);
+                    builder.CurrentTask = new Repair(builder, buildingPlan.CreatedUnit);
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace Orion.GameLogic.Tasks
 
             else if(buildingPlan.ConstructionBegan && buildingPlan.CreatedUnit.Health < buildingPlan.CreatedUnit.MaxHealth)
             {
-                builder.Task = new Repair( builder, buildingPlan.CreatedUnit);
+                builder.CurrentTask = new Repair( builder, buildingPlan.CreatedUnit);
             }
         }
         #endregion

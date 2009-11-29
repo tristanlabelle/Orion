@@ -59,7 +59,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle unit in builderHandles)
             {
                 Unit builder = (Unit)match.World.Entities.FromHandle(unit);
-                builder.Task = new BuildTask(builder, plan);
+                builder.CurrentTask = new BuildTask(builder, plan);
             }
         }
 

@@ -150,14 +150,14 @@ namespace Orion
         public Point[] GetAdjacentPoints()
         {
             Point[] points = new Point[Perimeter + 4];
-            for (int i = 0; i < Height; ++i)
+            for (int i = 0; i < Height + 1; ++i)
                 points[i] = new Point(MinX - 1, MinY - 1 + i);
-            for (int i = 0; i < Width; ++i)
-                points[Height + i] = new Point(MinX - 1 + i, ExclusiveMaxY);
-            for (int i = 0; i < Height; ++i)
-                points[Height + Width + i] = new Point(ExclusiveMaxX, ExclusiveMaxY - i);
-            for (int i = 0; i < Width; ++i)
-                points[Height + Width + Height + i] = new Point(ExclusiveMaxX - i, MinY - 1);
+            for (int i = 0; i < Width + 1; ++i)
+                points[Height + 1 + i] = new Point(MinX - 1 + i, ExclusiveMaxY);
+            for (int i = 0; i < Height + 1; ++i)
+                points[Height + Width + 2 + i] = new Point(ExclusiveMaxX, ExclusiveMaxY - i);
+            for (int i = 0; i < Width + 1; ++i)
+                points[Height + Width + Height + 3 + i] = new Point(ExclusiveMaxX - i, MinY - 1);
             return points;
         }
 

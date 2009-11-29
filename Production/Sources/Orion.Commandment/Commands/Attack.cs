@@ -56,7 +56,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle attackerHandle in attackerHandles)
             {
                 Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.Task = new AttackTask(attacker, target);
+                attacker.CurrentTask = new AttackTask(attacker, target);
             }
         }
 

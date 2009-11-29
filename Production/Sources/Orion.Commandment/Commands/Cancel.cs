@@ -49,7 +49,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.Task = null;
+                unit.CurrentTask = null;
             }
         }
 

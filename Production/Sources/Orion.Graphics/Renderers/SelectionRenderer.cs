@@ -48,13 +48,8 @@ namespace Orion.Graphics
             {
                 graphics.Stroke(unit.BoundingRectangle);
 
-                if (unit.Faction == userInputManager.Commander.Faction)
-                {
-                    if (unit.RallyPoint != null && (unit.RallyPoint.Value - unit.Position).Length > 1)
-                    {
-                        graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
-                    }
-                }
+                if (unit.Faction == userInputManager.Commander.Faction && unit.HasRallyPoint)
+                    graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
             }
         }
 

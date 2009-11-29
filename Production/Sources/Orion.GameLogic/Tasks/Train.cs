@@ -53,8 +53,6 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (HasEnded) return;
-
             if (trainer.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
 
             float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);

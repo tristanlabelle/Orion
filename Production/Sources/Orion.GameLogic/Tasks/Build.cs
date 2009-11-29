@@ -48,8 +48,6 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (hasEnded) return;
-
             if (!move.HasEnded)
             {
                 move.Update(timeDelta);

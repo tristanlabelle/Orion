@@ -95,8 +95,6 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (HasEnded) return;
-
             float targetDisplacementLength = (target.Position - moveTask.Path.Destination).LengthFast;
             float distanceToTarget = (target.Position - follower.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)

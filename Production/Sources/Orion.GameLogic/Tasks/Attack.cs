@@ -73,8 +73,6 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (HasEnded) return;
-
             if (IsTargetInRange)
             {
                 attacker.TimeSinceLastHitInSeconds += timeDelta;

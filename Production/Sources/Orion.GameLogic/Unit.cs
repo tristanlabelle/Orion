@@ -68,7 +68,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
-        #region Identification
+        #region Type-Related
         /// <summary>
         /// Gets the <see cref="UnitType"/> of this <see cref="Unit"/>.
         /// </summary>
@@ -76,9 +76,30 @@ namespace Orion.GameLogic
         {
             get { return type; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Unit"/> is a building.
+        /// </summary>
+        public bool IsBuilding
+        {
+            get { return type.IsBuilding; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Unit"/> moves in the air.
+        /// </summary>
+        public bool IsAirborne
+        {
+            get { return type.IsAirborne; }
+        }
+
+        public override bool IsSolid
+        {
+            get { return !type.IsAirborne; }
+        }
         #endregion
 
-        #region Affiliation
+        #region Faction
         /// <summary>
         /// Accesses the <see cref="Faction"/> which this <see cref="Unit"/> is a member of.
         /// </summary>
@@ -88,7 +109,6 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        #region State
         #region Physical
         public override Size Size
         {
@@ -121,7 +141,7 @@ namespace Orion.GameLogic
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(position, GetStat(UnitStat.SightRange)); }
+            get { return new Circle(Center, GetStat(UnitStat.SightRange)); }
         }
 
         #region Health
@@ -205,7 +225,6 @@ namespace Orion.GameLogic
             }
         }
 
-
         /// <summary>
         /// Gets a value indicating if the unit does nothing.
         /// </summary>
@@ -214,11 +233,6 @@ namespace Orion.GameLogic
             get { return queuedTasks.Count == 0; }
         }
         #endregion
-
-        public override bool IsSolid
-        {
-            get { return !type.IsAirborne; }
-        }
 
         public float TimeSinceLastHitInSeconds
         {
@@ -248,7 +262,6 @@ namespace Orion.GameLogic
             get { return rallyPoint; }
             set { rallyPoint = value; }
         }
-        #endregion
         #endregion
         #endregion
 
@@ -333,7 +346,7 @@ namespace Orion.GameLogic
         public bool CanSee(Unit unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            return LineOfSight.ContainsPoint(unit.position);
+            return LineOfSight.ContainsPoint(unit.Center);
         }
 
         /// <summary>

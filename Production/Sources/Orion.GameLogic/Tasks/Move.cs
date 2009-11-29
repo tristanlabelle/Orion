@@ -42,18 +42,8 @@ namespace Orion.GameLogic.Tasks
                 throw new ArgumentOutOfRangeException("destination");
 
             this.unit = unit;
-            this.destination = destination;
-            if (unit.Type.IsAirborne)
-            {
-                List<Vector2> points = new List<Vector2>();
-                points.Add(this.unit.Position);
-                points.Add(this.destination);
-                this.path = new Path(this.unit.Position, this.destination, points);
-            }
-            else
-            {
-                this.path = unit.Faction.FindPath(unit.Position, destination);
-            }
+            this.destination = (Point)destination;
+            this.path = FindPathToDestination();
         }
         #endregion
 
@@ -104,12 +94,13 @@ namespace Orion.GameLogic.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, unit.Size);
             if (unit.Type.IsAirborne || CanWalkOn(targetRegion))
             {
-                // Unit walks along a segment of the path within this frame.
                 unit.SetPosition(targetPosition);
             }
             else
             {
-                path = unit.Faction.FindPath(unit.GridRegion.Min, destination);
+                // An obstacle is blocking us
+                unit.SetPosition(unit.GridRegion.Min);
+                path = unit.Faction.FindPath(unit.Position, destination);
                 nextPointIndex = 1;
             }
         }
@@ -127,6 +118,20 @@ namespace Orion.GameLogic.Tasks
                 }
             }
             return true;
+        }
+        private Path FindPathToDestination()
+        {
+            if (unit.Type.IsAirborne)
+            {
+                List<Vector2> points = new List<Vector2>();
+                points.Add(unit.Position);
+                points.Add(destination);
+                return new Path(unit.Position, destination, points);
+            }
+            else
+            {
+                return unit.Faction.FindPath(unit.Position, destination);
+            }
         }
         #endregion
     }

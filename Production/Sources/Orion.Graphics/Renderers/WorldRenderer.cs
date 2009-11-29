@@ -42,15 +42,9 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Accesses the bounds of the world.
-        /// </summary>
         public Rectangle WorldBounds
         {
-            get
-            {
-                return world.Bounds;
-            }
+            get { return world.Bounds; }
         }
 
         public UnitsRenderer UnitRenderer
@@ -103,17 +97,34 @@ namespace Orion.Graphics
             var resourceNodes = world.Entities
                 .OfType<ResourceNode>()
                 .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
-            Texture texture;
             foreach (ResourceNode node in resourceNodes)
             {
-                if (node.Type == ResourceType.Aladdium)
-                    texture = textureManager.GetTexture("Aladdium");
-                else if (node.Type == ResourceType.Alagene)
-                    texture = textureManager.GetTexture("Alagene");
-                else throw new Exception("Ressource Type Unknown");
-
+                string resourceTypeName = node.Type.ToStringInvariant();
+                Texture texture = textureManager.GetTexture(resourceTypeName);
                 graphics.Fill(node.BoundingRectangle, texture);
             }
+        }
+
+        public void DrawMiniatureResources(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+
+            Rectangle bounds = graphics.CoordinateSystem;
+            var resourceNodes = world.Entities
+                .OfType<ResourceNode>()
+                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
+            foreach (ResourceNode node in resourceNodes)
+            {
+                graphics.FillColor = GetResourceColor(node.Type);
+                graphics.Fill(node.BoundingRectangle);
+            }
+        }
+
+        public static Color GetResourceColor(ResourceType type)
+        {
+            if (type == ResourceType.Aladdium) return Color.Green;
+            else if (type == ResourceType.Alagene) return Color.LightCyan;
+            else throw new Exception("Ressource type unknown.");
         }
 
         public void Dispose()

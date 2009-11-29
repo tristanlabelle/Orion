@@ -7,40 +7,12 @@ namespace Orion.Graphics
 {
     public class MatchRenderer : IRenderer
     {
-        #region Nested Types
-        public sealed class Minimap : FrameRenderer
-        {
-            private WorldRenderer worldRenderer;
-
-            internal Minimap(WorldRenderer worldRenderer)
-            {
-                Argument.EnsureNotNull(worldRenderer, "worldRenderer");
-                this.worldRenderer = worldRenderer;
-            }
-
-            internal Rectangle VisibleRect { get; set; }
-
-            public override void Draw(GraphicsContext context)
-            {
-                worldRenderer.DrawTerrain(context);
-                worldRenderer.DrawResources(context);
-                worldRenderer.UnitRenderer.DrawMiniature(context);
-                worldRenderer.DrawFogOfWar(context);
-
-                context.StrokeColor = Color.Orange;
-                Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
-                context.Stroke(intersection.GetValueOrDefault());
-                context.StrokeColor = Color.Gray;
-                context.Stroke(context.CoordinateSystem);
-            }
-        }
-        #endregion
 
         #region Fields
         private readonly UserInputManager inputManager;
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
-        private readonly Minimap minimap;
+        private readonly MinimapRenderer minimap;
         #endregion
 
         public MatchRenderer(World world, UserInputManager manager)
@@ -51,10 +23,10 @@ namespace Orion.Graphics
             inputManager = manager;
             selectionRenderer = new SelectionRenderer(inputManager);
             worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction);
-            minimap = new Minimap(worldRenderer);
+            minimap = new MinimapRenderer(worldRenderer);
         }
 
-        public Minimap MinimapRenderer
+        public MinimapRenderer MinimapRenderer
         {
             get { return minimap; }
         }

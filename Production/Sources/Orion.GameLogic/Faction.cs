@@ -291,8 +291,9 @@ namespace Orion.GameLogic
 
             Unit unit = (Unit)entity;
             int sightRange = unit.GetStat(UnitStat.SightRange);
-            Circle oldLineOfSight = new Circle(oldPosition, sightRange);
-            Circle newLineOfSight = new Circle(newPosition, sightRange);
+            Vector2 extent = entity.BoundingRectangle.Extent;
+            Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
+            Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 

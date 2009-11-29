@@ -98,31 +98,42 @@ namespace Orion.Graphics
 
         private void DrawUnits(GraphicsContext graphics)
         {
-            foreach (Unit unit in world.Entities.OfType<Unit>())
+            var units = world.Entities.OfType<Unit>();
+            foreach (Unit unit in units.Where(unit => !unit.IsAirborne))
+                DrawUnit(graphics, unit);
+            foreach (Unit unit in units.Where(unit => unit.IsAirborne))
+                DrawUnit(graphics, unit);
+        }
+
+        private void DrawUnit(GraphicsContext graphics, Unit unit)
+        {
+            TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
+            if (tileVisibility == TileVisibility.Visible)
             {
-                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
-                if (tileVisibility == TileVisibility.Visible)
+                string unitTypeName = unit.Type.Name;
+
+                Texture texture = textureManager.GetTexture(unit.Type.Name);
+
+                if (unit.Faction == null) graphics.StrokeColor = Color.White;
+                else graphics.StrokeColor = unit.Faction.Color;
+
+                if (unit.Faction == null) graphics.FillColor = Color.White;
+                else graphics.FillColor = unit.Faction.Color;
+
+                Rectangle unitBoundingRectangle = unit.BoundingRectangle;
+
+                // Workaround the fact that our unit textures face up,
+                // and building textures are not made to be rotated.
+                float drawingAngle = unit.IsBuilding ? 0 : unit.Angle - (float)Math.PI * 0.5f;
+                using (graphics.Transform(new Transform(unitBoundingRectangle.Center, drawingAngle)))
                 {
-                    string unitTypeName = unit.Type.Name;
+                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                    graphics.Fill(localRectangle, texture, unit.Faction.Color);
+                }
 
-                    Texture texture = textureManager.GetTexture(unit.Type.Name);
-
-                    if (unit.Faction == null) graphics.StrokeColor = Color.White;
-                    else graphics.StrokeColor = unit.Faction.Color;
-
-                    if (unit.Faction == null) graphics.FillColor = Color.White;
-                    else graphics.FillColor = unit.Faction.Color;
-
-                    Rectangle unitBoundingRectangle = unit.BoundingRectangle;
-                    using (graphics.Transform(new Transform(unitBoundingRectangle.Center, unit.Angle)))
-                    {
-                        graphics.Fill(Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height), texture, unit.Faction.Color);
-                    }
-
-                    if (DrawHealthBars)
-                    {
-                        DrawHealthBar(graphics, unit);
-                    }
+                if (DrawHealthBars)
+                {
+                    DrawHealthBar(graphics, unit);
                 }
             }
         }

@@ -36,9 +36,6 @@ namespace Orion.Commandment
             CreateFactionCamps();
             CreateResourceNodes();
 
-            // Update the world once to force committing the entity collection operations.
-            world.Update(0);
-
             world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
@@ -182,7 +179,7 @@ namespace Orion.Commandment
 
         private Point FindCampPosition(List<Vector2> campCenters, ref int minimumDistanceBetweenCamps)
         {
-            Point campMinPosition = new Point(0, 0);
+            Point campLocation = new Point(0, 0);
             int attemptCount = 0;
 
             while (true) // This while(true) is an euphemism for a disguised goto.
@@ -194,12 +191,12 @@ namespace Orion.Commandment
                     attemptCount = 0;
                 }
 
-                campMinPosition = new Point(random.Next(world.Size.Width), random.Next(world.Size.Height));
+                campLocation = new Point(random.Next(world.Size.Width), random.Next(world.Size.Height));
 
-                if (!IsCampAreaWalkable(campMinPosition)) continue;
+                if (!IsCampAreaWalkable(campLocation)) continue;
 
                 // The command center is created at the center of the camp.
-                Vector2 campCenter = new Vector2(campMinPosition.X + campSize * 0.5f, campMinPosition.Y + campSize * 0.5f);
+                Vector2 campCenter = new Vector2(campLocation.X + campSize * 0.5f, campLocation.Y + campSize * 0.5f);
                 bool isNearbyAnotherCamp = false;
                 foreach (Vector2 otherCampCenter in campCenters)
                 {
@@ -215,7 +212,7 @@ namespace Orion.Commandment
                 break;
             }
 
-            return campMinPosition;
+            return campLocation;
         }
 
         private bool IsCampAreaWalkable(Point position)
@@ -237,15 +234,22 @@ namespace Orion.Commandment
         {
             for (int i = 0; i < 25; i++)
             {
-                Point location;
-                do
-                {
-                    location = new Point(
-                        random.Next(world.Size.Width - ResourceNode.DefaultSize.Width),
-                        random.Next(world.Size.Height - ResourceNode.DefaultSize.Height));
-                } while (!world.Terrain.IsWalkable(location));
+                Point location = GetFreeLocation(ResourceNode.DefaultSize);
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
                 ResourceNode node = world.Entities.CreateResourceNode(resourceType, location);
+            }
+        }
+
+        private Point GetFreeLocation(Size size)
+        {
+            while (true)
+            {
+                Point location = new Point(
+                    random.Next(world.Size.Width - size.Width),
+                    random.Next(world.Size.Height - size.Height));
+
+                Region region = new Region(location, size);
+                if (world.IsFree(region)) return location;
             }
         }
 

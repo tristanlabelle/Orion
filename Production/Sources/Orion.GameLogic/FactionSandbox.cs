@@ -23,7 +23,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(faction, "faction");
             this.faction = faction;
-            this.faction.World.Entities.Died += OnEntityDied;
+            this.faction.World.Entities.Removed += OnEntityDied;
             this.faction.World.FactionDefeated += OnFactionDefeated;
         }
         #endregion

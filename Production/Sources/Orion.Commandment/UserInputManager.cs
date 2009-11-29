@@ -41,7 +41,7 @@ namespace Orion.Commandment
         {
             Argument.EnsureNotNull(userCommander, "userCommander");
             commander = userCommander;
-            commander.Faction.World.Entities.Died += OnEntityDied;
+            commander.Faction.World.Entities.Removed += OnEntityDied;
             selectionManager = new SelectionManager(userCommander.Faction);
 
             groups = new List<Unit>[10];
@@ -360,7 +360,7 @@ namespace Orion.Commandment
                     if (unit.Faction != commander.Faction) return false;
                     Skills.Train train = unit.Type.GetSkill<Skills.Train>();
                     if (train == null) return false;
-                    if (unit.UnderConstruction) return false;
+                    if (unit.IsUnderConstruction) return false;
                     return train.Supports(unitType);
                 });
             commander.LaunchTrain(trainers, unitType);

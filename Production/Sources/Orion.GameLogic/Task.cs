@@ -26,7 +26,12 @@ namespace Orion.GameLogic
         /// Updates this <see cref="Task"/> for a frame.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public abstract void Update(float timeDelta);
+        public void Update(float timeDelta)
+        {
+            if (!HasEnded) DoUpdate(timeDelta);
+        }
+
+        protected abstract void DoUpdate(float timeDelta);
 
         /// <summary>
         /// Releases all resources used by this <see cref="Task"/>.

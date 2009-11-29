@@ -63,7 +63,7 @@ namespace Orion.UserInterface
             World world = match.World;
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
-            world.Entities.Died += userInputManager.SelectionManager.EntityDied;
+            world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.25f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);

@@ -31,11 +31,17 @@ namespace Orion
             this.size = size;
         }
 
+        public Region(int minX, int minY, int width, int height)
+            : this(new Point(minX, minY), new Size(width, height)) { }
+
         public Region(Size size)
         {
             this.min = Point.Zero;
             this.size = size;
         }
+
+        public Region(int width, int height)
+            : this(new Size(width, height)) { }
         #endregion
 
         #region Properties
@@ -161,6 +167,12 @@ namespace Orion
             return points;
         }
 
+        public bool IsAdjacent(Point point)
+        {
+            return (point.X == MinX - 1 || point.X == ExclusiveMaxX)
+                && (point.Y == MinY - 1 || point.Y == ExclusiveMaxY);
+        }
+
         /// <summary>
         /// Tests for equality with another instance.
         /// </summary>
@@ -214,6 +226,15 @@ namespace Orion
         {
             Size size = new Size(exclusiveMax.X - min.X, exclusiveMax.Y - min.Y);
             return new Region(min, size);
+        }
+
+        public static Region Grow(Region region, int amount)
+        {
+            Argument.EnsurePositive(amount, "amount");
+            return new Region(
+                region.MinX - amount, region.MinY - amount,
+                region.Width + amount * 2, region.Height + amount * 2);
+
         }
 
         public static Region Union(Region a, Region b)

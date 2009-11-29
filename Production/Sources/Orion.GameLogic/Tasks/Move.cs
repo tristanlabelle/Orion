@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
             if (HasEnded) return;
 

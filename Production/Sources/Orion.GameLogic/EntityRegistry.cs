@@ -81,6 +81,7 @@ namespace Orion.GameLogic
         private readonly Func<Handle> uidGenerator;
 
         // Used to defer modification of the "entities" collection.
+        private bool isUpdating;
         private readonly Dictionary<Entity, DeferredChange> deferredChanges
             = new Dictionary<Entity, DeferredChange>();
 
@@ -117,13 +118,13 @@ namespace Orion.GameLogic
 
         #region Events
         /// <summary>
-        /// Raised when an entity dies.
+        /// Raised when an <see cref="Entity"/> gets removed.
         /// </summary>
-        public event GenericEventHandler<EntityRegistry, Entity> Died;
+        public event GenericEventHandler<EntityRegistry, Entity> Removed;
 
-        private void OnDied(Entity entity)
+        private void RaiseRemoved(Entity entity)
         {
-            GenericEventHandler<EntityRegistry, Entity> handler = Died;
+            var handler = Removed;
             if (handler != null) handler(this, entity);
         }
         #endregion
@@ -140,38 +141,19 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Event Handlers
+        private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            Move(entity, oldPosition);
+        }
+
         private void OnEntityDied(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
             Debug.WriteLine("Entity {0} died.");
 
-            DeferredChange change;
-            deferredChanges.TryGetValue(entity, out change);
-            Debug.Assert(!change.HasType(DeferredChangeType.Remove), "An entity has died twice.");
-            change = change.CreateCombined(DeferredChangeType.Remove);
-            deferredChanges[entity] = change;
-
-            if (entity.IsSolid) grid.Remove(entity);
-        }
-
-        private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
-        {
-            Argument.EnsureNotNull(entity, "entity");
-
-            DeferredChange change;
-            deferredChanges.TryGetValue(entity, out change);
-            if (!change.HasType(DeferredChangeType.Move))
-            {
-                change = change.CreateCombined(DeferredChangeType.Move, oldPosition);
-                deferredChanges[entity] = change;
-            }
-
-            if (entity.IsSolid)
-            {
-                Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
-                grid.Remove(entity, oldRegion);
-                grid.Add(entity);
-            }
+            Remove(entity);
         }
         #endregion
 
@@ -207,12 +189,140 @@ namespace Orion.GameLogic
             entity.Moved += entityMovedEventHandler;
             entity.Died += entityDiedEventHandler;
 
-            if (entity.IsSolid) grid.Add(entity);
-
-            deferredChanges.Add(entity, new DeferredChange(DeferredChangeType.Add, Vector2.Zero));
+            Add(entity);
         }
         #endregion
 
+        /// <summary>
+        /// Updates the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
+        /// </summary>
+        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
+        /// <remarks>
+        /// Used by <see cref="World"/>.
+        /// </remarks>
+        public void Update(float timeDeltaInSeconds)
+        {
+            if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
+
+            CommitDeferredChanges();
+
+            try
+            {
+                isUpdating = true;
+                foreach (Entity entity in entities.Values)
+                    entity.Update(timeDeltaInSeconds);
+            }
+            finally
+            {
+                isUpdating = false;
+            }
+        }
+
+        #region Collection Modifications
+        private void Add(Entity entity)
+        {
+            if (isUpdating) DeferAdd(entity);
+            else CommitAdd(entity);
+
+            if (entity.IsSolid) grid.Add(entity);
+        }
+
+        private void Move(Entity entity, Vector2 oldPosition)
+        {
+            if (isUpdating) DeferMove(entity, oldPosition);
+            else CommitMove(entity, oldPosition);
+
+            if (entity.IsSolid)
+            {
+                Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
+                grid.Remove(entity, oldRegion);
+                grid.Add(entity);
+            }
+        }
+
+        private void Remove(Entity entity)
+        {
+            if (isUpdating) DeferRemove(entity);
+            else CommitRemove(entity);
+
+            if (entity.IsSolid) grid.Remove(entity);
+        }
+
+        #region Deferring
+        private void DeferAdd(Entity entity)
+        {
+            deferredChanges.Add(entity, new DeferredChange(DeferredChangeType.Add, Vector2.Zero));
+        }
+
+        private void DeferMove(Entity entity, Vector2 oldPosition)
+        {
+            DeferredChange change;
+            deferredChanges.TryGetValue(entity, out change);
+            if (!change.HasType(DeferredChangeType.Move))
+            {
+                change = change.CreateCombined(DeferredChangeType.Move, oldPosition);
+                deferredChanges[entity] = change;
+            }
+        }
+
+        private void DeferRemove(Entity entity)
+        {
+            DeferredChange change;
+            deferredChanges.TryGetValue(entity, out change);
+            Debug.Assert(!change.HasType(DeferredChangeType.Remove), "An entity has died twice.");
+            change = change.CreateCombined(DeferredChangeType.Remove);
+            deferredChanges[entity] = change;
+        }
+        #endregion
+
+        #region Commiting
+        private void CommitDeferredChanges()
+        {
+            foreach (KeyValuePair<Entity, DeferredChange> pair in deferredChanges)
+            {
+                Entity entity = pair.Key;
+                DeferredChange change = pair.Value;
+                if (change.HasType(DeferredChangeType.Add))
+                {
+                    if (change.HasType(DeferredChangeType.Remove))
+                    {
+                        Debug.Fail("An entity has been both added and removed in the same frame, that's peculiar.");
+                        continue; // Nop, we're not going to add it to remove it thereafter
+                    }
+
+                    CommitAdd(entity);
+                }
+
+                if (change.HasType(DeferredChangeType.Move))
+                    CommitMove(entity, change.OldPosition);
+
+                if (change.HasType(DeferredChangeType.Remove))
+                    CommitRemove(entity);
+            }
+            deferredChanges.Clear();
+        }
+
+        private void CommitAdd(Entity entity)
+        {
+            entities.Add(entity.Handle, entity);
+            zoneManager.Add(entity);
+        }
+
+        private void CommitMove(Entity entity, Vector2 oldPosition)
+        {
+            zoneManager.UpdateZone(entity, oldPosition);
+        }
+
+        private void CommitRemove(Entity entity)
+        {
+            entities.Remove(entity.Handle);
+            zoneManager.Remove(entity);
+            RaiseRemoved(entity);
+        }
+        #endregion
+        #endregion
+
+        #region Queries
         /// <summary>
         /// Gets a <see cref="Entity"/> of this <see cref="UnitRegistry"/> from its unique identifier.
         /// </summary>
@@ -228,62 +338,11 @@ namespace Orion.GameLogic
             return entity;
         }
 
-        /// <summary>
-        /// Updates the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
-        /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        /// <remarks>
-        /// Used by <see cref="World"/>.
-        /// </remarks>
-        public void Update(float timeDeltaInSeconds)
-        {
-            CommitDeferredChanges();
-
-            foreach (Entity entity in entities.Values)
-                entity.Update(timeDeltaInSeconds);
-        }
-
-        #region Commit Deferred Changes
-        private void CommitDeferredChanges()
-        {
-            foreach (KeyValuePair<Entity, DeferredChange> pair in deferredChanges)
-            {
-                Entity entity = pair.Key;
-                DeferredChange change = pair.Value;
-                if (change.HasType(DeferredChangeType.Add))
-                {
-                    if (change.HasType(DeferredChangeType.Remove))
-                    {
-                        Debug.Fail("An entity has been both added and removed in the same frame, that's peculiar.");
-                        continue; // Nop, we're not going to add it to remove it thereafter
-                    }
-
-                    entities.Add(entity.Handle, entity);
-                    zoneManager.Add(entity);
-                }
-
-                if (change.HasType(DeferredChangeType.Move))
-                {
-                    zoneManager.UpdateZone(entity, change.OldPosition);
-                }
-
-                if (change.HasType(DeferredChangeType.Remove))
-                {
-                    entities.Remove(entity.Handle);
-                    zoneManager.Remove(entity);
-                    OnDied(entity);
-                }
-            }
-            deferredChanges.Clear();
-        }
-        #endregion
-
         public Entity GetSolidEntityAt(Point point)
         {
             return grid[point];
         }
 
-        #region Enumeration
         /// <summary>
         /// Gets an enumerator that iterates over the <see cref="Entity"/>s in this registry.
         /// </summary>

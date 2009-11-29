@@ -128,11 +128,6 @@ namespace Orion.GameLogic
             get { return angle; }
             set { angle = value; }
         }
-
-        public bool UnderConstruction
-        {
-            get { return isUnderConstruction; }
-        }
         #endregion
 
         /// <summary>
@@ -161,7 +156,7 @@ namespace Orion.GameLogic
 
                 OnDamageChanged();
                 if (damage == MaxHealth) Die();
-                else if (damage == 0 && UnderConstruction)
+                else if (damage == 0 && IsUnderConstruction)
                     isUnderConstruction = false;
             }
         }
@@ -181,6 +176,11 @@ namespace Orion.GameLogic
         {
             get { return MaxHealth - damage; }
             set { Damage = MaxHealth - value; }
+        }
+
+        public bool IsUnderConstruction
+        {
+            get { return isUnderConstruction; }
         }
         #endregion
 

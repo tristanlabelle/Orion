@@ -78,9 +78,11 @@ namespace Orion.GameLogic.Tasks
         /// if not the units moves towards its destination. The appropriate tasks are uptated each time.
         /// </summary>
         /// <param name="timeDelta"></param>
-        public override void Update(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
-            if (attack == null)
+            if (attack != null) attack.Update(timeDelta);
+
+            if (attack == null || attack.HasEnded)
             {
                 // If there's no-one in the attack range
                 if (!TryAttack())
@@ -94,27 +96,6 @@ namespace Orion.GameLogic.Tasks
                     {
                         move.Update(timeDelta);
                     }
-                }
-            }
-            else // if attacking
-            {
-                if (attack.HasEnded)
-                {
-                    if (!TryAttack())
-                    {
-                        if (move.HasEnded)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            move.Update(timeDelta);
-                        }
-                    }
-                }
-                else
-                {
-                    attack.Update(timeDelta);
                 }
             }
         }

@@ -25,7 +25,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(trainer, "trainer");
             if (!trainer.HasSkill<Skills.Train>())
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
-            if (trainer.UnderConstruction)
+            if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an Unit in Construction");
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
@@ -51,7 +51,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
             if (HasEnded) return;
 

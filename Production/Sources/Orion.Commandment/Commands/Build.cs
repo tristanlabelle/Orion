@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
 using BuildTask = Orion.GameLogic.Tasks.Build;
-using System.Linq;
-using System.Collections.ObjectModel;
+using ExtractAlageneSkill = Orion.GameLogic.Skills.ExtractAlagene;
 
 namespace Orion.Commandment.Commands
 {
@@ -52,9 +54,18 @@ namespace Orion.Commandment.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
-            BuildingPlan plan = new BuildingPlan(buildingType, location);
 
+            if (buildingType.HasSkill<ExtractAlageneSkill>())
+            {
+                ResourceNode node = match.World.Entities
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault(n => n.BoundingRectangle.ContainsPoint(location));
+                Debug.Assert(node != null, "Extractors can only be built on resource nodes.");
+            }
+
+            BuildingPlan plan = new BuildingPlan(faction, buildingType, location);
 
             foreach (Handle unit in builderHandles)
             {

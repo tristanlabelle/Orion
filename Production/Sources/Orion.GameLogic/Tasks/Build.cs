@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Diagnostics;
 using OpenTK.Math;
+using ExtractAlageneSkill = Orion.GameLogic.Skills.ExtractAlagene;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -25,27 +26,10 @@ namespace Orion.GameLogic.Tasks
             if (!builder.HasSkill<Skills.Build>())
                 throw new ArgumentException("Cannot build without the build skill.", "builder");
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
+
             this.buildingPlan = buildingPlan;
             this.builder = builder;
-
-            this.move = new Move(builder, buildingPlan.Position);
-
-            if (buildingPlan.BuildingType.HasSkill<Skills.ExtractAlagene>())
-            {
-                ResourceNode alageneNode = builder.World.Entities
-                            .OfType<ResourceNode>()
-                            .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(buildingPlan.Position)
-                            && node.Type == ResourceType.Alagene);
-
-                bool extractorAlreadyThere = builder.World.Entities
-                    .OfType<Unit>()
-                    .Any(unit => unit.BoundingRectangle.ContainsPoint(buildingPlan.Position));
-
-                if (!extractorAlreadyThere && alageneNode != null)
-                    buildingPlan.Position = (Point)alageneNode.Position;
-                else
-                    hasEnded = true;
-            }
+            this.move = new Move(builder, buildingPlan.Location);
         }
         #endregion
 
@@ -62,7 +46,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
             if (hasEnded) return;
 
@@ -71,40 +55,55 @@ namespace Orion.GameLogic.Tasks
                 move.Update(timeDelta);
                 return;
             }
-                //Unable To reach Destination
-            else if ((builder.Position - (Vector2)buildingPlan.Position).Length > 1)
+
+            if (!buildingPlan.GridRegion.Contains(builder.GridRegion.Min))
             {
+                //Unable To reach Destination
                 hasEnded = true;
                 return;
             }
 
-            if (!buildingPlan.ConstructionBegan)
+            if (buildingPlan.IsBuildingCreated)
             {
-                int aladdiumCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
-                int alageneCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
-
-                if (builder.Faction.AladdiumAmount >= aladdiumCost
-                    && builder.Faction.AlageneAmount >= alageneCost)
-                {
-                    builder.Faction.AladdiumAmount -= aladdiumCost;
-                    builder.Faction.AlageneAmount -= alageneCost;
-                    buildingPlan.lauchCreationOfThisUnit(builder.Faction.CreateUnit(buildingPlan.BuildingType, buildingPlan.Position));
-                    
-                    builder.CurrentTask = new Repair(builder, buildingPlan.CreatedUnit);
-                }
-                else
-                {
-                    Debug.WriteLine("Not Enough Resources");
-                    hasEnded = true;
-                    return;
-                }
+                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth)
+                    builder.CurrentTask = new Repair(builder, buildingPlan.Building);
+                hasEnded = true;
+                return;
             }
-            
 
-            else if(buildingPlan.ConstructionBegan && buildingPlan.CreatedUnit.Health < buildingPlan.CreatedUnit.MaxHealth)
+            if (!builder.World.IsFree(buildingPlan.GridRegion))
             {
-                builder.CurrentTask = new Repair( builder, buildingPlan.CreatedUnit);
+                Debug.WriteLine("Cannot build {0}, spot occupied.".FormatInvariant(buildingPlan.BuildingType));
+                hasEnded = true;
+                return;
             }
+
+            int aladdiumCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
+            int alageneCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
+            bool hasEnoughResources = builder.Faction.AladdiumAmount >= aladdiumCost
+                && builder.Faction.AlageneAmount >= alageneCost;
+
+            if (!hasEnoughResources)
+            {
+                Debug.WriteLine("Not enough resources to build {0}.".FormatInvariant(buildingPlan.BuildingType));
+                hasEnded = true;
+                return;
+            }
+
+            builder.Faction.AladdiumAmount -= aladdiumCost;
+            builder.Faction.AlageneAmount -= alageneCost;
+
+            buildingPlan.CreateBuilding();
+
+            if (buildingPlan.Building.HasSkill<ExtractAlageneSkill>())
+            {
+                ResourceNode node = builder.World.Entities
+                    .OfType<ResourceNode>()
+                    .First(n => n.BoundingRectangle.ContainsPoint(buildingPlan.Location));
+                node.Extractor = buildingPlan.Building;
+            }
+
+            builder.CurrentTask = new Repair(builder, buildingPlan.Building);
         }
         #endregion
     }

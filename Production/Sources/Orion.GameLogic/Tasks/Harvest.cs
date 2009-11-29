@@ -65,7 +65,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
             if (!node.IsHarvestableByFaction(harvester.Faction))
             {
@@ -73,21 +73,17 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (move.HasEnded)
-            {
-                if (mode == Mode.Extracting)
-                {
-                    UpdateExtracting(timeDelta);
-                }
-                else
-                {
-                    UpdateDelivering(timeDelta);
-                }
-            }
-            else
+            if (!move.HasEnded)
             {
                 move.Update(timeDelta);
+                return;
             }
+
+
+            if (mode == Mode.Extracting)
+                UpdateExtracting(timeDelta);
+            else
+                UpdateDelivering(timeDelta);
         }
 
         private void UpdateExtracting(float timeDelta)
@@ -105,12 +101,14 @@ namespace Orion.GameLogic.Tasks
                     mode = Mode.Delivering;
                     return;
                 }
+
                 if (node.AmountRemaining > 0)
                 {
                     node.Harvest(1);
                     --amountAccumulator;
                     ++amountCarrying;
                 }
+
                 if (amountCarrying >= maxCarryingAmount)
                 {
                     if (commandCenter != null)

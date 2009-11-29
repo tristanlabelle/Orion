@@ -6,53 +6,65 @@ using System.Collections;
 
 namespace Orion.GameLogic
 {
+    /// <summary>
+    /// Provides information about a building to be built.
+    /// </summary>
     public sealed class BuildingPlan
     {
         #region Fields
+        private readonly Faction faction;
         private readonly UnitType buildingType;
-        private Unit createdUnit;
-        private Point position;
-        private bool constructionBegan;
+        private readonly Point location;
+        private Unit building;
         #endregion
 
-        #region Constructor
-        public BuildingPlan(UnitType buildingType, Point position)
+        #region Constructors
+        public BuildingPlan(Faction faction, UnitType buildingType, Point location)
         {
+            Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(buildingType, "buildingType");
+
+            this.faction = faction;
             this.buildingType = buildingType;
-            this.position = position;
+            this.location = location;
         }
         #endregion
 
         #region Proprieties
-        public bool ConstructionBegan
-        {
-            get { return constructionBegan; }
-        }
         public UnitType BuildingType
         {
             get { return buildingType; }
         }
-        public Point Position
+
+        public Point Location
         {
-            get { return position; }
-            set { position = value; }
+            get { return location; }
         }
 
-        public Unit CreatedUnit
+        public Region GridRegion
         {
-            get { return createdUnit; }
+            get { return new Region(Location, buildingType.Size); }
         }
 
+        public bool IsBuildingCreated
+        {
+            get { return building != null; }
+        }
+
+        public Unit Building
+        {
+            get { return building; }
+        }
         #endregion
 
         #region Methods
-        public void lauchCreationOfThisUnit(Unit unit)
+        public void CreateBuilding()
         {
-            Argument.EnsureNotNull(unit, "unit");
-            createdUnit = unit;
-            unit.Health = 1;
-            constructionBegan = true;
+            if (IsBuildingCreated)
+                throw new InvalidOperationException("Cannot create more than one building from a plan.");
+
+            building = faction.CreateUnit(buildingType, location);
+            building.Health = 1;
         }
         #endregion
     }

@@ -35,7 +35,7 @@ namespace Orion.GameLogic.Tasks
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
 
             this.target = target;
-            moveTask = new Move(follower, target.Position);
+            moveTask = Move.ToPoint(follower, target.Position);
         }
         #endregion
 
@@ -72,7 +72,7 @@ namespace Orion.GameLogic.Tasks
             {
                 // This task never ends as even if we get in range at one point in time,
                 // the target may move again later.
-                return target == null || moveTask.Path == null || !target.IsAlive;
+                return target == null || moveTask.HasEnded || !target.IsAlive;
             }
         }
 
@@ -85,10 +85,10 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            float targetDisplacementLength = (target.Position - moveTask.Path.Destination).LengthFast;
+            float targetDisplacementLength = (target.Position - moveTask.Destination).LengthFast;
             float distanceToTarget = (target.Position - Unit.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
-                moveTask = new Move(Unit, target.Position);
+                moveTask = Move.ToPoint(Unit, target.Position);
 
             moveTask.Update(timeDelta);
         }

@@ -139,7 +139,7 @@ namespace Orion.GameLogic.Pathfinding
             PathNode sourceNode = GetPathNode(null, sourcePoint, 0, distanceToDestination);
 
             PathNode currentNode = sourceNode;
-            while (currentNode.DistanceToDestination > 0)
+            while (currentNode.DistanceToDestination > 0.0001f)
             {
                 closedNodes.Add(currentNode.Point, currentNode);
                 openNodes.Remove(currentNode.Point);

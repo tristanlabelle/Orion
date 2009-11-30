@@ -9,7 +9,7 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit building;
         private readonly GenericEventHandler<Entity> buildingDiedEventHandler;
-        private Follow follow;
+        private readonly Move move;
         private float aladdiumCost;
         private float alageneCost;
         private float totalAladdiumCost;
@@ -34,7 +34,7 @@ namespace Orion.GameLogic.Tasks
             this.building = building;
             this.buildingDiedEventHandler = OnBuildingDied;
             this.building.Died += buildingDiedEventHandler;
-            this.follow = new Follow(repairer, building);
+            this.move = Move.ToNearRegion(repairer, building.GridRegion);
             this.aladdiumCost = building.GetStat(UnitStat.AladdiumCost) / building.MaxHealth;
             this.alageneCost = building.GetStat(UnitStat.AlageneCost) / building.MaxHealth;
         }
@@ -60,9 +60,9 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (!follow.IsInRange)
+            if (!move.HasEnded)
             {
-                follow.Update(timeDelta);
+                move.Update(timeDelta);
                 return;
             }
 

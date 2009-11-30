@@ -28,7 +28,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
 
             this.buildingPlan = buildingPlan;
-            this.move = new Move(builder, buildingPlan.Location);
+            this.move = Move.ToNearRegion(builder, buildingPlan.GridRegion);
         }
         #endregion
 
@@ -53,9 +53,9 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (!buildingPlan.GridRegion.Contains(Unit.GridRegion.Min))
+            // Test if we're in the building's surrounding area
+            if (!Region.Grow(buildingPlan.GridRegion, 1).Contains(Unit.GridRegion.Min))
             {
-                //Unable To reach Destination
                 hasEnded = true;
                 return;
             }

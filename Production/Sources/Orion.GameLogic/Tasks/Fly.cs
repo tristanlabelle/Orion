@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
+using Orion.GameLogic.Pathfinding;
 
 namespace Orion.GameLogic.Tasks
 {
     /// <summary>
-    /// A task causing a unit to fly to a destination.
+    /// A <see cref="Task"/> causing a unit to fly to a destination.
     /// </summary>
-    public sealed class Fly : Task
+    public sealed class Fly : Move
     {
         #region Fields
         private readonly Vector2 destination;
@@ -27,6 +28,16 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
+        public override Vector2 Destination
+        {
+            get { return destination; }
+        }
+
+        public override Path Path
+        {
+            get { return new Path(new[] { (Point)Source, (Point)destination }); }
+        }
+
         public override bool HasEnded
         {
             get { return Unit.Position == destination; }
@@ -44,8 +55,8 @@ namespace Orion.GameLogic.Tasks
             Vector2 delta = destination - Unit.Position;
             Unit.Angle = (float)Math.Atan2(delta.Y, delta.X);
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
-            if (delta.LengthFast > distance) Unit.SetPosition(destination);
-            else Unit.SetPosition(Vector2.Normalize(delta) * distance);
+            if (distance > delta.LengthFast) Unit.SetPosition(destination);
+            else Unit.SetPosition(Unit.Position + Vector2.Normalize(delta) * distance);
         }
         #endregion
     }

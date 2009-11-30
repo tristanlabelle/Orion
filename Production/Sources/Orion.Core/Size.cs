@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using OpenTK.Math;
 
 namespace Orion
 {
@@ -63,6 +64,11 @@ namespace Orion
         #endregion
 
         #region Methods
+        public Vector2 ToVector()
+        {
+            return new Vector2(width, height);
+        }
+
         /// <summary>
         /// Tests for equality with another instance.
         /// </summary>
@@ -139,6 +145,11 @@ namespace Orion
         public static bool operator !=(Size a, Size b)
         {
             return !Equals(a, b);
+        }
+
+        public static explicit operator Vector2(Size size)
+        {
+            return size.ToVector();
         }
         #endregion
         #endregion

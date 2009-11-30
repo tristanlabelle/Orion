@@ -103,6 +103,7 @@
     <Compile Include="Tasks\Move.cs" />
     <Compile Include="Tasks\Repair.cs" />
     <Compile Include="Tasks\Train.cs" />
+    <Compile Include="Tasks\Walk.cs" />
     <Compile Include="Tasks\ZoneAttack.cs" />
     <Compile Include="Technology.cs" />
     <Compile Include="TechnologyBuilder.cs" />

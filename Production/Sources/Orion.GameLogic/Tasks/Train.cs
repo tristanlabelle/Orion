@@ -62,7 +62,7 @@ namespace Orion.GameLogic.Tasks
                     Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
                     Vector2 traineeDelta = trainee.Center - Unit.Center;
                     trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-                    if (Unit.HasRallyPoint) trainee.CurrentTask = new Move(trainee, Unit.RallyPoint.Value);
+                    if (Unit.HasRallyPoint) trainee.CurrentTask = Move.ToPoint(trainee, Unit.RallyPoint.Value);
                     hasEnded = true;
                 }
                 else

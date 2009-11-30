@@ -35,7 +35,7 @@ namespace Orion.GameLogic.Tasks
             
             this.destination = destination;
             this.targetDistance = unit.GetStat(UnitStat.AttackRange);
-            this.move = new Move(unit, destination);
+            this.move = Move.ToPoint(unit, destination);
         }
         #endregion
 
@@ -74,26 +74,15 @@ namespace Orion.GameLogic.Tasks
         /// At each update, checks if an enemy unit is in range of the striker, if so it creates an attack taks
         /// if not the units moves towards its destination. The appropriate tasks are uptated each time.
         /// </summary>
-        /// <param name="timeDelta"></param>
+        /// <param name="timeDelta">The time elapsed since the last update, in seconds.</param>
         protected override void DoUpdate(float timeDelta)
         {
             if (attack != null) attack.Update(timeDelta);
 
             if (attack == null || attack.HasEnded)
             {
-                // If there's no-one in the attack range
-                if (!TryAttack())
-                {
-                    // If we reached our destination.
-                    if (move.HasEnded)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        move.Update(timeDelta);
-                    }
-                }
+                if (TryAttack()) attack.Update(timeDelta);
+                else move.Update(timeDelta);
             }
         }
 

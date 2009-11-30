@@ -44,7 +44,7 @@ namespace Orion.GameLogic.Tasks
 
             this.node = node;
             this.commandCenterDestroyedEventHandler = OnCommandCenterDestroyed;
-            this.move = new Move(harvester, node.Position);
+            this.move = Move.ToNearRegion(harvester, node.GridRegion);
             node.Died += new GenericEventHandler<Entity>(nodeDied);
             commandCenter = FindClosestCommandCenter();
         }
@@ -95,7 +95,7 @@ namespace Orion.GameLogic.Tasks
                 if (nodeIsDead)
                 {
                     commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = new Move(Unit, commandCenter.Position);
+                    move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
                     mode = Mode.Delivering;
                     return;
                 }
@@ -120,7 +120,7 @@ namespace Orion.GameLogic.Tasks
                     else
                     {
                         commandCenter.Died += commandCenterDestroyedEventHandler;
-                        move = new Move(Unit, commandCenter.Position);
+                        move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
                         mode = Mode.Delivering;
                     }
                     return;
@@ -147,7 +147,7 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            move = new Move(Unit, node.Position);
+            move = Move.ToNearRegion(Unit, node.GridRegion);
             mode = Mode.Extracting;
         }
 
@@ -176,7 +176,7 @@ namespace Orion.GameLogic.Tasks
                 else
                 {
                     commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = new Move(Unit, commandCenter.Position);
+                    move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
                 }
             }
         }

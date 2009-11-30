@@ -22,7 +22,7 @@ namespace Orion.GameLogic
         private float angle;
         private float damage;
         private Vector2? rallyPoint;
-        private float totalHealthReceived;
+        private float healthBuilt;
         private bool isUnderConstruction;
         private float timeSinceLastHitInSeconds = 0;
         #endregion
@@ -148,9 +148,9 @@ namespace Orion.GameLogic
             get { return damage; }
             set
             {
-                Argument.EnsurePositive(value, "Damage");
-                if (value > MaxHealth) value = MaxHealth;
-                if (value == damage) return;
+                if (value < 0) value = 0;
+                else if (value > MaxHealth) value = MaxHealth;
+                else if (value == damage) return;
 
                 damage = value;
 
@@ -181,6 +181,14 @@ namespace Orion.GameLogic
         public bool IsUnderConstruction
         {
             get { return isUnderConstruction; }
+        }
+
+        /// <summary>
+        /// Gets the progress of the construction as a value from zero to one.
+        /// </summary>
+        public float ConstructionProgress
+        {
+            get { return isUnderConstruction ? healthBuilt / MaxHealth : 1; }
         }
         #endregion
 
@@ -407,8 +415,8 @@ namespace Orion.GameLogic
         {
             Argument.EnsurePositive(health, "health");
             this.Health += health;
-            this.totalHealthReceived += health;
-            if (totalHealthReceived >= MaxHealth)
+            this.healthBuilt += health;
+            if (healthBuilt >= MaxHealth)
                 isUnderConstruction = false;
         }
 

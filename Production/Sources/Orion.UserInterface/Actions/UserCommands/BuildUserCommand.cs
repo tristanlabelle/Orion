@@ -38,7 +38,7 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void Execute(Vector2 at)
         {
-            inputManager.LaunchBuild(at, buildingType);
+            inputManager.LaunchBuild((Point)(at - (Vector2)buildingType.Size * 0.5f), buildingType);
         }
         #endregion
     }

@@ -51,7 +51,7 @@ namespace Orion.Main
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.PushFilter(new CheatCodeExecutor(match));
+            pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
             pipeline.PushFilter(new ReplayPlayer(replay));
 
             match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);

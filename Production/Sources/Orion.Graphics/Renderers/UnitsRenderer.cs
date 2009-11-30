@@ -20,6 +20,7 @@ namespace Orion.Graphics
         private static readonly Color lowLifeColor = Color.Red;
         private static readonly Color middleLifeColor = Color.Yellow;
         private static readonly Color fullLifeColor = Color.ForestGreen;
+        private static readonly Size minimapUnitSize = new Size(3, 3);
         #endregion
 
         #region Methods
@@ -84,14 +85,13 @@ namespace Orion.Graphics
 
         private void DrawMiniatureUnits(GraphicsContext context)
         {
-            Rectangle unitRect = new Rectangle(3, 3);
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
+                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Center);
                 if (tileVisibility == TileVisibility.Visible)
                 {
                     context.FillColor = unit.Faction.Color;
-                    context.Fill(unitRect.TranslatedBy(unit.Position));
+                    context.Fill(new Rectangle(unit.Position, (Vector2)minimapUnitSize));
                 }
             }
         }
@@ -107,34 +107,24 @@ namespace Orion.Graphics
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Position);
+            TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Center);
             if (tileVisibility == TileVisibility.Visible)
             {
                 string unitTypeName = unit.Type.Name;
-
                 Texture texture = textureManager.GetTexture(unit.Type.Name);
-
-                if (unit.Faction == null) graphics.StrokeColor = Color.White;
-                else graphics.StrokeColor = unit.Faction.Color;
-
-                if (unit.Faction == null) graphics.FillColor = Color.White;
-                else graphics.FillColor = unit.Faction.Color;
-
-                Rectangle unitBoundingRectangle = unit.BoundingRectangle;
+                int alpha = unit.IsUnderConstruction ? 20 + (int)(unit.ConstructionProgress * 180) : 255;
+                Color tint = Color.FromArgb(alpha, unit.Faction.Color);
 
                 // Workaround the fact that our unit textures face up,
-                // and building textures are not made to be rotated.
+                // and building textures are not supposed to be rotated.
                 float drawingAngle = unit.IsBuilding ? 0 : unit.Angle - (float)Math.PI * 0.5f;
-                using (graphics.Transform(new Transform(unitBoundingRectangle.Center, drawingAngle)))
+                using (graphics.Transform(new Transform(unit.Center, drawingAngle)))
                 {
                     Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                    graphics.Fill(localRectangle, texture, unit.Faction.Color);
+                    graphics.Fill(localRectangle, texture, tint);
                 }
 
-                if (DrawHealthBars)
-                {
-                    DrawHealthBar(graphics, unit);
-                }
+                if (DrawHealthBars) DrawHealthBar(graphics, unit);
             }
         }
 

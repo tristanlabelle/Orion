@@ -361,11 +361,12 @@ namespace Orion.Graphics
         #endregion
 
         #region Textured
-        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle, Color modulation)
+        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle, Color tint)
         {
             Argument.EnsureNotNull(texture, "texture");
 
-            GL.Color4(modulation.R, modulation.G, modulation.B, modulation.A);
+            FillColor = tint;
+            CommitFillColor();
 
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
@@ -395,9 +396,9 @@ namespace Orion.Graphics
             Fill(rectangle, texture, textureRectangle, Color.White);
         }
 
-        public void Fill(Rectangle rectangle, Texture texture, Color modulation)
+        public void Fill(Rectangle rectangle, Texture texture, Color tint)
         {
-            Fill(rectangle, texture, Rectangle.Unit, modulation);
+            Fill(rectangle, texture, Rectangle.Unit, tint);
         }
 
         public void Fill(Rectangle rectangle, Texture texture)

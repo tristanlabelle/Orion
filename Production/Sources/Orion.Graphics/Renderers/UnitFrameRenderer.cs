@@ -8,18 +8,26 @@ using System.Collections;
 using OpenTK.Math;
 using Orion.GameLogic;
 
-
 namespace Orion.Graphics
 {
-    public class UnitFrameRenderer : FrameRenderer
+    public sealed class UnitFrameRenderer : FrameRenderer
     {
-        private Unit unit;
+        #region Fields
+        private static readonly UnitStat[] statsToDisplay = new[]
+            { UnitStat.AttackPower, UnitStat.AttackRange, UnitStat.MovementSpeed, UnitStat.SightRange };
 
+        private readonly Unit unit;
+        #endregion
+
+        #region Constructors
         public UnitFrameRenderer(Unit unit)
         {
+            Argument.EnsureNotNull(unit, "unit");
             this.unit = unit;
         }
+        #endregion
 
+        #region Methods
         public override void Draw(GraphicsContext context)
         {
             // If a baraque is selected and that it is currently executing a task. 
@@ -50,12 +58,28 @@ namespace Orion.Graphics
                 * */
 
             }
-     
-            string hp = "HP: {0}/{1}".FormatInvariant(unit.Health, unit.MaxHealth);
+
+            const float textLineDistance = 25;
+            const float firstLineY = 160;
+
             context.FillColor = Color.DarkBlue;
-            context.Draw(unit.Type.Name, new Vector2(150, 155));
-            context.Draw(hp, new Vector2(150, 130));
+            context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
+            string hp = "HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth);
+            context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
+
+            float y = firstLineY - textLineDistance * 2;
+            foreach (UnitStat stat in statsToDisplay)
+            {
+                if (stat == UnitStat.MaxHealth) continue;
+                int value = unit.GetStat(stat);
+                if (value == 0) continue;
+                string message = "{0}: {1}".FormatInvariant(Casing.CamelToWords(stat.ToStringInvariant()), value);
+                context.Draw(message, new Vector2(150, y));
+                y -= textLineDistance;
+            }
+
             base.Draw(context);
         }
+        #endregion
     }
 }

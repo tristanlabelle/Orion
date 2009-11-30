@@ -16,16 +16,19 @@ namespace Orion.Commandment.Pipeline
     /// </summary>
     public sealed class CheatCodeExecutor : CommandFilter
     {
-        #region Instance
         #region Fields
+        private readonly CheatCodeManager cheatCodeManager;
         private readonly Match match;
         private readonly Queue<Command> accumulatedCommands = new Queue<Command>();
         #endregion
 
         #region Constructors
-        public CheatCodeExecutor(Match match)
+        public CheatCodeExecutor(CheatCodeManager cheatCodeManager, Match match)
         {
+            Argument.EnsureNotNull(cheatCodeManager, "cheatCodeManager");
             Argument.EnsureNotNull(match, "match");
+
+            this.cheatCodeManager = cheatCodeManager;
             this.match = match;
         }
         #endregion
@@ -43,105 +46,15 @@ namespace Orion.Commandment.Pipeline
             {
                 Command command = accumulatedCommands.Dequeue();
                 SendMessage message = command as SendMessage;
-                if (message != null)
+                if (message != null && cheatCodeManager.Exists(message.Text))
                 {
-                    Action<Match, Faction> cheatCode;
-                    if (cheatCodes.TryGetValue(message.Text, out cheatCode))
-                    {
-                        cheatCode(match, match.World.FindFactionFromHandle(message.FactionHandle));
-                        command = new SendMessage(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
-                    }
+                    Faction faction = match.World.FindFactionFromHandle(message.FactionHandle);
+                    cheatCodeManager.Execute(message.Text, match, faction);
+                    command = new SendMessage(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
                 }
                 Flush(command);
             }
         }
-        #endregion
-        #endregion
-
-        #region Static
-        #region Fields
-        private static readonly Dictionary<string, Action<Match, Faction>> cheatCodes
-            = new Dictionary<string, Action<Match, Faction>>();
-        #endregion
-
-        #region Constructor
-        static CheatCodeExecutor()
-        {
-            cheatCodes["colorlessdeepfog"] = DisableFogOfWar;
-            cheatCodes["magiclamp"] = IncreaseResources;
-            cheatCodes["twelvehungrymen"] = IncreaseAvailableFood;
-            cheatCodes["whosyourdaddy"] = SpawnHeroUnit;
-            cheatCodes["turboturbo"] = AccelerateUnitDevelopment;
-            cheatCodes["brinformatique"] = InstantDefeat;
-            cheatCodes["itsover9000"] = InstantVictory;
-            cheatCodes["catchmymohawk"] = MisterT;
-            cheatCodes["!"] = MasterCheat;
-        }
-        #endregion
-
-        #region Methods
-        private static void DisableFogOfWar(Match match, Faction faction)
-        {
-            faction.LocalFogOfWar.Disable();
-        }
-
-        private static void IncreaseResources(Match match, Faction faction)
-        {
-            faction.AladdiumAmount += 5000;
-            faction.AlageneAmount += 5000;
-        }
-
-        private static void IncreaseAvailableFood(Match match, Faction faction)
-        {
-            faction.UsedFoodAmount -= 100;
-        }
-
-        private static void SpawnHeroUnit(Match match, Faction faction)
-        { 
-            UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
-            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
-        }
-
-        private static void AccelerateUnitDevelopment(Match match, Faction faction)
-        {
-            foreach (UnitType type in match.World.UnitTypes)
-            {
-                if (type.HasSkill<Skills.Train>()) type.GetSkill<Skills.Train>().Speed *= 50;
-                if (type.HasSkill<Skills.Build>()) type.GetSkill<Skills.Build>().Speed *= 50;
-            }
-        }
-
-        private static void InstantVictory(Match match, Faction faction)
-        {
-            IEnumerable<Unit> enemyBuildings = match.World.Entities
-                .OfType<Unit>()
-                .Where(u => u.Faction != faction);
-            foreach (Unit building in enemyBuildings) building.Suicide();
-        }
-
-        private static void InstantDefeat(Match match, Faction faction)
-        {
-            IEnumerable<Unit> userBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction == faction);
-            foreach (Unit building in userBuildings) building.Suicide();
-        }
-
-        private static void MisterT(Match match, Faction faction)
-        {
-            UnitType heroUnitType = match.World.UnitTypes.FromName("Mr T");
-            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
-        }
-
-        private static void MasterCheat(Match match, Faction faction)
-        {
-            DisableFogOfWar(match, faction);
-            IncreaseResources(match, faction);
-            IncreaseAvailableFood(match, faction);
-            SpawnHeroUnit(match, faction);
-            AccelerateUnitDevelopment(match, faction);
-            MisterT(match, faction);
-        }
-        #endregion
         #endregion
     }
 }

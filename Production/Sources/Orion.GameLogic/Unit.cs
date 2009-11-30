@@ -184,7 +184,7 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        #region Task
+        #region Tasks
         /// <summary>
         /// Gets the sequence of this unit's queued tasks, in the order they're to be executed.
         /// </summary>
@@ -221,7 +221,11 @@ namespace Orion.GameLogic
 
                 Debug.Assert(queuedTasks.Count == 0);
 
-                if (value != null) queuedTasks.Enqueue(value);
+                if (value != null)
+                {
+                    if (value.Unit != this) throw new ArgumentException("Cannot execute another unit's task.", "CurrentTask");
+                    queuedTasks.Enqueue(value);
+                }
             }
         }
 
@@ -356,6 +360,7 @@ namespace Orion.GameLogic
         public void EnqueueTask(Task task)
         {
             Argument.EnsureNotNull(task, "task");
+            if (task.Unit != this) throw new ArgumentException("Cannot execute another unit's task.", "task");
             queuedTasks.Enqueue(task);
         }
 

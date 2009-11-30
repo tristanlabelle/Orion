@@ -22,7 +22,6 @@ namespace Orion.GameLogic.Tasks
         private const float harvestDuration = 5;
         private const float depositingDuration = 0;
 
-        private readonly Unit harvester;
         private readonly ResourceNode node;
         private readonly GenericEventHandler<Entity> commandCenterDestroyedEventHandler;
         private int amountCarrying;
@@ -37,13 +36,12 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public Harvest(Unit harvester, ResourceNode node)
+            : base(harvester)
         {
-            Argument.EnsureNotNull(harvester, "harvester");
             if (!harvester.HasSkill<Skills.Harvest>())
                 throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
             Argument.EnsureNotNull(node, "node");
 
-            this.harvester = harvester;
             this.node = node;
             this.commandCenterDestroyedEventHandler = OnCommandCenterDestroyed;
             this.move = new Move(harvester, node.Position);
@@ -67,7 +65,7 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (!node.IsHarvestableByFaction(harvester.Faction))
+            if (!node.IsHarvestableByFaction(Unit.Faction))
             {
                 hasEnded = true;
                 return;
@@ -88,16 +86,16 @@ namespace Orion.GameLogic.Tasks
 
         private void UpdateExtracting(float timeDelta)
         {
-            float extractingSpeed = harvester.GetStat(UnitStat.ExtractingSpeed);
+            float extractingSpeed = Unit.GetStat(UnitStat.ExtractingSpeed);
             amountAccumulator += extractingSpeed * timeDelta;
 
-            int maxCarryingAmount = harvester.GetSkill<Skills.Harvest>().MaxCarryingAmount;
+            int maxCarryingAmount = Unit.GetSkill<Skills.Harvest>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
             {
                 if (nodeIsDead)
                 {
                     commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = new Move(harvester, commandCenter.Position);
+                    move = new Move(Unit, commandCenter.Position);
                     mode = Mode.Delivering;
                     return;
                 }
@@ -122,7 +120,7 @@ namespace Orion.GameLogic.Tasks
                     else
                     {
                         commandCenter.Died += commandCenterDestroyedEventHandler;
-                        move = new Move(harvester, commandCenter.Position);
+                        move = new Move(Unit, commandCenter.Position);
                         mode = Mode.Delivering;
                     }
                     return;
@@ -138,9 +136,9 @@ namespace Orion.GameLogic.Tasks
             
             //adds the resources to the unit's faction
             if (node.Type == ResourceType.Aladdium)
-                harvester.Faction.AladdiumAmount += amountCarrying;
+                Unit.Faction.AladdiumAmount += amountCarrying;
             else if (node.Type == ResourceType.Alagene)
-                harvester.Faction.AlageneAmount += amountCarrying;
+                Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
             if (nodeIsDead)
@@ -149,15 +147,15 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            move = new Move(harvester, node.Position);
+            move = new Move(Unit, node.Position);
             mode = Mode.Extracting;
         }
 
         private Unit FindClosestCommandCenter()
         {
-            return harvester.World.Entities
+            return Unit.World.Entities
                 .OfType<Unit>()
-                .Where(unit => unit.Faction == harvester.Faction && unit.HasSkill<Skills.StoreResources>())
+                .Where(other => other.Faction == Unit.Faction && other.HasSkill<Skills.StoreResources>())
                 .WithMinOrDefault(unit => (unit.Position - node.Position).LengthSquared);
         }
 
@@ -178,7 +176,7 @@ namespace Orion.GameLogic.Tasks
                 else
                 {
                     commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = new Move(harvester, commandCenter.Position);
+                    move = new Move(Unit, commandCenter.Position);
                 }
             }
         }

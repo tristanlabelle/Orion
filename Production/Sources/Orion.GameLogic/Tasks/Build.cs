@@ -13,7 +13,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class Build : Task
     {
         #region Fields
-        private readonly Unit builder;
         private readonly BuildingPlan buildingPlan;
         private Move move;
         private bool hasEnded = false;
@@ -21,6 +20,7 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public Build(Unit builder, BuildingPlan buildingPlan)
+            : base(builder)
         {
             Argument.EnsureNotNull(builder, "builder");
             if (!builder.HasSkill<Skills.Build>())
@@ -28,7 +28,6 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
 
             this.buildingPlan = buildingPlan;
-            this.builder = builder;
             this.move = new Move(builder, buildingPlan.Location);
         }
         #endregion
@@ -54,7 +53,7 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (!buildingPlan.GridRegion.Contains(builder.GridRegion.Min))
+            if (!buildingPlan.GridRegion.Contains(Unit.GridRegion.Min))
             {
                 //Unable To reach Destination
                 hasEnded = true;
@@ -64,22 +63,22 @@ namespace Orion.GameLogic.Tasks
             if (buildingPlan.IsBuildingCreated)
             {
                 if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth)
-                    builder.CurrentTask = new Repair(builder, buildingPlan.Building);
+                    Unit.CurrentTask = new Repair(Unit, buildingPlan.Building);
                 hasEnded = true;
                 return;
             }
 
-            if (!builder.World.IsFree(buildingPlan.GridRegion))
+            if (!Unit.World.IsFree(buildingPlan.GridRegion))
             {
                 Debug.WriteLine("Cannot build {0}, spot occupied.".FormatInvariant(buildingPlan.BuildingType));
                 hasEnded = true;
                 return;
             }
 
-            int aladdiumCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
-            int alageneCost = builder.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
-            bool hasEnoughResources = builder.Faction.AladdiumAmount >= aladdiumCost
-                && builder.Faction.AlageneAmount >= alageneCost;
+            int aladdiumCost = Unit.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
+            int alageneCost = Unit.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
+            bool hasEnoughResources = Unit.Faction.AladdiumAmount >= aladdiumCost
+                && Unit.Faction.AlageneAmount >= alageneCost;
 
             if (!hasEnoughResources)
             {
@@ -88,20 +87,20 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            builder.Faction.AladdiumAmount -= aladdiumCost;
-            builder.Faction.AlageneAmount -= alageneCost;
+            Unit.Faction.AladdiumAmount -= aladdiumCost;
+            Unit.Faction.AlageneAmount -= alageneCost;
 
             buildingPlan.CreateBuilding();
 
             if (buildingPlan.Building.HasSkill<ExtractAlageneSkill>())
             {
-                ResourceNode node = builder.World.Entities
+                ResourceNode node = Unit.World.Entities
                     .OfType<ResourceNode>()
                     .First(n => n.BoundingRectangle.ContainsPoint(buildingPlan.Location));
                 node.Extractor = buildingPlan.Building;
             }
 
-            builder.CurrentTask = new Repair(builder, buildingPlan.Building);
+            Unit.CurrentTask = new Repair(Unit, buildingPlan.Building);
         }
         #endregion
     }

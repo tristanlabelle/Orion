@@ -13,7 +13,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class Train : Task
     {
         #region Fields
-        private readonly Unit trainer;
         private readonly UnitType traineeType;
         private float healthPointsTrained = 0;
         private bool hasEnded = false;
@@ -21,6 +20,7 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public Train(Unit trainer, UnitType traineeType)
+            : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
             if (!trainer.HasSkill<Skills.Train>())
@@ -30,7 +30,6 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
 
-            this.trainer = trainer;
             this.traineeType = traineeType;
         }
         #endregion
@@ -43,30 +42,27 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get
-            {
-                return hasEnded;
-            }
+            get { return hasEnded; }
         }
         #endregion
 
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (trainer.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
+            if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
 
-            float maxHealth = trainer.Faction.GetStat(traineeType, UnitStat.MaxHealth);
-            float trainingSpeed = trainer.GetStat(UnitStat.TrainingSpeed);
+            float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+            float trainingSpeed = Unit.GetStat(UnitStat.TrainingSpeed);
             healthPointsTrained += trainingSpeed * timeDelta;
             if (healthPointsTrained >= maxHealth)
             {
                 Point? spawnPoint = GetSpawnPoint();
                 if (spawnPoint.HasValue)
                 {
-                    Unit trainee = trainer.Faction.CreateUnit(traineeType, spawnPoint.Value);
-                    Vector2 traineeDelta = trainee.Center - trainer.Center;
+                    Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
+                    Vector2 traineeDelta = trainee.Center - Unit.Center;
                     trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-                    if (trainer.HasRallyPoint) trainee.CurrentTask = new Move(trainee, trainer.RallyPoint.Value);
+                    if (Unit.HasRallyPoint) trainee.CurrentTask = new Move(trainee, Unit.RallyPoint.Value);
                     hasEnded = true;
                 }
                 else
@@ -78,16 +74,16 @@ namespace Orion.GameLogic.Tasks
 
         private Point? GetSpawnPoint()
         {
-            if (traineeType.IsAirborne) return (Point)trainer.Center;
+            if (traineeType.IsAirborne) return (Point)Unit.Center;
 
-            var adjacentPoints = trainer.GridRegion.GetAdjacentPoints()
-                    .Where(point => trainer.World.IsWithinBounds(point) && trainer.World.IsFree(point));
-            
-            if (trainer.HasRallyPoint)
+            var adjacentPoints = Unit.GridRegion.GetAdjacentPoints()
+                    .Where(point => Unit.World.IsWithinBounds(point) && Unit.World.IsFree(point));
+
+            if (Unit.HasRallyPoint)
             {
                 return adjacentPoints
                     .Select(point => (Point?)point)
-                    .WithMinOrDefault(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
+                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint.Value).LengthSquared);
             }
             else
             {

@@ -12,7 +12,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class Follow : Task
     {
         #region Fields
-        private readonly Unit follower;
         private readonly Unit target;
         private Move moveTask;
         #endregion
@@ -28,28 +27,19 @@ namespace Orion.GameLogic.Tasks
         /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
         /// </param>
         public Follow(Unit follower, Unit target)
+            : base(follower)
         {
-            Argument.EnsureNotNull(follower, "follower");
             if (!follower.HasSkill<Skills.Move>())
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
 
-            this.follower = follower;
             this.target = target;
             moveTask = new Move(follower, target.Position);
         }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the <see cref="Unit"/> that executes this task.
-        /// </summary>
-        public Unit Follower
-        {
-            get { return follower; }
-        }
-
         /// <summary>
         /// Gets the target <see cref="Unit"/> that gets followed.
         /// </summary>
@@ -60,7 +50,7 @@ namespace Orion.GameLogic.Tasks
 
         public bool IsInRange
         {
-            get { return (target.Position - follower.Position).Length <= 1;}
+            get { return (target.Position - Unit.Position).Length <= 1; }
         }
 
         /// <summary>
@@ -69,7 +59,7 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public float CurrentDistance
         {
-            get { return (target.Position - follower.Position).Length; }
+            get { return (target.Position - Unit.Position).Length; }
         }
 
         /// <summary>
@@ -96,9 +86,9 @@ namespace Orion.GameLogic.Tasks
         protected override void DoUpdate(float timeDelta)
         {
             float targetDisplacementLength = (target.Position - moveTask.Path.Destination).LengthFast;
-            float distanceToTarget = (target.Position - follower.Position).LengthFast;
+            float distanceToTarget = (target.Position - Unit.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
-                moveTask = new Move(follower, target.Position);
+                moveTask = new Move(Unit, target.Position);
 
             moveTask.Update(timeDelta);
         }

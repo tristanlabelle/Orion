@@ -7,7 +7,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class Repair : Task
     {
         #region Fields
-        private readonly Unit repairer;
         private readonly Unit building;
         private readonly GenericEventHandler<Entity> buildingDiedEventHandler;
         private Follow follow;
@@ -20,6 +19,7 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public Repair(Unit repairer, Unit building)
+            : base(repairer)
         {
             Argument.EnsureNotNull(repairer, "unit");
             Argument.EnsureNotNull(building, "building");
@@ -31,7 +31,6 @@ namespace Orion.GameLogic.Tasks
             if (building.Health >= building.MaxHealth) throw new ArgumentException("Cannot repair undamaged buildings.", "building");
             if (repairer.Faction != building.Faction) throw new ArgumentException("Cannot repair enemy buildings.", "building");
 
-            this.repairer = repairer;
             this.building = building;
             this.buildingDiedEventHandler = OnBuildingDied;
             this.building.Died += buildingDiedEventHandler;
@@ -42,11 +41,6 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
-        public Unit Unit
-        {
-            get { return repairer; }
-        }
-
         public Unit Building
         {
             get { return building; }
@@ -81,7 +75,7 @@ namespace Orion.GameLogic.Tasks
 
             if (building.IsUnderConstruction)
             {
-                building.Build(repairer.GetStat(UnitStat.BuildingSpeed) * timeDelta);
+                building.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
 
                 if (!building.IsUnderConstruction)
                 {
@@ -92,15 +86,15 @@ namespace Orion.GameLogic.Tasks
                     if (building.HasSkill<Skills.ExtractAlagene>())
                     {
                         // Smells like a hack!
-                        ResourceNode node = repairer.World.Entities.OfType<ResourceNode>()
+                        ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
                             .First(n => n.Position == building.Position);
-                        repairer.CurrentTask = new Harvest(repairer, node);
+                        Unit.CurrentTask = new Harvest(Unit, node);
                     }
 
                     return;
                 } 
             }
-            else if (repairer.Faction.AladdiumAmount >= aladdiumCost && repairer.Faction.AlageneAmount >= alageneCost)
+            else if (Unit.Faction.AladdiumAmount >= aladdiumCost && Unit.Faction.AlageneAmount >= alageneCost)
             {
                 building.Damage--;
                 totalAladdiumCost += aladdiumCost;
@@ -109,13 +103,13 @@ namespace Orion.GameLogic.Tasks
                 if (totalAladdiumCost > 1)
                 {
                     totalAladdiumCost--;
-                    repairer.Faction.AladdiumAmount--;
+                    Unit.Faction.AladdiumAmount--;
                 }
 
                 if (totalAlageneCost > 1)
                 {
                     totalAlageneCost--;
-                    repairer.Faction.AlageneAmount--;
+                    Unit.Faction.AlageneAmount--;
                 }
             }
         }

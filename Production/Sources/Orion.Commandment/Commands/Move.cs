@@ -6,6 +6,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
 using MoveTask = Orion.GameLogic.Tasks.Move;
+using FlyTask = Orion.GameLogic.Tasks.Fly;
 
 namespace Orion.Commandment.Commands
 {
@@ -55,7 +56,8 @@ namespace Orion.Commandment.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.CurrentTask = new MoveTask(unit, destination);
+                if (unit.IsAirborne) unit.CurrentTask = new FlyTask(unit, destination);
+                else unit.CurrentTask = new MoveTask(unit, destination);
             }
         }
 

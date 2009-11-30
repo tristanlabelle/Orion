@@ -13,7 +13,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class ZoneAttack : Task
     {
         #region Fields
-        private readonly Unit attacker;
         private readonly Vector2 destination;
         private readonly float targetDistance;
         private Unit target = null;
@@ -28,20 +27,19 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         /// <param name="unit">The <see cref="Unit"/> who attacks.</param>
         /// <param name="destination">The destination of the unit'</param>
-        public ZoneAttack(Unit striker, Vector2 destination)
+        public ZoneAttack(Unit unit, Vector2 destination)
+            : base(unit)
         {
-            Argument.EnsureNotNull(striker, "striker");
+            Argument.EnsureNotNull(unit, "unit");
             Argument.EnsureNotNull(destination, "destination");
             
-            this.attacker = striker;
             this.destination = destination;
-            this.targetDistance = striker.GetStat(UnitStat.AttackRange);
-            this.move = new Move(striker, destination);
+            this.targetDistance = unit.GetStat(UnitStat.AttackRange);
+            this.move = new Move(unit, destination);
         }
         #endregion
 
         #region Properties
-
         public override bool HasEnded
         {
             get { return move.HasEnded && (attack == null || attack.HasEnded); }
@@ -58,7 +56,7 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public float CurrentDistance
         {
-            get { return (target.Position - attacker.Position).Length; }
+            get { return (target.Position - Unit.Position).Length; }
         }
 
         /// <summary>
@@ -69,7 +67,6 @@ namespace Orion.GameLogic.Tasks
         {
             get { return CurrentDistance <= targetDistance; }
         }
-
         #endregion
 
         #region Methods
@@ -102,12 +99,12 @@ namespace Orion.GameLogic.Tasks
 
         public bool TryAttack()
         {
-            Unit target = attacker.World.Entities
-                .InArea(attacker.LineOfSight)
+            Unit target = Unit.World.Entities
+                .InArea(Unit.LineOfSight)
                 .OfType<Unit>()
-                .FirstOrDefault(unit => attacker.GetDiplomaticStance(unit) == DiplomaticStance.Enemy);
+                .FirstOrDefault(other => Unit.GetDiplomaticStance(other) == DiplomaticStance.Enemy);
 
-            if (target != null) attack = new Attack(attacker, target);
+            if (target != null) attack = new Attack(Unit, target);
             return target != null;
         }
         #endregion

@@ -11,7 +11,6 @@ namespace Orion.GameLogic.Tasks
     public sealed class Attack : Task
     {
         #region Fields
-        private readonly Unit attacker;
         private readonly Unit target;
         private readonly Follow follow;
         private float hitDelayInSeconds;
@@ -19,13 +18,13 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public Attack(Unit attacker, Unit target)
+            : base(attacker)
         {
             Argument.EnsureNotNull(attacker, "attacker");
             if (!attacker.HasSkill<Skills.Attack>())
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
-            this.attacker = attacker;
             this.target = target;
             if (attacker.HasSkill<Skills.Move>()) this.follow = new Follow(attacker, target);
             hitDelayInSeconds = attacker.GetStat(UnitStat.AttackDelay);
@@ -35,7 +34,7 @@ namespace Orion.GameLogic.Tasks
         #region Properties
         public Unit Attacker
         {
-            get { return attacker; }
+            get { return Unit; }
         }
 
         public Unit Target
@@ -47,8 +46,8 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                float squaredDistanceToTarget = (target.Position - attacker.Position).LengthSquared;
-                float attackRange = attacker.GetStat(UnitStat.AttackRange);
+                float squaredDistanceToTarget = (target.Position - Unit.Position).LengthSquared;
+                float attackRange = Unit.GetStat(UnitStat.AttackRange);
                 return squaredDistanceToTarget <= attackRange * attackRange;
             }
         }
@@ -62,9 +61,8 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                if (!attacker.HasSkill<Skills.Move>() && !IsTargetInRange)
-                    return true;
-
+                if (!Unit.CanSee(target)) return true;
+                if (!Unit.HasSkill<Skills.Move>() && !IsTargetInRange) return true;
                 return !target.IsAlive;
             }
         }
@@ -75,11 +73,11 @@ namespace Orion.GameLogic.Tasks
         {
             if (IsTargetInRange)
             {
-                attacker.TimeSinceLastHitInSeconds += timeDelta;
-                if (attacker.TimeSinceLastHitInSeconds > hitDelayInSeconds)
+                Unit.TimeSinceLastHitInSeconds += timeDelta;
+                if (Unit.TimeSinceLastHitInSeconds > hitDelayInSeconds)
                 {
-                    target.Damage += attacker.GetStat(UnitStat.AttackPower);
-                    attacker.TimeSinceLastHitInSeconds = 0;
+                    target.Damage += Unit.GetStat(UnitStat.AttackPower);
+                    Unit.TimeSinceLastHitInSeconds = 0;
                 }
             }
             else if (follow != null)

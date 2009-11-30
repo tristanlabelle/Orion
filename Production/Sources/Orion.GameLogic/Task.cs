@@ -8,7 +8,27 @@ namespace Orion.GameLogic
     [Serializable]
     public abstract class Task : IDisposable
     {
+        #region Fields
+        private readonly Unit unit;
+        #endregion
+
+        #region Constructors
+        protected Task(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            this.unit = unit;
+        }
+        #endregion
+
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Unit"/> accomplishing this task.
+        /// </summary>
+        public Unit Unit
+        {
+            get { return unit; }
+        }
+
         /// <summary>
         /// Gets a value indicating if this <see cref="Task"/> has terminated its execution,
         /// rendering the unit idle.

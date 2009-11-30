@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 
 namespace Orion.GameLogic.Pathfinding
 {
@@ -8,7 +8,7 @@ namespace Orion.GameLogic.Pathfinding
         private PathNode source;
         private Point16 point;
         private float costFromSource;
-        private float totalCost; // Stored instead of costToDestination as it is most often accessed.
+        private float distanceToDestination;
         #endregion
 
         #region Properties
@@ -27,32 +27,32 @@ namespace Orion.GameLogic.Pathfinding
             get { return costFromSource; }
         }
 
-        public float EstimatedCostToDestination
+        public float DistanceToDestination
         {
-            get { return totalCost - costFromSource; }
+            get { return distanceToDestination; }
         }
 
         public float TotalCost
         {
-            get { return totalCost; }
+            get { return costFromSource + distanceToDestination; }
         }
         #endregion
 
         #region Methods
         internal void Reset(PathNode source, Point16 point,
-            float costFromSource, float estimatedCostToDestination)
+            float costFromSource, float distanceToDestination)
         {
             this.source = source;
             this.point = point;
             this.costFromSource = costFromSource;
-            this.totalCost = costFromSource + estimatedCostToDestination;
+            this.distanceToDestination = distanceToDestination;
         }
 
-        internal void ChangeSource(PathNode source, float costFromSource, float estimatedCostToDestination)
+        internal void ChangeSource(PathNode source, float costFromSource, float distanceToDestination)
         {
             this.source = source;
             this.costFromSource = costFromSource;
-            this.totalCost = costFromSource + estimatedCostToDestination;
+            this.distanceToDestination = distanceToDestination;
         }
         #endregion
     }

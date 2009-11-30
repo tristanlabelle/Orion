@@ -237,11 +237,13 @@ namespace Orion.GameLogic
         /// Finds a path from a source to a destination.
         /// </summary>
         /// <param name="source">The position where the path should start.</param>
-        /// <param name="destination">The position the path should reach.</param>
+        /// <param name="destinationDistanceEvaluator">
+        /// A delegate to a method which evaluates the distance to the destination.
+        /// </param>
         /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Vector2 source, Vector2 destination)
+        public Path FindPath(Vector2 source, Func<Point, float> destinationDistanceEvaluator)
         {
-            return world.FindPath(source, destination, IsPathable);
+            return world.FindPath(source, destinationDistanceEvaluator, IsPathable);
         }
 
         private bool IsPathable(Point point)

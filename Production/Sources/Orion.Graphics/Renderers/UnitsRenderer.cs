@@ -199,7 +199,7 @@ namespace Orion.Graphics
 
             graphics.StrokeColor = Color.Gray;
             foreach (Path path in paths)
-                graphics.StrokeLineStrip(path.Points);
+                graphics.StrokeLineStrip(path.Points.Select(point => (Vector2)point + new Vector2(0.5f, 0.5f)));
         }
 
         private void DrawPathfindingDebugInfo(GraphicsContext graphics, Pathfinder pathfinder)

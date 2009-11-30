@@ -16,9 +16,9 @@ namespace Orion.GameLogic.Pathfinding
         private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
-        private readonly List<Vector2> points = new List<Vector2>();
+        private readonly List<Point> points = new List<Point>();
+        private Func<Point, float> destinationDistanceEvaluator;
         private Func<Point, bool> isWalkable;
-        private Point16 destinationPoint;
         private int maxNodesToVisit;
         #endregion
 
@@ -40,27 +40,34 @@ namespace Orion.GameLogic.Pathfinding
         /// by taking into account tile solidity.
         /// </summary>
         /// <param name="source">The position where the path starts.</param>
-        /// <param name="destination">The position the path should reach.</param>
+        /// <param name="distanceEvaluator">A delegate to a method which evaluates the distance to the destination.</param>
         /// <param name="isWalkable">A delegate to a method which evaluates if a given tile is walkable.</param>
         /// <param name="maxNodesToVisit">The maximum number of nodes to visit before giving up.</param>
         /// <returns>The path that was found, or <c>null</c> is none was.</returns>
-        public Path Find(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable, int maxNodesToVisit)
+        public Path Find(Point source, Func<Point, float> destinationDistanceEvaluator,
+            Func<Point, bool> isWalkable, int maxNodesToVisit)
         {
+            Argument.EnsureNotNull(destinationDistanceEvaluator, "distanceEvaluator");
             Argument.EnsureNotNull(isWalkable, "isWalkable");
 
             CleanUp();
 
+            this.destinationDistanceEvaluator = destinationDistanceEvaluator;
             this.isWalkable = isWalkable;
             Point16 sourcePoint = RoundCoordinates(source);
-            this.destinationPoint = RoundCoordinates(destination);
             this.maxNodesToVisit = maxNodesToVisit;
 
             PathNode destinationNode = FindPathNodes(sourcePoint);
 
-            if (destinationNode == null) destinationNode = FindClosedNodeNearestToDestination();
+            bool complete = true;
+            if (destinationNode == null)
+            {
+                destinationNode = FindClosedNodeNearestToDestination();
+                complete = false;
+            }
 
             FindPathPointsTo(destinationNode);
-            return new Path(source, destination, points);
+            return new Path(points, complete);
         }
 
         private void SmoothPathPoints()
@@ -99,7 +106,7 @@ namespace Orion.GameLogic.Pathfinding
 
         private PathNode FindClosedNodeNearestToDestination()
         {
-            return closedNodes.Values.WithMinOrDefault(node => node.EstimatedCostToDestination);
+            return closedNodes.Values.WithMinOrDefault(node => node.DistanceToDestination);
         }
 
         private void FindPathPointsTo(PathNode destinationNode)
@@ -115,10 +122,10 @@ namespace Orion.GameLogic.Pathfinding
         }
 
         private PathNode GetPathNode(PathNode parentNode, Point16 position,
-            float costFromSource, float estimatedCostToDestination)
+            float costFromSource, float distanceToDestination)
         {
             PathNode node = nodePool.Get();
-            node.Reset(parentNode, position, costFromSource, estimatedCostToDestination);
+            node.Reset(parentNode, position, costFromSource, distanceToDestination);
             return node;
         }
 
@@ -128,11 +135,11 @@ namespace Orion.GameLogic.Pathfinding
         /// <returns>The destination node, if a path is found getting to it.</returns>
         private PathNode FindPathNodes(Point16 sourcePoint)
         {
-            float estimatedCostFromSourceToDestination = GetMovementCost(sourcePoint, destinationPoint);
-            PathNode sourceNode = GetPathNode(null, sourcePoint, 0, estimatedCostFromSourceToDestination);
+            float distanceToDestination = destinationDistanceEvaluator(sourcePoint);
+            PathNode sourceNode = GetPathNode(null, sourcePoint, 0, distanceToDestination);
 
             PathNode currentNode = sourceNode;
-            while (currentNode.Point.X != destinationPoint.X || currentNode.Point.Y != destinationPoint.Y)
+            while (currentNode.DistanceToDestination > 0)
             {
                 closedNodes.Add(currentNode.Point, currentNode);
                 openNodes.Remove(currentNode.Point);
@@ -149,10 +156,10 @@ namespace Orion.GameLogic.Pathfinding
 
         private PathNode GetCheapestOpenNode()
         {
-            return openNodes.Values.WithMinOrDefault(node => node.EstimatedCostToDestination);
+            return openNodes.Values.WithMinOrDefault(node => node.DistanceToDestination);
         }
 
-        private float GetMovementCost(Point16 a, Point16 b)
+        private float GetDistance(Point16 a, Point16 b)
         {
             return ((Vector2)a - (Vector2)b).LengthFast;
         }
@@ -200,7 +207,7 @@ namespace Orion.GameLogic.Pathfinding
         {
             if (!IsOpenable(nearbyPoint)) return;
 
-            float movementCost = GetMovementCost(currentNode.Point, nearbyPoint);
+            float movementCost = GetDistance(currentNode.Point, nearbyPoint);
             if (currentNode.Source != null)
             {
                 // Discourage turns
@@ -216,14 +223,14 @@ namespace Orion.GameLogic.Pathfinding
                 if (costFromSource < nearbyNode.CostFromSource)
                 {
                     // If it is a better choice to pass through the current node, overwrite the parent and the move cost
-                    float estimatedCostToDestination = GetMovementCost(nearbyPoint, destinationPoint);
+                    float estimatedCostToDestination = destinationDistanceEvaluator(nearbyPoint);
                     nearbyNode.ChangeSource(currentNode, costFromSource, estimatedCostToDestination);
                 }
             }
             else
             {
                 // Add the node to the open list
-                float estimatedCostToDestination = GetMovementCost(nearbyPoint, destinationPoint);
+                float estimatedCostToDestination = destinationDistanceEvaluator(nearbyPoint);
                 nearbyNode = GetPathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
                 openNodes.Add(nearbyPoint, nearbyNode);
             }

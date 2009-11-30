@@ -22,8 +22,7 @@ namespace Orion.GameLogic.Tasks
 
         private readonly Unit unit;
         private readonly Vector2 destination;
-        private Path path;
-        private int nextPointIndex = 1;
+        private PathWalker pathWalker;
         #endregion
 
         #region Constructors
@@ -43,7 +42,7 @@ namespace Orion.GameLogic.Tasks
 
             this.unit = unit;
             this.destination = (Point)destination;
-            this.path = FindPathToDestination();
+            this.pathWalker = GetPathWalker();
         }
         #endregion
 
@@ -53,12 +52,12 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public Path Path
         {
-            get { return path; }
+            get { return pathWalker.Path; }
         }
 
         public override bool HasEnded
         {
-            get { return path == null || nextPointIndex > path.Points.Count - 1; }
+            get { return pathWalker == null || pathWalker.HasReachedDestination; }
         }
 
         public override string Description
@@ -70,38 +69,20 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (HasEnded) return;
-
-            Vector2 targetPathPoint = path.Points[nextPointIndex];
-            Vector2 delta = targetPathPoint - unit.Position;
-            Vector2 direction = Vector2.Normalize(delta);
-
-            unit.Angle = (float)Math.Atan2(direction.Y, direction.X);
-
             float distance = unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
-            Vector2 targetPosition;
-            if (distance < delta.Length)
-            {
-                targetPosition = unit.Position + (direction * distance);
-            }
-            else
-            {
-                // Unit will reach destination within this frame
-                targetPosition = targetPathPoint;
-                ++nextPointIndex;
-            }
+            pathWalker.Walk(distance);
 
-            Region targetRegion = Entity.GetGridRegion(targetPosition, unit.Size);
+            Region targetRegion = Entity.GetGridRegion(pathWalker.Position, unit.Size);
             if (unit.Type.IsAirborne || CanWalkOn(targetRegion))
             {
-                unit.SetPosition(targetPosition);
+                unit.Angle = pathWalker.Angle;
+                unit.SetPosition(pathWalker.Position);
             }
             else
             {
                 // An obstacle is blocking us
                 unit.SetPosition(unit.GridRegion.Min);
-                path = unit.Faction.FindPath(unit.Position, destination);
-                nextPointIndex = 1;
+                pathWalker = GetPathWalker();
             }
         }
 
@@ -119,18 +100,24 @@ namespace Orion.GameLogic.Tasks
             }
             return true;
         }
-        private Path FindPathToDestination()
+
+        private PathWalker GetPathWalker()
+        {
+            return new PathWalker(GetPath());
+        }
+
+        private Path GetPath()
         {
             if (unit.Type.IsAirborne)
             {
-                List<Vector2> points = new List<Vector2>();
-                points.Add(unit.Position);
-                points.Add(destination);
-                return new Path(unit.Position, destination, points);
+                List<Point> points = new List<Point>();
+                points.Add((Point)unit.Position);
+                points.Add((Point)destination);
+                return new Path(points);
             }
             else
             {
-                return unit.Faction.FindPath(unit.Position, destination);
+                return unit.Faction.FindPath(unit.Position, point => ((Vector2)point - destination).LengthFast);
             }
         }
         #endregion

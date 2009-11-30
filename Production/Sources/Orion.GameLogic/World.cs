@@ -120,34 +120,25 @@ namespace Orion.GameLogic
         /// Finds a path from a source to a destination.
         /// </summary>
         /// <param name="source">The position where the path should start.</param>
-        /// <param name="destination">The position the path should reach.</param>
+        /// <param name="destinationDistanceEvaluator">
+        /// A delegate to a method which evaluates the distance to the destination.
+        /// </param>
         /// <param name="isWalkable">A delegate to a method that tests if tiles are walkable.</param>
         /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Vector2 source, Vector2 destination, Func<Point, bool> isWalkable)
+        public Path FindPath(Vector2 source, Func<Point, float> destinationDistanceEvaluator,
+            Func<Point, bool> isWalkable)
         {
+            Argument.EnsureNotNull(isWalkable, "destinationDistanceEvaluator");
             Argument.EnsureNotNull(isWalkable, "isWalkable");
 
             if (!Bounds.ContainsPoint(source))
                 throw new ArgumentOutOfRangeException("source");
 
-            destination = Bounds.ClosestPointInside(destination);
-
-            int maxNumberOfNodes = (int)(source - destination).LengthFast * 40;
+            int maxNumberOfNodes = (int)(destinationDistanceEvaluator((Point)source) * 40);
             if (maxNumberOfNodes < 25) maxNumberOfNodes = 100;
             if (maxNumberOfNodes > 5000) maxNumberOfNodes = 5000;
 
-            return pathfinder.Find(source, destination, isWalkable, maxNumberOfNodes);
-        }
-
-        /// <summary>
-        /// Finds a path from a source to a destination.
-        /// </summary>
-        /// <param name="source">The position where the path should start.</param>
-        /// <param name="destination">The position the path should reach.</param>
-        /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Vector2 source, Vector2 destination)
-        {
-            return FindPath(source, destination, terrain.IsWalkableAndWithinBounds);
+            return pathfinder.Find((Point)source, destinationDistanceEvaluator, isWalkable, maxNumberOfNodes);
         }
         #endregion
 

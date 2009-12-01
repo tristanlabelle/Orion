@@ -54,7 +54,7 @@ namespace Orion.GameLogic
                 FoodCost = 1
             };
             builder.Skills.Add(new Skills.Move(10, false));
-            builder.Skills.Add(new Skills.Attack(1, 0, 5));
+            builder.Skills.Add(new Skills.Attack(1, 1, 5));
             builder.Skills.Add(new Skills.Harvest(1, 10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
             Register(builder);
@@ -73,7 +73,7 @@ namespace Orion.GameLogic
                 FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(12, false));
-            builder.Skills.Add(new Skills.Attack(3, 0, 3));
+            builder.Skills.Add(new Skills.Attack(3, 1, 3));
             Register(builder);
         }
 
@@ -107,7 +107,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(10, false));
-            builder.Skills.Add(new Skills.Attack(8, 0, 5));
+            builder.Skills.Add(new Skills.Attack(8, 1, 5));
             Register(builder);
         }
 
@@ -295,7 +295,7 @@ namespace Orion.GameLogic
                 MaxHealth = 5000
             };
             builder.Skills.Add(new Skills.Move(25, true));
-            builder.Skills.Add(new Skills.Attack(100, 0, 1));
+            builder.Skills.Add(new Skills.Attack(100, 1, 1));
             Register(builder);
         }
 

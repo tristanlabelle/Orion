@@ -13,16 +13,18 @@ namespace Orion.Graphics
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
         private readonly MinimapRenderer minimap;
+        private readonly TextureManager textureManager;
         #endregion
 
-        public MatchRenderer(World world, UserInputManager manager)
+        public MatchRenderer(World world, UserInputManager manager, TextureManager textureManager)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(manager, "manager");
 
+            this.textureManager = textureManager;
             inputManager = manager;
             selectionRenderer = new SelectionRenderer(inputManager);
-            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction);
+            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction, textureManager);
             minimap = new MinimapRenderer(worldRenderer);
         }
 

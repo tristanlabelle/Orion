@@ -23,7 +23,7 @@ namespace Orion.UserInterface.Actions
             Argument.EnsureNotNull(unitsRenderer, "unitsRenderer");
 
             foreach (ActionEnabler enabler in actionEnablers)
-                enabler.LetFill(type, actionButtons, unitsRenderer);
+                enabler.LetFill(type, actionButtons);
         }
         #endregion
 

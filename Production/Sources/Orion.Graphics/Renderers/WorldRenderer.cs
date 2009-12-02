@@ -28,12 +28,12 @@ namespace Orion.Graphics
         /// Initializes a new <see cref="WorldRenderer"/> from the <see cref="World"/> it is going to render.
         /// </summary>
         /// <param name="world">The <see cref="World"/> to be rendered.</param>
-        public WorldRenderer(World world, Faction faction)
+        public WorldRenderer(World world, Faction faction, TextureManager textureManager)
         {
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
-            this.textureManager = new TextureManager(@"../../../Assets");
+            this.textureManager = textureManager;
             this.terrainRenderer = new TerrainRenderer(world.Terrain);
             this.unitRenderer = new UnitsRenderer(world, faction, textureManager);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);

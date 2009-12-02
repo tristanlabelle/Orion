@@ -12,13 +12,13 @@ namespace Orion.UserInterface.Actions.Enablers
     {
         private UnitTypeRegistry registry;
 
-        public TrainEnabler(UserInputManager inputManager, ActionFrame frame, UnitTypeRegistry typeRegistry)
-            : base(inputManager, frame)
+        public TrainEnabler(UserInputManager inputManager, ActionFrame frame, UnitTypeRegistry typeRegistry, TextureManager textureManager)
+            : base(inputManager, frame, textureManager)
         {
             registry = typeRegistry;
         }
 
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer)
+        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
             if (type.HasSkill<Skills.Train>())
             {
@@ -42,8 +42,7 @@ namespace Orion.UserInterface.Actions.Enablers
                         }
 
                         ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                        Texture texture = unitsRenderer.GetTypeTexture(unitType);
-                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command, texture);
+                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command, textureManager);
                         int aladdium = playerFaction.GetStat(unitType, UnitStat.AladdiumCost);
                         int alagene = playerFaction.GetStat(unitType, UnitStat.AlageneCost);
                         button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);

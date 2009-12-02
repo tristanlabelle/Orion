@@ -14,14 +14,14 @@ namespace Orion.UserInterface.Actions
 
         #region Constructor
         public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager,
-            UnitType buildingType, Faction faction, Texture texture)
-            : base(frame, manager, Keys.None)
+            UnitType buildingType, Faction faction, TextureManager textureManager)
+            : base(frame, manager, Keys.None, textureManager)
         {
             this.buildingType = buildingType;
             int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
             int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
             Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
-            if (texture != null) base.Renderer = new TexturedFrameRenderer(texture);
+            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(buildingType.Name));
         }
         #endregion
 

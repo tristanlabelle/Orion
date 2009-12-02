@@ -15,18 +15,20 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Fields
         protected readonly UserInputManager inputManager;
         protected readonly ActionFrame container;
+        protected readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public ActionEnabler(UserInputManager manager, ActionFrame frame)
+        public ActionEnabler(UserInputManager manager, ActionFrame frame, TextureManager textureManager)
         {
             inputManager = manager;
             container = frame;
+            this.textureManager = textureManager;
         }
         #endregion
 
         #region Methods
-        public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer);
+        public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray);
         #endregion
     }
 }

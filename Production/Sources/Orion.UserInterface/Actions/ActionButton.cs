@@ -19,20 +19,22 @@ namespace Orion.UserInterface.Actions
         protected readonly ActionFrame container;
         protected readonly UserInputManager inputManager;
         private Frame tooltipContainer;
+        private TextureManager textureManager;
         #endregion
 
         #region Constructors
-        protected ActionButton(ActionFrame frame, UserInputManager manager, Keys hotkey)
+        protected ActionButton(ActionFrame frame, UserInputManager manager, Keys hotkey, TextureManager textureManager)
             : base(new Rectangle(1,1), "")
         {
+            this.textureManager = textureManager;
             HotKey = hotkey;
             container = frame;
             inputManager = manager;
             tooltipContainer = new Frame(new Rectangle(0, 0));
         }
 
-        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey)
-            : this(frame, manager, hotkey)
+        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey, TextureManager textureManager)
+            : this(frame, manager, hotkey, textureManager)
         {
             Name = "{0} ({1})".FormatInvariant(name, hotkey);
         }
@@ -70,7 +72,7 @@ namespace Orion.UserInterface.Actions
         public virtual ActionButton GetButtonAt(int x, int y)
         {
             if (x == 3 && y == 0)
-                return new CancelButton(container, inputManager);
+                return new CancelButton(container, inputManager,textureManager);
             return null;
         }
 

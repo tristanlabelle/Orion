@@ -11,19 +11,19 @@ namespace Orion.UserInterface.Actions.Enablers
     {
         private UnitTypeRegistry registry;
 
-        public BuildEnabler(UserInputManager manager, ActionFrame frame, UnitTypeRegistry entityRegistry)
-            : base(manager, frame)
+        public BuildEnabler(UserInputManager manager, ActionFrame frame, UnitTypeRegistry entityRegistry, TextureManager textureManager)
+            : base(manager, frame, textureManager)
         {
             registry = entityRegistry;
         }
 
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray, UnitsRenderer unitsRenderer)
+        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
             if (type.HasSkill<Skills.Build>())
             {
-                buttonsArray[0, 0] = new BuildActionButton(container, inputManager, type, registry, unitsRenderer);
+                buttonsArray[0, 0] = new BuildActionButton(container, inputManager, type, registry, base.textureManager);
                 buttonsArray[1, 0] = new GenericActionButton(container, inputManager,
-                    "Repair", Keys.R, new RepairUserCommand(inputManager), null);
+                    "Repair", Keys.R, new RepairUserCommand(inputManager), base.textureManager);
             }
         }
     }

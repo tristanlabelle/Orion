@@ -19,16 +19,16 @@ namespace Orion.UserInterface.Actions
 
         #region Constructors
         public ImmediateActionButton(ActionFrame frame, UserInputManager manager,
-            string name, Keys hotkey, ImmediateUserCommand command, Texture texture)
-            : base(frame, manager, name, hotkey)
+            string name, Keys hotkey, ImmediateUserCommand command, TextureManager textureManager)
+            : base(frame, manager, name, hotkey, textureManager)
         {
             this.command = command;
-            if (texture != null) base.Renderer = new TexturedFrameRenderer(texture);
+            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture("name"));
         }
 
         public ImmediateActionButton(ActionFrame frame, UserInputManager manager,
-            Keys hotkey, ImmediateUserCommand command, Texture texture)
-            : this(frame, manager, "", hotkey, command, texture)
+            Keys hotkey, ImmediateUserCommand command, TextureManager textureManager)
+            : this(frame, manager, "", hotkey, command, textureManager)
         { }
         #endregion
 

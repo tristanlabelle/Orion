@@ -14,14 +14,14 @@ namespace Orion.UserInterface.Actions
 
         #region Constructor
         public TechnologyResearchActionButton(ActionFrame frame, UserInputManager manager,
-            Technology technology, Faction faction, Texture texture)
-            : base(frame, manager, Keys.None)
+            Technology technology, Faction faction, TextureManager textureManager)
+            : base(frame, manager, Keys.None,textureManager)
         {
             this.technology = technology;
             int aladdium = technology.Requirements.AladdiumCost;
             int alagene = technology.Requirements.AlageneCost;
             Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(technology.Name, aladdium, alagene);
-            if (texture != null) base.Renderer = new TexturedFrameRenderer(texture);
+            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(technology.Name));
         }
         #endregion
 

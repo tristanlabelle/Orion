@@ -20,16 +20,15 @@ namespace Orion.UserInterface.Actions
 
         #region Constructor
         public BuildActionButton(ActionFrame frame, UserInputManager manager, UnitType type,
-            UnitTypeRegistry registry, UnitsRenderer unitsRenderer)
-            : base(frame, manager, "Build", Keys.B)
+            UnitTypeRegistry registry, TextureManager textureManager)
+            : base(frame, manager, "Build", Keys.B, textureManager)
         {
             Skills.Build buildingSkill = type.GetSkill<Skills.Build>();
             int x = 0;
             int y = 3;
             foreach (UnitType unitType in registry.Where(u => buildingSkill.Supports(u)))
             {
-                Texture texture = unitsRenderer.GetTypeTexture(unitType);
-                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction, texture);
+                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction, textureManager);
                 x++;
                 if (x == 4)
                 {
@@ -38,7 +37,8 @@ namespace Orion.UserInterface.Actions
                 }
             }
 
-            buildingButtons[3, 0] = new CancelButton(frame, manager);
+            buildingButtons[3, 0] = new CancelButton(frame, manager, textureManager);
+            Renderer = new TexturedFrameRenderer(textureManager.GetTexture("Build"));
         }
         #endregion
 

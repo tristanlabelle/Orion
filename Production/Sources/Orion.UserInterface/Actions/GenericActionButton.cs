@@ -17,11 +17,11 @@ namespace Orion.UserInterface.Actions
 
         #region Constructor
         public GenericActionButton(ActionFrame frame, UserInputManager manager,
-            string name, Keys hotkey, UserInputCommand provokedCommand, Texture texture)
-            : base(frame, manager, name, hotkey)
+            string name, Keys hotkey, UserInputCommand provokedCommand, TextureManager textureManager)
+            : base(frame, manager, name, hotkey,textureManager)
         {
             command = provokedCommand;
-            if (texture != null) base.Renderer = new TexturedFrameRenderer(texture);
+            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(name));
         }
         #endregion
 

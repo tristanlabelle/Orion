@@ -45,6 +45,7 @@ namespace Orion.UserInterface
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
+        private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
         private UnitType selectedType;
         private bool isSpaceDown;
@@ -59,10 +60,11 @@ namespace Orion.UserInterface
             this.match = match;
             this.localCommander = localCommander;
             match.Quitting += Quit;
+            textureManager  = new TextureManager(@"../../../Assets");
             userInputManager = new UserInputManager(localCommander);
             World world = match.World;
 
-            MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager);
+            MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager, textureManager);
             world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.25f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
@@ -122,11 +124,11 @@ namespace Orion.UserInterface
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
-            enablers.Add(new AttackEnabler(userInputManager, actions));
-            enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes));
-            enablers.Add(new HarvestEnabler(userInputManager, actions));
-            enablers.Add(new MoveEnabler(userInputManager, actions));
-            enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes));
+            enablers.Add(new AttackEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes, textureManager));
+            enablers.Add(new HarvestEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
         }
         #endregion
 

@@ -51,7 +51,8 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                if (!Unit.CanSee(target)) return true;
+                if (Unit.Faction.GetTileVisibility(target.GridRegion.Min) != TileVisibility.Visible)
+                    return true;
                 if (!Unit.IsInAttackRange(target))
                     return !Unit.HasSkill<Skills.Move>() || follow.HasEnded;
                 return !target.IsAlive;

@@ -326,7 +326,7 @@ namespace Orion.GameLogic
         /// <returns>
         /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
         /// </returns>
-        public bool CanSee(Unit other)
+        public bool IsInLineOfSight(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
             return LineOfSight.ContainsPoint(other.Center);
@@ -375,7 +375,6 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(other, "other");
             return faction.GetDiplomaticStance(other.faction);
         }
-
 
         /// <summary>
         /// Enqueues a <see cref="Task"/> to be executed by this <see cref="Unit"/>.

@@ -23,7 +23,7 @@ namespace Orion.UserInterface.Actions
             : base(frame, manager, name, hotkey, textureManager)
         {
             this.command = command;
-            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture("name"));
+            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(name));
         }
 
         public ImmediateActionButton(ActionFrame frame, UserInputManager manager,

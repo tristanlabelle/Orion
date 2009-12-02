@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions.Enablers
                         }
 
                         ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager, Keys.None, command, textureManager);
+                        ImmediateActionButton button = new ImmediateActionButton(container, inputManager,unitType.Name, Keys.None, command, textureManager);
                         int aladdium = playerFaction.GetStat(unitType, UnitStat.AladdiumCost);
                         int alagene = playerFaction.GetStat(unitType, UnitStat.AlageneCost);
                         button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);

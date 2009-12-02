@@ -10,40 +10,54 @@ namespace Orion.UserInterface.Widgets
 {
     public class ListFrame : ClippedView
     {
-        private Rectangle itemFrame;
-        private Vector2 padding;
+        private readonly GenericEventHandler<View, Rectangle> frameChangedHandler;
+        private readonly Vector2 padding;
 
-        public ListFrame(Rectangle frame, Rectangle itemFrame, Vector2 padding)
-            : base(frame, new Rectangle(0, frame.Height - padding.Y * 2, itemFrame.Width + padding.X * 2, padding.Y * 2), new FilledFrameRenderer())
+        public ListFrame(Rectangle frame, Vector2 padding)
+            : base(frame, new Rectangle(0, frame.Height - padding.Y, frame.Width, padding.Y), new FilledFrameRenderer())
         {
             this.padding = padding;
-            this.itemFrame = itemFrame;
+            frameChangedHandler = OnChildFrameChanged;
         }
 
-        public Rectangle ItemFrame
+        private void OnChildFrameChanged(View container, Rectangle newBounds)
         {
-            get { return itemFrame; }
+            int childIndex = Children.IndexOf(container);
+            float translateBy = (newBounds.MaxY + padding.Y) -
+                ((childIndex == 0) ? FullBounds.MaxY : Children[childIndex - 1].Frame.MaxY);
+            
+            foreach (ViewContainer child in Children.Skip(childIndex))
+                child.Frame = child.Frame.TranslatedBy(0, translateBy);
         }
 
         protected internal override void OnAddChild(ViewContainer child)
         {
             if (child != null)
             {
-                float yDelta = itemFrame.Height + padding.Y;
-                float yPos = Bounds.MaxY - padding.Y - yDelta * Children.Count;
-                child.Frame = itemFrame.TranslatedBy(padding.X, yPos);
-                FullBounds = FullBounds.TranslatedBy(0, -yDelta).ResizedBy(0, yDelta);
+                View view = child as View;
+                if (view != null) view.BoundsChanged += frameChangedHandler;
+
+                float yTransform = child.Frame.Height + padding.Y;
+                FullBounds = FullBounds.TranslatedBy(0, -yTransform).ResizedBy(0, yTransform);
+                child.Frame = new Rectangle(padding.X, FullBounds.MinY + padding.Y, child.Frame.Width, child.Frame.Height);
             }
             base.OnAddChild(child);
         }
 
         protected internal override void OnRemoveChild(ViewContainer child)
         {
-            int index = Children.IndexOf(child);
-            for (int i = index; i < Children.Count; i++)
+            if (child != null)
             {
-                View childAsView = (View)Children[i];
-                childAsView.Frame = childAsView.Frame.TranslatedBy(0, -itemFrame.Height);
+                View view = child as View;
+                if (view != null) view.BoundsChanged -= frameChangedHandler;
+
+                float yTranslation = -child.Frame.Height - padding.Y;
+                for (int index = Children.IndexOf(child) + 1; index < Children.Count; index++)
+                {
+                    ViewContainer container = Children[index];
+                    container.Frame = container.Frame.TranslatedBy(0, yTranslation);
+                }
+                FullBounds = FullBounds.ResizedBy(0, yTranslation);
             }
             base.OnRemoveChild(child);
         }

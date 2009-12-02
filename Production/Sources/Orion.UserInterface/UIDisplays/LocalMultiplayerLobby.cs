@@ -27,6 +27,7 @@ namespace Orion.UserInterface
         private int frameCounter;
 
         private readonly ListFrame gamesFrame;
+        private readonly Rectangle gameButtonRectangle;
         #endregion
 
         #region Constructors
@@ -38,7 +39,8 @@ namespace Orion.UserInterface
             timeoutDelegate = OnTimeout;
 
             Rectangle gamesFrameRect = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            gamesFrame = new ListFrame(gamesFrameRect, new Rectangle(gamesFrameRect.Width - 20, 30), new Vector2(10, 10));
+            gameButtonRectangle = new Rectangle(gamesFrameRect.Width - 20, 30);
+            gamesFrame = new ListFrame(gamesFrameRect, new Vector2(10, 10));
             Children.Add(gamesFrame);
 
             Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
@@ -135,7 +137,7 @@ namespace Orion.UserInterface
             string caption = "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(host), numberOfPlacesLeft);
             if (!hostedGames.ContainsKey(host))
             {
-                Button button = new Button(gamesFrame.ItemFrame, caption);
+                Button button = new Button(gameButtonRectangle, caption);
                 button.Triggered += b => { if (!requestedJoin.HasValue) AskJoinGame(host); };
                 gamesFrame.Children.Add(button);
                 hostedGames[host] = button;

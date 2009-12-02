@@ -13,15 +13,17 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly ListFrame replaysList;
+        private readonly Rectangle replayButtonFrame;
         #endregion
 
         #region Constructors
         public ReplayLoadingUI()
         {
             Rectangle replaysRectangle = Bounds.TranslatedBy(10, 60).ResizedBy(-60, -70);
-            replaysList = new ListFrame(replaysRectangle, new Rectangle(replaysRectangle.Width - 20, 30), new Vector2(10, 10));
+            replaysList = new ListFrame(replaysRectangle, new Vector2(10, 10));
             Rectangle scrollbarRectangle = new Rectangle(replaysRectangle.MaxX, replaysRectangle.MinY, 30, replaysRectangle.Height);
             Scrollbar replaysScrollbar = new Scrollbar(scrollbarRectangle, replaysList);
+            replayButtonFrame = new Rectangle(replaysRectangle.Width - 20, 30);
 
             Button exitButton = new Button(new Rectangle(10, 10, 100, 40), "Go Back");
 
@@ -48,7 +50,7 @@ namespace Orion.UserInterface
             {
                 foreach (FileInfo file in new DirectoryInfo("Replays").GetFiles("*.replay").OrderBy(file => file.Name))
                 {
-                    Button replayButton = new Button(replaysList.ItemFrame, file.Name);
+                    Button replayButton = new Button(replayButtonFrame, file.Name);
                     replayButton.Triggered += StartReplay;
                     replaysList.Children.Add(replayButton);
                 }

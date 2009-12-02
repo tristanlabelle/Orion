@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandSynchronizer2.cs" />
+    <Compile Include="CommandSynchronizer.cs" />
     <Compile Include="GameMessageType.cs" />
     <Compile Include="Protocol.cs" />
     <Compile Include="PeerEndPoint.cs" />
@@ -53,7 +53,6 @@
     <Compile Include="PacketType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SafeTransporter.cs" />
-    <Compile Include="CommandSynchronizer.cs" />
     <Compile Include="SetupMessageType.cs" />
   </ItemGroup>
   <ItemGroup>

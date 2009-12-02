@@ -103,7 +103,7 @@ namespace Orion.GameLogic
                 if (IsBuilding)
                     return HasSkill<Train>();
                 else
-                    return HasSkill<Skill>() || HasSkill<Attack>();
+                    return HasSkill<Build>() || HasSkill<Attack>();
             }
         }
         #endregion

@@ -38,6 +38,9 @@ namespace Orion.Commandment
         #region Methods
         public override void Update(float timeDelta)
         {
+            if (Faction.Status == FactionStatus.Defeated)
+                return;
+
             if (!initialized && Faction.Units.Count() > 0)
             {
                 Initialize();

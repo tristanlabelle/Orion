@@ -122,8 +122,8 @@ namespace Orion.Commandment
 
         private static void InstantDefeat(Match match, Faction faction)
         {
-            IEnumerable<Unit> userBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction == faction);
+            List<Unit> userBuildings = match.World.Entities
+                .OfType<Unit>().Where(u => u.Faction == faction).ToList();
             foreach (Unit building in userBuildings) building.Suicide();
         }
 

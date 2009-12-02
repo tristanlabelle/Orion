@@ -52,11 +52,16 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
+            float distance = Unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
             Vector2 delta = destination - Unit.Position;
             Unit.Angle = (float)Math.Atan2(delta.Y, delta.X);
-            float distance = Unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
-            if (distance > delta.LengthFast) Unit.SetPosition(destination);
-            else Unit.SetPosition(Unit.Position + Vector2.Normalize(delta) * distance);
+            if (distance > delta.LengthFast)
+            {
+                Unit.SetPosition(destination);
+                return;
+            }
+
+            Unit.SetPosition(Unit.Position + Vector2.Normalize(delta) * distance);
         }
         #endregion
     }

@@ -42,16 +42,6 @@ namespace Orion.GameLogic.Tasks
             get { return target; }
         }
 
-        public bool IsTargetInRange
-        {
-            get
-            {
-                float squaredDistanceToTarget = (target.Position - Unit.Position).LengthSquared;
-                float attackRange = Unit.GetStat(UnitStat.AttackRange);
-                return squaredDistanceToTarget <= attackRange * attackRange;
-            }
-        }
-
         public override string Description
         {
             get { return "attacking"; }
@@ -62,7 +52,8 @@ namespace Orion.GameLogic.Tasks
             get
             {
                 if (!Unit.CanSee(target)) return true;
-                if (!Unit.HasSkill<Skills.Move>() && !IsTargetInRange) return true;
+                if (!Unit.IsInAttackRange(target))
+                    return !Unit.HasSkill<Skills.Move>() || follow.HasEnded;
                 return !target.IsAlive;
             }
         }
@@ -71,7 +62,7 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            if (IsTargetInRange)
+            if (Unit.IsInAttackRange(target))
             {
                 Unit.TimeSinceLastHitInSeconds += timeDelta;
                 if (Unit.TimeSinceLastHitInSeconds > hitDelayInSeconds)

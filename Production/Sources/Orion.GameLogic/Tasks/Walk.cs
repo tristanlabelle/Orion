@@ -19,10 +19,12 @@ namespace Orion.GameLogic.Tasks
     public sealed class Walk : Move
     {
         #region Fields
-        private const float angularVelocity = (float)Math.PI * 2;
+        private const int maxAttemptCount = 8;
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
+        private bool isOnPath;
         private PathWalker pathWalker;
+        private int attemptCount = 1;
         #endregion
 
         #region Constructors
@@ -80,19 +82,47 @@ namespace Orion.GameLogic.Tasks
         protected override void DoUpdate(float timeDelta)
         {
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
-            pathWalker.Walk(distance);
-            Unit.Angle = pathWalker.Angle;
 
-            Region targetRegion = Entity.GetGridRegion(pathWalker.Position, Unit.Size);
+            Vector2 targetPosition;
+            if (isOnPath)
+            {
+                pathWalker.Walk(distance);
+                targetPosition = pathWalker.Position;
+                Unit.Angle = pathWalker.Angle;
+            }
+            else
+            {
+                // Get on the path before following it
+                Vector2 deltaToPathSource = pathWalker.Path.Source - Unit.Position;
+                if (distance > deltaToPathSource.LengthFast)
+                {
+                    targetPosition = pathWalker.Path.Source;
+                    isOnPath = true;
+                }
+                else
+                {
+                    targetPosition = Unit.Position + Vector2.Normalize(deltaToPathSource) * distance;
+                }
+            }
+
+            Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
-                Unit.SetPosition(pathWalker.Position);
+                Unit.SetPosition(targetPosition);
             }
             else
             {
                 // An obstacle is blocking us
-                Unit.SetPosition(Unit.GridRegion.Min);
-                pathWalker = GetPathWalker();
+                if (attemptCount >= maxAttemptCount)
+                {
+                    pathWalker = null;
+                }
+                else
+                {
+                    pathWalker = GetPathWalker();
+                    isOnPath = false;
+                    ++attemptCount;
+                }
             }
         }
 
@@ -113,7 +143,7 @@ namespace Orion.GameLogic.Tasks
 
         private PathWalker GetPathWalker()
         {
-            Path path = Unit.Faction.FindPath(Unit.Position, destinationDistanceEvaluator);
+            Path path = Unit.Faction.FindPath((Point)Unit.Center, destinationDistanceEvaluator);
             return new PathWalker(path);
         }
         #endregion

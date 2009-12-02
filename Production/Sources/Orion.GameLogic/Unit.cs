@@ -304,6 +304,40 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Stats
+        /// <summary>
+        /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
+        /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
+        public int GetStat(UnitStat stat)
+        {
+            return faction.GetStat(type, stat);
+        }
+
+        /// <summary>
+        /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="Unit"/> to be tested.</param>
+        /// <returns>
+        /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
+        /// </returns>
+        public bool CanSee(Unit other)
+        {
+            Argument.EnsureNotNull(other, "other");
+            return LineOfSight.ContainsPoint(other.Center);
+        }
+
+        public bool IsInAttackRange(Unit other)
+        {
+            Argument.EnsureNotNull(other, "other");
+            if (!HasSkill<Skills.Attack>()) return false;
+            int attackRange = GetStat(UnitStat.AttackRange);
+            if (attackRange == 0) return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
+            return (Center - other.Center).LengthSquared <= attackRange * attackRange;
+        }
+        #endregion
+
         /// <summary>
         /// Changes the position of this <see cref="Unit"/>.
         /// </summary>
@@ -338,28 +372,6 @@ namespace Orion.GameLogic
             return faction.GetDiplomaticStance(other.faction);
         }
 
-        /// <summary>
-        /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
-        /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
-        public int GetStat(UnitStat stat)
-        {
-            return faction.GetStat(type, stat);
-        }
-
-        /// <summary>
-        /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> to be tested.</param>
-        /// <returns>
-        /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
-        /// </returns>
-        public bool CanSee(Unit unit)
-        {
-            Argument.EnsureNotNull(unit, "unit");
-            return LineOfSight.ContainsPoint(unit.Center);
-        }
 
         /// <summary>
         /// Enqueues a <see cref="Task"/> to be executed by this <see cref="Unit"/>.

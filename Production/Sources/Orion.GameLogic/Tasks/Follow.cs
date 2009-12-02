@@ -13,6 +13,7 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit target;
+        private Vector2 oldTargetPosition;
         private Move moveTask;
         #endregion
 
@@ -35,7 +36,8 @@ namespace Orion.GameLogic.Tasks
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
 
             this.target = target;
-            moveTask = Move.ToPoint(follower, target.Position);
+            this.moveTask = Move.ToPoint(follower, target.Position);
+            this.oldTargetPosition = target.Position;
         }
         #endregion
 
@@ -85,10 +87,13 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(float timeDelta)
         {
-            float targetDisplacementLength = (target.Position - moveTask.Destination).LengthFast;
+            float targetDisplacementLength = (target.Position - oldTargetPosition).LengthFast;
             float distanceToTarget = (target.Position - Unit.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
+            {
                 moveTask = Move.ToPoint(Unit, target.Position);
+                oldTargetPosition = target.Position;
+            }
 
             moveTask.Update(timeDelta);
         }

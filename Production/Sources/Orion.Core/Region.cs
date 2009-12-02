@@ -222,10 +222,20 @@ namespace Orion
             return new Region(min, size);
         }
 
+        public static Region FromMinInclusiveMax(int minX, int minY, int inclusiveMaxX, int inclusiveMaxY)
+        {
+            return FromMinExclusiveMax(new Point(minX, minY), new Point(inclusiveMaxX, inclusiveMaxY));
+        }
+
         public static Region FromMinExclusiveMax(Point min, Point exclusiveMax)
         {
             Size size = new Size(exclusiveMax.X - min.X, exclusiveMax.Y - min.Y);
             return new Region(min, size);
+        }
+
+        public static Region FromMinExclusiveMax(int minX, int minY, int exclusiveMaxX, int exclusiveMaxY)
+        {
+            return FromMinExclusiveMax(new Point(minX, minY), new Point(exclusiveMaxX, exclusiveMaxY));
         }
 
         public static Region Grow(Region region, int amount)
@@ -234,7 +244,6 @@ namespace Orion
             return new Region(
                 region.MinX - amount, region.MinY - amount,
                 region.Width + amount * 2, region.Height + amount * 2);
-
         }
 
         public static Region Union(Region a, Region b)
@@ -244,6 +253,27 @@ namespace Orion
                 Math.Max(a.ExclusiveMax.X, b.ExclusiveMax.X),
                 Math.Max(a.ExclusiveMax.Y, b.ExclusiveMax.Y));
             return FromMinExclusiveMax(min, exclusiveMax);
+        }
+
+        public static Region? Intersection(Region a, Region b)
+        {
+            int minX = Math.Max(a.MinX, b.MinX);
+            int minY = Math.Max(a.MinY, b.MinY);
+            int exclusiveMaxX = Math.Min(a.ExclusiveMaxX, b.ExclusiveMaxX);
+            int exclusiveMaxY = Math.Min(a.ExclusiveMaxY, b.ExclusiveMaxY);
+
+            if (minX >= exclusiveMaxX || minY >= exclusiveMaxY) return null;
+            return Region.FromMinExclusiveMax(minX, minY, exclusiveMaxX, exclusiveMaxY);
+        }
+
+        public static bool Intersects(Region a, Region b)
+        {
+            return Intersection(a, b).HasValue;
+        }
+
+        public static bool AreAdjacentOrIntersecting(Region a, Region b)
+        {
+            return Intersects(Region.Grow(a, 1), b);
         }
 
         public static bool Equals(Region a, Region b)

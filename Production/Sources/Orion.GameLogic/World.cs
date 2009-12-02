@@ -125,7 +125,7 @@ namespace Orion.GameLogic
         /// </param>
         /// <param name="isWalkable">A delegate to a method that tests if tiles are walkable.</param>
         /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Vector2 source, Func<Point, float> destinationDistanceEvaluator,
+        public Path FindPath(Point source, Func<Point, float> destinationDistanceEvaluator,
             Func<Point, bool> isWalkable)
         {
             Argument.EnsureNotNull(isWalkable, "destinationDistanceEvaluator");
@@ -134,11 +134,11 @@ namespace Orion.GameLogic
             if (!Bounds.ContainsPoint(source))
                 throw new ArgumentOutOfRangeException("source");
 
-            int maxNumberOfNodes = (int)(destinationDistanceEvaluator((Point)source) * 40);
+            int maxNumberOfNodes = (int)(destinationDistanceEvaluator(source) * 40);
             if (maxNumberOfNodes < 25) maxNumberOfNodes = 100;
             if (maxNumberOfNodes > 5000) maxNumberOfNodes = 5000;
 
-            return pathfinder.Find((Point)source, destinationDistanceEvaluator, isWalkable, maxNumberOfNodes);
+            return pathfinder.Find(source, destinationDistanceEvaluator, isWalkable, maxNumberOfNodes);
         }
         #endregion
 

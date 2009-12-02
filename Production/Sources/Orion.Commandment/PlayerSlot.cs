@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Color = System.Drawing.Color;
 
 using Orion.GameLogic;
 
@@ -9,6 +10,13 @@ namespace Orion.Commandment
 {
     public abstract class PlayerSlot
     {
+        private Color color;
+
+        public Color Color
+        {
+            get { return color; }
+            set { color = value; }
+        }
         public abstract bool NeedsFaction { get; }
         public abstract override string ToString();
     }

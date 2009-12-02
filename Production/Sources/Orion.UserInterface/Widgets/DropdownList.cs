@@ -13,72 +13,6 @@ namespace Orion.UserInterface.Widgets
     public class DropdownList<T> : Frame
     {
         #region Nested Types
-        private class DropdownMenu : View
-        {
-            #region Fields
-            private DropdownList<T> parent;
-            #endregion
-
-            #region Constructors
-            public DropdownMenu(DropdownList<T> parent)
-                : base(parent.Bounds)
-            {
-                this.parent = parent;
-            }
-            #endregion
-
-            #region Properties
-            public new DropdownList<T> Parent
-            {
-                get { return parent; }
-            }
-
-            public override Rectangle Bounds
-            {
-                get { return new Rectangle(0,0, Parent.Bounds.Width, parent.Bounds.Height * Children.Count); }
-                set { throw new InvalidOperationException("Dropdown menus must be let manage their Bounds themselves"); }
-            }
-
-            public override Rectangle Frame
-            {
-                get
-                {
-                    Vector2 translation = new Vector2(0, -parent.Bounds.Height * Children.Count) + parent.Frame.Min;
-                    return Bounds.TranslatedBy(translation);
-                }
-                set { throw new InvalidOperationException("Dropdown menus must be let manage their Frame themselves"); }
-            }
-            #endregion
-
-            #region Methods
-            protected override bool OnMouseDown(MouseEventArgs args)
-            {
-                return false;
-            }
-
-            protected internal override void OnAddChild(ViewContainer child)
-            {
-                base.Bounds = Bounds;
-                base.OnAddChild(child);
-            }
-
-            protected internal override void Draw(GraphicsContext context)
-            {
-                context.FillColor = Color.DeepSkyBlue;
-                context.StrokeColor = Color.Black;
-                context.Fill(Bounds);
-                context.Stroke(Bounds);
-            }
-
-            public void AddItem(T item)
-            {
-                DropdownMenuRow row = new DropdownMenuRow(parent, item);
-                row.Frame = row.Frame.TranslatedTo(0, Bounds.MaxY);
-                Children.Add(row);
-            }
-            #endregion
-        }
-
         private class DropdownMenuRow : View
         {
             #region Fields
@@ -136,7 +70,7 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Fields
-        private readonly DropdownMenu menu;
+        private readonly ListFrame menu;
         private readonly DropdownListRowValueRenderer<T> renderer;
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
@@ -153,7 +87,7 @@ namespace Orion.UserInterface.Widgets
             : base(frame)
         {
             this.renderer = renderer;
-            menu = new DropdownMenu(this);
+            menu = new ListFrame(Bounds);
             parentMouseUp = ParentMouseUp;
         }
         #endregion
@@ -199,9 +133,18 @@ namespace Orion.UserInterface.Widgets
 
         public void AddItem(T item)
         {
-            menu.AddItem(item);
+            if (Items.Contains(item))
+                throw new InvalidOperationException("The same DropdownList can't contain twice the same item");
+
+            DropdownMenuRow row = new DropdownMenuRow(this, item);
+            menu.Children.Add(row);
+
             if (menu.Children.Count == 1)
                 SelectedItem = item;
+
+            menu.Bounds = menu.FullBounds;
+            //menu.Frame = Bounds.TranslatedBy(0, -menu.Bounds.Height - Bounds.Height).ResizedTo(menu.Bounds.Size);
+            menu.Frame = new Rectangle(Frame.Min, menu.Bounds.Size).TranslatedBy(0, -menu.Bounds.Height);
         }
 
         protected internal override void OnAddToParent(ViewContainer parent)

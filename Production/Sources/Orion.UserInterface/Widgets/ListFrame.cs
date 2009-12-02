@@ -10,8 +10,15 @@ namespace Orion.UserInterface.Widgets
 {
     public class ListFrame : ClippedView
     {
+        #region Fields
         private readonly GenericEventHandler<View, Rectangle> frameChangedHandler;
         private readonly Vector2 padding;
+        #endregion
+
+        #region Constructors
+        public ListFrame(Rectangle frame)
+            : this(frame, new Vector2(0, 0))
+        { }
 
         public ListFrame(Rectangle frame, Vector2 padding)
             : base(frame, new Rectangle(0, frame.Height - padding.Y, frame.Width, padding.Y), new FilledFrameRenderer())
@@ -19,7 +26,9 @@ namespace Orion.UserInterface.Widgets
             this.padding = padding;
             frameChangedHandler = OnChildFrameChanged;
         }
+        #endregion
 
+        #region Methods
         private void OnChildFrameChanged(View container, Rectangle newBounds)
         {
             int childIndex = Children.IndexOf(container);
@@ -61,5 +70,6 @@ namespace Orion.UserInterface.Widgets
             }
             base.OnRemoveChild(child);
         }
+        #endregion
     }
 }

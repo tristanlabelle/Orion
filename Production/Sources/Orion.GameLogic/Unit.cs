@@ -64,6 +64,13 @@ namespace Orion.GameLogic
         {
             if (DamageChanged != null) DamageChanged(this);
         }
+
+        public event GenericEventHandler<Unit> ConstructionComplete;
+
+        private void OnConstructionComplete()
+        {
+            if (ConstructionComplete != null) ConstructionComplete(this);
+        }
         #endregion
         #endregion
 
@@ -427,13 +434,17 @@ namespace Orion.GameLogic
             this.Health += health;
             this.healthBuilt += health;
             if (healthBuilt >= MaxHealth)
+            {
                 isUnderConstruction = false;
+                OnConstructionComplete();
+            }
         }
 
         public void CompleteConstruction()
         {
             this.Health = MaxHealth;
             this.isUnderConstruction = false;
+            OnConstructionComplete();
         }
         #endregion
     }

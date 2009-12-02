@@ -27,6 +27,7 @@ namespace Orion.GameLogic
         private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         private readonly GenericEventHandler<Entity> entityDiedEventHandler;
+        private readonly GenericEventHandler<Unit> foodStorageCreated;
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
         private int aladdiumAmount;
         private int alageneAmount;
@@ -34,6 +35,8 @@ namespace Orion.GameLogic
         private int usedFoodAmount = 0;
         private FactionStatus status = FactionStatus.Undefeated;
         private List<Technology> technologies = new List<Technology>();
+        private List<Unit> activeFoodStorages = new List<Unit>();
+
         #endregion
 
         #region Constructors
@@ -58,6 +61,7 @@ namespace Orion.GameLogic
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
+            this.foodStorageCreated = FoodStorageCreated;
 
             //technologies.Add(world.TechTree.Technologies.First());
         }
@@ -280,7 +284,7 @@ namespace Orion.GameLogic
             usedFoodAmount += type.FoodCost;
 
             if (unit.Type.HasSkill<Skills.StoreFood>())
-                totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+                unit.ConstructionComplete += foodStorageCreated;
 
             return unit;
         }
@@ -305,10 +309,27 @@ namespace Orion.GameLogic
             localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreFood>())
-                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+                FoodStorageDied(unit);
             unit.Died -= entityDiedEventHandler;
 
             CheckForDefeat();
+        }
+
+        private void FoodStorageCreated(Unit unit)
+        {
+            unit.ConstructionComplete -= foodStorageCreated;
+            activeFoodStorages.Add(unit);
+            totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity); 
+        }
+
+        private void FoodStorageDied(Unit unit)
+        { 
+            foreach(Unit foodStorage in activeFoodStorages)
+            if(unit == foodStorage)
+            {
+                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+                activeFoodStorages.Remove(unit);
+            }
         }
         #endregion
 

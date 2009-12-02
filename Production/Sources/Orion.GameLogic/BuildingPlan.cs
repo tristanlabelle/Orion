@@ -65,6 +65,8 @@ namespace Orion.GameLogic
 
             building = faction.CreateUnit(buildingType, location);
             building.Health = 1;
+            building.Build(1);
+            building.Health -= 1;
         }
         #endregion
     }

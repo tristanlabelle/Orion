@@ -143,7 +143,7 @@ namespace Orion.GameLogic.Tasks
 
         private PathWalker GetPathWalker()
         {
-            Path path = Unit.Faction.FindPath((Point)Unit.Center, destinationDistanceEvaluator);
+            Path path = Unit.Faction.FindPath(Unit.GridRegion.Min, destinationDistanceEvaluator);
             return new PathWalker(path);
         }
         #endregion

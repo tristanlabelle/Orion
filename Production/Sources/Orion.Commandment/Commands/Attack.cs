@@ -24,6 +24,8 @@ namespace Orion.Commandment.Commands
             : base(factionHandle)
         {
             Argument.EnsureNotNull(attackerHandles, "attackerHandles");
+            if (attackerHandles.Contains(targetHandle))
+                throw new ArgumentException("A unit cannot attack itself.");
 
             this.attackerHandles = attackerHandles.Distinct().ToList().AsReadOnly();
             this.targetHandle = targetHandle;

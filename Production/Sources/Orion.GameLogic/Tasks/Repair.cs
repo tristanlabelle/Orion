@@ -7,7 +7,7 @@ namespace Orion.GameLogic.Tasks
     public sealed class Repair : Task
     {
         #region Fields
-        private readonly Unit building;
+        private readonly Unit target;
         private readonly GenericEventHandler<Entity> buildingDiedEventHandler;
         private readonly Move move;
         private float aladdiumCost;
@@ -18,32 +18,36 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Constructors
-        public Repair(Unit repairer, Unit building)
+        public Repair(Unit repairer, Unit target)
             : base(repairer)
         {
             Argument.EnsureNotNull(repairer, "unit");
-            Argument.EnsureNotNull(building, "building");
+            Argument.EnsureNotNull(target, "target");
             if (!repairer.HasSkill<Skills.Build>())
                 throw new ArgumentException("Cannot repair without the repair skill.", "unit");
+            if (target == repairer)
+                throw new ArgumentException("A unit cannot repair itself.");
 
-            // TODO: check against repairability itself instead of the Building type, since otherwise mechanical units can be repaired too
-            if (!building.Type.IsBuilding) throw new ArgumentException("Can only repair buildings.", "building");
-            if (building.Health >= building.MaxHealth) throw new ArgumentException("Cannot repair undamaged buildings.", "building");
-            if (repairer.Faction != building.Faction) throw new ArgumentException("Cannot repair enemy buildings.", "building");
+            // TODO: check against repairability itself instead of the Building type,
+            // since otherwise mechanical units could be repaired too
+            if (!target.Type.IsBuilding)
+                throw new ArgumentException("Can only repair buildings.", "target");
+            if (repairer.Faction != target.Faction)
+                throw new ArgumentException("Cannot repair other faction buildings.", "target");
 
-            this.building = building;
+            this.target = target;
             this.buildingDiedEventHandler = OnBuildingDied;
-            this.building.Died += buildingDiedEventHandler;
-            this.move = Move.ToNearRegion(repairer, building.GridRegion);
-            this.aladdiumCost = building.GetStat(UnitStat.AladdiumCost) / building.MaxHealth;
-            this.alageneCost = building.GetStat(UnitStat.AlageneCost) / building.MaxHealth;
+            this.target.Died += buildingDiedEventHandler;
+            this.move = Move.ToNearRegion(repairer, target.GridRegion);
+            this.aladdiumCost = target.GetStat(UnitStat.AladdiumCost) / target.MaxHealth;
+            this.alageneCost = target.GetStat(UnitStat.AlageneCost) / target.MaxHealth;
         }
         #endregion
 
         #region Properties
         public Unit Building
         {
-            get { return building; }
+            get { return target; }
         }
 
         public override string Description
@@ -66,28 +70,28 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (building.Health >= building.MaxHealth)
+            if (target.Health >= target.MaxHealth)
             {
                 hasEnded = true;
-                building.Died -= buildingDiedEventHandler;
+                target.Died -= buildingDiedEventHandler;
                 return;
             }
 
-            if (building.IsUnderConstruction)
+            if (target.IsUnderConstruction)
             {
-                building.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
+                target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
 
-                if (!building.IsUnderConstruction)
+                if (!target.IsUnderConstruction)
                 {
                     hasEnded = true;
-                    building.Died -= buildingDiedEventHandler;
+                    target.Died -= buildingDiedEventHandler;
                     
                     // If we just built an alagene extractor, start harvesting.
-                    if (building.HasSkill<Skills.ExtractAlagene>())
+                    if (target.HasSkill<Skills.ExtractAlagene>())
                     {
                         // Smells like a hack!
                         ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
-                            .First(n => n.Position == building.Position);
+                            .First(n => n.Position == target.Position);
                         Unit.CurrentTask = new Harvest(Unit, node);
                     }
 
@@ -96,7 +100,7 @@ namespace Orion.GameLogic.Tasks
             }
             else if (Unit.Faction.AladdiumAmount >= aladdiumCost && Unit.Faction.AlageneAmount >= alageneCost)
             {
-                building.Damage--;
+                target.Damage--;
                 totalAladdiumCost += aladdiumCost;
                 totalAlageneCost += alageneCost;
 

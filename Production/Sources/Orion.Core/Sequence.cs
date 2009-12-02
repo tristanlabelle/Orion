@@ -567,6 +567,20 @@ namespace Orion
         #endregion
         #endregion
 
+        #region Except
+        public static IEnumerable<T> Except<T>(this IEnumerable<T> sequence, T item, IEqualityComparer<T> equalityComparer)
+        {
+            Argument.EnsureNotNull(sequence, "sequence");
+            Argument.EnsureNotNull(equalityComparer, "equalityComparer");
+            return sequence.Where(i => !equalityComparer.Equals(i, item));
+        }
+
+        public static IEnumerable<T> Except<T>(this IEnumerable<T> sequence, T item)
+        {
+            return Except(sequence, item, EqualityComparer<T>.Default);
+        }
+        #endregion
+
         #region Concatenation
         /// <summary>
         /// Concatenates an element to the end of a sequence.

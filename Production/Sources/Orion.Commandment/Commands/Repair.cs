@@ -24,6 +24,8 @@ namespace Orion.Commandment.Commands
             : base(factionHandle)
         {
             Argument.EnsureNotNullNorEmpty(units, "units");
+            if (units.Contains(targetHandle))
+                throw new ArgumentException("A unit cannot repair itself.");
 
             this.unitHandles = units.Distinct().ToList().AsReadOnly();
             this.targetHandle = targetHandle;

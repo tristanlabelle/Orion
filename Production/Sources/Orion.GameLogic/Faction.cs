@@ -59,9 +59,7 @@ namespace Orion.GameLogic
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
 
-            List<TechnologyEffect> effect = new List<TechnologyEffect>();
-            //effect.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 100));
-            //technologies.Add(new Technology("hp boost", null, effect));
+            //technologies.Add(world.TechTree.Technologies.First());
         }
         #endregion
 
@@ -324,6 +322,11 @@ namespace Orion.GameLogic
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
             }
+        }
+
+        public void AcquireTechnology(Technology technology)
+        {
+            this.technologies.Add(technology);
         }
 
         #region Diplomacy

@@ -20,12 +20,14 @@ namespace Orion.GameLogic
         #region Constructors
         public TechnologyRequirements(IEnumerable<Technology> technologies, int aladdiumCost, int alageneCost)
         {
-            Argument.EnsureNotNullNorEmpty(technologies, "technologies");
+            //Argument.EnsureNotNullNorEmpty(technologies, "technologies");
             Argument.EnsurePositive(aladdiumCost, "aladdiumCost");
             Argument.EnsurePositive(alageneCost, "alageneCost");
 
-            this.technologies = technologies.Distinct().ToList().AsReadOnly();
-            Argument.EnsurePositive(this.technologies.Count, "technologies.Count");
+            if(technologies!= null)
+                this.technologies = technologies.Distinct().ToList().AsReadOnly();
+            
+            //Argument.EnsurePositive(this.technologies.Count, "technologies.Count");
             this.aladdiumCost = aladdiumCost;
             this.alageneCost = alageneCost;
         }

@@ -21,6 +21,7 @@ namespace Orion.GameLogic
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
         private uint nextHandleValue;
+        private TechTree techTree;
         #endregion
 
         #region Constructors
@@ -35,6 +36,7 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             entities = new EntityRegistry(this, 5, 5, GenerateHandle);
             pathfinder = new Pathfinder();
+            techTree = new TechTree(this);
         }
         #endregion
 
@@ -55,6 +57,11 @@ namespace Orion.GameLogic
         public Terrain Terrain
         {
             get { return terrain; }
+        }
+
+        public TechTree TechTree
+        {
+            get { return techTree; }
         }
 
         /// <summary>

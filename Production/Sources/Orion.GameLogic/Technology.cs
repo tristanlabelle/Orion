@@ -22,12 +22,13 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly string name;
+        private readonly Handle handle;
         private readonly TechnologyRequirements requirements;
         private readonly ReadOnlyCollection<TechnologyEffect> effects;
         #endregion
 
         #region Constructors
-        public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects)
+        public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects, Handle handle)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
             //Argument.EnsureNotNull(requirements, "requirements");

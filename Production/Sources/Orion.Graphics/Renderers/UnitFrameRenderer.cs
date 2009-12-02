@@ -7,6 +7,7 @@ using System.Collections;
 
 using OpenTK.Math;
 using Orion.GameLogic;
+using Orion.GameLogic.Tasks;
 
 namespace Orion.Graphics
 {
@@ -17,6 +18,11 @@ namespace Orion.Graphics
             { UnitStat.AttackPower, UnitStat.AttackRange, UnitStat.MovementSpeed, UnitStat.SightRange };
 
         private readonly Unit unit;
+        private readonly UnitButtonRenderer buttonRenderer;
+        private readonly UnitsRenderer unitRenderer;
+        private readonly TextureManager textureManager;
+        private Train trainTask; 
+        
         #endregion
 
         #region Constructors
@@ -24,39 +30,69 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(unit, "unit");
             this.unit = unit;
+            this.textureManager = new TextureManager(@"../../../Assets"); 
+            this.unitRenderer= new UnitsRenderer(unit.World,unit.Faction,textureManager);
+            this.trainTask = null; 
+           // this.buttonRenderer = new UnitButtonRenderer(unitsRenderer, this.unit); 
+            
         }
         #endregion
 
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            // If a baraque is selected and that it is currently executing a task. 
-            if (unit.Type.Name == "Baraque" && unit.CurrentTask != null)
+            if (unit.HasSkill<Orion.GameLogic.Skills.Train>() && unit.CurrentTask != null)
             {
-               /*
-                //UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(, unit);
-                //Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
 
                 int firstStartingXPos=150; 
                 int firstStartingYPos=60;
-                Queue<Task> queusInFactory = new Queue<Task>(unit.TaskQueue);
-                if (queusInFactory.Count == 5)
+                Queue<Task> queuesInFactory = new Queue<Task>(unit.QueuedTasks);
+                if(queuesInFactory.Count>=1)
                 {
-                    firstStartingXPos = 150;
-                    firstStartingYPos = 10;
-                }
-                foreach(Task t in queusInFactory)
-                {
-                    Orion.Geometry.Rectangle rect = new Orion.Geometry.Rectangle(firstStartingXPos, firstStartingYPos, 50, 50);
-                    context.FillColor = Color.Black;
-                    context.Fill(rect);
-                    context.FillColor = Color.White;
-                    context.Stroke(rect);
-                    base.Draw(context);
-                    firstStartingXPos += 70;
-                }
-                * */
+                    for (int i = 0; i < queuesInFactory.Count; i++)
+                    {
+                        if (i == 4)
+                        {
+                            firstStartingXPos = 150;
+                            firstStartingYPos = 10;
+                        }
+                        // Returns a Task, and finds the unit assosiated to that Task. 
+                        Task t = queuesInFactory.ElementAt(i);
+                        if (t is Train)
+                            trainTask = (Train)t;
+                        Argument.EnsureNotNull(trainTask, "train");
+                        Texture texture = this.unitRenderer.GetTypeTexture(trainTask.TraineeType);
 
+                        Orion.Geometry.Rectangle rect2 = new Orion.Geometry.Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 48, 48);
+                        context.FillColor = Color.Black;
+                        context.Fill(rect2);
+                        context.FillColor = Color.White;
+                        context.Stroke(rect2);
+                        
+                        
+                        // Fills first rectangle with a caracter. 
+                        Orion.Geometry.Rectangle rect = new Orion.Geometry.Rectangle(firstStartingXPos, firstStartingYPos, 32, 32);
+                        context.Fill(rect, texture);
+                        context.FillColor = unit.Faction.Color;
+                        context.Stroke(rect);
+
+
+                        // Draws a completion HealthBar
+                        Orion.Geometry.Rectangle healthRect = new Orion.Geometry.Rectangle(300, 150, 180* trainTask.Progress, 10);
+                        context.FillColor = Color.Gold;
+                        context.Fill(healthRect);
+                        context.FillColor = Color.Black;
+                        context.Stroke(healthRect);
+
+
+                        base.Draw(context);
+                        firstStartingXPos += 60;
+                        
+                    
+                    }
+
+                }
+              
             }
 
             const float textLineDistance = 25;

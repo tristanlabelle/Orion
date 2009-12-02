@@ -44,6 +44,20 @@ namespace Orion.GameLogic.Tasks
         {
             get { return hasEnded; }
         }
+
+        public UnitType TraineeType
+        {
+            get { return traineeType; }
+        }
+
+        public float Progress
+        {
+            get
+            {
+                int maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+                return healthPointsTrained / maxHealth;
+            }
+        }
         #endregion
 
         #region Methods

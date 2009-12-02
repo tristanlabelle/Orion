@@ -222,10 +222,7 @@ namespace Orion.GameLogic
             set
             {
                 if (queuedTasks.Count == 1)
-                {
-                    Task oldTask = queuedTasks.Dequeue();
-                    oldTask.Dispose();
-                }
+                    queuedTasks.Dequeue();
 
                 Debug.Assert(queuedTasks.Count == 0);
 
@@ -409,7 +406,8 @@ namespace Orion.GameLogic
             {
                 Task task = queuedTasks.Peek();
                 task.Update(timeDeltaInSeconds);
-                if (task.HasEnded) queuedTasks.Dequeue();
+                if (task.HasEnded && queuedTasks.Count > 0 && queuedTasks.Peek() == task)
+                    queuedTasks.Dequeue();
             }
         }
 

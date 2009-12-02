@@ -54,7 +54,7 @@ namespace Orion.GameLogic.Tasks
             }
 
             // Test if we're in the building's surrounding area
-            if (!Region.Grow(buildingPlan.GridRegion, 1).Contains(Unit.GridRegion.Min))
+            if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, Unit.GridRegion))
             {
                 hasEnded = true;
                 return;
@@ -101,6 +101,7 @@ namespace Orion.GameLogic.Tasks
             }
 
             Unit.CurrentTask = new Repair(Unit, buildingPlan.Building);
+            hasEnded = true;
         }
         #endregion
     }

@@ -11,7 +11,7 @@ namespace Orion.Geometry
         #region Methods
         public static bool Test(Rectangle rectangle, Circle circle)
         {
-            Vector2 closestPointInRect = rectangle.ClosestPointInside(circle.Center);
+            Vector2 closestPointInRect = rectangle.Clamp(circle.Center);
             float squaredDistance = (circle.Center - closestPointInRect).LengthSquared;
             return squaredDistance < circle.SquaredRadius;
         }

@@ -54,24 +54,27 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
-        #region DamageChanged
         /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
         /// </summary>
         public event GenericEventHandler<Unit> DamageChanged;
 
-        private void OnDamageChanged()
+        private void RaiseDamageChanged()
         {
-            if (DamageChanged != null) DamageChanged(this);
+            var handler = DamageChanged;
+            if (handler != null) handler(this);
         }
 
+        /// <summary>
+        /// Raised when the construction of this <see cref="Unit"/> is completed.
+        /// </summary>
         public event GenericEventHandler<Unit> ConstructionComplete;
 
-        private void OnConstructionComplete()
+        private void RaiseConstructionComplete()
         {
-            if (ConstructionComplete != null) ConstructionComplete(this);
+            var handler = ConstructionComplete;
+            if (handler != null) handler(this);
         }
-        #endregion
         #endregion
 
         #region Properties
@@ -161,7 +164,7 @@ namespace Orion.GameLogic
 
                 damage = value;
 
-                OnDamageChanged();
+                RaiseDamageChanged();
                 if (damage == MaxHealth) Die();
                 else if (damage == 0 && IsUnderConstruction)
                     isUnderConstruction = false;
@@ -358,7 +361,7 @@ namespace Orion.GameLogic
 
             Vector2 oldPosition = position;
             position = value;
-            OnMoved(oldPosition, position);
+            RaiseMoved(oldPosition, position);
         }
 
         /// <summary>
@@ -435,7 +438,7 @@ namespace Orion.GameLogic
             if (healthBuilt >= MaxHealth)
             {
                 isUnderConstruction = false;
-                OnConstructionComplete();
+                RaiseConstructionComplete();
             }
         }
 
@@ -443,7 +446,7 @@ namespace Orion.GameLogic
         {
             this.Health = MaxHealth;
             this.isUnderConstruction = false;
-            OnConstructionComplete();
+            RaiseConstructionComplete();
         }
         #endregion
     }

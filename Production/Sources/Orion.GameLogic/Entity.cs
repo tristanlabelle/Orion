@@ -35,7 +35,7 @@ namespace Orion.GameLogic
         /// </summary>
         public event GenericEventHandler<Entity> Died;
 
-        private void OnDied()
+        private void RaiseDied()
         {
             var handler = Died;
             if (handler != null) handler(this);
@@ -46,7 +46,7 @@ namespace Orion.GameLogic
         /// </summary>
         public event ValueChangedEventHandler<Entity, Vector2> Moved;
 
-        protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
+        protected virtual void RaiseMoved(Vector2 oldPosition, Vector2 newPosition)
         {
             var handler = Moved;
             if (handler != null) handler(this, oldPosition, newPosition);
@@ -163,7 +163,7 @@ namespace Orion.GameLogic
         {
             if (isDead) return;
             isDead = true;
-            OnDied();
+            RaiseDied();
         }
 
         internal virtual void Update(float timeDeltaInSeconds) { }

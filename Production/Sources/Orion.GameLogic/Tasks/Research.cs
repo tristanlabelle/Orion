@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
-    class Research:Task
+    /// <summary>
+    /// A <see cref="Task"/> which causes a <see cref="Unit"/>
+    /// </summary>
+    public sealed class Research : Task
     {
         #region Fields
-        private Technology technology;
-        private bool hasEnded = false;
-        private float timeElapsed = 0;
+        private const float researchTimeInSeconds = 5;
+
+        private readonly Technology technology;
+        private float timeElapsed;
         #endregion
 
         #region Constructors
@@ -22,7 +27,6 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
-
         public Technology Technology
         {
             get { return technology; }
@@ -35,23 +39,32 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return hasEnded; }
+            get { return timeElapsed >= researchTimeInSeconds; }
         }
         #endregion
 
         #region Methods
-
-        protected override void  DoUpdate(float timeDelta)
+        protected override void DoUpdate(float timeDelta)
         {
-            timeElapsed += timeDelta;
-
-            if (timeElapsed >= 5)
+            if (timeElapsed == 0)
             {
-                Unit.Faction.AcquireTechnology(technology);
-                hasEnded = true;
-            }
-        }
+                bool hasEnoughResources = Unit.Faction.AladdiumAmount >= technology.Requirements.AladdiumCost
+                    && Unit.Faction.AlageneAmount >= technology.Requirements.AlageneCost;
+                if (!hasEnoughResources)
+                {
+                    Debug.WriteLine("Not enough resources to research {0}.".FormatInvariant(technology));
+                    return;
+                }
 
+                Unit.Faction.AladdiumAmount -= technology.Requirements.AladdiumCost;
+                Unit.Faction.AlageneAmount -= technology.Requirements.AlageneCost;
+                timeElapsed = float.Epsilon;
+            }
+
+            timeElapsed += timeDelta;
+            if (timeElapsed >= researchTimeInSeconds)
+                Unit.Faction.ResearchTechnology(technology);
+        }
         #endregion
     }
 }

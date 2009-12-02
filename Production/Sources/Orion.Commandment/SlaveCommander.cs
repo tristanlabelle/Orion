@@ -66,7 +66,7 @@ namespace Orion.Commandment
         {
             // Clamp the destination within the world bounds.
             // The world bounds maximums are be exclusive.
-            destination = World.Bounds.ClosestPointInside(destination);
+            destination = World.Bounds.Clamp(destination);
             if (destination.X == World.Size.Width) destination.X -= 0.0001f;
             if (destination.Y == World.Size.Height) destination.Y -= 0.0001f;
             return destination;

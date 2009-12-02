@@ -34,9 +34,7 @@ namespace Orion.GameLogic
         private int totalFoodAmount = 0;
         private int usedFoodAmount = 0;
         private FactionStatus status = FactionStatus.Undefeated;
-        private List<Technology> technologies = new List<Technology>();
-        private List<Unit> activeFoodStorages = new List<Unit>();
-
+        private HashSet<Technology> technologies = new HashSet<Technology>();
         #endregion
 
         #region Constructors
@@ -61,9 +59,7 @@ namespace Orion.GameLogic
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
             this.entityMovedEventHandler = OnEntityMoved;
             this.entityDiedEventHandler = OnEntityDied;
-            this.foodStorageCreated = FoodStorageCreated;
-
-            //technologies.Add(world.TechTree.Technologies.First());
+            this.foodStorageCreated = OnFoodStorageCreated;
         }
         #endregion
 
@@ -73,21 +69,32 @@ namespace Orion.GameLogic
         /// </summary>
         public event GenericEventHandler<Faction> Defeated;
 
-        /// <summary>
-        /// Raised when the area of the world that is visible by this faction changes.
-        /// </summary>
-        public event GenericEventHandler<Faction, Region> VisibilityChanged;
-
         private void RaiseDefeated()
         {
             var handler = Defeated;
             if (handler != null) handler(this);
         }
 
+        /// <summary>
+        /// Raised when the area of the world that is visible by this faction changes.
+        /// </summary>
+        public event GenericEventHandler<Faction, Region> VisibilityChanged;
+
         private void RaiseVisibilityChanged(Region region)
         {
             var handler = VisibilityChanged;
             if (handler != null) handler(this, region);
+        }
+
+        /// <summary>
+        /// Raised when a new <see cref="Technology"/> has been researched.
+        /// </summary>
+        public event GenericEventHandler<Faction, Technology> TechnologyResearched;
+
+        private void RaiseTechnologyResearched(Technology technology)
+        {
+            var handler = TechnologyResearched;
+            if (handler != null) handler(this, technology);
         }
         #endregion
 
@@ -208,6 +215,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
+        #region Stats & Technologies
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
         /// for a unit of this <see cref="Faction"/> by its <see cref="UnitType"/>.
@@ -233,6 +241,33 @@ namespace Orion.GameLogic
                 .Where(effect => effect.Stat == stat)
                 .Sum(effect => effect.Value);
         }
+
+        /// <summary>
+        /// Adds a <see cref="Technology"/>,
+        /// to the collection of technologies researched by this <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="technology">The <see cref="Technology"/> to be researched.</param>
+        public void ResearchTechnology(Technology technology)
+        {
+            Argument.EnsureNotNull(technology, "technology");
+            if (technologies.Contains(technology)) return;
+
+            Technology firstMissingTechnology = technology.Requirements.Technologies
+                .FirstOrDefault(t => !technologies.Contains(technology));
+            if (firstMissingTechnology != null)
+            {
+                throw new InvalidOperationException(
+                    "Cannot develop technology {0} without {1}."
+                    .FormatInvariant(technology, firstMissingTechnology));
+            }
+
+            Debug.Assert(technology.Effects.All(effect => effect.Stat != UnitStat.SightRange),
+                "Sight range changing technologies are not supported, the fog of war needs to be tweaked.");
+
+            technologies.Add(technology);
+            RaiseTechnologyResearched(technology);
+        }
+        #endregion
 
         #region Pathfinding
         /// <summary>
@@ -309,27 +344,16 @@ namespace Orion.GameLogic
             localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
             if (unit.Type.HasSkill<Skills.StoreFood>())
-                FoodStorageDied(unit);
+                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
             unit.Died -= entityDiedEventHandler;
 
             CheckForDefeat();
         }
 
-        private void FoodStorageCreated(Unit unit)
+        private void OnFoodStorageCreated(Unit unit)
         {
             unit.ConstructionComplete -= foodStorageCreated;
-            activeFoodStorages.Add(unit);
             totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity); 
-        }
-
-        private void FoodStorageDied(Unit unit)
-        { 
-            foreach(Unit foodStorage in activeFoodStorages)
-            if(unit == foodStorage)
-            {
-                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
-                activeFoodStorages.Remove(unit);
-            }
         }
         #endregion
 
@@ -343,11 +367,6 @@ namespace Orion.GameLogic
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
             }
-        }
-
-        public void AcquireTechnology(Technology technology)
-        {
-            this.technologies.Add(technology);
         }
 
         #region Diplomacy

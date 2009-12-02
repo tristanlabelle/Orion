@@ -236,13 +236,13 @@ namespace Orion.Geometry
         }
         #endregion
 
-        #region ClosestPointInside
+        #region Clamp
         /// <summary>
         /// Gets a point within this <see cref="Rectangle"/> that is the closest to a given point.
         /// </summary>
         /// <param name="point">The point which's closest image is to be found.</param>
         /// <returns>The closest image of that point within this <see cref="Rectangle"/>.</returns>
-        public Vector2 ClosestPointInside(Vector2 point)
+        public Vector2 Clamp(Vector2 point)
         {
             if (point.X < MinX) point.X = MinX;
             else if (point.X > MaxX) point.X = MaxX;
@@ -547,6 +547,21 @@ namespace Orion.Geometry
             point.Scale(to.Width / from.Width, to.Height / from.Height);
             return point + to.Min;
         }
+
+        #region Distance
+        public static float SquaredDistance(Rectangle a, Rectangle b)
+        {
+            Vector2 clamped1 = a.Clamp(b.Center);
+            Vector2 clamped2 = b.Clamp(clamped1);
+            return (clamped2 - clamped1).LengthSquared;
+        }
+
+        public static float Distance(Rectangle a, Rectangle b)
+        {
+            float squaredDistance = SquaredDistance(a, b);
+            return (float)Math.Sqrt(squaredDistance);
+        }
+        #endregion
 
         #region Boolean operations
         /// <summary>

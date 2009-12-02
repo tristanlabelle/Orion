@@ -58,7 +58,7 @@ namespace Orion.Main
                 }
                 else if (slot is AIPlayerSlot)
                 {
-                    Commander commander = new AICommander(faction, random);
+                    Commander commander = new AgressiveAICommander(faction, random);
                     // AIs bypass the synchronization filter as they are supposed to be fully deterministic
                     aiCommanders.Add(commander);
                 }

@@ -183,6 +183,7 @@ namespace Orion.Commandment
             List<Unit> potentialAttackers = 
                 allUnits.Where(unit => unit.Faction == Faction 
                 && unit.Type.HasSkill<Skills.Attack>() 
+                && !unit.Type.HasSkill<Skills.Harvest>()
                 && unit.IsIdle
                 ).ToList();
             List<Unit> attackers = new List<Unit>();
@@ -202,7 +203,7 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="amountOfHarvesters">The amount of harvesters to be assigned</param>
         /// <param name="node">The node to be harvested</param>
-        public void DispatchHarvesters(int amountOfHarvesters, ResourceNode node, bool includeBuilders)
+        public void DispatchHarvesters(int amountOfHarvesters, ResourceNode node)
         {
             if (node != null)
             {
@@ -210,10 +211,7 @@ namespace Orion.Commandment
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.CurrentTask.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
-                if (includeBuilders)
-                    potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
-                else
-                    potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>() && !unit.Type.HasSkill<Skills.Build>()).ToList();
+                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
                 
                 List<Unit> harvesters = new List<Unit>();
 

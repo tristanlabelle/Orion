@@ -52,7 +52,7 @@ namespace Orion.Main
                 }
                 else if (slot is AIPlayerSlot)
                 {
-                    Commander commander = new AICommander(faction, random);
+                    Commander commander = new AgressiveAICommander(faction, random);
                     aiCommanders.Add(commander);
                 }
                 else

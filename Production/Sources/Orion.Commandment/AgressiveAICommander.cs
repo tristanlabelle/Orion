@@ -33,14 +33,14 @@ namespace Orion.Commandment
                 int amountOfHarvesters = Evaluate("Schtroumpf", 1);
                 int amountOfAttackers = Evaluate("Viking", 1);
 
-                DispatchHarvesters(amountOfHarvesters, startingNode, false);
+                DispatchHarvesters(amountOfHarvesters, startingNode);
                 List<Vector2> positions = new List<Vector2>();
 
-                /*if (startingNode != null)
+                if (startingNode != null)
                 {
                     positions.Add(new Vector2(alageneStartingNode.Position.X + 2, alageneStartingNode.Position.Y + 2));
                     DispatchBuilders("AlageneExtractor", positions);
-                }*/
+                }
 
                 InitiateTraining("Viking", 1);
 

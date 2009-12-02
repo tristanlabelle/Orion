@@ -31,13 +31,14 @@ namespace Orion.GameLogic
         public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects, Handle handle)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
-            //Argument.EnsureNotNull(requirements, "requirements");
+            Argument.EnsureNotNull(requirements, "requirements");
             Argument.EnsureNotNull(effects, "effects");
 
             this.name = name;
             this.requirements = requirements;
             this.effects = effects.ToList().AsReadOnly();
             Argument.EnsureStrictlyPositive(this.effects.Count, "effects.Count");
+            this.handle = handle;
         }
         #endregion
 
@@ -65,6 +66,11 @@ namespace Orion.GameLogic
         public IEnumerable<TechnologyEffect> Effects
         {
             get { return effects; }
+        }
+
+        public Handle Handle
+        {
+            get { return handle; }
         }
         #endregion
 

@@ -48,6 +48,7 @@ namespace Orion.UserInterface
         private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
         private UnitType selectedType;
+        private readonly Frame diplomacyFrame;
         private bool isSpaceDown;
         #endregion
 
@@ -129,6 +130,36 @@ namespace Orion.UserInterface
             enablers.Add(new HarvestEnabler(userInputManager, actions, textureManager));
             enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
+
+            Rectangle diplomacyFrameRectangle = Instant.CreateComponentRectangle(Bounds,new Vector2(0.0f,0.0f), new Vector2(1f,1f));
+            diplomacyFrame = new Frame(diplomacyFrameRectangle);
+           // Children.Add(diplomacyFrame);
+            Rectangle listFrameRectangle = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
+            ListFrame listFrame = new ListFrame(listFrameRectangle,new Vector2(0,0));
+            Rectangle rectangleFrame = new Rectangle(listFrame.Bounds.Width, listFrame.Bounds.Height/10);
+            foreach (Faction aFaction in world.Factions)
+            {
+                Frame frameFaction = new Frame(rectangleFrame, aFaction.Color);
+                
+                Rectangle rectangleFaction = Instant.CreateComponentRectangle(frameFaction.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
+                DropdownList<DiplomaticStance> dropList = new DropdownList<DiplomaticStance>(rectangleFaction);
+
+                dropList.AddItem(DiplomaticStance.Enemy);
+                dropList.AddItem(DiplomaticStance.Ally);
+                dropList.SelectedItem = localCommander.Faction.GetDiplomaticStance(aFaction);
+
+                frameFaction.Children.Add(new Label(aFaction.Name));
+                frameFaction.Children.Add(dropList);
+
+
+                listFrame.Children.Add(frameFaction);
+            }
+            diplomacyFrame.Children.Add(listFrame);
+
+            Rectangle rectangleButton = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.4f,0.01f), new Vector2(0.6f,0.09f));
+            Button boutonAccepter = new Button(rectangleButton, "Accepter");
+            diplomacyFrame.Children.Add(boutonAccepter);
+            
         }
         #endregion
 

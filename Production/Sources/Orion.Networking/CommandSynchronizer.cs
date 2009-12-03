@@ -119,7 +119,8 @@ namespace Orion.Networking
         {
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
             int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
-            Debug.WriteLine("Current UPFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updatesForCommandFrame.Select(i => i.ToString()).ToArray()), longestCommandFrame));
+            string[] updates = updatesForCommandFrame.OrderBy(i => i).Select(i => i.ToString()).ToArray();
+            Debug.WriteLine("Current UPCFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updates), longestCommandFrame));
             previousFramesDuration.Enqueue(longestCommandFrame);
             if (previousFramesDuration.Count > maxEnqueuedFrameDurations) previousFramesDuration.Dequeue();
             updatesForCommandFrame.Clear();

@@ -112,9 +112,9 @@ namespace Orion.Commandment
             if (IsRunning)
             {
                 world.Update(timeDeltaInSeconds);
+                lastFrameNumber++;
             }
 
-            lastFrameNumber++;
             RaiseUpdated(timeDeltaInSeconds);
         }
 

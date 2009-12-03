@@ -314,8 +314,8 @@ namespace Orion.GameLogic
                     }
                     else
                     {
-                        Debug.Assert(tiles[x, y] != ushort.MaxValue && tiles[x, y] != 0,
-                            "Unit reference count underflow.");
+                        //Debug.Assert(tiles[x, y] != ushort.MaxValue && tiles[x, y] != 0,
+                        //    "Unit reference count underflow.");
                         tiles[x, y]--;
                     }
                 }

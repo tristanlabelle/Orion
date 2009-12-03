@@ -178,7 +178,6 @@ namespace Orion.GameLogic
             {
                 Argument.EnsurePositive(value, "AladdiumAmount");
                 aladdiumAmount = value;
-                Debug.WriteLine("{0} faction aladdium amount changed to {1}.".FormatInvariant(name, value));
             }
         }
 
@@ -192,7 +191,6 @@ namespace Orion.GameLogic
             {
                 Argument.EnsurePositive(value, "AlageneAmount");
                 alageneAmount = value;
-                Debug.WriteLine("{0} faction alagene amount changed to {1}.".FormatInvariant(name, value));
             }
         }
 

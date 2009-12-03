@@ -144,7 +144,7 @@ namespace Orion.GameLogic
         private void OnEntityDied(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Debug.WriteLine("Entity {0} died.");
+            //Debug.WriteLine("Entity {0} died.".FormatInvariant(entity));
 
             Remove(entity);
         }

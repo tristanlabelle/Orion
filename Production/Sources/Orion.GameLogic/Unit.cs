@@ -164,6 +164,7 @@ namespace Orion.GameLogic
             get { return damage; }
             set
             {
+                if (float.IsNaN(value)) throw new ArgumentException("The damage cannot be set to NaN.", "Damage");
                 if (value < 0) value = 0;
                 else if (value > MaxHealth) value = MaxHealth;
                 else if (value == damage) return;

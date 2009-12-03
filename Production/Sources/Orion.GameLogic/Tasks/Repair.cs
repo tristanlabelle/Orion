@@ -4,6 +4,10 @@ using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
+    /// <summary>
+    /// A <see cref="Task"/> which causes a <see cref="Unit"/> to repair a target to its full health
+    /// or to complete its construction.
+    /// </summary>
     [Serializable]
     public sealed class Repair : Task
     {
@@ -11,11 +15,13 @@ namespace Orion.GameLogic.Tasks
         private readonly Unit target;
         private readonly GenericEventHandler<Entity> targetDiedEventHandler;
         private readonly Move move;
-        private float aladdiumCost;
-        private float alageneCost;
-        private float totalAladdiumCost;
-        private float totalAlageneCost;
-        private bool hasEnded;
+        
+        /// <summary>
+        /// Remaining amount of aladdium that has been taken from the <see cref="Faction"/>'s coffers
+        /// and is to be used to repair.
+        /// </summary>
+        private float aladdiumCreditRemaining;
+        private float alageneCreditRemaining;
         #endregion
 
         #region Constructors
@@ -40,8 +46,6 @@ namespace Orion.GameLogic.Tasks
             this.targetDiedEventHandler = OnBuildingDied;
             this.target.Died += targetDiedEventHandler;
             this.move = Move.ToNearRegion(repairer, target.GridRegion);
-            this.aladdiumCost = target.GetStat(UnitStat.AladdiumCost) / target.MaxHealth;
-            this.alageneCost = target.GetStat(UnitStat.AlageneCost) / target.MaxHealth;
         }
         #endregion
 
@@ -58,7 +62,11 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return hasEnded; }
+            get
+            {
+                if (!target.IsAlive) return true;
+                return !target.IsUnderConstruction && target.Health >= target.MaxHealth;
+            }
         }
         #endregion
 
@@ -71,52 +79,86 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (!target.IsUnderConstruction && target.Health >= target.MaxHealth)
+            if (target.IsUnderConstruction) UpdateBuild(timeDelta);
+            else UpdateRepair(timeDelta);
+        }
+
+        private void UpdateBuild(float timeDelta)
+        {
+            target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
+
+            if (!target.IsUnderConstruction)
             {
-                hasEnded = true;
-                target.Died -= targetDiedEventHandler;
-                return;
-            }
-
-            if (target.IsUnderConstruction)
-            {
-                target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
-
-                if (!target.IsUnderConstruction)
+                // If we just built an alagene extractor, start harvesting.
+                if (target.HasSkill<Skills.ExtractAlagene>())
                 {
-                    hasEnded = true;
-                    target.Died -= targetDiedEventHandler;
-                    
-                    // If we just built an alagene extractor, start harvesting.
-                    if (target.HasSkill<Skills.ExtractAlagene>())
-                    {
-                        // Smells like a hack!
-                        ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
-                            .First(n => n.Position == target.Position);
-                        Unit.TaskQueue.OverrideWith(new Harvest(Unit, node));
-                    }
-
-                    return;
-                } 
-            }
-            else if (Unit.Faction.AladdiumAmount >= aladdiumCost && Unit.Faction.AlageneAmount >= alageneCost)
-            {
-                target.Damage--;
-                totalAladdiumCost += aladdiumCost;
-                totalAlageneCost += alageneCost;
-
-                if (totalAladdiumCost > 1)
-                {
-                    totalAladdiumCost--;
-                    Unit.Faction.AladdiumAmount--;
-                }
-
-                if (totalAlageneCost > 1)
-                {
-                    totalAlageneCost--;
-                    Unit.Faction.AlageneAmount--;
+                    // Smells like a hack!
+                    ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
+                        .First(n => n.Position == target.Position);
+                    Unit.TaskQueue.OverrideWith(new Harvest(Unit, node));
                 }
             }
+        }
+
+        private void UpdateRepair(float timeDelta)
+        {
+            if (!TryGetCredit()) return;
+
+            int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
+            int alageneCost = Target.GetStat(UnitStat.AlageneCost);
+
+            float healthToRepair = Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta;
+            if (healthToRepair > target.Damage) healthToRepair = target.Damage;
+
+            float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;
+            float frameAlageneCost = healthToRepair / Target.MaxHealth * alageneCost;
+
+            if (frameAladdiumCost > aladdiumCreditRemaining)
+            {
+                frameAladdiumCost = aladdiumCreditRemaining;
+                healthToRepair = aladdiumCreditRemaining / aladdiumCost * Target.MaxHealth;
+            }
+
+            if (frameAlageneCost > alageneCreditRemaining)
+            {
+                frameAlageneCost = alageneCreditRemaining;
+                healthToRepair = alageneCreditRemaining / alageneCost * Target.MaxHealth;
+            }
+
+            target.Health += healthToRepair;
+            aladdiumCreditRemaining -= frameAladdiumCost;
+            alageneCreditRemaining -= frameAlageneCost;
+        }
+
+        private bool TryGetCredit()
+        {
+            int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
+            int alageneCost = Target.GetStat(UnitStat.AlageneCost);
+
+            bool needsAladdiumCredit = aladdiumCost > 0 && aladdiumCreditRemaining <= 0;
+            bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;
+            if (!needsAladdiumCredit && !needsAlageneCredit) return true;
+
+            if ((needsAladdiumCredit && Faction.AladdiumAmount == 0)
+                || (needsAlageneCredit && Faction.AlageneAmount == 0))
+            {
+                Debug.WriteLine("Not enough resources to proceed with the repairing of {0}.".FormatInvariant(Target));
+                return false;
+            }
+
+            if (needsAladdiumCredit)
+            {
+                --Faction.AladdiumAmount;
+                ++aladdiumCreditRemaining;
+            }
+
+            if (needsAlageneCredit)
+            {
+                --Faction.AlageneAmount;
+                ++alageneCreditRemaining;
+            }
+
+            return true;
         }
 
         public override void Dispose()
@@ -127,7 +169,6 @@ namespace Orion.GameLogic.Tasks
         private void OnBuildingDied(Entity entity)
         {
             Debug.Assert(entity == target);
-            hasEnded = true;
             target.Died -= targetDiedEventHandler;
         }
         #endregion

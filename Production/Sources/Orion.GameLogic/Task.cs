@@ -39,6 +39,16 @@ namespace Orion.GameLogic
         /// Gets a human-readable string describing this <see cref="Task"/>.
         /// </summary>
         public abstract string Description { get; }
+
+        protected Faction Faction
+        {
+            get { return unit.Faction; }
+        }
+
+        protected World World
+        {
+            get { return unit.World; }
+        }
         #endregion
 
         #region Methods

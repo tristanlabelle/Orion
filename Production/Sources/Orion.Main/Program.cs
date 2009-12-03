@@ -118,8 +118,8 @@ namespace Orion.Main
             {
                 try
                 {
-                    //transporter = new SafeTransporter(port);
-                    //Debug.WriteLine("Listening on port {0}.".FormatInvariant(transporter.Port));
+                    transporter = new SafeTransporter(port);
+                    Debug.WriteLine("Listening on port {0}.".FormatInvariant(transporter.Port));
                     break;
                 }
                 catch

@@ -5,6 +5,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Skills;
 using Size = System.Drawing.Size;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -45,6 +46,10 @@ namespace Orion.GameLogic
             this.maxHealth = builder.MaxHealth;
             this.sightRange = builder.SightRange;
             this.foodCost = builder.FoodCost;
+
+            var attackSkill = GetSkill<Skills.Attack>();
+            Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
         }
         #endregion
 

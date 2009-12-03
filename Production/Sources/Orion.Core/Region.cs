@@ -24,9 +24,6 @@ namespace Orion
         #region Constructors
         public Region(Point min, Size size)
         {
-           Argument.EnsurePositive(min.X, "min.X");
-            Argument.EnsurePositive(min.Y, "min.Y");
-
             this.min = min;
             this.size = size;
         }

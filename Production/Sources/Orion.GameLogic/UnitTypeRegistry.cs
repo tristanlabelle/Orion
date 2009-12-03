@@ -23,7 +23,7 @@ namespace Orion.GameLogic
             RegisterPirate();
             RegisterNinja();
             RegisterViking();
-            RegisterJedi();
+            RegisterJedihad();
             RegisterSwineFlu();
             RegisterUfo();
             RegisterFlyingCarpet();
@@ -111,20 +111,20 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterJedi()
+        public void RegisterJedihad()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Jedi",
+                Name = "Jedihad",
                 Size = new Size(1, 1),
-                SightRange = 6,
+                SightRange = 8,
                 MaxHealth = 50,
                 AladdiumCost = 50,
                 AlageneCost = 75,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(14, false));
-            builder.Skills.Add(new Skills.Attack(4, 10, 3));
+            builder.Skills.Add(new Skills.Attack(4, 8, 3));
             Register(builder);
         }
 
@@ -134,14 +134,14 @@ namespace Orion.GameLogic
             {
                 Name = "Grippe A(H1N1)",
                 Size = new Size(2, 2),
-                SightRange = 6,
+                SightRange = 7,
                 MaxHealth = 35,
                 AladdiumCost = 75,
                 AlageneCost = 100,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(18, true));
-            builder.Skills.Add(new Skills.Attack(1, 8, 1));
+            builder.Skills.Add(new Skills.Attack(1, 7, 1));
             Register(builder);
         }
 
@@ -151,14 +151,14 @@ namespace Orion.GameLogic
             {
                 Name = "OVNI",
                 Size = new Size(2, 2),
-                SightRange = 8,
+                SightRange = 10,
                 MaxHealth = 80,
                 AladdiumCost = 150,
                 AlageneCost = 200,
                 FoodCost = 5
             };
             builder.Skills.Add(new Skills.Move(8, true));
-            builder.Skills.Add(new Skills.Attack(18, 12, 8));
+            builder.Skills.Add(new Skills.Attack(18, 10, 8));
             Register(builder);
         }
 
@@ -206,7 +206,8 @@ namespace Orion.GameLogic
                 AladdiumCost = 150,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.Train(type => type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking" || type.Name == "Jedi", 10));
+            builder.Skills.Add(new Skills.Train(type =>
+                type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking" || type.Name == "Jedihad", 10));
             Register(builder);
         }
 
@@ -221,7 +222,8 @@ namespace Orion.GameLogic
                 AladdiumCost = 200,
                 AlageneCost = 75
             };
-            builder.Skills.Add(new Skills.Train(type => type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
+            builder.Skills.Add(new Skills.Train(type =>
+                type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
             Register(builder);
         }
 

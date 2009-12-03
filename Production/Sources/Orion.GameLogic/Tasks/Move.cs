@@ -66,7 +66,7 @@ namespace Orion.GameLogic.Tasks
         {
             Argument.EnsureNotNull(unit, "unit");
             if (unit.IsAirborne) return new Fly(unit, destination);
-            return new Walk(unit, destination);
+            return new Walk(unit, (Point)destination);
         }
 
         public static Move ToNearRegion(Unit unit, Region region)

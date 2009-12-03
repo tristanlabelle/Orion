@@ -90,11 +90,11 @@ namespace Orion.GameLogic.Tasks
             if (!target.IsUnderConstruction)
             {
                 // If we just built an alagene extractor, start harvesting.
-                if (target.HasSkill<Skills.ExtractAlagene>())
+                if (Unit.HasSkill<Skills.Harvest>() && target.HasSkill<Skills.ExtractAlagene>())
                 {
                     // Smells like a hack!
                     ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
-                        .First(n => n.Position == target.Position);
+                        .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
                     Unit.TaskQueue.OverrideWith(new Harvest(Unit, node));
                 }
             }

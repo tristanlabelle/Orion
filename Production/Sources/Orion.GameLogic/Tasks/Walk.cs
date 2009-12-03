@@ -49,8 +49,8 @@ namespace Orion.GameLogic.Tasks
             this.pathWalker = GetPathWalker();
         }
 
-        public Walk(Unit unit, Vector2 destination)
-            : this(unit, (point => ((Vector2)point - destination).LengthFast)) { }
+        public Walk(Unit unit, Point destination)
+            : this(unit, (point => ((Vector2)point - (Vector2)destination).LengthFast)) { }
         #endregion
 
         #region Properties

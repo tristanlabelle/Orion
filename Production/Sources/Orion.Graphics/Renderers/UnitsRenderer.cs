@@ -63,6 +63,11 @@ namespace Orion.Graphics
             get { return drawHealthBars; }
             set { drawHealthBars = value; }
         }
+
+        private Texture UnderConstructionTexture
+        {
+            get { return textureManager.GetTexture("UnderConstruction"); }
+        }
         #endregion
 
         #region Methods
@@ -112,8 +117,6 @@ namespace Orion.Graphics
             {
                 string unitTypeName = unit.Type.Name;
                 Texture texture = textureManager.GetTexture(unit.Type.Name);
-                int alpha = unit.IsUnderConstruction ? 20 + (int)(unit.ConstructionProgress * 180) : 255;
-                Color tint = Color.FromArgb(alpha, unit.Faction.Color);
 
                 // Workaround the fact that our unit textures face up,
                 // and building textures are not supposed to be rotated.
@@ -121,7 +124,9 @@ namespace Orion.Graphics
                 using (graphics.Transform(new Transform(unit.Center, drawingAngle)))
                 {
                     Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                    graphics.Fill(localRectangle, texture, tint);
+                    graphics.Fill(localRectangle, texture, unit.Faction.Color);
+                    if (unit.IsUnderConstruction)
+                        graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
                 }
 
                 if (DrawHealthBars) DrawHealthBar(graphics, unit);

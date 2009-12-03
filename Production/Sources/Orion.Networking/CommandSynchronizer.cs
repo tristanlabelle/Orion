@@ -97,7 +97,7 @@ namespace Orion.Networking
                 peers.ForEach(peer => peer.SendDone(commandFrameNumber, updatesSinceLastCommandFrame));
             }
 
-            if (updatesSinceLastCommandFrame > TargetUpdatesPerCommandFrame)
+            if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame * 2)
             {
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
-namespace Orion.GameLogic
+namespace Orion
 {
     /// <summary>
     /// Encapsulates a handle to a game object.
@@ -13,6 +14,21 @@ namespace Orion.GameLogic
     [StructLayout(LayoutKind.Sequential, Size = sizeof(uint))]
     public struct Handle : IEquatable<Handle>, IComparable<Handle>
     {
+        #region Nested Types
+        private sealed class Generator
+        {
+            private uint nextValue;
+
+            public Handle Generate()
+            {
+                Debug.Assert(nextValue < uint.MaxValue);
+                Handle handle = new Handle(nextValue);
+                ++nextValue;
+                return handle;
+            }
+        }
+        #endregion
+
         #region Instance
         #region Fields
         private readonly uint value;
@@ -89,6 +105,15 @@ namespace Orion.GameLogic
         public static int Compare(Handle first, Handle second)
         {
             return first.CompareTo(second);
+        }
+
+        /// <summary>
+        /// Creates a delegate to a method which can be used to generate unique handles.
+        /// </summary>
+        /// <returns>A new handle generator delegate.</returns>
+        public static Func<Handle> CreateGenerator()
+        {
+            return new Generator().Generate;
         }
         #endregion
 

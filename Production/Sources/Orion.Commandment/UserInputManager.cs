@@ -206,7 +206,7 @@ namespace Orion.Commandment
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
         }
 
-        private void OnEntityDied(EntityRegistry sender, Entity args)
+        private void OnEntityDied(EntityManager sender, Entity args)
         {
             Unit unit = args as Unit;
             if (unit == null) return;

@@ -261,8 +261,8 @@ namespace Orion.GameLogic
                     .FormatInvariant(technology, firstMissingTechnology));
             }
 
-            Debug.Assert(technology.Effects.All(effect => effect.Stat != UnitStat.SightRange),
-                "Sight range changing technologies are not supported, the fog of war needs to be tweaked.");
+            Debug.Assert(technology.Effects.All(effect => effect.Stat != UnitStat.SightRange && effect.Stat != UnitStat.FoodStorageCapacity),
+                "Sight range and food storage capacity changing technologies are not supported, they would cause bugs.");
 
             technologies.Add(technology);
             RaiseTechnologyResearched(technology);
@@ -343,8 +343,8 @@ namespace Orion.GameLogic
             Unit unit = (Unit)entity;
             localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
-            if (unit.Type.HasSkill<Skills.StoreFood>())
-                totalFoodAmount -= unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity);
+            if (unit.Type.HasSkill<Skills.StoreFood>() && !unit.IsUnderConstruction)
+                totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
             unit.Died -= entityDiedEventHandler;
 
             CheckForDefeat();
@@ -353,7 +353,7 @@ namespace Orion.GameLogic
         private void OnFoodStorageCreated(Unit unit)
         {
             unit.ConstructionComplete -= foodStorageCreated;
-            totalFoodAmount += unit.Type.GetBaseStat(UnitStat.FoodStorageCapacity); 
+            totalFoodAmount += unit.GetStat(UnitStat.FoodStorageCapacity);
         }
         #endregion
 

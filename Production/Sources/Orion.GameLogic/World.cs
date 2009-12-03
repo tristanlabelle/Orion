@@ -17,11 +17,10 @@ namespace Orion.GameLogic
         #region Fields
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
-        private readonly EntityRegistry entities;
+        private readonly EntityManager entities;
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
         private readonly TechTree techTree;
-        private uint nextHandleValue;
         #endregion
 
         #region Constructors
@@ -34,10 +33,10 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(terrain, "terrain");
 
             this.terrain = terrain;
-            entities = new EntityRegistry(this, 5, 5, GenerateHandle);
+            entities = new EntityManager(this);
             pathfinder = new Pathfinder();
             techTree = new TechTree();
-            techTree.PopulateWithBaseTechs(GenerateHandle);
+            techTree.PopulateWithBaseTechs();
         }
         #endregion
 
@@ -76,7 +75,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the <see cref="EntityRegistry"/> containing the <see cref="Entities"/>s of this <see cref="World"/>.
         /// </summary>
-        public EntityRegistry Entities
+        public EntityManager Entities
         {
             get { return entities; }
         }
@@ -194,18 +193,6 @@ namespace Orion.GameLogic
             return factions[(int)handle.Value];
         }
         #endregion
-
-        /// <summary>
-        /// Generates a new handle for an object of this world.
-        /// </summary>
-        /// <returns>The <see cref="Handle"/> that was generated.</returns>
-        public Handle GenerateHandle()
-        {
-            Debug.Assert(nextHandleValue < uint.MaxValue);
-            Handle handle = new Handle(nextHandleValue);
-            ++nextHandleValue;
-            return handle;
-        }
 
         public bool IsWithinBounds(Point point)
         {

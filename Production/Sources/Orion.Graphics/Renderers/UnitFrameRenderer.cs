@@ -41,12 +41,12 @@ namespace Orion.Graphics
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            if (unit.HasSkill<Orion.GameLogic.Skills.Train>() && unit.CurrentTask != null)
+            if (unit.HasSkill<Orion.GameLogic.Skills.Train>() && unit.TaskQueue.Current != null)
             {
 
                 int firstStartingXPos=150; 
                 int firstStartingYPos=60;
-                Queue<Task> queuesInFactory = new Queue<Task>(unit.QueuedTasks);
+                Queue<Task> queuesInFactory = new Queue<Task>(unit.TaskQueue);
                 if(queuesInFactory.Count>=1)
                 {
                     for (int i = 0; i < queuesInFactory.Count; i++)

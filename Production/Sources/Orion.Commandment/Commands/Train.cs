@@ -62,16 +62,23 @@ namespace Orion.Commandment.Commands
             foreach (Handle trainerHandle in trainerHandles)
             {
                 Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
+                if (trainer.TaskQueue.IsFull)
+                {
+                    Debug.WriteLine("Cannot train {0}, task queue of {1} is full."
+                        .FormatInvariant(traineeType, trainer));
+                    continue;
+                }
+
                 if (alageneTotalCost + alageneCost <= faction.AlageneAmount
                    && aladdiumTotalCost + aladdiumCost <= faction.AladdiumAmount)
                 {
                     alageneTotalCost += alageneCost;
                     aladdiumTotalCost += aladdiumCost;
-                    trainer.EnqueueTask(new TrainTask(trainer, traineeType));
+                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
                 }
                 else
                 {
-                    Debug.WriteLine("Not Enough Ressource to Train all wished units");
+                    Debug.WriteLine("Not enough resources to train {0}.".FormatInvariant(traineeType));
                     break;
                 }
             }

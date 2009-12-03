@@ -207,8 +207,8 @@ namespace Orion.Commandment
         {
             if (node != null)
             {
-                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.CurrentTask is Orion.GameLogic.Tasks.Harvest)).ToList();
-                int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.CurrentTask.Description == "harvesting " + node.Type).ToList().Count;
+                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.TaskQueue.Current is Orion.GameLogic.Tasks.Harvest)).ToList();
+                int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
                 potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();

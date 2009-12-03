@@ -12,6 +12,7 @@ namespace Orion.GameLogic
     {
         #region Fields
         private readonly HashSet<Technology> technologies = new HashSet<Technology>();
+        private readonly Func<Handle> handleGenerator = Handle.CreateGenerator();
         #endregion
 
         #region Properties
@@ -22,10 +23,8 @@ namespace Orion.GameLogic
         #endregion
 
         #region Methods
-        public void PopulateWithBaseTechs(Func<Handle> handleGenerator)
+        public void PopulateWithBaseTechs()
         {
-            Argument.EnsureNotNull(handleGenerator, "handleGenerator");
-
             List<Technology> techsToAdd = new List<Technology>();
 
             //Tier 1 of the tree

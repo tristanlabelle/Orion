@@ -54,7 +54,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle harvesterHandle in harvesterHandles)
             {
                 Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);
-                harvester.CurrentTask = new HarvestTask(harvester, resourceNode);
+                harvester.TaskQueue.OverrideWith(new HarvestTask(harvester, resourceNode));
             }
         }
 

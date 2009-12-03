@@ -259,12 +259,12 @@ namespace Orion.GameLogic
 
         public IEnumerable<Type> GetUnitTaskQueue(Handle unit)
         {
-            return GetUnit(unit).QueuedTasks.Select(task => task.GetType());
+            return GetUnit(unit).TaskQueue.Select(task => task.GetType());
         }
 
         public Type GetUnitTask(Handle unit)
         {
-            Task task = GetUnit(unit).CurrentTask;
+            Task task = GetUnit(unit).TaskQueue.Current;
             if (task == null) return null;
             return task.GetType();
         }
@@ -293,7 +293,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Event Handlers
-        private void OnEntityDied(EntityRegistry sender, Entity args)
+        private void OnEntityDied(EntityManager sender, Entity args)
         {
             RaiseEntityDied(args.Handle);
         }

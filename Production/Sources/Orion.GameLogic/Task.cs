@@ -6,7 +6,7 @@ namespace Orion.GameLogic
     /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Unit"/> behavior.
     /// </summary>
     [Serializable]
-    public abstract class Task
+    public abstract class Task : IDisposable
     {
         #region Fields
         private readonly Unit unit;
@@ -52,6 +52,11 @@ namespace Orion.GameLogic
         }
 
         protected abstract void DoUpdate(float timeDelta);
+
+        /// <summary>
+        /// Releases all resources used by this <see cref="Task"/>.
+        /// </summary>
+        public virtual void Dispose() { }
 
         public override sealed string ToString()
         {

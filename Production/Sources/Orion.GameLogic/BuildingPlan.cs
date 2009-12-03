@@ -64,9 +64,6 @@ namespace Orion.GameLogic
                 throw new InvalidOperationException("Cannot create more than one building from a plan.");
 
             building = faction.CreateUnit(buildingType, location);
-            building.Health = 1;
-            building.Build(1);
-            building.Health -= 1;
         }
         #endregion
     }

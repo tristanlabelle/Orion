@@ -17,7 +17,7 @@ namespace Orion.GameLogic
     /// A collection of <see cref="Entity">entities</see> optimized for spatial queries.
     /// </summary>
     [Serializable]
-    public sealed class EntityRegistry : IEnumerable<Entity>
+    public sealed class EntityManager : IEnumerable<Entity>
     {
         #region Nested Types
         [Flags]
@@ -75,10 +75,10 @@ namespace Orion.GameLogic
         #region Instance
         #region Fields
         private readonly World world;
+        private readonly Func<Handle> handleGenerator = Handle.CreateGenerator();
         private readonly SortedList<Handle, Entity> entities = new SortedList<Handle, Entity>();
         private readonly EntityGrid grid;
         private readonly EntityZoneManager zoneManager;
-        private readonly Func<Handle> uidGenerator;
 
         // Used to defer modification of the "entities" collection.
         private bool isUpdating;
@@ -97,20 +97,13 @@ namespace Orion.GameLogic
         /// <param name="world">
         /// The <see cref="World"/> that to which the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> belong.
         /// </param>
-        /// <param name="columnCount">The number of spatial subdivisions along the x axis.</param>
-        /// <param name="rowCount">The number of spatial subdivisions along the y axis.</param>
-        /// <param name="handleGenerator">A delegate to a method which generates unique identifiers.</param>
-        internal EntityRegistry(World world, int columnCount, int rowCount, Func<Handle> uidGenerator)
+        internal EntityManager(World world)
         {
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureStrictlyPositive(columnCount, "columnCount");
-            Argument.EnsureStrictlyPositive(rowCount, "rowCount");
-            Argument.EnsureNotNull(uidGenerator, "uidGenerator");
 
             this.world = world;
             this.grid = new EntityGrid(world.Terrain);
             this.zoneManager = new EntityZoneManager(world.Size);
-            this.uidGenerator = uidGenerator;
             this.entityDiedEventHandler = OnEntityDied;
             this.entityMovedEventHandler = OnEntityMoved;
         }
@@ -120,7 +113,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when an <see cref="Entity"/> gets removed.
         /// </summary>
-        public event GenericEventHandler<EntityRegistry, Entity> Removed;
+        public event GenericEventHandler<EntityManager, Entity> Removed;
 
         private void RaiseRemoved(Entity entity)
         {
@@ -168,8 +161,8 @@ namespace Orion.GameLogic
         /// <returns>The newly created <see cref="Entity"/>.</returns>
         internal Unit CreateUnit(UnitType type, Faction faction, Point point)
         {
-            Handle uid = uidGenerator();
-            Unit unit = new Unit(uid, type, faction, point);
+            Handle handle = handleGenerator();
+            Unit unit = new Unit(handle, type, faction, point);
             InitializeEntity(unit);
             Debug.WriteLine("Created unit: {0} at {1}.".FormatInvariant(unit, point));
             return unit;
@@ -177,8 +170,8 @@ namespace Orion.GameLogic
 
         public ResourceNode CreateResourceNode(ResourceType type, Point point)
         {
-            Handle uid = uidGenerator();
-            ResourceNode node = new ResourceNode(world, uid, type, ResourceNode.DefaultTotalAmount, point);
+            Handle handle = handleGenerator();
+            ResourceNode node = new ResourceNode(world, handle, type, ResourceNode.DefaultTotalAmount, point);
             InitializeEntity(node);
             Debug.WriteLine("Created resource node: {0} at {1}.".FormatInvariant(node, point));
             return node;

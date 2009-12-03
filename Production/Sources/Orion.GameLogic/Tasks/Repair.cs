@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -8,7 +9,7 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly Unit target;
-        private readonly GenericEventHandler<Entity> buildingDiedEventHandler;
+        private readonly GenericEventHandler<Entity> targetDiedEventHandler;
         private readonly Move move;
         private float aladdiumCost;
         private float alageneCost;
@@ -36,8 +37,8 @@ namespace Orion.GameLogic.Tasks
                 throw new ArgumentException("Cannot repair other faction buildings.", "target");
 
             this.target = target;
-            this.buildingDiedEventHandler = OnBuildingDied;
-            this.target.Died += buildingDiedEventHandler;
+            this.targetDiedEventHandler = OnBuildingDied;
+            this.target.Died += targetDiedEventHandler;
             this.move = Move.ToNearRegion(repairer, target.GridRegion);
             this.aladdiumCost = target.GetStat(UnitStat.AladdiumCost) / target.MaxHealth;
             this.alageneCost = target.GetStat(UnitStat.AlageneCost) / target.MaxHealth;
@@ -45,14 +46,14 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
-        public Unit Building
+        public Unit Target
         {
             get { return target; }
         }
 
         public override string Description
         {
-            get { return "repairing"; }
+            get { return "repairing {0}".FormatInvariant(target); }
         }
 
         public override bool HasEnded
@@ -70,10 +71,10 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (target.Health >= target.MaxHealth)
+            if (!target.IsUnderConstruction && target.Health >= target.MaxHealth)
             {
                 hasEnded = true;
-                target.Died -= buildingDiedEventHandler;
+                target.Died -= targetDiedEventHandler;
                 return;
             }
 
@@ -84,7 +85,7 @@ namespace Orion.GameLogic.Tasks
                 if (!target.IsUnderConstruction)
                 {
                     hasEnded = true;
-                    target.Died -= buildingDiedEventHandler;
+                    target.Died -= targetDiedEventHandler;
                     
                     // If we just built an alagene extractor, start harvesting.
                     if (target.HasSkill<Skills.ExtractAlagene>())
@@ -92,7 +93,7 @@ namespace Orion.GameLogic.Tasks
                         // Smells like a hack!
                         ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
                             .First(n => n.Position == target.Position);
-                        Unit.CurrentTask = new Harvest(Unit, node);
+                        Unit.TaskQueue.OverrideWith(new Harvest(Unit, node));
                     }
 
                     return;
@@ -118,10 +119,16 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
+        public override void Dispose()
+        {
+            target.Died -= targetDiedEventHandler;
+        }
+
         private void OnBuildingDied(Entity entity)
         {
+            Debug.Assert(entity == target);
             hasEnded = true;
-            entity.Died -= buildingDiedEventHandler;
+            target.Died -= targetDiedEventHandler;
         }
         #endregion
     }

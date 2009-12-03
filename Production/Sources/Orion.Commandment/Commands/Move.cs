@@ -55,7 +55,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.CurrentTask = MoveTask.ToPoint(unit, destination);
+                unit.TaskQueue.OverrideWith(MoveTask.ToPoint(unit, destination));
             }
         }
 

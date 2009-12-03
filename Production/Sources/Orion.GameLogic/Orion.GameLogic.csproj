@@ -70,7 +70,6 @@
     <Compile Include="EntityZoneManager.cs" />
     <Compile Include="FactionSandbox.cs" />
     <Compile Include="FactionStatus.cs" />
-    <Compile Include="Handle.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />
     <Compile Include="Pathfinding\Path.cs" />
@@ -95,6 +94,7 @@
     <Compile Include="Skills\Train.cs" />
     <Compile Include="TagSet.cs" />
     <Compile Include="Task.cs" />
+    <Compile Include="TaskQueue.cs" />
     <Compile Include="Tasks\Attack.cs" />
     <Compile Include="Tasks\Build.cs" />
     <Compile Include="Tasks\Fly.cs" />
@@ -114,7 +114,7 @@
     <Compile Include="Terrain.cs" />
     <Compile Include="TileVisibility.cs" />
     <Compile Include="Unit.cs" />
-    <Compile Include="EntityRegistry.cs" />
+    <Compile Include="EntityManager.cs" />
     <Compile Include="UnitStat.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />

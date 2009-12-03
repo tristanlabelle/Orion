@@ -15,7 +15,6 @@ namespace Orion.GameLogic
         private int aladdiumCost;
         private int alageneCost;
         private HashSet<TechnologyEffect> effects = new HashSet<TechnologyEffect>();
-        private World world;
         #endregion
 
         #region Properties
@@ -75,12 +74,17 @@ namespace Orion.GameLogic
             return new TechnologyRequirements(requiredTechnologies, aladdiumCost, alageneCost);
         }
 
-        public Technology Build()
+        /// <summary>
+        /// Builds a <see cref="Technology"/> from this builder.
+        /// </summary>
+        /// <param name="handle">The handle of the newly built technology.</param>
+        /// <returns>A newly created technology.</returns>
+        public Technology Build(Handle handle)
         {
             if (name == null) throw new InvalidOperationException("A name must be set before the technology can be built.");
 
             TechnologyRequirements requirements = BuildRequirements();
-            return new Technology(name, requirements, effects, world.GenerateHandle());
+            return new Technology(name, requirements, effects, handle);
         }
         #endregion
     }

@@ -50,6 +50,7 @@
     <Compile Include="Bresenham.cs" />
     <Compile Include="BufferPool.cs" />
     <Compile Include="Casing.cs" />
+    <Compile Include="Handle.cs" />
     <Compile Include="PooledList.cs" />
     <Compile Include="FrameRateCounter.cs" />
     <Compile Include="Geometry\Circle.cs" />

@@ -182,7 +182,7 @@ namespace Orion.Graphics
         {
             var paths = world.Entities
                 .OfType<Unit>()
-                .Select(unit => unit.CurrentTask)
+                .Select(unit => unit.TaskQueue.Current)
                 .OfType<Move>()
                 .Select(task => task.Path)
                 .Where(path => path != null);
@@ -209,7 +209,7 @@ namespace Orion.Graphics
         {
             var attacks = world.Entities
                 .OfType<Unit>()
-                .Select(unit => unit.CurrentTask)
+                .Select(unit => unit.TaskQueue.Current)
                 .OfType<Attack>();
 
             graphics.StrokeColor = Color.Orange;

@@ -63,7 +63,7 @@ namespace Orion.GameLogic.Tasks
             if (buildingPlan.IsBuildingCreated)
             {
                 if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth)
-                    Unit.CurrentTask = new Repair(Unit, buildingPlan.Building);
+                    Unit.TaskQueue.OverrideWith(new Repair(Unit, buildingPlan.Building));
                 hasEnded = true;
                 return;
             }
@@ -100,7 +100,7 @@ namespace Orion.GameLogic.Tasks
                 node.Extractor = buildingPlan.Building;
             }
 
-            Unit.CurrentTask = new Repair(Unit, buildingPlan.Building);
+            Unit.TaskQueue.OverrideWith(new Repair(Unit, buildingPlan.Building));
             hasEnded = true;
         }
         #endregion

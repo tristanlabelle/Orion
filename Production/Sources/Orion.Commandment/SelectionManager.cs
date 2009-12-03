@@ -106,7 +106,7 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="source">The source EntityRegistry</param>
         /// <param name="entity">The entity that died</param>
-        public void EntityDied(EntityRegistry source, Entity entity)
+        public void EntityDied(EntityManager source, Entity entity)
         {
             if (entity is Unit)
             {

@@ -17,7 +17,7 @@ namespace Orion.GameLogic
         #region Fields
         private readonly UnitType type;
         private readonly Faction faction;
-        private readonly Queue<Task> queuedTasks = new Queue<Task>();
+        private readonly TaskQueue taskQueue;
         private Vector2 position;
         private float angle;
         private float damage;
@@ -47,9 +47,15 @@ namespace Orion.GameLogic
 
             this.type = type;
             this.faction = faction;
+            this.taskQueue = new TaskQueue(this);
             this.position = position;
-            
-            if (type.IsBuilding) isUnderConstruction = true;
+
+            if (type.IsBuilding)
+            {
+                Health = 1;
+                healthBuilt = 1;
+                isUnderConstruction = true;
+            }
         }
         #endregion
 
@@ -204,44 +210,11 @@ namespace Orion.GameLogic
 
         #region Tasks
         /// <summary>
-        /// Gets the sequence of this unit's queued tasks, in the order they're to be executed.
+        /// Gets the queue of this unit's tasks.
         /// </summary>
-        public IEnumerable<Task> QueuedTasks
+        public TaskQueue TaskQueue
         {
-            get { return queuedTasks; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this unit's task queue is full.
-        /// </summary>
-        public bool IsTaskQueueFull
-        {
-            get { return queuedTasks.Count >= 8; }
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="Task"/> currently executed by this <see cref="Unit"/>.
-        /// </summary>
-        public Task CurrentTask
-        {
-            get
-            {
-                if (queuedTasks.Count == 0) return null;
-                return queuedTasks.Peek();
-            }
-            set
-            {
-                if (queuedTasks.Count == 1)
-                    queuedTasks.Dequeue();
-
-                Debug.Assert(queuedTasks.Count == 0);
-
-                if (value != null)
-                {
-                    if (value.Unit != this) throw new ArgumentException("Cannot execute another unit's task.", "CurrentTask");
-                    queuedTasks.Enqueue(value);
-                }
-            }
+            get { return taskQueue; }
         }
 
         /// <summary>
@@ -249,7 +222,7 @@ namespace Orion.GameLogic
         /// </summary>
         public bool IsIdle
         {
-            get { return queuedTasks.Count == 0; }
+            get { return taskQueue.Count == 0; }
         }
         #endregion
 
@@ -380,17 +353,6 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Enqueues a <see cref="Task"/> to be executed by this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="task">The <see cref="Task"/> to be enqueued.</param>
-        public void EnqueueTask(Task task)
-        {
-            Argument.EnsureNotNull(task, "task");
-            if (task.Unit != this) throw new ArgumentException("Cannot execute another unit's task.", "task");
-            queuedTasks.Enqueue(task);
-        }
-
-        /// <summary>
         /// Updates this <see cref="Unit"/> for a frame.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
@@ -408,16 +370,13 @@ namespace Orion.GameLogic
                     .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
                 if (unitToAttack != null)
-                    CurrentTask = new Tasks.Attack(this, unitToAttack);
+                {
+                    Tasks.Attack attackTask = new Tasks.Attack(this, unitToAttack);
+                    taskQueue.OverrideWith(attackTask);
+                }
             }
 
-            if (queuedTasks.Count > 0)
-            {
-                Task task = queuedTasks.Peek();
-                task.Update(timeDeltaInSeconds);
-                if (task.HasEnded && queuedTasks.Count > 0 && queuedTasks.Peek() == task)
-                    queuedTasks.Dequeue();
-            }
+            taskQueue.Update(timeDeltaInSeconds);
         }
 
         public override string ToString()
@@ -427,14 +386,14 @@ namespace Orion.GameLogic
 
         public void Suicide()
         {
-            this.Health = 0;
+            Health = 0;
         }
 
-        public void Build(float health)
+        public void Build(float amount)
         {
-            Argument.EnsurePositive(health, "health");
-            this.Health += health;
-            this.healthBuilt += health;
+            Argument.EnsurePositive(amount, "amount");
+            Health += amount;
+            healthBuilt += amount;
             if (healthBuilt >= MaxHealth)
             {
                 isUnderConstruction = false;
@@ -444,8 +403,8 @@ namespace Orion.GameLogic
 
         public void CompleteConstruction()
         {
-            this.Health = MaxHealth;
-            this.isUnderConstruction = false;
+            Health = MaxHealth;
+            isUnderConstruction = false;
             RaiseConstructionComplete();
         }
         #endregion

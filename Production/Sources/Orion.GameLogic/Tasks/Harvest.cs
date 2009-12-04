@@ -87,8 +87,8 @@ namespace Orion.GameLogic.Tasks
 
         public override void Dispose()
         {
-            node.Died -= nodeDepletedEventHandler;
-            depot.Died -= depotDestroyedEventHandler;
+            if (node != null) node.Died -= nodeDepletedEventHandler;
+            if (depot != null) depot.Died -= depotDestroyedEventHandler;
         }
 
         private void UpdateExtracting(UpdateInfo info)

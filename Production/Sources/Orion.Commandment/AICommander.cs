@@ -217,6 +217,8 @@ namespace Orion.Commandment
 
                 amountOfHarvesters -= amountOfUnitsAlreadyHarvesting;
 
+
+                //OUT OF RANGE EXCEPTION HERE!!!!!
                 if (potentialHarvesters.Count > 0)
                 {
                     for (int i = 0; i < amountOfHarvesters; i++)
@@ -225,6 +227,7 @@ namespace Orion.Commandment
                         potentialHarvesters.Remove(potentialHarvesters.ElementAt(0));
                     }
                 }
+                ///END OUT OF RANGE
 
                 if (harvesters.Count > 0)
                     commands.Add(new Commands.Harvest(Faction.Handle, harvesters.Select(unit => unit.Handle), node.Handle));

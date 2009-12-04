@@ -19,21 +19,29 @@ namespace Orion.GameLogic
         #region Constructors
         public UnitTypeRegistry()
         {
+            RegisterPyramid();
             RegisterSmurf();
+
+            RegisterBarracks();
             RegisterPirate();
             RegisterNinja();
             RegisterViking();
-            RegisterJedihad();
+
+            RegisterStarPort();
             RegisterSwineFlu();
             RegisterUfo();
             RegisterFlyingCarpet();
-            RegisterPyramid();
-            RegisterBarack();
-            RegisterStarPort();
+
+            RegisterPropagandaCenter();
+            RegisterJedihad();
+            RegisterJesus();
+            RegisterFlyingSpaghettiMonster();
+
             RegisterTechCenter();
             RegisterTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
+
             RegisterChuckNorris();
             RegisterMrT();
         }
@@ -41,6 +49,24 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Hard-Coded UnitTypes
+        #region Pyramid & Units
+        public void RegisterPyramid()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Pyramide",
+                Size = new Size(3, 3),
+                SightRange = 8,
+                MaxHealth = 400,
+                AladdiumCost = 250,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new Skills.Train(type => type.Name == "Schtroumpf", 10));
+            builder.Skills.Add(new Skills.StoreResources());
+            builder.Skills.Add(new Skills.StoreFood(10));
+            Register(builder);
+        }
+
         public void RegisterSmurf()
         {
             var builder = new UnitTypeBuilder
@@ -57,6 +83,24 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.Attack(1, 0, 5));
             builder.Skills.Add(new Skills.Harvest(1, 10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
+            Register(builder);
+        }
+        #endregion
+
+        #region Barracks & Units
+        public void RegisterBarracks()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Temple de 2012",
+                Size = new Size(3, 3),
+                SightRange = 8,
+                MaxHealth = 200,
+                AladdiumCost = 150,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new Skills.Train(type =>
+                type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking", 10));
             Register(builder);
         }
 
@@ -110,21 +154,22 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.Attack(8, 0, 5));
             Register(builder);
         }
+        #endregion
 
-        public void RegisterJedihad()
+        #region StarPort & Units
+        public void RegisterStarPort()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Jedihad",
-                Size = new Size(1, 1),
+                Name = "Portail Démoniaque",
+                Size = new Size(3, 3),
                 SightRange = 8,
-                MaxHealth = 50,
-                AladdiumCost = 50,
-                AlageneCost = 75,
-                FoodCost = 3
+                MaxHealth = 250,
+                AladdiumCost = 200,
+                AlageneCost = 75
             };
-            builder.Skills.Add(new Skills.Move(14, false));
-            builder.Skills.Add(new Skills.Attack(4, 8, 3));
+            builder.Skills.Add(new Skills.Train(type =>
+                type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
             Register(builder);
         }
 
@@ -177,56 +222,78 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.Move(14, true));
             Register(builder);
         }
+        #endregion
 
-        public void RegisterPyramid()
+        #region Propaganda Center & Units
+        public void RegisterPropagandaCenter()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Pyramide",
-                Size = new Size(3, 3),
-                SightRange = 8,
-                MaxHealth = 400,
-                AladdiumCost = 250,
-                AlageneCost = 0
-            };
-            builder.Skills.Add(new Skills.Train(type => type.Name == "Schtroumpf", 10));
-            builder.Skills.Add(new Skills.StoreResources());
-            builder.Skills.Add(new Skills.StoreFood(10)); 
-            Register(builder);
-        }
-
-        public void RegisterBarack()
-        {
-            var builder = new UnitTypeBuilder
-            {
-                Name = "Temple de 2012",
+                Name = "Centre de propagande",
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 200,
-                AladdiumCost = 150,
-                AlageneCost = 0
+                AladdiumCost = 250,
+                AlageneCost = 125
             };
             builder.Skills.Add(new Skills.Train(type =>
-                type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking" || type.Name == "Jedihad", 10));
+                type.Name == "Jedihad" || type.Name == "Jésus"
+                || type.Name == "Flying Spaghetti Monster", 10));
             Register(builder);
         }
 
-        public void RegisterStarPort()
+        public void RegisterJedihad()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Portail Démoniaque",
-                Size = new Size(3, 3),
+                Name = "Jedihad",
+                Size = new Size(1, 1),
                 SightRange = 8,
-                MaxHealth = 250,
-                AladdiumCost = 200,
-                AlageneCost = 75
+                MaxHealth = 50,
+                AladdiumCost = 50,
+                AlageneCost = 75,
+                FoodCost = 3
             };
-            builder.Skills.Add(new Skills.Train(type =>
-                type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
+            builder.Skills.Add(new Skills.Move(14, false));
+            builder.Skills.Add(new Skills.Attack(8, 8, 3));
             Register(builder);
         }
 
+        public void RegisterJesus()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Jésus",
+                Size = new Size(2, 2),
+                SightRange = 8,
+                MaxHealth = 80,
+                AladdiumCost = 80,
+                AlageneCost = 40,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new Skills.Move(14, true));
+            Register(builder);
+        }
+
+        public void RegisterFlyingSpaghettiMonster()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Flying Spaghetti Monster",
+                Size = new Size(3, 3),
+                SightRange = 10,
+                MaxHealth = 80,
+                AladdiumCost = 300,
+                AlageneCost = 200,
+                FoodCost = 5
+            };
+            builder.Skills.Add(new Skills.Move(2, true));
+            builder.Skills.Add(new Skills.Attack(20, 3, 5));
+            Register(builder);
+        }
+        #endregion
+
+        #region Other Buildings
         public void RegisterTechCenter()
         {
             var builder = new UnitTypeBuilder
@@ -286,7 +353,9 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.StoreFood(10));
             Register(builder);
         }
+        #endregion
 
+        #region Heroes
         public void RegisterChuckNorris()
         {
             var builder = new UnitTypeBuilder
@@ -314,6 +383,7 @@ namespace Orion.GameLogic
             builder.Skills.Add(new Skills.Attack(50, 20, 1));
             Register(builder);
         }
+        #endregion
         #endregion
 
         public UnitType Register(UnitTypeBuilder builder)

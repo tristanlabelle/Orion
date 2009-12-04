@@ -24,6 +24,7 @@ namespace Orion.GameLogic.Tasks
             if (!unit.World.IsWithinBounds((Point)destination))
                 throw new ArgumentOutOfRangeException("destination");
             this.destination = destination;
+            Unit.LookAt(destination + new Vector2(0.5f, 0.5f));
         }
         #endregion
 
@@ -54,7 +55,6 @@ namespace Orion.GameLogic.Tasks
         {
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * info.TimeDeltaInSeconds;
             Vector2 delta = destination - Unit.Position;
-            Unit.LookAt(destination);
             if (distance > delta.LengthFast)
             {
                 Unit.SetPosition(destination);

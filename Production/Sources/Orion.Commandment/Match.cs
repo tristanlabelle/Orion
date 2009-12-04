@@ -15,6 +15,7 @@ namespace Orion.Commandment
     public sealed class Match
     {
         #region Fields
+        private const int resourceNodeCount = 60;
         private const int campSize = 15;
         private const int initialMinimumDistanceBetweenCamps = 175;
 
@@ -235,7 +236,7 @@ namespace Orion.Commandment
 
         private void CreateResourceNodes()
         {
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < resourceNodeCount; i++)
             {
                 Point location = GetFreeLocation(ResourceNode.DefaultSize);
                 ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;

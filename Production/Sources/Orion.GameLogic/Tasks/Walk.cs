@@ -105,6 +105,9 @@ namespace Orion.GameLogic.Tasks
                 }
             }
 
+            // Prevents floating point inaccuracies, we've had values of -0.0000001f
+            targetPosition = Unit.World.Bounds.Clamp(targetPosition);
+
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {

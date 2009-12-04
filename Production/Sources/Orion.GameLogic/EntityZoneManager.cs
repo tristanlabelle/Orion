@@ -132,7 +132,7 @@ namespace Orion.GameLogic
         private void AddToZone(Point point, Entity entity)
         {
             PooledList<Entity> zone = zones[point.X, point.Y];
-            //Debug.Assert(!zone.Contains(entity), "The zone already contains that entity.");
+            Debug.Assert(!zone.Contains(entity), "The zone already contains that entity.");
             zone.Add(entity);
         }
         #endregion
@@ -167,7 +167,7 @@ namespace Orion.GameLogic
         private void RemoveFromZone(Point point, Entity entity)
         {
             PooledList<Entity> zone = zones[point.X, point.Y];
-            //Debug.Assert(zone.Contains(entity), "The zone does not contain that entity.");
+            Debug.Assert(zone.Contains(entity), "The zone does not contain that entity.");
             zone.Remove(entity);
         }
         #endregion

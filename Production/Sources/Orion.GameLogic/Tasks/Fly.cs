@@ -54,7 +54,7 @@ namespace Orion.GameLogic.Tasks
         {
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * info.TimeDeltaInSeconds;
             Vector2 delta = destination - Unit.Position;
-            Unit.Angle = (float)Math.Atan2(delta.Y, delta.X);
+            Unit.LookAt(destination);
             if (distance > delta.LengthFast)
             {
                 Unit.SetPosition(destination);

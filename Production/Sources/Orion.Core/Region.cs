@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using OpenTK.Math;
 
 namespace Orion
 {
@@ -213,6 +214,7 @@ namespace Orion
 
         #region Static
         #region Methods
+        #region Factory Methods
         public static Region FromMinInclusiveMax(Point min, Point inclusiveMax)
         {
             Size size = new Size(inclusiveMax.X - min.X + 1, inclusiveMax.Y - min.Y + 1);
@@ -234,6 +236,7 @@ namespace Orion
         {
             return FromMinExclusiveMax(new Point(minX, minY), new Point(exclusiveMaxX, exclusiveMaxY));
         }
+        #endregion
 
         public static Region Grow(Region region, int amount)
         {
@@ -243,6 +246,7 @@ namespace Orion
                 region.Width + amount * 2, region.Height + amount * 2);
         }
 
+        #region Boolean Operations
         public static Region Union(Region a, Region b)
         {
             Point min = new Point(Math.Min(a.min.X, b.min.X), Math.Min(a.min.Y, b.min.Y));
@@ -272,6 +276,22 @@ namespace Orion
         {
             return Intersects(Region.Grow(a, 1), b);
         }
+        #endregion
+
+        #region Distance
+        public static float SquaredDistance(Region a, Region b)
+        {
+            Point clamped1 = a.Clamp(b.Min);
+            Point clamped2 = b.Clamp(clamped1);
+            return ((Vector2)clamped1 - (Vector2)clamped2).LengthSquared;
+        }
+
+        public static float Distance(Region a, Region b)
+        {
+            float squaredDistance = SquaredDistance(a, b);
+            return (float)Math.Sqrt(squaredDistance);
+        }
+        #endregion
 
         public static bool Equals(Region a, Region b)
         {

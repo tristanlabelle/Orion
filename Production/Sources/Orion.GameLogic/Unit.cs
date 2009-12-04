@@ -24,7 +24,7 @@ namespace Orion.GameLogic
         private Vector2? rallyPoint;
         private float healthBuilt;
         private bool isUnderConstruction;
-        private float timeSinceLastHitInSeconds = 0;
+        private float lastHitTime = float.NegativeInfinity;
         #endregion
 
         #region Constructors
@@ -227,13 +227,17 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        public float TimeSinceLastHitInSeconds
+        /// <summary>
+        /// Accesses the time when this <see cref="Unit"/> last hit something.
+        /// </summary>
+        public float LastHitTime
         {
-            get { return timeSinceLastHitInSeconds; }
+            get { return lastHitTime; }
             internal set
             {
-                Argument.EnsureNotNull(value, "timeSinceLastHitInSeconds");
-                timeSinceLastHitInSeconds = value;
+                Argument.EnsurePositive(value, "lastHitTime");
+                Debug.Assert(value >= lastHitTime);
+                lastHitTime = value;
             }
         }
 
@@ -319,6 +323,7 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Position/Angle
         /// <summary>
         /// Changes the position of this <see cref="Unit"/>.
         /// </summary>
@@ -337,6 +342,18 @@ namespace Orion.GameLogic
             position = value;
             RaiseMoved(oldPosition, position);
         }
+
+        /// <summary>
+        /// Rotates this <see cref="Unit"/> so that it faces a target.
+        /// </summary>
+        /// <param name="target">The location of the target to be faced.</param>
+        public void LookAt(Vector2 target)
+        {
+            Vector2 delta = target - Center;
+            if (delta.LengthSquared == 0) return;
+            Angle = (float)Math.Atan2(delta.Y, delta.X);
+        }
+        #endregion
 
         /// <summary>
         /// Gets the diplomatic stance of this <see cref="Unit"/> towards another one.

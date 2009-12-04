@@ -1,6 +1,6 @@
 ﻿using System;
 using Orion.Geometry;
-
+using OpenTK.Math;
 
 namespace Orion.GameLogic.Tasks
 {    
@@ -65,11 +65,11 @@ namespace Orion.GameLogic.Tasks
         {
             if (Unit.IsInAttackRange(target))
             {
-                Unit.TimeSinceLastHitInSeconds += info.TimeDeltaInSeconds;
-                if (Unit.TimeSinceLastHitInSeconds > hitDelayInSeconds)
+                Unit.LookAt(target.Center);
+                if (info.TimeInSeconds - Unit.LastHitTime > hitDelayInSeconds)
                 {
                     target.Damage += Unit.GetStat(UnitStat.AttackPower);
-                    Unit.TimeSinceLastHitInSeconds = 0;
+                    Unit.LastHitTime = info.TimeInSeconds;
                 }
             }
             else if (follow != null)

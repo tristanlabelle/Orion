@@ -23,12 +23,13 @@ namespace Orion.GameLogic.Tasks
         private const float depositingDuration = 0;
 
         private readonly ResourceNode node;
-        private readonly GenericEventHandler<Entity> commandCenterDestroyedEventHandler;
+        private readonly GenericEventHandler<Entity> nodeDepletedEventHandler;
+        private readonly GenericEventHandler<Entity> depotDestroyedEventHandler;
         private int amountCarrying;
         private float amountAccumulator;
         private float secondsGivingResource;
         private Move move;
-        private Unit commandCenter;
+        private Unit depot;
         private Mode mode = Mode.Extracting;
         private bool hasEnded;
         private bool nodeIsDead = false;
@@ -43,10 +44,11 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(node, "node");
 
             this.node = node;
-            this.commandCenterDestroyedEventHandler = OnCommandCenterDestroyed;
+            this.depotDestroyedEventHandler = OnDepotDestroyed;
+            this.nodeDepletedEventHandler = OnNodeDepleted;
             this.move = Move.ToNearRegion(harvester, node.GridRegion);
-            node.Died += new GenericEventHandler<Entity>(nodeDied);
-            commandCenter = FindClosestCommandCenter();
+            node.Died += nodeDepletedEventHandler;
+            depot = FindClosestDepot();
         }
 
         #endregion
@@ -77,15 +79,22 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-
             if (mode == Mode.Extracting)
                 UpdateExtracting(info);
             else
                 UpdateDelivering(info);
         }
 
+        public override void Dispose()
+        {
+            node.Died -= nodeDepletedEventHandler;
+            depot.Died -= depotDestroyedEventHandler;
+        }
+
         private void UpdateExtracting(UpdateInfo info)
         {
+            Unit.LookAt(node.Center);
+
             float extractingSpeed = Unit.GetStat(UnitStat.ExtractingSpeed);
             amountAccumulator += extractingSpeed * info.TimeDeltaInSeconds;
 
@@ -94,8 +103,8 @@ namespace Orion.GameLogic.Tasks
             {
                 if (nodeIsDead)
                 {
-                    commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
+                    depot.Died += depotDestroyedEventHandler;
+                    move = Move.ToNearRegion(Unit, depot.GridRegion);
                     mode = Mode.Delivering;
                     return;
                 }
@@ -109,18 +118,18 @@ namespace Orion.GameLogic.Tasks
 
                 if (amountCarrying >= maxCarryingAmount)
                 {
-                    if (commandCenter != null)
-                        commandCenter.Died -= commandCenterDestroyedEventHandler;
+                    if (depot != null)
+                        depot.Died -= depotDestroyedEventHandler;
 
-                    commandCenter = FindClosestCommandCenter();
-                    if (commandCenter == null)
+                    depot = FindClosestDepot();
+                    if (depot == null)
                     {
                         hasEnded = true;
                     }
                     else
                     {
-                        commandCenter.Died += commandCenterDestroyedEventHandler;
-                        move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
+                        depot.Died += depotDestroyedEventHandler;
+                        move = Move.ToNearRegion(Unit, depot.GridRegion);
                         mode = Mode.Delivering;
                     }
                     return;
@@ -130,6 +139,8 @@ namespace Orion.GameLogic.Tasks
 
         private void UpdateDelivering(UpdateInfo info)
         {
+            Unit.LookAt(depot.Center);
+
             secondsGivingResource += info.TimeDeltaInSeconds;
             if (secondsGivingResource < depositingDuration)
                 return;
@@ -151,39 +162,40 @@ namespace Orion.GameLogic.Tasks
             mode = Mode.Extracting;
         }
 
-        private Unit FindClosestCommandCenter()
+        private Unit FindClosestDepot()
         {
-            return Unit.World.Entities
-                .OfType<Unit>()
-                .Where(other => other.Faction == Unit.Faction && other.HasSkill<Skills.StoreResources>())
-                .WithMinOrDefault(unit => (unit.Position - node.Position).LengthSquared);
+            return Faction.Units
+                .Where(other => other.HasSkill<Skills.StoreResources>())
+                .WithMinOrDefault(unit => Region.SquaredDistance(unit.GridRegion, node.GridRegion));
         }
 
-        private void OnCommandCenterDestroyed(Entity sender)
+        private void OnDepotDestroyed(Entity sender)
         {
-            Debug.Assert(sender == commandCenter);
-            commandCenter.Died -= commandCenterDestroyedEventHandler;
-            commandCenter = null;
+            Debug.Assert(sender == depot);
+            depot.Died -= depotDestroyedEventHandler;
+            depot = null;
 
             if (mode == Mode.Delivering)
             {
-                commandCenter = FindClosestCommandCenter();
-                if (commandCenter == null)
+                depot = FindClosestDepot();
+                if (depot == null)
                 {
                     hasEnded = true;
                     return;
                 }
                 else
                 {
-                    commandCenter.Died += commandCenterDestroyedEventHandler;
-                    move = Move.ToNearRegion(Unit, commandCenter.GridRegion);
+                    depot.Died += depotDestroyedEventHandler;
+                    move = Move.ToNearRegion(Unit, depot.GridRegion);
                 }
             }
         }
 
-        void nodeDied(Entity sender)
+        private void OnNodeDepleted(Entity sender)
         {
+            Debug.Assert(sender == node);
             nodeIsDead = true;
+            node.Died -= nodeDepletedEventHandler;
         }
         #endregion
         #endregion

@@ -31,13 +31,18 @@ namespace Orion.UserInterface.Actions.UserCommands
         #region Methods
         public override void Execute(Entity entity)
         {
-            if (entity is ResourceNode && buildingType.HasSkill<Skills.ExtractAlagene>())
-                if (((ResourceNode)entity).Type == ResourceType.Alagene)
-                    inputManager.LaunchBuild(((ResourceNode)entity).Position, buildingType);
+            if (buildingType.HasSkill<Skills.ExtractAlagene>())
+            {
+                if (!(entity is ResourceNode)) return;
+                ResourceNode node = (ResourceNode)entity;
+                if (node.Type != ResourceType.Alagene) return;
+                inputManager.LaunchBuild(node.Position, buildingType);
+            }
         }
 
         public override void Execute(Vector2 at)
         {
+            if (buildingType.HasSkill<Skills.ExtractAlagene>()) return;
             inputManager.LaunchBuild((Point)(at - (Vector2)buildingType.Size * 0.5f), buildingType);
         }
         #endregion

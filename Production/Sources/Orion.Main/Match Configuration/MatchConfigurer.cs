@@ -16,7 +16,7 @@ namespace Orion.Main
         protected static Color[] playerColors = new Color[]
         {
             Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.Tan, Color.Turquoise
+            Color.Green, Color.Pink, Color.Tan, Color.Brown
         };
 
         private int seed;
@@ -34,7 +34,7 @@ namespace Orion.Main
         #region Properties
         public int NumberOfPlayers
         {
-            get { return UserInterface.NumberOfPlayers; }
+            get { return 0; }
         }
 
         public int Seed
@@ -43,12 +43,12 @@ namespace Orion.Main
             protected set { seed = value; }
         }
 
-        public MatchConfigurationUI UserInterface
+        public UIDisplay UserInterface
         {
             get { return AbstractUserInterface; }
         }
 
-        protected abstract MatchConfigurationUI AbstractUserInterface { get; }
+        protected abstract UIDisplay AbstractUserInterface { get; }
         #endregion
 
         #region Methods

@@ -9,12 +9,12 @@ using Orion.Commandment;
 using Orion.Geometry;
 using Orion.Graphics;
 
-namespace Orion.UserInterface.UIDisplays
+namespace Orion.UserInterface
 {
     public class UnifiedMatchConfigurationUI : UIDisplay
     {
         #region Nested Types
-        public class PlayerRow : Frame
+        private class PlayerRow : Frame
         {
             #region Fields
             private readonly UnifiedMatchConfigurationUI configurationUi;
@@ -27,7 +27,7 @@ namespace Orion.UserInterface.UIDisplays
                 : base(ui.rowRectangle)
             {
                 configurationUi = ui;
-                Rectangle labelRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.5f, 1));
+                Rectangle labelRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.05f, 0), new Vector2(0.5f, 1));
                 nameLabel = new Label(labelRect, initialLabel);
                 Children.Add(nameLabel);
 
@@ -89,38 +89,127 @@ namespace Orion.UserInterface.UIDisplays
         #endregion
 
         #region Fields
-        private GenericEventHandler<Button> exitPanel;
-        private GenericEventHandler<Button> startGame;
+        private static readonly Vector2 padding = new Vector2(10, 10);
         private Rectangle rowRectangle;
-        protected Button startButton;
-        protected Button exitButton;
+        private readonly bool isDecidor;
+        private readonly Button startButton;
+        private readonly Button exitButton;
 
-        private ListFrame youListFrame;
-        private ListFrame localPlayersListFrame;
-        private ListFrame aiListFrame;
+        private readonly ListFrame playersListFrame;
+        private readonly Dictionary<PlayerRow, PlayerSlot> playersMapping = new Dictionary<PlayerRow, PlayerSlot>();
+        private readonly IEnumerable<Color> colors;
         #endregion
 
         #region Constructors
-        public UnifiedMatchConfigurationUI(IEnumerable<Color> colors, bool displayStartButton)
+        public UnifiedMatchConfigurationUI(IEnumerable<Color> colors, bool isDecidor, bool displayRemotePlayers)
         {
-            Vector2 padding = new Vector2(10, 10);
+            this.colors = colors;
+            this.isDecidor = isDecidor;
 
-            Rectangle mainFrameRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.05f, 0.3f), new Vector2(0.95f, 0.8f));
-            ListFrame mainFrame = new ListFrame(mainFrameRect, padding);
+            Rectangle mainFrameRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.3f), new Vector2(0.8f, 0.975f));
+            playersListFrame = new ListFrame(mainFrameRect, padding);
+            Children.Add(playersListFrame);
 
-            rowRectangle = Instant.CreateComponentRectangle(mainFrameRect, new Vector2(0, 0), new Vector2(1, 0.1f));
+            rowRectangle = Instant.CreateComponentRectangle(playersListFrame.Bounds, new Vector2(0.025f, 0), new Vector2(0.975f, 0.06f));
 
-            Rectangle youFrameRect = Instant.CreateComponentRectangle(mainFrameRect, new Vector2(0, 0f), new Vector2(1, 0.1f));
-            youListFrame = new ListFrame(youFrameRect, padding);
-            Label youLabel = new Label("You");
-            youListFrame.Children.Add(youLabel);
+            Rectangle exitButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.825f, 0.3f), new Vector2(0.975f, 0.35f));
+            exitButton = new Button(exitButtonRect, "Back");
+            exitButton.Triggered += OnExit;
+            Children.Add(exitButton);
 
-            PlayerRow youRow = new PlayerRow(this, colors, "You", false);
-            youListFrame.Children.Add(youRow);
+            if (isDecidor)
+            {
+                Rectangle startButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.825f, 0.375f), new Vector2(0.975f, 0.425f));
+                startButton = new Button(startButtonRect, "Start");
+                startButton.Triggered += OnStart;
+                Children.Add(startButton);
+
+                Rectangle addAIRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.825f, 0.925f), new Vector2(0.975f, 0.975f));
+                Button addAIButton = new Button(addAIRect, "Add Computer");
+                addAIButton.Triggered += AddComputerPlayer;
+                Children.Add(addAIButton);
+
+                if (displayRemotePlayers)
+                {
+                    Rectangle addPlayerRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.825f, 0.85f), new Vector2(0.975f, 0.9f));
+                    Button addPlayerButton = new Button(addAIRect, "Add Player");
+                    addPlayerButton.Triggered += AddRemotePlayer;
+                    Children.Add(addPlayerButton);
+                }
+            }
         }
         #endregion
 
+        #region Events
+        public event GenericEventHandler<PlayerSlot> SlotDeleted;
+        public event GenericEventHandler<UnifiedMatchConfigurationUI> PressedAddComputer;
+        public event GenericEventHandler<UnifiedMatchConfigurationUI> PressedAddPlayer;
+        public event GenericEventHandler<UnifiedMatchConfigurationUI> PressedExit;
+        public event GenericEventHandler<UnifiedMatchConfigurationUI> PressedStartGame;
+        #endregion
+
         #region Methods
+
+        public void AddPlayer(string name, PlayerSlot slot)
+        {
+            Argument.EnsureLower(playersMapping.Count, colors.Count(), "playersMapping");
+            PlayerRow row = new PlayerRow(this, colors, name, isDecidor);
+            row.SelectedColorChanged += OnChangedSelectedColor;
+            row.RowSuppressed += OnDeletedSlot;
+            playersMapping[row] = slot;
+            playersListFrame.Children.Add(row);
+        }
+
+        public void SetColor(PlayerSlot slot, Color color)
+        {
+
+        }
+
+        private void AddComputerPlayer(Button sender)
+        {
+            if (PressedAddComputer != null)
+                PressedAddComputer(this);
+        }
+
+        private void AddRemotePlayer(Button sender)
+        {
+            if (PressedAddPlayer != null)
+                PressedAddPlayer(this);
+        }
+
+        private void OnExit(Button sender)
+        {
+            if (PressedExit != null)
+                PressedExit(this);
+        }
+
+        private void OnStart(Button sender)
+        {
+            if (PressedStartGame != null)
+                PressedStartGame(this);
+        }
+
+        private void OnChangedSelectedColor(PlayerRow row, Color newColor)
+        {
+            SetColor(playersMapping[row], newColor);
+        }
+
+        private void OnDeletedSlot(PlayerRow row)
+        {
+            if (SlotDeleted != null)
+                SlotDeleted(playersMapping[row]);
+            playersMapping.Remove(row);
+        }
+
+        public override void Dispose()
+        {
+            SlotDeleted = null;
+            PressedAddPlayer = null;
+            PressedAddComputer = null;
+            PressedExit = null;
+            PressedStartGame = null;
+            base.Dispose();
+        }
 
         #endregion
     }

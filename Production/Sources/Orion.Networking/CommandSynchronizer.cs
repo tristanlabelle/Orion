@@ -141,9 +141,12 @@ namespace Orion.Networking
 
         private void FactionDefeated(Faction sender)
         {
-            PeerEndPoint associatedEndPoint = peers.First(peer => peer.Faction == sender);
-            associatedEndPoint.Dispose();
-            peers.Remove(associatedEndPoint);
+            PeerEndPoint associatedEndPoint = peers.FirstOrDefault(peer => peer.Faction == sender);
+            if (associatedEndPoint != null)
+            {
+                associatedEndPoint.Dispose();
+                peers.Remove(associatedEndPoint);
+            }
         }
         #endregion
     }

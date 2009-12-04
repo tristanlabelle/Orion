@@ -44,9 +44,12 @@ namespace Orion.UserInterface.Widgets
             #region Methods
             protected override bool OnMouseUp(MouseEventArgs args)
             {
+                GenericEventHandler<DropdownList<T>, T> handler = parent.SelectionWillChange;
+                if (handler != null) handler(parent, Value);
+
                 if (parent.Enabled) parent.SelectedItem = this.Value;
 
-                GenericEventHandler<DropdownList<T>, T> handler = parent.SelectionChanged;
+                handler = parent.SelectionChanged;
                 if (handler != null) handler(parent, Value);
                 return base.OnMouseUp(args);
             }
@@ -93,6 +96,7 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Events
+        public event GenericEventHandler<DropdownList<T>, T> SelectionWillChange;
         public event GenericEventHandler<DropdownList<T>, T> SelectionChanged;
         #endregion
 
@@ -143,7 +147,6 @@ namespace Orion.UserInterface.Widgets
                 SelectedItem = item;
 
             menu.Bounds = menu.FullBounds;
-            //menu.Frame = Bounds.TranslatedBy(0, -menu.Bounds.Height - Bounds.Height).ResizedTo(menu.Bounds.Size);
             menu.Frame = new Rectangle(Frame.Min, menu.Bounds.Size).TranslatedBy(0, -menu.Bounds.Height);
         }
 

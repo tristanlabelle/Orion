@@ -11,21 +11,21 @@ namespace Orion.Main
 {
     sealed class SinglePlayerMatchConfigurer : MatchConfigurer
     {
-        private SinglePlayerMatchConfigurationUI ui;
+        private UnifiedMatchConfigurationUI ui;
 
         public SinglePlayerMatchConfigurer()
         {
-            ui = new SinglePlayerMatchConfigurationUI();
+            ui = new UnifiedMatchConfigurationUI(playerColors, true, false);
             ui.PressedStartGame += PressStart;
             Seed = (int)Environment.TickCount;
         }
 
-        private void PressStart(MatchConfigurationUI ui)
+        private void PressStart(UnifiedMatchConfigurationUI ui)
         {
             StartGame();
         }
 
-        protected override MatchConfigurationUI AbstractUserInterface
+        protected override UIDisplay AbstractUserInterface
         {
             get { return ui; }
         }
@@ -37,7 +37,8 @@ namespace Orion.Main
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             int colorIndex = 0;
-            foreach (PlayerSlot slot in UserInterface.Players)
+            List<PlayerSlot> players = new List<PlayerSlot>();
+            foreach (PlayerSlot slot in players)
             {
                 if (slot is ClosedPlayerSlot) continue;
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;

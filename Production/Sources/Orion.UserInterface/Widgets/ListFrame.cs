@@ -49,6 +49,7 @@ namespace Orion.UserInterface.Widgets
                 float yTransform = child.Frame.Height + padding.Y;
                 FullBounds = FullBounds.TranslatedBy(0, -yTransform).ResizedBy(0, yTransform);
                 child.Frame = new Rectangle(padding.X, FullBounds.MinY + padding.Y, child.Frame.Width, child.Frame.Height);
+                    
             }
             base.OnAddChild(child);
         }

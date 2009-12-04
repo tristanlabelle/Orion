@@ -166,7 +166,7 @@ namespace Orion.GameLogic
             RaiseDied();
         }
 
-        internal virtual void Update(float timeDeltaInSeconds) { }
+        internal virtual void Update(UpdateInfo info) { }
         #endregion
         #endregion
 

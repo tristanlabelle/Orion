@@ -63,7 +63,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (!node.IsHarvestableByFaction(Unit.Faction))
             {
@@ -73,21 +73,21 @@ namespace Orion.GameLogic.Tasks
 
             if (!move.HasEnded)
             {
-                move.Update(timeDelta);
+                move.Update(info);
                 return;
             }
 
 
             if (mode == Mode.Extracting)
-                UpdateExtracting(timeDelta);
+                UpdateExtracting(info);
             else
-                UpdateDelivering(timeDelta);
+                UpdateDelivering(info);
         }
 
-        private void UpdateExtracting(float timeDelta)
+        private void UpdateExtracting(UpdateInfo info)
         {
             float extractingSpeed = Unit.GetStat(UnitStat.ExtractingSpeed);
-            amountAccumulator += extractingSpeed * timeDelta;
+            amountAccumulator += extractingSpeed * info.TimeDeltaInSeconds;
 
             int maxCarryingAmount = Unit.GetSkill<Skills.Harvest>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
@@ -128,9 +128,9 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private void UpdateDelivering(float timeDelta)
+        private void UpdateDelivering(UpdateInfo info)
         {
-            secondsGivingResource += timeDelta;
+            secondsGivingResource += info.TimeDeltaInSeconds;
             if (secondsGivingResource < depositingDuration)
                 return;
             

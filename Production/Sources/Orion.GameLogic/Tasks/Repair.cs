@@ -71,21 +71,21 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (!move.HasEnded)
             {
-                move.Update(timeDelta);
+                move.Update(info);
                 return;
             }
 
-            if (target.IsUnderConstruction) UpdateBuild(timeDelta);
-            else UpdateRepair(timeDelta);
+            if (target.IsUnderConstruction) UpdateBuild(info);
+            else UpdateRepair(info);
         }
 
-        private void UpdateBuild(float timeDelta)
+        private void UpdateBuild(UpdateInfo info)
         {
-            target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta);
+            target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * info.TimeDeltaInSeconds);
 
             if (!target.IsUnderConstruction)
             {
@@ -100,14 +100,14 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private void UpdateRepair(float timeDelta)
+        private void UpdateRepair(UpdateInfo info)
         {
             if (!TryGetCredit()) return;
 
             int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
             int alageneCost = Target.GetStat(UnitStat.AlageneCost);
 
-            float healthToRepair = Unit.GetStat(UnitStat.BuildingSpeed) * timeDelta;
+            float healthToRepair = Unit.GetStat(UnitStat.BuildingSpeed) * info.TimeDeltaInSeconds;
             if (healthToRepair > target.Damage) healthToRepair = target.Damage;
 
             float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;

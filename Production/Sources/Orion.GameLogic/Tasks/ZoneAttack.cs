@@ -75,14 +75,14 @@ namespace Orion.GameLogic.Tasks
         /// if not the units moves towards its destination. The appropriate tasks are uptated each time.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last update, in seconds.</param>
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
-            if (attack != null) attack.Update(timeDelta);
+            if (attack != null) attack.Update(info);
 
             if (attack == null || attack.HasEnded)
             {
-                if (TryAttack()) attack.Update(timeDelta);
-                else move.Update(timeDelta);
+                if (TryAttack()) attack.Update(info);
+                else move.Update(info);
             }
         }
 

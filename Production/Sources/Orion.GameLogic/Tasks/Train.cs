@@ -61,13 +61,13 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
 
             float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             float trainingSpeed = Unit.GetStat(UnitStat.TrainingSpeed);
-            healthPointsTrained += trainingSpeed * timeDelta;
+            healthPointsTrained += trainingSpeed * info.TimeDeltaInSeconds;
             if (healthPointsTrained >= maxHealth)
             {
                 Point? spawnPoint = GetSpawnPoint();

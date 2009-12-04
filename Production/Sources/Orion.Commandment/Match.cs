@@ -20,7 +20,8 @@ namespace Orion.Commandment
 
         private readonly Random random;
         private readonly World world;
-        private int lastFrameNumber = 0;
+        private int lastFrameNumber;
+        private float gameTimeInSeconds;
         #endregion
 
         #region Constructors
@@ -111,7 +112,9 @@ namespace Orion.Commandment
         {
             if (IsRunning)
             {
-                world.Update(timeDeltaInSeconds);
+                gameTimeInSeconds += timeDeltaInSeconds;
+                UpdateInfo info = new UpdateInfo(lastFrameNumber, gameTimeInSeconds, timeDeltaInSeconds);
+                world.Update(info);
                 lastFrameNumber++;
             }
 

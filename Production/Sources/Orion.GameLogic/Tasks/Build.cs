@@ -45,11 +45,11 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (!move.HasEnded)
             {
-                move.Update(timeDelta);
+                move.Update(info);
                 return;
             }
 

@@ -189,11 +189,11 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
+        /// <param name="info">Information on this update.</param>
         /// <remarks>
         /// Used by <see cref="World"/>.
         /// </remarks>
-        public void Update(float timeDeltaInSeconds)
+        public void Update(UpdateInfo info)
         {
             if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
 
@@ -203,7 +203,7 @@ namespace Orion.GameLogic
             {
                 isUpdating = true;
                 foreach (Entity entity in entities.Values)
-                    entity.Update(timeDeltaInSeconds);
+                    entity.Update(info);
             }
             finally
             {

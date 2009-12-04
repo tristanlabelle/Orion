@@ -222,10 +222,10 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        public void Update(float timeDeltaInSeconds)
+        /// <param name="info">Information on this update.</param>
+        public void Update(UpdateInfo info)
         {
-            entities.Update(timeDeltaInSeconds);
+            entities.Update(info);
         }
         #endregion
     }

@@ -44,7 +44,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (timeElapsed == 0)
             {
@@ -61,7 +61,7 @@ namespace Orion.GameLogic.Tasks
                 timeElapsed = float.Epsilon;
             }
 
-            timeElapsed += timeDelta;
+            timeElapsed += info.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
                 Unit.Faction.ResearchTechnology(technology);
         }

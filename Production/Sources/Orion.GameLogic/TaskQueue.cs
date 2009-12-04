@@ -60,13 +60,13 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates the current task for a frame.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
-        public void Update(float timeDeltaInSeconds)
+        /// <param name="info">Information on the update.</param>
+        public void Update(UpdateInfo info)
         {
             if (IsEmpty) return;
 
             Task task = Current;
-            task.Update(timeDeltaInSeconds);
+            task.Update(info);
             if (task.HasEnded)
             {
                 task.Dispose();

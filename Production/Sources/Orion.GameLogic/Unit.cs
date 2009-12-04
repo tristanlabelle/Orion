@@ -356,11 +356,11 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates this <see cref="Unit"/> for a frame.
         /// </summary>
-        /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
+        /// <param name="info">Information on this update.</param>
         /// <remarks>
-        /// Used by <see cref="UnitRegistry"/>.
+        /// Used by <see cref="EntityManager"/>.
         /// </remarks>
-        internal override void Update(float timeDeltaInSeconds)
+        internal override void Update(UpdateInfo info)
         {
             if (IsIdle && HasSkill<Skills.Attack>())
             {
@@ -377,7 +377,7 @@ namespace Orion.GameLogic
                 }
             }
 
-            taskQueue.Update(timeDeltaInSeconds);
+            taskQueue.Update(info);
         }
 
         public override string ToString()

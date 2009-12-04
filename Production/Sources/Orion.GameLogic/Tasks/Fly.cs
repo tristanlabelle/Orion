@@ -50,9 +50,9 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
-            float distance = Unit.GetStat(UnitStat.MovementSpeed) * timeDelta;
+            float distance = Unit.GetStat(UnitStat.MovementSpeed) * info.TimeDeltaInSeconds;
             Vector2 delta = destination - Unit.Position;
             Unit.Angle = (float)Math.Atan2(delta.Y, delta.X);
             if (distance > delta.LengthFast)

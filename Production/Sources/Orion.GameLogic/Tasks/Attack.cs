@@ -61,11 +61,11 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(float timeDelta)
+        protected override void DoUpdate(UpdateInfo info)
         {
             if (Unit.IsInAttackRange(target))
             {
-                Unit.TimeSinceLastHitInSeconds += timeDelta;
+                Unit.TimeSinceLastHitInSeconds += info.TimeDeltaInSeconds;
                 if (Unit.TimeSinceLastHitInSeconds > hitDelayInSeconds)
                 {
                     target.Damage += Unit.GetStat(UnitStat.AttackPower);
@@ -74,7 +74,7 @@ namespace Orion.GameLogic.Tasks
             }
             else if (follow != null)
             {
-                follow.Update(timeDelta);
+                follow.Update(info);
             }
         }
         #endregion

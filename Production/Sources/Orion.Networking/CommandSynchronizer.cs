@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Commandment.Commands;
 using Orion.Commandment.Pipeline;
@@ -45,6 +46,11 @@ namespace Orion.Networking
             this.match = match;
             peers = endPoints.ToList();
             previousFramesDuration.Enqueue(defaultUpdatesPerFrame);
+
+            foreach (Faction faction in match.World.Factions)
+            {
+                faction.Defeated += FactionDefeated;
+            }
         }
         #endregion
 
@@ -131,6 +137,13 @@ namespace Orion.Networking
             foreach (Command command in commandsToExecute.OrderBy(c => c.FactionHandle.Value))
                 Flush(command);
             commandsToExecute.Clear();
+        }
+
+        private void FactionDefeated(Faction sender)
+        {
+            PeerEndPoint associatedEndPoint = peers.First(peer => peer.Faction == sender);
+            associatedEndPoint.Dispose();
+            peers.Remove(associatedEndPoint);
         }
         #endregion
     }

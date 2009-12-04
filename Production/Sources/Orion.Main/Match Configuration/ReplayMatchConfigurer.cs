@@ -27,7 +27,7 @@ namespace Orion.Main
             Seed = replay.WorldSeed;
         }
 
-        protected override UIDisplay AbstractUserInterface
+        protected override MatchConfigurationUI AbstractUserInterface
         {
             get { return null; }
         }

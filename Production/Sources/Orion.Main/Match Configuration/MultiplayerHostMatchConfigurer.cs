@@ -33,7 +33,7 @@ namespace Orion.Main
             get { return ui; }
         }
 
-        protected override UIDisplay AbstractUserInterface
+        protected override MatchConfigurationUI AbstractUserInterface
         {
             get { return ui; }
         }

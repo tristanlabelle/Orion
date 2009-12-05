@@ -13,24 +13,42 @@ namespace Orion
     {
         #region Fields
         private Stopwatch stopwatch;
-        private int frameCount;
-        private float secondsPerFrame;
+        private float timeAccumulator;
+        private int frameAccumulator;
+        private float peakTimeDelta;
+        private float averageSecondsPerFrame;
+        private float peakSecondsPerFrame;
         #endregion
 
         #region Properties
-        public float SecondsPerFrame
+        public float AverageSecondsPerFrame
         {
-            get { return secondsPerFrame; }
+            get { return averageSecondsPerFrame; }
         }
 
-        public float MillisecondsPerFrame
+        public float AverageMillisecondsPerFrame
         {
-            get { return secondsPerFrame * 1000; }
+            get { return averageSecondsPerFrame * 1000; }
         }
 
-        public float FramesPerSecond
+        public float AverageFramesPerSecond
         {
-            get { return (secondsPerFrame == 0) ? 0 : 1 / secondsPerFrame; }
+            get { return SpfToFps(averageSecondsPerFrame); }
+        }
+
+        public float PeakSecondsPerFrame
+        {
+            get { return peakSecondsPerFrame; }
+        }
+
+        public float PeakMillisecondsPerFrame
+        {
+            get { return peakSecondsPerFrame * 1000; }
+        }
+
+        public float PeakFramesPerSecond
+        {
+            get { return SpfToFps(peakSecondsPerFrame); }
         }
         #endregion
 
@@ -40,24 +58,36 @@ namespace Orion
             if (stopwatch == null)
             {
                 stopwatch = Stopwatch.StartNew();
+                return;
             }
-            else
+
+            float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
+            stopwatch.Reset();
+            stopwatch.Start();
+            
+            ++frameAccumulator;
+            timeAccumulator += timeDelta;
+            if (timeDelta > peakTimeDelta) peakTimeDelta = timeDelta;
+
+            if (timeAccumulator >= 1)
             {
-                ++frameCount;
-                if (stopwatch.ElapsedMilliseconds >= 1000)
-                {
-                    secondsPerFrame = (float)stopwatch.Elapsed.TotalSeconds / frameCount;
-                    stopwatch.Reset();
-                    stopwatch.Start();
-                    frameCount = 0;
-                }
+                averageSecondsPerFrame = timeAccumulator / frameAccumulator;
+                peakSecondsPerFrame = peakTimeDelta;
+                timeAccumulator = 0;
+                frameAccumulator = 0;
+                peakTimeDelta = 0;
             }
+        }
+
+        private static float SpfToFps(float spf)
+        {
+            return (spf == 0) ? 0 : 1 / spf;
         }
 
         public override string ToString()
         {
             return "{0:F2} frames per second, {1} milliseconds per frame"
-                .FormatInvariant(FramesPerSecond, (int)(SecondsPerFrame * 1000));
+                .FormatInvariant(AverageFramesPerSecond, (int)(AverageSecondsPerFrame * 1000));
         }
         #endregion
     }

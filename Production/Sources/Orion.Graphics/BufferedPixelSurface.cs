@@ -115,8 +115,8 @@ namespace Orion.Graphics
             try
             {
                 long pointer = (long)pinningHandle.AddrOfPinnedObject() + data.Offset
-                    + region.Min.Y * stride
-                    + region.Min.X * pixelFormat.GetBytesPerPixel();
+                    + region.MinY * stride
+                    + region.MinX * pixelFormat.GetBytesPerPixel();
                 RawPixelSurface rawImage = new RawPixelSurface(region.Size, pixelFormat, (IntPtr)pointer, stride, access);
                 accessor(rawImage);
             }

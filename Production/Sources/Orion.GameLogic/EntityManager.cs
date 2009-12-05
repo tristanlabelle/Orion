@@ -61,7 +61,7 @@ namespace Orion.GameLogic
 
             public DeferredChange CreateCombined(DeferredChangeType type)
             {
-                return CreateCombined(type, Vector2.Zero);
+                return CreateCombined(type, oldPosition);
             }
 
             public bool HasType(DeferredChangeType type)
@@ -228,8 +228,12 @@ namespace Orion.GameLogic
             if (entity.IsSolid)
             {
                 Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
-                grid.Remove(entity, oldRegion);
-                grid.Add(entity);
+                Region newRegion = Entity.GetGridRegion(entity.Position, entity.Size);
+                if (newRegion != oldRegion)
+                {
+                    grid.Remove(entity, oldRegion);
+                    grid.Add(entity, newRegion);
+                }
             }
         }
 

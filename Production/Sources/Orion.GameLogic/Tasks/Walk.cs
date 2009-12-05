@@ -131,15 +131,11 @@ namespace Orion.GameLogic.Tasks
 
         private bool CanMoveOn(Region targetRegion)
         {
-            for (int x = targetRegion.MinX; x < targetRegion.ExclusiveMaxX; ++x)
+            foreach (Point point in targetRegion.Points)
             {
-                for (int y = targetRegion.MinY; y < targetRegion.ExclusiveMaxY; ++y)
-                {
-                    Point point = new Point(x, y);
-                    if (!Unit.World.Terrain.IsWalkable(point)) return false;
-                    Entity entity = Unit.World.Entities.GetSolidEntityAt(point);
-                    if (entity != null && entity != Unit) return false;
-                }
+                if (!Unit.World.Terrain.IsWalkable(point)) return false;
+                Entity entity = Unit.World.Entities.GetSolidEntityAt(point);
+                if (entity != null && entity != Unit) return false;
             }
             return true;
         }

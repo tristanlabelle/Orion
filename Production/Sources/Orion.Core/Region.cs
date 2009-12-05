@@ -103,6 +103,19 @@ namespace Orion
         {
             get { return size.Width * 2 + size.Height * 2; }
         }
+
+        /// <summary>
+        /// Enumerates the points in this region.
+        /// </summary>
+        public IEnumerable<Point> Points
+        {
+            get
+            {
+                for (int x = MinX; x < ExclusiveMaxX; ++x)
+                    for (int y = MinY; y < ExclusiveMaxY; ++y)
+                        yield return new Point(x, y);
+            }
+        }
         #endregion
 
         #region Indexers

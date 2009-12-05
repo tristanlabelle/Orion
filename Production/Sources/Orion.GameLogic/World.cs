@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Pathfinding;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
-using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -116,11 +117,7 @@ namespace Orion.GameLogic
 
         public bool IsFree(Region region)
         {
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                    if (!IsFree(new Point(x, y)))
-                        return false;
-            return true;
+            return region.Points.All(point => IsFree(point));
         }
 
         /// <summary>

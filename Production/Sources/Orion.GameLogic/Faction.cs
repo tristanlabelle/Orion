@@ -482,15 +482,9 @@ namespace Orion.GameLogic
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)
         {
-            for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
-            {
-                for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
-                {
-                    Point point = new Point(x, y);
-                    if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                        localFogOfWar.Discover(point);
-                }
-            }
+            foreach (Point point in region.Points)
+                if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
+                    localFogOfWar.Discover(point);
         }
         #endregion
 

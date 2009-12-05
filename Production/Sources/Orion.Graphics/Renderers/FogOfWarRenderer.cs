@@ -66,19 +66,16 @@ namespace Orion.Graphics
         {
             byte fogAlpha = (byte)(FogTransparency * 255.99f);
 
-            for (int y = region.Min.Y; y < region.ExclusiveMax.Y; ++y)
+            foreach (Point point in region.Points)
             {
-                for (int x = region.Min.X; x < region.ExclusiveMax.X; ++x)
-                {
-                    int pixelIndex = (y - region.Min.Y) * region.Size.Width + (x - region.Min.X);
-                    TileVisibility visibility = faction.GetTileVisibility(new Point(x, y));
-                    if (visibility == TileVisibility.Undiscovered)
-                        pixelBuffer[pixelIndex] = 255;
-                    else if (visibility == TileVisibility.Discovered)
-                        pixelBuffer[pixelIndex] = fogAlpha;
-                    else if (visibility == TileVisibility.Visible)
-                        pixelBuffer[pixelIndex] = 0;
-                }
+                int pixelIndex = (point.Y - region.MinY) * region.Width + (point.X - region.MinX);
+                TileVisibility visibility = faction.GetTileVisibility(point);
+                if (visibility == TileVisibility.Undiscovered)
+                    pixelBuffer[pixelIndex] = 255;
+                else if (visibility == TileVisibility.Discovered)
+                    pixelBuffer[pixelIndex] = fogAlpha;
+                else if (visibility == TileVisibility.Visible)
+                    pixelBuffer[pixelIndex] = 0;
             }
         }
 

@@ -77,7 +77,7 @@ namespace Orion.Graphics
 
             int bytesPerPixel = pixelFormat.GetBytesPerPixel();
             int stride = size.Width * bytesPerPixel;
-            long pointer = (long)dataPointer + region.Min.Y * stride + region.Min.X * bytesPerPixel;
+            long pointer = (long)dataPointer + region.MinY * stride + region.MinX * bytesPerPixel;
             RawPixelSurface rawImage = new RawPixelSurface(region.Size, pixelFormat, (IntPtr)pointer, stride, access);
             accessor(rawImage);
         }

@@ -37,70 +37,56 @@ namespace Orion.GameLogic
         #region Indexers
         public Entity this[Point point]
         {
-            get { return GetEntityAt(point); }
+            get { return grid[point.X, point.Y]; }
+            private set { grid[point.X, point.Y] = value; }
         }
         #endregion
 
         #region Methods
         #region Queries
-        public Entity GetEntityAt(Point point)
-        {
-            return grid[point.X, point.Y];
-        }
-
         public bool IsFree(Point point)
         {
-            return GetEntityAt(point) == null;
+            return this[point] == null;
         }
 
         public bool IsFree(Region region)
         {
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-            {
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                {
-                    Point point = new Point(x, y);
-                    if (!IsFree(point)) return false;
-                }
-            }
-            return true;
+            return region.Points.All(point => IsFree(point));
         }
         #endregion
 
         #region Adding/Removal
+        public void Add(Entity entity, Region region)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+            Debug.Assert(entity.IsSolid, "A non-solid entity is being added to the grid.");
+            Debug.Assert(entity.IsAlive, "A dead entity is being added to the grid.");
+
+            foreach (Point point in region.Points)
+            {
+                Debug.Assert(this[point] == null,
+                    "Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
+                this[point] = entity;
+            }
+        }
+
         public void Add(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            if (!entity.IsSolid)
-            {
-                throw new ArgumentException(
-                    "The entity must be non-solid to be added to the entity grid.",
-                    "entity");
-            }
-
-            Region region = entity.GridRegion;
-
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-            {
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                {
-                    Debug.Assert(grid[x, y] == null, "Overwriting {0}.".FormatInvariant(grid[x, y]));
-                    grid[x, y] = entity;
-                }
-            }
+            Add(entity, entity.GridRegion);
         }
 
         public void Remove(Entity entity, Region region)
         {
             Argument.EnsureNotNull(entity, "entity");
+            Debug.Assert(entity.IsSolid, "A non-solid entity is being removed from the grid.");
 
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+            foreach (Point point in region.Points)
             {
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                {
-                    Debug.Assert(grid[x, y] == entity, "There was no entity to remove.");
-                    grid[x, y] = null;
-                }
+                Debug.Assert(this[point] == entity,
+                    "Cell {0} should have been occupied by {1} but was occupied by {2}."
+                    .FormatInvariant(point, entity, this[point]));
+                this[point] = null;
             }
         }
 

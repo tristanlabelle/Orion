@@ -57,11 +57,7 @@ namespace Orion.GameLogic
 
         private bool IsWalkable(Region region)
         {
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                    if (!IsWalkable(new Point(x, y)))
-                        return false;
-            return true;
+            return region.Points.All(point => IsWalkable(point));
         }
 
         public bool IsWalkableAndWithinBounds(Point point)

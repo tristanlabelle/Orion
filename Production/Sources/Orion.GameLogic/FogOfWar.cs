@@ -26,8 +26,8 @@ namespace Orion.GameLogic
             #region Constructors
             public RoundedCircle(Circle circle)
             {
-                this.centerX = (int)Math.Floor(circle.Center.X);
-                this.centerY = (int)Math.Floor(circle.Center.Y);
+                this.centerX = (int)Math.Round(circle.Center.X);
+                this.centerY = (int)Math.Round(circle.Center.Y);
                 this.radius = (int)Math.Round(circle.Radius);
             }
             #endregion
@@ -288,41 +288,36 @@ namespace Orion.GameLogic
             if (!isEnabled) return;
 
             CircleLookup lookup = GetCircleLookup(lineOfSight);
-            Point min = new Point(Math.Max(lookup.MinX, 0), Math.Max(lookup.MinY, 0));
-            Point exclusiveMax = new Point(
-                Math.Min(lookup.ExclusiveMaxX, Size.Width),
-                Math.Min(lookup.ExclusiveMaxY, Size.Height));
+            Region region = Region.FromMinExclusiveMax(
+                Math.Max(lookup.MinX, 0), Math.Max(lookup.MinY, 0),
+                Math.Min(lookup.ExclusiveMaxX, Size.Width), Math.Min(lookup.ExclusiveMaxY, Size.Height));
 
-            for (int x = min.X; x < exclusiveMax.X; x++)
+            foreach (Point point in region.Points)
             {
-                for (int y = min.Y; y < exclusiveMax.Y; y++)
-                {
-                    if (!lookup.IsSet(x, y)) continue;
+                if (!lookup.IsSet(point.X, point.Y)) continue;
 
-                    if (addOrRemove)
+                if (addOrRemove)
+                {
+                    if (tiles[point.X, point.Y] == ushort.MaxValue)
                     {
-                        if (tiles[x, y] == ushort.MaxValue)
-                        {
-                            tiles[x, y] = 1;
-                        }
-                        else
-                        {
-                            Debug.Assert(tiles[x, y] != ushort.MaxValue - 1,
-                                "Unit reference count overflow.");
-                            tiles[x, y]++;
-                        }
+                        tiles[point.X, point.Y] = 1;
                     }
                     else
                     {
-                        Debug.Assert(tiles[x, y] != ushort.MaxValue && tiles[x, y] != 0,
-                            "Unit reference count underflow.");
-                        tiles[x, y]--;
+                        Debug.Assert(tiles[point.X, point.Y] != ushort.MaxValue - 1,
+                            "Unit reference count overflow.");
+                        tiles[point.X, point.Y]++;
                     }
+                }
+                else
+                {
+                    Debug.Assert(tiles[point.X, point.Y] != ushort.MaxValue && tiles[point.X, point.Y] != 0,
+                        "Unit reference count underflow.");
+                    tiles[point.X, point.Y]--;
                 }
             }
 
-            Region dirtyRectangle = Region.FromMinExclusiveMax(min, exclusiveMax);
-            OnChanged(dirtyRectangle);
+            OnChanged(region);
         }
         #endregion
         #endregion

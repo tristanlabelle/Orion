@@ -7,6 +7,7 @@ using Orion.Commandment.Pipeline;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Skills = Orion.GameLogic.Skills;
+using System.Diagnostics;
 
 namespace Orion.Commandment
 {
@@ -217,17 +218,15 @@ namespace Orion.Commandment
 
                 amountOfHarvesters -= amountOfUnitsAlreadyHarvesting;
 
-
-                //OUT OF RANGE EXCEPTION HERE!!!!!
                 if (potentialHarvesters.Count > 0)
                 {
-                    for (int i = 0; i < amountOfHarvesters; i++)
+                    int harvestersToAdd = Math.Min(amountOfHarvesters, potentialHarvesters.Count);
+                    for (int i = 0; i < harvestersToAdd; i++)
                     {
-                        harvesters.Add(potentialHarvesters.ElementAt(0));
-                        potentialHarvesters.Remove(potentialHarvesters.ElementAt(0));
+                        harvesters.Add(potentialHarvesters[0]);
+                        potentialHarvesters.Remove(potentialHarvesters[0]);
                     }
                 }
-                ///END OUT OF RANGE
 
                 if (harvesters.Count > 0)
                     commands.Add(new Commands.Harvest(Faction.Handle, harvesters.Select(unit => unit.Handle), node.Handle));

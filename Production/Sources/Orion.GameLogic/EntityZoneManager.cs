@@ -74,8 +74,8 @@ namespace Orion.GameLogic
 
             int minX = Math.Max(0, (int)(rectangle.MinX / zoneSize.X));
             int minY = Math.Max(0, (int)(rectangle.MinY / zoneSize.Y));
-            int maxX = Math.Min(ZoneCountX - 1, (int)(rectangle.MaxX / zoneSize.X));
-            int maxY = Math.Min(ZoneCountY - 1, (int)(rectangle.MaxY / zoneSize.Y));
+            int maxX = Math.Min(ZoneCountX - 1, (int)Math.Ceiling(rectangle.MaxX / zoneSize.X));
+            int maxY = Math.Min(ZoneCountY - 1, (int)Math.Ceiling(rectangle.MaxY / zoneSize.Y));
 
             return Region.FromMinInclusiveMax(
                 new Point(minX, minY),
@@ -91,17 +91,14 @@ namespace Orion.GameLogic
         public IEnumerable<Entity> InArea(Rectangle area)
         {
             Region zoneRegion = GetZoneRegion(area);
-            for (int x = zoneRegion.Min.X; x < zoneRegion.ExclusiveMax.X; ++x)
+            foreach (Point point in zoneRegion.Points)
             {
-                for (int y = zoneRegion.Min.Y; y < zoneRegion.ExclusiveMax.Y; ++y)
+                PooledList<Entity> zone = zones[point.X, point.Y];
+                for (int i = 0; i < zone.Count; ++i)
                 {
-                    PooledList<Entity> zone = zones[x, y];
-                    for (int i = 0; i < zone.Count; ++i)
-                    {
-                        Entity entity = zone[i];
-                        if (area.ContainsPoint(entity.Center))
-                            yield return entity;
-                    }
+                    Entity entity = zone[i];
+                    if (area.ContainsPoint(entity.Center))
+                        yield return entity;
                 }
             }
         }
@@ -119,14 +116,8 @@ namespace Orion.GameLogic
 
         private void Add(Entity entity, Region zoneRegion)
         {
-            for (int x = zoneRegion.MinX; x < zoneRegion.ExclusiveMaxX; ++x)
-            {
-                for (int y = zoneRegion.MinY; y < zoneRegion.ExclusiveMaxY; ++y)
-                {
-                    Point point = new Point(x, y);
-                    AddToZone(point, entity);
-                }
-            }
+            foreach (Point point in zoneRegion.Points)
+                AddToZone(point, entity);
         }
 
         private void AddToZone(Point point, Entity entity)
@@ -154,14 +145,8 @@ namespace Orion.GameLogic
 
         private void Remove(Entity entity, Region zoneRegion)
         {
-            for (int x = zoneRegion.MinX; x < zoneRegion.ExclusiveMaxX; ++x)
-            {
-                for (int y = zoneRegion.MinY; y < zoneRegion.ExclusiveMaxY; ++y)
-                {
-                    Point point = new Point(x, y);
-                    RemoveFromZone(point, entity);
-                }
-            }
+            foreach (Point point in zoneRegion.Points)
+                RemoveFromZone(point, entity);
         }
 
         private void RemoveFromZone(Point point, Entity entity)

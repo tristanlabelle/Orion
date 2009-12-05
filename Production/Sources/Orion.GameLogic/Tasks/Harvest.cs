@@ -50,7 +50,6 @@ namespace Orion.GameLogic.Tasks
             node.Died += nodeDepletedEventHandler;
             depot = FindClosestDepot();
         }
-
         #endregion
 
         #region Properties

@@ -164,7 +164,7 @@ namespace Orion.Graphics
                 throw new ArgumentException("Invalid pixel region.");
             Argument.EnsureNotNull(pixelData, "data");
 
-            ValidatePixelBufferSize(pixelData, region.Size.Area, pixelFormat);
+            ValidatePixelBufferSize(pixelData, region.Area, pixelFormat);
 
             int lastID;
             GL.GetInteger(GetPName.Texture2D, out lastID);
@@ -175,7 +175,7 @@ namespace Orion.Graphics
 
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                 GL.TexSubImage2D(TextureTarget.Texture2D, 0,
-                    region.Min.X, region.Min.Y, region.Size.Width, region.Size.Height,
+                    region.MinX, region.MinY, region.Width, region.Height,
                     GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte,
                     pixelData);
             }

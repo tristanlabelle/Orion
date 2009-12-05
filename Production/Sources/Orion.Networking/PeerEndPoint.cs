@@ -89,6 +89,7 @@ namespace Orion.Networking
                     while (stream.Position != stream.Length)
                     {
                         Command deserializedCommand = Command.Deserialize(reader);
+                        Debug.Assert(deserializedCommand.FactionHandle == Faction.Handle, "Faction #{0} attempted mind control".FormatInvariant(deserializedCommand.FactionHandle));
                         commands.Add(deserializedCommand);
                     }
                     return commands;

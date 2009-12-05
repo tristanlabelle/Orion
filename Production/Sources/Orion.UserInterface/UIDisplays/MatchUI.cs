@@ -184,7 +184,7 @@ namespace Orion.UserInterface
             get { return MatchRenderer.WorldRenderer; }
         }
 
-        private UnitsRenderer UnitRenderer
+        private UnitsRenderer UnitsRenderer
         {
             get { return WorldRenderer.UnitRenderer; }
         }
@@ -437,12 +437,11 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(unit);
-            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(UnitRenderer, unit);
+            selectionFrame.Renderer = new UnitFrameRenderer(unit, UnitsRenderer);
+            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(UnitsRenderer, unit);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -460,7 +459,7 @@ namespace Orion.UserInterface
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                UnitButtonRenderer renderer = new UnitButtonRenderer(UnitRenderer, unit);
+                UnitButtonRenderer renderer = new UnitButtonRenderer(UnitsRenderer, unit);
                 renderer.HasFocus = unit.Type == SelectedType;
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
@@ -506,7 +505,7 @@ namespace Orion.UserInterface
             {
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
                 if (selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
-                    actions.Push(new UnitActionProvider(enablers, SelectedType, UnitRenderer));
+                    actions.Push(new UnitActionProvider(enablers, SelectedType, UnitsRenderer));
             }
         }
 

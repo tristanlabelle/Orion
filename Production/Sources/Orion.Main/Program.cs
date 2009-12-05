@@ -217,6 +217,10 @@ namespace Orion.Main
                 program.StartProgram();
                 program.Run();
             }
+
+            Debug.Assert(Orion.Graphics.Texture.AliveCount == 0,
+                "Congratulations! You've leaked {0} textures!"
+                .FormatInvariant(Orion.Graphics.Texture.AliveCount));
         }
         #endregion
         #endregion

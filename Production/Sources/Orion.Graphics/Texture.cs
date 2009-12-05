@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
 using SysImage = System.Drawing.Image;
+using System.Threading;
 
 namespace Orion.Graphics
 {
@@ -53,6 +54,8 @@ namespace Orion.Graphics
                 GL.DeleteTexture(id);
                 throw;
             }
+
+            Interlocked.Increment(ref aliveCount);
         }
 
         internal Texture(Size size, PixelFormat pixelFormat)
@@ -236,6 +239,7 @@ namespace Orion.Graphics
             EnsureNotDisposed();
             GL.DeleteTexture(id);
             id = 0;
+            Interlocked.Decrement(ref aliveCount);
         }
 
         private void EnsureNotDisposed()
@@ -281,6 +285,17 @@ namespace Orion.Graphics
         #endregion
 
         #region Static
+        #region Fields
+        private static int aliveCount;
+        #endregion
+
+        #region Properties
+        public static int AliveCount
+        {
+            get { return aliveCount; }
+        }
+        #endregion
+
         #region Methods
         public static Texture CreateBlank(Size size, PixelFormat pixelFormat, bool smooth, bool repeat)
         {

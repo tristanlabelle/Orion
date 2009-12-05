@@ -19,7 +19,6 @@ namespace Orion.Main
         private const float TimeSpeedMultiplier = 1;
         private const int DefaultHostPort = 41223;
         private const int DefaultClientPort = 41224;
-        private const int MaxSuccessiveUpdates = 5;
 
         private GameUI gameUI;
         private SafeTransporter transporter;

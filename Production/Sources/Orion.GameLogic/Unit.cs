@@ -369,16 +369,9 @@ namespace Orion.GameLogic
             return faction.GetDiplomaticStance(other.faction);
         }
 
-        /// <summary>
-        /// Updates this <see cref="Unit"/> for a frame.
-        /// </summary>
-        /// <param name="info">Information on this update.</param>
-        /// <remarks>
-        /// Used by <see cref="EntityManager"/>.
-        /// </remarks>
-        internal override void Update(UpdateInfo info)
+        protected override void DoUpdate(UpdateInfo info)
         {
-            if (IsIdle && HasSkill<Skills.Attack>())
+            if (!IsUnderConstruction && IsIdle && HasSkill<Skills.Attack>())
             {
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)

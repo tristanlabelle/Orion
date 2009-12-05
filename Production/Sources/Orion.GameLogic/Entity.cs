@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Geometry;
 using OpenTK.Math;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -48,6 +49,7 @@ namespace Orion.GameLogic
 
         protected virtual void RaiseMoved(Vector2 oldPosition, Vector2 newPosition)
         {
+            Debug.Assert(!isDead, "{0} is dead and yet moves.".FormatInvariant(this));
             var handler = Moved;
             if (handler != null) handler(this, oldPosition, newPosition);
         }
@@ -164,12 +166,29 @@ namespace Orion.GameLogic
 
         protected void Die()
         {
-            if (isDead) return;
+            if (isDead)
+            {
+                Debug.Fail("{0} attempted to die twice.".FormatInvariant(this));
+                return;
+            }
+
             isDead = true;
             RaiseDied();
         }
 
-        internal virtual void Update(UpdateInfo info) { }
+        /// <summary>
+        /// Updates this <see cref="Entity"/> for a frame.
+        /// </summary>
+        /// <param name="info">Information on this update.</param>
+        /// <remarks>
+        /// Invoked by <see cref="EntityManager"/>.
+        /// </remarks>
+        internal void Update(UpdateInfo info)
+        {
+            if (IsAlive) DoUpdate(info);
+        }
+
+        protected virtual void DoUpdate(UpdateInfo info) { }
         #endregion
         #endregion
 

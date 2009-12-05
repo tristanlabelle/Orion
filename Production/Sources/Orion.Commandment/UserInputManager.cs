@@ -237,10 +237,10 @@ namespace Orion.Commandment
             Entity intersectedEntity = World.Entities
                 .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
 
-            if (intersectedEntity is Unit)
+            Unit intersectedUnit = intersectedEntity as Unit;
+            if (intersectedUnit != null)
             {
-                // TODO: implement friendliness checks more elaborate than this
-                Unit intersectedUnit = (Unit)intersectedEntity;
+                // TODO: implement better friendliness checks
                 if (intersectedUnit.Faction == commander.Faction)
                 {
                     if (intersectedUnit.HasSkill<Skills.ExtractAlagene>())
@@ -248,9 +248,11 @@ namespace Orion.Commandment
                         ResourceNode alageneNode = World.Entities
                             .OfType<ResourceNode>()
                             .First(node => node.Position == intersectedUnit.Position);
-                        if(alageneNode.IsHarvestableByFaction(this.Faction))
+                        if (alageneNode.IsHarvestableByFaction(this.Faction))
                             LaunchHarvest(alageneNode);
                     }
+                    else if (intersectedUnit.IsBuilding)
+                        LaunchRepair(intersectedUnit);
                     else
                         LaunchMove(intersectedUnit.Position);
                 }

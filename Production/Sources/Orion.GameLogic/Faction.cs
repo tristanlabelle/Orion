@@ -427,6 +427,31 @@ namespace Orion.GameLogic
         #endregion
 
         #region FogOfWar
+        /// <summary>
+        /// Tests if a <see cref="Region"/> of the world is at least partially visible.
+        /// </summary>
+        /// <param name="region">The region to be checked.</param>
+        /// <returns>A value indicating if that region is at least partially visible.</returns>
+        public bool IsVisible(Region region)
+        {
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                    if (GetTileVisibility(new Point(x, y)) == TileVisibility.Visible)
+                        return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Tests if an entity is visible by this <see cref="Faction"/>.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
+        /// <returns>A value indicating if it is visible.</returns>
+        public bool IsVisible(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+            return IsVisible(entity.GridRegion);
+        }
+
         public TileVisibility GetTileVisibility(Point point)
         {
             TileVisibility visibility = localFogOfWar.GetTileVisibility(point);

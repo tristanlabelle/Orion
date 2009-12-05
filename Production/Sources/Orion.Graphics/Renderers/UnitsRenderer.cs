@@ -24,7 +24,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-
         private static Color Interpolate(Color first, Color second, float completion)
         {
             float opposite = 1 - completion;
@@ -33,7 +32,6 @@ namespace Orion.Graphics
                 (int)(first.G * opposite + second.G * completion),
                 (int)(first.B * opposite + second.B * completion));
         }
-
         #endregion
         #endregion
 
@@ -112,8 +110,7 @@ namespace Orion.Graphics
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Center);
-            if (tileVisibility == TileVisibility.Visible)
+            if (faction.IsVisible(unit))
             {
                 string unitTypeName = unit.Type.Name;
                 Texture texture = textureManager.GetTexture(unit.Type.Name);
@@ -140,10 +137,8 @@ namespace Orion.Graphics
             float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
 
-            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
-            {
+            if (faction.IsVisible(unit))
                 DrawHealthBar(context, unit, new Vector2(x, y));
-            }
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit, Vector2 origin)
@@ -151,10 +146,8 @@ namespace Orion.Graphics
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
             float leftHealthWidth = unit.Health * 0.1f;
 
-            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
-            {
+            if (faction.IsVisible(unit))
                 DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
-            }
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit, Rectangle into)
@@ -162,7 +155,7 @@ namespace Orion.Graphics
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+            if (faction.IsVisible(unit))
             {
                 if (unit.Health > unit.MaxHealth / 2)
                 {

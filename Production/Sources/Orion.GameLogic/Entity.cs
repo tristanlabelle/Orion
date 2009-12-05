@@ -126,6 +126,9 @@ namespace Orion.GameLogic
             get { return GetCollisionRectangle(BoundingRectangle); }
         }
 
+        /// <summary>
+        /// Gets the region of the world grid occupied by this <see cref="Entity"/>.
+        /// </summary>
         public Region GridRegion
         {
             get { return GetGridRegion(Position, Size); }

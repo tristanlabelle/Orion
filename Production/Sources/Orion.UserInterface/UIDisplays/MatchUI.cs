@@ -30,6 +30,7 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
+        private readonly Button inactiveSmurfsButton;
         #endregion
 
         #region Pause
@@ -48,7 +49,9 @@ namespace Orion.UserInterface
         private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
         private UnitType selectedType;
-        private  Frame diplomacyFrame;
+        private Frame diplomacyFrame;
+        private Dictionary<Unit, bool> smurfsActivityState = new Dictionary<Unit, bool>();
+        private readonly UnitType smurfType;
         private bool isSpaceDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
         #endregion
@@ -133,7 +136,15 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
           
-            
+
+            smurfType = world.UnitTypes.FromName("Schtroumpf");
+            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.03f, 0.33f), new Vector2(0.075f, 0.385f));
+            Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
+            TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
+            inactiveSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
+            inactiveSmurfsButton.Triggered += InactiveSmurfsButtonTriggered;
+
+            world.Entities.Added += EntityAdded;
         }
         #endregion
 
@@ -232,6 +243,49 @@ namespace Orion.UserInterface
         #endregion
 
         #region Event Handling
+        private void EntityAdded(EntityManager manager, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            if (unit.Type == smurfType)
+            {
+                smurfsActivityState[unit] = true;
+                unit.TaskQueue.Changed += SmurfTaskChanged;
+                unit.Died += SmurfDied;
+            }
+        }
+
+        private void SmurfTaskChanged(TaskQueue queue)
+        {
+            smurfsActivityState[queue.Unit] = queue.IsEmpty;
+        }
+
+        private void SmurfDied(Entity smurfAsEntity)
+        {
+            Unit smurf = (Unit)smurfAsEntity;
+            smurfsActivityState.Remove(smurf);
+        }
+
+        private void InactiveSmurfsButtonTriggered(Button sender)
+        {
+            IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
+            IEnumerable<Unit> smurfs = smurfsActivityState.Keys;
+            if (selectedUnits.Count() == 1)
+            {
+                Unit selectedUnit = selectedUnits.First();
+                if (smurfs.Contains(selectedUnit))
+                {
+                    int nextIndex = (smurfs.IndexOf(selectedUnit) + 1) % smurfs.Count();
+                    userInputManager.SelectionManager.SelectUnit(smurfs.Skip(nextIndex).First());
+                    CenterOnSelection();
+                    return;
+                }
+            }
+            userInputManager.SelectionManager.SelectUnit(smurfs.First());
+            CenterOnSelection();
+        }
+
         protected override bool OnMouseWheel(MouseEventArgs args)
         {
             double scale = 1 - (args.WheelDelta / 600.0);
@@ -325,10 +379,7 @@ namespace Orion.UserInterface
         {
             if (isSpaceDown && SelectedType != null)
             {
-                Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
-                Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
-                halfWorldBoundsSize.Scale(0.5f, 0.5f);
-                worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
+                CenterOnSelection();
             }
             DateTime now = DateTime.UtcNow;
             messagesToDelete.AddRange(messagesExpiration.Where(pair => pair.Value <= now).Select(pair => pair.Key));
@@ -339,8 +390,23 @@ namespace Orion.UserInterface
             }
             messagesToDelete.Clear();
 
+            bool shouldDisplaySmurfButton = smurfsActivityState.Values.Any(value => value == true);
+            if (Children.Contains(inactiveSmurfsButton) && !shouldDisplaySmurfButton)
+                Children.Remove(inactiveSmurfsButton);
+
+            if(!Children.Contains(inactiveSmurfsButton) && shouldDisplaySmurfButton)
+                Children.Add(inactiveSmurfsButton);
+
             match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);
+        }
+
+        private void CenterOnSelection()
+        {
+            Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
+            Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
+            halfWorldBoundsSize.Scale(0.5f, 0.5f);
+            worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
         }
 
         private void Quit(Match sender)

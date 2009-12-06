@@ -33,10 +33,6 @@ namespace Orion.Commandment
 
             this.random = random;
             this.world = world;
-            IsRunning = true;
-
-            CreateFactionCamps();
-            CreateResourceNodes();
 
             world.FactionDefeated += OnFactionDefeated;
         }
@@ -105,6 +101,14 @@ namespace Orion.Commandment
         #endregion
 
         #region Methods
+        public void Start()
+        {
+            IsRunning = true;
+
+            CreateFactionCamps();
+            CreateResourceNodes();
+        }
+
         /// <summary>
         /// Updates this <see cref="Match"/> for the duration of a frame.
         /// </summary>

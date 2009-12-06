@@ -110,6 +110,14 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        public event GenericEventHandler<EntityManager, Entity> Added;
+
+        private void RaiseAdded(Entity entity)
+        {
+            var handler = Added;
+            if (handler != null) handler(this, entity);
+        }
+
         /// <summary>
         /// Raised when an <see cref="Entity"/> gets removed.
         /// </summary>
@@ -303,6 +311,7 @@ namespace Orion.GameLogic
         {
             entities.Add(entity.Handle, entity);
             zoneManager.Add(entity);
+            RaiseAdded(entity);
         }
 
         private void CommitMove(Entity entity, Vector2 oldPosition)

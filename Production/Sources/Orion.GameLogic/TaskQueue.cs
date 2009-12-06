@@ -27,6 +27,16 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Events
+        public event GenericEventHandler<TaskQueue> Changed;
+
+        private void RaiseChanged()
+        {
+            var handler = Changed;
+            if (handler != null) handler(this);
+        }
+        #endregion
+
         #region Properties
         public int Count
         {
@@ -46,6 +56,11 @@ namespace Orion.GameLogic
         public Task Current
         {
             get { return IsEmpty ? null : tasks[0]; }
+        }
+
+        public Unit Unit
+        {
+            get { return unit; }
         }
         #endregion
 
@@ -71,6 +86,7 @@ namespace Orion.GameLogic
             {
                 task.Dispose();
                 if (Current == task) tasks.RemoveAt(0);
+                RaiseChanged();
             }
         }
 
@@ -82,6 +98,7 @@ namespace Orion.GameLogic
             Debug.Assert(!unit.IsUnderConstruction);
             Clear();
             tasks.Add(task);
+            RaiseChanged();
         }
 
         public void Enqueue(Task task)
@@ -92,6 +109,7 @@ namespace Orion.GameLogic
             if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
             Debug.Assert(!unit.IsUnderConstruction);
             tasks.Add(task);
+            RaiseChanged();
         }
 
         public List<Task>.Enumerator GetEnumerator()
@@ -104,6 +122,7 @@ namespace Orion.GameLogic
             foreach (Task task in tasks)
                 task.Dispose();
             tasks.Clear();
+            RaiseChanged();
         }
         #endregion
 

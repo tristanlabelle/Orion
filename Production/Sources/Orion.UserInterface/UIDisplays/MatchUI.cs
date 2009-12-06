@@ -463,6 +463,7 @@ namespace Orion.UserInterface
             int selectionCount = selection.Count();
             if (SelectedType == null && selectionCount > 0) SelectedType = selection.First().Type;
 
+            if (selectionCount == 0) SelectedType = null;
             if (selectionCount == 1) CreateSingleUnitSelectionPanel();
             else CreateMultipleUnitsSelectionPanel();
         }

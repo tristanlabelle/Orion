@@ -42,6 +42,9 @@ namespace Orion.UserInterface
         private bool mouseDownOnMinimap;
         #endregion
 
+        private Dictionary<Unit, bool> smurfsActivityState = new Dictionary<Unit, bool>();
+        private readonly UnitType smurfType;
+
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly SlaveCommander localCommander;
@@ -50,8 +53,6 @@ namespace Orion.UserInterface
         private readonly ActionFrame actions;
         private UnitType selectedType;
         private Frame diplomacyFrame;
-        private Dictionary<Unit, bool> smurfsActivityState = new Dictionary<Unit, bool>();
-        private readonly UnitType smurfType;
         private bool isSpaceDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
         #endregion
@@ -135,10 +136,8 @@ namespace Orion.UserInterface
             enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
-          
-
             smurfType = world.UnitTypes.FromName("Schtroumpf");
-            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.03f, 0.33f), new Vector2(0.075f, 0.385f));
+            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.92f, 0.33f), new Vector2(0.975f, 0.385f));
             Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
             TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
             inactiveSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
@@ -247,6 +246,7 @@ namespace Orion.UserInterface
         {
             Unit unit = entity as Unit;
             if (unit == null) return;
+            if (localCommander.Faction != unit.Faction) return;
 
             if (unit.Type == smurfType)
             {

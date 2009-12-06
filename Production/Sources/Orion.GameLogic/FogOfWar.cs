@@ -330,6 +330,12 @@ namespace Orion.GameLogic
         /// <returns>A flag indicating the visibility state of that tile.</returns>
         public TileVisibility GetTileVisibility(Point point)
         {
+            if (!((Region)Size).Contains(point))
+            {
+                Debug.Fail("Testing out-of-bounds tile visibility.");
+                return TileVisibility.Undiscovered;
+            }
+
             ushort value = tiles[point.X, point.Y];
             if (value == ushort.MaxValue) return TileVisibility.Undiscovered;
             return value == 0 ? TileVisibility.Discovered : TileVisibility.Visible;

@@ -90,8 +90,7 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                TileVisibility tileVisibility = faction.GetTileVisibility((Point)unit.Center);
-                if (tileVisibility == TileVisibility.Visible)
+                if (faction.IsVisible(unit))
                 {
                     context.FillColor = unit.Faction.Color;
                     context.Fill(new Rectangle(unit.Position, (Vector2)minimapUnitSize));

@@ -28,6 +28,9 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when the contents of this task queue has changed.
+        /// </summary>
         public event GenericEventHandler<TaskQueue> Changed;
 
         private void RaiseChanged()
@@ -38,26 +41,41 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the number of <see cref="Task">tasks</see> in this <see cref="TaskQueue"/>.
+        /// </summary>
         public int Count
         {
             get { return tasks.Count; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if this <see cref="TaskQueue"/> contains no <see cref="Task"/>.
+        /// </summary>
         public bool IsEmpty
         {
             get { return tasks.Count == 0; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if this <see cref="TaskQueue"/> is at its maximum capacity.
+        /// </summary>
         public bool IsFull
         {
             get { return tasks.Count >= maxLength; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="Task"/> currently being executed.
+        /// </summary>
         public Task Current
         {
             get { return IsEmpty ? null : tasks[0]; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="Unit"/> to which this <see cref="TaskQueue"/> belongs.
+        /// </summary>
         public Unit Unit
         {
             get { return unit; }
@@ -65,6 +83,11 @@ namespace Orion.GameLogic
         #endregion
 
         #region Indexers
+        /// <summary>
+        /// Gets a <see cref="Task"/> of this <see cref="TaskQueue"/> from its index.
+        /// </summary>
+        /// <param name="index">The index of the <see cref="Task"/> to be found.</param>
+        /// <returns>The <see cref="Task"/> at that index.</returns>
         public Task this[int index]
         {
             get { return tasks[index]; }
@@ -90,6 +113,10 @@ namespace Orion.GameLogic
             }
         }
 
+        /// <summary>
+        /// Clears the task queue of this <see cref="Unit"/> and sets a task as the current one.
+        /// </summary>
+        /// <param name="task">The new task to be set.</param>
         public void OverrideWith(Task task)
         {
             Argument.EnsureNotNull(task, "task");

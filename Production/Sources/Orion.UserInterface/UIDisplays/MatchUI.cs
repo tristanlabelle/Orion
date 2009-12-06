@@ -137,11 +137,11 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
             smurfType = world.UnitTypes.FromName("Schtroumpf");
-            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.92f, 0.33f), new Vector2(0.975f, 0.385f));
+            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.965f, 0.30f), new Vector2(0.995f, 0.34f));
             Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
             TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
             inactiveSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
-            inactiveSmurfsButton.Triggered += InactiveSmurfsButtonTriggered;
+            inactiveSmurfsButton.Triggered += OnInactiveSmurfsButtonTriggered;
 
             world.Entities.Added += EntityAdded;
         }
@@ -251,23 +251,23 @@ namespace Orion.UserInterface
             if (unit.Type == smurfType)
             {
                 smurfsActivityState[unit] = true;
-                unit.TaskQueue.Changed += SmurfTaskChanged;
-                unit.Died += SmurfDied;
+                unit.TaskQueue.Changed += OnSmurfTaskChanged;
+                unit.Died += OnSmurfDied;
             }
         }
 
-        private void SmurfTaskChanged(TaskQueue queue)
+        private void OnSmurfTaskChanged(TaskQueue queue)
         {
             smurfsActivityState[queue.Unit] = queue.IsEmpty;
         }
 
-        private void SmurfDied(Entity smurfAsEntity)
+        private void OnSmurfDied(Entity smurfAsEntity)
         {
             Unit smurf = (Unit)smurfAsEntity;
             smurfsActivityState.Remove(smurf);
         }
 
-        private void InactiveSmurfsButtonTriggered(Button sender)
+        private void OnInactiveSmurfsButtonTriggered(Button sender)
         {
             IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
             IEnumerable<Unit> smurfs = smurfsActivityState.Where(kp => kp.Value).Select(kp => kp.Key);

@@ -53,12 +53,16 @@ namespace Orion
         #endregion
 
         #region Methods
-        public void Update()
+        /// <summary>
+        /// Updates this <see cref="FrameRateCounter"/> for a frame.
+        /// </summary>
+        /// <returns>A value indicating if average and peak times have been updated.</returns>
+        public bool Update()
         {
             if (stopwatch == null)
             {
                 stopwatch = Stopwatch.StartNew();
-                return;
+                return false;
             }
 
             float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
@@ -69,14 +73,15 @@ namespace Orion
             timeAccumulator += timeDelta;
             if (timeDelta > peakTimeDelta) peakTimeDelta = timeDelta;
 
-            if (timeAccumulator >= 1)
-            {
-                averageSecondsPerFrame = timeAccumulator / frameAccumulator;
-                peakSecondsPerFrame = peakTimeDelta;
-                timeAccumulator = 0;
-                frameAccumulator = 0;
-                peakTimeDelta = 0;
-            }
+            if (timeAccumulator < 1) return false;
+            
+            averageSecondsPerFrame = timeAccumulator / frameAccumulator;
+            peakSecondsPerFrame = peakTimeDelta;
+            timeAccumulator = 0;
+            frameAccumulator = 0;
+            peakTimeDelta = 0;
+
+            return true;
         }
 
         private static float SpfToFps(float spf)

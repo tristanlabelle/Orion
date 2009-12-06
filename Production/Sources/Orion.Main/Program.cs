@@ -10,6 +10,8 @@ using System.Diagnostics;
 using Button = Orion.UserInterface.Widgets.Button;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Globalization;
 
 namespace Orion.Main
 {
@@ -24,6 +26,7 @@ namespace Orion.Main
 
         private GameUI gameUI;
         private SafeTransporter transporter;
+        private readonly StringBuilder windowTitleStringBuilder = new StringBuilder();
         #endregion
 
         #region Methods
@@ -176,6 +179,8 @@ namespace Orion.Main
 
             while (gameUI.IsWindowCreated)
             {
+                bool windowTitleNeedsUpdate = false;
+
                 float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                 float actualTimeDelta = newTime - oldTime;
                 if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
@@ -185,7 +190,7 @@ namespace Orion.Main
                 while (timeAccumulator >= TargetSecondsPerFrame)
                 {
                     gameUI.Update(TargetSecondsPerFrame);
-                    updateRateCounter.Update();
+                    windowTitleNeedsUpdate |= updateRateCounter.Update();
 
                     gameTime += TargetSecondsPerFrame;
                     timeAccumulator -= TargetSecondsPerFrame;
@@ -193,13 +198,23 @@ namespace Orion.Main
 
                 Application.DoEvents();
                 gameUI.Refresh();
-                gameUI.WindowTitle = "MS/U avg: {0:F2}, peak: {1:F2}; MS/D avg: {2:F2}, peak: {3:F2}"
-                    .FormatInvariant(updateRateCounter.AverageMillisecondsPerFrame,
-                        updateRateCounter.PeakMillisecondsPerFrame,
-                        drawRateCounter.AverageMillisecondsPerFrame,
-                        drawRateCounter.PeakMillisecondsPerFrame);
-                drawRateCounter.Update();
+                windowTitleNeedsUpdate |= drawRateCounter.Update();
+
+                if (windowTitleNeedsUpdate)
+                    UpdateWindowTitle(updateRateCounter, drawRateCounter);
             }
+        }
+
+        private void UpdateWindowTitle(FrameRateCounter updateRateCounter, FrameRateCounter drawRateCounter)
+        {
+            windowTitleStringBuilder.Remove(0, windowTitleStringBuilder.Length);
+            windowTitleStringBuilder.AppendFormat(CultureInfo.InvariantCulture,
+                "MS/U avg: {0:F2}, peak: {1:F2}; MS/D avg: {2:F2}, peak: {3:F2}",
+                updateRateCounter.AverageMillisecondsPerFrame,
+                updateRateCounter.PeakMillisecondsPerFrame,
+                drawRateCounter.AverageMillisecondsPerFrame,
+                drawRateCounter.PeakMillisecondsPerFrame);
+            gameUI.WindowTitle = windowTitleStringBuilder.ToString();
         }
         #endregion
 

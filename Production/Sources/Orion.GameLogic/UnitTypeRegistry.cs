@@ -96,8 +96,10 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 200,
+                MeleeArmor = 3,
+                RangedArmor = 3,
                 AladdiumCost = 150,
-                AlageneCost = 0
+                AlageneCost = 0,
             };
             builder.Skills.Add(new Skills.Train(type =>
                 type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking", 10));
@@ -112,6 +114,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 40,
+                MeleeArmor = 2,
+                RangedArmor = 1,
                 AladdiumCost = 50,
                 AlageneCost = 0,
                 FoodCost = 2
@@ -129,6 +133,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 40,
+                MeleeArmor = 1,
+                RangedArmor = 2,
                 AladdiumCost = 50,
                 AlageneCost = 25,
                 FoodCost = 2
@@ -146,6 +152,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 6,
                 MaxHealth = 50,
+                MeleeArmor = 3,
+                RangedArmor = 2,
                 AladdiumCost = 100,
                 AlageneCost = 25,
                 FoodCost = 3
@@ -165,6 +173,8 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 300,
+                MeleeArmor = 3,
+                RangedArmor = 3,
                 AladdiumCost = 200,
                 AlageneCost = 75
             };
@@ -181,6 +191,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 7,
                 MaxHealth = 40,
+                MeleeArmor = 1,
+                RangedArmor = 1,
                 AladdiumCost = 75,
                 AlageneCost = 100,
                 FoodCost = 3
@@ -198,6 +210,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 10,
                 MaxHealth = 100,
+                MeleeArmor = 1,
+                RangedArmor = 4,
                 AladdiumCost = 150,
                 AlageneCost = 200,
                 FoodCost = 5
@@ -215,6 +229,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 8,
                 MaxHealth = 75,
+                MeleeArmor = 1,
+                RangedArmor = 1,
                 AladdiumCost = 25,
                 AlageneCost = 50,
                 FoodCost = 2
@@ -233,6 +249,8 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 200,
+                MeleeArmor = 3,
+                RangedArmor = 3,
                 AladdiumCost = 250,
                 AlageneCost = 125
             };
@@ -250,6 +268,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 65,
+                MeleeArmor = 3,
+                RangedArmor = 3,
                 AladdiumCost = 100,
                 AlageneCost = 75,
                 FoodCost = 3
@@ -267,6 +287,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 8,
                 MaxHealth = 80,
+                MeleeArmor = 1,
+                RangedArmor = 1,
                 AladdiumCost = 80,
                 AlageneCost = 40,
                 FoodCost = 3
@@ -283,6 +305,8 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 10,
                 MaxHealth = 150,
+                MeleeArmor = 4,
+                RangedArmor = 4,
                 AladdiumCost = 300,
                 AlageneCost = 200,
                 FoodCost = 8
@@ -302,6 +326,8 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 4,
                 MaxHealth = 200,
+                MeleeArmor = 3,
+                RangedArmor = 3,
                 AladdiumCost = 150,
                 AlageneCost = 50
             };
@@ -316,7 +342,9 @@ namespace Orion.GameLogic
                 Name = "Jean-Marc",
                 Size = new Size(3, 3),
                 SightRange = 10,
-                MaxHealth = 50,
+                MaxHealth = 150,
+                MeleeArmor = 0,
+                RangedArmor = 0,
                 AladdiumCost = 120,
                 AlageneCost = 40
             };
@@ -331,7 +359,9 @@ namespace Orion.GameLogic
                 Name = "AlageneExtractor",
                 Size = new Size(2, 2),
                 SightRange = 4,
-                MaxHealth = 12,
+                MaxHealth = 75,
+                MeleeArmor = 1,
+                RangedArmor = 1,
                 AladdiumCost = 75,
                 AlageneCost = 0
             };
@@ -347,6 +377,8 @@ namespace Orion.GameLogic
                 Size = new Size(2, 2),
                 SightRange = 4,
                 MaxHealth = 80,
+                MeleeArmor = 2,
+                RangedArmor = 3,
                 AladdiumCost = 50,
                 AlageneCost = 0
             };
@@ -363,7 +395,9 @@ namespace Orion.GameLogic
                 Name = "Chuck Norris",
                 Size = new Size(5, 5),
                 SightRange = 10,
-                MaxHealth = 5000
+                MaxHealth = 5000,
+                MeleeArmor = 50,
+                RangedArmor = 50,
             };
             builder.Skills.Add(new Skills.Move(25, true));
             builder.Skills.Add(new Skills.Attack(100, 0, 1));
@@ -377,7 +411,9 @@ namespace Orion.GameLogic
                 Name = "Mr T",
                 Size = new Size(5, 5),
                 SightRange = 20,
-                MaxHealth = 1000
+                MaxHealth = 1000,
+                MeleeArmor = 10,
+                RangedArmor = 10,
             };
             builder.Skills.Add(new Skills.Move(15, true));
             builder.Skills.Add(new Skills.Attack(50, 20, 1));

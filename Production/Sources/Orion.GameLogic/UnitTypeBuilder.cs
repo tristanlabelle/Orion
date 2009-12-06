@@ -19,6 +19,8 @@ namespace Orion.GameLogic
         private int aladdiumCost;
         private int alageneCost;
         private int maxHealth;
+        private int meleeArmor;
+        private int rangedArmor;
         private int sightRange;
         private int foodCost;
         private Size size;
@@ -52,7 +54,7 @@ namespace Orion.GameLogic
             get { return aladdiumCost; }
             set
             {
-                Argument.EnsurePositive(aladdiumCost, "aladdiumCost");
+                Argument.EnsurePositive(value, "AladdiumCost");
                 this.aladdiumCost = value;
             }
         }
@@ -62,7 +64,7 @@ namespace Orion.GameLogic
             get { return alageneCost; }
             set
             {
-                Argument.EnsurePositive(alageneCost, "alageneCost");
+                Argument.EnsurePositive(value, "AlageneCost");
                 this.alageneCost = value;
             }
         }
@@ -72,8 +74,28 @@ namespace Orion.GameLogic
             get { return maxHealth; }
             set
             {
-                Argument.EnsureStrictlyPositive(maxHealth, "maxHealth");
+                Argument.EnsureStrictlyPositive(value, "MaxHealth");
                 this.maxHealth = value;
+            }
+        }
+
+        public int MeleeArmor
+        {
+            get { return meleeArmor; }
+            set
+            {
+                Argument.EnsurePositive(value, "MeleeArmor");
+                this.meleeArmor = value;
+            }
+        }
+
+        public int RangedArmor
+        {
+            get { return rangedArmor; }
+            set
+            {
+                Argument.EnsurePositive(value, "RangedArmor");
+                this.rangedArmor = value;
             }
         }
 
@@ -82,7 +104,7 @@ namespace Orion.GameLogic
             get { return sightRange; }
             set
             {
-                Argument.EnsureStrictlyPositive(sightRange, "sightRange");
+                Argument.EnsureStrictlyPositive(value, "SightRange");
                 this.sightRange = value;
             }
         }
@@ -103,7 +125,7 @@ namespace Orion.GameLogic
             get { return foodCost; }
             set 
             {
-                Argument.EnsureStrictlyPositive(value, "foodCost");
+                Argument.EnsureStrictlyPositive(value, "FoodCost");
                 this.foodCost = value;
             }
         }
@@ -120,6 +142,8 @@ namespace Orion.GameLogic
             aladdiumCost = 0;
             alageneCost = 0;
             maxHealth = 1;
+            meleeArmor = 0;
+            rangedArmor = 0;
             sightRange = 1;
             foodCost = 0;
             size = new Size(1, 1);

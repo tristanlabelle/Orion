@@ -26,8 +26,10 @@ namespace Orion.GameLogic
 
         private readonly int aladdiumCost;
         private readonly int alageneCost;
-        private readonly int maxHealth = 10;
-        private readonly int sightRange = 10;
+        private readonly int maxHealth;
+        private readonly int meleeArmor;
+        private readonly int rangedArmor;
+        private readonly int sightRange;
         private readonly int foodCost;
         #endregion
 
@@ -46,6 +48,8 @@ namespace Orion.GameLogic
             this.maxHealth = builder.MaxHealth;
             this.sightRange = builder.SightRange;
             this.foodCost = builder.FoodCost;
+            this.meleeArmor = builder.MeleeArmor;
+            this.rangedArmor = builder.RangedArmor;
 
             var attackSkill = GetSkill<Skills.Attack>();
             Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
@@ -134,10 +138,15 @@ namespace Orion.GameLogic
 
         public int GetBaseStat(UnitStat stat)
         {
-            if (stat == UnitStat.AladdiumCost) return aladdiumCost;
-            if (stat == UnitStat.AlageneCost) return alageneCost;
-            if (stat == UnitStat.MaxHealth) return maxHealth;
-            if (stat == UnitStat.SightRange) return sightRange;
+            switch (stat)
+            {
+                case UnitStat.AladdiumCost: return aladdiumCost;
+                case UnitStat.AlageneCost: return alageneCost;
+                case UnitStat.MaxHealth: return maxHealth;
+                case UnitStat.SightRange: return sightRange;
+                case UnitStat.MeleeArmor: return meleeArmor;
+                case UnitStat.RangedArmor: return rangedArmor;
+            }
 
             for (int i = 0; i < skills.Count; ++i)
             {

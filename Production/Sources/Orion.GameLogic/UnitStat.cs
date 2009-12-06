@@ -17,6 +17,8 @@ namespace Orion.GameLogic
         ExtractingSpeed,
         MaxCarryingAmount,
         MaxHealth,
+        MeleeArmor,
+        RangedArmor,
         MovementSpeed,
         SightRange,
         TrainingSpeed,

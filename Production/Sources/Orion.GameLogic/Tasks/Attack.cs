@@ -68,7 +68,11 @@ namespace Orion.GameLogic.Tasks
                 Unit.LookAt(target.Center);
                 if (info.TimeInSeconds - Unit.LastHitTime > hitDelayInSeconds)
                 {
-                    target.Damage += Unit.GetStat(UnitStat.AttackPower);
+                    int targetArmor = Unit.GetStat(UnitStat.AttackRange) == 1 ?
+                        target.GetStat(UnitStat.MeleeArmor) : target.GetStat(UnitStat.RangedArmor);
+                    int damage = Unit.GetStat(UnitStat.AttackPower) - targetArmor;
+                    if(damage < 1) damage = 1;
+                    target.Damage += damage;
                     Unit.LastHitTime = info.TimeInSeconds;
                 }
             }

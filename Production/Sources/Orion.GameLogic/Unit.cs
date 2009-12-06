@@ -15,6 +15,12 @@ namespace Orion.GameLogic
     public sealed class Unit : Entity
     {
         #region Fields
+        /// <summary>
+        /// The number of frames between successive checks for nearby enemies.
+        /// Used as an optimization.
+        /// </summary>
+        private const int nearbyEnemyCheckPeriod = 8;
+
         private readonly UnitType type;
         private readonly Faction faction;
         private readonly TaskQueue taskQueue;
@@ -371,7 +377,11 @@ namespace Orion.GameLogic
 
         protected override void DoUpdate(UpdateInfo info)
         {
-            if (!IsUnderConstruction && IsIdle && HasSkill<Skills.Attack>())
+            // OPTIM: As checking for nearby units takes a lot of processor time,
+            // we only do it once every few frames. We take our handle value
+            // so the units do not make their checks all at once.
+            if ((info.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
+                && !IsUnderConstruction && IsIdle && HasSkill<Skills.Attack>())
             {
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)

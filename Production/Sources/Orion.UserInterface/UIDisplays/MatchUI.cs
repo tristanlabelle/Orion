@@ -66,7 +66,7 @@ namespace Orion.UserInterface
             this.match = match;
             this.localCommander = localCommander;
             match.Quitting += Quit;
-            textureManager  = new TextureManager(@"../../../Assets");
+            textureManager = new TextureManager();
             userInputManager = new UserInputManager(localCommander);
             World world = match.World;
 

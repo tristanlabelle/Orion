@@ -14,8 +14,9 @@ namespace Orion.UserInterface.Actions
         public CancelButton(ActionFrame frame, UserInputManager manager, TextureManager textureManager)
             : base(frame, manager, "Cancel", Keys.Escape,textureManager)
         {
-            Renderer = new TexturedFrameRenderer (textureManager.GetTexture("Cancel"));
-          }
+            Texture texture = textureManager.GetAction("Cancel");
+            base.Renderer = new TexturedFrameRenderer(texture);
+        }
 
         protected override void OnPress()
         {

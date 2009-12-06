@@ -25,21 +25,18 @@ namespace Orion.Graphics
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="TextureManager"/> from the path of the
-        /// directory containing the textures.
+        /// Initializes a new <see cref="TextureManager"/>.
         /// </summary>
-        /// <param name="directoryPath">The path of the directory containing the textures.</param>
-        public TextureManager(string directoryPath)
+        public TextureManager()
         {
-            Argument.EnsureNotNull(directoryPath, "directoryPath");
-            directory = new DirectoryInfo(directoryPath);
+            directory = new DirectoryInfo(@"../../../Assets/Textures");
             Debug.Assert(directory.Exists, "The textures directory {0} does not exist.");
-            defaulTexture =  GetTexture("Default") ;
+            defaulTexture = Get("Default") ;
         }
         #endregion
 
         #region Methods
-        public Texture GetTexture(string name)
+        public Texture Get(string name)
         {
             Argument.EnsureNotNull(name, "name");
 
@@ -69,6 +66,21 @@ namespace Orion.Graphics
             }
         }
 
+        public Texture GetUnit(string unitTypeName)
+        {
+            return Get(Path.Combine("Units", unitTypeName));
+        }
+
+        public Texture GetAction(string actionName)
+        {
+            return Get(Path.Combine("Actions", actionName));
+        }
+
+        public Texture GetTechnology(string technologyName)
+        {
+            return Get(Path.Combine("Technologies", technologyName));
+        }
+
         public void Dispose()
         {
             foreach (Texture texture in textures.Values)
@@ -80,7 +92,7 @@ namespace Orion.Graphics
         {
             FileInfo[] candidateFiles = directory.GetFiles(name + ".*", SearchOption.TopDirectoryOnly);
             if (candidateFiles.Length == 0) return null;
-            if (candidateFiles.Length > 1) Debug.Fail("Multiple textures named '{0}' found.".FormatInvariant(name));
+            if (candidateFiles.Length > 1) Debug.Fail("Multiple textures found for '{0}'.".FormatInvariant(name));
             return candidateFiles[0].FullName;
         }
         #endregion

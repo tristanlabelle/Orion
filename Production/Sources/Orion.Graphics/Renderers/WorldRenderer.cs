@@ -100,7 +100,7 @@ namespace Orion.Graphics
             foreach (ResourceNode node in resourceNodes)
             {
                 string resourceTypeName = node.Type.ToStringInvariant();
-                Texture texture = textureManager.GetTexture(resourceTypeName);
+                Texture texture = textureManager.Get(resourceTypeName);
                 graphics.Fill(node.BoundingRectangle, texture);
             }
         }

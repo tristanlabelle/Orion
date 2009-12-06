@@ -72,7 +72,7 @@
     <Compile Include="Actions\Enablers\TrainEnabler.cs" />
     <Compile Include="Actions\GenericActionButton.cs" />
     <Compile Include="Actions\IActionProvider.cs" />
-    <Compile Include="Actions\ImmediateActionButton.cs" />
+    <Compile Include="Actions\TrainActionButton.cs" />
     <Compile Include="Actions\UnitActionProvider.cs" />
     <Compile Include="CustomGLControl.cs">
       <SubType>UserControl</SubType>

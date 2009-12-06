@@ -21,7 +21,9 @@ namespace Orion.UserInterface.Actions
             : base(frame, manager, name, hotkey,textureManager)
         {
             command = provokedCommand;
-            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(name));
+
+            Texture texture = textureManager.GetAction(name);
+            base.Renderer = new TexturedFrameRenderer(texture);
         }
         #endregion
 

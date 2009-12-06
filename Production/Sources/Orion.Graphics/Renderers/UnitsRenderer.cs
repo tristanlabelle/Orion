@@ -67,14 +67,14 @@ namespace Orion.Graphics
 
         private Texture UnderConstructionTexture
         {
-            get { return textureManager.GetTexture("UnderConstruction"); }
+            get { return textureManager.Get("UnderConstruction"); }
         }
         #endregion
 
         #region Methods
         public Texture GetTypeTexture(UnitType type)
         {
-            return textureManager.GetTexture(type.Name) ;
+            return textureManager.GetUnit(type.Name);
         }
 
         public void Draw(GraphicsContext graphics)
@@ -124,7 +124,7 @@ namespace Orion.Graphics
         {
             if (faction.IsVisible(unit))
             {
-                Texture texture = textureManager.GetTexture(unit.Type.Name);
+                Texture texture = GetTypeTexture(unit.Type);
                 Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
 
                 float drawingAngle = GetUnitDrawingAngle(unit);
@@ -141,7 +141,7 @@ namespace Orion.Graphics
         {
             if (faction.IsVisible(unit))
             {
-                Texture texture = textureManager.GetTexture(unit.Type.Name);
+                Texture texture = GetTypeTexture(unit.Type);
 
                 float drawingAngle = GetUnitDrawingAngle(unit);
                 using (graphics.Transform(unit.Center, drawingAngle))

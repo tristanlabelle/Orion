@@ -21,7 +21,9 @@ namespace Orion.UserInterface.Actions
             int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
             int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
             Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
-            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(buildingType.Name));
+
+            Texture texture = textureManager.GetUnit(buildingType.Name);
+            base.Renderer = new TexturedFrameRenderer(texture);
         }
         #endregion
 

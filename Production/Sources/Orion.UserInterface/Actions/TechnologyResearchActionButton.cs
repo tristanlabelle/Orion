@@ -21,7 +21,9 @@ namespace Orion.UserInterface.Actions
             int aladdium = technology.Requirements.AladdiumCost;
             int alagene = technology.Requirements.AlageneCost;
             Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(technology.Name, aladdium, alagene);
-            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(technology.Name));
+
+            Texture texture = textureManager.GetTechnology(technology.Name);
+            base.Renderer = new TexturedFrameRenderer(texture);
         }
         #endregion
 

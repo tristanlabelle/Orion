@@ -38,7 +38,9 @@ namespace Orion.UserInterface.Actions
             }
 
             buildingButtons[3, 0] = new CancelButton(frame, manager, textureManager);
-            Renderer = new TexturedFrameRenderer(textureManager.GetTexture("Build"));
+
+            Texture texture = textureManager.GetAction("Build");
+            base.Renderer = new TexturedFrameRenderer(texture);
         }
         #endregion
 

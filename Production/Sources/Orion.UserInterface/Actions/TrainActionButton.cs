@@ -11,22 +11,24 @@ using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface.Actions
 {
-    public class ImmediateActionButton : ActionButton
+    public class TrainActionButton : ActionButton
     {
         #region Fields
         private ImmediateUserCommand command;
         #endregion
 
         #region Constructors
-        public ImmediateActionButton(ActionFrame frame, UserInputManager manager,
+        public TrainActionButton(ActionFrame frame, UserInputManager manager,
             string name, Keys hotkey, ImmediateUserCommand command, TextureManager textureManager)
             : base(frame, manager, name, hotkey, textureManager)
         {
             this.command = command;
-            base.Renderer = new TexturedFrameRenderer(textureManager.GetTexture(name));
+
+            Texture texture = textureManager.GetUnit(name);
+            base.Renderer = new TexturedFrameRenderer(texture);
         }
 
-        public ImmediateActionButton(ActionFrame frame, UserInputManager manager,
+        public TrainActionButton(ActionFrame frame, UserInputManager manager,
             Keys hotkey, ImmediateUserCommand command, TextureManager textureManager)
             : this(frame, manager, "", hotkey, command, textureManager)
         { }

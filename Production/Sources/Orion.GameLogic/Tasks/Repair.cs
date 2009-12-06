@@ -79,6 +79,7 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
+            Unit.LookAt(target.Center);
             if (target.IsUnderConstruction) UpdateBuild(info);
             else UpdateRepair(info);
         }

@@ -270,7 +270,7 @@ namespace Orion.UserInterface
         private void InactiveSmurfsButtonTriggered(Button sender)
         {
             IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-            IEnumerable<Unit> smurfs = smurfsActivityState.Keys;
+            IEnumerable<Unit> smurfs = smurfsActivityState.Where(kp => kp.Value).Select(kp => kp.Key);
             if (selectedUnits.Count() == 1)
             {
                 Unit selectedUnit = selectedUnits.First();

@@ -116,7 +116,15 @@ namespace Orion.GameLogic
         #region Methods
         public TSkill GetSkill<TSkill>() where TSkill : Skill
         {
-            return skills.OfType<TSkill>().FirstOrDefault();
+            // OPTIM: There was a linq query here, but as this method is called quite often
+            // and had processor overhead, a for loop is preferred.
+            for (int i = 0; i < skills.Count; ++i)
+            {
+                TSkill skill = skills[i] as TSkill;
+                if (skill != null) return skill;
+            }
+
+            return null;
         }
 
         public bool HasSkill<TSkill>() where TSkill : Skill

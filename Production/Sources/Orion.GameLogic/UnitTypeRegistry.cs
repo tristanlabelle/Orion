@@ -282,13 +282,13 @@ namespace Orion.GameLogic
                 Name = "Flying Spaghetti Monster",
                 Size = new Size(3, 3),
                 SightRange = 10,
-                MaxHealth = 250,
+                MaxHealth = 150,
                 AladdiumCost = 300,
                 AlageneCost = 200,
-                FoodCost = 5
+                FoodCost = 8
             };
             builder.Skills.Add(new Skills.Move(2, true));
-            builder.Skills.Add(new Skills.Attack(30, 3, 4));
+            builder.Skills.Add(new Skills.Attack(20, 3, 6));
             Register(builder);
         }
         #endregion

@@ -8,6 +8,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 
 namespace Orion.Graphics
 {
@@ -15,7 +16,8 @@ namespace Orion.Graphics
     {
         #region Fields
         private static readonly UnitStat[] statsToDisplay = new[]
-            { UnitStat.AttackPower, UnitStat.AttackRange, UnitStat.MovementSpeed, UnitStat.SightRange };
+            { UnitStat.AttackPower, UnitStat.AttackRange, UnitStat.MeleeArmor, UnitStat.RangedArmor, UnitStat.MovementSpeed, UnitStat.SightRange };
+        private static readonly Font statsFont = new Font("Consolas", 12);
 
         private readonly Unit unit;
         private readonly UnitsRenderer unitsRenderer;
@@ -75,6 +77,7 @@ namespace Orion.Graphics
                 }
             }
 
+            context.Font = statsFont;
             const float textLineDistance = 25;
             const float firstLineY = 160;
 

@@ -33,7 +33,7 @@ namespace Orion.Graphics
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
         private StrokeStyle strokeStyle = StrokeStyle.Solid;
-        private Font font = new Font("Consolas", 12);
+        private Font font = new Font("Consolas", 14);
         private bool readyForDrawing;
         #endregion
 
@@ -324,7 +324,7 @@ namespace Orion.Graphics
         /// <param name="position">The position at which to print the string</param>
         public void Draw(string text, Vector2 position)
         {
-            Draw(new Text(text), position);
+            Draw(new Text(text, font), position);
         }
 
         public void Draw(Text text)

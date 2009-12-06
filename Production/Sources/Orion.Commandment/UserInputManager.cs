@@ -145,16 +145,16 @@ namespace Orion.Commandment
                 .OrderBy(unit => (unit.Center - selectionStart.Value).LengthSquared)
                 .ToList();
 
-            // Filter out buildings
-            bool containsNonBuildingUnits = selectedUnits.Any(unit => !unit.Type.IsBuilding);
-            if (containsNonBuildingUnits) selectedUnits.RemoveAll(unit => unit.Type.IsBuilding);
-
             // Filter out factions
             bool containsUnitsFromThisFaction = selectedUnits.Any(unit => unit.Faction == faction);
             if (containsUnitsFromThisFaction)
                 selectedUnits.RemoveAll(unit => unit.Faction != faction);
             else if (selectedUnits.Count > 1)
                 selectedUnits.RemoveRange(1, selectedUnits.Count - 1);
+
+            // Filter out buildings
+            bool containsNonBuildingUnits = selectedUnits.Any(unit => !unit.Type.IsBuilding);
+            if (containsNonBuildingUnits) selectedUnits.RemoveAll(unit => unit.Type.IsBuilding);
 
             if (shiftKeyPressed) selectionManager.AppendToSelection(selectedUnits);
             else selectionManager.SelectUnits(selectedUnits);

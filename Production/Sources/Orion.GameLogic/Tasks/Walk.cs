@@ -19,12 +19,14 @@ namespace Orion.GameLogic.Tasks
     public sealed class Walk : Move
     {
         #region Fields
-        private const int maxAttemptCount = 8;
+        private const int maxAttemptCount = 20;
+        private const float timeBeforeRepathfinding = 0.5f;
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
         private bool isOnPath;
         private PathWalker pathWalker;
         private int attemptCount = 1;
+        private float timeSinceLastPathfinding;
         #endregion
 
         #region Constructors
@@ -69,7 +71,7 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return pathWalker == null || pathWalker.HasReachedDestination; }
+            get { return pathWalker == null ? attemptCount >= maxAttemptCount : pathWalker.HasReachedDestination; }
         }
 
         public override string Description
@@ -81,6 +83,10 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(UpdateInfo info)
         {
+            timeSinceLastPathfinding += info.TimeDeltaInSeconds;
+
+            if (pathWalker == null && !TryRepath()) return;
+
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * info.TimeDeltaInSeconds;
 
             Vector2 targetPosition;
@@ -116,16 +122,8 @@ namespace Orion.GameLogic.Tasks
             else
             {
                 // An obstacle is blocking us
-                if (attemptCount >= maxAttemptCount)
-                {
-                    pathWalker = null;
-                }
-                else
-                {
-                    pathWalker = GetPathWalker();
-                    isOnPath = false;
-                    ++attemptCount;
-                }
+                pathWalker = null;
+                TryRepath();
             }
         }
 
@@ -143,7 +141,22 @@ namespace Orion.GameLogic.Tasks
         private PathWalker GetPathWalker()
         {
             Path path = Unit.Faction.FindPath(Unit.GridRegion.Min, destinationDistanceEvaluator);
+            if (path.Source == path.Destination) return null;
             return new PathWalker(path);
+        }
+
+        private bool TryRepath()
+        {
+            if (timeSinceLastPathfinding < timeBeforeRepathfinding) return false;
+
+            pathWalker = GetPathWalker();
+            timeSinceLastPathfinding = 0;
+            ++attemptCount;
+            if (pathWalker == null) return false;
+
+            isOnPath = false;
+
+            return true;
         }
         #endregion
     }

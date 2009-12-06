@@ -401,14 +401,6 @@ namespace Orion.UserInterface
             base.OnUpdate(args);
         }
 
-        private void CenterOnSelection()
-        {
-            Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
-            Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
-            halfWorldBoundsSize.Scale(0.5f, 0.5f);
-            worldView.Bounds = worldView.Bounds.TranslatedTo(unitToFollow.Position - halfWorldBoundsSize);
-        }
-
         private void Quit(Match sender)
         {
             Parent.PopDisplay(this);
@@ -497,6 +489,19 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
+        public void CenterOn(Vector2 position)
+        {
+            Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
+            halfWorldBoundsSize.Scale(0.5f, 0.5f);
+            worldView.Bounds = worldView.Bounds.TranslatedTo(position - halfWorldBoundsSize);
+        }
+
+        private void CenterOnSelection()
+        {
+            Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
+            CenterOn(unitToFollow.Position);
+        }
+
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();

@@ -1,8 +1,10 @@
 using System;
 using System.Net;
+using System.Linq;
 using System.Windows.Forms;
 using Orion.Commandment;
 using Orion.Networking;
+using Orion.GameLogic;
 using Orion.UserInterface;
 using System.Diagnostics;
 using Button = Orion.UserInterface.Widgets.Button;
@@ -152,6 +154,10 @@ namespace Orion.Main
 
             gameUI.Display(matchUI);
             match.Start();
+
+            Unit pyramid = localCommander.Faction.Units
+                .First(unit => unit.Type == match.World.UnitTypes.FromName("Pyramide"));
+            matchUI.CenterOn(pyramid.Center);
         }
 
         private void Run()

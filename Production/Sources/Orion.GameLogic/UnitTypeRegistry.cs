@@ -79,7 +79,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new Skills.Move(10, false));
+            builder.Skills.Add(new Skills.Move(8, false));
             builder.Skills.Add(new Skills.Attack(1, 0, 5));
             builder.Skills.Add(new Skills.Harvest(1, 10));
             builder.Skills.Add(new Skills.Build(type => type.IsBuilding, 20));
@@ -111,12 +111,12 @@ namespace Orion.GameLogic
                 Name = "Pirate",
                 Size = new Size(1, 1),
                 SightRange = 6,
-                MaxHealth = 45,
+                MaxHealth = 40,
                 AladdiumCost = 50,
                 AlageneCost = 0,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.Move(12, false));
+            builder.Skills.Add(new Skills.Move(8, false));
             builder.Skills.Add(new Skills.Attack(3, 0, 3));
             Register(builder);
         }
@@ -128,12 +128,12 @@ namespace Orion.GameLogic
                 Name = "Ninja",
                 Size = new Size(1, 1),
                 SightRange = 8,
-                MaxHealth = 30,
+                MaxHealth = 40,
                 AladdiumCost = 50,
                 AlageneCost = 25,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.Move(16, false));
+            builder.Skills.Add(new Skills.Move(10, false));
             builder.Skills.Add(new Skills.Attack(2, 5, 2));
             Register(builder);
         }
@@ -145,13 +145,13 @@ namespace Orion.GameLogic
                 Name = "Viking",
                 Size = new Size(1, 1),
                 SightRange = 6,
-                MaxHealth = 75,
+                MaxHealth = 50,
                 AladdiumCost = 100,
                 AlageneCost = 25,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.Move(10, false));
-            builder.Skills.Add(new Skills.Attack(8, 0, 5));
+            builder.Skills.Add(new Skills.Move(6, false));
+            builder.Skills.Add(new Skills.Attack(6, 0, 5));
             Register(builder);
         }
         #endregion
@@ -164,7 +164,7 @@ namespace Orion.GameLogic
                 Name = "Portail Démoniaque",
                 Size = new Size(3, 3),
                 SightRange = 8,
-                MaxHealth = 250,
+                MaxHealth = 300,
                 AladdiumCost = 200,
                 AlageneCost = 75
             };
@@ -180,13 +180,13 @@ namespace Orion.GameLogic
                 Name = "Grippe A(H1N1)",
                 Size = new Size(2, 2),
                 SightRange = 7,
-                MaxHealth = 35,
+                MaxHealth = 40,
                 AladdiumCost = 75,
                 AlageneCost = 100,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.Move(18, true));
-            builder.Skills.Add(new Skills.Attack(1, 7, 1));
+            builder.Skills.Add(new Skills.Move(15, true));
+            builder.Skills.Add(new Skills.Attack(1, 7, 2));
             Register(builder);
         }
 
@@ -197,13 +197,13 @@ namespace Orion.GameLogic
                 Name = "OVNI",
                 Size = new Size(2, 2),
                 SightRange = 10,
-                MaxHealth = 80,
+                MaxHealth = 100,
                 AladdiumCost = 150,
                 AlageneCost = 200,
                 FoodCost = 5
             };
             builder.Skills.Add(new Skills.Move(8, true));
-            builder.Skills.Add(new Skills.Attack(18, 10, 8));
+            builder.Skills.Add(new Skills.Attack(10, 8, 8));
             Register(builder);
         }
 
@@ -214,7 +214,7 @@ namespace Orion.GameLogic
                 Name = "Tapis Volant",
                 Size = new Size(2, 2),
                 SightRange = 8,
-                MaxHealth = 45,
+                MaxHealth = 75,
                 AladdiumCost = 25,
                 AlageneCost = 50,
                 FoodCost = 2
@@ -249,13 +249,13 @@ namespace Orion.GameLogic
                 Name = "Jedihad",
                 Size = new Size(1, 1),
                 SightRange = 8,
-                MaxHealth = 50,
-                AladdiumCost = 50,
+                MaxHealth = 65,
+                AladdiumCost = 100,
                 AlageneCost = 75,
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(14, false));
-            builder.Skills.Add(new Skills.Attack(8, 8, 3));
+            builder.Skills.Add(new Skills.Attack(6, 8, 3));
             Register(builder);
         }
 
@@ -288,7 +288,7 @@ namespace Orion.GameLogic
                 FoodCost = 8
             };
             builder.Skills.Add(new Skills.Move(2, true));
-            builder.Skills.Add(new Skills.Attack(20, 3, 6));
+            builder.Skills.Add(new Skills.Attack(15, 3, 5));
             Register(builder);
         }
         #endregion

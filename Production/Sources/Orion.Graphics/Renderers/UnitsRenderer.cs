@@ -21,6 +21,9 @@ namespace Orion.Graphics
         private static readonly Color middleLifeColor = Color.Yellow;
         private static readonly Color fullLifeColor = Color.ForestGreen;
         private static readonly Size minimapUnitSize = new Size(3, 3);
+        private const float shadowAlpha = 0.3f;
+        private const float shadowDistance = 0.7f;
+        private const float shadowScaling = 0.6f;
         #endregion
 
         #region Methods
@@ -100,24 +103,48 @@ namespace Orion.Graphics
 
         private void DrawUnits(GraphicsContext graphics)
         {
-            var units = world.Entities.OfType<Unit>();
-            foreach (Unit unit in units.Where(unit => !unit.IsAirborne))
-                DrawUnit(graphics, unit);
-            foreach (Unit unit in units.Where(unit => unit.IsAirborne))
-                DrawUnit(graphics, unit);
+            DrawGroundUnits(graphics);
+            DrawAirborneUnits(graphics);
+        }
+
+        private void DrawGroundUnits(GraphicsContext graphics)
+        {
+            var units = world.Entities.OfType<Unit>().Where(unit => !unit.IsAirborne);
+            foreach (Unit unit in units) DrawUnit(graphics, unit);
+        }
+
+        private void DrawAirborneUnits(GraphicsContext graphics)
+        {
+            var units = world.Entities.OfType<Unit>().Where(unit => unit.IsAirborne);
+            foreach (Unit unit in units) DrawUnitShadow(graphics, unit);
+            foreach (Unit unit in units) DrawUnit(graphics, unit);
+        }
+
+        private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
+        {
+            if (faction.IsVisible(unit))
+            {
+                Texture texture = textureManager.GetTexture(unit.Type.Name);
+                Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
+
+                float drawingAngle = GetUnitDrawingAngle(unit);
+                Vector2 shadowCenter = unit.Center - new Vector2(shadowDistance, shadowDistance);
+                using (graphics.Transform(shadowCenter, drawingAngle, shadowScaling))
+                {
+                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                    graphics.Fill(localRectangle, texture, tint);
+                }
+            }
         }
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
             if (faction.IsVisible(unit))
             {
-                string unitTypeName = unit.Type.Name;
                 Texture texture = textureManager.GetTexture(unit.Type.Name);
 
-                // Workaround the fact that our unit textures face up,
-                // and building textures are not supposed to be rotated.
-                float drawingAngle = unit.IsBuilding ? 0 : unit.Angle - (float)Math.PI * 0.5f;
-                using (graphics.Transform(new Transform(unit.Center, drawingAngle)))
+                float drawingAngle = GetUnitDrawingAngle(unit);
+                using (graphics.Transform(unit.Center, drawingAngle))
                 {
                     Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                     graphics.Fill(localRectangle, texture, unit.Faction.Color);
@@ -127,6 +154,13 @@ namespace Orion.Graphics
 
                 if (DrawHealthBars) DrawHealthBar(graphics, unit);
             }
+        }
+
+        private static float GetUnitDrawingAngle(Unit unit)
+        {
+            // Workaround the fact that our unit textures face up,
+            // and building textures are not supposed to be rotated.
+            return unit.IsBuilding ? 0 : unit.Angle - (float)Math.PI * 0.5f;
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit)

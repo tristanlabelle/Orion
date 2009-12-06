@@ -142,6 +142,22 @@ namespace Orion.Graphics
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
             return new TransformHandle();
         }
+
+        public TransformHandle Transform(Vector2 translation, float rotation, Vector2 scaling)
+        {
+            Transform transform = new Transform(translation, rotation, scaling);
+            return Transform(transform);
+        }
+
+        public TransformHandle Transform(Vector2 translation, float rotation)
+        {
+            return Transform(translation, rotation, new Vector2(1, 1));
+        }
+
+        public TransformHandle Transform(Vector2 translation, float rotation, float scaling)
+        {
+            return Transform(translation, rotation, new Vector2(scaling, scaling));
+        }
         #endregion
 
         #region Drawing

@@ -58,6 +58,8 @@ namespace Orion.GameLogic
                 Size = new Size(3, 3),
                 SightRange = 8,
                 MaxHealth = 400,
+                MeleeArmor = 4,
+                RangedArmor = 4,
                 AladdiumCost = 250,
                 AlageneCost = 0
             };
@@ -75,6 +77,8 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 5,
                 MaxHealth = 15,
+                MeleeArmor = 0,
+                RangedArmor = 2,
                 AladdiumCost = 50,
                 AlageneCost = 0,
                 FoodCost = 1
@@ -121,7 +125,7 @@ namespace Orion.GameLogic
                 FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(8, false));
-            builder.Skills.Add(new Skills.Attack(3, 0, 3));
+            builder.Skills.Add(new Skills.Attack(5, 0, 3));
             Register(builder);
         }
 
@@ -140,7 +144,7 @@ namespace Orion.GameLogic
                 FoodCost = 2
             };
             builder.Skills.Add(new Skills.Move(10, false));
-            builder.Skills.Add(new Skills.Attack(2, 5, 2));
+            builder.Skills.Add(new Skills.Attack(4, 5, 2));
             Register(builder);
         }
 
@@ -159,7 +163,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(6, false));
-            builder.Skills.Add(new Skills.Attack(6, 0, 5));
+            builder.Skills.Add(new Skills.Attack(8, 0, 5));
             Register(builder);
         }
         #endregion
@@ -198,7 +202,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(15, true));
-            builder.Skills.Add(new Skills.Attack(1, 7, 2));
+            builder.Skills.Add(new Skills.Attack(1, 7, 1));
             Register(builder);
         }
 
@@ -217,7 +221,7 @@ namespace Orion.GameLogic
                 FoodCost = 5
             };
             builder.Skills.Add(new Skills.Move(8, true));
-            builder.Skills.Add(new Skills.Attack(10, 8, 8));
+            builder.Skills.Add(new Skills.Attack(13, 8, 8));
             Register(builder);
         }
 
@@ -275,7 +279,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.Move(14, false));
-            builder.Skills.Add(new Skills.Attack(6, 8, 3));
+            builder.Skills.Add(new Skills.Attack(9, 8, 3));
             Register(builder);
         }
 
@@ -312,7 +316,7 @@ namespace Orion.GameLogic
                 FoodCost = 8
             };
             builder.Skills.Add(new Skills.Move(2, true));
-            builder.Skills.Add(new Skills.Attack(15, 3, 5));
+            builder.Skills.Add(new Skills.Attack(18, 3, 5));
             Register(builder);
         }
         #endregion

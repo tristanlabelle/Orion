@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
                 Unit.LookAt(target.Center);
                 if (info.TimeInSeconds - Unit.LastHitTime > hitDelayInSeconds)
                 {
-                    int targetArmor = Unit.GetStat(UnitStat.AttackRange) == 1 ?
+                    int targetArmor = Unit.GetStat(UnitStat.AttackRange) == 0 ?
                         target.GetStat(UnitStat.MeleeArmor) : target.GetStat(UnitStat.RangedArmor);
                     int damage = Unit.GetStat(UnitStat.AttackPower) - targetArmor;
                     if(damage < 1) damage = 1;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Control = System.Windows.Forms.Control;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment;
@@ -72,7 +74,7 @@ namespace Orion.UserInterface
 
             MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager, textureManager);
             world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
-            Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.25f), new Vector2(1, 1));
+            Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             Children.Add(worldView);
@@ -295,15 +297,23 @@ namespace Orion.UserInterface
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            if (worldView.Frame.ContainsPoint(args.Position))
+            {
+                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+                userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            }
             return base.OnMouseDown(args);
         }
 
         protected override bool OnMouseMove(MouseEventArgs args)
         {
-            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
+            {
+                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
+                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            }
+            else
+                userInputManager.SelectionManager.HoveredUnit = null;
             return base.OnMouseMove(args);
         }
 

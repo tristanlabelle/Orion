@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildingPlan.cs" />
+    <Compile Include="CollisionLayer.cs" />
     <Compile Include="DiplomaticStance.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityGrid.cs" />

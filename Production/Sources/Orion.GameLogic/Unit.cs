@@ -115,9 +115,9 @@ namespace Orion.GameLogic
             get { return type.IsAirborne; }
         }
 
-        public override bool IsSolid
+        public override CollisionLayer CollisionLayer
         {
-            get { return !type.IsAirborne; }
+            get { return type.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground; }
         }
         #endregion
 

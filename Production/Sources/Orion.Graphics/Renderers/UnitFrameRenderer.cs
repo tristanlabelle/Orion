@@ -16,7 +16,12 @@ namespace Orion.Graphics
     {
         #region Fields
         private static readonly UnitStat[] statsToDisplay = new[]
-            { UnitStat.AttackPower, UnitStat.AttackRange, UnitStat.MeleeArmor, UnitStat.RangedArmor, UnitStat.MovementSpeed, UnitStat.SightRange };
+        {
+            UnitStat.AttackPower, UnitStat.AttackRange,
+            UnitStat.MeleeArmor, UnitStat.RangedArmor,
+            UnitStat.MovementSpeed, UnitStat.SightRange
+        };
+
         private static readonly Font statsFont = new Font("Consolas", 12);
 
         private readonly Unit unit;

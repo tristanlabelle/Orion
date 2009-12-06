@@ -63,9 +63,9 @@ namespace Orion.GameLogic
             get { return position; }
         }
 
-        public override bool IsSolid
+        public override CollisionLayer CollisionLayer
         {
-            get { return type == ResourceType.Aladdium; }
+            get { return type == ResourceType.Alagene ? CollisionLayer.None : CollisionLayer.Ground; }
         }
 
         public Unit Extractor

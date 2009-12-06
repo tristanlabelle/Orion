@@ -225,7 +225,8 @@ namespace Orion.GameLogic
             if (isUpdating) DeferAdd(entity);
             else CommitAdd(entity);
 
-            if (entity.IsSolid) grid.Add(entity);
+            if (entity.CollisionLayer == CollisionLayer.Ground)
+                grid.Add(entity);
         }
 
         private void Move(Entity entity, Vector2 oldPosition)
@@ -233,7 +234,7 @@ namespace Orion.GameLogic
             if (isUpdating) DeferMove(entity, oldPosition);
             else CommitMove(entity, oldPosition);
 
-            if (entity.IsSolid)
+            if (entity.CollisionLayer == CollisionLayer.Ground)
             {
                 Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
                 Region newRegion = Entity.GetGridRegion(entity.Position, entity.Size);
@@ -250,7 +251,8 @@ namespace Orion.GameLogic
             if (isUpdating) DeferRemove(entity);
             else CommitRemove(entity);
 
-            if (entity.IsSolid) grid.Remove(entity);
+            if (entity.CollisionLayer == CollisionLayer.Ground)
+                grid.Remove(entity);
         }
 
         #region Deferring

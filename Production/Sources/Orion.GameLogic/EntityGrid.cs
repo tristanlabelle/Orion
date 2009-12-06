@@ -59,7 +59,8 @@ namespace Orion.GameLogic
         public void Add(Entity entity, Region region)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Debug.Assert(entity.IsSolid, "A non-solid entity is being added to the grid.");
+            Debug.Assert(entity.CollisionLayer != CollisionLayer.None,
+                "A non-collidable entity is being added to the grid.");
             Debug.Assert(entity.IsAlive, "A dead entity is being added to the grid.");
 
             foreach (Point point in region.Points)
@@ -79,7 +80,8 @@ namespace Orion.GameLogic
         public void Remove(Entity entity, Region region)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Debug.Assert(entity.IsSolid, "A non-solid entity is being removed from the grid.");
+            Debug.Assert(entity.CollisionLayer != CollisionLayer.None,
+                "A non-collidable entity is being removed from the grid.");
 
             foreach (Point point in region.Points)
             {

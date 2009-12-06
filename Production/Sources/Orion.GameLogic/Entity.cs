@@ -138,11 +138,11 @@ namespace Orion.GameLogic
         #endregion
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="Entity"/> is solid.
-        /// Solid entities occupy grid space and cannot overlap with other
-        /// solid entities or with the terrain.
+        /// Gets the <see cref="CollisionLayer"/> on which this
+        /// <see cref="Entity"/> lies. This should never change
+        /// in the lifetime of the <see cref="Entity"/>.
         /// </summary>
-        public abstract bool IsSolid { get; }
+        public abstract CollisionLayer CollisionLayer { get; }
 
         /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> is alive.

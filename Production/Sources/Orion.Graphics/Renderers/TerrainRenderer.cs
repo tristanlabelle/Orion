@@ -4,6 +4,7 @@
 using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using OpenTK.Graphics;
 
 namespace Orion.Graphics
 {
@@ -13,42 +14,24 @@ namespace Orion.Graphics
     public sealed class TerrainRenderer : IDisposable
     {
         #region Fields
-        public static readonly Color WalkableColor = Color.FromArgb(60, 50, 50);
-        public static readonly Color SolidColor = Color.FromArgb(255, 248, 233);
-
         private readonly Terrain terrain;
         private readonly Texture texture;
+        private readonly Texture groundTileTexture;
+        private readonly Texture obstacleTileTexture;
         #endregion
 
         #region Constructors
-        public TerrainRenderer(Terrain terrain)
+        public TerrainRenderer(Terrain terrain, TextureManager textureManager)
         {
             Argument.EnsureNotNull(terrain, "terrain");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.terrain = terrain;
-
-            byte[] pixels = new byte[terrain.Size.Area * 3];
-            for (int y = 0; y < terrain.Size.Height; ++y)
-            {
-                for (int x = 0; x < terrain.Size.Width; ++x)
-                {
-                    int pixelIndex = y * terrain.Size.Width + x;
-                    if (terrain.IsWalkable(new Point(x, y)))
-                    {
-                        pixels[pixelIndex * 3 + 0] = WalkableColor.R;
-                        pixels[pixelIndex * 3 + 1] = WalkableColor.G;
-                        pixels[pixelIndex * 3 + 2] = WalkableColor.B;
-                    }
-                    else
-                    {
-                        pixels[pixelIndex * 3 + 0] = SolidColor.R;
-                        pixels[pixelIndex * 3 + 1] = SolidColor.G;
-                        pixels[pixelIndex * 3 + 2] = SolidColor.B;
-                    }
-                }
-            }
-
-            texture = Texture.FromBuffer(terrain.Size, PixelFormat.Rgb, pixels, false, false);
+            this.texture = CreateTerrainTexture(terrain);
+            this.groundTileTexture = textureManager.Get("Ground");
+            this.groundTileTexture.SetRepeat(true);
+            this.obstacleTileTexture = textureManager.Get("Obstacle");
+            this.obstacleTileTexture.SetRepeat(true);
         }
         #endregion
 
@@ -56,12 +39,51 @@ namespace Orion.Graphics
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Size.Width, terrain.Size.Height);
+
+            GL.ColorMask(false, false, false, true);
             graphics.Fill(terrainBounds, texture);
+
+            Rectangle textureRectangle = new Rectangle(0, 0, terrain.Size.Width / 4, terrain.Size.Height / 4);
+
+            GL.ColorMask(true, true, true, false);
+            GL.Color4(1f, 1f, 1f, 1f);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.OneMinusDstAlpha, BlendingFactorDest.One);
+            groundTileTexture.BindWhile(() => graphics.DrawTexturedQuad(terrainBounds, textureRectangle));
+            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.One);
+            obstacleTileTexture.BindWhile(() => graphics.DrawTexturedQuad(terrainBounds, textureRectangle));
+            GL.Disable(EnableCap.Blend);
+            GL.Disable(EnableCap.Texture2D);
+        }
+
+        public void DrawMiniature(GraphicsContext graphics)
+        {
+            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Size.Width, terrain.Size.Height);
+            graphics.FillColor = Color.FromArgb(232, 207, 144);
+            graphics.Fill(terrainBounds);
+            graphics.Fill(terrainBounds, texture, Color.FromArgb(100, 78, 60));
         }
 
         public void Dispose()
         {
             texture.Dispose();
+        }
+
+        private static Texture CreateTerrainTexture(Terrain terrain)
+        {
+            byte[] pixels = new byte[terrain.Size.Area];
+            for (int y = 0; y < terrain.Size.Height; ++y)
+            {
+                for (int x = 0; x < terrain.Size.Width; ++x)
+                {
+                    int pixelIndex = y * terrain.Size.Width + x;
+                    Point point = new Point(x, y);
+                    pixels[pixelIndex] = terrain.IsWalkable(point) ? (byte)0 : (byte)255;
+                }
+            }
+
+            return Texture.FromBuffer(terrain.Size, PixelFormat.Alpha, pixels, false, false);
         }
         #endregion
     }

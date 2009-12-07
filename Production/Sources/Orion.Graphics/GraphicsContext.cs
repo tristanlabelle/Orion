@@ -397,16 +397,7 @@ namespace Orion.Graphics
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             }
 
-            GL.Begin(BeginMode.Quads);
-            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
-            DrawVertex(rectangle.MinX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
-            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MinX, rectangle.MaxY);
-            GL.End();
+            DrawTexturedQuad(rectangle, textureRectangle);
 
             if (texture.PixelFormat.HasAlphaChannel()) GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.Texture2D);
@@ -425,6 +416,25 @@ namespace Orion.Graphics
         public void Fill(Rectangle rectangle, Texture texture)
         {
             Fill(rectangle, texture, Rectangle.Unit, Color.White);
+        }
+
+        internal void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
+        {
+            GL.Begin(BeginMode.Quads);
+            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
+            DrawVertex(rectangle.MinX, rectangle.MinY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MinX, rectangle.MaxY);
+            GL.End();
+        }
+
+        internal void DrawTexturedQuad(Rectangle rectangle)
+        {
+            DrawTexturedQuad(rectangle, Rectangle.Unit);
         }
         #endregion
         #endregion

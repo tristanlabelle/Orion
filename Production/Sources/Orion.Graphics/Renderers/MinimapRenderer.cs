@@ -26,7 +26,7 @@ namespace Orion.Graphics
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            worldRenderer.DrawTerrain(context);
+            worldRenderer.DrawMiniatureTerrain(context);
             worldRenderer.DrawMiniatureResources(context);
             worldRenderer.UnitRenderer.DrawMiniature(context);
             worldRenderer.DrawFogOfWar(context);

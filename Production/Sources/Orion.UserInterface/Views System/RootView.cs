@@ -98,8 +98,10 @@ namespace Orion.UserInterface
 
         protected internal override void Render()
         {
-            GL.ClearColor(Color.Black);
+            GL.ColorMask(true, true, true, true);
+            GL.ClearColor(0, 0, 0, 0);
             GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.ColorMask(true, true, true, false);
             GL.LoadIdentity();
 
             displays.Peek().Render();

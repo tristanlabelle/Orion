@@ -34,7 +34,7 @@ namespace Orion.UserInterface
         private static GraphicsMode GetGraphicsMode()
         {
             return new GraphicsMode(
-                new ColorFormat(8, 8, 8, 0), // Color BPP
+                new ColorFormat(8, 8, 8, 8), // Color BPP
                 0, 0, // Depth, stencil BPP
                 0, // Antialiasing samples
                 new ColorFormat(0), // Accum buffer BPP

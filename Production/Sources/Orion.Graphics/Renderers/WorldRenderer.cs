@@ -34,10 +34,9 @@ namespace Orion.Graphics
 
             this.world = world;
             this.textureManager = textureManager;
-            this.terrainRenderer = new TerrainRenderer(world.Terrain);
+            this.terrainRenderer = new TerrainRenderer(world.Terrain, textureManager);
             this.unitRenderer = new UnitsRenderer(world, faction, textureManager);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
-            ;
         }
         #endregion
 
@@ -66,6 +65,12 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
             terrainRenderer.Draw(graphics);
+        }
+
+        public void DrawMiniatureTerrain(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+            terrainRenderer.DrawMiniature(graphics);
         }
 
         public void DrawFogOfWar(GraphicsContext graphics)

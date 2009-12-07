@@ -69,6 +69,7 @@ namespace Orion.Commandment
         {
             Default = new CheatCodeManager();
             Default.Register("colorlessdeepfog", DisableFogOfWar);
+            Default.Register("ferdinandmagellan", RevealMap);
             Default.Register("magiclamp", IncreaseResources);
             Default.Register("twelvehungrymen", IncreaseAvailableFood);
             Default.Register("whosyourdaddy", SpawnChuckNorris);
@@ -84,6 +85,11 @@ namespace Orion.Commandment
         private static void DisableFogOfWar(Match match, Faction faction)
         {
             faction.LocalFogOfWar.Disable();
+        }
+
+        private static void RevealMap(Match match, Faction faction)
+        {
+            faction.LocalFogOfWar.Reveal();
         }
 
         private static void IncreaseResources(Match match, Faction faction)

@@ -62,8 +62,8 @@ namespace Orion.Commandment.Commands
             {
                 ResourceNode node = match.World.Entities
                     .OfType<ResourceNode>()
-                    .FirstOrDefault(n => n.BoundingRectangle.ContainsPoint(location));
-                Debug.Assert(node != null, "Extractors can only be built on resource nodes.");
+                    .FirstOrDefault(n => n.BoundingRectangle.ContainsPoint(location) && n.Type == ResourceType.Alagene);
+                Debug.Assert(node != null, "Extractors can only be built on resource node  of Alagene.");
             }
 
             BuildingPlan plan = new BuildingPlan(faction, buildingType, location);

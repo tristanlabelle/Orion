@@ -105,9 +105,9 @@ namespace Orion.UserInterface
 
             CreateScrollers();
 
-            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.085f, 0.3f), new Vector2(0.915f, 0.34f));
+            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
-            Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.402f), new Vector2(0.5f, 0.9f));
+            Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             chatMessages = new TransparentFrame(messagesFrame);
             Children.Add(chatMessages);
 
@@ -142,7 +142,7 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
             smurfType = world.UnitTypes.FromName("Schtroumpf");
-            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.33f), new Vector2(0.06f, 0.38f));
+            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
             Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
             TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
             inactiveSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);

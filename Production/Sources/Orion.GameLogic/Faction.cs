@@ -299,6 +299,8 @@ namespace Orion.GameLogic
         /// <returns>The newly created <see cref="Unit"/>.</returns>
         public Unit CreateUnit(UnitType type, Point point)
         {
+            Argument.EnsureNotNull(type, "type");
+
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
             if (type.HasSkill<Skills.ExtractAlageneSkill>())

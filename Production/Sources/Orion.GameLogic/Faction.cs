@@ -352,8 +352,6 @@ namespace Orion.GameLogic
 
         private void OnEntityRemoved(EntityManager sender, Entity entity)
         {
-            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
-
             Unit unit = entity as Unit;
             if (unit == null) return;
 

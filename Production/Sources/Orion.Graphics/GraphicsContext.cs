@@ -158,6 +158,11 @@ namespace Orion.Graphics
         {
             return Transform(translation, rotation, new Vector2(scaling, scaling));
         }
+
+        public TransformHandle Translate(Vector2 translation)
+        {
+            return Transform(translation, 0, new Vector2(1, 1));
+        }
         #endregion
 
         #region Drawing

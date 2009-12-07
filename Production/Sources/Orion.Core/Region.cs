@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion
 {
@@ -137,6 +138,11 @@ namespace Orion
         #endregion
 
         #region Methods
+        public Rectangle ToRectangle()
+        {
+            return new Rectangle(MinX, MinY, Width, Height);
+        }
+
         /// <summary>
         /// Tests if a point is within this region.
         /// </summary>

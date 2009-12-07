@@ -26,10 +26,11 @@ namespace Orion.GameLogic
         private readonly Color color;
         private readonly FogOfWar localFogOfWar;
         private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
-        private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
-        private readonly GenericEventHandler<Entity> entityDiedEventHandler;
+        private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
+        private readonly GenericEventHandler<EntityManager, Entity> entityRemovedEventHandler;
         private readonly GenericEventHandler<Unit> foodStorageCreated;
         private readonly HashSet<Faction> allies = new HashSet<Faction>();
+        private readonly HashSet<RememberedBuilding> buildingMemory = new HashSet<RememberedBuilding>();
         private int aladdiumAmount;
         private int alageneAmount;
         private int totalFoodAmount = 0;
@@ -58,9 +59,11 @@ namespace Orion.GameLogic
             this.localFogOfWar = new FogOfWar(world.Size);
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.entityMovedEventHandler = OnEntityMoved;
-            this.entityDiedEventHandler = OnEntityDied;
+            this.unitMovedEventHandler = OnUnitMoved;
+            this.entityRemovedEventHandler = OnEntityRemoved;
             this.foodStorageCreated = OnFoodStorageCreated;
+
+            this.world.Entities.Removed += entityRemovedEventHandler;
         }
         #endregion
 
@@ -140,6 +143,17 @@ namespace Orion.GameLogic
         public FogOfWar LocalFogOfWar
         {
             get { return localFogOfWar; }
+        }
+
+        /// <summary>
+        /// Gets the building memory this faction has of other faction buildings.
+        /// </summary>
+        public IEnumerable<RememberedBuilding> BuildingMemory
+        {
+            get
+            {
+                return buildingMemory.Where(rememberedBuilding => !CanSee(rememberedBuilding.GridRegion));
+            }
         }
 
         /// <summary>
@@ -314,8 +328,7 @@ namespace Orion.GameLogic
             }
 
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
-            unit.Moved += entityMovedEventHandler;
-            unit.Died += entityDiedEventHandler;
+            unit.Moved += unitMovedEventHandler;
 
             usedFoodAmount += type.FoodCost;
 
@@ -325,7 +338,7 @@ namespace Orion.GameLogic
             return unit;
         }
 
-        private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
+        private void OnUnitMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
@@ -337,18 +350,26 @@ namespace Orion.GameLogic
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
-        private void OnEntityDied(Entity entity)
+        private void OnEntityRemoved(EntityManager sender, Entity entity)
         {
             Argument.EnsureBaseType(entity, typeof(Unit), "entity");
 
-            Unit unit = (Unit)entity;
-            localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
-            usedFoodAmount -= unit.Type.FoodCost;
-            if (unit.Type.HasSkill<Skills.StoreFoodSkill>() && !unit.IsUnderConstruction)
-                totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
-            unit.Died -= entityDiedEventHandler;
+            Unit unit = entity as Unit;
+            if (unit == null) return;
 
-            CheckForDefeat();
+            if (unit.Faction == this)
+            {
+                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
+                usedFoodAmount -= unit.Type.FoodCost;
+                if (unit.Type.HasSkill<Skills.StoreFoodSkill>() && !unit.IsUnderConstruction)
+                    totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
+
+                CheckForDefeat();
+            }
+            else if (unit.IsBuilding && CanSee(unit))
+            {
+                buildingMemory.Remove(new RememberedBuilding(unit));
+            }
         }
 
         private void OnFoodStorageCreated(Unit unit)
@@ -435,7 +456,7 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="region">The region to be checked.</param>
         /// <returns>A value indicating if that region is at least partially visible.</returns>
-        public bool IsVisible(Region region)
+        public bool CanSee(Region region)
         {
             for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
                 for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
@@ -449,10 +470,10 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
         /// <returns>A value indicating if it is visible.</returns>
-        public bool IsVisible(Entity entity)
+        public bool CanSee(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            return IsVisible(entity.GridRegion);
+            return CanSee(entity.GridRegion);
         }
 
         public TileVisibility GetTileVisibility(Point point)
@@ -480,7 +501,23 @@ namespace Orion.GameLogic
                 DiscoverFromOtherFogOfWar(sender, region);
             }
 
+            UpdateBuildingMemory(region);
             RaiseVisibilityChanged(region);
+        }
+
+        private void UpdateBuildingMemory(Region region)
+        {
+            var visibleOtherFactionBuildingsInRegion = world.Entities.InArea(region.ToRectangle())
+                .OfType<Unit>()
+                .Where(unit => unit.IsBuilding && unit.Faction != this && CanSee(unit))
+                .Select(building => new RememberedBuilding(building));
+            buildingMemory.UnionWith(visibleOtherFactionBuildingsInRegion);
+
+            buildingMemory.RemoveWhere(rememberedBuilding =>
+            {
+                Unit building = world.Entities.GetSolidEntityAt(rememberedBuilding.Location) as Unit;
+                return building == null || !rememberedBuilding.Matches(building);
+            });
         }
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)

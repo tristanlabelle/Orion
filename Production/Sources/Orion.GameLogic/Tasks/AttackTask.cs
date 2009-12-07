@@ -51,7 +51,7 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                if (!Unit.Faction.IsVisible(target))
+                if (!Unit.Faction.CanSee(target))
                     return true;
                 if (!Unit.IsInAttackRange(target))
                     return !Unit.HasSkill<Skills.MoveSkill>() || follow.HasEnded;

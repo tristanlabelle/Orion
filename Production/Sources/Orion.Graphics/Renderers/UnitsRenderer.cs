@@ -93,7 +93,7 @@ namespace Orion.Graphics
         {
             foreach (Unit unit in world.Entities.OfType<Unit>())
             {
-                if (faction.IsVisible(unit))
+                if (faction.CanSee(unit))
                 {
                     context.FillColor = unit.Faction.Color;
                     context.Fill(new Rectangle(unit.Position, (Vector2)minimapUnitSize));
@@ -103,8 +103,15 @@ namespace Orion.Graphics
 
         private void DrawUnits(GraphicsContext graphics)
         {
+            DrawRememberedBuildings(graphics);
             DrawGroundUnits(graphics);
             DrawAirborneUnits(graphics);
+        }
+
+        private void DrawRememberedBuildings(GraphicsContext graphics)
+        {
+            foreach (RememberedBuilding building in faction.BuildingMemory)
+                DrawRememberedBuilding(graphics, building);
         }
 
         private void DrawGroundUnits(GraphicsContext graphics)
@@ -122,7 +129,7 @@ namespace Orion.Graphics
 
         private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
         {
-            if (faction.IsVisible(unit))
+            if (faction.CanSee(unit))
             {
                 Texture texture = GetTypeTexture(unit.Type);
                 Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
@@ -139,7 +146,7 @@ namespace Orion.Graphics
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            if (faction.IsVisible(unit))
+            if (faction.CanSee(unit))
             {
                 Texture texture = GetTypeTexture(unit.Type);
 
@@ -153,6 +160,18 @@ namespace Orion.Graphics
                 }
 
                 if (DrawHealthBars) DrawHealthBar(graphics, unit);
+            }
+        }
+
+        private void DrawRememberedBuilding(GraphicsContext graphics, RememberedBuilding building)
+        {
+            Texture texture = GetTypeTexture(building.Type);
+
+            using (graphics.Translate(building.GridRegion.ToRectangle().Center))
+            {
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0,
+                    building.Type.Size.Width, building.Type.Size.Height);
+                graphics.Fill(localRectangle, texture, building.Faction.Color);
             }
         }
 
@@ -170,7 +189,7 @@ namespace Orion.Graphics
             float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
 
-            if (faction.IsVisible(unit))
+            if (faction.CanSee(unit))
                 DrawHealthBar(context, unit, new Vector2(x, y));
         }
 
@@ -179,7 +198,7 @@ namespace Orion.Graphics
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
             float leftHealthWidth = unit.Health * 0.1f;
 
-            if (faction.IsVisible(unit))
+            if (faction.CanSee(unit))
                 DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
         }
 
@@ -188,7 +207,7 @@ namespace Orion.Graphics
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            if (faction.IsVisible(unit))
+            if (faction.CanSee(unit))
             {
                 if (unit.Health > unit.MaxHealth / 2)
                 {

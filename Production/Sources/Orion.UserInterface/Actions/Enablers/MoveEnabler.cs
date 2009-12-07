@@ -15,7 +15,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.Move>())
+            if (type.HasSkill<Skills.MoveSkill>())
             {
                 buttonsArray[0, 3] = new GenericActionButton(container, inputManager,
                     "Move", Keys.M, new MoveUserCommand(inputManager), base.textureManager);

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
+using Orion.GameLogic.Tasks;
+using Skill = Orion.GameLogic.Skills.Skill;
 
 namespace Orion.GameLogic
 {
@@ -322,7 +324,7 @@ namespace Orion.GameLogic
         public bool IsInAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
-            if (!HasSkill<Skills.Attack>()) return false;
+            if (!HasSkill<Skills.AttackSkill>()) return false;
             int attackRange = GetStat(UnitStat.AttackRange);
             if (attackRange == 0) return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             return (Center - other.Center).LengthSquared <= attackRange * attackRange;
@@ -381,7 +383,7 @@ namespace Orion.GameLogic
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.
             if ((info.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
-                && !IsUnderConstruction && IsIdle && HasSkill<Skills.Attack>())
+                && !IsUnderConstruction && IsIdle && HasSkill<Skills.AttackSkill>())
             {
                 Unit unitToAttack = World.Entities
                     .InArea(LineOfSight)
@@ -391,7 +393,7 @@ namespace Orion.GameLogic
 
                 if (unitToAttack != null)
                 {
-                    Tasks.Attack attackTask = new Tasks.Attack(this, unitToAttack);
+                    Tasks.AttackTask attackTask = new Tasks.AttackTask(this, unitToAttack);
                     taskQueue.OverrideWith(attackTask);
                 }
             }

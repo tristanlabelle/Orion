@@ -5,6 +5,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
+using Orion.GameLogic.Technologies;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
@@ -300,7 +301,7 @@ namespace Orion.GameLogic
         {
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
-            if (type.HasSkill<Skills.ExtractAlagene>())
+            if (type.HasSkill<Skills.ExtractAlageneSkill>())
             {
                 ResourceNode alageneNode = World.Entities
                                 .OfType<ResourceNode>()
@@ -316,7 +317,7 @@ namespace Orion.GameLogic
 
             usedFoodAmount += type.FoodCost;
 
-            if (unit.Type.HasSkill<Skills.StoreFood>())
+            if (unit.Type.HasSkill<Skills.StoreFoodSkill>())
                 unit.ConstructionComplete += foodStorageCreated;
 
             return unit;
@@ -341,7 +342,7 @@ namespace Orion.GameLogic
             Unit unit = (Unit)entity;
             localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             usedFoodAmount -= unit.Type.FoodCost;
-            if (unit.Type.HasSkill<Skills.StoreFood>() && !unit.IsUnderConstruction)
+            if (unit.Type.HasSkill<Skills.StoreFoodSkill>() && !unit.IsUnderConstruction)
                 totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
             unit.Died -= entityDiedEventHandler;
 

@@ -107,8 +107,8 @@ namespace Orion.Commandment
         {
             foreach (UnitType type in match.World.UnitTypes)
             {
-                if (type.HasSkill<Skills.Train>()) type.GetSkill<Skills.Train>().Speed *= 50;
-                if (type.HasSkill<Skills.Build>()) type.GetSkill<Skills.Build>().Speed *= 50;
+                if (type.HasSkill<Skills.TrainSkill>()) type.GetSkill<Skills.TrainSkill>().Speed *= 50;
+                if (type.HasSkill<Skills.BuildSkill>()) type.GetSkill<Skills.BuildSkill>().Speed *= 50;
             }
         }
 

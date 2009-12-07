@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Skills = Orion.GameLogic.Skills;
@@ -128,7 +128,7 @@ namespace Orion.Commandment
             List<Unit> unitsToMove = units.Where(unit => unit.IsIdle).ToList();
 
             if(unitsToMove.Count > 0)
-                commands.Add(new Move(Faction.Handle, units.Select(unit => unit.Handle), position));
+                commands.Add(new MoveCommand(Faction.Handle, units.Select(unit => unit.Handle), position));
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Orion.Commandment
                 amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost);
             }
 
-            List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.Train>()).ToList();
+            List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.TrainSkill>()).ToList();
             List<Unit> trainers = new List<Unit>();
 
             if (amountToBeTrained <= potentialTrainers.Count)
@@ -171,7 +171,7 @@ namespace Orion.Commandment
             }
 
             if (trainers.Count > 0)
-                commands.Add(new Train(Faction.Handle, trainers.Select(unit => unit.Handle), toTrain.Handle));
+                commands.Add(new TrainCommand(Faction.Handle, trainers.Select(unit => unit.Handle), toTrain.Handle));
         }
 
         /// <summary>
@@ -183,8 +183,8 @@ namespace Orion.Commandment
         {
             List<Unit> potentialAttackers = 
                 allUnits.Where(unit => unit.Faction == Faction 
-                && unit.Type.HasSkill<Skills.Attack>() 
-                && !unit.Type.HasSkill<Skills.Harvest>()
+                && unit.Type.HasSkill<Skills.AttackSkill>() 
+                && !unit.Type.HasSkill<Skills.HarvestSkill>()
                 && unit.IsIdle
                 ).ToList();
             List<Unit> attackers = new List<Unit>();
@@ -196,7 +196,7 @@ namespace Orion.Commandment
             }
 
             if (attackers.Count > 0 && target != null)
-                commands.Add(new Commands.Attack(Faction.Handle, attackers.Select(unit => unit.Handle), target.Handle));
+                commands.Add(new Commands.AttackCommand(Faction.Handle, attackers.Select(unit => unit.Handle), target.Handle));
         }
 
         /// <summary>
@@ -208,11 +208,11 @@ namespace Orion.Commandment
         {
             if (node != null)
             {
-                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.TaskQueue.Current is Orion.GameLogic.Tasks.Harvest)).ToList();
+                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.TaskQueue.Current is Orion.GameLogic.Tasks.HarvestTask)).ToList();
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
-                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Harvest>()).ToList();
+                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.HarvestSkill>()).ToList();
                 
                 List<Unit> harvesters = new List<Unit>();
 
@@ -229,7 +229,7 @@ namespace Orion.Commandment
                 }
 
                 if (harvesters.Count > 0)
-                    commands.Add(new Commands.Harvest(Faction.Handle, harvesters.Select(unit => unit.Handle), node.Handle));
+                    commands.Add(new Commands.HarvestCommand(Faction.Handle, harvesters.Select(unit => unit.Handle), node.Handle));
             }
         }
 
@@ -242,7 +242,7 @@ namespace Orion.Commandment
         {
             UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.Build>()).ToList();
+            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.BuildSkill>()).ToList();
             List<Unit> builders = new List<Unit>();
 
             if (Positions.Count <= potentialBuilders.Count)
@@ -266,7 +266,7 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                commands.Add(new Build(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)Positions[i]));
+                commands.Add(new BuildCommand(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)Positions[i]));
             }
         }
 

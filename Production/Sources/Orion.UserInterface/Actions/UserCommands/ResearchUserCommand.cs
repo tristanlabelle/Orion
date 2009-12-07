@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
+using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
-using OpenTK.Math;
+using Orion.GameLogic.Technologies;
+using Keys = System.Windows.Forms.Keys;
+using Skills = Orion.GameLogic.Skills;
 
 namespace Orion.UserInterface.Actions.UserCommands
 {

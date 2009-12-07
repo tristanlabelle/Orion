@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Skills = Orion.GameLogic.Skills;
-
 
 namespace Orion.Commandment
 {
@@ -46,7 +45,7 @@ namespace Orion.Commandment
 
                 //TODO: remove this part when the AI is sandboxed as it is only here to test the behavior of the AI
                 if(World.Factions.First().Units.Where
-                    (unit => unit.HasSkill<Skills.Attack>())
+                    (unit => unit.HasSkill<Skills.AttackSkill>())
                     .Count() != 0)
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }

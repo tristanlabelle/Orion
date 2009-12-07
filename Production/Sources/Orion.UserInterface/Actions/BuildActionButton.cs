@@ -23,7 +23,7 @@ namespace Orion.UserInterface.Actions
             UnitTypeRegistry registry, TextureManager textureManager)
             : base(frame, manager, "Build", Keys.B, textureManager)
         {
-            Skills.Build buildingSkill = type.GetSkill<Skills.Build>();
+            Skills.BuildSkill buildingSkill = type.GetSkill<Skills.BuildSkill>();
             int x = 0;
             int y = 3;
             foreach (UnitType unitType in registry.Where(u => buildingSkill.Supports(u)))

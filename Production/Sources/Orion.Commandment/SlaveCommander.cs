@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Keys = System.Windows.Forms.Keys;
 
@@ -27,39 +27,39 @@ namespace Orion.Commandment
         public void SendMessage(string message)
         {
             Argument.EnsureNotNull(message, "message");
-            GenerateCommand(new SendMessage(Faction.Handle, message));
+            GenerateCommand(new SendMessageCommand(Faction.Handle, message));
         }
 
         public void LaunchCancel(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new Cancel(Faction.Handle, units.Select(unit => unit.Handle)));
+                GenerateActionCommand(new CancelCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchAttack(IEnumerable<Unit> units, Unit target)
         {
             units = units.Except(target);
             if (units.Count() > 0)
-                GenerateActionCommand(new Attack(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
+                GenerateActionCommand(new AttackCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
         }
 
         public void LaunchBuild(IEnumerable<Unit> units, UnitType buildingType, Point point)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new Build(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
+                GenerateActionCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
         }
 
         public void LaunchHarvest(IEnumerable<Unit> units, ResourceNode node)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new Harvest(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));
+                GenerateActionCommand(new HarvestCommand(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));
         }
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new Move(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateActionCommand(new MoveCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         private Vector2 ClampPosition(Vector2 destination)
@@ -76,42 +76,42 @@ namespace Orion.Commandment
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new ChangeRallyPoint(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateActionCommand(new ChangeRallyPointCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
         {
             units = units.Except(repairedUnit);
             if (units.Count() > 0)
-                GenerateActionCommand(new Repair(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
+                GenerateActionCommand(new RepairCommand(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
         }
 
         public void LaunchTrain(IEnumerable<Unit> buildings, UnitType trainedType)
         {
             if (buildings.Count() > 0)
-                GenerateActionCommand(new Train(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
+                GenerateActionCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
         }
 
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new Suicide(Faction.Handle, units.Select(unit => unit.Handle)));
+                GenerateActionCommand(new SuicideCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchChangeDiplomacy(Faction otherFaction)
         {
             if (otherFaction == null) return;
             if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
-                GenerateActionCommand(new ChangeDiplomaticStance(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
+                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
             else
-                GenerateActionCommand(new ChangeDiplomaticStance(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
+                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new ZoneAttack(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateActionCommand(new ZoneAttackCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void GenerateActionCommand(Command command)

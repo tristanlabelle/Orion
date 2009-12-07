@@ -18,7 +18,7 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.Attack>())
+            if (type.HasSkill<Skills.AttackSkill>())
             {
                 buttonsArray[2, 3] = new GenericActionButton(container, inputManager,
                     "Attack", Keys.A, new AttackUserCommand(inputManager), base.textureManager);

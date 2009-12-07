@@ -20,9 +20,9 @@ namespace Orion.UserInterface.Actions.Enablers
 
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.Train>())
+            if (type.HasSkill<Skills.TrainSkill>())
             {
-                Skills.Train train = type.GetSkill<Skills.Train>();
+                Skills.TrainSkill train = type.GetSkill<Skills.TrainSkill>();
                 int x = 0;
                 int y = 3;
                 Faction playerFaction = inputManager.Commander.Faction;

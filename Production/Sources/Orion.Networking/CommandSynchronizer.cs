@@ -6,7 +6,7 @@ using System.Text;
 using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Commandment.Commands;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands.Pipeline;
 using System.Diagnostics;
 
 namespace Orion.Networking

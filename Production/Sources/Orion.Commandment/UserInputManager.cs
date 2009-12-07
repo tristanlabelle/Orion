@@ -243,7 +243,7 @@ namespace Orion.Commandment
                 // TODO: implement better friendliness checks
                 if (intersectedUnit.Faction == commander.Faction)
                 {
-                    if (intersectedUnit.HasSkill<Skills.ExtractAlagene>())
+                    if (intersectedUnit.HasSkill<Skills.ExtractAlageneSkill>())
                     {
                         ResourceNode alageneNode = World.Entities
                             .OfType<ResourceNode>()
@@ -269,7 +269,7 @@ namespace Orion.Commandment
             {
                 if (World.Terrain.IsWalkableAndWithinBounds((Point)at))
                 {
-                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.Train>()))
+                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.TrainSkill>()))
                     {
                         LaunchChangeRallyPoint(at);
                     }
@@ -290,8 +290,8 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> builders = selectionManager.SelectedUnits.Where(unit =>
             {
-                Skills.Build build = unit.GetSkill<Skills.Build>();
-                Skills.Move move = unit.GetSkill<Skills.Move>();
+                Skills.BuildSkill build = unit.GetSkill<Skills.BuildSkill>();
+                Skills.MoveSkill move = unit.GetSkill<Skills.MoveSkill>();
                 if (build == null) return false;
                 if (unit.Faction != commander.Faction) return false;
                 if (move == null) return false;
@@ -306,39 +306,39 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<Skills.Attack>()), target);
-            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<Skills.Attack>() && unit.HasSkill<Skills.Move>()), target.Position);
+            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<Skills.AttackSkill>()), target);
+            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<Skills.AttackSkill>() && unit.HasSkill<Skills.MoveSkill>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
             // Those who can attack do so, the others simply move to the destination
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<Skills.Attack>()), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Attack>()), destination);
+            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<Skills.AttackSkill>()), destination);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.AttackSkill>()), destination);
         }
 
         public void LaunchHarvest(ResourceNode node)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<Skills.Harvest>()), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.Harvest>()), node.Position);
+            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<Skills.HarvestSkill>()), node);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.HarvestSkill>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Move>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
             commander.LaunchMove(movableUnits, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Train>()
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.TrainSkill>()
                 && unit.Type.IsBuilding);
             commander.LaunchChangeRallyPoint(targetUnits, at);
         }
@@ -349,7 +349,7 @@ namespace Orion.Commandment
             if (building.Damage < 1) return;
            
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.Build>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.BuildSkill>());
             if (targetUnits.Any(unit => unit.Faction != building.Faction)) return;
             commander.LaunchRepair(targetUnits, building);
         }
@@ -360,7 +360,7 @@ namespace Orion.Commandment
                 .Where(unit =>
                 {
                     if (unit.Faction != commander.Faction) return false;
-                    Skills.Train train = unit.Type.GetSkill<Skills.Train>();
+                    Skills.TrainSkill train = unit.Type.GetSkill<Skills.TrainSkill>();
                     if (train == null) return false;
                     if (unit.IsUnderConstruction) return false;
                     return train.Supports(unitType);

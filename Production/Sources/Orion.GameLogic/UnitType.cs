@@ -51,7 +51,7 @@ namespace Orion.GameLogic
             this.meleeArmor = builder.MeleeArmor;
             this.rangedArmor = builder.RangedArmor;
 
-            var attackSkill = GetSkill<Skills.Attack>();
+            var attackSkill = GetSkill<Skills.AttackSkill>();
             Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
         }
@@ -78,7 +78,7 @@ namespace Orion.GameLogic
 
         public bool IsBuilding
         {
-            get { return !HasSkill<Skills.Move>(); }
+            get { return !HasSkill<Skills.MoveSkill>(); }
         }
         #endregion
 
@@ -91,7 +91,7 @@ namespace Orion.GameLogic
         {
             get
             {
-                Move moveSkill = GetSkill<Move>();
+                MoveSkill moveSkill = GetSkill<MoveSkill>();
                 return moveSkill != null && moveSkill.IsAirborne;
             }
         }
@@ -110,9 +110,9 @@ namespace Orion.GameLogic
             get
             {
                 if (IsBuilding)
-                    return HasSkill<Train>();
+                    return HasSkill<TrainSkill>();
                 else
-                    return HasSkill<Build>() || HasSkill<Attack>();
+                    return HasSkill<BuildSkill>() || HasSkill<AttackSkill>();
             }
         }
         #endregion

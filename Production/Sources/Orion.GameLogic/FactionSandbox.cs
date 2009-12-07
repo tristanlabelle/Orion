@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK.Math;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
-using OpenTK.Math;
 
 namespace Orion.GameLogic
 {
@@ -264,7 +264,7 @@ namespace Orion.GameLogic
 
         public Type GetUnitTask(Handle unit)
         {
-            Task task = GetUnit(unit).TaskQueue.Current;
+            var task = GetUnit(unit).TaskQueue.Current;
             if (task == null) return null;
             return task.GetType();
         }

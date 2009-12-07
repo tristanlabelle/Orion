@@ -27,7 +27,7 @@ namespace Orion.UserInterface.Actions.UserCommands
                 inputManager.LaunchHarvest((ResourceNode)entity);
             else
                 if (entity is Unit)
-                    if (((Unit)entity).HasSkill<Skills.ExtractAlagene>())
+                    if (((Unit)entity).HasSkill<Skills.ExtractAlageneSkill>())
                     {
                         ResourceNode alageneNode = inputManager.Commander.Faction.World.Entities
                             .OfType<ResourceNode>()

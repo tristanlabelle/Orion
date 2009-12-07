@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Pathfinding;
+using Orion.GameLogic.Technologies;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
@@ -21,7 +22,7 @@ namespace Orion.GameLogic
         private readonly EntityManager entities;
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
-        private readonly TechTree techTree;
+        private readonly TechnologyTree technologyTree;
         #endregion
 
         #region Constructors
@@ -36,8 +37,8 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             entities = new EntityManager(this);
             pathfinder = new Pathfinder();
-            techTree = new TechTree();
-            techTree.PopulateWithBaseTechs();
+            technologyTree = new TechnologyTree();
+            technologyTree.PopulateWithBaseTechnologies();
         }
         #endregion
 
@@ -60,9 +61,9 @@ namespace Orion.GameLogic
             get { return terrain; }
         }
 
-        public TechTree TechTree
+        public TechnologyTree TechTree
         {
-            get { return techTree; }
+            get { return technologyTree; }
         }
 
         /// <summary>

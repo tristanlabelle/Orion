@@ -42,7 +42,7 @@ namespace Orion.Graphics
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            if (unit.HasSkill<Orion.GameLogic.Skills.Train>() && unit.TaskQueue.Current != null)
+            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current != null)
             {
                 int firstStartingXPos = 150; 
                 int firstStartingYPos = 60;
@@ -57,7 +57,7 @@ namespace Orion.Graphics
                         }
 
                         // Returns a Task, and finds the unit associated to that Task. 
-                        Train train = (Train)unit.TaskQueue[i];
+                        TrainTask train = (TrainTask)unit.TaskQueue[i];
                         Texture texture = unitsRenderer.GetTypeTexture(train.TraineeType);
 
                         Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 48, 48);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Collections.ObjectModel;
+using Orion.Commandment.Commands;
 
 namespace Orion.Commandment
 {
@@ -71,7 +72,7 @@ namespace Orion.Commandment
         /// Reads the next command from the data stream.
         /// </summary>
         /// <returns>The command that was read, paired with the number of the update where it occured.</returns>
-        public ReplayCommand ReadCommand()
+        public ReplayEvent ReadCommand()
         {
             int updateNumber = reader.ReadInt32();
             Command command = Command.Deserialize(reader);
@@ -80,7 +81,7 @@ namespace Orion.Commandment
                 throw new InvalidDataException("Commands aren't in order in replay.");
             lastUpdateNumber = updateNumber;
 
-            return new ReplayCommand(updateNumber, command);
+            return new ReplayEvent(updateNumber, command);
         }
 
         /// <summary>

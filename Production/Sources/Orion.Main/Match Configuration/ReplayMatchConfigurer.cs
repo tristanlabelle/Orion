@@ -6,7 +6,7 @@ using System.IO;
 using Color = System.Drawing.Color;
 using Orion.GameLogic;
 using Orion.Commandment;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands.Pipeline;
 using Orion.UserInterface;
 
 namespace Orion.Main

@@ -15,7 +15,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.Harvest>())
+            if (type.HasSkill<Skills.HarvestSkill>())
             {
                 buttonsArray[1, 2] = new GenericActionButton(container, inputManager,
                     "Harvest", Keys.H, new HarvestUserCommand(inputManager), base.textureManager);

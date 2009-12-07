@@ -19,7 +19,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.Build>())
+            if (type.HasSkill<Skills.BuildSkill>())
             {
                 buttonsArray[0, 0] = new BuildActionButton(container, inputManager, type, registry, base.textureManager);
                 buttonsArray[1, 0] = new GenericActionButton(container, inputManager,

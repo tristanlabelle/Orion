@@ -31,7 +31,7 @@ namespace Orion.UserInterface.Actions.UserCommands
         #region Methods
         public override void Execute(Entity entity)
         {
-            if (buildingType.HasSkill<Skills.ExtractAlagene>())
+            if (buildingType.HasSkill<Skills.ExtractAlageneSkill>())
             {
                 if (!(entity is ResourceNode)) return;
                 ResourceNode node = (ResourceNode)entity;
@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void Execute(Vector2 at)
         {
-            if (buildingType.HasSkill<Skills.ExtractAlagene>()) return;
+            if (buildingType.HasSkill<Skills.ExtractAlageneSkill>()) return;
             inputManager.LaunchBuild((Point)(at - (Vector2)buildingType.Size * 0.5f), buildingType);
         }
         #endregion

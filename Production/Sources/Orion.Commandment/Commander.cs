@@ -1,6 +1,7 @@
 using System;
 using Orion.GameLogic;
-using Orion.Commandment.Pipeline;
+using Orion.Commandment.Commands;
+using Orion.Commandment.Commands.Pipeline;
 
 namespace Orion.Commandment
 {

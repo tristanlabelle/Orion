@@ -78,6 +78,12 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
+            if (!move.HasReachedDestination)
+            {
+                hasEnded = true;
+                return;
+            }
+
             if (mode == Mode.Extracting)
                 UpdateExtracting(info);
             else

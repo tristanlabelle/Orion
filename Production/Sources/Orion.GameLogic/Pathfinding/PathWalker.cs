@@ -50,7 +50,7 @@ namespace Orion.GameLogic.Pathfinding
             }
         }
 
-        public bool HasReachedDestination
+        public bool HasReachedEnd
         {
             get { return targetPointIndex == path.PointCount; }
         }
@@ -59,7 +59,7 @@ namespace Orion.GameLogic.Pathfinding
         #region Methods
         public void Walk(float distance)
         {
-            if (HasReachedDestination) return;
+            if (HasReachedEnd) return;
 
             Vector2 targetPoint = path.Points[targetPointIndex];
             Vector2 delta = targetPoint - position;

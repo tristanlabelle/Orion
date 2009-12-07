@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-
-using OpenTK.Math;
-
-using Orion.GameLogic.Pathfinding;
 using System.Diagnostics;
+using System.Linq;
+using OpenTK.Math;
+using Orion.GameLogic.Pathfinding;
 using Orion.Geometry;
 
 namespace Orion.GameLogic.Tasks
@@ -57,6 +55,14 @@ namespace Orion.GameLogic.Tasks
         /// Gets the path followed by this unit.
         /// </summary>
         public abstract Path Path { get; }
+
+        /// <summary>
+        /// Gets a value indicating if the <see cref="Unit"/> has reached its destiation.
+        /// </summary>
+        /// <remarks>
+        /// Moving tasks can fail and end without having reached any destination if the path if blocked.
+        /// </remarks>
+        public abstract bool HasReachedDestination { get; }
         #endregion
         #endregion
 

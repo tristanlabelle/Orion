@@ -41,6 +41,11 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
+            get { return HasReachedDestination; }
+        }
+
+        public override bool HasReachedDestination
+        {
             get { return Unit.Position == destination; }
         }
 

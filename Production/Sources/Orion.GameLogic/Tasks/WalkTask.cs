@@ -71,7 +71,12 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return pathWalker == null ? attemptCount >= maxAttemptCount : pathWalker.HasReachedDestination; }
+            get { return pathWalker == null ? attemptCount >= maxAttemptCount : pathWalker.HasReachedEnd; }
+        }
+
+        public override bool HasReachedDestination
+        {
+            get { return pathWalker != null && pathWalker.HasReachedEnd && pathWalker.Path.IsComplete; }
         }
 
         public override string Description

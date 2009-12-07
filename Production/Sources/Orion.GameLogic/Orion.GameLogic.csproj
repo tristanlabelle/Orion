@@ -63,7 +63,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildingMemory.cs" />
     <Compile Include="RememberedBuilding.cs" />
     <Compile Include="Tasks\BuildingPlan.cs" />
     <Compile Include="CollisionLayer.cs" />

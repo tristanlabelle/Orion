@@ -68,6 +68,7 @@ namespace Orion.Main
             match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
 
             gameUI.Display(matchUI);
+            match.Start();
         }
         #endregion
 

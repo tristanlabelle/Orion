@@ -99,6 +99,12 @@ namespace Orion.Graphics
                     context.Fill(new Rectangle(unit.Position, (Vector2)minimapUnitSize));
                 }
             }
+
+            foreach (RememberedBuilding building in faction.BuildingMemory)
+            {
+                context.FillColor = building.Faction.Color;
+                context.Fill(new Rectangle(building.Location, (Vector2)minimapUnitSize));
+            }
         }
 
         private void DrawUnits(GraphicsContext graphics)

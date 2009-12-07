@@ -104,7 +104,7 @@ namespace Orion.UserInterface
 
             CreateScrollers();
 
-            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.085f, 0.3f), new Vector2(0.56f, 0.34f));
+            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.085f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
             Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.402f), new Vector2(0.5f, 0.9f));
             chatMessages = new TransparentFrame(messagesFrame);

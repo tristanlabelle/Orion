@@ -85,7 +85,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
             float targetDisplacementLength = (target.Position - oldTargetPosition).LengthFast;
             float distanceToTarget = (target.Position - Unit.Position).LengthFast;
@@ -95,7 +95,7 @@ namespace Orion.GameLogic.Tasks
                 oldTargetPosition = target.Position;
             }
 
-            moveTask.Update(info);
+            moveTask.Update(step);
         }
         #endregion
     }

@@ -199,11 +199,11 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates the <see cref="Entity"/>s in this <see cref="UnitRegistry"/> for a frame of the game.
         /// </summary>
-        /// <param name="info">Information on this update.</param>
+        /// <param name="step">Information on this simulation step.</param>
         /// <remarks>
         /// Used by <see cref="World"/>.
         /// </remarks>
-        public void Update(SimulationUpdateInfo info)
+        public void Update(SimulationStep step)
         {
             if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
 
@@ -213,7 +213,7 @@ namespace Orion.GameLogic
             {
                 isUpdating = true;
                 foreach (Entity entity in entities.Values)
-                    entity.Update(info);
+                    entity.Update(step);
             }
             finally
             {

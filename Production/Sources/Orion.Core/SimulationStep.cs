@@ -7,11 +7,11 @@ using System.ComponentModel;
 namespace Orion
 {
     /// <summary>
-    /// Regroups informations on an update frame of the game.
+    /// Regroups informations on an update step of the game.
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
-    public struct SimulationUpdateInfo
+    public struct SimulationStep
     {
         #region Fields
         private readonly int number;
@@ -20,7 +20,7 @@ namespace Orion
         #endregion
 
         #region Constructors
-        public SimulationUpdateInfo(int number, float timeInSeconds, float timeDeltaInSeconds)
+        public SimulationStep(int number, float timeInSeconds, float timeDeltaInSeconds)
         {
             this.number = number;
             this.timeInSeconds = timeInSeconds;
@@ -30,7 +30,7 @@ namespace Orion
 
         #region Properties
         /// <summary>
-        /// Gets the number of this update.
+        /// Gets the number of this step.
         /// </summary>
         public int Number
         {
@@ -54,7 +54,7 @@ namespace Orion
         }
 
         /// <summary>
-        /// Gets the game time, in seconds, which has elapsed since the last update.
+        /// Gets the game time, in seconds, which has elapsed since the last step.
         /// </summary>
         public float TimeDeltaInSeconds
         {

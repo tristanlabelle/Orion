@@ -70,19 +70,14 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        /// <summary>
-        /// At each update, checks if an enemy unit is in range of the striker, if so it creates an attack taks
-        /// if not the units moves towards its destination. The appropriate tasks are uptated each time.
-        /// </summary>
-        /// <param name="timeDelta">The time elapsed since the last update, in seconds.</param>
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
-            if (attack != null) attack.Update(info);
+            if (attack != null) attack.Update(step);
 
             if (attack == null || attack.HasEnded)
             {
-                if (TryAttack()) attack.Update(info);
-                else move.Update(info);
+                if (TryAttack()) attack.Update(step);
+                else move.Update(step);
             }
         }
 

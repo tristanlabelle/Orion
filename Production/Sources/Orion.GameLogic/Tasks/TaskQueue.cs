@@ -99,12 +99,12 @@ namespace Orion.GameLogic.Tasks
         /// Updates the current task for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
-        public void Update(SimulationUpdateInfo info)
+        public void Update(SimulationStep step)
         {
             if (IsEmpty) return;
 
             Task task = Current;
-            task.Update(info);
+            task.Update(step);
             if (task.HasEnded)
             {
                 task.Dispose();

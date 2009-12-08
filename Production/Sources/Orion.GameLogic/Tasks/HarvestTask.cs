@@ -64,7 +64,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
             if (!node.IsHarvestableByFaction(Unit.Faction))
             {
@@ -74,7 +74,7 @@ namespace Orion.GameLogic.Tasks
 
             if (!move.HasEnded)
             {
-                move.Update(info);
+                move.Update(step);
                 return;
             }
 
@@ -85,9 +85,9 @@ namespace Orion.GameLogic.Tasks
             }
 
             if (mode == Mode.Extracting)
-                UpdateExtracting(info);
+                UpdateExtracting(step);
             else
-                UpdateDelivering(info);
+                UpdateDelivering(step);
         }
 
         public override void Dispose()
@@ -96,12 +96,12 @@ namespace Orion.GameLogic.Tasks
             if (depot != null) depot.Died -= depotDestroyedEventHandler;
         }
 
-        private void UpdateExtracting(SimulationUpdateInfo info)
+        private void UpdateExtracting(SimulationStep step)
         {
             Unit.LookAt(node.Center);
 
             float extractingSpeed = Unit.GetStat(UnitStat.ExtractingSpeed);
-            amountAccumulator += extractingSpeed * info.TimeDeltaInSeconds;
+            amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
             int maxCarryingAmount = Unit.GetSkill<Skills.HarvestSkill>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
@@ -142,11 +142,11 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private void UpdateDelivering(SimulationUpdateInfo info)
+        private void UpdateDelivering(SimulationStep step)
         {
             Unit.LookAt(depot.Center);
 
-            secondsGivingResource += info.TimeDeltaInSeconds;
+            secondsGivingResource += step.TimeDeltaInSeconds;
             if (secondsGivingResource < depositingDuration)
                 return;
             

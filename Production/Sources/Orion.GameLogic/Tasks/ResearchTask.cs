@@ -45,7 +45,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
             if (timeElapsed == 0)
             {
@@ -62,7 +62,7 @@ namespace Orion.GameLogic.Tasks
                 timeElapsed = float.Epsilon;
             }
 
-            timeElapsed += info.TimeDeltaInSeconds;
+            timeElapsed += step.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
                 Unit.Faction.ResearchTechnology(technology);
         }

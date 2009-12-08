@@ -179,16 +179,16 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates this <see cref="Entity"/> for a frame.
         /// </summary>
-        /// <param name="info">Information on this update.</param>
+        /// <param name="step">Information on this simulation step.</param>
         /// <remarks>
         /// Invoked by <see cref="EntityManager"/>.
         /// </remarks>
-        internal void Update(SimulationUpdateInfo info)
+        internal void Update(SimulationStep step)
         {
-            if (IsAlive) DoUpdate(info);
+            if (IsAlive) DoUpdate(step);
         }
 
-        protected virtual void DoUpdate(SimulationUpdateInfo info) { }
+        protected virtual void DoUpdate(SimulationStep step) { }
         #endregion
         #endregion
 

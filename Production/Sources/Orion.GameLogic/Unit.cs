@@ -418,18 +418,18 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
-            timeElapsedSinceLastHitInSeconds += info.TimeDeltaInSeconds;
+            timeElapsedSinceLastHitInSeconds += step.TimeDeltaInSeconds;
 
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.
-            if ((info.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
+            if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
                 && !IsUnderConstruction && IsIdle && HasSkill<Skills.AttackSkill>())
                 TryAttackNearbyUnit();
 
-            taskQueue.Update(info);
+            taskQueue.Update(step);
         }
 
         private bool TryAttackNearbyUnit()

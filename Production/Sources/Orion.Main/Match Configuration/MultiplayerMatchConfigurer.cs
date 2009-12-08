@@ -85,7 +85,7 @@ namespace Orion.Main
             pipeline.AddCommander(localCommander);
 
             match.Updated += (sender, args) =>
-                pipeline.Update(sender.LastSimulationUpdateNumber, args.TimeDeltaInSeconds);
+                pipeline.Update(sender.LastSimulationStepNumber, args.TimeDeltaInSeconds);
         }
 
         public virtual void Dispose()

@@ -55,7 +55,7 @@ namespace Orion.Main
             pipeline.PushFilter(new ReplayPlayer(replay));
 
             match.Updated += (sender, args) =>
-                pipeline.Update(sender.LastSimulationUpdateNumber, args.TimeDeltaInSeconds);
+                pipeline.Update(sender.LastSimulationStepNumber, args.TimeDeltaInSeconds);
         }
     }
 }

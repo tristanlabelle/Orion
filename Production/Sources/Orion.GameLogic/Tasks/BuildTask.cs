@@ -45,11 +45,11 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
             if (!move.HasEnded)
             {
-                move.Update(info);
+                move.Update(step);
                 return;
             }
 

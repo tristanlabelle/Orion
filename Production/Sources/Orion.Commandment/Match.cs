@@ -21,7 +21,7 @@ namespace Orion.Commandment
 
         private readonly Random random;
         private readonly World world;
-        private SimulationUpdateInfo lastSimulationUpdateInfo;
+        private SimulationStep lastSimulationStep;
         #endregion
 
         #region Constructors
@@ -91,19 +91,19 @@ namespace Orion.Commandment
         public bool IsRunning { get; private set; }
 
         /// <summary>
-        /// Gets the number of the last update that was run.
+        /// Gets the number of the last simulation step that was run.
         /// </summary>
-        public int LastSimulationUpdateNumber
+        public int LastSimulationStepNumber
         {
-            get { return lastSimulationUpdateInfo.Number; }
+            get { return lastSimulationStep.Number; }
         }
 
         /// <summary>
-        /// Gets the information associated with the last update of the game simulation.
+        /// Gets the information associated with the last step of the game simulation.
         /// </summary>
-        public SimulationUpdateInfo LastSimulationUpdateInfo
+        public SimulationStep LastSimulationStep
         {
-            get { return lastSimulationUpdateInfo; }
+            get { return lastSimulationStep; }
         }
         #endregion
 
@@ -124,12 +124,12 @@ namespace Orion.Commandment
         {
             if (IsRunning)
             {
-                lastSimulationUpdateInfo = new SimulationUpdateInfo(
-                    lastSimulationUpdateInfo.Number + 1,
-                    lastSimulationUpdateInfo.TimeInSeconds + timeDeltaInSeconds,
+                lastSimulationStep = new SimulationStep(
+                    lastSimulationStep.Number + 1,
+                    lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
                     timeDeltaInSeconds);
 
-                world.Update(lastSimulationUpdateInfo);
+                world.Update(lastSimulationStep);
             }
 
             RaiseUpdated(timeDeltaInSeconds);

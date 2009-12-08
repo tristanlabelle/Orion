@@ -83,13 +83,13 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
-            timeSinceLastPathfinding += info.TimeDeltaInSeconds;
+            timeSinceLastPathfinding += step.TimeDeltaInSeconds;
 
             if (pathWalker == null && !TryRepath()) return;
 
-            float distance = Unit.GetStat(UnitStat.MovementSpeed) * info.TimeDeltaInSeconds;
+            float distance = Unit.GetStat(UnitStat.MovementSpeed) * step.TimeDeltaInSeconds;
 
             Vector2 targetPosition;
             if (isOnPath)

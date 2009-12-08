@@ -59,7 +59,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        protected override void DoUpdate(SimulationStep step)
         {
             if (Unit.IsInAttackRange(target))
             {
@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
             }
             else if (follow != null)
             {
-                follow.Update(info);
+                follow.Update(step);
             }
         }
         #endregion

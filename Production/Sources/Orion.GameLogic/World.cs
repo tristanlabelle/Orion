@@ -221,10 +221,10 @@ namespace Orion.GameLogic
         /// <summary>
         /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
         /// </summary>
-        /// <param name="info">Information on this update.</param>
-        public void Update(SimulationUpdateInfo info)
+        /// <param name="step">Information on this simulation step.</param>
+        public void Update(SimulationStep step)
         {
-            entities.Update(info);
+            entities.Update(step);
         }
         #endregion
     }

@@ -279,7 +279,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new Skills.MoveSkill(14, false));
-            builder.Skills.Add(new Skills.AttackSkill(9, 8, 3));
+            builder.Skills.Add(new Skills.AttackSkill(6, 3, 3));
             Register(builder);
         }
 

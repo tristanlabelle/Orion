@@ -114,6 +114,13 @@ namespace Orion.Commandment
                 GenerateActionCommand(new ZoneAttackCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
+        public void LaunchHeal(IEnumerable<Unit> units, Unit hurtUnit)
+        {
+            units = units.Except(hurtUnit);
+            if (units.Count() > 0)
+                GenerateActionCommand(new HealCommand(Faction.Handle, units.Select(unit => unit.Handle), hurtUnit.Handle));
+        }
+
         public void GenerateActionCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");

@@ -37,7 +37,7 @@ namespace Orion.Commandment
 
                 if (startingNode != null)
                 {
-                    positions.Add(new Vector2(alageneStartingNode.Position.X + 2, alageneStartingNode.Position.Y + 2));
+                    positions.Add(new Vector2(alageneStartingNode.Position.X, alageneStartingNode.Position.Y));
                     DispatchBuilders("AlageneExtractor", positions);
                 }
 

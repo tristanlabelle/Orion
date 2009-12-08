@@ -22,6 +22,7 @@ namespace Orion.GameLogic
         MovementSpeed,
         SightRange,
         TrainingSpeed,
-        FoodStorageCapacity
+        FoodStorageCapacity,
+        HealSpeed
     }
 }

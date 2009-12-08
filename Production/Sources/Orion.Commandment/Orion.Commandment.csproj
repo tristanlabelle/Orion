@@ -55,6 +55,7 @@
     <Compile Include="Commands\BuildCommand.cs" />
     <Compile Include="Commands\ChangeDiplomaticStanceCommand.cs" />
     <Compile Include="Commands\ChangeRallyPointCommand.cs" />
+    <Compile Include="Commands\HealCommand.cs" />
     <Compile Include="Commands\HarvestCommand.cs" />
     <Compile Include="Commands\CancelCommand.cs" />
     <Compile Include="Commands\SendMessageCommand.cs" />

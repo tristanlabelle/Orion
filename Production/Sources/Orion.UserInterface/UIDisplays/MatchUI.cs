@@ -140,6 +140,7 @@ namespace Orion.UserInterface
             enablers.Add(new HarvestEnabler(userInputManager, actions, textureManager));
             enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
+            enablers.Add(new HealEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
             smurfType = world.UnitTypes.FromName("Schtroumpf");
             Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));

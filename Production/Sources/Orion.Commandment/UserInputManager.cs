@@ -252,6 +252,8 @@ namespace Orion.Commandment
                     }
                     else if (intersectedUnit.IsBuilding)
                         LaunchRepair(intersectedUnit);
+                    else if (!intersectedUnit.IsBuilding && intersectedUnit.Damage > 0)
+                        LaunchHeal(intersectedUnit);
                     else
                         LaunchMove(intersectedUnit.Position);
                 }
@@ -352,6 +354,18 @@ namespace Orion.Commandment
             if (targetUnits.Any(unit => unit.Faction != building.Faction)) return;
             commander.LaunchRepair(targetUnits, building);
         }
+
+        public void LaunchHeal(Unit hurtUnit)
+        {
+            if (hurtUnit.Type.IsBuilding) return;
+            if (hurtUnit.Damage < 1) return;
+
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.HealSkill>());
+            if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
+            commander.LaunchHeal(targetUnits, hurtUnit);
+        }
+
 
         public void LaunchTrain(UnitType unitType)
         {

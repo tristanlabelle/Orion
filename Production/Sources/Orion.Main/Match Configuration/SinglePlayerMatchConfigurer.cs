@@ -71,7 +71,8 @@ namespace Orion.Main
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(localCommander);
 
-            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
+            match.Updated += (sender, args) =>
+                pipeline.Update(sender.LastSimulationUpdateNumber, args.TimeDeltaInSeconds);
         }
     }
 }

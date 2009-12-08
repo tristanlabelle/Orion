@@ -54,7 +54,8 @@ namespace Orion.Main
             pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
             pipeline.PushFilter(new ReplayPlayer(replay));
 
-            match.Updated += (sender, args) => pipeline.Update(sender.LastFrameNumber, args.TimeDeltaInSeconds);
+            match.Updated += (sender, args) =>
+                pipeline.Update(sender.LastSimulationUpdateNumber, args.TimeDeltaInSeconds);
         }
     }
 }

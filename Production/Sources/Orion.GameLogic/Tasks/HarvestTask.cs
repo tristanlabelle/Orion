@@ -64,7 +64,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(UpdateInfo info)
+        protected override void DoUpdate(SimulationUpdateInfo info)
         {
             if (!node.IsHarvestableByFaction(Unit.Faction))
             {
@@ -96,7 +96,7 @@ namespace Orion.GameLogic.Tasks
             if (depot != null) depot.Died -= depotDestroyedEventHandler;
         }
 
-        private void UpdateExtracting(UpdateInfo info)
+        private void UpdateExtracting(SimulationUpdateInfo info)
         {
             Unit.LookAt(node.Center);
 
@@ -142,7 +142,7 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private void UpdateDelivering(UpdateInfo info)
+        private void UpdateDelivering(SimulationUpdateInfo info)
         {
             Unit.LookAt(depot.Center);
 

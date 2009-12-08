@@ -106,15 +106,15 @@ namespace Orion.Commandment.Commands.Pipeline
         }
         #endregion
 
-        public void Update(int frameNumber, float timeDeltaInSeconds)
+        public void Update(int simulationUpdateNumber, float timeDeltaInSeconds)
         {
             foreach (Commander commander in commanders.Keys)
                 commander.Update(timeDeltaInSeconds);
 
             foreach (CommandFilter filter in filters)
-                filter.Update(frameNumber, timeDeltaInSeconds);
+                filter.Update(simulationUpdateNumber, timeDeltaInSeconds);
 
-            sink.Update(frameNumber, timeDeltaInSeconds);
+            sink.Update(simulationUpdateNumber, timeDeltaInSeconds);
         }
         #endregion
     }

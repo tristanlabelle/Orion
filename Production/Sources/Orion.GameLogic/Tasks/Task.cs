@@ -56,12 +56,12 @@ namespace Orion.GameLogic.Tasks
         /// Updates this <see cref="Task"/> for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
-        public void Update(UpdateInfo info)
+        public void Update(SimulationUpdateInfo info)
         {
             if (!HasEnded) DoUpdate(info);
         }
 
-        protected abstract void DoUpdate(UpdateInfo info);
+        protected abstract void DoUpdate(SimulationUpdateInfo info);
 
         /// <summary>
         /// Releases all resources used by this <see cref="Task"/>.

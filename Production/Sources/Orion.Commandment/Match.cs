@@ -21,8 +21,7 @@ namespace Orion.Commandment
 
         private readonly Random random;
         private readonly World world;
-        private int lastFrameNumber;
-        private float gameTimeInSeconds;
+        private SimulationUpdateInfo lastSimulationUpdateInfo;
         #endregion
 
         #region Constructors
@@ -92,11 +91,19 @@ namespace Orion.Commandment
         public bool IsRunning { get; private set; }
 
         /// <summary>
-        /// Gets the number of the last frame that was ran.
+        /// Gets the number of the last update that was run.
         /// </summary>
-        public int LastFrameNumber
+        public int LastSimulationUpdateNumber
         {
-            get { return lastFrameNumber; }
+            get { return lastSimulationUpdateInfo.Number; }
+        }
+
+        /// <summary>
+        /// Gets the information associated with the last update of the game simulation.
+        /// </summary>
+        public SimulationUpdateInfo LastSimulationUpdateInfo
+        {
+            get { return lastSimulationUpdateInfo; }
         }
         #endregion
 
@@ -117,10 +124,12 @@ namespace Orion.Commandment
         {
             if (IsRunning)
             {
-                gameTimeInSeconds += timeDeltaInSeconds;
-                UpdateInfo info = new UpdateInfo(lastFrameNumber, gameTimeInSeconds, timeDeltaInSeconds);
-                world.Update(info);
-                lastFrameNumber++;
+                lastSimulationUpdateInfo = new SimulationUpdateInfo(
+                    lastSimulationUpdateInfo.Number + 1,
+                    lastSimulationUpdateInfo.TimeInSeconds + timeDeltaInSeconds,
+                    timeDeltaInSeconds);
+
+                world.Update(lastSimulationUpdateInfo);
             }
 
             RaiseUpdated(timeDeltaInSeconds);

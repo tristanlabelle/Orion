@@ -377,7 +377,7 @@ namespace Orion.GameLogic
             return faction.GetDiplomaticStance(other.faction);
         }
 
-        protected override void DoUpdate(UpdateInfo info)
+        protected override void DoUpdate(SimulationUpdateInfo info)
         {
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value

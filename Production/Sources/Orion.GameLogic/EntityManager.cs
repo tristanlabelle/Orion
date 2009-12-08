@@ -203,7 +203,7 @@ namespace Orion.GameLogic
         /// <remarks>
         /// Used by <see cref="World"/>.
         /// </remarks>
-        public void Update(UpdateInfo info)
+        public void Update(SimulationUpdateInfo info)
         {
             if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
 

@@ -222,7 +222,7 @@ namespace Orion.GameLogic
         /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
         /// </summary>
         /// <param name="info">Information on this update.</param>
-        public void Update(UpdateInfo info)
+        public void Update(SimulationUpdateInfo info)
         {
             entities.Update(info);
         }

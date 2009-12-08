@@ -11,7 +11,7 @@ namespace Orion
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
-    public struct UpdateInfo
+    public struct SimulationUpdateInfo
     {
         #region Fields
         private readonly int number;
@@ -20,7 +20,7 @@ namespace Orion
         #endregion
 
         #region Constructors
-        public UpdateInfo(int number, float timeInSeconds, float timeDeltaInSeconds)
+        public SimulationUpdateInfo(int number, float timeInSeconds, float timeDeltaInSeconds)
         {
             this.number = number;
             this.timeInSeconds = timeInSeconds;

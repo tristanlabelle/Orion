@@ -71,7 +71,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(UpdateInfo info)
+        protected override void DoUpdate(SimulationUpdateInfo info)
         {
             if (!move.HasEnded)
             {
@@ -84,7 +84,7 @@ namespace Orion.GameLogic.Tasks
             else UpdateRepair(info);
         }
 
-        private void UpdateBuild(UpdateInfo info)
+        private void UpdateBuild(SimulationUpdateInfo info)
         {
             target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * info.TimeDeltaInSeconds);
 
@@ -101,7 +101,7 @@ namespace Orion.GameLogic.Tasks
             }
         }
 
-        private void UpdateRepair(UpdateInfo info)
+        private void UpdateRepair(SimulationUpdateInfo info)
         {
             if (!TryGetCredit()) return;
 

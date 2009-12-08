@@ -99,7 +99,7 @@ namespace Orion.GameLogic.Tasks
         /// Updates the current task for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
-        public void Update(UpdateInfo info)
+        public void Update(SimulationUpdateInfo info)
         {
             if (IsEmpty) return;
 

@@ -183,12 +183,12 @@ namespace Orion.GameLogic
         /// <remarks>
         /// Invoked by <see cref="EntityManager"/>.
         /// </remarks>
-        internal void Update(UpdateInfo info)
+        internal void Update(SimulationUpdateInfo info)
         {
             if (IsAlive) DoUpdate(info);
         }
 
-        protected virtual void DoUpdate(UpdateInfo info) { }
+        protected virtual void DoUpdate(SimulationUpdateInfo info) { }
         #endregion
         #endregion
 

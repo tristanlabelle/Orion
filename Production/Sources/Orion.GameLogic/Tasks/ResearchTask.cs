@@ -45,7 +45,7 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
-        protected override void DoUpdate(UpdateInfo info)
+        protected override void DoUpdate(SimulationUpdateInfo info)
         {
             if (timeElapsed == 0)
             {

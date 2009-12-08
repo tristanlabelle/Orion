@@ -24,7 +24,7 @@ namespace Orion.Graphics
         private const float shadowAlpha = 0.3f;
         private const float shadowDistance = 0.7f;
         private const float shadowScaling = 0.6f;
-        private const float meleeHitSpinTimeInSeconds = 0.5f;
+        private const float meleeHitSpinTimeInSeconds = 0.25f;
         #endregion
 
         #region Methods
@@ -189,10 +189,14 @@ namespace Orion.Graphics
             if (unit.IsBuilding) return 0;
 
             float baseAngle = unit.Angle - (float)Math.PI * 0.5f;
-            if (unit.GetStat(UnitStat.AttackRange) == 0
-                || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
+            bool isMelee = unit.GetStat(UnitStat.AttackRange) == 0;
+            if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
                 return baseAngle;
-            return unit.IsBuilding ? 0 : 
+
+            float spinProgress = unit.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;
+            float spinAngle = spinProgress * (float)Math.PI * 2;
+
+            return baseAngle + spinAngle; 
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit)

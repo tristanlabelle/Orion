@@ -89,15 +89,11 @@ namespace Orion.UserInterface.UIDisplays
         #endregion
 
         #region Fields
-        private GenericEventHandler<Button> exitPanel;
-        private GenericEventHandler<Button> startGame;
         private Rectangle rowRectangle;
         protected Button startButton;
         protected Button exitButton;
 
         private ListFrame youListFrame;
-        private ListFrame localPlayersListFrame;
-        private ListFrame aiListFrame;
         #endregion
 
         #region Constructors

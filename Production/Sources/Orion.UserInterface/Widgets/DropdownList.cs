@@ -17,7 +17,6 @@ namespace Orion.UserInterface.Widgets
         {
             #region Fields
             private readonly DropdownList<T> parent;
-            private bool isSelectedItem;
             public readonly T Value;
             #endregion
 

@@ -91,7 +91,8 @@ namespace Orion.GameLogic.Tasks
             Unit target = Unit.World.Entities
                 .InArea(Unit.LineOfSight)
                 .OfType<Unit>()
-                .FirstOrDefault(other => Unit.GetDiplomaticStance(other) == DiplomaticStance.Enemy);
+                .FirstOrDefault(other =>
+                    Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
 
             if (target != null) attack = new AttackTask(Unit, target);
             return target != null;

@@ -13,7 +13,6 @@ namespace Orion.GameLogic.Tasks
         #region Fields
         private readonly Unit target;
         private readonly FollowTask follow;
-        private float hitDelayInSeconds;
         #endregion
 
         #region Constructors
@@ -27,7 +26,6 @@ namespace Orion.GameLogic.Tasks
             
             this.target = target;
             if (attacker.HasSkill<Skills.MoveSkill>()) this.follow = new FollowTask(attacker, target);
-            hitDelayInSeconds = attacker.GetStat(UnitStat.AttackDelay);
         }
         #endregion
 
@@ -66,15 +64,7 @@ namespace Orion.GameLogic.Tasks
             if (Unit.IsInAttackRange(target))
             {
                 Unit.LookAt(target.Center);
-                if (info.TimeInSeconds - Unit.LastHitTime > hitDelayInSeconds)
-                {
-                    int targetArmor = Unit.GetStat(UnitStat.AttackRange) == 0 ?
-                        target.GetStat(UnitStat.MeleeArmor) : target.GetStat(UnitStat.RangedArmor);
-                    int damage = Unit.GetStat(UnitStat.AttackPower) - targetArmor;
-                    if(damage < 1) damage = 1;
-                    target.Damage += damage;
-                    Unit.LastHitTime = info.TimeInSeconds;
-                }
+                Unit.TryHit(target);
             }
             else if (follow != null)
             {

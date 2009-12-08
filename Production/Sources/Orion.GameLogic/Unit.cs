@@ -32,7 +32,7 @@ namespace Orion.GameLogic
         private Vector2? rallyPoint;
         private float healthBuilt;
         private bool isUnderConstruction;
-        private float lastHitTime = float.NegativeInfinity;
+        private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         #endregion
 
         #region Constructors
@@ -88,6 +88,17 @@ namespace Orion.GameLogic
         {
             var handler = ConstructionComplete;
             if (handler != null) handler(this);
+        }
+
+        /// <summary>
+        /// Raised when this <see cref="Unit"/> has hit another <see cref="Unit"/>.
+        /// </summary>
+        public event GenericEventHandler<Unit, Unit> Hitted;
+
+        private void RaiseHitted(Unit target)
+        {
+            var handler = Hitted;
+            if (handler != null) handler(this, target);
         }
         #endregion
 
@@ -236,17 +247,11 @@ namespace Orion.GameLogic
         #endregion
 
         /// <summary>
-        /// Accesses the time when this <see cref="Unit"/> last hit something.
+        /// Accesses the time elapsed since this <see cref="Unit"/> last hit something, in seconds.
         /// </summary>
-        public float LastHitTime
+        public float TimeElapsedSinceLastHitInSeconds
         {
-            get { return lastHitTime; }
-            internal set
-            {
-                Argument.EnsurePositive(value, "lastHitTime");
-                Debug.Assert(value >= lastHitTime);
-                lastHitTime = value;
-            }
+            get { return timeElapsedSinceLastHitInSeconds; }
         }
 
         #region Rally Point
@@ -362,48 +367,30 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        /// <summary>
-        /// Gets the diplomatic stance of this <see cref="Unit"/> towards another one.
-        /// </summary>
-        /// <param name="other">
-        /// The <see cref="Unit"/> with regard to which the diplomatic stance is to be retrieved.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DiplomaticStance"/> with regard to that <see cref="Unit"/>.
-        /// </returns>
-        public DiplomaticStance GetDiplomaticStance(Unit other)
+        #region Actions
+        public bool TryHit(Unit target)
         {
-            Argument.EnsureNotNull(other, "other");
-            return faction.GetDiplomaticStance(other.faction);
+            Argument.EnsureNotNull(target, "target");
+            float hitDelayInSeconds = GetStat(UnitStat.AttackDelay);
+            if (timeElapsedSinceLastHitInSeconds < hitDelayInSeconds)
+                return false;
+            Hit(target);
+            return true;
         }
 
-        protected override void DoUpdate(SimulationUpdateInfo info)
+        public void Hit(Unit target)
         {
-            // OPTIM: As checking for nearby units takes a lot of processor time,
-            // we only do it once every few frames. We take our handle value
-            // so the units do not make their checks all at once.
-            if ((info.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
-                && !IsUnderConstruction && IsIdle && HasSkill<Skills.AttackSkill>())
-            {
-                Unit unitToAttack = World.Entities
-                    .InArea(LineOfSight)
-                    .OfType<Unit>()
-                    .Where(unit => GetDiplomaticStance(unit) == DiplomaticStance.Enemy)
-                    .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+            Argument.EnsureNotNull(target, "target");
 
-                if (unitToAttack != null)
-                {
-                    Tasks.AttackTask attackTask = new Tasks.AttackTask(this, unitToAttack);
-                    taskQueue.OverrideWith(attackTask);
-                }
-            }
+            bool isMelee = GetStat(UnitStat.AttackRange) == 0;
+            int targetArmor = target.GetStat(isMelee ? UnitStat.MeleeArmor : UnitStat.RangedArmor);
+            int damage = Math.Max(1, GetStat(UnitStat.AttackPower) - targetArmor);
 
-            taskQueue.Update(info);
-        }
+            target.Health -= damage;
 
-        public override string ToString()
-        {
-            return "{0} {2} {1}".FormatInvariant(Handle, type, faction);
+            timeElapsedSinceLastHitInSeconds = 0;
+
+            RaiseHitted(target);
         }
 
         public void Suicide()
@@ -428,6 +415,41 @@ namespace Orion.GameLogic
             Health = MaxHealth;
             isUnderConstruction = false;
             RaiseConstructionComplete();
+        }
+        #endregion
+
+        protected override void DoUpdate(SimulationUpdateInfo info)
+        {
+            timeElapsedSinceLastHitInSeconds += info.TimeDeltaInSeconds;
+
+            // OPTIM: As checking for nearby units takes a lot of processor time,
+            // we only do it once every few frames. We take our handle value
+            // so the units do not make their checks all at once.
+            if ((info.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
+                && !IsUnderConstruction && IsIdle && HasSkill<Skills.AttackSkill>())
+                TryAttackNearbyUnit();
+
+            taskQueue.Update(info);
+        }
+
+        private bool TryAttackNearbyUnit()
+        {
+            Unit unitToAttack = World.Entities
+                .InArea(LineOfSight)
+                .OfType<Unit>()
+                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy)
+                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+
+            if (unitToAttack == null) return false;
+        
+            Tasks.AttackTask attackTask = new Tasks.AttackTask(this, unitToAttack);
+            taskQueue.OverrideWith(attackTask);
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return "{0} {2} {1}".FormatInvariant(Handle, type, faction);
         }
         #endregion
     }

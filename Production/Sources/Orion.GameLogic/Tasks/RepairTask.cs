@@ -35,8 +35,6 @@ namespace Orion.GameLogic.Tasks
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
 
-            // TODO: check against repairability itself instead of the Building type,
-            // since otherwise mechanical units could be repaired too
             if (!target.Type.IsBuilding)
                 throw new ArgumentException("Can only repair buildings.", "target");
             if (repairer.Faction != target.Faction)

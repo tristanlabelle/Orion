@@ -182,21 +182,6 @@ namespace Orion.Geometry
         #region Methods
         #region Factory
         /// <summary>
-        /// Gets a circle that contains two circles.
-        /// </summary>
-        /// <param name="circle1">The first circle.</param>
-        /// <param name="circle2">The second circle.</param>
-        /// <returns>The union of those circles, as a new circle containing both.</returns>
-        public static Circle Union(Circle circle1, Circle circle2)
-        {
-            // TODO: Test Circle.Union
-            // The center is the weighted average of the circle centers.
-            float radiusSum = circle1.radius + circle2.radius;
-            Vector2 center = (circle1.center * circle1.radius + circle2.center * circle2.radius) / radiusSum;
-            return new Circle(center, radiusSum * 0.5f);
-        }
-
-        /// <summary>
         /// Gets the signed distance between two <see cref="Circle"/>.
         /// </summary>
         /// <param name="circle1">The first <see cref="Circle"/> to be tested..</param>

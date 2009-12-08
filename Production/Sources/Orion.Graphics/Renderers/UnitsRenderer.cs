@@ -24,6 +24,7 @@ namespace Orion.Graphics
         private const float shadowAlpha = 0.3f;
         private const float shadowDistance = 0.7f;
         private const float shadowScaling = 0.6f;
+        private const float meleeHitSpinTimeInSeconds = 0.5f;
         #endregion
 
         #region Methods
@@ -185,7 +186,13 @@ namespace Orion.Graphics
         {
             // Workaround the fact that our unit textures face up,
             // and building textures are not supposed to be rotated.
-            return unit.IsBuilding ? 0 : unit.Angle - (float)Math.PI * 0.5f;
+            if (unit.IsBuilding) return 0;
+
+            float baseAngle = unit.Angle - (float)Math.PI * 0.5f;
+            if (unit.GetStat(UnitStat.AttackRange) == 0
+                || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
+                return baseAngle;
+            return unit.IsBuilding ? 0 : 
         }
 
         public void DrawHealthBar(GraphicsContext context, Unit unit)

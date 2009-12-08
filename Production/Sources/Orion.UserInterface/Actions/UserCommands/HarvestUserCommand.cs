@@ -39,7 +39,6 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void Execute(Vector2 point)
         {
-            // todo: don't silently fail
         }
     }
 }

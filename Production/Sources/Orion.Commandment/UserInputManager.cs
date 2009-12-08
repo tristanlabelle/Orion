@@ -240,7 +240,6 @@ namespace Orion.Commandment
             Unit intersectedUnit = intersectedEntity as Unit;
             if (intersectedUnit != null)
             {
-                // TODO: implement better friendliness checks
                 if (intersectedUnit.Faction == commander.Faction)
                 {
                     if (intersectedUnit.HasSkill<Skills.ExtractAlageneSkill>())

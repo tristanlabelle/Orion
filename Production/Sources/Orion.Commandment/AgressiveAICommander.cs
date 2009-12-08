@@ -43,7 +43,6 @@ namespace Orion.Commandment
 
                 InitiateTraining("Viking", 1);
 
-                //TODO: remove this part when the AI is sandboxed as it is only here to test the behavior of the AI
                 if(World.Factions.First().Units.Where
                     (unit => unit.HasSkill<Skills.AttackSkill>())
                     .Count() != 0)

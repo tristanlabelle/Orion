@@ -213,7 +213,7 @@ namespace Orion.GameLogic
         /// </summary>
         public float ConstructionProgress
         {
-            get { return isUnderConstruction ? healthBuilt / MaxHealth : 1; }
+            get { return isUnderConstruction ? Math.Min(healthBuilt / MaxHealth, 1) : 1; }
         }
         #endregion
 

@@ -13,24 +13,20 @@ namespace Orion.GameLogic
     public sealed class EntityGrid
     {
         #region Fields
-        private readonly Terrain terrain;
         private readonly Entity[,] grid;
         #endregion
 
         #region Constructors
-        public EntityGrid(Terrain terrain)
+        public EntityGrid(Size size)
         {
-            Argument.EnsureNotNull(terrain, "terrain");
-
-            this.terrain = terrain;
-            this.grid = new Entity[terrain.Size.Width, terrain.Size.Height];
+            this.grid = new Entity[size.Width, size.Height];
         }
         #endregion
 
         #region Properties
         public Size Size
         {
-            get { return terrain.Size; }
+            get { return new Size(grid.GetLength(0), grid.GetLength(1)); }
         }
         #endregion
 

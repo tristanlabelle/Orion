@@ -68,7 +68,7 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (!Unit.World.IsFree(buildingPlan.GridRegion))
+            if (!Unit.World.IsFree(buildingPlan.GridRegion, Unit.CollisionLayer))
             {
                 Debug.WriteLine("Cannot build {0}, spot occupied.".FormatInvariant(buildingPlan.BuildingType));
                 hasEnded = true;

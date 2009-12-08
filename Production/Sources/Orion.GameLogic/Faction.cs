@@ -282,28 +282,6 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        #region Pathfinding
-        /// <summary>
-        /// Finds a path from a source to a destination.
-        /// </summary>
-        /// <param name="source">The position where the path should start.</param>
-        /// <param name="destinationDistanceEvaluator">
-        /// A delegate to a method which evaluates the distance to the destination.
-        /// </param>
-        /// <returns>The path that was found, or <c>null</c> if there is none.</returns>
-        public Path FindPath(Point source, Func<Point, float> destinationDistanceEvaluator)
-        {
-            return world.FindPath(source, destinationDistanceEvaluator, IsPathable);
-        }
-
-        private bool IsPathable(Point point)
-        {
-            if (!world.IsWithinBounds(point)) return false;
-            if (GetTileVisibility(point) == TileVisibility.Undiscovered) return true;
-            return world.IsFree(point);
-        }
-        #endregion
-
         #region Units
         /// <summary>
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
@@ -513,7 +491,7 @@ namespace Orion.GameLogic
 
             buildingMemory.RemoveWhere(rememberedBuilding =>
             {
-                Unit building = world.Entities.GetSolidEntityAt(rememberedBuilding.Location) as Unit;
+                Unit building = world.Entities.GetEntityAt(rememberedBuilding.Location, CollisionLayer.Ground) as Unit;
                 return building == null || !rememberedBuilding.Matches(building);
             });
         }

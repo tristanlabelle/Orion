@@ -119,7 +119,7 @@ namespace Orion.GameLogic
 
         public override CollisionLayer CollisionLayer
         {
-            get { return type.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground; }
+            get { return type.CollisionLayer; }
         }
         #endregion
 

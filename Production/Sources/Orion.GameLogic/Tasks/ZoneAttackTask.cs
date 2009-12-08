@@ -35,7 +35,7 @@ namespace Orion.GameLogic.Tasks
             
             this.destination = destination;
             this.targetDistance = unit.GetStat(UnitStat.AttackRange);
-            this.move = MoveTask.ToPoint(unit, destination);
+            this.move = new MoveTask(unit, (Point)destination);
         }
         #endregion
 

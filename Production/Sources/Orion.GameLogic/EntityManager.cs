@@ -77,7 +77,8 @@ namespace Orion.GameLogic
         private readonly World world;
         private readonly Func<Handle> handleGenerator = Handle.CreateGenerator();
         private readonly SortedList<Handle, Entity> entities = new SortedList<Handle, Entity>();
-        private readonly EntityGrid grid;
+        private readonly EntityGrid groundGrid;
+        private readonly EntityGrid airGrid;
         private readonly EntityZoneManager zoneManager;
 
         // Used to defer modification of the "entities" collection.
@@ -102,7 +103,8 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(world, "world");
 
             this.world = world;
-            this.grid = new EntityGrid(world.Terrain);
+            this.groundGrid = new EntityGrid(world.Size);
+            this.airGrid = new EntityGrid(world.Size);
             this.zoneManager = new EntityZoneManager(world.Size);
             this.entityDiedEventHandler = OnEntityDied;
             this.entityMovedEventHandler = OnEntityMoved;
@@ -225,8 +227,8 @@ namespace Orion.GameLogic
             if (isUpdating) DeferAdd(entity);
             else CommitAdd(entity);
 
-            if (entity.CollisionLayer == CollisionLayer.Ground)
-                grid.Add(entity);
+            EntityGrid grid = GetGrid(entity.CollisionLayer);
+            if (grid != null) grid.Add(entity);
         }
 
         private void Move(Entity entity, Vector2 oldPosition)
@@ -234,7 +236,8 @@ namespace Orion.GameLogic
             if (isUpdating) DeferMove(entity, oldPosition);
             else CommitMove(entity, oldPosition);
 
-            if (entity.CollisionLayer == CollisionLayer.Ground)
+            EntityGrid grid = GetGrid(entity.CollisionLayer);
+            if (grid != null)
             {
                 Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
                 Region newRegion = Entity.GetGridRegion(entity.Position, entity.Size);
@@ -251,8 +254,8 @@ namespace Orion.GameLogic
             if (isUpdating) DeferRemove(entity);
             else CommitRemove(entity);
 
-            if (entity.CollisionLayer == CollisionLayer.Ground)
-                grid.Remove(entity);
+            EntityGrid grid = GetGrid(entity.CollisionLayer);
+            if (grid != null) grid.Remove(entity);
         }
 
         #region Deferring
@@ -331,6 +334,13 @@ namespace Orion.GameLogic
         #endregion
 
         #region Queries
+        private EntityGrid GetGrid(CollisionLayer layer)
+        {
+            if (layer == CollisionLayer.Ground) return groundGrid;
+            if (layer == CollisionLayer.Air) return airGrid;
+            return null;
+        }
+
         /// <summary>
         /// Gets a <see cref="Entity"/> of this <see cref="UnitRegistry"/> from its unique identifier.
         /// </summary>
@@ -346,8 +356,10 @@ namespace Orion.GameLogic
             return entity;
         }
 
-        public Entity GetSolidEntityAt(Point point)
+        public Entity GetEntityAt(Point point, CollisionLayer layer)
         {
+            EntityGrid grid = GetGrid(layer);
+            if (grid == null) return null;
             return grid[point];
         }
 

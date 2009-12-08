@@ -76,7 +76,11 @@ namespace Orion.GameLogic.Tasks
                     Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
                     Vector2 traineeDelta = trainee.Center - Unit.Center;
                     trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-                    if (Unit.HasRallyPoint) trainee.TaskQueue.OverrideWith(MoveTask.ToPoint(trainee, Unit.RallyPoint.Value));
+                    if (Unit.HasRallyPoint)
+                    {
+                        MoveTask moveToRallyPointTask = new MoveTask(trainee, (Point)Unit.RallyPoint.Value);
+                        trainee.TaskQueue.OverrideWith(moveToRallyPointTask);
+                    }
                     hasEnded = true;
                 }
                 else
@@ -88,20 +92,25 @@ namespace Orion.GameLogic.Tasks
 
         private Point? GetSpawnPoint()
         {
-            if (traineeType.IsAirborne) return (Point)Unit.Center;
+            Region trainerRegion = Unit.GridRegion;
+            Region spawnRegion = new Region(
+                trainerRegion.MinX - traineeType.Size.Width,
+                trainerRegion.MinY - traineeType.Size.Height,
+                trainerRegion.Size.Width + traineeType.Size.Width + 1,
+                trainerRegion.Size.Height + traineeType.Size.Height + 1);
 
-            var adjacentPoints = Unit.GridRegion.GetAdjacentPoints()
-                    .Where(point => Unit.World.IsWithinBounds(point) && Unit.World.IsFree(point));
+            var potentialSpawnPoints = spawnRegion.Points
+                .Where(point => Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer));
 
             if (Unit.HasRallyPoint)
             {
-                return adjacentPoints
+                return potentialSpawnPoints
                     .Select(point => (Point?)point)
                     .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint.Value).LengthSquared);
             }
             else
             {
-                return adjacentPoints.FirstOrNull();
+                return potentialSpawnPoints.FirstOrNull();
             }
         }
         #endregion

@@ -257,7 +257,7 @@ namespace Orion.Commandment
                     random.Next(world.Size.Height - size.Height));
 
                 Region region = new Region(location, size);
-                if (world.IsFree(region)) return location;
+                if (world.IsFree(region, CollisionLayer.Ground)) return location;
             }
         }
 

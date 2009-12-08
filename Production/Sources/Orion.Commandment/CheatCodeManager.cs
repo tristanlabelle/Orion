@@ -147,7 +147,6 @@ namespace Orion.Commandment
             IncreaseAvailableFood(match, faction);
             SpawnChuckNorris(match, faction);
             AccelerateUnitDevelopment(match, faction);
-            SpawnMisterT(match, faction);
         }
         #endregion
         #endregion

@@ -95,18 +95,18 @@
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\TrainSkill.cs" />
     <Compile Include="TagSet.cs" />
+    <Compile Include="Tasks\MoveTask.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tasks\Task.cs" />
     <Compile Include="Tasks\TaskQueue.cs" />
     <Compile Include="Tasks\AttackTask.cs" />
     <Compile Include="Tasks\BuildTask.cs" />
-    <Compile Include="Tasks\FlyTask.cs" />
     <Compile Include="Tasks\FollowTask.cs" />
     <Compile Include="Tasks\HarvestTask.cs" />
-    <Compile Include="Tasks\MoveTask.cs" />
     <Compile Include="Tasks\RepairTask.cs" />
     <Compile Include="Tasks\ResearchTask.cs" />
     <Compile Include="Tasks\TrainTask.cs" />
-    <Compile Include="Tasks\WalkTask.cs" />
     <Compile Include="Tasks\ZoneAttackTask.cs" />
     <Compile Include="Technologies\Technology.cs" />
     <Compile Include="Technologies\TechnologyBuilder.cs" />

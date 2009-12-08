@@ -111,14 +111,15 @@ namespace Orion.GameLogic
 
         #region Methods
         #region Pathfinding
-        public bool IsFree(Point point)
+        public bool IsFree(Point point, CollisionLayer layer)
         {
-            return terrain.IsWalkable(point) && entities.GetSolidEntityAt(point) == null;
+            if (layer == CollisionLayer.Ground && !terrain.IsWalkable(point)) return false;
+            return entities.GetEntityAt(point, layer) == null;
         }
 
-        public bool IsFree(Region region)
+        public bool IsFree(Region region, CollisionLayer layer)
         {
-            return region.Points.All(point => IsFree(point));
+            return region.Points.All(point => IsFree(point, layer));
         }
 
         /// <summary>

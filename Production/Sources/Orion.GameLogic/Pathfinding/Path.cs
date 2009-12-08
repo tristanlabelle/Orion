@@ -34,9 +34,9 @@ namespace Orion.GameLogic.Pathfinding
         }
 
         /// <summary>
-        /// Gets the destination point of this path.
+        /// Gets the end point of this path.
         /// </summary>
-        public Point Destination
+        public Point End
         {
             get { return points[points.Count - 1]; }
         }

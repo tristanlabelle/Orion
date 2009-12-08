@@ -96,6 +96,11 @@ namespace Orion.GameLogic
             }
         }
 
+        public CollisionLayer CollisionLayer
+        {
+            get { return IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground; }
+        }
+
         public int FoodCost
         {
             get { return foodCost; }

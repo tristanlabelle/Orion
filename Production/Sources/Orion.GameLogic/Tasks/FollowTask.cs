@@ -36,7 +36,7 @@ namespace Orion.GameLogic.Tasks
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
 
             this.target = target;
-            this.moveTask = MoveTask.ToPoint(follower, target.Position);
+            this.moveTask = new MoveTask(follower, (Point)target.Center);
             this.oldTargetPosition = target.Position;
         }
         #endregion
@@ -91,7 +91,7 @@ namespace Orion.GameLogic.Tasks
             float distanceToTarget = (target.Position - Unit.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
             {
-                moveTask = MoveTask.ToPoint(Unit, target.Position);
+                moveTask = new MoveTask(Unit, (Point)target.Center);
                 oldTargetPosition = target.Position;
             }
 

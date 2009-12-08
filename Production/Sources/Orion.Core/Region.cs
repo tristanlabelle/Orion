@@ -154,6 +154,12 @@ namespace Orion
                 && point.X < ExclusiveMaxX && point.Y < ExclusiveMaxY;
         }
 
+        public bool Contains(Region other)
+        {
+            Point otherInclusiveMax = new Point(other.MinX + Width - 1, other.MinY + Height - 1);
+            return Contains(other.min) && Contains(otherInclusiveMax);
+        }
+
         /// <summary>
         /// Clamps a point so its coordinates are within this region.
         /// </summary>

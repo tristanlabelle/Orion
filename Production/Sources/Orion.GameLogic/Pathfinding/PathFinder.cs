@@ -121,11 +121,11 @@ namespace Orion.GameLogic.Pathfinding
             points.Reverse();
         }
 
-        private PathNode GetPathNode(PathNode parentNode, Point16 position,
+        private PathNode GetPathNode(PathNode parentNode, Point position,
             float costFromSource, float distanceToDestination)
         {
             PathNode node = nodePool.Get();
-            node.Reset(parentNode, position, costFromSource, distanceToDestination);
+            node.Reset(parentNode, (Point16)position, costFromSource, distanceToDestination);
             return node;
         }
 
@@ -159,7 +159,7 @@ namespace Orion.GameLogic.Pathfinding
             return openNodes.Values.WithMinOrDefault(node => node.DistanceToDestination);
         }
 
-        private float GetDistance(Point16 a, Point16 b)
+        private float GetDistance(Point a, Point b)
         {
             return ((Vector2)a - (Vector2)b).LengthFast;
         }
@@ -182,8 +182,8 @@ namespace Orion.GameLogic.Pathfinding
             ///
             // #B
             // A#
-            if (!IsOpenable(new Point16((short)(currentNode.Point.X + offsetX), currentNode.Point.Y))
-                || !IsOpenable(new Point16(currentNode.Point.X, (short)(currentNode.Point.Y + offsetY))))
+            if (!IsOpenable(new Point(currentNode.Point.X + offsetX, currentNode.Point.Y))
+                || !IsOpenable(new Point(currentNode.Point.X, currentNode.Point.Y + offsetY)))
                 return;
 
             AddAdjacentNode(currentNode, offsetX, offsetY);
@@ -193,17 +193,17 @@ namespace Orion.GameLogic.Pathfinding
         {
             int x = currentNode.Point.X + offsetX;
             int y = currentNode.Point.Y + offsetY;
-            Point16 nearNode = new Point16((short)x, (short)y);
+            Point nearNode = new Point(x, y);
             AddNearbyNode(currentNode, nearNode);
         }
 
-        private bool IsOpenable(Point16 nearbyPoint)
+        private bool IsOpenable(Point nearbyPoint)
         {
-            return !closedNodes.ContainsKey(nearbyPoint)
+            return !closedNodes.ContainsKey((Point16)nearbyPoint)
                 && isWalkable(nearbyPoint);
         }
 
-        private void AddNearbyNode(PathNode currentNode, Point16 nearbyPoint)
+        private void AddNearbyNode(PathNode currentNode, Point nearbyPoint)
         {
             if (!IsOpenable(nearbyPoint)) return;
 
@@ -218,7 +218,7 @@ namespace Orion.GameLogic.Pathfinding
             float costFromSource = currentNode.CostFromSource + movementCost;
 
             PathNode nearbyNode;
-            if (openNodes.TryGetValue(nearbyPoint, out nearbyNode))
+            if (openNodes.TryGetValue((Point16)nearbyPoint, out nearbyNode))
             {
                 if (costFromSource < nearbyNode.CostFromSource)
                 {
@@ -232,11 +232,11 @@ namespace Orion.GameLogic.Pathfinding
                 // Add the node to the open list
                 float estimatedCostToDestination = destinationDistanceEvaluator(nearbyPoint);
                 nearbyNode = GetPathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
-                openNodes.Add(nearbyPoint, nearbyNode);
+                openNodes.Add((Point16)nearbyPoint, nearbyNode);
             }
         }
 
-        private bool IsSameDirection(Point16 a, Point16 b, Point16 c)
+        private bool IsSameDirection(Point a, Point b, Point c)
         {
             return (c.X - b.X) == (b.X - a.X) && (c.Y - b.Y) == (b.Y - a.Y);
         }

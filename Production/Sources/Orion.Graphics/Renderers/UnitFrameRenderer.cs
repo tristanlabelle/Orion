@@ -26,6 +26,7 @@ namespace Orion.Graphics
 
         private readonly Unit unit;
         private readonly UnitsRenderer unitsRenderer;
+        private bool unitBeingCreated; 
         #endregion
 
         #region Constructors
@@ -36,6 +37,7 @@ namespace Orion.Graphics
 
             this.unit = unit;
             this.unitsRenderer = unitsRenderer;
+            this.unitBeingCreated = false; 
         }
         #endregion
 
@@ -44,44 +46,54 @@ namespace Orion.Graphics
         {
             if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current != null)
             {
-                int firstStartingXPos = 150; 
-                int firstStartingYPos = 60;
+                unitBeingCreated = true;
+                int firstStartingXPos = 360;
+                int firstStartingYPos = 120;
                 if (unit.TaskQueue.Count >= 1)
                 {
                     for (int i = 0; i < unit.TaskQueue.Count; i++)
                     {
-                        if (i == 4)
+                        if (i+1 == 2)
                         {
-                            firstStartingXPos = 150;
-                            firstStartingYPos = 10;
+                            firstStartingXPos = 159;
+                            firstStartingYPos = 80;
+                        }
+                        if (i+1 == 6)
+                        {
+                            firstStartingXPos = 159;
+                            firstStartingYPos = 35;
                         }
 
                         // Returns a Task, and finds the unit associated to that Task. 
                         TrainTask train = (TrainTask)unit.TaskQueue[i];
                         Texture texture = unitsRenderer.GetTypeTexture(train.TraineeType);
 
-                        Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 48, 48);
+                        Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
                         context.FillColor = Color.Black;
                         context.Fill(rect2);
                         context.FillColor = Color.White;
                         context.Stroke(rect2);
-                        
+
                         // Fills first rectangle with a character. 
-                        Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 32, 32);
+                        Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 26, 26);
                         context.Fill(rect, texture);
                         context.FillColor = unit.Faction.Color;
                         context.Stroke(rect);
 
                         // Draws a completion HealthBar
-                        Rectangle healthRect = new Rectangle(300, 150, 180, 10);
-                        DrawCompletionRect(context, healthRect, train.Progress);
+                        Rectangle healthRect = new Rectangle(152 ,120, 186, 10);
+                        TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue.ElementAt(0);
+                        DrawCompletionRect(context, healthRect,currentUnitBeingTrained.Progress);
 
                         base.Draw(context);
-                        firstStartingXPos += 60;
+                        firstStartingXPos += 50;
+                        context.FillColor = Color.Black;
+                     
                     }
+                    string message = "In progress...";
+                    context.Draw(message, new Vector2(150, 5));
                 }
             }
-
             context.Font = statsFont;
             const float textLineDistance = 25;
             const float firstLineY = 160;
@@ -92,19 +104,20 @@ namespace Orion.Graphics
             context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
 
             float y = firstLineY - textLineDistance * 2;
-            foreach (UnitStat stat in statsToDisplay)
+            if (!unitBeingCreated)
             {
-                if (stat == UnitStat.MaxHealth) continue;
-                int value = unit.GetStat(stat);
-                if (value == 0) continue;
-                string message = "{0}: {1}".FormatInvariant(Casing.CamelToWords(stat.ToStringInvariant()), value);
-                context.Draw(message, new Vector2(150, y));
-                y -= textLineDistance;
+                foreach (UnitStat stat in statsToDisplay)
+                {
+                    if (stat == UnitStat.MaxHealth) continue;
+                    int value = unit.GetStat(stat);
+                    if (value == 0) continue;
+                    string message = "{0}: {1}".FormatInvariant(Casing.CamelToWords(stat.ToStringInvariant()), value);
+                    context.Draw(message, new Vector2(150, y));
+                    y -= textLineDistance;
+                }
             }
-
             base.Draw(context);
         }
-
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)
         {
             context.FillColor = Color.Black;

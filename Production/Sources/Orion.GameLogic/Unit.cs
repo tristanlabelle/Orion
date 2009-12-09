@@ -457,7 +457,7 @@ namespace Orion.GameLogic
                            .InArea(LineOfSight)
                            .OfType<Unit>()
                            .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
-                               && unit != this && unit.damage > 0)
+                               && unit != this && unit.damage > 0 && !unit.IsBuilding)
                            .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToHeal == null) return false;

@@ -371,11 +371,13 @@ namespace Orion.GameLogic
             {
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
+                return;
             }
             if (IsStuck())
             {
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
+                return;
             }
         }
         

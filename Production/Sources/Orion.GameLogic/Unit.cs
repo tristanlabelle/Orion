@@ -425,10 +425,14 @@ namespace Orion.GameLogic
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.
-            if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod) % nearbyEnemyCheckPeriod == 0
-                && !IsUnderConstruction && IsIdle && HasSkill<Skills.AttackSkill>())
-                TryAttackNearbyUnit();
-
+            if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
+                % nearbyEnemyCheckPeriod == 0 && IsIdle)
+            {
+                if (!IsUnderConstruction && HasSkill<Skills.AttackSkill>())
+                    TryAttackNearbyUnit();
+                else if (HasSkill<Skills.HealSkill>())
+                    TryHealNearbyUnit();
+            }
             taskQueue.Update(step);
         }
 
@@ -444,6 +448,22 @@ namespace Orion.GameLogic
         
             Tasks.AttackTask attackTask = new Tasks.AttackTask(this, unitToAttack);
             taskQueue.OverrideWith(attackTask);
+            return true;
+        }
+
+        private bool TryHealNearbyUnit()
+        {
+            Unit unitToHeal = World.Entities
+                           .InArea(LineOfSight)
+                           .OfType<Unit>()
+                           .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
+                               && unit != this && unit.damage > 0)
+                           .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+
+            if (unitToHeal == null) return false;
+
+            HealTask healTask = new HealTask(this, unitToHeal);
+            taskQueue.OverrideWith(healTask);
             return true;
         }
 

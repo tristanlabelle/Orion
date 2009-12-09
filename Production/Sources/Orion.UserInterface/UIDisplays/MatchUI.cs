@@ -188,10 +188,10 @@ namespace Orion.UserInterface
             Rectangle southFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.02f));
             Rectangle eastFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.98f, 0), new Vector2(1, 1));
             Rectangle westFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.02f, 1));
-            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 1), Keys.Up);
-            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -1), Keys.Down);
-            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(1, 0), Keys.Right);
-            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-1, 0), Keys.Left);
+            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 0.05f), Keys.Up);
+            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -0.05f), Keys.Down);
+            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(0.025f, 0), Keys.Right);
+            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-0.025f, 0), Keys.Left);
 
             Children.Add(northScroller);
             Children.Add(southScroller);

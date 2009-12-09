@@ -25,6 +25,12 @@ namespace Orion.UserInterface.Widgets
             base.OnMouseDown(args);
             return false;
         }
+
+        protected override bool OnDoubleClick(MouseEventArgs args)
+        {
+            base.OnDoubleClick(args);
+            return false;
+        }
         #endregion
     }
 }

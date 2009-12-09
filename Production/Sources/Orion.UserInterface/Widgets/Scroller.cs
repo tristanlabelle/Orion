@@ -72,7 +72,8 @@ namespace Orion.UserInterface.Widgets
         {
             if ((mouseTriggered || keyboardTriggered) && Enabled)
             {
-                scrolledView.ScrollBy(direction * args.TimeDeltaInSeconds * 40);
+                Vector2 scrollFactor = new Vector2(direction.X * scrolledView.Bounds.Width, direction.Y * scrolledView.Bounds.Height);
+                scrolledView.ScrollBy(scrollFactor * args.TimeDeltaInSeconds * 40);
             }
         }
 

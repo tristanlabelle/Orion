@@ -15,8 +15,9 @@ namespace Orion.Networking
     {
         #region Fields
         #region Updates Rate Management
+        private const int retainedSeconds = 5;
+        private const int updatesPerSecond = 40;
         private const int defaultUpdatesPerFrame = 6;
-        private const int maxEnqueuedFrameDurations = 0x48;
         private readonly List<int> updatesForCommandFrame = new List<int>();
         private readonly Queue<int> previousFramesDuration = new Queue<int>();
         private int updatesSinceLastCommandFrame = defaultUpdatesPerFrame - 1;
@@ -127,9 +128,10 @@ namespace Orion.Networking
             int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
             string[] updates = updatesForCommandFrame.OrderBy(i => i).Select(i => i.ToString()).ToArray();
             Debug.WriteLine("Current UPCFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updates), longestCommandFrame));
+            
             previousFramesDuration.Enqueue(longestCommandFrame);
-            if (previousFramesDuration.Count > maxEnqueuedFrameDurations) previousFramesDuration.Dequeue();
-            updatesForCommandFrame.Clear();
+            while (previousFramesDuration.Sum() > retainedSeconds * updatesPerSecond)
+                previousFramesDuration.Dequeue();
         }
 
         private void FlushCommands()

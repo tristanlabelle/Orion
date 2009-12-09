@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Keys = System.Windows.Forms.Keys;
 
 using OpenTK.Math;
 using Orion.Geometry;
@@ -35,6 +36,7 @@ namespace Orion.UserInterface.Widgets
             Frame container = new Frame(frameRect);
             Label displayedMessage = new Label(labelRect, message);
             Button okButton = new Button(buttonRect, "Ok");
+            okButton.HotKey = Keys.Enter;
             okButton.Triggered += button => { container.Dispose(); if(action != null) action(); };
 
             container.Children.Add(displayedMessage);

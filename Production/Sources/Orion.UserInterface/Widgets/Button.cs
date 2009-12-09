@@ -101,6 +101,12 @@ namespace Orion.UserInterface.Widgets
             return false;
         }
 
+        protected override bool OnDoubleClick(MouseEventArgs args)
+        {
+            base.OnDoubleClick(args);
+            return false;
+        }
+
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             if (args.Key == hotKey)

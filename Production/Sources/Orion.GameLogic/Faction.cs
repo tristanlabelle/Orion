@@ -365,8 +365,19 @@ namespace Orion.GameLogic
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
             }
+            if (IsStuck())
+            {
+                status = FactionStatus.Defeated;
+                RaiseDefeated();
+            }
         }
-
+        
+        private bool IsStuck()
+        {
+            if (MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<Skills.BuildSkill>()))
+                return true;
+            return false;
+        }
         #region Diplomacy
         /// <summary>
         /// Changes the diplomatic stance of this <see cref="Faction"/>

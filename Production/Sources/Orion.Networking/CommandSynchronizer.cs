@@ -130,8 +130,9 @@ namespace Orion.Networking
             Debug.WriteLine("Current UPCFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updates), longestCommandFrame));
             
             previousFramesDuration.Enqueue(longestCommandFrame);
-            while (previousFramesDuration.Sum() > retainedSeconds * updatesPerSecond)
+            while (previousFramesDuration.Count > 1 && previousFramesDuration.Sum() > retainedSeconds * updatesPerSecond)
                 previousFramesDuration.Dequeue();
+            updatesForCommandFrame.Clear();
         }
 
         private void FlushCommands()

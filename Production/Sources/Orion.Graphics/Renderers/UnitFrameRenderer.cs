@@ -26,7 +26,10 @@ namespace Orion.Graphics
 
         private readonly Unit unit;
         private readonly UnitsRenderer unitsRenderer;
-        private bool unitBeingCreated; 
+        private bool unitBeingCreated;
+        private const float textLineDistance = 25;
+        private const float firstLineY = 160;
+
         #endregion
 
         #region Constructors
@@ -94,15 +97,13 @@ namespace Orion.Graphics
                     context.Draw(message, new Vector2(150, 5));
                 }
             }
+            if (unit.TaskQueue.IsEmpty)
+                unitBeingCreated = false;
             context.Font = statsFont;
-            const float textLineDistance = 25;
-            const float firstLineY = 160;
-
             context.FillColor = Color.DarkBlue;
             context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
             string hp = "HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth);
             context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
-
             float y = firstLineY - textLineDistance * 2;
             if (!unitBeingCreated)
             {

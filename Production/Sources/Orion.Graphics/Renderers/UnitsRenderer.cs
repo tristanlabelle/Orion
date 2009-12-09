@@ -256,7 +256,24 @@ namespace Orion.Graphics
 
             graphics.StrokeColor = Color.Gray;
             foreach (Path path in paths)
+            {
+                var points = path.Points;
+                LineSegment segment = new LineSegment(points[0], points[points.Count - 1]);
+
+                graphics.StrokeColor = Color.Blue;
+                graphics.StrokeLineStrip(
+                    segment.EndPoint1 + new Vector2(0.5f, 0.5f),
+                    segment.EndPoint2 + new Vector2(0.5f, 0.5f));
+
+                foreach (var pair in XiaolinWu.GetPoints(segment))
+                {
+                    graphics.StrokeColor = Color.Gray;
+                    graphics.Stroke(new Rectangle(pair.Key.X, pair.Key.Y, 1, 1));
+                }
+
+                graphics.StrokeColor = Color.Red;
                 graphics.StrokeLineStrip(path.Points.Select(point => (Vector2)point + new Vector2(0.5f, 0.5f)));
+            }
         }
 
         private void DrawPathfindingDebugInfo(GraphicsContext graphics, Pathfinder pathfinder)

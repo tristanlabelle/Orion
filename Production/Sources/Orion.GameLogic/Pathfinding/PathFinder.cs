@@ -83,7 +83,7 @@ namespace Orion.GameLogic.Pathfinding
                     // the shortcut is really walkable.
                     Vector2 normalizedDelta = Vector2.NormalizeFast(destinationPoint - sourcePoint);
                     LineSegment lineSegment = new LineSegment(sourcePoint - normalizedDelta, destinationPoint + normalizedDelta);
-                    if (!Bresenham.All(lineSegment, 3, isWalkable))
+                    if (!Bresenham.GetPoints(lineSegment, 3).All(isWalkable))
                         break;
                     points.RemoveAt(i + 1);
                 }
@@ -156,7 +156,7 @@ namespace Orion.GameLogic.Pathfinding
 
         private PathNode GetCheapestOpenNode()
         {
-            return openNodes.Values.WithMinOrDefault(node => node.DistanceToDestination);
+            return openNodes.Values.WithMinOrDefault(node => node.TotalCost);
         }
 
         private float GetDistance(Point a, Point b)

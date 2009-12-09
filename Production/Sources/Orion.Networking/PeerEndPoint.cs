@@ -73,6 +73,13 @@ namespace Orion.Networking
             return availableCommands[commandFrame];
         }
 
+        public void SendLeave()
+        {
+            byte[] quitMessage = new byte[1];
+            quitMessage[0] = (byte)GameMessageType.Quit;
+            transporter.SendTo(quitMessage, Host);
+        }
+
         public void SendDone(int commandFrame, int numberOfUpdates)
         {
             BitConverter.GetBytes(commandFrame).CopyTo(doneMessage, 1);
@@ -118,7 +125,7 @@ namespace Orion.Networking
             if (args.Host != Host) return;
 
             if (args.Data[0] == (byte)GameMessageType.Quit)
-                OnLeaveGame();
+                Faction.GiveUp();
             else
             {
                 if (args.Data[0] == (byte)GameMessageType.Commands)
@@ -139,12 +146,7 @@ namespace Orion.Networking
         {
             if (endPoint != Host) return;
             Debug.WriteLine("Lost connection to {0}".FormatInvariant(endPoint));
-            OnLeaveGame();
-        }
-
-        private void OnLeaveGame()
-        {
-            if (Disconnected != null) Disconnected(this);
+            Faction.GiveUp();
         }
 
         public void Dispose()

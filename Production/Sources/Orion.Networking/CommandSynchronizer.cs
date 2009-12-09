@@ -45,6 +45,7 @@ namespace Orion.Networking
 
             this.transporter = transporter;
             this.match = match;
+            match.Quitting += LeaveGame;
             peers = endPoints.ToList();
             previousFramesDuration.Enqueue(defaultUpdatesPerFrame);
 
@@ -150,6 +151,11 @@ namespace Orion.Networking
                 associatedEndPoint.Dispose();
                 peers.Remove(associatedEndPoint);
             }
+        }
+
+        private void LeaveGame(Match sender)
+        {
+            peers.ForEach(peer => peer.SendLeave());
         }
         #endregion
     }

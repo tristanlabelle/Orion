@@ -25,6 +25,7 @@ namespace Orion.Graphics
         private const float shadowDistance = 0.7f;
         private const float shadowScaling = 0.6f;
         private const float meleeHitSpinTimeInSeconds = 0.25f;
+        //private const float airborneHitTimeInSeconds = 0.25f;
         #endregion
 
         #region Methods
@@ -150,7 +151,6 @@ namespace Orion.Graphics
                 }
             }
         }
-
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
             if (faction.CanSee(unit))
@@ -165,7 +165,6 @@ namespace Orion.Graphics
                     if (unit.IsUnderConstruction)
                         graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
                 }
-
                 if (DrawHealthBars) DrawHealthBar(graphics, unit);
             }
         }
@@ -288,6 +287,16 @@ namespace Orion.Graphics
                 if (node.Source != null)
                     graphics.StrokeLineStrip(node.Source.Point, node.Point);
         }
+        /*
+        private void DrawAirBorneAttackLines(GraphicsContext graphics)
+        {
+            var airbornneattacks = world.Entities.OfType<Unit>().Where(unit => unit.IsAirborne && unit.TimeElapsedSinceLastHitInSeconds < 0.25);
+            graphics.StrokeColor = this.faction.Color;
+
+        }
+         * */
+
+
 
         private void DrawAttackLines(GraphicsContext graphics)
         {

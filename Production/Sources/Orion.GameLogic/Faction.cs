@@ -355,6 +355,13 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        public void GiveUp()
+        {
+            Unit[] units = Units.OfType<Unit>().ToArray();
+            foreach (Unit unit in units)
+                unit.Suicide();
+        }
+
         private void CheckForDefeat()
         {
             if (status == FactionStatus.Defeated) return;

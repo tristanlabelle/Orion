@@ -249,7 +249,9 @@ namespace Orion
 
         public static Region FromMinInclusiveMax(int minX, int minY, int inclusiveMaxX, int inclusiveMaxY)
         {
-            return FromMinExclusiveMax(new Point(minX, minY), new Point(inclusiveMaxX, inclusiveMaxY));
+            Point min = new Point(minX, minY);
+            Point inclusiveMax = new Point(inclusiveMaxX, inclusiveMaxY);
+            return FromMinInclusiveMax(min, inclusiveMax);
         }
 
         public static Region FromMinExclusiveMax(Point min, Point exclusiveMax)
@@ -262,6 +264,40 @@ namespace Orion
         {
             return FromMinExclusiveMax(new Point(minX, minY), new Point(exclusiveMaxX, exclusiveMaxY));
         }
+
+        #region FromPoints
+        public static Region FromPoints(Point first, Point second)
+        {
+            int minX, maxX;
+            GetMinMax(first.X, second.X, out minX, out maxX);
+
+            int minY, maxY;
+            GetMinMax(first.Y, second.Y, out minY, out maxY);
+
+            return FromMinInclusiveMax(minX, minY, maxX, maxY);
+        }
+
+        public static Region FromPoints(int firstX, int firstY, int secondX, int secondY)
+        {
+            Point first = new Point(firstX, firstY);
+            Point second = new Point(secondX, secondY);
+            return FromPoints(first, second);
+        }
+
+        private static void GetMinMax(int a, int b, out int min, out int max)
+        {
+            if (a < b)
+            {
+                min = a;
+                max = b;
+            }
+            else
+            {
+                min = b;
+                max = a;
+            }
+        }
+        #endregion
         #endregion
 
         public static Region Grow(Region region, int amount)

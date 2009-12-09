@@ -13,6 +13,8 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class Pathfinder
     {
         #region Fields
+        private const bool discourageTurns = false;
+
         private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
@@ -67,6 +69,7 @@ namespace Orion.GameLogic.Pathfinding
             }
 
             FindPathPointsTo(destinationNode);
+            CheaplySmoothPathPoints();
             return new Path(points, complete);
         }
 
@@ -85,6 +88,24 @@ namespace Orion.GameLogic.Pathfinding
                     LineSegment lineSegment = new LineSegment(sourcePoint - normalizedDelta, destinationPoint + normalizedDelta);
                     if (!Bresenham.GetPoints(lineSegment, 3).All(isWalkable))
                         break;
+                    points.RemoveAt(i + 1);
+                }
+            }
+        }
+
+        private void CheaplySmoothPathPoints()
+        {
+            for (int i = 0; i < points.Count - 2; ++i)
+            {
+                Point sourcePoint = points[i];
+                while (i != points.Count - 2)
+                {
+                    Point destinationPoint = points[i + 2];
+
+                    Region region = Region.FromPoints(sourcePoint, destinationPoint);
+                    if (region.Area >= 40 || !region.Points.All(isWalkable))
+                        break;
+
                     points.RemoveAt(i + 1);
                 }
             }
@@ -208,7 +229,7 @@ namespace Orion.GameLogic.Pathfinding
             if (!IsOpenable(nearbyPoint)) return;
 
             float movementCost = GetDistance(currentNode.Point, nearbyPoint);
-            if (currentNode.Source != null)
+            if (discourageTurns && currentNode.Source != null)
             {
                 // Discourage turns
                 bool isTurning = !IsSameDirection(currentNode.Source.Point, currentNode.Point, nearbyPoint);

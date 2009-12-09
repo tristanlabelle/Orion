@@ -34,7 +34,7 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
-        private readonly Button inactiveSmurfsButton;
+        private readonly Button idleSmurfsButton;
         #endregion
 
         #region Pause
@@ -58,6 +58,7 @@ namespace Orion.UserInterface
         private UnitType selectedType;
         private Frame diplomacyFrame;
         private bool isSpaceDown;
+        private bool isShiftDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
         #endregion
 
@@ -146,8 +147,8 @@ namespace Orion.UserInterface
             Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
             Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
             TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
-            inactiveSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
-            inactiveSmurfsButton.Triggered += OnInactiveSmurfsButtonTriggered;
+            idleSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
+            idleSmurfsButton.Triggered += OnIdleSmurfsButtonTriggered;
 
             world.Entities.Added += EntityAdded;
         }
@@ -273,23 +274,30 @@ namespace Orion.UserInterface
             smurfsActivityState.Remove(smurf);
         }
 
-        private void OnInactiveSmurfsButtonTriggered(Button sender)
+        private void OnIdleSmurfsButtonTriggered(Button sender)
         {
-            IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
             IEnumerable<Unit> smurfs = smurfsActivityState.Where(kp => kp.Value).Select(kp => kp.Key);
-            if (selectedUnits.Count() == 1)
+            if (isShiftDown)
             {
-                Unit selectedUnit = selectedUnits.First();
-                if (smurfs.Contains(selectedUnit))
-                {
-                    int nextIndex = (smurfs.IndexOf(selectedUnit) + 1) % smurfs.Count();
-                    userInputManager.SelectionManager.SelectUnit(smurfs.Skip(nextIndex).First());
-                    CenterOnSelection();
-                    return;
-                }
+                userInputManager.SelectionManager.SelectUnits(smurfs);
             }
-            userInputManager.SelectionManager.SelectUnit(smurfs.First());
-            CenterOnSelection();
+            else
+            {
+                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
+                if (selectedUnits.Count() == 1)
+                {
+                    Unit selectedUnit = selectedUnits.First();
+                    if (smurfs.Contains(selectedUnit))
+                    {
+                        int nextIndex = (smurfs.IndexOf(selectedUnit) + 1) % smurfs.Count();
+                        userInputManager.SelectionManager.SelectUnit(smurfs.Skip(nextIndex).First());
+                        CenterOnSelection();
+                        return;
+                    }
+                }
+                userInputManager.SelectionManager.SelectUnit(smurfs.First());
+                CenterOnSelection();
+            }
         }
 
         protected override bool OnMouseWheel(MouseEventArgs args)
@@ -331,6 +339,7 @@ namespace Orion.UserInterface
 
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
+            isShiftDown = args.HasShift;
             MatchRenderer.DrawAllHealthBars = args.HasAlt;
             if (Children.Contains(chatInput))
             {
@@ -384,6 +393,7 @@ namespace Orion.UserInterface
 
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
+            isShiftDown = args.HasShift;
             (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
             isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
             return base.OnKeyUp(args);
@@ -405,11 +415,11 @@ namespace Orion.UserInterface
             messagesToDelete.Clear();
 
             bool shouldDisplaySmurfButton = smurfsActivityState.Values.Any(value => value == true);
-            if (Children.Contains(inactiveSmurfsButton) && !shouldDisplaySmurfButton)
-                Children.Remove(inactiveSmurfsButton);
+            if (Children.Contains(idleSmurfsButton) && !shouldDisplaySmurfButton)
+                Children.Remove(idleSmurfsButton);
 
-            if(!Children.Contains(inactiveSmurfsButton) && shouldDisplaySmurfButton)
-                Children.Add(inactiveSmurfsButton);
+            if(!Children.Contains(idleSmurfsButton) && shouldDisplaySmurfButton)
+                Children.Add(idleSmurfsButton);
 
             match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);

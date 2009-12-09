@@ -64,6 +64,11 @@ namespace Orion.GameLogic.Technologies
             foreach (Technology tech in techsToAdd)
                 technologies.Add(tech);
         }
+
+        public Technology FindTechnologyFromHandle(Handle handle)
+        {
+            return technologies.Where(tech => tech.Handle == handle).First();
+        }
         #endregion
     }
 }

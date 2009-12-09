@@ -53,15 +53,34 @@ namespace Orion.Commandment.Commands
 
             int alageneTotalCost = 0;
             int aladdiumTotalCost = 0;
-
+            int popNeeded = 0;
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType traineeType = match.World.UnitTypes.FromHandle(traineeTypeHandle);
 
             int alageneCost = traineeType.GetBaseStat(UnitStat.AlageneCost);
             int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
+
+            if (trainerHandles.Count * traineeType.FoodCost > faction.RemainingFoodAmount)
+            {
+                
+            }
+
+
+
             foreach (Handle trainerHandle in trainerHandles)
             {
                 Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
+                //for the first unit we take the food
+                if (trainer.TaskQueue.IsEmpty)
+                {
+                    if ((popNeeded + traineeType.FoodCost) <= faction.RemainingFoodAmount)
+                        popNeeded += traineeType.FoodCost;
+                    else
+                    {
+                        Debug.WriteLine("Not enought Food.");
+                        continue;
+                    }
+                }
                 if (trainer.TaskQueue.IsFull)
                 {
                     Debug.WriteLine("Cannot train {0}, task queue of {1} is full."

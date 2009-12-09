@@ -11,7 +11,7 @@ namespace Orion.Commandment
     /// <summary>
     /// A behaviorless commander which offers a public interface to create commands.
     /// </summary>
-    public sealed class SlaveCommander : Commander
+    public class SlaveCommander : Commander
     {
         #region Constructors
         /// <summary>

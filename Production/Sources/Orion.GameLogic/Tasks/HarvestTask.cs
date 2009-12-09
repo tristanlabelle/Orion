@@ -53,10 +53,16 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
+        public ResourceNode ResourceNode
+        {
+            get { return node; }
+        }
+
         public override string Description
         {
             get { return "harvesting " + node.Type; }
         }
+
         public override bool HasEnded
         {
             get { return hasEnded; }

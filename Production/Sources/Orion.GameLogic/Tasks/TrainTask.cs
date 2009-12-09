@@ -99,6 +99,8 @@ namespace Orion.GameLogic.Tasks
                 trainerRegion.Size.Width + traineeType.Size.Width + 1,
                 trainerRegion.Size.Height + traineeType.Size.Height + 1);
 
+            spawnRegion = Region.Intersection(spawnRegion, (Region)World.Size).Value;
+
             var potentialSpawnPoints = spawnRegion.Points
                 .Where(point => Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer));
 

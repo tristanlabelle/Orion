@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AgressiveAICommander.cs" />
     <Compile Include="AICommander.cs" />
+    <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="CheatCodeManager.cs" />
     <Compile Include="Commander.cs" />
     <Compile Include="Commands\Command.cs" />

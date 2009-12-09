@@ -427,6 +427,15 @@ namespace Orion.GameLogic
         #endregion
 
         #region FogOfWar
+        public bool HasSeen(Region region)
+        {
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                    if (GetTileVisibility(new Point(x, y)) != TileVisibility.Undiscovered)
+                        return true;
+            return false;
+        }
+
         /// <summary>
         /// Tests if a <see cref="Region"/> of the world is at least partially visible.
         /// </summary>

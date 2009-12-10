@@ -44,55 +44,56 @@ namespace Orion.Graphics
         #region Methods
         public override void Draw(GraphicsContext context)
         {
+            bool isTraining = false;
             if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask)
             {
+                isTraining = true;
+
                 int firstStartingXPos = 360;
                 int firstStartingYPos = 120;
-                if (unit.TaskQueue.Count >= 1)
+ 
+                for (int i = 0; i < unit.TaskQueue.Count; i++)
                 {
-                    for (int i = 0; i < unit.TaskQueue.Count; i++)
+                    if (i + 1 == 2)
                     {
-                        if (i + 1 == 2)
-                        {
-                            firstStartingXPos = 159;
-                            firstStartingYPos = 80;
-                        }
-
-                        if (i + 1 == 6)
-                        {
-                            firstStartingXPos = 159;
-                            firstStartingYPos = 35;
-                        }
-
-                        // Returns a Task, and finds the unit associated to that Task. 
-                        TrainTask train = (TrainTask)unit.TaskQueue[i];
-                        Texture texture = textureManager.GetUnit(train.TraineeType.Name);
-
-                        Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
-                        context.FillColor = Color.Black;
-                        context.Fill(rect2);
-                        context.FillColor = Color.White;
-                        context.Stroke(rect2);
-
-                        // Fills first rectangle with a character. 
-                        Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 26, 26);
-                        context.Fill(rect, texture);
-                        context.FillColor = unit.Faction.Color;
-                        context.Stroke(rect);
-
-                        // Draws a completion HealthBar
-                        Rectangle healthRect = new Rectangle(152 ,120, 186, 10);
-                        TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
-                        DrawCompletionRect(context, healthRect,currentUnitBeingTrained.Progress);
-
-                        base.Draw(context);
-                        firstStartingXPos += 50;
-                        context.FillColor = Color.Black;
+                        firstStartingXPos = 159;
+                        firstStartingYPos = 80;
                     }
 
-                    string message = "In progress...";
-                    context.Draw(message, new Vector2(150, 5));
+                    if (i + 1 == 6)
+                    {
+                        firstStartingXPos = 159;
+                        firstStartingYPos = 35;
+                    }
+
+                    // Returns a Task, and finds the unit associated to that Task. 
+                    TrainTask train = (TrainTask)unit.TaskQueue[i];
+                    Texture texture = textureManager.GetUnit(train.TraineeType.Name);
+
+                    Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
+                    context.FillColor = Color.Black;
+                    context.Fill(rect2);
+                    context.FillColor = Color.White;
+                    context.Stroke(rect2);
+
+                    // Fills first rectangle with a character. 
+                    Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 26, 26);
+                    context.Fill(rect, texture);
+                    context.FillColor = unit.Faction.Color;
+                    context.Stroke(rect);
+
+                    // Draws a completion HealthBar
+                    Rectangle healthRect = new Rectangle(152 ,120, 186, 10);
+                    TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
+                    DrawCompletionRect(context, healthRect,currentUnitBeingTrained.Progress);
+
+                    base.Draw(context);
+                    firstStartingXPos += 50;
+                    context.FillColor = Color.Black;
                 }
+
+                string message = "In progress...";
+                context.Draw(message, new Vector2(150, 5));
             }
 
             context.Font = statsFont;
@@ -104,7 +105,7 @@ namespace Orion.Graphics
             context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
 
             float y = firstLineY - textLineDistance * 2;
-            if (unit.TaskQueue.IsEmpty)
+            if (!isTraining)
             {
                 foreach (UnitStat stat in statsToDisplay)
                 {

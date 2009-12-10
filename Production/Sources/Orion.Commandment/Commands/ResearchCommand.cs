@@ -7,12 +7,10 @@ using Orion.GameLogic;
 
 namespace Orion.Commandment.Commands
 {
-    public class ResearchCommand:Command
+    public sealed class ResearchCommand : Command
     {
-
         #region Fields
         private Handle researcherHandle;
-        private Handle factionHandle;
         private Handle technologyHandle;
         #endregion
 
@@ -34,7 +32,7 @@ namespace Orion.Commandment.Commands
             Argument.EnsureNotNull(world, "world");
 
             return IsValidTechnologyHandle(world, technologyHandle)
-                && IsValidFactionHandle(world, factionHandle)
+                && IsValidFactionHandle(world, FactionHandle)
                 && IsValidEntityHandle(world, researcherHandle);
 
         }
@@ -54,7 +52,7 @@ namespace Orion.Commandment.Commands
 
         protected override void SerializeSpecific(System.IO.BinaryWriter writer)
         {
-            WriteHandle(writer, factionHandle);
+            WriteHandle(writer, FactionHandle);
             WriteHandle(writer, researcherHandle);
             WriteHandle(writer, technologyHandle);
         }

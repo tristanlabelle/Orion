@@ -15,7 +15,6 @@ namespace Orion.Graphics.Renderers
     /// </summary>
     public sealed class UnitsRenderer : IRenderer
     {
-        #region Static
         #region Fields
         private static readonly Size miniatureUnitSize = new Size(3, 3);
 
@@ -25,14 +24,12 @@ namespace Orion.Graphics.Renderers
 
         private const float meleeHitSpinTimeInSeconds = 0.25f;
         //private const float airborneHitTimeInSeconds = 0.25f;
-        #endregion
-        #endregion
 
-        #region Fields
         private readonly Faction faction;
         private readonly TextureManager textureManager;
         private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
         private readonly List<Ruin> ruins = new List<Ruin>();
+        private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
 
@@ -44,6 +41,8 @@ namespace Orion.Graphics.Renderers
             
             this.faction = faction;
             this.textureManager = textureManager;
+
+            World.Updated += OnWorldUpdated;
         }
         #endregion
 
@@ -76,9 +75,9 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public Texture GetTypeTexture(UnitType type)
+        private void OnWorldUpdated(World sender, SimulationStep args)
         {
-            return textureManager.GetUnit(type.Name);
+            simulationTimeInSeconds = args.TimeInSeconds;
         }
 
         public void Draw(GraphicsContext graphics)
@@ -145,26 +144,15 @@ namespace Orion.Graphics.Renderers
             foreach (Unit unit in units) DrawUnit(graphics, unit);
         }
 
-        private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
-        {
-            Texture texture = GetTypeTexture(unit.Type);
-            Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
-
-            float drawingAngle = GetUnitDrawingAngle(unit);
-            Vector2 shadowCenter = unit.Center - new Vector2(shadowDistance, shadowDistance);
-            using (graphics.Transform(shadowCenter, drawingAngle, shadowScaling))
-            {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                graphics.Fill(localRectangle, texture, tint);
-            }
-        }
-
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            Texture texture = GetTypeTexture(unit.Type);
+            Texture texture = textureManager.GetUnit(unit.Type.Name);
+
+            Vector2 center = unit.Center;
+            center.Y += GetOscillation(unit) * 0.15f;
 
             float drawingAngle = GetUnitDrawingAngle(unit);
-            using (graphics.Transform(unit.Center, drawingAngle))
+            using (graphics.Transform(center, drawingAngle))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                 graphics.Fill(localRectangle, texture, unit.Faction.Color);
@@ -175,15 +163,45 @@ namespace Orion.Graphics.Renderers
             if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
         }
 
+        private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
+        {
+            Texture texture = textureManager.GetUnit(unit.Type.Name);
+            Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
+
+            float drawingAngle = GetUnitDrawingAngle(unit);
+            float oscillation = GetOscillation(unit);
+            float distance = shadowDistance + oscillation * 0.1f;
+            Vector2 center = unit.Center - new Vector2(distance, distance);
+            float scaling = shadowScaling + oscillation * -0.1f;
+            using (graphics.Transform(center, drawingAngle, scaling))
+            {
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                graphics.Fill(localRectangle, texture, tint);
+            }
+        }
+
         private void DrawRememberedBuilding(GraphicsContext graphics, RememberedBuilding building)
         {
-            Texture texture = GetTypeTexture(building.Type);
+            Texture texture = textureManager.GetUnit(building.Type.Name);
 
             Rectangle buildingRectangle = building.GridRegion.ToRectangle();
             if (!Rectangle.Intersects(buildingRectangle, graphics.CoordinateSystem))
                 return;
 
             graphics.Fill(buildingRectangle, texture, building.Faction.Color);
+        }
+
+        private float GetOscillation(Unit unit)
+        {
+            if (!unit.IsAirborne) return 0;
+
+            float period = 3 + unit.Size.Area / 4.0f;
+            float offset = (unit.Handle.Value % 8) / 8.0f * period;
+            float progress = ((simulationTimeInSeconds + offset) % period) / period;
+            float sineAngle = (float)Math.PI * 2 * progress;
+            float sine = (float)Math.Sin(sineAngle);
+
+            return sine;
         }
 
         private static float GetUnitDrawingAngle(Unit unit)

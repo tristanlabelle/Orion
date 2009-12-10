@@ -235,6 +235,8 @@ namespace Orion.UserInterface
             foreach (Label writtenMessage in chatMessages.Children)
                 writtenMessage.Frame = writtenMessage.Frame.TranslatedBy(0, height);
             chatMessages.Children.Add(messageLabel);
+            if (chatMessages.Children.Count > 15)
+                chatMessages.Children.RemoveAt(0);
         }
 
         public void DisplayDefeatMessage(Faction faction)

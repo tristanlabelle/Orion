@@ -123,7 +123,7 @@ namespace Orion.GameLogic.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
-                Unit.LookAt(targetPosition + new Vector2(0.5f, 0.5f));
+                Unit.LookAt(targetPosition + (Vector2)Unit.Size * 0.5f);
                 Unit.SetPosition(targetPosition);
             }
             else

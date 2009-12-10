@@ -22,8 +22,8 @@ namespace Orion.GameLogic.Tasks
         private const float timeBeforeRepathfinding = 0.5f;
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
-        private bool isOnPath;
-        private PathWalker pathWalker;
+        private Path path;
+        private int targetPathPointIndex;
         private int attemptCount = 1;
         private float timeSinceLastPathfinding;
         #endregion
@@ -46,7 +46,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
-            this.pathWalker = GetPathWalker();
+            Repath();
         }
 
         public MoveTask(Unit unit, Point destination)
@@ -59,25 +59,25 @@ namespace Orion.GameLogic.Tasks
         /// </summary>
         public Path Path
         {
-            get { return pathWalker == null ? null : pathWalker.Path; }
+            get { return path; }
         }
 
         public override bool HasEnded
         {
-            get { return pathWalker == null ? attemptCount >= maxAttemptCount : pathWalker.HasReachedEnd; }
+            get { return path == null ? attemptCount >= maxAttemptCount : HasReachedDestination; }
         }
 
         public bool HasReachedDestination
         {
-            get { return pathWalker != null && pathWalker.HasReachedEnd && pathWalker.Path.IsComplete; }
+            get { return path != null && path.IsComplete && Unit.Position == path.End; }
         }
 
         public override string Description
         {
             get
             {
-                if (pathWalker == null) return "walking";
-                return "walking to {0}".FormatInvariant(pathWalker.Path.End);
+                if (path == null) return "walking";
+                return "walking to {0}".FormatInvariant(path.End);
             }
         }
         #endregion
@@ -87,34 +87,24 @@ namespace Orion.GameLogic.Tasks
         {
             timeSinceLastPathfinding += step.TimeDeltaInSeconds;
 
-            if (pathWalker == null && !TryRepath()) return;
+            if (path == null && !TryRepath()) return;
 
             float distance = Unit.GetStat(UnitStat.MovementSpeed) * step.TimeDeltaInSeconds;
 
+            Vector2 targetPathPoint = path.Points[targetPathPointIndex];
+            Unit.LookAt(targetPathPoint + (Vector2)Unit.Size * 0.5f);
+
+            Vector2 deltaToPathPoint = targetPathPoint - Unit.Position;
+
             Vector2 targetPosition;
-            if (isOnPath)
+            if (distance > deltaToPathPoint.LengthFast)
             {
-                pathWalker.Walk(distance);
-                targetPosition = pathWalker.Position;
+                targetPosition = targetPathPoint;
+                this.targetPathPointIndex = Math.Min(path.PointCount - 1, targetPathPointIndex + 1);
             }
             else
             {
-                // Get on the path before following it,
-                // as the first point should be where the unit is,
-                // aim for the second.
-                int targetPathPointIndex = pathWalker.Path.PointCount == 1 ? 0 : 1;
-                Point pathPoint = pathWalker.Path.Points[targetPathPointIndex];
-                Vector2 deltaToPathSource = pathPoint - Unit.Position;
-                if (distance > deltaToPathSource.LengthFast)
-                {
-                    targetPosition = pathPoint;
-                    pathWalker.SetCurrentPoint(targetPathPointIndex);
-                    isOnPath = true;
-                }
-                else
-                {
-                    targetPosition = Unit.Position + Vector2.Normalize(deltaToPathSource) * distance;
-                }
+                targetPosition = Unit.Position + Vector2.Normalize(deltaToPathPoint) * distance;
             }
 
             // Prevents floating point inaccuracies, we've had values of -0.0000001f
@@ -123,13 +113,11 @@ namespace Orion.GameLogic.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
-                Unit.LookAt(targetPosition + (Vector2)Unit.Size * 0.5f);
                 Unit.SetPosition(targetPosition);
             }
             else
             {
                 // An obstacle is blocking us
-                pathWalker = null;
                 TryRepath();
             }
         }
@@ -145,12 +133,13 @@ namespace Orion.GameLogic.Tasks
             return true;
         }
 
-        private PathWalker GetPathWalker()
+        private void Repath()
         {
-            Path path = Unit.World.FindPath(Unit.GridRegion.Min,
+            this.path = Unit.World.FindPath(Unit.GridRegion.Min,
                 destinationDistanceEvaluator, GetWalkabilityTester());
-            if (path.Source == path.End && !path.IsComplete) return null;
-            return new PathWalker(path);
+            this.targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
+
+            if (path.Source == path.End && !path.IsComplete) this.path = null;
         }
 
         private Func<Point, bool> GetWalkabilityTester()
@@ -189,14 +178,11 @@ namespace Orion.GameLogic.Tasks
         {
             if (timeSinceLastPathfinding < timeBeforeRepathfinding) return false;
 
-            pathWalker = GetPathWalker();
+            Repath();
             timeSinceLastPathfinding = 0;
             ++attemptCount;
-            if (pathWalker == null) return false;
 
-            isOnPath = false;
-
-            return true;
+            return path != null;
         }
         #endregion
         #endregion

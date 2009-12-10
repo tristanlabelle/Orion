@@ -33,6 +33,18 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Properties
+        private SelectionManager SelectionManager
+        {
+            get { return userInputManager.SelectionManager; }
+        }
+
+        private Faction Faction
+        {
+            get { return userInputManager.Commander.Faction; }
+        }
+        #endregion
+
         #region Methods
         /// <summary>
         /// Draws the selection markers under the <see cref="Unit"/>s.
@@ -44,11 +56,11 @@ namespace Orion.Graphics
 
             graphics.StrokeStyle = StrokeStyle.Solid;
             graphics.StrokeColor = selectionMarkerColor;
-            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
+            foreach (Unit unit in SelectionManager.SelectedUnits)
             {
                 graphics.Stroke(unit.BoundingRectangle);
 
-                if (unit.Faction == userInputManager.Commander.Faction && unit.HasRallyPoint)
+                if (unit.Faction == Faction && unit.HasRallyPoint)
                     graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
             }
         }

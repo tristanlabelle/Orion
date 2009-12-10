@@ -86,7 +86,10 @@ namespace Orion.Graphics.Renderers
 
             foreach (Ruin ruin in ruins)
             {
-                Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
+                Vector2 size = new Vector2(ruin.Size.Width, ruin.Size.Height);
+                Rectangle rectangle = new Rectangle(ruin.Min, size);
+                if (!Rectangle.Intersects(rectangle, graphics.CoordinateSystem))
+                    continue;
 
                 Region gridRegion = Entity.GetGridRegion(ruin.Min, ruin.Size);
                 if (!faction.CanSee(gridRegion)) continue;
@@ -98,13 +101,12 @@ namespace Orion.Graphics.Renderers
                 if (alpha < 0) alpha = 0;
                 if (alpha > 1) alpha = 1;
 
-                Vector2 size = new Vector2(ruin.Size.Width, ruin.Size.Height);
-                Rectangle localRectangle = new Rectangle(ruin.Min, size);
+                Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
 
                 int alphaComponent = (int)(alpha * 255);
                 Color color = Color.FromArgb(alphaComponent, ruin.Tint);
 
-                graphics.Fill(localRectangle, texture, color);
+                graphics.Fill(rectangle, texture, color);
             }
         }
         #endregion

@@ -41,14 +41,19 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
+        private IEnumerable<ResourceNode> GetVisibleClippedNodes(Rectangle clippingBounds)
+        {
+            return World.Entities
+                .OfType<ResourceNode>()
+                .Where(node => Rectangle.Intersects(clippingBounds, node.BoundingRectangle)
+                    && faction.HasSeen(node.GridRegion));
+        }
+
         public void Draw(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            Rectangle bounds = graphics.CoordinateSystem;
-            var resourceNodes = World.Entities
-                .OfType<ResourceNode>()
-                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
+            var resourceNodes = GetVisibleClippedNodes(graphics.CoordinateSystem);
             foreach (ResourceNode node in resourceNodes)
             {
                 string resourceTypeName = node.Type.ToStringInvariant();
@@ -61,10 +66,7 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            Rectangle bounds = graphics.CoordinateSystem;
-            var resourceNodes = World.Entities
-                .OfType<ResourceNode>()
-                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
+            var resourceNodes = GetVisibleClippedNodes(graphics.CoordinateSystem);
             foreach (ResourceNode node in resourceNodes)
             {
                 graphics.FillColor = GetResourceColor(node.Type);

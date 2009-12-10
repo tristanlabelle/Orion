@@ -122,64 +122,68 @@ namespace Orion.Graphics.Renderers
                 DrawRememberedBuilding(graphics, building);
         }
 
+        private IEnumerable<Unit> GetClippedVisibleUnits(Rectangle clippingBounds)
+        {
+            return World.Entities
+                .OfType<Unit>()
+                .Where(unit => Rectangle.Intersects(clippingBounds, unit.BoundingRectangle)
+                    && faction.CanSee(unit));
+        }
+
         private void DrawGroundUnits(GraphicsContext graphics)
         {
-            var units = World.Entities.OfType<Unit>().Where(unit => !unit.IsAirborne);
+            var units = GetClippedVisibleUnits(graphics.CoordinateSystem)
+                .Where(unit => !unit.IsAirborne);
             foreach (Unit unit in units) DrawUnit(graphics, unit);
         }
 
         private void DrawAirborneUnits(GraphicsContext graphics)
         {
-            var units = World.Entities.OfType<Unit>().Where(unit => unit.IsAirborne);
+            var units = GetClippedVisibleUnits(graphics.CoordinateSystem)
+                .Where(unit => unit.IsAirborne);
             foreach (Unit unit in units) DrawUnitShadow(graphics, unit);
             foreach (Unit unit in units) DrawUnit(graphics, unit);
         }
 
         private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
         {
-            if (faction.CanSee(unit))
-            {
-                Texture texture = GetTypeTexture(unit.Type);
-                Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
+            Texture texture = GetTypeTexture(unit.Type);
+            Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
 
-                float drawingAngle = GetUnitDrawingAngle(unit);
-                Vector2 shadowCenter = unit.Center - new Vector2(shadowDistance, shadowDistance);
-                using (graphics.Transform(shadowCenter, drawingAngle, shadowScaling))
-                {
-                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                    graphics.Fill(localRectangle, texture, tint);
-                }
+            float drawingAngle = GetUnitDrawingAngle(unit);
+            Vector2 shadowCenter = unit.Center - new Vector2(shadowDistance, shadowDistance);
+            using (graphics.Transform(shadowCenter, drawingAngle, shadowScaling))
+            {
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                graphics.Fill(localRectangle, texture, tint);
             }
         }
+
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            if (faction.CanSee(unit))
+            Texture texture = GetTypeTexture(unit.Type);
+
+            float drawingAngle = GetUnitDrawingAngle(unit);
+            using (graphics.Transform(unit.Center, drawingAngle))
             {
-                Texture texture = GetTypeTexture(unit.Type);
-
-                float drawingAngle = GetUnitDrawingAngle(unit);
-                using (graphics.Transform(unit.Center, drawingAngle))
-                {
-                    Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                    graphics.Fill(localRectangle, texture, unit.Faction.Color);
-                    if (unit.IsUnderConstruction)
-                        graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
-                }
-
-                if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                graphics.Fill(localRectangle, texture, unit.Faction.Color);
+                if (unit.IsUnderConstruction)
+                    graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
             }
+
+            if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
         }
 
         private void DrawRememberedBuilding(GraphicsContext graphics, RememberedBuilding building)
         {
             Texture texture = GetTypeTexture(building.Type);
 
-            using (graphics.Translate(building.GridRegion.ToRectangle().Center))
-            {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0,
-                    building.Type.Size.Width, building.Type.Size.Height);
-                graphics.Fill(localRectangle, texture, building.Faction.Color);
-            }
+            Rectangle buildingRectangle = building.GridRegion.ToRectangle();
+            if (!Rectangle.Intersects(buildingRectangle, graphics.CoordinateSystem))
+                return;
+
+            graphics.Fill(buildingRectangle, texture, building.Faction.Color);
         }
 
         private static float GetUnitDrawingAngle(Unit unit)

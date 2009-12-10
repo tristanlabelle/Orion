@@ -96,15 +96,19 @@ namespace Orion.GameLogic.Tasks
             {
                 pathWalker.Walk(distance);
                 targetPosition = pathWalker.Position;
-                Unit.Angle = pathWalker.Angle;
             }
             else
             {
-                // Get on the path before following it
-                Vector2 deltaToPathSource = pathWalker.Path.Source - Unit.Position;
+                // Get on the path before following it,
+                // as the first point should be where the unit is,
+                // aim for the second.
+                int targetPathPointIndex = pathWalker.Path.PointCount == 1 ? 0 : 1;
+                Point pathPoint = pathWalker.Path.Points[targetPathPointIndex];
+                Vector2 deltaToPathSource = pathPoint - Unit.Position;
                 if (distance > deltaToPathSource.LengthFast)
                 {
-                    targetPosition = pathWalker.Path.Source;
+                    targetPosition = pathPoint;
+                    pathWalker.SetCurrentPoint(targetPathPointIndex);
                     isOnPath = true;
                 }
                 else
@@ -119,6 +123,7 @@ namespace Orion.GameLogic.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
+                Unit.LookAt(targetPosition + new Vector2(0.5f, 0.5f));
                 Unit.SetPosition(targetPosition);
             }
             else

@@ -57,6 +57,12 @@ namespace Orion.GameLogic.Pathfinding
         #endregion
 
         #region Methods
+        public void SetCurrentPoint(int index)
+        {
+            position = path.Points[index];
+            targetPointIndex = index + 1;
+        }
+
         public void Walk(float distance)
         {
             if (HasReachedEnd) return;

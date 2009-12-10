@@ -362,7 +362,7 @@ namespace Orion.GameLogic
         public void LookAt(Vector2 target)
         {
             Vector2 delta = target - Center;
-            if (delta.LengthSquared == 0) return;
+            if (delta.LengthSquared < 0.01f) return;
             Angle = (float)Math.Atan2(delta.Y, delta.X);
         }
         #endregion

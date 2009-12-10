@@ -65,9 +65,9 @@ namespace Orion.GameLogic.Technologies
                 technologies.Add(tech);
         }
 
-        public Technology FindTechnologyFromHandle(Handle handle)
+        public Technology FromHandle(Handle handle)
         {
-            return technologies.Where(tech => tech.Handle == handle).First();
+            return technologies.FirstOrDefault(tech => tech.Handle == handle);
         }
         #endregion
     }

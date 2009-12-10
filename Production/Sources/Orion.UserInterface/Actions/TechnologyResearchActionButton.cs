@@ -10,20 +10,16 @@ namespace Orion.UserInterface.Actions
     public sealed class TechnologyResearchActionButton : ActionButton
     {
         #region Fields
-        private readonly Technology technology;
+        private readonly ImmediateUserCommand command;
         #endregion
 
         #region Constructor
         public TechnologyResearchActionButton(ActionFrame frame, UserInputManager manager,
-            Technology technology, Faction faction, TextureManager textureManager)
+            ImmediateUserCommand command, Faction faction, TextureManager textureManager, string technologyName)
             : base(frame, manager, Keys.None,textureManager)
         {
-            this.technology = technology;
-            int aladdium = technology.Requirements.AladdiumCost;
-            int alagene = technology.Requirements.AlageneCost;
-            Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(technology.Name, aladdium, alagene);
-
-            Texture texture = textureManager.GetTechnology(technology.Name);
+            this.command = command;
+            Texture texture = textureManager.GetTechnology(technologyName);
             base.Renderer = new TexturedFrameRenderer(texture);
         }
         #endregion
@@ -31,8 +27,7 @@ namespace Orion.UserInterface.Actions
         #region Methods
         protected override void OnPress()
         {
-            //inputManager.SelectedCommand = new BuildUserCommand(inputManager, buildingType);
-            base.OnPress();
+            command.Execute();
         }
         #endregion
     }

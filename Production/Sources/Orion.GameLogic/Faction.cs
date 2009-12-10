@@ -100,6 +100,13 @@ namespace Orion.GameLogic
             var handler = TechnologyResearched;
             if (handler != null) handler(this, technology);
         }
+
+        public event GenericEventHandler<Faction,string> Warning;
+        public void RaiseWarning(string message)
+        {
+            var handler = Warning;
+            if (handler != null) handler(this, message);
+        }
         #endregion
 
         #region Properties
@@ -253,6 +260,13 @@ namespace Orion.GameLogic
                 .SelectMany(tech => tech.Effects)
                 .Where(effect => effect.Stat == stat)
                 .Sum(effect => effect.Value);
+        }
+
+        public bool IsResearchable(Technology technology)
+        {
+            Argument.EnsureNotNull(technology, "technology");
+            return technology.Requirements.Technologies == null || technology.Requirements.Technologies
+                .All(tech => technologies.Contains(tech));
         }
 
         /// <summary>

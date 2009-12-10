@@ -32,13 +32,13 @@ namespace Orion.GameLogic.Technologies
 
             //HP increasing technology
             techEffects.Add(new TechnologyEffect("hp", UnitStat.MaxHealth, 10));
-            TechnologyRequirements techRequirements = new TechnologyRequirements(null, 100, 100);
+            TechnologyRequirements techRequirements = new TechnologyRequirements(new List<Technology>(), 100, 100);
             techsToAdd.Add(new Technology("Increased Health 1", techRequirements, techEffects, handleGenerator()));
             techEffects.Clear();
 
             //Attack Power increasing technology
             techEffects.Add(new TechnologyEffect("ap", UnitStat.AttackPower, 2));
-            techRequirements = new TechnologyRequirements(null, 120, 100);
+            techRequirements = new TechnologyRequirements(new List<Technology>(), 120, 100);
             techsToAdd.Add(new Technology("Increased Attack Power 1", techRequirements, techEffects, handleGenerator()));
             techEffects.Clear();
 

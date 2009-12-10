@@ -32,8 +32,7 @@ namespace Orion.UserInterface.Actions.UserCommands
         #region Methods
         public override void Execute()
         {
-            return;
-            //inputManager.LaunchResearch(technology);
+            inputManager.LaunchResearch(technology);
         }
         #endregion
     }

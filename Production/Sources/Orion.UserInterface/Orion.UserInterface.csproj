@@ -55,6 +55,7 @@
     <Compile Include="Actions\ActionFrame.cs" />
     <Compile Include="Actions\BuildingConstructionActionButton.cs" />
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
+    <Compile Include="Actions\Enablers\ResearchEnabler.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
     <Compile Include="Actions\CancelButton.cs" />
     <Compile Include="Actions\Enablers\ActionEnabler.cs" />

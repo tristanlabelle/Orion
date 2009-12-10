@@ -10,6 +10,7 @@ using Skills = Orion.GameLogic.Skills;
 
 using OpenTK.Math;
 using Orion.GameLogic.Skills;
+using Orion.GameLogic.Technologies;
 
 namespace Orion.Commandment
 {
@@ -381,6 +382,21 @@ namespace Orion.Commandment
             commander.LaunchTrain(trainers, unitType);
         }
 
+        public void LaunchResearch(Technology technology)
+        {
+            Unit tristan = selectionManager.SelectedUnits
+                .FirstOrDefault(unit =>
+                {
+                    if (unit.Faction != commander.Faction) return false;
+                    Skills.ResearchSkill reseach = unit.Type.GetSkill<Skills.ResearchSkill>();
+                    if (reseach == null) return false;
+                    if (unit.IsUnderConstruction) return false;
+                    if (!unit.IsIdle) return false;
+                    return reseach.Supports(technology);
+                });
+
+                commander.LaunchResearch(tristan, technology);
+        }
         public void LaunchSuicide()
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits

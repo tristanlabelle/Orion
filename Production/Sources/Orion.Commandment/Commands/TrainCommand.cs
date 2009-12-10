@@ -77,13 +77,13 @@ namespace Orion.Commandment.Commands
                         popNeeded += traineeType.FoodCost;
                     else
                     {
-                        Debug.WriteLine("Not enought Food.");
+                        faction.RaiseWarning("Not enought Food.");
                         continue;
                     }
                 }
                 if (trainer.TaskQueue.IsFull)
                 {
-                    Debug.WriteLine("Cannot train {0}, task queue of {1} is full."
+                    faction.RaiseWarning("Cannot train {0}, task queue of {1} is full."
                         .FormatInvariant(traineeType, trainer));
                     continue;
                 }
@@ -97,7 +97,7 @@ namespace Orion.Commandment.Commands
                 }
                 else
                 {
-                    Debug.WriteLine("Not enough resources to train {0}.".FormatInvariant(traineeType));
+                    faction.RaiseWarning("Not enough resources to train {0}.".FormatInvariant(traineeType));
                     break;
                 }
             }

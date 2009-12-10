@@ -142,7 +142,7 @@ namespace Orion.GameLogic.Tasks
             if ((needsAladdiumCredit && Faction.AladdiumAmount == 0)
                 || (needsAlageneCredit && Faction.AlageneAmount == 0))
             {
-                Debug.WriteLine("Not enough resources to proceed with the repairing of {0}.".FormatInvariant(Target));
+                Faction.RaiseWarning("Not enough resources to proceed with the repairing of {0}.".FormatInvariant(Target));
                 return false;
             }
 

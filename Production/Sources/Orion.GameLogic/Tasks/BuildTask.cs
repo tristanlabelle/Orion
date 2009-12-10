@@ -70,7 +70,8 @@ namespace Orion.GameLogic.Tasks
 
             if (!Unit.World.IsFree(buildingPlan.GridRegion, Unit.CollisionLayer))
             {
-                Debug.WriteLine("Cannot build {0}, spot occupied.".FormatInvariant(buildingPlan.BuildingType));
+
+                Faction.RaiseWarning("Cannot build {0}, spot occupied".FormatInvariant(buildingPlan.BuildingType));
                 hasEnded = true;
                 return;
             }
@@ -82,7 +83,9 @@ namespace Orion.GameLogic.Tasks
 
             if (!hasEnoughResources)
             {
-                Debug.WriteLine("Not enough resources to build {0}.".FormatInvariant(buildingPlan.BuildingType));
+
+
+                Faction.RaiseWarning("Not enough resources to build {0}.".FormatInvariant(buildingPlan.BuildingType));
                 hasEnded = true;
                 return;
             }

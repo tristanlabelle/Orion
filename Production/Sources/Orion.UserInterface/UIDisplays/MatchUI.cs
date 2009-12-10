@@ -146,6 +146,7 @@ namespace Orion.UserInterface
             enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
             enablers.Add(new HealEnabler(userInputManager, actions, world.UnitTypes, textureManager));
+            enablers.Add(new ResearchEnabler(userInputManager, actions, world.TechTree, textureManager));
 
             this.workerType = World.UnitTypes.FromName("Schtroumpf");
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
@@ -155,7 +156,9 @@ namespace Orion.UserInterface
             this.idleWorkerButton.Triggered += OnIdleSmurfsButtonTriggered;
 
             world.Entities.Added += EntityAdded;
+            LocalFaction.Warning += OnLocalFactionWarning;
         }
+
         #endregion
 
         #region Properties
@@ -519,6 +522,11 @@ namespace Orion.UserInterface
             // remove diplomacy pannel from view.
             assocFactionDropList.Clear();
             bouton.Parent.RemoveFromParent();
+        }
+
+        private void OnLocalFactionWarning(Faction sender, string args)
+        {
+            DisplayMessage(args, sender.Color);
         }
         #endregion
 

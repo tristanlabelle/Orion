@@ -85,7 +85,7 @@ namespace Orion.GameLogic.Tasks
                 }
                 else
                 {
-                    Debug.WriteLine("No place to spawn a unit.");
+                    Faction.RaiseWarning("No place to spawn a unit.");
                 }
             }
         }

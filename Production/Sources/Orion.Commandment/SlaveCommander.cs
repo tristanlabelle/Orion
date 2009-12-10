@@ -92,6 +92,13 @@ namespace Orion.Commandment
                 GenerateActionCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
         }
 
+        public void LaunchResearch(Unit tristan, Orion.GameLogic.Technologies.Technology technology)
+        {
+            if (tristan != null)
+            {
+                GenerateActionCommand(new ResearchCommand(tristan.Handle, Faction.Handle, technology.Handle));
+            }
+        }
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)

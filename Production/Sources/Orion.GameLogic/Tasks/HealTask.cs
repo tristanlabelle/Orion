@@ -56,6 +56,7 @@ namespace Orion.GameLogic.Tasks
             get
             {
                 if (!target.IsAlive) return true;
+                if (move.HasEnded && !move.HasReachedDestination) return true;
                 return target.Health >= target.MaxHealth;
             }
         }

@@ -10,6 +10,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         private Vector2? cursorPosition;
+        private Responder focused;
         #endregion
 
         #region Constructors
@@ -130,9 +131,7 @@ namespace Orion.UserInterface
             foreach (Responder child in Enumerable.Reverse(Children))
             {
                 bool keepPropagating = child.PropagateKeyPressEvent(character);
-                if (keepPropagating)
-                    child.DispatchKeyPressEvent(character);
-                else return false;
+                if (!keepPropagating) return false;
             }
 
             return DispatchKeyPressEvent(character);

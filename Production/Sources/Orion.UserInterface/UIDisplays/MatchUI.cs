@@ -110,6 +110,8 @@ namespace Orion.UserInterface
 
             Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
+            chatInput.Triggered += SendMessage;
+            chatInput.KeyDown += ChatInputKeyDown;
             Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             chatMessages = new TransparentFrame(messagesFrame);
             Children.Add(chatMessages);
@@ -348,51 +350,53 @@ namespace Orion.UserInterface
             return base.OnMouseUp(args);
         }
 
+        private void SendMessage(TextField chatInput)
+        {
+            string text = chatInput.Contents;
+            if (text.Length > 0)
+            {
+                SlaveCommander commander = userInputManager.Commander;
+                commander.SendMessage(chatInput.Contents);
+            }
+
+            Children.Remove(chatInput);
+        }
+
+        private void ChatInputKeyDown(Responder sender, KeyboardEventArgs args)
+        {
+            if (args.Key == Keys.Escape)
+            {
+                chatInput.Clear();
+                Children.Remove(chatInput);
+            }
+        }
+
         protected override bool OnKeyDown(KeyboardEventArgs args)
         {
             isShiftDown = args.HasShift;
             MatchRenderer.DrawAllHealthBars = args.HasAlt;
-            if (Children.Contains(chatInput))
+            isSpaceDown = args.Key == Keys.Space;
+            if (args.Key == Keys.F9)
             {
-                if (args.Key == Keys.Enter)
-                {
-                    string text = chatInput.Contents;
-                    if (text.Length > 0)
-                    {
-                        SlaveCommander commander = userInputManager.Commander;
-                        commander.SendMessage(chatInput.Contents);
-                    }
-
-                    Children.Remove(chatInput);
-                }
-                else if (args.Key == Keys.Escape)
-                {
-                    chatInput.Clear();
-                    Children.Remove(chatInput);
-                }
+                DisplayPausePanel();
                 return false;
             }
-            else
+            else if (args.Key == Keys.F10)
             {
-                isSpaceDown = args.Key == Keys.Space;
-                if (args.Key == Keys.Enter)
-                {
-                    chatInput.Clear();
-                    Children.Add(chatInput);
-                    return false;
-                }
-                else if (args.Key == Keys.F9)
-                {
-                    DisplayPausePanel();
-                    return false;
-                }
-                else if (args.Key == Keys.F10)
-                {
-                    DisplayDiplomacy();
-                    return false;
-                }
+                DisplayDiplomacy();
+                return false;
             }
             return base.OnKeyDown(args);
+        }
+
+        protected override bool OnKeyPress(char character)
+        {
+            if (character == '\r')
+            {
+                chatInput.Clear();
+                Children.Add(chatInput);
+            }
+            return base.OnKeyPress(character);
         }
 
         protected override bool OnDoubleClick(MouseEventArgs args)

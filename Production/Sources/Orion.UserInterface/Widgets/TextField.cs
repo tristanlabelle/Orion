@@ -92,6 +92,27 @@ namespace Orion.UserInterface.Widgets
                 context.StrokeLineStrip(textFrame.Max, new Vector2(textFrame.MaxX, textFrame.MinY));
             }
         }
+
+        protected internal override void OnAncestryChange(ViewContainer ancestor)
+        {
+            RootView root = Root as RootView;
+            if(root != null) root.FocusedView = Root == ancestor ? null : this;
+            base.OnAncestryChange(ancestor);
+        }
+
+        protected internal override void OnAddToParent(ViewContainer parent)
+        {
+            RootView root = Root as RootView;
+            if (root != null) root.FocusedView = this;
+            base.OnAddToParent(parent);
+        }
+
+        protected internal override void OnRemoveFromParent(ViewContainer parent)
+        {
+            RootView root = Root as RootView;
+            if (root != null) root.FocusedView = null;
+            base.OnRemoveFromParent(parent);
+        }
         #endregion
     }
 }

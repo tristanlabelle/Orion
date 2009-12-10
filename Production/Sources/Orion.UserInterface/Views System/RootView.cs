@@ -14,6 +14,7 @@ namespace Orion.UserInterface
 
         private Rectangle frame;
         private Stack<UIDisplay> displays;
+        private Responder focusedView;
         #endregion
 
         #region Constructors
@@ -46,6 +47,12 @@ namespace Orion.UserInterface
                 frame = value;
                 ResetViewport();
             }
+        }
+
+        public Responder FocusedView
+        {
+            get { return focusedView; }
+            set { focusedView = value; }
         }
         #endregion
 
@@ -93,7 +100,9 @@ namespace Orion.UserInterface
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            return TopmostDisplay.PropagateKeyboardEvent(type, args);
+            if (focusedView == null)
+                return TopmostDisplay.PropagateKeyboardEvent(type, args);
+            return focusedView.PropagateKeyboardEvent(type, args);
         }
 
         protected internal override void Render()

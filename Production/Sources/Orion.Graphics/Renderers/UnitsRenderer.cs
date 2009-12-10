@@ -87,6 +87,7 @@ namespace Orion.Graphics.Renderers
             DrawRememberedBuildings(graphics);
             DrawGroundUnits(graphics);
             DrawAirborneUnits(graphics);
+            DrawAirborneAttackLines(graphics);
         }
 
         #region Miniature
@@ -279,12 +280,30 @@ namespace Orion.Graphics.Renderers
                 graphics.StrokeLineStrip(attack.Attacker.Position, attack.Target.Position);
         }
         #endregion
-
-        //private void DrawAirborneAttackLines(GraphicsContext graphics)
-        //{
-        //    var airborneAttacks = World.Entities.OfType<Unit>().Where(unit => unit.IsAirborne && unit.TimeElapsedSinceLastHitInSeconds < 0.25);
-        //    graphics.StrokeColor = this.faction.Color;
-        //}
+        /*
+        private void DrawAirborneAttackLines(GraphicsContext graphics)
+        {
+            var airborneAttackers = World.Entities
+                .OfType<Unit>()
+                .Where(unit => unit.IsAirborne && unit.TaskQueue.Current is AttackTask);
+            graphics.StrokeColor = this.faction.Color;
+            
+            foreach (Unit unit in airborneAttackers)
+            {
+                AttackTask attackTask = (AttackTask)unit.TaskQueue.Current;
+                if (unit.TimeElapsedSinceLastHitInSeconds < airborneHitTimeInSeconds)
+                {
+                    //attackTask.Attacker.Position
+                    float laserProgress = unit.TimeElapsedSinceLastHitInSeconds / airborneHitTimeInSeconds; 
+                    float laserAngle = GetUnitDrawingAngle(unit);
+                    
+                    Rectangle laser = Rectangle.FromCenterSize(unit.Position.X, unit.Position.Y, 1, 1);
+                    graphics.Fill(laser);
+                }
+            }
+          
+        }
+        */
         #endregion
     }
 }

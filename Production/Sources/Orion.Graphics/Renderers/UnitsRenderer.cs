@@ -87,7 +87,7 @@ namespace Orion.Graphics.Renderers
             DrawRememberedBuildings(graphics);
             DrawGroundUnits(graphics);
             DrawAirborneUnits(graphics);
-            DrawAirborneAttackLines(graphics);
+            //DrawAirborneAttackLines(graphics);
         }
 
         #region Miniature

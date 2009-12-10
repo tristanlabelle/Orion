@@ -25,7 +25,7 @@ namespace Orion.Networking
         #endregion
 
         #region Peers Handling
-        private readonly List<PeerEndPoint> peers;
+        private readonly List<FactionEndPoint> peers;
         private readonly SafeTransporter transporter;
         #endregion
 
@@ -38,7 +38,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<PeerEndPoint> endPoints)
+        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<FactionEndPoint> endPoints)
         {
             Argument.EnsureNotNull(endPoints, "endPoints");
             Argument.EnsureNotNull(transporter, "transporter");
@@ -145,7 +145,7 @@ namespace Orion.Networking
 
         private void FactionDefeated(Faction sender)
         {
-            PeerEndPoint associatedEndPoint = peers.FirstOrDefault(peer => peer.Faction == sender);
+            FactionEndPoint associatedEndPoint = peers.FirstOrDefault(peer => peer.Faction == sender);
             if (associatedEndPoint != null)
             {
                 associatedEndPoint.Dispose();

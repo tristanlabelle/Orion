@@ -41,7 +41,7 @@ namespace Orion.Main
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
-            List<PeerEndPoint> peers = new List<PeerEndPoint>();
+            List<FactionEndPoint> peers = new List<FactionEndPoint>();
             int colorIndex = 0;
             foreach (PlayerSlot slot in UserInterface.Players)
             {
@@ -65,7 +65,7 @@ namespace Orion.Main
                 else if (slot is RemotePlayerSlot) // no commanders for remote players
                 {
                     IPv4EndPoint endPoint = ((RemotePlayerSlot)slot).RemoteHost.Value;
-                    PeerEndPoint peer = new PeerEndPoint(transporter, faction, endPoint);
+                    FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
                     peers.Add(peer);
                 }
                 else

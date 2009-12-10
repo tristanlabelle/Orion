@@ -668,6 +668,12 @@ namespace Orion.UserInterface
             boutonAccepter.Triggered += AcceptNewDiplomacy;
             diplomacyFrame.Children.Add(boutonAccepter);
         }
+
+        public override void Dispose()
+        {
+            textureManager.Dispose();
+            base.Dispose();
+        }
         #endregion
         #endregion
     }

@@ -326,12 +326,17 @@ namespace Orion.GameLogic
             return LineOfSight.ContainsPoint(other.Center);
         }
 
-        public bool IsInAttackRange(Unit other)
+        public bool HasWithinAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
             if (!HasSkill<Skills.AttackSkill>()) return false;
             int attackRange = GetStat(UnitStat.AttackRange);
-            if (attackRange == 0) return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
+            if (attackRange == 0)
+            {
+                if (!IsAirborne && other.IsAirborne)
+                    return false;
+                return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
+            }
             return (Center - other.Center).LengthSquared <= attackRange * attackRange;
         }
         #endregion
@@ -438,10 +443,14 @@ namespace Orion.GameLogic
 
         private bool TryAttackNearbyUnit()
         {
-            Unit unitToAttack = World.Entities
-                .InArea(LineOfSight)
+            IEnumerable<Unit> attackableUnits = World.Entities.InArea(LineOfSight)
                 .OfType<Unit>()
-                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy)
+                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy);
+
+            if(!IsAirborne && GetStat(UnitStat.AttackRange) == 0)
+                attackableUnits = attackableUnits.Where(u => !u.IsAirborne);
+
+            Unit unitToAttack = attackableUnits
                 .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToAttack == null) return false;

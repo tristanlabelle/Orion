@@ -46,7 +46,7 @@
     <Compile Include="CommandSynchronizer.cs" />
     <Compile Include="GameMessageType.cs" />
     <Compile Include="Protocol.cs" />
-    <Compile Include="PeerEndPoint.cs" />
+    <Compile Include="FactionEndPoint.cs" />
     <Compile Include="PeerLink.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="SafePacket.cs" />

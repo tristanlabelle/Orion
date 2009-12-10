@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Orion.Networking
 {
-    public class PeerEndPoint : IDisposable
+    public class FactionEndPoint : IDisposable
     {
         #region Fields
         private readonly byte[] doneMessage;
@@ -28,7 +28,7 @@ namespace Orion.Networking
         #endregion
 
         #region Constructors
-        public PeerEndPoint(SafeTransporter transporter, Faction faction, IPv4EndPoint host)
+        public FactionEndPoint(SafeTransporter transporter, Faction faction, IPv4EndPoint host)
         {
             this.transporter = transporter;
             receive = OnReceived;
@@ -46,7 +46,7 @@ namespace Orion.Networking
         #endregion
 
         #region Events
-        public event GenericEventHandler<PeerEndPoint> Disconnected;
+        public event GenericEventHandler<FactionEndPoint> Disconnected;
         #endregion
 
         #region Methods

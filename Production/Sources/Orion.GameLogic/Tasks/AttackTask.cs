@@ -51,7 +51,7 @@ namespace Orion.GameLogic.Tasks
             {
                 if (!Unit.Faction.CanSee(target))
                     return true;
-                if (!Unit.IsInAttackRange(target))
+                if (!Unit.HasWithinAttackRange(target))
                     return !Unit.HasSkill<Skills.MoveSkill>() || follow.HasEnded;
                 return !target.IsAlive;
             }
@@ -61,7 +61,7 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.IsInAttackRange(target))
+            if (Unit.HasWithinAttackRange(target))
             {
                 Unit.LookAt(target.Center);
                 Unit.TryHit(target);

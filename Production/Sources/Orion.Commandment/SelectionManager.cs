@@ -84,14 +84,23 @@ namespace Orion.Commandment
         {
             if (!selectedUnits.Contains(unit))
             {
-                selectedUnits.Add(unit);
-                UpdateSelection();
+                if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+                {
+                    selectedUnits.Add(unit);
+                    UpdateSelection();
+                }
             }
         }
 
         public void AppendToSelection(IEnumerable<Unit> units)
         {
-            selectedUnits.AddRange(units.Except(selectedUnits));
+            foreach (Unit unit in units)
+            {
+                if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+                {
+                    selectedUnits.Add(unit);
+                }
+            }
             UpdateSelection();
         }
 

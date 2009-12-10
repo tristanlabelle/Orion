@@ -27,16 +27,18 @@ namespace Orion.Graphics
 
         private readonly Unit unit;
         private readonly TextureManager textureManager;
+        private readonly Faction faction;
         #endregion
 
         #region Constructors
-        public UnitFrameRenderer(Unit unit, TextureManager textureManager)
+        public UnitFrameRenderer(Faction faction, Unit unit, TextureManager textureManager)
         {
             Argument.EnsureNotNull(unit, "unit");
             Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.unit = unit;
             this.textureManager = textureManager;
+            this.faction = faction; 
         }
         #endregion
 
@@ -44,7 +46,8 @@ namespace Orion.Graphics
         public override void Draw(GraphicsContext context)
         {
             bool isTraining = false;
-            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask)
+            
+            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
             {
                 isTraining = true;
 
@@ -116,7 +119,6 @@ namespace Orion.Graphics
                     y -= hp.Frame.Height;
                 }
             }
-
             base.Draw(context);
         }
 

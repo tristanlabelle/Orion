@@ -554,8 +554,9 @@ namespace Orion.UserInterface
 
         private void CreateSingleUnitSelectionPanel()
         {
+            
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(unit, textureManager);
+            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.Commander.Faction, unit, textureManager);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, textureManager);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;

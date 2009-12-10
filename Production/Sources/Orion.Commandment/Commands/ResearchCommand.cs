@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using Orion.GameLogic;
+using Orion.GameLogic.Technologies;
+using Orion.GameLogic.Tasks;
 
 namespace Orion.Commandment.Commands
 {
@@ -41,7 +44,27 @@ namespace Orion.Commandment.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            //TODO: dispatch tasks
+            Technology technology = match.World.TechTree.FromHandle(technologyHandle);
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
+            Unit researcher = (Unit)match.World.Entities.FromHandle(researcherHandle);
+
+            int aladiumCost = technology.Requirements.AladdiumCost;
+            int alageneCost = technology.Requirements.AlageneCost;
+
+            if (faction.AladdiumAmount >= aladiumCost && faction.AlageneAmount >= alageneCost)
+            {
+                if (researcher.TaskQueue.IsEmpty)
+                {
+                    researcher.TaskQueue.Enqueue(new ResearchTask(researcher, technology));
+                    faction.AladdiumAmount -= aladiumCost;
+                    faction.AlageneAmount -= alageneCost;
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Not enough resources");
+            }
+
         }
 
         public override string ToString()

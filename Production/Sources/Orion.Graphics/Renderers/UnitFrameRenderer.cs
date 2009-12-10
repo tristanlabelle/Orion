@@ -42,7 +42,7 @@ namespace Orion.Graphics
         }
         #endregion
 
-        #region Methods
+        #region Methods,
         public override void Draw(GraphicsContext context)
         {
             bool isTraining = false;

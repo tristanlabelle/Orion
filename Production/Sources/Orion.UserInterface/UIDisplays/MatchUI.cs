@@ -31,6 +31,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region General UI
+        private readonly MatchRenderer matchRenderer;
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
@@ -75,7 +76,7 @@ namespace Orion.UserInterface
             userInputManager = new UserInputManager(localCommander);
             World world = match.World;
 
-            MatchRenderer matchRenderer = new MatchRenderer(world, userInputManager, textureManager);
+            matchRenderer = new MatchRenderer(world, userInputManager, textureManager);
             world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
@@ -672,6 +673,7 @@ namespace Orion.UserInterface
         public override void Dispose()
         {
             textureManager.Dispose();
+            matchRenderer.Dispose();
             base.Dispose();
         }
         #endregion

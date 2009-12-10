@@ -5,7 +5,7 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
-    public sealed class FogOfWarRenderer
+    public sealed class FogOfWarRenderer : IDisposable
     {
         #region Fields
         private const float FogTransparency = 0.5f;
@@ -110,6 +110,11 @@ namespace Orion.Graphics
                 }
             }
             PixelSurface.SaveToFile(surface, "FogOfWar.png");
+        }
+
+        public void Dispose()
+        {
+            texture.Dispose();
         }
         #endregion
     }

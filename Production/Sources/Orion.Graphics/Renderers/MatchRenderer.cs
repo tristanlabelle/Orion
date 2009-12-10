@@ -1,13 +1,13 @@
-﻿using Orion.Commandment;
+﻿using System;
+using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
-    public class MatchRenderer : IRenderer
+    public class MatchRenderer : IRenderer, IDisposable
     {
-
         #region Fields
         private readonly UserInputManager inputManager;
         private readonly SelectionRenderer selectionRenderer;
@@ -16,6 +16,7 @@ namespace Orion.Graphics
         private readonly TextureManager textureManager;
         #endregion
 
+        #region Constructors
         public MatchRenderer(World world, UserInputManager manager, TextureManager textureManager)
         {
             Argument.EnsureNotNull(world, "world");
@@ -27,7 +28,9 @@ namespace Orion.Graphics
             worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction, textureManager);
             minimap = new MinimapRenderer(worldRenderer);
         }
+        #endregion
 
+        #region Properties
         public MinimapRenderer MinimapRenderer
         {
             get { return minimap; }
@@ -43,7 +46,9 @@ namespace Orion.Graphics
             get { return worldRenderer.UnitRenderer.DrawHealthBars; }
             set { worldRenderer.UnitRenderer.DrawHealthBars = value; }
         }
+        #endregion
 
+        #region Methods
         public void Draw(GraphicsContext context)
         {
             Argument.EnsureNotNull(context, "context");
@@ -61,5 +66,11 @@ namespace Orion.Graphics
             worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }
+
+        public void Dispose()
+        {
+            worldRenderer.Dispose();
+        }
+        #endregion
     }
 }

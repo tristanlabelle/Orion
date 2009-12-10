@@ -135,6 +135,7 @@ namespace Orion.Graphics
         public void Dispose()
         {
             terrainRenderer.Dispose();
+            fogOfWarRenderer.Dispose();
         }
         #endregion
     }

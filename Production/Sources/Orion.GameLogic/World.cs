@@ -44,6 +44,17 @@ namespace Orion.GameLogic
 
         #region Events
         /// <summary>
+        /// Raised after this <see cref="World"/> has been updated.
+        /// </summary>
+        public event GenericEventHandler<World, SimulationStep> Updated;
+
+        private void RaiseUpdated(SimulationStep step)
+        {
+            var handler = Updated;
+            if (handler != null) handler(this, step);
+        }
+
+        /// <summary>
         /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s has been defeated.
         /// </summary>
         public event GenericEventHandler<World, Faction> FactionDefeated;
@@ -225,6 +236,7 @@ namespace Orion.GameLogic
         public void Update(SimulationStep step)
         {
             entities.Update(step);
+            RaiseUpdated(step);
         }
         #endregion
     }

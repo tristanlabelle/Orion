@@ -313,8 +313,6 @@ namespace Orion.Commandment
                 }
                 region = Region.Grow(region, 1);
             }
-
-            Debug.Fail("No place found to build building!");
         }
 
 

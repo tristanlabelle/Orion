@@ -172,6 +172,7 @@ namespace Orion.GameLogic
             Faction faction = new Faction(handle, this, name, color);
             faction.Defeated += RaiseFactionDefeated;
             factions.Add(faction);
+            faction.AladdiumAmount = 200;
             return faction;
         }
 

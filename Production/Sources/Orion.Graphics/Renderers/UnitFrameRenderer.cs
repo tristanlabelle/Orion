@@ -22,8 +22,7 @@ namespace Orion.Graphics
             UnitStat.MovementSpeed, UnitStat.SightRange
         };
 
-        private static readonly Font statsFont = new Font("Consolas", 12);
-        private const float textLineDistance = 25;
+        private static readonly Font statsFont = new Font("Consolas", 10);
         private const float firstLineY = 160;
 
         private readonly Unit unit;
@@ -101,10 +100,10 @@ namespace Orion.Graphics
             
             context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
 
-            string hp = "HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth);
-            context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
+            Text hp = new Text("HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth), statsFont);
+            context.Draw(hp, new Vector2(150, firstLineY - hp.Frame.Height));
 
-            float y = firstLineY - textLineDistance * 2;
+            float y = firstLineY - hp.Frame.Height * 2;
             if (!isTraining)
             {
                 foreach (UnitStat stat in statsToDisplay)
@@ -114,7 +113,7 @@ namespace Orion.Graphics
                     if (value == 0) continue;
                     string message = "{0}: {1}".FormatInvariant(Casing.CamelToWords(stat.ToStringInvariant()), value);
                     context.Draw(message, new Vector2(150, y));
-                    y -= textLineDistance;
+                    y -= hp.Frame.Height;
                 }
             }
 

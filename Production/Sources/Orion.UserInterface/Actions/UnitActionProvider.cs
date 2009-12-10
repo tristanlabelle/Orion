@@ -16,11 +16,10 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Constructors
-        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType type, UnitsRenderer unitsRenderer)
+        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType type)
         {
             Argument.EnsureNotNull(actionEnablers, "actionEnablers");
             Argument.EnsureNotNull(type, "type");
-            Argument.EnsureNotNull(unitsRenderer, "unitsRenderer");
 
             foreach (ActionEnabler enabler in actionEnablers)
                 enabler.LetFill(type, actionButtons);

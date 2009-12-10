@@ -3,7 +3,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public sealed class MinimapRenderer : FrameRenderer
     {
@@ -28,7 +28,7 @@ namespace Orion.Graphics
         {
             worldRenderer.DrawMiniatureTerrain(context);
             worldRenderer.DrawMiniatureResources(context);
-            worldRenderer.UnitRenderer.DrawMiniature(context);
+            worldRenderer.DrawMiniatureUnits(context);
             worldRenderer.DrawFogOfWar(context);
 
             context.StrokeColor = Color.Orange;

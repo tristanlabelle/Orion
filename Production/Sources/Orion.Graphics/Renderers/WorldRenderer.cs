@@ -5,7 +5,7 @@ using Orion.Geometry;
 
 using Color = System.Drawing.Color;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     /// <summary>
     /// Provides methods to draw the game <see cref="World"/>.
@@ -16,26 +16,35 @@ namespace Orion.Graphics
         private static readonly Color AladdiumColor = Color.LightBlue;
         private static readonly Color AlageneColor = Color.Green;
 
-        private readonly World world;
+        private readonly Faction faction;
+        private readonly TextureManager textureManager;
+
         private readonly TerrainRenderer terrainRenderer;
-        private readonly UnitsRenderer unitRenderer;
+        private readonly ResourcesRenderer resourcesRenderer;
+        private readonly RuinsRenderer ruinsRenderer;
+        private readonly UnitsRenderer unitsRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
-        private TextureManager textureManager;
         #endregion
 
         #region Constructors
         /// <summary>
         /// Initializes a new <see cref="WorldRenderer"/> from the <see cref="World"/> it is going to render.
         /// </summary>
-        /// <param name="world">The <see cref="World"/> to be rendered.</param>
-        public WorldRenderer(World world, Faction faction, TextureManager textureManager)
+        /// <param name="faction">
+        /// The <see cref="Faction"/> providing the view point to the <see cref="World"/> to be rendered.
+        /// </param>
+        public WorldRenderer(Faction faction, TextureManager textureManager)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(faction, "faction");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
-            this.world = world;
+            this.faction = faction;
             this.textureManager = textureManager;
-            this.terrainRenderer = new TerrainRenderer(world.Terrain, textureManager);
-            this.unitRenderer = new UnitsRenderer(faction, textureManager);
+
+            this.terrainRenderer = new TerrainRenderer(World.Terrain, textureManager);
+            this.resourcesRenderer = new ResourcesRenderer(faction, textureManager);
+            this.ruinsRenderer = new RuinsRenderer(faction, textureManager);
+            this.unitsRenderer = new UnitsRenderer(faction, textureManager);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
         #endregion
@@ -43,24 +52,23 @@ namespace Orion.Graphics
         #region Properties
         public Rectangle WorldBounds
         {
-            get { return world.Bounds; }
+            get { return World.Bounds; }
         }
 
-        public UnitsRenderer UnitRenderer
+        public bool DrawHealthBars
         {
-            get { return unitRenderer; }
+            get { return unitsRenderer.DrawHealthBars; }
+            set { unitsRenderer.DrawHealthBars = value; }
+        }
+
+        private World World
+        {
+            get { return faction.World; }
         }
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Draws the <see cref="World"/>'s terrain.
-        /// </summary>
-        /// <param name="graphics">The <see cref="GraphicsContext"/> in which to draw.</param>
-        /// <param name="viewRectangle">
-        /// A <see cref="Rectangle"/>, in world units, which specifies the parts of the
-        /// <see cref="World"/> which have to be drawn.
-        /// </param>
+        #region Terrain
         public void DrawTerrain(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
@@ -72,65 +80,44 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(graphics, "graphics");
             terrainRenderer.DrawMiniature(graphics);
         }
+        #endregion
 
-        public void DrawFogOfWar(GraphicsContext graphics)
-        {
-            Argument.EnsureNotNull(graphics, "graphics");
-            fogOfWarRenderer.Draw(graphics);
-        }
-
-        /// <summary>
-        /// Draws the <see cref="World"/>'s entities, including <see cref="Unit"/>s.
-        /// </summary>
-        /// <param name="graphics">The <see cref="GraphicsContext"/> in which to draw.</param>
-        /// <param name="viewRectangle">
-        /// A <see cref="Rectangle"/>, in world units, which specifies the parts of the
-        /// <see cref="World"/> which have to be drawn.
-        /// </param>
-        public void DrawUnits(GraphicsContext graphics)
-        {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            unitRenderer.Draw(graphics);
-        }
-
+        #region Resources
         public void DrawResources(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-
-            Rectangle bounds = graphics.CoordinateSystem;
-            var resourceNodes = world.Entities
-                .OfType<ResourceNode>()
-                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
-            foreach (ResourceNode node in resourceNodes)
-            {
-                string resourceTypeName = node.Type.ToStringInvariant();
-                Texture texture = textureManager.Get(resourceTypeName);
-                graphics.Fill(node.BoundingRectangle, texture);
-            }
+            resourcesRenderer.Draw(graphics);
         }
 
         public void DrawMiniatureResources(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-
-            Rectangle bounds = graphics.CoordinateSystem;
-            var resourceNodes = world.Entities
-                .OfType<ResourceNode>()
-                .Where(node => Rectangle.Intersects(bounds, node.BoundingRectangle));
-            foreach (ResourceNode node in resourceNodes)
-            {
-                graphics.FillColor = GetResourceColor(node.Type);
-                graphics.Fill(node.BoundingRectangle);
-            }
+            resourcesRenderer.DrawMiniature(graphics);
         }
+        #endregion
 
-        public static Color GetResourceColor(ResourceType type)
+        #region Units
+        public void DrawUnits(GraphicsContext graphics)
         {
-            if (type == ResourceType.Aladdium) return Color.Green;
-            else if (type == ResourceType.Alagene) return Color.LightCyan;
-            else throw new Exception("Ressource type unknown.");
+            Argument.EnsureNotNull(graphics, "graphics");
+            ruinsRenderer.Draw(graphics);
+            unitsRenderer.Draw(graphics);
         }
+
+        public void DrawMiniatureUnits(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+            unitsRenderer.DrawMiniature(graphics);
+        }
+        #endregion
+
+        #region Fog of War
+        public void DrawFogOfWar(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+            fogOfWarRenderer.Draw(graphics);
+        }
+        #endregion
 
         public void Dispose()
         {

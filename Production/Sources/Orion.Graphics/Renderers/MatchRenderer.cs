@@ -4,7 +4,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public class MatchRenderer : IRenderer, IDisposable
     {
@@ -17,16 +17,16 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
-        public MatchRenderer(World world, UserInputManager manager, TextureManager textureManager)
+        public MatchRenderer(UserInputManager inputManager, TextureManager textureManager)
         {
-            Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(manager, "manager");
+            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.textureManager = textureManager;
-            inputManager = manager;
-            selectionRenderer = new SelectionRenderer(inputManager);
-            worldRenderer = new WorldRenderer(world, inputManager.Commander.Faction, textureManager);
-            minimap = new MinimapRenderer(worldRenderer);
+            this.inputManager = inputManager;
+            this.selectionRenderer = new SelectionRenderer(inputManager);
+            this.worldRenderer = new WorldRenderer(inputManager.Commander.Faction, textureManager);
+            this.minimap = new MinimapRenderer(worldRenderer);
         }
         #endregion
 
@@ -43,8 +43,18 @@ namespace Orion.Graphics
 
         public bool DrawAllHealthBars
         {
-            get { return worldRenderer.UnitRenderer.DrawHealthBars; }
-            set { worldRenderer.UnitRenderer.DrawHealthBars = value; }
+            get { return worldRenderer.DrawHealthBars; }
+            set { worldRenderer.DrawHealthBars = value; }
+        }
+
+        private SelectionManager SelectionManager
+        {
+            get { return inputManager.SelectionManager; }
+        }
+
+        private Faction Faction
+        {
+            get { return inputManager.Commander.Faction; }
         }
         #endregion
 
@@ -59,10 +69,9 @@ namespace Orion.Graphics
             worldRenderer.DrawUnits(context);
             selectionRenderer.DrawSelectionMarkers(context);
 
-            if (inputManager.SelectionManager.HoveredUnit != null)
-            {
-                worldRenderer.UnitRenderer.DrawHealthBar(context, inputManager.SelectionManager.HoveredUnit);
-            }
+            if (SelectionManager.HoveredUnit != null && Faction.CanSee(SelectionManager.HoveredUnit))
+                HealthBarRenderer.Draw(context, SelectionManager.HoveredUnit);
+
             worldRenderer.DrawFogOfWar(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }

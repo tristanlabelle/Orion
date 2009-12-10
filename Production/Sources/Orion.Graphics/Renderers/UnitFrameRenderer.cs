@@ -23,45 +23,42 @@ namespace Orion.Graphics
         };
 
         private static readonly Font statsFont = new Font("Consolas", 12);
-
-        private readonly Unit unit;
-        private readonly UnitsRenderer unitsRenderer;
-        private bool unitBeingCreated;
         private const float textLineDistance = 25;
         private const float firstLineY = 160;
 
+        private readonly Unit unit;
+        private readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public UnitFrameRenderer(Unit unit, UnitsRenderer unitsRenderer)
+        public UnitFrameRenderer(Unit unit, TextureManager textureManager)
         {
             Argument.EnsureNotNull(unit, "unit");
-            Argument.EnsureNotNull(unitsRenderer, "unitsRenderer");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.unit = unit;
-            this.unitsRenderer = unitsRenderer;
-            this.unitBeingCreated = false; 
+            this.textureManager = textureManager;
         }
         #endregion
 
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current != null)
+            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask)
             {
-                unitBeingCreated = true;
                 int firstStartingXPos = 360;
                 int firstStartingYPos = 120;
                 if (unit.TaskQueue.Count >= 1)
                 {
                     for (int i = 0; i < unit.TaskQueue.Count; i++)
                     {
-                        if (i+1 == 2)
+                        if (i + 1 == 2)
                         {
                             firstStartingXPos = 159;
                             firstStartingYPos = 80;
                         }
-                        if (i+1 == 6)
+
+                        if (i + 1 == 6)
                         {
                             firstStartingXPos = 159;
                             firstStartingYPos = 35;
@@ -69,7 +66,7 @@ namespace Orion.Graphics
 
                         // Returns a Task, and finds the unit associated to that Task. 
                         TrainTask train = (TrainTask)unit.TaskQueue[i];
-                        Texture texture = unitsRenderer.GetTypeTexture(train.TraineeType);
+                        Texture texture = textureManager.GetUnit(train.TraineeType.Name);
 
                         Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
                         context.FillColor = Color.Black;
@@ -85,27 +82,29 @@ namespace Orion.Graphics
 
                         // Draws a completion HealthBar
                         Rectangle healthRect = new Rectangle(152 ,120, 186, 10);
-                        TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue.ElementAt(0);
+                        TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
                         DrawCompletionRect(context, healthRect,currentUnitBeingTrained.Progress);
 
                         base.Draw(context);
                         firstStartingXPos += 50;
                         context.FillColor = Color.Black;
-                     
                     }
+
                     string message = "In progress...";
                     context.Draw(message, new Vector2(150, 5));
                 }
             }
-            if (unit.TaskQueue.IsEmpty)
-                unitBeingCreated = false;
+
             context.Font = statsFont;
             context.FillColor = Color.DarkBlue;
+            
             context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
+
             string hp = "HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth);
             context.Draw(hp, new Vector2(150, firstLineY - textLineDistance));
+
             float y = firstLineY - textLineDistance * 2;
-            if (!unitBeingCreated)
+            if (unit.TaskQueue.IsEmpty)
             {
                 foreach (UnitStat stat in statsToDisplay)
                 {
@@ -117,8 +116,10 @@ namespace Orion.Graphics
                     y -= textLineDistance;
                 }
             }
+
             base.Draw(context);
         }
+
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)
         {
             context.FillColor = Color.Black;

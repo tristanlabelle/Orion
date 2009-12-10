@@ -3,23 +3,24 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.Geometry;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public sealed class UnitButtonRenderer : FrameRenderer
     {
         #region Fields
-        private readonly UnitsRenderer unitRenderer;
-        private bool hasFocus;
         public readonly Unit unit;
+        private readonly TextureManager textureManager;
+        private bool hasFocus;
         #endregion
 
         #region Constructors
-        public UnitButtonRenderer(UnitsRenderer unitRenderer, Unit unit)
+        public UnitButtonRenderer(Unit unit, TextureManager textureManager)
             : base(unit.Faction.Color)
         {
-            this.unitRenderer = unitRenderer;
-            
+            Argument.EnsureNotNull(textureManager, "textureManager");
+
             this.unit = unit;
+            this.textureManager = textureManager;
         }
         #endregion
 
@@ -46,14 +47,14 @@ namespace Orion.Graphics
                 context.CoordinateSystem.CenterX, context.CoordinateSystem.Height * 5 / 8,
                 size, size);
 
-            Texture texture = unitRenderer.GetTypeTexture(unit.Type);
+            Texture texture = textureManager.GetUnit(unit.Type.Name);
             context.Fill(rectangle, texture, unit.Faction.Color);
 
             float healthRatio = unit.Health / unit.MaxHealth;
             float yHealth = context.CoordinateSystem.Height / 4;
             Vector2 start = new Vector2(context.CoordinateSystem.Width / 5, yHealth - 0.25f);
             Vector2 end = new Vector2(context.CoordinateSystem.Width / 5 * 4, yHealth + 0.25f);
-            unitRenderer.DrawHealthBar(context, unit, new Rectangle(start, end - start));
+            HealthBarRenderer.Draw(context, unit, new Rectangle(start, end - start));
         }
         #endregion
     }

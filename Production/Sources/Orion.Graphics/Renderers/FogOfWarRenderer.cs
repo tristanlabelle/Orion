@@ -3,7 +3,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public sealed class FogOfWarRenderer : IDisposable
     {

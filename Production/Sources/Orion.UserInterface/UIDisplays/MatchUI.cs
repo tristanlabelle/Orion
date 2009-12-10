@@ -10,6 +10,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Orion.Graphics;
+using Orion.Graphics.Renderers;
 using Orion.UserInterface.Widgets;
 using Orion.UserInterface.Actions;
 using Orion.UserInterface.Actions.Enablers;
@@ -35,7 +36,6 @@ namespace Orion.UserInterface
         private readonly ClippedView worldView;
         private readonly Frame hudFrame;
         private readonly Frame selectionFrame;
-        private readonly Button idleSmurfsButton;
         #endregion
 
         #region Pause
@@ -47,12 +47,14 @@ namespace Orion.UserInterface
         private bool mouseDownOnMinimap;
         #endregion
 
-        private Dictionary<Unit, bool> smurfsActivityState = new Dictionary<Unit, bool>();
-        private readonly UnitType smurfType;
+        #region Idle Workers
+        private readonly UnitType workerType;
+        private readonly Dictionary<Unit, bool> workersActivityState = new Dictionary<Unit, bool>();
+        private readonly Button idleWorkerButton;
+        #endregion
 
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
         private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
@@ -70,13 +72,12 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.match = match;
-            this.localCommander = localCommander;
-            match.Quitting += Quit;
-            textureManager = new TextureManager();
-            userInputManager = new UserInputManager(localCommander);
+            this.match.Quitting += Quit;
+            this.userInputManager = new UserInputManager(localCommander);
+            this.textureManager = new TextureManager();
             World world = match.World;
 
-            matchRenderer = new MatchRenderer(world, userInputManager, textureManager);
+            matchRenderer = new MatchRenderer(userInputManager, textureManager);
             world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
@@ -144,12 +145,12 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
             enablers.Add(new HealEnabler(userInputManager, actions, world.UnitTypes, textureManager));
 
-            smurfType = world.UnitTypes.FromName("Schtroumpf");
-            Rectangle inactiveSmurfsRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
-            Texture smurfTexture = UnitsRenderer.GetTypeTexture(smurfType);
-            TexturedFrameRenderer smurfButtonRenderer = new TexturedFrameRenderer(smurfTexture, Color.White, Color.Gray, Color.LightGray);
-            idleSmurfsButton = new Button(inactiveSmurfsRectangle, "", smurfButtonRenderer);
-            idleSmurfsButton.Triggered += OnIdleSmurfsButtonTriggered;
+            this.workerType = World.UnitTypes.FromName("Schtroumpf");
+            Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
+            Texture workerTexture = textureManager.GetUnit(workerType.Name);
+            TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Color.White, Color.Gray, Color.LightGray);
+            this.idleWorkerButton = new Button(inactiveWorkerRectangle, "", workerButtonRenderer);
+            this.idleWorkerButton.Triggered += OnIdleSmurfsButtonTriggered;
 
             world.Entities.Added += EntityAdded;
         }
@@ -176,9 +177,19 @@ namespace Orion.UserInterface
             get { return MatchRenderer.WorldRenderer; }
         }
 
-        private UnitsRenderer UnitsRenderer
+        private SlaveCommander LocalCommander
         {
-            get { return WorldRenderer.UnitRenderer; }
+            get { return userInputManager.Commander; }
+        }
+
+        private Faction LocalFaction
+        {
+            get { return LocalCommander.Faction; }
+        }
+
+        private World World
+        {
+            get { return LocalFaction.World; }
         }
         #endregion
 
@@ -229,7 +240,7 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(faction, "faction");
             DisplayMessage("{0} was defeated.".FormatInvariant(faction.Name), faction.Color);
 
-            if (faction == localCommander.Faction)
+            if (faction == LocalFaction)
             {
                 if(match.IsPausable)
                     match.Pause();
@@ -240,7 +251,7 @@ namespace Orion.UserInterface
         public void DisplayVictoryMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            if (faction == localCommander.Faction)
+            if (faction == LocalFaction)
             {
                 if(match.IsPausable)
                     match.Pause();
@@ -253,12 +264,11 @@ namespace Orion.UserInterface
         private void EntityAdded(EntityManager manager, Entity entity)
         {
             Unit unit = entity as Unit;
-            if (unit == null) return;
-            if (localCommander.Faction != unit.Faction) return;
+            if (unit == null || unit.Faction != LocalFaction) return;
 
-            if (unit.Type == smurfType)
+            if (unit.Type == workerType)
             {
-                smurfsActivityState[unit] = true;
+                workersActivityState[unit] = true;
                 unit.TaskQueue.Changed += OnSmurfTaskChanged;
                 unit.Died += OnSmurfDied;
             }
@@ -266,18 +276,18 @@ namespace Orion.UserInterface
 
         private void OnSmurfTaskChanged(TaskQueue queue)
         {
-            smurfsActivityState[queue.Unit] = queue.IsEmpty;
+            workersActivityState[queue.Unit] = queue.IsEmpty;
         }
 
         private void OnSmurfDied(Entity smurfAsEntity)
         {
             Unit smurf = (Unit)smurfAsEntity;
-            smurfsActivityState.Remove(smurf);
+            workersActivityState.Remove(smurf);
         }
 
         private void OnIdleSmurfsButtonTriggered(Button sender)
         {
-            IEnumerable<Unit> smurfs = smurfsActivityState.Where(kp => kp.Value).Select(kp => kp.Key);
+            IEnumerable<Unit> smurfs = workersActivityState.Where(kp => kp.Value).Select(kp => kp.Key);
             if (isShiftDown)
             {
                 userInputManager.SelectionManager.SelectUnits(smurfs);
@@ -415,12 +425,12 @@ namespace Orion.UserInterface
             }
             messagesToDelete.Clear();
 
-            bool shouldDisplaySmurfButton = smurfsActivityState.Values.Any(value => value == true);
-            if (Children.Contains(idleSmurfsButton) && !shouldDisplaySmurfButton)
-                Children.Remove(idleSmurfsButton);
+            bool shouldDisplaySmurfButton = workersActivityState.Values.Any(value => value == true);
+            if (Children.Contains(idleWorkerButton) && !shouldDisplaySmurfButton)
+                Children.Remove(idleWorkerButton);
 
-            if(!Children.Contains(idleSmurfsButton) && shouldDisplaySmurfButton)
-                Children.Add(idleSmurfsButton);
+            if(!Children.Contains(idleWorkerButton) && shouldDisplaySmurfButton)
+                Children.Add(idleWorkerButton);
 
             match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);
@@ -494,11 +504,12 @@ namespace Orion.UserInterface
         {
             foreach (var pair in assocFactionDropList)
             {
-                if (localCommander.Faction.GetDiplomaticStance(pair.Key) != pair.Value.SelectedItem)
+                if (LocalFaction.GetDiplomaticStance(pair.Key) != pair.Value.SelectedItem)
                 {
-                    localCommander.LaunchChangeDiplomacy(pair.Key);
+                    LocalCommander.LaunchChangeDiplomacy(pair.Key);
                 }
             }
+
             // remove diplomacy pannel from view.
             assocFactionDropList.Clear();
             bouton.Parent.RemoveFromParent();
@@ -530,8 +541,8 @@ namespace Orion.UserInterface
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(unit, UnitsRenderer);
-            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(UnitsRenderer, unit);
+            selectionFrame.Renderer = new UnitFrameRenderer(unit, textureManager);
+            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, textureManager);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -549,7 +560,7 @@ namespace Orion.UserInterface
             float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                UnitButtonRenderer renderer = new UnitButtonRenderer(UnitsRenderer, unit);
+                UnitButtonRenderer renderer = new UnitButtonRenderer(unit, textureManager);
                 renderer.HasFocus = unit.Type == SelectedType;
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
@@ -595,7 +606,7 @@ namespace Orion.UserInterface
             {
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
                 if (selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
-                    actions.Push(new UnitActionProvider(enablers, SelectedType, UnitsRenderer));
+                    actions.Push(new UnitActionProvider(enablers, SelectedType));
             }
         }
 
@@ -641,23 +652,22 @@ namespace Orion.UserInterface
             Rectangle listFrameRectangle = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
             ListFrame listFrame = new ListFrame(listFrameRectangle,new Vector2(0,0));
             Rectangle rectangleFrame = new Rectangle(listFrame.Bounds.Width, listFrame.Bounds.Height/10);
-            foreach (Faction aFaction in localCommander.Faction.World.Factions)
+            foreach (Faction faction in World.Factions)
             {
-                if (aFaction == localCommander.Faction) continue;
+                if (faction == LocalFaction) continue;
 
-                Frame frameFaction = new Frame(rectangleFrame, aFaction.Color);
+                Frame frameFaction = new Frame(rectangleFrame, faction.Color);
                 
                 Rectangle rectangleFaction = Instant.CreateComponentRectangle(frameFaction.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
-                DropdownList<DiplomaticStance> dropList = new DropdownList<DiplomaticStance>(rectangleFaction);
-                assocFactionDropList.Add(aFaction, dropList);
+                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(rectangleFaction);
+                assocFactionDropList.Add(faction, dropdownList);
 
+                dropdownList.AddItem(DiplomaticStance.Enemy);
+                dropdownList.AddItem(DiplomaticStance.Ally);
+                dropdownList.SelectedItem = LocalFaction.GetDiplomaticStance(faction);
 
-                dropList.AddItem(DiplomaticStance.Enemy);
-                dropList.AddItem(DiplomaticStance.Ally);
-                dropList.SelectedItem = localCommander.Faction.GetDiplomaticStance(aFaction);
-
-                frameFaction.Children.Add(new Label(aFaction.Name));
-                frameFaction.Children.Add(dropList);
+                frameFaction.Children.Add(new Label(faction.Name));
+                frameFaction.Children.Add(dropdownList);
                 
 
                 listFrame.Children.Add(frameFaction);

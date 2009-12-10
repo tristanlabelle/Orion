@@ -165,8 +165,8 @@ namespace Orion.Commandment
             {
                 for (int i = 0; i < amountOfTrains; i++)
                 {
-                    trainers.Add(potentialTrainers.ElementAt(0));
-                    potentialTrainers.Remove(potentialTrainers.ElementAt(0));
+                    trainers.Add(potentialTrainers[0]);
+                    potentialTrainers.Remove(potentialTrainers[0]);
                 }
             }
 
@@ -260,8 +260,8 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                builders.Add(potentialBuilders.ElementAt(0));
-                potentialBuilders.Remove(potentialBuilders.ElementAt(0));
+                builders.Add(potentialBuilders[0]);
+                potentialBuilders.Remove(potentialBuilders[0]);
             }
 
             for (int i = 0; i < amountOfBuildings; i++)

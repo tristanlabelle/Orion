@@ -8,20 +8,16 @@ using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     /// <summary>
     /// Provides functionality to draw <see cref="Unit"/>s on-screen.
     /// </summary>
-    public sealed class UnitsRenderer
+    public sealed class UnitsRenderer : IRenderer
     {
         #region Static
         #region Fields
-        private static readonly Color lowLifeColor = Color.Red;
-        private static readonly Color middleLifeColor = Color.Yellow;
-        private static readonly Color fullLifeColor = Color.ForestGreen;
-
-        private static readonly Size minimapUnitSize = new Size(3, 3);
+        private static readonly Size miniatureUnitSize = new Size(3, 3);
 
         private const float shadowAlpha = 0.3f;
         private const float shadowDistance = 0.7f;
@@ -29,21 +25,6 @@ namespace Orion.Graphics
 
         private const float meleeHitSpinTimeInSeconds = 0.25f;
         //private const float airborneHitTimeInSeconds = 0.25f;
-
-        private const float buildingRuinDurationInSeconds = 60;
-        private const float skeletonDurationInSeconds = 15;
-        private const float ruinFadeDurationInSeconds = 1;
-        #endregion
-
-        #region Methods
-        private static Color Interpolate(Color first, Color second, float completion)
-        {
-            float opposite = 1 - completion;
-            return Color.FromArgb(
-                (int)(first.R * opposite + second.R * completion),
-                (int)(first.G * opposite + second.G * completion),
-                (int)(first.B * opposite + second.B * completion));
-        }
         #endregion
         #endregion
 
@@ -52,7 +33,6 @@ namespace Orion.Graphics
         private readonly TextureManager textureManager;
         private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
         private readonly List<Ruin> ruins = new List<Ruin>();
-        private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
 
@@ -64,9 +44,6 @@ namespace Orion.Graphics
             
             this.faction = faction;
             this.textureManager = textureManager;
-
-            World.Updated += OnWorldUpdated;
-            World.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
@@ -99,21 +76,6 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        #region Event Handlers
-        private void OnWorldUpdated(World sender, SimulationStep args)
-        {
-            simulationTimeInSeconds = args.TimeInSeconds;
-            ClearExpiredRuins();
-        }
-
-        private void OnEntityRemoved(EntityManager sender, Entity args)
-        {
-            Unit unit = args as Unit;
-            if (unit == null) return;
-            AddRuin(unit);
-        }
-        #endregion
-
         public Texture GetTypeTexture(UnitType type)
         {
             return textureManager.GetUnit(type.Name);
@@ -123,7 +85,6 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            DrawRuins(graphics);
             DrawRememberedBuildings(graphics);
             DrawGroundUnits(graphics);
             DrawAirborneUnits(graphics);
@@ -142,14 +103,14 @@ namespace Orion.Graphics
                 if (faction.CanSee(unit))
                 {
                     context.FillColor = unit.Faction.Color;
-                    context.Fill(new Rectangle(unit.Position, (Vector2)minimapUnitSize));
+                    context.Fill(new Rectangle(unit.Position, (Vector2)miniatureUnitSize));
                 }
             }
 
             foreach (RememberedBuilding building in faction.BuildingMemory)
             {
                 context.FillColor = building.Faction.Color;
-                context.Fill(new Rectangle(building.Location, (Vector2)minimapUnitSize));
+                context.Fill(new Rectangle(building.Location, (Vector2)miniatureUnitSize));
             }
         }
         #endregion
@@ -204,7 +165,8 @@ namespace Orion.Graphics
                     if (unit.IsUnderConstruction)
                         graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
                 }
-                if (DrawHealthBars) DrawHealthBar(graphics, unit);
+
+                if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
             }
         }
 
@@ -235,54 +197,6 @@ namespace Orion.Graphics
             float spinAngle = spinProgress * (float)Math.PI * 2;
 
             return baseAngle + spinAngle;
-        }
-        #endregion
-
-        #region Health Bars
-        public void DrawHealthBar(GraphicsContext context, Unit unit)
-        {
-            float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            Rectangle unitBoundingRectangle = unit.BoundingRectangle;
-            float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
-            float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
-
-            if (faction.CanSee(unit))
-                DrawHealthBar(context, unit, new Vector2(x, y));
-        }
-
-        public void DrawHealthBar(GraphicsContext context, Unit unit, Vector2 origin)
-        {
-            float healthbarWidth = (float)Math.Log(unit.MaxHealth);
-            float leftHealthWidth = unit.Health * 0.1f;
-
-            if (faction.CanSee(unit))
-                DrawHealthBar(context, unit, new Rectangle(origin, new Vector2(healthbarWidth, 0.15f)));
-        }
-
-        public void DrawHealthBar(GraphicsContext context, Unit unit, Rectangle into)
-        {
-            float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
-            Vector2 origin = into.Min;
-
-            if (faction.CanSee(unit))
-            {
-                if (unit.Health > unit.MaxHealth / 2)
-                {
-                    float lifeFraction = (unit.Health - unit.MaxHealth / 2f) / (unit.MaxHealth / 2f);
-                    context.FillColor = Interpolate(middleLifeColor, fullLifeColor, lifeFraction);
-                }
-                else
-                {
-                    float lifeFraction = unit.Health / (unit.MaxHealth / 2f);
-                    context.FillColor = Interpolate(lowLifeColor, middleLifeColor, lifeFraction);
-                }
-
-                Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
-                context.Fill(lifeRect);
-                Rectangle damageRect = new Rectangle(origin.X + leftHealthWidth, origin.Y, into.Width - leftHealthWidth, into.Height);
-                context.FillColor = Color.DarkGray;
-                context.Fill(damageRect);
-            }
         }
         #endregion
 
@@ -349,62 +263,6 @@ namespace Orion.Graphics
         //    var airborneAttacks = World.Entities.OfType<Unit>().Where(unit => unit.IsAirborne && unit.TimeElapsedSinceLastHitInSeconds < 0.25);
         //    graphics.StrokeColor = this.faction.Color;
         //}
-
-        #region Ruins
-        private void DrawRuins(GraphicsContext graphics)
-        {
-            foreach (Ruin ruin in ruins)
-            {
-                Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
-
-                Region gridRegion = Entity.GetGridRegion(ruin.Min, ruin.Size);
-                if (!faction.CanSee(gridRegion)) continue;
-
-                float durationInSeconds = GetDurationInSeconds(ruin.Type);
-                float ageInSeconds = simulationTimeInSeconds - ruin.CreationTimeInSeconds;
-                float lifetimeRemainingInSeconds = durationInSeconds - ageInSeconds;
-                float alpha = lifetimeRemainingInSeconds / ruinFadeDurationInSeconds;
-                if (alpha < 0) alpha = 0;
-                if (alpha > 1) alpha = 1;
-
-                Vector2 size = new Vector2(ruin.Size.Width, ruin.Size.Height);
-                Rectangle localRectangle = new Rectangle(ruin.Min, size);
-
-                int alphaComponent = (int)(alpha * 255);
-                Color color = Color.FromArgb(alphaComponent, ruin.Tint);
-
-                graphics.Fill(localRectangle, texture, color);
-            }
-        }
-
-        private void ClearExpiredRuins()
-        {
-            while (ruins.Count > 0)
-            {
-                Ruin oldestRuin = ruins[0];
-                float durationInSeconds = GetDurationInSeconds(oldestRuin.Type);
-                if (simulationTimeInSeconds - oldestRuin.CreationTimeInSeconds < durationInSeconds)
-                    break;
-
-                ruins.RemoveAt(0);
-                ruinPool.Add(oldestRuin);
-            }
-        }
-
-        private static float GetDurationInSeconds(RuinType ruinType)
-        {
-            return ruinType == RuinType.Building ? buildingRuinDurationInSeconds : skeletonDurationInSeconds;
-        }
-
-        private void AddRuin(Unit unit)
-        {
-            Ruin ruin = ruinPool.Get();
-            ruin.Reset(simulationTimeInSeconds,
-                unit.IsBuilding ? RuinType.Building : RuinType.Unit,
-                unit.Position, unit.Size, faction.Color);
-            ruins.Add(ruin);
-        }
-        #endregion
         #endregion
     }
 }

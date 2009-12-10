@@ -58,8 +58,11 @@
     <Compile Include="RawPixelSurface.cs" />
     <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
     <Compile Include="Renderers\FilledFrameRenderer.cs" />
+    <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
+    <Compile Include="Renderers\ResourcesRenderer.cs" />
     <Compile Include="Renderers\Ruin.cs" />
+    <Compile Include="Renderers\RuinsRenderer.cs" />
     <Compile Include="Renderers\TexturedFrameRenderer.cs" />
     <Compile Include="StrokeStyle.cs" />
     <Compile Include="Text.cs" />

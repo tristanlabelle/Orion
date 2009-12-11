@@ -15,8 +15,9 @@ namespace Orion.GameLogic.Tasks
     {
         #region Fields
         private readonly UnitType traineeType;
-        private float healthPointsTrained = 0;
-        private bool hasEnded = false;
+        private float healthPointsTrained;
+        private bool attemptingToPlaceUnit;
+        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -59,7 +60,7 @@ namespace Orion.GameLogic.Tasks
             get
             {
                 int maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
-                return healthPointsTrained / maxHealth;
+                return Math.Min(healthPointsTrained / maxHealth, 1);
             }
         }
         #endregion
@@ -70,27 +71,30 @@ namespace Orion.GameLogic.Tasks
             if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
 
             float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
-            float trainingSpeed = Unit.GetStat(UnitStat.TrainingSpeed);
-            healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
-            if (healthPointsTrained >= maxHealth)
+            if (healthPointsTrained < maxHealth)
             {
-                Point? spawnPoint = GetSpawnPoint();
-                if (spawnPoint.HasValue)
+                float trainingSpeed = Unit.GetStat(UnitStat.TrainingSpeed);
+                healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
+                return;
+            }
+
+            Point? spawnPoint = GetSpawnPoint();
+            if (spawnPoint.HasValue)
+            {
+                Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
+                Vector2 traineeDelta = trainee.Center - Unit.Center;
+                trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+                if (Unit.HasRallyPoint)
                 {
-                    Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
-                    Vector2 traineeDelta = trainee.Center - Unit.Center;
-                    trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-                    if (Unit.HasRallyPoint)
-                    {
-                        MoveTask moveToRallyPointTask = new MoveTask(trainee, (Point)Unit.RallyPoint.Value);
-                        trainee.TaskQueue.OverrideWith(moveToRallyPointTask);
-                    }
-                    hasEnded = true;
+                    MoveTask moveToRallyPointTask = new MoveTask(trainee, (Point)Unit.RallyPoint.Value);
+                    trainee.TaskQueue.OverrideWith(moveToRallyPointTask);
                 }
-                else
-                {
-                    Faction.RaiseWarning("No place to spawn a unit.");
-                }
+                hasEnded = true;
+            }
+            else if (!attemptingToPlaceUnit)
+            {
+                attemptingToPlaceUnit = true;
+                Faction.RaiseWarning("No place to spawn a unit.");
             }
         }
 

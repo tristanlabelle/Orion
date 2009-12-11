@@ -153,7 +153,12 @@ namespace Orion.Commandment
                 amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost);
             }
 
-            List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<TrainSkill>()).ToList();
+            List<Unit> potentialTrainers = allUnits
+                .Where(unit => unit.Faction == Faction
+                    && unit.IsIdle
+                    && unit.HasSkill<TrainSkill>()
+                    && unit.GetSkill<TrainSkill>().Supports(toTrain))
+                .ToList();
             List<Unit> trainers = new List<Unit>();
 
             if (amountToBeTrained <= potentialTrainers.Count)

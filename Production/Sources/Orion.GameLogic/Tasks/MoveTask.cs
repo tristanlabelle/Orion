@@ -18,13 +18,13 @@ namespace Orion.GameLogic.Tasks
     {
         #region Instance
         #region Fields
-        private const int maxAttemptCount = 20;
+        private const int maxConsecutiveFailCount = 3;
         private const float timeBeforeRepathfinding = 0.5f;
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
         private Path path;
         private int targetPathPointIndex;
-        private int attemptCount = 1;
+        private int consecutiveFailCount;
         private float timeSinceLastPathfinding;
         #endregion
 
@@ -64,7 +64,7 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return path == null ? attemptCount >= maxAttemptCount : HasReachedDestination; }
+            get { return path == null ? consecutiveFailCount >= maxConsecutiveFailCount : HasReachedDestination; }
         }
 
         public bool HasReachedDestination
@@ -139,7 +139,8 @@ namespace Orion.GameLogic.Tasks
                 destinationDistanceEvaluator, GetWalkabilityTester());
             this.targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
 
-            if (path.Source == path.End && !path.IsComplete) this.path = null;
+            if (path.Source == path.End && !path.IsComplete)
+                this.path = null;
         }
 
         private Func<Point, bool> GetWalkabilityTester()
@@ -180,7 +181,8 @@ namespace Orion.GameLogic.Tasks
 
             Repath();
             timeSinceLastPathfinding = 0;
-            ++attemptCount;
+            if (this.path == null) ++consecutiveFailCount;
+            else consecutiveFailCount = 0;
 
             return path != null;
         }

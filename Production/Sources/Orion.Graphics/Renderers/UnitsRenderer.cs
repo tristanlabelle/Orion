@@ -23,7 +23,8 @@ namespace Orion.Graphics.Renderers
         private const float shadowScaling = 0.6f;
 
         private const float meleeHitSpinTimeInSeconds = 0.25f;
-        //private const float airborneHitTimeInSeconds = 0.25f;
+        private const float rangedShootTimeInSeconds = 0.25f;
+        private const float laserLength = 0.8f;
 
         private readonly Faction faction;
         private readonly TextureManager textureManager;
@@ -86,8 +87,9 @@ namespace Orion.Graphics.Renderers
 
             DrawRememberedBuildings(graphics);
             DrawGroundUnits(graphics);
+            DrawLasers(graphics, CollisionLayer.Ground);
             DrawAirborneUnits(graphics);
-            //DrawAirborneAttackLines(graphics);
+            DrawLasers(graphics, CollisionLayer.Air);
         }
 
         #region Miniature
@@ -268,42 +270,42 @@ namespace Orion.Graphics.Renderers
                     graphics.StrokeLineStrip(node.Source.Point, node.Point);
         }
 
-        private void DrawAttackLines(GraphicsContext graphics)
+        private void DrawLasers(GraphicsContext graphics, CollisionLayer layer)
         {
-            var attacks = World.Entities
+            var attackTasks = World.Entities
                 .OfType<Unit>()
-                .Select(unit => unit.TaskQueue.Current)
-                .OfType<AttackTask>();
+                .Where(unit => unit.CollisionLayer == layer)
+                .Select(unit => unit.TaskQueue.Current as AttackTask)
+                .Where(task => task != null);
 
-            graphics.StrokeColor = Color.Orange;
-            foreach (AttackTask attack in attacks)
-                graphics.StrokeLineStrip(attack.Attacker.Position, attack.Target.Position);
+            foreach (AttackTask attackTask in attackTasks)
+            {
+                Unit attacker = attackTask.Unit;
+                bool isRanged = attacker.GetStat(UnitStat.AttackRange) > 0;
+                if (!isRanged || attacker.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)
+                    continue;
+
+                Unit target = attackTask.Target;
+                if (!Rectangle.Intersects(attacker.BoundingRectangle, graphics.CoordinateSystem)
+                    && !Rectangle.Intersects(target.BoundingRectangle, graphics.CoordinateSystem))
+                    continue;
+
+                float laserProgress = attacker.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;
+
+                Vector2 delta = target.Center - attacker.Center;
+                Vector2 normalizedDelta = Vector2.Normalize(delta);
+                float distance = delta.LengthFast;
+
+                Vector2 laserStart = attacker.Center + (normalizedDelta
+                    * Math.Max(0, laserProgress * distance - laserLength * 0.5f));
+                Vector2 laserEnd = attacker.Center + (normalizedDelta
+                    * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
+
+                graphics.StrokeColor = attacker.Faction.Color;
+                graphics.StrokeLineStrip(laserStart, laserEnd);
+            }
         }
         #endregion
-        /*
-        private void DrawAirborneAttackLines(GraphicsContext graphics)
-        {
-            var airborneAttackers = World.Entities
-                .OfType<Unit>()
-                .Where(unit => unit.IsAirborne && unit.TaskQueue.Current is AttackTask);
-            graphics.StrokeColor = this.faction.Color;
-            
-            foreach (Unit unit in airborneAttackers)
-            {
-                AttackTask attackTask = (AttackTask)unit.TaskQueue.Current;
-                if (unit.TimeElapsedSinceLastHitInSeconds < airborneHitTimeInSeconds)
-                {
-                    //attackTask.Attacker.Position
-                    float laserProgress = unit.TimeElapsedSinceLastHitInSeconds / airborneHitTimeInSeconds; 
-                    float laserAngle = GetUnitDrawingAngle(unit);
-                    
-                    Rectangle laser = Rectangle.FromCenterSize(unit.Position.X, unit.Position.Y, 1, 1);
-                    graphics.Fill(laser);
-                }
-            }
-          
-        }
-        */
         #endregion
     }
 }

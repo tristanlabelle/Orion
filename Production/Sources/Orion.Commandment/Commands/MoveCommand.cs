@@ -14,7 +14,7 @@ namespace Orion.Commandment.Commands
     /// <see cref="Task"/> to move to a destination.
     /// </summary>
     [Serializable]
-    public sealed class MoveCommand : Command
+    public sealed class MoveCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -45,6 +45,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new MoveCommand(FactionHandle, entityHandles, destination);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

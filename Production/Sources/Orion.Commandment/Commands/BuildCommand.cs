@@ -16,7 +16,7 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which causes a <see cref="Unit"/>
     /// to be assigned the <see cref="BuildTask"/> task.
     /// </summary>
-    public sealed class BuildCommand : Command
+    public sealed class BuildCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> builderHandles;
@@ -52,6 +52,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new BuildCommand(FactionHandle, entityHandles, buildingTypeHandle, location);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

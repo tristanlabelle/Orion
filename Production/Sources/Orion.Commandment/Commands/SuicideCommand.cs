@@ -11,7 +11,7 @@ namespace Orion.Commandment.Commands
     /// <summary>
     /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.
     /// </summary>
-    public sealed class SuicideCommand : Command
+    public sealed class SuicideCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -34,6 +34,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new SuicideCommand(FactionHandle, entityHandles);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

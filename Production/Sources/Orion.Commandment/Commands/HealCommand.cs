@@ -8,7 +8,7 @@ using HealTask = Orion.GameLogic.Tasks.HealTask;
 
 namespace Orion.Commandment.Commands
 {
-    public sealed class HealCommand : Command
+    public sealed class HealCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -41,6 +41,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new HealCommand(FactionHandle, entityHandles, targetHandle);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

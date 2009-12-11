@@ -13,7 +13,7 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to move to a location and attack enemies on their way.
     /// </summary>
-    public sealed class ZoneAttackCommand : Command
+    public sealed class ZoneAttackCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> attackerHandles;
@@ -44,6 +44,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new ZoneAttackCommand(FactionHandle, entityHandles, destination);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

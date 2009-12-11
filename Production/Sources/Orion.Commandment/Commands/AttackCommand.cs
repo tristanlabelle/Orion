@@ -12,7 +12,7 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to attack another <see cref="Unit"/>.
     /// </summary>
-    public sealed class AttackCommand : Command
+    public sealed class AttackCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> attackerHandles;
@@ -45,6 +45,11 @@ namespace Orion.Commandment.Commands
         #endregion
 
         #region Methods
+        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
+        {
+            return new AttackCommand(FactionHandle, entityHandles, targetHandle);
+        }
+
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");

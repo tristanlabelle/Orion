@@ -18,6 +18,7 @@ namespace Orion.Commandment.Commands.Pipeline
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
+            concernedHandles.Clear();
             while (commands.Count > 0)
             {
                 Command command = commands.Pop();
@@ -35,7 +36,6 @@ namespace Orion.Commandment.Commands.Pipeline
                     else Flush(command);
                 }
             }
-            concernedHandles.Clear();
         }
 
         private void FlushOptimized(Command command)

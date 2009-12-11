@@ -12,7 +12,7 @@ namespace Orion.Commandment.Commands
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>
     /// to be assigned to some <see cref="Unit"/>s.
     /// </summary>
-    public sealed class HarvestCommand : Command
+    public sealed class HarvestCommand : Command, IMultipleExecutingEntitiesCommand
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> harvesterHandles;

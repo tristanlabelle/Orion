@@ -145,9 +145,9 @@ namespace Orion.UserInterface
             protected override void RemoveItem(int index)
             {
                 ViewContainer child = Items[index];
-                Items[index].Parent = null;
                 parent.OnRemoveChild(child);
                 child.OnRemoveFromParent(parent);
+                Items[index].Parent = null;
                 base.RemoveItem(index);
             }
 

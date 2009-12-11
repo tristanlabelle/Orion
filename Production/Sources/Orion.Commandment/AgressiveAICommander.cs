@@ -6,11 +6,11 @@ using Orion.Commandment.Commands;
 using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Skills = Orion.GameLogic.Skills;
+using Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
-    public class AgressiveAICommander:AICommander
+    public class AgressiveAICommander : AICommander
     {
         #region Constructors
         public AgressiveAICommander(Faction faction, Random random)
@@ -33,19 +33,16 @@ namespace Orion.Commandment
                 int amountOfAttackers = Evaluate("Viking", 1);
 
                 DispatchHarvesters(amountOfHarvesters, startingNode);
-                List<Vector2> positions = new List<Vector2>();
 
                 if (startingNode != null)
                 {
-                    positions.Add(new Vector2(alageneStartingNode.Position.X, alageneStartingNode.Position.Y));
+                    var positions = new List<Vector2> { alageneStartingNode.Position };
                     DispatchBuilders("AlageneExtractor", positions);
                 }
 
                 InitiateTraining("Viking", 1);
 
-                if(World.Factions.First().Units.Where
-                    (unit => unit.HasSkill<Skills.AttackSkill>())
-                    .Count() != 0)
+                if (World.Factions.First().Units.Any(unit => unit.HasSkill<AttackSkill>()))
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 

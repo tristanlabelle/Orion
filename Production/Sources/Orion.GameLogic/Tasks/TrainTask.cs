@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
-using System.Diagnostics;
+using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -23,13 +24,16 @@ namespace Orion.GameLogic.Tasks
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            if (!trainer.HasSkill<Skills.TrainSkill>())
-                throw new ArgumentException("Cannot train without the train skill.", "trainer");
             if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an Unit in Construction");
+            TrainSkill trainSkill = trainer.GetSkill<TrainSkill>();
+            if (trainSkill == null)
+                throw new ArgumentException("Cannot train without the train skill.", "trainer");
+            if (!trainSkill.Supports(traineeType))
+                throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
-
+            
             this.traineeType = traineeType;
         }
         #endregion

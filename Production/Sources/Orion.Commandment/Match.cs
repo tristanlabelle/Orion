@@ -5,7 +5,7 @@ using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using System.Linq;
 using System.Collections.Generic;
-using Skills = Orion.GameLogic.Skills;
+
 
 namespace Orion.Commandment
 {

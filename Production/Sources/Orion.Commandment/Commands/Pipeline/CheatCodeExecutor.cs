@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-using Skills = Orion.GameLogic.Skills;
+
 
 using OpenTK.Math;
 

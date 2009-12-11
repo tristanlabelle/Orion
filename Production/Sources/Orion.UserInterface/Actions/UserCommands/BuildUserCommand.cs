@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
+using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
-using OpenTK.Math;
+using Orion.GameLogic.Skills;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Actions.UserCommands
 {
@@ -31,7 +31,7 @@ namespace Orion.UserInterface.Actions.UserCommands
         #region Methods
         public override void Execute(Entity entity)
         {
-            if (buildingType.HasSkill<Skills.ExtractAlageneSkill>())
+            if (buildingType.HasSkill<ExtractAlageneSkill>())
             {
                 if (!(entity is ResourceNode)) return;
                 ResourceNode node = (ResourceNode)entity;
@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void Execute(Vector2 at)
         {
-            if (buildingType.HasSkill<Skills.ExtractAlageneSkill>()) return;
+            if (buildingType.HasSkill<ExtractAlageneSkill>()) return;
             inputManager.LaunchBuild((Point)(at - (Vector2)buildingType.Size * 0.5f), buildingType);
         }
         #endregion

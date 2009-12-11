@@ -79,7 +79,7 @@ namespace Orion.Commandment.Commands
 
         protected bool IsValidTechnologyHandle(World world, Handle handle)
         {
-            return world.TechTree.FromHandle(handle) != null;
+            return world.TechnologyTree.FromHandle(handle) != null;
         }
 
         protected bool IsValidUnitTypeHandle(World world, Handle handle)

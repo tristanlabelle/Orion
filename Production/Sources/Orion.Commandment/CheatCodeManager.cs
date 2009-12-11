@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-using Skills = Orion.GameLogic.Skills;
+using Orion.GameLogic.Skills;
 
 namespace Orion.Commandment
 {
@@ -113,8 +113,8 @@ namespace Orion.Commandment
         {
             foreach (UnitType type in match.World.UnitTypes)
             {
-                if (type.HasSkill<Skills.TrainSkill>()) type.GetSkill<Skills.TrainSkill>().Speed *= 50;
-                if (type.HasSkill<Skills.BuildSkill>()) type.GetSkill<Skills.BuildSkill>().Speed *= 50;
+                if (type.HasSkill<TrainSkill>()) type.GetSkill<TrainSkill>().Speed *= 50;
+                if (type.HasSkill<BuildSkill>()) type.GetSkill<BuildSkill>().Speed *= 50;
             }
         }
 

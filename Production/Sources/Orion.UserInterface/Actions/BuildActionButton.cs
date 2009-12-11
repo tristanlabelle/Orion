@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
-using Skills = Orion.GameLogic.Skills;
+using OpenTK.Math;
 using Orion.Commandment;
 using Orion.GameLogic;
-using OpenTK.Math;
+using Orion.GameLogic.Skills;
 using Orion.Graphics;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Actions
 {
@@ -23,12 +22,12 @@ namespace Orion.UserInterface.Actions
             UnitTypeRegistry registry, TextureManager textureManager)
             : base(frame, manager, "Build", Keys.B, textureManager)
         {
-            Skills.BuildSkill buildingSkill = type.GetSkill<Skills.BuildSkill>();
+            BuildSkill buildSkill = type.GetSkill<BuildSkill>();
             int x = 0;
             int y = 3;
-            foreach (UnitType unitType in registry.Where(u => buildingSkill.Supports(u)))
+            foreach (UnitType unitType in registry.Where(u => buildSkill.Supports(u)))
             {
-                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.Commander.Faction, textureManager);
+                buildingButtons[x, y] = new BuildingConstructionActionButton(frame, manager, unitType, manager.LocalCommander.Faction, textureManager);
                 x++;
                 if (x == 4)
                 {

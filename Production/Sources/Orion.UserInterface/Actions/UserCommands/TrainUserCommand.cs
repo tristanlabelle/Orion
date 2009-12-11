@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
+
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Geometry;

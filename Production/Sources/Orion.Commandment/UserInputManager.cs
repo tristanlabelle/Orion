@@ -6,7 +6,7 @@ using Keys = System.Windows.Forms.Keys;
 
 using Orion.Geometry;
 using Orion.GameLogic;
-using Skills = Orion.GameLogic.Skills;
+
 
 using OpenTK.Math;
 using Orion.GameLogic.Skills;
@@ -54,9 +54,19 @@ namespace Orion.Commandment
         #endregion
 
         #region Properties
-        public SlaveCommander Commander
+        public SlaveCommander LocalCommander
         {
             get { return commander; }
+        }
+
+        public Faction LocalFaction
+        {
+            get { return commander.Faction; }
+        }
+
+        public World World
+        {
+            get { return LocalFaction.World; }
         }
 
         public SelectionManager SelectionManager
@@ -78,16 +88,6 @@ namespace Orion.Commandment
         {
             get { return mouseCommand; }
             set { mouseCommand = value; }
-        }
-
-        private Faction Faction
-        {
-            get { return commander.Faction; }
-        }
-
-        private World World
-        {
-            get { return Faction.World; }
         }
         #endregion
 
@@ -170,7 +170,7 @@ namespace Orion.Commandment
             else
             {
                 Vector2 point = new Vector2(args.X, args.Y);
-                SelectionManager.HoveredUnit = Faction.World.Entities
+                SelectionManager.HoveredUnit = World.Entities
                     .OfType<Unit>()
                     .FirstOrDefault(unit => unit.BoundingRectangle.ContainsPoint(point));
             }
@@ -232,7 +232,7 @@ namespace Orion.Commandment
 
         public void LaunchDefaultCommand(Vector2 at)
         {
-            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != Faction);
+            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != LocalFaction);
             if (otherFactionOnlySelection) return;
 
             Entity intersectedEntity = World.Entities
@@ -243,12 +243,12 @@ namespace Orion.Commandment
             {
                 if (intersectedUnit.Faction == commander.Faction)
                 {
-                    if (intersectedUnit.HasSkill<Skills.ExtractAlageneSkill>())
+                    if (intersectedUnit.HasSkill<ExtractAlageneSkill>())
                     {
                         ResourceNode alageneNode = World.Entities
                             .OfType<ResourceNode>()
                             .First(node => node.Position == intersectedUnit.Position);
-                        if (alageneNode.IsHarvestableByFaction(this.Faction))
+                        if (alageneNode.IsHarvestableByFaction(LocalFaction))
                             LaunchHarvest(alageneNode);
                     }
                     else if (intersectedUnit.IsBuilding)
@@ -262,7 +262,7 @@ namespace Orion.Commandment
             }
             else if (intersectedEntity is ResourceNode)
             {
-                if (((ResourceNode)intersectedEntity).IsHarvestableByFaction(this.Faction))
+                if (((ResourceNode)intersectedEntity).IsHarvestableByFaction(LocalFaction))
                     LaunchHarvest((ResourceNode)intersectedEntity);
                 else
                     LaunchMove(((ResourceNode)intersectedEntity).Position);
@@ -271,7 +271,7 @@ namespace Orion.Commandment
             {
                 if (World.Terrain.IsWalkableAndWithinBounds((Point)at))
                 {
-                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<Skills.TrainSkill>()))
+                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                     {
                         LaunchChangeRallyPoint(at);
                     }
@@ -292,12 +292,12 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> builders = selectionManager.SelectedUnits.Where(unit =>
             {
-                Skills.BuildSkill build = unit.GetSkill<Skills.BuildSkill>();
-                Skills.MoveSkill move = unit.GetSkill<Skills.MoveSkill>();
-                if (build == null) return false;
+                BuildSkill buildSkill = unit.GetSkill<BuildSkill>();
+                MoveSkill moveSkill = unit.GetSkill<MoveSkill>();
+                if (buildSkill == null) return false;
                 if (unit.Faction != commander.Faction) return false;
-                if (move == null) return false;
-                return build.Supports(unitTypeToBuild);
+                if (moveSkill == null) return false;
+                return buildSkill.Supports(unitTypeToBuild);
             });
 
 
@@ -308,39 +308,39 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<Skills.AttackSkill>()), target);
-            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<Skills.AttackSkill>() && unit.HasSkill<Skills.MoveSkill>()), target.Position);
+            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
+            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can attack do so, the others simply move to the destination
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<Skills.AttackSkill>()), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.AttackSkill>()), destination);
+            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
         }
 
         public void LaunchHarvest(ResourceNode node)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<Skills.HarvestSkill>()), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<Skills.HarvestSkill>()), node.Position);
+            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<HarvestSkill>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.MoveSkill>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             commander.LaunchMove(movableUnits, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.TrainSkill>()
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<TrainSkill>()
                 && unit.Type.IsBuilding);
             commander.LaunchChangeRallyPoint(targetUnits, at);
         }
@@ -351,7 +351,7 @@ namespace Orion.Commandment
             if (building.Damage < 1) return;
            
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.BuildSkill>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<BuildSkill>());
             if (targetUnits.Any(unit => unit.Faction != building.Faction)) return;
             commander.LaunchRepair(targetUnits, building);
         }
@@ -362,7 +362,7 @@ namespace Orion.Commandment
             if (hurtUnit.Damage < 1) return;
 
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<Skills.HealSkill>());
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<HealSkill>());
             if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
             commander.LaunchHeal(targetUnits, hurtUnit);
         }
@@ -374,7 +374,7 @@ namespace Orion.Commandment
                 .Where(unit =>
                 {
                     if (unit.Faction != commander.Faction) return false;
-                    Skills.TrainSkill train = unit.Type.GetSkill<Skills.TrainSkill>();
+                    TrainSkill train = unit.Type.GetSkill<TrainSkill>();
                     if (train == null) return false;
                     if (unit.IsUnderConstruction) return false;
                     return train.Supports(unitType);
@@ -388,7 +388,7 @@ namespace Orion.Commandment
                 .FirstOrDefault(unit =>
                 {
                     if (unit.Faction != commander.Faction) return false;
-                    Skills.ResearchSkill reseach = unit.Type.GetSkill<Skills.ResearchSkill>();
+                    ResearchSkill reseach = unit.Type.GetSkill<ResearchSkill>();
                     if (reseach == null) return false;
                     if (unit.IsUnderConstruction) return false;
                     if (!unit.IsIdle) return false;

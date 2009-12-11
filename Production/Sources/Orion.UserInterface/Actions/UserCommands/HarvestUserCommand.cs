@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
-using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Geometry;
-using Orion.Commandment;
 using OpenTK.Math;
+using Orion.Commandment;
+using Orion.GameLogic;
+using Orion.GameLogic.Skills;
 
 namespace Orion.UserInterface.Actions.UserCommands
 {
@@ -23,18 +17,22 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void Execute(Entity entity)
         {
-            if (entity is ResourceNode)
-                inputManager.LaunchHarvest((ResourceNode)entity);
-            else
-                if (entity is Unit)
-                    if (((Unit)entity).HasSkill<Skills.ExtractAlageneSkill>())
-                    {
-                        ResourceNode alageneNode = inputManager.Commander.Faction.World.Entities
-                            .OfType<ResourceNode>()
-                            .First(node => node.Position == ((Unit)entity).Position);
-                        if (alageneNode.IsHarvestableByFaction(inputManager.Commander.Faction))
-                            inputManager.LaunchHarvest(alageneNode);
-                    }
+            ResourceNode resourceNode = entity as ResourceNode;
+            if (resourceNode != null)
+            {
+                inputManager.LaunchHarvest(resourceNode);
+                return;
+            }
+
+            Unit unit = entity as Unit;
+            if (unit != null && unit.HasSkill<ExtractAlageneSkill>())
+            {
+                ResourceNode alageneNode = inputManager.World.Entities
+                    .OfType<ResourceNode>()
+                    .First(node => node.Position == unit.Position);
+                if (alageneNode.IsHarvestableByFaction(inputManager.LocalFaction))
+                    inputManager.LaunchHarvest(alageneNode);
+            }
         }
 
         public override void Execute(Vector2 point)

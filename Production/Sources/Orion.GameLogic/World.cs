@@ -72,7 +72,7 @@ namespace Orion.GameLogic
             get { return terrain; }
         }
 
-        public TechnologyTree TechTree
+        public TechnologyTree TechnologyTree
         {
             get { return technologyTree; }
         }

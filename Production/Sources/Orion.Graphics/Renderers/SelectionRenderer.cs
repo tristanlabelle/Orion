@@ -41,7 +41,7 @@ namespace Orion.Graphics
 
         private Faction Faction
         {
-            get { return userInputManager.Commander.Faction; }
+            get { return userInputManager.LocalCommander.Faction; }
         }
         #endregion
 

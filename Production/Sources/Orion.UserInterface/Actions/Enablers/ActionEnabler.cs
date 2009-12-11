@@ -27,6 +27,23 @@ namespace Orion.UserInterface.Actions.Enablers
         }
         #endregion
 
+        #region Properties
+        protected SlaveCommander LocalCommander
+        {
+            get { return inputManager.LocalCommander; }
+        }
+
+        protected Faction LocalFaction
+        {
+            get { return LocalCommander.Faction; }
+        }
+
+        protected World World
+        {
+            get { return LocalFaction.World; }
+        }
+        #endregion
+
         #region Methods
         public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray);
         #endregion

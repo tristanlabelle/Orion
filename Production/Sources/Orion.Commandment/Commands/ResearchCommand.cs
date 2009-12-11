@@ -44,7 +44,7 @@ namespace Orion.Commandment.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Technology technology = match.World.TechTree.FromHandle(technologyHandle);
+            Technology technology = match.World.TechnologyTree.FromHandle(technologyHandle);
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             Unit researcher = (Unit)match.World.Entities.FromHandle(researcherHandle);
 

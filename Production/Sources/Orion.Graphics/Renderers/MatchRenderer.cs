@@ -25,7 +25,7 @@ namespace Orion.Graphics.Renderers
             this.textureManager = textureManager;
             this.inputManager = inputManager;
             this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.Commander.Faction, textureManager);
+            this.worldRenderer = new WorldRenderer(inputManager.LocalCommander.Faction, textureManager);
             this.minimap = new MinimapRenderer(worldRenderer);
         }
         #endregion
@@ -54,7 +54,7 @@ namespace Orion.Graphics.Renderers
 
         private Faction Faction
         {
-            get { return inputManager.Commander.Faction; }
+            get { return inputManager.LocalCommander.Faction; }
         }
         #endregion
 

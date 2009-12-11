@@ -7,7 +7,7 @@ using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
+
 
 namespace Orion.UserInterface.Actions.UserCommands
 {

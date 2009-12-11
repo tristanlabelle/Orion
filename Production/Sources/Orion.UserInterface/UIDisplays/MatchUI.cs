@@ -86,7 +86,7 @@ namespace Orion.UserInterface
             Children.Add(worldView);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.Commander.Faction);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalCommander.Faction);
             Children.Add(resourceDisplay);
 
             Rectangle hudRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
@@ -141,12 +141,12 @@ namespace Orion.UserInterface
             minimapFrame.MouseMoved += MinimapMouseMove;
 
             enablers.Add(new AttackEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new BuildEnabler(userInputManager, actions, world.UnitTypes, textureManager));
+            enablers.Add(new BuildEnabler(userInputManager, actions, textureManager));
             enablers.Add(new HarvestEnabler(userInputManager, actions, textureManager));
             enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new TrainEnabler(userInputManager, actions, world.UnitTypes, textureManager));
-            enablers.Add(new HealEnabler(userInputManager, actions, world.UnitTypes, textureManager));
-            enablers.Add(new ResearchEnabler(userInputManager, actions, world.TechTree, textureManager));
+            enablers.Add(new TrainEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new HealEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new ResearchEnabler(userInputManager, actions, textureManager));
 
             this.workerType = World.UnitTypes.FromName("Schtroumpf");
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
@@ -184,7 +184,7 @@ namespace Orion.UserInterface
 
         private SlaveCommander LocalCommander
         {
-            get { return userInputManager.Commander; }
+            get { return userInputManager.LocalCommander; }
         }
 
         private Faction LocalFaction
@@ -360,7 +360,7 @@ namespace Orion.UserInterface
             string text = chatInput.Contents;
             if (text.Length > 0)
             {
-                SlaveCommander commander = userInputManager.Commander;
+                SlaveCommander commander = userInputManager.LocalCommander;
                 commander.SendMessage(chatInput.Contents);
             }
 
@@ -453,7 +453,7 @@ namespace Orion.UserInterface
         private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
         {
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
-            worldView.FullBounds = userInputManager.Commander.Faction.World.Bounds
+            worldView.FullBounds = userInputManager.LocalCommander.Faction.World.Bounds
                 .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y).ResizedBy(newBounds.Width, newBounds.Height);
 
             if (worldView.IsMouseOver)
@@ -556,7 +556,7 @@ namespace Orion.UserInterface
         {
             
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.Commander.Faction, unit, textureManager);
+            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, textureManager);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, textureManager);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
@@ -620,7 +620,7 @@ namespace Orion.UserInterface
             if (SelectedType != null)
             {
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (selectedUnits.Count(u => u.Faction != userInputManager.Commander.Faction) == 0)
+                if (selectedUnits.Count(u => u.Faction != userInputManager.LocalCommander.Faction) == 0)
                     actions.Push(new UnitActionProvider(enablers, SelectedType));
             }
         }

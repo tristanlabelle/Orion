@@ -1,9 +1,9 @@
 ﻿using Orion.Commandment;
 using Orion.GameLogic;
+using Orion.GameLogic.Skills;
+using Orion.Graphics;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
-using Skills = Orion.GameLogic.Skills;
-using Orion.Graphics;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
@@ -18,7 +18,7 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (type.HasSkill<Skills.AttackSkill>())
+            if (type.HasSkill<AttackSkill>())
             {
                 buttonsArray[2, 3] = new GenericActionButton(container, inputManager,
                     "Attack", Keys.A, new AttackUserCommand(inputManager), base.textureManager);

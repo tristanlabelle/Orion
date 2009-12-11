@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment.Commands;
 using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
+using Orion.GameLogic.Skills;
 using Orion.Geometry;
-using Skills = Orion.GameLogic.Skills;
-using System.Diagnostics;
 
 namespace Orion.Commandment
 {
@@ -153,7 +153,7 @@ namespace Orion.Commandment
                 amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost);
             }
 
-            List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<Skills.TrainSkill>()).ToList();
+            List<Unit> potentialTrainers = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.HasSkill<TrainSkill>()).ToList();
             List<Unit> trainers = new List<Unit>();
 
             if (amountToBeTrained <= potentialTrainers.Count)
@@ -183,8 +183,8 @@ namespace Orion.Commandment
         {
             List<Unit> potentialAttackers = 
                 allUnits.Where(unit => unit.Faction == Faction 
-                && unit.Type.HasSkill<Skills.AttackSkill>() 
-                && !unit.Type.HasSkill<Skills.HarvestSkill>()
+                && unit.Type.HasSkill<AttackSkill>() 
+                && !unit.Type.HasSkill<HarvestSkill>()
                 && unit.IsIdle
                 ).ToList();
             List<Unit> attackers = new List<Unit>();
@@ -212,7 +212,7 @@ namespace Orion.Commandment
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
-                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.HarvestSkill>()).ToList();
+                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<HarvestSkill>()).ToList();
                 
                 List<Unit> harvesters = new List<Unit>();
 
@@ -238,15 +238,15 @@ namespace Orion.Commandment
         /// </summary>
         /// <param name="buildingType">name of the type of building to be built</param>
         /// <param name="Positions">Positions at which the buildings will be built</param>
-        public void DispatchBuilders(string typeName, List<Vector2> Positions)
+        public void DispatchBuilders(string typeName, List<Vector2> positions)
         {
             UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<Skills.BuildSkill>()).ToList();
+            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();
             List<Unit> builders = new List<Unit>();
 
-            if (Positions.Count <= potentialBuilders.Count)
-                amountOfBuildings = Positions.Count;
+            if (positions.Count <= potentialBuilders.Count)
+                amountOfBuildings = positions.Count;
             else
                 amountOfBuildings = potentialBuilders.Count;
 
@@ -266,7 +266,7 @@ namespace Orion.Commandment
 
             for (int i = 0; i < amountOfBuildings; i++)
             {
-                commands.Add(new BuildCommand(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)Positions[i]));
+                commands.Add(new BuildCommand(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)positions[i]));
             }
         }
 

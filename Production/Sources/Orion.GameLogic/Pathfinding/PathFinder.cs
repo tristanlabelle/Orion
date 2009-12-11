@@ -13,8 +13,6 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class Pathfinder
     {
         #region Fields
-        private const bool discourageTurns = false;
-
         private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
         private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
         private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
@@ -229,13 +227,6 @@ namespace Orion.GameLogic.Pathfinding
             if (!IsOpenable(nearbyPoint)) return;
 
             float movementCost = GetDistance(currentNode.Point, nearbyPoint);
-            if (discourageTurns && currentNode.Source != null)
-            {
-                // Discourage turns
-                bool isTurning = !IsSameDirection(currentNode.Source.Point, currentNode.Point, nearbyPoint);
-                if (isTurning) ++movementCost;
-            }
-
             float costFromSource = currentNode.CostFromSource + movementCost;
 
             PathNode nearbyNode;

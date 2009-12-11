@@ -7,15 +7,15 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Actions
 {
-    public sealed class TechnologyResearchActionButton : ActionButton
+    public sealed class ResearchActionButton : ActionButton
     {
         #region Fields
         private readonly ImmediateUserCommand command;
         #endregion
 
         #region Constructor
-        public TechnologyResearchActionButton(ActionFrame frame, UserInputManager manager,
-            ImmediateUserCommand command, Faction faction, TextureManager textureManager, string technologyName)
+        public ResearchActionButton(ActionFrame frame, UserInputManager manager,
+            ImmediateUserCommand command, TextureManager textureManager, string technologyName)
             : base(frame, manager, Keys.None,textureManager)
         {
             this.command = command;

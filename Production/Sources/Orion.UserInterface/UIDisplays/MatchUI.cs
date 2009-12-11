@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Control = System.Windows.Forms.Control;
-using MouseButtons = System.Windows.Forms.MouseButtons;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Commandment;
@@ -11,12 +9,13 @@ using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
-using Orion.UserInterface.Widgets;
 using Orion.UserInterface.Actions;
 using Orion.UserInterface.Actions.Enablers;
+using Orion.UserInterface.Widgets;
 using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.UserInterface
 {

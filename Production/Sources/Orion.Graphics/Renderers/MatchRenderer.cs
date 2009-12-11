@@ -6,7 +6,7 @@ using Color = System.Drawing.Color;
 
 namespace Orion.Graphics.Renderers
 {
-    public class MatchRenderer : IRenderer, IDisposable
+    public sealed class MatchRenderer : IRenderer, IDisposable
     {
         #region Fields
         private readonly UserInputManager inputManager;
@@ -73,6 +73,8 @@ namespace Orion.Graphics.Renderers
                 HealthBarRenderer.Draw(context, SelectionManager.HoveredUnit);
 
             worldRenderer.DrawFogOfWar(context);
+            if (inputManager.SelectedCommand is IRenderer)
+                ((IRenderer)inputManager.SelectedCommand).Draw(context);
             selectionRenderer.DrawSelectionRectangle(context);
         }
 

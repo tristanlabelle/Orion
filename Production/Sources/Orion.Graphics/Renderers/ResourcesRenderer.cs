@@ -46,7 +46,7 @@ namespace Orion.Graphics.Renderers
             return World.Entities
                 .OfType<ResourceNode>()
                 .Where(node => Rectangle.Intersects(clippingBounds, node.BoundingRectangle)
-                    && faction.HasSeen(node.GridRegion));
+                    && faction.HasPartiallySeen(node.GridRegion));
         }
 
         public void Draw(GraphicsContext graphics)

@@ -162,7 +162,7 @@ namespace Orion.Commandment
 
             var visibleNodes = World.Entities
                 .OfType<ResourceNode>()
-                .Where(n => n.Type == type && Faction.HasSeen(n.GridRegion));
+                .Where(n => n.Type == type && Faction.HasPartiallySeen(n.GridRegion));
 
             var pair = visibleNodes.Select(n =>
                 new KeyValuePair<ResourceNode, int>(n, Faction.Units

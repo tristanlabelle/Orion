@@ -461,13 +461,16 @@ namespace Orion.GameLogic
         #endregion
 
         #region FogOfWar
-        public bool HasSeen(Region region)
+        public bool HasPartiallySeen(Region region)
         {
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                    if (GetTileVisibility(new Point(x, y)) != TileVisibility.Undiscovered)
-                        return true;
-            return false;
+            return region.Points
+                .Any(point => GetTileVisibility(point) != TileVisibility.Undiscovered);
+        }
+
+        public bool HasFullySeen(Region region)
+        {
+            return region.Points
+                .All(point => GetTileVisibility(point) != TileVisibility.Undiscovered);
         }
 
         /// <summary>

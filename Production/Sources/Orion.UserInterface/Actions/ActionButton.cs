@@ -15,11 +15,11 @@ namespace Orion.UserInterface.Actions
     public abstract class ActionButton : Button, IActionProvider
     {
         #region Fields
-        private string name;
+        private readonly TextureManager textureManager;
         protected readonly ActionFrame container;
         protected readonly UserInputManager inputManager;
+        private string name;
         private Frame tooltipContainer;
-        private TextureManager textureManager;
         #endregion
 
         #region Constructors
@@ -65,6 +65,11 @@ namespace Orion.UserInterface.Actions
                     i++;
                 }
             }
+        }
+
+        protected TextureManager TextureManager
+        {
+            get { return textureManager; }
         }
         #endregion
 

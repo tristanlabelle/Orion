@@ -39,6 +39,16 @@ namespace Orion.Commandment.Commands
         {
             get { return builderHandles; }
         }
+
+        public Handle BuildingTypeHandle
+        {
+            get { return buildingTypeHandle; }
+        }
+
+        public Point Destination
+        {
+            get { return location; }
+        }
         #endregion
 
         #region Methods

@@ -8,8 +8,6 @@ using HealTask = Orion.GameLogic.Tasks.HealTask;
 
 namespace Orion.Commandment.Commands
 {
-
-
     public sealed class HealCommand : Command
     {
         #region Fields
@@ -34,6 +32,11 @@ namespace Orion.Commandment.Commands
         public override IEnumerable<Handle> ExecutingEntityHandles
         {
             get { return unitHandles; }
+        }
+
+        public Handle TargetHandle
+        {
+            get { return targetHandle; }
         }
         #endregion
 

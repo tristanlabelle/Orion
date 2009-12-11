@@ -34,6 +34,11 @@ namespace Orion.Commandment.Commands
         {
             get { return harvesterHandles; }
         }
+
+        public Handle TargetHandle
+        {
+            get { return resourceNodeHandle; }
+        }
         #endregion
 
         #region Methods

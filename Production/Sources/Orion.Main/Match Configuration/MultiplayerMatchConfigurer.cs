@@ -79,6 +79,7 @@ namespace Orion.Main
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushReplayRecorderToPipeline(pipeline);
             ICommandSink aiCommandSink = pipeline.TopMostSink;
+            pipeline.PushFilter(new CommandOptimizer());
             pipeline.PushFilter(new CommandSynchronizer(match, transporter, peers));
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));

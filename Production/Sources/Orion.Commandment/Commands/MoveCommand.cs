@@ -37,6 +37,11 @@ namespace Orion.Commandment.Commands
         {
             get { return unitHandles; }
         }
+
+        public Vector2 Destination
+        {
+            get { return destination; }
+        }
         #endregion
 
         #region Methods

@@ -117,7 +117,7 @@ namespace Orion.Graphics.Renderers
             Ruin ruin = ruinPool.Get();
             ruin.Reset(simulationTimeInSeconds,
                 unit.IsBuilding ? RuinType.Building : RuinType.Unit,
-                unit.Position, unit.Size, faction.Color);
+                unit.Position, unit.Size, unit.Faction.Color);
             ruins.Add(ruin);
         }
 

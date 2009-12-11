@@ -38,22 +38,22 @@ namespace Orion.Graphics
 
             this.unit = unit;
             this.textureManager = textureManager;
-            this.faction = faction; 
+            this.faction = faction;
         }
         #endregion
 
-        #region Methods,
+        #region Methods
         public override void Draw(GraphicsContext context)
         {
             bool isTraining = false;
-            
+
             if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
             {
                 isTraining = true;
 
                 int firstStartingXPos = 360;
                 int firstStartingYPos = 120;
- 
+
                 for (int i = 0; i < unit.TaskQueue.Count; i++)
                 {
                     if (i + 1 == 2)
@@ -85,9 +85,9 @@ namespace Orion.Graphics
                     context.Stroke(rect);
 
                     // Draws a completion HealthBar
-                    Rectangle healthRect = new Rectangle(152 ,120, 186, 10);
+                    Rectangle healthRect = new Rectangle(152, 120, 186, 10);
                     TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
-                    DrawCompletionRect(context, healthRect,currentUnitBeingTrained.Progress);
+                    DrawCompletionRect(context, healthRect, currentUnitBeingTrained.Progress);
 
                     base.Draw(context);
                     firstStartingXPos += 50;
@@ -100,7 +100,7 @@ namespace Orion.Graphics
 
             context.Font = statsFont;
             context.FillColor = Color.DarkBlue;
-            
+
             context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
 
             Text hp = new Text("HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth), statsFont);

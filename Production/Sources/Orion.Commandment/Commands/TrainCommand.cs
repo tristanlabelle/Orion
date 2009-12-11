@@ -62,10 +62,8 @@ namespace Orion.Commandment.Commands
 
             if (trainerHandles.Count * traineeType.FoodCost > faction.RemainingFoodAmount)
             {
-                
+#warning Mathieu?
             }
-
-
 
             foreach (Handle trainerHandle in trainerHandles)
             {
@@ -77,7 +75,7 @@ namespace Orion.Commandment.Commands
                         popNeeded += traineeType.FoodCost;
                     else
                     {
-                        faction.RaiseWarning("Not enought Food.");
+                        faction.RaiseWarning("Not enough food.");
                         continue;
                     }
                 }

@@ -1,30 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
-using Orion.Geometry;
-using Orion.GameLogic;
-
-
 using OpenTK.Math;
+using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.GameLogic.Technologies;
+using Orion.Geometry;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Commandment
 {
-    public abstract class UserInputCommand
-    {
-        public abstract void Execute(Entity entity);
-        public abstract void Execute(Vector2 point);
-    }
-
-    public abstract class ImmediateUserCommand
-    {
-        public abstract void Execute();
-    }
-
     public class UserInputManager
     {
         #region Fields
@@ -97,14 +82,16 @@ namespace Orion.Commandment
         {
             if (mouseCommand != null)
             {
-                if (args.ButtonPressed == MouseButton.Left) LaunchMouseCommand(args.Position);
+                if (args.ButtonPressed == MouseButton.Left)
+                    LaunchMouseCommand(args.Position);
                 mouseCommand = null;
+                return;
             }
-            else
-            {
-                if (args.ButtonPressed == MouseButton.Left) selectionStart = args.Position;
-                else if (args.ButtonPressed == MouseButton.Right) LaunchDefaultCommand(args.Position);
-            }
+
+            if (args.ButtonPressed == MouseButton.Left)
+                selectionStart = args.Position;
+            else if (args.ButtonPressed == MouseButton.Right)
+                LaunchDefaultCommand(args.Position);
         }
 
         public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
@@ -113,7 +100,7 @@ namespace Orion.Commandment
             selectionEnd = args.Position;
             Faction faction = commander.Faction;
             Rectangle selection = SelectionRectangle.Value;
-            //TO BE OPTIMIZED
+            
             Unit selectedUnit = faction.World.Entities
                 .OfType<Unit>()
                 .FirstOrDefault(unit => Rectangle.Intersects(selection, unit.BoundingRectangle));
@@ -166,6 +153,12 @@ namespace Orion.Commandment
 
         public void HandleMouseMove(object responder, MouseEventArgs args)
         {
+            if (mouseCommand != null)
+            {
+                mouseCommand.OnMouseMoved(args.Position);
+                return;
+            }
+
             if (selectionStart.HasValue) selectionEnd = args.Position;
             else
             {
@@ -189,14 +182,14 @@ namespace Orion.Commandment
                 case Keys.D3: case Keys.D4: case Keys.D5:
                 case Keys.D6: case Keys.D7: case Keys.D8:
                 case Keys.D9:
-                    int groupNumer = args.Key - Keys.D0;
+                    int groupNumber = args.Key - Keys.D0;
                     if (args.HasControl)
                     {
-                        groups[groupNumer] = selectionManager.SelectedUnits.ToList();
+                        groups[groupNumber] = selectionManager.SelectedUnits.ToList();
                     }
-                    else if (groups[groupNumer].Count > 0)
+                    else if (groups[groupNumber].Count > 0)
                     {
-                        selectionManager.SelectUnits(groups[groupNumer]);
+                        selectionManager.SelectUnits(groups[groupNumber]);
                     }
                     break;
             }
@@ -219,14 +212,9 @@ namespace Orion.Commandment
         #endregion
 
         #region Launching dynamically chosen commands
-        public void LaunchMouseCommand(Vector2 at)
+        public void LaunchMouseCommand(Vector2 location)
         {
-            Entity intersectedEntity = World.Entities
-                .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
-
-            if (intersectedEntity == null) mouseCommand.Execute(at);
-            else mouseCommand.Execute(intersectedEntity);
-
+            mouseCommand.OnClick(location);
             mouseCommand = null;
         }
 
@@ -288,7 +276,7 @@ namespace Orion.Commandment
             commander.LaunchCancel(selectionManager.SelectedUnits);
         }
 
-        public void LaunchBuild(Vector2 destination, UnitType unitTypeToBuild)
+        public void LaunchBuild(Point location, UnitType unitTypeToBuild)
         {
             IEnumerable<Unit> builders = selectionManager.SelectedUnits.Where(unit =>
             {
@@ -301,7 +289,7 @@ namespace Orion.Commandment
             });
 
 
-            commander.LaunchBuild(builders, unitTypeToBuild, (Point)destination);
+            commander.LaunchBuild(builders, unitTypeToBuild, location);
         }
 
         public void LaunchAttack(Unit target)

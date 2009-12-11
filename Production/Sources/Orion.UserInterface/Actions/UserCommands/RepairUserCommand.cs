@@ -6,21 +6,14 @@ namespace Orion.UserInterface.Actions.UserCommands
 {
     public sealed class RepairUserCommand : UserInputCommand
     {
-        private UserInputManager inputManager;
+        public RepairUserCommand(UserInputManager inputManager)
+            : base(inputManager) {}
 
-        public RepairUserCommand(UserInputManager manager)
+        public override void OnClick(Vector2 location)
         {
-            inputManager = manager;
-        }
-
-        public override void Execute(Entity entity)
-        {
-            if (entity is Unit) inputManager.LaunchRepair((Unit)entity);
-            else Execute(entity.Position);
-        }
-
-        public override void Execute(Vector2 point)
-        {
+            Point point = (Point)location;
+            Unit target = World.Entities.GetUnitAt(point);
+            if (target != null) InputManager.LaunchRepair(target);
         }
     }
 }

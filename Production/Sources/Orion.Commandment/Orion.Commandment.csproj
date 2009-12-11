@@ -70,6 +70,7 @@
     <Compile Include="Commands\TrainCommand.cs" />
     <Compile Include="Commands\ZoneAttackCommand.cs" />
     <Compile Include="FactionMessage.cs" />
+    <Compile Include="ImmediateUserCommand.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs" />
     <Compile Include="Commands\Pipeline\CommandPipeline.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="SlaveCommander.cs" />
     <Compile Include="Commands\Pipeline\CommandFilter.cs" />
     <Compile Include="Commands\Pipeline\CommandExecutor.cs" />
+    <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>
   <ItemGroup>

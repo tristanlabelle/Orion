@@ -98,12 +98,23 @@ namespace Orion.GameLogic
             get { return unitTypes; }
         }
 
+        #region Size/Bounds
         /// <summary>
         /// Gets the size of this <see cref="World"/>, in tiles.
         /// </summary>
         public Size Size
         {
             get { return terrain.Size; }
+        }
+
+        public int Width
+        {
+            get { return terrain.Size.Width; }
+        }
+
+        public int Height
+        {
+            get { return terrain.Size.Height; }
         }
 
         /// <summary>
@@ -113,6 +124,7 @@ namespace Orion.GameLogic
         {
             get { return new Rectangle(0, 0, Size.Width, Size.Height); }
         }
+        #endregion
 
         public Pathfinder Pathfinder
         {

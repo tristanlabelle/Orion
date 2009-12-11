@@ -467,7 +467,10 @@ namespace Orion.UserInterface
         {
             if (args.ButtonPressed == MouseButton.Left)
             {
-                if (userInputManager.SelectedCommand != null) userInputManager.LaunchMouseCommand(args.Position);
+                if (userInputManager.SelectedCommand != null)
+                {
+                    userInputManager.LaunchMouseCommand(args.Position);
+                }
                 else
                 {
                     MoveWorldView(args.Position);

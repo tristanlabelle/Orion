@@ -3,12 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
 using OpenTK.Math;
-
-using Orion.Geometry;
 using Orion.GameLogic.Tasks;
-
+using Orion.Geometry;
 using Point = System.Drawing.Point;
 
 namespace Orion.GameLogic
@@ -361,6 +358,11 @@ namespace Orion.GameLogic
             EntityGrid grid = GetGrid(layer);
             if (grid == null) return null;
             return grid[point];
+        }
+
+        public Unit GetUnitAt(Point point)
+        {
+            return airGrid[point] as Unit ?? groundGrid[point] as Unit;
         }
 
         /// <summary>

@@ -82,10 +82,22 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Size
         public Size Size
         {
             get { return size; }
         }
+
+        public int Width
+        {
+            get { return size.Width; }
+        }
+
+        public int Height
+        {
+            get { return size.Height; }
+        }
+        #endregion
 
         public bool IsAirborne
         {

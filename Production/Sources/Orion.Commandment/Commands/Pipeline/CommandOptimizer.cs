@@ -25,16 +25,17 @@ namespace Orion.Commandment.Commands.Pipeline
                 IEnumerable<Handle> handles = command.ExecutingEntityHandles;
                 IEnumerable<Handle> availableUnits = handles.Except(concernedHandles);
 
-                if (availableUnits.Count() > 0)
+                if (handles.Count() > 0 && availableUnits.Count() > 0)
                 {
                     IMultipleExecutingEntitiesCommand manyEntitiesCommand = command as IMultipleExecutingEntitiesCommand;
                     if (manyEntitiesCommand != null)
                     {
                         Command optimizedCommand = (Command)manyEntitiesCommand.CopyWithEntities(availableUnits);
                         FlushOptimized(optimizedCommand);
+                        continue;
                     }
-                    else Flush(command);
                 }
+                Flush(command);
             }
         }
 

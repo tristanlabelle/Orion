@@ -15,7 +15,7 @@ namespace Orion.UserInterface.Actions
         #region Constructor
         public BuildingConstructionActionButton(ActionFrame frame, UserInputManager manager,
             UnitType buildingType, Faction faction, TextureManager textureManager)
-            : base(frame, manager, Keys.None, textureManager)
+            : base(frame, manager, string.Empty, Keys.None, textureManager)
         {
             this.buildingType = buildingType;
             int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);

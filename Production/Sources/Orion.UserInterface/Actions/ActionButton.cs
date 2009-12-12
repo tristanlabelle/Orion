@@ -19,24 +19,23 @@ namespace Orion.UserInterface.Actions
         protected readonly ActionFrame container;
         protected readonly UserInputManager inputManager;
         private string name;
+        private string description;
         private Frame tooltipContainer;
         #endregion
 
         #region Constructors
-        protected ActionButton(ActionFrame frame, UserInputManager manager, Keys hotkey, TextureManager textureManager)
-            : base(new Rectangle(1,1), "")
+        protected ActionButton(ActionFrame frame, UserInputManager inputManager, string name, Keys hotkey, TextureManager textureManager)
+            : base(new Rectangle(1,1), string.Empty)
         {
-            this.textureManager = textureManager;
-            HotKey = hotkey;
-            container = frame;
-            inputManager = manager;
-            tooltipContainer = new Frame(new Rectangle(0, 0));
-        }
+            Argument.EnsureNotNull(frame, "frame");
+            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(name, "name");
 
-        protected ActionButton(ActionFrame frame, UserInputManager manager, string name, Keys hotkey, TextureManager textureManager)
-            : this(frame, manager, hotkey, textureManager)
-        {
-            Name = "{0} ({1})".FormatInvariant(name, hotkey);
+            base.HotKey = hotkey;
+            this.container = frame;
+            this.inputManager = inputManager;
+            this.name = name;
+            UpdateTooltip();
         }
         #endregion
 
@@ -44,26 +43,47 @@ namespace Orion.UserInterface.Actions
         public string Name
         {
             get { return name; }
-            internal set
+            set
             {
-                const float defaultFontSize = 28;
-                name = value;
-                tooltipContainer.Dispose();
-                IEnumerable<Text> lines = value.Split('\n').Select(str => new Text(str));
-                Rectangle tooltipFrameRect =
-                    new Rectangle(lines.Max(t => t.Frame.Width), lines.Count() * defaultFontSize);
-                Rectangle tooltipRect = tooltipFrameRect.ScaledBy(0.4f / defaultFontSize);
-                tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f));
-                tooltipContainer.Bounds = tooltipFrameRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
+                Argument.EnsureNotNull(value, "Name");
+                this.name = value;
+                UpdateTooltip();
+            }
+        }
 
-                int i = 0;
-                foreach (Text text in lines.Reverse())
+        public string Description
+        {
+            get { return description; }
+            set
+            {
+                description = value;
+                UpdateTooltip();
+            }
+        }
+
+        public string TooltipText
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.Append(name);
+
+                if (HotKey != Keys.None)
                 {
-                    Label tooltipLabel = new Label(text);
-                    tooltipLabel.Frame = tooltipLabel.Frame.TranslatedBy(0, tooltipLabel.Frame.Height * i);
-                    tooltipContainer.Children.Add(tooltipLabel);
-                    i++;
+                    stringBuilder.Append(" (");
+                    stringBuilder.Append(HotKey.ToStringInvariant());
+                    stringBuilder.Append(')');
                 }
+
+                string description = Description;
+                if (description != null)
+                {
+                    stringBuilder.Append('\n');
+                    stringBuilder.Append(description);
+                }
+
+                return stringBuilder.ToString();
             }
         }
 
@@ -77,7 +97,7 @@ namespace Orion.UserInterface.Actions
         public virtual ActionButton GetButtonAt(int x, int y)
         {
             if (x == 3 && y == 0)
-                return new CancelButton(container, inputManager,textureManager);
+                return new CancelButton(container, inputManager, textureManager);
             return null;
         }
 
@@ -98,6 +118,31 @@ namespace Orion.UserInterface.Actions
             container.Push(this);
         }
 
+        private void UpdateTooltip()
+        {
+            const float defaultFontSize = 28;
+
+            if (tooltipContainer != null)
+            {
+                tooltipContainer.Dispose();
+                tooltipContainer = null;
+            }
+
+            IEnumerable<Text> lines = TooltipText.Split('\n').Select(str => new Text(str));
+            Rectangle tooltipFrameRect = new Rectangle(lines.Max(t => t.Frame.Width), lines.Count() * defaultFontSize);
+            Rectangle tooltipRect = tooltipFrameRect.ScaledBy(0.4f / defaultFontSize);
+            tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f));
+            tooltipContainer.Bounds = tooltipFrameRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
+
+            int i = 0;
+            foreach (Text text in lines.Reverse())
+            {
+                Label tooltipLabel = new Label(text);
+                tooltipLabel.Frame = tooltipLabel.Frame.TranslatedBy(0, tooltipLabel.Frame.Height * i);
+                tooltipContainer.Children.Add(tooltipLabel);
+                i++;
+            }
+        }
         #endregion
     }
 }

@@ -16,7 +16,7 @@ namespace Orion.UserInterface.Actions
         #region Constructor
         public ResearchActionButton(ActionFrame frame, UserInputManager manager,
             ImmediateUserCommand command, TextureManager textureManager, string technologyName)
-            : base(frame, manager, Keys.None,textureManager)
+            : base(frame, manager, string.Empty, Keys.None, textureManager)
         {
             this.command = command;
             Texture texture = textureManager.GetTechnology(technologyName);

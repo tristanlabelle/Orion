@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Orion.GameLogic.Skills;
 using Size = System.Drawing.Size;
 
 namespace Orion.GameLogic
@@ -63,9 +64,9 @@ namespace Orion.GameLogic
                 AladdiumCost = 250,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.TrainSkill(type => type.Name == "Schtroumpf", 10));
-            builder.Skills.Add(new Skills.StoreResourcesSkill());
-            builder.Skills.Add(new Skills.StoreFoodSkill(10));
+            builder.Skills.Add(new TrainSkill(type => type.Name == "Schtroumpf", 10));
+            builder.Skills.Add(new StoreResourcesSkill());
+            builder.Skills.Add(new StoreFoodSkill(10));
             Register(builder);
         }
 
@@ -83,10 +84,10 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new Skills.MoveSkill(8, false));
-            builder.Skills.Add(new Skills.AttackSkill(1, 0, 5));
-            builder.Skills.Add(new Skills.HarvestSkill(1, 10));
-            builder.Skills.Add(new Skills.BuildSkill(type => type.IsBuilding, 20));
+            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new AttackSkill(1, 0, 5));
+            builder.Skills.Add(new HarvestSkill(1, 10));
+            builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 20));
             Register(builder);
         }
         #endregion
@@ -105,7 +106,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 150,
                 AlageneCost = 0,
             };
-            builder.Skills.Add(new Skills.TrainSkill(type =>
+            builder.Skills.Add(new TrainSkill(type =>
                 type.Name == "Pirate" || type.Name == "Ninja" || type.Name == "Viking", 10));
             Register(builder);
         }
@@ -116,7 +117,7 @@ namespace Orion.GameLogic
             {
                 Name = "Pirate",
                 Size = new Size(1, 1),
-                SightRange = 6,
+                SightRange = 8,
                 MaxHealth = 40,
                 MeleeArmor = 2,
                 RangedArmor = 1,
@@ -124,8 +125,8 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.MoveSkill(8, false));
-            builder.Skills.Add(new Skills.AttackSkill(5, 0, 3));
+            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new AttackSkill(5, 0, 3));
             Register(builder);
         }
 
@@ -143,8 +144,8 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.MoveSkill(10, false));
-            builder.Skills.Add(new Skills.AttackSkill(4, 5, 2));
+            builder.Skills.Add(new MoveSkill(10, false));
+            builder.Skills.Add(new AttackSkill(4, 5, 2));
             Register(builder);
         }
 
@@ -154,7 +155,7 @@ namespace Orion.GameLogic
             {
                 Name = "Viking",
                 Size = new Size(1, 1),
-                SightRange = 6,
+                SightRange = 8,
                 MaxHealth = 50,
                 MeleeArmor = 3,
                 RangedArmor = 2,
@@ -162,8 +163,8 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.MoveSkill(6, false));
-            builder.Skills.Add(new Skills.AttackSkill(8, 0, 5));
+            builder.Skills.Add(new MoveSkill(6, false));
+            builder.Skills.Add(new AttackSkill(8, 0, 4));
             Register(builder);
         }
         #endregion
@@ -182,7 +183,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 200,
                 AlageneCost = 75
             };
-            builder.Skills.Add(new Skills.TrainSkill(type =>
+            builder.Skills.Add(new TrainSkill(type =>
                 type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
             Register(builder);
         }
@@ -201,8 +202,8 @@ namespace Orion.GameLogic
                 AlageneCost = 100,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.MoveSkill(15, true));
-            builder.Skills.Add(new Skills.AttackSkill(1, 7, 1));
+            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new AttackSkill(1, 7, 1));
             Register(builder);
         }
 
@@ -220,8 +221,8 @@ namespace Orion.GameLogic
                 AlageneCost = 200,
                 FoodCost = 5
             };
-            builder.Skills.Add(new Skills.MoveSkill(8, true));
-            builder.Skills.Add(new Skills.AttackSkill(13, 8, 8));
+            builder.Skills.Add(new MoveSkill(8, true));
+            builder.Skills.Add(new AttackSkill(13, 8, 8));
             Register(builder);
         }
 
@@ -239,7 +240,7 @@ namespace Orion.GameLogic
                 AlageneCost = 50,
                 FoodCost = 2
             };
-            builder.Skills.Add(new Skills.MoveSkill(14, true));
+            builder.Skills.Add(new MoveSkill(14, true));
             Register(builder);
         }
         #endregion
@@ -258,7 +259,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 250,
                 AlageneCost = 125
             };
-            builder.Skills.Add(new Skills.TrainSkill(type =>
+            builder.Skills.Add(new TrainSkill(type =>
                 type.Name == "Jedihad" || type.Name == "Jésus"
                 || type.Name == "Flying Spaghetti Monster", 10));
             Register(builder);
@@ -278,8 +279,8 @@ namespace Orion.GameLogic
                 AlageneCost = 75,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.MoveSkill(9, false));
-            builder.Skills.Add(new Skills.AttackSkill(6, 3, 3));
+            builder.Skills.Add(new MoveSkill(9, false));
+            builder.Skills.Add(new AttackSkill(6, 3, 3));
             Register(builder);
         }
 
@@ -297,8 +298,8 @@ namespace Orion.GameLogic
                 AlageneCost = 40,
                 FoodCost = 3
             };
-            builder.Skills.Add(new Skills.MoveSkill(14, true));
-            builder.Skills.Add(new Skills.HealSkill(2));
+            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new HealSkill(3));
             Register(builder);
         }
 
@@ -316,8 +317,8 @@ namespace Orion.GameLogic
                 AlageneCost = 200,
                 FoodCost = 8
             };
-            builder.Skills.Add(new Skills.MoveSkill(2, true));
-            builder.Skills.Add(new Skills.AttackSkill(18, 3, 5));
+            builder.Skills.Add(new MoveSkill(2, true));
+            builder.Skills.Add(new AttackSkill(18, 3, 5));
             Register(builder);
         }
         #endregion
@@ -336,7 +337,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 150,
                 AlageneCost = 50
             };
-            builder.Skills.Add(new Skills.ResearchSkill(technology => technology.Name == "Increased Health 1"));
+            builder.Skills.Add(new ResearchSkill(technology => technology.Name == "Increased Health 1"));
             Register(builder);
         }
 
@@ -353,7 +354,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 120,
                 AlageneCost = 40
             };
-            builder.Skills.Add(new Skills.AttackSkill(12, 8, 2));
+            builder.Skills.Add(new AttackSkill(12, 8, 2));
             Register(builder);
         }
 
@@ -370,7 +371,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 75,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.ExtractAlageneSkill());
+            builder.Skills.Add(new ExtractAlageneSkill());
             Register(builder);
         }
 
@@ -387,7 +388,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 50,
                 AlageneCost = 0
             };
-            builder.Skills.Add(new Skills.StoreFoodSkill(10));
+            builder.Skills.Add(new StoreFoodSkill(10));
             Register(builder);
         }
         #endregion
@@ -404,8 +405,8 @@ namespace Orion.GameLogic
                 MeleeArmor = 50,
                 RangedArmor = 50,
             };
-            builder.Skills.Add(new Skills.MoveSkill(25, true));
-            builder.Skills.Add(new Skills.AttackSkill(100, 0, 1));
+            builder.Skills.Add(new MoveSkill(25, true));
+            builder.Skills.Add(new AttackSkill(100, 0, 1));
             Register(builder);
         }
 
@@ -420,8 +421,8 @@ namespace Orion.GameLogic
                 MeleeArmor = 10,
                 RangedArmor = 10,
             };
-            builder.Skills.Add(new Skills.MoveSkill(15, true));
-            builder.Skills.Add(new Skills.AttackSkill(50, 20, 1));
+            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new AttackSkill(50, 20, 1));
             Register(builder);
         }
         #endregion

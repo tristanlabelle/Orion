@@ -98,6 +98,9 @@
     <Compile Include="Views System\RenderedView.cs" />
     <Compile Include="Views System\Responder.cs" />
     <Compile Include="Views System\RootView.cs" />
+    <Compile Include="Views System\ViewChildrenCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Widgets\Scrollbar.cs" />
     <Compile Include="Widgets\Button.cs" />
     <Compile Include="Widgets\DropdownList.cs" />

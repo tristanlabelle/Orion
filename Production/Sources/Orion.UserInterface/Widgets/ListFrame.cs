@@ -39,7 +39,7 @@ namespace Orion.UserInterface.Widgets
                 child.Frame = child.Frame.TranslatedBy(0, translateBy);
         }
 
-        protected internal override void OnAddChild(ViewContainer child)
+        protected internal override void OnChildAdded(ViewContainer child)
         {
             if (child != null)
             {
@@ -50,10 +50,10 @@ namespace Orion.UserInterface.Widgets
                 FullBounds = FullBounds.TranslatedBy(0, -yTransform).ResizedBy(0, yTransform);
                 child.Frame = new Rectangle(padding.X, FullBounds.MinY + padding.Y, child.Frame.Width, child.Frame.Height);
             }
-            base.OnAddChild(child);
+            base.OnChildAdded(child);
         }
 
-        protected internal override void OnRemoveChild(ViewContainer child)
+        protected internal override void OnChildRemoved(ViewContainer child)
         {
             if (child != null)
             {
@@ -68,7 +68,7 @@ namespace Orion.UserInterface.Widgets
                 }
                 FullBounds = FullBounds.ResizedBy(0, yTranslation);
             }
-            base.OnRemoveChild(child);
+            base.OnChildRemoved(child);
         }
         #endregion
     }

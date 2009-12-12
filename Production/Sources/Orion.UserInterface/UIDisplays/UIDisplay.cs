@@ -34,11 +34,15 @@ namespace Orion.UserInterface
             if (handler != null) handler(this, hiddenOf);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            Entered = null;
-            Shadowed = null;
-            base.Dispose();
+            if (disposing)
+            {
+                Entered = null;
+                Shadowed = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

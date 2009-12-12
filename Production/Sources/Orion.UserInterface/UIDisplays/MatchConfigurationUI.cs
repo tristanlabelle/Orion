@@ -107,11 +107,15 @@ namespace Orion.UserInterface
             if (handler != null) handler(this);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            PressedStartGame = null;
-            PressedExit = null;
-            base.Dispose();
+            if (disposing)
+            {
+                PressedStartGame = null;
+                PressedExit = null;
+            }
+
+            base.Dispose(disposing);
         }
 
         #region UIDisplay Implementation

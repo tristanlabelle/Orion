@@ -322,14 +322,17 @@ namespace Orion.UserInterface
             Instant.DisplayAlert(this, "{0} was successfully ping'ed.".FormatInvariant(endPoint.Value));
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            transporter.Received -= receptionDelegate;
-            HostedGame = null;
-            JoinedGame = null;
-            base.Dispose();
-        }
+            if (disposing)
+            {
+                transporter.Received -= receptionDelegate;
+                HostedGame = null;
+                JoinedGame = null;
+            }
 
+            base.Dispose(disposing);
+        }
         #endregion
     }
 }

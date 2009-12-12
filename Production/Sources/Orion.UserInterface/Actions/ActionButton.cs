@@ -12,28 +12,30 @@ using Orion.UserInterface.Actions.Enablers;
 
 namespace Orion.UserInterface.Actions
 {
-    public abstract class ActionButton : Button, IActionProvider
+    public class ActionButton : Button, IActionProvider
     {
         #region Fields
-        private readonly TextureManager textureManager;
         protected readonly ActionFrame container;
         protected readonly UserInputManager inputManager;
+        private readonly TextureManager textureManager;
         private string name;
         private string description;
         private Frame tooltipContainer;
         #endregion
 
         #region Constructors
-        protected ActionButton(ActionFrame frame, UserInputManager inputManager, string name, Keys hotkey, TextureManager textureManager)
+        public ActionButton(ActionFrame container, UserInputManager inputManager,
+            string name, Keys hotkey, TextureManager textureManager)
             : base(new Rectangle(1,1), string.Empty)
         {
-            Argument.EnsureNotNull(frame, "frame");
+            Argument.EnsureNotNull(container, "container");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(name, "name");
 
             base.HotKey = hotkey;
-            this.container = frame;
+            this.container = container;
             this.inputManager = inputManager;
+            this.textureManager = textureManager;
             this.name = name;
             UpdateTooltip();
         }
@@ -115,6 +117,9 @@ namespace Orion.UserInterface.Actions
 
         protected override void OnPress()
         {
+            // The base call must be done first to raise the Triggered event
+            // because it seems that container.Push disposes this button.
+            base.OnPress();
             container.Push(this);
         }
 

@@ -129,7 +129,6 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-
         public void AddItem(T item)
         {
             if (Items.Contains(item))
@@ -153,18 +152,18 @@ namespace Orion.UserInterface.Widgets
             base.OnAddToParent(parent);
         }
 
-        protected internal override void OnRemoveFromParent(ViewContainer parent)
+        protected internal override void OnRemovedFromParent(ViewContainer parent)
         {
             latestRespondingAncestor.MouseUp -= parentMouseUp;
-            base.OnRemoveFromParent(parent);
+            base.OnRemovedFromParent(parent);
         }
 
-        protected internal override void OnAncestryChange(ViewContainer ancestor)
+        protected internal override void OnAncestryChanged(ViewContainer ancestor)
         {
             latestRespondingAncestor.MouseUp -= parentMouseUp;
             latestRespondingAncestor = (Responder)Root;
             latestRespondingAncestor.MouseUp += parentMouseUp;
-            base.OnAncestryChange(ancestor);
+            base.OnAncestryChanged(ancestor);
         }
 
         protected override bool OnMouseDown(MouseEventArgs args)
@@ -178,12 +177,11 @@ namespace Orion.UserInterface.Widgets
             Parent.Children.Remove(menu);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            SelectionChanged = null;
-            base.Dispose();
+            if (disposing) SelectionChanged = null;
+            base.Dispose(disposing);
         }
-
         #endregion
     }
 }

@@ -93,11 +93,11 @@ namespace Orion.UserInterface.Widgets
             }
         }
 
-        protected internal override void OnAncestryChange(ViewContainer ancestor)
+        protected internal override void OnAncestryChanged(ViewContainer ancestor)
         {
             RootView root = Root as RootView;
             if(root != null) root.FocusedView = Root == ancestor ? null : this;
-            base.OnAncestryChange(ancestor);
+            base.OnAncestryChanged(ancestor);
         }
 
         protected internal override void OnAddToParent(ViewContainer parent)
@@ -107,11 +107,11 @@ namespace Orion.UserInterface.Widgets
             base.OnAddToParent(parent);
         }
 
-        protected internal override void OnRemoveFromParent(ViewContainer parent)
+        protected internal override void OnRemovedFromParent(ViewContainer parent)
         {
             RootView root = Root as RootView;
             if (root != null) root.FocusedView = null;
-            base.OnRemoveFromParent(parent);
+            base.OnRemovedFromParent(parent);
         }
         #endregion
     }

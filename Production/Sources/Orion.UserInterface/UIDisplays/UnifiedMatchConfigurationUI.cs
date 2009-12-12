@@ -78,11 +78,15 @@ namespace Orion.UserInterface.UIDisplays
                 if (RowSuppressed != null) RowSuppressed(this);
             }
 
-            public override void Dispose()
+            protected override void Dispose(bool disposing)
             {
-                SelectedColorChanged = null;
-                RowSuppressed = null;
-                base.Dispose();
+                if (disposing)
+                {
+                    SelectedColorChanged = null;
+                    RowSuppressed = null;
+                }
+
+                base.Dispose(disposing);
             }
             #endregion
         }

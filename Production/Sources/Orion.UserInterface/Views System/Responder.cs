@@ -10,7 +10,6 @@ namespace Orion.UserInterface
     {
         #region Fields
         private Vector2? cursorPosition;
-        private Responder focused;
         #endregion
 
         #region Constructors
@@ -28,12 +27,12 @@ namespace Orion.UserInterface
         {
             get
             {
-                if (isDisposed) throw new ObjectDisposedException(null);
+                EnsureNotDisposed();
                 return cursorPosition;
             }
             set
             {
-                if (isDisposed) throw new ObjectDisposedException(null);
+                EnsureNotDisposed();
                 cursorPosition = value;
             }
         }
@@ -42,7 +41,7 @@ namespace Orion.UserInterface
         {
             get
             {
-                if (isDisposed) throw new ObjectDisposedException(null);
+                EnsureNotDisposed();
                 return cursorPosition.HasValue;
             }
         }
@@ -63,7 +62,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-
         #region Event Propagation
         /// <summary>Propagates a mouse event to the child views.</summary>
         /// <remarks>
@@ -74,7 +72,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             bool eventCanSink = true;
             foreach (Responder child in Enumerable.Reverse(Children))
             {
@@ -113,7 +111,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             foreach (Responder child in Enumerable.Reverse(Children))
             {
                 bool keepPropagating = child.PropagateKeyboardEvent(type, args);
@@ -127,7 +125,7 @@ namespace Orion.UserInterface
 
         protected internal virtual bool PropagateKeyPressEvent(char character)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             foreach (Responder child in Enumerable.Reverse(Children))
             {
                 bool keepPropagating = child.PropagateKeyPressEvent(character);
@@ -142,7 +140,7 @@ namespace Orion.UserInterface
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
         protected internal virtual void PropagateUpdateEvent(UpdateEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             foreach (Responder child in Enumerable.Reverse(Children)) child.PropagateUpdateEvent(args);
             OnUpdate(args);
         }
@@ -151,7 +149,7 @@ namespace Orion.UserInterface
         #region Event Dispatch
         protected internal bool DispatchMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             switch (eventType)
             {
                 case MouseEventType.MouseDown: return OnMouseDown(args);
@@ -167,13 +165,13 @@ namespace Orion.UserInterface
 
         protected internal bool DispatchKeyPressEvent(char character)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             return OnKeyPress(character);
         }
 
         protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             switch (type)
             {
                 case KeyboardEventType.KeyDown: return OnKeyDown(args);
@@ -184,7 +182,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Event Handling
-
         #region Mouse Events
         /// <summary>
         /// Calls the event handler for mouse button pressing.
@@ -270,16 +267,11 @@ namespace Orion.UserInterface
             return true;
         }
 
-
         private void InvokeEventHandlers(GenericEventHandler<Responder, MouseEventArgs> handler, MouseEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
-            if (handler != null)
-            {
-                handler(this, args);
-            }
+            EnsureNotDisposed();
+            if (handler != null) handler(this, args);
         }
-
         #endregion
 
         #region Keyboard Events
@@ -325,7 +317,7 @@ namespace Orion.UserInterface
         #region Update Events
         protected virtual void OnUpdate(UpdateEventArgs args)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            EnsureNotDisposed();
             GenericEventHandler<Responder, UpdateEventArgs> handler = Updated;
             if (handler != null)
             {
@@ -335,36 +327,36 @@ namespace Orion.UserInterface
         #endregion
 
         #region Hierarchy Events
-        protected internal override void OnRemoveFromParent(ViewContainer parent)
+        protected internal override void OnRemovedFromParent(ViewContainer parent)
         {
             if (cursorPosition.HasValue)
             {
                 cursorPosition = null;
                 PropagateMouseEvent(MouseEventType.MouseExited, new MouseEventArgs());
             }
-            base.OnRemoveFromParent(parent);
+            base.OnRemovedFromParent(parent);
         }
         #endregion
-
         #endregion
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (isDisposed) throw new ObjectDisposedException(null);
+            if (disposing)
+            {
+                MouseDown = null;
+                MouseUp = null;
+                MouseMoved = null;
+                MouseWheel = null;
+                MouseEntered = null;
+                MouseExited = null;
+                KeyDown = null;
+                KeyUp = null;
+                KeyPress = null;
+                Updated = null;
+            }
 
-            MouseDown = null;
-            MouseUp = null;
-            MouseMoved = null;
-            MouseWheel = null;
-            MouseEntered = null;
-            MouseExited = null;
-            KeyDown = null;
-            KeyUp = null;
-            KeyPress = null;
-            Updated = null;
-            base.Dispose();
+            base.Dispose(disposing);
         }
-
         #endregion
     }
 }

@@ -54,10 +54,11 @@ namespace Orion.UserInterface
             if (handler != null) handler(playerSlots.IndexOf(slot), value);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            SlotOccupationChanged = null;
-            base.Dispose();
+            if (disposing) SlotOccupationChanged = null;
+
+            base.Dispose(disposing);
         }
         #endregion
     }

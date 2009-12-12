@@ -39,6 +39,12 @@ namespace Orion.UserInterface.Widgets
         /// Triggered when the button is pressed or when its <see cref="P:HotKey"/> is pressed.
         /// </summary>
         public event GenericEventHandler<Button> Triggered;
+
+        private void RaiseTriggered()
+        {
+            var handler = Triggered;
+            if (handler != null) handler(this);
+        }
         #endregion
 
         #region Properties
@@ -68,10 +74,10 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            Triggered = null;
-            base.Dispose();
+            if (disposing) Triggered = null;
+            base.Dispose(disposing);
         }
 
         protected override bool OnMouseEnter(MouseEventArgs args)
@@ -120,11 +126,7 @@ namespace Orion.UserInterface.Widgets
 
         protected virtual void OnPress()
         {
-            if (enabled)
-            {
-                GenericEventHandler<Button> handler = Triggered;
-                if (handler != null) handler(this);
-            }
+            if (enabled) RaiseTriggered();
         }
 
         private void AlignCaption()

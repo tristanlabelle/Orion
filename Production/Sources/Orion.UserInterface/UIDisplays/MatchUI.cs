@@ -697,11 +697,15 @@ namespace Orion.UserInterface
             diplomacyFrame.Children.Add(boutonAccepter);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            textureManager.Dispose();
-            matchRenderer.Dispose();
-            base.Dispose();
+            if (disposing)
+            {
+                textureManager.Dispose();
+                matchRenderer.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
         #endregion
         #endregion

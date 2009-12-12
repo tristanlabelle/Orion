@@ -102,6 +102,7 @@ namespace Orion.GameLogic
         }
 
         public event GenericEventHandler<Faction,string> Warning;
+
         public void RaiseWarning(string message)
         {
             var handler = Warning;
@@ -187,6 +188,11 @@ namespace Orion.GameLogic
         public FactionStatus Status
         {
             get { return status; }
+        }
+
+        private bool IsStuck
+        {
+            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<Skills.BuildSkill>()); }
         }
 
         #region Resources
@@ -381,26 +387,14 @@ namespace Orion.GameLogic
             if (status == FactionStatus.Defeated) return;
             
             bool hasKeepAliveUnit = Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
-            if (!hasKeepAliveUnit)
-            {
-                status = FactionStatus.Defeated;
-                RaiseDefeated();
-                return;
-            }
-            if (IsStuck())
+            if (!hasKeepAliveUnit || IsStuck)
             {
                 status = FactionStatus.Defeated;
                 RaiseDefeated();
                 return;
             }
         }
-        
-        private bool IsStuck()
-        {
-            if (MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<Skills.BuildSkill>()))
-                return true;
-            return false;
-        }
+
         #region Diplomacy
         /// <summary>
         /// Changes the diplomatic stance of this <see cref="Faction"/>

@@ -53,7 +53,8 @@ namespace Orion.GameLogic.Tasks
                     && Unit.Faction.AlageneAmount >= technology.Requirements.AlageneCost;
                 if (!hasEnoughResources)
                 {
-                    Faction.RaiseWarning("Not enough resources to research {0}.".FormatInvariant(technology));
+                    string warning = "Not enough resources to research {0}.".FormatInvariant(technology.Name);
+                    Faction.RaiseWarning(warning);
                     return;
                 }
 

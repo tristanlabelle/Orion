@@ -81,8 +81,8 @@ namespace Orion.Commandment.Commands
                 }
                 if (trainer.TaskQueue.IsFull)
                 {
-                    faction.RaiseWarning("Cannot train {0}, task queue of {1} is full."
-                        .FormatInvariant(traineeType, trainer));
+                    faction.RaiseWarning("Cannot train {0}, task queue full."
+                        .FormatInvariant(traineeType.Name));
                     continue;
                 }
 
@@ -95,7 +95,7 @@ namespace Orion.Commandment.Commands
                 }
                 else
                 {
-                    faction.RaiseWarning("Not enough resources to train {0}.".FormatInvariant(traineeType));
+                    faction.RaiseWarning("Not enough resources to train {0}.".FormatInvariant(traineeType.Name));
                     break;
                 }
             }

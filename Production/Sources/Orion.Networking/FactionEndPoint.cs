@@ -145,7 +145,7 @@ namespace Orion.Networking
         private void OnTimedOut(SafeTransporter transporter, IPv4EndPoint endPoint)
         {
             if (endPoint != Host) return;
-            Faction.RaiseWarning("Lost connection to {0}".FormatInvariant(endPoint));
+            Faction.RaiseWarning("Lost connection to {0}.".FormatInvariant(endPoint));
             Faction.GiveUp();
         }
 

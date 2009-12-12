@@ -16,8 +16,8 @@ namespace Orion.Graphics.Renderers
     public sealed class RuinsRenderer : IRenderer
     {
         #region Fields
-        private const float buildingRuinDurationInSeconds = 60;
-        private const float skeletonDurationInSeconds = 15;
+        private const float buildingRuinDurationInSeconds = 60 * 4;
+        private const float skeletonDurationInSeconds = 60;
         private const float ruinFadeDurationInSeconds = 1;
 
         private readonly Faction faction;

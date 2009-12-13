@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Orion.Commandment;
 
-namespace Orion.Distiller
+namespace Orion.Tools.ReplayPrinter
 {
     class Program
     {

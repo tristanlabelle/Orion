@@ -309,7 +309,6 @@ namespace Orion.Networking
         {
             EnsureNotDisposed();
             Argument.EnsureNotNull(message, "message");
-            Argument.EnsureNotNull(hostEndPoint, "hostEndPoint");
             Debug.Assert(message.Length < 512, "Warning: A network message exceeded 512 bytes.");
 
             lock (peers)

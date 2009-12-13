@@ -5,7 +5,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.GameLogic.Tasks;
-using Skill = Orion.GameLogic.Skills.Skill;
+using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic
 {
@@ -33,6 +33,7 @@ namespace Orion.GameLogic
         private float healthBuilt;
         private bool isUnderConstruction;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
+        private Stack<Unit> transportedUnits = new Stack<Unit>();
         #endregion
 
         #region Constructors
@@ -273,6 +274,11 @@ namespace Orion.GameLogic
             set { rallyPoint = value; }
         }
         #endregion
+
+        public bool IsTransportFull
+        {
+            get { return transportedUnits.Count == GetStat(UnitStat.TransportCapacity); }
+        }
         #endregion
 
         #region Methods
@@ -329,7 +335,7 @@ namespace Orion.GameLogic
         public bool HasWithinAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
-            if (!HasSkill<Skills.AttackSkill>()) return false;
+            if (!HasSkill<AttackSkill>()) return false;
             int attackRange = GetStat(UnitStat.AttackRange);
             if (attackRange == 0)
             {
@@ -421,6 +427,41 @@ namespace Orion.GameLogic
             isUnderConstruction = false;
             RaiseConstructionComplete();
         }
+
+        public void Embark(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureEqual(unit.Faction, faction, "unit.Faction");
+            Debug.Assert(HasSkill<TransportSkill>());
+            Debug.Assert(!IsTransportFull);
+            Debug.Assert(unit != this);
+            Debug.Assert(!transportedUnits.Contains(unit));
+
+            transportedUnits.Push(unit);
+
+            unit.taskQueue.Clear();
+            World.Entities.Remove(unit);
+        }
+
+        public void Disembark()
+        {
+            while (transportedUnits.Count > 0)
+            {
+                Unit transportedUnit = transportedUnits.Peek();
+
+                Point? location = GridRegion.GetAdjacentPoints()
+                    .FirstOrNull(point => World.IsFree(point, transportedUnit.CollisionLayer));
+                if (!location.HasValue)
+                {
+                    faction.RaiseWarning("No place to disembark units.");
+                    break;
+                }
+
+                transportedUnits.Pop();
+                transportedUnit.SetPosition(location.Value);
+                World.Entities.Add(transportedUnit);
+            }
+        }
         #endregion
 
         protected override void DoUpdate(SimulationStep step)
@@ -433,9 +474,9 @@ namespace Orion.GameLogic
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
-                if (!IsUnderConstruction && HasSkill<Skills.AttackSkill>())
+                if (!IsUnderConstruction && HasSkill<AttackSkill>())
                     TryAttackNearbyUnit();
-                else if (HasSkill<Skills.HealSkill>())
+                else if (HasSkill<HealSkill>())
                     TryHealNearbyUnit();
             }
             taskQueue.Update(step);

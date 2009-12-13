@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="RememberedBuilding.cs" />
     <Compile Include="Skills\HealSkill.cs" />
+    <Compile Include="Skills\TransportSkill.cs" />
     <Compile Include="Tasks\BuildingPlan.cs" />
     <Compile Include="CollisionLayer.cs" />
     <Compile Include="DiplomaticStance.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\TrainSkill.cs" />
     <Compile Include="TagSet.cs" />
+    <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Tasks\HealTask.cs" />
     <Compile Include="Tasks\MoveTask.cs">
       <SubType>Code</SubType>

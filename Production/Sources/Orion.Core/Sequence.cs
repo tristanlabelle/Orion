@@ -12,7 +12,14 @@ namespace Orion
     public static class Sequence
     {
         #region Methods
-        #region Finding/Counting
+        #region None
+        public static bool None<T>(this IEnumerable<T> sequence, Func<T, bool> predicate)
+        {
+            return !Enumerable.Any(sequence, predicate);
+        }
+        #endregion
+
+        #region First/Last
         #region FirstOrDefault/LastOrDefault
         /// <summary>
         /// Retrieves the first element of a sequence that matches a condition or a default value.
@@ -144,7 +151,9 @@ namespace Orion
             return matching;
         }
         #endregion
+        #endregion
 
+        #region Indices
         #region IndexOf
         /// <summary>
         /// Gets the index of the first element matching a condition in a sequence.
@@ -267,6 +276,7 @@ namespace Orion
         {
             return IndexOfLast(sequence, value, null);
         }
+        #endregion
         #endregion
 
         #region WithMin/WithMax
@@ -564,7 +574,6 @@ namespace Orion
         {
             return Count(sequence, value, null);
         }
-        #endregion
         #endregion
 
         #region Except

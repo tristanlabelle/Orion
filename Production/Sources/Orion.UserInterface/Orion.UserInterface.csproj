@@ -56,12 +56,14 @@
     <Compile Include="Actions\BuildingConstructionActionButton.cs" />
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
     <Compile Include="Actions\Enablers\ResearchEnabler.cs" />
+    <Compile Include="Actions\Enablers\TransportEnabler.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
     <Compile Include="Actions\CancelButton.cs" />
     <Compile Include="Actions\Enablers\ActionEnabler.cs" />
     <Compile Include="Actions\Enablers\AttackEnabler.cs" />
     <Compile Include="Actions\BuildActionButton.cs" />
     <Compile Include="Actions\ResearchActionButton.cs" />
+    <Compile Include="Actions\UserCommands\EmbarkUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HealUserCommand.cs" />
     <Compile Include="Actions\UserCommands\ResearchUserCommand.cs" />
     <Compile Include="Actions\UserCommands\TrainUserCommand.cs" />

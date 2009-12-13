@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="AgressiveAICommander.cs" />
     <Compile Include="AICommander.cs" />
+    <Compile Include="Commands\DisembarkCommand.cs" />
+    <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\IMultipleExecutingEntitiesCommand.cs" />
     <Compile Include="Commands\Pipeline\CommandOptimizer.cs" />
     <Compile Include="Commands\ResearchCommand.cs" />

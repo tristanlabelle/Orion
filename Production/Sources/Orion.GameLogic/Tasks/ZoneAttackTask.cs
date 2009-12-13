@@ -31,7 +31,6 @@ namespace Orion.GameLogic.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            Argument.EnsureNotNull(destination, "destination");
             
             this.destination = destination;
             this.targetDistance = unit.GetStat(UnitStat.AttackRange);

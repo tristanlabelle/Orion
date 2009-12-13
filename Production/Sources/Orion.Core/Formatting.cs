@@ -32,7 +32,7 @@ namespace Orion
         /// <returns>The culture invariant string representation of <paramref name="object"/>.</returns>
         public static string ToStringInvariant<T>(this T @object) where T : IFormattable
         {
-            if (!typeof(T).IsValueType) Argument.EnsureNotNull(@object, "object");
+            if (!typeof(T).IsValueType) Argument.EnsureNotNull((object)@object, "object");
             return @object.ToString(null, CultureInfo.InvariantCulture);
         }
 
@@ -48,7 +48,7 @@ namespace Orion
         /// <returns>The culture invariant string representation of <paramref name="object"/>.</returns>
         public static string ToStringInvariant<T>(this T @object, string format) where T : IFormattable
         {
-            if (!typeof(T).IsValueType) Argument.EnsureNotNull(@object, "object");
+            if (!typeof(T).IsValueType) Argument.EnsureNotNull((object)@object, "object");
             return @object.ToString(format, CultureInfo.InvariantCulture);
         }
         #endregion

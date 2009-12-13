@@ -329,19 +329,35 @@ namespace Orion.Commandment
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<TrainSkill>()
-                && unit.Type.IsBuilding);
+                && unit.IsBuilding);
             commander.LaunchChangeRallyPoint(targetUnits, at);
         }
 
         public void LaunchRepair(Unit building)
         {
-            if (!building.Type.IsBuilding) return;
+            if (building.Faction != LocalFaction) return;
+            if (!building.IsBuilding) return;
             if (building.Damage < 1) return;
            
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<BuildSkill>());
-            if (targetUnits.Any(unit => unit.Faction != building.Faction)) return;
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
             commander.LaunchRepair(targetUnits, building);
+        }
+
+        public void LaunchEmbark(Unit target)
+        {
+            if (target.Faction != LocalFaction || target.IsBuilding) return;
+
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<MoveSkill>());
+            commander.LaunchEmbark(targetUnits, target);
+        }
+
+        public void LaunchDisembark()
+        {
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<TransportSkill>());
+            commander.LaunchDisembark(targetUnits);
         }
 
         public void LaunchHeal(Unit hurtUnit)
@@ -354,7 +370,6 @@ namespace Orion.Commandment
             if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
             commander.LaunchHeal(targetUnits, hurtUnit);
         }
-
 
         public void LaunchTrain(UnitType unitType)
         {
@@ -385,6 +400,7 @@ namespace Orion.Commandment
 
                 commander.LaunchResearch(tristan, technology);
         }
+
         public void LaunchSuicide()
         {
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits

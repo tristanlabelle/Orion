@@ -5,6 +5,7 @@ using Orion.Commandment.Commands;
 using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Keys = System.Windows.Forms.Keys;
+using Orion.GameLogic.Technologies;
 
 namespace Orion.Commandment
 {
@@ -92,13 +93,25 @@ namespace Orion.Commandment
                 GenerateActionCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
         }
 
-        public void LaunchResearch(Unit tristan, Orion.GameLogic.Technologies.Technology technology)
+        public void LaunchResearch(Unit reseacher, Technology technology)
         {
-            if (tristan != null)
-            {
-                GenerateActionCommand(new ResearchCommand(tristan.Handle, Faction.Handle, technology.Handle));
-            }
+            if (reseacher != null)
+                GenerateActionCommand(new ResearchCommand(reseacher.Handle, Faction.Handle, technology.Handle));
         }
+
+        public void LaunchEmbark(IEnumerable<Unit> units, Unit target)
+        {
+            units = units.Except(target);
+            if (units.Count() > 0)
+                GenerateActionCommand(new EmbarkCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
+        }
+
+        public void LaunchDisembark(IEnumerable<Unit> units)
+        {
+            if (units.Count() > 0)
+                GenerateActionCommand(new DisembarkCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+        }
+
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)

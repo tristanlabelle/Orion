@@ -675,7 +675,7 @@ namespace Orion
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="value"/> is null.
         /// </exception>
-        public static void EnsureNotNull<T>(T value, string name)
+        public static void EnsureNotNull<T>(T value, string name) where T : class
         {
             if (typeof(T).IsValueType) return;
             if (value != null) return;

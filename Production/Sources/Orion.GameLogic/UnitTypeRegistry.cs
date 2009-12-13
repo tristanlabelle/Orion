@@ -240,7 +240,8 @@ namespace Orion.GameLogic
                 AlageneCost = 50,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new MoveSkill(10, true));
+            builder.Skills.Add(new TransportSkill(5));
             Register(builder);
         }
         #endregion

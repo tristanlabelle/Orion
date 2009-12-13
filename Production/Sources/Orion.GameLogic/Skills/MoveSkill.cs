@@ -18,7 +18,6 @@ namespace Orion.GameLogic.Skills
         public MoveSkill(int speed, bool isAirborne)
         {
             Argument.EnsureStrictlyPositive(speed, "speed");
-            Argument.EnsureNotNull(isAirborne, "isAirborne");
             this.speed = speed;
             this.isAirborne = isAirborne;
         }

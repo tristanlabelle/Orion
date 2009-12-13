@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C# Express 2008
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.GameLogic", "Orion.GameLogic\Orion.GameLogic.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Core", "Orion.Core\Orion.Core.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Networking", "Orion.N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.UserInterface", "Orion.UserInterface\Orion.UserInterface.csproj", "{F2382CAC-67F5-4246-B033-D586A1A68FA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Distiller", "Orion.Distiller\Orion.Distiller.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Tools.ReplayPrinter", "Orion.Tools.ReplayPrinter\Orion.Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +58,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Orion.Main.csproj

@@ -15,9 +15,9 @@ namespace Orion.UserInterface.Actions.UserCommands
         {
             ResourceNode resourceNode = World.Entities
                 .OfType<ResourceNode>()
-                .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(location));
-            if (resourceNode == null || !resourceNode.IsHarvestableByFaction(LocalFaction))
-                return;
+                .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(location)
+                    && node.IsHarvestableByFaction(LocalFaction));
+            if (resourceNode == null) return;
 
             InputManager.LaunchHarvest(resourceNode);
         }

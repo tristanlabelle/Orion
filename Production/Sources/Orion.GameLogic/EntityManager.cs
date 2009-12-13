@@ -219,8 +219,10 @@ namespace Orion.GameLogic
         }
 
         #region Collection Modifications
-        private void Add(Entity entity)
+        public void Add(Entity entity)
         {
+            Argument.EnsureNotNull(entity, "entity");
+
             if (isUpdating) DeferAdd(entity);
             else CommitAdd(entity);
 
@@ -246,8 +248,10 @@ namespace Orion.GameLogic
             }
         }
 
-        private void Remove(Entity entity)
+        public void Remove(Entity entity)
         {
+            Argument.EnsureNotNull(entity, "entity");
+
             if (isUpdating) DeferRemove(entity);
             else CommitRemove(entity);
 

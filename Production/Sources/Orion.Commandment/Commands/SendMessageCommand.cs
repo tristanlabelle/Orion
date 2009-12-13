@@ -20,7 +20,6 @@ namespace Orion.Commandment.Commands
         public SendMessageCommand(Handle factionHandle, string text)
             : base(factionHandle)
         {
-            Argument.EnsureNotNull(factionHandle, "factionHandle");
             Argument.EnsureNotNull(text, "text");
             this.text = text;
         }

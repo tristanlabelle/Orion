@@ -19,24 +19,37 @@ namespace Orion.Tools.ReplayPrinter
 
             using (ReplayReader replayReader = new ReplayReader(args[0]))
             {
-                Stream outputStream = args.Length == 1
-                    ? Console.OpenStandardOutput()
-                    : new FileStream(args[1], FileMode.Create);
-
-                using (StreamWriter outputWriter = new StreamWriter(outputStream))
+                bool owned = false;
+                TextWriter textWriter = null;
+                if (args.Length == 1)
                 {
-                    PrintReplay(replayReader, outputWriter);
+                    textWriter = Console.Out;
+                    owned = false;
+                }
+                else
+                {
+                    textWriter = new StreamWriter(args[1]);
+                    owned = true;
+                }
+
+                try
+                {
+                    PrintReplay(replayReader, textWriter);
+                }
+                finally
+                {
+                    if (owned) textWriter.Dispose();
                 }
             }
         }
 
-        static void PrintReplay(ReplayReader replay, StreamWriter output)
+        static void PrintReplay(ReplayReader replay, TextWriter output)
         {
             PrintHeader(replay, output);
             PrintCommands(replay, output);
         }
 
-        static void PrintHeader(ReplayReader replay, StreamWriter output)
+        static void PrintHeader(ReplayReader replay, TextWriter output)
         {
             output.WriteLine("Game seed is {0}", replay.WorldSeed);
             output.WriteLine("There are {0} factions:", replay.FactionNames.Count());
@@ -44,7 +57,7 @@ namespace Orion.Tools.ReplayPrinter
                 output.WriteLine("  - {0}", factionName);
         }
 
-        static void PrintCommands(ReplayReader replay, StreamWriter output)
+        static void PrintCommands(ReplayReader replay, TextWriter output)
         {
             while (!replay.IsEndOfStreamReached)
             {
@@ -55,7 +68,7 @@ namespace Orion.Tools.ReplayPrinter
 
         static void PrintUsage()
         {
-            Console.WriteLine("usage: Orion.Distiller replay-name [output-file]");
+            Console.WriteLine("usage: Orion.Tools.ReplayPrinter replay-name [output-file]");
         }
     }
 }

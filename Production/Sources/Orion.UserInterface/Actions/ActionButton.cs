@@ -20,7 +20,6 @@ namespace Orion.UserInterface.Actions
         private readonly TextureManager textureManager;
         private string name;
         private string description;
-        private Frame tooltipContainer;
         #endregion
 
         #region Constructors
@@ -37,7 +36,6 @@ namespace Orion.UserInterface.Actions
             this.inputManager = inputManager;
             this.textureManager = textureManager;
             this.name = name;
-            UpdateTooltip();
         }
         #endregion
 
@@ -48,8 +46,7 @@ namespace Orion.UserInterface.Actions
             set
             {
                 Argument.EnsureNotNull(value, "Name");
-                this.name = value;
-                UpdateTooltip();
+                name = value;
             }
         }
 
@@ -58,8 +55,8 @@ namespace Orion.UserInterface.Actions
             get { return description; }
             set
             {
+                Argument.EnsureNotNull(value, "Name");
                 description = value;
-                UpdateTooltip();
             }
         }
 
@@ -105,13 +102,14 @@ namespace Orion.UserInterface.Actions
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            Children.Add(tooltipContainer);
+            container.TooltipFrame.SetDescription(TooltipText);
+            container.ShowTooltip();
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            Children.Remove(tooltipContainer);
+            container.HideTooltip();
             return base.OnMouseExit(args);
         }
 
@@ -121,32 +119,6 @@ namespace Orion.UserInterface.Actions
             // because it seems that container.Push disposes this button.
             base.OnPress();
             container.Push(this);
-        }
-
-        private void UpdateTooltip()
-        {
-            const float defaultFontSize = 28;
-
-            if (tooltipContainer != null)
-            {
-                tooltipContainer.Dispose();
-                tooltipContainer = null;
-            }
-
-            IEnumerable<Text> lines = TooltipText.Split('\n').Select(str => new Text(str));
-            Rectangle tooltipFrameRect = new Rectangle(lines.Max(t => t.Frame.Width), lines.Count() * defaultFontSize);
-            Rectangle tooltipRect = tooltipFrameRect.ScaledBy(0.4f / defaultFontSize);
-            tooltipContainer = new Frame(tooltipRect.TranslatedTo(-tooltipRect.CenterX + Bounds.CenterX, 1.2f));
-            tooltipContainer.Bounds = tooltipFrameRect.TranslatedBy(-3, -3).ResizedBy(6, 6);
-
-            int i = 0;
-            foreach (Text text in lines.Reverse())
-            {
-                Label tooltipLabel = new Label(text);
-                tooltipLabel.Frame = tooltipLabel.Frame.TranslatedBy(0, tooltipLabel.Frame.Height * i);
-                tooltipContainer.Children.Add(tooltipLabel);
-                i++;
-            }
         }
         #endregion
     }

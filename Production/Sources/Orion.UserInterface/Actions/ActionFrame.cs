@@ -11,14 +11,27 @@ namespace Orion.UserInterface.Actions
 {
     public class ActionFrame : Frame
     {
+        #region Fields
         private Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
+        private TooltipFrame tooltipFrame;
+        #endregion
 
+        #region Constructors
         public ActionFrame(Rectangle frame)
             : base(frame)
         {
-            Bounds = new Rectangle(4, 4);
+            tooltipFrame = new TooltipFrame(new Vector2(0, Bounds.MaxY), Bounds.Width);
         }
+        #endregion
 
+        #region Properties
+        internal TooltipFrame TooltipFrame
+        {
+            get { return tooltipFrame; }
+        }
+        #endregion
+
+        #region Methods
         public void Pop()
         {
             actionProviders.Pop();
@@ -43,6 +56,17 @@ namespace Orion.UserInterface.Actions
             ResetActions();
         }
 
+        internal void ShowTooltip()
+        {
+            if(!Children.Contains(tooltipFrame))
+                Children.Add(tooltipFrame);
+        }
+
+        internal void HideTooltip()
+        {
+            Children.Remove(tooltipFrame);
+        }
+
         private void ResetActions()
         {
             while (Children.Count > 0) Children[0].Dispose();
@@ -50,11 +74,12 @@ namespace Orion.UserInterface.Actions
             if (actionProviders.Count > 0)
             {
                 IActionProvider provider = actionProviders.Peek();
-                Rectangle templateSize = new Rectangle(0.8f, 0.8f);
+                Rectangle templateSize = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.2f, 0.2f));
+                Vector2 padding = new Vector2(Bounds.Width * 0.0375f, Bounds.Height * 0.0375f);
 
                 for (int y = 3; y >= 0; y--)
                 {
-                    Vector2 origin = new Vector2(0.1f, 0.1f + y);
+                    Vector2 origin = new Vector2(padding.X, padding.Y + (templateSize.Height + padding.Y) * y);
                     for (int x = 0; x < 4; x++)
                     {
                         ActionButton button = provider.GetButtonAt(x, y);
@@ -63,10 +88,11 @@ namespace Orion.UserInterface.Actions
                             button.Frame = templateSize.TranslatedBy(origin);
                             Children.Add(button);
                         }
-                        origin.X += 1;
+                        origin.X += padding.X + templateSize.Width;
                     }
                 }
             }
         }
+        #endregion
     }
 }

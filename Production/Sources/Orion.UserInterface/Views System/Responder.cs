@@ -76,7 +76,15 @@ namespace Orion.UserInterface
             bool eventCanSink = true;
             foreach (Responder child in Enumerable.Reverse(Children))
             {
-                if (child.Frame.ContainsPoint(args.Position))
+                if (!child.Frame.ContainsPoint(args.Position))
+                {
+                    if (child.IsMouseOver)
+                    {
+                        child.PropagateMouseEvent(MouseEventType.MouseExited, args);
+                        child.MousePosition = null;
+                    }
+                }
+                else
                 {
                     if (eventCanSink)
                     {
@@ -87,11 +95,6 @@ namespace Orion.UserInterface
                         child.MousePosition = args.Position;
                         eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
-                }
-                else if (child.IsMouseOver)
-                {
-                    child.PropagateMouseEvent(MouseEventType.MouseExited, args);
-                    child.MousePosition = null;
                 }
             }
 

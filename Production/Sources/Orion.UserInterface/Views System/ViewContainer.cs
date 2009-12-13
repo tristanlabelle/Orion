@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Orion.Geometry;
@@ -194,6 +195,7 @@ namespace Orion.UserInterface
         /// </summary>
         public void Dispose()
         {
+            Debug.WriteLine("{0} is being disposed", this.ToString());
             EnsureNotDisposed();
 
             try

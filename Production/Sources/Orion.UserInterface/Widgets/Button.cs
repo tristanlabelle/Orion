@@ -102,8 +102,8 @@ namespace Orion.UserInterface.Widgets
         protected override bool OnMouseUp(MouseEventArgs args)
         {
             if (enabled) caption.Color = Color.Cyan;
-            OnPress();
             base.OnMouseUp(args);
+            OnPress();
             return false;
         }
 

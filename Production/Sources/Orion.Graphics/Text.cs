@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using Rectangle = Orion.Geometry.Rectangle;
-
+using OpenTK.Math;
 using OpenTK.Graphics;
 
 namespace Orion.Graphics
@@ -43,6 +43,24 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
+        public float HeightForConstrainedWidth(float width)
+        {
+            RectangleF constraint = new RectangleF(0, 0, width, float.MaxValue);
+            return MeasureConstrained(constraint).Height;
+        }
+
+        public float WidthForConstrainedHeight(float height)
+        {
+            RectangleF constraint = new RectangleF(0, 0, float.MaxValue, height);
+            return MeasureConstrained(constraint).Width;
+        }
+        
+        private Rectangle MeasureConstrained(RectangleF constraint)
+        {
+            RectangleF extents = defaultTextPrinter.Measure(Value, Font, constraint).BoundingBox;
+            return new Rectangle(extents.X, 0, extents.Width, extents.Height);
+        }
+
         #region Object Model
         public override string ToString()
         {

@@ -12,35 +12,28 @@ namespace Orion.GameLogic.Technologies
     public sealed class TechnologyRequirements
     {
         #region Fields
-        private readonly ReadOnlyCollection<Technology> technologies;
         private readonly int aladdiumCost;
         private readonly int alageneCost;
+        private readonly ReadOnlyCollection<Technology> technologies;
         #endregion
 
         #region Constructors
-        public TechnologyRequirements(IEnumerable<Technology> technologies, int aladdiumCost, int alageneCost)
+        public TechnologyRequirements(int aladdiumCost, int alageneCost, IEnumerable<Technology> technologies)
         {
-            Argument.EnsureNotNull(technologies, "technologies");
             Argument.EnsurePositive(aladdiumCost, "aladdiumCost");
             Argument.EnsurePositive(alageneCost, "alageneCost");
+            Argument.EnsureNotNull(technologies, "technologies");
 
-            this.technologies = technologies.Distinct().ToList().AsReadOnly();
-            
-            //Argument.EnsurePositive(this.technologies.Count, "technologies.Count");
             this.aladdiumCost = aladdiumCost;
             this.alageneCost = alageneCost;
+            this.technologies = technologies.Distinct().ToList().AsReadOnly();
         }
+
+        public TechnologyRequirements(int aladdiumCost, int alageneCost, params Technology[] technologies)
+            : this(aladdiumCost, alageneCost, (IEnumerable<Technology>)technologies) { }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the sequence of <see cref="Technology">technologies</see> required.
-        /// </summary>
-        public IEnumerable<Technology> Technologies
-        {
-            get { return technologies; }
-        }
-
         /// <summary>
         /// Gets the number of aladdium resource points required.
         /// </summary>
@@ -56,12 +49,20 @@ namespace Orion.GameLogic.Technologies
         {
             get { return alageneCost; }
         }
+        /// <summary>
+        /// Gets the sequence of <see cref="Technology">technologies</see> required.
+        /// </summary>
+        public IEnumerable<Technology> Technologies
+        {
+            get { return technologies; }
+        }
+
         #endregion
 
         #region Methods
         public override string ToString()
         {
-            return "{0} alladium, {1} alagene".FormatInvariant(aladdiumCost, alageneCost);
+            return "{0} aladdium, {1} alagene".FormatInvariant(aladdiumCost, alageneCost);
         }
         #endregion
     }

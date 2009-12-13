@@ -56,6 +56,14 @@ namespace Orion.GameLogic.Skills
             skills.Add(newSkill);
         }
 
+        public void Add(IEnumerable<Skill> newSkills)
+        {
+            Argument.EnsureNotNull(newSkills, "newSkills");
+
+            foreach (Skill newSkill in newSkills)
+                Add(newSkill);
+        }
+
         public TSkill Find<TSkill>() where TSkill : Skill
         {
             return skills.OfType<TSkill>().FirstOrDefault();

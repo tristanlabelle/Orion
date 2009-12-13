@@ -338,7 +338,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 150,
                 AlageneCost = 50
             };
-            builder.Skills.Add(new ResearchSkill(technology => technology.Name == "Increased Health 1"));
+            builder.Skills.Add(new ResearchSkill(technology => true));
             Register(builder);
         }
 

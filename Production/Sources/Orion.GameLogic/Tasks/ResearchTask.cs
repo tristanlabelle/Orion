@@ -47,22 +47,6 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (timeElapsed == 0)
-            {
-                bool hasEnoughResources = Unit.Faction.AladdiumAmount >= technology.Requirements.AladdiumCost
-                    && Unit.Faction.AlageneAmount >= technology.Requirements.AlageneCost;
-                if (!hasEnoughResources)
-                {
-                    string warning = "Not enough resources to research {0}.".FormatInvariant(technology.Name);
-                    Faction.RaiseWarning(warning);
-                    return;
-                }
-
-                Unit.Faction.AladdiumAmount -= technology.Requirements.AladdiumCost;
-                Unit.Faction.AlageneAmount -= technology.Requirements.AlageneCost;
-                timeElapsed = float.Epsilon;
-            }
-
             timeElapsed += step.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
                 Unit.Faction.ResearchTechnology(technology);

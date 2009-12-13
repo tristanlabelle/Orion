@@ -62,9 +62,8 @@ namespace Orion.Commandment.Commands
             }
             else
             {
-                Debug.WriteLine("Not enough resources");
+                faction.RaiseWarning("Not enough resources");
             }
-
         }
 
         public override string ToString()

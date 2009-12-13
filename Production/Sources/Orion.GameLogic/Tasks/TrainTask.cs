@@ -111,7 +111,8 @@ namespace Orion.GameLogic.Tasks
             spawnRegion = Region.Intersection(spawnRegion, (Region)World.Size).Value;
 
             var potentialSpawnPoints = spawnRegion.Points
-                .Where(point => Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer));
+                .Where(point => Unit.World.IsWithinBounds(point)
+                    && Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer));
 
             if (Unit.HasRallyPoint)
             {

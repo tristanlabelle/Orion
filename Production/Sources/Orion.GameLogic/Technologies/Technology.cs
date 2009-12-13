@@ -21,28 +21,39 @@ namespace Orion.GameLogic.Technologies
     public sealed class Technology
     {
         #region Fields
-        private readonly string name;
         private readonly Handle handle;
+        private readonly string name;
         private readonly TechnologyRequirements requirements;
         private readonly ReadOnlyCollection<TechnologyEffect> effects;
         #endregion
 
         #region Constructors
-        public Technology(string name, TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects, Handle handle)
+        public Technology(Handle handle, string name,
+            TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
             Argument.EnsureNotNull(requirements, "requirements");
             Argument.EnsureNotNull(effects, "effects");
 
+            this.handle = handle;
             this.name = name;
             this.requirements = requirements;
             this.effects = effects.ToList().AsReadOnly();
             Argument.EnsureStrictlyPositive(this.effects.Count, "effects.Count");
-            this.handle = handle;
         }
+
+        public Technology(Handle handle, string name,
+            TechnologyRequirements requirements, params TechnologyEffect[] effects)
+            : this(handle, name, requirements, (IEnumerable<TechnologyEffect>)effects)
+        { }
         #endregion
 
         #region Properties
+        public Handle Handle
+        {
+            get { return handle; }
+        }
+
         /// <summary>
         /// Gets the name of this <see cref="Technology"/>.
         /// </summary>
@@ -60,6 +71,21 @@ namespace Orion.GameLogic.Technologies
             get { return requirements; }
         }
 
+        public int AladdiumCost
+        {
+            get { return requirements.AladdiumCost; }
+        }
+
+        public int AlageneCost
+        {
+            get { return requirements.AlageneCost; }
+        }
+
+        public IEnumerable<Technology> RequiredTechnologies
+        {
+            get { return requirements.Technologies; }
+        }
+
         /// <summary>
         /// Gets the sequence of this <see cref="Technology"/>'s effects.
         /// </summary>
@@ -67,14 +93,16 @@ namespace Orion.GameLogic.Technologies
         {
             get { return effects; }
         }
-
-        public Handle Handle
-        {
-            get { return handle; }
-        }
         #endregion
 
         #region Methods
+        public int GetEffect(UnitType unitType, UnitStat stat)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            return effects.Where(effect => effect.AppliesTo(unitType) && effect.Stat == stat)
+                .Sum(effect => effect.Value);
+        }
+
         public override string ToString()
         {
             return name;

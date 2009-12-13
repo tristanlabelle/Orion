@@ -9,30 +9,25 @@ namespace Orion.GameLogic.Technologies
     public struct TechnologyEffect
     {
         #region Fields
-        private readonly string tag;
+        private readonly Func<UnitType, bool> predicate;
         private readonly UnitStat stat;
         private readonly int value;
         #endregion
 
         #region Constructors
-        public TechnologyEffect(string tag, UnitStat stat, int value)
+        public TechnologyEffect(Func<UnitType, bool> predicate, UnitStat stat, int value)
         {
-            Argument.EnsureNotNull(tag, "tag");
+            Argument.EnsureNotNull(predicate, "predicate");
             Argument.EnsureDefined(stat, "stat");
             Argument.EnsureNotEqual(value, 0, "value");
 
-            this.tag = tag;
+            this.predicate = predicate;
             this.stat = stat;
             this.value = value;
         }
         #endregion
 
         #region Properties
-        public string Tag
-        {
-            get { return tag; }
-        }
-
         public UnitStat Stat
         {
             get { return stat; }
@@ -45,9 +40,15 @@ namespace Orion.GameLogic.Technologies
         #endregion
 
         #region Methods
+        public bool AppliesTo(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            return predicate(unitType);
+        }
+
         public override string ToString()
         {
-            return "+{0} {1} for {2}".FormatInvariant(value, stat, tag);
+            return "+{0} {1}".FormatInvariant(value, stat);
         }
         #endregion
     }

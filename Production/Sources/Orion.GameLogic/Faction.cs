@@ -253,7 +253,7 @@ namespace Orion.GameLogic
         public int GetStat(UnitType type, UnitStat stat)
         {
             Argument.EnsureNotNull(type, "type");
-            return type.GetBaseStat(stat) + GetTechnologyBonuses(stat);
+            return type.GetBaseStat(stat) + GetTechnologyBonuses(type, stat);
         }
 
         /// <summary>
@@ -261,12 +261,9 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="stat">The stat type.</param>
         /// <returns>The sum of the bonuses offered by technologies</returns>
-        public int GetTechnologyBonuses(UnitStat stat)
+        public int GetTechnologyBonuses(UnitType type, UnitStat stat)
         {
-            return technologies
-                .SelectMany(tech => tech.Effects)
-                .Where(effect => effect.Stat == stat)
-                .Sum(effect => effect.Value);
+            return technologies.Sum(tech => tech.GetEffect(type, stat));
         }
 
         public bool IsResearchable(Technology technology)

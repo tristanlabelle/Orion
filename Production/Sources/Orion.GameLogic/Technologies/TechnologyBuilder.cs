@@ -56,6 +56,12 @@ namespace Orion.GameLogic.Technologies
         public ICollection<TechnologyEffect> Effects
         {
             get { return effects; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Effect");
+                effects.Clear();
+                effects.UnionWith(value);
+            }
         }
         #endregion
 
@@ -71,7 +77,7 @@ namespace Orion.GameLogic.Technologies
 
         public TechnologyRequirements BuildRequirements()
         {
-            return new TechnologyRequirements(requiredTechnologies, aladdiumCost, alageneCost);
+            return new TechnologyRequirements(aladdiumCost, alageneCost, requiredTechnologies);
         }
 
         /// <summary>
@@ -84,7 +90,7 @@ namespace Orion.GameLogic.Technologies
             if (name == null) throw new InvalidOperationException("A name must be set before the technology can be built.");
 
             TechnologyRequirements requirements = BuildRequirements();
-            return new Technology(name, requirements, effects, handle);
+            return new Technology(handle, name, requirements, effects);
         }
         #endregion
     }

@@ -136,6 +136,11 @@ namespace Orion.GameLogic
         #region Pathfinding
         public bool IsFree(Point point, CollisionLayer layer)
         {
+            if (!IsWithinBounds(point))
+            {
+                Debug.Fail("Testing if an out-of-bounds point is free.");
+                return false;
+            }
             if (layer == CollisionLayer.Ground && !terrain.IsWalkable(point)) return false;
             return entities.GetEntityAt(point, layer) == null;
         }

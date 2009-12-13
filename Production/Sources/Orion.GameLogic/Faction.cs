@@ -105,6 +105,7 @@ namespace Orion.GameLogic
 
         public void RaiseWarning(string message)
         {
+            Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
             var handler = Warning;
             if (handler != null) handler(this, message);
         }

@@ -96,9 +96,11 @@ namespace Orion.Commandment
         {
             foreach (Unit unit in units)
             {
-                if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
+                Point unitPosition = (Point)unit.Position;
+                if (faction.GetTileVisibility(unitPosition) == TileVisibility.Visible)
                 {
-                    selectedUnits.Add(unit);
+                    if (!selectedUnits.Contains(unit))
+                        selectedUnits.Add(unit);
                 }
             }
             UpdateSelection();

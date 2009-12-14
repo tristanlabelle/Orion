@@ -4,6 +4,7 @@ using System.Linq;
 
 using OpenTK.Math;
 using Orion.Geometry;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Pathfinding
 {
@@ -19,6 +20,7 @@ namespace Orion.GameLogic.Pathfinding
         private readonly List<Point> points = new List<Point>();
         private Func<Point, float> destinationDistanceEvaluator;
         private Func<Point, bool> isWalkable;
+        private PathNode nodeNearestToDestination;
         private int maxNodesToVisit;
         #endregion
 
@@ -62,7 +64,8 @@ namespace Orion.GameLogic.Pathfinding
             bool complete = true;
             if (destinationNode == null)
             {
-                destinationNode = FindClosedNodeNearestToDestination();
+                Debug.Assert(nodeNearestToDestination != null);
+                destinationNode = nodeNearestToDestination;
                 complete = false;
             }
 
@@ -121,11 +124,8 @@ namespace Orion.GameLogic.Pathfinding
             closedNodes.Clear();
 
             points.Clear();
-        }
 
-        private PathNode FindClosedNodeNearestToDestination()
-        {
-            return closedNodes.Values.WithMinOrDefault(node => node.DistanceToDestination);
+            nodeNearestToDestination = null;
         }
 
         private void FindPathPointsTo(PathNode destinationNode)
@@ -145,6 +145,13 @@ namespace Orion.GameLogic.Pathfinding
         {
             PathNode node = nodePool.Get();
             node.Reset(parentNode, (Point16)position, costFromSource, distanceToDestination);
+
+            if (nodeNearestToDestination == null
+                || distanceToDestination < nodeNearestToDestination.DistanceToDestination)
+            {
+                nodeNearestToDestination = node;
+            }
+
             return node;
         }
 

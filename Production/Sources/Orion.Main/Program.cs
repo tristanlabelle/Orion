@@ -227,7 +227,7 @@ namespace Orion.Main
         }
         #endregion
 
-        #region Static
+        #region Main
         /// <summary>
         /// Main entry point for the program.
         /// </summary>

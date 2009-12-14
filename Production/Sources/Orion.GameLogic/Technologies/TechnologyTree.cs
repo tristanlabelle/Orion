@@ -28,9 +28,9 @@ namespace Orion.GameLogic.Technologies
             Technology increasedSchtroumpfSpeed = new TechnologyBuilder
             {
                 Name = "Increased Schtroumpf Speed",
-                AladdiumCost = 100,
-                AlageneCost = 100,
-                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MovementSpeed, 4) }
+                AladdiumCost = 200,
+                AlageneCost = 50,
+                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MovementSpeed, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(increasedSchtroumpfSpeed);
@@ -38,9 +38,9 @@ namespace Orion.GameLogic.Technologies
             Technology importJeanMarc = new TechnologyBuilder
             {
                 Name = "Import Jean-Marc",
-                AladdiumCost = 500,
+                AladdiumCost = 250,
                 AlageneCost = 200,
-                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Jean-Marc", UnitStat.AttackPower, 4) }
+                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Jean-Marc", UnitStat.AttackPower, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(importJeanMarc);

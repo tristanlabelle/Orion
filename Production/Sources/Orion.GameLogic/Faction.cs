@@ -269,8 +269,8 @@ namespace Orion.GameLogic
         public bool IsResearchable(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
-            return technology.Requirements.Technologies == null || technology.Requirements.Technologies
-                .All(tech => technologies.Contains(tech));
+            return !HasResearched(technology)
+                && technology.RequiredTechnologies.All(tech => technologies.Contains(tech));
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace Orion.GameLogic
         public void ResearchTechnology(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
-            if (technologies.Contains(technology)) return;
+            if (HasResearched(technology)) return;
 
             Technology firstMissingTechnology = technology.Requirements.Technologies
                 .FirstOrDefault(t => !technologies.Contains(technology));
@@ -297,6 +297,11 @@ namespace Orion.GameLogic
 
             technologies.Add(technology);
             RaiseTechnologyResearched(technology);
+        }
+
+        public bool HasResearched(Technology technology)
+        {
+            return technologies.Contains(technology);
         }
         #endregion
 

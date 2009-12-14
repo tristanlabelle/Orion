@@ -83,10 +83,10 @@ namespace Orion.GameLogic.Tasks
         public bool TryAttack()
         {
             Unit target = Unit.World.Entities
-                .InArea(Unit.LineOfSight)
+                .Intersecting(Unit.LineOfSight)
                 .OfType<Unit>()
-                .FirstOrDefault(other =>
-                    Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
+                .FirstOrDefault(other => Unit.IsInLineOfSight(other)
+                    && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
 
             if (target != null) attack = new AttackTask(Unit, target);
             return target != null;

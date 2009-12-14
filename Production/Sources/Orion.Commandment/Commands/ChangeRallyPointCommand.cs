@@ -54,7 +54,7 @@ namespace Orion.Commandment.Commands
             foreach (Handle buildingHandle in buildingHandles)
             {
                 Unit building = (Unit)match.World.Entities.FromHandle(buildingHandle);
-                building.RallyPoint = position;
+                if (!building.IsUnderConstruction) building.RallyPoint = position;
             }
         }
 

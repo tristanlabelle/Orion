@@ -526,7 +526,8 @@ namespace Orion.GameLogic
 
         private void UpdateBuildingMemory(Region region)
         {
-            var visibleOtherFactionBuildingsInRegion = world.Entities.InArea(region.ToRectangle())
+            var visibleOtherFactionBuildingsInRegion = world.Entities
+                .Intersecting(region.ToRectangle())
                 .OfType<Unit>()
                 .Where(unit => unit.IsBuilding && unit.Faction != this && CanSee(unit))
                 .Select(building => new RememberedBuilding(building));

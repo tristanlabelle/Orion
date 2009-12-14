@@ -3,6 +3,7 @@ using System.Linq;
 
 using OpenTK.Math;
 using System.Diagnostics;
+using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -23,16 +24,13 @@ namespace Orion.GameLogic.Tasks
         private const float depositingDuration = 0;
 
         private readonly ResourceNode node;
-        private readonly GenericEventHandler<Entity> nodeDepletedEventHandler;
-        private readonly GenericEventHandler<Entity> depotDestroyedEventHandler;
         private int amountCarrying;
         private float amountAccumulator;
         private float secondsGivingResource;
         private MoveTask move;
         private Unit depot;
         private Mode mode = Mode.Extracting;
-        private bool hasEnded;
-        private bool nodeIsDead = false;
+        private bool depotAvailable = true;
         #endregion
 
         #region Constructors
@@ -44,11 +42,7 @@ namespace Orion.GameLogic.Tasks
             Argument.EnsureNotNull(node, "node");
 
             this.node = node;
-            this.depotDestroyedEventHandler = OnDepotDestroyed;
-            this.nodeDepletedEventHandler = OnNodeDepleted;
             this.move = MoveTask.ToNearRegion(harvester, node.GridRegion);
-            node.Died += nodeDepletedEventHandler;
-            depot = FindClosestDepot();
         }
         #endregion
 
@@ -65,28 +59,22 @@ namespace Orion.GameLogic.Tasks
 
         public override bool HasEnded
         {
-            get { return hasEnded; }
+            get
+            {
+                return (move.HasEnded && !move.HasReachedDestination)
+                    || !node.IsAlive
+                    || !node.IsHarvestableByFaction(Unit.Faction)
+                    || !depotAvailable;
+            }
         }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!node.IsHarvestableByFaction(Unit.Faction))
-            {
-                hasEnded = true;
-                return;
-            }
-
             if (!move.HasEnded)
             {
                 move.Update(step);
-                return;
-            }
-
-            if (!move.HasReachedDestination)
-            {
-                hasEnded = true;
                 return;
             }
 
@@ -96,12 +84,6 @@ namespace Orion.GameLogic.Tasks
                 UpdateDelivering(step);
         }
 
-        public override void Dispose()
-        {
-            if (node != null) node.Died -= nodeDepletedEventHandler;
-            if (depot != null) depot.Died -= depotDestroyedEventHandler;
-        }
-
         private void UpdateExtracting(SimulationStep step)
         {
             Unit.LookAt(node.Center);
@@ -109,12 +91,11 @@ namespace Orion.GameLogic.Tasks
             float extractingSpeed = Unit.GetStat(UnitStat.ExtractingSpeed);
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
-            int maxCarryingAmount = Unit.GetSkill<Skills.HarvestSkill>().MaxCarryingAmount;
+            int maxCarryingAmount = Unit.GetSkill<HarvestSkill>().MaxCarryingAmount;
             while (amountAccumulator >= 1)
             {
-                if (nodeIsDead)
+                if (!node.IsAlive)
                 {
-                    depot.Died += depotDestroyedEventHandler;
                     move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                     mode = Mode.Delivering;
                     return;
@@ -129,20 +110,17 @@ namespace Orion.GameLogic.Tasks
 
                 if (amountCarrying >= maxCarryingAmount)
                 {
-                    if (depot != null)
-                        depot.Died -= depotDestroyedEventHandler;
-
                     depot = FindClosestDepot();
                     if (depot == null)
                     {
-                        hasEnded = true;
+                        depotAvailable = false;
                     }
                     else
                     {
-                        depot.Died += depotDestroyedEventHandler;
                         move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                         mode = Mode.Delivering;
                     }
+
                     return;
                 }
             }
@@ -150,6 +128,14 @@ namespace Orion.GameLogic.Tasks
 
         private void UpdateDelivering(SimulationStep step)
         {
+            if (!depot.IsAlive)
+            {
+                depot = FindClosestDepot();
+                if (depot == null) depotAvailable = false;
+                else move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                return;
+            }
+
             Unit.LookAt(depot.Center);
 
             secondsGivingResource += step.TimeDeltaInSeconds;
@@ -163,11 +149,7 @@ namespace Orion.GameLogic.Tasks
                 Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
-            if (nodeIsDead)
-            {
-                hasEnded = true;
-                return;
-            }
+            if (!node.IsAlive) return;
 
             move = MoveTask.ToNearRegion(Unit, node.GridRegion);
             mode = Mode.Extracting;
@@ -176,37 +158,8 @@ namespace Orion.GameLogic.Tasks
         private Unit FindClosestDepot()
         {
             return Faction.Units
-                .Where(other => other.HasSkill<Skills.StoreResourcesSkill>())
+                .Where(other => !other.IsUnderConstruction && other.HasSkill<StoreResourcesSkill>())
                 .WithMinOrDefault(unit => Region.SquaredDistance(unit.GridRegion, node.GridRegion));
-        }
-
-        private void OnDepotDestroyed(Entity sender)
-        {
-            Debug.Assert(sender == depot);
-            depot.Died -= depotDestroyedEventHandler;
-            depot = null;
-
-            if (mode == Mode.Delivering)
-            {
-                depot = FindClosestDepot();
-                if (depot == null)
-                {
-                    hasEnded = true;
-                    return;
-                }
-                else
-                {
-                    depot.Died += depotDestroyedEventHandler;
-                    move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
-                }
-            }
-        }
-
-        private void OnNodeDepleted(Entity sender)
-        {
-            Debug.Assert(sender == node);
-            nodeIsDead = true;
-            node.Died -= nodeDepletedEventHandler;
         }
         #endregion
         #endregion

@@ -55,7 +55,7 @@ namespace Orion.GameLogic
             return IsWalkable(region);
         }
 
-        private bool IsWalkable(Region region)
+        public bool IsWalkable(Region region)
         {
             return region.Points.All(point => IsWalkable(point));
         }

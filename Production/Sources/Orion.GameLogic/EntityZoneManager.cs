@@ -72,14 +72,21 @@ namespace Orion.GameLogic
         {
             Vector2 zoneSize = ZoneSize;
 
-            int minX = Math.Max(0, (int)(rectangle.MinX / zoneSize.X));
-            int minY = Math.Max(0, (int)(rectangle.MinY / zoneSize.Y));
-            int maxX = Math.Min(ZoneCountX - 1, (int)Math.Ceiling(rectangle.MaxX / zoneSize.X));
-            int maxY = Math.Min(ZoneCountY - 1, (int)Math.Ceiling(rectangle.MaxY / zoneSize.Y));
+            int minX = Clamp((int)(rectangle.MinX / zoneSize.X), 0, ZoneCountX - 1);
+            int minY = Clamp((int)(rectangle.MinY / zoneSize.Y), 0, ZoneCountY - 1);
+            int maxX = Clamp((int)Math.Ceiling(rectangle.MaxX / zoneSize.X), 0, ZoneCountX - 1);
+            int maxY = Clamp((int)Math.Ceiling(rectangle.MaxY / zoneSize.Y), 0, ZoneCountY - 1);
 
             return Region.FromMinInclusiveMax(
                 new Point(minX, minY),
                 new Point(maxX, maxY));
+        }
+
+        private int Clamp(int value, int inclusiveMin, int inclusiveMax)
+        {
+            if (value < inclusiveMin) return inclusiveMin;
+            if (value > inclusiveMax) return inclusiveMax;
+            return value;
         }
 
         #region Queries
@@ -88,7 +95,7 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="area">The area in which to check.</param>
         /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
-        public IEnumerable<Entity> InArea(Rectangle area)
+        public IEnumerable<Entity> Intersecting(Rectangle area)
         {
             Region zoneRegion = GetZoneRegion(area);
             foreach (Point point in zoneRegion.Points)
@@ -100,6 +107,20 @@ namespace Orion.GameLogic
                     if (area.ContainsPoint(entity.Center))
                         yield return entity;
                 }
+            }
+        }
+
+        public IEnumerable<Entity> Intersecting(Vector2 point)
+        {
+            Vector2 zoneSize = ZoneSize;
+            int zoneX = Clamp((int)(point.X / zoneSize.X), 0, ZoneCountX - 1);
+            int zoneY = Clamp((int)(point.Y / zoneSize.Y), 0, ZoneCountY - 1);
+            PooledList<Entity> zone = zones[zoneX, zoneY];
+            for (int i = 0; i < zone.Count; ++i)
+            {
+                Entity entity = zone[i];
+                if (entity.BoundingRectangle.ContainsPoint(point))
+                    yield return entity;
             }
         }
         #endregion

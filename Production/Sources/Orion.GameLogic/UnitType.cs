@@ -51,7 +51,7 @@ namespace Orion.GameLogic
             this.meleeArmor = builder.MeleeArmor;
             this.rangedArmor = builder.RangedArmor;
 
-            var attackSkill = GetSkill<Skills.AttackSkill>();
+            var attackSkill = GetSkill<AttackSkill>();
             Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
         }

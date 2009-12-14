@@ -322,14 +322,14 @@ namespace Orion.GameLogic
         /// <summary>
         /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
         /// </summary>
-        /// <param name="other">The <see cref="Unit"/> to be tested.</param>
+        /// <param name="other">The <see cref="Entity"/> to be tested.</param>
         /// <returns>
         /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
         /// </returns>
-        public bool IsInLineOfSight(Unit other)
+        public bool IsInLineOfSight(Entity other)
         {
             Argument.EnsureNotNull(other, "other");
-            return LineOfSight.ContainsPoint(other.Center);
+            return Intersection.Test(LineOfSight, other.BoundingRectangle);
         }
 
         public bool HasWithinAttackRange(Unit other)
@@ -484,9 +484,11 @@ namespace Orion.GameLogic
 
         private bool TryAttackNearbyUnit()
         {
-            IEnumerable<Unit> attackableUnits = World.Entities.InArea(LineOfSight)
+            IEnumerable<Unit> attackableUnits = World.Entities
+                .Intersecting(LineOfSight)
                 .OfType<Unit>()
-                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy);
+                .Where(unit => IsInLineOfSight(unit)
+                    && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy);
 
             if(!IsAirborne && GetStat(UnitStat.AttackRange) == 0)
                 attackableUnits = attackableUnits.Where(u => !u.IsAirborne);
@@ -504,11 +506,14 @@ namespace Orion.GameLogic
         private bool TryHealNearbyUnit()
         {
             Unit unitToHeal = World.Entities
-                           .InArea(LineOfSight)
-                           .OfType<Unit>()
-                           .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
-                               && unit != this && unit.damage > 0 && !unit.IsBuilding)
-                           .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+               .Intersecting(LineOfSight)
+               .OfType<Unit>()
+               .Where(unit => IsInLineOfSight(unit)
+                   && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
+                   && unit != this
+                   && unit.Damage > 0
+                   && !unit.IsBuilding)
+               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToHeal == null) return false;
 

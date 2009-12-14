@@ -14,9 +14,9 @@ namespace Orion.UserInterface.Actions.UserCommands
         public override void OnClick(Vector2 location)
         {
             ResourceNode resourceNode = World.Entities
+                .Intersecting(location)
                 .OfType<ResourceNode>()
-                .FirstOrDefault(node => node.BoundingRectangle.ContainsPoint(location)
-                    && node.IsHarvestableByFaction(LocalFaction));
+                .FirstOrDefault(node => node.IsHarvestableByFaction(LocalFaction));
             if (resourceNode == null) return;
 
             InputManager.LaunchHarvest(resourceNode);

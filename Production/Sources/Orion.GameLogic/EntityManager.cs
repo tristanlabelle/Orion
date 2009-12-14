@@ -379,24 +379,29 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Gets the <see cref="Entity"/>s which are in a given rectangular area.
+        /// Gets the <see cref="Entity"/>s which intersect a rectangular area.
         /// </summary>
         /// <param name="area">The area in which to check.</param>
-        /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
-        public IEnumerable<Entity> InArea(Rectangle area)
+        /// <returns>A sequence of <see cref="Entity"/>s intersecting that area.</returns>
+        public IEnumerable<Entity> Intersecting(Rectangle area)
         {
-            return zoneManager.InArea(area);
+            return zoneManager.Intersecting(area);
         }
 
         /// <summary>
-        /// Gets the <see cref="Entity"/>s which are in a given circular area.
+        /// Gets the <see cref="Entity"/>s which intersect a given circular area.
         /// </summary>
         /// <param name="area">The area in which to check.</param>
-        /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
-        public IEnumerable<Entity> InArea(Circle area)
+        /// <returns>A sequence of <see cref="Entity"/>s intersecting that area.</returns>
+        public IEnumerable<Entity> Intersecting(Circle area)
         {
-            return zoneManager.InArea(area.BoundingRectangle)
-                .Where(entity => area.ContainsPoint(entity.Center));
+            return zoneManager.Intersecting(area.BoundingRectangle)
+                .Where(entity => Intersection.Test(area, entity.BoundingRectangle));
+        }
+
+        public IEnumerable<Entity> Intersecting(Vector2 location)
+        {
+            return zoneManager.Intersecting(location);
         }
         #endregion
         #endregion

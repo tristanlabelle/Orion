@@ -266,7 +266,16 @@ namespace Orion.Commandment
                     random.Next(world.Size.Height - size.Height));
 
                 Region region = new Region(location, size);
-                if (world.IsFree(region, CollisionLayer.Ground)) return location;
+
+                bool isWalkable = world.Terrain.IsWalkable(region);
+                if (!isWalkable) continue;
+
+                bool isFreeOfEntities = world.Entities
+                    .Intersecting(region.ToRectangle())
+                    .None(entity => Region.Intersects(entity.GridRegion, region));
+                if (!isFreeOfEntities) continue;
+
+                return location;
             }
         }
 

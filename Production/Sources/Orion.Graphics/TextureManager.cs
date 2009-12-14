@@ -84,7 +84,8 @@ namespace Orion.Graphics
         public void Dispose()
         {
             foreach (Texture texture in textures.Values)
-                texture.Dispose();
+                if (texture != null)
+                    texture.Dispose();
             textures.Clear();
         }
 

@@ -458,7 +458,10 @@ namespace Orion.GameLogic
                 }
 
                 transportedUnits.Pop();
-                transportedUnit.SetPosition(location.Value);
+                // HACK: Change the position directly instead of using SetPosition
+                // because we don't want to raise the Moved event, EntityManager
+                // doesn't like that.
+                transportedUnit.position = location.Value;
                 World.Entities.Add(transportedUnit);
             }
         }

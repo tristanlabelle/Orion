@@ -146,6 +146,8 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, textureManager));
             enablers.Add(new HealEnabler(userInputManager, actions, textureManager));
             enablers.Add(new ResearchEnabler(userInputManager, actions, textureManager));
+            // Purposefully disabled as transporting causes a few problems.
+            //enablers.Add(new TransportEnabler(userInputManager, actions, textureManager));
 
             this.workerType = World.UnitTypes.FromName("Schtroumpf");
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));

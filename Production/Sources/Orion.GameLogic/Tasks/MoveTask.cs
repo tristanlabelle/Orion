@@ -153,7 +153,6 @@ namespace Orion.GameLogic.Tasks
 
         private bool IsGroundPathable(Point point)
         {
-            if (!Unit.World.IsWithinBounds(point)) return false;
             if (Unit.Faction.GetTileVisibility(point) == TileVisibility.Undiscovered) return true;
             return Unit.World.IsFree(point, Unit.CollisionLayer);
         }

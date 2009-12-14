@@ -1,25 +1,34 @@
 ﻿using System;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace Orion.GameLogic.Pathfinding
 {
-    public sealed class PathNode
+    [ImmutableObject(true)]
+    [StructLayout(LayoutKind.Sequential, Size = 4 * 3)]
+    public struct PathNode
     {
         #region Fields
-        private PathNode source;
-        private Point16 point;
-        private float costFromSource;
-        private float distanceToDestination;
+        private readonly int parentNodeIndex;
+        private readonly float costFromSource;
+        private readonly float distanceToDestination;
+        #endregion
+
+        #region Constructors
+        public PathNode(int parentNodeIndex,
+            float costFromSource, float distanceToDestination)
+        {
+            this.parentNodeIndex = parentNodeIndex;
+            this.costFromSource = costFromSource;
+            this.distanceToDestination = distanceToDestination;
+        }
         #endregion
 
         #region Properties
-        public PathNode Source
+        public int ParentNodeIndex
         {
-            get { return source; }
-        }
-
-        public Point16 Point
-        {
-            get { return point; }
+            get { return parentNodeIndex; }
         }
 
         public float CostFromSource
@@ -35,24 +44,6 @@ namespace Orion.GameLogic.Pathfinding
         public float TotalCost
         {
             get { return costFromSource + distanceToDestination; }
-        }
-        #endregion
-
-        #region Methods
-        internal void Reset(PathNode source, Point16 point,
-            float costFromSource, float distanceToDestination)
-        {
-            this.source = source;
-            this.point = point;
-            this.costFromSource = costFromSource;
-            this.distanceToDestination = distanceToDestination;
-        }
-
-        internal void ChangeSource(PathNode source, float costFromSource, float distanceToDestination)
-        {
-            this.source = source;
-            this.costFromSource = costFromSource;
-            this.distanceToDestination = distanceToDestination;
         }
         #endregion
     }

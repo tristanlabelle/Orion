@@ -5,6 +5,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Geometry;
 using System.Diagnostics;
+using System.Collections;
 
 namespace Orion.GameLogic.Pathfinding
 {
@@ -14,29 +15,30 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class Pathfinder
     {
         #region Fields
-        private readonly Pool<PathNode> nodePool = new Pool<PathNode>();
-        private readonly Dictionary<Point16, PathNode> openNodes = new Dictionary<Point16, PathNode>();
-        private readonly Dictionary<Point16, PathNode> closedNodes = new Dictionary<Point16, PathNode>();
+        private readonly Size gridSize;
+        private readonly PathNode[] nodes;
+        private readonly BitArray closedNodes;
+        private readonly HashSet<int> openNodeIndices = new HashSet<int>();
         private readonly List<Point> points = new List<Point>();
         private Func<Point, float> destinationDistanceEvaluator;
         private Func<Point, bool> isWalkable;
-        private PathNode nodeNearestToDestination;
+        private int startPointIndex;
+        private int nodeNearestToDestinationIndex;
         private int maxNodesToVisit;
+        private int visitedNodeCount;
         #endregion
 
-        #region Properties
-        public IEnumerable<PathNode> OpenNodes
+        #region Constructors
+        public Pathfinder(Size gridSize)
         {
-            get { return openNodes.Values; }
-        }
-
-        public IEnumerable<PathNode> ClosedNodes
-        {
-            get { return closedNodes.Values; }
+            this.gridSize = gridSize;
+            this.nodes = new PathNode[gridSize.Area];
+            this.closedNodes = new BitArray(gridSize.Area);
         }
         #endregion
 
         #region Methods
+        #region Public
         /// <summary>
         /// Finds a path to go from a source position to a destination position
         /// by taking into account tile solidity.
@@ -56,45 +58,22 @@ namespace Orion.GameLogic.Pathfinding
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
             this.isWalkable = isWalkable;
-            Point16 sourcePoint = RoundCoordinates(source);
+            this.startPointIndex = PointToIndex(source);
+            this.nodeNearestToDestinationIndex = startPointIndex;
             this.maxNodesToVisit = maxNodesToVisit;
 
-            PathNode destinationNode = FindPathNodes(sourcePoint);
+            int endPointIndex = FindPathNodes();
+            Point endPoint = IndexToPoint(endPointIndex);
+            PathNode endNode = nodes[endPointIndex];
 
-            bool complete = true;
-            if (destinationNode == null)
-            {
-                Debug.Assert(nodeNearestToDestination != null);
-                destinationNode = nodeNearestToDestination;
-                complete = false;
-            }
-
-            FindPathPointsTo(destinationNode);
-            CheaplySmoothPathPoints();
-            return new Path(points, complete);
+            FindPathPointsTo(endPoint);
+            SmoothPathPoints();
+            return new Path(points, IsDestination(endNode));
         }
+        #endregion
 
+        #region Smoothing
         private void SmoothPathPoints()
-        {
-            for (int i = 0; i < points.Count - 2; ++i)
-            {
-                Vector2 sourcePoint = points[i];
-                while (i != points.Count - 2)
-                {
-                    Vector2 destinationPoint = points[i + 2];
-
-                    // Extend the line segment by 1 in both directions to be sure
-                    // the shortcut is really walkable.
-                    Vector2 normalizedDelta = Vector2.NormalizeFast(destinationPoint - sourcePoint);
-                    LineSegment lineSegment = new LineSegment(sourcePoint - normalizedDelta, destinationPoint + normalizedDelta);
-                    if (!Bresenham.GetPoints(lineSegment, 3).All(isWalkable))
-                        break;
-                    points.RemoveAt(i + 1);
-                }
-            }
-        }
-
-        private void CheaplySmoothPathPoints()
         {
             for (int i = 0; i < points.Count - 2; ++i)
             {
@@ -111,78 +90,131 @@ namespace Orion.GameLogic.Pathfinding
                 }
             }
         }
+        #endregion
 
         private void CleanUp()
         {
-            // Return the path nodes to the internal pool of nodes.
-            foreach (PathNode node in openNodes.Values)
-                nodePool.Add(node);
-            openNodes.Clear();
-
-            foreach (PathNode node in closedNodes.Values)
-                nodePool.Add(node);
-            closedNodes.Clear();
+            closedNodes.SetAll(false);
+            openNodeIndices.Clear();
 
             points.Clear();
 
-            nodeNearestToDestination = null;
+            visitedNodeCount = 0;
+            nodeNearestToDestinationIndex = -1;
         }
 
-        private void FindPathPointsTo(PathNode destinationNode)
+        private void FindPathPointsTo(Point endPoint)
         {
-            PathNode currentNode = destinationNode;
-            while (currentNode != null)
+            int currentPointIndex = PointToIndex(endPoint);
+            while (true)
             {
-                points.Add(currentNode.Point);
-                currentNode = currentNode.Source;
+                Point currentPoint = IndexToPoint(currentPointIndex);
+                points.Add(currentPoint);
+
+                PathNode currentNode = nodes[currentPointIndex];
+
+                int parentNodeIndex = currentNode.ParentNodeIndex;
+                if (parentNodeIndex == -1) break;
+
+                currentPointIndex = parentNodeIndex;
             }
 
             points.Reverse();
         }
 
-        private PathNode GetPathNode(PathNode parentNode, Point position,
-            float costFromSource, float distanceToDestination)
+        #region Node queries
+        private int PointToIndex(Point point)
         {
-            PathNode node = nodePool.Get();
-            node.Reset(parentNode, (Point16)position, costFromSource, distanceToDestination);
-
-            if (nodeNearestToDestination == null
-                || distanceToDestination < nodeNearestToDestination.DistanceToDestination)
-            {
-                nodeNearestToDestination = node;
-            }
-
-            return node;
+            return point.Y * gridSize.Width + point.X;
         }
 
-        /// <summary>
-        /// Finds a path to the destination point, creating the needed nodes along the way.
-        /// </summary>
-        /// <returns>The destination node, if a path is found getting to it.</returns>
-        private PathNode FindPathNodes(Point16 sourcePoint)
+        private Point IndexToPoint(int index)
         {
-            float distanceToDestination = destinationDistanceEvaluator(sourcePoint);
-            PathNode sourceNode = GetPathNode(null, sourcePoint, 0, distanceToDestination);
-
-            PathNode currentNode = sourceNode;
-            while (currentNode.DistanceToDestination > 0.0001f)
-            {
-                closedNodes.Add(currentNode.Point, currentNode);
-                openNodes.Remove(currentNode.Point);
-                AddNearbyNodes(currentNode);
-
-                if (openNodes.Count == 0 || openNodes.Count + closedNodes.Count > maxNodesToVisit)
-                    return null;
-
-                currentNode = GetCheapestOpenNode();
-            }
-
-            return currentNode;
+            return new Point(index % gridSize.Width, index / gridSize.Width);
         }
 
-        private PathNode GetCheapestOpenNode()
+        private bool IsDestination(PathNode node)
         {
-            return openNodes.Values.WithMinOrDefault(node => node.TotalCost);
+            return node.DistanceToDestination < 0.001f;
+        }
+
+        private void Open(Point nodePoint, int parentNodeIndex, float costFromSource)
+        {
+            int nodeIndex = PointToIndex(nodePoint);
+
+            float distanceToDestination = destinationDistanceEvaluator(nodePoint);
+
+            PathNode node = new PathNode(parentNodeIndex, costFromSource, distanceToDestination);
+            nodes[nodeIndex] = node;
+            openNodeIndices.Add(nodeIndex);
+
+            if (nodeNearestToDestinationIndex == -1
+                || distanceToDestination < nodes[nodeNearestToDestinationIndex].DistanceToDestination)
+            {
+                nodeNearestToDestinationIndex = nodeIndex;
+            }
+
+            ++visitedNodeCount;
+        }
+
+        private void Close(int nodeIndex)
+        {
+            Debug.Assert(!closedNodes[nodeIndex]);
+            openNodeIndices.Remove(nodeIndex);
+            closedNodes[nodeIndex] = true;
+        }
+
+        private bool IsOpenable(Point point)
+        {
+            if (point.X < 0 || point.Y < 0 || point.X >= gridSize.Width || point.Y >= gridSize.Height)
+                return false;
+
+            int nodeIndex = PointToIndex(point);
+            return !closedNodes[nodeIndex] && isWalkable(point);
+        }
+        #endregion
+
+        private int FindPathNodes()
+        {
+            Point startPoint = IndexToPoint(startPointIndex);
+            Open(startPoint, -1, 0);
+            while (true)
+            {
+                int currentNodeIndex = GetCheapestOpenNodeIndex();
+                PathNode currentNode = nodes[currentNodeIndex];
+                if (IsDestination(currentNode)) return currentNodeIndex;
+
+                Close(currentNodeIndex);
+
+                Point currentNodePoint = IndexToPoint(currentNodeIndex);
+                AddNearbyNodes(currentNodePoint);
+
+                if (openNodeIndices.Count == 0 || visitedNodeCount >= maxNodesToVisit)
+                    return nodeNearestToDestinationIndex;
+            }
+        }
+
+        private int GetCheapestOpenNodeIndex()
+        {
+            using (var enumerator = openNodeIndices.GetEnumerator())
+            {
+                if (!enumerator.MoveNext()) throw new Exception("Expected at least one open node.");
+
+                int cheapestNodeIndex = enumerator.Current;
+                PathNode cheapestNode = nodes[cheapestNodeIndex];
+                while (enumerator.MoveNext())
+                {
+                    int nodeIndex = enumerator.Current;
+                    PathNode node = nodes[nodeIndex];
+                    if (node.TotalCost < cheapestNode.TotalCost)
+                    {
+                        cheapestNodeIndex = nodeIndex;
+                        cheapestNode = node;
+                    }
+                }
+
+                return cheapestNodeIndex;
+            }
         }
 
         private float GetDistance(Point a, Point b)
@@ -190,79 +222,73 @@ namespace Orion.GameLogic.Pathfinding
             return ((Vector2)a - (Vector2)b).LengthFast;
         }
 
-        private void AddNearbyNodes(PathNode currentNode)
+        #region Adding Nodes
+        private void AddNearbyNodes(Point currentNodePoint)
         {
-            AddDiagonalAdjacentNode(currentNode, -1, -1);
-            AddAdjacentNode(currentNode, 0, -1);
-            AddDiagonalAdjacentNode(currentNode, 1, -1);
-            AddAdjacentNode(currentNode, -1, 0);
-            AddAdjacentNode(currentNode, 1, 0);
-            AddDiagonalAdjacentNode(currentNode, -1, 1);
-            AddAdjacentNode(currentNode, 0, 1);
-            AddDiagonalAdjacentNode(currentNode, 1, 1);
+            AddDiagonalAdjacentNode(currentNodePoint, -1, -1);
+            AddAdjacentNode(currentNodePoint, 0, -1);
+            AddDiagonalAdjacentNode(currentNodePoint, 1, -1);
+            AddAdjacentNode(currentNodePoint, -1, 0);
+            AddAdjacentNode(currentNodePoint, 1, 0);
+            AddDiagonalAdjacentNode(currentNodePoint, -1, 1);
+            AddAdjacentNode(currentNodePoint, 0, 1);
+            AddDiagonalAdjacentNode(currentNodePoint, 1, 1);
         }
 
-        private void AddDiagonalAdjacentNode(PathNode currentNode, int offsetX, int offsetY)
+        private void AddDiagonalAdjacentNode(Point currentNodePoint, int offsetX, int offsetY)
         {
             // Disallow going from A to B in situations like (# is non-walkable):
             ///
             // #B
             // A#
-            if (!IsOpenable(new Point(currentNode.Point.X + offsetX, currentNode.Point.Y))
-                || !IsOpenable(new Point(currentNode.Point.X, currentNode.Point.Y + offsetY)))
+            if (!IsOpenable(new Point(currentNodePoint.X + offsetX, currentNodePoint.Y))
+                || !IsOpenable(new Point(currentNodePoint.X, currentNodePoint.Y + offsetY)))
                 return;
 
-            AddAdjacentNode(currentNode, offsetX, offsetY);
+            AddAdjacentNode(currentNodePoint, offsetX, offsetY);
         }
 
-        private void AddAdjacentNode(PathNode currentNode, int offsetX, int offsetY)
+        private void AddAdjacentNode(Point currentNodePoint, int offsetX, int offsetY)
         {
-            int x = currentNode.Point.X + offsetX;
-            int y = currentNode.Point.Y + offsetY;
-            Point nearNode = new Point(x, y);
-            AddNearbyNode(currentNode, nearNode);
+            int x = currentNodePoint.X + offsetX;
+            int y = currentNodePoint.Y + offsetY;
+            Point adjacentPoint = new Point(x, y);
+            AddAdjacentNode(currentNodePoint, adjacentPoint);
         }
 
-        private bool IsOpenable(Point nearbyPoint)
+        private void AddAdjacentNode(Point currentNodePoint, Point adjacentPoint)
         {
-            return !closedNodes.ContainsKey((Point16)nearbyPoint)
-                && isWalkable(nearbyPoint);
-        }
+            if (!IsOpenable(adjacentPoint)) return;
 
-        private void AddNearbyNode(PathNode currentNode, Point nearbyPoint)
-        {
-            if (!IsOpenable(nearbyPoint)) return;
+            int currentNodeIndex = PointToIndex(currentNodePoint);
+            PathNode currentNode = nodes[currentNodeIndex];
 
-            float movementCost = GetDistance(currentNode.Point, nearbyPoint);
+            float movementCost = GetDistance(currentNodePoint, adjacentPoint);
             float costFromSource = currentNode.CostFromSource + movementCost;
 
-            PathNode nearbyNode;
-            if (openNodes.TryGetValue((Point16)nearbyPoint, out nearbyNode))
+            int adjacentNodeIndex = PointToIndex(adjacentPoint);
+            if (openNodeIndices.Contains(adjacentNodeIndex))
             {
-                if (costFromSource < nearbyNode.CostFromSource)
+                PathNode adjacentNode = nodes[adjacentNodeIndex];
+                if (costFromSource < adjacentNode.CostFromSource)
                 {
-                    // If it is a better choice to pass through the current node, overwrite the parent and the move cost
-                    float estimatedCostToDestination = destinationDistanceEvaluator(nearbyPoint);
-                    nearbyNode.ChangeSource(currentNode, costFromSource, estimatedCostToDestination);
+                    // If it is a better choice to pass through the current node, overwrite the source and the move cost
+                    float distanceToDestination = destinationDistanceEvaluator(adjacentPoint);
+                    adjacentNode = new PathNode(currentNodeIndex, costFromSource, distanceToDestination);
+                    nodes[adjacentNodeIndex] = adjacentNode;
                 }
             }
             else
             {
                 // Add the node to the open list
-                float estimatedCostToDestination = destinationDistanceEvaluator(nearbyPoint);
-                nearbyNode = GetPathNode(currentNode, nearbyPoint, costFromSource, estimatedCostToDestination);
-                openNodes.Add((Point16)nearbyPoint, nearbyNode);
+                Open(adjacentPoint, currentNodeIndex, costFromSource);
             }
         }
+        #endregion
 
         private bool IsSameDirection(Point a, Point b, Point c)
         {
             return (c.X - b.X) == (b.X - a.X) && (c.Y - b.Y) == (b.Y - a.Y);
-        }
-
-        private Point16 RoundCoordinates(Vector2 point)
-        {
-            return new Point16((short)point.X, (short)point.Y);
         }
         #endregion
     }

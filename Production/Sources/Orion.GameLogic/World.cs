@@ -36,7 +36,7 @@ namespace Orion.GameLogic
 
             this.terrain = terrain;
             entities = new EntityManager(this);
-            pathfinder = new Pathfinder();
+            pathfinder = new Pathfinder(terrain.Size);
             technologyTree = new TechnologyTree();
             technologyTree.PopulateWithBaseTechnologies();
         }

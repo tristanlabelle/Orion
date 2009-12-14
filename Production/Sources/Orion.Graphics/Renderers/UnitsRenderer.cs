@@ -257,19 +257,6 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        private void DrawPathfindingDebugInfo(GraphicsContext graphics, Pathfinder pathfinder)
-        {
-            graphics.StrokeColor = Color.Yellow;
-            foreach (PathNode node in pathfinder.ClosedNodes)
-                if (node.Source != null)
-                    graphics.StrokeLineStrip(node.Source.Point, node.Point);
-
-            graphics.StrokeColor = Color.Lime;
-            foreach (PathNode node in pathfinder.OpenNodes)
-                if (node.Source != null)
-                    graphics.StrokeLineStrip(node.Source.Point, node.Point);
-        }
-
         private void DrawLasers(GraphicsContext graphics, CollisionLayer layer)
         {
             var attackTasks = World.Entities

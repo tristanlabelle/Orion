@@ -35,7 +35,6 @@ namespace Orion.GameLogic.Pathfinding
         #region Methods
         public void Enqueue(PathNode node)
         {
-            Argument.EnsureNotNull(node, "node");
 
             GrowIfFull();
             nodes[count] = node;
@@ -57,7 +56,6 @@ namespace Orion.GameLogic.Pathfinding
 
         public void Update(PathNode node)
         {
-            Argument.EnsureNotNull(node, "node");
             int index = Array.IndexOf(nodes, node);
             if (index == -1) throw new ArgumentException("No such node in the queue.", "node");
             BubbleTowardsRoot(index);

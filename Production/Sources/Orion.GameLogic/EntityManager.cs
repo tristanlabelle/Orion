@@ -204,13 +204,13 @@ namespace Orion.GameLogic
         {
             if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
 
-            CommitDeferredChanges();
-
             try
             {
                 isUpdating = true;
                 foreach (Entity entity in entities.Values)
                     entity.Update(step);
+
+                CommitDeferredChanges();
             }
             finally
             {

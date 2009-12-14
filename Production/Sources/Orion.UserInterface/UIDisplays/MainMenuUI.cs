@@ -9,7 +9,7 @@ namespace Orion.UserInterface
 {
     public class MainMenuUI : UIDisplay
     {
-        private const string creditsString = "Aladdin / Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / Mathieu Lavoie / Tristan Labelle";
+        private const string creditsString = "Aladdin / Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
         private const string thanks = "Merci à Guillaume Lacasse";
 
         public MainMenuUI()

@@ -3,6 +3,7 @@ using System.Linq;
 
 using OpenTK.Math;
 using Orion.Geometry;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -13,18 +14,23 @@ namespace Orion.GameLogic
     {
         #region Instance
         #region Fields
-        private readonly BitArray2D tiles;
+        /// <summary>
+        /// Values indicating the walkability of every tile.
+        /// </summary>
+        /// <remarks>
+        /// Stored as a bool array as it offers the best retrieval time.
+        /// </remarks>
+        private readonly bool[] tiles;
+        private readonly Size size;
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="Terrain"/> object. 
-        /// </summary>
-        /// <param name="size">The size of the terrain to be generated.</param>
-        public Terrain(Size size)
+        public Terrain(BitArray2D tiles)
         {
-            Argument.EnsureStrictlyPositive(size.Area, "size.Area");
-            this.tiles = new BitArray2D(size.Width, size.Height);
+            Argument.EnsureNotNull(tiles, "tiles");
+            this.tiles = new bool[tiles.ColumnCount * tiles.RowCount];
+            tiles.Bits.CopyTo(this.tiles, 0);
+            this.size = new Size(tiles.ColumnCount, tiles.RowCount);
         }
         #endregion
 
@@ -34,14 +40,16 @@ namespace Orion.GameLogic
         /// </summary>
         public Size Size
         {
-            get { return new Size(tiles.ColumnCount, tiles.RowCount); }
+            get { return size; }
         }
         #endregion
 
         #region Methods
         public bool IsWalkable(Point point)
         {
-            return !tiles[point.X, point.Y];
+            Debug.Assert(point.X >= 0 && point.Y >= 0 && point.X < size.Width && point.Y < size.Height);
+            int index = point.X * size.Width + point.Y;
+            return !tiles[index];
         }
 
         public bool IsWalkable(Rectangle rectangle)
@@ -81,7 +89,7 @@ namespace Orion.GameLogic
         {
             PerlinNoise noise = new PerlinNoise(random);
 
-            Terrain terrain = new Terrain(size);
+            BitArray2D tiles = new BitArray2D(size.Width, size.Height);
             double[] rawTerrain = new double[size.Width * size.Height];
             for (int i = 0; i < size.Height; i++)
             {
@@ -95,11 +103,11 @@ namespace Orion.GameLogic
             int k = 0;
             foreach (double noiseValue in rawTerrain.Select(d => d / max))
             {
-                terrain.tiles[k % size.Height, k / size.Height] = noiseValue >= 0.5;
+                tiles[k % size.Height, k / size.Height] = noiseValue >= 0.5;
                 k++;
             }
 
-            return terrain;
+            return new Terrain(tiles);
         }
         #endregion
         #endregion

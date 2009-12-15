@@ -29,7 +29,8 @@ namespace Orion.GameLogic
         private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
         private readonly GenericEventHandler<EntityManager, Entity> entityRemovedEventHandler;
         private readonly GenericEventHandler<Unit> foodStorageCreated;
-        private readonly HashSet<Faction> allies = new HashSet<Faction>();
+        private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
+        private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
         private readonly HashSet<RememberedBuilding> buildingMemory = new HashSet<RememberedBuilding>();
         private int aladdiumAmount;
         private int alageneAmount;
@@ -413,13 +414,13 @@ namespace Orion.GameLogic
             if (target == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
             Argument.EnsureDefined(stance, "stance");
 
-            if (allies.Contains(target) == (stance == DiplomaticStance.Ally))
+            if (factionsWeRegardAsAllies.Contains(target) == (stance == DiplomaticStance.Ally))
                 return;
 
             if (stance == DiplomaticStance.Ally)
-                allies.Add(target);
+                factionsWeRegardAsAllies.Add(target);
             else
-                allies.Remove(target);
+                factionsWeRegardAsAllies.Remove(target);
 
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
@@ -434,9 +435,9 @@ namespace Orion.GameLogic
         /// <returns>The <see cref="DiplomaticStance"/> with regard to that faction.</returns>
         public DiplomaticStance GetDiplomaticStance(Faction faction)
         {
-            Argument.EnsureNotNull(faction, "faction");
-            if (faction == this) return DiplomaticStance.Ally;
-            return allies.Contains(faction) ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
+            Debug.Assert(faction != null);
+            return faction == this || factionsWeRegardAsAllies.Contains(faction)
+                ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
         }
 
         private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
@@ -446,10 +447,16 @@ namespace Orion.GameLogic
                 // As another faction has set us as allies, so we see what they do.
                 source.localFogOfWar.Changed += fogOfWarChangedEventHandler;
                 DiscoverFromOtherFogOfWar(source.localFogOfWar, (Region)world.Size);
+
+                Debug.Assert(!factionsRegardingUsAsAllies.Contains(source));
+                factionsRegardingUsAsAllies.Add(source);
             }
             else
             {
                 source.localFogOfWar.Changed -= fogOfWarChangedEventHandler;
+
+                Debug.Assert(factionsRegardingUsAsAllies.Contains(source));
+                factionsRegardingUsAsAllies.Remove(source);
             }
 
             // Invalidate the whole visibility to take into account new allies.
@@ -500,7 +507,7 @@ namespace Orion.GameLogic
             TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
             if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
 
-            foreach (Faction faction in world.Factions.Where(f => f.GetDiplomaticStance(this) == DiplomaticStance.Ally))
+            foreach (Faction faction in factionsRegardingUsAsAllies)
             {
                 if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
                     return TileVisibility.Visible;
@@ -509,6 +516,25 @@ namespace Orion.GameLogic
             }
 
             return visibility;
+        }
+
+        /// <summary>
+        /// Tests if a point has been seen by this faction, without making out-of-bounds checks.
+        /// </summary>
+        /// <param name="point">The point to be tested.</param>
+        /// <returns>A value indicating if that tile has been seen.</returns>
+        /// <remarks>
+        /// Optimized for pathfinding.
+        /// </remarks>
+        public bool HasSeen(Point point)
+        {
+            if (localFogOfWar.IsDiscovered(point)) return true;
+
+            for (int i = 0; i < factionsRegardingUsAsAllies.Count; ++i)
+                if (factionsRegardingUsAsAllies[i].localFogOfWar.IsDiscovered(point))
+                    return true;
+
+            return false;
         }
 
         private void OnFogOfWarChanged(FogOfWar sender, Region region)

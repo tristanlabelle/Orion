@@ -45,6 +45,8 @@ namespace Orion.GameLogic.Tasks
                 throw new ArgumentException("Cannot walk without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
+            Debug.Assert(unit.IsAirborne || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
+
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
             Repath();
         }
@@ -153,22 +155,24 @@ namespace Orion.GameLogic.Tasks
 
         private bool IsGroundPathable(Point point)
         {
-            if (Unit.Faction.GetTileVisibility(point) == TileVisibility.Undiscovered) return true;
+            if (!Unit.Faction.HasSeen(point)) return true;
             return Unit.World.Terrain.IsWalkable(point) && World.Entities.GetGroundEntityAt(point) == null;
         }
 
-        private bool IsAirPathable(Point point)
+        private bool IsAirPathable(Point minPoint)
         {
-            Region region = new Region(point, Unit.Size);
-            if (region.MinX < 0 || region.MinY < 0
-                || region.ExclusiveMaxX > World.Size.Width
-                || region.ExclusiveMaxY > World.Size.Height)
+            Region region = new Region(minPoint, Unit.Size);
+            if (region.ExclusiveMaxX > World.Size.Width || region.ExclusiveMaxY > World.Size.Height)
                 return false;
 
-            foreach (Point regionPoint in region.Points)
+            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
             {
-                Entity entity = Unit.World.Entities.GetEntityAt(regionPoint, CollisionLayer.Air);
-                if (entity != null && entity != Unit) return false;
+                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                {
+                    Point occupied = new Point(x, y);
+                    Entity entity = Unit.World.Entities.GetAirEntityAt(occupied);
+                    if (entity != null && entity != Unit) return false;
+                }
             }
 
             return true;

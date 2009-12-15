@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
     <Compile Include="RememberedBuilding.cs" />
     <Compile Include="Skills\HealSkill.cs" />
     <Compile Include="Skills\TransportSkill.cs" />

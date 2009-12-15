@@ -12,7 +12,7 @@ namespace Orion.GameLogic.Pathfinding
     /// <summary>
     /// Finds paths to go from one point to another in a grid-based environment.
     /// </summary>
-    public sealed class Pathfinder
+    public sealed partial class Pathfinder
     {
         #region Fields
         private static readonly float sideMovementCost = GetDistance(new Point(0, 0), new Point(1, 0));
@@ -21,7 +21,7 @@ namespace Orion.GameLogic.Pathfinding
         private readonly Size gridSize;
         private readonly PathNode[] nodes;
         private readonly byte[] nodeStates;
-        private readonly HashSet<int> openNodeIndices = new HashSet<int>();
+        private readonly OpenList openList;
         private readonly List<Point> points = new List<Point>();
         private Func<Point, float> destinationDistanceEvaluator;
         private Func<Point, bool> isWalkable;
@@ -39,6 +39,7 @@ namespace Orion.GameLogic.Pathfinding
             this.gridSize = gridSize;
             this.nodes = new PathNode[gridSize.Area];
             this.nodeStates = new byte[gridSize.Area];
+            this.openList = new OpenList(this);
         }
         #endregion
 
@@ -73,7 +74,7 @@ namespace Orion.GameLogic.Pathfinding
 
             FindPathPointsTo(endPoint);
             SmoothPathPoints();
-            return new Path(points, IsDestination(endNode));
+            return new Path(points, endNode.IsDestination);
         }
         #endregion
 
@@ -99,7 +100,7 @@ namespace Orion.GameLogic.Pathfinding
 
         private void CleanUp()
         {
-            openNodeIndices.Clear();
+            openList.Clear();
 
             points.Clear();
 
@@ -149,11 +150,6 @@ namespace Orion.GameLogic.Pathfinding
             return new Point(index % gridSize.Width, index / gridSize.Width);
         }
 
-        private static bool IsDestination(PathNode node)
-        {
-            return node.DistanceToDestination < 0.001f;
-        }
-
         private void Open(Point nodePoint, int parentNodeIndex, float costFromSource)
         {
             int nodeIndex = PointToIndex(nodePoint);
@@ -163,7 +159,7 @@ namespace Orion.GameLogic.Pathfinding
             PathNode node = new PathNode(parentNodeIndex, costFromSource, distanceToDestination);
             nodes[nodeIndex] = node;
             nodeStates[nodeIndex] = openNodeStateValue;
-            openNodeIndices.Add(nodeIndex);
+            openList.Add(nodeIndex);
 
             if (nodeNearestToDestinationIndex == -1
                 || distanceToDestination < nodes[nodeNearestToDestinationIndex].DistanceToDestination)
@@ -177,7 +173,7 @@ namespace Orion.GameLogic.Pathfinding
         private void Close(int nodeIndex)
         {
             Debug.Assert(nodeStates[nodeIndex] == openNodeStateValue);
-            openNodeIndices.Remove(nodeIndex);
+            openList.Remove(nodeIndex);
             nodeStates[nodeIndex] = closedNodeStateValue;
         }
 
@@ -197,40 +193,17 @@ namespace Orion.GameLogic.Pathfinding
             Open(startPoint, -1, 0);
             while (true)
             {
-                int currentNodeIndex = GetCheapestOpenNodeIndex();
+                int currentNodeIndex = openList.Cheapest;
                 PathNode currentNode = nodes[currentNodeIndex];
-                if (IsDestination(currentNode)) return currentNodeIndex;
+                if (currentNode.IsDestination) return currentNodeIndex;
 
                 Close(currentNodeIndex);
 
                 Point currentNodePoint = IndexToPoint(currentNodeIndex);
                 AddNearbyNodes(currentNodePoint);
 
-                if (openNodeIndices.Count == 0 || visitedNodeCount >= maxNodesToVisit)
+                if (openList.Count == 0 || visitedNodeCount >= maxNodesToVisit)
                     return nodeNearestToDestinationIndex;
-            }
-        }
-
-        private int GetCheapestOpenNodeIndex()
-        {
-            using (var enumerator = openNodeIndices.GetEnumerator())
-            {
-                if (!enumerator.MoveNext()) throw new Exception("Expected at least one open node.");
-
-                int cheapestNodeIndex = enumerator.Current;
-                PathNode cheapestNode = nodes[cheapestNodeIndex];
-                while (enumerator.MoveNext())
-                {
-                    int nodeIndex = enumerator.Current;
-                    PathNode node = nodes[nodeIndex];
-                    if (node.TotalCost < cheapestNode.TotalCost)
-                    {
-                        cheapestNodeIndex = nodeIndex;
-                        cheapestNode = node;
-                    }
-                }
-
-                return cheapestNodeIndex;
             }
         }
 

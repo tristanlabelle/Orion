@@ -18,8 +18,8 @@ namespace Orion
     {
         #region Instance
         #region Fields
-        private readonly int x;
-        private readonly int y;
+        public readonly int X;
+        public readonly int Y;
         #endregion
 
         #region Constructors
@@ -30,38 +30,20 @@ namespace Orion
         /// <param name="y">The y of the size.</param>
         public Point(int x, int y)
         {
-            this.x = x;
-            this.y = y;
-        }
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Gets the x coordinate of this point.
-        /// </summary>
-        public int X
-        {
-            get { return x; }
-        }
-
-        /// <summary>
-        /// Gets the y coordinate of this point.
-        /// </summary>
-        public int Y
-        {
-            get { return y; }
+            this.X = x;
+            this.Y = y;
         }
         #endregion
 
         #region Methods
         public Vector2 ToVector()
         {
-            return new Vector2(x, y);
+            return new Vector2(X, Y);
         }
 
         public bool Equals(Point other)
         {
-            return x == other.x && y == other.y;
+            return X == other.X && Y == other.Y;
         }
 
         public override bool Equals(object obj)
@@ -82,7 +64,7 @@ namespace Orion
 
         public string ToString(IFormatProvider formatProvider)
         {
-            return string.Format(formatProvider, "({0},{1})", x, y);
+            return string.Format(formatProvider, "({0},{1})", X, Y);
         }
         #endregion
 

@@ -369,6 +369,11 @@ namespace Orion.GameLogic
             return groundGrid[point];
         }
 
+        public Entity GetAirEntityAt(Point point)
+        {
+            return airGrid[point];
+        }
+
         public Unit GetUnitAt(Point point)
         {
             return airGrid[point] as Unit ?? groundGrid[point] as Unit;

@@ -14,39 +14,27 @@ namespace Orion
     {
         #region Instance
         #region Fields
-        private readonly short x;
-        private readonly short y;
+        public readonly short X;
+        public readonly short Y;
         #endregion
 
         #region Constructor
         public Point16(short x, short y)
         {
-            this.x = x;
-            this.y = y;
-        }
-        #endregion
-
-        #region Properties
-        public short X
-        {
-            get { return x; }
-        }
-
-        public short Y
-        {
-            get { return y; }
+            this.X = x;
+            this.Y = y;
         }
         #endregion
 
         #region Methods
         public Point ToPoint()
         {
-            return new Point(x, y);
+            return new Point(X, Y);
         }
         
         public Vector2 ToVector()
         {
-            return new Vector2(x, y);
+            return new Vector2(X, Y);
         }
 
         #region Object Model
@@ -57,7 +45,7 @@ namespace Orion
         /// <returns>True this <see name="SmallPoint"/> is equal to <paramref name="other"/>, false if not.</returns>
         public bool Equals(Point16 other)
         {
-            return x == other.x && y == other.y;
+            return X == other.X && Y == other.Y;
         }
 
         public override bool Equals(object obj)
@@ -68,12 +56,12 @@ namespace Orion
 
         public override int GetHashCode()
         {
-            return ((int)x << 16) | (int)(ushort)y;
+            return ((int)X << 16) | (int)(ushort)Y;
         }
 
         public override string ToString()
         {
-            return "({0}, {1})".FormatInvariant(x, y);
+            return "({0}, {1})".FormatInvariant(X, Y);
         }
         #endregion
         #endregion

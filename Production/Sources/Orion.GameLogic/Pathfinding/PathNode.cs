@@ -10,40 +10,30 @@ namespace Orion.GameLogic.Pathfinding
     public struct PathNode
     {
         #region Fields
-        private readonly int parentNodeIndex;
-        private readonly float costFromSource;
-        private readonly float distanceToDestination;
+        public readonly int ParentNodeIndex;
+        public readonly float CostFromSource;
+        public readonly float TotalCost;
         #endregion
 
         #region Constructors
         public PathNode(int parentNodeIndex,
             float costFromSource, float distanceToDestination)
         {
-            this.parentNodeIndex = parentNodeIndex;
-            this.costFromSource = costFromSource;
-            this.distanceToDestination = distanceToDestination;
+            this.ParentNodeIndex = parentNodeIndex;
+            this.CostFromSource = costFromSource;
+            this.TotalCost = costFromSource + distanceToDestination;
         }
         #endregion
 
         #region Properties
-        public int ParentNodeIndex
-        {
-            get { return parentNodeIndex; }
-        }
-
-        public float CostFromSource
-        {
-            get { return costFromSource; }
-        }
-
         public float DistanceToDestination
         {
-            get { return distanceToDestination; }
+            get { return TotalCost - CostFromSource; }
         }
 
-        public float TotalCost
+        public bool IsDestination
         {
-            get { return costFromSource + distanceToDestination; }
+            get { return TotalCost - CostFromSource < 0.001f; }
         }
         #endregion
     }

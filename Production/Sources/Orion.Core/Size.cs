@@ -18,8 +18,8 @@ namespace Orion
     {
         #region Instance
         #region Fields
-        private readonly int width;
-        private readonly int height;
+        public readonly int Width;
+        public readonly int Height;
         #endregion
 
         #region Constructors
@@ -32,41 +32,25 @@ namespace Orion
         {
             Argument.EnsurePositive(width, "width");
             Argument.EnsurePositive(height, "height");
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the width component of this size.
-        /// </summary>
-        public int Width
-        {
-            get { return width; }
-        }
-
-        /// <summary>
-        /// Gets the height component of this size.
-        /// </summary>
-        public int Height
-        {
-            get { return height; }
-        }
-
-        /// <summary>
         /// Gets the area of this size.
         /// </summary>
         public int Area
         {
-            get { return width * height; }
+            get { return Width * Height; }
         }
         #endregion
 
         #region Methods
         public Vector2 ToVector()
         {
-            return new Vector2(width, height);
+            return new Vector2(Width, Height);
         }
 
         /// <summary>
@@ -76,7 +60,7 @@ namespace Orion
         /// <returns>True they are equal, false otherwise.</returns>
         public bool Equals(Size other)
         {
-            return width == other.width && height == other.height;
+            return Width == other.Width && Height == other.Height;
         }
 
         public override bool Equals(object obj)
@@ -102,7 +86,7 @@ namespace Orion
         /// <returns>A string representation of this <see cref="Size"/>.</returns>
         public string ToString(IFormatProvider formatProvider)
         {
-            return string.Format(formatProvider, "{0}x{1}", width, height);
+            return string.Format(formatProvider, "{0}x{1}", Width, Height);
         }
         #endregion
 

@@ -198,22 +198,9 @@ namespace Orion.GameLogic
         {
             Argument.EnsurePositive(minimumSize, "minimumSize");
 
-            uint allocationSize = CeilingPowerOfTwo((uint)minimumSize);
+            uint allocationSize = PowerOfTwo.Ceiling((uint)minimumSize);
             if (allocationSize < 16) allocationSize = 16;
             return new Entity[allocationSize];
-        }
-
-        private static uint CeilingPowerOfTwo(uint value)
-        {
-            // Source: http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2Float
-            // Edge case 0 is handled by under and overflowing.
-            --value;
-            value |= value >> 1;
-            value |= value >> 2;
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            return value + 1;
         }
         #endregion
         #endregion

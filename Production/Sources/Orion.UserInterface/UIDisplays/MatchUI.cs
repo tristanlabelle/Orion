@@ -129,11 +129,11 @@ namespace Orion.UserInterface
             pausePanel = new Frame(pausePanelRectangle);
 
             Rectangle quitGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
-            Button quitGame = new Button(quitGameRectangle, "Quit");
+            Button quitGame = new Button(quitGameRectangle, "Quitter");
             quitGame.Triggered += button => match.Quit();
 
             Rectangle resumeGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
-            Button resumeGame = new Button(resumeGameRectangle, match.IsPausable ? "Resume" : "Return");
+            Button resumeGame = new Button(resumeGameRectangle, match.IsPausable ? "Reprendre" : "Retour");
             resumeGame.Triggered += button => HidePausePanel();
 
             pausePanel.Children.Add(quitGame);
@@ -256,13 +256,13 @@ namespace Orion.UserInterface
         public void DisplayDefeatMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            DisplayMessage("{0} was defeated.".FormatInvariant(faction.Name), faction.Color);
+            DisplayMessage("{0} a été vaincu.".FormatInvariant(faction.Name), faction.Color);
 
             if (faction == LocalFaction)
             {
                 if(match.IsPausable)
                     match.Pause();
-                Instant.DisplayAlert(this, "You have lost the match.", () => Parent.PopDisplay(this));
+                Instant.DisplayAlert(this, "Vous avez perdu le match.", () => Parent.PopDisplay(this));
             }
         }
 
@@ -273,7 +273,7 @@ namespace Orion.UserInterface
             {
                 if(match.IsPausable)
                     match.Pause();
-                Instant.DisplayAlert(this, "VICTORY!", () => Parent.PopDisplay(this));
+                Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
             }
         }
         #endregion

@@ -13,9 +13,9 @@ namespace Orion.Graphics
     {
         #region Fields
         internal static TextPrinter defaultTextPrinter = new TextPrinter();
-        public static Font DefaultFont = new Font("Consolas", 14);
+        public static Font DefaultFont = new Font("Trebuchet MS", 14);
 
-        public readonly string Value;
+        private readonly string value;
         public readonly Font Font;
         #endregion
 
@@ -26,17 +26,22 @@ namespace Orion.Graphics
 
         public Text(string text, Font font)
         {
-            Value = text;
+            value = text + " ";
             Font = font;
         }
         #endregion
 
         #region Properties
+        public string Value
+        {
+            get { return value.Substring(0, value.Length - 1); }
+        }
+
         public Rectangle Frame
         {
             get
             {
-                RectangleF extents = defaultTextPrinter.Measure(Value, Font).BoundingBox;
+                RectangleF extents = defaultTextPrinter.Measure(value, Font).BoundingBox;
                 return new Rectangle(extents.X, 0, extents.Width, extents.Height);
             }
         }
@@ -57,7 +62,7 @@ namespace Orion.Graphics
         
         private Rectangle MeasureConstrained(RectangleF constraint)
         {
-            RectangleF extents = defaultTextPrinter.Measure(Value, Font, constraint).BoundingBox;
+            RectangleF extents = defaultTextPrinter.Measure(value, Font, constraint).BoundingBox;
             return new Rectangle(extents.X, 0, extents.Width, extents.Height);
         }
 

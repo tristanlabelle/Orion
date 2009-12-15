@@ -95,7 +95,7 @@ namespace Orion.Commandment.Commands
                 }
                 else
                 {
-                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}.".FormatInvariant(traineeType.Name));
+                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}".FormatInvariant(traineeType.Name));
                     break;
                 }
             }

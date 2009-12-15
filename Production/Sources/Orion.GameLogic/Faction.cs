@@ -102,7 +102,7 @@ namespace Orion.GameLogic
             if (handler != null) handler(this, technology);
         }
 
-        public event GenericEventHandler<Faction,string> Warning;
+        public event GenericEventHandler<Faction, string> Warning;
 
         public void RaiseWarning(string message)
         {
@@ -389,7 +389,7 @@ namespace Orion.GameLogic
         private void CheckForDefeat()
         {
             if (status == FactionStatus.Defeated) return;
-            
+
             bool hasKeepAliveUnit = Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
             if (!hasKeepAliveUnit || IsStuck)
             {

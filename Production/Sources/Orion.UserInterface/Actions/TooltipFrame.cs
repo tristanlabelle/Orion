@@ -24,7 +24,7 @@ namespace Orion.UserInterface.Actions
         public TooltipFrame(Vector2 origin, float width)
             : base(new Rectangle(origin.X, origin.Y, width, 0))
         {
-            tooltipFont = new Font("Consolas", 12);
+            tooltipFont = new Font("Trebuchet MS", 12);
             this.origin = origin;
             this.width = width;
         }

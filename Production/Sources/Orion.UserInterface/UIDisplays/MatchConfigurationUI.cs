@@ -40,10 +40,10 @@ namespace Orion.UserInterface
             }
 
             exitPanel = OnPressedExit;
-            exitButton = new Button(new Rectangle(10, 10, 100, 40), "Go Back");
+            exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
             Children.Add(exitButton);
             startGame = OnPressedStartGame;
-            startButton = new Button(new Rectangle(Bounds.MaxX - 110, 10, 100, 40), "Start");
+            startButton = new Button(new Rectangle(Bounds.MaxX - 110, 10, 100, 40), "Commencer");
             startButton.Enabled = enableStartGame;
             Children.Add(startButton);
         }

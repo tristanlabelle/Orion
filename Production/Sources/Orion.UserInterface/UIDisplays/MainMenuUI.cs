@@ -19,17 +19,17 @@ namespace Orion.UserInterface
             AddCenteredLabel("Orion", titleFont, 600);
 
             Rectangle singlePlayerButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.165f, 0.505f), new Vector2(0.475f, 0.66f));
-            Button singleplayerGame = new Button(singlePlayerButtonRect, "Single Player Game");
+            Button singleplayerGame = new Button(singlePlayerButtonRect, "Un joueur");
             singleplayerGame.Triggered += BeginSinglePlayer;
             Children.Add(singleplayerGame);
 
             Rectangle multiplayerButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.525f, 0.505f), new Vector2(0.835f, 0.66f));
-            Button multiplayerGame = new Button(multiplayerButtonRect, "Multiplayer Game");
+            Button multiplayerGame = new Button(multiplayerButtonRect, "Multijoueur");
             multiplayerGame.Triggered += BeginMultiplayerGame;
             Children.Add(multiplayerGame);
 
             Rectangle viewReplayButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.345f, 0.33f), new Vector2(0.655f, 0.485f));
-            Button replayGame = new Button(viewReplayButtonRect, "View Replay");
+            Button replayGame = new Button(viewReplayButtonRect, "Regarder une partie");
             replayGame.Triggered += BeginViewReplay;
             Children.Add(replayGame);
 

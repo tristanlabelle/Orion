@@ -33,7 +33,7 @@ namespace Orion.Graphics
         private Color fillColor = Color.White;
         private Color strokeColor = Color.Black;
         private StrokeStyle strokeStyle = StrokeStyle.Solid;
-        private Font font = new Font("Consolas", 14);
+        private Font font = new Font("Trebuchet MS", 14);
         private bool readyForDrawing;
         #endregion
 

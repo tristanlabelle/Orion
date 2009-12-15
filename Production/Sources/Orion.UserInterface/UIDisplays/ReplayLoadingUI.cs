@@ -25,7 +25,7 @@ namespace Orion.UserInterface
             Scrollbar replaysScrollbar = new Scrollbar(scrollbarRectangle, replaysList);
             replayButtonFrame = new Rectangle(replaysRectangle.Width - 20, 30);
 
-            Button exitButton = new Button(new Rectangle(10, 10, 100, 40), "Go Back");
+            Button exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
 
             exitButton.Triggered += PressedExitButton;
 
@@ -48,7 +48,7 @@ namespace Orion.UserInterface
             DirectoryInfo replays = new DirectoryInfo("Replays");
             if (replays.Exists)
             {
-                foreach (FileInfo file in new DirectoryInfo("Replays").GetFiles("*.replay").OrderBy(file => file.Name))
+                foreach (FileInfo file in replays.GetFiles("*.replay").OrderBy(file => file.Name))
                 {
                     Button replayButton = new Button(replayButtonFrame, file.Name);
                     replayButton.Triggered += StartReplay;

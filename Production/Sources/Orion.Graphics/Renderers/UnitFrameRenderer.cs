@@ -22,7 +22,7 @@ namespace Orion.Graphics
             UnitStat.MovementSpeed, UnitStat.SightRange
         };
 
-        private static readonly Font statsFont = new Font("Consolas", 10);
+        private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private const float firstLineY = 160;
 
         private readonly Unit unit;

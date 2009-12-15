@@ -44,17 +44,17 @@ namespace Orion.UserInterface
             Children.Add(gamesFrame);
 
             Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
-            Button hostButton = new Button(hostFrame, "Host");
+            Button hostButton = new Button(hostFrame, "Héberger");
             hostButton.Triggered += PressHostGame;
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
-            Button joinRemoteButton = new Button(joinRemoteFrame, "Join with IP...");
+            Button joinRemoteButton = new Button(joinRemoteFrame, "Joindre une adresse");
             joinRemoteButton.Triggered += PressJoinRemoteGame;
             Children.Add(joinRemoteButton);
 
             Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
-            Button backButton = new Button(backButtonFrame, "Back");
+            Button backButton = new Button(backButtonFrame, "Retour");
             backButton.Triggered += PressBack;
             Children.Add(backButton);
 
@@ -120,7 +120,7 @@ namespace Orion.UserInterface
                 case SetupMessageType.RefuseJoinRequest:
                     if (args.Host == requestedJoin)
                     {
-                        Instant.DisplayAlert(this, "The host refused your request to join the game.");
+                        Instant.DisplayAlert(this, "L'hôte a refusé votre demande.");
                     }
                     break;
             }
@@ -128,13 +128,13 @@ namespace Orion.UserInterface
 
         private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
         {
-            Instant.DisplayAlert(this, "Unable to reach {0}.".FormatInvariant(ResolveHostAddress(host)));
+            Instant.DisplayAlert(this, "Impossible de rejoindre {0}.".FormatInvariant(ResolveHostAddress(host)));
             requestedJoin = null;
         }
 
         private void ShowGame(IPv4EndPoint host, int numberOfPlacesLeft)
         {
-            string caption = "{0} ({1} places left)".FormatInvariant(ResolveHostAddress(host), numberOfPlacesLeft);
+            string caption = "{0} ({1} places libres)".FormatInvariant(ResolveHostAddress(host), numberOfPlacesLeft);
             if (!hostedGames.ContainsKey(host))
             {
                 Button button = new Button(gameButtonRectangle, caption);
@@ -179,7 +179,7 @@ namespace Orion.UserInterface
         private void PressJoinRemoteGame(Button sender)
         {
             if (!requestedJoin.HasValue)
-                Instant.Prompt(this, "What is the address of the game you want to join?", JoinAddress);
+                Instant.Prompt(this, "Quelle adresse voulez-vous joindre ?", JoinAddress);
         }
 
         private void PressHostGame(Button sender)
@@ -210,12 +210,12 @@ namespace Orion.UserInterface
                 }
                 catch (FormatException)
                 {
-                    Instant.DisplayAlert(this, "Value {0} is an invalid port number.".FormatInvariant(parts[1]));
+                    Instant.DisplayAlert(this, "La valeur {0} est un nom de port invalide.".FormatInvariant(parts[1]));
                     return;
                 }
                 catch (SocketException)
                 {
-                    Instant.DisplayAlert(this, "Cannot resolve name or address {0}.".FormatInvariant(parts[0]));
+                    Instant.DisplayAlert(this, "Impossible de résoudre le nom ou l'adresse {0}.".FormatInvariant(parts[0]));
                     return;
                 }
             }
@@ -229,12 +229,12 @@ namespace Orion.UserInterface
                 }
                 catch (SocketException)
                 {
-                    Instant.DisplayAlert(this, "Cannot resolve name or address {0}.".FormatInvariant(address));
+                    Instant.DisplayAlert(this, "Impossible de résoudre le nom ou l'adresse {0}.".FormatInvariant(address));
                     return;
                 }
                 catch (InvalidOperationException)
                 {
-                    Instant.DisplayAlert(this, "Could not find an IPv4 address for host {0}".FormatInvariant(address));
+                    Instant.DisplayAlert(this, "Impossible de trouver une adresse IPv4 pour l'hôte {0}".FormatInvariant(address));
                     return;
                 }
             }
@@ -307,7 +307,7 @@ namespace Orion.UserInterface
 
         private void PressPing(Button sender)
         {
-            Instant.Prompt(this, "Enter the IP address to ping:", Ping);
+            Instant.Prompt(this, "Entrez l'adresse IP à ping'er:", Ping);
         }
 
         private void Ping(string address)
@@ -315,11 +315,11 @@ namespace Orion.UserInterface
             IPv4EndPoint? endPoint = TryParseAddress(address);
             if (!endPoint.HasValue)
             {
-                Instant.DisplayAlert(this, "Unable to resolve {0}.".FormatInvariant(address));
+                Instant.DisplayAlert(this, "Impossible de résoudre {0}.".FormatInvariant(address));
             }
 
             transporter.Ping(endPoint.Value);
-            Instant.DisplayAlert(this, "{0} was successfully ping'ed.".FormatInvariant(endPoint.Value));
+            Instant.DisplayAlert(this, "{0} a été pingé avec succès.".FormatInvariant(endPoint.Value));
         }
 
         protected override void Dispose(bool disposing)

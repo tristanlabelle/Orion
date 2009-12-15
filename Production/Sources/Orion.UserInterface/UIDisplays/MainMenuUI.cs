@@ -9,16 +9,14 @@ namespace Orion.UserInterface
 {
     public class MainMenuUI : UIDisplay
     {
-        private const string creditsString = "Aladdin / Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
-        private const string thanks = "Merci à Guillaume Lacasse";
+        // HACK: Add whitespace to then end of strings because the last word ends up clipped otherwise.
+        private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle       ";
+        private const string artistName = "Guillaume Lacasse ";
 
         public MainMenuUI()
         {
-            Font impact = new Font("Impact", 48);
-            Text orionText = new Text("Orion", impact);
-            Label orionLabel = new Label(orionText);
-            orionLabel.Color = Color.White;
-            AddCentered(orionLabel, 600);
+            Font titleFont = new Font("Impact", 48);
+            AddCenteredLabel("Orion", titleFont, 600);
 
             Rectangle singlePlayerButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.165f, 0.505f), new Vector2(0.475f, 0.66f));
             Button singleplayerGame = new Button(singlePlayerButtonRect, "Single Player Game");
@@ -35,16 +33,11 @@ namespace Orion.UserInterface
             replayGame.Triggered += BeginViewReplay;
             Children.Add(replayGame);
 
-            Font trebuchet = new Font("Trebuchet MS", 10);
-            Text creditsText = new Text(creditsString, trebuchet);
-            Text thanksText = new Text(thanks, trebuchet);
-
-            Label creditsLabel = new Label(creditsText);
-            creditsLabel.Color = Color.White;
-            Label thanksLabel = new Label(thanksText);
-            thanksLabel.Color = Color.White;
-            AddCentered(creditsLabel, 100);
-            AddCentered(thanksLabel, 80);
+            Font creditsFont = new Font("Trebuchet MS", 10);
+            AddCenteredLabel("Programmeurs ", creditsFont, 110);
+            AddCenteredLabel(programmerNames, creditsFont, 90);
+            AddCenteredLabel("Artiste  ", creditsFont, 60);
+            AddCenteredLabel(artistName, creditsFont, 40);
         }
 
         public event GenericEventHandler<MainMenuUI> LaunchedSinglePlayerGame;
@@ -69,8 +62,11 @@ namespace Orion.UserInterface
                 LaunchedReplayViewer(this);
         }
 
-        private void AddCentered(Label label, float y)
+        private void AddCenteredLabel(string @string, Font font, float y)
         {
+            Text text = new Text(@string, font);
+            Label label = new Label(text);
+            label.Color = Color.White;
             float x = (Bounds.Width - label.Frame.Width) / 2;
             label.Frame = label.Frame.TranslatedTo(x, y);
             Children.Add(label);

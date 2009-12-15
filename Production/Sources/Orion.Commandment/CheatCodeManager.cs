@@ -77,7 +77,9 @@ namespace Orion.Commandment
             Default.Register("brinformatique", InstantDefeat);
             Default.Register("itsover9000", InstantVictory);
             Default.Register("catchmymohawk", SpawnMisterT);
+#if DEBUG
             Default.Register("!", MasterCheat);
+#endif
         }
         #endregion
 

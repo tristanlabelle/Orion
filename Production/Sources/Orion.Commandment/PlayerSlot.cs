@@ -34,7 +34,7 @@ namespace Orion.Commandment
         {
             if (RemoteHost.HasValue)
                 return RemoteHost.Value.ToString();
-            return "Open";
+            return "Ouvert";
         }
     }
 
@@ -47,7 +47,7 @@ namespace Orion.Commandment
 
         public override string ToString()
         {
-            return "Closed";
+            return "Fermé";
         }
     }
 
@@ -60,7 +60,7 @@ namespace Orion.Commandment
 
         public override string ToString()
         {
-            return "Computer";
+            return "Ordinateur";
         }
     }
 
@@ -73,7 +73,7 @@ namespace Orion.Commandment
 
         public override string ToString()
         {
-            return "You";
+            return "Vous";
         }
     }
 }

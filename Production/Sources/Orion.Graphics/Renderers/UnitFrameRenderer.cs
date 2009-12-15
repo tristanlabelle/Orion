@@ -22,6 +22,8 @@ namespace Orion.Graphics
             UnitStat.MovementSpeed, UnitStat.SightRange
         };
 
+        private static readonly Dictionary<UnitStat, string> statNames = new Dictionary<UnitStat, string>();
+
         private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private const float firstLineY = 160;
 
@@ -31,6 +33,23 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
+        static UnitFrameRenderer()
+        {
+            statNames[UnitStat.AladdiumCost] = "Coût d'Aladdium";
+            statNames[UnitStat.AlageneCost] = "Coût d'Alagène";
+            statNames[UnitStat.AttackDelay] = "Délai d'attaque";
+            statNames[UnitStat.AttackPower] = "Puissance d'attaque";
+            statNames[UnitStat.AttackRange] = "Portée d'attaque";
+            statNames[UnitStat.BuildingSpeed] = "Vitesse de construction";
+            statNames[UnitStat.ExtractingSpeed] = "Vitesse d'extraction";
+            statNames[UnitStat.FoodStorageCapacity] = "Capacité de stockage";
+            statNames[UnitStat.HealSpeed] = "Vitesse de soin";
+            statNames[UnitStat.MeleeArmor] = "Armure au corps-à-corps";
+            statNames[UnitStat.RangedArmor] = "Armure à distance";
+            statNames[UnitStat.MovementSpeed] = "Vitesse de mouvement";
+            statNames[UnitStat.SightRange] = "Portée de vision";
+        }
+
         public UnitFrameRenderer(Faction faction, Unit unit, TextureManager textureManager)
         {
             Argument.EnsureNotNull(unit, "unit");
@@ -114,7 +133,7 @@ namespace Orion.Graphics
                     if (stat == UnitStat.MaxHealth) continue;
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;
-                    string message = "{0}: {1}".FormatInvariant(Casing.CamelToWords(stat.ToStringInvariant()), value);
+                    string message = "{0}: {1}".FormatInvariant(statNames[stat], value);
                     context.Draw(message, new Vector2(150, y));
                     y -= hp.Frame.Height;
                 }

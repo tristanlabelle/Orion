@@ -31,6 +31,10 @@ namespace Orion.GameLogic
         private readonly int rangedArmor;
         private readonly int sightRange;
         private readonly int foodCost;
+
+        // Cached values, for improved performance.
+        private readonly bool isAirborne;
+        private readonly bool isBuilding;
         #endregion
 
         #region Constructors
@@ -50,6 +54,18 @@ namespace Orion.GameLogic
             this.foodCost = builder.FoodCost;
             this.meleeArmor = builder.MeleeArmor;
             this.rangedArmor = builder.RangedArmor;
+
+            MoveSkill moveSkill = GetSkill<MoveSkill>();
+            if (moveSkill == null)
+            {
+                this.isBuilding = true;
+                this.isAirborne = false;
+            }
+            else
+            {
+                this.isBuilding = false;
+                this.isAirborne = moveSkill.IsAirborne;
+            }
 
             var attackSkill = GetSkill<AttackSkill>();
             Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
@@ -78,7 +94,12 @@ namespace Orion.GameLogic
 
         public bool IsBuilding
         {
-            get { return !HasSkill<Skills.MoveSkill>(); }
+            get { return isBuilding; }
+        }
+
+        public bool IsAirborne
+        {
+            get { return isAirborne; }
         }
         #endregion
 
@@ -98,15 +119,6 @@ namespace Orion.GameLogic
             get { return size.Height; }
         }
         #endregion
-
-        public bool IsAirborne
-        {
-            get
-            {
-                MoveSkill moveSkill = GetSkill<MoveSkill>();
-                return moveSkill != null && moveSkill.IsAirborne;
-            }
-        }
 
         public CollisionLayer CollisionLayer
         {

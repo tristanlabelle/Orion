@@ -94,7 +94,7 @@ namespace Orion.Graphics
                     context.FillColor = Color.Black;
                 }
 
-                string message = "In progress...";
+                string message = "En progrès...";
                 context.Draw(message, new Vector2(150, 5));
             }
 

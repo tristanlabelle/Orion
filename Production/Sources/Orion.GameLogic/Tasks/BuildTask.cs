@@ -76,7 +76,7 @@ namespace Orion.GameLogic.Tasks
 
             if (!Unit.World.IsFree(buildingPlan.GridRegion, Unit.CollisionLayer))
             {
-                string warning = "No place to build {0}.".FormatInvariant(buildingPlan.BuildingType.Name);
+                string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);
                 hasEnded = true;
                 return;
@@ -89,7 +89,7 @@ namespace Orion.GameLogic.Tasks
 
             if (!hasEnoughResources)
             {
-                string warning = "Not enough resources to build {0}."
+                string warning = "Pas assez de ressources pour construire le bâtiment {0}"
                     .FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);
                 hasEnded = true;

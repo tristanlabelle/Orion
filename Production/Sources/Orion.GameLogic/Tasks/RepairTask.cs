@@ -142,7 +142,7 @@ namespace Orion.GameLogic.Tasks
             if ((needsAladdiumCredit && Faction.AladdiumAmount == 0)
                 || (needsAlageneCredit && Faction.AlageneAmount == 0))
             {
-                string warning = "Not enough resources to repair {0}.".FormatInvariant(Target.Type.Name);
+                string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Type.Name);
                 Faction.RaiseWarning(warning);
                 return false;
             }

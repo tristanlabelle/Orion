@@ -94,7 +94,7 @@ namespace Orion.GameLogic.Tasks
             else if (!attemptingToPlaceUnit)
             {
                 attemptingToPlaceUnit = true;
-                string warning = "No free space to spawn {0}.".FormatInvariant(traineeType.Name);
+                string warning = "Pas de place pour faire apparaître l'unité {0}".FormatInvariant(traineeType.Name);
                 Faction.RaiseWarning(warning);
             }
         }

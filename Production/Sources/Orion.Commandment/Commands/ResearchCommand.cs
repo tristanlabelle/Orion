@@ -62,7 +62,7 @@ namespace Orion.Commandment.Commands
             }
             else
             {
-                faction.RaiseWarning("Not enough resources");
+                faction.RaiseWarning("Pas assez de ressources.");
             }
         }
 

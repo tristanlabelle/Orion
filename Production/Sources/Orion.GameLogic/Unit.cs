@@ -453,7 +453,7 @@ namespace Orion.GameLogic
                     .FirstOrNull(point => World.IsFree(point, transportedUnit.CollisionLayer));
                 if (!location.HasValue)
                 {
-                    faction.RaiseWarning("No place to disembark units.");
+                    faction.RaiseWarning("Pas de place pour le débarquement d'unités");
                     break;
                 }
 

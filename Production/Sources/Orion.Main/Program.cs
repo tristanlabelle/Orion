@@ -1,17 +1,17 @@
 using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Windows.Forms;
 using Orion.Commandment;
-using Orion.Networking;
 using Orion.GameLogic;
+using Orion.Networking;
 using Orion.UserInterface;
-using System.Diagnostics;
 using Button = Orion.UserInterface.Widgets.Button;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Globalization;
 
 namespace Orion.Main
 {
@@ -208,6 +208,7 @@ namespace Orion.Main
 
         private void UpdateWindowTitle(FrameRateCounter updateRateCounter, FrameRateCounter drawRateCounter)
         {
+#if DEBUG
             windowTitleStringBuilder.Remove(0, windowTitleStringBuilder.Length);
             windowTitleStringBuilder.AppendFormat(CultureInfo.InvariantCulture,
                 "MS/U avg: {0:F2}, peak: {1:F2}; MS/D avg: {2:F2}, peak: {3:F2}",
@@ -216,6 +217,7 @@ namespace Orion.Main
                 drawRateCounter.AverageMillisecondsPerFrame,
                 drawRateCounter.PeakMillisecondsPerFrame);
             gameUI.WindowTitle = windowTitleStringBuilder.ToString();
+#endif
         }
         #endregion
 

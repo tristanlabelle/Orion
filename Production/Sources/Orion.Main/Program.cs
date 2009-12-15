@@ -97,7 +97,9 @@ namespace Orion.Main
                 {
                     var stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.Read);
                     var writer = new StreamWriter(stream);
+#if DEBUG
                     writer.AutoFlush = true;
+#endif
                     Trace.Listeners.Add(new TextWriterTraceListener(writer));
                     break;
                 }

@@ -88,6 +88,16 @@ namespace Orion.UserInterface
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalCommander.Faction);
             Children.Add(resourceDisplay);
 
+            Rectangle pauseButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.6f, 0), new Vector2(0.8f, 1));
+            Button pauseButton = new Button(pauseButtonRectangle, "Pause");
+            pauseButton.Triggered += b => DisplayPausePanel();
+            Children.Add(pauseButton);
+
+            Rectangle diplomacyButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.8f, 0), new Vector2(1, 1));
+            Button diplomacyButton = new Button(diplomacyButtonRectangle, "Diplomacie");
+            diplomacyButton.Triggered += b => DisplayDiplomacy();
+            Children.Add(diplomacyButton);
+
             Rectangle hudRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
             hudFrame = new Frame(hudRectangle);
             Children.Add(hudFrame);

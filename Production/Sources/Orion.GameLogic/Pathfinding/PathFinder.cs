@@ -15,9 +15,12 @@ namespace Orion.GameLogic.Pathfinding
     public sealed class Pathfinder
     {
         #region Fields
+        private static readonly float sideMovementCost = GetDistance(new Point(0, 0), new Point(1, 0));
+        private static readonly float diagonalMovementCost = GetDistance(new Point(0, 0), new Point(1, 1));
+
         private readonly Size gridSize;
         private readonly PathNode[] nodes;
-        private readonly BitArray closedNodes;
+        private readonly byte[] nodeStates;
         private readonly HashSet<int> openNodeIndices = new HashSet<int>();
         private readonly List<Point> points = new List<Point>();
         private Func<Point, float> destinationDistanceEvaluator;
@@ -26,6 +29,8 @@ namespace Orion.GameLogic.Pathfinding
         private int nodeNearestToDestinationIndex;
         private int maxNodesToVisit;
         private int visitedNodeCount;
+        private byte openNodeStateValue = 1;
+        private byte closedNodeStateValue = 2;
         #endregion
 
         #region Constructors
@@ -33,7 +38,7 @@ namespace Orion.GameLogic.Pathfinding
         {
             this.gridSize = gridSize;
             this.nodes = new PathNode[gridSize.Area];
-            this.closedNodes = new BitArray(gridSize.Area);
+            this.nodeStates = new byte[gridSize.Area];
         }
         #endregion
 
@@ -94,13 +99,24 @@ namespace Orion.GameLogic.Pathfinding
 
         private void CleanUp()
         {
-            closedNodes.SetAll(false);
             openNodeIndices.Clear();
 
             points.Clear();
 
             visitedNodeCount = 0;
             nodeNearestToDestinationIndex = -1;
+
+            if (openNodeStateValue == byte.MaxValue - 2)
+            {
+                openNodeStateValue = 1;
+                closedNodeStateValue = 2;
+                Array.Clear(nodeStates, 0, nodeStates.Length);
+            }
+            else
+            {
+                openNodeStateValue = (byte)(openNodeStateValue + 2);
+                closedNodeStateValue = (byte)(closedNodeStateValue + 2);
+            }
         }
 
         private void FindPathPointsTo(Point endPoint)
@@ -133,7 +149,7 @@ namespace Orion.GameLogic.Pathfinding
             return new Point(index % gridSize.Width, index / gridSize.Width);
         }
 
-        private bool IsDestination(PathNode node)
+        private static bool IsDestination(PathNode node)
         {
             return node.DistanceToDestination < 0.001f;
         }
@@ -146,6 +162,7 @@ namespace Orion.GameLogic.Pathfinding
 
             PathNode node = new PathNode(parentNodeIndex, costFromSource, distanceToDestination);
             nodes[nodeIndex] = node;
+            nodeStates[nodeIndex] = openNodeStateValue;
             openNodeIndices.Add(nodeIndex);
 
             if (nodeNearestToDestinationIndex == -1
@@ -159,9 +176,9 @@ namespace Orion.GameLogic.Pathfinding
 
         private void Close(int nodeIndex)
         {
-            Debug.Assert(!closedNodes[nodeIndex]);
+            Debug.Assert(nodeStates[nodeIndex] == openNodeStateValue);
             openNodeIndices.Remove(nodeIndex);
-            closedNodes[nodeIndex] = true;
+            nodeStates[nodeIndex] = closedNodeStateValue;
         }
 
         private bool IsOpenable(Point point)
@@ -170,7 +187,7 @@ namespace Orion.GameLogic.Pathfinding
                 return false;
 
             int nodeIndex = PointToIndex(point);
-            return !closedNodes[nodeIndex] && isWalkable(point);
+            return nodeStates[nodeIndex] != closedNodeStateValue && isWalkable(point);
         }
         #endregion
 
@@ -217,7 +234,7 @@ namespace Orion.GameLogic.Pathfinding
             }
         }
 
-        private float GetDistance(Point a, Point b)
+        private static float GetDistance(Point a, Point b)
         {
             return ((Vector2)a - (Vector2)b).LengthFast;
         }
@@ -225,49 +242,47 @@ namespace Orion.GameLogic.Pathfinding
         #region Adding Nodes
         private void AddNearbyNodes(Point currentNodePoint)
         {
-            AddDiagonalAdjacentNode(currentNodePoint, -1, -1);
-            AddAdjacentNode(currentNodePoint, 0, -1);
-            AddDiagonalAdjacentNode(currentNodePoint, 1, -1);
-            AddAdjacentNode(currentNodePoint, -1, 0);
-            AddAdjacentNode(currentNodePoint, 1, 0);
-            AddDiagonalAdjacentNode(currentNodePoint, -1, 1);
-            AddAdjacentNode(currentNodePoint, 0, 1);
-            AddDiagonalAdjacentNode(currentNodePoint, 1, 1);
+            AddDiagonalNode(currentNodePoint, -1, -1);
+            AddSideNode(currentNodePoint, 0, -1);
+            AddDiagonalNode(currentNodePoint, 1, -1);
+            AddSideNode(currentNodePoint, -1, 0);
+            AddSideNode(currentNodePoint, 1, 0);
+            AddDiagonalNode(currentNodePoint, -1, 1);
+            AddSideNode(currentNodePoint, 0, 1);
+            AddDiagonalNode(currentNodePoint, 1, 1);
         }
 
-        private void AddDiagonalAdjacentNode(Point currentNodePoint, int offsetX, int offsetY)
+        private void AddSideNode(Point currentNodePoint, int offsetX, int offsetY)
+        {
+            Point adjacentPoint = new Point(currentNodePoint.X + offsetX, currentNodePoint.Y + offsetY);
+            AddAdjacentNode(currentNodePoint, adjacentPoint, sideMovementCost);
+        }
+
+        private void AddDiagonalNode(Point currentNodePoint, int offsetX, int offsetY)
         {
             // Disallow going from A to B in situations like (# is non-walkable):
             ///
             // #B
             // A#
-            if (!IsOpenable(new Point(currentNodePoint.X + offsetX, currentNodePoint.Y))
-                || !IsOpenable(new Point(currentNodePoint.X, currentNodePoint.Y + offsetY)))
+            Point adjacentPoint = new Point(currentNodePoint.X + offsetX, currentNodePoint.Y + offsetY);
+            if (!IsOpenable(new Point(adjacentPoint.X, currentNodePoint.Y))
+                || !IsOpenable(new Point(currentNodePoint.X, adjacentPoint.Y)))
                 return;
 
-            AddAdjacentNode(currentNodePoint, offsetX, offsetY);
+            AddAdjacentNode(currentNodePoint, adjacentPoint, diagonalMovementCost);
         }
 
-        private void AddAdjacentNode(Point currentNodePoint, int offsetX, int offsetY)
-        {
-            int x = currentNodePoint.X + offsetX;
-            int y = currentNodePoint.Y + offsetY;
-            Point adjacentPoint = new Point(x, y);
-            AddAdjacentNode(currentNodePoint, adjacentPoint);
-        }
-
-        private void AddAdjacentNode(Point currentNodePoint, Point adjacentPoint)
+        private void AddAdjacentNode(Point currentNodePoint, Point adjacentPoint, float movementCost)
         {
             if (!IsOpenable(adjacentPoint)) return;
 
             int currentNodeIndex = PointToIndex(currentNodePoint);
             PathNode currentNode = nodes[currentNodeIndex];
 
-            float movementCost = GetDistance(currentNodePoint, adjacentPoint);
             float costFromSource = currentNode.CostFromSource + movementCost;
 
             int adjacentNodeIndex = PointToIndex(adjacentPoint);
-            if (openNodeIndices.Contains(adjacentNodeIndex))
+            if (nodeStates[adjacentNodeIndex] == openNodeStateValue)
             {
                 PathNode adjacentNode = nodes[adjacentNodeIndex];
                 if (costFromSource < adjacentNode.CostFromSource)

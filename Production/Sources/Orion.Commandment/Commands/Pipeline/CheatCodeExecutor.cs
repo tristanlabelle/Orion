@@ -48,7 +48,7 @@ namespace Orion.Commandment.Commands.Pipeline
                 {
                     Faction faction = match.World.FindFactionFromHandle(message.FactionHandle);
                     cheatCodeManager.Execute(message.Text, match, faction);
-                    command = new SendMessageCommand(message.FactionHandle, "Cheat '{0}' enabled!".FormatInvariant(message.Text));
+                    command = new SendMessageCommand(message.FactionHandle, "Code de triche '{0}' appliqué!".FormatInvariant(message.Text));
                 }
                 Flush(command);
             }

@@ -15,7 +15,7 @@ namespace Orion.Commandment
         #region Instance
         #region Fields
         private readonly BinaryWriter writer;
-        private bool autoFlush = true;
+        private bool autoFlush;
         private bool isHeaderWritten;
         private int lastUpdateNumber = 0;
         #endregion
@@ -25,6 +25,10 @@ namespace Orion.Commandment
         {
             Argument.EnsureNotNull(writer, "writer");
             this.writer = writer;
+
+#if !DEBUG
+            this.autoFlush = true;
+#endif
         }
 
         public ReplayWriter(Stream stream)

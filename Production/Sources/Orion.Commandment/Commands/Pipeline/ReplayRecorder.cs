@@ -38,9 +38,7 @@ namespace Orion.Commandment.Commands.Pipeline
             {
                 Command command = commandQueue.Dequeue();
                 writer.WriteCommand(updateNumber, command);
-#if DEBUG
                 Flush(command);
-#endif
             }
         }
         #endregion

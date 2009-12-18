@@ -348,14 +348,14 @@ namespace Orion.GameLogic
             {
                 Name = "Jean-Marc",
                 Size = new Size(3, 3),
-                SightRange = 10,
-                MaxHealth = 150,
+                SightRange = 7,
+                MaxHealth = 120,
                 MeleeArmor = 0,
                 RangedArmor = 0,
                 AladdiumCost = 120,
                 AlageneCost = 40
             };
-            builder.Skills.Add(new AttackSkill(12, 8, 2));
+            builder.Skills.Add(new AttackSkill(8, 8, 2));
             Register(builder);
         }
 

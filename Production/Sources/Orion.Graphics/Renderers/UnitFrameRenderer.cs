@@ -133,7 +133,7 @@ namespace Orion.Graphics
                     if (stat == UnitStat.MaxHealth) continue;
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;
-                    string message = "{0}: {1}".FormatInvariant(statNames[stat], value);
+                    string message = "{0}: {1} ".FormatInvariant(statNames[stat], value);
                     context.Draw(message, new Vector2(150, y));
                     y -= hp.Frame.Height;
                 }

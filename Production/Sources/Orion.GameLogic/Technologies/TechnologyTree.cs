@@ -47,17 +47,44 @@ namespace Orion.GameLogic.Technologies
 
             Technology holyTrinity = new TechnologyBuilder
             {
-                Name = "Sainte-Trinité",
+                Name = "Sainte-trinité",
                 AladdiumCost = 200,
                 AlageneCost = 150,
                 Effects = new[]
                 {
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MaxHealth, 30),
                     new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.RangedArmor, 1),
                     new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 
             technologies.Add(holyTrinity);
+
+            Technology strongSmurf = new TechnologyBuilder
+            {
+                Name = "Schtroumpf costaud",
+                AladdiumCost = 150,
+                AlageneCost = 150,
+                Effects = new[]
+                {
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MaxHealth, 40)
+                }
+            }.Build(handleGenerator());
+
+            technologies.Add(strongSmurf);
+
+            Technology spaghettiAlfredo = new TechnologyBuilder
+            {
+                Name = "Spaghetti Alfredo",
+                AladdiumCost = 200,
+                AlageneCost = 150,
+                Effects = new[]
+                {
+                    new TechnologyEffect(unitType => unitType.Name == "Flying Spaghetti Monster", UnitStat.MovementSpeed, 2)
+                }
+            }.Build(handleGenerator());
+
+            technologies.Add(spaghettiAlfredo);
         }
 
         public Technology FromHandle(Handle handle)

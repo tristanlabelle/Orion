@@ -77,7 +77,7 @@ namespace Orion.GameLogic
                 Name = "Schtroumpf",
                 Size = new Size(1, 1),
                 SightRange = 5,
-                MaxHealth = 15,
+                MaxHealth = 25,
                 MeleeArmor = 0,
                 RangedArmor = 2,
                 AladdiumCost = 50,
@@ -85,7 +85,7 @@ namespace Orion.GameLogic
                 FoodCost = 1
             };
             builder.Skills.Add(new MoveSkill(8, false));
-            builder.Skills.Add(new AttackSkill(1, 0, 5));
+            builder.Skills.Add(new AttackSkill(2, 0, 5));
             builder.Skills.Add(new HarvestSkill(1, 10));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 20));
             Register(builder);

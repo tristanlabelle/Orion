@@ -64,10 +64,12 @@ namespace Orion.GameLogic.Technologies
             {
                 Name = "Schtroumpf costaud",
                 AladdiumCost = 150,
-                AlageneCost = 150,
+                AlageneCost = 100,
                 Effects = new[]
                 {
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MaxHealth, 40)
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.AttackPower, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MaxHealth, 25),
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 

@@ -45,10 +45,6 @@ namespace Orion.Networking
         }
         #endregion
 
-        #region Events
-        public event GenericEventHandler<FactionEndPoint> Disconnected;
-        #endregion
-
         #region Methods
         public bool IsDoneForFrame(int commandFrame)
         {

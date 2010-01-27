@@ -44,6 +44,20 @@ namespace Orion.GameLogic.Technologies
             }.Build(handleGenerator());
 
             technologies.Add(importJeanMarc);
+
+            Technology holyTrinity = new TechnologyBuilder
+            {
+                Name = "Sainte-Trinité",
+                AladdiumCost = 200,
+                AlageneCost = 150,
+                Effects = new[]
+                {
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.RangedArmor, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MeleeArmor, 1)
+                }
+            }.Build(handleGenerator());
+
+            technologies.Add(holyTrinity);
         }
 
         public Technology FromHandle(Handle handle)

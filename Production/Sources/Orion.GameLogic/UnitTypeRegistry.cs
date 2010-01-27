@@ -77,7 +77,7 @@ namespace Orion.GameLogic
                 Name = "Schtroumpf",
                 Size = new Size(1, 1),
                 SightRange = 5,
-                MaxHealth = 25,
+                MaxHealth = 20,
                 MeleeArmor = 0,
                 RangedArmor = 2,
                 AladdiumCost = 50,

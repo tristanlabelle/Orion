@@ -10,14 +10,18 @@ namespace Orion.GameLogic.Skills
     {
         #region Fields
         private int speed;
+        private int healRange;
+
         #endregion
 
         #region Constructors
         
-        public HealSkill(int speed)
+        public HealSkill(int speed, int healRange)
         {
             Argument.EnsureStrictlyPositive(speed, "speed");
             this.speed = speed;
+            Argument.EnsureStrictlyPositive(healRange, "healRange");
+            this.healRange = healRange;
         }
         #endregion
 
@@ -30,6 +34,12 @@ namespace Orion.GameLogic.Skills
             get { return speed; }
             set { speed = value; }
         }
+
+        public int HealRange
+        {
+            get { return healRange; }
+            set { healRange = value; }
+        }
         #endregion
 
         #region Methods
@@ -37,6 +47,7 @@ namespace Orion.GameLogic.Skills
         public override int? TryGetBaseStat(UnitStat stat)
         {
             if (stat == UnitStat.HealSpeed) return speed;
+            if (stat == UnitStat.HealRange) return healRange;
             return null;
         }
         #endregion

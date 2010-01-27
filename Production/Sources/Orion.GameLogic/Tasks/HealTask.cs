@@ -41,6 +41,11 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Properties
+
+        public bool IsWithinRange
+        {
+            get { return (Unit.Center - target.Center).LengthFast <= Unit.GetStat(UnitStat.HealRange); }
+        }
         public Unit Target
         {
             get { return target; }
@@ -56,7 +61,7 @@ namespace Orion.GameLogic.Tasks
             get
             {
                 if (!target.IsAlive) return true;
-                if (move.HasEnded && !move.HasReachedDestination) return true;
+                if (move.HasEnded && !IsWithinRange) return true;
                 return target.Health >= target.MaxHealth;
             }
         }
@@ -65,15 +70,19 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!move.HasEnded)
+            if (IsWithinRange)
+            {
+                Unit.LookAt(target.Center);
+                int speed = Unit.GetStat(UnitStat.HealSpeed);
+                target.Health += speed * step.TimeDeltaInSeconds;
+            }
+            else if (!move.HasEnded)
             {
                 move.Update(step);
                 return;
             }
             
-            Unit.LookAt(target.Center);
-            int speed = Unit.GetStat(UnitStat.HealSpeed);
-            target.Health += speed * step.TimeDeltaInSeconds;
+           
         }
 
         #endregion

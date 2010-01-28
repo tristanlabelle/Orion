@@ -55,6 +55,16 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
+        /// Raised when a unit gets hit.
+        /// </summary>
+        public event GenericEventHandler<World, HitEventArgs> UnitHit;
+
+        public void RaiseUnitHit(HitEventArgs args)
+        {
+            if (UnitHit != null) UnitHit(this, args);
+        }
+
+        /// <summary>
         /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s has been defeated.
         /// </summary>
         public event GenericEventHandler<World, Faction> FactionDefeated;

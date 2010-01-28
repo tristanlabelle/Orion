@@ -50,6 +50,11 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Properties
+        public Faction Faction
+        {
+            get { return faction; }
+        }
+
         public Rectangle WorldBounds
         {
             get { return World.Bounds; }
@@ -61,7 +66,7 @@ namespace Orion.Graphics.Renderers
             set { unitsRenderer.DrawHealthBars = value; }
         }
 
-        private World World
+        public World World
         {
             get { return faction.World; }
         }

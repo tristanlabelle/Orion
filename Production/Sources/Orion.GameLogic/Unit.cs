@@ -94,12 +94,15 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Unit"/> has hit another <see cref="Unit"/>.
         /// </summary>
-        public event GenericEventHandler<Unit, Unit> Hitted;
+        public event GenericEventHandler<Unit, HitEventArgs> Hitted;
 
-        private void RaiseHitted(Unit target)
+        private void RaiseHitted(Unit target, float damage)
         {
-            var handler = Hitted;
-            if (handler != null) handler(this, target);
+            HitEventArgs args = new HitEventArgs(this, target, damage);
+
+            if (Hitted != null) Hitted(this, args);
+
+            World.RaiseUnitHit(args);
         }
         #endregion
 
@@ -401,7 +404,7 @@ namespace Orion.GameLogic
 
             timeElapsedSinceLastHitInSeconds = 0;
 
-            RaiseHitted(target);
+            RaiseHitted(target, damage);
         }
 
         public void Suicide()

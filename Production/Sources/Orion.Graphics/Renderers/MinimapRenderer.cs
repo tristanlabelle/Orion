@@ -2,6 +2,7 @@ using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using System.Diagnostics;
 
 namespace Orion.Graphics.Renderers
 {
@@ -9,13 +10,16 @@ namespace Orion.Graphics.Renderers
     {
         #region Fields
         private readonly WorldRenderer worldRenderer;
+        private readonly AttackWarningRenderer attackWarningRenderer;
         #endregion
 
         #region Constructors
         public MinimapRenderer(WorldRenderer worldRenderer)
         {
             Argument.EnsureNotNull(worldRenderer, "worldRenderer");
+
             this.worldRenderer = worldRenderer;
+            this.attackWarningRenderer = new AttackWarningRenderer(worldRenderer.Faction);
         }
         #endregion
 
@@ -30,6 +34,7 @@ namespace Orion.Graphics.Renderers
             worldRenderer.DrawMiniatureResources(context);
             worldRenderer.DrawMiniatureUnits(context);
             worldRenderer.DrawFogOfWar(context);
+            attackWarningRenderer.Draw(context);
 
             context.StrokeColor = Color.Orange;
             Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);

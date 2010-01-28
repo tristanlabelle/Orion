@@ -71,9 +71,11 @@ namespace Orion.Networking
         {
             get
             {
-                int average = (int)(previousFramesDuration.Average() + 0.5);
-                int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
-                return average + deviation * 2;
+                //int average = (int)(previousFramesDuration.Average() + 0.5);
+                //int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
+                //return average + deviation * 2;
+#warning Hard-coded updates/command frame
+                return 5;
             }
         }
         #endregion

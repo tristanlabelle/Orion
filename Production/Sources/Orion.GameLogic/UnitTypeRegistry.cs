@@ -40,6 +40,7 @@ namespace Orion.GameLogic
 
             RegisterTechCenter();
             RegisterTower();
+            RegisterWatchTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
 
@@ -356,6 +357,22 @@ namespace Orion.GameLogic
                 AlageneCost = 40
             };
             builder.Skills.Add(new AttackSkill(8, 7, 2));
+            Register(builder);
+        }
+
+        public void RegisterWatchTower()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Tour de garde",
+                Size = new Size(2, 2),
+                SightRange = 16,
+                MaxHealth = 100,
+                MeleeArmor = 1,
+                RangedArmor = 1,
+                AladdiumCost = 150,
+                AlageneCost = 25
+            };
             Register(builder);
         }
 

@@ -480,7 +480,7 @@ namespace Orion.GameLogic
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
-                if (!IsUnderConstruction && HasSkill<AttackSkill>())
+                if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>())
                     TryAttackNearbyUnit();
                 else if (HasSkill<HealSkill>())
                     TryHealNearbyUnit();

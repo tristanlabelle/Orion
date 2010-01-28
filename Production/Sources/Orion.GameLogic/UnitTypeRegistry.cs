@@ -275,14 +275,14 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 65,
-                MeleeArmor = 3,
+                MeleeArmor = 1,
                 RangedArmor = 3,
-                AladdiumCost = 100,
+                AladdiumCost = 20,
                 AlageneCost = 75,
-                FoodCost = 3
+                FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(9, false));
-            builder.Skills.Add(new AttackSkill(6, 3, 3));
+            builder.Skills.Add(new AttackSkill(5, 3, 3));
             Register(builder);
         }
 

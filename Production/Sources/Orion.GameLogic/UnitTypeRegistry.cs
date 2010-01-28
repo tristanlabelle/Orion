@@ -52,7 +52,7 @@ namespace Orion.GameLogic
         #region Methods
         #region Hard-Coded UnitTypes
         #region Pyramid & Units
-        public void RegisterPyramid()
+        private void RegisterPyramid()
         {
             var builder = new UnitTypeBuilder
             {
@@ -71,7 +71,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterSmurf()
+        private void RegisterSmurf()
         {
             var builder = new UnitTypeBuilder
             {
@@ -94,7 +94,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Barracks & Units
-        public void RegisterBarracks()
+        private void RegisterBarracks()
         {
             var builder = new UnitTypeBuilder
             {
@@ -112,7 +112,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterPirate()
+        private void RegisterPirate()
         {
             var builder = new UnitTypeBuilder
             {
@@ -131,7 +131,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterNinja()
+        private void RegisterNinja()
         {
             var builder = new UnitTypeBuilder
             {
@@ -150,7 +150,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterViking()
+        private void RegisterViking()
         {
             var builder = new UnitTypeBuilder
             {
@@ -171,7 +171,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region StarPort & Units
-        public void RegisterStarPort()
+        private void RegisterStarPort()
         {
             var builder = new UnitTypeBuilder
             {
@@ -189,7 +189,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterSwineFlu()
+        private void RegisterSwineFlu()
         {
             var builder = new UnitTypeBuilder
             {
@@ -208,7 +208,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterUfo()
+        private void RegisterUfo()
         {
             var builder = new UnitTypeBuilder
             {
@@ -227,7 +227,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterFlyingCarpet()
+        private void RegisterFlyingCarpet()
         {
             var builder = new UnitTypeBuilder
             {
@@ -248,7 +248,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Propaganda Center & Units
-        public void RegisterPropagandaCenter()
+        private void RegisterPropagandaCenter()
         {
             var builder = new UnitTypeBuilder
             {
@@ -267,7 +267,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterJedihad()
+        private void RegisterJedihad()
         {
             var builder = new UnitTypeBuilder
             {
@@ -286,7 +286,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterJesus()
+        private void RegisterJesus()
         {
             var builder = new UnitTypeBuilder
             {
@@ -305,7 +305,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterFlyingSpaghettiMonster()
+        private void RegisterFlyingSpaghettiMonster()
         {
             var builder = new UnitTypeBuilder
             {
@@ -326,7 +326,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Other Buildings
-        public void RegisterTechCenter()
+        private void RegisterTechCenter()
         {
             var builder = new UnitTypeBuilder
             {
@@ -343,7 +343,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterTower()
+        private void RegisterTower()
         {
             var builder = new UnitTypeBuilder
             {
@@ -360,7 +360,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterWatchTower()
+        private void RegisterWatchTower()
         {
             var builder = new UnitTypeBuilder
             {
@@ -376,7 +376,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterAlageneExtractor()
+        private void RegisterAlageneExtractor()
         {
             var builder = new UnitTypeBuilder
             {
@@ -393,7 +393,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterSupplyDepot()
+        private void RegisterSupplyDepot()
         {
             var builder = new UnitTypeBuilder
             {
@@ -412,7 +412,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Heroes
-        public void RegisterChuckNorris()
+        private void RegisterChuckNorris()
         {
             var builder = new UnitTypeBuilder
             {
@@ -428,7 +428,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        public void RegisterMrT()
+        private void RegisterMrT()
         {
             var builder = new UnitTypeBuilder
             {

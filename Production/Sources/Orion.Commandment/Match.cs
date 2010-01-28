@@ -6,7 +6,6 @@ using Orion.GameLogic;
 using System.Linq;
 using System.Collections.Generic;
 
-
 namespace Orion.Commandment
 {
     /// <summary>
@@ -15,7 +14,7 @@ namespace Orion.Commandment
     public sealed class Match
     {
         #region Fields
-        private const int resourceNodeCount = 60;
+        private const int resourceNodeCount = 85;
         private const int campSize = 15;
         private const int initialMinimumDistanceBetweenCamps = 175;
 

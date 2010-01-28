@@ -201,7 +201,7 @@ namespace Orion.GameLogic
                 RangedArmor = 1,
                 AladdiumCost = 75,
                 AlageneCost = 100,
-                FoodCost = 3
+                FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(15, true));
             builder.Skills.Add(new AttackSkill(1, 7, 1));
@@ -218,9 +218,9 @@ namespace Orion.GameLogic
                 MaxHealth = 100,
                 MeleeArmor = 1,
                 RangedArmor = 4,
-                AladdiumCost = 150,
-                AlageneCost = 200,
-                FoodCost = 5
+                AladdiumCost = 140,
+                AlageneCost = 140,
+                FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(8, true));
             builder.Skills.Add(new AttackSkill(13, 8, 8));

@@ -493,18 +493,20 @@ namespace Orion.GameLogic
             IEnumerable<Unit> attackableUnits = World.Entities
                 .Intersecting(LineOfSight)
                 .OfType<Unit>()
-                .Where(unit => IsInLineOfSight(unit)
-                    && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy);
+                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy
+                    && IsInLineOfSight(unit));
 
-            if(!IsAirborne && GetStat(UnitStat.AttackRange) == 0)
+            if (!IsAirborne && GetStat(UnitStat.AttackRange) == 0)
                 attackableUnits = attackableUnits.Where(u => !u.IsAirborne);
 
+            // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
-                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared
+                    + (unit.HasSkill<AttackSkill>() ? 0 : 100));
 
             if (unitToAttack == null) return false;
         
-            Tasks.AttackTask attackTask = new Tasks.AttackTask(this, unitToAttack);
+            AttackTask attackTask = new AttackTask(this, unitToAttack);
             taskQueue.OverrideWith(attackTask);
             return true;
         }
@@ -514,11 +516,11 @@ namespace Orion.GameLogic
             Unit unitToHeal = World.Entities
                .Intersecting(LineOfSight)
                .OfType<Unit>()
-               .Where(unit => IsInLineOfSight(unit)
-                   && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
-                   && unit != this
+               .Where(unit => unit != this
                    && unit.Damage > 0
-                   && !unit.IsBuilding)
+                   && !unit.IsBuilding
+                   && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
+                   && IsInLineOfSight(unit))
                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToHeal == null) return false;

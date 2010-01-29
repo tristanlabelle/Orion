@@ -130,6 +130,8 @@ namespace Orion.Commandment
 
                 world.Update(lastSimulationStep);
             }
+            else
+                Console.WriteLine("*** GAME PAUSED!");
 
             RaiseUpdated(timeDeltaInSeconds);
         }

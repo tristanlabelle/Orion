@@ -115,7 +115,6 @@ namespace Orion.Networking
             {
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {
-                    Console.WriteLine("*** GAME PAUSED!");
                     match.Pause();
                     return;
                 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Orion.GameLogic;
 using Orion.Commandment;
@@ -113,10 +114,10 @@ namespace Orion.Networking
 
             if (updatesSinceLastCommandFrame >= TargetUpdatesPerCommandFrame * 2)
             {
-                if (!AllPeersDone || !ReceivedFromAllPeers)
+                while (!AllPeersDone || !ReceivedFromAllPeers)
                 {
-                    match.Pause();
-                    return;
+                    Thread.Sleep(10);
+                    transporter.Poll();
                 }
                 match.Resume();
 

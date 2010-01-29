@@ -109,7 +109,7 @@ namespace Orion.GameLogic
                 for (int i = 0; i < zone.Count; ++i)
                 {
                     Entity entity = zone[i];
-                    if (area.ContainsPoint(entity.Center))
+                    if (Rectangle.Intersects(area, entity.BoundingRectangle))
                         yield return entity;
                 }
             }

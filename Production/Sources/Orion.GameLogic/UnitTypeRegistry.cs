@@ -362,7 +362,7 @@ namespace Orion.GameLogic
                 FoodCost = 5
             };
             builder.Skills.Add(new MoveSkill(3, false));
-            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Coke diète", 10, 200));
+            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Coke diète", 10, 400));
             Register(builder);
         }
 
@@ -380,7 +380,7 @@ namespace Orion.GameLogic
                 FoodCost = 5
             };
             builder.Skills.Add(new MoveSkill(3, false));
-            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Mentos", 10, 200));
+            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Mentos", 10, 400));
             Register(builder);
         }
         #endregion

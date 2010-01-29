@@ -506,23 +506,40 @@ namespace Orion.GameLogic
 
             Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, suicideBombSkill.ExplosionRadius);
 
+            explodingTarget.Suicide();
+            Explode();
+
+            return true;
+        }
+
+        private void Explode()
+        {
+            SuicideBombSkill suicideBombSkill = GetSkill<SuicideBombSkill>();
+            Circle explosionCircle = new Circle(Center, suicideBombSkill.ExplosionRadius);
+
+            World.RaiseExplosionOccured(explosionCircle);
+            Suicide();
+
             Unit[] damagedUnits = World.Entities
                 .Intersecting(explosionCircle)
                 .OfType<Unit>()
-                .Where(unit => unit != this && unit != explodingTarget)
+                .Where(unit => unit != this && unit.IsAlive)
                 .ToArray();
 
-            foreach (Unit unit in damagedUnits)
+            foreach (Unit damagedUnit in damagedUnits)
             {
-                unit.Health -= suicideBombSkill.ExplosionDamage;
+                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
+                float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
+                    * suicideBombSkill.ExplosionDamage;
+                damagedUnit.Health -= damage;
             }
 
-            Suicide();
-            explodingTarget.Suicide();
-
-            World.RaiseExplosionOccured(explosionCircle);
-
-            return true;
+            foreach (Unit damagedUnit in damagedUnits)
+            {
+                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                damagedUnit.Explode();
+            }
         }
 
         private bool TryAttackNearbyUnit()

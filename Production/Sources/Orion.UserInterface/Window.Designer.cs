@@ -39,9 +39,9 @@ namespace Orion.UserInterface
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
-            this.glControl.Margin = new System.Windows.Forms.Padding(5);
+            this.glControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.glControl.Name = "glControl";
-            this.glControl.Size = new System.Drawing.Size(1056, 702);
+            this.glControl.Size = new System.Drawing.Size(961, 678);
             this.glControl.TabIndex = 0;
             this.glControl.VSync = false;
             this.glControl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseWheel);
@@ -53,12 +53,12 @@ namespace Orion.UserInterface
             // 
             // Window
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1056, 702);
+            this.ClientSize = new System.Drawing.Size(961, 678);
             this.Controls.Add(this.glControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Window";
             this.Text = "Orion";
             this.ResumeLayout(false);

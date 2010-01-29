@@ -49,7 +49,7 @@ namespace Orion.UserInterface
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
-            Button joinRemoteButton = new Button(joinRemoteFrame, "Joindre par IP");
+            Button joinRemoteButton = new Button(joinRemoteFrame, "Jointer par IP");
             joinRemoteButton.Triggered += PressJoinRemoteGame;
             Children.Add(joinRemoteButton);
 

@@ -29,7 +29,7 @@ namespace Orion.UserInterface
             Children.Add(multiplayerGame);
 
             Rectangle viewReplayButtonRect = Instant.CreateComponentRectangle(Bounds, new Vector2(0.345f, 0.33f), new Vector2(0.655f, 0.485f));
-            Button replayGame = new Button(viewReplayButtonRect, "Regarder une partie");
+            Button replayGame = new Button(viewReplayButtonRect, "Visionner une partie");
             replayGame.Triggered += BeginViewReplay;
             Children.Add(replayGame);
 

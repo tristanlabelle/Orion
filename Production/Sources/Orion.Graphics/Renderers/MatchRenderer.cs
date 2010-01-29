@@ -72,7 +72,9 @@ namespace Orion.Graphics.Renderers
             if (SelectionManager.HoveredUnit != null && Faction.CanSee(SelectionManager.HoveredUnit))
                 HealthBarRenderer.Draw(context, SelectionManager.HoveredUnit);
 
+            worldRenderer.DrawExplosions(context);
             worldRenderer.DrawFogOfWar(context);
+
             if (inputManager.SelectedCommand is IRenderer)
                 ((IRenderer)inputManager.SelectedCommand).Draw(context);
             selectionRenderer.DrawSelectionRectangle(context);

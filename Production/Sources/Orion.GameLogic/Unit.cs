@@ -92,17 +92,17 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Raised when this <see cref="Unit"/> has hit another <see cref="Unit"/>.
+        /// Raised when this <see cref="Unit"/> hits another <see cref="Unit"/>.
         /// </summary>
-        public event GenericEventHandler<Unit, HitEventArgs> Hitted;
+        public event GenericEventHandler<Unit, HitEventArgs> Hitting;
 
-        private void RaiseHitted(Unit target, float damage)
+        private void RaiseHitting(Unit target, float damage)
         {
             HitEventArgs args = new HitEventArgs(this, target, damage);
 
-            if (Hitted != null) Hitted(this, args);
+            if (Hitting != null) Hitting(this, args);
 
-            World.RaiseUnitHit(args);
+            World.RaiseUnitHitting(args);
         }
         #endregion
 
@@ -404,7 +404,7 @@ namespace Orion.GameLogic
 
             timeElapsedSinceLastHitInSeconds = 0;
 
-            RaiseHitted(target, damage);
+            RaiseHitting(target, damage);
         }
 
         public void Suicide()
@@ -480,12 +480,49 @@ namespace Orion.GameLogic
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
+                if (HasSkill<SuicideBombSkill>() && TryExplode())
+                    return;
+
                 if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>())
                     TryAttackNearbyUnit();
                 else if (HasSkill<HealSkill>())
                     TryHealNearbyUnit();
             }
             taskQueue.Update(step);
+        }
+
+        private bool TryExplode()
+        {
+            SuicideBombSkill suicideBombSkill = GetSkill<SuicideBombSkill>();
+
+            Unit explodingTarget = World.Entities
+                .Intersecting(Rectangle.FromCenterSize(Center, new Vector2(3, 3)))
+                .OfType<Unit>()
+                .FirstOrDefault(unit => unit != this
+                    && suicideBombSkill.IsExplodingTarget(unit.type)
+                    && Region.AreAdjacentOrIntersecting(GridRegion, unit.GridRegion));
+
+            if (explodingTarget == null) return false;
+
+            Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, suicideBombSkill.ExplosionRadius);
+
+            Unit[] damagedUnits = World.Entities
+                .Intersecting(explosionCircle)
+                .OfType<Unit>()
+                .Where(unit => unit != this && unit != explodingTarget)
+                .ToArray();
+
+            foreach (Unit unit in damagedUnits)
+            {
+                unit.Health -= suicideBombSkill.ExplosionDamage;
+            }
+
+            Suicide();
+            explodingTarget.Suicide();
+
+            World.RaiseExplosionOccured(explosionCircle);
+
+            return true;
         }
 
         private bool TryAttackNearbyUnit()

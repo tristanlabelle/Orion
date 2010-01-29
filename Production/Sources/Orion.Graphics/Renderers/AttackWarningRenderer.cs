@@ -46,7 +46,7 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(faction, "faction");
             this.faction = faction;
-            this.faction.World.UnitHit += OnWorldUnitHit;
+            this.faction.World.UnitHitting += OnWorldUnitHit;
             this.faction.World.Updated += OnWorldUpdated;
         }
         #endregion

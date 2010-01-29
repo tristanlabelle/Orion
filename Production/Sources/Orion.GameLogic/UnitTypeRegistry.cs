@@ -39,6 +39,9 @@ namespace Orion.GameLogic
             RegisterFlyingSpaghettiMonster();
 
             RegisterTechCenter();
+            RegisterMentos();
+            RegisterDietCoke();
+
             RegisterTower();
             RegisterWatchTower();
             RegisterAlageneExtractor();
@@ -325,7 +328,7 @@ namespace Orion.GameLogic
         }
         #endregion
 
-        #region Other Buildings
+        #region Tech Center
         private void RegisterTechCenter()
         {
             var builder = new UnitTypeBuilder
@@ -340,9 +343,49 @@ namespace Orion.GameLogic
                 AlageneCost = 50
             };
             builder.Skills.Add(new ResearchSkill(technology => true));
+            builder.Skills.Add(new TrainSkill(type =>
+                type.Name == "Mentos" || type.Name == "Coke diète", 10));
             Register(builder);
         }
 
+        private void RegisterMentos()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Mentos",
+                Size = new Size(1, 1),
+                SightRange = 3,
+                MaxHealth = 100,
+                MeleeArmor = 3,
+                RangedArmor = 3,
+                AlageneCost = 1000,
+                FoodCost = 5
+            };
+            builder.Skills.Add(new MoveSkill(3, false));
+            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Coke diète", 10, 200));
+            Register(builder);
+        }
+
+        private void RegisterDietCoke()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Coke diète",
+                Size = new Size(1, 1),
+                SightRange = 3,
+                MaxHealth = 100,
+                MeleeArmor = 3,
+                RangedArmor = 3,
+                AladdiumCost = 1000,
+                FoodCost = 5
+            };
+            builder.Skills.Add(new MoveSkill(3, false));
+            builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Mentos", 10, 200));
+            Register(builder);
+        }
+        #endregion
+
+        #region Other Buildings
         private void RegisterTower()
         {
             var builder = new UnitTypeBuilder

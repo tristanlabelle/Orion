@@ -55,13 +55,23 @@ namespace Orion.GameLogic
         }
 
         /// <summary>
-        /// Raised when a unit gets hit.
+        /// Raised when a unit hits another unit.
         /// </summary>
-        public event GenericEventHandler<World, HitEventArgs> UnitHit;
+        public event GenericEventHandler<World, HitEventArgs> UnitHitting;
 
-        public void RaiseUnitHit(HitEventArgs args)
+        internal void RaiseUnitHitting(HitEventArgs args)
         {
-            if (UnitHit != null) UnitHit(this, args);
+            if (UnitHitting != null) UnitHitting(this, args);
+        }
+
+        /// <summary>
+        /// Raised when an explosion occurs!
+        /// </summary>
+        public event GenericEventHandler<World, Circle> ExplosionOccured;
+
+        internal void RaiseExplosionOccured(Circle circle)
+        {
+            if (ExplosionOccured != null) ExplosionOccured(this, circle);
         }
 
         /// <summary>

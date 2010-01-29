@@ -23,6 +23,7 @@ namespace Orion.Graphics.Renderers
         private readonly ResourcesRenderer resourcesRenderer;
         private readonly RuinsRenderer ruinsRenderer;
         private readonly UnitsRenderer unitsRenderer;
+        private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
         #endregion
 
@@ -45,6 +46,7 @@ namespace Orion.Graphics.Renderers
             this.resourcesRenderer = new ResourcesRenderer(faction, textureManager);
             this.ruinsRenderer = new RuinsRenderer(faction, textureManager);
             this.unitsRenderer = new UnitsRenderer(faction, textureManager);
+            this.explosionRenderer = new ExplosionRenderer(faction.World, textureManager);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
         #endregion
@@ -85,9 +87,7 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(graphics, "graphics");
             terrainRenderer.DrawMiniature(graphics);
         }
-        #endregion
 
-        #region Resources
         public void DrawResources(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
@@ -99,9 +99,7 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(graphics, "graphics");
             resourcesRenderer.DrawMiniature(graphics);
         }
-        #endregion
 
-        #region Units
         public void DrawUnits(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
@@ -114,9 +112,13 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(graphics, "graphics");
             unitsRenderer.DrawMiniature(graphics);
         }
-        #endregion
 
-        #region Fog of War
+        public void DrawExplosions(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+            explosionRenderer.Draw(graphics);
+        }
+
         public void DrawFogOfWar(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");

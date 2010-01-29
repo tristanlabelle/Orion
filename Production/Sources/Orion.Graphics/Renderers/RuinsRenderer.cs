@@ -16,6 +16,7 @@ namespace Orion.Graphics.Renderers
     public sealed class RuinsRenderer : IRenderer
     {
         #region Fields
+        private const float maxRuinAlpha = 0.8f;
         private const float buildingRuinDurationInSeconds = 60 * 4;
         private const float skeletonDurationInSeconds = 60;
         private const float ruinFadeDurationInSeconds = 1;
@@ -99,7 +100,7 @@ namespace Orion.Graphics.Renderers
                 float lifetimeRemainingInSeconds = durationInSeconds - ageInSeconds;
                 float alpha = lifetimeRemainingInSeconds / ruinFadeDurationInSeconds;
                 if (alpha < 0) alpha = 0;
-                if (alpha > 1) alpha = 1;
+                if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
 
                 Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
 

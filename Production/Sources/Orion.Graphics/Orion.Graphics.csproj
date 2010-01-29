@@ -58,6 +58,7 @@
     <Compile Include="RawPixelSurface.cs" />
     <Compile Include="Renderers\AttackWarningRenderer.cs" />
     <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
+    <Compile Include="Renderers\ExplosionRenderer.cs" />
     <Compile Include="Renderers\FilledFrameRenderer.cs" />
     <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />

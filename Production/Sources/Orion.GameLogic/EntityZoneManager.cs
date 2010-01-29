@@ -97,6 +97,11 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
         public IEnumerable<Entity> Intersecting(Rectangle area)
         {
+            return IntersectingWithDuplicates(area).Distinct();
+        }
+
+        private IEnumerable<Entity> IntersectingWithDuplicates(Rectangle area)
+        {
             Region zoneRegion = GetZoneRegion(area);
             foreach (Point point in zoneRegion.Points)
             {

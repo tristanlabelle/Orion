@@ -15,7 +15,7 @@ namespace Orion.Networking
     {
         #region Fields
         #region Updates Rate Management
-        private const int retainedSeconds = 5;
+        private const int retentionDelay = 5;
         private const int updatesPerSecond = 40;
         private const int defaultUpdatesPerFrame = 6;
         private readonly List<int> updatesForCommandFrame = new List<int>();
@@ -71,11 +71,15 @@ namespace Orion.Networking
         {
             get
             {
-                //int average = (int)(previousFramesDuration.Average() + 0.5);
-                //int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
-                //return average + deviation * 2;
+#if false
+                // adaptative frame rate
+                int average = (int)(previousFramesDuration.Average() + 0.5);
+                int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
+                return average + deviation * 2;
+#else
 #warning Hard-coded updates/command frame
                 return 5;
+#endif
             }
         }
         #endregion
@@ -111,6 +115,7 @@ namespace Orion.Networking
             {
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {
+                    Console.WriteLine("*** GAME PAUSED!");
                     match.Pause();
                     return;
                 }
@@ -133,7 +138,7 @@ namespace Orion.Networking
             Debug.WriteLine("Current UPCFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updates), longestCommandFrame));
             
             previousFramesDuration.Enqueue(longestCommandFrame);
-            while (previousFramesDuration.Count > 1 && previousFramesDuration.Sum() > retainedSeconds * updatesPerSecond)
+            while (previousFramesDuration.Count > 1 && previousFramesDuration.Sum() > retentionDelay * updatesPerSecond)
                 previousFramesDuration.Dequeue();
             updatesForCommandFrame.Clear();
         }

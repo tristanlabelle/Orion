@@ -127,7 +127,7 @@ namespace Orion.GameLogic
                 RangedArmor = 1,
                 AladdiumCost = 50,
                 AlageneCost = 0,
-                FoodCost = 2
+                FoodCost = 1
             };
             builder.Skills.Add(new MoveSkill(8, false));
             builder.Skills.Add(new AttackSkill(5, 0, 3));
@@ -160,15 +160,15 @@ namespace Orion.GameLogic
                 Name = "Viking",
                 Size = new Size(1, 1),
                 SightRange = 8,
-                MaxHealth = 50,
-                MeleeArmor = 3,
+                MaxHealth = 75,
+                MeleeArmor = 4,
                 RangedArmor = 2,
                 AladdiumCost = 100,
                 AlageneCost = 25,
                 FoodCost = 3
             };
             builder.Skills.Add(new MoveSkill(6, false));
-            builder.Skills.Add(new AttackSkill(8, 0, 4));
+            builder.Skills.Add(new AttackSkill(14, 0, 4));
             Register(builder);
         }
         #endregion

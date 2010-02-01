@@ -355,9 +355,9 @@ namespace Orion.GameLogic
                 Name = "Mentos",
                 Size = new Size(1, 1),
                 SightRange = 3,
-                MaxHealth = 100,
-                MeleeArmor = 3,
-                RangedArmor = 3,
+                MaxHealth = 200,
+                MeleeArmor = 5,
+                RangedArmor = 5,
                 AladdiumCost = 3000,
                 FoodCost = 5
             };
@@ -373,9 +373,9 @@ namespace Orion.GameLogic
                 Name = "Coke diète",
                 Size = new Size(1, 1),
                 SightRange = 3,
-                MaxHealth = 100,
-                MeleeArmor = 3,
-                RangedArmor = 3,
+                MaxHealth = 200,
+                MeleeArmor = 5,
+                RangedArmor = 5,
                 AlageneCost = 3000,
                 FoodCost = 5
             };

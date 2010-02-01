@@ -480,18 +480,18 @@ namespace Orion.GameLogic
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
-                if (HasSkill<SuicideBombSkill>() && TryExplode())
+                if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
                     return;
 
-                if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>())
-                    TryAttackNearbyUnit();
-                else if (HasSkill<HealSkill>())
-                    TryHealNearbyUnit();
+                if (HasSkill<BuildSkill>() && TryRepairNearbyUnit()) { }
+                else if (HasSkill<HealSkill>() && TryHealNearbyUnit()) { }
+                else if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>()
+                    && TryAttackNearbyUnit()) { }
             }
             taskQueue.Update(step);
         }
 
-        private bool TryExplode()
+        private bool TryExplodeWithNearbyUnit()
         {
             SuicideBombSkill suicideBombSkill = GetSkill<SuicideBombSkill>();
 
@@ -581,6 +581,25 @@ namespace Orion.GameLogic
 
             HealTask healTask = new HealTask(this, unitToHeal);
             taskQueue.OverrideWith(healTask);
+            return true;
+        }
+
+        private bool TryRepairNearbyUnit()
+        {
+            Unit unitToRepair = World.Entities
+               .Intersecting(LineOfSight)
+               .OfType<Unit>()
+               .Where(unit => unit != this
+                   && unit.IsBuilding
+                   && unit.IsUnderConstruction
+                   && unit.Faction == faction
+                   && IsInLineOfSight(unit))
+               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+
+            if (unitToRepair == null) return false;
+
+            RepairTask repairTask = new RepairTask(this, unitToRepair);
+            taskQueue.OverrideWith(repairTask);
             return true;
         }
 

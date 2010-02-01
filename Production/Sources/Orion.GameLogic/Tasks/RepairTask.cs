@@ -12,9 +12,13 @@ namespace Orion.GameLogic.Tasks
     public sealed class RepairTask : Task
     {
         #region Fields
+        private const float repairSpeedRatio = 0.25f;
+
         private readonly Unit target;
         private readonly GenericEventHandler<Entity> targetDiedEventHandler;
         private readonly MoveTask move;
+        private readonly bool building;
+        private bool hasEnded;
         
         /// <summary>
         /// Remaining amount of aladdium that has been taken from the <see cref="Faction"/>'s coffers
@@ -44,6 +48,7 @@ namespace Orion.GameLogic.Tasks
             this.targetDiedEventHandler = OnBuildingDied;
             this.target.Died += targetDiedEventHandler;
             this.move = MoveTask.ToNearRegion(repairer, target.GridRegion);
+            this.building = target.IsUnderConstruction;
         }
         #endregion
 
@@ -62,9 +67,10 @@ namespace Orion.GameLogic.Tasks
         {
             get
             {
-                if (!target.IsAlive) return true;
-                if (move.HasEnded && !move.HasReachedDestination) return true;
-                return !target.IsUnderConstruction && target.Health >= target.MaxHealth;
+                return hasEnded
+                    || !target.IsAlive
+                    || (move.HasEnded && !move.HasReachedDestination)
+                    || (!building && target.Health >= target.MaxHealth);
             }
         }
         #endregion
@@ -79,13 +85,16 @@ namespace Orion.GameLogic.Tasks
             }
 
             Unit.LookAt(target.Center);
-            if (target.IsUnderConstruction) UpdateBuild(step);
+            if (building) UpdateBuild(step);
             else UpdateRepair(step);
         }
 
         private void UpdateBuild(SimulationStep step)
         {
-            target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * step.TimeDeltaInSeconds);
+            if (target.IsUnderConstruction)
+            {
+                target.Build(Unit.GetStat(UnitStat.BuildingSpeed) * step.TimeDeltaInSeconds);
+            }
 
             if (!target.IsUnderConstruction)
             {
@@ -97,6 +106,8 @@ namespace Orion.GameLogic.Tasks
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
                     Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
                 }
+
+                hasEnded = true;
             }
         }
 
@@ -107,7 +118,7 @@ namespace Orion.GameLogic.Tasks
             int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
             int alageneCost = Target.GetStat(UnitStat.AlageneCost);
 
-            float healthToRepair = Unit.GetStat(UnitStat.BuildingSpeed) * step.TimeDeltaInSeconds;
+            float healthToRepair = Unit.GetStat(UnitStat.BuildingSpeed) * repairSpeedRatio * step.TimeDeltaInSeconds;
             if (healthToRepair > target.Damage) healthToRepair = target.Damage;
 
             float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;

@@ -98,6 +98,7 @@ namespace Orion.Networking
 
             if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)
             {
+                Debug.WriteLine("Sending commands for commands frame {0}".FormatInvariant(commandFrameNumber), "Network");
                 peers.ForEach(peer => peer.SendCommands(commandFrameNumber, commandsToSend));
                 commandsToExecute.AddRange(commandsToSend);
                 commandsToSend.Clear();
@@ -115,13 +116,17 @@ namespace Orion.Networking
             {
                 if (!AllPeersDone || !ReceivedFromAllPeers)
                 {
+                    Debug.WriteLine("Match paused!", "Network");
                     match.Pause();
                     return;
                 }
                 match.Resume();
 
+                Debug.WriteLine("Received commands for commands frame {0}".FormatInvariant(commandFrameNumber), "Network");
+                var commands = peers.SelectMany(peer => peer.GetCommandsForCommandFrame(commandFrameNumber));
+                commandsToExecute.AddRange(commands);
+
                 AdaptUpdatesPerCommandFrame();
-                peers.ForEach(peer => commandsToExecute.AddRange(peer.GetCommandsForCommandFrame(commandFrameNumber)));
                 FlushCommands();
 
                 commandFrameNumber++;

@@ -27,7 +27,11 @@ namespace Orion.Graphics.Renderers
             pixelBuffer = new byte[faction.LocalFogOfWar.Size.Area];
             UpdatePixelBuffer();
 
-            texture = Texture.FromBuffer(faction.LocalFogOfWar.Size, PixelFormat.Alpha, pixelBuffer, true, false);
+            int textureWidth = Math.Max(
+                PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Width),
+                PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Height));
+            Size textureSize = new Size(textureWidth, textureWidth);
+            texture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelBuffer, true, false);
         }
         #endregion
 

@@ -60,9 +60,12 @@ namespace Orion.Graphics
         public void DrawMiniature(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-            Rectangle textureRectangle = new Rectangle(0, 0,
+
+            float textureRectangleHeight = terrain.Height / (float)texture.Height;
+            Rectangle textureRectangle = new Rectangle(0, 1 - textureRectangleHeight,
                 terrain.Width / (float)texture.Width,
-                terrain.Height / (float)texture.Height);
+                textureRectangleHeight);
+
             graphics.FillColor = Color.FromArgb(232, 207, 144);
             graphics.Fill(terrainBounds);
             graphics.Fill(terrainBounds, texture, Color.FromArgb(100, 78, 60));

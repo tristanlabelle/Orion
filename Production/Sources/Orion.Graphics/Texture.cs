@@ -51,12 +51,23 @@ namespace Orion.Graphics
                     }
 
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.pixelFormat),
-                        size.Width, size.Height, 0, GetGLPixelFormat(this.pixelFormat), PixelType.UnsignedByte,
+
+                    PixelInternalFormat glInternalFormat = GetGLInternalPixelFormat(this.pixelFormat);
+                    OpenTK.Graphics.PixelFormat glPixelFormat = GetGLPixelFormat(this.pixelFormat);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
+                        size.Width, size.Height, 0, glPixelFormat, PixelType.UnsignedByte,
                         dataPointer);
 
-                    ErrorCode code = GL.GetError();
-                    Debug.Assert(code == ErrorCode.NoError);
+#if false
+                    if (!hasMipmaps)
+                    {
+                        // "Manually" generate mipmaps
+                        Glu.Build2DMipmap(TextureTarget.Texture2D, (int)glInternalFormat,
+                            size.Width, size.Height, glPixelFormat, PixelType.UnsignedByte,
+                            dataPointer);
+                        hasMipmaps = true;
+                    }
+#endif
 
                     GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
                         (int)TextureEnvMode.Modulate);

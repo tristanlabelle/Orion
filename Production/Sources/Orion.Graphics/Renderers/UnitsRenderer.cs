@@ -283,6 +283,10 @@ namespace Orion.Graphics.Renderers
                 Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
 
+                Vector2 laserCenter = attacker.Center + normalizedDelta * laserProgress * distance;
+                if (!faction.CanSee(new Region((int)laserCenter.X, (int)laserCenter.Y, 1, 1)))
+                    continue;
+
                 Vector2 laserStart = attacker.Center + (normalizedDelta
                     * Math.Max(0, laserProgress * distance - laserLength * 0.5f));
                 Vector2 laserEnd = attacker.Center + (normalizedDelta

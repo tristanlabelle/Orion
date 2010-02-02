@@ -74,14 +74,14 @@ namespace Orion.GameLogic.Tasks
                     return registry.FromName("Grand Schtroumpf");
                 else if (traineeType.Name == "Pirate")
                     return registry.FromName("Barbe Bleu");
-                else if (traineeType.Name == "Léonardo")
-                    return registry.FromName("Grand Schtroumpf");
-                else if (traineeType.Name == "Thor")
-                    return registry.FromName("Grand Schtroumpf");
-                else if (traineeType.Name == "Allah Skywalker")
-                    return registry.FromName("Grand Schtroumpf");
-                else if (traineeType.Name == "Jésus-Raptor")
-                    return registry.FromName("Grand Schtroumpf");
+                else if (traineeType.Name == "Ninja")
+                    return registry.FromName("Léonardo");
+                else if (traineeType.Name == "Viking")
+                    return registry.FromName("Thor");
+                else if (traineeType.Name == "Jedihad")
+                    return registry.FromName("Allah Skywalker");
+                else if (traineeType.Name == "Jésus")
+                    return registry.FromName("Jésus-Raptor");
                 else
                     return traineeType;
             }

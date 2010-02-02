@@ -16,7 +16,8 @@ namespace Orion.Main
         protected static Color[] playerColors = new Color[]
         {
             Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.Tan, Color.Turquoise
+            Color.Green, Color.Pink, Color.Tan, Color.Turquoise,
+            Color.Lime
         };
 
         private int seed;
@@ -62,7 +63,7 @@ namespace Orion.Main
         {
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(seed));
             random = new MersenneTwister(seed);
-            Terrain terrain = Terrain.Generate(new Size(128, 128), random);
+            Terrain terrain = Terrain.Generate(new Size(256, 256), random);
             world = new World(terrain, random);
         }
 

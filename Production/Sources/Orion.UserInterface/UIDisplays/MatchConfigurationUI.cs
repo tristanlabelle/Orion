@@ -6,6 +6,7 @@ using System.Text;
 using Orion.Geometry;
 using Orion.Commandment;
 using Orion.UserInterface.Widgets;
+using Orion.GameLogic;
 
 namespace Orion.UserInterface
 {
@@ -18,7 +19,8 @@ namespace Orion.UserInterface
         protected Button exitButton;
 
         protected Random random;
-        protected DropdownList<PlayerSlot>[] playerSlots = new DropdownList<PlayerSlot>[8];
+        protected DropdownList<PlayerSlot>[] playerSlots
+            = new DropdownList<PlayerSlot>[Faction.Colors.Length];
         protected Frame backgroundFrame;
         #endregion
 

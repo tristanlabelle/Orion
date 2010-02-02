@@ -42,7 +42,7 @@ namespace Orion.Main
                 if (slot is ClosedPlayerSlot) continue;
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
 
-                Color color = playerColors[colorIndex];
+                Color color = Faction.Colors[colorIndex];
                 Faction faction = world.CreateFaction(color.Name, color);
                 colorIndex++;
 

@@ -19,6 +19,12 @@ namespace Orion.GameLogic
     {
         #region Fields
         private const int maxFoodAmount = 200;
+        public static Color[] Colors = new Color[]
+        {
+            Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
+            Color.Green, Color.Pink, Color.White, Color.Turquoise,
+            Color.Lime, Color.Gray
+        };
 
         private readonly Handle handle;
         private readonly World world;

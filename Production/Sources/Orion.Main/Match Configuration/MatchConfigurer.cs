@@ -13,13 +13,6 @@ namespace Orion.Main
     abstract class MatchConfigurer
     {
         #region Fields
-        protected static Color[] playerColors = new Color[]
-        {
-            Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.White, Color.Turquoise,
-            Color.Lime, Color.Gray
-        };
-
         private int seed;
         protected World world;
         protected Random random;

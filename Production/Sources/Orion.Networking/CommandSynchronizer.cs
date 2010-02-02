@@ -78,7 +78,7 @@ namespace Orion.Networking
                 return average + deviation * 2;
 #else
 #warning Hard-coded updates/command frame
-                return 5;
+                return 10;
 #endif
             }
         }

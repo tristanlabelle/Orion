@@ -43,7 +43,7 @@ namespace Orion.Main
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)
             {
-                world.CreateFaction(factionName, playerColors[colorIndex]);
+                world.CreateFaction(factionName, Faction.Colors[colorIndex]);
                 colorIndex++;
             }
 

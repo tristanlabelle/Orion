@@ -38,12 +38,12 @@ namespace Orion.Graphics
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Size.Width, terrain.Size.Height);
+            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
 
             GL.ColorMask(false, false, false, true);
             graphics.Fill(terrainBounds, texture);
 
-            Rectangle textureRectangle = new Rectangle(0, 0, terrain.Size.Width / 4, terrain.Size.Height / 4);
+            Rectangle textureRectangle = new Rectangle(0, 0, terrain.Width / 4, terrain.Height / 4);
 
             GL.ColorMask(true, true, true, false);
             GL.Color4(1f, 1f, 1f, 1f);
@@ -59,7 +59,10 @@ namespace Orion.Graphics
 
         public void DrawMiniature(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Size.Width, terrain.Size.Height);
+            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
+            Rectangle textureRectangle = new Rectangle(0, 0,
+                terrain.Width / (float)texture.Width,
+                terrain.Height / (float)texture.Height);
             graphics.FillColor = Color.FromArgb(232, 207, 144);
             graphics.Fill(terrainBounds);
             graphics.Fill(terrainBounds, texture, Color.FromArgb(100, 78, 60));
@@ -72,18 +75,21 @@ namespace Orion.Graphics
 
         private static Texture CreateTerrainTexture(Terrain terrain)
         {
-            byte[] pixels = new byte[terrain.Size.Area];
-            for (int y = 0; y < terrain.Size.Height; ++y)
+            int textureWidth = Math.Max(PowerOfTwo.Ceiling(terrain.Size.Width), PowerOfTwo.Ceiling(terrain.Size.Height));
+            Size textureSize = new Size(textureWidth, textureWidth);
+
+            byte[] pixels = new byte[textureSize.Area];
+            for (int y = 0; y < terrain.Height; ++y)
             {
-                for (int x = 0; x < terrain.Size.Width; ++x)
+                for (int x = 0; x < terrain.Width; ++x)
                 {
-                    int pixelIndex = y * terrain.Size.Width + x;
+                    int pixelIndex = y * textureSize.Width + x;
                     Point point = new Point(x, y);
                     pixels[pixelIndex] = terrain.IsWalkable(point) ? (byte)0 : (byte)255;
                 }
             }
 
-            return Texture.FromBuffer(terrain.Size, PixelFormat.Alpha, pixels, false, false);
+            return Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixels, false, false);
         }
         #endregion
     }

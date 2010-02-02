@@ -35,6 +35,16 @@ namespace Orion.GameLogic
         #endregion
 
         #region Properties
+        public int Width
+        {
+            get { return size.Width; }
+        }
+
+        public int Height
+        {
+            get { return size.Height; }
+        }
+
         /// <summary>
         /// Gets the size of this terrain, in tiles.
         /// </summary>

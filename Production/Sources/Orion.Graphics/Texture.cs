@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
 using SysImage = System.Drawing.Image;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Orion.Graphics
 {
@@ -19,6 +20,7 @@ namespace Orion.Graphics
         #region Fields
         private readonly Size size;
         private readonly PixelFormat pixelFormat;
+        private bool hasMipmaps = true;
         private int id;
         #endregion
 
@@ -28,6 +30,8 @@ namespace Orion.Graphics
             Argument.EnsureStrictlyPositive(size.Area, "size.Area");
             Argument.EnsureDefined(pixelFormat, "pixelFormat");
 
+            Debug.Assert(PowerOfTwo.Is(size.Width) && PowerOfTwo.Is(size.Height));
+
             this.size = size;
             this.pixelFormat = pixelFormat;
             this.id = GL.GenTexture();
@@ -36,14 +40,23 @@ namespace Orion.Graphics
             {
                 BindWhile(() =>
                 {
-                    // If the following line ever throws, just wrap it in a try-catch and ignore it,
-                    // those who do not support mipmaps will have to live without it.
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
+                    try
+                    {
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.GenerateMipmap, 1);
+                    }
+                    catch (GraphicsException)
+                    {
+                        Debug.WriteLine("Automatic mipmap generation not supported and disabled.");
+                        hasMipmaps = false;
+                    }
 
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(this.pixelFormat),
                         size.Width, size.Height, 0, GetGLPixelFormat(this.pixelFormat), PixelType.UnsignedByte,
                         dataPointer);
+
+                    ErrorCode code = GL.GetError();
+                    Debug.Assert(code == ErrorCode.NoError);
 
                     GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
                         (int)TextureEnvMode.Modulate);
@@ -63,6 +76,16 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
+        public int Width
+        {
+            get { return size.Width; }
+        }
+
+        public int Height
+        {
+            get { return size.Height; }
+        }
+
         /// <summary>
         /// Gets the size of this texture, in pixels.
         /// </summary>
@@ -140,7 +163,9 @@ namespace Orion.Graphics
             BindWhile(() =>
             {
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                    (int)(on ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Nearest));
+                    (int)(on
+                        ? (hasMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear)
+                        : TextureMinFilter.Nearest));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
                     (int)(on ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
             });
@@ -148,10 +173,22 @@ namespace Orion.Graphics
 
         internal void SetRepeat(bool on)
         {
-            SetParameter(TextureParameterName.TextureWrapS,
-                (int)(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
-            SetParameter(TextureParameterName.TextureWrapT,
-                (int)(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge));
+            try
+            {
+                SetWrapMode(on ? TextureWrapMode.Repeat : TextureWrapMode.ClampToEdge);
+            }
+            catch (GraphicsException)
+            {
+                Debug.WriteLine("Clamp to edge wrap mode not supported, defaulting to clamp."
+                    + " Some artifacts may occur around the edges of the textures.");
+                SetWrapMode(on ? TextureWrapMode.Repeat : TextureWrapMode.Clamp);
+            }
+        }
+
+        internal void SetWrapMode(TextureWrapMode wrapMode)
+        {
+            SetParameter(TextureParameterName.TextureWrapS, (int)wrapMode);
+            SetParameter(TextureParameterName.TextureWrapT, (int)wrapMode);
         }
         #endregion
 

@@ -1,6 +1,4 @@
 ﻿using System;
-
-
 using Orion.GameLogic;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
@@ -35,13 +33,25 @@ namespace Orion.Graphics
         }
         #endregion
 
+        #region Properties
+        private Rectangle TextureRectangle
+        {
+            get
+            {
+                return new Rectangle(0, 0,
+                    terrain.Width / (float)texture.Width,
+                    terrain.Height / (float)texture.Height);
+            }
+        }
+        #endregion
+
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
 
             GL.ColorMask(false, false, false, true);
-            graphics.Fill(terrainBounds, texture);
+            graphics.Fill(terrainBounds, texture, TextureRectangle);
 
             Rectangle textureRectangle = new Rectangle(0, 0, terrain.Width / 4, terrain.Height / 4);
 
@@ -61,14 +71,9 @@ namespace Orion.Graphics
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
 
-            float textureRectangleHeight = terrain.Height / (float)texture.Height;
-            Rectangle textureRectangle = new Rectangle(0, 1 - textureRectangleHeight,
-                terrain.Width / (float)texture.Width,
-                textureRectangleHeight);
-
             graphics.FillColor = Color.FromArgb(232, 207, 144);
             graphics.Fill(terrainBounds);
-            graphics.Fill(terrainBounds, texture, Color.FromArgb(100, 78, 60));
+            graphics.Fill(terrainBounds, texture, TextureRectangle, Color.FromArgb(100, 78, 60));
         }
 
         public void Dispose()

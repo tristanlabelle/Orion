@@ -24,13 +24,17 @@ namespace Orion.Graphics.Renderers
             this.faction = faction;
             this.faction.VisibilityChanged += OnVisibilityChanged;
 
-            pixelBuffer = new byte[faction.LocalFogOfWar.Size.Area];
-            UpdatePixelBuffer();
-
             int textureWidth = Math.Max(
                 PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Width),
                 PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Height));
             Size textureSize = new Size(textureWidth, textureWidth);
+
+            pixelBuffer = new byte[textureSize.Area];
+            for (int i = 0; i < pixelBuffer.Length; ++i)
+                pixelBuffer[i] = 255;
+
+            UpdatePixelBuffer();
+
             texture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelBuffer, true, false);
         }
         #endregion
@@ -39,6 +43,16 @@ namespace Orion.Graphics.Renderers
         public bool IsDirty
         {
             get { return dirtyRegion.HasValue; }
+        }
+
+        private Rectangle TextureRectangle
+        {
+            get
+            {
+                return new Rectangle(0, 0,
+                    faction.LocalFogOfWar.Size.Width / (float)texture.Width,
+                    faction.LocalFogOfWar.Size.Height / (float)texture.Height);
+            }
         }
         #endregion
 
@@ -53,8 +67,9 @@ namespace Orion.Graphics.Renderers
 
             if (faction.LocalFogOfWar.IsEnabled)
             {
-                Rectangle terrainBounds = new Rectangle(0, 0, faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
-                graphics.Fill(terrainBounds, texture, Color.Black);
+                Rectangle terrainBounds = new Rectangle(0, 0,
+                    faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
+                graphics.Fill(terrainBounds, texture, TextureRectangle, Color.Black);
             }
         }
 

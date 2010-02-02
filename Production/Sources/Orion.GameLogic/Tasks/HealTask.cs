@@ -32,8 +32,7 @@ namespace Orion.GameLogic.Tasks
             // since otherwise mechanical units could be repaired too
             if (target.Type.IsBuilding)
                 throw new ArgumentException("Can only heal non buildings units.", "target");
-            if (healer.Faction != target.Faction)
-                throw new ArgumentException("Cannot heal other faction units.", "target");
+            Debug.Assert(healer.Faction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally);
 
             this.target = target;
             this.move = MoveTask.ToNearRegion(healer, target.GridRegion);

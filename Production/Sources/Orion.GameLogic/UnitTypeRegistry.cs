@@ -511,7 +511,7 @@ namespace Orion.GameLogic
             builder.Skills.Add(new MoveSkill(8, false));
             builder.Skills.Add(new AttackSkill(8, 0, 4));
             builder.Skills.Add(new HarvestSkill(1, 10));
-            builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 5));
+            builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 100));
             Register(builder);
         }
 

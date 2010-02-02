@@ -63,7 +63,7 @@ namespace Orion.Main
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(seed));
             random = new MersenneTwister(seed);
             Terrain terrain = Terrain.Generate(new Size(128, 128), random);
-            world = new World(terrain);
+            world = new World(terrain, random);
         }
 
         protected void TryPushReplayRecorderToPipeline(CommandPipeline pipeline)

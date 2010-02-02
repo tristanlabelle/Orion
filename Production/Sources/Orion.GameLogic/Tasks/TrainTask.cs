@@ -34,8 +34,8 @@ namespace Orion.GameLogic.Tasks
                 throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
-            
-            this.traineeType = traineeType;
+
+            this.traineeType = TryTrainHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
         }
         #endregion
 
@@ -66,6 +66,28 @@ namespace Orion.GameLogic.Tasks
         #endregion
 
         #region Methods
+        private UnitType TryTrainHero(Random random, UnitType traineeType, UnitTypeRegistry registry)
+        {
+            if (random.Next(0, 100) > 97)
+            {
+                if (traineeType.Name == "Schtroumpf")
+                    return registry.FromName("Grand Schtroumpf");
+                else if (traineeType.Name == "Pirate")
+                    return registry.FromName("Barbe Bleu");
+                else if (traineeType.Name == "Léonardo")
+                    return registry.FromName("Grand Schtroumpf");
+                else if (traineeType.Name == "Thor")
+                    return registry.FromName("Grand Schtroumpf");
+                else if (traineeType.Name == "Allah Skywalker")
+                    return registry.FromName("Grand Schtroumpf");
+                else if (traineeType.Name == "Jésus-Raptor")
+                    return registry.FromName("Grand Schtroumpf");
+                else
+                    return traineeType;
+            }
+            return traineeType;
+        }
+
         protected override void DoUpdate(SimulationStep step)
         {
             if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost) return;

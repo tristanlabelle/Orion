@@ -49,6 +49,13 @@ namespace Orion.GameLogic
 
             RegisterChuckNorris();
             RegisterMrT();
+
+            RegisterHeroJedihad();
+            RegisterHeroJesus();
+            RegisterHeroNinja();
+            RegisterHeroPirate();
+            RegisterHeroSmurf();
+            RegisterHeroViking();
         }
         #endregion
 
@@ -486,6 +493,200 @@ namespace Orion.GameLogic
             builder.Skills.Add(new AttackSkill(50, 20, 1));
             Register(builder);
         }
+
+        private void RegisterHeroSmurf()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Grand Schtroumpf",
+                Size = new Size(1, 1),
+                SightRange = 5,
+                MaxHealth = 60,
+                MeleeArmor = 1,
+                RangedArmor = 2,
+                AladdiumCost = 50,
+                AlageneCost = 0,
+                FoodCost = 1
+            };
+            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new AttackSkill(8, 0, 4));
+            builder.Skills.Add(new HarvestSkill(1, 10));
+            builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 5));
+            Register(builder);
+        }
+
+        private void RegisterHeroPirate()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Barbe Bleu",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 120,
+                MeleeArmor = 4,
+                RangedArmor = 2,
+                AladdiumCost = 50,
+                AlageneCost = 0,
+                FoodCost = 1
+            };
+            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new AttackSkill(16, 0, 3));
+            Register(builder);
+        }
+
+        private void RegisterHeroNinja()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Léonardo",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 120,
+                MeleeArmor = 2,
+                RangedArmor = 4,
+                AladdiumCost = 50,
+                AlageneCost = 25,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(10, false));
+            builder.Skills.Add(new AttackSkill(10, 5, 2));
+            Register(builder);
+        }
+
+        private void RegisterHeroViking()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Thor",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 200,
+                MeleeArmor = 8,
+                RangedArmor = 3,
+                AladdiumCost = 100,
+                AlageneCost = 25,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new MoveSkill(6, false));
+            builder.Skills.Add(new AttackSkill(50, 1, 4));
+            Register(builder);
+        }
+
+        private void RegisterHeroJedihad()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Allah Skywalker",
+                Size = new Size(1, 1),
+                SightRange = 8,
+                MaxHealth = 160,
+                MeleeArmor = 3,
+                RangedArmor = 5,
+                AladdiumCost = 20,
+                AlageneCost = 75,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(9, false));
+            builder.Skills.Add(new AttackSkill(14, 3, 3));
+            Register(builder);
+        }
+
+        private void RegisterHeroJesus()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Jésus-Raptor",
+                Size = new Size(2, 2),
+                SightRange = 8,
+                MaxHealth = 200,
+                MeleeArmor = 2,
+                RangedArmor = 2,
+                AladdiumCost = 80,
+                AlageneCost = 40,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new AttackSkill(14, 0, 3));
+            builder.Skills.Add(new HealSkill(2, 6));
+            Register(builder);
+        }
+/*
+        private void RegisterHeroFlyingSpaghettiMonster()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Flying Spaghetti Monster",
+                Size = new Size(3, 3),
+                SightRange = 10,
+                MaxHealth = 150,
+                MeleeArmor = 4,
+                RangedArmor = 4,
+                AladdiumCost = 250,
+                AlageneCost = 175,
+                FoodCost = 3
+            };
+            builder.Skills.Add(new MoveSkill(2, true));
+            builder.Skills.Add(new AttackSkill(16, 5, 5));
+            Register(builder);
+        }
+
+        private void RegisterSwineFlu()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Grippe A(H1N1)",
+                Size = new Size(2, 2),
+                SightRange = 7,
+                MaxHealth = 40,
+                MeleeArmor = 1,
+                RangedArmor = 1,
+                AladdiumCost = 75,
+                AlageneCost = 100,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new AttackSkill(1, 7, 1));
+            Register(builder);
+        }
+
+        private void RegisterUfo()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "OVNI",
+                Size = new Size(2, 2),
+                SightRange = 10,
+                MaxHealth = 100,
+                MeleeArmor = 1,
+                RangedArmor = 4,
+                AladdiumCost = 140,
+                AlageneCost = 140,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(8, true));
+            builder.Skills.Add(new AttackSkill(13, 8, 8));
+            Register(builder);
+        }
+
+        private void RegisterFlyingCarpet()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Tapis Volant",
+                Size = new Size(2, 2),
+                SightRange = 8,
+                MaxHealth = 75,
+                MeleeArmor = 1,
+                RangedArmor = 1,
+                AladdiumCost = 25,
+                AlageneCost = 50,
+                FoodCost = 2
+            };
+            builder.Skills.Add(new MoveSkill(10, true));
+            builder.Skills.Add(new TransportSkill(5));
+            Register(builder);
+        }
+ */
         #endregion
         #endregion
 

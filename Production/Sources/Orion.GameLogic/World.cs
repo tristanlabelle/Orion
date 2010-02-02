@@ -23,6 +23,7 @@ namespace Orion.GameLogic
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
         private readonly TechnologyTree technologyTree;
+        private readonly Random random;
         #endregion
 
         #region Constructors
@@ -30,7 +31,7 @@ namespace Orion.GameLogic
         /// Initializes a new <see cref="World"/>.
         /// </summary>
         /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
-        public World(Terrain terrain)
+        public World(Terrain terrain, Random random)
         {
             Argument.EnsureNotNull(terrain, "terrain");
 
@@ -39,6 +40,7 @@ namespace Orion.GameLogic
             pathfinder = new Pathfinder(terrain.Size);
             technologyTree = new TechnologyTree();
             technologyTree.PopulateWithBaseTechnologies();
+            this.random = random;
         }
         #endregion
 
@@ -95,6 +97,11 @@ namespace Orion.GameLogic
         public TechnologyTree TechnologyTree
         {
             get { return technologyTree; }
+        }
+
+        public Random Random
+        {
+            get { return random; }
         }
 
         /// <summary>

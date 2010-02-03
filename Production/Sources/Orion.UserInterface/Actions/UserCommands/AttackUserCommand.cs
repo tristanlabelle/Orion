@@ -13,7 +13,10 @@ namespace Orion.UserInterface.Actions.UserCommands
 
         public override void OnClick(Vector2 location)
         {
-            Unit target = World.Entities.GetUnitAt((Point)location);
+            Point point = (Point)location;
+            if (!World.IsWithinBounds(point)) return;
+
+            Unit target = World.Entities.GetUnitAt(point);
             if (target == null) InputManager.LaunchZoneAttack(location);
             else InputManager.LaunchAttack(target);
         }

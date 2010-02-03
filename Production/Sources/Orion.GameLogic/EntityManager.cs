@@ -359,6 +359,12 @@ namespace Orion.GameLogic
 
         public Entity GetEntityAt(Point point, CollisionLayer layer)
         {
+            if (!world.IsWithinBounds(point))
+            {
+                Debug.Fail("Point out of world bounds.");
+                return null;
+            }
+
             EntityGrid grid = GetGrid(layer);
             if (grid == null) return null;
             return grid[point];
@@ -366,16 +372,34 @@ namespace Orion.GameLogic
 
         public Entity GetGroundEntityAt(Point point)
         {
+            if (!world.IsWithinBounds(point))
+            {
+                Debug.Fail("Point out of world bounds.");
+                return null;
+            }
+
             return groundGrid[point];
         }
 
         public Entity GetAirEntityAt(Point point)
         {
+            if (!world.IsWithinBounds(point))
+            {
+                Debug.Fail("Point out of world bounds.");
+                return null;
+            }
+
             return airGrid[point];
         }
 
         public Unit GetUnitAt(Point point)
         {
+            if (!world.IsWithinBounds(point))
+            {
+                Debug.Fail("Point out of world bounds.");
+                return null;
+            }
+
             return airGrid[point] as Unit ?? groundGrid[point] as Unit;
         }
 

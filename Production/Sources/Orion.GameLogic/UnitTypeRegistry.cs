@@ -56,6 +56,7 @@ namespace Orion.GameLogic
             RegisterHeroPirate();
             RegisterHeroSmurf();
             RegisterHeroViking();
+            RegisterHeroFlyingSpaghettiMonster();
         }
         #endregion
 
@@ -610,27 +611,27 @@ namespace Orion.GameLogic
             builder.Skills.Add(new HealSkill(2, 6));
             Register(builder);
         }
-/*
+
         private void RegisterHeroFlyingSpaghettiMonster()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Flying Spaghetti Monster",
+                Name = "Ta Mère",
                 Size = new Size(3, 3),
                 SightRange = 10,
-                MaxHealth = 150,
+                MaxHealth = 300,
                 MeleeArmor = 4,
-                RangedArmor = 4,
+                RangedArmor = 5,
                 AladdiumCost = 250,
                 AlageneCost = 175,
                 FoodCost = 3
             };
-            builder.Skills.Add(new MoveSkill(2, true));
-            builder.Skills.Add(new AttackSkill(16, 5, 5));
+            builder.Skills.Add(new MoveSkill(3, true));
+            builder.Skills.Add(new AttackSkill(50, 5, 4));
             Register(builder);
         }
-
-        private void RegisterSwineFlu()
+/*
+        private void RegisterHeroSwineFlu()
         {
             var builder = new UnitTypeBuilder
             {
@@ -649,7 +650,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        private void RegisterUfo()
+        private void RegisterHeroUfo()
         {
             var builder = new UnitTypeBuilder
             {
@@ -668,7 +669,7 @@ namespace Orion.GameLogic
             Register(builder);
         }
 
-        private void RegisterFlyingCarpet()
+        private void RegisterHeroFlyingCarpet()
         {
             var builder = new UnitTypeBuilder
             {

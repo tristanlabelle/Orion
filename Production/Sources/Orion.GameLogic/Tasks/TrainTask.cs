@@ -82,6 +82,8 @@ namespace Orion.GameLogic.Tasks
                     return registry.FromName("Allah Skywalker");
                 else if (traineeType.Name == "Jésus")
                     return registry.FromName("Jésus-Raptor");
+                else if (traineeType.Name == "Flying Spaghetti Monster")
+                    return registry.FromName("Ta Mère");
                 else
                     return traineeType;
             }

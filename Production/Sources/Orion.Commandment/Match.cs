@@ -48,9 +48,9 @@ namespace Orion.Commandment
         public event GenericEventHandler<Match, FactionMessage> FactionMessageReceived;
 
         /// <summary>
-        /// Raised when all <see cref="Faction"/>s but one are defeated.
+        /// Raised when allied factions defeat all their ennemies.
         /// </summary>
-        public event GenericEventHandler<Match, Faction> WorldConquered;
+        public event GenericEventHandler<Match, IEnumerable<Faction>> WorldConquered;
 
         public event GenericEventHandler<Match> Quitting;
 
@@ -66,7 +66,7 @@ namespace Orion.Commandment
             if (handler != null) handler(this, message);
         }
 
-        private void RaiseWorldConquered(Faction faction)
+        private void RaiseWorldConquered(IEnumerable<Faction> faction)
         {
             var handler = WorldConquered;
             if (handler != null) handler(this, faction);
@@ -130,8 +130,6 @@ namespace Orion.Commandment
 
                 world.Update(lastSimulationStep);
             }
-            else
-                Console.WriteLine("*** GAME PAUSED!");
 
             RaiseUpdated(timeDeltaInSeconds);
         }
@@ -154,8 +152,20 @@ namespace Orion.Commandment
 
         private void CheckForWorldConquered()
         {
-            var aliveFactions = world.Factions.Where(faction => faction.Status == FactionStatus.Undefeated);
-            if (aliveFactions.Count() == 1) RaiseWorldConquered(aliveFactions.First());
+            List<Faction> aliveFactions = world.Factions.Where(faction => faction.Status == FactionStatus.Undefeated).ToList();
+            for (int i = 0; i < aliveFactions.Count; i++)
+            {
+                Faction referenceFaction = aliveFactions[i];
+                for (int j = i + 1; j < aliveFactions.Count; j++)
+                {
+                    Faction checkedFaction = aliveFactions[j];
+                    DiplomaticStance referenceDiplomaticStance = referenceFaction.GetDiplomaticStance(checkedFaction);
+                    DiplomaticStance checkedDiplomaticStance = checkedFaction.GetDiplomaticStance(referenceFaction);
+                    if (referenceDiplomaticStance != DiplomaticStance.Ally || checkedDiplomaticStance != DiplomaticStance.Ally)
+                        return;
+                }
+            }
+            if (aliveFactions.Count() == 1) RaiseWorldConquered(aliveFactions);
         }
         #endregion
 

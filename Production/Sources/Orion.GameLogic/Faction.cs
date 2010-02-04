@@ -424,9 +424,16 @@ namespace Orion.GameLogic
                 return;
 
             if (stance == DiplomaticStance.Ally)
+            {
                 factionsWeRegardAsAllies.Add(target);
+                RaiseWarning("{0} est maintenant votre allié.".FormatInvariant(target));
+            }
             else
+            {
                 factionsWeRegardAsAllies.Remove(target);
+                target.SetDiplomaticStance(this, DiplomaticStance.Enemy);
+                RaiseWarning("{0} est maintenant hostile à votre égard.".FormatInvariant(target));
+            }
 
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }

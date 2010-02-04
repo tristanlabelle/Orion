@@ -278,12 +278,12 @@ namespace Orion.UserInterface
             }
         }
 
-        public void DisplayVictoryMessage(Faction faction)
+        public void DisplayVictoryMessage(IEnumerable<Faction> factions)
         {
-            Argument.EnsureNotNull(faction, "faction");
-            if (faction == LocalFaction)
+            Argument.EnsureNotNull(factions, "factions");
+            if (factions.Contains(LocalFaction))
             {
-                if(match.IsPausable)
+                if (match.IsPausable)
                     match.Pause();
                 Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
             }

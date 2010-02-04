@@ -13,70 +13,75 @@ namespace Orion
         #region Instance
         #region Fields
         private readonly BitArray bits;
-        private readonly int columnCount;
+        private readonly int width;
         #endregion
 
         #region Constructors
         /// <summary>
         /// Initializes a new instance with the specified dimensions and a default value for the bits.
         /// </summary>
-        /// <param name="rowCount">The number of rows this bit array contains.</param>
-        /// <param name="columnCount">The number of columns this bit array contains.</param>
+        /// <param name="width">The width of the array.</param>
+        /// <param name="height">The height of the array.</param>
         /// <param name="defaultValue">The default value of the bits in this array.</param>
-        public BitArray2D(int rowCount, int columnCount, bool defaultValue)
+        public BitArray2D(int width, int height, bool defaultValue)
         {
-            Argument.EnsurePositive(rowCount, "rowCount");
-            Argument.EnsurePositive(columnCount, "columnCount");
+            Argument.EnsurePositive(width, "width");
+            Argument.EnsurePositive(height, "height");
 
-            this.bits = new BitArray(rowCount * columnCount, defaultValue);
-            this.columnCount = columnCount;
+            this.bits = new BitArray(width * height, defaultValue);
+            this.width = width;
         }
 
         /// <summary>
         /// Initializes a new instance with the specified dimensions.
         /// </summary>
-        /// <param name="rowCount">The number of rows this bit array contains.</param>
-        /// <param name="columnCount">The number of columns this bit array contains.</param>
-        public BitArray2D(int rowCount, int columnCount)
-            : this(rowCount, columnCount, false) { }
+        /// <param name="width">The width of the array.</param>
+        /// <param name="height">The height of the array.</param>
+        public BitArray2D(int width, int height)
+            : this(width, height, false) { }
+
+        public BitArray2D(Size size, bool defaultValue)
+            : this(size.Width, size.Height, defaultValue) { }
+
+        public BitArray2D(Size size)
+            : this(size, false) { }
 
         /// <summary>
         /// Initializes a new instance from an array of bits to be copied.
         /// </summary>
         /// <param name="bits">The bits to be copied.</param>
-        /// <param name="rowCount">The number of bit rows.</param>
-        /// <param name="columnCount">The number of bit columns.</param>
-        public BitArray2D(BitArray bits, int rowCount, int columnCount)
+        /// <param name="width">The width of the array.</param>
+        /// <param name="height">The height of the array.</param>
+        public BitArray2D(BitArray bits, int width, int height)
         {
             Argument.EnsureNotNull(bits, "bits");
-            Argument.EnsurePositive(rowCount, "rowCount");
-            Argument.EnsurePositive(columnCount, "columnCount");
+            Argument.EnsurePositive(width, "width");
+            Argument.EnsurePositive(height, "height");
 
-            if (bits.Length != rowCount * columnCount)
-                throw new ArgumentException("Row and column count do not match bit array size.");
+            if (bits.Length != width * height)
+                throw new ArgumentException("Width and height do not match bit array size.");
 
             this.bits = (BitArray)bits.Clone();
-            this.columnCount = columnCount;
+            this.width = width;
         }
 
         /// <summary>
         /// Initializes a new instance from an array of bits to be copied.
         /// </summary>
         /// <param name="bits">The bits to be copied.</param>
-        /// <param name="rowCount">The number of bit rows.</param>
-        /// <param name="columnCount">The number of bit columns.</param>
-        public BitArray2D(bool[] bits, int rowCount, int columnCount)
+        /// <param name="width">The width of the array.</param>
+        /// <param name="height">The height of width array.</param>
+        public BitArray2D(bool[] bits, int width, int height)
         {
             Argument.EnsureNotNull(bits, "bits");
-            Argument.EnsurePositive(rowCount, "rowCount");
-            Argument.EnsurePositive(columnCount, "columnCount");
+            Argument.EnsurePositive(width, "width");
+            Argument.EnsurePositive(height, "height");
 
-
-            if (bits.Length != rowCount * columnCount)
-                throw new ArgumentException("Row and column count do not match bit array size.");
+            if (bits.Length != width * height)
+                throw new ArgumentException("Width and height do not match bit array size.");
 
             this.bits = new BitArray(bits);
-            this.columnCount = columnCount;
+            this.width = width;
         }
         #endregion
 
@@ -90,25 +95,33 @@ namespace Orion
         }
 
         /// <summary>
-        /// Gets the number of rows this bit array contains.
+        /// Gets the width of this 2D array.
         /// </summary>
-        public int RowCount
+        public int Width
         {
-            get { return bits.Length / columnCount; }
+            get { return width; }
         }
 
         /// <summary>
-        /// Gets the number of columns this bit array contains.
+        /// Gets the height of this 2D array.
         /// </summary>
-        public int ColumnCount
+        public int Height
         {
-            get { return columnCount; }
+            get { return bits.Count / width; }
         }
 
         /// <summary>
-        /// Gets the length of this bit array, in bits.
+        /// Gets the Size of this 2D array.
         /// </summary>
-        public int Length
+        public Size Size
+        {
+            get { return new Size(width, Height); }
+        }
+
+        /// <summary>
+        /// Gets the area of this bit array, in bits.
+        /// </summary>
+        public int Area
         {
             get { return bits.Length; }
         }
@@ -118,13 +131,24 @@ namespace Orion
         /// <summary>
         /// Accesses a bit at a given location in this array.
         /// </summary>
-        /// <param name="rowIndex">The index of the bit's row.</param>
-        /// <param name="columnIndex">The index of the bit's column.</param>
+        /// <param name="x">The x coordinate of the bit.</param>
+        /// <param name="y">The y coordinate of the bit.</param>
         /// <returns>The value of the bit at that location.</returns>
-        public bool this[int rowIndex, int columnIndex]
+        public bool this[int x, int y]
         {
-            get { return bits[GetIndex(rowIndex, columnIndex)]; }
-            set { bits[GetIndex(rowIndex, columnIndex)] = value; }
+            get { return bits[GetIndex(x, y)]; }
+            set { bits[GetIndex(x, y)] = value; }
+        }
+
+        /// <summary>
+        /// Accesses a bit at a given location in this array.
+        /// </summary>
+        /// <param name="point">The coordinates of the bit.</param>
+        /// <returns>The value of the bit at that location.</returns>
+        public bool this[Point point]
+        {
+            get { return this[point.X, point.Y]; }
+            set { this[point.X, point.Y] = value; }
         }
         #endregion
 
@@ -135,7 +159,7 @@ namespace Orion
         /// <returns>The bit array to be cloned.</returns>
         public BitArray2D Clone()
         {
-            return new BitArray2D(bits, RowCount, columnCount);
+            return new BitArray2D(bits, Width, Height);
         }
 
         /// <summary>
@@ -166,12 +190,12 @@ namespace Orion
 
         public override string ToString()
         {
-            return "{0}x{1} bits".FormatInvariant(RowCount, ColumnCount);
+            return "{0}x{1} bits".FormatInvariant(width, Height);
         }
 
-        private int GetIndex(int rowIndex, int columnIndex)
+        private int GetIndex(int x, int y)
         {
-            return rowIndex * columnCount + columnIndex;
+            return y * width + x;
         }
         #endregion
 
@@ -240,7 +264,7 @@ namespace Orion
             /// </returns>
             public bool MoveNext()
             {
-                if (index == array.Length) return false;
+                if (index == array.Area) return false;
                 ++index;
                 return true;
             }

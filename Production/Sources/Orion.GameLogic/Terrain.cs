@@ -28,9 +28,9 @@ namespace Orion.GameLogic
         public Terrain(BitArray2D tiles)
         {
             Argument.EnsureNotNull(tiles, "tiles");
-            this.tiles = new bool[tiles.ColumnCount * tiles.RowCount];
+            this.tiles = new bool[tiles.Area];
             tiles.Bits.CopyTo(this.tiles, 0);
-            this.size = new Size(tiles.ColumnCount, tiles.RowCount);
+            this.size = tiles.Size;
         }
         #endregion
 
@@ -99,7 +99,7 @@ namespace Orion.GameLogic
         {
             PerlinNoise noise = new PerlinNoise(random);
 
-            BitArray2D tiles = new BitArray2D(size.Width, size.Height);
+            BitArray2D tiles = new BitArray2D(size);
             double[] rawTerrain = new double[size.Area];
             for (int y = 0; y < size.Height; y++)
             {

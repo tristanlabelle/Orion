@@ -157,10 +157,10 @@ namespace Orion.UserInterface
             if (regex.IsMatch(sizeString))
             {
                 System.Text.RegularExpressions.Match result = regex.Match(sizeString);
-                Size newSize = new Size(Int32.Parse(result.Groups[1].Value), Int32.Parse(result.Groups[2].Value));
+                Size newSize = new Size(int.Parse(result.Groups[1].Value), int.Parse(result.Groups[2].Value));
                 if (newSize.Width >= minSize.Width && newSize.Height >= minSize.Height)
                 {
-                    MapSize = new Size(Int32.Parse(result.Groups[1].Value), Int32.Parse(result.Groups[2].Value));
+                    MapSize = newSize;
                     return;
                 }
             }

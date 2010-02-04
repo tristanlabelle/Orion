@@ -121,12 +121,12 @@ namespace Orion.GameLogic
 
             public int Width
             {
-                get { return bitmap.ColumnCount; }
+                get { return bitmap.Width; }
             }
 
             public int Height
             {
-                get { return bitmap.RowCount; }
+                get { return bitmap.Height; }
             }
 
             public int ExclusiveMaxX
@@ -277,8 +277,8 @@ namespace Orion.GameLogic
         {
             BitArray2D bitmap = GetCircleBitmap(circle.Radius);
 
-            int minX = circle.CenterX - bitmap.ColumnCount / 2;
-            int minY = circle.CenterY - bitmap.RowCount / 2;
+            int minX = circle.CenterX - bitmap.Width / 2;
+            int minY = circle.CenterY - bitmap.Height / 2;
 
             return new CircleLookup(minX, minY, bitmap);
         }

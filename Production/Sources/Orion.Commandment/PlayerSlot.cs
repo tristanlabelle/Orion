@@ -5,6 +5,7 @@ using System.Text;
 using Color = System.Drawing.Color;
 
 using Orion.GameLogic;
+using System.Net;
 
 namespace Orion.Commandment
 {
@@ -23,7 +24,26 @@ namespace Orion.Commandment
 
     public sealed class RemotePlayerSlot : PlayerSlot
     {
-        public IPv4EndPoint? RemoteHost { get; set; }
+        private IPv4EndPoint? remoteHost;
+        private string name;
+
+        public IPv4EndPoint? RemoteHost
+        {
+            get { return remoteHost; }
+            set
+            {
+                remoteHost = value;
+                if (remoteHost.HasValue)
+                {
+                    IPHostEntry hostEntry = Dns.GetHostEntry(remoteHost.Value.Address);
+                    name = hostEntry == null ? null : hostEntry.HostName;
+                }
+                else
+                {
+                    name = null;
+                }
+            }
+        }
 
         public override bool NeedsFaction
         {
@@ -33,7 +53,7 @@ namespace Orion.Commandment
         public override string ToString()
         {
             if (RemoteHost.HasValue)
-                return RemoteHost.Value.ToString();
+                return name == null ? RemoteHost.Value.ToString() : name;
             return "Ouvert";
         }
     }

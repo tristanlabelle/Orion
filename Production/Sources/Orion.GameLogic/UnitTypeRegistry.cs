@@ -477,7 +477,7 @@ namespace Orion.GameLogic
                 MeleeArmor = 5,
                 RangedArmor = 5,
             };
-            builder.Skills.Add(new MoveSkill(20, false));
+            builder.Skills.Add(new MoveSkill(20, true));
             builder.Skills.Add(new AttackSkill(75, 0, 1));
             Register(builder);
         }

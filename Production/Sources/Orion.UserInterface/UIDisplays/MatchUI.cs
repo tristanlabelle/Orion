@@ -580,7 +580,6 @@ namespace Orion.UserInterface
 
         private void CreateSingleUnitSelectionPanel()
         {
-            
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
             selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, textureManager);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, textureManager);
@@ -595,10 +594,12 @@ namespace Orion.UserInterface
         private void CreateMultipleUnitsSelectionPanel()
         {
             selectionFrame.Renderer = new FilledFrameRenderer(Color.DarkGray, Color.Gray);
-            const float padding = 10;
-            Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 7 - padding * 2, selectionFrame.Bounds.Height / 2 - padding * 2);
-            float currentX = padding + selectionFrame.Bounds.MinX;
-            float currentY = selectionFrame.Bounds.Height - padding - frame.Height;
+            const float paddingX = 5;
+            const float paddingY = 15;
+            Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 11 - paddingX * 2,
+                selectionFrame.Bounds.Height / 2.2f - paddingY * 2);
+            float currentX = paddingX + selectionFrame.Bounds.MinX;
+            float currentY = selectionFrame.Bounds.Height - paddingY - frame.Height;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, textureManager);
@@ -607,11 +608,11 @@ namespace Orion.UserInterface
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
                 unitButton.Triggered += ButtonPress;
-                currentX += frame.Width + padding;
+                currentX += frame.Width + paddingX;
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
                 {
-                    currentY -= frame.Height + padding;
-                    currentX = padding + selectionFrame.Bounds.MinX;
+                    currentY -= frame.Height + paddingY;
+                    currentX = paddingX + selectionFrame.Bounds.MinX;
                 }
                 selectionFrame.Children.Add(unitButton);
             }

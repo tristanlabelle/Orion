@@ -307,7 +307,7 @@ namespace Orion.UserInterface
 
         private void PressPing(Button sender)
         {
-            Instant.Prompt(this, "Entrez l'adresse IP à ping'er:", Ping);
+            Instant.Prompt(this, "Entrez l'adresse IP à pinger:", Ping);
         }
 
         private void Ping(string address)

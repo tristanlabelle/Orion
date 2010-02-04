@@ -110,7 +110,19 @@ namespace Orion.UserInterface
             actions = new ActionFrame(actionsRectangle);
             hudFrame.Children.Add(actions);
 
-            Rectangle minimapRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.02f, 0.08f), new Vector2(0.23f, 0.92f));
+            Vector2 maxMinimapRectangleSize = new Vector2(0.21f, 0.84f);
+            Vector2 minimapRectangleSize = maxMinimapRectangleSize;
+            if (match.World.Width > match.World.Height)
+                minimapRectangleSize.Y *= match.World.Height / (float)match.World.Width;
+            else
+                minimapRectangleSize.X *= match.World.Width / (float)match.World.Height;
+
+            Vector2 minimapRectangleOrigin = new Vector2(
+                0.02f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
+                0.08f + (maxMinimapRectangleSize.Y - minimapRectangleSize.Y) * 0.5f);
+
+            Rectangle minimapRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds,
+                minimapRectangleOrigin, minimapRectangleOrigin + minimapRectangleSize);
             minimapFrame = new Frame(minimapRectangle, matchRenderer.MinimapRenderer);
             minimapFrame.Bounds = world.Bounds;
             hudFrame.Children.Add(minimapFrame);

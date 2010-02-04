@@ -58,7 +58,7 @@ namespace Orion.GameLogic
         public bool IsWalkable(Point point)
         {
             Debug.Assert(point.X >= 0 && point.Y >= 0 && point.X < size.Width && point.Y < size.Height);
-            int index = point.X * size.Width + point.Y;
+            int index = point.Y * size.Width + point.X;
             return !tiles[index];
         }
 
@@ -100,12 +100,12 @@ namespace Orion.GameLogic
             PerlinNoise noise = new PerlinNoise(random);
 
             BitArray2D tiles = new BitArray2D(size.Width, size.Height);
-            double[] rawTerrain = new double[size.Width * size.Height];
-            for (int i = 0; i < size.Height; i++)
+            double[] rawTerrain = new double[size.Area];
+            for (int y = 0; y < size.Height; y++)
             {
-                for (int j = 0; j < size.Width; j++)
+                for (int x = 0; x < size.Width; x++)
                 {
-                    rawTerrain[i * size.Width + j] = noise[j, i];
+                    rawTerrain[y * size.Width + x] = noise[x, y];
                 }
             }
 
@@ -113,7 +113,7 @@ namespace Orion.GameLogic
             int k = 0;
             foreach (double noiseValue in rawTerrain.Select(d => d / max))
             {
-                tiles[k % size.Height, k / size.Height] = noiseValue >= 0.5;
+                tiles[k % size.Width, k / size.Width] = noiseValue >= 0.5;
                 k++;
             }
 

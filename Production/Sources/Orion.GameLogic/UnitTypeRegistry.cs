@@ -57,6 +57,9 @@ namespace Orion.GameLogic
             RegisterHeroSmurf();
             RegisterHeroViking();
             RegisterHeroFlyingSpaghettiMonster();
+            RegisterFlyingCarpet();
+            RegisterHeroSwineFlu();
+            RegisterHeroUfo();
         }
         #endregion
 
@@ -470,12 +473,12 @@ namespace Orion.GameLogic
                 Name = "Chuck Norris",
                 Size = new Size(5, 5),
                 SightRange = 10,
-                MaxHealth = 5000,
-                MeleeArmor = 50,
-                RangedArmor = 50,
+                MaxHealth = 500,
+                MeleeArmor = 5,
+                RangedArmor = 5,
             };
-            builder.Skills.Add(new MoveSkill(25, true));
-            builder.Skills.Add(new AttackSkill(100, 0, 1));
+            builder.Skills.Add(new MoveSkill(20, false));
+            builder.Skills.Add(new AttackSkill(75, 0, 1));
             Register(builder);
         }
 
@@ -630,23 +633,23 @@ namespace Orion.GameLogic
             builder.Skills.Add(new AttackSkill(50, 5, 4));
             Register(builder);
         }
-/*
+
         private void RegisterHeroSwineFlu()
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Grippe A(H1N1)",
+                Name = "Anthrax",
                 Size = new Size(2, 2),
-                SightRange = 7,
-                MaxHealth = 40,
-                MeleeArmor = 1,
-                RangedArmor = 1,
+                SightRange = 9,
+                MaxHealth = 100,
+                MeleeArmor = 2,
+                RangedArmor = 2,
                 AladdiumCost = 75,
                 AlageneCost = 100,
                 FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(15, true));
-            builder.Skills.Add(new AttackSkill(1, 7, 1));
+            builder.Skills.Add(new AttackSkill(5, 10, 1));
             Register(builder);
         }
 
@@ -654,12 +657,12 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "OVNI",
-                Size = new Size(2, 2),
+                Name = "Vaisseau Mère",
+                Size = new Size(3, 3),
                 SightRange = 10,
-                MaxHealth = 100,
+                MaxHealth = 250,
                 MeleeArmor = 1,
-                RangedArmor = 4,
+                RangedArmor = 8,
                 AladdiumCost = 140,
                 AlageneCost = 140,
                 FoodCost = 2
@@ -673,21 +676,21 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Tapis Volant",
+                Name = "Le Tapis d'Aladdin",
                 Size = new Size(2, 2),
                 SightRange = 8,
-                MaxHealth = 75,
-                MeleeArmor = 1,
-                RangedArmor = 1,
+                MaxHealth = 100,
+                MeleeArmor = 2,
+                RangedArmor = 2,
                 AladdiumCost = 25,
                 AlageneCost = 50,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(10, true));
-            builder.Skills.Add(new TransportSkill(5));
+            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new TransportSkill(12));
             Register(builder);
         }
- */
+ 
         #endregion
         #endregion
 

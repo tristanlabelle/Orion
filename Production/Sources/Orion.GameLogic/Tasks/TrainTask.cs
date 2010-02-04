@@ -68,24 +68,32 @@ namespace Orion.GameLogic.Tasks
         #region Methods
         private UnitType TryTrainHero(Random random, UnitType traineeType, UnitTypeRegistry registry)
         {
+            if (random.Next(0, 10000) == 1337)
+            {
+                return registry.FromName("Chuck Norris");
+            }
             if (random.Next(0, 100) > 97)
             {
                 if (traineeType.Name == "Schtroumpf")
                     return registry.FromName("Grand Schtroumpf");
-                else if (traineeType.Name == "Pirate")
+                if (traineeType.Name == "Pirate")
                     return registry.FromName("Barbe Bleu");
-                else if (traineeType.Name == "Ninja")
+                if (traineeType.Name == "Ninja")
                     return registry.FromName("Léonardo");
-                else if (traineeType.Name == "Viking")
+                if (traineeType.Name == "Viking")
                     return registry.FromName("Thor");
-                else if (traineeType.Name == "Jedihad")
+                if (traineeType.Name == "Jedihad")
                     return registry.FromName("Allah Skywalker");
-                else if (traineeType.Name == "Jésus")
+                if (traineeType.Name == "Jésus")
                     return registry.FromName("Jésus-Raptor");
-                else if (traineeType.Name == "Flying Spaghetti Monster")
+                if (traineeType.Name == "Flying Spaghetti Monster")
                     return registry.FromName("Ta Mère");
-                else
-                    return traineeType;
+                if (traineeType.Name == "Grippe A(H1N1)")
+                    return registry.FromName("Anthrax");
+                if (traineeType.Name == "OVNI")
+                    return registry.FromName("Vaisseau Mère");
+                if (traineeType.Name == "Tapis Volant")
+                    return registry.FromName("Le Tapis d'Aladdin");
             }
             return traineeType;
         }

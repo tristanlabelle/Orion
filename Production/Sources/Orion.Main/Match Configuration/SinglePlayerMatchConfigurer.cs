@@ -32,7 +32,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld();
+            CreateWorld(UserInterface.MapSize);
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();

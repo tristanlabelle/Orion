@@ -47,6 +47,11 @@ namespace Orion.UserInterface.Widgets
 
         public static void Prompt(Responder parent, string message, Action<string> onClose)
         {
+            Prompt(parent, message, "", onClose);
+        }
+
+        public static void Prompt(Responder parent, string message, string defaultValue, Action<string> onClose)
+        {
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
 
@@ -60,6 +65,7 @@ namespace Orion.UserInterface.Widgets
             Frame container = new Frame(frameRect);
             Label displayedMessage = new Label(labelRect, message);
             TextField input = new TextField(textFieldRect);
+            input.Contents = defaultValue;
             Button okButton = new Button(okButtonRect, "Ok");
             Button cancelButton = new Button(cancelButtonRect, "Cancel");
 

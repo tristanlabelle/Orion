@@ -14,7 +14,7 @@ namespace Orion.Commandment
     public sealed class Match
     {
         #region Fields
-        private const int resourceNodeCount = 85;
+        private const double resourcesRatio = 0.00518798828125;
         private const int campSize = 15;
         private const int initialMinimumDistanceBetweenCamps = 175;
 
@@ -250,6 +250,7 @@ namespace Orion.Commandment
 
         private void CreateResourceNodes()
         {
+            int resourceNodeCount = (int)(world.Terrain.Width * world.Terrain.Height * resourcesRatio);
             for (int i = 0; i < resourceNodeCount; i++)
             {
                 Point location = GetFreeLocation(ResourceNode.DefaultSize);

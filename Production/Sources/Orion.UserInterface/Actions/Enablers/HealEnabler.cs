@@ -17,7 +17,7 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (type.HasSkill<HealSkill>())
             {
-                buttonsArray[2, 3] = new GenericActionButton(container, inputManager,
+                buttonsArray[3, 2] = new GenericActionButton(container, inputManager,
                     "Heal", Keys.H, new HealUserCommand(inputManager), base.textureManager);
             }
         }

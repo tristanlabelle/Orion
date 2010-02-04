@@ -26,6 +26,7 @@ namespace Orion.Main
             ui.PressedExit += ExitGame;
             ui.SlotOccupationChanged += SlotChanged;
             ui.KickedPlayer += KickedPlayer;
+            ui.SizeChanged += TransferSizeChange;
         }
 
         public new MultiplayerHostMatchConfigurationUI UserInterface
@@ -73,6 +74,15 @@ namespace Orion.Main
             else throw new InvalidOperationException("Unknown slot type selected");
 
             transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
+        }
+
+        private void TransferSizeChange(MatchConfigurationUI ui, Size size)
+        {
+            byte[] sizeMessage = new byte[9];
+            sizeMessage[0] = (byte)SetupMessageType.ChangeSize;
+            BitConverter.GetBytes(size.Width).CopyTo(sizeMessage, 1);
+            BitConverter.GetBytes(size.Height).CopyTo(sizeMessage, 1 + sizeof(int));
+            transporter.SendTo(sizeMessage, UserInterface.PlayerAddresses);
         }
 
         private void KickedPlayer(IPv4EndPoint peer)

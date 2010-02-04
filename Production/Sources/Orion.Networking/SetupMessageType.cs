@@ -21,8 +21,9 @@ namespace Orion.Networking
         SetSeed = 109,
 
         Message = 110,
+        ChangeSize = 111,
 
-        StartGame = 111,
-        Exit = 112
+        StartGame = 112,
+        Exit = 114
     }
 }

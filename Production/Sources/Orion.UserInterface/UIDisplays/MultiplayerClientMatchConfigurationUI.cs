@@ -15,6 +15,7 @@ namespace Orion.UserInterface
             : base(transporter)
         {
             Children.Remove(startButton);
+            Children.Remove(sizeChangeButton);
         }
         #endregion
 

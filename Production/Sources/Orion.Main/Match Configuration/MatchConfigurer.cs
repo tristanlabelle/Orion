@@ -52,10 +52,11 @@ namespace Orion.Main
             if (handler != null) handler(this);
         }
 
-        protected void CreateWorld()
+        protected void CreateWorld(Size worldSize)
         {
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(seed));
             random = new MersenneTwister(seed);
+            Terrain terrain = Terrain.Generate(worldSize, random);
             Terrain terrain = Terrain.Generate(new Size(128, 128), random);
             world = new World(terrain, random);
         }

@@ -55,6 +55,7 @@ namespace Orion.Main
                 case SetupMessageType.SetSlot: SetSlot(data); break;
                 case SetupMessageType.SetSeed: SetSeed(data); break;
                 case SetupMessageType.StartGame: StartGame(); break;
+                case SetupMessageType.ChangeSize: SetSize(args.Host, data); break;
                 case SetupMessageType.Exit: ForceExit(); break;
             }
         }
@@ -93,6 +94,13 @@ namespace Orion.Main
                 case SlotType.AI: UserInterface.UseAIForSlot(bytes[1]); break;
                 case SlotType.Local: UserInterface.SetLocalPlayerForSlot(bytes[1]); break;
             }
+        }
+
+        private void SetSize(IPv4EndPoint host, byte[] bytes)
+        {
+            if (host != gameHost) return;
+            Size size = new Size(BitConverter.ToInt32(bytes, 1), BitConverter.ToInt32(bytes, 1 + sizeof(int)));
+            UserInterface.MapSize = size;
         }
 
         private void SetSeed(byte[] bytes)

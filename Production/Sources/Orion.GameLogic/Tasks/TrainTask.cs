@@ -72,7 +72,7 @@ namespace Orion.GameLogic.Tasks
             {
                 return registry.FromName("Chuck Norris");
             }
-            if (random.Next(0, 100) > 97)
+            if (random.Next(0, 100) == 99)
             {
                 if (traineeType.Name == "Schtroumpf")
                     return registry.FromName("Grand Schtroumpf");

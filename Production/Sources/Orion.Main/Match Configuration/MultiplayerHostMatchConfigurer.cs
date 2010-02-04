@@ -78,11 +78,17 @@ namespace Orion.Main
 
         private void TransferSizeChange(MatchConfigurationUI ui, Size size)
         {
+            transporter.SendTo(CreateSizeChangePacket(), UserInterface.PlayerAddresses);
+        }
+
+        private byte[] CreateSizeChangePacket()
+        {
+            Size size = UserInterface.MapSize;
             byte[] sizeMessage = new byte[9];
             sizeMessage[0] = (byte)SetupMessageType.ChangeSize;
             BitConverter.GetBytes(size.Width).CopyTo(sizeMessage, 1);
             BitConverter.GetBytes(size.Height).CopyTo(sizeMessage, 1 + sizeof(int));
-            transporter.SendTo(sizeMessage, UserInterface.PlayerAddresses);
+            return sizeMessage;
         }
 
         private void KickedPlayer(IPv4EndPoint peer)
@@ -194,6 +200,7 @@ namespace Orion.Main
             setSlotMessage[1] = (byte)newPeerSlotNumber;
             setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
+            transporter.SendTo(CreateSizeChangePacket(), host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);
         }

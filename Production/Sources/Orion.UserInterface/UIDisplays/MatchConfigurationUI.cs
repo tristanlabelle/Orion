@@ -158,7 +158,7 @@ namespace Orion.UserInterface
             {
                 System.Text.RegularExpressions.Match result = regex.Match(sizeString);
                 Size newSize = new Size(Int32.Parse(result.Groups[1].Value), Int32.Parse(result.Groups[2].Value));
-                if (newSize.Width < minSize.Width || newSize.Height < minSize.Height)
+                if (newSize.Width >= minSize.Width && newSize.Height >= minSize.Height)
                 {
                     MapSize = new Size(Int32.Parse(result.Groups[1].Value), Int32.Parse(result.Groups[2].Value));
                     return;

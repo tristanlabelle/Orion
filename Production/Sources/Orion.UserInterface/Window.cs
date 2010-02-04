@@ -130,6 +130,14 @@ namespace Orion.UserInterface
         private void glControl_KeyDown(object sender, KeyEventArgs args)
         {
             if (args.Alt) args.Handled = true;
+            if (args.KeyCode == Keys.V && args.Modifiers == Keys.Control && Clipboard.ContainsText())
+            {
+                string pastedText = Clipboard.GetText();
+                foreach (char pastedCharacter in pastedText)
+                    OnKeyPress(pastedCharacter);
+                return;
+            }
+
             TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
         }
 
@@ -140,7 +148,12 @@ namespace Orion.UserInterface
 
         private void glControl_KeyPress(object sender, KeyPressEventArgs args)
         {
-            rootView.PropagateKeyPressEvent(args.KeyChar);
+            OnKeyPress(args.KeyChar);
+        }
+
+        private void OnKeyPress(char keyChar)
+        {
+            rootView.PropagateKeyPressEvent(keyChar);
         }
 
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)

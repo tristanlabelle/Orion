@@ -98,6 +98,22 @@ namespace Orion.GameLogic.Technologies
             }.Build(handleGenerator());
 
             technologies.Add(spaghettiAlfredo);
+
+            Technology islamForce = new TechnologyBuilder
+            {
+                Name = "Islam Force",
+                AladdiumCost = 100,
+                AlageneCost = 250,
+                Effects = new[]
+                {
+                    new TechnologyEffect(unitType => unitType.Name == "Jedihad", UnitStat.AttackPower, 2),
+                    new TechnologyEffect(unitType => unitType.Name == "Jedihad", UnitStat.AttackDelay, -2),
+                    new TechnologyEffect(unitType => unitType.Name == "Allah Skywalker", UnitStat.AttackPower, 2),
+                    new TechnologyEffect(unitType => unitType.Name == "Allah Skywalker", UnitStat.AttackDelay, -2),
+                }
+            }.Build(handleGenerator());
+
+            technologies.Add(spaghettiAlfredo);
         }
 
         public Technology FromHandle(Handle handle)

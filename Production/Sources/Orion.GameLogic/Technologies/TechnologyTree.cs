@@ -41,7 +41,7 @@ namespace Orion.GameLogic.Technologies
 
             Technology importJeanMarc = new TechnologyBuilder
             {
-                Name = "Rechercher Jean-Marc",
+                Name = "Import Jean-Marc",
                 AladdiumCost = 250,
                 AlageneCost = 200,
                 Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Jean-Marc", UnitStat.AttackPower, 2) }

@@ -57,7 +57,7 @@ namespace Orion.GameLogic
             RegisterHeroSmurf();
             RegisterHeroViking();
             RegisterHeroFlyingSpaghettiMonster();
-            RegisterFlyingCarpet();
+            RegisterHeroFlyingCarpet();
             RegisterHeroSwineFlu();
             RegisterHeroUfo();
         }

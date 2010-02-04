@@ -14,7 +14,7 @@ namespace Orion.Commandment
     public sealed class SelectionManager
     {
         #region Fields
-        public const int MaxSelectedUnits = 16;
+        public const int MaxSelectedUnits = 24;
 
         private Unit hoveredUnit;
         private readonly List<Unit> selectedUnits = new List<Unit>();

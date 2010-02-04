@@ -30,7 +30,11 @@ namespace Orion.GameLogic.Technologies
                 Name = "Augmenter la vitesse des schtroumpfs",
                 AladdiumCost = 200,
                 AlageneCost = 50,
-                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MovementSpeed, 2) }
+                Effects = new[] 
+                {
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MovementSpeed, 2),
+                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MovementSpeed, 2)
+                }
             }.Build(handleGenerator());
 
             technologies.Add(increasedSchtroumpfSpeed);
@@ -54,7 +58,10 @@ namespace Orion.GameLogic.Technologies
                 {
                     new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MaxHealth, 30),
                     new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.RangedArmor, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MeleeArmor, 1)
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MeleeArmor, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.MaxHealth, 30),
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.RangedArmor, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 
@@ -69,7 +76,10 @@ namespace Orion.GameLogic.Technologies
                 {
                     new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.AttackPower, 1),
                     new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MaxHealth, 25),
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MeleeArmor, 1)
+                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MeleeArmor, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.AttackPower, 1),
+                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MaxHealth, 25),
+                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 
@@ -82,7 +92,8 @@ namespace Orion.GameLogic.Technologies
                 AlageneCost = 150,
                 Effects = new[]
                 {
-                    new TechnologyEffect(unitType => unitType.Name == "Flying Spaghetti Monster", UnitStat.MovementSpeed, 2)
+                    new TechnologyEffect(unitType => unitType.Name == "Flying Spaghetti Monster", UnitStat.MovementSpeed, 2),
+                    new TechnologyEffect(unitType => unitType.Name == "Ta Mère", UnitStat.MovementSpeed, 2)
                 }
             }.Build(handleGenerator());
 

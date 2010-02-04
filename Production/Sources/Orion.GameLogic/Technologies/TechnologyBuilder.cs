@@ -14,6 +14,7 @@ namespace Orion.GameLogic.Technologies
         private HashSet<Technology> requiredTechnologies = new HashSet<Technology>();
         private int aladdiumCost;
         private int alageneCost;
+        private Func<UnitType, bool> predicate = type => true;
         private HashSet<TechnologyEffect> effects = new HashSet<TechnologyEffect>();
         #endregion
 
@@ -50,6 +51,16 @@ namespace Orion.GameLogic.Technologies
             {
                 Argument.EnsurePositive(value, "AlageneCost");
                 alageneCost = value;
+            }
+        }
+
+        public Func<UnitType, bool> Predicate
+        {
+            get { return predicate; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Predicate");
+                predicate = value;
             }
         }
 
@@ -90,7 +101,7 @@ namespace Orion.GameLogic.Technologies
             if (name == null) throw new InvalidOperationException("A name must be set before the technology can be built.");
 
             TechnologyRequirements requirements = BuildRequirements();
-            return new Technology(handle, name, requirements, effects);
+            return new Technology(handle, name, requirements, predicate, effects);
         }
         #endregion
     }

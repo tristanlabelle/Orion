@@ -30,11 +30,8 @@ namespace Orion.GameLogic.Technologies
                 Name = "Augmenter la vitesse des schtroumpfs",
                 AladdiumCost = 200,
                 AlageneCost = 50,
-                Effects = new[] 
-                {
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MovementSpeed, 2),
-                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MovementSpeed, 2)
-                }
+                Predicate = (type => type.Name == "Schtroumpf" || type.Name == "Grand Schtroumpf"),
+                Effects = new[] { new TechnologyEffect(UnitStat.MovementSpeed, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(increasedSchtroumpfSpeed);
@@ -44,7 +41,8 @@ namespace Orion.GameLogic.Technologies
                 Name = "Import Jean-Marc",
                 AladdiumCost = 250,
                 AlageneCost = 200,
-                Effects = new[] { new TechnologyEffect(unitType => unitType.Name == "Jean-Marc", UnitStat.AttackPower, 2) }
+                Predicate = (type => type.Name == "Jean-Marc"),
+                Effects = new[] { new TechnologyEffect(UnitStat.AttackPower, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(importJeanMarc);
@@ -54,14 +52,12 @@ namespace Orion.GameLogic.Technologies
                 Name = "Sainte-trinité",
                 AladdiumCost = 200,
                 AlageneCost = 150,
+                Predicate = (type => type.Name == "Jésus" || type.Name == "Jésus-Raptor"),
                 Effects = new[]
                 {
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MaxHealth, 30),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.RangedArmor, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus", UnitStat.MeleeArmor, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.MaxHealth, 30),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.RangedArmor, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Jésus-Raptor", UnitStat.MeleeArmor, 1)
+                    new TechnologyEffect(UnitStat.MaxHealth, 30),
+                    new TechnologyEffect(UnitStat.RangedArmor, 1),
+                    new TechnologyEffect(UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 
@@ -72,14 +68,12 @@ namespace Orion.GameLogic.Technologies
                 Name = "Schtroumpf costaud",
                 AladdiumCost = 150,
                 AlageneCost = 100,
+                Predicate = (type => type.Name == "Schtroumpf" || type.Name == "Grand Schtroumpf"),
                 Effects = new[]
                 {
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.AttackPower, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MaxHealth, 25),
-                    new TechnologyEffect(unitType => unitType.Name == "Schtroumpf", UnitStat.MeleeArmor, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.AttackPower, 1),
-                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MaxHealth, 25),
-                    new TechnologyEffect(unitType => unitType.Name == "Grand Schtroumpf", UnitStat.MeleeArmor, 1)
+                    new TechnologyEffect(UnitStat.AttackPower, 1),
+                    new TechnologyEffect(UnitStat.MaxHealth, 25),
+                    new TechnologyEffect(UnitStat.MeleeArmor, 1)
                 }
             }.Build(handleGenerator());
 
@@ -90,11 +84,8 @@ namespace Orion.GameLogic.Technologies
                 Name = "Spaghetti Alfredo",
                 AladdiumCost = 200,
                 AlageneCost = 150,
-                Effects = new[]
-                {
-                    new TechnologyEffect(unitType => unitType.Name == "Flying Spaghetti Monster", UnitStat.MovementSpeed, 2),
-                    new TechnologyEffect(unitType => unitType.Name == "Ta Mère", UnitStat.MovementSpeed, 2)
-                }
+                Predicate = (type => type.Name == "Flying Spaghetti Monster" || type.Name == "Ta Mère"),
+                Effects = new[] { new TechnologyEffect(UnitStat.MovementSpeed, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(spaghettiAlfredo);
@@ -104,12 +95,11 @@ namespace Orion.GameLogic.Technologies
                 Name = "Islam Force",
                 AladdiumCost = 100,
                 AlageneCost = 250,
+                Predicate = (type => type.Name == "Jedihad" || type.Name == "Allah Skywalker"),
                 Effects = new[]
                 {
-                    new TechnologyEffect(unitType => unitType.Name == "Jedihad", UnitStat.AttackPower, 2),
-                    new TechnologyEffect(unitType => unitType.Name == "Jedihad", UnitStat.AttackDelay, -2),
-                    new TechnologyEffect(unitType => unitType.Name == "Allah Skywalker", UnitStat.AttackPower, 2),
-                    new TechnologyEffect(unitType => unitType.Name == "Allah Skywalker", UnitStat.AttackDelay, -2),
+                    new TechnologyEffect(UnitStat.AttackPower, 2),
+                    new TechnologyEffect(UnitStat.AttackDelay, -2),
                 }
             }.Build(handleGenerator());
 

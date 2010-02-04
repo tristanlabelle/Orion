@@ -24,27 +24,33 @@ namespace Orion.GameLogic.Technologies
         private readonly Handle handle;
         private readonly string name;
         private readonly TechnologyRequirements requirements;
+        private readonly Func<UnitType, bool> predicate;
         private readonly ReadOnlyCollection<TechnologyEffect> effects;
         #endregion
 
         #region Constructors
         public Technology(Handle handle, string name,
-            TechnologyRequirements requirements, IEnumerable<TechnologyEffect> effects)
+            TechnologyRequirements requirements,
+            Func<UnitType, bool> predicate,
+            IEnumerable<TechnologyEffect> effects)
         {
             Argument.EnsureNotNullNorBlank(name, "name");
             Argument.EnsureNotNull(requirements, "requirements");
+            Argument.EnsureNotNull(predicate, "predicate");
             Argument.EnsureNotNull(effects, "effects");
 
             this.handle = handle;
             this.name = name;
             this.requirements = requirements;
+            this.predicate = predicate;
             this.effects = effects.ToList().AsReadOnly();
             Argument.EnsureStrictlyPositive(this.effects.Count, "effects.Count");
         }
 
         public Technology(Handle handle, string name,
-            TechnologyRequirements requirements, params TechnologyEffect[] effects)
-            : this(handle, name, requirements, (IEnumerable<TechnologyEffect>)effects)
+            TechnologyRequirements requirements,
+            Func<UnitType, bool> predicate, params TechnologyEffect[] effects)
+            : this(handle, name, requirements, predicate, (IEnumerable<TechnologyEffect>)effects)
         { }
         #endregion
 
@@ -96,10 +102,18 @@ namespace Orion.GameLogic.Technologies
         #endregion
 
         #region Methods
+        public bool AppliesTo(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            return predicate(unitType);
+        }
+
         public int GetEffect(UnitType unitType, UnitStat stat)
         {
             Argument.EnsureNotNull(unitType, "unitType");
-            return effects.Where(effect => effect.AppliesTo(unitType) && effect.Stat == stat)
+            if (!AppliesTo(unitType)) return 0;
+
+            return effects.Where(effect => effect.Stat == stat)
                 .Sum(effect => effect.Value);
         }
 

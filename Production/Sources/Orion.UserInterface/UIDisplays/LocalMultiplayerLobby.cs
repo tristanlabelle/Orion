@@ -128,7 +128,7 @@ namespace Orion.UserInterface
 
         private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
         {
-            Instant.DisplayAlert(this, "Impossible de rejoindre {0}.".FormatInvariant(ResolveHostAddress(host)));
+            Instant.DisplayAlert(this, "Impossible de rejointer {0}.".FormatInvariant(ResolveHostAddress(host)));
             requestedJoin = null;
         }
 
@@ -179,7 +179,7 @@ namespace Orion.UserInterface
         private void PressJoinRemoteGame(Button sender)
         {
             if (!requestedJoin.HasValue)
-                Instant.Prompt(this, "Quelle adresse voulez-vous joindre ?", JoinAddress);
+                Instant.Prompt(this, "Quelle adresse voulez-vous jointer?", JoinAddress);
         }
 
         private void PressHostGame(Button sender)

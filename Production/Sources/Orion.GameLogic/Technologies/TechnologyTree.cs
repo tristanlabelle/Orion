@@ -113,7 +113,7 @@ namespace Orion.GameLogic.Technologies
                 }
             }.Build(handleGenerator());
 
-            technologies.Add(spaghettiAlfredo);
+            technologies.Add(islamForce);
         }
 
         public Technology FromHandle(Handle handle)

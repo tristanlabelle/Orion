@@ -116,6 +116,13 @@ namespace Orion.GameLogic
             var handler = Warning;
             if (handler != null) handler(this, message);
         }
+
+        private void RaiseWarning(string message, Faction source)
+        {
+            Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
+            var handler = Warning;
+            if (handler != null) handler(source, message);
+        }
         #endregion
 
         #region Properties
@@ -426,13 +433,13 @@ namespace Orion.GameLogic
             if (stance == DiplomaticStance.Ally)
             {
                 factionsWeRegardAsAllies.Add(target);
-                RaiseWarning("{0} est maintenant votre allié.".FormatInvariant(target));
+                target.RaiseWarning("{0} est maintenant votre allié.".FormatInvariant(this), this);
             }
             else
             {
                 factionsWeRegardAsAllies.Remove(target);
                 target.SetDiplomaticStance(this, DiplomaticStance.Enemy);
-                RaiseWarning("{0} est maintenant hostile à votre égard.".FormatInvariant(target));
+                target.RaiseWarning("{0} est maintenant hostile à votre égard.".FormatInvariant(this), this);
             }
 
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);

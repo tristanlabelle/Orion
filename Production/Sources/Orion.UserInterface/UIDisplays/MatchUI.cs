@@ -698,6 +698,7 @@ namespace Orion.UserInterface
             foreach (Faction faction in World.Factions)
             {
                 if (faction == LocalFaction) continue;
+                if (faction.Status == FactionStatus.Defeated) continue;
 
                 Frame frameFaction = new Frame(rectangleFrame, faction.Color);
                 

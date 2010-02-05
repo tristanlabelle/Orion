@@ -34,6 +34,7 @@ namespace Orion.GameLogic
         private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
         private readonly GenericEventHandler<EntityManager, Entity> entityRemovedEventHandler;
+        private readonly GenericEventHandler<World, Faction> factionDefeatedEventHandler;
         private readonly GenericEventHandler<Unit> foodStorageCreated;
         private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
         private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
@@ -66,6 +67,8 @@ namespace Orion.GameLogic
             this.localFogOfWar = new FogOfWar(world.Size);
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
+            this.factionDefeatedEventHandler = OnFactionDefeated;
+            world.FactionDefeated += factionDefeatedEventHandler;
             this.unitMovedEventHandler = OnUnitMoved;
             this.entityRemovedEventHandler = OnEntityRemoved;
             this.foodStorageCreated = OnFoodStorageCreated;
@@ -385,6 +388,11 @@ namespace Orion.GameLogic
             }
         }
 
+        private void OnFactionDefeated(World world, Faction faction)
+        {
+            if(faction == this) return;
+            factionsWeRegardAsAllies.Remove(faction);
+        }
         private void OnFoodStorageCreated(Unit unit)
         {
             unit.ConstructionComplete -= foodStorageCreated;

@@ -104,6 +104,7 @@
     <Compile Include="Tasks\MoveTask.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Tasks\StandGuardTask.cs" />
     <Compile Include="Tasks\Task.cs" />
     <Compile Include="Tasks\TaskQueue.cs" />
     <Compile Include="Tasks\AttackTask.cs" />

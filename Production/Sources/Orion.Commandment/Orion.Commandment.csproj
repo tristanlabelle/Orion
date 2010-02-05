@@ -53,6 +53,7 @@
     <Compile Include="Commands\IMultipleExecutingEntitiesCommand.cs" />
     <Compile Include="Commands\Pipeline\CommandOptimizer.cs" />
     <Compile Include="Commands\ResearchCommand.cs" />
+    <Compile Include="Commands\StandGuardCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="CheatCodeManager.cs" />
     <Compile Include="Commander.cs" />

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioContext.cs" />
+    <Compile Include="AudioSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoundBuffer.cs" />
   </ItemGroup>

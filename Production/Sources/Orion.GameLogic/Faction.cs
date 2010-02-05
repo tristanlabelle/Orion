@@ -22,8 +22,8 @@ namespace Orion.GameLogic
         public static Color[] Colors = new Color[]
         {
             Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.White, Color.Turquoise,
-            Color.Lime, Color.Gray
+            Color.Green, Color.Pink, Color.Gray, Color.DarkBlue,
+            Color.Lime, Color.Purple, Color.White, Color.Chocolate
         };
 
         private readonly Handle handle;

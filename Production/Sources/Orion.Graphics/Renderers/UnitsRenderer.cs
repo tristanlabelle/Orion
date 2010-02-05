@@ -280,6 +280,8 @@ namespace Orion.Graphics.Renderers
                 float laserProgress = attacker.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;
 
                 Vector2 delta = target.Center - attacker.Center;
+                if (delta.LengthSquared < 0.001f) continue;
+
                 Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
 

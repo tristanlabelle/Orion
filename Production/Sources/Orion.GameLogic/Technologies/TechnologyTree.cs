@@ -27,7 +27,7 @@ namespace Orion.GameLogic.Technologies
         {
             Technology increasedSchtroumpfSpeed = new TechnologyBuilder
             {
-                Name = "Augmenter la vitesse des schtroumpfs",
+                Name = "Schtroumpf véloce",
                 AladdiumCost = 200,
                 AlageneCost = 50,
                 Predicate = (type => type.Name == "Schtroumpf" || type.Name == "Grand Schtroumpf"),
@@ -49,7 +49,7 @@ namespace Orion.GameLogic.Technologies
 
             Technology holyTrinity = new TechnologyBuilder
             {
-                Name = "Sainte-trinité",
+                Name = "Sainte Trinité",
                 AladdiumCost = 200,
                 AlageneCost = 150,
                 Predicate = (type => type.Name == "Jésus" || type.Name == "Jésus-Raptor"),

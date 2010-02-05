@@ -418,7 +418,7 @@ namespace Orion.GameLogic
         {
             var builder = new UnitTypeBuilder
             {
-                Name = "Tour de garde",
+                Name = "Oeil de Sauron",
                 Size = new Size(2, 2),
                 SightRange = 16,
                 MaxHealth = 100,

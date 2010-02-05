@@ -118,15 +118,6 @@ namespace Orion.Commandment
                 GenerateActionCommand(new SuicideCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
-        public void LaunchChangeDiplomacy(Faction otherFaction)
-        {
-            if (otherFaction == null) return;
-            if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
-                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
-            else
-                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
-        }
-
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = ClampPosition(destination);
@@ -141,11 +132,26 @@ namespace Orion.Commandment
                 GenerateActionCommand(new HealCommand(Faction.Handle, units.Select(unit => unit.Handle), hurtUnit.Handle));
         }
 
+        public void LaunchStandGuard(IEnumerable<Unit> units)
+        {
+            if (units.Count() > 0)
+                GenerateActionCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+        }
+
         public void GenerateActionCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");
             if (Faction.Status == FactionStatus.Defeated) return;
             GenerateCommand(command);
+        }
+
+        public void LaunchChangeDiplomacy(Faction otherFaction)
+        {
+            if (otherFaction == null) return;
+            if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
+                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
+            else
+                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
         #endregion
     }

@@ -168,6 +168,7 @@ namespace Orion.UserInterface
             enablers.Add(new TrainEnabler(userInputManager, actions, textureManager));
             enablers.Add(new HealEnabler(userInputManager, actions, textureManager));
             enablers.Add(new ResearchEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new StandGuardEnabler(userInputManager, actions, textureManager));
             // Purposefully disabled as transporting causes a few problems.
             //enablers.Add(new TransportEnabler(userInputManager, actions, textureManager));
 

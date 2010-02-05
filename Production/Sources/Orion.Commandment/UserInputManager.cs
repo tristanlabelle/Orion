@@ -176,7 +176,7 @@ namespace Orion.Commandment
                 case Keys.Escape: mouseCommand = null; break;
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
-                case Keys.F9: LaunchChangeDimplomacy(); break;
+                case Keys.F9: ChangeDimplomaticStance(); break;
 
                 case Keys.D0: case Keys.D1: case Keys.D2:
                 case Keys.D3: case Keys.D4: case Keys.D5:
@@ -408,11 +408,12 @@ namespace Orion.Commandment
             commander.LaunchSuicide(targetUnits);
         }
 
-        public void LaunchChangeDimplomacy()
+        public void LaunchStandGuard()
         {
-            // For Now I just Test Ally
-            Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
-            commander.LaunchChangeDiplomacy(otherFaction);
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction)
+                .Where(unit => unit.HasSkill<MoveSkill>());
+            commander.LaunchStandGuard(targetUnits);
         }
 
         public void LaunchCancel()
@@ -420,6 +421,13 @@ namespace Orion.Commandment
             IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchCancel(targetUnits);
+        }
+
+        public void ChangeDimplomaticStance()
+        {
+            // For Now I just Test Ally
+            Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
+            commander.LaunchChangeDiplomacy(otherFaction);
         }
         #endregion
         #endregion

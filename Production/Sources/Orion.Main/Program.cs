@@ -121,7 +121,6 @@ namespace Orion.Main
         #region Running the Game
         private void StartProgram()
         {
-            new AudioContext();
             int port = DefaultHostPort;
             do
             {

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.UserInterface", "Orio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Tools.ReplayPrinter", "Orion.Tools.ReplayPrinter\Orion.Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Audio", "Orion.Audio\Orion.Audio.csproj", "{957AD388-F524-456F-A5DD-B80BAB90A355}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,13 +57,17 @@ Global
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957AD388-F524-456F-A5DD-B80BAB90A355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957AD388-F524-456F-A5DD-B80BAB90A355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_Active = 0
 		CodeStyleEnforcer_RulesLocation = 
+		CodeStyleEnforcer_Active = 0
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Orion.Main.csproj

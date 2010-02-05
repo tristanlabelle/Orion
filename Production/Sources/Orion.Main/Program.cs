@@ -12,6 +12,7 @@ using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
 using Button = Orion.UserInterface.Widgets.Button;
+using OpenTK.Audio;
 
 namespace Orion.Main
 {
@@ -120,6 +121,7 @@ namespace Orion.Main
         #region Running the Game
         private void StartProgram()
         {
+            new AudioContext();
             int port = DefaultHostPort;
             do
             {

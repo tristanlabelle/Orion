@@ -32,11 +32,6 @@ namespace Orion.Audio
 
             Alut.InitWithoutContext();
             Debug.Assert(AL.GetError() == ALError.NoError);
-
-            foreach (string file in Directory.GetFiles(directory, "*.wav"))
-            {
-                Alut.CreateBufferFromFile(
-            }
         }
         #endregion
 

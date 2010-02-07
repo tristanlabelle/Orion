@@ -16,8 +16,8 @@ using Color = System.Drawing.Color;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
-using AudioContext = Orion.Audio.AudioContext;
-using MatchAudioRenderer = Orion.Audio.MatchRenderer;
+//using AudioContext = Orion.Audio.AudioContext;
+//using MatchAudioRenderer = Orion.Audio.MatchRenderer;
 
 namespace Orion.UserInterface
 {
@@ -57,8 +57,8 @@ namespace Orion.UserInterface
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly UserInputManager userInputManager;
-        private readonly AudioContext audioContext;
-        private readonly MatchAudioRenderer matchAudioRenderer;
+        //private readonly AudioContext audioContext;
+        //private readonly MatchAudioRenderer matchAudioRenderer;
         private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
         private UnitType selectedType;
@@ -78,9 +78,9 @@ namespace Orion.UserInterface
             this.match.Quitting += Quit;
             this.userInputManager = new UserInputManager(localCommander);
 
-            this.audioContext = new AudioContext();
-            this.audioContext.IsMuted = false;
-            this.matchAudioRenderer = new Orion.Audio.MatchRenderer(audioContext, match, this.userInputManager);
+            //this.audioContext = new AudioContext();
+            //this.audioContext.IsMuted = false;
+            //this.matchAudioRenderer = new Orion.Audio.MatchRenderer(audioContext, match, this.userInputManager);
 
             this.textureManager = new TextureManager();
             World world = match.World;

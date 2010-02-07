@@ -41,14 +41,6 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ActionButton.cs" />
@@ -128,6 +120,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Orion.Audio\Orion.Audio.csproj">
+      <Project>{957AD388-F524-456F-A5DD-B80BAB90A355}</Project>
+      <Name>Orion.Audio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Orion.Commandment</Name>

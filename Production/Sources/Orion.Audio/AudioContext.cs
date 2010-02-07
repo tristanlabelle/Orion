@@ -2,152 +2,83 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK;
-using OpenTK.Audio;
 using System.IO;
 using System.Diagnostics;
 using OpenTK.Math;
+using IrrKlang;
+using System.Text.RegularExpressions;
 
 namespace Orion.Audio
 {
     public sealed class AudioContext : IDisposable
     {
         #region Fields
-        private readonly IntPtr deviceHandle;
-        private readonly ContextHandle contextHandle;
-        private readonly AudioSource[] sources;
+        internal static readonly string[] SupportedFormats = new[] { ".wav", ".ogg" };
+
+        private readonly Random random = new Random();
+        private readonly ISoundEngine engine;
+        private readonly Dictionary<string, SoundGroup> soundGroups = new Dictionary<string, SoundGroup>();
+        private float volume = 1;
+        private bool isMuted;
         #endregion
 
         #region Constructors
         public AudioContext()
         {
-            deviceHandle = Alc.OpenDevice(null);
-            if (deviceHandle == null) return;
-
-            contextHandle = Alc.CreateContext(deviceHandle, (int[])null);
-            if (contextHandle == null) return;
-
-            Alc.MakeContextCurrent(contextHandle);
-            Debug.Assert(AL.GetError() == ALError.NoError);
-
-            Alut.InitWithoutContext();
-            Debug.Assert(AL.GetError() == ALError.NoError);
-
-            sources = new AudioSource[32];
-            for (int i = 0; i < sources.Length; ++i)
-                sources[i] = new AudioSource();
+            engine = new ISoundEngine(SoundOutputDriver.AutoDetect, SoundEngineOptionFlag.DefaultOptions | SoundEngineOptionFlag.MultiThreaded);
         }
         #endregion
 
         #region Properties
-        public string DeviceName
+        public float Volume
         {
-            get
-            {
-                return contextHandle.Handle == IntPtr.Zero
-                    ? null
-                    : Alc.GetString(deviceHandle, AlcGetString.DefaultDeviceSpecifier);
-            }
-        }
-
-        public bool IsDummy
-        {
-            get { return contextHandle.Handle == IntPtr.Zero; }
-        }
-
-        public Vector2 ListenerPosition
-        {
-            get { return GetListenerVector(ALListener3f.Position); }
-            set { SetListenerVector(ALListener3f.Position, value); }
-        }
-
-        public Vector2 ListenerVelocity
-        {
-            get { return GetListenerVector(ALListener3f.Velocity); }
-            set { SetListenerVector(ALListener3f.Velocity, value); }
-        }
-
-        public float ListenerGain
-        {
-            get
-            {
-                float value;
-                AL.GetListener(ALListenerf.Gain, out value);
-                Debug.Assert(AL.GetError() != ALError.NoError);
-                return value;
-            }
+            get { return volume; }
             set
             {
-                AL.Listener(ALListenerf.Gain, value);
-                Debug.Assert(AL.GetError() != ALError.NoError);
+                if (!isMuted) engine.SoundVolume = value;
+                volume = value;
             }
         }
 
-        public float SpeedOfSound
+        public bool IsMuted
         {
-            get
-            {
-                float value = AL.Get(ALGetFloat.SpeedOfSound);
-                Debug.Assert(AL.GetError() != ALError.NoError);
-                return value;
-            }
+            get { return isMuted; }
             set
             {
-                AL.SpeedOfSound(value);
-                Debug.Assert(AL.GetError() != ALError.NoError);
+                isMuted = value;
+                engine.SoundVolume = isMuted ? 0 : volume;
             }
         }
         #endregion
 
         #region Methods
-        public bool Play(string name)
+        public void PlaySound(string name)
         {
-            if (IsDummy) return false;
+            Argument.EnsureNotNull(name, "name");
 
-            string path = "../../../Assets/Sounds/" + name + ".wav";
-            SoundBuffer soundBuffer = new SoundBuffer(path);
+            SoundGroup soundGroup = GetSoundGroup(name);
+            if (soundGroup.IsEmpty) return;
 
-            AudioSource source = sources.FirstOrDefault(s => !s.IsInUse);
-            if (source == null) return false;
-
-            source.Buffer = soundBuffer;
-            source.Play();
-
-            return true;
-        }
-
-        public void StopAllSounds()
-        {
-            foreach (AudioSource source in sources)
-                if (source.IsInUse)
-                    source.Stop();
+            string filePath = soundGroup.GetRandomFilePath(random);
+            engine.Play2D(filePath);
         }
 
         public void Dispose()
         {
-            for (int i = 0; i < sources.Length; ++i)
-            {
-                sources[i].Dispose();
-                sources[i] = null;
-            }
-
-            Alc.MakeContextCurrent(ContextHandle.Zero);
-            if (contextHandle != null) Alc.DestroyContext(contextHandle);
-            if (deviceHandle != null) Alc.CloseDevice(deviceHandle);
+            engine.RemoveAllSoundSources();
+            engine.StopAllSounds();
+            engine.__dtor();
         }
 
-        private Vector2 GetListenerVector(ALListener3f param)
+        private SoundGroup GetSoundGroup(string name)
         {
-            Vector3 value;
-            AL.GetListener(param, out value);
-            Debug.Assert(AL.GetError() == ALError.NoError);
-            return value.Xy;
-        }
+            SoundGroup soundGroup;
+            if (soundGroups.TryGetValue(name, out soundGroup))
+                return soundGroup;
 
-        private void SetListenerVector(ALListener3f param, Vector2 value)
-        {
-            AL.Listener(param, value.X, value.Y, 0);
-            Debug.Assert(AL.GetError() == ALError.NoError);
+            soundGroup = new SoundGroup(name);
+            soundGroups.Add(name, soundGroup);
+            return soundGroup;
         }
         #endregion
     }

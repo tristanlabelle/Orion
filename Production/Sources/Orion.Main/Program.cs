@@ -12,7 +12,8 @@ using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
 using Button = Orion.UserInterface.Widgets.Button;
-using OpenTK.Audio;
+using Orion.Audio;
+using System.Threading;
 
 namespace Orion.Main
 {

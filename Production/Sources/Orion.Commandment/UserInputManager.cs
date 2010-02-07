@@ -176,7 +176,7 @@ namespace Orion.Commandment
                 case Keys.Escape: mouseCommand = null; break;
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
-                case Keys.F9: ChangeDimplomaticStance(); break;
+                case Keys.F9: ChangeDiplomaticStance(); break;
 
                 case Keys.D0: case Keys.D1: case Keys.D2:
                 case Keys.D3: case Keys.D4: case Keys.D5:
@@ -423,7 +423,7 @@ namespace Orion.Commandment
             commander.LaunchCancel(targetUnits);
         }
 
-        public void ChangeDimplomaticStance()
+        public void ChangeDiplomaticStance()
         {
             // For Now I just Test Ally
             Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");

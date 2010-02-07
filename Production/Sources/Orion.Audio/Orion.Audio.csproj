@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="irrKlang.NET, Version=1.1.3.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\irrKlang.NET.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Debug\OpenTK.dll</HintPath>
@@ -39,27 +43,26 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioContext.cs" />
-    <Compile Include="AudioSource.cs" />
+    <Compile Include="MatchRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SoundBuffer.cs" />
+    <Compile Include="SoundGroup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="alut.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="openal32.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
+      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
+      <Name>Orion.Commandment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Orion.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.GameLogic\Orion.GameLogic.csproj">
+      <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
+      <Name>Orion.GameLogic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

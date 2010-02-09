@@ -78,6 +78,50 @@ namespace Orion
         }
         #endregion
 
+        #region InclusiveMax
+        public int InclusiveMaxX
+        {
+            get
+            {
+                if (Width == 0)
+                {
+                    throw new InvalidOperationException(
+                        "A zero-width region does not have an inclusive maximum x coordinate.");
+                }
+
+                return MinX + Width - 1;
+            }
+        }
+
+        public int InclusiveMaxY
+        {
+            get
+            {
+                if (Height == 0)
+                {
+                    throw new InvalidOperationException(
+                        "A zero-height region does not have an inclusive maximum y coordinate.");
+                }
+
+                return MinY + Height - 1;
+            }
+        }
+
+        public Point InclusiveMax
+        {
+            get
+            {
+                if (Size.Area == 0)
+                {
+                    throw new InvalidOperationException(
+                        "A zero-sized region does not have an inclusive maximum coordinate.");
+                }
+
+                return new Point(ExclusiveMaxX, ExclusiveMaxY);
+            }
+        }
+        #endregion
+
         #region ExclusiveMax
         public int ExclusiveMaxX
         {
@@ -115,6 +159,31 @@ namespace Orion
                 for (int x = MinX; x < ExclusiveMaxX; ++x)
                     for (int y = MinY; y < ExclusiveMaxY; ++y)
                         yield return new Point(x, y);
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the points in the internal border of this region.
+        /// </summary>
+        public IEnumerable<Point> InternalBorderPoints
+        {
+            get
+            {
+                if (Size.Area == 0) yield break;
+
+                Point inclusiveMax = InclusiveMax;
+
+                for (int y = MinY; y < inclusiveMax.Y; ++y)
+                    yield return new Point(MinX, y);
+
+                for (int x = MinX; x < inclusiveMax.X; ++x)
+                    yield return new Point(x, inclusiveMax.Y);
+
+                for (int y = inclusiveMax.Y; y > MinY; --y)
+                    yield return new Point(inclusiveMax.X, y);
+
+                for (int x = inclusiveMax.X; x > MinX; --x)
+                    yield return new Point(x, MinY);
             }
         }
         #endregion

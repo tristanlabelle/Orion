@@ -15,11 +15,12 @@ namespace Orion.UserInterface
 {
     public abstract class MatchConfigurationUI : UIDisplay
     {
-        private static readonly Size minSize = new Size(64, 64);
         #region Fields
+        private static readonly Size minSize = new Size(50, 50);
+
         private GenericEventHandler<Button> exitPanel;
         private GenericEventHandler<Button> startGame;
-        private Size size = new Size(128, 128);
+        private Size size = new Size(150, 150);
         private readonly Label sizeField;
         protected readonly Button sizeChangeButton;
         protected readonly Button startButton;
@@ -158,7 +159,13 @@ namespace Orion.UserInterface
             {
                 System.Text.RegularExpressions.Match result = regex.Match(sizeString);
                 Size newSize = new Size(int.Parse(result.Groups[1].Value), int.Parse(result.Groups[2].Value));
+
+#if DEBUG
+                // Don't limit sizes when debugging (although it creates more bugs than it fixes...)
+                if (newSize.Width > 0 && newSize.Height > 0)
+#else
                 if (newSize.Width >= minSize.Width && newSize.Height >= minSize.Height)
+#endif
                 {
                     MapSize = newSize;
                     return;

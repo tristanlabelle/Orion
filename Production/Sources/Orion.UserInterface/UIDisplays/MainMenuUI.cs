@@ -36,7 +36,7 @@ namespace Orion.UserInterface
             Font creditsFont = new Font("Trebuchet MS", 10);
             AddCenteredLabel("Programmeurs ", creditsFont, 110);
             AddCenteredLabel(programmerNames, creditsFont, 90);
-            AddCenteredLabel("Artiste  ", creditsFont, 60);
+            AddCenteredLabel("Artiste audio-vidéo  ", creditsFont, 60);
             AddCenteredLabel(artistName, creditsFont, 40);
         }
 

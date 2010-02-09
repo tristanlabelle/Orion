@@ -17,6 +17,7 @@ namespace Orion.GameLogic.Tasks
         private readonly UnitType traineeType;
         private float healthPointsTrained;
         private bool attemptingToPlaceUnit;
+        private bool waitingForEnoughFood;
         private bool hasEnded;
         #endregion
 
@@ -100,7 +101,18 @@ namespace Orion.GameLogic.Tasks
 
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost) return;
+            if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost)
+            {
+                if (!waitingForEnoughFood)
+                {
+                    waitingForEnoughFood = true;
+                    string warning = "Pas assez de nourriture pour créer l'unité {0}".FormatInvariant(traineeType.Name);
+                    Faction.RaiseWarning(warning);
+                }
+
+                return;
+            }
+            waitingForEnoughFood = false;
 
             float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             if (healthPointsTrained < maxHealth)
@@ -121,6 +133,8 @@ namespace Orion.GameLogic.Tasks
                     MoveTask moveToRallyPointTask = new MoveTask(trainee, (Point)Unit.RallyPoint.Value);
                     trainee.TaskQueue.OverrideWith(moveToRallyPointTask);
                 }
+
+                attemptingToPlaceUnit = false;
                 hasEnded = true;
             }
             else if (!attemptingToPlaceUnit)
@@ -134,17 +148,19 @@ namespace Orion.GameLogic.Tasks
         private Point? GetSpawnPoint()
         {
             Region trainerRegion = Unit.GridRegion;
+
             Region spawnRegion = new Region(
                 trainerRegion.MinX - traineeType.Size.Width,
                 trainerRegion.MinY - traineeType.Size.Height,
-                trainerRegion.Size.Width + traineeType.Size.Width + 1,
-                trainerRegion.Size.Height + traineeType.Size.Height + 1);
-
-            spawnRegion = Region.Intersection(spawnRegion, (Region)World.Size).Value;
-
-            var potentialSpawnPoints = spawnRegion.Points
-                .Where(point => Unit.World.IsWithinBounds(point)
-                    && Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer));
+                trainerRegion.Size.Width + traineeType.Size.Width,
+                trainerRegion.Size.Height + traineeType.Size.Height);
+            var potentialSpawnPoints = spawnRegion.InternalBorderPoints
+                .Where(point =>
+                    {
+                        Region region = new Region(point, traineeType.Size);
+                        return new Region(Unit.World.Size).Contains(region)
+                            && Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer);
+                    });
 
             if (Unit.HasRallyPoint)
             {

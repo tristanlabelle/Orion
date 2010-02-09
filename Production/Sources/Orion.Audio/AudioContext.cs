@@ -25,7 +25,14 @@ namespace Orion.Audio
         #region Constructors
         public AudioContext()
         {
-            engine = new ISoundEngine(SoundOutputDriver.AutoDetect, SoundEngineOptionFlag.DefaultOptions | SoundEngineOptionFlag.MultiThreaded);
+            try
+            {
+                engine = new ISoundEngine(SoundOutputDriver.DirectSound);
+            }
+            catch (Exception) // We have to catch Exception as that's what's thrown by IrrKlang >.<
+            {
+                engine = new ISoundEngine(SoundOutputDriver.NullDriver);
+            }
         }
         #endregion
 

@@ -56,7 +56,7 @@ namespace Orion.GameLogic.Tasks
                     target = Unit.World.Entities
                         .Intersecting(Unit.LineOfSight)
                         .OfType<Unit>()
-                        .FirstOrDefault(other => Unit.HasWithinAttackRange(other)
+                        .FirstOrDefault(other => Unit.IsWithinAttackRange(other)
                             && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
                 if (target != null)
                 {
@@ -70,7 +70,7 @@ namespace Orion.GameLogic.Tasks
         {
             if (target != null)
                 if (target.IsAlive)
-                    if (Unit.HasWithinAttackRange(target))
+                    if (Unit.IsWithinAttackRange(target))
                         return true;
             return false;
         }

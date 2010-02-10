@@ -335,18 +335,20 @@ namespace Orion.GameLogic
             return Intersection.Test(LineOfSight, other.BoundingRectangle);
         }
 
-        public bool HasWithinAttackRange(Unit other)
+        public bool IsWithinAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
+
             if (!HasSkill<AttackSkill>()) return false;
+
             int attackRange = GetStat(UnitStat.AttackRange);
             if (attackRange == 0)
             {
-                if (!IsAirborne && other.IsAirborne)
-                    return false;
+                if (!IsAirborne && other.IsAirborne) return false;
                 return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             }
-            return (Center - other.Center).LengthSquared <= attackRange * attackRange;
+
+            return Region.SquaredDistance(GridRegion, other.GridRegion) <= attackRange * attackRange + 0.001f;
         }
         #endregion
 

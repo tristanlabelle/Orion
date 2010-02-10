@@ -27,7 +27,7 @@ namespace Orion.Audio
         {
             try
             {
-                engine = new ISoundEngine(SoundOutputDriver.DirectSound);
+                engine = new ISoundEngine();
             }
             catch (Exception) // We have to catch Exception as that's what's thrown by IrrKlang >.<
             {

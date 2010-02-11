@@ -96,6 +96,7 @@ namespace Orion.GameLogic.Tasks
             {
                 if (!node.IsAlive)
                 {
+                    Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(node.Type));
                     move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                     mode = Mode.Delivering;
                     return;

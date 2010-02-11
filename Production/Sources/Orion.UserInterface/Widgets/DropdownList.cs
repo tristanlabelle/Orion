@@ -61,7 +61,8 @@ namespace Orion.UserInterface.Widgets
                     context.FillColor = Color.FromArgb(0x40, Color.Black);
                     context.Fill(Bounds);
                 }
-                context.FillColor = Color.White;
+
+                context.FillColor = parent.TextColor;
                 parent.renderer.Draw(Value, context);
             }
             #endregion
@@ -71,6 +72,7 @@ namespace Orion.UserInterface.Widgets
         #region Fields
         private readonly ListFrame menu;
         private readonly DropdownListRowValueRenderer<T> renderer;
+        private Color textColor = Color.White;
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
         private GenericEventHandler<Responder, MouseEventArgs> parentMouseUp;
@@ -101,6 +103,12 @@ namespace Orion.UserInterface.Widgets
         {
             get { return enabled; }
             set { enabled = value; }
+        }
+
+        public Color TextColor
+        {
+            get { return textColor; }
+            set { textColor = value; }
         }
 
         public T SelectedItem

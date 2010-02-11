@@ -45,6 +45,7 @@ namespace Orion.UserInterface
             for (int i = 0; i < playerSlots.Length; i++)
             {
                 playerSlots[i] = new DropdownList<PlayerSlot>(dropdownListRect);
+                playerSlots[i].TextColor = Faction.Colors[i];
                 dropdownListRect = dropdownListRect.TranslatedBy(0, -40);
                 backgroundFrame.Children.Add(playerSlots[i]);
             }

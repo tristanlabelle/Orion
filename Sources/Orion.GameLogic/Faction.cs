@@ -112,18 +112,22 @@ namespace Orion.GameLogic
 
         public event GenericEventHandler<Faction, string> Warning;
 
-        public void RaiseWarning(string message)
-        {
-            Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
-            var handler = Warning;
-            if (handler != null) handler(this, message);
-        }
-
         private void RaiseWarning(string message, Faction source)
         {
+#warning Ugly hack, event sender should always be the event owner!
+
+#if DEBUG
+            // #if'd so the FormatInvariant is not executed in release.
             Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
+#endif
+
             var handler = Warning;
             if (handler != null) handler(source, message);
+        }
+
+        public void RaiseWarning(string message)
+        {
+            RaiseWarning(message, this);
         }
         #endregion
 
@@ -297,8 +301,11 @@ namespace Orion.GameLogic
                     .FormatInvariant(technology, firstMissingTechnology));
             }
 
+#if DEBUG
+            // #if'd for performance
             Debug.Assert(technology.Effects.All(effect => effect.Stat != UnitStat.SightRange && effect.Stat != UnitStat.FoodStorageCapacity),
                 "Sight range and food storage capacity changing technologies are not supported, they would cause bugs.");
+#endif
 
             technologies.Add(technology);
             RaiseTechnologyResearched(technology);

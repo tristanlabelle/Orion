@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace Orion
 {
@@ -50,6 +51,18 @@ namespace Orion
         {
             if (!typeof(T).IsValueType) Argument.EnsureNotNull((object)@object, "object");
             return @object.ToString(format, CultureInfo.InvariantCulture);
+        }
+        #endregion
+
+        #region StringBuilder
+        /// <summary>
+        /// Clears the content of a <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/> to be cleared.</param>
+        public static void Clear(this StringBuilder stringBuilder)
+        {
+            Argument.EnsureNotNull(stringBuilder, "stringBuilder");
+            stringBuilder.Remove(0, stringBuilder.Length);
         }
         #endregion
     }

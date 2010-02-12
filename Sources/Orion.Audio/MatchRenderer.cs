@@ -16,6 +16,7 @@ namespace Orion.Audio
         private readonly AudioContext audioContext;
         private readonly Match match;
         private readonly UserInputManager userInputManager;
+        private readonly StringBuilder stringBuilder = new StringBuilder();
         #endregion
 
         #region Constructors
@@ -52,8 +53,11 @@ namespace Orion.Audio
         #region Methods
         private void PlayUnitSound(UnitType unitType, string name)
         {
-            string soundName = "{0}.{1}".FormatInvariant(unitType.Name, name);
-            audioContext.PlaySound(soundName);
+            stringBuilder.Clear();
+            stringBuilder.Append(unitType.Name);
+            stringBuilder.Append('.');
+            stringBuilder.Append(name);
+            audioContext.PlaySound(stringBuilder.ToString());
         }
 
         private void OnSelectionChanged(SelectionManager sender)

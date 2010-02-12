@@ -61,8 +61,11 @@ namespace Orion.GameLogic
 
             foreach (Point point in region.Points)
             {
+#if DEBUG
+                // #if'd so the FormatInvariant is not executed in release.
                 Debug.Assert(this[point] == null,
                     "Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
+#endif
                 this[point] = entity;
             }
         }
@@ -81,9 +84,12 @@ namespace Orion.GameLogic
 
             foreach (Point point in region.Points)
             {
+#if DEBUG
+                // #if'd so the FormatInvariant is not executed in release.
                 Debug.Assert(this[point] == entity,
                     "Cell {0} should have been occupied by {1} but was occupied by {2}."
                     .FormatInvariant(point, entity, this[point]));
+#endif
                 this[point] = null;
             }
         }

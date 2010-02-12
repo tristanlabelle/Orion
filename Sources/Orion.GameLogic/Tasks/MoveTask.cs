@@ -79,7 +79,7 @@ namespace Orion.GameLogic.Tasks
             get
             {
                 if (path == null) return "walking";
-                return "walking to {0}".FormatInvariant(path.End);
+                return "walking to " + path.End.ToStringInvariant();
             }
         }
         #endregion

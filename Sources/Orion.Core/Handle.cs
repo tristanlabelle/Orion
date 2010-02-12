@@ -84,7 +84,7 @@ namespace Orion
 
         public override string ToString()
         {
-            return "#{0}".FormatInvariant(value);
+            return '#' + value.ToStringInvariant();
         }
         #endregion
         #endregion

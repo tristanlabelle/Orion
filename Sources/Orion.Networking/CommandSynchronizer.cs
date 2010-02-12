@@ -98,7 +98,11 @@ namespace Orion.Networking
 
             if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)
             {
+#if DEBUG
+                // #if'd so FormatInvariant is not executed in release
                 Debug.WriteLine("Sending commands for commands frame {0}".FormatInvariant(commandFrameNumber), "Network");
+#endif
+
                 peers.ForEach(peer => peer.SendCommands(commandFrameNumber, commandsToSend));
                 commandsToExecute.AddRange(commandsToSend);
                 commandsToSend.Clear();
@@ -121,8 +125,12 @@ namespace Orion.Networking
                     return;
                 }
                 match.Resume();
-
+                
+#if DEBUG
+                // #if'd so FormatInvariant is not executed in release
                 Debug.WriteLine("Received commands for commands frame {0}".FormatInvariant(commandFrameNumber), "Network");
+#endif
+
                 var commands = peers.SelectMany(peer => peer.GetCommandsForCommandFrame(commandFrameNumber));
                 commandsToExecute.AddRange(commands);
 
@@ -139,7 +147,11 @@ namespace Orion.Networking
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
             int longestCommandFrame = updatesForCommandFrame.Max() - TargetUpdatesPerCommandFrame;
             string[] updates = updatesForCommandFrame.OrderBy(i => i).Select(i => i.ToString()).ToArray();
+            
+#if DEBUG
+            // #if'd for performance in release
             Debug.WriteLine("Current UPCFs are {{{0}}}, selected={1}".FormatInvariant(string.Join(", ", updates), longestCommandFrame));
+#endif
             
             previousFramesDuration.Enqueue(longestCommandFrame);
             while (previousFramesDuration.Count > 1 && previousFramesDuration.Sum() > retentionDelay * updatesPerSecond)

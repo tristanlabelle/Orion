@@ -15,6 +15,7 @@ namespace Orion.Graphics.Renderers
         private readonly Faction faction;
         private readonly TextureManager textureManager;
         private readonly HashSet<RememberedBuilding> buildings = new HashSet<RememberedBuilding>();
+        private readonly HashSet<RememberedBuilding> tempSet = new HashSet<RememberedBuilding>();
         #endregion
 
         #region Constructors
@@ -57,12 +58,17 @@ namespace Orion.Graphics.Renderers
         {
             Debug.Assert(sender == faction);
 
-            var visibleOtherFactionBuildingsInRegion = faction.World.Entities
-                .Intersecting(region.ToRectangle())
-                .OfType<Unit>()
-                .Where(unit => unit.IsBuilding && unit.Faction != faction && faction.CanSee(unit))
-                .Select(building => new RememberedBuilding(building));
-            buildings.UnionWith(visibleOtherFactionBuildingsInRegion);
+            tempSet.Clear();
+            foreach (Entity entity in faction.World.Entities.Intersecting(region.ToRectangle()))
+            {
+                Unit unit = entity as Unit;
+                if (unit == null || unit.Faction == faction || !unit.IsBuilding || !faction.CanSee(unit))
+                    continue;
+
+                tempSet.Add(new RememberedBuilding(unit));
+            }
+            buildings.UnionWith(tempSet);
+            tempSet.Clear();
 
             buildings.RemoveWhere(rememberedBuilding =>
             {

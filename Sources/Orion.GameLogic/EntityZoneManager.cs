@@ -22,6 +22,11 @@ namespace Orion.GameLogic
         /// An entity can be in multiple of those if its bounding rectangle straddles two or more zones.
         /// </summary>
         private readonly PooledList<Entity>[,] zones;
+
+        /// <summary>
+        /// A temporary set that is reused between queries to avoid unnecessary allocations.
+        /// </summary>
+        private readonly HashSet<Entity> queryTempSet = new HashSet<Entity>();
         #endregion
 
         #region Constructors
@@ -97,10 +102,14 @@ namespace Orion.GameLogic
         /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
         public IEnumerable<Entity> Intersecting(Rectangle area)
         {
-            return IntersectingWithDuplicates(area).Distinct();
+            queryTempSet.Clear();
+            AddIntersectingToTempSet(area);
+            Entity[] entities = queryTempSet.ToArray();
+            queryTempSet.Clear();
+            return entities;
         }
 
-        private IEnumerable<Entity> IntersectingWithDuplicates(Rectangle area)
+        private void AddIntersectingToTempSet(Rectangle area)
         {
             Region zoneRegion = GetZoneRegion(area);
             foreach (Point point in zoneRegion.Points)
@@ -110,7 +119,7 @@ namespace Orion.GameLogic
                 {
                     Entity entity = zone[i];
                     if (Rectangle.Intersects(area, entity.BoundingRectangle))
-                        yield return entity;
+                        queryTempSet.Add(entity);
                 }
             }
         }

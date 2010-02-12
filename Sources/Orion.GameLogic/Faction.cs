@@ -38,7 +38,6 @@ namespace Orion.GameLogic
         private readonly GenericEventHandler<Unit> foodStorageCreated;
         private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
         private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
-        private readonly HashSet<RememberedBuilding> buildingMemory = new HashSet<RememberedBuilding>();
         private int aladdiumAmount;
         private int alageneAmount;
         private int totalFoodAmount = 0;
@@ -169,17 +168,6 @@ namespace Orion.GameLogic
         public FogOfWar LocalFogOfWar
         {
             get { return localFogOfWar; }
-        }
-
-        /// <summary>
-        /// Gets the building memory this faction has of other faction buildings.
-        /// </summary>
-        public IEnumerable<RememberedBuilding> BuildingMemory
-        {
-            get
-            {
-                return buildingMemory.Where(rememberedBuilding => !CanSee(rememberedBuilding.GridRegion));
-            }
         }
 
         /// <summary>
@@ -382,10 +370,6 @@ namespace Orion.GameLogic
 
                 CheckForDefeat();
             }
-            else if (unit.IsBuilding && CanSee(unit))
-            {
-                buildingMemory.Remove(new RememberedBuilding(unit));
-            }
         }
 
         private void OnFactionDefeated(World world, Faction faction)
@@ -393,6 +377,7 @@ namespace Orion.GameLogic
             if(faction == this) return;
             factionsWeRegardAsAllies.Remove(faction);
         }
+
         private void OnFoodStorageCreated(Unit unit)
         {
             unit.ConstructionComplete -= foodStorageCreated;
@@ -574,24 +559,7 @@ namespace Orion.GameLogic
                 DiscoverFromOtherFogOfWar(sender, region);
             }
 
-            UpdateBuildingMemory(region);
             RaiseVisibilityChanged(region);
-        }
-
-        private void UpdateBuildingMemory(Region region)
-        {
-            var visibleOtherFactionBuildingsInRegion = world.Entities
-                .Intersecting(region.ToRectangle())
-                .OfType<Unit>()
-                .Where(unit => unit.IsBuilding && unit.Faction != this && CanSee(unit))
-                .Select(building => new RememberedBuilding(building));
-            buildingMemory.UnionWith(visibleOtherFactionBuildingsInRegion);
-
-            buildingMemory.RemoveWhere(rememberedBuilding =>
-            {
-                Unit building = world.Entities.GetEntityAt(rememberedBuilding.Location, CollisionLayer.Ground) as Unit;
-                return building == null || !rememberedBuilding.Matches(building);
-            });
         }
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)

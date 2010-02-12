@@ -30,6 +30,7 @@ namespace Orion.Graphics.Renderers
         private readonly TextureManager textureManager;
         private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
         private readonly List<Ruin> ruins = new List<Ruin>();
+        private readonly BuildingMemoryRenderer buildingMemoryRenderer;
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
@@ -42,6 +43,7 @@ namespace Orion.Graphics.Renderers
             
             this.faction = faction;
             this.textureManager = textureManager;
+            this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, textureManager);
 
             World.Updated += OnWorldUpdated;
         }
@@ -100,6 +102,8 @@ namespace Orion.Graphics.Renderers
 
         private void DrawMiniatureUnits(GraphicsContext context)
         {
+            buildingMemoryRenderer.DrawMiniature(context, miniatureUnitSize);
+
             foreach (Unit unit in World.Entities.OfType<Unit>())
             {
                 if (faction.CanSee(unit))
@@ -108,20 +112,13 @@ namespace Orion.Graphics.Renderers
                     context.Fill(new Rectangle(unit.Position, (Vector2)miniatureUnitSize));
                 }
             }
-
-            foreach (RememberedBuilding building in faction.BuildingMemory)
-            {
-                context.FillColor = building.Faction.Color;
-                context.Fill(new Rectangle(building.Location, (Vector2)miniatureUnitSize));
-            }
         }
         #endregion
 
         #region Units
         private void DrawRememberedBuildings(GraphicsContext graphics)
         {
-            foreach (RememberedBuilding building in faction.BuildingMemory)
-                DrawRememberedBuilding(graphics, building);
+            buildingMemoryRenderer.Draw(graphics);
         }
 
         private IEnumerable<Unit> GetClippedVisibleUnits(Rectangle clippingBounds)

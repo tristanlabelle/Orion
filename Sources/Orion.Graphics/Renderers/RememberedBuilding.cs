@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using Orion.GameLogic;
 
-namespace Orion.GameLogic
+namespace Orion.Graphics.Renderers
 {
     /// <summary>
     /// Represents what is remembered of a building which has been seen but is now in the fog of war.

@@ -97,7 +97,6 @@
   <ItemGroup>
     <Compile Include="HitEventArgs.cs" />
     <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
-    <Compile Include="RememberedBuilding.cs" />
     <Compile Include="Skills\HealSkill.cs" />
     <Compile Include="Skills\SuicideBombSkill.cs" />
     <Compile Include="Skills\TransportSkill.cs" />

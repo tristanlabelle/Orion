@@ -83,11 +83,11 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when the construction of this <see cref="Unit"/> is completed.
         /// </summary>
-        public event GenericEventHandler<Unit> ConstructionComplete;
+        public event GenericEventHandler<Unit> ConstructionCompleted;
 
-        private void RaiseConstructionComplete()
+        private void RaiseConstructionCompleted()
         {
-            var handler = ConstructionComplete;
+            var handler = ConstructionCompleted;
             if (handler != null) handler(this);
         }
 
@@ -422,7 +422,7 @@ namespace Orion.GameLogic
             if (healthBuilt >= MaxHealth)
             {
                 isUnderConstruction = false;
-                RaiseConstructionComplete();
+                RaiseConstructionCompleted();
             }
         }
 
@@ -430,7 +430,7 @@ namespace Orion.GameLogic
         {
             Health = MaxHealth;
             isUnderConstruction = false;
-            RaiseConstructionComplete();
+            RaiseConstructionCompleted();
         }
 
         public void Embark(Unit unit)

@@ -8,6 +8,7 @@ using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Technologies;
 using Orion.Geometry;
 using Color = System.Drawing.Color;
+using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic
 {
@@ -33,9 +34,7 @@ namespace Orion.GameLogic
         private readonly FogOfWar localFogOfWar;
         private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
-        private readonly GenericEventHandler<EntityManager, Entity> entityRemovedEventHandler;
-        private readonly GenericEventHandler<World, Faction> factionDefeatedEventHandler;
-        private readonly GenericEventHandler<Unit> foodStorageCreated;
+        private readonly GenericEventHandler<Unit> buildingConstructionCompleted;
         private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
         private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
         private int aladdiumAmount;
@@ -66,13 +65,11 @@ namespace Orion.GameLogic
             this.localFogOfWar = new FogOfWar(world.Size);
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.factionDefeatedEventHandler = OnFactionDefeated;
-            world.FactionDefeated += factionDefeatedEventHandler;
             this.unitMovedEventHandler = OnUnitMoved;
-            this.entityRemovedEventHandler = OnEntityRemoved;
-            this.foodStorageCreated = OnFoodStorageCreated;
+            this.buildingConstructionCompleted = OnBuildingConstructionCompleted;
 
-            this.world.Entities.Removed += entityRemovedEventHandler;
+            world.FactionDefeated += OnFactionDefeated;
+            this.world.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
@@ -340,22 +337,27 @@ namespace Orion.GameLogic
                 alageneNode.Extractor = unit;
             }
 
-            localFogOfWar.AddLineOfSight(unit.LineOfSight);
+            if (unit.IsBuilding)
+            {
+                unit.ConstructionCompleted += buildingConstructionCompleted;
+                localFogOfWar.AddRegion(unit.GridRegion);
+            }
+            else
+            {
+                localFogOfWar.AddLineOfSight(unit.LineOfSight);
+            }
+
             unit.Moved += unitMovedEventHandler;
-
             usedFoodAmount += type.FoodCost;
-
-            if (unit.Type.HasSkill<Skills.StoreFoodSkill>())
-                unit.ConstructionComplete += foodStorageCreated;
 
             return unit;
         }
 
         private void OnUnitMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
-            Argument.EnsureBaseType(entity, typeof(Unit), "entity");
-
             Unit unit = (Unit)entity;
+            Debug.Assert(!unit.IsBuilding);
+
             int sightRange = unit.GetStat(UnitStat.SightRange);
             Vector2 extent = entity.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
@@ -366,17 +368,24 @@ namespace Orion.GameLogic
         private void OnEntityRemoved(EntityManager sender, Entity entity)
         {
             Unit unit = entity as Unit;
-            if (unit == null) return;
+            if (unit == null || unit.Faction != this) return;
 
-            if (unit.Faction == this)
+            if (unit.IsUnderConstruction)
             {
-                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
-                usedFoodAmount -= unit.Type.FoodCost;
-                if (unit.Type.HasSkill<Skills.StoreFoodSkill>() && !unit.IsUnderConstruction)
+                unit.ConstructionCompleted -= buildingConstructionCompleted;
+                localFogOfWar.RemoveRegion(unit.GridRegion);
+            }
+            else
+            {
+                if (unit.Type.HasSkill<Skills.StoreFoodSkill>())
                     totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
 
-                CheckForDefeat();
+                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }
+
+            usedFoodAmount -= unit.Type.FoodCost;
+
+            CheckForDefeat();
         }
 
         private void OnFactionDefeated(World world, Faction faction)
@@ -385,10 +394,15 @@ namespace Orion.GameLogic
             factionsWeRegardAsAllies.Remove(faction);
         }
 
-        private void OnFoodStorageCreated(Unit unit)
+        private void OnBuildingConstructionCompleted(Unit unit)
         {
-            unit.ConstructionComplete -= foodStorageCreated;
-            totalFoodAmount += unit.GetStat(UnitStat.FoodStorageCapacity);
+            Debug.Assert(unit != null && unit.Faction == this);
+
+            unit.ConstructionCompleted -= buildingConstructionCompleted;
+            localFogOfWar.RemoveRegion(unit.GridRegion);
+            localFogOfWar.AddLineOfSight(unit.LineOfSight);
+
+            if (unit.HasSkill<StoreFoodSkill>()) totalFoodAmount += unit.GetStat(UnitStat.FoodStorageCapacity);
         }
         #endregion
 
@@ -573,7 +587,7 @@ namespace Orion.GameLogic
         {
             foreach (Point point in region.Points)
                 if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                    localFogOfWar.Discover(point);
+                    localFogOfWar.Reveal(point);
         }
         #endregion
 

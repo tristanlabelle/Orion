@@ -243,10 +243,56 @@ namespace Orion.GameLogic
             ModifyLineOfSight(roundedLineOfSight, false);
         }
 
-        public void Discover(Point point)
+        public void AddRegion(Region region)
         {
-            if (tiles[point.X, point.Y] == ushort.MaxValue)
-                tiles[point.X, point.Y] = 0;
+            ModifyRegion(region, true);
+        }
+
+        public void RemoveRegion(Region region)
+        {
+            ModifyRegion(region, false);
+        }
+
+        public void Reveal(Point point)
+        {
+            RevealWithoutRaisingEvent(point.X, point.Y);
+            OnChanged(new Region(point, new Size(1, 1)));
+        }
+
+        private void RevealWithoutRaisingEvent(int x, int y)
+        {
+            if (tiles[x, y] == ushort.MaxValue)
+                tiles[x, y] = 0;
+        }
+
+        /// <summary>
+        /// Reveals the map, as if the player had seen every tile at least once.
+        /// </summary>
+        public void Reveal()
+        {
+            if (!isEnabled) return;
+
+            for (int x = 0; x < Size.Width; x++)
+                for (int y = 0; y < Size.Height; y++)
+                    RevealWithoutRaisingEvent(x, y);
+
+            OnChanged();
+        }
+
+        /// <summary>
+        /// Disables the fog of war, as if there were always units seeing every tile.
+        /// </summary>
+        public void Disable()
+        {
+            if (!isEnabled) return;
+
+            isEnabled = false;
+
+            for (int x = 0; x < Size.Width; x++)
+                for (int y = 0; y < Size.Height; y++)
+                    tiles[x, y] = 1;
+
+            OnChanged();
         }
         #endregion
 
@@ -292,32 +338,50 @@ namespace Orion.GameLogic
                 Math.Max(lookup.MinX, 0), Math.Max(lookup.MinY, 0),
                 Math.Min(lookup.ExclusiveMaxX, Size.Width), Math.Min(lookup.ExclusiveMaxY, Size.Height));
 
-            foreach (Point point in region.Points)
+            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
             {
-                if (!lookup.IsSet(point.X, point.Y)) continue;
-
-                if (addOrRemove)
+                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
                 {
-                    if (tiles[point.X, point.Y] == ushort.MaxValue)
-                    {
-                        tiles[point.X, point.Y] = 1;
-                    }
-                    else
-                    {
-                        Debug.Assert(tiles[point.X, point.Y] != ushort.MaxValue - 1,
-                            "Unit reference count overflow.");
-                        tiles[point.X, point.Y]++;
-                    }
-                }
-                else
-                {
-                    Debug.Assert(tiles[point.X, point.Y] != ushort.MaxValue && tiles[point.X, point.Y] != 0,
-                        "Unit reference count underflow.");
-                    tiles[point.X, point.Y]--;
+                    if (!lookup.IsSet(x, y)) continue;
+                    ModifyAtWithoutRaisingChanged(x, y, addOrRemove);
                 }
             }
 
             OnChanged(region);
+        }
+
+        private void ModifyRegion(Region region, bool addOrRemove)
+        {
+            if (!isEnabled) return;
+
+            for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
+                for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
+                    ModifyAtWithoutRaisingChanged(x, y, addOrRemove);
+
+            OnChanged(region);
+        }
+
+        private void ModifyAtWithoutRaisingChanged(int x, int y, bool addOrRemove)
+        {
+            if (addOrRemove)
+            {
+                if (tiles[x, y] == ushort.MaxValue)
+                {
+                    tiles[x, y] = 1;
+                }
+                else
+                {
+                    Debug.Assert(tiles[x, y] != ushort.MaxValue - 1,
+                        "Unit reference count overflow.");
+                    tiles[x, y]++;
+                }
+            }
+            else
+            {
+                Debug.Assert(tiles[x, y] != ushort.MaxValue && tiles[x, y] != 0,
+                    "Unit reference count underflow.");
+                tiles[x, y]--;
+            }
         }
         #endregion
         #endregion
@@ -344,39 +408,6 @@ namespace Orion.GameLogic
         {
             ushort value = tiles[point.X, point.Y];
             return value > 0 && value < ushort.MaxValue;
-        }
-        #endregion
-
-        #region Cheats
-        /// <summary>
-        /// Reveals the map, as if the player had seen every tile at least once.
-        /// </summary>
-        public void Reveal()
-        {
-            if (!isEnabled) return;
-
-            for (int x = 0; x < Size.Width; x++)
-                for (int y = 0; y < Size.Height; y++)
-                    if (tiles[x, y] == ushort.MaxValue)
-                        tiles[x, y] = 0;
-
-            OnChanged();
-        }
-
-        /// <summary>
-        /// Disables the fog of war, as if there were always units seeing every tile.
-        /// </summary>
-        public void Disable()
-        {
-            if (!isEnabled) return;
-
-            isEnabled = false;
-
-            for (int x = 0; x < Size.Width; x++)
-                for (int y = 0; y < Size.Height; y++)
-                    tiles[x, y] = 1;
-
-            OnChanged();
         }
         #endregion
         #endregion

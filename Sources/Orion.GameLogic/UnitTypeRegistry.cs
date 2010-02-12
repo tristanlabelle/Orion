@@ -424,7 +424,7 @@ namespace Orion.GameLogic
                 MaxHealth = 100,
                 MeleeArmor = 1,
                 RangedArmor = 1,
-                AladdiumCost = 150,
+                AladdiumCost = 100,
                 AlageneCost = 25
             };
             Register(builder);

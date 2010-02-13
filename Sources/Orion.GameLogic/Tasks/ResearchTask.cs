@@ -21,9 +21,10 @@ namespace Orion.GameLogic.Tasks
 
         #region Constructors
         public ResearchTask(Unit researcher, Technology technology)
-            :base(researcher)
+            : base(researcher)
         {
             this.technology = technology;
+            researcher.Faction.BeginResearch(technology);
         }
         #endregion
 
@@ -49,7 +50,12 @@ namespace Orion.GameLogic.Tasks
         {
             timeElapsed += step.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
-                Unit.Faction.ResearchTechnology(technology);
+                Unit.Faction.CompleteResearch(technology);
+        }
+
+        public override void Dispose()
+        {
+            if (!HasEnded) Unit.Faction.CancelResearch(technology);
         }
         #endregion
     }

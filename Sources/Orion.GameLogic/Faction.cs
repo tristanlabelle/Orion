@@ -32,17 +32,22 @@ namespace Orion.GameLogic
         private readonly string name;
         private readonly Color color;
         private readonly FogOfWar localFogOfWar;
+
+        private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
+        private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
+
+        private readonly HashSet<Technology> researches = new HashSet<Technology>();
+        private readonly HashSet<Technology> technologies = new HashSet<Technology>();
+
         private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
         private readonly GenericEventHandler<Unit> buildingConstructionCompleted;
-        private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
-        private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
+
         private int aladdiumAmount;
         private int alageneAmount;
         private int totalFoodAmount = 0;
         private int usedFoodAmount = 0;
         private FactionStatus status = FactionStatus.Undefeated;
-        private HashSet<Technology> technologies = new HashSet<Technology>();
         #endregion
 
         #region Constructors
@@ -276,6 +281,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(technology, "technology");
             return !HasResearched(technology)
+                && !IsResearching(technology)
                 && technology.RequiredTechnologies.All(tech => technologies.Contains(tech));
         }
 
@@ -284,7 +290,7 @@ namespace Orion.GameLogic
         /// to the collection of technologies researched by this <see cref="Faction"/>.
         /// </summary>
         /// <param name="technology">The <see cref="Technology"/> to be researched.</param>
-        public void ResearchTechnology(Technology technology)
+        public void AddResearchedTechnology(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
             if (HasResearched(technology)) return;
@@ -311,6 +317,36 @@ namespace Orion.GameLogic
         public bool HasResearched(Technology technology)
         {
             return technologies.Contains(technology);
+        }
+
+        public bool IsResearching(Technology technology)
+        {
+            return researches.Contains(technology);
+        }
+
+        internal void BeginResearch(Technology technology)
+        {
+            Debug.Assert(technology != null);
+            Debug.Assert(!HasResearched(technology));
+            Debug.Assert(!researches.Contains(technology));
+            Debug.Assert(IsResearchable(technology));
+            researches.Add(technology);
+        }
+
+        internal void CancelResearch(Technology technology)
+        {
+            Debug.Assert(technology != null);
+            bool wasRemoved = researches.Remove(technology);
+            Debug.Assert(wasRemoved);
+        }
+
+        internal void CompleteResearch(Technology technology)
+        {
+            Debug.Assert(technology != null);
+            bool wasRemoved = researches.Remove(technology);
+            Debug.Assert(wasRemoved);
+            technologies.Add(technology);
+            RaiseTechnologyResearched(technology);
         }
         #endregion
 

@@ -8,15 +8,20 @@ using Orion.GameLogic.Skills;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 using Orion.UserInterface.Actions.UserCommands;
+using Keys = System.Windows.Forms.Keys;
+using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
-    public class ResearchEnabler : ActionEnabler
+    public sealed class ResearchEnabler : ActionEnabler
     {
+        #region Constructors
         public ResearchEnabler(UserInputManager inputManager, ActionFrame frame, TextureManager textureManager)
             : base(inputManager, frame, textureManager)
-        {}
+        { }
+        #endregion
 
+        #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
             ResearchSkill researchSkill = type.GetSkill<ResearchSkill>();
@@ -40,12 +45,20 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ImmediateUserCommand command = new ResearchUserCommand(inputManager, technology);
-                ResearchActionButton button = new ResearchActionButton(container, inputManager, command, textureManager, technology.Name);
+                ActionButton button = new ActionButton(container, inputManager, string.Empty, Keys.None, textureManager);
+
                 button.Name = "{0}\nAladdium: {1} Alagene: {2}"
                     .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);
+
+                Texture texture = textureManager.GetTechnology(technology.Name);
+                button.Renderer = new TexturedFrameRenderer(texture);
+
+                Technology technologyForClosure = technology;
+                button.Triggered += delegate(Button sender) { inputManager.LaunchResearch(technologyForClosure); };
+
                 buttonsArray[x, y] = button;
             }
         }
+        #endregion
     }
 }

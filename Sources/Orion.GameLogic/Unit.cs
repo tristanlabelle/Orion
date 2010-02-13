@@ -605,6 +605,12 @@ namespace Orion.GameLogic
             return true;
         }
 
+        private new void Die()
+        {
+            taskQueue.Clear();
+            base.Die();
+        }
+
         public override string ToString()
         {
             return "{0} {2} {1}".FormatInvariant(Handle, type, faction);

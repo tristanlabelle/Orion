@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.UserInterface.Widgets;
+using Orion.Commandment;
+using Keys = System.Windows.Forms.Keys;
+using Orion.Graphics;
 
 namespace Orion.UserInterface.Actions
 {
     public class ActionFrame : Frame
     {
         #region Fields
-        private Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
-        private TooltipFrame tooltipFrame;
+        private readonly Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
+        private readonly TooltipFrame tooltipFrame;
         #endregion
 
         #region Constructors
@@ -32,6 +34,25 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Methods
+        public ActionButton CreateCancelButton(UserInputManager inputManager, TextureManager textureManager)
+        {
+            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(textureManager, "textureManager");
+
+            ActionButton button = new ActionButton(this, inputManager, "Cancel", Keys.Escape, textureManager);
+
+            Texture texture = textureManager.GetAction("Cancel");
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.SelectedCommand = null;
+                this.Restore();
+            };
+
+            return button;
+        }
+
         public void Pop()
         {
             PopAndDispose();

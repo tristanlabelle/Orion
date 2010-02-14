@@ -12,17 +12,22 @@ namespace Orion.UserInterface.Actions
     public sealed class UnitActionProvider : IActionProvider
     {
         #region Fields
+        private readonly List<ActionEnabler> enablers;
+        private readonly UnitType unitType;
         private readonly ActionButton[,] buttons = new ActionButton[4, 4];
         #endregion
 
         #region Constructors
-        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType type)
+        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType unitType)
         {
             Argument.EnsureNotNull(actionEnablers, "actionEnablers");
-            Argument.EnsureNotNull(type, "type");
+            Argument.EnsureNotNull(unitType, "unitType");
 
-            foreach (ActionEnabler enabler in actionEnablers)
-                enabler.LetFill(type, buttons);
+            this.enablers = actionEnablers.ToList();
+            Argument.EnsureNoneNull(this.enablers, "actionEnablers");
+            this.unitType = unitType;
+
+            CreateButtons();
         }
         #endregion
 
@@ -32,7 +37,24 @@ namespace Orion.UserInterface.Actions
             return buttons[point.X, point.Y];
         }
 
+        public void Refresh()
+        {
+            DisposeButtons();
+            CreateButtons();
+        }
+
         public void Dispose()
+        {
+            DisposeButtons();
+        }
+
+        private void CreateButtons()
+        {
+            foreach (ActionEnabler enabler in enablers)
+                enabler.LetFill(unitType, buttons);
+        }
+
+        private void DisposeButtons()
         {
             for (int y = 0; y < buttons.GetLength(1); ++y)
             {

@@ -105,7 +105,6 @@
     <Compile Include="Commands\TrainCommand.cs" />
     <Compile Include="Commands\ZoneAttackCommand.cs" />
     <Compile Include="FactionMessage.cs" />
-    <Compile Include="ImmediateUserCommand.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs" />
     <Compile Include="Commands\Pipeline\CommandPipeline.cs" />

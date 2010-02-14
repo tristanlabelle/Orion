@@ -16,12 +16,52 @@ namespace Orion.UserInterface.Actions
     public sealed class BuildActionProvider : IActionProvider
     {
         #region Fields
+        private readonly ActionFrame actionFrame;
+        private readonly UserInputManager inputManager;
+        private readonly UnitType unitType;
+        private readonly UnitTypeRegistry unitTypeRegistry;
+        private readonly TextureManager textureManager;
         private readonly ActionButton[,] buttons = new ActionButton[4, 4];
         #endregion
 
         #region Constructors
         public BuildActionProvider(ActionFrame actionFrame, UserInputManager inputManager, UnitType unitType,
             UnitTypeRegistry unitTypeRegistry, TextureManager textureManager)
+        {
+            Argument.EnsureNotNull(actionFrame, "actionFrame");
+            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(unitTypeRegistry, "unitTypeRegistry");
+            Argument.EnsureNotNull(textureManager, "textureManager");
+
+            this.actionFrame = actionFrame;
+            this.inputManager = inputManager;
+            this.unitType = unitType;
+            this.unitTypeRegistry = unitTypeRegistry;
+            this.textureManager = textureManager;
+
+            CreateButtons();
+        }
+        #endregion
+
+        #region Methods
+        public ActionButton GetButtonAt(Point point)
+        {
+            return buttons[point.X, point.Y];
+        }
+
+        public void Refresh()
+        {
+            DisposeButtons();
+            CreateButtons();
+        }
+
+        public void Dispose()
+        {
+            DisposeButtons();
+        }
+
+        private void CreateButtons()
         {
             BuildSkill buildSkill = unitType.GetSkill<BuildSkill>();
             Debug.Assert(buildSkill != null);
@@ -32,7 +72,7 @@ namespace Orion.UserInterface.Actions
             {
                 buttons[x, y] = new BuildingConstructionActionButton(actionFrame, inputManager,
                     buildingType, inputManager.LocalCommander.Faction, textureManager);
-                
+
                 x++;
                 if (x == 4)
                 {
@@ -41,17 +81,10 @@ namespace Orion.UserInterface.Actions
                 }
             }
 
-            buttons[3, 0] = new CancelButton(actionFrame, inputManager, textureManager);
-        }
-        #endregion
-
-        #region Methods
-        public ActionButton GetButtonAt(Point point)
-        {
-            return buttons[point.X, point.Y];
+            buttons[3, 0] = actionFrame.CreateCancelButton(inputManager, textureManager);
         }
 
-        public void Dispose()
+        private void DisposeButtons()
         {
             for (int y = 0; y < buttons.GetLength(1); ++y)
             {

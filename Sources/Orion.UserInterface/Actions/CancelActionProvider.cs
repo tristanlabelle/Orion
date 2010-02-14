@@ -25,16 +25,7 @@ namespace Orion.UserInterface.Actions
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(textureManager, "textureManager");
 
-            button = new CancelButton(actionFrame, inputManager, textureManager); //, "Cancel", Keys.Escape, textureManager);
-
-            //Texture texture = textureManager.GetAction("Cancel");
-            //button.Renderer = new TexturedFrameRenderer(texture);
-
-            //button.Triggered += delegate(Button sender)
-            //{
-            //    inputManager.SelectedCommand = null;
-            //    actionFrame.Restore();
-            //};
+            button = actionFrame.CreateCancelButton(inputManager, textureManager);
         }
         #endregion
 
@@ -48,6 +39,8 @@ namespace Orion.UserInterface.Actions
         {
             button.Dispose();
         }
+
+        void IActionProvider.Refresh() {}
         #endregion
     }
 }

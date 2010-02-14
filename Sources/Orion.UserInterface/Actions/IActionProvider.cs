@@ -19,5 +19,10 @@ namespace Orion.UserInterface.Actions
         /// This <see cref="IActionProvider"/> still owns the returned <see cref="ActionButton"/>.
         /// </remarks>
         ActionButton GetButtonAt(Point point);
+
+        /// <summary>
+        /// Recreates the <see cref="ActionButton"/>s as to reflect some new context.
+        /// </summary>
+        void Refresh();
     }
 }

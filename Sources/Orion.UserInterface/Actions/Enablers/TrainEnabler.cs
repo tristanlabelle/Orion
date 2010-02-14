@@ -5,23 +5,27 @@ using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 using Orion.Graphics;
 using Orion.GameLogic.Skills;
+using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface.Actions.Enablers
 {
-    public class TrainEnabler : ActionEnabler
+    public sealed class TrainEnabler : ActionEnabler
     {
+        #region Constructors
         public TrainEnabler(UserInputManager inputManager, ActionFrame frame, TextureManager textureManager)
             : base(inputManager, frame, textureManager)
         { }
+        #endregion
 
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
+        #region Methods
+        public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            TrainSkill trainSkill = type.GetSkill<TrainSkill>();
+            TrainSkill trainSkill = unitType.GetSkill<TrainSkill>();
             if (trainSkill == null) return;
             
             int x = 0;
             int y = 3;
-            foreach (UnitType unitType in World.UnitTypes.Where(t => !t.IsBuilding && trainSkill.Supports(t)))
+            foreach (UnitType traineeType in World.UnitTypes.Where(t => !t.IsBuilding && trainSkill.Supports(t)))
             {
                 // find an empty slot
                 while (buttonsArray[x, y] != null)
@@ -34,13 +38,21 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                TrainActionButton button = new TrainActionButton(actionFrame, inputManager,unitType.Name, Keys.None, command, textureManager);
-                int aladdium = LocalFaction.GetStat(unitType, UnitStat.AladdiumCost);
-                int alagene = LocalFaction.GetStat(unitType, UnitStat.AlageneCost);
-                button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);
+                ActionButton button = new ActionButton(actionFrame, inputManager, traineeType.Name, Keys.NoName, textureManager);
+
+                Texture texture = textureManager.GetUnit(traineeType.Name);
+                button.Renderer = new TexturedFrameRenderer(texture);
+
+                UnitType traineeTypeForClosure = traineeType;
+                button.Triggered += delegate(Button sender) { inputManager.LaunchTrain(traineeTypeForClosure); };
+
+                int aladdium = LocalFaction.GetStat(traineeType, UnitStat.AladdiumCost);
+                int alagene = LocalFaction.GetStat(traineeType, UnitStat.AlageneCost);
+                button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(traineeType.Name, aladdium, alagene);
+
                 buttonsArray[x, y] = button;
             }
         }
+        #endregion
     }
 }

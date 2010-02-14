@@ -10,10 +10,16 @@ namespace Orion.UserInterface.Actions.Enablers
 {
     public sealed class MoveEnabler : ActionEnabler
     {
+        #region Fields
+        private readonly MoveUserCommand userCommand;
+        #endregion
+
         #region Constructors
         public MoveEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
             : base(inputManager, actionFrame, textureManager)
-        { }
+        {
+            userCommand = new MoveUserCommand(inputManager);
+        }
         #endregion
 
         #region Methods
@@ -31,7 +37,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void OnButtonPressed(Button sender)
         {
-            inputManager.SelectedCommand = new MoveUserCommand(inputManager);
+            inputManager.SelectedCommand = userCommand;
             actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
         }
         #endregion

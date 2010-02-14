@@ -657,7 +657,7 @@ namespace Orion.UserInterface
             if (SelectedType != null)
             {
                 IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (selectedUnits.Count(u => u.Faction != userInputManager.LocalCommander.Faction) == 0)
+                if (selectedUnits.None(u => u.Faction != userInputManager.LocalCommander.Faction))
                     actions.Push(new UnitActionProvider(enablers, SelectedType));
             }
         }

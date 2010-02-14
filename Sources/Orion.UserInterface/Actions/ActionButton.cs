@@ -12,7 +12,7 @@ using Orion.UserInterface.Actions.Enablers;
 
 namespace Orion.UserInterface.Actions
 {
-    public class ActionButton : Button, IActionProvider
+    public class ActionButton : Button
     {
         #region Fields
         protected readonly ActionFrame container;
@@ -20,6 +20,7 @@ namespace Orion.UserInterface.Actions
         private readonly TextureManager textureManager;
         private string name;
         private string description;
+        private IActionProvider actionProvider;
         #endregion
 
         #region Constructors
@@ -90,16 +91,15 @@ namespace Orion.UserInterface.Actions
         {
             get { return textureManager; }
         }
+
+        public IActionProvider ActionProvider
+        {
+            get { return actionProvider; }
+            set { actionProvider = value; }
+        }
         #endregion
 
         #region Methods
-        public virtual ActionButton GetButtonAt(int x, int y)
-        {
-            if (x == 3 && y == 0)
-                return new CancelButton(container, inputManager, textureManager);
-            return null;
-        }
-
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
             container.TooltipFrame.SetDescription(TooltipText);
@@ -118,7 +118,8 @@ namespace Orion.UserInterface.Actions
             // The base call must be done first to raise the Triggered event
             // because it seems that container.Push disposes this button.
             base.OnPress();
-            container.Push(this);
+            if (actionProvider == null) actionProvider = new CancelActionProvider(container, inputManager, textureManager);
+            container.Push(actionProvider);
         }
         #endregion
     }

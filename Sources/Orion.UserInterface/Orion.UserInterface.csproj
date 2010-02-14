@@ -71,13 +71,17 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ActionButton.cs" />
     <Compile Include="Actions\ActionFrame.cs" />
+    <Compile Include="Actions\BuildActionProvider.cs" />
     <Compile Include="Actions\BuildingConstructionActionButton.cs" />
+    <Compile Include="Actions\CancelActionProvider.cs" />
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
     <Compile Include="Actions\Enablers\ResearchEnabler.cs" />
     <Compile Include="Actions\Enablers\StandGuardEnabler.cs" />

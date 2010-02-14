@@ -27,18 +27,39 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, textureManager);
-            Texture texture = textureManager.GetAction("Move");
-            button.Renderer = new TexturedFrameRenderer(texture);
-            button.Triggered += OnButtonPressed;
-
-            buttonsArray[0, 3] = button;
+            buttonsArray[0, 3] = CreateMoveButton();
+            buttonsArray[3, 3] = CreateStandGuardButton();
         }
 
-        private void OnButtonPressed(Button sender)
+        private ActionButton CreateMoveButton()
         {
-            inputManager.SelectedCommand = userCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, textureManager);
+
+            Texture texture = textureManager.GetAction("Move");
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.SelectedCommand = userCommand;
+                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            };
+
+            return button;
+        }
+
+        private ActionButton CreateStandGuardButton()
+        {
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, textureManager);
+
+            Texture texture = textureManager.GetAction("Stand Guard");
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.LaunchStandGuard();
+            };
+
+            return button;
         }
         #endregion
     }

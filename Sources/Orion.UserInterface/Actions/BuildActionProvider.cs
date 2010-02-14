@@ -7,6 +7,9 @@ using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.GameLogic.Skills;
 using System.Diagnostics;
+using Keys = System.Windows.Forms.Keys;
+using Orion.UserInterface.Widgets;
+using Orion.UserInterface.Actions.UserCommands;
 
 namespace Orion.UserInterface.Actions
 {
@@ -70,8 +73,7 @@ namespace Orion.UserInterface.Actions
             int y = 3;
             foreach (UnitType buildingType in unitTypeRegistry.Where(u => buildSkill.Supports(u)))
             {
-                buttons[x, y] = new BuildingConstructionActionButton(actionFrame, inputManager,
-                    buildingType, inputManager.LocalCommander.Faction, textureManager);
+                buttons[x, y] = CreateButton(buildingType);
 
                 x++;
                 if (x == 4)
@@ -82,6 +84,27 @@ namespace Orion.UserInterface.Actions
             }
 
             buttons[3, 0] = actionFrame.CreateCancelButton(inputManager, textureManager);
+        }
+
+        private ActionButton CreateButton(UnitType buildingType)
+        {
+            ActionButton button = new ActionButton(actionFrame, inputManager, buildingType.Name, Keys.None, textureManager);
+
+            Texture texture = textureManager.GetUnit(buildingType.Name);
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            Faction faction = inputManager.LocalCommander.Faction;
+            int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
+            int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
+            button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
+
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.SelectedCommand = new BuildUserCommand(inputManager, textureManager, buildingType);
+                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            };
+
+            return button;
         }
 
         private void DisposeButtons()

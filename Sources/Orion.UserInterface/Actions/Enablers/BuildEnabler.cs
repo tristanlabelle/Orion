@@ -23,12 +23,27 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Methods
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
+        public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            if (!type.HasSkill<BuildSkill>()) return;
+            if (!unitType.HasSkill<BuildSkill>()) return;
             
-            buttonsArray[0, 0] = new BuildActionButton(actionFrame, inputManager, type, World.UnitTypes, base.textureManager);
+            buttonsArray[0, 0] = CreateBuildButton(unitType);
             buttonsArray[1, 0] = CreateRepairButton();
+        }
+
+        private ActionButton CreateBuildButton(UnitType unitType)
+        {
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Build", Keys.B, textureManager);
+
+            Texture texture = textureManager.GetAction("Build");
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            button.Triggered += delegate(Button sender)
+            {
+                actionFrame.Push(new BuildActionProvider(actionFrame, inputManager, unitType, World.UnitTypes, textureManager));
+            };
+
+            return button;
         }
 
         private ActionButton CreateRepairButton()
@@ -38,15 +53,13 @@ namespace Orion.UserInterface.Actions.Enablers
             Texture texture = textureManager.GetAction("Repair");
             button.Renderer = new TexturedFrameRenderer(texture);
 
-            button.Triggered += OnRepairButtonPressed;
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.SelectedCommand = repairUserCommand;
+                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            };
 
             return button;
-        }
-
-        private void OnRepairButtonPressed(Button button)
-        {
-            inputManager.SelectedCommand = repairUserCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
         }
         #endregion
     }

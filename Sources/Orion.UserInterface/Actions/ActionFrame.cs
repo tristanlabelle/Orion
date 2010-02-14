@@ -34,31 +34,43 @@ namespace Orion.UserInterface.Actions
         #region Methods
         public void Pop()
         {
-            actionProviders.Pop();
-            ResetActions();
+            PopAndDispose();
+            Refresh();
         }
 
         public void Push(IActionProvider provider)
         {
+            Argument.EnsureNotNull(provider, "provider");
+
             actionProviders.Push(provider);
-            ResetActions();
+            Refresh();
         }
 
         public void Clear()
         {
             actionProviders.Clear();
-            ResetActions();
+            Refresh();
         }
 
+        /// <summary>
+        /// Pops all pushed <see cref="IActionProvider"/>s until the root one is reached.
+        /// </summary>
         public void Restore()
         {
-            while (actionProviders.Count > 1) actionProviders.Pop();
-            ResetActions();
+            while (actionProviders.Count > 1) PopAndDispose();
+
+            Refresh();
+        }
+
+        private void PopAndDispose()
+        {
+            IActionProvider previousActionProvider = actionProviders.Pop();
+            previousActionProvider.Dispose();
         }
 
         internal void ShowTooltip()
         {
-            if(!Children.Contains(tooltipFrame))
+            if (!Children.Contains(tooltipFrame))
                 Children.Add(tooltipFrame);
         }
 
@@ -67,29 +79,28 @@ namespace Orion.UserInterface.Actions
             Children.Remove(tooltipFrame);
         }
 
-        private void ResetActions()
+        private void Refresh()
         {
-            while (Children.Count > 0) Children[0].Dispose();
             Children.Clear();
-            if (actionProviders.Count > 0)
-            {
-                IActionProvider provider = actionProviders.Peek();
-                Rectangle templateSize = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.2f, 0.2f));
-                Vector2 padding = new Vector2(Bounds.Width * 0.0375f, Bounds.Height * 0.0375f);
+            if (actionProviders.Count == 0) return;
+            
+            IActionProvider provider = actionProviders.Peek();
+            Rectangle templateSize = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.2f, 0.2f));
+            Vector2 padding = new Vector2(Bounds.Width * 0.0375f, Bounds.Height * 0.0375f);
 
-                for (int y = 3; y >= 0; y--)
+            for (int y = 3; y >= 0; y--)
+            {
+                Vector2 origin = new Vector2(padding.X, padding.Y + (templateSize.Height + padding.Y) * y);
+                for (int x = 0; x < 4; x++)
                 {
-                    Vector2 origin = new Vector2(padding.X, padding.Y + (templateSize.Height + padding.Y) * y);
-                    for (int x = 0; x < 4; x++)
+                    Point point = new Point(x, y);
+                    ActionButton button = provider.GetButtonAt(point);
+                    if (button != null)
                     {
-                        ActionButton button = provider.GetButtonAt(x, y);
-                        if (button != null)
-                        {
-                            button.Frame = templateSize.TranslatedBy(origin);
-                            Children.Add(button);
-                        }
-                        origin.X += padding.X + templateSize.Width;
+                        button.Frame = templateSize.TranslatedBy(origin);
+                        Children.Add(button);
                     }
+                    origin.X += padding.X + templateSize.Width;
                 }
             }
         }

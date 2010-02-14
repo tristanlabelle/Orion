@@ -15,25 +15,24 @@ namespace Orion.UserInterface.Actions
     public class ActionButton : Button
     {
         #region Fields
-        protected readonly ActionFrame container;
+        protected readonly ActionFrame actionFrame;
         protected readonly UserInputManager inputManager;
-        private readonly TextureManager textureManager;
+        protected readonly TextureManager textureManager;
         private string name;
         private string description;
-        private IActionProvider actionProvider;
         #endregion
 
         #region Constructors
-        public ActionButton(ActionFrame container, UserInputManager inputManager,
+        public ActionButton(ActionFrame actionFrame, UserInputManager inputManager,
             string name, Keys hotkey, TextureManager textureManager)
             : base(new Rectangle(1,1), string.Empty)
         {
-            Argument.EnsureNotNull(container, "container");
+            Argument.EnsureNotNull(actionFrame, "actionFrame");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(name, "name");
 
             base.HotKey = hotkey;
-            this.container = container;
+            this.actionFrame = actionFrame;
             this.inputManager = inputManager;
             this.textureManager = textureManager;
             this.name = name;
@@ -91,35 +90,20 @@ namespace Orion.UserInterface.Actions
         {
             get { return textureManager; }
         }
-
-        public IActionProvider ActionProvider
-        {
-            get { return actionProvider; }
-            set { actionProvider = value; }
-        }
         #endregion
 
         #region Methods
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            container.TooltipFrame.SetDescription(TooltipText);
-            container.ShowTooltip();
+            actionFrame.TooltipFrame.SetDescription(TooltipText);
+            actionFrame.ShowTooltip();
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            container.HideTooltip();
+            actionFrame.HideTooltip();
             return base.OnMouseExit(args);
-        }
-
-        protected override void OnPress()
-        {
-            // The base call must be done first to raise the Triggered event
-            // because it seems that container.Push disposes this button.
-            base.OnPress();
-            if (actionProvider == null) actionProvider = new CancelActionProvider(container, inputManager, textureManager);
-            container.Push(actionProvider);
         }
         #endregion
     }

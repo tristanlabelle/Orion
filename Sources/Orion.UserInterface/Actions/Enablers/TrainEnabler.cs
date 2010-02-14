@@ -35,7 +35,7 @@ namespace Orion.UserInterface.Actions.Enablers
                 }
 
                 ImmediateUserCommand command = new TrainUserCommand(inputManager, unitType);
-                TrainActionButton button = new TrainActionButton(container, inputManager,unitType.Name, Keys.None, command, textureManager);
+                TrainActionButton button = new TrainActionButton(actionFrame, inputManager,unitType.Name, Keys.None, command, textureManager);
                 int aladdium = LocalFaction.GetStat(unitType, UnitStat.AladdiumCost);
                 int alagene = LocalFaction.GetStat(unitType, UnitStat.AlageneCost);
                 button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(unitType.Name, aladdium, alagene);

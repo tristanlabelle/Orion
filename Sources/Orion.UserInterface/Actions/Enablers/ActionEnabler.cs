@@ -14,15 +14,19 @@ namespace Orion.UserInterface.Actions.Enablers
     {
         #region Fields
         protected readonly UserInputManager inputManager;
-        protected readonly ActionFrame container;
+        protected readonly ActionFrame actionFrame;
         protected readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public ActionEnabler(UserInputManager manager, ActionFrame frame, TextureManager textureManager)
+        public ActionEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
         {
-            inputManager = manager;
-            container = frame;
+            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(actionFrame, "actionFrame");
+            Argument.EnsureNotNull(textureManager, "textureManager");
+
+            this.inputManager = inputManager;
+            this.actionFrame = actionFrame;
             this.textureManager = textureManager;
         }
         #endregion

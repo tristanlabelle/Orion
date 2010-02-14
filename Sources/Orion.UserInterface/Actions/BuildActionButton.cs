@@ -14,17 +14,27 @@ namespace Orion.UserInterface.Actions
     public sealed class BuildActionButton : ActionButton
     {
         #region Fields
-        private ActionButton[,] buildingButtons = new ActionButton[4, 4];
+        private readonly UnitType unitType;
+        private readonly UnitTypeRegistry unitTypeRegistry;
         #endregion
 
         #region Constructor
-        public BuildActionButton(ActionFrame frame, UserInputManager manager, UnitType type,
-            UnitTypeRegistry registry, TextureManager textureManager)
+        public BuildActionButton(ActionFrame frame, UserInputManager manager, UnitType unitType,
+            UnitTypeRegistry unitTypeRegistry, TextureManager textureManager)
             : base(frame, manager, "Build", Keys.B, textureManager)
         {
+            this.unitType = unitType;
+            this.unitTypeRegistry = unitTypeRegistry;
             Texture texture = textureManager.GetAction("Build");
             base.Renderer = new TexturedFrameRenderer(texture);
-            base.ActionProvider = new BuildActionProvider(frame, manager, type, registry, textureManager);
+        }
+        #endregion
+
+        #region Methods
+        protected override void OnPress()
+        {
+            base.OnPress();
+            actionFrame.Push(new BuildActionProvider(actionFrame, inputManager, unitType, unitTypeRegistry, textureManager));
         }
         #endregion
     }

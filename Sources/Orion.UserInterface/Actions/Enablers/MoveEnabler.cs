@@ -11,11 +11,9 @@ namespace Orion.UserInterface.Actions.Enablers
     public sealed class MoveEnabler : ActionEnabler
     {
         #region Constructors
-        public MoveEnabler(UserInputManager manager, ActionFrame frame, TextureManager textureManager)
-            : base(manager, frame, textureManager)
-        {
-
-        }
+        public MoveEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
+            : base(inputManager, actionFrame, textureManager)
+        { }
         #endregion
 
         #region Methods
@@ -23,7 +21,7 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(container, inputManager, "Move", Keys.M, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, textureManager);
             Texture texture = textureManager.GetAction("Move");
             button.Renderer = new TexturedFrameRenderer(texture);
             button.Triggered += OnButtonPressed;
@@ -34,6 +32,7 @@ namespace Orion.UserInterface.Actions.Enablers
         private void OnButtonPressed(Button sender)
         {
             inputManager.SelectedCommand = new MoveUserCommand(inputManager);
+            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
         }
         #endregion
     }

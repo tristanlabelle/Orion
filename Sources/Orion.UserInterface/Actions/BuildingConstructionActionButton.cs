@@ -30,8 +30,9 @@ namespace Orion.UserInterface.Actions
         #region Methods
         protected override void OnPress()
         {
-            inputManager.SelectedCommand = new BuildUserCommand(inputManager, TextureManager, buildingType);
             base.OnPress();
+            inputManager.SelectedCommand = new BuildUserCommand(inputManager, TextureManager, buildingType);
+            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
         }
         #endregion
     }

@@ -17,8 +17,8 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (type.HasSkill<BuildSkill>())
             {
-                buttonsArray[0, 0] = new BuildActionButton(container, inputManager, type, World.UnitTypes, base.textureManager);
-                buttonsArray[1, 0] = new GenericActionButton(container, inputManager,
+                buttonsArray[0, 0] = new BuildActionButton(actionFrame, inputManager, type, World.UnitTypes, base.textureManager);
+                buttonsArray[1, 0] = new GenericActionButton(actionFrame, inputManager,
                     "Repair", Keys.R, new RepairUserCommand(inputManager), base.textureManager);
             }
         }

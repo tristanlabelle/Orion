@@ -17,7 +17,7 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (type.HasSkill<HarvestSkill>())
             {
-                buttonsArray[1, 2] = new GenericActionButton(container, inputManager,
+                buttonsArray[1, 2] = new GenericActionButton(actionFrame, inputManager,
                     "Harvest", Keys.H, new HarvestUserCommand(inputManager), base.textureManager);
             }
         }

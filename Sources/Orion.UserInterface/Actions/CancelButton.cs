@@ -20,7 +20,7 @@ namespace Orion.UserInterface.Actions
         protected override void OnPress()
         {
             inputManager.SelectedCommand = null;
-            container.Restore();
+            actionFrame.Restore();
         }
     }
 }

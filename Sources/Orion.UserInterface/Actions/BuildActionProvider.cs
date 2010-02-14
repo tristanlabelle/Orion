@@ -46,9 +46,24 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(int x, int y)
+        public ActionButton GetButtonAt(Point point)
         {
-            return buttons[x, y];
+            return buttons[point.X, point.Y];
+        }
+
+        public void Dispose()
+        {
+            for (int y = 0; y < buttons.GetLength(1); ++y)
+            {
+                for (int x = 0; x < buttons.GetLength(0); ++x)
+                {
+                    if (buttons[x, y] != null)
+                    {
+                        buttons[x, y].Dispose();
+                        buttons[x, y] = null;
+                    }
+                }
+            }
         }
         #endregion
     }

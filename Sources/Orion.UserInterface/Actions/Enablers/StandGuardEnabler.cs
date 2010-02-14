@@ -20,7 +20,7 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (type.HasSkill<Skills.MoveSkill>())
             {
-                buttonsArray[3, 3] = new StandGuardButton(container, inputManager, textureManager);
+                buttonsArray[3, 3] = new StandGuardButton(actionFrame, inputManager, textureManager);
             }
         }
         #endregion

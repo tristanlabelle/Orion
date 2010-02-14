@@ -33,7 +33,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void AddEmbarkButton(ActionButton[,] buttonsArray)
         {
-            ActionButton button = new ActionButton(container, inputManager, "Embark", Keys.None, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Embark", Keys.None, textureManager);
             Texture texture = textureManager.GetAction("Embark");
             button.Renderer = new TexturedFrameRenderer(texture);
             button.Triggered += OnEmbarkButtonPressed;
@@ -43,7 +43,7 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void AddDisembarkButton(ActionButton[,] buttonsArray)
         {
-            ActionButton button = new ActionButton(container, inputManager, "Disembark", Keys.None, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Disembark", Keys.None, textureManager);
             Texture texture = textureManager.GetAction("Disembark");
             button.Renderer = new TexturedFrameRenderer(texture);
             button.Triggered += OnDisembarkButtonPressed;

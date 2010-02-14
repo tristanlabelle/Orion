@@ -45,7 +45,7 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(container, inputManager, string.Empty, Keys.None, textureManager);
+                ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, textureManager);
 
                 button.Name = "{0}\nAladdium: {1} Alagene: {2}"
                     .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);

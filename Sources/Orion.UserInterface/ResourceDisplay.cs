@@ -1,9 +1,7 @@
-﻿
-using OpenTK.Math;
+﻿using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.Graphics;
-using Color = System.Drawing.Color;
 
 namespace Orion.UserInterface
 {
@@ -26,9 +24,9 @@ namespace Orion.UserInterface
         {
             Text text = new Text("Aladdium: {0}    Alagene: {1}    Population: {2}/{3}"
                                 .FormatInvariant(faction.AladdiumAmount, faction.AlageneAmount, faction.UsedFoodAmount, faction.MaxFoodAmount));
-            context.FillColor = Color.Blue;
+            context.FillColor = Colors.Blue;
             context.Fill(Bounds);
-            context.FillColor = Color.White;
+            context.FillColor = Colors.White;
             context.Draw(text);
         }
         #endregion

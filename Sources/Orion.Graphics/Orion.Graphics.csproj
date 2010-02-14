@@ -100,7 +100,6 @@
     <Compile Include="Renderers\Ruin.cs" />
     <Compile Include="Renderers\RuinsRenderer.cs" />
     <Compile Include="Renderers\TexturedFrameRenderer.cs" />
-    <Compile Include="StrokeStyle.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TextRenderer.cs" />
     <Compile Include="Texture.cs" />

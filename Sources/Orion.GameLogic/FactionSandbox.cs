@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.GameLogic
 {
@@ -73,7 +72,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the color of this faction.
         /// </summary>
-        public Color Color
+        public ColorRgb Color
         {
             get { return faction.Color; }
         }
@@ -218,7 +217,7 @@ namespace Orion.GameLogic
             return GetFaction(faction).Name;
         }
 
-        public Color GetFactionColor(Handle faction)
+        public ColorRgb GetFactionColor(Handle faction)
         {
             return GetFaction(faction).Color;
         }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 using OpenTK.Math;
 
 namespace Orion.Graphics.Renderers
@@ -15,9 +14,9 @@ namespace Orion.Graphics.Renderers
     public static class HealthBarRenderer
     {
         #region Fields
-        private static readonly Color lowLifeColor = Color.Red;
-        private static readonly Color middleLifeColor = Color.Yellow;
-        private static readonly Color fullLifeColor = Color.ForestGreen;
+        private static readonly ColorRgb lowLifeColor = Colors.Red;
+        private static readonly ColorRgb middleLifeColor = Colors.Yellow;
+        private static readonly ColorRgb fullLifeColor = Colors.ForestGreen;
         #endregion
 
         #region Methods
@@ -51,30 +50,21 @@ namespace Orion.Graphics.Renderers
             Rectangle damageRect = new Rectangle(
                 origin.X + leftHealthWidth, origin.Y,
                 into.Width - leftHealthWidth, into.Height);
-            context.FillColor = Color.DarkGray;
+            context.FillColor = Colors.DarkGray;
             context.Fill(damageRect);
         }
 
-        private static Color Interpolate(Color first, Color second, float progress)
-        {
-            float opposite = 1 - progress;
-            return Color.FromArgb(
-                (int)(first.R * opposite + second.R * progress),
-                (int)(first.G * opposite + second.G * progress),
-                (int)(first.B * opposite + second.B * progress));
-        }
-
-        private static Color Interpolate(Color first, Color second, Color third, float progress)
+        private static ColorRgb Interpolate(ColorRgb first, ColorRgb second, ColorRgb third, float progress)
         {
             if (progress >= 0.5f)
             {
                 float subprogress = (progress - 0.5f) * 2;
-                return Interpolate(middleLifeColor, fullLifeColor, subprogress);
+                return ColorRgb.Lerp(second, third, subprogress);
             }
             else
             {
                 float subprogress = progress * 2;
-                return Interpolate(lowLifeColor, middleLifeColor, subprogress);
+                return ColorRgb.Lerp(first, second, subprogress);
             }
         }
         #endregion

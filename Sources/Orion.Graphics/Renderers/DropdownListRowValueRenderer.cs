@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Color = System.Drawing.Color;
 using Orion.GameLogic;
 
 namespace Orion.Graphics
@@ -15,9 +14,9 @@ namespace Orion.Graphics
         }
     }
 
-    public class DropdownListRowColorRenderer : DropdownListRowValueRenderer<Color>
+    public class DropdownListRowColorRenderer : DropdownListRowValueRenderer<ColorRgb>
     {
-        public override void Draw(Color color, GraphicsContext context)
+        public override void Draw(ColorRgb color, GraphicsContext context)
         {
             context.FillColor = color;
             context.Fill(context.CoordinateSystem.TranslatedBy(1, 1).ResizedBy(-2, -2));

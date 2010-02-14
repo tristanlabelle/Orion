@@ -1,7 +1,6 @@
 using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 using System.Diagnostics;
 
 namespace Orion.Graphics.Renderers
@@ -36,10 +35,10 @@ namespace Orion.Graphics.Renderers
             worldRenderer.DrawFogOfWar(context);
             attackWarningRenderer.Draw(context);
 
-            context.StrokeColor = Color.Orange;
+            context.StrokeColor = Colors.Orange;
             Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
             context.Stroke(intersection.GetValueOrDefault());
-            context.StrokeColor = Color.Gray;
+            context.StrokeColor = Colors.Gray;
             context.Stroke(context.CoordinateSystem);
         }
         #endregion

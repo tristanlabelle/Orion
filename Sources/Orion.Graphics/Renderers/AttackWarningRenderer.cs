@@ -34,7 +34,7 @@ namespace Orion.Graphics.Renderers
         private const int warningCircleCount = 3;
         private const float warningCircleDuration = 0.3f;
         private const float warningLifeSpan = 8;
-        private static readonly Color warningCircleColor = Color.Red;
+        private static readonly ColorRgb warningCircleColor = Colors.Red;
 
         private readonly Faction faction;
         private readonly List<AttackWarning> warnings = new List<AttackWarning>();

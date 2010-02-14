@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Skills;
-using Size = System.Drawing.Size;
 using System.Diagnostics;
 
 namespace Orion.GameLogic

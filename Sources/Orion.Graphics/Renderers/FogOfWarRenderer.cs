@@ -1,7 +1,6 @@
 ﻿using System;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.Graphics.Renderers
 {
@@ -69,7 +68,7 @@ namespace Orion.Graphics.Renderers
             {
                 Rectangle terrainBounds = new Rectangle(0, 0,
                     faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
-                graphics.Fill(terrainBounds, texture, TextureRectangle, Color.Black);
+                graphics.Fill(terrainBounds, texture, TextureRectangle, Colors.Black);
             }
         }
 

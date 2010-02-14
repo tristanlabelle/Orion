@@ -1,7 +1,6 @@
 ﻿using Orion.Geometry;
 using Orion.Graphics;
 using OpenTK.Math;
-using Color = System.Drawing.Color;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Widgets
@@ -27,7 +26,7 @@ namespace Orion.UserInterface.Widgets
             : base(frame, renderer)
         {
             this.caption = new Label(caption);
-            this.caption.Color = Color.White;
+            this.caption.Color = Colors.White;
             enabled = true;
             AlignCaption();
             Children.Add(this.caption);
@@ -82,26 +81,26 @@ namespace Orion.UserInterface.Widgets
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            if(enabled) caption.Color = Color.Cyan;
+            if(enabled) caption.Color = Colors.Cyan;
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Color.White;
+            if (enabled) caption.Color = Colors.White;
             return base.OnMouseExit(args);
         }
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Color.Orange;
+            if (enabled) caption.Color = Colors.Orange;
             base.OnMouseDown(args);
             return false;
         }
 
         protected override bool OnMouseUp(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Color.Cyan;
+            if (enabled) caption.Color = Colors.Cyan;
             base.OnMouseUp(args);
             OnPress();
             return false;

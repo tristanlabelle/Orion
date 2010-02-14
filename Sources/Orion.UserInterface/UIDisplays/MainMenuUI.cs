@@ -1,5 +1,4 @@
-﻿using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+﻿using Font = System.Drawing.Font;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
@@ -66,7 +65,7 @@ namespace Orion.UserInterface
         {
             Text text = new Text(@string, font);
             Label label = new Label(text);
-            label.Color = Color.White;
+            label.Color = Colors.White;
             float x = (Bounds.Width - label.Frame.Width) / 2;
             label.Frame = label.Frame.TranslatedTo(x, y);
             Children.Add(label);

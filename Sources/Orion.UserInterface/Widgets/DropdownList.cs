@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Color = System.Drawing.Color;
 
 using Orion.Geometry;
 using Orion.Graphics;
@@ -52,13 +51,13 @@ namespace Orion.UserInterface.Widgets
 
             protected internal override void Draw(GraphicsContext context)
             {
-                if (!parent.Enabled) context.FillColor = Color.FromArgb(0x40, Color.Blue);
-                else context.FillColor = Color.Blue;
+                if (!parent.Enabled) context.FillColor = new ColorRgba(Colors.Blue, 0.25f);
+                else context.FillColor = Colors.Blue;
 
                 context.Fill(Bounds);
                 if (IsMouseOver && parent.selectedItem != this)
                 {
-                    context.FillColor = Color.FromArgb(0x40, Color.Black);
+                    context.FillColor = new ColorRgba(Colors.Black, 0.25f);
                     context.Fill(Bounds);
                 }
 
@@ -72,7 +71,7 @@ namespace Orion.UserInterface.Widgets
         #region Fields
         private readonly ListFrame menu;
         private readonly DropdownListRowValueRenderer<T> renderer;
-        private Color textColor = Color.White;
+        private ColorRgba textColor = Colors.White;
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
         private GenericEventHandler<Responder, MouseEventArgs> parentMouseUp;
@@ -98,14 +97,13 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Properties
-
         public bool Enabled
         {
             get { return enabled; }
             set { enabled = value; }
         }
 
-        public Color TextColor
+        public ColorRgba TextColor
         {
             get { return textColor; }
             set { textColor = value; }
@@ -133,7 +131,6 @@ namespace Orion.UserInterface.Widgets
         {
             get { return menu.Children.Select(row => ((DropdownMenuRow)row).Value); }
         }
-
         #endregion
 
         #region Methods

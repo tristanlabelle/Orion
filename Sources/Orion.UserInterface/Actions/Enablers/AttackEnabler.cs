@@ -18,7 +18,7 @@ namespace Orion.UserInterface.Actions.Enablers
         public AttackEnabler(UserInputManager manager, ActionFrame frame, TextureManager textureManager)
             : base(manager, frame, textureManager)
         {
-            this.userCommand = new AttackUserCommand(inputManager);
+            this.userCommand = new AttackUserCommand(inputManager, textureManager);
         }
         #endregion
 

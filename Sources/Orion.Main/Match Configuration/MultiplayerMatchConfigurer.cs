@@ -7,7 +7,6 @@ using Orion.Commandment.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
-using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {
@@ -48,8 +47,8 @@ namespace Orion.Main
                 if (slot is ClosedPlayerSlot) continue;
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
 
-                Color color = Faction.Colors[colorIndex];
-                Faction faction = world.CreateFaction(color.Name, color);
+                ColorRgb color = Faction.Colors[colorIndex];
+                Faction faction = world.CreateFaction(Colors.GetName(color), color);
                 colorIndex++;
 
                 if (slot is LocalPlayerSlot)

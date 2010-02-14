@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-
-using Color = System.Drawing.Color;
 using Orion.Geometry;
 
 namespace Orion.Graphics.Renderers
@@ -15,8 +13,8 @@ namespace Orion.Graphics.Renderers
     public sealed class ResourcesRenderer : IRenderer
     {
         #region Fields
-        private static readonly Color miniatureAladdiumColor = Color.Green;
-        private static readonly Color miniatureAlageneColor = Color.LightCyan;
+        private static readonly ColorRgb miniatureAladdiumColor = Colors.Green;
+        private static readonly ColorRgb miniatureAlageneColor = Colors.LightCyan;
 
         private readonly Faction faction;
         private readonly TextureManager textureManager;
@@ -74,7 +72,7 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        public static Color GetResourceColor(ResourceType type)
+        public static ColorRgb GetResourceColor(ResourceType type)
         {
             if (type == ResourceType.Aladdium) return miniatureAladdiumColor;
             else if (type == ResourceType.Alagene) return miniatureAlageneColor;

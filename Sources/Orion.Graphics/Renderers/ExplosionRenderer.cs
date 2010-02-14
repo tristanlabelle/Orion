@@ -5,7 +5,6 @@ using System.Text;
 using Orion.GameLogic;
 using Orion.Geometry;
 using OpenTK.Math;
-using Color = System.Drawing.Color;
 
 namespace Orion.Graphics.Renderers
 {
@@ -62,7 +61,7 @@ namespace Orion.Graphics.Renderers
                 Rectangle rectangle = Rectangle.FromCenterSize(
                     explosion.Circle.Center,
                     new Vector2(radius, radius));
-                Color color = Color.FromArgb((int)(alpha * 255), Color.White);
+                ColorRgba color = new ColorRgba(Colors.White, alpha);
                 graphics.Fill(rectangle, texture, color);
             }
         }

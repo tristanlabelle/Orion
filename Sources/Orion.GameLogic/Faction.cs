@@ -7,8 +7,8 @@ using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Technologies;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 using Orion.GameLogic.Skills;
+using ColorPalette = Orion.Colors;
 
 namespace Orion.GameLogic
 {
@@ -20,17 +20,17 @@ namespace Orion.GameLogic
     {
         #region Fields
         private const int maxFoodAmount = 200;
-        public static Color[] Colors = new Color[]
+        public static ColorRgb[] Colors = new ColorRgb[]
         {
-            Color.Red, Color.Cyan, Color.Yellow, Color.Orange,
-            Color.Green, Color.Pink, Color.Gray, Color.DarkBlue,
-            Color.Lime, Color.Purple, Color.White, Color.Chocolate
+            ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Yellow, ColorPalette.Orange,
+            ColorPalette.Green, ColorPalette.Pink, ColorPalette.Gray, ColorPalette.DarkBlue,
+            ColorPalette.Lime, ColorPalette.Purple, ColorPalette.White, ColorPalette.Chocolate
         };
 
         private readonly Handle handle;
         private readonly World world;
         private readonly string name;
-        private readonly Color color;
+        private readonly ColorRgb color;
         private readonly FogOfWar localFogOfWar;
 
         private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
@@ -57,8 +57,8 @@ namespace Orion.GameLogic
         /// <param name="handle">The handle of this <see cref="Faction"/>.</param>
         /// <param name="world">The <see cref="World"/> hosting this <see cref="Faction"/>.</param>
         /// <param name="name">The name of this <see cref="Faction"/>.</param>
-        /// <param name="color">The distinctive <see cref="Color"/> of this <see cref="Faction"/>'s units.</param>
-        internal Faction(Handle handle, World world, string name, Color color)
+        /// <param name="color">The distinctive <see cref="ColorRgb"/> of this <see cref="Faction"/>'s units.</param>
+        internal Faction(Handle handle, World world, string name, ColorRgb color)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNullNorBlank(name, "name");
@@ -154,7 +154,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Gets the <see cref="Color"/> used to visually identify units of this <see cref="Faction"/>.
         /// </summary>
-        public Color Color
+        public ColorRgb Color
         {
             get { return color; }
         }

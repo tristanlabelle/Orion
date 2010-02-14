@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Color = System.Drawing.Color;
 using Orion.GameLogic;
 using Orion.Commandment;
 using Orion.Commandment.Commands.Pipeline;
@@ -14,7 +13,6 @@ namespace Orion.Main
     class ReplayMatchConfigurer : MatchConfigurer
     {
         private const string neutralFactionName = "\rSpectator";
-        private static readonly Color neutralFactionColor = Color.Black;
 
         private ReplayReader replay;
 

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using RectangleF = System.Drawing.RectangleF;
-
-using OpenTK.Graphics;
-using OpenTK.Math;
-
-using Orion.Geometry;
-
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
+using OpenTK.Graphics;
+using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.Graphics
 {
@@ -30,9 +27,8 @@ namespace Orion.Graphics
         #region Instance
         #region Fields
         private Rectangle coordinateSystem;
-        private Color fillColor = Color.White;
-        private Color strokeColor = Color.Black;
-        private StrokeStyle strokeStyle = StrokeStyle.Solid;
+        private ColorRgba fillColor = Colors.White;
+        private ColorRgba strokeColor = Colors.Black;
         private Font font = new Font("Trebuchet MS", 14);
         private bool readyForDrawing;
         #endregion
@@ -47,7 +43,6 @@ namespace Orion.Graphics
         public GraphicsContext(Rectangle bounds)
         {
             coordinateSystem = bounds;
-            strokeStyle = StrokeStyle.Solid;
         }
         #endregion
 
@@ -64,7 +59,7 @@ namespace Orion.Graphics
         /// <summary>
         /// Accesses the <see cref="Color"/> currently used to fill shapes.
         /// </summary>
-        public Color FillColor
+        public ColorRgba FillColor
         {
             get { return fillColor; }
             set { fillColor = value; }
@@ -73,23 +68,10 @@ namespace Orion.Graphics
         /// <summary>
         /// Accesses the <see cref="Color"/> currently used to stroke shape outlines.
         /// </summary>
-        public Color StrokeColor
+        public ColorRgba StrokeColor
         {
             get { return strokeColor; }
             set { strokeColor = value; }
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="StrokeStyle"/> currently used to stroke shape outlines. (Currently has no effect.)
-        /// </summary>
-        public StrokeStyle StrokeStyle
-        {
-            get { return strokeStyle; }
-            set
-            {
-                strokeStyle = value;
-                CommitStrokeStyle();
-            }
         }
 
         /// <summary>
@@ -260,7 +242,6 @@ namespace Orion.Graphics
         /// <param name="triangle">The <see cref="Triangle"/> to be stroked.</param>
         public void Stroke(Triangle triangle)
         {
-            CommitStrokeStyle();
             GL.Begin(BeginMode.LineLoop);
             DrawVertices(triangle);
             GL.End();
@@ -375,14 +356,17 @@ namespace Orion.Graphics
             GL.Translate(origin.X, origin.Y, 0);
             GL.Scale(1, -1, 1);
             RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
-            Text.defaultTextPrinter.Print(text.Value, text.Font, fillColor, renderInto);
+
+            Color color = Color.FromArgb(fillColor.ByteA, fillColor.ByteR, fillColor.ByteG, fillColor.ByteB);
+            Text.defaultTextPrinter.Print(text.Value, text.Font, color, renderInto);
+
             GL.PopMatrix();
         }
 
         #endregion
 
         #region Textured
-        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle, Color tint)
+        public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle, ColorRgba tint)
         {
             Argument.EnsureNotNull(texture, "texture");
 
@@ -405,17 +389,17 @@ namespace Orion.Graphics
 
         public void Fill(Rectangle rectangle, Texture texture, Rectangle textureRectangle)
         {
-            Fill(rectangle, texture, textureRectangle, Color.White);
+            Fill(rectangle, texture, textureRectangle, Colors.White);
         }
 
-        public void Fill(Rectangle rectangle, Texture texture, Color tint)
+        public void Fill(Rectangle rectangle, Texture texture, ColorRgba tint)
         {
             Fill(rectangle, texture, Rectangle.Unit, tint);
         }
 
         public void Fill(Rectangle rectangle, Texture texture)
         {
-            Fill(rectangle, texture, Rectangle.Unit, Color.White);
+            Fill(rectangle, texture, Rectangle.Unit, Colors.White);
         }
 
         internal void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
@@ -459,15 +443,7 @@ namespace Orion.Graphics
         /// </summary>
         private void CommitFillColor()
         {
-            if (fillColor.A < 255)
-            {
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            }
-            else
-                GL.Disable(EnableCap.Blend);
-
-            GL.Color4(fillColor.R, fillColor.G, fillColor.B, fillColor.A);
+            CommitColor(fillColor);
         }
 
         /// <summary>
@@ -475,12 +451,20 @@ namespace Orion.Graphics
         /// </summary>
         private void CommitStrokeColor()
         {
-            GL.Color4(strokeColor.R, strokeColor.G, strokeColor.B, strokeColor.A);
+            CommitColor(strokeColor);
         }
 
-        private void CommitStrokeStyle()
+        private void CommitColor(ColorRgba color)
         {
-            GL.LineStipple(1, (short)strokeStyle);
+            if (color.A < 1f)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            }
+            else
+                GL.Disable(EnableCap.Blend);
+
+            GL.Color4(color.R, color.G, color.B, color.A);
         }
         #endregion
         #endregion

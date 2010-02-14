@@ -1,20 +1,20 @@
-﻿using Color = System.Drawing.Color;
+﻿using System;
 
 namespace Orion.Graphics
 {
     public abstract class FrameRenderer : IRenderer
     {
         #region Fields
-        public readonly Color StrokeColor;
+        public readonly ColorRgba StrokeColor;
         #endregion
 
         #region Contructors
         public FrameRenderer()
         {
-            StrokeColor = Color.Gray;
+            StrokeColor = Colors.Gray;
         }
 
-        public FrameRenderer(Color strokeColor)
+        public FrameRenderer(ColorRgba strokeColor)
         {
             StrokeColor = strokeColor;
         }

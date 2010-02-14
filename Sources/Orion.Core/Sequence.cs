@@ -590,6 +590,22 @@ namespace Orion
         }
         #endregion
 
+        #region ForEach
+        /// <summary>
+        /// Applies a delegate for each item of a sequence.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the sequence.</typeparam>
+        /// <param name="sequence">The sequence of items.</param>
+        /// <param name="action">The action to be applied to each item.</param>
+        public static void ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
+        {
+            Argument.EnsureNotNull(sequence, "sequence");
+            Argument.EnsureNotNull(action, "action");
+
+            foreach (T item in sequence) action(item);
+        }
+        #endregion
+
         #region Concatenation
         /// <summary>
         /// Concatenates an element to the end of a sequence.

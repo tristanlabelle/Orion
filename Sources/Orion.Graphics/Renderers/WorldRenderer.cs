@@ -3,8 +3,6 @@ using System.Linq;
 using Orion.GameLogic;
 using Orion.Geometry;
 
-using Color = System.Drawing.Color;
-
 namespace Orion.Graphics.Renderers
 {
     /// <summary>
@@ -13,9 +11,6 @@ namespace Orion.Graphics.Renderers
     public sealed class WorldRenderer : IDisposable
     {
         #region Fields
-        private static readonly Color AladdiumColor = Color.LightBlue;
-        private static readonly Color AlageneColor = Color.Green;
-
         private readonly Faction faction;
         private readonly TextureManager textureManager;
 

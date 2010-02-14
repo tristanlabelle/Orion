@@ -6,7 +6,6 @@ using Orion.GameLogic;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.Graphics.Renderers
 {
@@ -157,7 +156,7 @@ namespace Orion.Graphics.Renderers
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                 graphics.Fill(localRectangle, texture, unit.Faction.Color);
                 if (unit.IsUnderConstruction)
-                    graphics.Fill(localRectangle, UnderConstructionTexture, Color.White);
+                    graphics.Fill(localRectangle, UnderConstructionTexture, Colors.White);
             }
 
             if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
@@ -166,7 +165,7 @@ namespace Orion.Graphics.Renderers
         private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
         {
             Texture texture = textureManager.GetUnit(unit.Type.Name);
-            Color tint = Color.FromArgb((int)(shadowAlpha * 255), Color.Black);
+            ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
 
             float drawingAngle = GetUnitDrawingAngle(unit);
             float oscillation = GetOscillation(unit);
@@ -219,39 +218,6 @@ namespace Orion.Graphics.Renderers
             float spinAngle = spinProgress * (float)Math.PI * 2;
 
             return baseAngle + spinAngle;
-        }
-        #endregion
-
-        #region Debug
-        private void DrawPaths(GraphicsContext graphics)
-        {
-            var paths = World.Entities
-                .OfType<Unit>()
-                .Select(unit => unit.TaskQueue.Current)
-                .OfType<MoveTask>()
-                .Select(task => task.Path)
-                .Where(path => path != null);
-
-            graphics.StrokeColor = Color.Gray;
-            foreach (Path path in paths)
-            {
-                var points = path.Points;
-                LineSegment segment = new LineSegment(points[0], points[points.Count - 1]);
-
-                graphics.StrokeColor = Color.Blue;
-                graphics.StrokeLineStrip(
-                    segment.EndPoint1 + new Vector2(0.5f, 0.5f),
-                    segment.EndPoint2 + new Vector2(0.5f, 0.5f));
-
-                foreach (var pair in XiaolinWu.GetPoints(segment))
-                {
-                    graphics.StrokeColor = Color.Gray;
-                    graphics.Stroke(new Rectangle(pair.Key.X, pair.Key.Y, 1, 1));
-                }
-
-                graphics.StrokeColor = Color.Red;
-                graphics.StrokeLineStrip(path.Points.Select(point => (Vector2)point + new Vector2(0.5f, 0.5f)));
-            }
         }
 
         private void DrawLasers(GraphicsContext graphics, CollisionLayer layer)

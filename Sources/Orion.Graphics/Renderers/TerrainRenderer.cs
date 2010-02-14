@@ -1,7 +1,6 @@
 ﻿using System;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 using OpenTK.Graphics;
 
 namespace Orion.Graphics
@@ -71,9 +70,9 @@ namespace Orion.Graphics
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
 
-            graphics.FillColor = Color.FromArgb(232, 207, 144);
+            graphics.FillColor = ColorRgb.FromBytes(232, 207, 144);
             graphics.Fill(terrainBounds);
-            graphics.Fill(terrainBounds, texture, TextureRectangle, Color.FromArgb(100, 78, 60));
+            graphics.Fill(terrainBounds, texture, TextureRectangle, ColorRgb.FromBytes(100, 78, 60));
         }
 
         public void Dispose()

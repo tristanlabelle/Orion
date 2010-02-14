@@ -1,25 +1,25 @@
-using Color = System.Drawing.Color;
+using System;
 
 namespace Orion.Graphics
 {
     public sealed class FilledFrameRenderer : FrameRenderer
     {
         #region Fields
-        public readonly Color FillColor;
+        public readonly ColorRgba FillColor;
         #endregion
 
         #region Constructors
         public FilledFrameRenderer()
         {
-            FillColor = Color.DarkGray;
+            FillColor = Colors.DarkGray;
         }
 
-        public FilledFrameRenderer(Color fillColor)
+        public FilledFrameRenderer(ColorRgba fillColor)
         {
             FillColor = fillColor;
         }
 
-        public FilledFrameRenderer(Color fillColor, Color strokeColor)
+        public FilledFrameRenderer(ColorRgba fillColor, ColorRgba strokeColor)
             : base(strokeColor)
         {
             FillColor = fillColor;

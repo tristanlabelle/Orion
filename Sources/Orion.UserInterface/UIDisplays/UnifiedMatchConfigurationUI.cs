@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Color = System.Drawing.Color;
 using OpenTK.Math;
 using Orion.UserInterface.Widgets;
 using Orion.Commandment;
@@ -19,11 +18,11 @@ namespace Orion.UserInterface.UIDisplays
             #region Fields
             private readonly UnifiedMatchConfigurationUI configurationUi;
             private readonly Label nameLabel;
-            private readonly DropdownList<Color> colors;
+            private readonly DropdownList<ColorRgb> colors;
             #endregion
 
             #region Constructors
-            public PlayerRow(UnifiedMatchConfigurationUI ui, IEnumerable<Color> colorItems, string initialLabel, bool deletable)
+            public PlayerRow(UnifiedMatchConfigurationUI ui, IEnumerable<ColorRgb> colorItems, string initialLabel, bool deletable)
                 : base(ui.rowRectangle)
             {
                 configurationUi = ui;
@@ -32,11 +31,11 @@ namespace Orion.UserInterface.UIDisplays
                 Children.Add(nameLabel);
 
                 Rectangle dropdownRow = Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0), new Vector2(0.7f, 1));
-                colors = new DropdownList<Color>(dropdownRow, new DropdownListRowColorRenderer());
+                colors = new DropdownList<ColorRgb>(dropdownRow, new DropdownListRowColorRenderer());
                 Children.Add(colors);
                 colors.SelectionChanged += SelectionChanged;
 
-                foreach (Color color in colorItems)
+                foreach (ColorRgb color in colorItems)
                     colors.AddItem(color);
 
                 if (deletable)
@@ -50,12 +49,12 @@ namespace Orion.UserInterface.UIDisplays
             #endregion
 
             #region Events
-            public event GenericEventHandler<PlayerRow, Color> SelectedColorChanged;
+            public event GenericEventHandler<PlayerRow, ColorRgb> SelectedColorChanged;
             public event GenericEventHandler<PlayerRow> RowSuppressed;
             #endregion
 
             #region Properties
-            public DropdownList<Color> ColorList
+            public DropdownList<ColorRgb> ColorList
             {
                 get { return colors; }
             }
@@ -68,7 +67,7 @@ namespace Orion.UserInterface.UIDisplays
             #endregion
 
             #region Methods
-            private void SelectionChanged(DropdownList<Color> list, Color color)
+            private void SelectionChanged(DropdownList<ColorRgb> list, ColorRgb color)
             {
                 if (SelectedColorChanged != null) SelectedColorChanged(this, color);
             }
@@ -101,7 +100,7 @@ namespace Orion.UserInterface.UIDisplays
         #endregion
 
         #region Constructors
-        public UnifiedMatchConfigurationUI(IEnumerable<Color> colors, bool displayStartButton)
+        public UnifiedMatchConfigurationUI(IEnumerable<ColorRgb> colors, bool displayStartButton)
         {
             Vector2 padding = new Vector2(10, 10);
 

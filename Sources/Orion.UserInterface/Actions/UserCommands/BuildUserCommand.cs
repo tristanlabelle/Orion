@@ -5,7 +5,6 @@ using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.Graphics;
-using Color = System.Drawing.Color;
 using Orion.Geometry;
 
 namespace Orion.UserInterface.Actions.UserCommands
@@ -101,11 +100,11 @@ namespace Orion.UserInterface.Actions.UserCommands
             if (!minLocation.HasValue) return;
 
             Texture texture = textureManager.GetUnit(buildingType.Name);
-            Color tint = IsLocationValid ? Color.LightBlue : Color.Red;
+            ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
                 buildingType.Width, buildingType.Height);
-            context.FillColor = Color.FromArgb(100, tint);
+            context.FillColor = new ColorRgba(tint, 0.4f);
             context.Fill(rectangle);
             context.Fill(rectangle, texture, tint);
         }

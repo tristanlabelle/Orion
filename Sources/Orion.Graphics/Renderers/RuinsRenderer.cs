@@ -6,8 +6,6 @@ using Orion.GameLogic;
 using OpenTK.Math;
 using Orion.Geometry;
 
-using Color = System.Drawing.Color;
-
 namespace Orion.Graphics.Renderers
 {
     /// <summary>
@@ -104,9 +102,7 @@ namespace Orion.Graphics.Renderers
 
                 Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
 
-                int alphaComponent = (int)(alpha * 255);
-                Color color = Color.FromArgb(alphaComponent, ruin.Tint);
-
+                ColorRgba color = new ColorRgba(ruin.Tint, alpha);
                 graphics.Fill(rectangle, texture, color);
             }
         }
@@ -118,7 +114,7 @@ namespace Orion.Graphics.Renderers
             Ruin ruin = ruinPool.Get();
             ruin.Reset(simulationTimeInSeconds,
                 unit.IsBuilding ? RuinType.Building : RuinType.Unit,
-                unit.Position, unit.Size, unit.Faction.Color);
+                unit.Position, unit.Size, unit.Faction);
             ruins.Add(ruin);
         }
 

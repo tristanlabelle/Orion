@@ -1,6 +1,5 @@
 ﻿using Orion.Geometry;
 using Orion.Graphics;
-using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface.Widgets
@@ -43,7 +42,7 @@ namespace Orion.UserInterface.Widgets
         /// <summary>
         /// Accesses this object's text color.
         /// </summary>
-        public Color Color { get; set; }
+        public ColorRgba Color { get; set; }
         #endregion
 
         #region Methods

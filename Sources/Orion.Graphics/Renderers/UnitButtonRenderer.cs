@@ -1,4 +1,4 @@
-﻿using Color = System.Drawing.Color;
+﻿using System;
 using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.Geometry;
@@ -35,8 +35,8 @@ namespace Orion.Graphics.Renderers
         #region Methods
         public override void Draw(GraphicsContext context)
         {
-            context.StrokeColor = hasFocus ? Color.White : Color.Black;
-            context.FillColor = hasFocus ? Color.FromArgb(75, 75, 75) : Color.Black;
+            context.StrokeColor = hasFocus ? Colors.White : Colors.Black;
+            context.FillColor = hasFocus ? ColorRgb.FromBytes(75, 75, 75) : Colors.Black;
             context.Fill(context.CoordinateSystem);
             context.Stroke(context.CoordinateSystem);
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Commandment;
-using System.Drawing;
 using Orion.Commandment.Commands;
 using System.Diagnostics;
 using Orion.GameLogic;
@@ -33,7 +32,7 @@ namespace Orion.Audio
             this.userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
             this.userInputManager.LocalCommander.CommandGenerated += OnCommandGenerated;
 
-            if (this.userInputManager.LocalFaction.Color == Color.Pink)
+            if (this.userInputManager.LocalFaction.Color == Colors.Pink)
                 this.audioContext.PlaySound("tapette");
         }
         #endregion

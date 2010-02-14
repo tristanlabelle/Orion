@@ -12,7 +12,6 @@ using Orion.Graphics.Renderers;
 using Orion.UserInterface.Actions;
 using Orion.UserInterface.Actions.Enablers;
 using Orion.UserInterface.Widgets;
-using Color = System.Drawing.Color;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
@@ -112,7 +111,7 @@ namespace Orion.UserInterface
             Children.Add(hudFrame);
 
             Rectangle selectionFrameRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.25f, 0), new Vector2(0.75f, 1));
-            selectionFrame = new Frame(selectionFrameRectangle, Color.DarkGray);
+            selectionFrame = new Frame(selectionFrameRectangle, Colors.DarkGray);
             hudFrame.Children.Add(selectionFrame);
 
             Rectangle actionsRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.75f, 0), new Vector2(1, 1));
@@ -181,7 +180,7 @@ namespace Orion.UserInterface
             this.workerType = World.UnitTypes.FromName("Schtroumpf");
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
             Texture workerTexture = textureManager.GetUnit(workerType.Name);
-            TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Color.White, Color.Gray, Color.LightGray);
+            TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
             this.idleWorkerButton = new Button(inactiveWorkerRectangle, "", workerButtonRenderer);
             this.idleWorkerButton.Triggered += OnIdleSmurfsButtonTriggered;
 
@@ -257,7 +256,7 @@ namespace Orion.UserInterface
             DisplayMessage(text, message.Faction.Color);
         }
 
-        public void DisplayMessage(string text, Color color)
+        public void DisplayMessage(string text, ColorRgb color)
         {
             Argument.EnsureNotNull(text, "text");
 
@@ -600,7 +599,7 @@ namespace Orion.UserInterface
 
         private void CreateMultipleUnitsSelectionPanel()
         {
-            selectionFrame.Renderer = new FilledFrameRenderer(Color.DarkGray, Color.Gray);
+            selectionFrame.Renderer = new FilledFrameRenderer(Colors.DarkGray, Colors.Gray);
             const float paddingX = 5;
             const float paddingY = 15;
             Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 11 - paddingX * 2,

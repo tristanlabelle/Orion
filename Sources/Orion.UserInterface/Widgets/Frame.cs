@@ -1,7 +1,6 @@
 ﻿using Orion.Geometry;
 using Orion.Graphics;
 using OpenTK.Math;
-using Color = System.Drawing.Color;
 
 namespace Orion.UserInterface.Widgets
 {
@@ -11,7 +10,7 @@ namespace Orion.UserInterface.Widgets
         public Frame(Rectangle frame)
             : base(frame, new FilledFrameRenderer())
         { }
-        public Frame(Rectangle frame, Color fillColor)
+        public Frame(Rectangle frame, ColorRgba fillColor)
             : base(frame, new FilledFrameRenderer(fillColor))
         { }
         public Frame(Rectangle frame, IRenderer renderer)

@@ -1,5 +1,4 @@
 ﻿using System;
-using Color = System.Drawing.Color;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,12 +50,12 @@ namespace Orion.UserInterface.Actions
 
         protected internal override void Draw(GraphicsContext context)
         {
-            context.FillColor = Color.Gray;
-            context.StrokeColor = Color.White;
+            context.FillColor = Colors.Gray;
+            context.StrokeColor = Colors.White;
             context.Fill(Bounds);
             context.Stroke(Bounds);
 
-            context.FillColor = Color.White;
+            context.FillColor = Colors.White;
             float top = Bounds.MaxY;
             foreach (Text part in description)
             {

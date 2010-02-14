@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Keys = System.Windows.Forms.Keys;
-using Color = System.Drawing.Color;
 using Orion.Geometry;
 using Orion.Graphics;
 using OpenTK.Math;
@@ -75,11 +74,11 @@ namespace Orion.UserInterface.Widgets
 
         protected internal override void Draw(GraphicsContext context)
         {
-            context.FillColor = Color.LightGreen;
-            context.StrokeColor = Color.Gray;
+            context.FillColor = Colors.LightGreen;
+            context.StrokeColor = Colors.Gray;
             context.Fill(Bounds);
             context.Stroke(Bounds);
-            context.FillColor = Color.Black;
+            context.FillColor = Colors.Black;
 
             Text text;
             if (contents.Value.Length == 1) text = new Text(contents.Value + " ");

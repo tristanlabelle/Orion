@@ -7,7 +7,6 @@ using Orion.GameLogic;
 using Orion.Networking;
 using Orion.UserInterface;
 using Orion.UserInterface.Widgets;
-using Color = System.Drawing.Color;
 
 namespace Orion.Main
 {

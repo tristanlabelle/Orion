@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Color = System.Drawing.Color;
 using Orion.Geometry;
 using Orion.Graphics;
 using OpenTK.Math;
@@ -26,7 +25,7 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public Scrollbar(Rectangle frame, ClippedView scrollee)
-            : base(frame, Color.FromArgb(0x80, Color.Gray))
+            : base(frame, new ColorRgba(Colors.Gray, 0.5f))
         {
             Frame = frame;
             Scrollee = scrollee;
@@ -36,7 +35,7 @@ namespace Orion.UserInterface.Widgets
             topArrow = new Frame(arrowRect.TranslatedBy(0, frame.Height - frame.Width), new DelegatedRenderer(RenderTopArrow));
             topArrow.Bounds = new Rectangle(1, 1);
             bottomArrow.Bounds = new Rectangle(1, 1);
-            slider = new Frame(new Rectangle(frame.Width, 1), Color.Orange);
+            slider = new Frame(new Rectangle(frame.Width, 1), Colors.Orange);
 
             slider.MouseDown += SliderMouseDown;
             topArrow.MouseDown += MoveUp;
@@ -129,13 +128,13 @@ namespace Orion.UserInterface.Widgets
 
         private void DrawScrollbarEnd(GraphicsContext context, Triangle fillMe)
         {
-            context.StrokeColor = Color.Black;
-            context.FillColor = Color.Gray;
+            context.StrokeColor = Colors.Black;
+            context.FillColor = Colors.Gray;
 
             context.Fill(context.CoordinateSystem);
             context.Stroke(context.CoordinateSystem);
 
-            context.FillColor = Color.Black;
+            context.FillColor = Colors.Black;
             context.Fill(fillMe);
         }
         #endregion

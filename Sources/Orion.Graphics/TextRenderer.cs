@@ -112,7 +112,7 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(text, "text");
 
             float x = 0;
-            graphics.StrokeColor = Color.Red;
+            graphics.StrokeColor = Colors.Red;
             foreach (char character in text)
             {
                 Rectangle textureRectangle;

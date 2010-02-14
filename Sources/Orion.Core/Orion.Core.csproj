@@ -71,17 +71,17 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
     <Compile Include="BitArray2D.cs" />
-    <Compile Include="Bresenham.cs" />
     <Compile Include="BufferPool.cs" />
     <Compile Include="Casing.cs" />
+    <Compile Include="ColorRgb.cs" />
+    <Compile Include="ColorRgba.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="PooledList.cs" />
     <Compile Include="FrameRateCounter.cs" />
@@ -112,7 +112,6 @@
     <Compile Include="MersenneTwister.cs" />
     <Compile Include="SimulationStep.cs" />
     <Compile Include="ValueChangedEventHandler.cs" />
-    <Compile Include="XiaolinWu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,7 +6,6 @@ using OpenTK.Math;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Technologies;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.GameLogic
 {
@@ -210,7 +209,7 @@ namespace Orion.GameLogic
         /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
         /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
         /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
-        public Faction CreateFaction(string name, Color color)
+        public Faction CreateFaction(string name, ColorRgb color)
         {
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
@@ -228,7 +227,7 @@ namespace Orion.GameLogic
         public Faction CreateSpectatorFaction()
         {
             const string spectatorFactionName = "\rSpectator";
-            Color spectatorFactionColor = Color.Black;
+            ColorRgb spectatorFactionColor = Colors.Black;
 
             Handle handle = new Handle(0xFFFFFFFF);
             Faction faction = new Faction(handle, this, spectatorFactionName, spectatorFactionColor);

@@ -2,7 +2,6 @@
 using Orion.Commandment;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.Graphics.Renderers
 {

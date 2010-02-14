@@ -1,4 +1,4 @@
-using Color = System.Drawing.Color;
+using System;
 
 namespace Orion.Graphics
 {
@@ -6,8 +6,8 @@ namespace Orion.Graphics
     {
         #region Fields
         public readonly Texture Texture;
-        private readonly Color tint;
-        private readonly Color background;
+        private readonly ColorRgba tint;
+        private readonly ColorRgba background;
         #endregion
 
         #region Constructors
@@ -15,20 +15,20 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(texture, "texture");
             this.Texture = texture;
-            this.tint = Color.White;
-            this.background = Color.Transparent;
+            this.tint = Colors.White;
+            this.background = Colors.TransparentBlack;
         }
 
-        public TexturedFrameRenderer(Texture texture, Color tint, Color strokeColor)
+        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba strokeColor)
             : base(strokeColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.Texture = texture;
             this.tint = tint;
-            this.background = Color.Transparent;
+            this.background = Colors.TransparentBlack;
         }
 
-        public TexturedFrameRenderer(Texture texture, Color tint, Color strokeColor, Color backgroundColor)
+        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba strokeColor, ColorRgba backgroundColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.Texture = texture;

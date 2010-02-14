@@ -7,7 +7,6 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 
 namespace Orion.Graphics
@@ -92,9 +91,9 @@ namespace Orion.Graphics
                     Texture texture = textureManager.GetUnit(train.TraineeType.Name);
 
                     Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
-                    context.FillColor = Color.Black;
+                    context.FillColor = Colors.Black;
                     context.Fill(rect2);
-                    context.FillColor = Color.White;
+                    context.FillColor = Colors.White;
                     context.Stroke(rect2);
 
                     // Fills first rectangle with a character. 
@@ -110,7 +109,7 @@ namespace Orion.Graphics
 
                     base.Draw(context);
                     firstStartingXPos += 50;
-                    context.FillColor = Color.Black;
+                    context.FillColor = Colors.Black;
                 }
 
                 string message = "En progrès...";
@@ -118,7 +117,7 @@ namespace Orion.Graphics
             }
 
             context.Font = statsFont;
-            context.FillColor = Color.DarkBlue;
+            context.FillColor = Colors.DarkBlue;
 
             context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
 
@@ -143,14 +142,14 @@ namespace Orion.Graphics
 
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)
         {
-            context.FillColor = Color.Black;
+            context.FillColor = Colors.Black;
             context.Fill(bounds);
 
             Rectangle progressRect = new Rectangle(bounds.MinX, bounds.MinY, bounds.Width * progress, bounds.Height);
-            context.FillColor = Color.Gold;
+            context.FillColor = Colors.Gold;
             context.Fill(progressRect);
 
-            context.StrokeColor = Color.Black;
+            context.StrokeColor = Colors.Black;
             context.Stroke(bounds);
         }
         #endregion

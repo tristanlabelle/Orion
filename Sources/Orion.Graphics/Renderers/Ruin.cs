@@ -6,7 +6,6 @@ using Orion.GameLogic;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.Graphics
 {
@@ -20,7 +19,7 @@ namespace Orion.Graphics
         private RuinType type;
         private Vector2 min;
         private Size size;
-        private Color tint;
+        private Faction faction;
         #endregion
 
         #region Properties
@@ -44,21 +43,26 @@ namespace Orion.Graphics
             get { return size; }
         }
 
-        public Color Tint
+        public Faction Faction
         {
-            get { return tint; }
+            get { return faction; }
+        }
+
+        public ColorRgb Tint
+        {
+            get { return faction.Color; }
         }
         #endregion
 
         #region Methods
         public void Reset(float creationTimeInSeconds, RuinType type,
-            Vector2 min, Size size, Color tint)
+            Vector2 min, Size size, Faction faction)
         {
             this.creationTimeInSeconds = creationTimeInSeconds;
             this.type = type;
             this.min = min;
             this.size = size;
-            this.tint = tint;
+            this.faction = faction;
         }
         #endregion
     }

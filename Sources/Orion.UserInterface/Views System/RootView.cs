@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using OpenTK.Graphics;
 using OpenTK.Math;
 using Orion.Geometry;
-using Color = System.Drawing.Color;
 
 namespace Orion.UserInterface
 {

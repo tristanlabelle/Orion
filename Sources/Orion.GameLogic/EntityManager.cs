@@ -6,7 +6,6 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
-using Point = System.Drawing.Point;
 
 namespace Orion.GameLogic
 {

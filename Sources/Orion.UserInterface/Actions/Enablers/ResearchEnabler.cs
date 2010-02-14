@@ -45,19 +45,26 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, textureManager);
-
-                button.Name = "{0}\nAladdium: {1} Alagene: {2}"
-                    .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);
-
-                Texture texture = textureManager.GetTechnology(technology.Name);
-                button.Renderer = new TexturedFrameRenderer(texture);
-
-                Technology technologyForClosure = technology;
-                button.Triggered += delegate(Button sender) { inputManager.LaunchResearch(technologyForClosure); };
-
-                buttonsArray[x, y] = button;
+                buttonsArray[x, y] = CreateButton(technology);
             }
+        }
+
+        private ActionButton CreateButton(Technology technology)
+        {
+            ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, textureManager);
+
+            button.Name = "{0}\nAladdium: {1} Alagene: {2}"
+                .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);
+
+            Texture texture = textureManager.GetTechnology(technology.Name);
+            button.Renderer = new TexturedFrameRenderer(texture);
+
+            button.Triggered += delegate(Button sender)
+            {
+                inputManager.LaunchResearch(technology);
+            };
+
+            return button;
         }
         #endregion
     }

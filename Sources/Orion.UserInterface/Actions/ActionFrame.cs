@@ -100,12 +100,14 @@ namespace Orion.UserInterface.Actions
             Children.Remove(tooltipFrame);
         }
 
-        private void Refresh()
+        public void Refresh()
         {
             Children.Clear();
             if (actionProviders.Count == 0) return;
             
             IActionProvider provider = actionProviders.Peek();
+            provider.Refresh();
+
             Rectangle templateSize = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.2f, 0.2f));
             Vector2 padding = new Vector2(Bounds.Width * 0.0375f, Bounds.Height * 0.0375f);
 
@@ -124,6 +126,18 @@ namespace Orion.UserInterface.Actions
                     origin.X += padding.X + templateSize.Width;
                 }
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // We don't actually own our children buttons so clear them
+                // so the base Dispose does not do so
+                Children.Clear();
+            }
+
+            base.Dispose(disposing);
         }
         #endregion
     }

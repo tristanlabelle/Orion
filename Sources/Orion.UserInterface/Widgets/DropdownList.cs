@@ -72,6 +72,7 @@ namespace Orion.UserInterface.Widgets
         private readonly ListFrame menu;
         private readonly DropdownListRowValueRenderer<T> renderer;
         private ColorRgba textColor = Colors.White;
+        private Func<T, string> stringConverter = (value) => value.ToString();
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
         private GenericEventHandler<Responder, MouseEventArgs> parentMouseUp;
@@ -107,6 +108,16 @@ namespace Orion.UserInterface.Widgets
         {
             get { return textColor; }
             set { textColor = value; }
+        }
+
+        public Func<T, string> StringConverter
+        {
+            get { return stringConverter; }
+            set
+            {
+                Argument.EnsureNotNull(value, "StringConverter");
+                this.stringConverter = value;
+            }
         }
 
         public T SelectedItem

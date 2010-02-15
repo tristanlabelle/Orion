@@ -5,31 +5,26 @@ using System.Text;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using IrrKlang;
 
 namespace Orion.Audio
 {
-    internal sealed class SoundGroup
+    public sealed class SoundGroup
     {
         #region Fields
         private readonly string name;
-        private readonly ReadOnlyCollection<string> filePaths;
+        private readonly ReadOnlyCollection<Sound> sounds;
         #endregion
 
         #region Constructors
-        public SoundGroup(string name)
+        internal SoundGroup(string name, IEnumerable<Sound> sounds)
         {
             Argument.EnsureNotNull(name, "name");
+            Argument.EnsureNotNull(sounds, "sounds");
 
             this.name = name;
-            this.filePaths = Directory.GetFiles("../../../Assets/Sounds/", name + ".*")
-                .Where(path => AudioContext.SupportedFormats.Contains(Path.GetExtension(path))
-                    && Regex.IsMatch(Path.GetFileNameWithoutExtension(path).Substring(name.Length), @"\A(\.\d+)?\Z"))
-                .ToList()
-                .AsReadOnly();
+            this.sounds = sounds.ToList().AsReadOnly();
         }
-        #endregion
-
-        #region Events
         #endregion
 
         #region Properties
@@ -38,31 +33,37 @@ namespace Orion.Audio
             get { return name; }
         }
 
-        public ReadOnlyCollection<string> FilePaths
+        public ReadOnlyCollection<Sound> Sounds
         {
-            get { return filePaths; }
+            get { return sounds; }
         }
 
-        public int FileCount
+        public int SoundCount
         {
-            get { return filePaths.Count; }
+            get { return sounds.Count; }
         }
 
         public bool IsEmpty
         {
-            get { return filePaths.Count == 0; }
+            get { return sounds.Count == 0; }
         }
         #endregion
 
         #region Methods
-        public string GetRandomFilePath(Random random)
+        public Sound GetRandomSound(Random random)
         {
-            return filePaths[random.Next(filePaths.Count)];
+            Argument.EnsureNotNull(random, "random");
+
+            if (sounds.Count == 0)
+                throw new InvalidOperationException("Cannot get a random sound from an empty sound group.");
+
+            int index = random.Next(sounds.Count);
+            return sounds[index];
         }
 
         public override string ToString()
         {
-            return "{0} ({1} file(s))".FormatInvariant(name, filePaths.Count);
+            return "{0} ({1} sounds(s))".FormatInvariant(name, SoundCount);
         }
         #endregion
     }

@@ -20,7 +20,7 @@ using MatchAudioRenderer = Orion.Audio.MatchRenderer;
 
 namespace Orion.UserInterface
 {
-    public class MatchUI : UIDisplay
+    public sealed class MatchUI : UIDisplay
     {
         #region Fields
         #region Chat
@@ -481,6 +481,8 @@ namespace Orion.UserInterface
 
         private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
         {
+            matchAudioRenderer.SetViewBounds(newBounds);
+
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
             worldView.FullBounds = userInputManager.LocalCommander.Faction.World.Bounds
                 .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y).ResizedBy(newBounds.Width, newBounds.Height);

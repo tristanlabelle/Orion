@@ -33,8 +33,8 @@ namespace Orion.GameLogic
         private readonly ColorRgb color;
         private readonly FogOfWar localFogOfWar;
 
-        private readonly List<Faction> factionsWeRegardAsAllies = new List<Faction>();
-        private readonly List<Faction> factionsRegardingUsAsAllies = new List<Faction>();
+        private readonly HashSet<Faction> factionsWeRegardAsAllies = new HashSet<Faction>();
+        private readonly HashSet<Faction> factionsRegardingUsAsAllies = new HashSet<Faction>();
 
         private readonly HashSet<Technology> researches = new HashSet<Technology>();
         private readonly HashSet<Technology> technologies = new HashSet<Technology>();
@@ -593,15 +593,12 @@ namespace Orion.GameLogic
         /// </summary>
         /// <param name="point">The point to be tested.</param>
         /// <returns>A value indicating if that tile has been seen.</returns>
-        /// <remarks>
-        /// Optimized for pathfinding.
-        /// </remarks>
         public bool HasSeen(Point point)
         {
             if (localFogOfWar.IsDiscovered(point)) return true;
 
-            for (int i = 0; i < factionsRegardingUsAsAllies.Count; ++i)
-                if (factionsRegardingUsAsAllies[i].localFogOfWar.IsDiscovered(point))
+            foreach (Faction faction in factionsRegardingUsAsAllies)
+                if (faction.localFogOfWar.IsDiscovered(point))
                     return true;
 
             return false;

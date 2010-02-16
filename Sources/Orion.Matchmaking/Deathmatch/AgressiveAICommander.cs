@@ -8,7 +8,7 @@ using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.GameLogic.Skills;
 
-namespace Orion.Matchmaking
+namespace Orion.Matchmaking.Deathmatch
 {
     public class AgressiveAICommander : AICommander
     {

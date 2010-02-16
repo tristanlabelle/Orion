@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Orion.Matchmaking;
+using Orion.Matchmaking.Deathmatch;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Networking;

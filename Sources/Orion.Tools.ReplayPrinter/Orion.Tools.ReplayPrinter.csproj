@@ -67,21 +67,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Orion.Commandment\Orion.Matchmaking.csproj">
+    <ProjectReference Include="..\Orion.Matchmaking\Orion.Matchmaking.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Orion.Matchmaking</Name>
     </ProjectReference>

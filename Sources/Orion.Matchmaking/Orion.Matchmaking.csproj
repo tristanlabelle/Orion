@@ -8,8 +8,8 @@
     <ProjectGuid>{84DCA135-541D-41F5-9118-C83324225E2B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Orion.Commandment</RootNamespace>
-    <AssemblyName>Orion.Commandment</AssemblyName>
+    <RootNamespace>Orion.Matchmaking</RootNamespace>
+    <AssemblyName>Orion.Matchmaking</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>Client</TargetFrameworkSubset>

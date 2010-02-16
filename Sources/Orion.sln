@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.GameLogic", "Orion.Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Core", "Orion.Core\Orion.Core.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Matchmaking", "Orion.Commandment\Orion.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Graphics", "Orion.Graphics\Orion.Graphics.csproj", "{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Main", "Orion.Main\Orion.Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
@@ -18,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Tools.ReplayPrinter", "Orion.Tools.ReplayPrinter\Orion.Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Audio", "Orion.Audio\Orion.Audio.csproj", "{957AD388-F524-456F-A5DD-B80BAB90A355}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Matchmaking", "Orion.Matchmaking\Orion.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,18 +53,6 @@ Global
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x64.Build.0 = Release|x64
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x64.ActiveCfg = Debug|x64
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x64.Build.0 = Debug|x64
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x64.ActiveCfg = Release|x64
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x64.Build.0 = Release|x64
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|x64.ActiveCfg = Debug|x64
@@ -137,13 +125,25 @@ Global
 		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|x64.Build.0 = Release|x64
 		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|x86.ActiveCfg = Release|x86
 		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|x86.Build.0 = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x64.ActiveCfg = Debug|x64
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x64.Build.0 = Debug|x64
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x64.ActiveCfg = Release|x64
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x64.Build.0 = Release|x64
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Orion.Main.csproj

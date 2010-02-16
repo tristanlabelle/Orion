@@ -148,10 +148,6 @@
       <Project>{957AD388-F524-456F-A5DD-B80BAB90A355}</Project>
       <Name>Orion.Audio</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Orion.Commandment\Orion.Matchmaking.csproj">
-      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
-      <Name>Orion.Matchmaking</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Orion.Core\Orion.Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Orion.Core</Name>
@@ -163,6 +159,10 @@
     <ProjectReference Include="..\Orion.Graphics\Orion.Graphics.csproj">
       <Project>{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}</Project>
       <Name>Orion.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orion.Matchmaking\Orion.Matchmaking.csproj">
+      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
+      <Name>Orion.Matchmaking</Name>
     </ProjectReference>
     <ProjectReference Include="..\Orion.Networking\Orion.Networking.csproj">
       <Project>{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}</Project>

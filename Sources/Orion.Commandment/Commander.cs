@@ -1,9 +1,9 @@
 using System;
 using Orion.GameLogic;
-using Orion.Commandment.Commands;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking.Commands;
+using Orion.Matchmaking.Commands.Pipeline;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Abstract base class for commanders, classes responsible of generating
@@ -75,7 +75,7 @@ namespace Orion.Commandment
         /// to flush its local pipeline.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public virtual void Update(float timeDelta) { }
+        public abstract void Update(float timeDelta);
 
         public override string ToString()
         {

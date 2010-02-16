@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using Orion.GameLogic;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// A command filter which records commands passing trough it in a replay.

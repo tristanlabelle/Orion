@@ -472,6 +472,67 @@ namespace Orion.GameLogic
         }
         #endregion
 
+        #region Spawning
+        /// <summary>
+        /// Attempts to find a point surrounding this unit where a unit of a given type could be spawned.
+        /// </summary>
+        /// <param name="spawneeType">The type of the unit to be spawned.</param>
+        /// <returns>A point where such a unit could be spawned, or null if</returns>
+        public Point? TryGetFreeSurroundingSpawnPoint(UnitType spawneeType)
+        {
+            Argument.EnsureNotNull(spawneeType, "spawneeType");
+
+            Region trainerRegion = GridRegion;
+
+            Region spawnRegion = new Region(
+                trainerRegion.MinX - spawneeType.Size.Width,
+                trainerRegion.MinY - spawneeType.Size.Height,
+                trainerRegion.Size.Width + spawneeType.Size.Width,
+                trainerRegion.Size.Height + spawneeType.Size.Height);
+            var potentialSpawnPoints = spawnRegion.InternalBorderPoints
+                .Where(point =>
+                    {
+                        Region region = new Region(point, spawneeType.Size);
+                        return new Region(World.Size).Contains(region)
+                            && World.IsFree(new Region(point, spawneeType.Size), spawneeType.CollisionLayer);
+                    });
+
+            if (HasRallyPoint)
+            {
+                return potentialSpawnPoints
+                    .Select(point => (Point?)point)
+                    .WithMinOrDefault(point => ((Vector2)point - RallyPoint.Value).LengthSquared);
+            }
+            else
+            {
+                return potentialSpawnPoints.FirstOrNull();
+            }
+        }
+
+        /// <summary>
+        /// Spawns a unit of a given type around this unit.
+        /// </summary>
+        /// <param name="spawneeType">The type of the unit to be spawned.</param>
+        public Unit TrySpawn(UnitType spawneeType)
+        {
+            Argument.EnsureNotNull(spawneeType, "spawneeType");
+
+            Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
+            if (!point.HasValue) return null;
+
+            Unit spawnee = World.Entities.CreateUnit(spawneeType, faction, point.Value);
+            Vector2 traineeDelta = spawnee.Center - Center;
+            spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+            if (HasRallyPoint)
+            {
+                MoveTask moveToRallyPointTask = new MoveTask(spawnee, (Point)RallyPoint.Value);
+                spawnee.TaskQueue.OverrideWith(moveToRallyPointTask);
+            }
+
+            return spawnee;
+        }
+        #endregion
+
         protected override void DoUpdate(SimulationStep step)
         {
             timeElapsedSinceLastHitInSeconds += step.TimeDeltaInSeconds;

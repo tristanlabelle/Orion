@@ -8,7 +8,7 @@ using Orion.GameLogic.Tasks;
 using OpenTK.Math;
 using System.Diagnostics;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     public sealed class HarvestingAICommander : SlaveCommander
     {

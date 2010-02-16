@@ -122,18 +122,9 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            Point? spawnPoint = GetSpawnPoint();
-            if (spawnPoint.HasValue)
+            Unit trainee = Unit.TrySpawn(traineeType);
+            if (trainee != null)
             {
-                Unit trainee = Unit.Faction.CreateUnit(traineeType, spawnPoint.Value);
-                Vector2 traineeDelta = trainee.Center - Unit.Center;
-                trainee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-                if (Unit.HasRallyPoint)
-                {
-                    MoveTask moveToRallyPointTask = new MoveTask(trainee, (Point)Unit.RallyPoint.Value);
-                    trainee.TaskQueue.OverrideWith(moveToRallyPointTask);
-                }
-
                 attemptingToPlaceUnit = false;
                 hasEnded = true;
             }
@@ -142,35 +133,6 @@ namespace Orion.GameLogic.Tasks
                 attemptingToPlaceUnit = true;
                 string warning = "Pas de place pour faire apparaître l'unité {0}".FormatInvariant(traineeType.Name);
                 Faction.RaiseWarning(warning);
-            }
-        }
-
-        private Point? GetSpawnPoint()
-        {
-            Region trainerRegion = Unit.GridRegion;
-
-            Region spawnRegion = new Region(
-                trainerRegion.MinX - traineeType.Size.Width,
-                trainerRegion.MinY - traineeType.Size.Height,
-                trainerRegion.Size.Width + traineeType.Size.Width,
-                trainerRegion.Size.Height + traineeType.Size.Height);
-            var potentialSpawnPoints = spawnRegion.InternalBorderPoints
-                .Where(point =>
-                    {
-                        Region region = new Region(point, traineeType.Size);
-                        return new Region(Unit.World.Size).Contains(region)
-                            && Unit.World.IsFree(new Region(point, traineeType.Size), traineeType.CollisionLayer);
-                    });
-
-            if (Unit.HasRallyPoint)
-            {
-                return potentialSpawnPoints
-                    .Select(point => (Point?)point)
-                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint.Value).LengthSquared);
-            }
-            else
-            {
-                return potentialSpawnPoints.FirstOrNull();
             }
         }
         #endregion

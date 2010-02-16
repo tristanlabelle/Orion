@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Commandment;
-using Orion.Commandment.Commands;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands;
 using System.Diagnostics;
 using Orion.GameLogic;
 using OpenTK.Math;

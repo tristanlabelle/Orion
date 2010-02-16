@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Orion.GameLogic;
 using System.Diagnostics;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// A command sink which executes the <see cref="Command"/>s which reaches it.

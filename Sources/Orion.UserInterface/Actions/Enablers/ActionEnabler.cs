@@ -6,7 +6,7 @@ using System.Text;
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Geometry;
-using Orion.Commandment;
+using Orion.Matchmaking;
 
 namespace Orion.UserInterface.Actions.Enablers
 {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Collections.ObjectModel;
-using Orion.Commandment.Commands;
+using Orion.Matchmaking.Commands;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Provides means of reading replay files.

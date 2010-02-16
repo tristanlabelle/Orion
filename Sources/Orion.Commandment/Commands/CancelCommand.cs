@@ -6,7 +6,7 @@ using System.Linq;
 
 using Orion.GameLogic;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which cancels the current <see cref="Task"/> of a set of <see cref="Unit"/>s.

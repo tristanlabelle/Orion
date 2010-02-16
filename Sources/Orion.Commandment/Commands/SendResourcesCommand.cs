@@ -5,7 +5,7 @@ using System.Text;
 using Orion.GameLogic;
 using System.IO;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes resources to be given to another <see cref="Faction"/>.

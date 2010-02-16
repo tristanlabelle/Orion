@@ -7,7 +7,7 @@ using Orion.GameLogic;
 
 using OpenTK.Math;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// A command filter which executes cheat codes if messages match them.

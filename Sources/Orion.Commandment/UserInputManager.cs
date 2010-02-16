@@ -8,7 +8,7 @@ using Orion.GameLogic.Technologies;
 using Orion.Geometry;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     public class UserInputManager
     {

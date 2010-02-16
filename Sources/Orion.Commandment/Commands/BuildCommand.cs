@@ -10,7 +10,7 @@ using Orion.GameLogic.Tasks;
 using BuildTask = Orion.GameLogic.Tasks.BuildTask;
 using ExtractAlageneSkill = Orion.GameLogic.Skills.ExtractAlageneSkill;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes a <see cref="Unit"/>

@@ -7,7 +7,7 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using ZoneAttackTask = Orion.GameLogic.Tasks.ZoneAttackTask;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s

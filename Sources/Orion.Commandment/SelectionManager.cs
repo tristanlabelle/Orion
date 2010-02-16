@@ -6,7 +6,7 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.Geometry;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.

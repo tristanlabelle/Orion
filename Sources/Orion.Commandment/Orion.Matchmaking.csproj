@@ -117,6 +117,7 @@
     <Compile Include="SlaveCommander.cs" />
     <Compile Include="Commands\Pipeline\CommandFilter.cs" />
     <Compile Include="Commands\Pipeline\CommandExecutor.cs" />
+    <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />
   </ItemGroup>

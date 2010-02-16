@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Orion.GameLogic;
-using Orion.Commandment;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands.Pipeline;
 using Orion.UserInterface;
 
 namespace Orion.Main

@@ -7,7 +7,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using System.IO;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     public sealed class EmbarkCommand : Command, IMultipleExecutingEntitiesCommand
     {

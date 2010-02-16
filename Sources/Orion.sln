@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.GameLogic", "Orion.Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Core", "Orion.Core\Orion.Core.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Commandment", "Orion.Commandment\Orion.Commandment.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Matchmaking", "Orion.Commandment\Orion.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orion.Graphics", "Orion.Graphics\Orion.Graphics.csproj", "{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}"
 EndProject
@@ -142,8 +142,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_Active = 0
 		CodeStyleEnforcer_RulesLocation = 
+		CodeStyleEnforcer_Active = 0
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Orion.Main.csproj

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using Orion.UserInterface.Widgets;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.Geometry;
 using Orion.Graphics;
 

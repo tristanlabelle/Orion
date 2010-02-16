@@ -3,7 +3,7 @@ using System.Text;
 using System;
 using Orion.GameLogic;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// Encapsulates the process by which commands go from their source to their destination.

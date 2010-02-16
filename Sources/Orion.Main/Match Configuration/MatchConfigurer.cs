@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Orion.Commandment;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.UserInterface;
 

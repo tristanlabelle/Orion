@@ -6,7 +6,7 @@ using System.Text;
 using Orion.GameLogic;
 using System.IO;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.

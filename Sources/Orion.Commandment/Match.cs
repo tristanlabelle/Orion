@@ -1,12 +1,12 @@
 using System;
 using OpenTK.Math;
-using Orion.Commandment;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Represents a match that is played between a number of commanders in a world.

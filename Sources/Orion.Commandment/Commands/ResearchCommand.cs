@@ -8,7 +8,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 using Orion.GameLogic.Tasks;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     public sealed class ResearchCommand : Command
     {

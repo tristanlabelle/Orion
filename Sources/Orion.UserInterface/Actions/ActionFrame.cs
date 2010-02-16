@@ -5,7 +5,7 @@ using System.Text;
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.UserInterface.Widgets;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Keys = System.Windows.Forms.Keys;
 using Orion.Graphics;
 

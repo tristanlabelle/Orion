@@ -5,7 +5,7 @@ using System.Text;
 using Orion.GameLogic;
 using System.Net;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     public abstract class PlayerSlot
     {

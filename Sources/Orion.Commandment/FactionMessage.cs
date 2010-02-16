@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Orion.GameLogic;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Encapsulates a message sent by a faction.

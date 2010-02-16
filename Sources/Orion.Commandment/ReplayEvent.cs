@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Commandment.Commands;
+using Orion.Matchmaking.Commands;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Encapsulates a command and its location in time.

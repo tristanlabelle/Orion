@@ -6,7 +6,7 @@ using Keys = System.Windows.Forms.Keys;
 
 using Orion.Graphics;
 using Orion.Geometry;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.UserInterface.Widgets;
 using Orion.UserInterface.Actions.Enablers;
 

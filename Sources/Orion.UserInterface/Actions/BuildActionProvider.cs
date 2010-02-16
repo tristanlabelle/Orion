@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.GameLogic.Skills;

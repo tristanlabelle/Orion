@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;

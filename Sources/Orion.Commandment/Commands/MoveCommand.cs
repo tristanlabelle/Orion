@@ -7,7 +7,7 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using MoveTask = Orion.GameLogic.Tasks.MoveTask;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which assigns to a set of <see cref="Unit"/>s the

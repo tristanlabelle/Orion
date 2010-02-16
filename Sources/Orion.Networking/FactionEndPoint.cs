@@ -5,8 +5,8 @@ using System.Text;
 using System.IO;
 
 using Orion.GameLogic;
-using Orion.Commandment;
-using Orion.Commandment.Commands;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands;
 using System.Diagnostics;
 
 namespace Orion.Networking

@@ -5,7 +5,7 @@ using System.Text;
 
 using Orion.GameLogic;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     public interface IMultipleExecutingEntitiesCommand
     {

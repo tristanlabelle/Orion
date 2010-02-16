@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 using Orion.GameLogic;
-using Orion.Commandment;
-using Orion.Commandment.Commands;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands;
+using Orion.Matchmaking.Commands.Pipeline;
 using System.Diagnostics;
 
 namespace Orion.Networking

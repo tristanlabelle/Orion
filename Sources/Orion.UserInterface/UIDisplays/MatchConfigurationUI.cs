@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using Orion.Geometry;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.UserInterface.Widgets;
 using Orion.GameLogic;
 using Orion.Graphics;

@@ -7,7 +7,7 @@ using OpenTK.Math;
 using System.IO;
 using System.Collections.ObjectModel;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the rally point of a <see cref="Unit"/> to be changed to a new value.

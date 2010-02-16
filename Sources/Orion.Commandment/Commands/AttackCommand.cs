@@ -6,7 +6,7 @@ using System.Linq;
 using Orion.GameLogic;
 using AttackTask = Orion.GameLogic.Tasks.AttackTask;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s

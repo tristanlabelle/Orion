@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using Orion.GameLogic;
 using System.IO;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     public sealed class DisembarkCommand : Command, IMultipleExecutingEntitiesCommand
     {

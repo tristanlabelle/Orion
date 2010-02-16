@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Commandment;
+using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.Graphics;

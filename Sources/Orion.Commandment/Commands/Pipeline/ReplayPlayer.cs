@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// A command filter which injects commands read from a replay file.

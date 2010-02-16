@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Commandment.Commands;
-using Orion.Commandment.Commands.Pipeline;
+using Orion.Matchmaking.Commands;
+using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using Keys = System.Windows.Forms.Keys;
 using Orion.GameLogic.Technologies;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// A behaviorless commander which offers a public interface to create commands.
@@ -153,6 +153,8 @@ namespace Orion.Commandment
             else
                 GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
+
+        public override void Update(float timeDelta) { }
         #endregion
     }
 }

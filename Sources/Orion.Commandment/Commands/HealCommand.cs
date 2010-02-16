@@ -6,7 +6,7 @@ using System.Linq;
 using Orion.GameLogic;
 using HealTask = Orion.GameLogic.Tasks.HealTask;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     public sealed class HealCommand : Command, IMultipleExecutingEntitiesCommand
     {

@@ -6,7 +6,7 @@ using Orion.GameLogic;
 using HarvestTask = Orion.GameLogic.Tasks.HarvestTask;
 using System.Collections.ObjectModel;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>

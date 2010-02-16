@@ -6,7 +6,7 @@ using Orion.GameLogic;
 using System.Diagnostics;
 using System.IO;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes a <see cref="Faction"/> to change its

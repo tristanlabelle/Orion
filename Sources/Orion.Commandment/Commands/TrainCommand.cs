@@ -7,7 +7,7 @@ using System.Linq;
 using Orion.GameLogic;
 using TrainTask = Orion.GameLogic.Tasks.TrainTask;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="TrainTask"/> task

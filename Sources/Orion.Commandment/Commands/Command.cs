@@ -7,7 +7,7 @@ using Orion.GameLogic;
 using System.IO;
 using System.Diagnostics;
 
-namespace Orion.Commandment.Commands
+namespace Orion.Matchmaking.Commands
 {
     /// <summary>
     /// Abstract base class for commands, the atomic unit of game state change

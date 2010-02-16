@@ -81,9 +81,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Orion.Commandment\Orion.Commandment.csproj">
+    <ProjectReference Include="..\Orion.Commandment\Orion.Matchmaking.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
-      <Name>Orion.Commandment</Name>
+      <Name>Orion.Matchmaking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

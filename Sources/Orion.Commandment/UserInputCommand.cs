@@ -2,7 +2,7 @@ using System;
 using OpenTK.Math;
 using Orion.GameLogic;
 
-namespace Orion.Commandment
+namespace Orion.Matchmaking
 {
     /// <summary>
     /// Represents a tool which handles the left click to

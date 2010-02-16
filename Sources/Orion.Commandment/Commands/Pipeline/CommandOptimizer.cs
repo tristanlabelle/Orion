@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.GameLogic;
 
-namespace Orion.Commandment.Commands.Pipeline
+namespace Orion.Matchmaking.Commands.Pipeline
 {
     public class CommandOptimizer : CommandFilter
     {

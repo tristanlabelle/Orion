@@ -255,11 +255,16 @@ namespace Orion.GameLogic
 
         public void Reveal(Point point)
         {
-            RevealWithoutRaisingEvent(point.X, point.Y);
+            RevealWithoutRaisingEvent(point);
             OnChanged(new Region(point, new Size(1, 1)));
         }
 
-        private void RevealWithoutRaisingEvent(int x, int y)
+        public void RevealWithoutRaisingEvent(Point point)
+        {
+            RevealWithoutRaisingEvent(point.X, point.Y);
+        }
+
+        public void RevealWithoutRaisingEvent(int x, int y)
         {
             if (tiles[x, y] == ushort.MaxValue)
                 tiles[x, y] = 0;

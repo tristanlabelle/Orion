@@ -620,7 +620,7 @@ namespace Orion.GameLogic
         {
             foreach (Point point in region.Points)
                 if (other.GetTileVisibility(point) != TileVisibility.Undiscovered)
-                    localFogOfWar.Reveal(point);
+                    localFogOfWar.RevealWithoutRaisingEvent(point);
         }
         #endregion
 

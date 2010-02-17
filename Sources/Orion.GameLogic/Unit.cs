@@ -520,7 +520,7 @@ namespace Orion.GameLogic
             Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
             if (!point.HasValue) return null;
 
-            Unit spawnee = World.Entities.CreateUnit(spawneeType, faction, point.Value);
+            Unit spawnee = faction.CreateUnit(spawneeType, point.Value);
             Vector2 traineeDelta = spawnee.Center - Center;
             spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
             if (HasRallyPoint)

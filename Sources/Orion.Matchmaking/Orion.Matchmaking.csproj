@@ -44,6 +44,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttackMonitor.cs" />
     <Compile Include="Deathmatch\AgressiveAICommander.cs" />
     <Compile Include="AICommander.cs" />
     <Compile Include="Commands\DisembarkCommand.cs" />

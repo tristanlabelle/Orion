@@ -7,36 +7,37 @@ using System.Diagnostics;
 using OpenTK.Math;
 using Orion.Geometry;
 using System.Drawing;
+using Orion.Matchmaking;
 
 namespace Orion.Graphics.Renderers
 {
-    public struct AttackWarning
-    {
-        #region Fields
-        public readonly float SpawnTime;
-        public readonly Vector2 Position;
-        #endregion
-
-        #region Constructors
-        public AttackWarning(float spawnTime, Vector2 position)
-        {
-            this.SpawnTime = spawnTime;
-            this.Position = position;
-        }
-        #endregion
-    }
-
     public sealed class AttackWarningRenderer : IRenderer
     {
+        #region AttackWarning
+        private struct AttackWarning
+        {
+            #region Fields
+            public readonly float SpawnTime;
+            public readonly Vector2 Position;
+            #endregion
+
+            #region Constructors
+            public AttackWarning(float spawnTime, Vector2 position)
+            {
+                this.SpawnTime = spawnTime;
+                this.Position = position;
+            }
+            #endregion
+        }
+        #endregion
+
         #region Fields
-        private const float warningCollisionRadius = 10;
         private const float warningCircleRadius = 16;
         private const int warningCircleCount = 3;
         private const float warningCircleDuration = 0.3f;
-        private const float warningLifeSpan = 8;
         private static readonly ColorRgb warningCircleColor = Colors.Red;
 
-        private readonly Faction faction;
+        private readonly AttackMonitor monitor;
         private readonly List<AttackWarning> warnings = new List<AttackWarning>();
         private float time;
         #endregion
@@ -45,9 +46,10 @@ namespace Orion.Graphics.Renderers
         public AttackWarningRenderer(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            this.faction = faction;
-            this.faction.World.UnitHitting += OnWorldUnitHit;
-            this.faction.World.Updated += OnWorldUpdated;
+
+            this.monitor = new AttackMonitor(faction);
+            this.monitor.Warning += OnWarning;
+            faction.World.Updated += OnWorldUpdated;
         }
         #endregion
 
@@ -56,49 +58,34 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(context, "context");
 
-            foreach (AttackWarning warning in warnings)
+            for (int i = warnings.Count - 1; i >= 0; --i)
             {
+                AttackWarning warning = warnings[i];
+
                 float age = time - warning.SpawnTime;
-                if (age >= warningCircleCount * warningCircleDuration) continue;
-                float radius = (age % warningCircleDuration) / warningCircleDuration * warningCircleRadius;
-                Circle circle = new Circle(warning.Position, radius);
-                context.StrokeColor = warningCircleColor;
-                context.Stroke(circle);
+                if (age < warningCircleCount * warningCircleDuration)
+                {
+                    float radius = (age % warningCircleDuration) / warningCircleDuration * warningCircleRadius;
+                    Circle circle = new Circle(warning.Position, radius);
+                    context.StrokeColor = warningCircleColor;
+                    context.Stroke(circle);
+                }
+                else
+                {
+                    warnings.RemoveAt(i);
+                }
             }
         }
 
-        private void Update(SimulationStep step)
+        private void OnWarning(AttackMonitor sender, Vector2 position)
         {
-            time = step.TimeInSeconds;
-            warnings.RemoveAll(warning => (step.TimeInSeconds - warning.SpawnTime) > warningLifeSpan);
-        }
-
-        private void AddWarning(Vector2 position)
-        {
-            if (warnings.Any(w => (w.Position - position).LengthFast < warningCollisionRadius))
-                return;
-
             AttackWarning warning = new AttackWarning(time, position);
             warnings.Add(warning);
         }
 
-        private void OnWorldUnitHit(World sender, HitEventArgs args)
-        {
-            Debug.Assert(sender == faction.World);
-            Debug.Assert(args.Hitter != null);
-            Debug.Assert(args.Target != null);
-
-            if (args.Hitter.Faction == faction) return;
-            if (args.Target.Faction != faction) return;
-
-            AddWarning(args.Target.Center);
-        }
-
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            Debug.Assert(sender == faction.World);
-
-            Update(step);
+            time = step.TimeInSeconds;
         }
         #endregion
     }

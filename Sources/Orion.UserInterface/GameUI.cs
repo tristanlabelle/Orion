@@ -1,8 +1,5 @@
 using System;
 using System.Diagnostics;
-
-
-
 namespace Orion.UserInterface
 {
     /// <summary>
@@ -29,6 +26,11 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
+        public Window Window
+        {
+            get { return mainWindow; }
+        }
+
         /// <summary>
         /// Gets a value indicating if the window is still created.
         /// </summary>

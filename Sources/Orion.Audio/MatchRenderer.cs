@@ -18,6 +18,10 @@ namespace Orion.Audio
         private readonly Match match;
         private readonly UserInputManager userInputManager;
         private readonly SoundSource voicesSoundSource;
+        private readonly AttackMonitor attackMonitor;
+        /// <summary>
+        /// Reused between calls to minimize object garbage.
+        /// </summary>
         private readonly StringBuilder stringBuilder = new StringBuilder();
         #endregion
 
@@ -33,6 +37,10 @@ namespace Orion.Audio
             this.userInputManager = userInputManager;
 
             this.voicesSoundSource = audioContext.CreateSource();
+            this.voicesSoundSource.Volume = 0.8f;
+
+            this.attackMonitor = new AttackMonitor(userInputManager.LocalCommander.Faction);
+            this.attackMonitor.Warning += OnAttackWarning;
 
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
@@ -55,6 +63,11 @@ namespace Orion.Audio
         private Faction LocalFaction
         {
             get { return userInputManager.LocalFaction; }
+        }
+
+        private World World
+        {
+            get { return LocalFaction.World; }
         }
 
         private UnitType SelectedUnitType
@@ -141,6 +154,20 @@ namespace Orion.Audio
             if (sound == null) return;
 
             audioContext.PlayAndForget(sound, args.Hitter.Center);
+        }
+
+        private void OnAttackWarning(AttackMonitor sender, Vector2 position)
+        {
+            bool isNearBase = World.Entities
+                .Intersecting(new Circle(position, 6))
+                .OfType<Unit>()
+                .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
+
+            string soundGroup = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
+            Sound sound = audioContext.GetRandomSoundFromGroup(soundGroup);
+            if (sound == null) return;
+
+            audioContext.PlayAndForget(sound, position);
         }
         #endregion
     }

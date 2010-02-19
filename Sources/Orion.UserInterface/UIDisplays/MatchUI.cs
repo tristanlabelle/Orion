@@ -702,6 +702,8 @@ namespace Orion.UserInterface
             Rectangle listFrameRectangle = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
             ListFrame listFrame = new ListFrame(listFrameRectangle,new Vector2(0,0));
             Rectangle rectangleFrame = new Rectangle(listFrame.Bounds.Width, listFrame.Bounds.Height/10);
+
+            assocFactionDropList.Clear();
             foreach (Faction faction in World.Factions)
             {
                 if (faction == LocalFaction) continue;

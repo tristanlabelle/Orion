@@ -44,6 +44,7 @@ namespace Orion.Audio
 
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
+            this.match.World.ExplosionOccured += OnExplosionOccured;
             this.userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
             this.userInputManager.LocalCommander.CommandGenerated += OnCommandGenerated;
         }
@@ -167,7 +168,15 @@ namespace Orion.Audio
             Sound sound = audioContext.GetRandomSoundFromGroup(soundGroup);
             if (sound == null) return;
 
-            audioContext.PlayAndForget(sound, position);
+            audioContext.PlayAndForget(sound, null);
+        }
+
+        private void OnExplosionOccured(World sender, Circle args)
+        {
+            Sound sound = audioContext.GetRandomSoundFromGroup("Explosion");
+            if (sound == null) return;
+
+            audioContext.PlayAndForget(sound, null);
         }
         #endregion
     }

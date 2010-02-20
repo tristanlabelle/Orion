@@ -43,7 +43,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Orion.Matchmaking\Orion.Matchmaking.csproj">
+    <ProjectReference Include="..\Orion.Matchmaking\Matchmaking.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Orion.Matchmaking</Name>
     </ProjectReference>

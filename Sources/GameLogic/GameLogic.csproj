@@ -137,7 +137,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Orion.Core\Core.csproj">
+    <ProjectReference Include="..\Core\Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Orion.Core</Name>
     </ProjectReference>

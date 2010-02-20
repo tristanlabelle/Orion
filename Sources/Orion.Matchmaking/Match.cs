@@ -21,6 +21,8 @@ namespace Orion.Matchmaking
         private readonly Random random;
         private readonly World world;
         private SimulationStep lastSimulationStep;
+        private bool isPausable;
+        private bool isRunning;
         #endregion
 
         #region Constructors
@@ -85,9 +87,16 @@ namespace Orion.Matchmaking
             get { return world; }
         }
 
-        public bool IsPausable { get; set; }
+        public bool IsPausable
+        {
+            get { return isPausable; }
+            set { isPausable = value; }
+        }
 
-        public bool IsRunning { get; private set; }
+        public bool IsRunning
+        {
+            get { return isRunning; }
+        }
 
         /// <summary>
         /// Gets the number of the last simulation step that was run.
@@ -109,7 +118,7 @@ namespace Orion.Matchmaking
         #region Methods
         public void Start()
         {
-            IsRunning = true;
+            isRunning = true;
 
             CreateFactionCamps();
             CreateResourceNodes();
@@ -172,12 +181,12 @@ namespace Orion.Matchmaking
         #region Pause/Resume/Quit
         public void Pause()
         {
-            IsRunning = false;
+            isRunning = false;
         }
 
         public void Resume()
         {
-            IsRunning = true;
+            isRunning = true;
         }
 
         public void Quit()

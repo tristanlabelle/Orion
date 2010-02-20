@@ -58,6 +58,9 @@ namespace Orion.Graphics
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in SelectionManager.SelectedUnits)
             {
+                if (!SelectionManager.LocalFaction.CanSee(unit))
+                    continue;
+
                 graphics.Stroke(unit.BoundingRectangle);
 
                 if (unit.Faction == Faction && unit.HasRallyPoint)

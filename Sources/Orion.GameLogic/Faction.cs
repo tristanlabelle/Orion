@@ -569,6 +569,11 @@ namespace Orion.GameLogic
         public bool CanSee(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
+
+            // Early out for units of our faction, which we can always see.
+            Unit unit = entity as Unit;
+            if (unit != null && unit.Faction == this) return true;
+
             return CanSee(entity.GridRegion);
         }
 

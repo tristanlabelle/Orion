@@ -53,6 +53,14 @@ namespace Orion.Matchmaking
 
         #region Properties
         /// <summary>
+        /// Gets the local faction towards which this <see cref="SelectionManager"/> has a bias.
+        /// </summary>
+        public Faction LocalFaction
+        {
+            get { return faction; }
+        }
+
+        /// <summary>
         /// Gets the sequence of units currently selected.
         /// </summary>
         public IEnumerable<Unit> SelectedUnits

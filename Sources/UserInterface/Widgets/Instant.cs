@@ -69,14 +69,14 @@ namespace Orion.UserInterface.Widgets
             Button okButton = new Button(okButtonRect, "Ok");
             Button cancelButton = new Button(cancelButtonRect, "Cancel");
 
-            GenericEventHandler<Responder> accept = delegate(Responder sender)
+            Action<Responder> accept = delegate(Responder sender)
             {
                 onClose(input.Contents);
                 container.Dispose();
             };
 
-            okButton.Triggered += new GenericEventHandler<Button>(accept);
-            input.Triggered += new GenericEventHandler<TextField>(accept);
+            okButton.Triggered += new Action<Button>(accept);
+            input.Triggered += new Action<TextField>(accept);
 
             cancelButton.Triggered += delegate(Button sender)
             {

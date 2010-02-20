@@ -35,7 +35,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<int, PlayerSlot> SlotChanged;
+        public event Action<int, PlayerSlot> SlotChanged;
         #endregion
 
         #region Methods
@@ -68,7 +68,7 @@ namespace Orion.UserInterface
 
         private void SelectionChanged(DropdownList<PlayerSlot> sender, PlayerSlot newValue)
         {
-            GenericEventHandler<int, PlayerSlot> handler = SlotChanged;
+            Action<int, PlayerSlot> handler = SlotChanged;
             if(handler != null)
                 handler(Array.IndexOf(playerSlots, sender), newValue);
         }

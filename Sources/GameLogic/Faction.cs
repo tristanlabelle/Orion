@@ -39,9 +39,9 @@ namespace Orion.GameLogic
         private readonly HashSet<Technology> researches = new HashSet<Technology>();
         private readonly HashSet<Technology> technologies = new HashSet<Technology>();
 
-        private readonly GenericEventHandler<FogOfWar, Region> fogOfWarChangedEventHandler;
+        private readonly Action<FogOfWar, Region> fogOfWarChangedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
-        private readonly GenericEventHandler<Unit> buildingConstructionCompleted;
+        private readonly Action<Unit> buildingConstructionCompleted;
 
         private int aladdiumAmount;
         private int alageneAmount;
@@ -82,7 +82,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Faction"/> gets defeated.
         /// </summary>
-        public event GenericEventHandler<Faction> Defeated;
+        public event Action<Faction> Defeated;
 
         private void RaiseDefeated()
         {
@@ -93,7 +93,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when the area of the world that is visible by this faction changes.
         /// </summary>
-        public event GenericEventHandler<Faction, Region> VisibilityChanged;
+        public event Action<Faction, Region> VisibilityChanged;
 
         private void RaiseVisibilityChanged(Region region)
         {
@@ -104,7 +104,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when a new <see cref="Technology"/> has been researched.
         /// </summary>
-        public event GenericEventHandler<Faction, Technology> TechnologyResearched;
+        public event Action<Faction, Technology> TechnologyResearched;
 
         private void RaiseTechnologyResearched(Technology technology)
         {
@@ -112,7 +112,7 @@ namespace Orion.GameLogic
             if (handler != null) handler(this, technology);
         }
 
-        public event GenericEventHandler<Faction, string> Warning;
+        public event Action<Faction, string> Warning;
 
         private void RaiseWarning(string message, Faction source)
         {

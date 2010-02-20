@@ -37,14 +37,14 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<ViewContainer, ViewContainer> AddedToParent;
-        public event GenericEventHandler<ViewContainer, ViewContainer> RemovedFromParent;
-        public event GenericEventHandler<ViewContainer, ViewContainer> ChildAdded;
-        public event GenericEventHandler<ViewContainer, ViewContainer> ChildRemoved;
-        public event GenericEventHandler<ViewContainer, ViewContainer> AncestryChanged;
-        public event GenericEventHandler<ViewContainer> Disposed;
+        public event Action<ViewContainer, ViewContainer> AddedToParent;
+        public event Action<ViewContainer, ViewContainer> RemovedFromParent;
+        public event Action<ViewContainer, ViewContainer> ChildAdded;
+        public event Action<ViewContainer, ViewContainer> ChildRemoved;
+        public event Action<ViewContainer, ViewContainer> AncestryChanged;
+        public event Action<ViewContainer> Disposed;
 
-        private void RaiseEvent(GenericEventHandler<ViewContainer, ViewContainer> eventHandler, ViewContainer arg)
+        private void RaiseEvent(Action<ViewContainer, ViewContainer> eventHandler, ViewContainer arg)
         {
             EnsureNotDisposed();
             if (eventHandler != null) eventHandler(this, arg);

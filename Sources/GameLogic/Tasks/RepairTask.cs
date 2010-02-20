@@ -15,7 +15,7 @@ namespace Orion.GameLogic.Tasks
         private const float repairSpeedRatio = 0.25f;
 
         private readonly Unit target;
-        private readonly GenericEventHandler<Entity> targetDiedEventHandler;
+        private readonly Action<Entity> targetDiedEventHandler;
         private readonly MoveTask move;
         private readonly bool building;
         private bool hasEnded;

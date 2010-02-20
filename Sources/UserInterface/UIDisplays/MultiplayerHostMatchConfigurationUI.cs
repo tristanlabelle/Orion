@@ -18,8 +18,8 @@ namespace Orion.UserInterface
 
         #region Events
 
-        public event GenericEventHandler<int, PlayerSlot> SlotOccupationChanged;
-        public event GenericEventHandler<IPv4EndPoint> KickedPlayer;
+        public event Action<int, PlayerSlot> SlotOccupationChanged;
+        public event Action<IPv4EndPoint> KickedPlayer;
 
         #endregion
 
@@ -46,11 +46,11 @@ namespace Orion.UserInterface
             RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
             if (remoteSlot.RemoteHost.HasValue)
             {
-                GenericEventHandler<IPv4EndPoint> kickHandler = KickedPlayer;
+                Action<IPv4EndPoint> kickHandler = KickedPlayer;
                 if (kickHandler != null) kickHandler(remoteSlot.RemoteHost.Value);
                 remoteSlot.RemoteHost = null;
             }
-            GenericEventHandler<int, PlayerSlot> handler = SlotOccupationChanged;
+            Action<int, PlayerSlot> handler = SlotOccupationChanged;
             if (handler != null) handler(playerSlots.IndexOf(slot), value);
         }
 

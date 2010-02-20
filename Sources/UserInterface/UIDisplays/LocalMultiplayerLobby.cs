@@ -18,8 +18,8 @@ namespace Orion.UserInterface
         private static readonly byte[] explorePacket = new byte[] { (byte)SetupMessageType.Explore };
         private const int repollAfterFrames = 250;
 
-        private readonly GenericEventHandler<SafeTransporter, NetworkEventArgs> receptionDelegate;
-        private readonly GenericEventHandler<SafeTransporter, IPv4EndPoint> timeoutDelegate;
+        private readonly Action<SafeTransporter, NetworkEventArgs> receptionDelegate;
+        private readonly Action<SafeTransporter, IPv4EndPoint> timeoutDelegate;
         private readonly Dictionary<IPv4EndPoint, Button> hostedGames = new Dictionary<IPv4EndPoint, Button>();
         private readonly int port;
         private SafeTransporter transporter;
@@ -66,8 +66,8 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<LocalMultiplayerLobby> HostedGame;
-        public event GenericEventHandler<LocalMultiplayerLobby, IPv4EndPoint> JoinedGame;
+        public event Action<LocalMultiplayerLobby> HostedGame;
+        public event Action<LocalMultiplayerLobby, IPv4EndPoint> JoinedGame;
         #endregion
 
         #region Methods
@@ -169,7 +169,7 @@ namespace Orion.UserInterface
 
         private void JoinGame(IPv4EndPoint host)
         {
-            GenericEventHandler<LocalMultiplayerLobby, IPv4EndPoint> handler = JoinedGame;
+            Action<LocalMultiplayerLobby, IPv4EndPoint> handler = JoinedGame;
             if (handler != null)
             {
                 handler(this, host);
@@ -184,7 +184,7 @@ namespace Orion.UserInterface
 
         private void PressHostGame(Button sender)
         {
-            GenericEventHandler<LocalMultiplayerLobby> handler = HostedGame;
+            Action<LocalMultiplayerLobby> handler = HostedGame;
             if (handler != null && !requestedJoin.HasValue) handler(this);
         }
 

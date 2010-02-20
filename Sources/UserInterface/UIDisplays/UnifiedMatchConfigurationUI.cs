@@ -49,8 +49,8 @@ namespace Orion.UserInterface.UIDisplays
             #endregion
 
             #region Events
-            public event GenericEventHandler<PlayerRow, ColorRgb> SelectedColorChanged;
-            public event GenericEventHandler<PlayerRow> RowSuppressed;
+            public event Action<PlayerRow, ColorRgb> SelectedColorChanged;
+            public event Action<PlayerRow> RowSuppressed;
             #endregion
 
             #region Properties

@@ -30,7 +30,7 @@ namespace Orion.UserInterface.Widgets
         /// <summary>
         /// Triggered when the Return key is pressed.
         /// </summary>
-        public event GenericEventHandler<TextField> Triggered;
+        public event Action<TextField> Triggered;
         #endregion
 
         #region Properties
@@ -57,7 +57,7 @@ namespace Orion.UserInterface.Widgets
             }
             else if (arg == '\r')
             {
-                GenericEventHandler<TextField> handler = Triggered;
+                Action<TextField> handler = Triggered;
                 if (handler != null) handler(this);
             }
             else Contents += arg;

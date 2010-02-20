@@ -18,8 +18,8 @@ namespace Orion.UserInterface
         #region Fields
         private static readonly Size minSize = new Size(50, 50);
 
-        private GenericEventHandler<Button> exitPanel;
-        private GenericEventHandler<Button> startGame;
+        private Action<Button> exitPanel;
+        private Action<Button> startGame;
         private Size size = new Size(150, 150);
         private readonly Label sizeField;
         protected readonly Button sizeChangeButton;
@@ -70,9 +70,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<MatchConfigurationUI> PressedStartGame;
-        public event GenericEventHandler<MatchConfigurationUI> PressedExit;
-        public event GenericEventHandler<MatchConfigurationUI, Size> SizeChanged;
+        public event Action<MatchConfigurationUI> PressedStartGame;
+        public event Action<MatchConfigurationUI> PressedExit;
+        public event Action<MatchConfigurationUI, Size> SizeChanged;
         #endregion
 
         #region Properties
@@ -129,14 +129,14 @@ namespace Orion.UserInterface
 
         protected virtual void OnPressedExit(Button button)
         {
-            GenericEventHandler<MatchConfigurationUI> handler = PressedExit;
+            Action<MatchConfigurationUI> handler = PressedExit;
             if (handler != null) handler(this);
             Parent.PopDisplay(this);
         }
 
         protected virtual void OnPressedStartGame(Button button)
         {
-            GenericEventHandler<MatchConfigurationUI> handler = PressedStartGame;
+            Action<MatchConfigurationUI> handler = PressedStartGame;
             if (handler != null) handler(this);
         }
 

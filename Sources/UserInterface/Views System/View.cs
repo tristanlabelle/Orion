@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.Graphics;
@@ -20,8 +20,8 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<View, Rectangle> BoundsChanged;
-        public event GenericEventHandler<View, Rectangle> FrameChanged;
+        public event Action<View, Rectangle> BoundsChanged;
+        public event Action<View, Rectangle> FrameChanged;
         #endregion
 
         #region Properties
@@ -43,7 +43,7 @@ namespace Orion.UserInterface
                     Vector2 position = MousePosition.Value;
                     PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position.X, position.Y, MouseButton.None, 0, 0));
                 }
-                GenericEventHandler<View, Rectangle> boundsEvent = BoundsChanged;
+                Action<View, Rectangle> boundsEvent = BoundsChanged;
                 if (boundsEvent != null) boundsEvent(this, previousBounds);
             }
         }
@@ -55,7 +55,7 @@ namespace Orion.UserInterface
             {
                 Rectangle previousFrame = base.Frame;
                 base.Frame = value;
-                GenericEventHandler<View, Rectangle> frameEvent = FrameChanged;
+                Action<View, Rectangle> frameEvent = FrameChanged;
                 if (frameEvent != null) frameEvent(this, previousFrame);
             }
         }

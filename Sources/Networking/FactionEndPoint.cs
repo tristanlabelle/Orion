@@ -16,8 +16,8 @@ namespace Orion.Networking
         #region Fields
         private readonly byte[] doneMessage;
 
-        private GenericEventHandler<SafeTransporter, NetworkEventArgs> receive;
-        private GenericEventHandler<SafeTransporter, IPv4EndPoint> timeout;
+        private Action<SafeTransporter, NetworkEventArgs> receive;
+        private Action<SafeTransporter, IPv4EndPoint> timeout;
         private readonly SafeTransporter transporter;
 
         private readonly Dictionary<int, List<Command>> availableCommands = new Dictionary<int, List<Command>>();

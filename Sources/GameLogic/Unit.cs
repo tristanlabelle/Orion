@@ -72,7 +72,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
         /// </summary>
-        public event GenericEventHandler<Unit> DamageChanged;
+        public event Action<Unit> DamageChanged;
 
         private void RaiseDamageChanged()
         {
@@ -83,7 +83,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when the construction of this <see cref="Unit"/> is completed.
         /// </summary>
-        public event GenericEventHandler<Unit> ConstructionCompleted;
+        public event Action<Unit> ConstructionCompleted;
 
         private void RaiseConstructionCompleted()
         {
@@ -94,7 +94,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Unit"/> hits another <see cref="Unit"/>.
         /// </summary>
-        public event GenericEventHandler<Unit, HitEventArgs> Hitting;
+        public event Action<Unit, HitEventArgs> Hitting;
 
         private void RaiseHitting(Unit target, float damage)
         {

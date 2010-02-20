@@ -34,7 +34,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this <see cref="Entity"/> dies.
         /// </summary>
-        public event GenericEventHandler<Entity> Died;
+        public event Action<Entity> Died;
 
         private void RaiseDied()
         {

@@ -54,7 +54,7 @@ namespace Orion.Matchmaking
         /// <summary>
         /// Raised when the faction is under attack.
         /// </summary>
-        public event GenericEventHandler<AttackMonitor, Vector2> Warning;
+        public event Action<AttackMonitor, Vector2> Warning;
         #endregion
 
         #region Properties

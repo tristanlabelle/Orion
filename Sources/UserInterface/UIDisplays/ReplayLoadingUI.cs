@@ -38,7 +38,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<ReplayLoadingUI, string> PressedStartReplay;
+        public event Action<ReplayLoadingUI, string> PressedStartReplay;
         #endregion
 
         #region Methods

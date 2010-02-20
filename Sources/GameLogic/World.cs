@@ -47,7 +47,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised after this <see cref="World"/> has been updated.
         /// </summary>
-        public event GenericEventHandler<World, SimulationStep> Updated;
+        public event Action<World, SimulationStep> Updated;
 
         private void RaiseUpdated(SimulationStep step)
         {
@@ -58,7 +58,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when a unit hits another unit.
         /// </summary>
-        public event GenericEventHandler<World, HitEventArgs> UnitHitting;
+        public event Action<World, HitEventArgs> UnitHitting;
 
         internal void RaiseUnitHitting(HitEventArgs args)
         {
@@ -68,7 +68,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when an explosion occurs!
         /// </summary>
-        public event GenericEventHandler<World, Circle> ExplosionOccured;
+        public event Action<World, Circle> ExplosionOccured;
 
         internal void RaiseExplosionOccured(Circle circle)
         {
@@ -78,7 +78,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s has been defeated.
         /// </summary>
-        public event GenericEventHandler<World, Faction> FactionDefeated;
+        public event Action<World, Faction> FactionDefeated;
 
         private void RaiseFactionDefeated(Faction faction)
         {

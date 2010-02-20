@@ -180,7 +180,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when this fog of war changes.
         /// </summary>
-        public event GenericEventHandler<FogOfWar, Region> Changed;
+        public event Action<FogOfWar, Region> Changed;
 
         private void OnChanged(Region dirtyRectangle)
         {

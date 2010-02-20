@@ -48,17 +48,17 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseDown;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseUp;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseMoved;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseWheel;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseEntered;
-        public event GenericEventHandler<Responder, MouseEventArgs> MouseExited;
-        public event GenericEventHandler<Responder, MouseEventArgs> DoubleClick;
-        public event GenericEventHandler<Responder, KeyboardEventArgs> KeyDown;
-        public event GenericEventHandler<Responder, KeyboardEventArgs> KeyUp;
-        public event GenericEventHandler<Responder, char> KeyPress;
-        public event GenericEventHandler<Responder, UpdateEventArgs> Updated;
+        public event Action<Responder, MouseEventArgs> MouseDown;
+        public event Action<Responder, MouseEventArgs> MouseUp;
+        public event Action<Responder, MouseEventArgs> MouseMoved;
+        public event Action<Responder, MouseEventArgs> MouseWheel;
+        public event Action<Responder, MouseEventArgs> MouseEntered;
+        public event Action<Responder, MouseEventArgs> MouseExited;
+        public event Action<Responder, MouseEventArgs> DoubleClick;
+        public event Action<Responder, KeyboardEventArgs> KeyDown;
+        public event Action<Responder, KeyboardEventArgs> KeyUp;
+        public event Action<Responder, char> KeyPress;
+        public event Action<Responder, UpdateEventArgs> Updated;
         #endregion
 
         #region Methods
@@ -270,7 +270,7 @@ namespace Orion.UserInterface
             return true;
         }
 
-        private void InvokeEventHandlers(GenericEventHandler<Responder, MouseEventArgs> handler, MouseEventArgs args)
+        private void InvokeEventHandlers(Action<Responder, MouseEventArgs> handler, MouseEventArgs args)
         {
             EnsureNotDisposed();
             if (handler != null) handler(this, args);
@@ -306,12 +306,12 @@ namespace Orion.UserInterface
             return true;
         }
 
-        private void InvokeEventHandlers(GenericEventHandler<Responder, KeyboardEventArgs> handler, KeyboardEventArgs args)
+        private void InvokeEventHandlers(Action<Responder, KeyboardEventArgs> handler, KeyboardEventArgs args)
         {
             if (handler != null) handler(this, args);
         }
 
-        private void InvokeEventHandlers(GenericEventHandler<Responder, char> handler, char arg)
+        private void InvokeEventHandlers(Action<Responder, char> handler, char arg)
         {
             if (handler != null) handler(this, arg);
         }
@@ -321,7 +321,7 @@ namespace Orion.UserInterface
         protected virtual void OnUpdate(UpdateEventArgs args)
         {
             EnsureNotDisposed();
-            GenericEventHandler<Responder, UpdateEventArgs> handler = Updated;
+            Action<Responder, UpdateEventArgs> handler = Updated;
             if (handler != null)
             {
                 handler(this, args);

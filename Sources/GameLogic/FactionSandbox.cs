@@ -31,12 +31,12 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when one entity of the world dies.
         /// </summary>
-        public event GenericEventHandler<FactionSandbox, Handle> EntityDied;
+        public event Action<FactionSandbox, Handle> EntityDied;
 
         /// <summary>
         /// Raised when a faction gets defeated.
         /// </summary>
-        public event GenericEventHandler<FactionSandbox, Handle> FactionDefeated;
+        public event Action<FactionSandbox, Handle> FactionDefeated;
 
         private void RaiseEntityDied(Handle handle)
         {

@@ -31,7 +31,7 @@ namespace Orion.Matchmaking
         /// <summary>
         /// Raised when this <see cref="Commander"/> generates a <see cref="Command"/>.
         /// </summary>
-        public event GenericEventHandler<Commander, Command> CommandGenerated;
+        public event Action<Commander, Command> CommandGenerated;
 
         private void OnCommandGenerated(Command command)
         {

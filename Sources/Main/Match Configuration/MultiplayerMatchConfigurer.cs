@@ -13,8 +13,8 @@ namespace Orion.Main
 {
     abstract class MultiplayerMatchConfigurer : MatchConfigurer, IDisposable
     {
-        private GenericEventHandler<SafeTransporter, NetworkEventArgs> received;
-        private GenericEventHandler<SafeTransporter, IPv4EndPoint> timedOut;
+        private Action<SafeTransporter, NetworkEventArgs> received;
+        private Action<SafeTransporter, IPv4EndPoint> timedOut;
         protected SafeTransporter transporter;
 
         public MultiplayerMatchConfigurer(SafeTransporter transporter)

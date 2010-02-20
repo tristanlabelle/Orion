@@ -31,7 +31,7 @@ namespace Orion.GameLogic.Tasks
         /// <summary>
         /// Raised when the contents of this task queue has changed.
         /// </summary>
-        public event GenericEventHandler<TaskQueue> Changed;
+        public event Action<TaskQueue> Changed;
 
         private void RaiseChanged()
         {

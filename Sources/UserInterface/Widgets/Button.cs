@@ -1,4 +1,5 @@
-﻿using Orion.Geometry;
+﻿using System;
+using Orion.Geometry;
 using Orion.Graphics;
 using OpenTK.Math;
 using Keys = System.Windows.Forms.Keys;
@@ -37,7 +38,7 @@ namespace Orion.UserInterface.Widgets
         /// <summary>
         /// Triggered when the button is pressed or when its <see cref="P:HotKey"/> is pressed.
         /// </summary>
-        public event GenericEventHandler<Button> Triggered;
+        public event Action<Button> Triggered;
 
         private void RaiseTriggered()
         {

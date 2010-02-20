@@ -12,7 +12,7 @@ namespace Orion.Audio
     {
         #region Fields
         private readonly AudioContext context;
-        private readonly GenericEventHandler<AudioContext> listenerPositionChangedHandler;
+        private readonly Action<AudioContext> listenerPositionChangedHandler;
         private ISound irrKlangSound;
         private Sound sound;
         private Vector3? position;

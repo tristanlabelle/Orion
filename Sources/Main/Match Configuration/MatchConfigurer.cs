@@ -20,7 +20,7 @@ namespace Orion.Main
 
         #region Events
 
-        public event GenericEventHandler<MatchConfigurer> GameStarted;
+        public event Action<MatchConfigurer> GameStarted;
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace Orion.Main
         #region Methods
         protected void StartGame()
         {
-            GenericEventHandler<MatchConfigurer> handler = GameStarted;
+            Action<MatchConfigurer> handler = GameStarted;
             if (handler != null) handler(this);
         }
 

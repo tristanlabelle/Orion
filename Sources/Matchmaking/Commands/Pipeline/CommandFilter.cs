@@ -13,7 +13,7 @@ namespace Orion.Matchmaking.Commands.Pipeline
         /// <summary>
         /// Raised when an event has been flushed by this filter.
         /// </summary>
-        public event GenericEventHandler<CommandFilter, Command> Flushed;
+        public event Action<CommandFilter, Command> Flushed;
         #endregion
 
         #region Methods

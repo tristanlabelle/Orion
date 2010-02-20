@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace Orion.UserInterface
 {
     public abstract class UIDisplay : Responder
@@ -9,8 +10,8 @@ namespace Orion.UserInterface
             Bounds = Frame;
         }
 
-        public event GenericEventHandler<UIDisplay, RootView> Entered;
-        public event GenericEventHandler<UIDisplay, RootView> Shadowed;
+        public event Action<UIDisplay, RootView> Entered;
+        public event Action<UIDisplay, RootView> Shadowed;
 
         public new ViewChildrenCollection Children
         {
@@ -24,13 +25,13 @@ namespace Orion.UserInterface
 
         internal virtual void OnEnter(RootView enterOn)
         {
-            GenericEventHandler<UIDisplay, RootView> handler = Entered;
+            Action<UIDisplay, RootView> handler = Entered;
             if (handler != null) handler(this, enterOn);
         }
 
         internal virtual void OnShadow(RootView hiddenOf)
         {
-            GenericEventHandler<UIDisplay, RootView> handler = Shadowed;
+            Action<UIDisplay, RootView> handler = Shadowed;
             if (handler != null) handler(this, hiddenOf);
         }
 

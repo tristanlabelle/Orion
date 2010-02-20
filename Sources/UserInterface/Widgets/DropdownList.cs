@@ -44,7 +44,7 @@ namespace Orion.UserInterface.Widgets
             {
                 if (parent.Enabled) parent.SelectedItem = this.Value;
 
-                GenericEventHandler<DropdownList<T>, T> handler = parent.SelectionChanged;
+                Action<DropdownList<T>, T> handler = parent.SelectionChanged;
                 if (handler != null) handler(parent, Value);
                 return base.OnMouseUp(args);
             }
@@ -75,7 +75,7 @@ namespace Orion.UserInterface.Widgets
         private Func<T, string> stringConverter = (value) => value.ToString();
         private DropdownMenuRow selectedItem;
         private Responder latestRespondingAncestor;
-        private GenericEventHandler<Responder, MouseEventArgs> parentMouseUp;
+        private Action<Responder, MouseEventArgs> parentMouseUp;
         private bool enabled = true;
         #endregion
 
@@ -94,7 +94,7 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Events
-        public event GenericEventHandler<DropdownList<T>, T> SelectionChanged;
+        public event Action<DropdownList<T>, T> SelectionChanged;
         #endregion
 
         #region Properties

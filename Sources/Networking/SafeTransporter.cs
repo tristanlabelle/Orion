@@ -78,23 +78,23 @@ namespace Orion.Networking
         /// Raised when a packet arrives.
         /// </summary>
         /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
-        public event GenericEventHandler<SafeTransporter, NetworkEventArgs> Received;
+        public event Action<SafeTransporter, NetworkEventArgs> Received;
 
         /// <summary>
         /// Raised when a packet cannot reach its destination.
         /// </summary>
         /// <remarks>This event is only raised when the method <see cref="M:Poll"/> is called.</remarks>
-        public event GenericEventHandler<SafeTransporter, IPv4EndPoint> TimedOut;
+        public event Action<SafeTransporter, IPv4EndPoint> TimedOut;
 
         private void OnReceived(IPv4EndPoint hostEndPoint, byte[] message)
         {
-            GenericEventHandler<SafeTransporter, NetworkEventArgs> handler = Received;
+            Action<SafeTransporter, NetworkEventArgs> handler = Received;
             if (handler != null) handler(this, new NetworkEventArgs(hostEndPoint, message));
         }
 
         private void OnTimedOut(IPv4EndPoint endPoint)
         {
-            GenericEventHandler<SafeTransporter, IPv4EndPoint> handler = TimedOut;
+            Action<SafeTransporter, IPv4EndPoint> handler = TimedOut;
             if (handler != null) handler(this, endPoint);
         }
         #endregion

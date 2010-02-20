@@ -11,7 +11,7 @@ namespace Orion.UserInterface.Widgets
     public class ListFrame : ClippedView
     {
         #region Fields
-        private readonly GenericEventHandler<View, Rectangle> frameChangedHandler;
+        private readonly Action<View, Rectangle> frameChangedHandler;
         private readonly Vector2 padding;
         #endregion
 

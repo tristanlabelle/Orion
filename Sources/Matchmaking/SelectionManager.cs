@@ -1,8 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using OpenTK.Math;
-
 using Orion.GameLogic;
 using Orion.Geometry;
 
@@ -35,8 +34,8 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Events
-        public event GenericEventHandler<SelectionManager> SelectionCleared;
-        public event GenericEventHandler<SelectionManager> SelectionChanged;
+        public event Action<SelectionManager> SelectionCleared;
+        public event Action<SelectionManager> SelectionChanged;
 
         private void RaiseSelectionCleared()
         {
@@ -46,7 +45,7 @@ namespace Orion.Matchmaking
 
         private void RaiseSelectionChanged()
         {
-            GenericEventHandler<SelectionManager> handler = SelectionChanged;
+            Action<SelectionManager> handler = SelectionChanged;
             if (handler != null) handler(this);
         }
         #endregion

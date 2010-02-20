@@ -42,19 +42,19 @@ namespace Orion.Matchmaking
         /// <summary>
         /// Raised when this <see cref="Match"/> gets updated for a frame.
         /// </summary>
-        public event GenericEventHandler<Match, UpdateEventArgs> Updated;
+        public event Action<Match, UpdateEventArgs> Updated;
 
         /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
-        public event GenericEventHandler<Match, FactionMessage> FactionMessageReceived;
+        public event Action<Match, FactionMessage> FactionMessageReceived;
 
         /// <summary>
         /// Raised when allied factions defeat all their ennemies.
         /// </summary>
-        public event GenericEventHandler<Match, IEnumerable<Faction>> WorldConquered;
+        public event Action<Match, IEnumerable<Faction>> WorldConquered;
 
-        public event GenericEventHandler<Match> Quitting;
+        public event Action<Match> Quitting;
 
         private void RaiseUpdated(float timeDeltaInSeconds)
         {

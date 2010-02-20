@@ -41,7 +41,7 @@ namespace Orion.Audio
         #endregion
 
         #region Events
-        public event GenericEventHandler<AudioContext> ListenerPositionChanged;
+        public event Action<AudioContext> ListenerPositionChanged;
         #endregion
 
         #region Properties

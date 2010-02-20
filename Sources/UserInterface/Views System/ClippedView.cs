@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics;
+﻿using System;
+using OpenTK.Graphics;
 using OpenTK.Math;
 using Orion.Geometry;
 using Orion.Graphics;
@@ -22,7 +23,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event GenericEventHandler<ClippedView, Rectangle> FullBoundsChanged;
+        public event Action<ClippedView, Rectangle> FullBoundsChanged;
         #endregion
 
         #region Properties

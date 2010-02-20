@@ -75,7 +75,7 @@ namespace Orion.GameLogic
             {
                 Argument.EnsureNotNull(value, "Extractor");
                 extractor = value;
-                extractor.Died += new GenericEventHandler<Entity>(OnExtractorDied);
+                extractor.Died += new Action<Entity>(OnExtractorDied);
             }
         }
         #endregion

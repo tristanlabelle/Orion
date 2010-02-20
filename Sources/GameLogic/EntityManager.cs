@@ -82,7 +82,7 @@ namespace Orion.GameLogic
         private readonly Dictionary<Entity, DeferredChange> deferredChanges
             = new Dictionary<Entity, DeferredChange>();
 
-        private readonly GenericEventHandler<Entity> entityDiedEventHandler;
+        private readonly Action<Entity> entityDiedEventHandler;
         private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
         #endregion
 
@@ -108,7 +108,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Events
-        public event GenericEventHandler<EntityManager, Entity> Added;
+        public event Action<EntityManager, Entity> Added;
 
         private void RaiseAdded(Entity entity)
         {
@@ -119,7 +119,7 @@ namespace Orion.GameLogic
         /// <summary>
         /// Raised when an <see cref="Entity"/> gets removed.
         /// </summary>
-        public event GenericEventHandler<EntityManager, Entity> Removed;
+        public event Action<EntityManager, Entity> Removed;
 
         private void RaiseRemoved(Entity entity)
         {

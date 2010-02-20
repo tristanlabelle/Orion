@@ -1,8 +1,9 @@
-﻿using Font = System.Drawing.Font;
+﻿using System;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
 using OpenTK.Math;
+using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface
 {
@@ -39,9 +40,9 @@ namespace Orion.UserInterface
             AddCenteredLabel(artistName, creditsFont, 40);
         }
 
-        public event GenericEventHandler<MainMenuUI> LaunchedSinglePlayerGame;
-        public event GenericEventHandler<MainMenuUI> LaunchedMultiplayerGame;
-        public event GenericEventHandler<MainMenuUI> LaunchedReplayViewer;
+        public event Action<MainMenuUI> LaunchedSinglePlayerGame;
+        public event Action<MainMenuUI> LaunchedMultiplayerGame;
+        public event Action<MainMenuUI> LaunchedReplayViewer;
 
         private void BeginSinglePlayer(Button sender)
         {

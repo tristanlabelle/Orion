@@ -103,13 +103,13 @@ namespace Orion.Graphics.Renderers
         {
             buildingMemoryRenderer.DrawMiniature(context, miniatureUnitSize);
 
-            foreach (Unit unit in World.Entities.OfType<Unit>())
+            foreach (Entity entity in World.Entities)
             {
-                if (faction.CanSee(unit))
-                {
-                    context.FillColor = unit.Faction.Color;
-                    context.Fill(new Rectangle(unit.Position, (Vector2)miniatureUnitSize));
-                }
+                Unit unit = entity as Unit;
+                if (unit == null || !faction.CanSee(unit)) continue;
+                
+                context.FillColor = unit.Faction.Color;
+                context.Fill(new Rectangle(unit.Position, (Vector2)miniatureUnitSize));
             }
         }
         #endregion

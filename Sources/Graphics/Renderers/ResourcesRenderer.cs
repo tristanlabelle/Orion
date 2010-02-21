@@ -39,37 +39,46 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        private IEnumerable<ResourceNode> GetVisibleClippedNodes(Rectangle clippingBounds)
-        {
-            return World.Entities
-                .OfType<ResourceNode>()
-                .Where(node => Rectangle.Intersects(clippingBounds, node.BoundingRectangle)
-                    && faction.HasPartiallySeen(node.GridRegion));
-        }
-
         public void Draw(GraphicsContext graphics)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            var resourceNodes = GetVisibleClippedNodes(graphics.CoordinateSystem);
-            foreach (ResourceNode node in resourceNodes)
-            {
-                string resourceTypeName = node.Type.ToStringInvariant();
-                Texture texture = textureManager.Get(resourceTypeName);
-                graphics.Fill(node.BoundingRectangle, texture);
-            }
+            DrawClipped(graphics, DrawUnclipped);
         }
 
         public void DrawMiniature(GraphicsContext graphics)
         {
+            DrawClipped(graphics, DrawMiniatureUnclipped);
+        }
+
+        private void DrawClipped(GraphicsContext graphics, Action<GraphicsContext, ResourceNode> drawDelegate)
+        {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            var resourceNodes = GetVisibleClippedNodes(graphics.CoordinateSystem);
-            foreach (ResourceNode node in resourceNodes)
+            Rectangle clippingBounds = graphics.CoordinateSystem;
+            foreach (Entity entity in World.Entities)
             {
-                graphics.FillColor = GetResourceColor(node.Type);
-                graphics.Fill(node.BoundingRectangle);
+                ResourceNode resourceNode = entity as ResourceNode;
+                if (resourceNode == null) continue;
+
+                Rectangle boundingRectangle = entity.BoundingRectangle;
+                if (!Rectangle.Intersects(clippingBounds, boundingRectangle)
+                    || !faction.HasPartiallySeen(resourceNode.GridRegion))
+                    continue;
+
+                drawDelegate(graphics, resourceNode);
             }
+        }
+
+        private void DrawUnclipped(GraphicsContext graphics, ResourceNode resourceNode)
+        {
+            string resourceTypeName = resourceNode.Type.ToStringInvariant();
+            Texture texture = textureManager.Get(resourceTypeName);
+            graphics.Fill(resourceNode.BoundingRectangle, texture);
+        }
+
+        private void DrawMiniatureUnclipped(GraphicsContext graphics, ResourceNode resourceNode)
+        {
+            graphics.FillColor = GetResourceColor(resourceNode.Type);
+            graphics.Fill(resourceNode.BoundingRectangle);
         }
 
         public static ColorRgb GetResourceColor(ResourceType type)

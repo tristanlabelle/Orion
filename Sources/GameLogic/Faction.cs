@@ -274,7 +274,10 @@ namespace Orion.GameLogic
         /// <returns>The sum of the bonuses offered by technologies</returns>
         public int GetTechnologyBonuses(UnitType type, UnitStat stat)
         {
-            return technologies.Sum(tech => tech.GetEffect(type, stat));
+            int total = 0;
+            foreach (Technology technology in technologies)
+                total += technology.GetEffect(type, stat);
+            return total;
         }
 
         public bool IsResearchable(Technology technology)

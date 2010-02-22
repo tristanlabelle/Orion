@@ -1,6 +1,6 @@
 using System;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     [Flags]
     internal enum PeerState

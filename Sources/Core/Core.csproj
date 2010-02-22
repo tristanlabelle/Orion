@@ -31,6 +31,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="irrKlang.NET, Version=1.1.3.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\irrKlang.NET.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Debug\OpenTK.dll</HintPath>
@@ -44,13 +48,22 @@
   <ItemGroup>
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
+    <Compile Include="Engine\Audio\SoundContext.cs" />
+    <Compile Include="Engine\Audio\Sound.cs" />
+    <Compile Include="Engine\Audio\SoundGroup.cs" />
+    <Compile Include="Engine\Audio\SoundSource.cs" />
     <Compile Include="BitArray2D.cs" />
     <Compile Include="BufferPool.cs" />
     <Compile Include="Casing.cs" />
     <Compile Include="ColorRgb.cs" />
     <Compile Include="ColorRgba.cs" />
     <Compile Include="Colors.cs" />
-    <Compile Include="Handle.cs" />
+    <Compile Include="Engine\Networking\PacketType.cs" />
+    <Compile Include="Engine\Networking\PeerLink.cs" />
+    <Compile Include="Engine\Networking\PeerState.cs" />
+    <Compile Include="Engine\Networking\Protocol.cs" />
+    <Compile Include="Engine\Networking\SafePacket.cs" />
+    <Compile Include="Engine\Networking\SafeTransporter.cs" />
     <Compile Include="PooledList.cs" />
     <Compile Include="FrameRateCounter.cs" />
     <Compile Include="Geometry\Circle.cs" />
@@ -58,14 +71,14 @@
     <Compile Include="Formatting.cs" />
     <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="Geometry\LineSegment.cs" />
-    <Compile Include="IPv4Address.cs" />
-    <Compile Include="IPv4EndPoint.cs" />
+    <Compile Include="Engine\Networking\IPv4Address.cs" />
+    <Compile Include="Engine\Networking\IPv4EndPoint.cs" />
     <Compile Include="MouseEventArgs.cs" />
-    <Compile Include="NetworkTimeoutEventArgs.cs" />
+    <Compile Include="Engine\Networking\NetworkTimeoutEventArgs.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Point16.cs" />
     <Compile Include="PerlinNoise.cs" />
-    <Compile Include="NetworkEventArgs.cs" />
+    <Compile Include="Engine\Networking\NetworkEventArgs.cs" />
     <Compile Include="Pool.cs" />
     <Compile Include="PowerOfTwo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-using System.IO;
 
 namespace Orion.Matchmaking.Commands
 {

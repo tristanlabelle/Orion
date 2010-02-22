@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Net.Sockets;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Holds all data needed to garantee the delivery of a packet of data.

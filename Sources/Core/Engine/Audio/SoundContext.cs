@@ -8,13 +8,17 @@ using OpenTK.Math;
 using IrrKlang;
 using System.Text.RegularExpressions;
 
-namespace Orion.Audio
+namespace Orion.Engine.Audio
 {
-    public sealed class AudioContext : IDisposable
+    /// <summary>
+    /// Provides means of playing 3D sound using a sound driver.
+    /// </summary>
+    public sealed class SoundContext : IDisposable
     {
         #region Fields
         private readonly Random random = new Random();
         private readonly ISoundEngine irrKlangEngine;
+        private readonly bool isUsingNullDriver;
         private readonly Dictionary<string, Sound> sounds = new Dictionary<string, Sound>();
         private readonly Dictionary<string, SoundGroup> soundGroups = new Dictionary<string, SoundGroup>();
         private Vector3 listenerPosition;
@@ -24,32 +28,42 @@ namespace Orion.Audio
         #endregion
 
         #region Constructors
-        public AudioContext()
+        public SoundContext()
         {
-            try
-            {
-                irrKlangEngine = new ISoundEngine();
-            }
-            catch (Exception) // We have to catch Exception as that's what's thrown by IrrKlang >.<
-            {
-                irrKlangEngine = new ISoundEngine(SoundOutputDriver.NullDriver);
-            }
+            bool succeeded;
+            this.irrKlangEngine = CreateIrrKlangEngine(out succeeded);
+            this.isUsingNullDriver = !succeeded;
+            this.listenerPosition = Vector3.Zero;
+            this.listenerDirection = new Vector3(0, 0, 1);
 
-            listenerPosition = Vector3.Zero;
-            listenerDirection = new Vector3(0, 0, 1);
+            Debug.WriteLine("Using {0} sound device".FormatInvariant(irrKlangEngine.Name));
         }
         #endregion
 
         #region Events
-        public event Action<AudioContext> ListenerPositionChanged;
+        public event Action<SoundContext> ListenerPositionChanged;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the name of the driver being used.
+        /// </summary>
         public string DriverName
         {
             get { return irrKlangEngine.Name; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if we're using a dummy driver because sound wasn't available.
+        /// </summary>
+        public bool IsUsingNullDriver
+        {
+            get { return isUsingNullDriver; }
+        }
+
+        /// <summary>
+        /// Gets the global sound volume in this <see cref="AudioContext"/>.
+        /// </summary>
         public float Volume
         {
             get { return volume; }
@@ -60,6 +74,9 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating if sounds in this <see cref="AudioContext"/> are muted.
+        /// </summary>
         public bool IsMuted
         {
             get { return isMuted; }
@@ -70,6 +87,9 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Accesses the location of the listener in the 3D world.
+        /// </summary>
         public Vector3 ListenerPosition
         {
             get { return listenerPosition; }
@@ -81,12 +101,16 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Accesses the direction vector of the sound listener.
+        /// </summary>
         public Vector3 ListenerDirection
         {
             get { return listenerDirection; }
             set
             {
-                listenerDirection = value;
+                if (value.LengthSquared < 0.001f) throw new ArgumentOutOfRangeException("The listener direction vector must be non-zero.");
+                listenerDirection = Vector3.NormalizeFast(value);
                 UpdateIrrKlangListener();
             }
         }
@@ -103,6 +127,11 @@ namespace Orion.Audio
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Loads a sound from its name.
+        /// </summary>
+        /// <param name="name">The name of the sound to be loaded.</param>
+        /// <returns>The sound that was loaded, or null.</returns>
         public Sound GetSound(string name)
         {
             Argument.EnsureNotNull(name, "name");
@@ -158,6 +187,10 @@ namespace Orion.Audio
             return soundGroup.GetRandomSound(random);
         }
 
+        /// <summary>
+        /// Creates a new sound source in this context.
+        /// </summary>
+        /// <returns>A newly created source.</returns>
         public SoundSource CreateSource()
         {
             return new SoundSource(this);
@@ -173,6 +206,9 @@ namespace Orion.Audio
                 irrKlangEngine.Play2D(sound.IrrKlangSource, false, false, false);
         }
 
+        /// <summary>
+        /// Releases all resources used by this sound context.
+        /// </summary>
         public void Dispose()
         {
             irrKlangEngine.StopAllSounds();
@@ -185,6 +221,39 @@ namespace Orion.Audio
 
             irrKlangEngine.RemoveAllSoundSources();
             irrKlangEngine.__dtor();
+        }
+
+        private static ISoundEngine CreateIrrKlangEngine(out bool succeeded)
+        {
+            ISoundDeviceList deviceList = new ISoundDeviceList(SoundDeviceListType.PlaybackDevice);
+            try
+            {
+#if DEBUG
+                Debug.WriteLine(deviceList.DeviceCount.ToStringInvariant() + " available sound devices");
+                for (int i = 0; i < deviceList.DeviceCount; ++i)
+                    Debug.WriteLine(i.ToStringInvariant() + ": " + deviceList.getDeviceDescription(i));
+#endif
+
+                if (deviceList.DeviceCount > 0)
+                {
+                    try
+                    {
+                        succeeded = true;
+                        return new ISoundEngine(SoundOutputDriver.AutoDetect,
+                            SoundEngineOptionFlag.DefaultOptions | SoundEngineOptionFlag.MultiThreaded);
+
+                    }
+                    catch (Exception) { } // We have to catch Exception as that's what's thrown by IrrKlang >.<
+                }
+
+                succeeded = false;
+                return new ISoundEngine(SoundOutputDriver.NullDriver);
+            }
+            catch
+            {
+                deviceList.__dtor();
+                throw;
+            }
         }
 
         private void UpdateIrrKlangListener()

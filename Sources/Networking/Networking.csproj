@@ -42,28 +42,22 @@
   <ItemGroup>
     <Compile Include="CommandSynchronizer.cs" />
     <Compile Include="GameMessageType.cs" />
-    <Compile Include="Protocol.cs" />
     <Compile Include="FactionEndPoint.cs" />
-    <Compile Include="PeerLink.cs" />
-    <Compile Include="PeerState.cs" />
-    <Compile Include="SafePacket.cs" />
-    <Compile Include="PacketType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SafeTransporter.cs" />
     <Compile Include="SetupMessageType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
-      <Name>Orion.Core</Name>
+      <Name>Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
       <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
-      <Name>Orion.GameLogic</Name>
+      <Name>GameLogic</Name>
     </ProjectReference>
     <ProjectReference Include="..\Matchmaking\Matchmaking.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
-      <Name>Orion.Matchmaking</Name>
+      <Name>Matchmaking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

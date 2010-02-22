@@ -6,8 +6,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.IO;
+using Orion.Engine.Networking;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// A Transporter is responsible for safely transporting UDP packets over a network.

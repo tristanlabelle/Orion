@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Identifies the purpose of a packet.

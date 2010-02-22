@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace Orion
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Represents an IP address in the IPV4 protocol.

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Geometry;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Technologies;
-using Orion.Geometry;
 
 namespace Orion.GameLogic
 {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System;
+using System.Collections;
+using System.Diagnostics;
 using OpenTK.Math;
 using Orion.Geometry;
-using System.Diagnostics;
-using System.Collections;
 
 namespace Orion.GameLogic.Pathfinding
 {

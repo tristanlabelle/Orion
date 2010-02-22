@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace Orion
+namespace Orion.GameLogic
 {
     /// <summary>
     /// Encapsulates a handle to a game object.

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
-using Orion.GameLogic.Tasks;
 using Orion.Geometry;
+using Orion.GameLogic.Tasks;
 
 namespace Orion.GameLogic
 {

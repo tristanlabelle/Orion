@@ -1,9 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
-
 using OpenTK.Math;
 using Orion.Geometry;
-using System.Diagnostics;
 
 namespace Orion.GameLogic
 {

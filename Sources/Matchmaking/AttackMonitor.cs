@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
-using System.Diagnostics;
-using Orion.GameLogic;
-using Orion.Geometry;
 using OpenTK.Graphics;
+using Orion.Geometry;
+using Orion.GameLogic;
 
 namespace Orion.Matchmaking
 {

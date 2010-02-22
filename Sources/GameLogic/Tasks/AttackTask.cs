@@ -1,6 +1,6 @@
 ﻿using System;
-using Orion.Geometry;
 using OpenTK.Math;
+using Orion.Geometry;
 
 namespace Orion.GameLogic.Tasks
 {    

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Geometry;
 using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.GameLogic.Technologies;
-using Orion.Geometry;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Matchmaking

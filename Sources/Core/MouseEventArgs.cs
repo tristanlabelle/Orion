@@ -1,5 +1,4 @@
-﻿
-using OpenTK.Math;
+﻿using OpenTK.Math;
 
 namespace Orion
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using IrrKlang;
 
-namespace Orion.Audio
+namespace Orion.Engine.Audio
 {
     public sealed class Sound
     {
@@ -28,6 +28,9 @@ namespace Orion.Audio
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the name of this sound.
+        /// </summary>
         public string Name
         {
             get { return name; }
@@ -38,11 +41,6 @@ namespace Orion.Audio
             get { return filePath; }
         }
 
-        internal ISoundSource IrrKlangSource
-        {
-            get { return irrKlangSource; }
-        }
-
         public TimeSpan Duration
         {
             get { return TimeSpan.FromMilliseconds(irrKlangSource.PlayLength); }
@@ -51,6 +49,11 @@ namespace Orion.Audio
         public float DurationInSeconds
         {
             get { return (float)Duration.TotalSeconds; }
+        }
+
+        internal ISoundSource IrrKlangSource
+        {
+            get { return irrKlangSource; }
         }
         #endregion
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic.Skills;
-using System.Diagnostics;
 
 namespace Orion.GameLogic
 {

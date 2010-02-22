@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Orion.Geometry;
 using OpenTK.Math;
+using Orion.Geometry;
 using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks

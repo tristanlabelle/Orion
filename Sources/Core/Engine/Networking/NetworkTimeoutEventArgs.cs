@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Orion
+namespace Orion.Engine.Networking
 {
     public struct NetworkTimeoutEventArgs
     {

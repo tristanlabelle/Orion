@@ -4,8 +4,8 @@ using OpenTK.Math;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
-using Keys = System.Windows.Forms.Keys;
 using Orion.GameLogic.Technologies;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Matchmaking
 {

@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using IrrKlang;
 
-namespace Orion.Audio
+namespace Orion.Engine.Audio
 {
     public sealed class SoundGroup
     {

@@ -4,8 +4,9 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using Orion.Engine.Networking;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Represent a connection to a distant computer (peer)

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Geometry;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Technologies;
-using Orion.Geometry;
 using Orion.GameLogic.Skills;
 using ColorPalette = Orion.Colors;
 

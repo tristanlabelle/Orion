@@ -4,7 +4,7 @@ using System.Net;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace Orion
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Represents an end point of an IPV4 connection.

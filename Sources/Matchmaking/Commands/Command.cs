@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Orion.GameLogic;
-using System.IO;
-using System.Diagnostics;
 
 namespace Orion.Matchmaking.Commands
 {

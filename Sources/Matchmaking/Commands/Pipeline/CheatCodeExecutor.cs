@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.GameLogic;
-
-
 using OpenTK.Math;
+using Orion.GameLogic;
 
 namespace Orion.Matchmaking.Commands.Pipeline
 {

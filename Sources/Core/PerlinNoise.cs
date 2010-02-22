@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace Orion
 {
     [Serializable]

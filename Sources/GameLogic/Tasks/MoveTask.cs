@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
-using Orion.GameLogic.Pathfinding;
 using Orion.Geometry;
+using Orion.GameLogic.Pathfinding;
 
 namespace Orion.GameLogic.Tasks
 {

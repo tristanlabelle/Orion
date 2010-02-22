@@ -45,7 +45,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Matchmaking\Matchmaking.csproj">
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
-      <Name>Orion.Matchmaking</Name>
+      <Name>Matchmaking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

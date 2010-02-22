@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK.Math;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Orion.Matchmaking
 {

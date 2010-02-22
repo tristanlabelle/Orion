@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using OpenTK.Math;
+using Orion.Engine.Audio;
+using Orion.Geometry;
+using Orion.GameLogic;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
-using System.Diagnostics;
-using Orion.GameLogic;
-using OpenTK.Math;
-using Orion.Geometry;
 
 namespace Orion.Audio
 {
-    public sealed class MatchRenderer : IDisposable
+    public sealed class MatchAudioPresenter : IDisposable
     {
         #region Fields
-        private readonly AudioContext audioContext;
+        private readonly SoundContext soundContext;
         private readonly Match match;
         private readonly UserInputManager userInputManager;
         private readonly SoundSource voicesSoundSource;
@@ -26,14 +27,14 @@ namespace Orion.Audio
         #endregion
 
         #region Constructors
-        public MatchRenderer(AudioContext audioContext, Match match, UserInputManager userInputManager)
+        public MatchAudioPresenter(SoundContext audioContext, Match match, UserInputManager userInputManager)
         {
             Argument.EnsureNotNull(audioContext, "audioContext");
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
 
             this.match = match;
-            this.audioContext = audioContext;
+            this.soundContext = audioContext;
             this.userInputManager = userInputManager;
 
             this.voicesSoundSource = audioContext.CreateSource();
@@ -86,7 +87,7 @@ namespace Orion.Audio
         #region Methods
         public void SetViewBounds(Rectangle viewBounds)
         {
-            audioContext.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 50.0f);
+            soundContext.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 50.0f);
         }
         
         public void Dispose()
@@ -96,7 +97,7 @@ namespace Orion.Audio
 
         private void PlayVoice(string name)
         {
-            Sound sound = audioContext.GetRandomSoundFromGroup(name);
+            Sound sound = soundContext.GetRandomSoundFromGroup(name);
             if (sound == null) return;
 
             voicesSoundSource.Play(sound);
@@ -115,10 +116,10 @@ namespace Orion.Audio
         {
             if (step.Number == 5 && userInputManager.LocalFaction.Color == Colors.Pink)
             {
-                Sound sound = audioContext.GetRandomSoundFromGroup("Tapette");
+                Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
                 if (sound == null) return;
 
-                audioContext.PlayAndForget(sound, null);
+                soundContext.PlayAndForget(sound, null);
             }
         }
 
@@ -151,10 +152,10 @@ namespace Orion.Audio
 
             bool isMelee = args.Hitter.GetStat(UnitStat.AttackRange) == 0;
             string soundGroup = isMelee ? "MeleeAttack" : "RangeAttack";
-            Sound sound = audioContext.GetRandomSoundFromGroup(soundGroup);
+            Sound sound = soundContext.GetRandomSoundFromGroup(soundGroup);
             if (sound == null) return;
 
-            audioContext.PlayAndForget(sound, args.Hitter.Center);
+            soundContext.PlayAndForget(sound, args.Hitter.Center);
         }
 
         private void OnAttackWarning(AttackMonitor sender, Vector2 position)
@@ -165,18 +166,18 @@ namespace Orion.Audio
                 .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
 
             string soundGroup = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
-            Sound sound = audioContext.GetRandomSoundFromGroup(soundGroup);
+            Sound sound = soundContext.GetRandomSoundFromGroup(soundGroup);
             if (sound == null) return;
 
-            audioContext.PlayAndForget(sound, null);
+            soundContext.PlayAndForget(sound, null);
         }
 
         private void OnExplosionOccured(World sender, Circle args)
         {
-            Sound sound = audioContext.GetRandomSoundFromGroup("Explosion");
+            Sound sound = soundContext.GetRandomSoundFromGroup("Explosion");
             if (sound == null) return;
 
-            audioContext.PlayAndForget(sound, null);
+            soundContext.PlayAndForget(sound, null);
         }
         #endregion
     }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Geometry;
-using System.Diagnostics;
 
 namespace Orion.GameLogic
 {

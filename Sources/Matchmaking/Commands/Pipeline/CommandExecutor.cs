@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Orion.GameLogic;
 using System.Diagnostics;
+using Orion.GameLogic;
 
 namespace Orion.Matchmaking.Commands.Pipeline
 {

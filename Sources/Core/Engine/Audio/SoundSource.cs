@@ -6,13 +6,16 @@ using OpenTK.Math;
 using IrrKlang;
 using System.Diagnostics;
 
-namespace Orion.Audio
+namespace Orion.Engine.Audio
 {
+    /// <summary>
+    /// Represents a location in 3D space that emits sounds to be heard by the listener.
+    /// </summary>
     public sealed class SoundSource : IDisposable
     {
         #region Fields
-        private readonly AudioContext context;
-        private readonly Action<AudioContext> listenerPositionChangedHandler;
+        private readonly SoundContext context;
+        private readonly Action<SoundContext> listenerPositionChangedHandler;
         private ISound irrKlangSound;
         private Sound sound;
         private Vector3? position;
@@ -20,7 +23,7 @@ namespace Orion.Audio
         #endregion
 
         #region Constructors
-        internal SoundSource(AudioContext context)
+        internal SoundSource(SoundContext context)
         {
             Debug.Assert(context != null);
             this.context = context;
@@ -30,6 +33,9 @@ namespace Orion.Audio
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the sound currently bound to this source.
+        /// </summary>
         public Sound Sound
         {
             get { return sound; }
@@ -41,6 +47,10 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Accesses the 3D position of sound played through this source.
+        /// A value of <c>null</c> indicates that the sound is played in 2D.
+        /// </summary>
         public Vector3? Position
         {
             get { return position; }
@@ -51,6 +61,9 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Accesses the volume at which this source plays sounds.
+        /// </summary>
         public float Volume
         {
             get { return volume; }
@@ -61,6 +74,9 @@ namespace Orion.Audio
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating if this source is currently playing a sound.
+        /// </summary>
         public bool IsPlaying
         {
             get { return irrKlangSound != null && !irrKlangSound.Paused && !irrKlangSound.Finished; }
@@ -82,6 +98,9 @@ namespace Orion.Audio
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Starts or resumes playing the sound currently attached to this source.
+        /// </summary>
         public void Play()
         {
             if (sound == null) throw new InvalidOperationException("Cannot play a sound source without a sound.");
@@ -102,6 +121,10 @@ namespace Orion.Audio
             if (irrKlangSound != null) irrKlangSound.Volume = volume;
         }
 
+        /// <summary>
+        /// Attaches a sound to this source and starts playing it.
+        /// </summary>
+        /// <param name="sound">The sound to be attached and played.</param>
         public void Play(Sound sound)
         {
             Argument.EnsureNotNull(sound, "sound");
@@ -110,25 +133,34 @@ namespace Orion.Audio
             Play();
         }
 
+        /// <summary>
+        /// Pauses a sound that is currently playing.
+        /// </summary>
         public void Pause()
         {
             if (sound == null) throw new InvalidOperationException("Cannot pause a sound source without a sound.");
             if (irrKlangSound != null) irrKlangSound.Paused = true;
         }
 
+        /// <summary>
+        /// Stops playing a sound and rewinds to its beginning.
+        /// </summary>
         public void Stop()
         {
             if (sound == null) throw new InvalidOperationException("Cannot stop a sound source without a sound.");
             DeleteIrrKlangSound();
         }
 
+        /// <summary>
+        /// Releases all resources used by this <see cref="SoundSource"/>.
+        /// </summary>
         public void Dispose()
         {
             context.ListenerPositionChanged -= listenerPositionChangedHandler;
             Sound = null;
         }
 
-        private void OnListenerPositionChanged(AudioContext context)
+        private void OnListenerPositionChanged(SoundContext context)
         {
             Debug.Assert(context == this.context);
             if (!position.HasValue && irrKlangSound != null)

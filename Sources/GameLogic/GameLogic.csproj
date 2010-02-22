@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handle.cs" />
     <Compile Include="HitEventArgs.cs" />
     <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
     <Compile Include="Skills\HealSkill.cs" />
@@ -139,7 +140,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
-      <Name>Orion.Core</Name>
+      <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.GameLogic;
 
 namespace Orion.Matchmaking
 {

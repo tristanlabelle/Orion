@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Orion.Networking
+namespace Orion.Engine.Networking
 {
     /// <summary>
     /// Encapsulates the knowledge of the format in which packets are sent.

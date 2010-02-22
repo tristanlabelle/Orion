@@ -66,8 +66,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Main.csproj

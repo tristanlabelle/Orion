@@ -1,5 +1,4 @@
 ﻿using System;
-
 using OpenTK.Math;
 using Orion.Geometry;
 

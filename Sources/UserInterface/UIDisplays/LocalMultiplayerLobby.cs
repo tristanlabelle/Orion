@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using OpenTK.Math;
+using Orion.Engine.Networking;
 using Orion.Geometry;
 using Orion.Networking;
 using Orion.UserInterface.Widgets;

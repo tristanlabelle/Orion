@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Orion.GameLogic;
 using HarvestTask = Orion.GameLogic.Tasks.HarvestTask;
-using System.Collections.ObjectModel;
 
 namespace Orion.Matchmaking.Commands
 {

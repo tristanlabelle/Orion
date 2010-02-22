@@ -20,6 +20,7 @@ namespace Orion.Audio
         private readonly UserInputManager userInputManager;
         private readonly SoundSource voicesSoundSource;
         private readonly AttackMonitor attackMonitor;
+
         /// <summary>
         /// Reused between calls to minimize object garbage.
         /// </summary>
@@ -43,6 +44,7 @@ namespace Orion.Audio
             this.attackMonitor = new AttackMonitor(userInputManager.LocalCommander.Faction);
             this.attackMonitor.Warning += OnAttackWarning;
 
+            this.match.World.Entities.Added += OnEntityAdded;
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
             this.match.World.ExplosionOccured += OnExplosionOccured;
@@ -110,6 +112,14 @@ namespace Orion.Audio
             stringBuilder.Append('.');
             stringBuilder.Append(name);
             PlayVoice(stringBuilder.ToString());
+        }
+
+        private void OnEntityAdded(EntityManager arg1, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null || unit.Faction != LocalFaction) return;
+
+            PlayUnitSound(unit.Type, "Select");
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)

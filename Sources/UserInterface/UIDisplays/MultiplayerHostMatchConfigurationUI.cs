@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orion.Collections;
 using Orion.Engine.Networking;
 using Orion.Networking;
 using Orion.Matchmaking;

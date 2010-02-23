@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Orion.Collections;
 using Orion.GameLogic;
 using TrainTask = Orion.GameLogic.Tasks.TrainTask;
 

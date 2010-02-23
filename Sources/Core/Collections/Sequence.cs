@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion
+namespace Orion.Collections
 {
     /// <summary>
     /// Provides extensions to the <see cref="IEnumerable"/> and

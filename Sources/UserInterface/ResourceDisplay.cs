@@ -2,6 +2,8 @@
 using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.Graphics;
+using System;
+using Orion.Engine.Graphics;
 
 namespace Orion.UserInterface
 {

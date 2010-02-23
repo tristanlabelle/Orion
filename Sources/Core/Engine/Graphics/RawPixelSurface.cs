@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Provides access to a 2D pixel surface's raw data via a pointer.

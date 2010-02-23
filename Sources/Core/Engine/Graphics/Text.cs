@@ -7,7 +7,7 @@ using Rectangle = Orion.Geometry.Rectangle;
 using OpenTK.Math;
 using OpenTK.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     public struct Text
     {

@@ -1,4 +1,5 @@
-﻿
+﻿using Orion.Engine.Graphics;
+
 namespace Orion.Graphics
 {
     public delegate void RenderingDelegate(GraphicsContext context);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using OpenTK.Math;
 using OpenTK.Graphics;
+using Orion.Collections;
 using Orion.Geometry;
 
 namespace Orion.GameLogic

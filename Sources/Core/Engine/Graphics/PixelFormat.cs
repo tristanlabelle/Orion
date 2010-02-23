@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Describes the format of a texture in memory.

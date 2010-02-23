@@ -1,4 +1,6 @@
-﻿using OpenTK.Math;
+﻿using System;
+using OpenTK.Math;
+using Orion.Engine.Graphics;
 using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.Geometry;

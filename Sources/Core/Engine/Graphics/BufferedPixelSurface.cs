@@ -8,7 +8,7 @@ using SysImage = System.Drawing.Image;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 using System.Drawing.Imaging;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// A 2D pixel surface which's pixels are buffered in a byte array.

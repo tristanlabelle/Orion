@@ -7,9 +7,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
-using Orion.Matchmaking;
 using Orion.GameLogic;
+using Orion.Matchmaking;
 using Orion.Networking;
 using Orion.UserInterface;
 using Orion.Audio;
@@ -250,9 +251,9 @@ namespace Orion.Main
                 program.Run();
             }
 
-            Debug.Assert(Orion.Graphics.Texture.AliveCount == 0,
+            Debug.Assert(Texture.AliveCount == 0,
                 "Congratulations! You've leaked {0} textures!"
-                .FormatInvariant(Orion.Graphics.Texture.AliveCount));
+                .FormatInvariant(Texture.AliveCount));
         }
         #endregion
         #endregion

@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Collections;
 
-namespace Orion
+namespace Orion.Collections
 {
     /// <summary>
     /// A list of items which use a buffer pool instead of allocating its own buffers.

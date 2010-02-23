@@ -8,7 +8,7 @@ using System.Text;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 using SysGraphics = System.Drawing.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Provides utility methods to deal with <see cref="IPixelSurface"/>s.

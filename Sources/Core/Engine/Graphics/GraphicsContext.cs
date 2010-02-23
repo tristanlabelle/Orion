@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using RectangleF = System.Drawing.RectangleF;
-using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
 using OpenTK.Graphics;
 using OpenTK.Math;
 using Orion.Geometry;
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Represents a space in which it is possible to draw. Methods to fill and stroke shapes are supplied.
@@ -283,19 +283,6 @@ namespace Orion.Graphics
                 DrawVertex(point);
         }
 
-        /// <summary>
-        /// Strokes the outline of a polygon using the current <see cref="P:StrokeColor"/>.
-        /// </summary>
-        /// <param name="path">A <see href="LinePath"/> to stroke.</param>
-        /// <param name="position">A position by which to offset the path's points.</param>
-        public void Stroke(LinePath path, Vector2 position)
-        {
-            CommitStrokeColor();
-            GL.Begin(BeginMode.Lines);
-            DrawVertices(path.LineSegments, position);
-            GL.End();
-        }
-
         private void DrawVertices(IEnumerable<LineSegment> lineSegments, Vector2 position)
         {
             if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
@@ -402,7 +389,8 @@ namespace Orion.Graphics
             Fill(rectangle, texture, Rectangle.Unit, Colors.White);
         }
 
-        internal void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
+        [Obsolete("To be made private or internal")]
+        public void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
         {
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
@@ -416,7 +404,8 @@ namespace Orion.Graphics
             GL.End();
         }
 
-        internal void DrawTexturedQuad(Rectangle rectangle)
+        [Obsolete("To be made private or internal")]
+        public void DrawTexturedQuad(Rectangle rectangle)
         {
             DrawTexturedQuad(rectangle, Rectangle.Unit);
         }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Orion.Collections;
 using Orion.GameLogic;
 
 namespace Orion.Matchmaking.Commands

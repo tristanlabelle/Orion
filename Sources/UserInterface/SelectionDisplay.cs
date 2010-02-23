@@ -1,13 +1,13 @@
 ﻿using System;
-using Orion.Matchmaking;
+using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Matchmaking;
 
 namespace Orion.UserInterface
 {
     public class SelectionDisplay : View
     {
-
         public SelectionDisplay(Rectangle frame)
             : base(frame)
         { }
@@ -21,7 +21,7 @@ namespace Orion.UserInterface
             }
         }
 
-        protected internal override void Draw(Orion.Graphics.GraphicsContext context)
+        protected internal override void Draw(GraphicsContext context)
         {
             throw new NotImplementedException();
         }

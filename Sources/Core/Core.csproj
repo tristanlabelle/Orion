@@ -39,10 +39,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Debug\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK.Utilities, Version=0.9.8.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Debug\OpenTK.Utilities.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -52,19 +57,28 @@
     <Compile Include="Engine\Audio\Sound.cs" />
     <Compile Include="Engine\Audio\SoundGroup.cs" />
     <Compile Include="Engine\Audio\SoundSource.cs" />
-    <Compile Include="BitArray2D.cs" />
-    <Compile Include="BufferPool.cs" />
-    <Compile Include="Casing.cs" />
+    <Compile Include="Collections\BitArray2D.cs" />
+    <Compile Include="Collections\BufferPool.cs" />
     <Compile Include="ColorRgb.cs" />
     <Compile Include="ColorRgba.cs" />
     <Compile Include="Colors.cs" />
+    <Compile Include="Engine\Graphics\BufferedPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\GraphicsContext.cs" />
+    <Compile Include="Engine\Graphics\IPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\PixelFormat.cs" />
+    <Compile Include="Engine\Graphics\PixelSurface.cs" />
+    <Compile Include="Engine\Graphics\RawPixelSurface.cs" />
+    <Compile Include="Engine\Graphics\Text.cs" />
+    <Compile Include="Engine\Graphics\TextRenderer.cs" />
+    <Compile Include="Engine\Graphics\Texture.cs" />
+    <Compile Include="Engine\Graphics\TextureManager.cs" />
     <Compile Include="Engine\Networking\PacketType.cs" />
     <Compile Include="Engine\Networking\PeerLink.cs" />
     <Compile Include="Engine\Networking\PeerState.cs" />
     <Compile Include="Engine\Networking\Protocol.cs" />
     <Compile Include="Engine\Networking\SafePacket.cs" />
     <Compile Include="Engine\Networking\SafeTransporter.cs" />
-    <Compile Include="PooledList.cs" />
+    <Compile Include="Collections\PooledList.cs" />
     <Compile Include="FrameRateCounter.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Ellipse.cs" />
@@ -86,8 +100,9 @@
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="KeyboardEventArgs.cs" />
     <Compile Include="Region.cs" />
-    <Compile Include="Sequence.cs" />
+    <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Size.cs" />
+    <Compile Include="Transform.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />
     <Compile Include="SimulationStep.cs" />

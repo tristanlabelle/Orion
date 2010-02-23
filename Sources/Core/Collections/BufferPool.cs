@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion
+namespace Orion.Collections
 {
     /// <summary>
     /// Provides a pool of arrays which facilitates their reuse as buffers.

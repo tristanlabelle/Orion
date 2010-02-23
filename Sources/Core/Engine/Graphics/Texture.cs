@@ -1,15 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
 using SysImage = System.Drawing.Image;
-using System.Threading;
-using System.Diagnostics;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Provides a representation of an image stored in the video memory.
@@ -141,7 +141,8 @@ namespace Orion.Graphics
         /// before reverting to the last bound texture.
         /// </summary>
         /// <param name="action">The action to be performed on the bound texture.</param>
-        internal void BindWhile(Action action)
+        [Obsolete("To be made private or internal")]
+        public void BindWhile(Action action)
         {
             Argument.EnsureNotNull(action, "action");
 
@@ -159,17 +160,20 @@ namespace Orion.Graphics
             }
         }
 
-        internal void SetParameter(TextureParameterName name, int value)
+        [Obsolete("To be made private or internal")]
+        public void SetParameter(TextureParameterName name, int value)
         {
             BindWhile(() => { GL.TexParameter(TextureTarget.Texture2D, name, value); });
         }
 
-        internal void SetEnv(TextureEnvParameter param, int value)
+        [Obsolete("To be made private or internal")]
+        public void SetEnv(TextureEnvParameter param, int value)
         {
             BindWhile(() => { GL.TexEnv(TextureEnvTarget.TextureEnv, param, value); });
         }
 
-        internal void SetSmooth(bool on)
+        [Obsolete("To be made private or internal")]
+        public void SetSmooth(bool on)
         {
             BindWhile(() =>
             {
@@ -182,7 +186,8 @@ namespace Orion.Graphics
             });
         }
 
-        internal void SetRepeat(bool on)
+        [Obsolete("To be made private or internal")]
+        public void SetRepeat(bool on)
         {
             try
             {
@@ -196,7 +201,8 @@ namespace Orion.Graphics
             }
         }
 
-        internal void SetWrapMode(TextureWrapMode wrapMode)
+        [Obsolete("To be made private or internal")]
+        public void SetWrapMode(TextureWrapMode wrapMode)
         {
             SetParameter(TextureParameterName.TextureWrapS, (int)wrapMode);
             SetParameter(TextureParameterName.TextureWrapT, (int)wrapMode);

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.GameLogic;
 using MoveTask = Orion.GameLogic.Tasks.MoveTask;
 

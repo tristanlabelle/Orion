@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Orion.Collections;
 using Orion.Engine.Networking;
 using Orion.Matchmaking;
 using Orion.GameLogic;

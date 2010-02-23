@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.Engine.Audio;
 using Orion.Geometry;
 using Orion.GameLogic;

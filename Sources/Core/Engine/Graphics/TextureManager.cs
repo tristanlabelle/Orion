@@ -8,7 +8,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Provides means of loading texture and caches those.

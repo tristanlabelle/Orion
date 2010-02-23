@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using BuildTask = Orion.GameLogic.Tasks.BuildTask;

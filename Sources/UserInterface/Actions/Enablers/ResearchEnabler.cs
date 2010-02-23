@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Matchmaking;
+using Orion.Engine.Graphics;
 using Orion.Graphics;
 using Orion.GameLogic.Skills;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
+using Orion.Matchmaking;
+using Orion.UserInterface.Widgets;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
-using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface.Actions.Enablers
 {

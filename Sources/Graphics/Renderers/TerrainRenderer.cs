@@ -1,7 +1,10 @@
 ﻿using System;
+using OpenTK.Graphics;
+using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;
-using OpenTK.Graphics;
+using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
+using PixelFormat = Orion.Engine.Graphics.PixelFormat;
 
 namespace Orion.Graphics
 {

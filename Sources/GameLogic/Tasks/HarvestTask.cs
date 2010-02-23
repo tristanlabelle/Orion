@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks

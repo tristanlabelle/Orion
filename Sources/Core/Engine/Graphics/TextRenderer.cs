@@ -13,7 +13,7 @@ using SysGraphics = System.Drawing.Graphics;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 using SysRectangle = System.Drawing.Rectangle;
 
-namespace Orion.Graphics
+namespace Orion.Engine.Graphics
 {
     public sealed class TextRenderer : IDisposable
     {

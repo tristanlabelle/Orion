@@ -123,8 +123,11 @@ namespace Orion.GameLogic.Tasks
             if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
             Debug.Assert(Count <= 1, "More than one task was overriden, is this voluntary?");
             Debug.Assert(!unit.IsUnderConstruction);
+
             Clear();
+
             tasks.Add(task);
+
             RaiseChanged();
         }
 
@@ -135,7 +138,9 @@ namespace Orion.GameLogic.Tasks
             if (tasks.Contains(task)) throw new InvalidOperationException("Cannot add a task already present.");
             if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
             Debug.Assert(!unit.IsUnderConstruction);
+
             tasks.Add(task);
+
             RaiseChanged();
         }
 
@@ -146,9 +151,12 @@ namespace Orion.GameLogic.Tasks
 
         public void Clear()
         {
+            if (tasks.Count == 0) return;
+
             foreach (Task task in tasks)
                 task.Dispose();
             tasks.Clear();
+
             RaiseChanged();
         }
         #endregion

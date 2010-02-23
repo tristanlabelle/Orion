@@ -18,6 +18,11 @@ namespace Orion.UserInterface.Widgets
             return new Rectangle(computedOrigin + parentSystem.Min, computedTopmost - computedOrigin);
         }
 
+        public static Rectangle CreateComponentRectangle(Rectangle parentSystem, Rectangle childRectangle)
+        {
+            return CreateComponentRectangle(parentSystem, childRectangle.Min, childRectangle.Max);
+        }
+
         public static void DisplayAlert(Responder parent, string message)
         {
             DisplayAlert(parent, message, null);

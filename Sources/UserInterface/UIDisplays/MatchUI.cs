@@ -50,8 +50,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Idle Workers
-        private readonly UnitType workerType;
-        private readonly Dictionary<Unit, bool> workersActivityState = new Dictionary<Unit, bool>();
+        private readonly WorkerActivityMonitor workerActivityMonitor;
         private readonly Button idleWorkerButton;
         #endregion
 
@@ -179,17 +178,17 @@ namespace Orion.UserInterface
             enablers.Add(new HealEnabler(userInputManager, actions, textureManager));
             enablers.Add(new ResearchEnabler(userInputManager, actions, textureManager));
 
-            this.workerType = World.UnitTypes.FromName("Schtroumpf");
+            workerActivityMonitor = new WorkerActivityMonitor(LocalFaction);
+            workerActivityMonitor.WorkerActivityStateChanged += OnWorkerActivityStateChanged;
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
-            Texture workerTexture = textureManager.GetUnit(workerType.Name);
+            Texture workerTexture = textureManager.GetUnit("Schtroumpf");
             TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
             this.idleWorkerButton = new Button(inactiveWorkerRectangle, "", workerButtonRenderer);
-            this.idleWorkerButton.Triggered += OnIdleSmurfsButtonTriggered;
+            this.idleWorkerButton.Triggered += OnIdleWorkerButtonTriggered;
+            UpdateWorkerActivityButton();
 
-            world.Entities.Added += EntityAdded;
             LocalFaction.Warning += OnLocalFactionWarning;
         }
-
         #endregion
 
         #region Properties
@@ -299,36 +298,25 @@ namespace Orion.UserInterface
         #endregion
 
         #region Event Handling
-        private void EntityAdded(EntityManager manager, Entity entity)
+        private void OnWorkerActivityStateChanged(WorkerActivityMonitor sender, Unit worker)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != LocalFaction) return;
-
-            if (unit.Type == workerType)
-            {
-                workersActivityState[unit] = true;
-                unit.TaskQueue.Changed += OnSmurfTaskChanged;
-                unit.Died += OnSmurfDied;
-            }
+            UpdateWorkerActivityButton();
         }
 
-        private void OnSmurfTaskChanged(TaskQueue queue)
+        private void UpdateWorkerActivityButton()
         {
-            workersActivityState[queue.Unit] = queue.IsEmpty;
+            if (workerActivityMonitor.InactiveWorkerCount == 0)
+                Children.Remove(idleWorkerButton);
+            else if (idleWorkerButton.Parent == null)
+                Children.Add(idleWorkerButton);
         }
 
-        private void OnSmurfDied(Entity smurfAsEntity)
+        private void OnIdleWorkerButtonTriggered(Button sender)
         {
-            Unit smurf = (Unit)smurfAsEntity;
-            workersActivityState.Remove(smurf);
-        }
-
-        private void OnIdleSmurfsButtonTriggered(Button sender)
-        {
-            IEnumerable<Unit> smurfs = workersActivityState.Where(kp => kp.Value).Select(kp => kp.Key);
+            var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
             if (isShiftDown)
             {
-                userInputManager.SelectionManager.SelectUnits(smurfs);
+                userInputManager.SelectionManager.SelectUnits(inactiveWorkers);
             }
             else
             {
@@ -336,15 +324,16 @@ namespace Orion.UserInterface
                 if (selectedUnits.Count() == 1)
                 {
                     Unit selectedUnit = selectedUnits.First();
-                    if (smurfs.Contains(selectedUnit))
+                    if (inactiveWorkers.Contains(selectedUnit))
                     {
-                        int nextIndex = (smurfs.IndexOf(selectedUnit) + 1) % smurfs.Count();
-                        userInputManager.SelectionManager.SelectUnit(smurfs.Skip(nextIndex).First());
+                        int nextIndex = (inactiveWorkers.IndexOf(selectedUnit) + 1) % inactiveWorkers.Count();
+                        userInputManager.SelectionManager.SelectUnit(inactiveWorkers.ElementAt(nextIndex));
                         CenterOnSelection();
                         return;
                     }
                 }
-                userInputManager.SelectionManager.SelectUnit(smurfs.First());
+
+                userInputManager.SelectionManager.SelectUnit(inactiveWorkers.First());
                 CenterOnSelection();
             }
         }
@@ -456,6 +445,7 @@ namespace Orion.UserInterface
             {
                 CenterOnSelection();
             }
+
             DateTime now = DateTime.UtcNow;
             messagesToDelete.AddRange(messagesExpiration.Where(pair => pair.Value <= now).Select(pair => pair.Key));
             foreach (Label toDelete in messagesToDelete)
@@ -464,13 +454,6 @@ namespace Orion.UserInterface
                 toDelete.Dispose();
             }
             messagesToDelete.Clear();
-
-            bool shouldDisplaySmurfButton = workersActivityState.Values.Any(value => value == true);
-            if (Children.Contains(idleWorkerButton) && !shouldDisplaySmurfButton)
-                Children.Remove(idleWorkerButton);
-
-            if(!Children.Contains(idleWorkerButton) && shouldDisplaySmurfButton)
-                Children.Add(idleWorkerButton);
 
             match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);

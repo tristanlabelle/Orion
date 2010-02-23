@@ -106,6 +106,7 @@
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />
+    <Compile Include="WorkerActivityMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Orion.UserInterface
 {
     /// <summary>
-    /// Objects of this class are used to render the game. They encapsulate a game window and a world renderer.
+    /// Objects of this class are used to render the game.
     /// They are capable of refreshing the OpenGL control.
     /// </summary>
     public sealed class GameUI : IDisposable
@@ -49,7 +49,6 @@ namespace Orion.UserInterface
         {
             get { return mainWindow.rootView; }
         }
-
         #endregion
 
         #region Methods

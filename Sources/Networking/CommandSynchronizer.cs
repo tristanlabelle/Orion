@@ -71,15 +71,10 @@ namespace Orion.Networking
         {
             get
             {
-#if false
                 // adaptative frame rate
                 int average = (int)(previousFramesDuration.Average() + 0.5);
                 int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
                 return average + deviation * 2;
-#else
-#warning Hard-coded updates/command frame
-                return 7;
-#endif
             }
         }
         #endregion

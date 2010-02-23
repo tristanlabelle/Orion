@@ -32,7 +32,7 @@ namespace Orion.Matchmaking
 
         #region Fields
         private const float warningRadius = 10;
-        private const float warningLifeSpan = 10;
+        private const float warningLifeSpan = 30;
 
         private readonly Faction faction;
         private readonly Queue<Entry> entries = new Queue<Entry>();

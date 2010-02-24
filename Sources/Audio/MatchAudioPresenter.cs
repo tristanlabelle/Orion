@@ -13,6 +13,9 @@ using Orion.Matchmaking.Commands;
 
 namespace Orion.Audio
 {
+    /// <summary>
+    /// Provides an audible representation of game logic events.
+    /// </summary>
     public sealed class MatchAudioPresenter : IDisposable
     {
         #region Fields
@@ -98,21 +101,24 @@ namespace Orion.Audio
             voicesSoundSource.Dispose();
         }
 
-        private void PlayVoice(string name)
-        {
-            Sound sound = soundContext.GetRandomSoundFromGroup(name);
-            if (sound == null) return;
-
-            voicesSoundSource.Play(sound);
-        }
-
-        private void PlayUnitSound(UnitType unitType, string name)
+        private Sound GetUnitVoiceSound(UnitType unitType, string eventName)
         {
             stringBuilder.Clear();
             stringBuilder.Append(unitType.Name);
             stringBuilder.Append('.');
-            stringBuilder.Append(name);
-            PlayVoice(stringBuilder.ToString());
+            stringBuilder.Append(eventName);
+
+            string soundGroup = stringBuilder.ToString();
+
+            return soundContext.GetRandomSoundFromGroup(soundGroup);
+        }
+
+        private void PlayUnitVoice(UnitType unitType, string eventName)
+        {
+            Sound sound = GetUnitVoiceSound(unitType, eventName);
+            if (sound == null) return;
+
+            voicesSoundSource.Play(sound);
         }
 
         private void OnEntityAdded(EntityManager arg1, Entity entity)
@@ -120,7 +126,10 @@ namespace Orion.Audio
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != LocalFaction) return;
 
-            PlayUnitSound(unit.Type, "Select");
+            Sound sound = GetUnitVoiceSound(unit.Type, "Select");
+            if (sound == null) return;
+
+            soundContext.PlayAndForget(sound, unit.Center);
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)
@@ -141,7 +150,7 @@ namespace Orion.Audio
             UnitType unitType = SelectedUnitType;
             if (unitType == null) return;
 
-            PlayUnitSound(unitType, "Select");
+            PlayUnitVoice(unitType, "Select");
         }
 
         private void OnCommandGenerated(Commander sender, Command args)
@@ -153,7 +162,7 @@ namespace Orion.Audio
             if (unitType == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", "");
-            PlayUnitSound(unitType, commandName);
+            PlayUnitVoice(unitType, commandName);
         }
 
         private void OnUnitHitting(World sender, HitEventArgs args)
@@ -163,10 +172,7 @@ namespace Orion.Audio
 
             bool isMelee = args.Hitter.GetStat(UnitStat.AttackRange) == 0;
             string soundGroup = isMelee ? "MeleeAttack" : "RangeAttack";
-            Sound sound = soundContext.GetRandomSoundFromGroup(soundGroup);
-            if (sound == null) return;
-
-            soundContext.PlayAndForget(sound, args.Hitter.Center);
+            soundContext.PlayAndForgetRandomSoundFromGroup(soundGroup, args.Hitter.Center);
         }
 
         private void OnAttackWarning(AttackMonitor sender, Vector2 position)
@@ -177,18 +183,12 @@ namespace Orion.Audio
                 .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
 
             string soundGroup = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
-            Sound sound = soundContext.GetRandomSoundFromGroup(soundGroup);
-            if (sound == null) return;
-
-            soundContext.PlayAndForget(sound, null);
+            soundContext.PlayAndForgetRandomSoundFromGroup(soundGroup, null);
         }
 
         private void OnExplosionOccured(World sender, Circle args)
         {
-            Sound sound = soundContext.GetRandomSoundFromGroup("Explosion");
-            if (sound == null) return;
-
-            soundContext.PlayAndForget(sound, null);
+            soundContext.PlayAndForgetRandomSoundFromGroup("Explosion", null);
         }
         #endregion
     }

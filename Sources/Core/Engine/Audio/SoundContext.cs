@@ -206,6 +206,14 @@ namespace Orion.Engine.Audio
                 irrKlangEngine.Play2D(sound.IrrKlangSource, false, false, false);
         }
 
+        public void PlayAndForgetRandomSoundFromGroup(string groupName, Vector2? position)
+        {
+            Sound sound = GetRandomSoundFromGroup(groupName);
+            if (sound == null) return;
+
+            PlayAndForget(sound, position);
+        }
+
         /// <summary>
         /// Releases all resources used by this sound context.
         /// </summary>

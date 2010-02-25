@@ -15,8 +15,10 @@ namespace Orion.Graphics
     {
         #region Fields
         private readonly Terrain terrain;
-        private readonly Texture texture;
-        private readonly Texture groundTileTexture;
+        private readonly Texture obstacleMaskTexture;
+        private readonly Texture splattingMaskTexture;
+        private readonly Texture grassTileTexture;
+        private readonly Texture sandTileTexture;
         private readonly Texture obstacleTileTexture;
         #endregion
 
@@ -27,9 +29,14 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.terrain = terrain;
-            this.texture = CreateTerrainTexture(terrain);
-            this.groundTileTexture = textureManager.Get("Ground");
-            this.groundTileTexture.SetRepeat(true);
+            this.obstacleMaskTexture = CreateObstacleMaskTexture(terrain);
+            this.splattingMaskTexture = CreateSplattingMaskTexture(terrain.Size);
+            this.grassTileTexture = textureManager.Get("Grass");
+            this.grassTileTexture.SetSmooth(true);
+            this.grassTileTexture.SetRepeat(true);
+            this.sandTileTexture = textureManager.Get("Sand");
+            this.sandTileTexture.SetSmooth(true);
+            this.sandTileTexture.SetRepeat(true);
             this.obstacleTileTexture = textureManager.Get("Obstacle");
             this.obstacleTileTexture.SetRepeat(true);
         }
@@ -41,8 +48,8 @@ namespace Orion.Graphics
             get
             {
                 return new Rectangle(0, 0,
-                    terrain.Width / (float)texture.Width,
-                    terrain.Height / (float)texture.Height);
+                    terrain.Width / (float)obstacleMaskTexture.Width,
+                    terrain.Height / (float)obstacleMaskTexture.Height);
             }
         }
         #endregion
@@ -51,22 +58,33 @@ namespace Orion.Graphics
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
+            Rectangle grassTextureRectangle = new Rectangle(0, 0, terrain.Width / 4, terrain.Height / 4);
+            Rectangle sandTextureRectangle = new Rectangle(0, 0, terrain.Width / 16, terrain.Height / 16);
 
+            GL.Color4(1f, 1f, 1f, 1f);
+
+            graphics.Fill(terrainBounds, grassTileTexture, grassTextureRectangle);
+            DrawMasked(graphics, terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, TextureRectangle);
+            DrawMasked(graphics, terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, TextureRectangle);
+        }
+
+        private void DrawMasked(GraphicsContext graphics,
+            Rectangle rectangle, Texture maskedTexture, Rectangle maskedTextureRectangle,
+            Texture maskingTexture, Rectangle maskingTextureRectangle)
+        {
             GL.ColorMask(false, false, false, true);
-            graphics.Fill(terrainBounds, texture, TextureRectangle);
-
-            Rectangle textureRectangle = new Rectangle(0, 0, terrain.Width / 4, terrain.Height / 4);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            graphics.Fill(rectangle, maskingTexture, maskingTextureRectangle);
 
             GL.ColorMask(true, true, true, false);
-            GL.Color4(1f, 1f, 1f, 1f);
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.OneMinusDstAlpha, BlendingFactorDest.One);
-            groundTileTexture.BindWhile(() => graphics.DrawTexturedQuad(terrainBounds, textureRectangle));
-            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.One);
-            obstacleTileTexture.BindWhile(() => graphics.DrawTexturedQuad(terrainBounds, textureRectangle));
+            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.OneMinusDstAlpha);
+            maskedTexture.BindWhile(() => graphics.DrawTexturedQuad(rectangle, maskedTextureRectangle));
             GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.Texture2D);
+
+            GL.ColorMask(true, true, true, true);
         }
 
         public void DrawMiniature(GraphicsContext graphics)
@@ -75,15 +93,15 @@ namespace Orion.Graphics
 
             graphics.FillColor = ColorRgb.FromBytes(232, 207, 144);
             graphics.Fill(terrainBounds);
-            graphics.Fill(terrainBounds, texture, TextureRectangle, ColorRgb.FromBytes(100, 78, 60));
+            graphics.Fill(terrainBounds, obstacleMaskTexture, TextureRectangle, ColorRgb.FromBytes(100, 78, 60));
         }
 
         public void Dispose()
         {
-            texture.Dispose();
+            obstacleMaskTexture.Dispose();
         }
 
-        private static Texture CreateTerrainTexture(Terrain terrain)
+        private static Texture CreateObstacleMaskTexture(Terrain terrain)
         {
             int textureWidth = Math.Max(PowerOfTwo.Ceiling(terrain.Size.Width), PowerOfTwo.Ceiling(terrain.Size.Height));
             Size textureSize = new Size(textureWidth, textureWidth);
@@ -100,6 +118,32 @@ namespace Orion.Graphics
             }
 
             return Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixels, false, false);
+        }
+
+        private static Texture CreateSplattingMaskTexture(Size size)
+        {
+            int textureWidth = Math.Max(PowerOfTwo.Ceiling(size.Width), PowerOfTwo.Ceiling(size.Height));
+            Size textureSize = new Size(textureWidth, textureWidth);
+
+            PerlinNoise noise = new PerlinNoise();
+            noise.Density = 3;
+            noise.Frequency = 0.01f;
+            byte[] pixels = new byte[textureSize.Area];
+            for (int y = 0; y < textureSize.Height; ++y)
+            {
+                for (int x = 0; x < textureSize.Width; ++x)
+                {
+                    int pixelIndex = y * textureSize.Width + x;
+
+                    double value = noise[x, y];
+                    if (value < 0) value = 0;
+                    else if (value > 1) value = 1;
+
+                    pixels[pixelIndex] = (byte)(value * 255);
+                }
+            }
+
+            return Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixels, true, false);
         }
         #endregion
     }

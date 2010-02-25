@@ -65,7 +65,7 @@ namespace Orion.Engine.Audio
 
         internal void Dispose()
         {
-            irrKlangSource.__dtor();
+            irrKlangSource.Dispose();
         }
         #endregion
     }

@@ -172,7 +172,7 @@ namespace Orion.Engine.Audio
             if (irrKlangSound == null) return;
             
             irrKlangSound.Stop();
-            irrKlangSound.__dtor();
+            irrKlangSound.Dispose();
             irrKlangSound = null;
         }
         #endregion

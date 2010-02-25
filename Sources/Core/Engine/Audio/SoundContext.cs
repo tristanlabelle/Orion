@@ -228,40 +228,32 @@ namespace Orion.Engine.Audio
             sounds.Clear();
 
             irrKlangEngine.RemoveAllSoundSources();
-            irrKlangEngine.__dtor();
         }
 
         private static ISoundEngine CreateIrrKlangEngine(out bool succeeded)
         {
             ISoundDeviceList deviceList = new ISoundDeviceList(SoundDeviceListType.PlaybackDevice);
-            try
-            {
 #if DEBUG
-                Debug.WriteLine(deviceList.DeviceCount.ToStringInvariant() + " available sound devices");
-                for (int i = 0; i < deviceList.DeviceCount; ++i)
-                    Debug.WriteLine(i.ToStringInvariant() + ": " + deviceList.getDeviceDescription(i));
+            Debug.WriteLine(deviceList.DeviceCount.ToStringInvariant() + " available sound devices");
+            for (int i = 0; i < deviceList.DeviceCount; ++i)
+                Debug.WriteLine(i.ToStringInvariant() + ": " + deviceList.getDeviceDescription(i));
 #endif
 
-                if (deviceList.DeviceCount > 0)
-                {
-                    try
-                    {
-                        succeeded = true;
-                        return new ISoundEngine(SoundOutputDriver.AutoDetect,
-                            SoundEngineOptionFlag.DefaultOptions | SoundEngineOptionFlag.MultiThreaded);
-
-                    }
-                    catch (Exception) { } // We have to catch Exception as that's what's thrown by IrrKlang >.<
-                }
-
-                succeeded = false;
-                return new ISoundEngine(SoundOutputDriver.NullDriver);
-            }
-            catch
+            if (deviceList.DeviceCount > 0)
             {
-                deviceList.__dtor();
-                throw;
+                try
+                {
+                    succeeded = true;
+                    return new ISoundEngine(SoundOutputDriver.AutoDetect,
+                        SoundEngineOptionFlag.DefaultOptions | SoundEngineOptionFlag.MultiThreaded);
+
+                }
+                catch (Exception) { } // We have to catch Exception as that's what's thrown by IrrKlang >.<
             }
+
+            succeeded = false;
+            return new ISoundEngine(SoundOutputDriver.NullDriver);
+
         }
 
         private void UpdateIrrKlangListener()

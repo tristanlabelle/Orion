@@ -28,7 +28,7 @@ namespace Orion.UserInterface
         #region Chat
         private static readonly TimeSpan messageTimeToLive = new TimeSpan(0, 0, 10);
         private readonly TextField chatInput;
-        private readonly TransparentFrame chatMessages;
+        private readonly Frame chatMessagesFrame;
         private readonly Dictionary<Label, DateTime> messagesExpiration = new Dictionary<Label, DateTime>();
         private readonly List<Label> messagesToDelete = new List<Label>();
         #endregion
@@ -143,8 +143,9 @@ namespace Orion.UserInterface
             chatInput.Triggered += SendMessage;
             chatInput.KeyDown += ChatInputKeyDown;
             Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
-            chatMessages = new TransparentFrame(messagesFrame);
-            Children.Add(chatMessages);
+            chatMessagesFrame = new Frame(messagesFrame, null);
+            chatMessagesFrame.CaptureMouseEvents = false;
+            Children.Add(chatMessagesFrame);
 
             Rectangle pausePanelRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
             pausePanel = new Frame(pausePanelRectangle);
@@ -184,6 +185,7 @@ namespace Orion.UserInterface
             Texture workerTexture = textureManager.GetUnit("Schtroumpf");
             TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
             this.idleWorkerButton = new Button(inactiveWorkerRectangle, "", workerButtonRenderer);
+            this.idleWorkerButton.CaptionUpColor = Colors.Red;
             this.idleWorkerButton.Triggered += OnIdleWorkerButtonTriggered;
             UpdateWorkerActivityButton();
 
@@ -265,11 +267,11 @@ namespace Orion.UserInterface
             messageLabel.Color = color;
             messagesExpiration[messageLabel] = DateTime.UtcNow + messageTimeToLive;
             float height = messageLabel.Frame.Height;
-            foreach (Label writtenMessage in chatMessages.Children)
+            foreach (Label writtenMessage in chatMessagesFrame.Children)
                 writtenMessage.Frame = writtenMessage.Frame.TranslatedBy(0, height);
-            chatMessages.Children.Add(messageLabel);
-            if (chatMessages.Children.Count > 15)
-                chatMessages.Children.RemoveAt(0);
+            chatMessagesFrame.Children.Add(messageLabel);
+            if (chatMessagesFrame.Children.Count > 15)
+                chatMessagesFrame.Children.RemoveAt(0);
         }
 
         public void DisplayDefeatMessage(Faction faction)
@@ -307,8 +309,12 @@ namespace Orion.UserInterface
         {
             if (workerActivityMonitor.InactiveWorkerCount == 0)
                 Children.Remove(idleWorkerButton);
-            else if (idleWorkerButton.Parent == null)
-                Children.Add(idleWorkerButton);
+            else
+            {
+                idleWorkerButton.Caption = workerActivityMonitor.InactiveWorkerCount.ToStringInvariant();
+                if (idleWorkerButton.Parent == null)
+                    Children.Add(idleWorkerButton);
+            }
         }
 
         private void OnIdleWorkerButtonTriggered(Button sender)

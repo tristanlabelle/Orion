@@ -13,6 +13,9 @@ namespace Orion.UserInterface.Widgets
         private Label caption;
         private Keys hotKey;
         private bool enabled;
+        private ColorRgba captionUpColor = Colors.White;
+        private ColorRgba captionDownColor = Colors.Orange;
+        private ColorRgba captionOverColor = Colors.Cyan;
         #endregion
 
         #region Constructors
@@ -49,7 +52,6 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Properties
-
         public string Caption
         {
             get { return caption.Text.Value; }
@@ -58,6 +60,28 @@ namespace Orion.UserInterface.Widgets
                 caption.Text = new Text(value);
                 AlignCaption();
             }
+        }
+
+        public ColorRgba CaptionUpColor
+        {
+            get { return captionUpColor; }
+            set
+            {
+                captionUpColor = value;
+                caption.Color = value;
+            }
+        }
+
+        public ColorRgba CaptionDownColor
+        {
+            get { return captionDownColor; }
+            set { captionDownColor = value; }
+        }
+
+        public ColorRgba CaptionOverColor
+        {
+            get { return captionOverColor; }
+            set { captionOverColor = value; }
         }
 
         public Keys HotKey
@@ -71,7 +95,6 @@ namespace Orion.UserInterface.Widgets
             get { return enabled; }
             set { enabled = value; }
         }
-
         #endregion
 
         #region Methods
@@ -83,26 +106,26 @@ namespace Orion.UserInterface.Widgets
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            if(enabled) caption.Color = Colors.Cyan;
+            if (enabled) caption.Color = captionOverColor;
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Colors.White;
+            if (enabled) caption.Color = captionUpColor;
             return base.OnMouseExit(args);
         }
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Colors.Orange;
+            if (enabled) caption.Color = captionDownColor;
             base.OnMouseDown(args);
             return false;
         }
 
         protected override bool OnMouseUp(MouseEventArgs args)
         {
-            if (enabled) caption.Color = Colors.Cyan;
+            if (enabled) caption.Color = captionOverColor;
             base.OnMouseUp(args);
             OnPress();
             return false;

@@ -39,7 +39,7 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionFrame, inputManager, traineeType.Name, Keys.NoName, textureManager);
+                ActionButton button = new ActionButton(actionFrame, inputManager, traineeType.Name, Keys.None, textureManager);
 
                 Texture texture = textureManager.GetUnit(traineeType.Name);
                 button.Renderer = new TexturedFrameRenderer(texture);

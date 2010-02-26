@@ -233,6 +233,8 @@ namespace Orion.UserInterface
                     Disposed = null;
                     disposedEventHandler(this);
                 }
+
+                GC.SuppressFinalize(this);
             }
         }
 

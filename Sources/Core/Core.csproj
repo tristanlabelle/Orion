@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -43,9 +43,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="irrKlang.NET2.0, Version=1.3.0.0, Culture=neutral, PublicKeyToken=a854741bd80517c7, processorArchitecture=x86">
+    <Reference Include="irrKlang.NET, Version=1.1.3.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\irrKlang.NET2.0.dll</HintPath>
+      <HintPath>..\References\irrKlang.NET.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Utilities, Version=0.9.8.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

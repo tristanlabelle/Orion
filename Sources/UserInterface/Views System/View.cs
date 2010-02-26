@@ -26,10 +26,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
-
         public new ViewChildrenCollection Children
         {
-            get { return base.Children as ViewChildrenCollection; }
+            get { return (ViewChildrenCollection)base.Children; }
         }
 
         public override Rectangle Bounds
@@ -44,6 +43,7 @@ namespace Orion.UserInterface
                     Vector2 position = MousePosition.Value;
                     PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position.X, position.Y, MouseButton.None, 0, 0));
                 }
+
                 Action<View, Rectangle> boundsEvent = BoundsChanged;
                 if (boundsEvent != null) boundsEvent(this, previousBounds);
             }

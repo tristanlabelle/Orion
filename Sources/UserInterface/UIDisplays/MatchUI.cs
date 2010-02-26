@@ -83,11 +83,14 @@ namespace Orion.UserInterface
 
             matchRenderer = new MatchRenderer(userInputManager, textureManager);
             world.Entities.Removed += userInputManager.SelectionManager.EntityDied;
+
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
             worldView.Bounds = new Rectangle(40, 20);
             worldView.MinimumVisibleBounds = new Rectangle(8, 4);
+            worldView.BoundsChanged += OnWorldViewBoundsChanged;
             Children.Add(worldView);
+            matchAudioRenderer.SetViewBounds(worldView.Bounds);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalCommander.Faction);
@@ -159,7 +162,6 @@ namespace Orion.UserInterface
 
             KeyDown += userInputManager.HandleKeyDown;
             KeyUp += userInputManager.HandleKeyUp;
-            worldView.BoundsChanged += WorldViewBoundsChanged;
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
             userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
@@ -441,7 +443,7 @@ namespace Orion.UserInterface
             Parent.PopDisplay(this);
         }
 
-        private void WorldViewBoundsChanged(View sender, Rectangle newBounds)
+        private void OnWorldViewBoundsChanged(View sender, Rectangle newBounds)
         {
             matchAudioRenderer.SetViewBounds(newBounds);
 

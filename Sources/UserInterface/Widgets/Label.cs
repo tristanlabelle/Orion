@@ -9,7 +9,7 @@ namespace Orion.UserInterface.Widgets
     /// <summary>
     /// A Label is a visible readonly text field.
     /// </summary>
-    public sealed class Label : View
+    public class Label : View
     {
         #region Constructors
         public Label(Rectangle frame)

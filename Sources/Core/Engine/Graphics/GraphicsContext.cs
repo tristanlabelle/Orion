@@ -345,6 +345,8 @@ namespace Orion.Engine.Graphics
             RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
 
             Color color = Color.FromArgb(fillColor.ByteA, fillColor.ByteR, fillColor.ByteG, fillColor.ByteB);
+
+            // We could enable blending here when alpha < 255 but OpenTK doesn't support it :(.
             Text.defaultTextPrinter.Print(text.Value, text.Font, color, renderInto);
 
             GL.PopMatrix();

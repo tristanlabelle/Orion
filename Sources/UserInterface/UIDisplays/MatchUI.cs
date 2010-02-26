@@ -4,21 +4,20 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Collections;
 using Orion.Engine.Graphics;
-using Orion.Matchmaking;
-using Orion.Matchmaking.Commands;
 using Orion.GameLogic;
-using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
+using Orion.Matchmaking;
+using Orion.Matchmaking.Commands;
 using Orion.UserInterface.Actions;
 using Orion.UserInterface.Actions.Enablers;
 using Orion.UserInterface.Widgets;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
+using MatchAudioRenderer = Orion.Audio.MatchAudioPresenter;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using SoundContext = Orion.Engine.Audio.SoundContext;
-using MatchAudioRenderer = Orion.Audio.MatchAudioPresenter;
 
 namespace Orion.UserInterface
 {
@@ -26,11 +25,8 @@ namespace Orion.UserInterface
     {
         #region Fields
         #region Chat
-        private static readonly TimeSpan messageTimeToLive = new TimeSpan(0, 0, 10);
         private readonly TextField chatInput;
-        private readonly Frame chatMessagesFrame;
-        private readonly Dictionary<Label, DateTime> messagesExpiration = new Dictionary<Label, DateTime>();
-        private readonly List<Label> messagesToDelete = new List<Label>();
+        private readonly MatchConsole console;
         #endregion
 
         #region General UI
@@ -138,14 +134,14 @@ namespace Orion.UserInterface
 
             CreateScrollers();
 
-            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
-            chatInput = new TextField(chatInputFrame);
+            Rectangle chatInputRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
+            chatInput = new TextField(chatInputRectangle);
             chatInput.Triggered += SendMessage;
             chatInput.KeyDown += ChatInputKeyDown;
-            Rectangle messagesFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
-            chatMessagesFrame = new Frame(messagesFrame, null);
-            chatMessagesFrame.CaptureMouseEvents = false;
-            Children.Add(chatMessagesFrame);
+
+            Rectangle consoleRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
+            console = new MatchConsole(consoleRectangle);
+            Children.Add(console);
 
             Rectangle pausePanelRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
             pausePanel = new Frame(pausePanelRectangle);
@@ -256,46 +252,29 @@ namespace Orion.UserInterface
             Argument.EnsureNotNull(message, "message");
 
             string text = "{0}: {1}".FormatInvariant(message.Faction.Name, message.Text);
-            DisplayMessage(text, message.Faction.Color);
-        }
-
-        public void DisplayMessage(string text, ColorRgb color)
-        {
-            Argument.EnsureNotNull(text, "text");
-
-            Label messageLabel = new Label(text);
-            messageLabel.Color = color;
-            messagesExpiration[messageLabel] = DateTime.UtcNow + messageTimeToLive;
-            float height = messageLabel.Frame.Height;
-            foreach (Label writtenMessage in chatMessagesFrame.Children)
-                writtenMessage.Frame = writtenMessage.Frame.TranslatedBy(0, height);
-            chatMessagesFrame.Children.Add(messageLabel);
-            if (chatMessagesFrame.Children.Count > 15)
-                chatMessagesFrame.Children.RemoveAt(0);
+            console.AddMessage(text, message.Faction.Color);
         }
 
         public void DisplayDefeatMessage(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
-            DisplayMessage("{0} a été vaincu.".FormatInvariant(faction.Name), faction.Color);
 
-            if (faction == LocalFaction)
-            {
-                if(match.IsPausable)
-                    match.Pause();
-                Instant.DisplayAlert(this, "Vous avez perdu le match.", () => Parent.PopDisplay(this));
-            }
+            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
+            console.AddMessage(text, faction.Color);
+
+            if (faction != LocalFaction) return;
+            
+            if (match.IsPausable) match.Pause();
+            Instant.DisplayAlert(this, "Vous avez perdu le match.", () => Parent.PopDisplay(this));
         }
 
         public void DisplayVictoryMessage(IEnumerable<Faction> factions)
         {
             Argument.EnsureNotNull(factions, "factions");
-            if (factions.Contains(LocalFaction))
-            {
-                if (match.IsPausable)
-                    match.Pause();
-                Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
-            }
+            if (!factions.Contains(LocalFaction)) return;
+            
+            if (match.IsPausable) match.Pause();
+            Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
         }
         #endregion
 
@@ -452,15 +431,7 @@ namespace Orion.UserInterface
                 CenterOnSelection();
             }
 
-            DateTime now = DateTime.UtcNow;
-            messagesToDelete.AddRange(messagesExpiration.Where(pair => pair.Value <= now).Select(pair => pair.Key));
-            foreach (Label toDelete in messagesToDelete)
-            {
-                messagesExpiration.Remove(toDelete);
-                toDelete.Dispose();
-            }
-            messagesToDelete.Clear();
-
+            console.Update(args.TimeDeltaInSeconds);
             match.Update(args.TimeDeltaInSeconds);
             base.OnUpdate(args);
         }
@@ -551,7 +522,7 @@ namespace Orion.UserInterface
 
         private void OnLocalFactionWarning(Faction sender, string args)
         {
-            DisplayMessage(args, sender.Color);
+            console.AddMessage(args, sender.Color);
         }
         #endregion
 

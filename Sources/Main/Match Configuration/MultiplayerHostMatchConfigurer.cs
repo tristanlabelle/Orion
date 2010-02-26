@@ -13,7 +13,7 @@ namespace Orion.Main
 {
     sealed class MultiplayerHostMatchConfigurer : MultiplayerMatchConfigurer
     {
-        private static readonly byte[] advertizeGameMessage = new byte[2] { (byte)SetupMessageType.Advertise, 12 };
+        private static readonly byte[] advertiseGameMessage = new byte[2] { (byte)SetupMessageType.Advertise, 12 };
         private static readonly byte[] refuseJoinGameMessage = new byte[] { (byte)SetupMessageType.RefuseJoinRequest };
 
         private MultiplayerHostMatchConfigurationUI ui;
@@ -121,8 +121,8 @@ namespace Orion.Main
         private void Advertise(IPv4EndPoint host)
         {
             int leftSlots = ui.Players.OfType<RemotePlayerSlot>().Count(slot => !slot.RemoteHost.HasValue);
-            advertizeGameMessage[1] = (byte)leftSlots;
-            transporter.SendTo(advertizeGameMessage, host);
+            advertiseGameMessage[1] = (byte)leftSlots;
+            transporter.SendTo(advertiseGameMessage, host);
         }
 
         private void TryJoin(IPv4EndPoint host)

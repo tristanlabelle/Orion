@@ -353,6 +353,19 @@ namespace Orion.Engine.Graphics
             return texture;
         }
 
+        /// <summary>
+        /// Creates a texture with a checkerboard pattern of a given size.
+        /// </summary>
+        /// <param name="size">The size of the texture to be created.</param>
+        /// <param name="firstColor">The first color of the checkerboard pattern.</param>
+        /// <param name="secondColor">The second color of the checkerboard pattern.</param>
+        /// <returns>The newly created checkerboard texture.</returns>
+        public static Texture CreateCheckerboard(Size size, ColorRgb firstColor, ColorRgb secondColor)
+        {
+            using (BufferedPixelSurface surface = BufferedPixelSurface.CreateCheckerboard(size, firstColor, secondColor))
+                return FromPixelSurface(surface, false, true);
+        }
+
         public static Texture FromPixelSurface(IPixelSurface surface, bool smooth, bool repeat)
         {
             Argument.EnsureNotNull(surface, "surface");

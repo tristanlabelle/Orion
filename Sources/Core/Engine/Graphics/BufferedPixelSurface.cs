@@ -182,6 +182,49 @@ namespace Orion.Engine.Graphics
             }
         }
 
+        /// <summary>
+        /// Creates a pixel surface with a checkerboard pattern of a given size.
+        /// </summary>
+        /// <param name="size">The size of the pixel surface to be created.</param>
+        /// <param name="firstColor">The first color of the checkerboard pattern.</param>
+        /// <param name="secondColor">The second color of the checkerboard pattern.</param>
+        /// <returns>The newly created checkerboard pixel surface.</returns>
+        public static BufferedPixelSurface CreateCheckerboard(Size size, ColorRgb firstColor, ColorRgb secondColor)
+        {
+            byte[] pixelData = new byte[size.Area * 3];
+
+            byte firstColorR = firstColor.ByteR;
+            byte firstColorG = firstColor.ByteG;
+            byte firstColorB = firstColor.ByteB;
+
+            byte secondColorR = secondColor.ByteR;
+            byte secondColorG = secondColor.ByteG;
+            byte secondColorB = secondColor.ByteB;
+
+            for (int y = 0; y < size.Height; y++)
+            {
+                for (int x = 0; x < size.Width; x++)
+                {
+                    int pixelIndex = x + y * size.Width;
+                    int pixelDataOffset = pixelIndex * 3;
+                    if ((x + y) % 2 == 1)
+                    {
+                        pixelData[pixelDataOffset + 0] = firstColorR;
+                        pixelData[pixelDataOffset + 1] = firstColorG;
+                        pixelData[pixelDataOffset + 2] = firstColorB;
+                    }
+                    else
+                    {
+                        pixelData[pixelDataOffset + 0] = secondColorR;
+                        pixelData[pixelDataOffset + 1] = secondColorG;
+                        pixelData[pixelDataOffset + 2] = secondColorB;
+                    }
+                }
+            }
+
+            return new BufferedPixelSurface(size, PixelFormat.Rgb, new ArraySegment<byte>(pixelData), Access.Read);
+        }
+
 
         private static bool IsSupportedPixelFormat(SysPixelFormat pixelFormat)
         {

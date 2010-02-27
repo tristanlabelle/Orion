@@ -17,9 +17,7 @@ namespace Orion.Engine.Graphics
     {
         #region Fields
         private readonly DirectoryInfo directory;
-        private readonly Dictionary<string, Texture> textures
-            = new Dictionary<string, Texture>();
-
+        private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
         private readonly Texture defaulTexture;
         #endregion
 
@@ -31,7 +29,8 @@ namespace Orion.Engine.Graphics
         {
             directory = new DirectoryInfo(@"../../../Assets/Textures");
             Debug.Assert(directory.Exists, "The textures directory {0} does not exist.");
-            defaulTexture = Get("Default") ;
+
+            defaulTexture = Get("Default") ?? Texture.CreateCheckerboard(new Size(4, 4), Colors.Yellow, Colors.Pink);
         }
         #endregion
 
@@ -42,8 +41,12 @@ namespace Orion.Engine.Graphics
 
             Texture texture;
             if (textures.TryGetValue(name, out texture))
-            {
                 return texture ?? defaulTexture;
+
+            if (!directory.Exists)
+            {
+                textures.Add(name, null);
+                return defaulTexture;
             }
 
             string filePath = GetPath(name);
@@ -55,7 +58,7 @@ namespace Orion.Engine.Graphics
             }
             try
             {
-                texture =  Texture.FromFile(filePath, true, false);
+                texture = Texture.FromFile(filePath, true, false);
                 textures.Add(name, texture);
                 return texture;
             }
@@ -83,10 +86,19 @@ namespace Orion.Engine.Graphics
 
         public void Dispose()
         {
+            bool defaultTextureWasDisposed = false;
             foreach (Texture texture in textures.Values)
+            {
                 if (texture != null)
+                {
+                    if (texture == defaulTexture) defaultTextureWasDisposed = true;
                     texture.Dispose();
+                }
+            }
             textures.Clear();
+
+            if (!defaultTextureWasDisposed && defaulTexture != null)
+                defaulTexture.Dispose();
         }
 
         private string GetPath(string name)

@@ -167,10 +167,18 @@ namespace Orion.Engine.Audio
             if (soundGroups.TryGetValue(name, out soundGroup))
                 return soundGroup;
 
-            var sounds = Directory.GetFiles("../../../Assets/Sounds/", name + ".*")
-                .Select(filePath => Path.GetFileNameWithoutExtension(filePath))
-                .Select(soundName => GetSound(soundName))
-                .Where(sound => sound != null);
+            IEnumerable<Sound> sounds = null;
+            try
+            {
+                sounds = Directory.GetFiles("../../../Assets/Sounds/", name + ".*")
+                    .Select(filePath => Path.GetFileNameWithoutExtension(filePath))
+                    .Select(soundName => GetSound(soundName))
+                    .Where(sound => sound != null);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                sounds = Enumerable.Empty<Sound>();
+            }
 
             soundGroup = new SoundGroup(name, sounds);
             soundGroups.Add(name, soundGroup);

@@ -14,6 +14,9 @@ namespace Orion.Graphics
     public sealed class TerrainRenderer : IDisposable
     {
         #region Fields
+        private static readonly float GrassTextureSizeInTiles = 4;
+        private static readonly float SandTextureSizeInTiles = 12;
+
         private readonly Terrain terrain;
         private readonly Texture obstacleMaskTexture;
         private readonly Texture splattingMaskTexture;
@@ -58,10 +61,8 @@ namespace Orion.Graphics
         public void Draw(GraphicsContext graphics)
         {
             Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-            Rectangle grassTextureRectangle = new Rectangle(0, 0, terrain.Width / 4, terrain.Height / 4);
-            Rectangle sandTextureRectangle = new Rectangle(0, 0, terrain.Width / 16, terrain.Height / 16);
-
-            GL.Color4(1f, 1f, 1f, 1f);
+            Rectangle grassTextureRectangle = new Rectangle(0, 0, terrain.Width / GrassTextureSizeInTiles, terrain.Height / GrassTextureSizeInTiles);
+            Rectangle sandTextureRectangle = new Rectangle(0, 0, terrain.Width / SandTextureSizeInTiles, terrain.Height / SandTextureSizeInTiles);
 
             graphics.Fill(terrainBounds, grassTileTexture, grassTextureRectangle);
             graphics.FillMasked(terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, TextureRectangle);

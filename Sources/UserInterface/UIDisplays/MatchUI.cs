@@ -118,7 +118,7 @@ namespace Orion.UserInterface
             actions = new ActionFrame(actionsRectangle);
             hudFrame.Children.Add(actions);
 
-            Vector2 maxMinimapRectangleSize = new Vector2(0.21f, 0.84f);
+            Vector2 maxMinimapRectangleSize = new Vector2(0.23f, 0.9f);
             Vector2 minimapRectangleSize = maxMinimapRectangleSize;
             if (match.World.Width > match.World.Height)
                 minimapRectangleSize.Y *= match.World.Height / (float)match.World.Width;
@@ -126,8 +126,8 @@ namespace Orion.UserInterface
                 minimapRectangleSize.X *= match.World.Width / (float)match.World.Height;
 
             Vector2 minimapRectangleOrigin = new Vector2(
-                0.02f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
-                0.08f + (maxMinimapRectangleSize.Y - minimapRectangleSize.Y) * 0.5f);
+                0.01f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
+                0.05f + (maxMinimapRectangleSize.Y - minimapRectangleSize.Y) * 0.5f);
 
             Rectangle minimapRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds,
                 minimapRectangleOrigin, minimapRectangleOrigin + minimapRectangleSize);
@@ -232,10 +232,12 @@ namespace Orion.UserInterface
         #region Initialization
         private void CreateScrollers()
         {
-            Rectangle northFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.98f), new Vector2(1, 1));
-            Rectangle southFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.02f));
-            Rectangle eastFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.98f, 0), new Vector2(1, 1));
-            Rectangle westFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.02f, 1));
+            const float sliderSize = 0.005f;
+
+            Rectangle northFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 1 - sliderSize), new Vector2(1, 1));
+            Rectangle southFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, sliderSize));
+            Rectangle eastFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(1 - sliderSize, 0), new Vector2(1, 1));
+            Rectangle westFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(sliderSize, 1));
             Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 0.05f), Keys.Up);
             Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -0.05f), Keys.Down);
             Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(0.025f, 0), Keys.Right);
@@ -339,6 +341,7 @@ namespace Orion.UserInterface
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
                 userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
+
             return base.OnMouseDown(args);
         }
 
@@ -351,6 +354,7 @@ namespace Orion.UserInterface
             }
             else
                 userInputManager.SelectionManager.HoveredUnit = null;
+
             return base.OnMouseMove(args);
         }
 
@@ -446,12 +450,9 @@ namespace Orion.UserInterface
         private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
         {
             Rectangle newBounds = sender.Bounds;
-
             matchAudioRenderer.SetViewBounds(newBounds);
-
-            Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
-            worldView.FullBounds = userInputManager.LocalCommander.Faction.World.Bounds
-                .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y)
+            worldView.FullBounds = World.Bounds
+                .TranslatedBy(-newBounds.Extent)
                 .ResizedBy(newBounds.Width, newBounds.Height);
 
             if (worldView.IsMouseOver)
@@ -647,7 +648,7 @@ namespace Orion.UserInterface
             if (!match.IsRunning)
             {
                 foreach (Scroller scroller in Children.OfType<Scroller>())
-                    scroller.Enabled = false;
+                    scroller.IsEnabled = false;
             }
 
             Children.Add(pausePanel);
@@ -656,9 +657,7 @@ namespace Orion.UserInterface
         private void HidePausePanel()
         {
             foreach (Scroller scroller in Children.OfType<Scroller>())
-            {
-                scroller.Enabled = true;
-            }
+                scroller.IsEnabled = true;
 
             Children.Remove(pausePanel);
             match.Resume();

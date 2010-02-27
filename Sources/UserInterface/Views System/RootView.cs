@@ -16,7 +16,6 @@ namespace Orion.UserInterface
         private Rectangle frame;
         private Stack<UIDisplay> displays;
         private Responder focusedView;
-        private GraphicsContext graphicsContext;
         #endregion
 
         #region Constructors
@@ -26,13 +25,11 @@ namespace Orion.UserInterface
         /// <param name="frame">The frame of the view</param>
         /// <param name="bounds">The bounds of the view</param>
         public RootView(Rectangle frame, Rectangle bounds)
-            : base()
         {
-            this.Bounds = bounds;
             this.Frame = frame;
+            this.Bounds = bounds;
             this.displays = new Stack<UIDisplay>();
             this.displays.Push(new NullUI());
-            this.graphicsContext = new GraphicsContext();
         }
         #endregion
 
@@ -45,11 +42,7 @@ namespace Orion.UserInterface
         public override Rectangle Frame
         {
             get { return frame; }
-            set
-            {
-                frame = value;
-                ResetViewport();
-            }
+            set { frame = value; }
         }
 
         public Responder FocusedView
@@ -108,16 +101,17 @@ namespace Orion.UserInterface
             return focusedView.PropagateKeyboardEvent(type, args);
         }
 
-        protected internal override void Render()
+        protected internal override void Render(GraphicsContext graphicsContext)
         {
             graphicsContext.Clear(Colors.Black);
-            displays.Peek().Render();
+            ResetViewport(graphicsContext);
+            displays.Peek().Render(graphicsContext);
         }
 
-        private void ResetViewport()
+        private void ResetViewport(GraphicsContext graphicsContext)
         {
             Rectangle bounds = Bounds;
-            GL.Viewport(0, 0, (int)Frame.Size.X, (int)Frame.Size.Y);
+            GL.Viewport(0, 0, (int)Frame.Width, (int)Frame.Height);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             GL.Ortho(bounds.MinX, bounds.Width, bounds.MinY, bounds.Height, -1, 1);

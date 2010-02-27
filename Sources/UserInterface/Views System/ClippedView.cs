@@ -1,6 +1,6 @@
 ﻿using System;
-using OpenTK.Graphics;
 using OpenTK.Math;
+using Orion.Engine.Graphics;
 using Orion.Geometry;
 using Orion.Graphics;
 
@@ -138,7 +138,7 @@ namespace Orion.UserInterface
             Bounds = newBounds.TranslatedTo(min);
         }
 
-        protected internal override void Render()
+        protected internal override void Render(GraphicsContext graphicsContext)
         {
             Vector2 origin = Frame.Min;
             Vector2 end = Frame.Max;
@@ -152,7 +152,7 @@ namespace Orion.UserInterface
             Vector2 size = end - origin;
 
             Region region = new Region((int)origin.X, (int)origin.Y, (int)size.X, (int)size.Y);
-            using (graphicsContext.Scissor(region)) base.Render();
+            using (graphicsContext.Scissor(region)) base.Render(graphicsContext);
         }
 
         protected override void Dispose(bool disposing)

@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using Orion.Engine.Graphics;
 using Orion.Geometry;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using SysPoint = System.Drawing.Point;
@@ -14,6 +15,7 @@ namespace Orion.UserInterface
     {
         #region Fields
         internal readonly RootView rootView;
+        private readonly GraphicsContext graphicsContext;
         private SysPoint lastGameMousePosition;
         private MouseButtons lastMouseButtons;
         #endregion
@@ -27,10 +29,12 @@ namespace Orion.UserInterface
             InitializeComponent();
 
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
-            rootView = new RootView(windowBounds, RootView.ContentsBounds);
-            
-            lastGameMousePosition = GetGameMousePosition();
-            lastMouseButtons = Control.MouseButtons;
+            this.rootView = new RootView(windowBounds, RootView.ContentsBounds);
+
+            this.graphicsContext = new GraphicsContext();
+
+            this.lastGameMousePosition = GetGameMousePosition();
+            this.lastMouseButtons = Control.MouseButtons;
         }
         #endregion
 
@@ -123,7 +127,7 @@ namespace Orion.UserInterface
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
-            rootView.Render();
+            rootView.Render(graphicsContext);
             glControl.SwapBuffers();
         }
 

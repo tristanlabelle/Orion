@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Orion.Geometry;
+using Orion.Engine.Graphics;
 
 namespace Orion.UserInterface
 {
@@ -248,11 +249,13 @@ namespace Orion.UserInterface
         /// <summary>
         /// Renders this container.
         /// </summary>
-        protected internal virtual void Render()
+        protected internal virtual void Render(GraphicsContext graphicsContext)
         {
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+
             EnsureNotDisposed();
             foreach (ViewContainer container in Children)
-                container.Render();
+                container.Render(graphicsContext);
         }
 
         protected internal virtual void OnAddToParent(ViewContainer parent)

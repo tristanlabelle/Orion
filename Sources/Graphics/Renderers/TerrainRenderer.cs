@@ -1,5 +1,4 @@
 ﻿using System;
-using OpenTK.Graphics;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Audio;
 using Orion.Collections;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
@@ -75,8 +76,7 @@ namespace Orion.UserInterface
             this.userInputManager = new UserInputManager(localCommander);
 
             this.audioContext = new SoundContext();
-            this.audioContext.IsMuted = false;
-            this.matchAudioRenderer = new Orion.Audio.MatchAudioPresenter(audioContext, match, this.userInputManager);
+            this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.userInputManager);
 
             this.textureManager = new TextureManager();
             World world = match.World;
@@ -182,7 +182,7 @@ namespace Orion.UserInterface
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
             Texture workerTexture = textureManager.GetUnit("Schtroumpf");
             TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
-            this.idleWorkerButton = new Button(inactiveWorkerRectangle, "", workerButtonRenderer);
+            this.idleWorkerButton = new Button(inactiveWorkerRectangle, string.Empty, workerButtonRenderer);
             this.idleWorkerButton.CaptionUpColor = Colors.Red;
             this.idleWorkerButton.Triggered += OnIdleWorkerButtonTriggered;
             UpdateWorkerActivityButton();
@@ -421,7 +421,7 @@ namespace Orion.UserInterface
         protected override bool OnKeyUp(KeyboardEventArgs args)
         {
             isShiftDown = args.HasShift;
-            (worldView.Renderer as MatchRenderer).DrawAllHealthBars = args.HasAlt;
+            ((MatchRenderer)worldView.Renderer).DrawAllHealthBars = args.HasAlt;
             isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
             return base.OnKeyUp(args);
         }
@@ -443,13 +443,16 @@ namespace Orion.UserInterface
             Parent.PopDisplay(this);
         }
 
-        private void OnWorldViewBoundsChanged(View sender, Rectangle newBounds)
+        private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
         {
+            Rectangle newBounds = sender.Bounds;
+
             matchAudioRenderer.SetViewBounds(newBounds);
 
             Vector2 boundsHalfsize = new Vector2(newBounds.Width / 2, newBounds.Height / 2);
             worldView.FullBounds = userInputManager.LocalCommander.Faction.World.Bounds
-                .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y).ResizedBy(newBounds.Width, newBounds.Height);
+                .TranslatedBy(-boundsHalfsize.X, -boundsHalfsize.Y)
+                .ResizedBy(newBounds.Width, newBounds.Height);
 
             if (worldView.IsMouseOver)
             {
@@ -517,7 +520,7 @@ namespace Orion.UserInterface
                 }
             }
 
-            // remove diplomacy pannel from view.
+            // Remove diplomacy panel from view.
             assocFactionDropList.Clear();
             bouton.Parent.RemoveFromParent();
         }
@@ -539,9 +542,8 @@ namespace Orion.UserInterface
         #region Methods
         public void CenterOn(Vector2 position)
         {
-            Vector2 halfWorldBoundsSize = worldView.Bounds.Size;
-            halfWorldBoundsSize.Scale(0.5f, 0.5f);
-            worldView.Bounds = worldView.Bounds.TranslatedTo(position - halfWorldBoundsSize);
+            Vector2 worldBoundsExtent = worldView.Bounds.Extent;
+            worldView.Bounds = worldView.Bounds.TranslatedTo(position - worldBoundsExtent);
         }
 
         private void CenterOnSelection()
@@ -639,13 +641,16 @@ namespace Orion.UserInterface
 
         private void DisplayPausePanel()
         {
-            if (!Children.Contains(pausePanel))
+            if (Children.Contains(pausePanel)) return;
+
+            match.Pause();
+            if (!match.IsRunning)
             {
-                match.Pause();
-                if (!match.IsRunning)
-                    foreach (Scroller scroller in Children.OfType<Scroller>()) scroller.Enabled = false;
-                Children.Add(pausePanel);
+                foreach (Scroller scroller in Children.OfType<Scroller>())
+                    scroller.Enabled = false;
             }
+
+            Children.Add(pausePanel);
         }
 
         private void HidePausePanel()
@@ -654,6 +659,7 @@ namespace Orion.UserInterface
             {
                 scroller.Enabled = true;
             }
+
             Children.Remove(pausePanel);
             match.Resume();
         }
@@ -692,9 +698,9 @@ namespace Orion.UserInterface
             diplomacyFrame.Children.Add(listFrame);
 
             Rectangle rectangleButton = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.4f,0.01f), new Vector2(0.6f,0.09f));
-            Button boutonAccepter = new Button(rectangleButton, "Accepter");
-            boutonAccepter.Triggered += AcceptNewDiplomacy;
-            diplomacyFrame.Children.Add(boutonAccepter);
+            Button acceptButton = new Button(rectangleButton, "Accepter");
+            acceptButton.Triggered += AcceptNewDiplomacy;
+            diplomacyFrame.Children.Add(acceptButton);
         }
 
         protected override void Dispose(bool disposing)

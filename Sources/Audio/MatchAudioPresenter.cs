@@ -29,6 +29,8 @@ namespace Orion.Audio
         /// Reused between calls to minimize object garbage.
         /// </summary>
         private readonly StringBuilder stringBuilder = new StringBuilder();
+
+        private bool isGameStarted;
         #endregion
 
         #region Constructors
@@ -123,6 +125,8 @@ namespace Orion.Audio
 
         private void OnEntityAdded(EntityManager arg1, Entity entity)
         {
+            if (!isGameStarted) return;
+
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != LocalFaction) return;
 
@@ -134,12 +138,17 @@ namespace Orion.Audio
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            if (step.Number == 5 && userInputManager.LocalFaction.Color == Colors.Pink)
+            if (step.Number == 2)
             {
-                Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
-                if (sound == null) return;
+                isGameStarted = true;
 
-                soundContext.PlayAndForget(sound, null);
+                if (userInputManager.LocalFaction.Color == Colors.Pink)
+                {
+                    Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
+                    if (sound == null) return;
+
+                    soundContext.PlayAndForget(sound, null);
+                }
             }
         }
 

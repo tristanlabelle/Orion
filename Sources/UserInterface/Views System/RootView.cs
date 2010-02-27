@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using OpenTK.Graphics;
 using OpenTK.Math;
+using Orion.Engine.Graphics;
 using Orion.Geometry;
+using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 
 namespace Orion.UserInterface
 {
-    public class RootView : Responder
+    public sealed class RootView : Responder
     {
         #region Fields
         public static readonly Rectangle ContentsBounds = new Rectangle(1024, 768);
@@ -14,6 +16,7 @@ namespace Orion.UserInterface
         private Rectangle frame;
         private Stack<UIDisplay> displays;
         private Responder focusedView;
+        private GraphicsContext graphicsContext;
         #endregion
 
         #region Constructors
@@ -25,10 +28,11 @@ namespace Orion.UserInterface
         public RootView(Rectangle frame, Rectangle bounds)
             : base()
         {
-            Bounds = bounds;
-            Frame = frame;
-            displays = new Stack<UIDisplay>();
-            displays.Push(new NullUI());
+            this.Bounds = bounds;
+            this.Frame = frame;
+            this.displays = new Stack<UIDisplay>();
+            this.displays.Push(new NullUI());
+            this.graphicsContext = new GraphicsContext(bounds);
         }
         #endregion
 
@@ -106,12 +110,7 @@ namespace Orion.UserInterface
 
         protected internal override void Render()
         {
-            GL.ColorMask(true, true, true, true);
-            GL.ClearColor(0, 0, 0, 0);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            GL.ColorMask(true, true, true, false);
-            GL.LoadIdentity();
-
+            graphicsContext.Clear(Colors.Black);
             displays.Peek().Render();
         }
 

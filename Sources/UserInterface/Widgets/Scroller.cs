@@ -7,6 +7,8 @@ namespace Orion.UserInterface.Widgets
     public class Scroller : Responder
     {
         #region Fields
+        private static readonly float ScrollDelayInSeconds = 0.2f;
+        private static readonly float ScrollSpeed = 40;
 
         private readonly ClippedView scrolledView;
         private readonly Vector2 direction;
@@ -14,6 +16,7 @@ namespace Orion.UserInterface.Widgets
 
         private bool mouseTriggered;
         private bool keyboardTriggered;
+        private float timeHoveredInSeconds;
         #endregion
 
         #region Constructors
@@ -41,12 +44,14 @@ namespace Orion.UserInterface.Widgets
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
             mouseTriggered = true;
+            timeHoveredInSeconds = 0;
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
             mouseTriggered = false;
+            timeHoveredInSeconds = 0;
             return base.OnMouseExit(args);
         }
 
@@ -70,10 +75,12 @@ namespace Orion.UserInterface.Widgets
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if ((mouseTriggered || keyboardTriggered) && Enabled)
+            timeHoveredInSeconds += args.TimeDeltaInSeconds;
+            bool shouldScroll = Enabled && (keyboardTriggered || (mouseTriggered && timeHoveredInSeconds >= ScrollDelayInSeconds));
+            if (shouldScroll)
             {
                 Vector2 scrollFactor = new Vector2(direction.X * scrolledView.Bounds.Width, direction.Y * scrolledView.Bounds.Height);
-                scrolledView.ScrollBy(scrollFactor * args.TimeDeltaInSeconds * 40);
+                scrolledView.ScrollBy(scrollFactor * args.TimeDeltaInSeconds * ScrollSpeed);
             }
         }
 

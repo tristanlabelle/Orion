@@ -9,7 +9,7 @@ namespace Orion.UserInterface
     public abstract class View : Responder
     {
         #region Fields
-        private GraphicsContext context;
+        protected readonly GraphicsContext context;
         #endregion
 
         #region Constructors

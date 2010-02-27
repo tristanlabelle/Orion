@@ -64,27 +64,8 @@ namespace Orion.Graphics
             GL.Color4(1f, 1f, 1f, 1f);
 
             graphics.Fill(terrainBounds, grassTileTexture, grassTextureRectangle);
-            DrawMasked(graphics, terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, TextureRectangle);
-            DrawMasked(graphics, terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, TextureRectangle);
-        }
-
-        private void DrawMasked(GraphicsContext graphics,
-            Rectangle rectangle, Texture maskedTexture, Rectangle maskedTextureRectangle,
-            Texture maskingTexture, Rectangle maskingTextureRectangle)
-        {
-            GL.ColorMask(false, false, false, true);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            graphics.Fill(rectangle, maskingTexture, maskingTextureRectangle);
-
-            GL.ColorMask(true, true, true, false);
-            GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.OneMinusDstAlpha);
-            maskedTexture.BindWhile(() => graphics.DrawTexturedQuad(rectangle, maskedTextureRectangle));
-            GL.Disable(EnableCap.Blend);
-            GL.Disable(EnableCap.Texture2D);
-
-            GL.ColorMask(true, true, true, true);
+            graphics.FillMasked(terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, TextureRectangle);
+            graphics.FillMasked(terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, TextureRectangle);
         }
 
         public void DrawMiniature(GraphicsContext graphics)

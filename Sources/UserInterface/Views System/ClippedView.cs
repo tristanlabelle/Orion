@@ -151,10 +151,8 @@ namespace Orion.UserInterface
             }
             Vector2 size = end - origin;
 
-            GL.Scissor((int)origin.X, (int)origin.Y, (int)size.X, (int)size.Y);
-            GL.Enable(EnableCap.ScissorTest);
-            base.Render();
-            GL.Disable(EnableCap.ScissorTest);
+            Region region = new Region((int)origin.X, (int)origin.Y, (int)size.X, (int)size.Y);
+            using (context.Scissor(region)) base.Render();
         }
 
         protected override void Dispose(bool disposing)

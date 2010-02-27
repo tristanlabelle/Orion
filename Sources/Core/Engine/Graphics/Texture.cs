@@ -141,8 +141,7 @@ namespace Orion.Engine.Graphics
         /// before reverting to the last bound texture.
         /// </summary>
         /// <param name="action">The action to be performed on the bound texture.</param>
-        [Obsolete("To be made private or internal")]
-        public void BindWhile(Action action)
+        internal void BindWhile(Action action)
         {
             Argument.EnsureNotNull(action, "action");
 
@@ -160,19 +159,16 @@ namespace Orion.Engine.Graphics
             }
         }
 
-        [Obsolete("To be made private or internal")]
-        public void SetParameter(TextureParameterName name, int value)
+        private void SetParameter(TextureParameterName name, int value)
         {
             BindWhile(() => { GL.TexParameter(TextureTarget.Texture2D, name, value); });
         }
 
-        [Obsolete("To be made private or internal")]
-        public void SetEnv(TextureEnvParameter param, int value)
+        private void SetEnv(TextureEnvParameter param, int value)
         {
             BindWhile(() => { GL.TexEnv(TextureEnvTarget.TextureEnv, param, value); });
         }
 
-        [Obsolete("To be made private or internal")]
         public void SetSmooth(bool on)
         {
             BindWhile(() =>
@@ -186,7 +182,6 @@ namespace Orion.Engine.Graphics
             });
         }
 
-        [Obsolete("To be made private or internal")]
         public void SetRepeat(bool on)
         {
             try
@@ -201,8 +196,7 @@ namespace Orion.Engine.Graphics
             }
         }
 
-        [Obsolete("To be made private or internal")]
-        public void SetWrapMode(TextureWrapMode wrapMode)
+        private void SetWrapMode(TextureWrapMode wrapMode)
         {
             SetParameter(TextureParameterName.TextureWrapS, (int)wrapMode);
             SetParameter(TextureParameterName.TextureWrapT, (int)wrapMode);

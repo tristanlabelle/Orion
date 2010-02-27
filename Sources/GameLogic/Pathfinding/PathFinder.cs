@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using System.Collections;
 using System.Diagnostics;
 using OpenTK.Math;
@@ -107,7 +106,7 @@ namespace Orion.GameLogic.Pathfinding
             visitedNodeCount = 0;
             nodeNearestToDestinationIndex = -1;
 
-            if (openNodeStateValue == byte.MaxValue - 2)
+            if ((int)openNodeStateValue == (int)byte.MaxValue - 2)
             {
                 openNodeStateValue = 1;
                 closedNodeStateValue = 2;

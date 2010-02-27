@@ -20,11 +20,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-        protected internal override void Render()
-        {
-            base.Render();
-        }
-
         protected internal sealed override void Draw(GraphicsContext context)
         {
             if (Renderer != null) Renderer.Draw(context);

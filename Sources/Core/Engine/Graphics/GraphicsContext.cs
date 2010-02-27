@@ -17,10 +17,12 @@ namespace Orion.Engine.Graphics
         #region Nested Types
         public struct TransformHandle : IDisposable
         {
-            public void Dispose()
-            {
-                GL.PopMatrix();
-            }
+            public void Dispose()  { GL.PopMatrix(); }
+        }
+
+        public struct ScissorRectangleHandle : IDisposable
+        {
+            public void Dispose() { GL.Disable(EnableCap.ScissorTest); }
         }
         #endregion
 
@@ -86,7 +88,7 @@ namespace Orion.Engine.Graphics
 
         #region Methods
         #region OpenGL Context
-
+        [Obsolete("Should be abstracted from the game")]
         public void SetUpGLContext(Rectangle parentSystem)
         {
             GL.PushMatrix();
@@ -98,11 +100,47 @@ namespace Orion.Engine.Graphics
             readyForDrawing = true;
         }
 
+        [Obsolete("Should be abstracted from the game")]
         public void RestoreGLContext()
         {
             GL.PopMatrix();
 
             readyForDrawing = false;
+        }
+        #endregion
+
+        #region Clearing
+        /// <summary>
+        /// Clears the backbuffer to a given color.
+        /// </summary>
+        /// <param name="color">The color to which the backbuffer should be cleared.</param>
+        public void Clear(ColorRgb color)
+        {
+            GL.ColorMask(true, true, true, true);
+            GL.ClearColor(color.R, color.G, color.B, 0);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.ColorMask(true, true, true, false);
+        }
+        #endregion
+
+        #region Scissor Rectangle
+        /// <summary>
+        /// Applies a temporary scissor rectangle.
+        /// This method is best called in a C# <c>using</c> statement.
+        /// </summary>
+        /// <param name="region">The region of the viewport to be scissored.</param>
+        /// <returns>
+        /// A handle that should be disposed when the scope of the scissor rectangle ends.
+        /// </returns>
+        public ScissorRectangleHandle Scissor(Region region)
+        {
+            bool isActive;
+            GL.GetBoolean(GetPName.ScissorTest, out isActive);
+            if (isActive) throw new InvalidOperationException("Cannot nest Scissor boxes");
+
+            GL.Scissor(region.MinX, region.MinY, region.Width, region.Height);
+            GL.Enable(EnableCap.ScissorTest);
+            return new ScissorRectangleHandle();
         }
         #endregion
 
@@ -391,8 +429,37 @@ namespace Orion.Engine.Graphics
             Fill(rectangle, texture, Rectangle.Unit, Colors.White);
         }
 
-        [Obsolete("To be made private or internal")]
-        public void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
+        /// <summary>
+        /// Draws a texture using another texture as a drawing mask.
+        /// </summary>
+        /// <param name="rectangle">The rectangle where the texture is to be drawn.</param>
+        /// <param name="maskedTexture">The masked texture to be drawn.</param>
+        /// <param name="maskedTextureRectangle">The texture coordinates of the masked texture.</param>
+        /// <param name="maskingTexture">The texture to use as a mask.</param>
+        /// <param name="maskingTextureRectangle">The texture coordinates of the masking texture.</param>
+        public void FillMasked(Rectangle rectangle,
+            Texture maskedTexture, Rectangle maskedTextureRectangle,
+            Texture maskingTexture, Rectangle maskingTextureRectangle)
+        {
+            Argument.EnsureNotNull(maskedTexture, "maskedTexture");
+            Argument.EnsureNotNull(maskingTexture, "maskingTexture");
+
+            GL.ColorMask(false, false, false, true);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            Fill(rectangle, maskingTexture, maskingTextureRectangle);
+
+            GL.ColorMask(true, true, true, false);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.DstAlpha, BlendingFactorDest.OneMinusDstAlpha);
+            maskedTexture.BindWhile(() => DrawTexturedQuad(rectangle, maskedTextureRectangle));
+            GL.Disable(EnableCap.Blend);
+            GL.Disable(EnableCap.Texture2D);
+
+            GL.ColorMask(true, true, true, true);
+        }
+
+        private void DrawTexturedQuad(Rectangle rectangle, Rectangle textureRectangle)
         {
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
@@ -406,8 +473,7 @@ namespace Orion.Engine.Graphics
             GL.End();
         }
 
-        [Obsolete("To be made private or internal")]
-        public void DrawTexturedQuad(Rectangle rectangle)
+        private void DrawTexturedQuad(Rectangle rectangle)
         {
             DrawTexturedQuad(rectangle, Rectangle.Unit);
         }

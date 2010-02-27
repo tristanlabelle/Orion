@@ -4,23 +4,24 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
+using Orion.Geometry;
 
 namespace Orion.Graphics
 {
     public class DropdownListRowValueRenderer<T>
     {
-        public virtual void Draw(T value, GraphicsContext context)
+        public virtual void Draw(T value, GraphicsContext context, Rectangle bounds)
         {
-            context.Draw(value.ToString());
+            context.Draw(value.ToString(), bounds.Min);
         }
     }
 
     public class DropdownListRowColorRenderer : DropdownListRowValueRenderer<ColorRgb>
     {
-        public override void Draw(ColorRgb color, GraphicsContext context)
+        public override void Draw(ColorRgb color, GraphicsContext context, Rectangle bounds)
         {
             context.FillColor = color;
-            context.Fill(context.CoordinateSystem.TranslatedBy(1, 1).ResizedBy(-2, -2));
+            context.Fill(bounds.TranslatedBy(1, 1).ResizedBy(-2, -2));
         }
     }
 
@@ -34,9 +35,9 @@ namespace Orion.Graphics
             stances[DiplomaticStance.Enemy] = "Ennemi";
         }
 
-        public override void Draw(DiplomaticStance stance, GraphicsContext context)
+        public override void Draw(DiplomaticStance stance, GraphicsContext context, Rectangle bounds)
         {
-            context.Draw(stances[stance]);
+            context.Draw(stances[stance], bounds.Min);
         }
     }
 }

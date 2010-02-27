@@ -1,8 +1,9 @@
 ﻿using Orion.Engine.Graphics;
+using Orion.Geometry;
 
 namespace Orion.Graphics
 {
-    public delegate void RenderingDelegate(GraphicsContext context);
+    public delegate void RenderingDelegate(GraphicsContext context, Rectangle rectangle);
 
     public class DelegatedRenderer : IRenderer
     {
@@ -10,12 +11,13 @@ namespace Orion.Graphics
 
         public DelegatedRenderer(RenderingDelegate renderingDelegate)
         {
+            Argument.EnsureNotNull(renderingDelegate, "renderingDelegate");
             RenderingDelegate = renderingDelegate;
         }
 
-        public void Draw(GraphicsContext context)
+        public void Draw(GraphicsContext context, Rectangle rectangle)
         {
-            RenderingDelegate(context);
+            RenderingDelegate(context, rectangle);
         }
     }
 }

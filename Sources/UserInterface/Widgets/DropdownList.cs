@@ -49,20 +49,20 @@ namespace Orion.UserInterface.Widgets
                 return base.OnMouseUp(args);
             }
 
-            protected internal override void Draw(GraphicsContext context)
+            protected internal override void Draw(GraphicsContext graphicsContext)
             {
-                if (!parent.Enabled) context.FillColor = new ColorRgba(Colors.Blue, 0.25f);
-                else context.FillColor = Colors.Blue;
+                if (!parent.Enabled) graphicsContext.FillColor = new ColorRgba(Colors.Blue, 0.25f);
+                else graphicsContext.FillColor = Colors.Blue;
 
-                context.Fill(Bounds);
+                graphicsContext.Fill(Bounds);
                 if (IsMouseOver && parent.selectedItem != this)
                 {
-                    context.FillColor = new ColorRgba(Colors.Black, 0.25f);
-                    context.Fill(Bounds);
+                    graphicsContext.FillColor = new ColorRgba(Colors.Black, 0.25f);
+                    graphicsContext.Fill(Bounds);
                 }
 
-                context.FillColor = parent.TextColor;
-                parent.renderer.Draw(Value, context);
+                graphicsContext.FillColor = parent.TextColor;
+                parent.renderer.Draw(Value, graphicsContext, Bounds);
             }
             #endregion
         }

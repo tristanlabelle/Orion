@@ -62,7 +62,7 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context)
+        public override void Draw(GraphicsContext context, Rectangle bounds)
         {
             bool isTraining = false;
 
@@ -108,7 +108,7 @@ namespace Orion.Graphics
                     TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
                     DrawCompletionRect(context, healthRect, currentUnitBeingTrained.Progress);
 
-                    base.Draw(context);
+                    base.Draw(context, bounds);
                     firstStartingXPos += 50;
                     context.FillColor = Colors.Black;
                 }
@@ -138,7 +138,7 @@ namespace Orion.Graphics
                     y -= hp.Frame.Height;
                 }
             }
-            base.Draw(context);
+            base.Draw(context, bounds);
         }
 
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)

@@ -9,8 +9,9 @@ using OpenTK.Math;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class ExplosionRenderer : IRenderer
+    public sealed class ExplosionRenderer
     {
+        #region Nested Types
         private struct Explosion
         {
             public readonly float SpawnTime;
@@ -22,6 +23,7 @@ namespace Orion.Graphics.Renderers
                 this.Circle = circle;
             }
         }
+        #endregion
 
         #region Fields
         private const float lifeTime = 0.6f;

@@ -29,19 +29,19 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context)
+        public override void Draw(GraphicsContext context, Rectangle bounds)
         {
-            worldRenderer.DrawMiniatureTerrain(context);
-            worldRenderer.DrawMiniatureResources(context);
-            worldRenderer.DrawMiniatureUnits(context);
-            worldRenderer.DrawFogOfWar(context);
+            worldRenderer.DrawMiniatureTerrain(context, bounds);
+            worldRenderer.DrawMiniatureResources(context, bounds);
+            worldRenderer.DrawMiniatureUnits(context, bounds);
+            worldRenderer.DrawFogOfWar(context, bounds);
             attackWarningRenderer.Draw(context);
 
             context.StrokeColor = Colors.Orange;
-            Rectangle? intersection = Rectangle.Intersection(context.CoordinateSystem, VisibleRect);
+            Rectangle? intersection = Rectangle.Intersection(bounds, VisibleRect);
             context.Stroke(intersection.GetValueOrDefault());
             context.StrokeColor = Colors.Gray;
-            context.Stroke(context.CoordinateSystem);
+            context.Stroke(bounds);
         }
         #endregion
     }

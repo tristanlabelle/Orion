@@ -59,24 +59,26 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public void Draw(GraphicsContext context)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             Argument.EnsureNotNull(context, "context");
 
-            minimap.VisibleRect = context.CoordinateSystem;
-            worldRenderer.DrawTerrain(context);
-            worldRenderer.DrawResources(context);
-            worldRenderer.DrawUnits(context);
+            minimap.VisibleRect = bounds;
+            worldRenderer.DrawTerrain(context, bounds);
+            worldRenderer.DrawResources(context, bounds);
+            worldRenderer.DrawUnits(context, bounds);
             selectionRenderer.DrawSelectionMarkers(context);
 
             if (SelectionManager.HoveredUnit != null && Faction.CanSee(SelectionManager.HoveredUnit))
                 HealthBarRenderer.Draw(context, SelectionManager.HoveredUnit);
 
-            worldRenderer.DrawExplosions(context);
-            worldRenderer.DrawFogOfWar(context);
+            worldRenderer.DrawExplosions(context, bounds);
+            worldRenderer.DrawFogOfWar(context, bounds);
 
-            if (inputManager.SelectedCommand is IRenderer)
-                ((IRenderer)inputManager.SelectedCommand).Draw(context);
+            IRenderer selectedCommandRenderer = inputManager.SelectedCommand as IRenderer;
+            if (selectedCommandRenderer != null)
+                selectedCommandRenderer.Draw(context, bounds);
+
             selectionRenderer.DrawSelectionRectangle(context);
         }
 

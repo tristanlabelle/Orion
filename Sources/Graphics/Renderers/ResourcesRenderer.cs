@@ -40,21 +40,22 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public void Draw(GraphicsContext graphics)
+        public void Draw(GraphicsContext graphics, Rectangle bounds)
         {
-            DrawClipped(graphics, DrawUnclipped);
+            DrawClipped(graphics, bounds, DrawUnclipped);
         }
 
-        public void DrawMiniature(GraphicsContext graphics)
+        public void DrawMiniature(GraphicsContext graphics, Rectangle bounds)
         {
-            DrawClipped(graphics, DrawMiniatureUnclipped);
+            DrawClipped(graphics, bounds, DrawMiniatureUnclipped);
         }
 
-        private void DrawClipped(GraphicsContext graphics, Action<GraphicsContext, ResourceNode> drawDelegate)
+        private void DrawClipped(GraphicsContext graphics, Rectangle bounds,
+            Action<GraphicsContext, ResourceNode> drawDelegate)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            Rectangle clippingBounds = graphics.CoordinateSystem;
+            Rectangle clippingBounds = bounds;
             foreach (Entity entity in World.Entities)
             {
                 ResourceNode resourceNode = entity as ResourceNode;

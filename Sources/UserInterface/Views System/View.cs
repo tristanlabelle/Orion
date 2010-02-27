@@ -9,14 +9,16 @@ namespace Orion.UserInterface
     public abstract class View : Responder
     {
         #region Fields
-        protected readonly GraphicsContext context;
+        protected readonly GraphicsContext graphicsContext;
+        private Rectangle bounds;
         #endregion
 
         #region Constructors
         public View(Rectangle rectangle)
         {
-            context = new GraphicsContext(new Rectangle(rectangle.Size));
+            this.graphicsContext = new GraphicsContext();
             base.Frame = rectangle;
+            this.bounds = new Rectangle(rectangle.Size);
         }
         #endregion
 
@@ -33,11 +35,11 @@ namespace Orion.UserInterface
 
         public override Rectangle Bounds
         {
-            get { return context.CoordinateSystem; }
+            get { return bounds; }
             set
             {
-                Rectangle previousBounds = context.CoordinateSystem;
-                context.CoordinateSystem = value;
+                Rectangle previousBounds = bounds;
+                bounds = value;
                 if (IsMouseOver)
                 {
                     Vector2 position = MousePosition.Value;
@@ -75,11 +77,11 @@ namespace Orion.UserInterface
 
         protected internal override void Render()
         {
-            context.SetUpGLContext(Frame);
+            graphicsContext.SetUpGLContext(Frame, Bounds);
 
-            Draw(context);
+            Draw(graphicsContext);
             base.Render();
-            context.RestoreGLContext();
+            graphicsContext.RestoreGLContext();
         }
 
         protected internal abstract void Draw(GraphicsContext context);

@@ -13,7 +13,7 @@ namespace Orion.Graphics.Renderers
     /// <summary>
     /// Provides functionality to draw <see cref="Unit"/>s on-screen.
     /// </summary>
-    public sealed class UnitsRenderer : IRenderer
+    public sealed class UnitsRenderer
     {
         #region Fields
         private static readonly Size miniatureUnitSize = new Size(3, 3);
@@ -83,15 +83,15 @@ namespace Orion.Graphics.Renderers
             simulationTimeInSeconds = args.TimeInSeconds;
         }
 
-        public void Draw(GraphicsContext graphics)
+        public void Draw(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
             DrawRememberedBuildings(graphics);
-            DrawGroundUnits(graphics);
-            DrawLasers(graphics, CollisionLayer.Ground);
-            DrawAirborneUnits(graphics);
-            DrawLasers(graphics, CollisionLayer.Air);
+            DrawGroundUnits(graphics, bounds);
+            DrawLasers(graphics, bounds, CollisionLayer.Ground);
+            DrawAirborneUnits(graphics, bounds);
+            DrawLasers(graphics, bounds, CollisionLayer.Air);
         }
 
         #region Miniature
@@ -129,16 +129,16 @@ namespace Orion.Graphics.Renderers
                     && faction.CanSee(unit));
         }
 
-        private void DrawGroundUnits(GraphicsContext graphics)
+        private void DrawGroundUnits(GraphicsContext graphics, Rectangle bounds)
         {
-            var units = GetClippedVisibleUnits(graphics.CoordinateSystem)
+            var units = GetClippedVisibleUnits(bounds)
                 .Where(unit => !unit.IsAirborne);
             foreach (Unit unit in units) DrawUnit(graphics, unit);
         }
 
-        private void DrawAirborneUnits(GraphicsContext graphics)
+        private void DrawAirborneUnits(GraphicsContext graphics, Rectangle bounds)
         {
-            var units = GetClippedVisibleUnits(graphics.CoordinateSystem)
+            var units = GetClippedVisibleUnits(bounds)
                 .Where(unit => unit.IsAirborne);
             foreach (Unit unit in units) DrawUnitShadow(graphics, unit);
             foreach (Unit unit in units) DrawUnit(graphics, unit);
@@ -180,12 +180,12 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        private void DrawRememberedBuilding(GraphicsContext graphics, RememberedBuilding building)
+        private void DrawRememberedBuilding(GraphicsContext graphics, Rectangle bounds, RememberedBuilding building)
         {
             Texture texture = textureManager.GetUnit(building.Type.Name);
 
             Rectangle buildingRectangle = building.GridRegion.ToRectangle();
-            if (!Rectangle.Intersects(buildingRectangle, graphics.CoordinateSystem))
+            if (!Rectangle.Intersects(buildingRectangle, bounds))
                 return;
 
             graphics.Fill(buildingRectangle, texture, building.Faction.Color);
@@ -221,7 +221,7 @@ namespace Orion.Graphics.Renderers
             return baseAngle + spinAngle;
         }
 
-        private void DrawLasers(GraphicsContext graphics, CollisionLayer layer)
+        private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)
         {
             var attackTasks = World.Entities
                 .OfType<Unit>()
@@ -237,8 +237,8 @@ namespace Orion.Graphics.Renderers
                     continue;
 
                 Unit target = attackTask.Target;
-                if (!Rectangle.Intersects(attacker.BoundingRectangle, graphics.CoordinateSystem)
-                    && !Rectangle.Intersects(target.BoundingRectangle, graphics.CoordinateSystem))
+                if (!Rectangle.Intersects(attacker.BoundingRectangle, bounds)
+                    && !Rectangle.Intersects(target.BoundingRectangle, bounds))
                     continue;
 
                 float laserProgress = attacker.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;

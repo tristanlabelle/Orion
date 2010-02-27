@@ -96,7 +96,7 @@ namespace Orion.UserInterface.Actions.UserCommands
             return new Point(minX, minY);
         }
 
-        public void Draw(GraphicsContext context)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             if (!minLocation.HasValue) return;
 

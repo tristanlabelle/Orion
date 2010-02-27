@@ -152,7 +152,7 @@ namespace Orion.UserInterface
             Vector2 size = end - origin;
 
             Region region = new Region((int)origin.X, (int)origin.Y, (int)size.X, (int)size.Y);
-            using (context.Scissor(region)) base.Render();
+            using (graphicsContext.Scissor(region)) base.Render();
         }
 
         protected override void Dispose(bool disposing)

@@ -42,12 +42,12 @@ namespace Orion.UserInterface.Actions.UserCommands
             cursorPosition = new Vector2(float.NaN, float.NaN);
         }
 
-        public void Draw(GraphicsContext graphicsContext)
+        public void Draw(GraphicsContext graphicsContext, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
             Texture texture = textureManager.GetAction("Attack");
-            float minBoundsSize = Math.Min(graphicsContext.CoordinateSystem.Width, graphicsContext.CoordinateSystem.Height);
+            float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
             Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
             Rectangle rectangle = new Rectangle(cursorPosition - size, size);
             graphicsContext.Fill(rectangle, texture);

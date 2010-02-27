@@ -12,7 +12,7 @@ namespace Orion.Graphics.Renderers
     /// <summary>
     /// Provides functionality to draw the ruins left by destroyed buildings or dead units.
     /// </summary>
-    public sealed class RuinsRenderer : IRenderer
+    public sealed class RuinsRenderer
     {
         #region Fields
         private const float maxRuinAlpha = 0.8f;
@@ -80,7 +80,7 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Drawing
-        public void Draw(GraphicsContext graphics)
+        public void Draw(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
@@ -88,7 +88,7 @@ namespace Orion.Graphics.Renderers
             {
                 Vector2 size = new Vector2(ruin.Size.Width, ruin.Size.Height);
                 Rectangle rectangle = new Rectangle(ruin.Min, size);
-                if (!Rectangle.Intersects(rectangle, graphics.CoordinateSystem))
+                if (!Rectangle.Intersects(rectangle, bounds))
                     continue;
 
                 Region gridRegion = Entity.GetGridRegion(ruin.Min, ruin.Size);

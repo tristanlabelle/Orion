@@ -11,7 +11,7 @@ using Orion.Matchmaking;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class AttackWarningRenderer : IRenderer
+    public sealed class AttackWarningRenderer
     {
         #region AttackWarning
         private struct AttackWarning

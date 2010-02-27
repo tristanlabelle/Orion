@@ -72,50 +72,50 @@ namespace Orion.Graphics.Renderers
 
         #region Methods
         #region Terrain
-        public void DrawTerrain(GraphicsContext graphics)
+        public void DrawTerrain(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             terrainRenderer.Draw(graphics);
         }
 
-        public void DrawMiniatureTerrain(GraphicsContext graphics)
+        public void DrawMiniatureTerrain(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             terrainRenderer.DrawMiniature(graphics);
         }
 
-        public void DrawResources(GraphicsContext graphics)
+        public void DrawResources(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            resourcesRenderer.Draw(graphics);
+            resourcesRenderer.Draw(graphics, bounds);
         }
 
-        public void DrawMiniatureResources(GraphicsContext graphics)
+        public void DrawMiniatureResources(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            resourcesRenderer.DrawMiniature(graphics);
+            resourcesRenderer.DrawMiniature(graphics, bounds);
         }
 
-        public void DrawUnits(GraphicsContext graphics)
+        public void DrawUnits(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            ruinsRenderer.Draw(graphics);
-            unitsRenderer.Draw(graphics);
+            ruinsRenderer.Draw(graphics, bounds);
+            unitsRenderer.Draw(graphics, bounds);
         }
 
-        public void DrawMiniatureUnits(GraphicsContext graphics)
+        public void DrawMiniatureUnits(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             unitsRenderer.DrawMiniature(graphics);
         }
 
-        public void DrawExplosions(GraphicsContext graphics)
+        public void DrawExplosions(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             explosionRenderer.Draw(graphics);
         }
 
-        public void DrawFogOfWar(GraphicsContext graphics)
+        public void DrawFogOfWar(GraphicsContext graphics, Rectangle bounds)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             fogOfWarRenderer.Draw(graphics);

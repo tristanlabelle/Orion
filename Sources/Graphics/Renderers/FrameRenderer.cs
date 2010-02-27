@@ -1,5 +1,6 @@
 ﻿using System;
 using Orion.Engine.Graphics;
+using Orion.Geometry;
 
 namespace Orion.Graphics
 {
@@ -22,10 +23,10 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public virtual void Draw(GraphicsContext context)
+        public virtual void Draw(GraphicsContext context, Rectangle bounds)
         {
             context.StrokeColor = StrokeColor;
-            context.Stroke(context.CoordinateSystem);
+            context.Stroke(bounds);
         }
         #endregion
     }

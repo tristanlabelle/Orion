@@ -1,5 +1,6 @@
 using System;
 using Orion.Engine.Graphics;
+using Orion.Geometry;
 
 namespace Orion.Graphics
 {
@@ -39,12 +40,12 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context)
+        public override void Draw(GraphicsContext context, Rectangle bounds)
         {
             context.FillColor = background;
-            context.Fill(context.CoordinateSystem);
-            context.Fill(context.CoordinateSystem, Texture, tint);
-            base.Draw(context);
+            context.Fill(bounds);
+            context.Fill(bounds, Texture, tint);
+            base.Draw(context, bounds);
         }
         #endregion
     }

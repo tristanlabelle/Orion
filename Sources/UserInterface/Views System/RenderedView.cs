@@ -7,22 +7,30 @@ namespace Orion.UserInterface
 {
     public class RenderedView : View
     {
+        #region Fields
+        private IRenderer renderer;
+        #endregion
+
         #region Constructors
         public RenderedView(Rectangle frame, IRenderer renderer)
             : base(frame)
         {
-            Renderer = renderer;
+            this.renderer = renderer;
         }
         #endregion
 
         #region Properties
-        public IRenderer Renderer { get; set; }
+        public IRenderer Renderer
+        {
+            get { return renderer; }
+            set { renderer = value; }
+        }
         #endregion
 
         #region Methods
-        protected internal sealed override void Draw(GraphicsContext context)
+        protected internal sealed override void Draw(GraphicsContext graphicsContext)
         {
-            if (Renderer != null) Renderer.Draw(context);
+            if (Renderer != null) Renderer.Draw(graphicsContext, Bounds);
         }
         #endregion
     }

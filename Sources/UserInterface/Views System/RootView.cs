@@ -32,7 +32,7 @@ namespace Orion.UserInterface
             this.Frame = frame;
             this.displays = new Stack<UIDisplay>();
             this.displays.Push(new NullUI());
-            this.graphicsContext = new GraphicsContext(bounds);
+            this.graphicsContext = new GraphicsContext();
         }
         #endregion
 

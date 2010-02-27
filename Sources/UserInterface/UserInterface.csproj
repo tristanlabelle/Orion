@@ -77,7 +77,6 @@
     </Compile>
     <Compile Include="GameUI.cs" />
     <Compile Include="ResourceDisplay.cs" />
-    <Compile Include="SelectionDisplay.cs" />
     <Compile Include="UIDisplays\LocalMultiplayerLobby.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />
     <Compile Include="UIDisplays\MatchConfigurationUI.cs" />

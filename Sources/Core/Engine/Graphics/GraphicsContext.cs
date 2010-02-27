@@ -28,7 +28,6 @@ namespace Orion.Engine.Graphics
 
         #region Instance
         #region Fields
-        private Rectangle coordinateSystem;
         private ColorRgba fillColor = Colors.White;
         private ColorRgba strokeColor = Colors.Black;
         private Font font = new Font("Trebuchet MS", 14);
@@ -36,28 +35,11 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new <see cref="GraphicsContext"/> object with the given bounds for its local coordinate system. 
-        /// </summary>
-        /// <param name="bounds">
-        /// A <see cref="Rectangle"/> defining the local coordinate system.
-        /// </param>
-        public GraphicsContext(Rectangle bounds)
-        {
-            coordinateSystem = bounds;
-        }
+        [Obsolete("To be made internal and created by the engine.")]
+        public GraphicsContext() { }
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Accesses the bounds of the local coordinate system. 
-        /// </summary>
-        public Rectangle CoordinateSystem
-        {
-            get { return coordinateSystem; }
-            set { coordinateSystem = value; }
-        }
-
         /// <summary>
         /// Accesses the <see cref="Color"/> currently used to fill shapes.
         /// </summary>
@@ -89,13 +71,13 @@ namespace Orion.Engine.Graphics
         #region Methods
         #region OpenGL Context
         [Obsolete("Should be abstracted from the game")]
-        public void SetUpGLContext(Rectangle parentSystem)
+        public void SetUpGLContext(Rectangle parentSystem, Rectangle bounds)
         {
             GL.PushMatrix();
 
-            GL.Translate(parentSystem.Min.X, parentSystem.Min.Y, 0);
-            GL.Scale(parentSystem.Width / CoordinateSystem.Width, parentSystem.Height / CoordinateSystem.Height, 1);
-            GL.Translate(-CoordinateSystem.Min.X, -CoordinateSystem.Min.Y, 0);
+            GL.Translate(parentSystem.MinX, parentSystem.MinY, 0);
+            GL.Scale(parentSystem.Width / bounds.Width, parentSystem.Height / bounds.Height, 1);
+            GL.Translate(-bounds.MinX, -bounds.MinY, 0);
 
             readyForDrawing = true;
         }

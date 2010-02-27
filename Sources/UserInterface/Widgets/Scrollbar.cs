@@ -117,26 +117,26 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Drawing
-        private void RenderBottomArrow(GraphicsContext context)
+        private void RenderBottomArrow(GraphicsContext graphicsContext, Rectangle bounds)
         {
-            DrawScrollbarEnd(context, downTriangle);
+            DrawScrollbarEnd(graphicsContext, bounds, downTriangle);
         }
 
-        private void RenderTopArrow(GraphicsContext context)
+        private void RenderTopArrow(GraphicsContext graphicsContext, Rectangle bounds)
         {
-            DrawScrollbarEnd(context, upTriangle);
+            DrawScrollbarEnd(graphicsContext, bounds, upTriangle);
         }
 
-        private void DrawScrollbarEnd(GraphicsContext context, Triangle fillMe)
+        private void DrawScrollbarEnd(GraphicsContext graphicsContext, Rectangle bounds, Triangle triangle)
         {
-            context.StrokeColor = Colors.Black;
-            context.FillColor = Colors.Gray;
+            graphicsContext.StrokeColor = Colors.Black;
+            graphicsContext.FillColor = Colors.Gray;
 
-            context.Fill(context.CoordinateSystem);
-            context.Stroke(context.CoordinateSystem);
+            graphicsContext.Fill(bounds);
+            graphicsContext.Stroke(bounds);
 
-            context.FillColor = Colors.Black;
-            context.Fill(fillMe);
+            graphicsContext.FillColor = Colors.Black;
+            graphicsContext.Fill(triangle);
         }
         #endregion
         #endregion

@@ -14,7 +14,7 @@ namespace Orion.UserInterface
     public partial class Window : Form
     {
         #region Fields
-        internal readonly RootView rootView;
+        private readonly RootView rootView;
         private readonly GraphicsContext graphicsContext;
         private SysPoint lastGameMousePosition;
         private MouseButtons lastMouseButtons;
@@ -35,6 +35,18 @@ namespace Orion.UserInterface
 
             this.lastGameMousePosition = GetGameMousePosition();
             this.lastMouseButtons = Control.MouseButtons;
+        }
+        #endregion
+
+        #region Properties
+        public RootView RootView
+        {
+            get { return rootView; }
+        }
+
+        public GraphicsContext GraphicsContext
+        {
+            get { return graphicsContext; }
         }
         #endregion
 

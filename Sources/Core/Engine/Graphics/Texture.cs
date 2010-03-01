@@ -435,7 +435,7 @@ namespace Orion.Engine.Graphics
         {
             Argument.EnsureNotNull(image, "image");
 
-            IPixelSurface surface = BufferedPixelSurface.FromDrawingImage(image);
+            IPixelSurface surface = BufferedPixelSurface.FromImage(image);
             return Texture.FromPixelSurface(surface, smooth, repeat);
         }
         #endregion

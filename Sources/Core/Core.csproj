@@ -73,7 +73,6 @@
     <Compile Include="Engine\Graphics\PixelSurface.cs" />
     <Compile Include="Engine\Graphics\RawPixelSurface.cs" />
     <Compile Include="Engine\Graphics\Text.cs" />
-    <Compile Include="Engine\Graphics\TextRenderer.cs" />
     <Compile Include="Engine\Graphics\Texture.cs" />
     <Compile Include="Engine\Graphics\TextureManager.cs" />
     <Compile Include="Engine\Networking\PacketType.cs" />

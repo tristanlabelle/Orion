@@ -144,7 +144,7 @@ namespace Orion.Engine.Graphics
 
         #region Static
         #region Methods
-        public static BufferedPixelSurface FromDrawingImage(SysImage image)
+        public static BufferedPixelSurface FromImage(SysImage image)
         {
             Argument.EnsureNotNull(image, "image");
 

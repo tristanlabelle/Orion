@@ -66,8 +66,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public MatchUI(Match match, SlaveCommander localCommander)
+        public MatchUI(GraphicsContext graphicsContext, Match match, SlaveCommander localCommander)
         {
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(localCommander, "localCommander");
 
@@ -78,7 +79,7 @@ namespace Orion.UserInterface
             this.audioContext = new SoundContext();
             this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.userInputManager);
 
-            this.textureManager = new TextureManager();
+            this.textureManager = new TextureManager(graphicsContext);
             World world = match.World;
 
             matchRenderer = new MatchRenderer(userInputManager, textureManager);

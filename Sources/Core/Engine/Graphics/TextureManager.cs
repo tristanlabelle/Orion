@@ -16,6 +16,7 @@ namespace Orion.Engine.Graphics
     public sealed class TextureManager : IDisposable
     {
         #region Fields
+        private readonly GraphicsContext graphicsContext;
         private readonly DirectoryInfo directory;
         private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
         private readonly Texture defaulTexture;
@@ -23,14 +24,19 @@ namespace Orion.Engine.Graphics
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="TextureManager"/>.
+        /// Initializes a new <see cref="TextureManager"/> from a <see cref="GraphicsContext"/>.
         /// </summary>
-        public TextureManager()
+        /// <param name="graphicsContext">The <see cref="GraphicsContext"/> to be used.</param>
+        public TextureManager(GraphicsContext graphicsContext)
         {
-            directory = new DirectoryInfo(@"../../../Assets/Textures");
-            Debug.Assert(directory.Exists, "The textures directory {0} does not exist.");
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            defaulTexture = Get("Default") ?? Texture.CreateCheckerboard(new Size(4, 4), Colors.Yellow, Colors.Pink);
+            this.graphicsContext = graphicsContext;
+            this.directory = new DirectoryInfo(@"../../../Assets/Textures");
+            Debug.Assert(this.directory.Exists, "Warning: The textures directory {0} does not exist.");
+
+            this.defaulTexture = Get("Default")
+                ?? graphicsContext.CreateCheckerboardTexture(new Size(4, 4), Colors.Yellow, Colors.Pink);
         }
         #endregion
 
@@ -56,9 +62,14 @@ namespace Orion.Engine.Graphics
                 textures.Add(name, null);
                 return defaulTexture;
             }
+
             try
             {
-                texture = Texture.FromFile(filePath, true, false);
+                texture = graphicsContext.CreateTextureFromFile(filePath);
+
+                texture.SetSmooth(true);
+                texture.SetRepeat(false);
+
                 textures.Add(name, texture);
                 return texture;
             }

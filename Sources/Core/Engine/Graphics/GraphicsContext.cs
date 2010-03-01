@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using OpenTK.Math;
 using Orion.Geometry;
 using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
+using Image = System.Drawing.Image;
 
 namespace Orion.Engine.Graphics
 {
@@ -102,6 +105,117 @@ namespace Orion.Engine.Graphics
             GL.ClearColor(color.R, color.G, color.B, 0);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.ColorMask(true, true, true, false);
+        }
+        #endregion
+
+        #region Textures
+        /// <summary>
+        /// Creates a texture from the data contained in an array.
+        /// </summary>
+        /// <param name="size">The size of the texture to be created.</param>
+        /// <param name="pixelFormat">The pixel format of the texture data.</param>
+        /// <param name="pixelData">The pixel data used to initialize the texture.</param>
+        /// <returns>A newly created texture.</returns>
+        public Texture CreateTexture<T>(Size size, PixelFormat pixelFormat, ArraySegment<T> pixelData) where T : struct
+        {
+            Argument.EnsureNotNull(pixelData.Array, "pixelData.Array");
+
+            GCHandle pinningHandle = GCHandle.Alloc(pixelData.Array, GCHandleType.Pinned);
+            try
+            {
+                long address = (long)pinningHandle.AddrOfPinnedObject() + (pixelData.Offset * Marshal.SizeOf(typeof(T)));
+                return new Texture(size, pixelFormat, (IntPtr)address);
+            }
+            finally
+            {
+                pinningHandle.Free();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new texture from a given pixel surface.
+        /// </summary>
+        /// <param name="surface">The pixel surface to be copied to the new texture.</param>
+        /// <returns>A newly created texture.</returns>
+        public Texture CreateTexture(IPixelSurface surface)
+        {
+            Texture texture = null;
+            surface.Lock((Region)surface.Size, Access.Read, rawImage =>
+            {
+                texture = new Texture(rawImage.Size, rawImage.PixelFormat, rawImage.DataPointer);
+            });
+
+            return texture;
+        }
+        /// <summary>
+        /// Creates a new texture from a <see cref="System.Drawing.Image"/>.
+        /// </summary>
+        /// <param name="image">The image to be copied to the new texture.</param>
+        /// <returns>A newly created texture.</returns>
+        public Texture CreateTexture(Image image)
+        {
+            Argument.EnsureNotNull(image, "image");
+
+            IPixelSurface surface = BufferedPixelSurface.FromImage(image);
+            return CreateTexture(surface);
+        }
+
+        /// <summary>
+        /// Creates a texture without initializing its contents.
+        /// </summary>
+        /// <param name="size">The size of the texture to be created.</param>
+        /// <param name="pixelFormat">The pixel format of the texture to be created.</param>
+        /// <returns>A newly created texture.</returns>
+        public Texture CreateBlankTexture(Size size, PixelFormat pixelFormat)
+        {
+            return new Texture(size, pixelFormat);
+        }
+
+        /// <summary>
+        /// Creates a texture with a checkerboard pattern.
+        /// </summary>
+        /// <param name="size">The size of the texture to be created.</param>
+        /// <param name="firstColor">The first color of the checkerboard pattern.</param>
+        /// <param name="secondColor">The second color of the checkerboard pattern.</param>
+        /// <returns>A newly created checkerboard texture.</returns>
+        public Texture CreateCheckerboardTexture(Size size, ColorRgb firstColor, ColorRgb secondColor)
+        {
+            using (BufferedPixelSurface surface = BufferedPixelSurface.CreateCheckerboard(size, firstColor, secondColor))
+                return CreateTexture(surface);
+        }
+
+        /// <summary>
+        /// Creates a new texture from a file via a stream.
+        /// </summary>
+        /// <param name="stream">A stream which accesses an image file.</param>
+        /// <returns>A newly created texture with the data from that image.</returns>
+        public Texture CreateTextureFromStream(Stream stream)
+        {
+            Argument.EnsureNotNull(stream, "stream");
+
+            try
+            {
+                using (Image image = Image.FromStream(stream))
+                    return CreateTexture(image);
+            }
+            catch (OutOfMemoryException e)
+            {
+                // System.Drawing.Image.FromFile throws an OutOfMemoryException when it fails to decode an image.
+                throw new IOException(e.Message, e);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new texture from an image stored in a file.
+        /// </summary>
+        /// <param name="filePath">The path to the image to be loaded.</param>
+        /// <returns>A newly created texture with the data from that image.</returns>
+        public Texture CreateTextureFromFile(string filePath)
+        {
+            Argument.EnsureNotNull(filePath, "filePath");
+
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                return CreateTextureFromStream(stream);
         }
         #endregion
 

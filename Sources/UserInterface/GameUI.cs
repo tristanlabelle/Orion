@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Orion.Engine.Graphics;
 namespace Orion.UserInterface
 {
     /// <summary>
@@ -47,14 +48,19 @@ namespace Orion.UserInterface
 
         public RootView RootView
         {
-            get { return mainWindow.rootView; }
+            get { return mainWindow.RootView; }
+        }
+
+        public GraphicsContext GraphicsContext
+        {
+            get { return mainWindow.GraphicsContext; }
         }
         #endregion
 
         #region Methods
         public void Display(UIDisplay display)
         {
-            mainWindow.rootView.PushDisplay(display);
+            mainWindow.RootView.PushDisplay(display);
         }
 
         /// <summary>
@@ -73,7 +79,7 @@ namespace Orion.UserInterface
         /// </param>
         public void Update(float timeDeltaInSeconds)
         {
-            mainWindow.rootView.Update(timeDeltaInSeconds);
+            mainWindow.RootView.Update(timeDeltaInSeconds);
         }
 
         /// <summary>

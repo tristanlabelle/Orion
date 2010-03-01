@@ -65,7 +65,7 @@ namespace Orion.Main
             Match match;
             SlaveCommander localCommander;
             replayConfigurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(match, localCommander);
+            MatchUI matchUI = new MatchUI(gameUI.GraphicsContext, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -156,7 +156,7 @@ namespace Orion.Main
             Match match;
             SlaveCommander localCommander;
             configurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(match, localCommander);
+            MatchUI matchUI = new MatchUI(gameUI.GraphicsContext, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);

@@ -32,7 +32,6 @@ namespace Orion.Graphics
 
             this.terrain = terrain;
             this.obstacleMaskTexture = CreateObstacleMaskTexture(terrain);
-            this.obstacleMaskTexture.SetSmooth(true);
             this.splattingMaskTexture = CreateSplattingMaskTexture(terrain.Size);
             this.grassTileTexture = textureManager.Get("Grass");
             this.grassTileTexture.SetSmooth(true);
@@ -99,7 +98,7 @@ namespace Orion.Graphics
                 }
             }
 
-            return Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixels, false, false);
+            return Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixels, true, false);
         }
 
         private static Texture CreateSplattingMaskTexture(Size size)

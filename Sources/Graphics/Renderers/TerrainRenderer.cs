@@ -32,6 +32,7 @@ namespace Orion.Graphics
 
             this.terrain = terrain;
             this.obstacleMaskTexture = CreateObstacleMaskTexture(terrain);
+            this.obstacleMaskTexture.SetSmooth(true);
             this.splattingMaskTexture = CreateSplattingMaskTexture(terrain.Size);
             this.grassTileTexture = textureManager.Get("Grass");
             this.grassTileTexture.SetSmooth(true);

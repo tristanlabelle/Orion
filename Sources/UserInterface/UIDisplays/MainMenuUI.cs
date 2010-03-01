@@ -8,7 +8,10 @@ using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface
 {
-    public class MainMenuUI : UIDisplay
+    /// <summary>
+    /// The user interface for the main menu of the game.
+    /// </summary>
+    public sealed class MainMenuUI : UIDisplay
     {
         #region Fields
         // HACK: Add whitespace to then end of strings because the last word ends up clipped otherwise.
@@ -22,10 +25,10 @@ namespace Orion.UserInterface
             Font titleFont = new Font("Impact", 48);
             AddCenteredLabel("Orion", titleFont, 600);
 
-            CreateButton(0.6f, "Monojoueur", BeginSinglePlayer);
-            CreateButton(0.5f, "Multijoueur", BeginMultiplayerGame);
-            CreateButton(0.4f, "Tower Defense", null);
-            CreateButton(0.3f, "Visionner une partie", BeginViewReplay);
+            CreateButton(0.6f, "Monojoueur", () => SinglePlayerSelected);
+            CreateButton(0.5f, "Multijoueur", () => MultiplayerSelected);
+            CreateButton(0.4f, "Tower Defense", () => TowerDefenseSelected);
+            CreateButton(0.3f, "Visionner une partie", () => ViewReplaySelected);
 
             Font creditsFont = new Font("Trebuchet MS", 10);
             AddCenteredLabel("Programmeurs ", creditsFont, 110);
@@ -36,36 +39,51 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event Action<MainMenuUI> LaunchedSinglePlayerGame;
-        public event Action<MainMenuUI> LaunchedMultiplayerGame;
-        public event Action<MainMenuUI> LaunchedReplayViewer;
+        /// <summary>
+        /// Raised when the user has chosen to launch a single-player game.
+        /// </summary>
+        public event Action<MainMenuUI> SinglePlayerSelected;
+
+        /// <summary>
+        /// Raised when the user has chosen to launch a multiplayer game.
+        /// </summary>
+        public event Action<MainMenuUI> MultiplayerSelected;
+
+        /// <summary>
+        /// Raised when the user has chosen to launch a tower defense game.
+        /// </summary>
+        public event Action<MainMenuUI> TowerDefenseSelected;
+
+        /// <summary>
+        /// Raised when the user has chosen to view a replay.
+        /// </summary>
+        public event Action<MainMenuUI> ViewReplaySelected;
         #endregion
 
         #region Methods
-        private void CreateButton(float y, string caption, Action clickHandler)
+        /// <summary>
+        /// Creates a menu button.
+        /// </summary>
+        /// <param name="y">The y position of the button.</param>
+        /// <param name="caption">The caption text on the button.</param>
+        /// <param name="eventGetter">
+        /// A delegate to a method which retreives the event to be raised when the button is clicked.
+        /// </param>
+        private void CreateButton(float y, string caption, Func<Action<MainMenuUI>> eventGetter)
         {
             Rectangle rectangle = Instant.CreateComponentRectangle(Bounds, Rectangle.FromCenterSize(0.5f, y, 0.25f, 0.08f));
             Button button = new Button(rectangle, caption);
+
+            if (eventGetter != null)
+            {
+                button.Triggered += sender => 
+                {
+                    Action<MainMenuUI> @event = eventGetter();
+                    if (@event != null) @event(this);
+                };
+            }
+
             Children.Add(button);
-            if (clickHandler != null) button.Triggered += (sender) => clickHandler();
-        }
-
-        private void BeginSinglePlayer()
-        {
-            if (LaunchedSinglePlayerGame != null)
-                LaunchedSinglePlayerGame(this);
-        }
-
-        private void BeginMultiplayerGame()
-        {
-            if (LaunchedMultiplayerGame != null)
-                LaunchedMultiplayerGame(this);
-        }
-
-        private void BeginViewReplay()
-        {
-            if (LaunchedReplayViewer != null)
-                LaunchedReplayViewer(this);
         }
 
         private void AddCenteredLabel(string @string, Font font, float y)

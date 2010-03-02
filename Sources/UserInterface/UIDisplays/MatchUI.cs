@@ -534,10 +534,10 @@ namespace Orion.UserInterface
         #endregion
 
         #region IUIDisplay Implementation
-        internal override void OnShadow(RootView shadowedFrom)
+        internal override void OnShadowed(RootView shadowedFrom)
         {
             shadowedFrom.PopDisplay(this);
-            base.OnShadow(shadowedFrom);
+            base.OnShadowed(shadowedFrom);
         }
         #endregion
 

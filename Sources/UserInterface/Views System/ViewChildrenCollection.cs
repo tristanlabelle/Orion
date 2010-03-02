@@ -122,6 +122,7 @@ namespace Orion.UserInterface
         protected override void InsertItem(int index, ViewContainer item)
         {
             Argument.EnsureNotNull(item, "item");
+            if (item is RootView) throw new ArgumentException("The root view cannot be added as a child to another view.");
             if (item.Parent != null) throw new ArgumentException("Expected a view without any parent.");
             if (Contains(item)) return;
             if (item.IsAncestorOf(parent))

@@ -74,7 +74,7 @@ namespace Orion.UserInterface
         {
             EnsureNotDisposed();
             bool eventCanSink = true;
-            foreach (Responder child in Enumerable.Reverse(Children))
+            foreach (Responder child in Children.Reverse())
             {
                 if (!child.Frame.ContainsPoint(args.Position))
                 {

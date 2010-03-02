@@ -22,7 +22,6 @@ namespace Orion.Engine.Graphics
         private ColorRgba fillColor = Colors.White;
         private ColorRgba strokeColor = Colors.Black;
         private Font font = new Font("Trebuchet MS", 14);
-        private bool readyForDrawing;
         #endregion
 
         #region Constructors
@@ -61,8 +60,8 @@ namespace Orion.Engine.Graphics
 
         #region Methods
         #region OpenGL Context
-        [Obsolete("Should be abstracted from the game")]
-        public void SetUpGLContext(Rectangle parentSystem, Rectangle bounds)
+        [Obsolete("Superseded by Transform.")]
+        public DisposableHandle SetViewTransform(Rectangle parentSystem, Rectangle bounds)
         {
             GL.PushMatrix();
 
@@ -70,15 +69,7 @@ namespace Orion.Engine.Graphics
             GL.Scale(parentSystem.Width / bounds.Width, parentSystem.Height / bounds.Height, 1);
             GL.Translate(-bounds.MinX, -bounds.MinY, 0);
 
-            readyForDrawing = true;
-        }
-
-        [Obsolete("Should be abstracted from the game")]
-        public void RestoreGLContext()
-        {
-            GL.PopMatrix();
-
-            readyForDrawing = false;
+            return new DisposableHandle(() => GL.PopMatrix());
         }
         #endregion
 
@@ -296,8 +287,6 @@ namespace Orion.Engine.Graphics
 
         private void DrawVertices(Ellipse ellipse)
         {
-            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-
             for (int i = 0; i < unitCirclePoints.Length; ++i)
             {
                 Vector2 unitCirclePoint = unitCirclePoints[i];
@@ -335,8 +324,6 @@ namespace Orion.Engine.Graphics
 
         private void DrawVertices(Rectangle rectangle)
         {
-            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-
             DrawVertex(rectangle.MinX, rectangle.MinY);
             DrawVertex(rectangle.MaxX, rectangle.MinY);
             DrawVertex(rectangle.MaxX, rectangle.MaxY);
@@ -370,8 +357,6 @@ namespace Orion.Engine.Graphics
 
         private void DrawVertices(Triangle triangle)
         {
-            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-
             DrawVertex(triangle.Vertex1);
             DrawVertex(triangle.Vertex2);
             DrawVertex(triangle.Vertex3);
@@ -398,16 +383,12 @@ namespace Orion.Engine.Graphics
 
         private void DrawVertices(IEnumerable<Vector2> points)
         {
-            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-
             foreach (Vector2 point in points)
                 DrawVertex(point);
         }
 
         private void DrawVertices(IEnumerable<LineSegment> lineSegments, Vector2 position)
         {
-            if (!readyForDrawing) throw new InvalidOperationException("Cannot draw in an unprepared graphics context");
-
             foreach (LineSegment lineSegment in lineSegments)
             {
                 DrawVertex(lineSegment.EndPoint1 + position);

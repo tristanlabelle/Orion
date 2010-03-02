@@ -177,20 +177,20 @@ namespace Orion.UserInterface
         }
 
         #region UIDisplay Implementation
-        internal override void OnEnter(RootView enterOn)
+        internal override void OnEntered(RootView enterOn)
         {
             InitializeSlots();
             exitButton.Triggered += exitPanel;
             startButton.Triggered += startGame;
-            base.OnEnter(enterOn);
+            base.OnEntered(enterOn);
         }
 
-        internal override void OnShadow(RootView hiddenOf)
+        internal override void OnShadowed(RootView hiddenOf)
         {
             exitButton.Triggered -= exitPanel;
             startButton.Triggered -= startGame;
             foreach (DropdownList<PlayerSlot> list in playerSlots) list.Dispose();
-            base.OnShadow(hiddenOf);
+            base.OnShadowed(hiddenOf);
         }
         #endregion
         #endregion

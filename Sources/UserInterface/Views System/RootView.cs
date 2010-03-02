@@ -59,12 +59,12 @@ namespace Orion.UserInterface
             while (topDisplay != displays.Peek())
             {
                 topDisplay = displays.Peek();
-                topDisplay.OnShadow(this);
+                topDisplay.OnShadowed(this);
             }
 
             displays.Push(display);
             Children.Add(display);
-            display.OnEnter(this);
+            display.OnEntered(this);
         }
 
         public void PopDisplay(UIDisplay display)
@@ -74,7 +74,7 @@ namespace Orion.UserInterface
 
             displays.Pop();
             display.Dispose();
-            TopmostDisplay.OnEnter(this);
+            TopmostDisplay.OnEntered(this);
         }
 
         public void Update(float delta)
@@ -90,14 +90,12 @@ namespace Orion.UserInterface
             bool canSink = TopmostDisplay.PropagateMouseEvent(eventType,
                 new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
 
-            if (canSink) return DispatchMouseEvent(eventType, args);
-            return false;
+            return canSink ? DispatchMouseEvent(eventType, args) : false;
         }
 
         protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
-            if (focusedView == null)
-                return TopmostDisplay.PropagateKeyboardEvent(type, args);
+            if (focusedView == null) return TopmostDisplay.PropagateKeyboardEvent(type, args);
             return focusedView.PropagateKeyboardEvent(type, args);
         }
 

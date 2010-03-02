@@ -10,23 +10,21 @@ namespace Orion.UserInterface
     public abstract class ViewContainer : IDisposable
     {
         #region Fields
-        private Collection<ViewContainer> children;
+        private readonly Collection<ViewContainer> children;
         private ViewContainer parent;
-        protected internal bool isDisposed;
+        private bool isDisposed;
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Constructs a ViewContainer.
-        /// </summary>
         public ViewContainer()
         {
-            children = new ViewChildrenCollection(this);
+            this.children = new ViewChildrenCollection(this);
         }
 
-        public ViewContainer(Collection<ViewContainer> childrenCollection)
+        public ViewContainer(Collection<ViewContainer> children)
         {
-            children = childrenCollection;
+            Argument.EnsureNotNull(children, "children");
+            this.children = children;
         }
         #endregion
 
@@ -38,24 +36,50 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when the parent has changed.
+        /// The argument specifies the new parent.
+        /// </summary>
         public event Action<ViewContainer, ViewContainer> AddedToParent;
-        public event Action<ViewContainer, ViewContainer> RemovedFromParent;
-        public event Action<ViewContainer, ViewContainer> ChildAdded;
-        public event Action<ViewContainer, ViewContainer> ChildRemoved;
-        public event Action<ViewContainer, ViewContainer> AncestryChanged;
-        public event Action<ViewContainer> Disposed;
 
-        private void RaiseEvent(Action<ViewContainer, ViewContainer> eventHandler, ViewContainer arg)
-        {
-            EnsureNotDisposed();
-            if (eventHandler != null) eventHandler(this, arg);
-        }
+        /// <summary>
+        /// Raised when this view has been orphanized.
+        /// The argument specifies the old parent.
+        /// </summary>
+        public event Action<ViewContainer, ViewContainer> RemovedFromParent;
+
+        /// <summary>
+        /// Raised when a child view has been added to this view.
+        /// The argument specifies the view that was added.
+        /// </summary>
+        public event Action<ViewContainer, ViewContainer> ChildAdded;
+
+        /// <summary>
+        /// Raised when a child view has been removed from this view.
+        /// The argument specifies the view that was removed.
+        /// </summary>
+        public event Action<ViewContainer, ViewContainer> ChildRemoved;
+
+        /// <summary>
+        /// Raised when one of the views in this views' ancestry has been added or removed.
+        /// The argument specifies the view in the ancestry that changed.
+        /// </summary>
+        public event Action<ViewContainer, ViewContainer> AncestryChanged;
+
+        /// <summary>
+        /// Raised when this object has been disposed.
+        /// </summary>
+        public event Action<ViewContainer> Disposed;
         #endregion
 
         #region Properties
         public virtual Rectangle Frame { get; set; }
         public virtual Rectangle Bounds { get; set; }
 
+        /// <summary>
+        /// Gets the Z-Index of this view in its parent.
+        /// 0 is the bottommost.
+        /// </summary>
         public int ZIndex
         {
             get
@@ -67,6 +91,9 @@ namespace Orion.UserInterface
         }
 
         #region Hierarchy
+        /// <summary>
+        /// Gets the parent view at the root of this container's ancestor tree.
+        /// </summary>
         public ViewContainer Root
         {
             get
@@ -78,7 +105,7 @@ namespace Orion.UserInterface
         }
 
         /// <summary>
-        /// Gets the parent ViewContainer of this container.
+        /// Gets the parent view of this container.
         /// </summary>
         public ViewContainer Parent
         {
@@ -95,7 +122,7 @@ namespace Orion.UserInterface
         }
 
         /// <summary>
-        /// Gets the collection of this <see cref="View"/>'s children.
+        /// Gets the collection of this view's children.
         /// </summary>
         public Collection<ViewContainer> Children
         {
@@ -107,7 +134,7 @@ namespace Orion.UserInterface
         }
 
         /// <summary>
-        /// Gets the sequence of <see cref="View"/> which are descendants of this one.
+        /// Gets the sequence of views which are descendants of this one.
         /// </summary>
         public IEnumerable<ViewContainer> Descendants
         {
@@ -125,6 +152,9 @@ namespace Orion.UserInterface
             }
         }
 
+        /// <summary>
+        /// Gets the sequence of views which are ancestors of this one.
+        /// </summary>
         public IEnumerable<ViewContainer> Ancestors
         {
             get
@@ -220,28 +250,38 @@ namespace Orion.UserInterface
         {
             if (disposing)
             {
+                EnsureNotDisposed();
                 RemoveFromParent();
+
+                // Children are removed this way as they detach from their parent (this) when removed.
                 while (children.Count > 0) children[0].Dispose();
+
                 AddedToParent = null;
                 RemovedFromParent = null;
                 ChildAdded = null;
                 ChildRemoved = null;
                 AncestryChanged = null;
 
-                var disposedEventHandler = Disposed;
-                if (disposedEventHandler != null)
-                {
-                    Disposed = null;
-                    disposedEventHandler(this);
-                }
-
                 GC.SuppressFinalize(this);
+
+                isDisposed = true;
+
+                Disposed.Raise(this);
+                Disposed = null;
+            }
+            else
+            {
+                // Use an assert if being finalized because the finalizer thread
+                // is not a nice place to throw an exception.
+                Debug.Assert(!isDisposed);
+                isDisposed = true;
             }
         }
 
         protected void EnsureNotDisposed()
         {
-#warning Cannot properly implement EnsureNotDisposed as many objects depend on usage of disposed objects :/
+#warning Cannot properly implement EnsureNotDisposed as many objects depend on usage of disposed views :/
+            Debug.Assert(!isDisposed, "A view is being used after being disposed.");
             //if (isDisposed) throw new ObjectDisposedException(null);
         }
         #endregion
@@ -260,30 +300,30 @@ namespace Orion.UserInterface
 
         protected internal virtual void OnAddToParent(ViewContainer parent)
         {
-            RaiseEvent(AddedToParent, parent);
+            AddedToParent.Raise(this, parent);
             PropagateAncestryChangedEvent(parent);
         }
 
         protected internal virtual void OnRemovedFromParent(ViewContainer oldParent)
         {
-            RaiseEvent(RemovedFromParent, oldParent);
+            RemovedFromParent.Raise(this, oldParent);
             PropagateAncestryChangedEvent(oldParent);
         }
 
         protected internal virtual void OnAncestryChanged(ViewContainer ancestor)
         {
-            RaiseEvent(AncestryChanged, ancestor);
+            AncestryChanged.Raise(this, ancestor);
             PropagateAncestryChangedEvent(ancestor);
         }
 
         protected internal virtual void OnChildAdded(ViewContainer child)
         {
-            RaiseEvent(ChildAdded, child);
+            ChildAdded.Raise(this, child);
         }
 
         protected internal virtual void OnChildRemoved(ViewContainer child)
         {
-            RaiseEvent(ChildRemoved, child);
+            ChildRemoved.Raise(this, child);
         }
 
         protected internal virtual void PropagateAncestryChangedEvent(ViewContainer changingAncestor)

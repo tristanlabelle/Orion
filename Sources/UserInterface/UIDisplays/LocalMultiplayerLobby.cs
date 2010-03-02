@@ -73,19 +73,19 @@ namespace Orion.UserInterface
 
         #region Methods
 
-        internal override void OnEnter(RootView enterOn)
+        internal override void OnEntered(RootView enterOn)
         {
             transporter.Received += receptionDelegate;
             transporter.TimedOut += timeoutDelegate;
             transporter.Broadcast(explorePacket, port);
-            base.OnEnter(enterOn);
+            base.OnEntered(enterOn);
         }
 
-        internal override void OnShadow(RootView hiddenOf)
+        internal override void OnShadowed(RootView hiddenOf)
         {
             transporter.Received -= receptionDelegate;
             transporter.TimedOut -= timeoutDelegate;
-            base.OnShadow(hiddenOf);
+            base.OnShadowed(hiddenOf);
         }
 
         protected override void OnUpdate(UpdateEventArgs args)

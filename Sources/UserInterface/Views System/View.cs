@@ -75,11 +75,11 @@ namespace Orion.UserInterface
 
         protected internal override void Render(GraphicsContext graphicsContext)
         {
-            graphicsContext.SetUpGLContext(Frame, Bounds);
-
-            Draw(graphicsContext);
-            base.Render(graphicsContext);
-            graphicsContext.RestoreGLContext();
+            using (graphicsContext.SetViewTransform(Frame, Bounds))
+            {
+                Draw(graphicsContext);
+                base.Render(graphicsContext);
+            }
         }
 
         protected internal abstract void Draw(GraphicsContext graphicsContext);

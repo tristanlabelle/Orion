@@ -15,21 +15,21 @@ namespace Orion.UserInterface
 
         public new ViewChildrenCollection Children
         {
-            get { return base.Children as ViewChildrenCollection; }
+            get { return (ViewChildrenCollection)base.Children; }
         }
 
         public new RootView Parent
         {
-            get { return base.Parent as RootView; }
+            get { return (RootView)base.Parent; }
         }
 
-        internal virtual void OnEnter(RootView enterOn)
+        internal virtual void OnEntered(RootView enterOn)
         {
             Action<UIDisplay, RootView> handler = Entered;
             if (handler != null) handler(this, enterOn);
         }
 
-        internal virtual void OnShadow(RootView hiddenOf)
+        internal virtual void OnShadowed(RootView hiddenOf)
         {
             Action<UIDisplay, RootView> handler = Shadowed;
             if (handler != null) handler(this, hiddenOf);

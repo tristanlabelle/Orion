@@ -52,58 +52,49 @@ namespace Orion.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            int alageneTotalCost = 0;
-            int aladdiumTotalCost = 0;
-            int popNeeded = 0;
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType traineeType = match.World.UnitTypes.FromHandle(traineeTypeHandle);
 
-            int alageneCost = traineeType.GetBaseStat(UnitStat.AlageneCost);
-            int aladdiumCost = traineeType.GetBaseStat(UnitStat.AladdiumCost);
+            int alageneCost = faction.GetStat(traineeType, UnitStat.AlageneCost);
+            int aladdiumCost = faction.GetStat(traineeType, UnitStat.AladdiumCost);
 
-            if (trainerHandles.Count * traineeType.FoodCost > faction.RemainingFoodAmount)
-            {
-#warning Mathieu?
-            }
+            bool taskQueueFullWarningRaised = false;
 
             foreach (Handle trainerHandle in trainerHandles)
             {
                 Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
-                //for the first unit we take the food
-                if (trainer.TaskQueue.IsEmpty)
-                {
-                    if ((popNeeded + traineeType.FoodCost) <= faction.RemainingFoodAmount)
-                        popNeeded += traineeType.FoodCost;
-                    else
-                    {
-                        faction.RaiseWarning("Pas assez de nourriture.");
-                        continue;
-                    }
-                }
                 if (trainer.TaskQueue.IsFull)
                 {
-                    faction.RaiseWarning("Impossible d'entraîner un {0}, la queue de tâches est pleine"
-                        .FormatInvariant(traineeType.Name));
+                    // Prevent multiple "task queue full" warnings, the player only needs to know it once,
+                    // even when it applies to multiple trainers.
+                    if (!taskQueueFullWarningRaised)
+                    {
+                        faction.RaiseWarning("Impossible d'entraîner un {0}, la queue de tâches est pleine."
+                            .FormatInvariant(traineeType.Name));
+                        taskQueueFullWarningRaised = true;
+                    }
+
                     continue;
                 }
 
-                if (alageneTotalCost + alageneCost <= faction.AlageneAmount
-                   && aladdiumTotalCost + aladdiumCost <= faction.AladdiumAmount)
+                if (traineeType.FoodCost > faction.RemainingFoodAmount)
                 {
-                    alageneTotalCost += alageneCost;
-                    aladdiumTotalCost += aladdiumCost;
-                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
-                }
-                else
-                {
-                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}".FormatInvariant(traineeType.Name));
+                    faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
+                        .FormatInvariant(traineeType.Name));
                     break;
                 }
-            }
 
-            // Now we take the cost out for all queued units!
-            faction.AlageneAmount -= alageneTotalCost;
-            faction.AladdiumAmount -= aladdiumTotalCost;
+                if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
+                {
+                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
+                        .FormatInvariant(traineeType.Name));
+                    break;
+                }
+
+                faction.AlageneAmount -= alageneCost;
+                faction.AladdiumAmount -= aladdiumCost;
+                trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
+            }
         }
 
         public override string ToString()

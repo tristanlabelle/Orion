@@ -15,9 +15,10 @@ namespace Orion.Networking
     {
         #region Fields
         #region Updates Rate Management
-        private const int retentionDelay = 5;
+        private const int retentionDelay = 4;
         private const int updatesPerSecond = 40;
         private const int defaultUpdatesPerFrame = 6;
+        private const int maxUpdatesPerFrame = 10;
         private readonly List<int> updatesForCommandFrame = new List<int>();
         private readonly Queue<int> previousFramesDuration = new Queue<int>();
         private int updatesSinceLastCommandFrame = defaultUpdatesPerFrame - 1;
@@ -74,7 +75,7 @@ namespace Orion.Networking
                 // adaptative frame rate
                 int average = (int)(previousFramesDuration.Average() + 0.5);
                 int deviation = (int)Math.Sqrt(previousFramesDuration.Select(i => (i - average) * (i - average)).Average());
-                return average + deviation * 2;
+                return Math.Min(average + deviation * 2, maxUpdatesPerFrame);
             }
         }
         #endregion

@@ -9,6 +9,7 @@ using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Image = System.Drawing.Image;
+using System.Diagnostics;
 
 namespace Orion.Engine.Graphics
 {
@@ -210,7 +211,7 @@ namespace Orion.Engine.Graphics
         {
             bool isActive;
             GL.GetBoolean(GetPName.ScissorTest, out isActive);
-            if (isActive) throw new InvalidOperationException("Cannot nest Scissor boxes");
+            Debug.Assert(!isActive, "Cannot nest Scissor boxes");
 
             GL.Scissor(region.MinX, region.MinY, region.Width, region.Height);
             GL.Enable(EnableCap.ScissorTest);

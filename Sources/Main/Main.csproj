@@ -58,6 +58,7 @@
     <Compile Include="Match Configuration\MultiplayerMatchConfigurer.cs" />
     <Compile Include="Match Configuration\ReplayMatchConfigurer.cs" />
     <Compile Include="Match Configuration\SlotType.cs" />
+    <Compile Include="Match Configuration\TowerDefenseMatchConfigurer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

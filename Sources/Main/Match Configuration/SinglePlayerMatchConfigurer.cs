@@ -11,15 +11,20 @@ namespace Orion.Main
 {
     sealed class SinglePlayerMatchConfigurer : MatchConfigurer
     {
+        #region Fields
         private SinglePlayerMatchConfigurationUI ui;
+        #endregion
 
+        #region Constructors
         public SinglePlayerMatchConfigurer()
         {
             ui = new SinglePlayerMatchConfigurationUI();
             ui.PressedStartGame += PressStart;
             Seed = (int)Environment.TickCount;
         }
+        #endregion
 
+        #region Methods
         private void PressStart(MatchConfigurationUI ui)
         {
             StartGame();
@@ -61,6 +66,7 @@ namespace Orion.Main
                 }
             }
 
+            WorldGenerator.Generate(world, random);
             match = new Match(random, world);
             match.IsPausable = true;
 
@@ -74,5 +80,6 @@ namespace Orion.Main
             match.Updated += (sender, args) =>
                 pipeline.Update(sender.LastSimulationStepNumber, args.TimeDeltaInSeconds);
         }
+        #endregion
     }
 }

@@ -2,6 +2,7 @@
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;
+using System.Diagnostics;
 
 namespace Orion.Graphics.Renderers
 {
@@ -24,18 +25,18 @@ namespace Orion.Graphics.Renderers
             this.faction = faction;
             this.faction.VisibilityChanged += OnVisibilityChanged;
 
-            int textureWidth = Math.Max(
-                PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Width),
-                PowerOfTwo.Ceiling(faction.LocalFogOfWar.Size.Height));
+            int textureWidth = PowerOfTwo.Ceiling(
+                Math.Max(faction.World.Size.Width, faction.World.Size.Height));
             Size textureSize = new Size(textureWidth, textureWidth);
 
-            pixelBuffer = new byte[textureSize.Area];
+            this.pixelBuffer = new byte[textureSize.Area];
             for (int i = 0; i < pixelBuffer.Length; ++i)
-                pixelBuffer[i] = 255;
+                this.pixelBuffer[i] = 255;
 
             UpdatePixelBuffer();
 
-            texture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelBuffer, true, false);
+            this.texture = Texture.CreateBlank(textureSize, PixelFormat.Alpha, true, false);
+            texture.Blit((Region)faction.World.Size, pixelBuffer);
         }
         #endregion
 
@@ -85,22 +86,31 @@ namespace Orion.Graphics.Renderers
         {
             byte fogAlpha = (byte)(FogTransparency * 255.99f);
 
-            foreach (Point point in region.Points)
+            int exclusiveMaxX = region.ExclusiveMaxX;
+            int exclusiveMaxY = region.ExclusiveMaxY;
+            for (int x = region.MinX; x < exclusiveMaxX; ++x)
             {
-                int pixelIndex = (point.Y - region.MinY) * region.Width + (point.X - region.MinX);
-                TileVisibility visibility = faction.GetTileVisibility(point);
-                if (visibility == TileVisibility.Undiscovered)
-                    pixelBuffer[pixelIndex] = 255;
-                else if (visibility == TileVisibility.Discovered)
-                    pixelBuffer[pixelIndex] = fogAlpha;
-                else if (visibility == TileVisibility.Visible)
-                    pixelBuffer[pixelIndex] = 0;
+                for (int y = region.MinY; y < exclusiveMaxY; ++y)
+                {
+                    Point point = new Point(x, y);
+                    int pixelIndex = (y - region.MinY) * region.Width + (x - region.MinX);
+                    TileVisibility visibility = faction.GetTileVisibility(point);
+                    if (visibility == TileVisibility.Undiscovered)
+                        pixelBuffer[pixelIndex] = 255;
+                    else if (visibility == TileVisibility.Discovered)
+                        pixelBuffer[pixelIndex] = fogAlpha;
+                    else
+                    {
+                        Debug.Assert(visibility == TileVisibility.Visible);
+                        pixelBuffer[pixelIndex] = 0;
+                    }
+                }
             }
         }
 
         private void UpdatePixelBuffer()
         {
-            Region region = (Region)faction.LocalFogOfWar.Size;
+            Region region = (Region)faction.World.Size;
             UpdatePixelBuffer(region);
         }
 

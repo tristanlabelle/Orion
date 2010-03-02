@@ -112,6 +112,7 @@
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />
     <Compile Include="WorkerActivityMonitor.cs" />
+    <Compile Include="WorldGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

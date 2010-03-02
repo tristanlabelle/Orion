@@ -156,8 +156,10 @@ namespace Orion
         {
             get
             {
-                for (int x = MinX; x < ExclusiveMaxX; ++x)
-                    for (int y = MinY; y < ExclusiveMaxY; ++y)
+                int exclusiveMaxX = ExclusiveMaxX;
+                int exclusiveMaxY = ExclusiveMaxY;
+                for (int x = MinX; x < exclusiveMaxX; ++x)
+                    for (int y = MinY; y < exclusiveMaxY; ++y)
                         yield return new Point(x, y);
             }
         }

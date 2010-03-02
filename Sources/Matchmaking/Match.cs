@@ -15,10 +15,6 @@ namespace Orion.Matchmaking
     public sealed class Match
     {
         #region Fields
-        private const double resourcesRatio = 0.00518798828125;
-        private const int campSize = 15;
-        private const int initialMinimumDistanceBetweenCamps = 175;
-
         private readonly Random random;
         private readonly World world;
         private SimulationStep lastSimulationStep;
@@ -120,9 +116,6 @@ namespace Orion.Matchmaking
         public void Start()
         {
             isRunning = true;
-
-            CreateFactionCamps();
-            CreateResourceNodes();
         }
 
         /// <summary>
@@ -193,134 +186,6 @@ namespace Orion.Matchmaking
         public void Quit()
         {
             RaiseQuitting();
-        }
-        #endregion
-
-        #region Private Camp Creation
-        private void CreateFactionCamps()
-        {
-            List<Vector2> campCenters = new List<Vector2>();
-            int minimumDistanceBetweenCamps = initialMinimumDistanceBetweenCamps;
-
-            // Find a Spot To place a base
-            foreach (Faction faction in world.Factions)
-            {
-                Point campMinPosition = FindCampPosition(campCenters, ref minimumDistanceBetweenCamps);
-
-                Vector2 campCenter = new Vector2(campMinPosition.X + campSize * 0.5f, campMinPosition.Y + campSize * 0.5f);
-                campCenters.Add(campMinPosition);
-
-                CreateCampUnits(faction, campCenter);
-                CreateCampResourceNodes(campCenter);
-            }
-        }
-
-        private Point FindCampPosition(List<Vector2> campCenters, ref int minimumDistanceBetweenCamps)
-        {
-            Point campLocation = new Point(0, 0);
-            int attemptCount = 0;
-
-            while (true) // This while(true) is an euphemism for a disguised goto.
-            {
-                ++attemptCount;
-                if (attemptCount == 750)
-                {
-                    minimumDistanceBetweenCamps = (int)(minimumDistanceBetweenCamps * 0.80f);
-                    attemptCount = 0;
-                }
-
-                campLocation = new Point(random.Next(world.Size.Width), random.Next(world.Size.Height));
-
-                if (!IsCampAreaWalkable(campLocation)) continue;
-
-                // The command center is created at the center of the camp.
-                Vector2 campCenter = new Vector2(campLocation.X + campSize * 0.5f, campLocation.Y + campSize * 0.5f);
-                bool isNearbyAnotherCamp = false;
-                foreach (Vector2 otherCampCenter in campCenters)
-                {
-                    if ((otherCampCenter - campCenter).Length < minimumDistanceBetweenCamps)
-                    {
-                        isNearbyAnotherCamp = true;
-                        break;
-                    }
-                }
-
-                if (isNearbyAnotherCamp) continue;
-
-                break;
-            }
-
-            return campLocation;
-        }
-
-        private bool IsCampAreaWalkable(Point position)
-        {
-            for (int row = 0; row < campSize; row++)
-            {
-                for (int column = 0; column < campSize; column++)
-                {
-                    Point testedPoint = new Point(position.X + column, position.Y + row);
-                    if (!world.IsWithinBounds(testedPoint) || !world.Terrain.IsWalkable(testedPoint))
-                        return false;
-                }
-            }
-
-            return true;
-        }
-
-        private void CreateResourceNodes()
-        {
-            int resourceNodeCount = (int)(world.Terrain.Width * world.Terrain.Height * resourcesRatio);
-            for (int i = 0; i < resourceNodeCount; i++)
-            {
-                Point location = GetFreeLocation(ResourceNode.DefaultSize);
-                ResourceType resourceType = (i % 2 == 0) ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.Entities.CreateResourceNode(resourceType, location);
-            }
-        }
-
-        private Point GetFreeLocation(Size size)
-        {
-            while (true)
-            {
-                Point location = new Point(
-                    random.Next(world.Size.Width - size.Width),
-                    random.Next(world.Size.Height - size.Height));
-
-                Region region = new Region(location, size);
-
-                bool isWalkable = world.Terrain.IsWalkable(region);
-                if (!isWalkable) continue;
-
-                bool isFreeOfEntities = world.Entities
-                    .Intersecting(region.ToRectangle())
-                    .None(entity => Region.Intersects(entity.GridRegion, region));
-                if (!isFreeOfEntities) continue;
-
-                return location;
-            }
-        }
-
-        private void CreateCampUnits(Faction faction, Vector2 campCenter)
-        {
-            Unit building = faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
-            building.CompleteConstruction();
-            Region buildingRegion = building.GridRegion;
-
-            UnitType unitType = world.UnitTypes.FromName("Schtroumpf");
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));
-            faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY + 1));
-        }
-
-        private void CreateCampResourceNodes(Vector2 campCenter)
-        {
-            world.Entities.CreateResourceNode(ResourceType.Aladdium,
-                (Point)(campCenter + new Vector2(campSize / -4f, campSize / -4f)));
-
-            world.Entities.CreateResourceNode(ResourceType.Alagene,
-                (Point)(campCenter + new Vector2(campSize / -4f, campSize / 4f)));
         }
         #endregion
         #endregion

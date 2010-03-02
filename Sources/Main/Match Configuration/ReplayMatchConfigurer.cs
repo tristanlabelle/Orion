@@ -45,6 +45,7 @@ namespace Orion.Main
                 colorIndex++;
             }
 
+            WorldGenerator.Generate(world, random);
             match = new Match(random, world);
             match.IsPausable = true;
 

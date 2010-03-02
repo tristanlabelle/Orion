@@ -50,6 +50,12 @@ namespace Orion.Main
             gameUI.Display(lobby);
         }
 
+        private void StartTowerDefenseGame(MainMenuUI sender)
+        {
+            MatchConfigurer configurer = new TowerDefenseMatchConfigurer();
+            StartGame(configurer);
+        }
+
         private void EnterReplayViewer(MainMenuUI sender)
         {
             ReplayLoadingUI replayLoader = new ReplayLoadingUI();
@@ -144,6 +150,7 @@ namespace Orion.Main
             MainMenuUI menuUI = new MainMenuUI();
             menuUI.SinglePlayerSelected += ConfigureSinglePlayerGame;
             menuUI.MultiplayerSelected += EnterMultiplayerLobby;
+            menuUI.TowerDefenseSelected += StartTowerDefenseGame;
             menuUI.ViewReplaySelected += EnterReplayViewer;
             gameUI = new GameUI();
             gameUI.Display(menuUI);
@@ -151,7 +158,9 @@ namespace Orion.Main
 
         private void StartGame(MatchConfigurer configurer)
         {
-            gameUI.RootView.PopDisplay(configurer.UserInterface);
+            MatchConfigurationUI matchConfigurationUI = configurer.UserInterface;
+            if (matchConfigurationUI != null)
+                gameUI.RootView.PopDisplay(matchConfigurationUI);
 
             Match match;
             SlaveCommander localCommander;

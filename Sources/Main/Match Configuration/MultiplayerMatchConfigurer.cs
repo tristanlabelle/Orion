@@ -75,6 +75,7 @@ namespace Orion.Main
                 }
             }
 
+            WorldGenerator.Generate(world, random);
             match = new Match(random, world);
 
             CommandPipeline pipeline = new CommandPipeline(match);

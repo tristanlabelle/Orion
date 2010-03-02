@@ -299,7 +299,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Commiting
-        private void CommitDeferredChanges()
+        public void CommitDeferredChanges()
         {
             foreach (KeyValuePair<Entity, DeferredChange> pair in deferredChanges)
             {

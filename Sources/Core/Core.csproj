@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
+    <Compile Include="DisposableHandle.cs" />
     <Compile Include="Engine\Audio\SoundContext.cs" />
     <Compile Include="Engine\Audio\Sound.cs" />
     <Compile Include="Engine\Audio\SoundGroup.cs" />

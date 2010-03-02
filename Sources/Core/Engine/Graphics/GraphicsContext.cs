@@ -17,18 +17,6 @@ namespace Orion.Engine.Graphics
     /// </summary>
     public sealed class GraphicsContext
     {
-        #region Nested Types
-        public struct TransformHandle : IDisposable
-        {
-            public void Dispose()  { GL.PopMatrix(); }
-        }
-
-        public struct ScissorRectangleHandle : IDisposable
-        {
-            public void Dispose() { GL.Disable(EnableCap.ScissorTest); }
-        }
-        #endregion
-
         #region Instance
         #region Fields
         private ColorRgba fillColor = Colors.White;
@@ -222,13 +210,12 @@ namespace Orion.Engine.Graphics
         #region Scissor Rectangle
         /// <summary>
         /// Applies a temporary scissor rectangle.
-        /// This method is best called in a C# <c>using</c> statement.
         /// </summary>
         /// <param name="region">The region of the viewport to be scissored.</param>
         /// <returns>
         /// A handle that should be disposed when the scope of the scissor rectangle ends.
         /// </returns>
-        public ScissorRectangleHandle Scissor(Region region)
+        public DisposableHandle Scissor(Region region)
         {
             bool isActive;
             GL.GetBoolean(GetPName.ScissorTest, out isActive);
@@ -236,7 +223,7 @@ namespace Orion.Engine.Graphics
 
             GL.Scissor(region.MinX, region.MinY, region.Width, region.Height);
             GL.Enable(EnableCap.ScissorTest);
-            return new ScissorRectangleHandle();
+            return new DisposableHandle(() => GL.Disable(EnableCap.ScissorTest));
         }
         #endregion
 
@@ -249,33 +236,33 @@ namespace Orion.Engine.Graphics
         /// <returns>
         /// A handle that should be disposed when the scope of the transformation ends.
         /// </returns>
-        public TransformHandle Transform(Transform transform)
+        public DisposableHandle Transform(Transform transform)
         {
             GL.PushMatrix();
             GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
             float rotationAngleInDegrees = (float)(transform.Rotation * 180 / Math.PI);
             GL.Rotate(rotationAngleInDegrees, Vector3.UnitZ);
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
-            return new TransformHandle();
+            return new DisposableHandle(() => GL.PopMatrix());
         }
 
-        public TransformHandle Transform(Vector2 translation, float rotation, Vector2 scaling)
+        public DisposableHandle Transform(Vector2 translation, float rotation, Vector2 scaling)
         {
             Transform transform = new Transform(translation, rotation, scaling);
             return Transform(transform);
         }
 
-        public TransformHandle Transform(Vector2 translation, float rotation)
+        public DisposableHandle Transform(Vector2 translation, float rotation)
         {
             return Transform(translation, rotation, new Vector2(1, 1));
         }
 
-        public TransformHandle Transform(Vector2 translation, float rotation, float scaling)
+        public DisposableHandle Transform(Vector2 translation, float rotation, float scaling)
         {
             return Transform(translation, rotation, new Vector2(scaling, scaling));
         }
 
-        public TransformHandle Translate(Vector2 translation)
+        public DisposableHandle Translate(Vector2 translation)
         {
             return Transform(translation, 0, new Vector2(1, 1));
         }

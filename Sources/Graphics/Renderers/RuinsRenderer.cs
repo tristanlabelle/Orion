@@ -80,15 +80,15 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Drawing
-        public void Draw(GraphicsContext graphics, Rectangle bounds)
+        public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
             foreach (Ruin ruin in ruins)
             {
                 Vector2 size = new Vector2(ruin.Size.Width, ruin.Size.Height);
                 Rectangle rectangle = new Rectangle(ruin.Min, size);
-                if (!Rectangle.Intersects(rectangle, bounds))
+                if (!Rectangle.Intersects(rectangle, viewBounds))
                     continue;
 
                 Region gridRegion = Entity.GetGridRegion(ruin.Min, ruin.Size);
@@ -104,7 +104,7 @@ namespace Orion.Graphics.Renderers
                 Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
 
                 ColorRgba color = new ColorRgba(ruin.Tint, alpha);
-                graphics.Fill(rectangle, texture, color);
+                graphicsContext.Fill(rectangle, texture, color);
             }
         }
         #endregion

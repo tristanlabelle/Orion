@@ -45,7 +45,7 @@ namespace Orion.Graphics
         #endregion
 
         #region Properties
-        private Rectangle TextureRectangle
+        private Rectangle UnitTextureRectangle
         {
             get
             {
@@ -59,13 +59,13 @@ namespace Orion.Graphics
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-            Rectangle grassTextureRectangle = new Rectangle(0, 0, terrain.Width / GrassTextureSizeInTiles, terrain.Height / GrassTextureSizeInTiles);
-            Rectangle sandTextureRectangle = new Rectangle(0, 0, terrain.Width / SandTextureSizeInTiles, terrain.Height / SandTextureSizeInTiles);
+            Rectangle terrainBounds = new Rectangle(terrain.Width, terrain.Height);
+            Rectangle grassTextureRectangle = new Rectangle(terrain.Width / GrassTextureSizeInTiles, terrain.Height / GrassTextureSizeInTiles);
+            Rectangle sandTextureRectangle = new Rectangle(terrain.Width / SandTextureSizeInTiles, terrain.Height / SandTextureSizeInTiles);
 
             graphics.Fill(terrainBounds, grassTileTexture, grassTextureRectangle);
-            graphics.FillMasked(terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, TextureRectangle);
-            graphics.FillMasked(terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, TextureRectangle);
+            graphics.FillMasked(terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, UnitTextureRectangle);
+            graphics.FillMasked(terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, UnitTextureRectangle);
         }
 
         public void DrawMiniature(GraphicsContext graphics)
@@ -74,7 +74,7 @@ namespace Orion.Graphics
 
             graphics.FillColor = ColorRgb.FromBytes(232, 207, 144);
             graphics.Fill(terrainBounds);
-            graphics.Fill(terrainBounds, obstacleMaskTexture, TextureRectangle, ColorRgb.FromBytes(100, 78, 60));
+            graphics.Fill(terrainBounds, obstacleMaskTexture, UnitTextureRectangle, ColorRgb.FromBytes(100, 78, 60));
         }
 
         public void Dispose()

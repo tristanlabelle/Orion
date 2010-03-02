@@ -5,6 +5,6 @@ namespace Orion.Graphics
 {
     public interface IRenderer
     {
-        void Draw(GraphicsContext context, Rectangle bounds);
+        void Draw(GraphicsContext graphicsContext, Rectangle bounds);
     }
 }

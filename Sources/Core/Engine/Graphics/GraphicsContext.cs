@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics;
@@ -9,7 +10,6 @@ using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Image = System.Drawing.Image;
-using System.Diagnostics;
 
 namespace Orion.Engine.Graphics
 {

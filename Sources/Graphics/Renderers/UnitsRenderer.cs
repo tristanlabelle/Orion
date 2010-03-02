@@ -83,15 +83,15 @@ namespace Orion.Graphics.Renderers
             simulationTimeInSeconds = args.TimeInSeconds;
         }
 
-        public void Draw(GraphicsContext graphics, Rectangle bounds)
+        public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            DrawRememberedBuildings(graphics);
-            DrawGroundUnits(graphics, bounds);
-            DrawLasers(graphics, bounds, CollisionLayer.Ground);
-            DrawAirborneUnits(graphics, bounds);
-            DrawLasers(graphics, bounds, CollisionLayer.Air);
+            DrawRememberedBuildings(graphicsContext);
+            DrawGroundUnits(graphicsContext, viewBounds);
+            DrawLasers(graphicsContext, viewBounds, CollisionLayer.Ground);
+            DrawAirborneUnits(graphicsContext, viewBounds);
+            DrawLasers(graphicsContext, viewBounds, CollisionLayer.Air);
         }
 
         #region Miniature
@@ -129,19 +129,19 @@ namespace Orion.Graphics.Renderers
                     && faction.CanSee(unit));
         }
 
-        private void DrawGroundUnits(GraphicsContext graphics, Rectangle bounds)
+        private void DrawGroundUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var units = GetClippedVisibleUnits(bounds)
+            var units = GetClippedVisibleUnits(viewBounds)
                 .Where(unit => !unit.IsAirborne);
-            foreach (Unit unit in units) DrawUnit(graphics, unit);
+            foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
         }
 
-        private void DrawAirborneUnits(GraphicsContext graphics, Rectangle bounds)
+        private void DrawAirborneUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var units = GetClippedVisibleUnits(bounds)
+            var units = GetClippedVisibleUnits(viewBounds)
                 .Where(unit => unit.IsAirborne);
-            foreach (Unit unit in units) DrawUnitShadow(graphics, unit);
-            foreach (Unit unit in units) DrawUnit(graphics, unit);
+            foreach (Unit unit in units) DrawUnitShadow(graphicsContext, unit);
+            foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
         }
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
@@ -163,7 +163,7 @@ namespace Orion.Graphics.Renderers
             if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
         }
 
-        private void DrawUnitShadow(GraphicsContext graphics, Unit unit)
+        private void DrawUnitShadow(GraphicsContext graphicsContext, Unit unit)
         {
             Texture texture = textureManager.GetUnit(unit.Type.Name);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
@@ -173,22 +173,22 @@ namespace Orion.Graphics.Renderers
             float distance = shadowDistance + oscillation * 0.1f;
             Vector2 center = unit.Center - new Vector2(distance, distance);
             float scaling = shadowScaling + oscillation * -0.1f;
-            using (graphics.Transform(center, drawingAngle, scaling))
+            using (graphicsContext.Transform(center, drawingAngle, scaling))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
-                graphics.Fill(localRectangle, texture, tint);
+                graphicsContext.Fill(localRectangle, texture, tint);
             }
         }
 
-        private void DrawRememberedBuilding(GraphicsContext graphics, Rectangle bounds, RememberedBuilding building)
+        private void DrawRememberedBuilding(GraphicsContext graphicsContext, Rectangle viewBounds, RememberedBuilding building)
         {
             Texture texture = textureManager.GetUnit(building.Type.Name);
 
             Rectangle buildingRectangle = building.GridRegion.ToRectangle();
-            if (!Rectangle.Intersects(buildingRectangle, bounds))
+            if (!Rectangle.Intersects(buildingRectangle, viewBounds))
                 return;
 
-            graphics.Fill(buildingRectangle, texture, building.Faction.Color);
+            graphicsContext.Fill(buildingRectangle, texture, building.Faction.Color);
         }
 
         private float GetOscillation(Unit unit)

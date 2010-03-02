@@ -40,22 +40,22 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public void Draw(GraphicsContext graphics, Rectangle bounds)
+        public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            DrawClipped(graphics, bounds, DrawUnclipped);
+            DrawClipped(graphicsContext, viewBounds, DrawUnclipped);
         }
 
-        public void DrawMiniature(GraphicsContext graphics, Rectangle bounds)
+        public void DrawMiniature(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            DrawClipped(graphics, bounds, DrawMiniatureUnclipped);
+            DrawClipped(graphicsContext, viewBounds, DrawMiniatureUnclipped);
         }
 
-        private void DrawClipped(GraphicsContext graphics, Rectangle bounds,
+        private void DrawClipped(GraphicsContext graphicsContext, Rectangle viewBounds,
             Action<GraphicsContext, ResourceNode> drawDelegate)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            Rectangle clippingBounds = bounds;
+            Rectangle clippingBounds = viewBounds;
             foreach (Entity entity in World.Entities)
             {
                 ResourceNode resourceNode = entity as ResourceNode;
@@ -66,21 +66,21 @@ namespace Orion.Graphics.Renderers
                     || !faction.HasPartiallySeen(resourceNode.GridRegion))
                     continue;
 
-                drawDelegate(graphics, resourceNode);
+                drawDelegate(graphicsContext, resourceNode);
             }
         }
 
-        private void DrawUnclipped(GraphicsContext graphics, ResourceNode resourceNode)
+        private void DrawUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
         {
             string resourceTypeName = resourceNode.Type.ToStringInvariant();
             Texture texture = textureManager.Get(resourceTypeName);
-            graphics.Fill(resourceNode.BoundingRectangle, texture);
+            graphicsContext.Fill(resourceNode.BoundingRectangle, texture);
         }
 
-        private void DrawMiniatureUnclipped(GraphicsContext graphics, ResourceNode resourceNode)
+        private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
         {
-            graphics.FillColor = GetResourceColor(resourceNode.Type);
-            graphics.Fill(resourceNode.BoundingRectangle);
+            graphicsContext.FillColor = GetResourceColor(resourceNode.Type);
+            graphicsContext.Fill(resourceNode.BoundingRectangle);
         }
 
         public static ColorRgb GetResourceColor(ResourceType type)

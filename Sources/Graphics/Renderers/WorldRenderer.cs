@@ -3,6 +3,7 @@ using System.Linq;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Matchmaking.TowerDefense;
 
 namespace Orion.Graphics.Renderers
 {
@@ -71,56 +72,54 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        #region Terrain
-        public void DrawTerrain(GraphicsContext graphics, Rectangle bounds)
+        public void DrawTerrain(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            terrainRenderer.Draw(graphics);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            terrainRenderer.Draw(graphicsContext);
         }
 
-        public void DrawMiniatureTerrain(GraphicsContext graphics, Rectangle bounds)
+        public void DrawMiniatureTerrain(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            terrainRenderer.DrawMiniature(graphics);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            terrainRenderer.DrawMiniature(graphicsContext);
         }
 
-        public void DrawResources(GraphicsContext graphics, Rectangle bounds)
+        public void DrawResources(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            resourcesRenderer.Draw(graphics, bounds);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            resourcesRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureResources(GraphicsContext graphics, Rectangle bounds)
+        public void DrawMiniatureResources(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            resourcesRenderer.DrawMiniature(graphics, bounds);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            resourcesRenderer.DrawMiniature(graphicsContext, viewBounds);
         }
 
-        public void DrawUnits(GraphicsContext graphics, Rectangle bounds)
+        public void DrawUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            ruinsRenderer.Draw(graphics, bounds);
-            unitsRenderer.Draw(graphics, bounds);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            ruinsRenderer.Draw(graphicsContext, viewBounds);
+            unitsRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureUnits(GraphicsContext graphics, Rectangle bounds)
+        public void DrawMiniatureUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            unitsRenderer.DrawMiniature(graphics);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            unitsRenderer.DrawMiniature(graphicsContext);
         }
 
-        public void DrawExplosions(GraphicsContext graphics, Rectangle bounds)
+        public void DrawExplosions(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            explosionRenderer.Draw(graphics);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            explosionRenderer.Draw(graphicsContext);
         }
 
-        public void DrawFogOfWar(GraphicsContext graphics, Rectangle bounds)
+        public void DrawFogOfWar(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-            fogOfWarRenderer.Draw(graphics);
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            fogOfWarRenderer.Draw(graphicsContext);
         }
-        #endregion
 
         public void Dispose()
         {

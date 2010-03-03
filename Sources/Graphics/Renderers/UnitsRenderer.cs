@@ -152,7 +152,7 @@ namespace Orion.Graphics.Renderers
             center.Y += GetOscillation(unit) * 0.15f;
 
             float drawingAngle = GetUnitDrawingAngle(unit);
-            using (graphics.Transform(center, drawingAngle))
+            using (graphics.PushTransform(center, drawingAngle))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                 graphics.Fill(localRectangle, texture, unit.Faction.Color);
@@ -173,7 +173,7 @@ namespace Orion.Graphics.Renderers
             float distance = shadowDistance + oscillation * 0.1f;
             Vector2 center = unit.Center - new Vector2(distance, distance);
             float scaling = shadowScaling + oscillation * -0.1f;
-            using (graphicsContext.Transform(center, drawingAngle, scaling))
+            using (graphicsContext.PushTransform(center, drawingAngle, scaling))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                 graphicsContext.Fill(localRectangle, texture, tint);

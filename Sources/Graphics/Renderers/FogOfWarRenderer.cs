@@ -35,7 +35,7 @@ namespace Orion.Graphics.Renderers
 
             UpdatePixelBuffer();
 
-            this.texture = Texture.CreateBlank(textureSize, PixelFormat.Alpha, true, false);
+            this.texture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelBuffer, true, false);
             texture.Blit((Region)faction.World.Size, pixelBuffer);
         }
         #endregion

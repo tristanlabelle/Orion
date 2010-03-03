@@ -20,6 +20,7 @@ namespace Orion.Engine.Graphics
     {
         #region Instance
         #region Fields
+        private readonly Stack<Region> scissorStack = new Stack<Region>();
         private ColorRgba fillColor = Colors.White;
         private ColorRgba strokeColor = Colors.Black;
         private Font font = new Font("Trebuchet MS", 14);
@@ -31,6 +32,33 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the size of the viewport.
+        /// </summary>
+        public Size ViewportSize
+        {
+            get
+            {
+                int[] viewportCoordinates = new int[4];
+                GL.GetInteger(GetPName.Viewport, viewportCoordinates);
+
+                return new Size(viewportCoordinates[2], viewportCoordinates[3]);
+            }
+        }
+
+        /// <summary>
+        /// Gets the clipping region of the viewport.
+        /// </summary>
+        public Region ScissorRegion
+        {
+            get
+            {
+                return scissorStack.Count == 0
+                ? new Region(ViewportSize)
+                : scissorStack.Peek();
+            }
+        }
+
         /// <summary>
         /// Accesses the <see cref="Color"/> currently used to fill shapes.
         /// </summary>
@@ -207,15 +235,22 @@ namespace Orion.Engine.Graphics
         /// <returns>
         /// A handle that should be disposed when the scope of the scissor rectangle ends.
         /// </returns>
-        public DisposableHandle Scissor(Region region)
+        public DisposableHandle PushScissorRegion(Region region)
         {
-            bool isActive;
-            GL.GetBoolean(GetPName.ScissorTest, out isActive);
-            Debug.Assert(!isActive, "Cannot nest Scissor boxes");
+            Region clippedRegion = Region.Intersection(ScissorRegion, region) ?? new Region(0, 0);
 
-            GL.Scissor(region.MinX, region.MinY, region.Width, region.Height);
             GL.Enable(EnableCap.ScissorTest);
-            return new DisposableHandle(() => GL.Disable(EnableCap.ScissorTest));
+            GL.Scissor(
+                clippedRegion.MinX, clippedRegion.MinY,
+                clippedRegion.Width, clippedRegion.Height);
+
+            scissorStack.Push(clippedRegion);
+
+            return new DisposableHandle(() =>
+            {
+                scissorStack.Pop();
+                if (scissorStack.Count == 0) GL.Disable(EnableCap.ScissorTest);
+            });
         }
         #endregion
 
@@ -228,7 +263,7 @@ namespace Orion.Engine.Graphics
         /// <returns>
         /// A handle that should be disposed when the scope of the transformation ends.
         /// </returns>
-        public DisposableHandle Transform(Transform transform)
+        public DisposableHandle PushTransform(Transform transform)
         {
             GL.PushMatrix();
             GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
@@ -238,25 +273,25 @@ namespace Orion.Engine.Graphics
             return new DisposableHandle(() => GL.PopMatrix());
         }
 
-        public DisposableHandle Transform(Vector2 translation, float rotation, Vector2 scaling)
+        public DisposableHandle PushTransform(Vector2 translation, float rotation, Vector2 scaling)
         {
             Transform transform = new Transform(translation, rotation, scaling);
-            return Transform(transform);
+            return PushTransform(transform);
         }
 
-        public DisposableHandle Transform(Vector2 translation, float rotation)
+        public DisposableHandle PushTransform(Vector2 translation, float rotation)
         {
-            return Transform(translation, rotation, new Vector2(1, 1));
+            return PushTransform(translation, rotation, new Vector2(1, 1));
         }
 
-        public DisposableHandle Transform(Vector2 translation, float rotation, float scaling)
+        public DisposableHandle PushTransform(Vector2 translation, float rotation, float scaling)
         {
-            return Transform(translation, rotation, new Vector2(scaling, scaling));
+            return PushTransform(translation, rotation, new Vector2(scaling, scaling));
         }
 
-        public DisposableHandle Translate(Vector2 translation)
+        public DisposableHandle PushTranslate(Vector2 translation)
         {
-            return Transform(translation, 0, new Vector2(1, 1));
+            return PushTransform(translation, 0, new Vector2(1, 1));
         }
         #endregion
 

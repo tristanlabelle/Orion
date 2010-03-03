@@ -7,7 +7,7 @@ using OpenTK.Math;
 using Orion.Geometry;
 using Orion.GameLogic;
 
-namespace Orion.Matchmaking
+namespace Orion.GameLogic
 {
     public sealed class AttackMonitor
     {

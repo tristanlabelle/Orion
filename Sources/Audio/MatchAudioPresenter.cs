@@ -31,6 +31,12 @@ namespace Orion.Audio
         private readonly StringBuilder stringBuilder = new StringBuilder();
 
         private bool isGameStarted;
+
+        /// <summary>
+        /// A flag that is set to true if an explosion sound has been played in the current frame.
+        /// This prevents playing multiple explosion sounds in chain reactions.
+        /// </summary>
+        private bool explosionInCurrentFrame;
         #endregion
 
         #region Constructors
@@ -138,7 +144,9 @@ namespace Orion.Audio
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            if (step.Number == 2)
+            explosionInCurrentFrame = false;
+
+            if (step.TimeInSeconds > 0.5f)
             {
                 isGameStarted = true;
 
@@ -197,7 +205,10 @@ namespace Orion.Audio
 
         private void OnExplosionOccured(World sender, Circle args)
         {
+            if (explosionInCurrentFrame) return;
+
             soundContext.PlayAndForgetRandomSoundFromGroup("Explosion", null);
+            explosionInCurrentFrame = true;
         }
         #endregion
     }

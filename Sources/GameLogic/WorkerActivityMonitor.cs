@@ -7,7 +7,7 @@ using Orion.GameLogic.Skills;
 using Orion.GameLogic.Tasks;
 using System.Diagnostics;
 
-namespace Orion.Matchmaking
+namespace Orion.GameLogic
 {
     /// <summary>
     /// Monitors the activity of workers for a given faction.

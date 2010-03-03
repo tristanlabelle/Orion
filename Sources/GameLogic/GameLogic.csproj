@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttackMonitor.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="HitEventArgs.cs" />
     <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="Entity.cs" />
     <Compile Include="EntityGrid.cs" />
     <Compile Include="EntityZoneManager.cs" />
-    <Compile Include="FactionSandbox.cs" />
     <Compile Include="FactionStatus.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="FogOfWar.cs" />
@@ -101,7 +101,6 @@
     <Compile Include="Skills\StoreFoodSkill.cs" />
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\TrainSkill.cs" />
-    <Compile Include="TagSet.cs" />
     <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Tasks\HealTask.cs" />
     <Compile Include="Tasks\MoveTask.cs">
@@ -124,7 +123,6 @@
     <Compile Include="Technologies\TechnologyRequirements.cs" />
     <Compile Include="Technologies\TechnologyTree.cs" />
     <Compile Include="Terrain.cs" />
-    <Compile Include="TileType.cs" />
     <Compile Include="TileVisibility.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="EntityManager.cs" />
@@ -132,6 +130,7 @@
     <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />
+    <Compile Include="WorkerActivityMonitor.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

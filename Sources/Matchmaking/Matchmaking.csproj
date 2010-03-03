@@ -48,7 +48,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttackMonitor.cs" />
     <Compile Include="Deathmatch\AgressiveAICommander.cs" />
     <Compile Include="AICommander.cs" />
     <Compile Include="Commands\DisembarkCommand.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />
-    <Compile Include="WorkerActivityMonitor.cs" />
     <Compile Include="WorldGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

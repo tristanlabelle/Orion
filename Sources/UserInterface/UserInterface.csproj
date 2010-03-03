@@ -88,7 +88,6 @@
     <Compile Include="UIDisplays\ReplayLoadingUI.cs" />
     <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\NullUI.cs" />
-    <Compile Include="UIDisplays\UnifiedMatchConfigurationUI.cs" />
     <Compile Include="Views System\ClippedView.cs" />
     <Compile Include="Views System\RenderedView.cs" />
     <Compile Include="Views System\Responder.cs" />

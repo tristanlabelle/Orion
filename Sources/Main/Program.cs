@@ -44,7 +44,7 @@ namespace Orion.Main
 
         private void EnterMultiplayerLobby(MainMenuUI sender)
         {
-            LocalMultiplayerLobby lobby = new LocalMultiplayerLobby(transporter);
+            HostMultiplayerLobby lobby = new HostMultiplayerLobby(transporter);
             lobby.HostedGame += BeginHostMultiplayerGame;
             lobby.JoinedGame += JoinedMultiplayerGame;
             gameUI.Display(lobby);
@@ -83,14 +83,14 @@ namespace Orion.Main
         #endregion
 
         #region Multiplayer Lobby Event Handlers
-        private void BeginHostMultiplayerGame(LocalMultiplayerLobby sender)
+        private void BeginHostMultiplayerGame(HostMultiplayerLobby sender)
         {
             MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
             configurer.GameStarted += StartGame;
             gameUI.RootView.PushDisplay(configurer.UserInterface);
         }
 
-        private void JoinedMultiplayerGame(LocalMultiplayerLobby lobby, IPv4EndPoint host)
+        private void JoinedMultiplayerGame(HostMultiplayerLobby lobby, IPv4EndPoint host)
         {
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
             configurer.GameStarted += StartGame;

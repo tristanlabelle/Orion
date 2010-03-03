@@ -13,7 +13,7 @@ using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface
 {
-    public sealed class LocalMultiplayerLobby : UIDisplay
+    public sealed class HostMultiplayerLobby : UIDisplay
     {
         #region Fields
         private static readonly byte[] explorePacket = new byte[] { (byte)SetupMessageType.Explore };
@@ -32,7 +32,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public LocalMultiplayerLobby(SafeTransporter transporter)
+        public HostMultiplayerLobby(SafeTransporter transporter)
         {
             port = transporter.Port;
             this.transporter = transporter;
@@ -67,8 +67,8 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event Action<LocalMultiplayerLobby> HostedGame;
-        public event Action<LocalMultiplayerLobby, IPv4EndPoint> JoinedGame;
+        public event Action<HostMultiplayerLobby> HostedGame;
+        public event Action<HostMultiplayerLobby, IPv4EndPoint> JoinedGame;
         #endregion
 
         #region Methods
@@ -170,7 +170,7 @@ namespace Orion.UserInterface
 
         private void JoinGame(IPv4EndPoint host)
         {
-            Action<LocalMultiplayerLobby, IPv4EndPoint> handler = JoinedGame;
+            Action<HostMultiplayerLobby, IPv4EndPoint> handler = JoinedGame;
             if (handler != null)
             {
                 handler(this, host);
@@ -185,7 +185,7 @@ namespace Orion.UserInterface
 
         private void PressHostGame(Button sender)
         {
-            Action<LocalMultiplayerLobby> handler = HostedGame;
+            Action<HostMultiplayerLobby> handler = HostedGame;
             if (handler != null && !requestedJoin.HasValue) handler(this);
         }
 

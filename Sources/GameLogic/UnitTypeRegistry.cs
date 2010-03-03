@@ -170,7 +170,7 @@ namespace Orion.GameLogic
                 Name = "Viking",
                 Size = new Size(1, 1),
                 SightRange = 8,
-                MaxHealth = 75,
+                MaxHealth = 70,
                 MeleeArmor = 4,
                 RangedArmor = 2,
                 AladdiumCost = 100,
@@ -178,7 +178,7 @@ namespace Orion.GameLogic
                 FoodCost = 3
             };
             builder.Skills.Add(new MoveSkill(6, false));
-            builder.Skills.Add(new AttackSkill(14, 0, 4));
+            builder.Skills.Add(new AttackSkill(12, 0, 4));
             Register(builder);
         }
         #endregion
@@ -194,8 +194,8 @@ namespace Orion.GameLogic
                 MaxHealth = 300,
                 MeleeArmor = 3,
                 RangedArmor = 3,
-                AladdiumCost = 200,
-                AlageneCost = 75
+                AladdiumCost = 180,
+                AlageneCost = 70
             };
             builder.Skills.Add(new TrainSkill(type =>
                 type.Name == "Grippe A(H1N1)" || type.Name == "OVNI" || type.Name == "Tapis Volant", 10));
@@ -216,8 +216,8 @@ namespace Orion.GameLogic
                 AlageneCost = 100,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(15, true));
-            builder.Skills.Add(new AttackSkill(1, 7, 1));
+            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new AttackSkill(2, 7, 1));
             Register(builder);
         }
 
@@ -230,13 +230,13 @@ namespace Orion.GameLogic
                 SightRange = 10,
                 MaxHealth = 100,
                 MeleeArmor = 1,
-                RangedArmor = 4,
+                RangedArmor = 3,
                 AladdiumCost = 140,
                 AlageneCost = 140,
                 FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(8, true));
-            builder.Skills.Add(new AttackSkill(13, 8, 8));
+            builder.Skills.Add(new AttackSkill(13, 8, 6));
             Register(builder);
         }
 
@@ -513,7 +513,7 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new MoveSkill(8, false));
             builder.Skills.Add(new AttackSkill(8, 0, 4));
-            builder.Skills.Add(new HarvestSkill(1, 10));
+            builder.Skills.Add(new HarvestSkill(5, 10));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 100));
             Register(builder);
         }

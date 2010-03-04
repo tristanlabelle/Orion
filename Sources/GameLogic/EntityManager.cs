@@ -404,7 +404,18 @@ namespace Orion.GameLogic
             return airGrid[point];
         }
 
-        public Unit GetUnitAt(Point point)
+        public Entity GetTopmostEntityAt(Point point)
+        {
+            if (!world.IsWithinBounds(point))
+            {
+                Debug.Fail("Point out of world bounds.");
+                return null;
+            }
+
+            return airGrid[point] ?? groundGrid[point];
+        }
+
+        public Unit GetTopmostUnitAt(Point point)
         {
             if (!world.IsWithinBounds(point))
             {

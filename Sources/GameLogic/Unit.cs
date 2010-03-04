@@ -275,7 +275,11 @@ namespace Orion.GameLogic
         public Vector2? RallyPoint
         {
             get { return rallyPoint; }
-            set { rallyPoint = value; }
+            set
+            {
+                Debug.Assert(type.IsBuilding);
+                rallyPoint = value;
+            }
         }
         #endregion
 
@@ -524,13 +528,34 @@ namespace Orion.GameLogic
             Unit spawnee = faction.CreateUnit(spawneeType, point.Value);
             Vector2 traineeDelta = spawnee.Center - Center;
             spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
-            if (HasRallyPoint)
-            {
-                MoveTask moveToRallyPointTask = new MoveTask(spawnee, (Point)RallyPoint.Value);
-                spawnee.TaskQueue.OverrideWith(moveToRallyPointTask);
-            }
+
+            if (HasRallyPoint) spawnee.ApplyRallyPoint(rallyPoint.Value);
 
             return spawnee;
+        }
+
+        private void ApplyRallyPoint(Vector2 target)
+        {
+            // Check to see if we can harvest automatically
+            if (HasSkill<HarvestSkill>())
+            {
+                ResourceNode resourceNode = World.Entities
+                    .Intersecting(target)
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault();
+
+                if (resourceNode != null && resourceNode.IsHarvestableByFaction(faction))
+                {
+                    HarvestTask harvestTask = new HarvestTask(this, resourceNode);
+                    taskQueue.OverrideWith(harvestTask);
+                    return;
+                }
+            }
+
+            // Move instead
+            Point targetPoint = (Point)target;
+            MoveTask moveToRallyPointTask = new MoveTask(this, targetPoint);
+            taskQueue.OverrideWith(moveToRallyPointTask);
         }
         #endregion
 

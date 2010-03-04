@@ -58,7 +58,6 @@ namespace Orion.UserInterface
         private readonly MatchAudioRenderer matchAudioRenderer;
         private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
-        private UnitType selectedType;
         private Frame diplomacyFrame;
         private bool isSpaceDown;
         private bool isShiftDown;
@@ -163,8 +162,9 @@ namespace Orion.UserInterface
             KeyDown += userInputManager.HandleKeyDown;
             KeyUp += userInputManager.HandleKeyUp;
 
-            userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
-            localCommander.CommandGenerated += CommanderGeneratedCommand;
+            userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
+            userInputManager.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
+            localCommander.CommandGenerated += OnCommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
@@ -191,16 +191,6 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
-        private UnitType SelectedType
-        {
-            get { return selectedType; }
-            set
-            {
-                selectedType = value;
-                UpdateSkillsPanel();
-            }
-        }
-
         private MatchRenderer MatchRenderer
         {
             get { return (MatchRenderer)worldView.Renderer; }
@@ -209,6 +199,11 @@ namespace Orion.UserInterface
         private WorldRenderer WorldRenderer
         {
             get { return MatchRenderer.WorldRenderer; }
+        }
+
+        private SelectionManager SelectionManager
+        {
+            get { return userInputManager.SelectionManager; }
         }
 
         private SlaveCommander LocalCommander
@@ -304,7 +299,7 @@ namespace Orion.UserInterface
             var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
             if (isShiftDown)
             {
-                userInputManager.SelectionManager.SelectUnits(inactiveWorkers);
+                userInputManager.SelectionManager.SetSelection(inactiveWorkers);
             }
             else
             {
@@ -315,13 +310,13 @@ namespace Orion.UserInterface
                     if (inactiveWorkers.Contains(selectedUnit))
                     {
                         int nextIndex = (inactiveWorkers.IndexOf(selectedUnit) + 1) % inactiveWorkers.Count();
-                        userInputManager.SelectionManager.SelectUnit(inactiveWorkers.ElementAt(nextIndex));
+                        userInputManager.SelectionManager.SetSelection(inactiveWorkers.ElementAt(nextIndex));
                         CenterOnSelection();
                         return;
                     }
                 }
 
-                userInputManager.SelectionManager.SelectUnit(inactiveWorkers.First());
+                userInputManager.SelectionManager.SetSelection(inactiveWorkers.First());
                 CenterOnSelection();
             }
         }
@@ -352,7 +347,9 @@ namespace Orion.UserInterface
                 userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
             else
-                userInputManager.SelectionManager.HoveredUnit = null;
+            {
+                userInputManager.HoveredUnit = null;
+            }
 
             return base.OnMouseMove(args);
         }
@@ -431,10 +428,8 @@ namespace Orion.UserInterface
 
         protected override void OnUpdate(UpdateEventArgs args)
         {
-            if (isSpaceDown && SelectedType != null)
-            {
+            if (isSpaceDown && !SelectionManager.IsSelectionEmpty)
                 CenterOnSelection();
-            }
 
             console.Update(args.TimeDeltaInSeconds);
             match.Update(args.TimeDeltaInSeconds);
@@ -486,23 +481,23 @@ namespace Orion.UserInterface
             if (mouseDownOnMinimap) MoveWorldView(args.Position);
         }
 
-        private void SelectionChanged(SelectionManager selectionManager)
+        private void OnSelectionChanged(SelectionManager selectionManager)
         {
-            if (selectionManager.IsSelectionEmpty) SelectedType = null;
-
             while (selectionFrame.Children.Count > 0) selectionFrame.Children[0].Dispose();
             selectionFrame.Children.Clear();
 
-            IEnumerable<Unit> selection = selectionManager.SelectedUnits;
-            int selectionCount = selection.Count();
-            if (SelectedType == null && selectionCount > 0) SelectedType = selection.First().Type;
-
-            if (selectionCount == 0) SelectedType = null;
-            if (selectionCount == 1) CreateSingleUnitSelectionPanel();
-            else CreateMultipleUnitsSelectionPanel();
+            if (selectionManager.SelectedUnitCount == 1)
+                CreateSingleUnitSelectionPanel();
+            else if (selectionManager.SelectedUnitCount > 1)
+                CreateMultipleUnitsSelectionPanel();
         }
 
-        private void CommanderGeneratedCommand(Commander commander, Command command)
+        private void OnSelectedUnitTypeChanged(SelectionManager selectionManager)
+        {
+            UpdateSkillsPanel();
+        }
+
+        private void OnCommanderGeneratedCommand(Commander commander, Command command)
         {
             actions.Restore();
         }
@@ -545,8 +540,7 @@ namespace Orion.UserInterface
 
         private void CenterOnSelection()
         {
-            Unit unitToFollow = userInputManager.SelectionManager.SelectedUnits.First(unit => unit.Type == SelectedType);
-            CenterOn(unitToFollow.Position);
+            CenterOn(SelectionManager.LeadingUnit.Center);
         }
 
         private void CreateSingleUnitSelectionPanel()
@@ -558,7 +552,7 @@ namespace Orion.UserInterface
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
 
-            unitButton.Triggered += ButtonPress;
+            unitButton.Triggered += OnUnitButtonPressed;
             selectionFrame.Children.Add(unitButton);
         }
 
@@ -574,11 +568,11 @@ namespace Orion.UserInterface
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, textureManager);
-                renderer.HasFocus = unit.Type == SelectedType;
+                renderer.HasFocus = (unit.Type == SelectionManager.SelectedUnitType);
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
-                unitButton.Triggered += ButtonPress;
+                unitButton.Triggered += OnUnitButtonPressed;
                 currentX += frame.Width + paddingX;
                 if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
                 {
@@ -589,38 +583,33 @@ namespace Orion.UserInterface
             }
         }
 
-        private void ButtonPress(Button button)
+        private void OnUnitButtonPressed(Button button)
         {
-            if (button.Renderer is UnitButtonRenderer)
+            Unit unit = ((UnitButtonRenderer)button.Renderer).Unit;
+            if (unit.Type == SelectionManager.SelectedUnitType || SelectionManager.SelectedUnitCount == 1)
             {
-                Unit unit = (button.Renderer as UnitButtonRenderer).unit;
-                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (unit.Type == SelectedType || selectedUnits.Count() == 1)
+                SelectionManager.SetSelection(unit);
+                MoveWorldView(unit.Center);
+            }
+            else
+            {
+                SelectionManager.SelectedUnitType = unit.Type;
+                foreach (Button unitButton in selectionFrame.Children)
                 {
-                    userInputManager.SelectionManager.SelectUnit(unit);
-                    MoveWorldView(unit.Position);
+                    UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
+                    renderer.HasFocus = renderer.Unit.Type == SelectionManager.SelectedUnitType;
                 }
-                else
-                {
-                    SelectedType = unit.Type;
-                    foreach (Button unitButton in selectionFrame.Children)
-                    {
-                        UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
-                        renderer.HasFocus = renderer.unit.Type == SelectedType;
-                    }
-                }
-            } 
+            }
         }
 
         private void UpdateSkillsPanel()
         {
             actions.Clear();
-            if (SelectedType != null)
-            {
-                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (selectedUnits.None(u => u.Faction != userInputManager.LocalCommander.Faction))
-                    actions.Push(new UnitActionProvider(enablers, SelectedType));
-            }
+            if (SelectionManager.IsSelectionEmpty) return;
+            
+            IEnumerable<Unit> selectedUnits = SelectionManager.SelectedUnits;
+            if (selectedUnits.All(u => u.Faction == LocalFaction))
+                actions.Push(new UnitActionProvider(enablers, SelectionManager.SelectedUnitType));
         }
 
         private void MoveWorldView(Vector2 center)

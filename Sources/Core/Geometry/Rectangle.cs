@@ -200,6 +200,14 @@ namespace Orion.Geometry
         }
 
         /// <summary>
+        /// Gets the area of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float Area
+        {
+            get { return Width * Height; }
+        }
+
+        /// <summary>
         /// Gets the size of this <see cref="Rectangle"/>.
         /// </summary>
         public Vector2 Size

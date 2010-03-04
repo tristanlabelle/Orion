@@ -35,7 +35,7 @@ namespace Orion.UserInterface.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            Unit target = World.Entities.GetUnitAt(point);
+            Unit target = World.Entities.GetTopmostUnitAt(point);
             if (target == null) InputManager.LaunchZoneAttack(location);
             else InputManager.LaunchAttack(target);
 

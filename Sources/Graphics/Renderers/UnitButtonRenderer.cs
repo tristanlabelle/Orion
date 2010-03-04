@@ -9,7 +9,7 @@ namespace Orion.Graphics.Renderers
     public sealed class UnitButtonRenderer : FrameRenderer
     {
         #region Fields
-        public readonly Unit unit;
+        private readonly Unit unit;
         private readonly TextureManager textureManager;
         private bool hasFocus;
         #endregion
@@ -26,6 +26,11 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Properties
+        public Unit Unit
+        {
+            get { return unit; }
+        }
+
         public bool HasFocus
         {
             get { return hasFocus; }

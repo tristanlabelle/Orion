@@ -69,8 +69,8 @@ namespace Orion.Graphics.Renderers
             worldRenderer.DrawUnits(context, bounds);
             selectionRenderer.DrawSelectionMarkers(context);
 
-            if (SelectionManager.HoveredUnit != null && Faction.CanSee(SelectionManager.HoveredUnit))
-                HealthBarRenderer.Draw(context, SelectionManager.HoveredUnit);
+            if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
+                HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
 
             worldRenderer.DrawExplosions(context, bounds);
             worldRenderer.DrawFogOfWar(context, bounds);

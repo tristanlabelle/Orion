@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.Geometry;
 using Orion.GameLogic;
 
@@ -15,11 +16,12 @@ namespace Orion.Matchmaking
         #region Fields
         public static readonly int SelectionLimit = 24;
         public static readonly int SelectionGroupCount = 10;
+        public static readonly float NearbySelectionRadius = 10;
 
         private readonly Faction faction;
         private readonly List<Unit> selectedUnits = new List<Unit>();
         private readonly HashSet<Unit>[] selectionGroups;
-        private Unit hoveredUnit;
+        private UnitType selectedUnitType;
         #endregion
 
         #region Constructors
@@ -46,6 +48,11 @@ namespace Orion.Matchmaking
         /// Raised when the contents of the selection has changed.
         /// </summary>
         public event Action<SelectionManager> SelectionChanged;
+
+        /// <summary>
+        /// Raised when the currently selected unit type has changed.
+        /// </summary>
+        public event Action<SelectionManager> SelectedUnitTypeChanged;
         #endregion
 
         #region Properties
@@ -66,7 +73,7 @@ namespace Orion.Matchmaking
         }
 
         /// <summary>
-        /// Gets the number of units that are currently selected.
+        /// Gets the number of units which are currently selected.
         /// </summary>
         public int SelectedUnitCount
         {
@@ -89,10 +96,30 @@ namespace Orion.Matchmaking
             get { return selectedUnits.Count == SelectionLimit; }
         }
 
-        public Unit HoveredUnit
+        /// <summary>
+        /// Gets the type of unit which has the focus within the selection.
+        /// This is never null when the selection isn't empty.
+        /// </summary>
+        public UnitType SelectedUnitType
         {
-            get { return hoveredUnit; }
-            set { hoveredUnit = value; }
+            get { return selectedUnitType; }
+            set
+            {
+                if (value == selectedUnitType) return;
+                if (IsSelectionEmpty) throw new ArgumentException("The selected unit type cannot be null when there's a selection.");
+                if (selectedUnits.None(unit => unit.Type == value))
+                    throw new ArgumentException("The selected unit type must be the type of a unit in the selection.");
+                selectedUnitType = value;
+                SelectedUnitTypeChanged.Raise(this);
+            }
+        }
+
+        /// <summary>
+        /// Gets the unit that leads the selection.
+        /// </summary>
+        public Unit LeadingUnit
+        {
+            get { return IsSelectionEmpty ? null : selectedUnits.First(unit => unit.Type == selectedUnitType); }
         }
 
         private World World
@@ -107,13 +134,50 @@ namespace Orion.Matchmaking
         /// Clears the selection and selects a single unit.
         /// </summary>
         /// <param name="unit">The unit to be selected.</param>
-        public void SelectUnit(Unit unit)
+        public void SetSelection(Unit unit)
         {
             Argument.EnsureNotNull(unit, "unit");
 
             selectedUnits.Clear();
             if (IsSelectable(unit)) selectedUnits.Add(unit);
+            ResetSelectedUnitType();
             SelectionChanged.Raise(this);
+        }
+
+        /// <summary>
+        /// Clears the selection and adds some unit to it.
+        /// </summary>
+        /// <param name="units">The units to be added.</param>
+        public void SetSelection(IEnumerable<Unit> units)
+        {
+            Argument.EnsureNotNull(units, "units");
+
+            selectedUnits.Clear();
+            foreach (Unit unit in units)
+                if (IsSelectable(unit))
+                    selectedUnits.Add(unit);
+
+            SortSelection();
+            ResetSelectedUnitType();
+            SelectionChanged.Raise(this);
+        }
+
+        /// <summary>
+        /// Clears the selection and selects units in a radius with a given type.
+        /// </summary>
+        /// <param name="position">The position from which to check for units.</param>
+        /// <param name="unitType">The type of the units to be selected.</param>
+        public void SelectNearbyUnitsOfType(Vector2 position, UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+
+            IEnumerable<Unit> selectedUnits = faction.World.Entities
+                .OfType<Unit>()
+                .Where(unit => (unit.Center - position).LengthSquared <= NearbySelectionRadius * NearbySelectionRadius
+                    && unit.Type == unitType
+                    && unit.Faction == faction);
+            
+            SetSelection(selectedUnits);
         }
 
         /// <summary>
@@ -127,23 +191,6 @@ namespace Orion.Matchmaking
             if (!IsSelectable(unit)) return;
 
             selectedUnits.Add(unit);
-            SortSelection();
-            SelectionChanged.Raise(this);
-        }
-
-        /// <summary>
-        /// Clears the selection and adds some unit to it.
-        /// </summary>
-        /// <param name="units">The units to be added.</param>
-        public void SelectUnits(IEnumerable<Unit> units)
-        {
-            Argument.EnsureNotNull(units, "units");
-
-            selectedUnits.Clear();
-            foreach (Unit unit in units)
-                if (IsSelectable(unit))
-                    selectedUnits.Add(unit);
-
             SortSelection();
             SelectionChanged.Raise(this);
         }
@@ -173,6 +220,91 @@ namespace Orion.Matchmaking
         }
 
         /// <summary>
+        /// Toggles the selection of a single unit.
+        /// </summary>
+        /// <param name="unit">The unit to be added or removed.</param>
+        public void ToggleSelection(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+
+            if (selectedUnits.Contains(unit))
+                RemoveFromSelection(unit);
+            else
+                AddToSelection(unit);
+        }
+
+        /// <summary>
+        /// Selects the units that intersect a rectangle.
+        /// </summary>
+        /// <param name="rectangleStart">The start of the rectangle. Units closer to this are selected first.</param>
+        /// <param name="rectangleEnd">The end of the rectangle.</param>
+        public void SelectInRectangle(Vector2 rectangleStart, Vector2 rectangleEnd)
+        {
+            SelectInRectangle(rectangleStart, rectangleEnd, false);
+        }
+
+        /// <summary>
+        /// Adds units intersecting a rectangle to the selection.
+        /// </summary>
+        /// <param name="rectangleStart">The start of the rectangle. Units closer to this are selected first.</param>
+        /// <param name="rectangleEnd">The end of the rectangle.</param>
+        public void AddRectangleToSelection(Vector2 rectangleStart, Vector2 rectangleEnd)
+        {
+            SelectInRectangle(rectangleStart, rectangleEnd, true);
+        }
+
+        private void SelectInRectangle(Vector2 rectangleStart, Vector2 rectangleEnd, bool add)
+        {
+            Rectangle rectangle = Rectangle.FromPoints(rectangleStart, rectangleEnd);
+
+            List<Unit> units = faction.World.Entities
+                .OfType<Unit>()
+                .Where(unit => Rectangle.Intersects(rectangle, unit.BoundingRectangle))
+                .OrderBy(unit => (unit.Center - rectangleStart).LengthSquared)
+                .ToList();
+
+            // Filter out factions
+            bool containsUnitsFromThisFaction = units.Any(unit => unit.Faction == faction);
+            if (containsUnitsFromThisFaction)
+                units.RemoveAll(unit => unit.Faction != faction);
+            else if (units.Count > 1)
+                units.RemoveRange(1, units.Count - 1);
+
+            // Filter out buildings
+            bool containsNonBuildingUnits = units.Any(unit => !unit.Type.IsBuilding);
+            if (containsNonBuildingUnits) units.RemoveAll(unit => unit.Type.IsBuilding);
+
+            if (add) AddToSelection(units);
+            else SetSelection(units);
+        }
+
+        /// <summary>
+        /// Removes a unit from the current selection.
+        /// </summary>
+        /// <param name="unit">The unit to be removed from the selection.</param>
+        public void RemoveFromSelection(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+
+            if (!selectedUnits.Remove(unit)) return;
+
+            if (unit.Type == selectedUnitType)
+            {
+                // Try to see if we can keep the same selected unit type, else find a new one.
+                Unit newSelectionLeader = selectedUnits.FirstOrDefault(u => u != unit && u.Type == selectedUnitType);
+                if (newSelectionLeader == null)
+                {
+                    newSelectionLeader = selectedUnits.FirstOrDefault(u => u != unit);
+                    selectedUnitType = newSelectionLeader == null ? null : newSelectionLeader.Type;
+                    SelectedUnitTypeChanged.Raise(this);
+                }
+            }
+
+            SortSelection();
+            SelectionChanged.Raise(this);
+        }
+
+        /// <summary>
         /// Removes all units from the selection.
         /// </summary>
         public void ClearSelection()
@@ -192,7 +324,33 @@ namespace Orion.Matchmaking
 
         private void SortSelection()
         {
-            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
+            // Sort first by unit types, so that the groups with the most units come first,
+            // and then by unit handle.
+            var selectedUnitTypes = selectedUnits.GroupBy(unit => unit.Type)
+                .OrderByDescending(group => group.Count())
+                .Select(group => group.Key)
+                .ToList();
+
+            selectedUnits.Sort((a, b) =>
+                {
+                    int comparison = selectedUnitTypes.IndexOf(a.Type).CompareTo(selectedUnitTypes.IndexOf(b.Type));
+                    if (comparison == 0) comparison = a.Handle.Value.CompareTo(b.Handle.Value);
+                    return comparison;
+                });
+        }
+        #endregion
+
+        #region Selected Unit Type
+        /// <summary>
+        /// Resets the selected unit type to its default value according to the current selection.
+        /// </summary>
+        public void ResetSelectedUnitType()
+        {
+            UnitType newSelectedUnitType = selectedUnits.Select(unit => unit.Type).FirstOrDefault();
+            if (newSelectedUnitType == selectedUnitType) return;
+
+            selectedUnitType = newSelectedUnitType;
+            SelectedUnitTypeChanged.Raise(this);
         }
         #endregion
 
@@ -221,6 +379,8 @@ namespace Orion.Matchmaking
 
             var selectionGroup = selectionGroups[index];
             if (selectionGroup.Count == 0) return false;
+
+            selectionGroup.RemoveWhere(unit => !IsSelectable(unit));
 
             selectedUnits.Clear();
             selectedUnits.AddRange(selectionGroup);
@@ -264,13 +424,10 @@ namespace Orion.Matchmaking
             Unit unit = entity as Unit;
             if (unit == null) return;
 
-            if (hoveredUnit == unit) hoveredUnit = null;
-
             foreach (var selectionGroup in selectionGroups)
                 selectionGroup.Remove(unit);
 
-            if (selectedUnits.Remove(unit))
-                SelectionChanged.Raise(this);
+            RemoveFromSelection(unit);
         }
         #endregion
     }

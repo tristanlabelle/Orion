@@ -13,8 +13,11 @@ namespace Orion.Matchmaking
     public class UserInputManager
     {
         #region Fields
-        private SlaveCommander commander;
-        private SelectionManager selectionManager;
+        private static readonly float SingleClickMaxRectangleArea = 0.1f;
+
+        private readonly SlaveCommander commander;
+        private readonly SelectionManager selectionManager;
+        private Unit hoveredUnit;
         private UserInputCommand mouseCommand;
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
@@ -22,11 +25,12 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Constructors
-        public UserInputManager(SlaveCommander userCommander)
+        public UserInputManager(SlaveCommander commander)
         {
-            Argument.EnsureNotNull(userCommander, "userCommander");
-            commander = userCommander;
-            selectionManager = new SelectionManager(userCommander.Faction);
+            Argument.EnsureNotNull(commander, "commander");
+            this.commander = commander;
+            this.selectionManager = new SelectionManager(commander.Faction);
+            commander.Faction.World.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
@@ -49,6 +53,12 @@ namespace Orion.Matchmaking
         public SelectionManager SelectionManager
         {
             get { return selectionManager; }
+        }
+
+        public Unit HoveredUnit
+        {
+            get { return hoveredUnit; }
+            set { hoveredUnit = value; }
         }
 
         public Rectangle? SelectionRectangle
@@ -86,61 +96,73 @@ namespace Orion.Matchmaking
                 LaunchDefaultCommand(args.Position);
         }
 
-        public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
-        {
-            selectionStart = args.Position;
-            selectionEnd = args.Position;
-            Faction faction = commander.Faction;
-            Rectangle selection = SelectionRectangle.Value;
-            
-            Unit selectedUnit = faction.World.Entities
-                .OfType<Unit>()
-                .FirstOrDefault(unit => Rectangle.Intersects(selection, unit.BoundingRectangle));
-
-            if (selectedUnit != null && selectedUnit.Faction == faction)
-            {
-                IEnumerable<Unit> selectedUnits = faction.World.Entities
-                    .OfType<Unit>()
-                    .Where(unit => (unit.Position - args.Position).Length < 10
-                            && unit.Type == selectedUnit.Type
-                            && unit.Faction == faction);
-                selectionManager.SelectUnits(selectedUnits);
-            }
-            selectionStart = null;
-            selectionEnd = null;
-            
-        }
-
         public void HandleMouseUp(object responder, MouseEventArgs args)
         {
-            if (!selectionStart.HasValue) return;
+            if (!this.selectionStart.HasValue) return;
             if (args.ButtonPressed != MouseButton.Left) return;
 
-            selectionEnd = args.Position;
-            Faction faction = commander.Faction;
-            Rectangle selection = SelectionRectangle.Value;
-            List<Unit> selectedUnits = faction.World.Entities
-                .OfType<Unit>()
-                .Where(unit => Rectangle.Intersects(selection, unit.BoundingRectangle))
-                .OrderBy(unit => (unit.Center - selectionStart.Value).LengthSquared)
-                .ToList();
+            this.selectionEnd = args.Position;
+            Vector2 selectionRectangleStart = this.selectionStart.Value;
+            Vector2 selectionRectangleEnd = this.selectionEnd.Value;
+            Rectangle selectionRectangle = this.SelectionRectangle.Value;
+            this.selectionStart = null;
+            this.selectionEnd = null;
 
-            // Filter out factions
-            bool containsUnitsFromThisFaction = selectedUnits.Any(unit => unit.Faction == faction);
-            if (containsUnitsFromThisFaction)
-                selectedUnits.RemoveAll(unit => unit.Faction != faction);
-            else if (selectedUnits.Count > 1)
-                selectedUnits.RemoveRange(1, selectedUnits.Count - 1);
+            if (selectionRectangle.Area < SingleClickMaxRectangleArea)
+            {
+                HandleMouseClick(selectionRectangleStart);
+            }
+            else
+            {
+                if (shiftKeyPressed)
+                    selectionManager.AddRectangleToSelection(selectionRectangleStart, selectionRectangleEnd);
+                else
+                    selectionManager.SelectInRectangle(selectionRectangleStart, selectionRectangleEnd);
+            }
+        }
 
-            // Filter out buildings
-            bool containsNonBuildingUnits = selectedUnits.Any(unit => !unit.Type.IsBuilding);
-            if (containsNonBuildingUnits) selectedUnits.RemoveAll(unit => unit.Type.IsBuilding);
+        private void HandleMouseClick(Vector2 position)
+        {
+            Point point = (Point)position;
+            Unit clickedUnit = World.IsWithinBounds(point)
+                ? World.Entities.GetTopmostUnitAt(point)
+                : null;
 
-            if (shiftKeyPressed) selectionManager.AddToSelection(selectedUnits);
-            else selectionManager.SelectUnits(selectedUnits);
+            if (clickedUnit == null)
+            {
+                if (!shiftKeyPressed) selectionManager.ClearSelection();
+                return;
+            }
 
+            if (shiftKeyPressed)
+                selectionManager.ToggleSelection(clickedUnit);
+            else
+                selectionManager.SetSelection(clickedUnit);
+        }
+
+        public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
+        {
             selectionStart = null;
             selectionEnd = null;
+
+            Point point = (Point)args.Position;
+            if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) != TileVisibility.Visible)
+            {
+                selectionManager.ClearSelection();
+                return;
+            }
+
+            Unit clickedUnit = World.Entities.GetTopmostUnitAt(point);
+            if (clickedUnit == null)
+            {
+                selectionManager.ClearSelection();
+                return;
+            }
+
+            if (clickedUnit.Faction == LocalFaction)
+                selectionManager.SelectNearbyUnitsOfType(clickedUnit.Center, clickedUnit.Type);
+            else
+                selectionManager.SetSelection(clickedUnit);
         }
 
         public void HandleMouseMove(object responder, MouseEventArgs args)
@@ -154,10 +176,8 @@ namespace Orion.Matchmaking
             if (selectionStart.HasValue) selectionEnd = args.Position;
             else
             {
-                Vector2 point = new Vector2(args.X, args.Y);
-                SelectionManager.HoveredUnit = World.Entities
-                    .OfType<Unit>()
-                    .FirstOrDefault(unit => unit.BoundingRectangle.ContainsPoint(point));
+                Point point = (Point)args.Position;
+                hoveredUnit = World.IsWithinBounds(point) ? World.Entities.GetTopmostUnitAt(point) : null;
             }
         }
 
@@ -183,6 +203,14 @@ namespace Orion.Matchmaking
         {
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
         }
+
+        private void OnEntityRemoved(EntityManager source, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            if (unit == hoveredUnit) hoveredUnit = null;
+        }
         #endregion
 
         #region Launching dynamically chosen commands
@@ -192,56 +220,75 @@ namespace Orion.Matchmaking
             mouseCommand = null;
         }
 
-        public void LaunchDefaultCommand(Vector2 at)
+        public void LaunchDefaultCommand(Vector2 target)
         {
             bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != LocalFaction);
             if (otherFactionOnlySelection) return;
 
-            Entity intersectedEntity = World.Entities
-                .FirstOrDefault(entity => entity.BoundingRectangle.ContainsPoint(at));
-
-            Unit intersectedUnit = intersectedEntity as Unit;
-            if (intersectedUnit != null)
+            Point point = (Point)target;
+            if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
             {
-                if (intersectedUnit.Faction == commander.Faction)
-                {
-                    if (intersectedUnit.HasSkill<ExtractAlageneSkill>())
-                    {
-                        ResourceNode alageneNode = World.Entities
-                            .OfType<ResourceNode>()
-                            .First(node => node.Position == intersectedUnit.Position);
-                        if (alageneNode.IsHarvestableByFaction(LocalFaction))
-                            LaunchHarvest(alageneNode);
-                    }
-                    else if (intersectedUnit.IsBuilding)
-                        LaunchRepair(intersectedUnit);
-                    else if (!intersectedUnit.IsBuilding && intersectedUnit.Damage > 0)
-                        LaunchHeal(intersectedUnit);
-                    else
-                        LaunchMove(intersectedUnit.Position);
-                }
-                else LaunchAttack(intersectedUnit);
+                LaunchMove(target);
+                return;
             }
-            else if (intersectedEntity is ResourceNode)
+
+            Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
+            if (targetEntity is Unit)
             {
-                if (((ResourceNode)intersectedEntity).IsHarvestableByFaction(LocalFaction))
-                    LaunchHarvest((ResourceNode)intersectedEntity);
+                LaunchDefaultCommand((Unit)targetEntity);
+            }
+            else if (targetEntity is ResourceNode)
+            {
+                ResourceNode targetResourceNode = (ResourceNode)targetEntity;
+                if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                    LaunchChangeRallyPoint(targetResourceNode.Center);
                 else
-                    LaunchMove(((ResourceNode)intersectedEntity).Position);
+                    LaunchDefaultCommand(targetResourceNode);
             }
             else
             {
-                if (World.Terrain.IsWalkableAndWithinBounds((Point)at))
-                {
-                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
-                    {
-                        LaunchChangeRallyPoint(at);
-                    }
-                }
-                LaunchMove(at);
+                if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                    LaunchChangeRallyPoint(target);
+                else
+                    LaunchMove(target);
             }
         }
 
+        private void LaunchDefaultCommand(Unit target)
+        {
+            if (target.Faction == commander.Faction)
+            {
+                if (target.HasSkill<ExtractAlageneSkill>())
+                {
+                    ResourceNode alageneNode = World.Entities
+                        .OfType<ResourceNode>()
+                        .First(node => node.Position == target.Position);
+                    if (alageneNode.IsHarvestableByFaction(LocalFaction))
+                        LaunchHarvest(alageneNode);
+                }
+                else if (target.IsBuilding)
+                    LaunchRepair(target);
+                else if (!target.IsBuilding && target.Damage > 0)
+                    LaunchHeal(target);
+                else
+                    LaunchMove(target.Position);
+            }
+            else
+            {
+                if (target.Faction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
+                    LaunchMove(target.Center);
+                else
+                    LaunchAttack(target);
+            }
+        }
+
+        private void LaunchDefaultCommand(ResourceNode target)
+        {
+            if (target.IsHarvestableByFaction(LocalFaction))
+                LaunchHarvest(target);
+            else
+                LaunchMove(target.Position);
+        }
         #endregion
 
         #region Launching individual commands

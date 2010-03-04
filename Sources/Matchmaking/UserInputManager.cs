@@ -19,7 +19,6 @@ namespace Orion.Matchmaking
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
         private bool shiftKeyPressed;
-        private List<Unit>[] groups;
         #endregion
 
         #region Constructors
@@ -27,14 +26,7 @@ namespace Orion.Matchmaking
         {
             Argument.EnsureNotNull(userCommander, "userCommander");
             commander = userCommander;
-            commander.Faction.World.Entities.Removed += OnEntityDied;
             selectionManager = new SelectionManager(userCommander.Faction);
-
-            groups = new List<Unit>[10];
-            for (int i = 0; i < groups.Length;i++ )
-            {
-                groups[i] = new List<Unit>();
-            }
         }
         #endregion
 
@@ -177,37 +169,19 @@ namespace Orion.Matchmaking
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
                 case Keys.F9: ChangeDiplomaticStance(); break;
+            }
 
-                case Keys.D0: case Keys.D1: case Keys.D2:
-                case Keys.D3: case Keys.D4: case Keys.D5:
-                case Keys.D6: case Keys.D7: case Keys.D8:
-                case Keys.D9:
-                    int groupNumber = args.Key - Keys.D0;
-                    if (args.HasControl)
-                    {
-                        groups[groupNumber] = selectionManager.SelectedUnits.ToList();
-                    }
-                    else if (groups[groupNumber].Count > 0)
-                    {
-                        selectionManager.SelectUnits(groups[groupNumber]);
-                    }
-                    break;
+            if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
+            {
+                int groupNumber = args.Key - Keys.D0;
+                if (args.HasControl) selectionManager.SaveSelectionGroup(groupNumber);
+                else selectionManager.TryLoadSelectionGroup(groupNumber);
             }
         }
 
         public void HandleKeyUp(object responder, KeyboardEventArgs args)
         {
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
-        }
-
-        private void OnEntityDied(EntityManager sender, Entity args)
-        {
-            Unit unit = args as Unit;
-            if (unit == null) return;
-            for (int i = 0; i < groups.Length; i++)
-            {
-                groups[i].Remove(unit);
-            }
         }
         #endregion
 

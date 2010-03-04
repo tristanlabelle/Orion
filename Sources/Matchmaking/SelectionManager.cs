@@ -13,10 +13,12 @@ namespace Orion.Matchmaking
     public sealed class SelectionManager
     {
         #region Fields
-        public const int SelectionLimit = 24;
+        public static readonly int SelectionLimit = 24;
+        public static readonly int SelectionGroupCount = 10;
 
         private readonly Faction faction;
         private readonly List<Unit> selectedUnits = new List<Unit>();
+        private readonly HashSet<Unit>[] selectionGroups;
         private Unit hoveredUnit;
         #endregion
 
@@ -29,7 +31,12 @@ namespace Orion.Matchmaking
         public SelectionManager(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
+
             this.faction = faction;
+            this.faction.World.Entities.Removed += OnEntityRemoved;
+            this.selectionGroups = new HashSet<Unit>[SelectionGroupCount];
+            for (int i = 0; i < this.selectionGroups.Length; ++i)
+                this.selectionGroups[i] = new HashSet<Unit>();
         }
         #endregion
 
@@ -94,6 +101,7 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Methods
+        #region Selection modification
         /// <summary>
         /// Clears the selection and selects a single unit.
         /// </summary>
@@ -104,6 +112,21 @@ namespace Orion.Matchmaking
 
             selectedUnits.Clear();
             if (IsSelectable(unit)) selectedUnits.Add(unit);
+            SelectionChanged.Raise(this);
+        }
+
+        /// <summary>
+        /// Attempts to add a given unit to the selection.
+        /// </summary>
+        /// <param name="unit">The unit to be added.</param>
+        public void AddToSelection(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+
+            if (!IsSelectable(unit)) return;
+
+            selectedUnits.Add(unit);
+            SortSelection();
             SelectionChanged.Raise(this);
         }
 
@@ -120,21 +143,6 @@ namespace Orion.Matchmaking
                 if (IsSelectable(unit))
                     selectedUnits.Add(unit);
 
-            SortSelection();
-            SelectionChanged.Raise(this);
-        }
-
-        /// <summary>
-        /// Attempts to add a given unit to the selection.
-        /// </summary>
-        /// <param name="unit">The unit to be added.</param>
-        public void AddToSelection(Unit unit)
-        {
-            Argument.EnsureNotNull(unit, "unit");
-
-            if (!IsSelectable(unit)) return;
-            
-            selectedUnits.Add(unit);
             SortSelection();
             SelectionChanged.Raise(this);
         }
@@ -172,18 +180,59 @@ namespace Orion.Matchmaking
             selectedUnits.Clear();
             SelectionChanged.Raise(this);
         }
+        #endregion
+
+        #region Groups
+        /// <summary>
+        /// Copies the current selection to a selection group.
+        /// </summary>
+        /// <param name="index">The index of the selection group to be filled.</param>
+        public void SaveSelectionGroup(int index)
+        {
+            ValidateGroupIndex(index);
+
+            var selectionGroup = selectionGroups[index];
+            selectionGroup.Clear();
+            selectionGroup.UnionWith(selectedUnits);
+        }
 
         /// <summary>
-        /// Informs this <see cref="SelectionManager"/> that an entity died.
+        /// Loads a selection group if it isn't empty.
         /// </summary>
-        /// <param name="source">The source EntityRegistry</param>
-        /// <param name="entity">The entity that died</param>
-        public void EntityDied(EntityManager source, Entity entity)
+        /// <param name="index">The index of the selection group to be loaded.</param>
+        /// <returns>True is the selection group was loaded, false if it was empty.</returns>
+        public bool TryLoadSelectionGroup(int index)
+        {
+            ValidateGroupIndex(index);
+
+            var selectionGroup = selectionGroups[index];
+            if (selectionGroup.Count == 0) return false;
+
+            selectedUnits.Clear();
+            selectedUnits.AddRange(selectionGroup);
+
+            SortSelection();
+            SelectionChanged.Raise(this);
+
+            return true;
+        }
+
+        private void ValidateGroupIndex(int index)
+        {
+            if (index < 0 || index >= selectionGroups.Length)
+                throw new ArgumentOutOfRangeException("Selection group index out of range.");
+        }
+        #endregion
+
+        private void OnEntityRemoved(EntityManager source, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;
 
             if (hoveredUnit == unit) hoveredUnit = null;
+
+            foreach (var selectionGroup in selectionGroups)
+                selectionGroup.Remove(unit);
 
             if (selectedUnits.Remove(unit))
                 SelectionChanged.Raise(this);

@@ -33,6 +33,7 @@ namespace Orion.Matchmaking
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
+            this.faction.World.Updated += OnWorldUpdated;
             this.faction.World.Entities.Removed += OnEntityRemoved;
             this.selectionGroups = new HashSet<Unit>[SelectionGroupCount];
             for (int i = 0; i < this.selectionGroups.Length; ++i)
@@ -180,6 +181,19 @@ namespace Orion.Matchmaking
             selectedUnits.Clear();
             SelectionChanged.Raise(this);
         }
+
+        private bool IsSelectable(Unit unit)
+        {
+            return !IsSelectionFull
+                && !selectedUnits.Contains(unit)
+                && unit.IsAlive
+                && faction.CanSee(unit);
+        }
+
+        private void SortSelection()
+        {
+            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
+        }
         #endregion
 
         #region Groups
@@ -224,6 +238,27 @@ namespace Orion.Matchmaking
         }
         #endregion
 
+        private void OnWorldUpdated(World arg1, SimulationStep arg2)
+        {
+            RemoveHiddenUnitsFromSelection();
+        }
+
+        private void RemoveHiddenUnitsFromSelection()
+        {
+            bool wasUnitRemoved = false;
+            for (int i = selectedUnits.Count - 1; i > 0; --i)
+            {
+                Unit unit = selectedUnits[i];
+                if (!faction.CanSee(unit))
+                {
+                    selectedUnits.RemoveAt(i);
+                    wasUnitRemoved = true;
+                }
+            }
+
+            if (wasUnitRemoved) SelectionChanged.Raise(this);
+        }
+
         private void OnEntityRemoved(EntityManager source, Entity entity)
         {
             Unit unit = entity as Unit;
@@ -236,19 +271,6 @@ namespace Orion.Matchmaking
 
             if (selectedUnits.Remove(unit))
                 SelectionChanged.Raise(this);
-        }
-
-        private bool IsSelectable(Unit unit)
-        {
-            return !IsSelectionFull
-                && !selectedUnits.Contains(unit)
-                && unit.IsAlive
-                && faction.CanSee(unit);
-        }
-
-        private void SortSelection()
-        {
-            selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
         }
         #endregion
     }

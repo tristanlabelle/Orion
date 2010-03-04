@@ -171,14 +171,14 @@ namespace Orion.GameLogic
                 Size = new Size(1, 1),
                 SightRange = 8,
                 MaxHealth = 70,
-                MeleeArmor = 4,
+                MeleeArmor = 3,
                 RangedArmor = 2,
                 AladdiumCost = 100,
                 AlageneCost = 25,
                 FoodCost = 3
             };
             builder.Skills.Add(new MoveSkill(6, false));
-            builder.Skills.Add(new AttackSkill(12, 0, 4));
+            builder.Skills.Add(new AttackSkill(13, 0, 4));
             Register(builder);
         }
         #endregion
@@ -271,8 +271,8 @@ namespace Orion.GameLogic
                 MaxHealth = 200,
                 MeleeArmor = 3,
                 RangedArmor = 3,
-                AladdiumCost = 250,
-                AlageneCost = 125
+                AladdiumCost = 125,
+                AlageneCost = 200
             };
             builder.Skills.Add(new TrainSkill(type =>
                 type.Name == "Jedihad" || type.Name == "Jésus"
@@ -290,12 +290,12 @@ namespace Orion.GameLogic
                 MaxHealth = 65,
                 MeleeArmor = 1,
                 RangedArmor = 3,
-                AladdiumCost = 20,
-                AlageneCost = 75,
+                AladdiumCost = 30,
+                AlageneCost = 90,
                 FoodCost = 2
             };
             builder.Skills.Add(new MoveSkill(9, false));
-            builder.Skills.Add(new AttackSkill(4, 3, 4));
+            builder.Skills.Add(new AttackSkill(5, 3, 4));
             Register(builder);
         }
 

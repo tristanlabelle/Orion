@@ -13,7 +13,7 @@ namespace Orion.Engine.Networking
     /// <summary>
     /// A Transporter is responsible for safely transporting UDP packets over a network.
     /// It guarantees that packets are going to arrive without loss or duplication and as sent.
-    /// The order of arrival is not garanteed.
+    /// The order of arrival is guaranteed.
     /// It creates a single UDP socket for communication to various hosts.
     /// The remote host must use a Transporter as well for reception.
     /// </summary>

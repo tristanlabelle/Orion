@@ -165,7 +165,6 @@ namespace Orion.UserInterface
             KeyUp += userInputManager.HandleKeyUp;
 
             userInputManager.SelectionManager.SelectionChanged += SelectionChanged;
-            userInputManager.SelectionManager.SelectionCleared += SelectionCleared;
             localCommander.CommandGenerated += CommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
@@ -488,13 +487,10 @@ namespace Orion.UserInterface
             if (mouseDownOnMinimap) MoveWorldView(args.Position);
         }
 
-        private void SelectionCleared(SelectionManager selectionManager)
-        {
-            SelectedType = null;
-        }
-
         private void SelectionChanged(SelectionManager selectionManager)
         {
+            if (selectionManager.IsSelectionEmpty) SelectedType = null;
+
             while (selectionFrame.Children.Count > 0) selectionFrame.Children[0].Dispose();
             selectionFrame.Children.Clear();
 

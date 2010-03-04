@@ -144,7 +144,7 @@ namespace Orion.Matchmaking
             bool containsNonBuildingUnits = selectedUnits.Any(unit => !unit.Type.IsBuilding);
             if (containsNonBuildingUnits) selectedUnits.RemoveAll(unit => unit.Type.IsBuilding);
 
-            if (shiftKeyPressed) selectionManager.AppendToSelection(selectedUnits);
+            if (shiftKeyPressed) selectionManager.AddToSelection(selectedUnits);
             else selectionManager.SelectUnits(selectedUnits);
 
             selectionStart = null;

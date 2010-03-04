@@ -60,7 +60,7 @@ namespace Orion.Graphics
             graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in SelectionManager.SelectedUnits)
             {
-                if (!SelectionManager.LocalFaction.CanSee(unit))
+                if (!SelectionManager.Faction.CanSee(unit))
                     continue;
 
                 graphics.Stroke(unit.BoundingRectangle);

@@ -13,11 +13,11 @@ namespace Orion.Matchmaking
     public sealed class SelectionManager
     {
         #region Fields
-        public const int MaxSelectedUnits = 24;
+        public const int SelectionLimit = 24;
 
-        private Unit hoveredUnit;
-        private readonly List<Unit> selectedUnits = new List<Unit>();
         private readonly Faction faction;
+        private readonly List<Unit> selectedUnits = new List<Unit>();
+        private Unit hoveredUnit;
         #endregion
 
         #region Constructors
@@ -34,27 +34,17 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Events
-        public event Action<SelectionManager> SelectionCleared;
+        /// <summary>
+        /// Raised when the contents of the selection has changed.
+        /// </summary>
         public event Action<SelectionManager> SelectionChanged;
-
-        private void RaiseSelectionCleared()
-        {
-            var handler = SelectionCleared;
-            if (handler != null) handler(this);
-        }
-
-        private void RaiseSelectionChanged()
-        {
-            Action<SelectionManager> handler = SelectionChanged;
-            if (handler != null) handler(this);
-        }
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets the local faction towards which this <see cref="SelectionManager"/> has a bias.
+        /// Gets the faction towards which this <see cref="SelectionManager"/> has a bias.
         /// </summary>
-        public Faction LocalFaction
+        public Faction Faction
         {
             get { return faction; }
         }
@@ -67,56 +57,120 @@ namespace Orion.Matchmaking
             get { return selectedUnits; }
         }
 
+        /// <summary>
+        /// Gets the number of units that are currently selected.
+        /// </summary>
+        public int SelectedUnitCount
+        {
+            get { return selectedUnits.Count; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if no units are currently selected.
+        /// </summary>
+        public bool IsSelectionEmpty
+        {
+            get { return selectedUnits.Count == 0; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the maximum number of units are currently selected.
+        /// </summary>
+        public bool IsSelectionFull
+        {
+            get { return selectedUnits.Count == SelectionLimit; }
+        }
+
         public Unit HoveredUnit
         {
             get { return hoveredUnit; }
             set { hoveredUnit = value; }
         }
+
+        private World World
+        {
+            get { return faction.World; }
+        }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Clears the selection and selects a single unit.
+        /// </summary>
+        /// <param name="unit">The unit to be selected.</param>
         public void SelectUnit(Unit unit)
         {
-            ClearSelection();
-            AppendToSelection(unit);
+            Argument.EnsureNotNull(unit, "unit");
+
+            selectedUnits.Clear();
+            if (IsSelectable(unit)) selectedUnits.Add(unit);
+            SelectionChanged.Raise(this);
         }
 
+        /// <summary>
+        /// Clears the selection and adds some unit to it.
+        /// </summary>
+        /// <param name="units">The units to be added.</param>
         public void SelectUnits(IEnumerable<Unit> units)
         {
-            ClearSelection();
-            AppendToSelection(units);
-        }
+            Argument.EnsureNotNull(units, "units");
 
-        public void AppendToSelection(Unit unit)
-        {
-            if (!selectedUnits.Contains(unit))
-            {
-                if (faction.GetTileVisibility((Point)unit.Position) == TileVisibility.Visible)
-                {
+            selectedUnits.Clear();
+            foreach (Unit unit in units)
+                if (IsSelectable(unit))
                     selectedUnits.Add(unit);
-                    UpdateSelection();
-                }
-            }
+
+            SortSelection();
+            SelectionChanged.Raise(this);
         }
 
-        public void AppendToSelection(IEnumerable<Unit> units)
+        /// <summary>
+        /// Attempts to add a given unit to the selection.
+        /// </summary>
+        /// <param name="unit">The unit to be added.</param>
+        public void AddToSelection(Unit unit)
         {
+            Argument.EnsureNotNull(unit, "unit");
+
+            if (!IsSelectable(unit)) return;
+            
+            selectedUnits.Add(unit);
+            SortSelection();
+            SelectionChanged.Raise(this);
+        }
+
+        /// <summary>
+        /// Adds numerous units to the selection.
+        /// </summary>
+        /// <param name="units">The units to be added.</param>
+        public void AddToSelection(IEnumerable<Unit> units)
+        {
+            Argument.EnsureNotNull(units, "units");
+
+            bool wasUnitAdded = false;
             foreach (Unit unit in units)
             {
-                Point unitPosition = (Point)unit.Position;
-                if (faction.GetTileVisibility(unitPosition) == TileVisibility.Visible)
-                {
-                    if (!selectedUnits.Contains(unit))
-                        selectedUnits.Add(unit);
-                }
+                if (!IsSelectable(unit)) continue;
+                
+                selectedUnits.Add(unit);
+                wasUnitAdded = true;
             }
-            UpdateSelection();
+
+            if (wasUnitAdded)
+            {
+                SortSelection();
+                SelectionChanged.Raise(this);
+            }
         }
 
+        /// <summary>
+        /// Removes all units from the selection.
+        /// </summary>
         public void ClearSelection()
         {
+            if (selectedUnits.Count == 0) return;
             selectedUnits.Clear();
-            RaiseSelectionCleared();
+            SelectionChanged.Raise(this);
         }
 
         /// <summary>
@@ -126,24 +180,26 @@ namespace Orion.Matchmaking
         /// <param name="entity">The entity that died</param>
         public void EntityDied(EntityManager source, Entity entity)
         {
-            if (entity is Unit)
-            {
-                Unit unit = (Unit)entity ;
-                if (selectedUnits.Contains(unit))
-                {
-                    selectedUnits.Remove(unit);
-                    UpdateSelection();
-                }
-                if (hoveredUnit == unit) hoveredUnit = null;
-            }
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            if (hoveredUnit == unit) hoveredUnit = null;
+
+            if (selectedUnits.Remove(unit))
+                SelectionChanged.Raise(this);
         }
 
-        private void UpdateSelection()
+        private bool IsSelectable(Unit unit)
         {
-            if (selectedUnits.Count > MaxSelectedUnits)
-                selectedUnits.RemoveRange(MaxSelectedUnits, selectedUnits.Count - MaxSelectedUnits);
+            return !IsSelectionFull
+                && !selectedUnits.Contains(unit)
+                && unit.IsAlive
+                && faction.CanSee(unit);
+        }
+
+        private void SortSelection()
+        {
             selectedUnits.Sort((a, b) => a.Type.Handle.Value.CompareTo(b.Type.Handle.Value));
-            RaiseSelectionChanged();
         }
         #endregion
     }

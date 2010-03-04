@@ -246,7 +246,7 @@ namespace Orion.Matchmaking
         private void RemoveHiddenUnitsFromSelection()
         {
             bool wasUnitRemoved = false;
-            for (int i = selectedUnits.Count - 1; i > 0; --i)
+            for (int i = selectedUnits.Count - 1; i >= 0; --i)
             {
                 Unit unit = selectedUnits[i];
                 if (!faction.CanSee(unit))

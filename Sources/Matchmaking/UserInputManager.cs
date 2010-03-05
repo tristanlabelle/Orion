@@ -260,11 +260,16 @@ namespace Orion.Matchmaking
             {
                 if (target.HasSkill<ExtractAlageneSkill>())
                 {
-                    ResourceNode alageneNode = World.Entities
-                        .OfType<ResourceNode>()
-                        .First(node => node.Position == target.Position);
-                    if (alageneNode.IsHarvestableByFaction(LocalFaction))
-                        LaunchHarvest(alageneNode);
+                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                        LaunchChangeRallyPoint(target.Center);
+                    else
+                    {
+                        ResourceNode alageneNode = World.Entities
+                            .OfType<ResourceNode>()
+                            .First(node => node.Position == target.Position);
+                        if (alageneNode.IsHarvestableByFaction(LocalFaction))
+                            LaunchHarvest(alageneNode);
+                    }
                 }
                 else if (target.IsBuilding)
                     LaunchRepair(target);

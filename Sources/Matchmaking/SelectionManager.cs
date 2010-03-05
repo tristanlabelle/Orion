@@ -384,11 +384,7 @@ namespace Orion.Matchmaking
 
             selectionGroup.RemoveWhere(unit => !IsSelectable(unit));
 
-            selectedUnits.Clear();
-            selectedUnits.AddRange(selectionGroup);
-
-            SortSelection();
-            SelectionChanged.Raise(this);
+            SetSelection(selectionGroup);
 
             return true;
         }

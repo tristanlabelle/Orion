@@ -275,7 +275,7 @@ namespace Orion.Matchmaking
             }
             else
             {
-                if (target.Faction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
+                if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
                     LaunchMove(target.Center);
                 else
                     LaunchAttack(target);

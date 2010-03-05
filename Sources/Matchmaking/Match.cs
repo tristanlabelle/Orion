@@ -168,7 +168,7 @@ namespace Orion.Matchmaking
                         return;
                 }
             }
-            if (aliveFactions.Count() == 1) RaiseWorldConquered(aliveFactions);
+            RaiseWorldConquered(aliveFactions);
         }
         #endregion
 

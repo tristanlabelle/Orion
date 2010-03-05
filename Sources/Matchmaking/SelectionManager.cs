@@ -288,19 +288,11 @@ namespace Orion.Matchmaking
 
             if (!selectedUnits.Remove(unit)) return;
 
-            if (unit.Type == selectedUnitType)
-            {
-                // Try to see if we can keep the same selected unit type, else find a new one.
-                Unit newSelectionLeader = selectedUnits.FirstOrDefault(u => u != unit && u.Type == selectedUnitType);
-                if (newSelectionLeader == null)
-                {
-                    newSelectionLeader = selectedUnits.FirstOrDefault(u => u != unit);
-                    selectedUnitType = newSelectionLeader == null ? null : newSelectionLeader.Type;
-                    SelectedUnitTypeChanged.Raise(this);
-                }
-            }
-
             SortSelection();
+
+            if (unit.Type == selectedUnitType)
+                UpdateSelectedUnitType();
+
             SelectionChanged.Raise(this);
         }
 
@@ -354,6 +346,15 @@ namespace Orion.Matchmaking
             selectedUnitType = newSelectedUnitType;
             SelectedUnitTypeChanged.Raise(this);
         }
+
+        private void UpdateSelectedUnitType()
+        {
+            if (selectedUnits.Any(u => u.Type == selectedUnitType)) return;
+
+            Unit newSelectionLeader = selectedUnits.FirstOrDefault();
+            selectedUnitType = newSelectionLeader == null ? null : newSelectionLeader.Type;
+            SelectedUnitTypeChanged.Raise(this);
+        }
         #endregion
 
         #region Groups
@@ -382,7 +383,7 @@ namespace Orion.Matchmaking
             var selectionGroup = selectionGroups[index];
             if (selectionGroup.Count == 0) return false;
 
-            selectionGroup.RemoveWhere(unit => !IsSelectable(unit));
+            selectionGroup.RemoveWhere(unit => !faction.CanSee(unit));
 
             SetSelection(selectionGroup);
 
@@ -414,7 +415,11 @@ namespace Orion.Matchmaking
                 }
             }
 
-            if (wasUnitRemoved) SelectionChanged.Raise(this);
+            if (wasUnitRemoved)
+            {
+                UpdateSelectedUnitType();
+                SelectionChanged.Raise(this);
+            }
         }
 
         private void OnEntityRemoved(EntityManager source, Entity entity)

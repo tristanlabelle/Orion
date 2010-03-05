@@ -194,8 +194,10 @@ namespace Orion.Matchmaking
             if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
             {
                 int groupNumber = args.Key - Keys.D0;
-                if (args.HasControl) selectionManager.SaveSelectionGroup(groupNumber);
-                else selectionManager.TryLoadSelectionGroup(groupNumber);
+                if (args.HasControl)
+                    selectionManager.SaveSelectionGroup(groupNumber);
+                else
+                    selectionManager.TryLoadSelectionGroup(groupNumber);
             }
         }
 

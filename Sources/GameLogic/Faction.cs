@@ -350,6 +350,7 @@ namespace Orion.GameLogic
             Debug.Assert(wasRemoved);
             technologies.Add(technology);
             RaiseTechnologyResearched(technology);
+            RaiseWarning("La technologie {0} est maintenant disponible.".FormatInvariant(technology.Name));
         }
         #endregion
 

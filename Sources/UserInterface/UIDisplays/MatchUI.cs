@@ -299,7 +299,7 @@ namespace Orion.UserInterface
             var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
             if (isShiftDown)
             {
-                userInputManager.SelectionManager.SetSelection(inactiveWorkers);
+                SelectionManager.SetSelection(inactiveWorkers);
             }
             else
             {

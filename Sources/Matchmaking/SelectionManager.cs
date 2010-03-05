@@ -311,6 +311,8 @@ namespace Orion.Matchmaking
         {
             if (selectedUnits.Count == 0) return;
             selectedUnits.Clear();
+            selectedUnitType = null;
+            SelectedUnitTypeChanged.Raise(this);
             SelectionChanged.Raise(this);
         }
 

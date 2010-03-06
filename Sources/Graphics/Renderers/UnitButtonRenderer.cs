@@ -10,18 +10,18 @@ namespace Orion.Graphics.Renderers
     {
         #region Fields
         private readonly Unit unit;
-        private readonly TextureManager textureManager;
+        private readonly Texture texture;
         private bool hasFocus;
         #endregion
 
         #region Constructors
-        public UnitButtonRenderer(Unit unit, TextureManager textureManager)
+        public UnitButtonRenderer(Unit unit, GameGraphics gameGraphics)
             : base(unit.Faction.Color)
         {
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.unit = unit;
-            this.textureManager = textureManager;
+            this.texture = gameGraphics.GetUnitTexture(unit);
         }
         #endregion
 
@@ -53,7 +53,6 @@ namespace Orion.Graphics.Renderers
                 bounds.CenterX, bounds.Height * 5 / 8,
                 size, size);
 
-            Texture texture = textureManager.GetUnit(unit.Type.Name);
             context.Fill(rectangle, texture, unit.Faction.Color);
 
             float healthRatio = unit.Health / unit.MaxHealth;

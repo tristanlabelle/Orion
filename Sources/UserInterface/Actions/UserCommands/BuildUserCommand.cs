@@ -13,21 +13,21 @@ namespace Orion.UserInterface.Actions.UserCommands
     public sealed class BuildUserCommand : UserInputCommand, IRenderer
     {
         #region Fields
-        private readonly TextureManager textureManager;
         private readonly UnitType buildingType;
+        private readonly Texture texture;
         private Point? minLocation;
         #endregion
 
         #region Constructors
-        public BuildUserCommand(UserInputManager inputManager, TextureManager textureManager,
+        public BuildUserCommand(UserInputManager inputManager, GameGraphics gameGraphics,
             UnitType buildingType)
             : base(inputManager)
         {
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             Argument.EnsureNotNull(buildingType, "buildingType");
 
-            this.textureManager = textureManager;
             this.buildingType = buildingType;
+            this.texture = gameGraphics.GetUnitTexture(buildingType);
         }
         #endregion
 
@@ -100,7 +100,6 @@ namespace Orion.UserInterface.Actions.UserCommands
         {
             if (!minLocation.HasValue) return;
 
-            Texture texture = textureManager.GetUnit(buildingType.Name);
             ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,

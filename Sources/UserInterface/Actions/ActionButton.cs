@@ -17,24 +17,25 @@ namespace Orion.UserInterface.Actions
         #region Fields
         protected readonly ActionFrame actionFrame;
         protected readonly UserInputManager inputManager;
-        protected readonly TextureManager textureManager;
+        protected readonly GameGraphics gameGraphics;
         private string name;
         private string description;
         #endregion
 
         #region Constructors
         public ActionButton(ActionFrame actionFrame, UserInputManager inputManager,
-            string name, Keys hotkey, TextureManager textureManager)
+            string name, Keys hotkey, GameGraphics gameGraphics)
             : base(new Rectangle(1,1), string.Empty)
         {
             Argument.EnsureNotNull(actionFrame, "actionFrame");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(name, "name");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             base.HotKey = hotkey;
             this.actionFrame = actionFrame;
             this.inputManager = inputManager;
-            this.textureManager = textureManager;
+            this.gameGraphics = gameGraphics;
             this.name = name;
         }
         #endregion
@@ -86,9 +87,9 @@ namespace Orion.UserInterface.Actions
             }
         }
 
-        protected TextureManager TextureManager
+        protected GameGraphics GameGraphics
         {
-            get { return textureManager; }
+            get { return gameGraphics; }
         }
         #endregion
 

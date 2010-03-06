@@ -51,12 +51,12 @@ namespace Orion.UserInterface
         private readonly Button idleWorkerButton;
         #endregion
 
+        private readonly GameGraphics gameGraphics;
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly UserInputManager userInputManager;
         private readonly SoundContext audioContext;
         private readonly MatchAudioRenderer matchAudioRenderer;
-        private readonly TextureManager textureManager;
         private readonly ActionFrame actions;
         private Frame diplomacyFrame;
         private bool isSpaceDown;
@@ -65,9 +65,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public MatchUI(GraphicsContext graphicsContext, Match match, SlaveCommander localCommander)
+        public MatchUI(GameGraphics gameGraphics, Match match, SlaveCommander localCommander)
         {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(localCommander, "localCommander");
 
@@ -78,10 +78,10 @@ namespace Orion.UserInterface
             this.audioContext = new SoundContext();
             this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.userInputManager);
 
-            this.textureManager = new TextureManager(graphicsContext);
+            this.gameGraphics = gameGraphics;
             World world = match.World;
 
-            matchRenderer = new MatchRenderer(userInputManager, textureManager);
+            matchRenderer = new MatchRenderer(userInputManager, gameGraphics);
 
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
@@ -168,18 +168,18 @@ namespace Orion.UserInterface
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
-            enablers.Add(new AttackEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new BuildEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new HarvestEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new MoveEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new TrainEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new HealEnabler(userInputManager, actions, textureManager));
-            enablers.Add(new ResearchEnabler(userInputManager, actions, textureManager));
+            enablers.Add(new AttackEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new BuildEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new HarvestEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new TrainEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new HealEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new ResearchEnabler(userInputManager, actions, gameGraphics));
 
             workerActivityMonitor = new WorkerActivityMonitor(LocalFaction);
             workerActivityMonitor.WorkerActivityStateChanged += OnWorkerActivityStateChanged;
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
-            Texture workerTexture = textureManager.GetUnit("Schtroumpf");
+            Texture workerTexture = gameGraphics.GetUnitTexture("Schtroumpf");
             TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
             this.idleWorkerButton = new Button(inactiveWorkerRectangle, string.Empty, workerButtonRenderer);
             this.idleWorkerButton.CaptionUpColor = Colors.Red;
@@ -546,8 +546,8 @@ namespace Orion.UserInterface
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, textureManager);
-            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, textureManager);
+            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, gameGraphics);
+            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -567,7 +567,7 @@ namespace Orion.UserInterface
             float currentY = selectionFrame.Bounds.Height - paddingY - frame.Height;
             foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
             {
-                UnitButtonRenderer renderer = new UnitButtonRenderer(unit, textureManager);
+                UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
                 renderer.HasFocus = (unit.Type == SelectionManager.SelectedUnitType);
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
@@ -691,7 +691,6 @@ namespace Orion.UserInterface
         {
             if (disposing)
             {
-                textureManager.Dispose();
                 matchRenderer.Dispose();
             }
 

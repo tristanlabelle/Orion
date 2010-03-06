@@ -17,8 +17,8 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Constructors
-        public MoveEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
-            : base(inputManager, actionFrame, textureManager)
+        public MoveEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
+            : base(inputManager, actionFrame, gameGraphics)
         {
             userCommand = new MoveUserCommand(inputManager);
         }
@@ -35,15 +35,15 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private ActionButton CreateMoveButton()
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, gameGraphics);
 
-            Texture texture = textureManager.GetAction("Move");
+            Texture texture = gameGraphics.GetActionTexture("Move");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
                 inputManager.SelectedCommand = userCommand;
-                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
             };
 
             return button;
@@ -51,9 +51,9 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private ActionButton CreateStandGuardButton()
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, gameGraphics);
 
-            Texture texture = textureManager.GetAction("Stand Guard");
+            Texture texture = gameGraphics.GetActionTexture("Stand Guard");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)

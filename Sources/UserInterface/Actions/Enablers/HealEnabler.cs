@@ -17,8 +17,8 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Constructors
-        public HealEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
-            : base(inputManager, actionFrame, textureManager)
+        public HealEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
+            : base(inputManager, actionFrame, gameGraphics)
         {
             this.userCommand = new HealUserCommand(inputManager);
         }
@@ -28,10 +28,10 @@ namespace Orion.UserInterface.Actions.Enablers
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
             if (!type.HasSkill<HealSkill>()) return;
-            
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Heal", Keys.H, textureManager);
 
-            Texture texture = textureManager.GetAction("Heal");
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Heal", Keys.H, gameGraphics);
+
+            Texture texture = gameGraphics.GetActionTexture("Heal");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += OnButtonPressed;
@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions.Enablers
         private void OnButtonPressed(Button button)
         {
             inputManager.SelectedCommand = userCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
         }
         #endregion
     }

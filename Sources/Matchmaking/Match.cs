@@ -47,7 +47,7 @@ namespace Orion.Matchmaking
         public event Action<Match, FactionMessage> FactionMessageReceived;
 
         /// <summary>
-        /// Raised when allied factions defeat all their ennemies.
+        /// Raised when allied factions defeat all their enemies.
         /// </summary>
         public event Action<Match, IEnumerable<Faction>> WorldConquered;
 

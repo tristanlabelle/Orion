@@ -10,22 +10,22 @@ namespace Orion.Graphics.Renderers
     {
         #region Fields
         private readonly UserInputManager inputManager;
+        private readonly GameGraphics gameGraphics;
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
         private readonly MinimapRenderer minimap;
-        private readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public MatchRenderer(UserInputManager inputManager, TextureManager textureManager)
+        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            this.textureManager = textureManager;
             this.inputManager = inputManager;
+            this.gameGraphics = gameGraphics;
             this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.LocalCommander.Faction, textureManager);
+            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics);
             this.minimap = new MinimapRenderer(worldRenderer);
         }
         #endregion

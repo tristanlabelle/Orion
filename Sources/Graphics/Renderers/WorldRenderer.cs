@@ -14,7 +14,7 @@ namespace Orion.Graphics.Renderers
     {
         #region Fields
         private readonly Faction faction;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics gameGraphics;
 
         private readonly TerrainRenderer terrainRenderer;
         private readonly ResourcesRenderer resourcesRenderer;
@@ -31,19 +31,20 @@ namespace Orion.Graphics.Renderers
         /// <param name="faction">
         /// The <see cref="Faction"/> providing the view point to the <see cref="World"/> to be rendered.
         /// </param>
-        public WorldRenderer(Faction faction, TextureManager textureManager)
+        /// <param name="gameGraphics">The game graphics which provides access to graphics resources.</param>
+        public WorldRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.textureManager = textureManager;
+            this.gameGraphics = gameGraphics;
 
-            this.terrainRenderer = new TerrainRenderer(World.Terrain, textureManager);
-            this.resourcesRenderer = new ResourcesRenderer(faction, textureManager);
-            this.ruinsRenderer = new RuinsRenderer(faction, textureManager);
-            this.unitsRenderer = new UnitsRenderer(faction, textureManager);
-            this.explosionRenderer = new ExplosionRenderer(faction.World, textureManager);
+            this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
+            this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
+            this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
+            this.unitsRenderer = new UnitsRenderer(faction, gameGraphics);
+            this.explosionRenderer = new ExplosionRenderer(faction.World, gameGraphics);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
         }
         #endregion

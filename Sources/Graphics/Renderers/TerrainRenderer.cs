@@ -25,21 +25,21 @@ namespace Orion.Graphics
         #endregion
 
         #region Constructors
-        public TerrainRenderer(Terrain terrain, TextureManager textureManager)
+        public TerrainRenderer(Terrain terrain, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(terrain, "terrain");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.terrain = terrain;
             this.obstacleMaskTexture = CreateObstacleMaskTexture(terrain);
             this.splattingMaskTexture = CreateSplattingMaskTexture(terrain.Size);
-            this.grassTileTexture = textureManager.Get("Grass");
+            this.grassTileTexture = gameGraphics.GetMiscTexture("Grass");
             this.grassTileTexture.SetSmooth(true);
             this.grassTileTexture.SetRepeat(true);
-            this.sandTileTexture = textureManager.Get("Sand");
+            this.sandTileTexture = gameGraphics.GetMiscTexture("Sand");
             this.sandTileTexture.SetSmooth(true);
             this.sandTileTexture.SetRepeat(true);
-            this.obstacleTileTexture = textureManager.Get("Obstacle");
+            this.obstacleTileTexture = gameGraphics.GetMiscTexture("Obstacle");
             this.obstacleTileTexture.SetRepeat(true);
         }
         #endregion

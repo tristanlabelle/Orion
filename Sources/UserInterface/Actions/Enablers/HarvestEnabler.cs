@@ -17,8 +17,8 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Constructors
-        public HarvestEnabler(UserInputManager inputManager, ActionFrame actionFrame, TextureManager textureManager)
-            : base(inputManager, actionFrame, textureManager)
+        public HarvestEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
+            : base(inputManager, actionFrame, gameGraphics)
         {
             this.userCommand = new HarvestUserCommand(inputManager);
         }
@@ -29,9 +29,9 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<HarvestSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Harvest", Keys.H, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Harvest", Keys.H, gameGraphics);
 
-            Texture texture = textureManager.GetAction("Harvest");
+            Texture texture = gameGraphics.GetActionTexture("Harvest");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += OnButtonPressed;
@@ -42,7 +42,7 @@ namespace Orion.UserInterface.Actions.Enablers
         private void OnButtonPressed(Button button)
         {
             inputManager.SelectedCommand = userCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, textureManager));
+            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
         }
         #endregion
     }

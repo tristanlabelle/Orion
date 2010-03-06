@@ -16,11 +16,8 @@ namespace Orion.UserInterface.Actions.Enablers
     public sealed class TransportEnabler : ActionEnabler
     {
         #region Constructors
-        public TransportEnabler(UserInputManager manager, ActionFrame frame, TextureManager textureManager)
-            : base(manager, frame, textureManager)
-        {
-
-        }
+        public TransportEnabler(UserInputManager manager, ActionFrame frame, GameGraphics gameGraphics)
+            : base(manager, frame, gameGraphics) { }
         #endregion
 
         #region Methods
@@ -34,8 +31,8 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void AddEmbarkButton(ActionButton[,] buttonsArray)
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Embark", Keys.None, textureManager);
-            Texture texture = textureManager.GetAction("Embark");
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Embark", Keys.None, gameGraphics);
+            Texture texture = gameGraphics.GetActionTexture("Embark");
             button.Renderer = new TexturedFrameRenderer(texture);
             button.Triggered += OnEmbarkButtonPressed;
 
@@ -44,8 +41,8 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void AddDisembarkButton(ActionButton[,] buttonsArray)
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Disembark", Keys.None, textureManager);
-            Texture texture = textureManager.GetAction("Disembark");
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Disembark", Keys.None, gameGraphics);
+            Texture texture = gameGraphics.GetActionTexture("Disembark");
             button.Renderer = new TexturedFrameRenderer(texture);
             button.Triggered += OnDisembarkButtonPressed;
 

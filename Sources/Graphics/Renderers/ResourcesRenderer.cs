@@ -18,17 +18,17 @@ namespace Orion.Graphics.Renderers
         private static readonly ColorRgb miniatureAlageneColor = Colors.LightCyan;
 
         private readonly Faction faction;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics gameGraphics;
         #endregion
 
         #region Constructors
-        public ResourcesRenderer(Faction faction, TextureManager textureManager)
+        public ResourcesRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.textureManager = textureManager;
+            this.gameGraphics = gameGraphics;
         }
         #endregion
 
@@ -73,7 +73,7 @@ namespace Orion.Graphics.Renderers
         private void DrawUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
         {
             string resourceTypeName = resourceNode.Type.ToStringInvariant();
-            Texture texture = textureManager.Get(resourceTypeName);
+            Texture texture = gameGraphics.GetMiscTexture(resourceTypeName);
             graphicsContext.Fill(resourceNode.BoundingRectangle, texture);
         }
 

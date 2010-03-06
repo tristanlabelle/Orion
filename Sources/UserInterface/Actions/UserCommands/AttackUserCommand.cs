@@ -11,16 +11,16 @@ namespace Orion.UserInterface.Actions.UserCommands
     public sealed class AttackUserCommand : UserInputCommand, IRenderer
     {
         #region Fields
-        private readonly TextureManager textureManager;
+        private readonly Texture texture;
         private Vector2 cursorPosition = new Vector2(float.NaN, float.NaN);
         #endregion
 
         #region Constructors
-        public AttackUserCommand(UserInputManager inputManager, TextureManager textureManager)
+        public AttackUserCommand(UserInputManager inputManager, GameGraphics gameGraphics)
             : base(inputManager)
         {
-            Argument.EnsureNotNull(textureManager, "textureManager");
-            this.textureManager = textureManager;
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
+            this.texture = gameGraphics.GetActionTexture("Attack");
         }
         #endregion
 
@@ -46,7 +46,6 @@ namespace Orion.UserInterface.Actions.UserCommands
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            Texture texture = textureManager.GetAction("Attack");
             float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
             Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
             Rectangle rectangle = new Rectangle(cursorPosition - size, size);

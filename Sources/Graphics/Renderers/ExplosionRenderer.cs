@@ -28,19 +28,19 @@ namespace Orion.Graphics.Renderers
         #region Fields
         private const float lifeTime = 0.6f;
         private readonly World world;
-        private readonly TextureManager textureManager;
+        private readonly Texture texture;
         private readonly List<Explosion> explosions = new List<Explosion>();
         private float time;
         #endregion
 
         #region Constructors
-        public ExplosionRenderer(World world, TextureManager textureManager)
+        public ExplosionRenderer(World world, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(world, "world");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.world = world;
-            this.textureManager = textureManager;
+            this.texture = gameGraphics.GetMiscTexture("ExplosionFlash");
 
             this.world.Updated += OnWorldUpdated;
             this.world.ExplosionOccured += OnExplosionOccured;
@@ -51,9 +51,6 @@ namespace Orion.Graphics.Renderers
         public void Draw(GraphicsContext graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-
-            Texture texture = textureManager.Get("ExplosionFlash");
-
             foreach (Explosion explosion in explosions)
             {
                 float age = time - explosion.SpawnTime;

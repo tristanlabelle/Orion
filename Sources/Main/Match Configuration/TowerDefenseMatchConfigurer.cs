@@ -36,7 +36,6 @@ namespace Orion.Main
             localFaction.LocalFogOfWar.Disable();
             localCommander = new SlaveCommander(localFaction);
 
-            WorldGenerator.Generate(world, random);
             match = new Match(random, world);
             match.IsPausable = true;
 

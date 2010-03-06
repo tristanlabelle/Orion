@@ -35,14 +35,14 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Methods
-        public ActionButton CreateCancelButton(UserInputManager inputManager, TextureManager textureManager)
+        public ActionButton CreateCancelButton(UserInputManager inputManager, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            ActionButton button = new ActionButton(this, inputManager, "Cancel", Keys.Escape, textureManager);
+            ActionButton button = new ActionButton(this, inputManager, "Cancel", Keys.Escape, gameGraphics);
 
-            Texture texture = textureManager.GetAction("Cancel");
+            Texture texture = gameGraphics.GetActionTexture("Cancel");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)

@@ -16,6 +16,7 @@ using Orion.UserInterface;
 using Orion.Audio;
 using System.Threading;
 using Button = Orion.UserInterface.Widgets.Button;
+using Orion.GameLogic.Skills;
 
 namespace Orion.Main
 {
@@ -71,7 +72,7 @@ namespace Orion.Main
             Match match;
             SlaveCommander localCommander;
             replayConfigurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.GraphicsContext, match, localCommander);
+            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -165,7 +166,7 @@ namespace Orion.Main
             Match match;
             SlaveCommander localCommander;
             configurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.GraphicsContext, match, localCommander);
+            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -174,9 +175,8 @@ namespace Orion.Main
             gameUI.Display(matchUI);
             match.Start();
 
-            Unit pyramid = localCommander.Faction.Units
-                .First(unit => unit.Type == match.World.UnitTypes.FromName("Pyramide"));
-            matchUI.CenterOn(pyramid.Center);
+            Unit building = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>());
+            if (building != null) matchUI.CenterOn(building.Center);
         }
 
         private void Run()

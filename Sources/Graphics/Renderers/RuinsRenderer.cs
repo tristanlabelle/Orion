@@ -21,7 +21,8 @@ namespace Orion.Graphics.Renderers
         private const float ruinFadeDurationInSeconds = 1;
 
         private readonly Faction faction;
-        private readonly TextureManager textureManager;
+        private readonly Texture buildingRuinTexture;
+        private readonly Texture skeletonTexture;
 
         /// <remarks>
         /// OPTIM: Ruins are allocated on the heap so we pool them
@@ -33,13 +34,14 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public RuinsRenderer(Faction faction, TextureManager textureManager)
+        public RuinsRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.textureManager = textureManager;
+            this.buildingRuinTexture = gameGraphics.GetMiscTexture("Ruins");
+            this.skeletonTexture = gameGraphics.GetMiscTexture("Skeleton");
 
             World.Updated += OnWorldUpdated;
             World.Entities.Removed += OnEntityRemoved;
@@ -47,16 +49,6 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Properties
-        private Texture BuildingRuinTexture
-        {
-            get { return textureManager.GetUnit("Ruins"); }
-        }
-
-        private Texture SkeletonTexture
-        {
-            get { return textureManager.GetUnit("Skeleton"); }
-        }
-
         private World World
         {
             get { return faction.World; }
@@ -101,7 +93,7 @@ namespace Orion.Graphics.Renderers
                 if (alpha < 0) alpha = 0;
                 if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
 
-                Texture texture = ruin.Type == RuinType.Building ? BuildingRuinTexture : SkeletonTexture;
+                Texture texture = ruin.Type == RuinType.Building ? buildingRuinTexture : skeletonTexture;
 
                 ColorRgba color = new ColorRgba(ruin.Tint, alpha);
                 graphicsContext.Fill(rectangle, texture, color);

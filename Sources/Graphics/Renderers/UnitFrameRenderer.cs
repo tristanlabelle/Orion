@@ -9,6 +9,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Font = System.Drawing.Font;
+using Orion.GameLogic.Skills;
 
 namespace Orion.Graphics
 {
@@ -28,7 +29,7 @@ namespace Orion.Graphics
         private const float firstLineY = 160;
 
         private readonly Unit unit;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics gameGraphics;
         private readonly Faction faction;
         #endregion
 
@@ -50,13 +51,13 @@ namespace Orion.Graphics
             statNames[UnitStat.SightRange] = "Portée de vision";
         }
 
-        public UnitFrameRenderer(Faction faction, Unit unit, TextureManager textureManager)
+        public UnitFrameRenderer(Faction faction, Unit unit, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(unit, "unit");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.unit = unit;
-            this.textureManager = textureManager;
+            this.gameGraphics = gameGraphics;
             this.faction = faction;
         }
         #endregion
@@ -66,7 +67,7 @@ namespace Orion.Graphics
         {
             bool isTraining = false;
 
-            if (unit.HasSkill<Orion.GameLogic.Skills.TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
+            if (unit.HasSkill<TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
             {
                 isTraining = true;
 
@@ -89,7 +90,7 @@ namespace Orion.Graphics
 
                     // Returns a Task, and finds the unit associated to that Task. 
                     TrainTask train = (TrainTask)unit.TaskQueue[i];
-                    Texture texture = textureManager.GetUnit(train.TraineeType.Name);
+                    Texture texture = gameGraphics.GetUnitTexture(train.TraineeType);
 
                     Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
                     context.FillColor = Colors.Black;

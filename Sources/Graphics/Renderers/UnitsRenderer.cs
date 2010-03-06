@@ -27,7 +27,7 @@ namespace Orion.Graphics.Renderers
         private const float laserLength = 0.8f;
 
         private readonly Faction faction;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics gameGraphics;
         private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
         private readonly List<Ruin> ruins = new List<Ruin>();
         private readonly BuildingMemoryRenderer buildingMemoryRenderer;
@@ -36,14 +36,14 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public UnitsRenderer(Faction faction, TextureManager textureManager)
+        public UnitsRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             
             this.faction = faction;
-            this.textureManager = textureManager;
-            this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, textureManager);
+            this.gameGraphics = gameGraphics;
+            this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
 
             World.Updated += OnWorldUpdated;
         }
@@ -58,17 +58,7 @@ namespace Orion.Graphics.Renderers
 
         private Texture UnderConstructionTexture
         {
-            get { return textureManager.Get("UnderConstruction"); }
-        }
-
-        private Texture BuildingRuinTexture
-        {
-            get { return textureManager.GetUnit("Ruins"); }
-        }
-
-        private Texture SkeletonTexture
-        {
-            get { return textureManager.GetUnit("Skeleton"); }
+            get { return gameGraphics.GetMiscTexture("UnderConstruction"); }
         }
 
         private World World
@@ -146,7 +136,7 @@ namespace Orion.Graphics.Renderers
 
         private void DrawUnit(GraphicsContext graphics, Unit unit)
         {
-            Texture texture = textureManager.GetUnit(unit.Type.Name);
+            Texture texture = gameGraphics.GetUnitTexture(unit);
 
             Vector2 center = unit.Center;
             center.Y += GetOscillation(unit) * 0.15f;
@@ -165,7 +155,7 @@ namespace Orion.Graphics.Renderers
 
         private void DrawUnitShadow(GraphicsContext graphicsContext, Unit unit)
         {
-            Texture texture = textureManager.GetUnit(unit.Type.Name);
+            Texture texture = gameGraphics.GetUnitTexture(unit);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
 
             float drawingAngle = GetUnitDrawingAngle(unit);
@@ -182,7 +172,7 @@ namespace Orion.Graphics.Renderers
 
         private void DrawRememberedBuilding(GraphicsContext graphicsContext, Rectangle viewBounds, RememberedBuilding building)
         {
-            Texture texture = textureManager.GetUnit(building.Type.Name);
+            Texture texture = gameGraphics.GetUnitTexture(building.Type);
 
             Rectangle buildingRectangle = building.GridRegion.ToRectangle();
             if (!Rectangle.Intersects(buildingRectangle, viewBounds))

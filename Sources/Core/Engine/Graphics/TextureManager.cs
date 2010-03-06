@@ -19,7 +19,7 @@ namespace Orion.Engine.Graphics
         private readonly GraphicsContext graphicsContext;
         private readonly DirectoryInfo directory;
         private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
-        private readonly Texture defaulTexture;
+        private readonly Texture defaultTexture;
         #endregion
 
         #region Constructors
@@ -27,16 +27,27 @@ namespace Orion.Engine.Graphics
         /// Initializes a new <see cref="TextureManager"/> from a <see cref="GraphicsContext"/>.
         /// </summary>
         /// <param name="graphicsContext">The <see cref="GraphicsContext"/> to be used.</param>
-        public TextureManager(GraphicsContext graphicsContext)
+        /// <param name="rootPath">The path to the root directory from which to load textures.</param>
+        public TextureManager(GraphicsContext graphicsContext, string rootPath)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            Argument.EnsureNotNull(rootPath, "rootPath");
 
             this.graphicsContext = graphicsContext;
-            this.directory = new DirectoryInfo(@"../../../Assets/Textures");
+            this.directory = new DirectoryInfo(rootPath);
             Debug.Assert(this.directory.Exists, "Warning: The textures directory {0} does not exist.");
 
-            this.defaulTexture = Get("Default")
-                ?? graphicsContext.CreateCheckerboardTexture(new Size(4, 4), Colors.Yellow, Colors.Pink);
+            this.defaultTexture = graphicsContext.CreateCheckerboardTexture(new Size(4, 4), Colors.Yellow, Colors.Pink);
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the texture that is returned when no texture is found.
+        /// </summary>
+        public Texture DefaultTexture
+        {
+            get { return defaultTexture; }
         }
         #endregion
 
@@ -47,12 +58,12 @@ namespace Orion.Engine.Graphics
 
             Texture texture;
             if (textures.TryGetValue(name, out texture))
-                return texture ?? defaulTexture;
+                return texture ?? defaultTexture;
 
             if (!directory.Exists)
             {
                 textures.Add(name, null);
-                return defaulTexture;
+                return defaultTexture;
             }
 
             string filePath = GetPath(name);
@@ -60,7 +71,7 @@ namespace Orion.Engine.Graphics
             if (filePath == null)
             {
                 textures.Add(name, null);
-                return defaulTexture;
+                return defaultTexture;
             }
 
             try
@@ -76,25 +87,31 @@ namespace Orion.Engine.Graphics
             catch (IOException)
             {
                 textures.Add(name, null);
-                return defaulTexture;
+                return defaultTexture;
             }
         }
 
+        [Obsolete("Superseded by GameGraphics.GetUnitTexture")]
         public Texture GetUnit(string unitTypeName)
         {
             return Get(Path.Combine("Units", unitTypeName));
         }
 
+        [Obsolete("Superseded by GameGraphics.GetActionTexture")]
         public Texture GetAction(string actionName)
         {
             return Get(Path.Combine("Actions", actionName));
         }
 
+        [Obsolete("Superseded by GameGraphics.GetTechnologyTexture")]
         public Texture GetTechnology(string technologyName)
         {
             return Get(Path.Combine("Technologies", technologyName));
         }
 
+        /// <summary>
+        /// Disposes all textures loaded by this texture manager.
+        /// </summary>
         public void Dispose()
         {
             bool defaultTextureWasDisposed = false;
@@ -102,14 +119,14 @@ namespace Orion.Engine.Graphics
             {
                 if (texture != null)
                 {
-                    if (texture == defaulTexture) defaultTextureWasDisposed = true;
+                    if (texture == defaultTexture) defaultTextureWasDisposed = true;
                     texture.Dispose();
                 }
             }
             textures.Clear();
 
-            if (!defaultTextureWasDisposed && defaulTexture != null)
-                defaulTexture.Dispose();
+            if (!defaultTextureWasDisposed && defaultTexture != null)
+                defaultTexture.Dispose();
         }
 
         private string GetPath(string name)

@@ -14,20 +14,20 @@ namespace Orion.Graphics.Renderers
     {
         #region Fields
         private readonly Faction faction;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics gameGraphics;
         private readonly HashSet<RememberedBuilding> buildings = new HashSet<RememberedBuilding>();
         private readonly HashSet<RememberedBuilding> tempSet = new HashSet<RememberedBuilding>();
         private bool hasVisibilityChanged = false;
         #endregion
 
         #region Constructors
-        public BuildingMemoryRenderer(Faction faction, TextureManager textureManager)
+        public BuildingMemoryRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.textureManager = textureManager;
+            this.gameGraphics = gameGraphics;
             this.faction.VisibilityChanged += OnVisibilityChanged;
             this.faction.World.Entities.Removed += OnEntityRemoved;
         }
@@ -42,7 +42,7 @@ namespace Orion.Graphics.Renderers
             RemoveDeprecatedBuildings();
             foreach (RememberedBuilding building in buildings)
             {
-                Texture texture = textureManager.GetUnit(building.Type.Name);
+                Texture texture = gameGraphics.GetUnitTexture(building.Type);
                 graphics.Fill(building.GridRegion.ToRectangle(), texture, building.Faction.Color);
             }
         }

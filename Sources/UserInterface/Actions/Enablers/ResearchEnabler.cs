@@ -17,8 +17,8 @@ namespace Orion.UserInterface.Actions.Enablers
     public sealed class ResearchEnabler : ActionEnabler
     {
         #region Constructors
-        public ResearchEnabler(UserInputManager inputManager, ActionFrame frame, TextureManager textureManager)
-            : base(inputManager, frame, textureManager)
+        public ResearchEnabler(UserInputManager inputManager, ActionFrame frame, GameGraphics gameGraphics)
+            : base(inputManager, frame, gameGraphics)
         { }
         #endregion
 
@@ -52,12 +52,12 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private ActionButton CreateButton(Technology technology)
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, textureManager);
+            ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, gameGraphics);
 
             button.Name = "{0}\nAladdium: {1} Alagene: {2}"
                 .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);
 
-            Texture texture = textureManager.GetTechnology(technology.Name);
+            Texture texture = gameGraphics.GetTechnologyTexture(technology);
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)

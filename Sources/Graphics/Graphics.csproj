@@ -49,6 +49,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameGraphics.cs" />
     <Compile Include="Renderers\AttackWarningRenderer.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />

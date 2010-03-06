@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Orion.Engine.Graphics;
+using Orion.Graphics;
 namespace Orion.UserInterface
 {
     /// <summary>
@@ -11,18 +12,15 @@ namespace Orion.UserInterface
     {
         #region Fields
         private readonly Window mainWindow;
+        private readonly GameGraphics graphics;
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Constructs a GameUI from a passed World object.
-        /// </summary>
-        /// <param name="world">The World object containing the game data</param>
-        /// <param name="userInputCommander">The user input commander that will receive UI events</param>
         public GameUI()
         {
-            mainWindow = new Window();
-            mainWindow.Show();
+            this.mainWindow = new Window();
+            this.mainWindow.Show();
+            this.graphics = new GameGraphics(this.mainWindow.GraphicsContext);
         }
         #endregion
 
@@ -51,9 +49,9 @@ namespace Orion.UserInterface
             get { return mainWindow.RootView; }
         }
 
-        public GraphicsContext GraphicsContext
+        public GameGraphics Graphics
         {
-            get { return mainWindow.GraphicsContext; }
+            get { return graphics; }
         }
         #endregion
 

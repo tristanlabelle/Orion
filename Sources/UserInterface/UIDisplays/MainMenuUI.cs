@@ -17,24 +17,30 @@ namespace Orion.UserInterface
         // HACK: Add whitespace to then end of strings because the last word ends up clipped otherwise.
         private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle       ";
         private const string artistName = "Guillaume Lacasse ";
+
+        private readonly Texture backgroundTexture;
         #endregion
 
         #region Constructors
-        public MainMenuUI()
+        public MainMenuUI(GameGraphics gameGraphics)
         {
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
+
+            this.backgroundTexture = gameGraphics.GetMiscTexture("MenuBackground");
+
             Font titleFont = new Font("Impact", 48);
-            AddCenteredLabel("Orion", titleFont, 600);
+            AddCenteredLabel("Orion", titleFont, Colors.White, 700);
 
-            CreateButton(0.6f, "Monojoueur", () => SinglePlayerSelected);
-            CreateButton(0.5f, "Multijoueur", () => MultiplayerSelected);
-            CreateButton(0.4f, "Tower Defense", () => TowerDefenseSelected);
-            CreateButton(0.3f, "Visionner une partie", () => ViewReplaySelected);
+            CreateButton(0.38f, "Monojoueur", () => SinglePlayerSelected);
+            CreateButton(0.31f, "Multijoueur", () => MultiplayerSelected);
+            CreateButton(0.24f, "Tower Defense", () => TowerDefenseSelected);
+            CreateButton(0.17f, "Visionner une partie", () => ViewReplaySelected);
 
-            Font creditsFont = new Font("Trebuchet MS", 10);
-            AddCenteredLabel("Programmeurs ", creditsFont, 110);
-            AddCenteredLabel(programmerNames, creditsFont, 90);
-            AddCenteredLabel("Artiste audio-vidéo  ", creditsFont, 60);
-            AddCenteredLabel(artistName, creditsFont, 40);
+            Font creditsFont = new Font("Trebuchet MS", 11);
+            AddCenteredLabel("Programmeurs ", creditsFont, Colors.Orange, 90);
+            AddCenteredLabel(programmerNames, creditsFont, Colors.Yellow, 70);
+            AddCenteredLabel("Artiste audio-vidéo  ", creditsFont, Colors.Orange, 40);
+            AddCenteredLabel(artistName, creditsFont, Colors.Yellow, 20);
         }
         #endregion
 
@@ -67,11 +73,11 @@ namespace Orion.UserInterface
         /// <param name="y">The y position of the button.</param>
         /// <param name="caption">The caption text on the button.</param>
         /// <param name="eventGetter">
-        /// A delegate to a method which retreives the event to be raised when the button is clicked.
+        /// A delegate to a method which retrieves the event to be raised when the button is clicked.
         /// </param>
         private void CreateButton(float y, string caption, Func<Action<MainMenuUI>> eventGetter)
         {
-            Rectangle rectangle = Instant.CreateComponentRectangle(Bounds, Rectangle.FromCenterSize(0.5f, y, 0.25f, 0.08f));
+            Rectangle rectangle = Instant.CreateComponentRectangle(Bounds, Rectangle.FromCenterSize(0.5f, y, 0.25f, 0.06f));
             Button button = new Button(rectangle, caption);
 
             if (eventGetter != null)
@@ -86,14 +92,21 @@ namespace Orion.UserInterface
             Children.Add(button);
         }
 
-        private void AddCenteredLabel(string @string, Font font, float y)
+        private void AddCenteredLabel(string @string, Font font, ColorRgb color, float y)
         {
             Text text = new Text(@string, font);
             Label label = new Label(text);
-            label.Color = Colors.White;
+            label.Color = color;
             float x = (Bounds.Width - label.Frame.Width) / 2;
             label.Frame = label.Frame.TranslatedTo(x, y);
             Children.Add(label);
+        }
+
+        protected internal override void Render(GraphicsContext graphicsContext)
+        {
+            graphicsContext.Fill(Bounds, backgroundTexture);
+
+            base.Render(graphicsContext);
         }
         #endregion
     }

@@ -148,12 +148,14 @@ namespace Orion.Main
 
             EnableLogging();
 
-            MainMenuUI menuUI = new MainMenuUI();
+            gameUI = new GameUI();
+
+            MainMenuUI menuUI = new MainMenuUI(gameUI.Graphics);
             menuUI.SinglePlayerSelected += ConfigureSinglePlayerGame;
             menuUI.MultiplayerSelected += EnterMultiplayerLobby;
             menuUI.TowerDefenseSelected += StartTowerDefenseGame;
             menuUI.ViewReplaySelected += EnterReplayViewer;
-            gameUI = new GameUI();
+
             gameUI.Display(menuUI);
         }
 

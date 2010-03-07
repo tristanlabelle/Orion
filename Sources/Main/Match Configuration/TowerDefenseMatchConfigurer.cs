@@ -34,6 +34,7 @@ namespace Orion.Main
 
             Faction localFaction = world.CreateFaction("Player", Colors.Red);
             localFaction.LocalFogOfWar.Disable();
+            localFaction.CreateUnit(world.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(localFaction);
 
             match = new Match(random, world);

@@ -168,10 +168,11 @@ namespace Orion.UserInterface
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
+            enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new AttackEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new StandGuardEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new BuildEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new HarvestEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new TrainEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new HealEnabler(userInputManager, actions, gameGraphics));
             enablers.Add(new ResearchEnabler(userInputManager, actions, gameGraphics));

@@ -59,6 +59,8 @@ namespace Orion.GameLogic
             RegisterHeroFlyingCarpet();
             RegisterHeroSwineFlu();
             RegisterHeroUfo();
+
+            RegisterTowerDefenseBuilder();
         }
         #endregion
 
@@ -691,6 +693,24 @@ namespace Orion.GameLogic
         }
  
         #endregion
+
+        private void RegisterTowerDefenseBuilder()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Métaschtroumpf",
+                Size = new Size(2, 2),
+                SightRange = 10,
+                MaxHealth = 1,
+                AladdiumCost = 0,
+                AlageneCost = 0,
+                FoodCost = 1
+            };
+            builder.Skills.Add(new MoveSkill(20, true));
+            builder.Skills.Add(new BuildSkill(type => type.IsBuilding
+                && type.HasSkill<AttackSkill>(), 200));
+            Register(builder);
+        }
         #endregion
 
         public UnitType Register(UnitTypeBuilder builder)

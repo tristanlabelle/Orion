@@ -177,8 +177,9 @@ namespace Orion.Main
             gameUI.Display(matchUI);
             match.Start();
 
-            Unit building = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>());
-            if (building != null) matchUI.CenterOn(building.Center);
+            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+                ?? localCommander.Faction.Units.FirstOrDefault();
+            if (viewTarget != null) matchUI.CenterOn(viewTarget.Center);
         }
 
         private void Run()

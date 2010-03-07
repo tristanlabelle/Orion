@@ -29,12 +29,6 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            buttonsArray[0, 3] = CreateMoveButton();
-            buttonsArray[3, 3] = CreateStandGuardButton();
-        }
-
-        private ActionButton CreateMoveButton()
-        {
             ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Move");
@@ -46,22 +40,7 @@ namespace Orion.UserInterface.Actions.Enablers
                 actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
             };
 
-            return button;
-        }
-
-        private ActionButton CreateStandGuardButton()
-        {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, gameGraphics);
-
-            Texture texture = gameGraphics.GetActionTexture("Stand Guard");
-            button.Renderer = new TexturedFrameRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
-            {
-                inputManager.LaunchStandGuard();
-            };
-
-            return button;
+            buttonsArray[0, 3] = button;
         }
         #endregion
     }

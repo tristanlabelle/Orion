@@ -489,7 +489,7 @@ namespace Orion.UserInterface
 
             if (selectionManager.SelectedUnitCount == 1)
                 CreateSingleUnitSelectionPanel();
-            else if (selectionManager.SelectedUnitCount > 1)
+            else
                 CreateMultipleUnitsSelectionPanel();
         }
 

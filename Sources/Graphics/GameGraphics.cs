@@ -12,7 +12,7 @@ namespace Orion.Graphics
     /// <summary>
     /// Central point of access to game graphics. Used for rendering and resource creating.
     /// </summary>
-    public sealed class GameGraphics
+    public sealed class GameGraphics : IDisposable
     {
         #region Fields
         private readonly GraphicsContext graphicsContext;
@@ -48,7 +48,7 @@ namespace Orion.Graphics
         /// <returns>The texture for that game element.</returns>
         public Texture GetMiscTexture(string name)
         {
-            return textureManager.Get(name);
+            return GetTexture(name);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Orion.Graphics
             Argument.EnsureNotNull(unitTypeName, "unitTypeName");
 
             string fullName = Path.Combine("Units", unitTypeName);
-            return textureManager.Get(fullName);
+            return GetTexture(fullName);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Orion.Graphics
         public Texture GetResourceTexture(ResourceType type)
         {
             string name = type.ToStringInvariant();
-            return textureManager.Get(name);
+            return GetTexture(name);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Orion.Graphics
         public Texture GetActionTexture(string actionName)
         {
             string fullName = Path.Combine("Actions", actionName);
-            return textureManager.Get(fullName);
+            return GetTexture(fullName);
         }
 
         /// <summary>
@@ -128,7 +128,23 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(technology, "technology");
             string fullName = Path.Combine("Technologies", technology.Name);
-            return textureManager.Get(fullName);
+            return GetTexture(fullName);
+        }
+
+        private Texture GetTexture(string name)
+        {
+            Texture texture = textureManager.Get(name);
+            if (texture == textureManager.DefaultTexture)
+                texture = textureManager.Get("Default");
+            return texture;
+        }
+
+        /// <summary>
+        /// Releases all resources used by this object.
+        /// </summary>
+        public void Dispose()
+        {
+            textureManager.Dispose();
         }
         #endregion
     }

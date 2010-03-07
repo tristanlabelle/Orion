@@ -20,6 +20,7 @@ namespace Orion.UserInterface
         {
             this.mainWindow = new Window();
             this.mainWindow.Show();
+            this.mainWindow.HandleDestroyed += OnWindowHandleDestroyed;
             this.graphics = new GameGraphics(this.mainWindow.GraphicsContext);
         }
         #endregion
@@ -86,6 +87,11 @@ namespace Orion.UserInterface
         public void Dispose()
         {
             mainWindow.Dispose();
+        }
+
+        private void OnWindowHandleDestroyed(object sender, EventArgs e)
+        {
+            graphics.Dispose();
         }
         #endregion
     }

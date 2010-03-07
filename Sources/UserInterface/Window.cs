@@ -28,6 +28,8 @@ namespace Orion.UserInterface
         {
             InitializeComponent();
 
+            this.Icon = Orion.UserInterface.Properties.Resources.Orion;
+
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             this.rootView = new RootView(windowBounds, RootView.ContentsBounds);
 

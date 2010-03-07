@@ -57,7 +57,6 @@ namespace Orion.UserInterface
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(961, 678);
             this.Controls.Add(this.glControl);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Window";
             this.Text = "Orion";

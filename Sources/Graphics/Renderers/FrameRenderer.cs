@@ -25,8 +25,7 @@ namespace Orion.Graphics
         #region Methods
         public virtual void Draw(GraphicsContext context, Rectangle bounds)
         {
-            context.StrokeColor = StrokeColor;
-            context.Stroke(bounds);
+            context.Stroke(bounds, StrokeColor);
         }
         #endregion
     }

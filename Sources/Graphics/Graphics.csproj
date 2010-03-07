@@ -53,7 +53,6 @@
     <Compile Include="Renderers\AttackWarningRenderer.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />
-    <Compile Include="Renderers\DropdownListRowValueRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
     <Compile Include="Renderers\FilledFrameRenderer.cs" />
     <Compile Include="Renderers\HealthBarRenderer.cs" />

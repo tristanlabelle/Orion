@@ -75,21 +75,19 @@ namespace Orion.UserInterface.Widgets
 
         protected internal override void Draw(GraphicsContext context)
         {
-            context.FillColor = Colors.LightGreen;
-            context.StrokeColor = Colors.Gray;
-            context.Fill(Bounds);
-            context.Stroke(Bounds);
-            context.FillColor = Colors.Black;
+            context.Fill(Bounds, Colors.LightGreen);
+            context.Stroke(Bounds, Colors.Gray);
 
             Text text;
             if (contents.Value.Length == 1) text = new Text(contents.Value + " ");
             else text = contents;
             Rectangle textBounds = new Rectangle(Bounds.Width, Math.Min(Bounds.Height, text.Frame.Height));
-            context.Draw(text, textBounds);
+            context.Draw(text, textBounds, Colors.Black);
             if ((updateCounter / cursorBlinkFrequency) % 2 == 0)
             {
                 Rectangle textFrame = contents.Frame;
-                context.StrokeLineStrip(textFrame.Max, new Vector2(textFrame.MaxX, textFrame.MinY));
+                LineSegment lineSegment = new LineSegment(textFrame.Max, new Vector2(textFrame.MaxX, textFrame.MinY));
+                context.Stroke(lineSegment, Colors.Black);
             }
         }
 

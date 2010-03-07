@@ -99,8 +99,8 @@ namespace Orion.Graphics.Renderers
                 Unit unit = entity as Unit;
                 if (unit == null || !faction.CanSee(unit)) continue;
                 
-                context.FillColor = unit.Faction.Color;
-                context.Fill(new Rectangle(unit.Position, (Vector2)miniatureUnitSize));
+                Rectangle rectangle = new Rectangle(unit.Position, (Vector2)miniatureUnitSize);
+                context.Fill(rectangle, unit.Faction.Color);
             }
         }
         #endregion
@@ -248,8 +248,8 @@ namespace Orion.Graphics.Renderers
                 Vector2 laserEnd = attacker.Center + (normalizedDelta
                     * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
 
-                graphics.StrokeColor = attacker.Faction.Color;
-                graphics.StrokeLineStrip(laserStart, laserEnd);
+                LineSegment lineSegment = new LineSegment(laserStart, laserEnd);
+                graphics.Stroke(lineSegment, attacker.Faction.Color);
             }
         }
         #endregion

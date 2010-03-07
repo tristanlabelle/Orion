@@ -104,8 +104,7 @@ namespace Orion.UserInterface.Actions.UserCommands
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
                 buildingType.Width, buildingType.Height);
-            context.FillColor = new ColorRgba(tint, 0.4f);
-            context.Fill(rectangle);
+            context.Fill(rectangle, tint.ToRgba(0.4f));
             context.Fill(rectangle, texture, tint);
         }
         #endregion

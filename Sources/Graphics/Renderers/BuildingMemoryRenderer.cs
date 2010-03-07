@@ -52,8 +52,8 @@ namespace Orion.Graphics.Renderers
             RemoveDeprecatedBuildings();
             foreach (RememberedBuilding building in buildings)
             {
-                graphics.FillColor = building.Faction.Color;
-                graphics.Fill(new Rectangle(building.Location, (Vector2)unitSize));
+                Rectangle rectangle = new Rectangle(building.Location, (Vector2)unitSize);
+                graphics.Fill(rectangle, building.Faction.Color);
             }
         }
 

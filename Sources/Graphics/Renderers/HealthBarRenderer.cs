@@ -18,6 +18,7 @@ namespace Orion.Graphics.Renderers
         private static readonly ColorRgb lowLifeColor = Colors.Red;
         private static readonly ColorRgb middleLifeColor = Colors.Yellow;
         private static readonly ColorRgb fullLifeColor = Colors.ForestGreen;
+        private static readonly ColorRgb borderColor = Colors.DarkGray;
         #endregion
 
         #region Methods
@@ -44,15 +45,15 @@ namespace Orion.Graphics.Renderers
             Vector2 origin = into.Min;
 
             float lifeFraction = unit.Health / unit.MaxHealth;
-            context.FillColor = Interpolate(lowLifeColor, middleLifeColor, fullLifeColor, lifeFraction);
+            ColorRgb lifeColor = Interpolate(lowLifeColor, middleLifeColor, fullLifeColor, lifeFraction);
 
             Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
-            context.Fill(lifeRect);
+            context.Fill(lifeRect, lifeColor);
             Rectangle damageRect = new Rectangle(
                 origin.X + leftHealthWidth, origin.Y,
                 into.Width - leftHealthWidth, into.Height);
-            context.FillColor = Colors.DarkGray;
-            context.Fill(damageRect);
+
+            context.Fill(damageRect, borderColor);
         }
 
         private static ColorRgb Interpolate(ColorRgb first, ColorRgb second, ColorRgb third, float progress)

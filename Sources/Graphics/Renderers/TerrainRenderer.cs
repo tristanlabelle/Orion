@@ -15,6 +15,9 @@ namespace Orion.Graphics
         #region Fields
         private static readonly float GrassTextureSizeInTiles = 4;
         private static readonly float SandTextureSizeInTiles = 12;
+        private static readonly float ObstacleTextureSizeInTiles = 4;
+        private static readonly ColorRgb MiniatureWalkableColor = ColorRgb.FromBytes(232, 207, 144);
+        private static readonly ColorRgb MiniatureObstacleColor = ColorRgb.FromBytes(100, 78, 60);
 
         private readonly Terrain terrain;
         private readonly Texture obstacleMaskTexture;
@@ -54,27 +57,54 @@ namespace Orion.Graphics
                     terrain.Height / (float)obstacleMaskTexture.Height);
             }
         }
+
+        private Rectangle TerrainBounds
+        {
+            get { return new Rectangle(terrain.Width, terrain.Height); } 
+        }
+
+        private Rectangle GrassTextureRectangle
+        {
+            get
+            {
+                return new Rectangle(
+                    terrain.Width / GrassTextureSizeInTiles,
+                    terrain.Height / GrassTextureSizeInTiles);
+            }
+        }
+
+        private Rectangle SandTextureRectangle
+        {
+            get
+            {
+                return new Rectangle(
+                    terrain.Width / SandTextureSizeInTiles,
+                    terrain.Height / SandTextureSizeInTiles);
+            }
+        }
+
+        private Rectangle ObstacleTextureRectangle
+        {
+            get
+            {
+                return new Rectangle(
+                    terrain.Width / ObstacleTextureSizeInTiles,
+                    terrain.Height / ObstacleTextureSizeInTiles);
+            }
+        }
         #endregion
 
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(terrain.Width, terrain.Height);
-            Rectangle grassTextureRectangle = new Rectangle(terrain.Width / GrassTextureSizeInTiles, terrain.Height / GrassTextureSizeInTiles);
-            Rectangle sandTextureRectangle = new Rectangle(terrain.Width / SandTextureSizeInTiles, terrain.Height / SandTextureSizeInTiles);
-
-            graphics.Fill(terrainBounds, grassTileTexture, grassTextureRectangle);
-            graphics.FillMasked(terrainBounds, sandTileTexture, sandTextureRectangle, splattingMaskTexture, UnitTextureRectangle);
-            graphics.FillMasked(terrainBounds, obstacleTileTexture, grassTextureRectangle, obstacleMaskTexture, UnitTextureRectangle);
+            graphics.Fill(TerrainBounds, grassTileTexture, GrassTextureRectangle);
+            graphics.FillMasked(TerrainBounds, sandTileTexture, SandTextureRectangle, splattingMaskTexture, UnitTextureRectangle);
+            graphics.FillMasked(TerrainBounds, obstacleTileTexture, ObstacleTextureRectangle, obstacleMaskTexture, UnitTextureRectangle);
         }
 
         public void DrawMiniature(GraphicsContext graphics)
         {
-            Rectangle terrainBounds = new Rectangle(0, 0, terrain.Width, terrain.Height);
-
-            graphics.FillColor = ColorRgb.FromBytes(232, 207, 144);
-            graphics.Fill(terrainBounds);
-            graphics.Fill(terrainBounds, obstacleMaskTexture, UnitTextureRectangle, ColorRgb.FromBytes(100, 78, 60));
+            Draw(graphics);
         }
 
         public void Dispose()

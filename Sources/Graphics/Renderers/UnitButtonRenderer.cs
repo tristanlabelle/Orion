@@ -9,6 +9,11 @@ namespace Orion.Graphics.Renderers
     public sealed class UnitButtonRenderer : FrameRenderer
     {
         #region Fields
+        private static readonly ColorRgb FocusedStrokeColor = Colors.White;
+        private static readonly ColorRgb UnfocusedStrokeColor = Colors.Black;
+        private static readonly ColorRgb FocusedFillColor = ColorRgb.FromBytes(75, 75, 75);
+        private static readonly ColorRgb UnfocusedFillColor = Colors.Black;
+
         private readonly Unit unit;
         private readonly Texture texture;
         private bool hasFocus;
@@ -36,17 +41,23 @@ namespace Orion.Graphics.Renderers
             get { return hasFocus; }
             set { hasFocus = value; }
         }
+
+        private ColorRgb StrokeColor
+        {
+            get { return hasFocus ? FocusedStrokeColor : UnfocusedStrokeColor; }
+        }
+
+        private ColorRgb FillColor
+        {
+            get { return hasFocus ? FocusedFillColor : UnfocusedFillColor; }
+        }
         #endregion
 
         #region Methods
         public override void Draw(GraphicsContext context, Rectangle bounds)
         {
-            context.StrokeColor = hasFocus ? Colors.White : Colors.Black;
-            context.FillColor = hasFocus ? ColorRgb.FromBytes(75, 75, 75) : Colors.Black;
-            context.Fill(bounds);
-            context.Stroke(bounds);
-
-            context.StrokeColor = StrokeColor;
+            context.Fill(bounds, FillColor);
+            context.Stroke(bounds, StrokeColor);
 
             float size = bounds.Width * 3 / 4;
             Rectangle rectangle = Rectangle.FromCenterSize(

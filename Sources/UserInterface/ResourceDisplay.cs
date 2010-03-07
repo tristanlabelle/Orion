@@ -26,10 +26,8 @@ namespace Orion.UserInterface
         {
             Text text = new Text("Aladdium: {0}    Alagene: {1}    Population: {2}/{3}"
                                 .FormatInvariant(faction.AladdiumAmount, faction.AlageneAmount, faction.UsedFoodAmount, faction.MaxFoodAmount));
-            context.FillColor = Colors.Blue;
-            context.Fill(Bounds);
-            context.FillColor = Colors.White;
-            context.Draw(text);
+            context.Fill(Bounds, Colors.Blue);
+            context.Draw(text, Colors.White);
         }
         #endregion
     }

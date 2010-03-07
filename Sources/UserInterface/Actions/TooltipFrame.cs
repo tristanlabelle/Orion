@@ -51,12 +51,9 @@ namespace Orion.UserInterface.Actions
 
         protected internal override void Draw(GraphicsContext context)
         {
-            context.FillColor = Colors.Gray;
-            context.StrokeColor = Colors.White;
-            context.Fill(Bounds);
-            context.Stroke(Bounds);
+            context.Fill(Bounds, Colors.Gray);
+            context.Stroke(Bounds, Colors.White);
 
-            context.FillColor = Colors.White;
             float top = Bounds.MaxY;
             foreach (Text part in description)
             {
@@ -64,7 +61,7 @@ namespace Orion.UserInterface.Actions
                 float height = part.HeightForConstrainedWidth(width);
                 top -= height;
                 Rectangle textBounds = new Rectangle(width, height);
-                context.Draw(part, new Vector2(0, top), textBounds);
+                context.Draw(part, new Vector2(0, top), textBounds, Colors.Black);
             }
         }
         #endregion

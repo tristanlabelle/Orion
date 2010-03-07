@@ -21,8 +21,6 @@ namespace Orion.Engine.Graphics
         #region Instance
         #region Fields
         private readonly Stack<Region> scissorStack = new Stack<Region>();
-        private ColorRgba fillColor = Colors.White;
-        private ColorRgba strokeColor = Colors.Black;
         private Font font = new Font("Trebuchet MS", 14);
         #endregion
 
@@ -57,24 +55,6 @@ namespace Orion.Engine.Graphics
                 ? new Region(ViewportSize)
                 : scissorStack.Peek();
             }
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="Color"/> currently used to fill shapes.
-        /// </summary>
-        public ColorRgba FillColor
-        {
-            get { return fillColor; }
-            set { fillColor = value; }
-        }
-
-        /// <summary>
-        /// Accesses the <see cref="Color"/> currently used to stroke shape outlines.
-        /// </summary>
-        public ColorRgba StrokeColor
-        {
-            get { return strokeColor; }
-            set { strokeColor = value; }
         }
 
         /// <summary>
@@ -298,24 +278,26 @@ namespace Orion.Engine.Graphics
         #region Drawing
         #region Ellipses (and implicitly converted circles)
         /// <summary>
-        /// Fills a given <see cref="Ellipse"/> using the current <see cref="P:FillColor"/>.
+        /// Fills a given <see cref="Ellipse"/>.
         /// </summary>
         /// <param name="ellipse">An <see cref="Ellipse"/> to be filled.</param>
-        public void Fill(Ellipse ellipse)
+        /// <param name="color">The color to be used to fill the shape.</param>
+        public void Fill(Ellipse ellipse, ColorRgba color)
         {
-            CommitFillColor();
+            CommitColor(color);
             GL.Begin(BeginMode.Polygon);
             DrawVertices(ellipse);
             GL.End();
         }
 
         /// <summary>
-        /// Strokes the outline of a given <see cref="Ellipse"/> using the current <see cref="P:StrokeColor"/>.
+        /// Strokes the outline of a given <see cref="Ellipse"/>.
         /// </summary>
         /// <param name="ellipse">An <see cref="Ellipse"/> to be strokes.</param>
-        public void Stroke(Ellipse ellipse)
+        /// <param name="color">The color to be used to stroke the shape.</param>
+        public void Stroke(Ellipse ellipse, ColorRgba color)
         {
-            CommitStrokeColor();
+            CommitColor(color);
             GL.Begin(BeginMode.LineLoop);
             DrawVertices(ellipse);
             GL.End();
@@ -335,24 +317,26 @@ namespace Orion.Engine.Graphics
 
         #region Rectangles
         /// <summary>
-        /// Fills a <see cref="Rectangle"/> using the current <see cref="P:FillColor"/>.
+        /// Fills a <see cref="Rectangle"/>.
         /// </summary>
         /// <param name="rectangle">A <see href="Rectangle"/> to fill with color.</param>
-        public void Fill(Rectangle rectangle)
+        /// <param name="color">The color to be used to fill the shape.</param>
+        public void Fill(Rectangle rectangle, ColorRgba color)
         {
-            CommitFillColor();
+            CommitColor(color);
             GL.Begin(BeginMode.Quads);
             DrawVertices(rectangle);
             GL.End();
         }
 
         /// <summary>
-        /// Strokes the outline of a <see cref="Rectangle"/> using the current <see cref="P:StrokeColor"/>.
+        /// Strokes the outline of a <see cref="Rectangle"/>.
         /// </summary>
         /// <param name="rectangle">A <see href="Rectangle"/> to stroke.</param>
-        public void Stroke(Rectangle rectangle)
+        /// <param name="color">The color to be used to stroke the shape.</param>
+        public void Stroke(Rectangle rectangle, ColorRgba color)
         {
-            CommitStrokeColor();
+            CommitColor(color);
             GL.Begin(BeginMode.LineLoop);
             DrawVertices(rectangle);
             GL.End();
@@ -369,23 +353,26 @@ namespace Orion.Engine.Graphics
 
         #region Triangles
         /// <summary>
-        /// Fills a <see cref="Triangle"/> shape using the current <see cref="P:FillColor"/>.
+        /// Fills a <see cref="Triangle"/> shape.
         /// </summary>
         /// <param name="triangle">The <see cref="Triangle"/> to be filled.</param>
-        public void Fill(Triangle triangle)
+        /// <param name="color">The color to be used to fill the shape.</param>
+        public void Fill(Triangle triangle, ColorRgba color)
         {
-            CommitFillColor();
+            CommitColor(color);
             GL.Begin(BeginMode.Triangles);
             DrawVertices(triangle);
             GL.End();
         }
 
         /// <summary>
-        /// Strokes the outline of a <see cref="Triangle"/> shape using the current <see cref="P:StrokeColor"/>.
+        /// Strokes the outline of a <see cref="Triangle"/> shape.
         /// </summary>
         /// <param name="triangle">The <see cref="Triangle"/> to be stroked.</param>
-        public void Stroke(Triangle triangle)
+        /// <param name="color">The color to be used to stroke the shape.</param>
+        public void Stroke(Triangle triangle, ColorRgba color)
         {
+            CommitColor(color);
             GL.Begin(BeginMode.LineLoop);
             DrawVertices(triangle);
             GL.End();
@@ -400,73 +387,54 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Lines
-        /// <summary>
-        /// Strokes a line using the current <see cref="P:StrokeColor"/>.
-        /// </summary>
-        /// <param name="points">A sequence of points forming a line.</param>
-        public void StrokeLineStrip(IEnumerable<Vector2> points)
+        public void StrokeLineStrip(IEnumerable<Vector2> points, ColorRgba color)
         {
-            CommitStrokeColor();
+            CommitColor(color);
             GL.Begin(BeginMode.LineStrip);
             DrawVertices(points);
             GL.End();
         }
 
-        public void StrokeLineStrip(params Vector2[] points)
+        public void Stroke(LineSegment lineSegment, ColorRgba color)
         {
-            StrokeLineStrip((IEnumerable<Vector2>)points);
+            CommitColor(color);
+            GL.Begin(BeginMode.LineStrip);
+            DrawVertex(lineSegment.EndPoint1);
+            DrawVertex(lineSegment.EndPoint2);
+            GL.End();
         }
 
         private void DrawVertices(IEnumerable<Vector2> points)
         {
-            foreach (Vector2 point in points)
-                DrawVertex(point);
-        }
-
-        private void DrawVertices(IEnumerable<LineSegment> lineSegments, Vector2 position)
-        {
-            foreach (LineSegment lineSegment in lineSegments)
-            {
-                DrawVertex(lineSegment.EndPoint1 + position);
-                DrawVertex(lineSegment.EndPoint2 + position);
-            }
+            foreach (Vector2 point in points) DrawVertex(point);
         }
         #endregion
 
         #region Text
-
-        /// <summary>
-        /// Printes text, using this context's defined font and color, to the view at the origin coordinates
-        /// </summary>
-        /// <param name="text">The text to print</param>
-        public void Draw(string text)
+        public void Draw(string text, ColorRgba color)
         {
-            Draw(text, new Vector2(0, 0));
+            Draw(text, new Vector2(0, 0), color);
         }
 
-        /// <summary>
-        /// Prints text, using this context's defined font and color, to the view at specified coordinates. 
-        /// </summary>
-        /// <param name="text">The <see cref="System.String"/> to print</param>
-        /// <param name="position">The position at which to print the string</param>
-        public void Draw(string text, Vector2 position)
+        public void Draw(string text, Vector2 position, ColorRgba color)
         {
-            Draw(new Text(text, font), position);
+            Text textObject = new Text(text, font);
+            Draw(textObject, position, color);
         }
 
-        public void Draw(Text text)
+        public void Draw(Text text, ColorRgba color)
         {
-            Draw(text, Vector2.Zero);
+            Draw(text, Vector2.Zero, color);
         }
 
-        public void Draw(Text text, Rectangle clippingRect)
+        public void Draw(Text text, Rectangle clippingRect, ColorRgba color)
         {
-            Draw(text, Vector2.Zero, clippingRect);
+            Draw(text, Vector2.Zero, clippingRect, color);
         }
 
-        public void Draw(Text text, Vector2 position)
+        public void Draw(Text text, Vector2 position, ColorRgba color)
         {
-            Draw(text, position, text.Frame);
+            Draw(text, position, text.Frame, color);
         }
 
         /// <summary>
@@ -475,21 +443,21 @@ namespace Orion.Engine.Graphics
         /// <remarks>Words or lines not fitting in the rectangle will be completely trimmed.</remarks>
         /// <param name="text">The <see cref="Text"/> object to draw</param>
         /// <param name="clippingRect">The rectangle clipping the text</param>
-        public void Draw(Text text, Vector2 origin, Rectangle clippingRect)
+        /// <param name="color">The color with which to draw the text.</param>
+        public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
             GL.PushMatrix();
             GL.Translate(origin.X, origin.Y, 0);
             GL.Scale(1, -1, 1);
             RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
 
-            Color color = Color.FromArgb(fillColor.ByteA, fillColor.ByteR, fillColor.ByteG, fillColor.ByteB);
+            Color systemColor = Color.FromArgb(color.ByteA, color.ByteR, color.ByteG, color.ByteB);
 
             // We could enable blending here when alpha < 255 but OpenTK doesn't support it :(.
-            Text.defaultTextPrinter.Print(text.Value, text.Font, color, renderInto);
+            Text.defaultTextPrinter.Print(text.Value, text.Font, systemColor, renderInto);
 
             GL.PopMatrix();
         }
-
         #endregion
 
         #region Textured
@@ -497,8 +465,7 @@ namespace Orion.Engine.Graphics
         {
             Argument.EnsureNotNull(texture, "texture");
 
-            FillColor = tint;
-            CommitFillColor();
+            CommitColor(tint);
 
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, texture.ID);
@@ -543,6 +510,8 @@ namespace Orion.Engine.Graphics
         {
             Argument.EnsureNotNull(maskedTexture, "maskedTexture");
             Argument.EnsureNotNull(maskingTexture, "maskingTexture");
+
+            CommitColor(Colors.White);
 
             GL.ColorMask(false, false, false, true);
             GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -593,22 +562,6 @@ namespace Orion.Engine.Graphics
             // but not on GL.Vertex2(Vector2), so we can save performance
             // by calling that overload instead. Silly huh?
             DrawVertex(new Vector2(x, y));
-        }
-
-        /// <summary>
-        /// Commits any changes to <see cref="FillColor"/> to OpenGL.
-        /// </summary>
-        private void CommitFillColor()
-        {
-            CommitColor(fillColor);
-        }
-
-        /// <summary>
-        /// Commits any changes to <see cref="StrokeColor"/> to OpenGL.
-        /// </summary>
-        private void CommitStrokeColor()
-        {
-            CommitColor(strokeColor);
         }
 
         private void CommitColor(ColorRgba color)

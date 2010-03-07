@@ -79,8 +79,8 @@ namespace Orion.Graphics.Renderers
 
         private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
         {
-            graphicsContext.FillColor = GetResourceColor(resourceNode.Type);
-            graphicsContext.Fill(resourceNode.BoundingRectangle);
+            ColorRgb color = GetResourceColor(resourceNode.Type);
+            graphicsContext.Fill(resourceNode.BoundingRectangle, color);
         }
 
         public static ColorRgb GetResourceColor(ResourceType type)

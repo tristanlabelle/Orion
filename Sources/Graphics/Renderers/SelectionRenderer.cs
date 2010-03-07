@@ -57,16 +57,18 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            graphics.StrokeColor = selectionMarkerColor;
             foreach (Unit unit in SelectionManager.SelectedUnits)
             {
                 if (!SelectionManager.Faction.CanSee(unit))
                     continue;
 
-                graphics.Stroke(unit.BoundingRectangle);
+                graphics.Stroke(unit.BoundingRectangle, selectionMarkerColor);
 
                 if (unit.Faction == Faction && unit.HasRallyPoint)
-                    graphics.StrokeLineStrip(unit.Center, unit.RallyPoint.Value);
+                {
+                    LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint.Value);
+                    graphics.Stroke(lineSegment, selectionMarkerColor);
+                }
             }
         }
 
@@ -81,10 +83,8 @@ namespace Orion.Graphics
             if (userInputManager.SelectionRectangle.HasValue)
             {
                 Rectangle selectionRectangle = userInputManager.SelectionRectangle.Value;
-                graphics.StrokeColor = selectionRectangleStrokeColor;
-                graphics.Stroke(selectionRectangle);
-                graphics.FillColor = selectionRectangleFillColor;
-                graphics.Fill(selectionRectangle);
+                graphics.Stroke(selectionRectangle, selectionRectangleStrokeColor);
+                graphics.Fill(selectionRectangle, selectionRectangleFillColor);
             }
         }
         #endregion

@@ -667,7 +667,8 @@ namespace Orion.UserInterface
                 Frame frameFaction = new Frame(rectangleFrame, faction.Color);
                 
                 Rectangle rectangleFaction = Instant.CreateComponentRectangle(frameFaction.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
-                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(rectangleFaction, new DropdownListRowDiplomaticStanceRenderer());
+                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(rectangleFaction);
+                dropdownList.StringConverter = stance => stance == DiplomaticStance.Ally ? "Allié" : "Ennemi";
                 assocFactionDropList.Add(faction, dropdownList);
 
                 dropdownList.AddItem(DiplomaticStance.Enemy);

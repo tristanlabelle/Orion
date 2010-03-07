@@ -16,16 +16,17 @@ namespace Orion.Graphics
     public sealed class UnitFrameRenderer : FrameRenderer
     {
         #region Fields
+        private static readonly ColorRgb progressBarColor = Colors.Gold;
+        private static readonly ColorRgb progressBarBorderColor = Colors.Black;
+        private static readonly ColorRgb progressBarBackgroundColor = Colors.Black;
+        private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private static readonly UnitStat[] statsToDisplay = new[]
         {
             UnitStat.AttackPower, UnitStat.AttackRange,
             UnitStat.MeleeArmor, UnitStat.RangedArmor,
             UnitStat.MovementSpeed, UnitStat.SightRange
         };
-
         private static readonly Dictionary<UnitStat, string> statNames = new Dictionary<UnitStat, string>();
-
-        private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private const float firstLineY = 160;
 
         private readonly Unit unit;
@@ -93,16 +94,13 @@ namespace Orion.Graphics
                     Texture texture = gameGraphics.GetUnitTexture(train.TraineeType);
 
                     Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
-                    context.FillColor = Colors.Black;
-                    context.Fill(rect2);
-                    context.FillColor = Colors.White;
-                    context.Stroke(rect2);
+                    context.Fill(rect2, Colors.Black);
+                    context.Stroke(rect2, Colors.White);
 
                     // Fills first rectangle with a character. 
                     Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 26, 26);
                     context.Fill(rect, texture);
-                    context.FillColor = unit.Faction.Color;
-                    context.Stroke(rect);
+                    context.Stroke(rect, unit.Faction.Color);
 
                     // Draws a completion HealthBar
                     Rectangle healthRect = new Rectangle(152, 120, 186, 10);
@@ -111,20 +109,15 @@ namespace Orion.Graphics
 
                     base.Draw(context, bounds);
                     firstStartingXPos += 50;
-                    context.FillColor = Colors.Black;
                 }
-
-                string message = "En progrès...";
-                context.Draw(message, new Vector2(150, 5));
             }
 
             context.Font = statsFont;
-            context.FillColor = Colors.DarkBlue;
 
-            context.Draw(unit.Type.Name, new Vector2(150, firstLineY));
+            context.Draw(unit.Type.Name, new Vector2(150, firstLineY), Colors.Black);
 
             Text hp = new Text("HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth), statsFont);
-            context.Draw(hp, new Vector2(150, firstLineY - hp.Frame.Height));
+            context.Draw(hp, new Vector2(150, firstLineY - hp.Frame.Height), Colors.Black);
 
             float y = firstLineY - hp.Frame.Height * 2;
             if (!isTraining)
@@ -135,7 +128,7 @@ namespace Orion.Graphics
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;
                     string message = "{0}: {1} ".FormatInvariant(statNames[stat], value);
-                    context.Draw(message, new Vector2(150, y));
+                    context.Draw(message, new Vector2(150, y), Colors.Black);
                     y -= hp.Frame.Height;
                 }
             }
@@ -144,15 +137,10 @@ namespace Orion.Graphics
 
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)
         {
-            context.FillColor = Colors.Black;
-            context.Fill(bounds);
-
+            context.Fill(bounds, progressBarBackgroundColor);
             Rectangle progressRect = new Rectangle(bounds.MinX, bounds.MinY, bounds.Width * progress, bounds.Height);
-            context.FillColor = Colors.Gold;
-            context.Fill(progressRect);
-
-            context.StrokeColor = Colors.Black;
-            context.Stroke(bounds);
+            context.Fill(progressRect, progressBarColor);
+            context.Stroke(bounds, progressBarBorderColor);
         }
         #endregion
     }

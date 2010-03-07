@@ -12,7 +12,7 @@ namespace Orion.UserInterface.Widgets
     public class DropdownList<T> : Frame
     {
         #region Nested Types
-        private class DropdownMenuRow : View
+        private sealed class DropdownMenuRow : View
         {
             #region Fields
             private readonly DropdownList<T> parent;
@@ -44,25 +44,23 @@ namespace Orion.UserInterface.Widgets
             {
                 if (parent.Enabled) parent.SelectedItem = this.Value;
 
-                Action<DropdownList<T>, T> handler = parent.SelectionChanged;
-                if (handler != null) handler(parent, Value);
+                parent.SelectionChanged.Raise(parent, Value);
                 return base.OnMouseUp(args);
             }
 
             protected internal override void Draw(GraphicsContext graphicsContext)
             {
-                if (!parent.Enabled) graphicsContext.FillColor = new ColorRgba(Colors.Blue, 0.25f);
-                else graphicsContext.FillColor = Colors.Blue;
+                ColorRgba fillColor = new ColorRgba(Colors.Blue, parent.Enabled ? 1 : 0.25f);
+                graphicsContext.Fill(Bounds, fillColor);
 
-                graphicsContext.Fill(Bounds);
                 if (IsMouseOver && parent.selectedItem != this)
                 {
-                    graphicsContext.FillColor = new ColorRgba(Colors.Black, 0.25f);
-                    graphicsContext.Fill(Bounds);
+                    ColorRgba mouseOverColor = new ColorRgba(Colors.Black, 0.25f);
+                    graphicsContext.Fill(Bounds, mouseOverColor);
                 }
 
-                graphicsContext.FillColor = parent.TextColor;
-                parent.renderer.Draw(Value, graphicsContext, Bounds);
+                string text = parent.stringConverter(Value);
+                graphicsContext.Draw(text, Bounds.Min, parent.TextColor);
             }
             #endregion
         }
@@ -70,7 +68,6 @@ namespace Orion.UserInterface.Widgets
 
         #region Fields
         private readonly ListFrame menu;
-        private readonly DropdownListRowValueRenderer<T> renderer;
         private ColorRgba textColor = Colors.White;
         private Func<T, string> stringConverter = (value) => value.ToString();
         private DropdownMenuRow selectedItem;
@@ -81,13 +78,8 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public DropdownList(Rectangle frame)
-            : this(frame, new DropdownListRowValueRenderer<T>())
-        { }
-
-        public DropdownList(Rectangle frame, DropdownListRowValueRenderer<T> renderer)
             : base(frame)
         {
-            this.renderer = renderer;
             menu = new ListFrame(Bounds);
             parentMouseUp = ParentMouseUp;
         }

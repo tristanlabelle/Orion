@@ -67,8 +67,7 @@ namespace Orion.Graphics.Renderers
                 {
                     float radius = (age % warningCircleDuration) / warningCircleDuration * warningCircleRadius;
                     Circle circle = new Circle(warning.Position, radius);
-                    context.StrokeColor = warningCircleColor;
-                    context.Stroke(circle);
+                    context.Stroke(circle, warningCircleColor);
                 }
                 else
                 {

@@ -129,14 +129,10 @@ namespace Orion.UserInterface.Widgets
 
         private void DrawScrollbarEnd(GraphicsContext graphicsContext, Rectangle bounds, Triangle triangle)
         {
-            graphicsContext.StrokeColor = Colors.Black;
-            graphicsContext.FillColor = Colors.Gray;
+            graphicsContext.Fill(bounds, Colors.Gray);
+            graphicsContext.Stroke(bounds, Colors.Black);
 
-            graphicsContext.Fill(bounds);
-            graphicsContext.Stroke(bounds);
-
-            graphicsContext.FillColor = Colors.Black;
-            graphicsContext.Fill(triangle);
+            graphicsContext.Fill(triangle, Colors.Black);
         }
         #endregion
         #endregion

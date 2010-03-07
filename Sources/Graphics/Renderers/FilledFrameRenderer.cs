@@ -31,8 +31,7 @@ namespace Orion.Graphics
         #region Methods
         public override void Draw(GraphicsContext context, Rectangle bounds)
         {
-            context.FillColor = FillColor;
-            context.Fill(bounds);
+            context.Fill(bounds, FillColor);
             base.Draw(context, bounds);
         }
         #endregion

@@ -50,8 +50,7 @@ namespace Orion.UserInterface.Widgets
         #region Methods
         protected internal override void Draw(GraphicsContext context)
         {
-            context.FillColor = Color;
-            context.Draw(Text, Bounds);
+            context.Draw(Text, Bounds, Color);
         }
         #endregion
     }

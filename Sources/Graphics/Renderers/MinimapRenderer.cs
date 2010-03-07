@@ -10,6 +10,9 @@ namespace Orion.Graphics.Renderers
     public sealed class MinimapRenderer : FrameRenderer
     {
         #region Fields
+        private static readonly ColorRgb ViewRectangleColor = Colors.Orange;
+        private static readonly ColorRgb BorderColor = Colors.Gray;
+
         private readonly WorldRenderer worldRenderer;
         private readonly AttackWarningRenderer attackWarningRenderer;
         #endregion
@@ -37,11 +40,9 @@ namespace Orion.Graphics.Renderers
             worldRenderer.DrawFogOfWar(context, bounds);
             attackWarningRenderer.Draw(context);
 
-            context.StrokeColor = Colors.Orange;
-            Rectangle? intersection = Rectangle.Intersection(bounds, VisibleRect);
-            context.Stroke(intersection.GetValueOrDefault());
-            context.StrokeColor = Colors.Gray;
-            context.Stroke(bounds);
+            Rectangle intersection = Rectangle.Intersection(bounds, VisibleRect).GetValueOrDefault();
+            context.Stroke(intersection, ViewRectangleColor);
+            context.Stroke(bounds, BorderColor);
         }
         #endregion
     }

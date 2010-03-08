@@ -30,7 +30,6 @@ namespace Orion.UserInterface
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Window));
             this.glControl = new Orion.UserInterface.CustomGLControl();
             this.SuspendLayout();
             // 
@@ -39,7 +38,7 @@ namespace Orion.UserInterface
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
-            this.glControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.glControl.Margin = new System.Windows.Forms.Padding(4);
             this.glControl.Name = "glControl";
             this.glControl.Size = new System.Drawing.Size(961, 678);
             this.glControl.TabIndex = 0;
@@ -57,8 +56,9 @@ namespace Orion.UserInterface
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(961, 678);
             this.Controls.Add(this.glControl);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Window";
+            this.ShowIcon = false;
             this.Text = "Orion";
             this.ResumeLayout(false);
 

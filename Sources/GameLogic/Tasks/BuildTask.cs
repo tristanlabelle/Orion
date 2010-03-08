@@ -74,7 +74,7 @@ namespace Orion.GameLogic.Tasks
                 return;
             }
 
-            if (!Unit.World.IsFree(buildingPlan.GridRegion, Unit.CollisionLayer))
+            if (!Unit.World.IsFree(buildingPlan.GridRegion, buildingPlan.BuildingType.CollisionLayer))
             {
                 string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);

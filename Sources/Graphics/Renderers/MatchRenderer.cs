@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Orion.Engine.Graphics;
 using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.Geometry;
+using Orion.Matchmaking.TowerDefense;
 
 namespace Orion.Graphics.Renderers
 {
@@ -17,7 +19,7 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics)
+        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics, CreepPath creepPath)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
@@ -25,7 +27,7 @@ namespace Orion.Graphics.Renderers
             this.inputManager = inputManager;
             this.gameGraphics = gameGraphics;
             this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics);
+            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics, creepPath);
             this.minimap = new MinimapRenderer(worldRenderer);
         }
         #endregion

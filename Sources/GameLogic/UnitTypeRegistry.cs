@@ -61,6 +61,7 @@ namespace Orion.GameLogic
             RegisterHeroUfo();
 
             RegisterTowerDefenseBuilder();
+            RegisterTowerDefenseTower();
         }
         #endregion
 
@@ -708,7 +709,25 @@ namespace Orion.GameLogic
             };
             builder.Skills.Add(new MoveSkill(20, true));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding
-                && type.HasSkill<AttackSkill>(), 200));
+                && type.HasSkill<AttackSkill>()
+                && type.GetBaseStat(UnitStat.AlageneCost) == 0, 200));
+            Register(builder);
+        }
+
+        private void RegisterTowerDefenseTower()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Generic Tower",
+                Size = new Size(3, 3),
+                SightRange = 7,
+                MaxHealth = 120,
+                MeleeArmor = 0,
+                RangedArmor = 0,
+                AladdiumCost = 100,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new AttackSkill(30, 7, 2));
             Register(builder);
         }
         #endregion

@@ -35,19 +35,33 @@ namespace Orion.Main
             CreepPath creepPath = CreepPath.Generate(world.Size, new Random());
 
             Faction localFaction = world.CreateFaction("Player", Colors.Red);
+            localFaction.AladdiumAmount = 500;
+            localFaction.AlageneAmount = 0;
             localFaction.LocalFogOfWar.Disable();
             localFaction.CreateUnit(world.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(localFaction);
             
-            Faction aiFaction = world.CreateFaction("Creeps", Colors.Blue);
-            Commander aiCommander = new CreepWaveCommander(aiFaction, creepPath);
+            Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
+            Commander creepCommander = new CreepWaveCommander(creepFaction, creepPath);
 
-            match = new Match(random, world);
+            world.Entities.Removed += (sender, entity) =>
+                {
+                    Unit unit = entity as Unit;
+                    bool isKilledCreep = unit != null
+                        && unit.Faction == creepFaction
+                        && !unit.GridRegion.Contains(creepPath.Points[creepPath.Points.Count - 1]);
+
+                    if (!isKilledCreep) return;
+
+                    localFaction.AladdiumAmount += (int)(unit.GetStat(UnitStat.AladdiumCost) * 0.1f);
+                };
+
+            match = new Match(random, world, creepPath);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
             pipeline.AddCommander(localCommander);
-            pipeline.AddCommander(aiCommander);
+            pipeline.AddCommander(creepCommander);
 
             match.Updated += (sender, args) =>
                 pipeline.Update(sender.LastSimulationStepNumber, args.TimeDeltaInSeconds);

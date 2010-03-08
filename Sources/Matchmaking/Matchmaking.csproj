@@ -107,6 +107,7 @@
     <Compile Include="SelectionManager.cs" />
     <Compile Include="SlaveCommander.cs" />
     <Compile Include="TowerDefense\CreepPath.cs" />
+    <Compile Include="TowerDefense\CreepTask.cs" />
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />

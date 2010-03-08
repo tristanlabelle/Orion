@@ -40,8 +40,8 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.faction = faction;
-            this.buildingRuinTexture = gameGraphics.GetMiscTexture("Ruins");
-            this.skeletonTexture = gameGraphics.GetMiscTexture("Skeleton");
+            this.buildingRuinTexture = gameGraphics.GetUnitTexture("Ruins");
+            this.skeletonTexture = gameGraphics.GetUnitTexture("Skeleton");
 
             World.Updated += OnWorldUpdated;
             World.Entities.Removed += OnEntityRemoved;

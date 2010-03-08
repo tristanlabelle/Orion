@@ -28,7 +28,7 @@ namespace Orion.Matchmaking.TowerDefense
             "Chuck Norris"
         };
         private static readonly int unitsPerWave = 20;
-        private static readonly float timeBetweenWaves = 30;
+        private static readonly float timeBetweenWaves = 5;
 
         private readonly CreepPath path;
         private int nextWaveIndex;
@@ -41,6 +41,9 @@ namespace Orion.Matchmaking.TowerDefense
         {
             Argument.EnsureNotNull(path, "path");
             this.path = path;
+
+            UnitType worker = World.UnitTypes.First(unit => unit.HasSkill<BuildSkill>());
+            faction.CreateUnit(worker, Point.Zero);
         }
         #endregion
 
@@ -61,11 +64,11 @@ namespace Orion.Matchmaking.TowerDefense
             UnitType unitType = World.UnitTypes.FromName(unitTypeName);
 
             Point spawnPoint = path.Points[0];
-            Unit unit = Faction.CreateUnit(unitType, spawnPoint);
+            Unit creep = Faction.CreateUnit(unitType, spawnPoint);
             Point destinationPoint = path.Points[path.Points.Count - 1];
-            unit.TaskQueue.OverrideWith(new MoveTask(unit, destinationPoint));
+            creep.TaskQueue.OverrideWith(new CreepTask(creep, path));
 
-            ++nextWaveIndex;
+            nextWaveIndex = (nextWaveIndex + 1) % waveUnitTypeNames.Length;
         }
         #endregion
     }

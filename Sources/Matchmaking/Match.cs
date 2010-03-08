@@ -6,6 +6,7 @@ using Orion.Collections;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
+using Orion.Matchmaking.TowerDefense;
 
 namespace Orion.Matchmaking
 {
@@ -17,19 +18,22 @@ namespace Orion.Matchmaking
         #region Fields
         private readonly Random random;
         private readonly World world;
+        private readonly CreepPath creepPath;
         private SimulationStep lastSimulationStep;
         private bool isPausable;
         private bool isRunning;
         #endregion
 
         #region Constructors
-        public Match(Random random, World world)
+#warning HORRIBLE HACK, Refactor and get the CreepPath out of there ASAP!
+        public Match(Random random, World world, CreepPath creepPath)
         {
             Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
 
             this.random = random;
             this.world = world;
+            this.creepPath = creepPath;
 
             world.FactionDefeated += OnFactionDefeated;
         }
@@ -82,6 +86,11 @@ namespace Orion.Matchmaking
         public World World
         {
             get { return world; }
+        }
+
+        public CreepPath CreepPath
+        {
+            get { return creepPath; }
         }
 
         public bool IsPausable

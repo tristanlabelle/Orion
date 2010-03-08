@@ -23,10 +23,10 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public CreepPathRenderer(CreepPath path, TextureManager textureManager)
+        public CreepPathRenderer(CreepPath path, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(path, "path");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.path = path;
 
@@ -45,8 +45,9 @@ namespace Orion.Graphics.Renderers
                 }
             }
 
-            this.maskTexture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelData, true, false);
-            this.pathTexture = textureManager.Get("Path");
+            this.maskTexture = gameGraphics.GraphicsContext.CreateTexture(textureSize, PixelFormat.Alpha, new ArraySegment<byte>(pixelData));
+            this.maskTexture.SetSmooth(true);
+            this.pathTexture = gameGraphics.GetMiscTexture("Path");
             this.pathTexture.SetSmooth(true);
             this.pathTexture.SetRepeat(true);
         }
@@ -75,12 +76,12 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public void Draw(GraphicsContext context, Rectangle viewBounds)
+        public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            Argument.EnsureNotNull(context, "context");
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             
             Rectangle terrainBounds = new Rectangle(path.TerrainSize.Width, path.TerrainSize.Height);
-            context.FillMasked(terrainBounds, pathTexture, PathTextureRectangle, maskTexture, UnitTextureRectangle);
+            graphicsContext.FillMasked(terrainBounds, pathTexture, PathTextureRectangle, maskTexture, UnitTextureRectangle);
         }
         #endregion
     }

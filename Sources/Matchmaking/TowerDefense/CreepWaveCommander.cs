@@ -11,28 +11,29 @@ namespace Orion.Matchmaking.TowerDefense
     public sealed class CreepWaveCommander : Commander
     {
         #region Fields
-        private static readonly string[] waveUnitTypeNames = new[]
+        private static readonly string[] WaveCreepTypeNames = new[]
         {
-            "Mentos",
-            "Coke diète",
             "Schtroumpf",
             "Pirate",
             "Ninja",
-            "Tapis Volant",
             "Jedihad",
             "Viking",
-            "Flying Spaghetti Monster",
+            "Tapis Volant",
             "OVNI",
             "Jésus",
             "Jésus-Raptor",
-            "Chuck Norris"
+            "Mentos",
+            "Coke diète",
+            "Flying Spaghetti Monster",
         };
-        private static readonly int unitsPerWave = 20;
-        private static readonly float timeBetweenWaves = 5;
+        private static readonly int CreepsPerWave = 10;
+        private static readonly float TimeBetweenWaves = 10;
+        private static readonly float TimeBetweenCreeps = 1;
 
         private readonly CreepPath path;
-        private int nextWaveIndex;
-        private float timeBeforeNextWave = 3;
+        private int waveIndex;
+        private int spawnedCreepCount;
+        private float timeBeforeNextCreep = TimeBetweenWaves;
         #endregion
 
         #region Constructors
@@ -50,25 +51,34 @@ namespace Orion.Matchmaking.TowerDefense
         #region Methods
         public override void Update(float timeDelta)
         {
-            timeBeforeNextWave -= timeDelta;
-            if (timeBeforeNextWave < 0)
-            {
-                SendNextWave();
-                timeBeforeNextWave = timeBetweenWaves;
-            }
+            timeBeforeNextCreep -= timeDelta;
+            if (timeBeforeNextCreep > 0) return;
+
+            if (!TrySpawnCreep()) return;
+
+            timeBeforeNextCreep = TimeBetweenCreeps;
+            ++spawnedCreepCount;
+
+            if (spawnedCreepCount < CreepsPerWave) return;
+
+            waveIndex = (waveIndex + 1) % WaveCreepTypeNames.Length;
+            spawnedCreepCount = 0;
+            timeBeforeNextCreep = TimeBetweenWaves;
         }
 
-        public void SendNextWave()
+        private bool TrySpawnCreep()
         {
-            string unitTypeName = waveUnitTypeNames[nextWaveIndex];
-            UnitType unitType = World.UnitTypes.FromName(unitTypeName);
+            string creepTypeName = WaveCreepTypeNames[waveIndex];
+            UnitType creepType = World.UnitTypes.FromName(creepTypeName);
 
             Point spawnPoint = path.Points[0];
-            Unit creep = Faction.CreateUnit(unitType, spawnPoint);
-            Point destinationPoint = path.Points[path.Points.Count - 1];
-            creep.TaskQueue.OverrideWith(new CreepTask(creep, path));
+            Region spawnRegion = new Region(spawnPoint, creepType.Size);
+            if (!World.IsFree(spawnRegion, creepType.CollisionLayer))
+                return false;
 
-            nextWaveIndex = (nextWaveIndex + 1) % waveUnitTypeNames.Length;
+            Unit creep = Faction.CreateUnit(creepType, spawnPoint);
+            creep.TaskQueue.OverrideWith(new CreepTask(creep, path));
+            return true;
         }
         #endregion
     }

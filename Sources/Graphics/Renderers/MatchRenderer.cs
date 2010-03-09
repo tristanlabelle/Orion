@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using OpenTK.Math;
 using Orion.Engine.Graphics;
 using Orion.Matchmaking;
 using Orion.GameLogic;
@@ -16,6 +17,13 @@ namespace Orion.Graphics.Renderers
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
         private readonly MinimapRenderer minimap;
+
+        #region Chuck Norris
+        private const float secondsToShakeWhenChuckNorrisSpawns = 5;
+        private float offsetX;
+        private float offsetY;
+        private float shakingSecondsLeft = 0;
+        #endregion
         #endregion
 
         #region Constructors
@@ -29,6 +37,10 @@ namespace Orion.Graphics.Renderers
             this.selectionRenderer = new SelectionRenderer(inputManager);
             this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics, creepPath);
             this.minimap = new MinimapRenderer(worldRenderer);
+
+            World world = Faction.World;
+            world.Updated += UpdateShaking;
+            world.Entities.Added += CheckForChuckNorris;
         }
         #endregion
 
@@ -66,20 +78,24 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(context, "context");
 
             minimap.VisibleRect = bounds;
-            worldRenderer.DrawTerrain(context, bounds);
-            worldRenderer.DrawResources(context, bounds);
-            worldRenderer.DrawUnits(context, bounds);
-            selectionRenderer.DrawSelectionMarkers(context);
 
-            if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
-                HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
+            using (context.PushTranslate(new Vector2(offsetX, offsetY)))
+            {
+                worldRenderer.DrawTerrain(context, bounds);
+                worldRenderer.DrawResources(context, bounds);
+                worldRenderer.DrawUnits(context, bounds);
+                selectionRenderer.DrawSelectionMarkers(context);
 
-            worldRenderer.DrawExplosions(context, bounds);
-            worldRenderer.DrawFogOfWar(context, bounds);
+                if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
+                    HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
 
-            IRenderer selectedCommandRenderer = inputManager.SelectedCommand as IRenderer;
-            if (selectedCommandRenderer != null)
-                selectedCommandRenderer.Draw(context, bounds);
+                worldRenderer.DrawExplosions(context, bounds);
+                worldRenderer.DrawFogOfWar(context, bounds);
+
+                IRenderer selectedCommandRenderer = inputManager.SelectedCommand as IRenderer;
+                if (selectedCommandRenderer != null)
+                    selectedCommandRenderer.Draw(context, bounds);
+            }
 
             selectionRenderer.DrawSelectionRectangle(context);
         }
@@ -88,6 +104,35 @@ namespace Orion.Graphics.Renderers
         {
             worldRenderer.Dispose();
         }
+
+        #region Chuck Norris
+        private void CheckForChuckNorris(EntityManager manager, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            if (unit.Type.Name == "Chuck Norris")
+                shakingSecondsLeft += secondsToShakeWhenChuckNorrisSpawns;
+        }
+
+        private void UpdateShaking(World world, SimulationStep step)
+        {
+            if (shakingSecondsLeft != 0)
+            {
+                offsetX = (float)(world.Random.NextDouble() - 0.5) * 5;
+                offsetY = (float)(world.Random.NextDouble() - 0.5) * 5;
+                Console.WriteLine("{0}, {1}", offsetX, offsetY);
+                shakingSecondsLeft -= step.TimeDeltaInSeconds;
+                if (shakingSecondsLeft < 0)
+                    shakingSecondsLeft = 0;
+            }
+            else
+            {
+                offsetX = 0;
+                offsetY = 0;
+            }
+        }
+        #endregion
         #endregion
     }
 }

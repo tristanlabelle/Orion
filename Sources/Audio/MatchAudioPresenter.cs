@@ -8,6 +8,7 @@ using Orion.Collections;
 using Orion.Engine.Audio;
 using Orion.Geometry;
 using Orion.GameLogic;
+using Orion.GameLogic.Utilities;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
 
@@ -23,7 +24,7 @@ namespace Orion.Audio
         private readonly Match match;
         private readonly UserInputManager userInputManager;
         private readonly SoundSource voicesSoundSource;
-        private readonly AttackMonitor attackMonitor;
+        private readonly UnderAttackWarningProvider underAttackWarningProvider;
 
         /// <summary>
         /// Reused between calls to minimize object garbage.
@@ -53,8 +54,8 @@ namespace Orion.Audio
             this.voicesSoundSource = audioContext.CreateSource();
             this.voicesSoundSource.Volume = 0.8f;
 
-            this.attackMonitor = new AttackMonitor(userInputManager.LocalCommander.Faction);
-            this.attackMonitor.Warning += OnAttackWarning;
+            this.underAttackWarningProvider = new UnderAttackWarningProvider(userInputManager.LocalFaction);
+            this.underAttackWarningProvider.UnderAttack += OnUnderAttackWarning;
 
             this.match.World.Entities.Added += OnEntityAdded;
             this.match.World.UnitHitting += OnUnitHitting;
@@ -192,7 +193,7 @@ namespace Orion.Audio
             soundContext.PlayAndForgetRandomSoundFromGroup(soundGroup, args.Hitter.Center);
         }
 
-        private void OnAttackWarning(AttackMonitor sender, Vector2 position)
+        private void OnUnderAttackWarning(UnderAttackWarningProvider sender, Vector2 position)
         {
             bool isNearBase = World.Entities
                 .Intersecting(new Circle(position, 6))

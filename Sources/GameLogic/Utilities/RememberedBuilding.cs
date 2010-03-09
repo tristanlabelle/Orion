@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Orion.GameLogic;
+using System.ComponentModel;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.GameLogic.Utilities
 {
     /// <summary>
     /// Represents what is remembered of a building which has been seen but is now in the fog of war.
     /// </summary>
+    [ImmutableObject(true)]
     public struct RememberedBuilding : IEquatable<RememberedBuilding>
     {
         #region Instance

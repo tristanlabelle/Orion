@@ -170,17 +170,6 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        private void DrawRememberedBuilding(GraphicsContext graphicsContext, Rectangle viewBounds, RememberedBuilding building)
-        {
-            Texture texture = gameGraphics.GetUnitTexture(building.Type);
-
-            Rectangle buildingRectangle = building.GridRegion.ToRectangle();
-            if (!Rectangle.Intersects(buildingRectangle, viewBounds))
-                return;
-
-            graphicsContext.Fill(buildingRectangle, texture, building.Faction.Color);
-        }
-
         private float GetOscillation(Unit unit)
         {
             if (!unit.IsAirborne) return 0;

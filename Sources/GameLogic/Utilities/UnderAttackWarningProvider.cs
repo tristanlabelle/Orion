@@ -7,9 +7,12 @@ using OpenTK.Math;
 using Orion.Geometry;
 using Orion.GameLogic;
 
-namespace Orion.GameLogic
+namespace Orion.GameLogic.Utilities
 {
-    public sealed class AttackMonitor
+    /// <summary>
+    /// Monitors the attacks to a faction and provides "under attack" warnings.
+    /// </summary>
+    public sealed class UnderAttackWarningProvider
     {
         #region Entry
         private struct Entry
@@ -39,7 +42,7 @@ namespace Orion.GameLogic
         #endregion
 
         #region Constructors
-        public AttackMonitor(Faction faction)
+        public UnderAttackWarningProvider(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
 
@@ -51,9 +54,9 @@ namespace Orion.GameLogic
 
         #region Events
         /// <summary>
-        /// Raised when the faction is under attack.
+        /// Raised when the monitored faction is under attack.
         /// </summary>
-        public event Action<AttackMonitor, Vector2> Warning;
+        public event Action<UnderAttackWarningProvider, Vector2> UnderAttack;
         #endregion
 
         #region Properties
@@ -80,7 +83,7 @@ namespace Orion.GameLogic
             Entry entry = new Entry(time, position);
             entries.Enqueue(entry);
 
-            if (Warning != null) Warning(this, position);
+            if (UnderAttack != null) UnderAttack(this, position);
         }
 
         private void OnWorldUnitHit(World sender, HitEventArgs args)

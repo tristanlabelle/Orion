@@ -14,7 +14,7 @@ namespace Orion.Graphics.Renderers
         private static readonly ColorRgb BorderColor = Colors.Gray;
 
         private readonly WorldRenderer worldRenderer;
-        private readonly AttackWarningRenderer attackWarningRenderer;
+        private readonly UnderAttackWarningRenderer attackWarningRenderer;
         #endregion
 
         #region Constructors
@@ -23,7 +23,7 @@ namespace Orion.Graphics.Renderers
             Argument.EnsureNotNull(worldRenderer, "worldRenderer");
 
             this.worldRenderer = worldRenderer;
-            this.attackWarningRenderer = new AttackWarningRenderer(worldRenderer.Faction);
+            this.attackWarningRenderer = new UnderAttackWarningRenderer(worldRenderer.Faction);
         }
         #endregion
 

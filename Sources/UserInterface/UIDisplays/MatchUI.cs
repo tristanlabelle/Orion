@@ -6,6 +6,7 @@ using Orion.Audio;
 using Orion.Collections;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
+using Orion.GameLogic.Utilities;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;

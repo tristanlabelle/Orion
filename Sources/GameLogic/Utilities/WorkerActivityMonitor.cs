@@ -7,7 +7,7 @@ using Orion.GameLogic.Skills;
 using Orion.GameLogic.Tasks;
 using System.Diagnostics;
 
-namespace Orion.GameLogic
+namespace Orion.GameLogic.Utilities
 {
     /// <summary>
     /// Monitors the activity of workers for a given faction.

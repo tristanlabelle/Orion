@@ -50,14 +50,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameGraphics.cs" />
-    <Compile Include="Renderers\AttackWarningRenderer.cs" />
+    <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
     <Compile Include="Renderers\FilledFrameRenderer.cs" />
     <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
-    <Compile Include="Renderers\RememberedBuilding.cs" />
     <Compile Include="Renderers\ResourcesRenderer.cs" />
     <Compile Include="Renderers\Ruin.cs" />
     <Compile Include="Renderers\RuinsRenderer.cs" />

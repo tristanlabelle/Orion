@@ -8,10 +8,11 @@ using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.Geometry;
 using Orion.Matchmaking;
+using Orion.GameLogic.Utilities;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class AttackWarningRenderer
+    public sealed class UnderAttackWarningRenderer
     {
         #region AttackWarning
         private struct AttackWarning
@@ -37,18 +38,18 @@ namespace Orion.Graphics.Renderers
         private const float warningCircleDuration = 0.3f;
         private static readonly ColorRgb warningCircleColor = Colors.Red;
 
-        private readonly AttackMonitor monitor;
+        private readonly UnderAttackWarningProvider provider;
         private readonly List<AttackWarning> warnings = new List<AttackWarning>();
         private float time;
         #endregion
 
         #region Constructors
-        public AttackWarningRenderer(Faction faction)
+        public UnderAttackWarningRenderer(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
 
-            this.monitor = new AttackMonitor(faction);
-            this.monitor.Warning += OnWarning;
+            this.provider = new UnderAttackWarningProvider(faction);
+            this.provider.UnderAttack += OnWarning;
             faction.World.Updated += OnWorldUpdated;
         }
         #endregion
@@ -76,7 +77,7 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        private void OnWarning(AttackMonitor sender, Vector2 position)
+        private void OnWarning(UnderAttackWarningProvider sender, Vector2 position)
         {
             AttackWarning warning = new AttackWarning(time, position);
             warnings.Add(warning);

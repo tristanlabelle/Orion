@@ -64,9 +64,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttackMonitor.cs" />
+    <Compile Include="Utilities\FogOfWarMemory.cs" />
+    <Compile Include="Utilities\RememberedBuilding.cs" />
+    <Compile Include="Utilities\UnderAttackWarningProvider.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="HitEventArgs.cs" />
     <Compile Include="Pathfinding\Pathfinder.OpenList.cs" />
@@ -130,7 +134,7 @@
     <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />
-    <Compile Include="WorkerActivityMonitor.cs" />
+    <Compile Include="Utilities\WorkerActivityMonitor.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

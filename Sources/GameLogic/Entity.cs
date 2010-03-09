@@ -197,6 +197,10 @@ namespace Orion.GameLogic
 
         #region Static
         #region Methods
+        /// <summary>
+        /// The maximum size (in width or height) of entities.
+        /// This limitation exists to optimize the EntityZoneManager.
+        /// </summary>
         public static readonly int MaxSize = 4;
 
         public static Region GetGridRegion(Vector2 position, Size size)

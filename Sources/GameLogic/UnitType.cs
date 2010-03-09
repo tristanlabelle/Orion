@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic
@@ -23,6 +24,9 @@ namespace Orion.GameLogic
         private readonly ReadOnlyCollection<Skill> skills;
         private readonly Size size;
 
+        private readonly bool isAirborne;
+        private readonly bool isBuilding;
+
         private readonly int aladdiumCost;
         private readonly int alageneCost;
         private readonly int maxHealth;
@@ -30,10 +34,6 @@ namespace Orion.GameLogic
         private readonly int rangedArmor;
         private readonly int sightRange;
         private readonly int foodCost;
-
-        // Cached values, for improved performance.
-        private readonly bool isAirborne;
-        private readonly bool isBuilding;
         #endregion
 
         #region Constructors
@@ -46,6 +46,9 @@ namespace Orion.GameLogic
             this.skills = builder.Skills.ToList().AsReadOnly();
             this.size = builder.Size;
 
+            this.isAirborne = builder.IsAirborne;
+            this.isBuilding = builder.Skills.None(skill => skill is MoveSkill);
+
             this.aladdiumCost = builder.AladdiumCost;
             this.alageneCost = builder.AlageneCost;
             this.maxHealth = builder.MaxHealth;
@@ -53,18 +56,6 @@ namespace Orion.GameLogic
             this.foodCost = builder.FoodCost;
             this.meleeArmor = builder.MeleeArmor;
             this.rangedArmor = builder.RangedArmor;
-
-            MoveSkill moveSkill = GetSkill<MoveSkill>();
-            if (moveSkill == null)
-            {
-                this.isBuilding = true;
-                this.isAirborne = false;
-            }
-            else
-            {
-                this.isBuilding = false;
-                this.isAirborne = moveSkill.IsAirborne;
-            }
 
             var attackSkill = GetSkill<AttackSkill>();
             Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,

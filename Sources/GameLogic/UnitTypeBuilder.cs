@@ -17,6 +17,7 @@ namespace Orion.GameLogic
         #region Fields
         private string name;
         private SkillCollection skills = new SkillCollection();
+        private bool isAirborne;
         private int aladdiumCost;
         private int alageneCost;
         private int maxHealth;
@@ -48,6 +49,12 @@ namespace Orion.GameLogic
         public SkillCollection Skills
         {
             get { return skills; }
+        }
+
+        public bool IsAirborne
+        {
+            get { return isAirborne; }
+            set { isAirborne = value; }
         }
 
         public int AladdiumCost

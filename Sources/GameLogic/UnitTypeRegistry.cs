@@ -101,7 +101,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(2, 0, 5));
             builder.Skills.Add(new HarvestSkill(1, 10));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 20));
@@ -142,7 +142,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(5, 0, 3));
             Register(builder);
         }
@@ -161,7 +161,7 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(10, false));
+            builder.Skills.Add(new MoveSkill(10));
             builder.Skills.Add(new AttackSkill(4, 5, 2));
             Register(builder);
         }
@@ -180,7 +180,7 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 3
             };
-            builder.Skills.Add(new MoveSkill(6, false));
+            builder.Skills.Add(new MoveSkill(6));
             builder.Skills.Add(new AttackSkill(13, 0, 4));
             Register(builder);
         }
@@ -211,6 +211,7 @@ namespace Orion.GameLogic
             {
                 Name = "Grippe A(H1N1)",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 7,
                 MaxHealth = 40,
                 MeleeArmor = 1,
@@ -219,7 +220,7 @@ namespace Orion.GameLogic
                 AlageneCost = 100,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new MoveSkill(14));
             builder.Skills.Add(new AttackSkill(2, 7, 1));
             Register(builder);
         }
@@ -230,6 +231,7 @@ namespace Orion.GameLogic
             {
                 Name = "OVNI",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 100,
                 MeleeArmor = 1,
@@ -238,7 +240,7 @@ namespace Orion.GameLogic
                 AlageneCost = 140,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(8, true));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(13, 8, 6));
             Register(builder);
         }
@@ -249,6 +251,7 @@ namespace Orion.GameLogic
             {
                 Name = "Tapis Volant",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 8,
                 MaxHealth = 75,
                 MeleeArmor = 1,
@@ -257,7 +260,7 @@ namespace Orion.GameLogic
                 AlageneCost = 50,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(10, true));
+            builder.Skills.Add(new MoveSkill(10));
             builder.Skills.Add(new TransportSkill(5));
             Register(builder);
         }
@@ -297,7 +300,7 @@ namespace Orion.GameLogic
                 AlageneCost = 90,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(9, false));
+            builder.Skills.Add(new MoveSkill(9));
             builder.Skills.Add(new AttackSkill(5, 3, 4));
             Register(builder);
         }
@@ -308,6 +311,7 @@ namespace Orion.GameLogic
             {
                 Name = "Jésus",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 8,
                 MaxHealth = 80,
                 MeleeArmor = 1,
@@ -316,7 +320,7 @@ namespace Orion.GameLogic
                 AlageneCost = 40,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new MoveSkill(14));
             builder.Skills.Add(new HealSkill(3,4));
             Register(builder);
         }
@@ -327,6 +331,7 @@ namespace Orion.GameLogic
             {
                 Name = "Flying Spaghetti Monster",
                 Size = new Size(3, 3),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 150,
                 MeleeArmor = 4,
@@ -335,7 +340,7 @@ namespace Orion.GameLogic
                 AlageneCost = 175,
                 FoodCost = 3
             };
-            builder.Skills.Add(new MoveSkill(2, true));
+            builder.Skills.Add(new MoveSkill(2));
             builder.Skills.Add(new AttackSkill(16, 5, 5));
             Register(builder);
         }
@@ -374,7 +379,7 @@ namespace Orion.GameLogic
                 AladdiumCost = 3000,
                 FoodCost = 5
             };
-            builder.Skills.Add(new MoveSkill(3, false));
+            builder.Skills.Add(new MoveSkill(3));
             builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Coke diète", 10, 400));
             Register(builder);
         }
@@ -392,7 +397,7 @@ namespace Orion.GameLogic
                 AlageneCost = 3000,
                 FoodCost = 5
             };
-            builder.Skills.Add(new MoveSkill(3, false));
+            builder.Skills.Add(new MoveSkill(3));
             builder.Skills.Add(new SuicideBombSkill(type => type.Name == "Mentos", 10, 400));
             Register(builder);
         }
@@ -474,12 +479,13 @@ namespace Orion.GameLogic
             {
                 Name = "Chuck Norris",
                 Size = new Size(4, 4),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 500,
                 MeleeArmor = 5,
                 RangedArmor = 5,
             };
-            builder.Skills.Add(new MoveSkill(20, true));
+            builder.Skills.Add(new MoveSkill(20));
             builder.Skills.Add(new AttackSkill(75, 0, 1));
             Register(builder);
         }
@@ -490,12 +496,13 @@ namespace Orion.GameLogic
             {
                 Name = "Mr T",
                 Size = new Size(4, 4),
+                IsAirborne = true,
                 SightRange = 20,
                 MaxHealth = 1000,
                 MeleeArmor = 10,
                 RangedArmor = 10,
             };
-            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new MoveSkill(15));
             builder.Skills.Add(new AttackSkill(50, 20, 1));
             Register(builder);
         }
@@ -514,7 +521,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(8, 0, 4));
             builder.Skills.Add(new HarvestSkill(5, 10));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding, 100));
@@ -535,7 +542,7 @@ namespace Orion.GameLogic
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new MoveSkill(8, false));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(16, 0, 3));
             Register(builder);
         }
@@ -554,7 +561,7 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(10, false));
+            builder.Skills.Add(new MoveSkill(10));
             builder.Skills.Add(new AttackSkill(10, 5, 2));
             Register(builder);
         }
@@ -573,7 +580,7 @@ namespace Orion.GameLogic
                 AlageneCost = 25,
                 FoodCost = 3
             };
-            builder.Skills.Add(new MoveSkill(6, false));
+            builder.Skills.Add(new MoveSkill(6));
             builder.Skills.Add(new AttackSkill(50, 0, 4));
             Register(builder);
         }
@@ -592,7 +599,7 @@ namespace Orion.GameLogic
                 AlageneCost = 75,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(9, false));
+            builder.Skills.Add(new MoveSkill(9));
             builder.Skills.Add(new AttackSkill(14, 3, 3));
             Register(builder);
         }
@@ -603,6 +610,7 @@ namespace Orion.GameLogic
             {
                 Name = "Jésus-Raptor",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 8,
                 MaxHealth = 200,
                 MeleeArmor = 2,
@@ -611,7 +619,7 @@ namespace Orion.GameLogic
                 AlageneCost = 40,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(14, true));
+            builder.Skills.Add(new MoveSkill(14));
             builder.Skills.Add(new AttackSkill(14, 0, 3));
             builder.Skills.Add(new HealSkill(2, 6));
             Register(builder);
@@ -623,6 +631,7 @@ namespace Orion.GameLogic
             {
                 Name = "Ta Mère",
                 Size = new Size(3, 3),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 300,
                 MeleeArmor = 4,
@@ -631,7 +640,7 @@ namespace Orion.GameLogic
                 AlageneCost = 175,
                 FoodCost = 3
             };
-            builder.Skills.Add(new MoveSkill(3, true));
+            builder.Skills.Add(new MoveSkill(3));
             builder.Skills.Add(new AttackSkill(50, 5, 4));
             Register(builder);
         }
@@ -642,6 +651,7 @@ namespace Orion.GameLogic
             {
                 Name = "Anthrax",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 9,
                 MaxHealth = 100,
                 MeleeArmor = 2,
@@ -650,7 +660,7 @@ namespace Orion.GameLogic
                 AlageneCost = 100,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new MoveSkill(15));
             builder.Skills.Add(new AttackSkill(5, 9, 1));
             Register(builder);
         }
@@ -661,6 +671,7 @@ namespace Orion.GameLogic
             {
                 Name = "Vaisseau Mère",
                 Size = new Size(3, 3),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 250,
                 MeleeArmor = 1,
@@ -669,7 +680,7 @@ namespace Orion.GameLogic
                 AlageneCost = 140,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(8, true));
+            builder.Skills.Add(new MoveSkill(8));
             builder.Skills.Add(new AttackSkill(13, 8, 8));
             Register(builder);
         }
@@ -680,6 +691,7 @@ namespace Orion.GameLogic
             {
                 Name = "Le Tapis d'Aladdin",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 8,
                 MaxHealth = 100,
                 MeleeArmor = 2,
@@ -688,7 +700,7 @@ namespace Orion.GameLogic
                 AlageneCost = 50,
                 FoodCost = 2
             };
-            builder.Skills.Add(new MoveSkill(15, true));
+            builder.Skills.Add(new MoveSkill(15));
             builder.Skills.Add(new TransportSkill(12));
             Register(builder);
         }
@@ -701,13 +713,14 @@ namespace Orion.GameLogic
             {
                 Name = "Métaschtroumpf",
                 Size = new Size(2, 2),
+                IsAirborne = true,
                 SightRange = 10,
                 MaxHealth = 1,
                 AladdiumCost = 0,
                 AlageneCost = 0,
                 FoodCost = 1
             };
-            builder.Skills.Add(new MoveSkill(20, true));
+            builder.Skills.Add(new MoveSkill(20));
             builder.Skills.Add(new BuildSkill(type => type.IsBuilding
                 && type.HasSkill<AttackSkill>()
                 && type.GetBaseStat(UnitStat.AlageneCost) == 0, 200));

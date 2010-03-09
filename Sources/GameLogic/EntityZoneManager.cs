@@ -15,19 +15,19 @@ namespace Orion.GameLogic
     public sealed class EntityZoneManager
     {
         #region Fields
+        /// <summary>
+        /// The width and height of zones, in tiles.
+        /// </summary>
+        private static readonly int ZoneSize = 8;
+
         private readonly Size worldSize;
         private readonly BufferPool<Entity> bufferPool;
 
         /// <summary>
         /// Holds the entity zones in use.
-        /// An entity can be in multiple of those if its bounding rectangle straddles two or more zones.
+        /// An entity can be in a single zone at a time, based on its center.
         /// </summary>
         private readonly PooledList<Entity>[,] zones;
-
-        /// <summary>
-        /// A temporary set that is reused between queries to avoid unnecessary allocations.
-        /// </summary>
-        private readonly HashSet<Entity> queryTempSet = new HashSet<Entity>();
         #endregion
 
         #region Constructors
@@ -35,7 +35,10 @@ namespace Orion.GameLogic
         {
             this.worldSize = worldSize;
             this.bufferPool = new BufferPool<Entity>(AllocateBuffer);
-            this.zones = new PooledList<Entity>[8, 8];
+
+            int zoneCountX = (worldSize.Width + ZoneSize - 1) / ZoneSize;
+            int zoneCountY = (worldSize.Height + ZoneSize - 1) / ZoneSize;
+            this.zones = new PooledList<Entity>[zoneCountX, zoneCountY];
             for (int x = 0; x < zones.GetLength(0); ++x)
                 for (int y = 0; y < zones.GetLength(1); ++y)
                     zones[x, y] = new PooledList<Entity>(bufferPool);
@@ -58,34 +61,14 @@ namespace Orion.GameLogic
         {
             get { return zones.GetLength(1); }
         }
-
-        /// <summary>
-        /// Gets the size of a zone, in world units.
-        /// </summary>
-        private Vector2 ZoneSize
-        {
-            get
-            {
-                return new Vector2(
-                    worldSize.Width / (float)ZoneCountX,
-                    worldSize.Height / (float)ZoneCountY);
-            }
-        }
         #endregion
 
         #region Methods
-        private Region GetZoneRegion(Rectangle rectangle)
+        private Point GetZonePoint(Vector2 point)
         {
-            Vector2 zoneSize = ZoneSize;
-
-            int minX = Clamp((int)(rectangle.MinX / zoneSize.X), 0, ZoneCountX - 1);
-            int minY = Clamp((int)(rectangle.MinY / zoneSize.Y), 0, ZoneCountY - 1);
-            int maxX = Clamp((int)Math.Ceiling(rectangle.MaxX / zoneSize.X), 0, ZoneCountX - 1);
-            int maxY = Clamp((int)Math.Ceiling(rectangle.MaxY / zoneSize.Y), 0, ZoneCountY - 1);
-
-            return Region.FromMinInclusiveMax(
-                new Point(minX, minY),
-                new Point(maxX, maxY));
+            int x = Clamp((int)point.X / ZoneSize, 0, ZoneCountX - 1);
+            int y = Clamp((int)point.Y / ZoneSize, 0, ZoneCountY - 1);
+            return new Point(x, y);
         }
 
         private int Clamp(int value, int inclusiveMin, int inclusiveMax)
@@ -100,110 +83,118 @@ namespace Orion.GameLogic
         /// Gets the <see cref="Entity"/>s which are in a given rectangular area.
         /// </summary>
         /// <param name="area">The area in which to check.</param>
-        /// <returns>A sequence of <see cref="Entity"/>s in that area.</returns>
+        /// <returns>A sequence of <see cref="Entity"/>s intersecting that area.</returns>
         public IEnumerable<Entity> Intersecting(Rectangle area)
         {
-            queryTempSet.Clear();
-            AddIntersectingToTempSet(area);
-            Entity[] entities = queryTempSet.ToArray();
-            queryTempSet.Clear();
-            return entities;
-        }
+            int minZoneX = Clamp((int)((area.MinX - Entity.MaxSize * 0.5f) / ZoneSize), 0, ZoneCountX - 1);
+            int minZoneY = Clamp((int)((area.MinY - Entity.MaxSize * 0.5f) / ZoneSize), 0, ZoneCountY - 1);
+            int inclusiveMaxZoneX = Clamp((int)((area.MaxX + Entity.MaxSize * 0.5f) / ZoneSize), 0, ZoneCountX - 1);
+            int inclusiveMaxZoneY = Clamp((int)((area.MaxY + Entity.MaxSize * 0.5f) / ZoneSize), 0, ZoneCountY - 1);
 
-        private void AddIntersectingToTempSet(Rectangle area)
-        {
-            Region zoneRegion = GetZoneRegion(area);
-            foreach (Point point in zoneRegion.Points)
+            for (int y = minZoneY; y <= inclusiveMaxZoneY; ++y)
             {
-                PooledList<Entity> zone = zones[point.X, point.Y];
-                for (int i = 0; i < zone.Count; ++i)
+                for (int x = minZoneX; x <= inclusiveMaxZoneX; ++x)
                 {
-                    Entity entity = zone[i];
-                    if (Rectangle.Intersects(area, entity.BoundingRectangle))
-                        queryTempSet.Add(entity);
+                    PooledList<Entity> zone = zones[x, y];
+                    for (int i = 0; i < zone.Count; ++i)
+                    {
+                        Entity entity = zone[i];
+                        if (Rectangle.Intersects(area, entity.BoundingRectangle))
+                            yield return entity;
+                    }
                 }
             }
         }
 
         public IEnumerable<Entity> Intersecting(Vector2 point)
         {
-            Vector2 zoneSize = ZoneSize;
-            int zoneX = Clamp((int)(point.X / zoneSize.X), 0, ZoneCountX - 1);
-            int zoneY = Clamp((int)(point.Y / zoneSize.Y), 0, ZoneCountY - 1);
-            PooledList<Entity> zone = zones[zoneX, zoneY];
-            for (int i = 0; i < zone.Count; ++i)
-            {
-                Entity entity = zone[i];
-                if (entity.BoundingRectangle.ContainsPoint(point))
-                    yield return entity;
-            }
+            Rectangle rectangle = new Rectangle(point.X, point.Y, float.Epsilon, float.Epsilon);
+            return Intersecting(rectangle);
         }
         #endregion
 
         #region Updating
-        #region Adding
+        /// <summary>
+        /// Adds an entity to the zone it belongs to.
+        /// Assumes the entity is not present.
+        /// </summary>
+        /// <param name="entity">The entity to be added.</param>
         public void Add(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            Region zoneRegion = GetZoneRegion(entity.BoundingRectangle);
-            Add(entity, zoneRegion);
+            Point zonePoint = GetZonePoint(entity.Center);
+            Add(entity, zonePoint);
         }
 
-        private void Add(Entity entity, Region zoneRegion)
+        private void Add(Entity entity, Point zonePoint)
         {
-            foreach (Point point in zoneRegion.Points)
-                AddToZone(point, entity);
-        }
+            var zone = zones[zonePoint.X, zonePoint.Y];
 
-        private void AddToZone(Point point, Entity entity)
-        {
-            PooledList<Entity> zone = zones[point.X, point.Y];
-            Debug.Assert(!zone.Contains(entity), "The zone already contains that entity.");
+#if DEBUG
+            // #if'd so Contains is not executed in release.
+            if (zone.Contains(entity))
+            {
+                Debug.Fail("The zone at {0} already contains the entity to be added, {1}."
+                    .FormatInvariant(zonePoint, entity));
+            }
+#endif
+
             zone.Add(entity);
         }
-        #endregion
 
-        #region Removing
+        /// <summary>
+        /// Removes an entity to the zone it belongs to.
+        /// Assumes the entity is present.
+        /// </summary>
+        /// <param name="entity">The entity to be removed.</param>
         public void Remove(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Remove(entity, entity.BoundingRectangle);
+            Remove(entity, entity.Center);
         }
 
-        public void Remove(Entity entity, Rectangle boundingRectangle)
+        /// <summary>
+        /// Removes an entity to the zone it belonged to when its center was at a given position.
+        /// </summary>
+        /// <param name="entity">The entity to be removed.</param>
+        /// <param name="center">The center of the entity to be removed.</param>
+        private void Remove(Entity entity, Vector2 center)
+        {
+            Point zonePoint = GetZonePoint(center);
+            Remove(entity, zonePoint);
+        }
+
+        private void Remove(Entity entity, Point zonePoint)
+        {
+            var zone = zones[zonePoint.X, zonePoint.Y];
+            bool wasRemoved = zone.Remove(entity);
+
+#if DEBUG
+            if (!wasRemoved)
+            {
+                Debug.Fail("The zone did not contain the entity to be removed, {0}."
+                    .FormatInvariant(entity));
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Updates the zone in which an entity is according to its old and new position.
+        /// </summary>
+        /// <param name="entity">The entity to be updated.</param>
+        /// <param name="oldCenter">The last entity center known to this manager.</param>
+        public void UpdateZone(Entity entity, Vector2 oldCenter)
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            Region zoneRegion = GetZoneRegion(boundingRectangle);
-            Remove(entity, zoneRegion);
-        }
+            Point oldZonePoint = GetZonePoint(oldCenter);
+            Point newZonePoint = GetZonePoint(entity.Center);
 
-        private void Remove(Entity entity, Region zoneRegion)
-        {
-            foreach (Point point in zoneRegion.Points)
-                RemoveFromZone(point, entity);
-        }
-
-        private void RemoveFromZone(Point point, Entity entity)
-        {
-            PooledList<Entity> zone = zones[point.X, point.Y];
-            Debug.Assert(zone.Contains(entity), "The zone does not contain that entity.");
-            zone.Remove(entity);
-        }
-        #endregion
-
-        public void UpdateZone(Entity entity, Vector2 oldPosition)
-        {
-            Rectangle oldBoundingRectangle = new Rectangle(oldPosition.X, oldPosition.Y,
-                entity.Size.Width, entity.Size.Height);
-            Region oldZoneRegion = GetZoneRegion(oldBoundingRectangle);
-            Region newZoneRegion = GetZoneRegion(entity.BoundingRectangle);
-
-            if (newZoneRegion != oldZoneRegion)
+            if (newZonePoint != oldZonePoint)
             {
-                Remove(entity, oldZoneRegion);
-                Add(entity, newZoneRegion);
+                Remove(entity, oldZonePoint);
+                Add(entity, newZonePoint);
             }
         }
         #endregion

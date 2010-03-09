@@ -473,7 +473,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Chuck Norris",
-                Size = new Size(5, 5),
+                Size = new Size(4, 4),
                 SightRange = 10,
                 MaxHealth = 500,
                 MeleeArmor = 5,
@@ -489,7 +489,7 @@ namespace Orion.GameLogic
             var builder = new UnitTypeBuilder
             {
                 Name = "Mr T",
-                Size = new Size(5, 5),
+                Size = new Size(4, 4),
                 SightRange = 20,
                 MaxHealth = 1000,
                 MeleeArmor = 10,

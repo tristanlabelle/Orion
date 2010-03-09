@@ -93,14 +93,10 @@ namespace Orion.Graphics
                     TrainTask train = (TrainTask)unit.TaskQueue[i];
                     Texture texture = gameGraphics.GetUnitTexture(train.TraineeType);
 
-                    Rectangle rect2 = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
-                    context.Fill(rect2, Colors.Black);
-                    context.Stroke(rect2, Colors.White);
-
-                    // Fills first rectangle with a character. 
-                    Rectangle rect = new Rectangle(firstStartingXPos, firstStartingYPos, 26, 26);
-                    context.Fill(rect, texture);
-                    context.Stroke(rect, unit.Faction.Color);
+                    Rectangle rect = new Rectangle(firstStartingXPos - 8, firstStartingYPos - 8, 40, 40);
+                    context.Fill(rect, Colors.Black);
+                    context.Fill(rect, texture, unit.Faction.Color);
+                    context.Stroke(rect, Colors.White);
 
                     // Draws a completion HealthBar
                     Rectangle healthRect = new Rectangle(152, 120, 186, 10);

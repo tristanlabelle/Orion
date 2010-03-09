@@ -80,7 +80,7 @@ namespace Orion.GameLogic
         #region Location/Size
         /// <summary>
         /// Gets the size of this <see cref="Entity"/>, in tiles.
-        /// This value is garantee to remain constant.
+        /// This value is garanteed to remain constant.
         /// </summary>
         public abstract Size Size { get; }
 
@@ -197,6 +197,8 @@ namespace Orion.GameLogic
 
         #region Static
         #region Methods
+        public static readonly int MaxSize = 4;
+
         public static Region GetGridRegion(Vector2 position, Size size)
         {
             Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));

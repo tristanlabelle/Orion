@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic.Skills;
+using System.Diagnostics;
 
 namespace Orion.GameLogic
 {
@@ -114,8 +115,8 @@ namespace Orion.GameLogic
             get { return size; }
             set
             {
-                Argument.EnsureStrictlyPositive(value.Width, "Size.Width");
-                Argument.EnsureStrictlyPositive(value.Height, "Size.Height");
+                Argument.EnsureWithin(value.Width, 0, Entity.MaxSize, "Size.Width");
+                Argument.EnsureWithin(value.Height, 0, Entity.MaxSize, "Size.Height");
                 this.size = value;
             }
         }

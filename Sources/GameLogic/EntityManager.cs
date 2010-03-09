@@ -334,7 +334,8 @@ namespace Orion.GameLogic
 
         private void CommitMove(Entity entity, Vector2 oldPosition)
         {
-            zoneManager.UpdateZone(entity, oldPosition);
+            Vector2 oldCenter = oldPosition + entity.BoundingRectangle.Extent;
+            zoneManager.UpdateZone(entity, oldCenter);
         }
 
         private void CommitRemove(Entity entity)

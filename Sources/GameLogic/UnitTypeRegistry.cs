@@ -62,6 +62,7 @@ namespace Orion.GameLogic
 
             RegisterTowerDefenseBuilder();
             RegisterTowerDefenseTower();
+            RegisterTowerDefenseTower2();
         }
         #endregion
 
@@ -734,10 +735,27 @@ namespace Orion.GameLogic
                 Name = "Generic Tower",
                 Size = new Size(3, 3),
                 SightRange = 7,
-                MaxHealth = 120,
+                MaxHealth = 1,
                 MeleeArmor = 0,
                 RangedArmor = 0,
-                AladdiumCost = 100,
+                AladdiumCost = 60,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new AttackSkill(15, 7, 2));
+            Register(builder);
+        }
+
+        private void RegisterTowerDefenseTower2()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Other Generic Tower",
+                Size = new Size(3, 3),
+                SightRange = 7,
+                MaxHealth = 1,
+                MeleeArmor = 0,
+                RangedArmor = 0,
+                AladdiumCost = 140,
                 AlageneCost = 0
             };
             builder.Skills.Add(new AttackSkill(30, 7, 2));

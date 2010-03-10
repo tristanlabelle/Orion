@@ -49,6 +49,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SpriteAnimation.cs" />
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />

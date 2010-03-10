@@ -17,18 +17,30 @@ namespace Orion.Graphics.Renderers
     public sealed class UnitsRenderer
     {
         #region Fields
+        #region Constants
+        private static readonly float fireSize = 2;
+        private static readonly float fireAlpha = 0.8f;
+        private static readonly float fireSecondsPerFrame = 0.04f;
+
+        /// <summary>
+        /// The health ratio below which buildings are on fire.
+        /// </summary>
+        private static readonly float fireHealthRatio = 0.5f;
+
         private static readonly Size miniatureUnitSize = new Size(3, 3);
 
-        private const float shadowAlpha = 0.3f;
-        private const float shadowDistance = 0.7f;
-        private const float shadowScaling = 0.6f;
+        private static readonly float shadowAlpha = 0.3f;
+        private static readonly float shadowDistance = 0.7f;
+        private static readonly float shadowScaling = 0.6f;
 
-        private const float meleeHitSpinTimeInSeconds = 0.25f;
-        private const float rangedShootTimeInSeconds = 0.25f;
-        private const float laserLength = 0.8f;
+        private static readonly float meleeHitSpinTimeInSeconds = 0.25f;
+        private static readonly float rangedShootTimeInSeconds = 0.25f;
+        private static readonly float laserLength = 0.8f;
+        #endregion
 
         private readonly Faction faction;
         private readonly GameGraphics gameGraphics;
+        private readonly SpriteAnimation fireAnimation;
         private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
         private readonly List<Ruin> ruins = new List<Ruin>();
         private readonly BuildingMemoryRenderer buildingMemoryRenderer;
@@ -44,6 +56,7 @@ namespace Orion.Graphics.Renderers
             
             this.faction = faction;
             this.gameGraphics = gameGraphics;
+            this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
 
             World.Updated += OnWorldUpdated;
@@ -147,8 +160,21 @@ namespace Orion.Graphics.Renderers
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
                 graphics.Fill(localRectangle, texture, unit.Faction.Color);
+            }
+
+            if (unit.IsBuilding)
+            {
                 if (unit.IsUnderConstruction)
-                    graphics.Fill(localRectangle, UnderConstructionTexture, Colors.White);
+                {
+                    graphics.Fill(unit.BoundingRectangle, UnderConstructionTexture, Colors.White);
+                }
+                else if (unit.Health / unit.MaxHealth < fireHealthRatio)
+                {
+                    float fireTime = simulationTimeInSeconds + (unit.Handle.Value * fireSecondsPerFrame);
+                    Texture fireTexture = fireAnimation.GetTextureFromTime(simulationTimeInSeconds);
+                    Rectangle fireRectangle = Rectangle.FromCenterSize(unit.Center, new Vector2(fireSize, fireSize));
+                    graphics.Fill(fireRectangle, fireTexture, new ColorRgba(1, 1, 1, fireAlpha));
+                }
             }
 
             if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);

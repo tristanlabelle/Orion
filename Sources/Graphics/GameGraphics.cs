@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
-using System.IO;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 
 namespace Orion.Graphics
 {
     /// <summary>
-    /// Central point of access to game graphics. Used for rendering and resource creating.
+    /// Central point of access to game graphics. Used for rendering and resource creation.
     /// </summary>
     public sealed class GameGraphics : IDisposable
     {
         #region Fields
         private readonly GraphicsContext graphicsContext;
         private readonly TextureManager textureManager;
+        private readonly SpriteAnimation fireAnimation;
         #endregion
 
         #region Constructors
@@ -37,6 +38,16 @@ namespace Orion.Graphics
         public GraphicsContext GraphicsContext
         {
             get { return graphicsContext; }
+        }
+
+        public TextureManager TextureManager
+        {
+            get { return textureManager; }
+        }
+
+        public Texture DefaultTexture
+        {
+            get { return textureManager.Get("Default"); }
         }
         #endregion
 
@@ -135,7 +146,7 @@ namespace Orion.Graphics
         {
             Texture texture = textureManager.Get(name);
             if (texture == textureManager.DefaultTexture)
-                texture = textureManager.Get("Default");
+                texture = DefaultTexture;
             return texture;
         }
 

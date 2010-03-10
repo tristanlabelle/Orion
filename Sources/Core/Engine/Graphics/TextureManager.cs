@@ -49,6 +49,14 @@ namespace Orion.Engine.Graphics
         {
             get { return defaultTexture; }
         }
+
+        /// <summary>
+        /// Gets the base directory from which textures are loaded.
+        /// </summary>
+        public DirectoryInfo Directory
+        {
+            get { return directory; }
+        }
         #endregion
 
         #region Methods

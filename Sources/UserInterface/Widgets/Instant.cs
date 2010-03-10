@@ -52,7 +52,7 @@ namespace Orion.UserInterface.Widgets
 
         public static void Prompt(Responder parent, string message, Action<string> onClose)
         {
-            Prompt(parent, message, "", onClose);
+            Prompt(parent, message, string.Empty, onClose);
         }
 
         public static void Prompt(Responder parent, string message, string defaultValue, Action<string> onClose)

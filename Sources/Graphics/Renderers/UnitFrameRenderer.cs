@@ -27,7 +27,7 @@ namespace Orion.Graphics
             UnitStat.MovementSpeed, UnitStat.SightRange
         };
         private static readonly Dictionary<UnitStat, string> statNames = new Dictionary<UnitStat, string>();
-        private const float firstLineY = 160;
+        private const float firstLineY = 180;
 
         private readonly Unit unit;
         private readonly GameGraphics gameGraphics;
@@ -128,6 +128,7 @@ namespace Orion.Graphics
                     y -= hp.Frame.Height;
                 }
             }
+
             base.Draw(context, bounds);
         }
 

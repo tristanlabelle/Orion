@@ -179,7 +179,7 @@ namespace Orion.Audio
             UnitType unitType = SelectedUnitType;
             if (unitType == null) return;
 
-            string commandName = args.GetType().Name.Replace("Command", "");
+            string commandName = args.GetType().Name.Replace("Command", string.Empty);
             PlayUnitVoice(unitType, commandName);
         }
 

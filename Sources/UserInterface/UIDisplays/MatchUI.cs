@@ -550,7 +550,7 @@ namespace Orion.UserInterface
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
             selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, gameGraphics);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
-            Button unitButton = new Button(new Rectangle(10, 10, 130, 175), "", buttonRenderer);
+            Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
 
@@ -571,7 +571,7 @@ namespace Orion.UserInterface
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
                 renderer.HasFocus = (unit.Type == SelectionManager.SelectedUnitType);
-                Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), "", renderer);
+                Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), string.Empty, renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
                 unitButton.Triggered += OnUnitButtonPressed;

@@ -390,6 +390,20 @@ namespace Orion.Matchmaking
             return true;
         }
 
+        /// <summary>
+        /// Gets a value indicating if a selection group contains a unit.
+        /// </summary>
+        /// <param name="unit">The unit to be found.</param>
+        /// <param name="index">The index of the selection group in which to look.</param>
+        /// <returns>True if the unit is in that selection group, false if not.</returns>
+        public bool IsInSelectionGroup(Unit unit, int index)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureWithin(index, 0, SelectionGroupCount - 1, "index");
+
+            return selectionGroups[index].Contains(unit);
+        }
+
         private void ValidateGroupIndex(int index)
         {
             if (index < 0 || index >= selectionGroups.Length)

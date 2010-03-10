@@ -20,7 +20,7 @@ namespace Orion.UserInterface.Widgets
 
         #region Constructors
         public Button(Rectangle frame)
-            : this(frame, "", new FilledFrameRenderer())
+            : this(frame, string.Empty, new FilledFrameRenderer())
         { }
 
         public Button(Rectangle frame, string caption)

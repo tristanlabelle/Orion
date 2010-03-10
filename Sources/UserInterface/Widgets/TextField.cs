@@ -23,7 +23,7 @@ namespace Orion.UserInterface.Widgets
         public TextField(Rectangle frame)
             : base(frame)
         {
-            contents = new Text("");
+            contents = new Text(string.Empty);
         }
         #endregion
 
@@ -45,7 +45,7 @@ namespace Orion.UserInterface.Widgets
         #region Methods
         public void Clear()
         {
-            contents = new Text("");
+            contents = new Text(string.Empty);
         }
 
         protected override bool OnKeyPress(char arg)

@@ -15,7 +15,7 @@ namespace Orion.UserInterface.Widgets
         public Label(Rectangle frame)
             : base(frame)
         {
-            Text = new Text("");
+            Text = new Text(string.Empty);
         }
 
         public Label(Rectangle frame, string caption)

@@ -147,7 +147,7 @@ namespace Orion.Audio
         {
             explosionInCurrentFrame = false;
 
-            if (step.TimeInSeconds > 0.5f)
+            if (!isGameStarted && step.TimeInSeconds > 0.5f)
             {
                 isGameStarted = true;
 

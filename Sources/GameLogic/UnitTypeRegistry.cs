@@ -45,6 +45,7 @@ namespace Orion.GameLogic
             RegisterWatchTower();
             RegisterAlageneExtractor();
             RegisterSupplyDepot();
+            RegisterGrenary();
 
             RegisterChuckNorris();
             RegisterMrT();
@@ -469,6 +470,23 @@ namespace Orion.GameLogic
                 AlageneCost = 0
             };
             builder.Skills.Add(new StoreFoodSkill(10));
+            Register(builder);
+        }
+
+        private void RegisterGrenary()
+        {
+            var builder = new UnitTypeBuilder
+            {
+                Name = "Le Costco des Hells",
+                Size = new Size(2, 2),
+                SightRange = 4,
+                MaxHealth = 100,
+                MeleeArmor = 2,
+                RangedArmor = 2,
+                AladdiumCost = 80,
+                AlageneCost = 0
+            };
+            builder.Skills.Add(new StoreResourcesSkill());
             Register(builder);
         }
         #endregion

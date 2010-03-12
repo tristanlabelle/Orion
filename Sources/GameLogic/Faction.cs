@@ -22,9 +22,9 @@ namespace Orion.GameLogic
         private const int maxFoodAmount = 200;
         public static ColorRgb[] Colors = new ColorRgb[]
         {
-            ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Pink, ColorPalette.Orange,
-            ColorPalette.Green, ColorPalette.Yellow, ColorPalette.Gray, ColorPalette.DarkBlue,
-            ColorPalette.Lime, ColorPalette.Purple, ColorPalette.White, ColorPalette.Chocolate
+            ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Magenta, ColorPalette.Orange,
+            ColorPalette.Green, ColorPalette.Yellow, ColorPalette.Gray, ColorPalette.Blue,
+            ColorPalette.Lime, ColorPalette.Indigo, ColorPalette.White, ColorPalette.Chocolate
         };
 
         private readonly Handle handle;

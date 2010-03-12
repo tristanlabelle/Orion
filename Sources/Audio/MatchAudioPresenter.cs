@@ -151,7 +151,7 @@ namespace Orion.Audio
             {
                 isGameStarted = true;
 
-                if (uiCommander.Faction.Color == Colors.Pink)
+                if (uiCommander.Faction.Color == Colors.Magenta)
                 {
                     Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
                     if (sound == null) return;

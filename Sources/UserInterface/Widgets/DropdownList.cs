@@ -50,7 +50,7 @@ namespace Orion.UserInterface.Widgets
 
             protected internal override void Draw(GraphicsContext graphicsContext)
             {
-                ColorRgba fillColor = new ColorRgba(Colors.Blue, parent.Enabled ? 1 : 0.25f);
+                ColorRgba fillColor = new ColorRgba(Colors.DarkSlateGray, parent.Enabled ? 1 : 0.25f);
                 graphicsContext.Fill(Bounds, fillColor);
 
                 if (IsMouseOver && parent.selectedItem != this)

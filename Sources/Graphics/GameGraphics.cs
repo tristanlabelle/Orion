@@ -17,7 +17,6 @@ namespace Orion.Graphics
         #region Fields
         private readonly GraphicsContext graphicsContext;
         private readonly TextureManager textureManager;
-        private readonly SpriteAnimation fireAnimation;
         #endregion
 
         #region Constructors

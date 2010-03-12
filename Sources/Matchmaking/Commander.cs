@@ -51,9 +51,9 @@ namespace Orion.Matchmaking
 
         /// <summary>
         /// Gets the <see cref="World"/> of the <see cref="Faction"/>
-        /// which  is controlled by this <see cref="Commander"/>.
+        /// which is controlled by this <see cref="Commander"/>.
         /// </summary>
-        protected World World
+        public World World
         {
             get { return faction.World; }
         }

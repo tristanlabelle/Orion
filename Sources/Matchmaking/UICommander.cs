@@ -38,11 +38,6 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Properties
-        public World World
-        {
-            get { return Faction.World; }
-        }
-
         public SelectionManager SelectionManager
         {
             get { return selectionManager; }

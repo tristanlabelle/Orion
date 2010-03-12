@@ -6,7 +6,7 @@ using Orion.Geometry;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class UnitButtonRenderer : FrameRenderer
+    public sealed class UnitButtonRenderer : IRenderer
     {
         #region Fields
         private static readonly ColorRgb FocusedStrokeColor = Colors.White;
@@ -21,7 +21,6 @@ namespace Orion.Graphics.Renderers
 
         #region Constructors
         public UnitButtonRenderer(Unit unit, GameGraphics gameGraphics)
-            : base(unit.Faction.Color)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
@@ -54,7 +53,7 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             context.Fill(bounds, FillColor);
             context.Stroke(bounds, StrokeColor);

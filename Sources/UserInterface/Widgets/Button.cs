@@ -27,7 +27,7 @@ namespace Orion.UserInterface.Widgets
             : this(frame, caption, new FilledFrameRenderer())
         { }
 
-        public Button(Rectangle frame, string caption, FrameRenderer renderer)
+        public Button(Rectangle frame, string caption, IRenderer renderer)
             : base(frame, renderer)
         {
             this.caption = new Label(caption);

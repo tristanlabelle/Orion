@@ -22,7 +22,7 @@ namespace Orion.Audio
         #region Fields
         private readonly SoundContext soundContext;
         private readonly Match match;
-        private readonly UserInputManager userInputManager;
+        private readonly UICommander uiCommander;
         private readonly SoundSource voicesSoundSource;
         private readonly UnderAttackWarningProvider underAttackWarningProvider;
 
@@ -41,35 +41,35 @@ namespace Orion.Audio
         #endregion
 
         #region Constructors
-        public MatchAudioPresenter(SoundContext audioContext, Match match, UserInputManager userInputManager)
+        public MatchAudioPresenter(SoundContext audioContext, Match match, UICommander uiCommander)
         {
             Argument.EnsureNotNull(audioContext, "audioContext");
             Argument.EnsureNotNull(match, "match");
-            Argument.EnsureNotNull(userInputManager, "userInputManager");
+            Argument.EnsureNotNull(uiCommander, "uiCommander");
 
             this.match = match;
             this.soundContext = audioContext;
-            this.userInputManager = userInputManager;
+            this.uiCommander = uiCommander;
 
             this.voicesSoundSource = audioContext.CreateSource();
             this.voicesSoundSource.Volume = 0.8f;
 
-            this.underAttackWarningProvider = new UnderAttackWarningProvider(userInputManager.LocalFaction);
+            this.underAttackWarningProvider = new UnderAttackWarningProvider(uiCommander.Faction);
             this.underAttackWarningProvider.UnderAttack += OnUnderAttackWarning;
 
             this.match.World.Entities.Added += OnEntityAdded;
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
             this.match.World.ExplosionOccured += OnExplosionOccured;
-            this.userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
-            this.userInputManager.LocalCommander.CommandGenerated += OnCommandGenerated;
+            this.uiCommander.SelectionManager.SelectionChanged += OnSelectionChanged;
+            this.uiCommander.CommandGenerated += OnCommandGenerated;
         }
         #endregion
 
         #region Properties
         private SelectionManager SelectionManager
         {
-            get { return userInputManager.SelectionManager; }
+            get { return uiCommander.SelectionManager; }
         }
 
         private IEnumerable<Unit> SelectedUnits
@@ -79,7 +79,7 @@ namespace Orion.Audio
 
         private Faction LocalFaction
         {
-            get { return userInputManager.LocalFaction; }
+            get { return uiCommander.Faction; }
         }
 
         private World World
@@ -151,7 +151,7 @@ namespace Orion.Audio
             {
                 isGameStarted = true;
 
-                if (userInputManager.LocalFaction.Color == Colors.Pink)
+                if (uiCommander.Faction.Color == Colors.Pink)
                 {
                     Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
                     if (sound == null) return;
@@ -173,7 +173,7 @@ namespace Orion.Audio
 
         private void OnCommandGenerated(Commander sender, Command args)
         {
-            Debug.Assert(sender == userInputManager.LocalCommander);
+            Debug.Assert(sender == uiCommander);
             Debug.Assert(args != null);
 
             UnitType unitType = SelectedUnitType;

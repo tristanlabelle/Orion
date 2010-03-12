@@ -11,31 +11,31 @@ namespace Orion.Matchmaking
     public abstract class UserInputCommand
     {
         #region Fields
-        private readonly UserInputManager inputManager;
+        private readonly UICommander uiCommander;
         #endregion
 
         #region Constructors
-        protected UserInputCommand(UserInputManager inputManager)
+        protected UserInputCommand(UICommander uiCommander)
         {
-            Argument.EnsureNotNull(inputManager, "inputManager");
-            this.inputManager = inputManager;
+            Argument.EnsureNotNull(uiCommander, "uiCommander");
+            this.uiCommander = uiCommander;
         }
         #endregion
 
         #region Properties
-        protected UserInputManager InputManager
+        protected UICommander InputManager
         {
-            get { return inputManager; }
+            get { return uiCommander; }
         }
 
         protected World World
         {
-            get { return inputManager.World; }
+            get { return uiCommander.World; }
         }
 
         protected Faction LocalFaction
         {
-            get { return inputManager.LocalFaction; }
+            get { return uiCommander.Faction; }
         }
         #endregion
 

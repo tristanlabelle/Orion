@@ -17,10 +17,10 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Constructors
-        public MoveEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
-            : base(inputManager, actionFrame, gameGraphics)
+        public MoveEnabler(UICommander uiCommander, ActionFrame actionFrame, GameGraphics gameGraphics)
+            : base(uiCommander, actionFrame, gameGraphics)
         {
-            userCommand = new MoveUserCommand(inputManager);
+            userCommand = new MoveUserCommand(uiCommander);
         }
         #endregion
 
@@ -29,15 +29,15 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Move", Keys.M, gameGraphics);
+            ActionButton button = new ActionButton(actionFrame, uiCommander, "Move", Keys.M, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Move");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.SelectedCommand = userCommand;
-                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
+                uiCommander.SelectedCommand = userCommand;
+                actionFrame.Push(new CancelActionProvider(actionFrame, uiCommander, gameGraphics));
             };
 
             buttonsArray[0, 3] = button;

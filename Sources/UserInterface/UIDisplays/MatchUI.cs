@@ -55,7 +55,7 @@ namespace Orion.UserInterface
         private readonly GameGraphics gameGraphics;
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly UserInputManager userInputManager;
+        private readonly UICommander uiCommander;
         private readonly SoundContext audioContext;
         private readonly MatchAudioRenderer matchAudioRenderer;
         private readonly ActionFrame actions;
@@ -66,23 +66,23 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public MatchUI(GameGraphics gameGraphics, Match match, SlaveCommander localCommander)
+        public MatchUI(GameGraphics gameGraphics, Match match, UICommander uiCommander)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             Argument.EnsureNotNull(match, "match");
-            Argument.EnsureNotNull(localCommander, "localCommander");
+            Argument.EnsureNotNull(uiCommander, "uiCommander");
 
             this.match = match;
             this.match.Quitting += Quit;
-            this.userInputManager = new UserInputManager(localCommander);
+            this.uiCommander = uiCommander;
 
             this.audioContext = new SoundContext();
-            this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.userInputManager);
+            this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.uiCommander);
 
             this.gameGraphics = gameGraphics;
             World world = match.World;
 
-            matchRenderer = new MatchRenderer(userInputManager, gameGraphics, match.CreepPath);
+            matchRenderer = new MatchRenderer(uiCommander, gameGraphics, match.CreepPath);
 
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
@@ -93,7 +93,7 @@ namespace Orion.UserInterface
             matchAudioRenderer.SetViewBounds(worldView.Bounds);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalCommander.Faction);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, uiCommander.Faction);
             Children.Add(resourceDisplay);
 
             Rectangle pauseButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.69f, 0), new Vector2(0.84f, 1));
@@ -160,23 +160,23 @@ namespace Orion.UserInterface
             pausePanel.Children.Add(quitGame);
             pausePanel.Children.Add(resumeGame);
 
-            KeyDown += userInputManager.HandleKeyDown;
-            KeyUp += userInputManager.HandleKeyUp;
+            KeyDown += uiCommander.HandleKeyDown;
+            KeyUp += uiCommander.HandleKeyUp;
 
-            userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
-            userInputManager.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
-            localCommander.CommandGenerated += OnCommanderGeneratedCommand;
+            uiCommander.SelectionManager.SelectionChanged += OnSelectionChanged;
+            uiCommander.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
+            uiCommander.CommandGenerated += OnCommanderGeneratedCommand;
             minimapFrame.MouseDown += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
-            enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new AttackEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new StandGuardEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new BuildEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new HarvestEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new TrainEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new HealEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new ResearchEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new MoveEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new AttackEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new StandGuardEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new BuildEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new HarvestEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new TrainEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new HealEnabler(uiCommander, actions, gameGraphics));
+            enablers.Add(new ResearchEnabler(uiCommander, actions, gameGraphics));
 
             workerActivityMonitor = new WorkerActivityMonitor(LocalFaction);
             workerActivityMonitor.WorkerActivityStateChanged += OnWorkerActivityStateChanged;
@@ -205,17 +205,12 @@ namespace Orion.UserInterface
 
         private SelectionManager SelectionManager
         {
-            get { return userInputManager.SelectionManager; }
-        }
-
-        private SlaveCommander LocalCommander
-        {
-            get { return userInputManager.LocalCommander; }
+            get { return uiCommander.SelectionManager; }
         }
 
         private Faction LocalFaction
         {
-            get { return LocalCommander.Faction; }
+            get { return uiCommander.Faction; }
         }
 
         private World World
@@ -305,20 +300,20 @@ namespace Orion.UserInterface
             }
             else
             {
-                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
+                IEnumerable<Unit> selectedUnits = uiCommander.SelectionManager.SelectedUnits;
                 if (selectedUnits.Count() == 1)
                 {
                     Unit selectedUnit = selectedUnits.First();
                     if (inactiveWorkers.Contains(selectedUnit))
                     {
                         int nextIndex = (inactiveWorkers.IndexOf(selectedUnit) + 1) % inactiveWorkers.Count();
-                        userInputManager.SelectionManager.SetSelection(inactiveWorkers.ElementAt(nextIndex));
+                        uiCommander.SelectionManager.SetSelection(inactiveWorkers.ElementAt(nextIndex));
                         CenterOnSelection();
                         return;
                     }
                 }
 
-                userInputManager.SelectionManager.SetSelection(inactiveWorkers.First());
+                uiCommander.SelectionManager.SetSelection(inactiveWorkers.First());
                 CenterOnSelection();
             }
         }
@@ -335,7 +330,7 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position))
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                uiCommander.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
 
             return base.OnMouseDown(args);
@@ -346,11 +341,11 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                uiCommander.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
             else
             {
-                userInputManager.HoveredUnit = null;
+                uiCommander.HoveredUnit = null;
             }
 
             return base.OnMouseMove(args);
@@ -359,7 +354,7 @@ namespace Orion.UserInterface
         protected override bool OnMouseUp(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            uiCommander.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             mouseDownOnMinimap = false;
             return base.OnMouseUp(args);
         }
@@ -367,12 +362,8 @@ namespace Orion.UserInterface
         private void SendMessage(TextField chatInput)
         {
             string text = chatInput.Contents;
-            if (text.Length > 0)
-            {
-                SlaveCommander commander = userInputManager.LocalCommander;
-                commander.SendMessage(chatInput.Contents);
-            }
-
+            if (text.Length > 0) uiCommander.SendMessage(chatInput.Contents);
+  
             Children.Remove(chatInput);
         }
 
@@ -416,7 +407,7 @@ namespace Orion.UserInterface
         protected override bool OnDoubleClick(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDoubleClick(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            uiCommander.HandleMouseDoubleClick(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             return base.OnDoubleClick(args);
         }
 
@@ -454,7 +445,7 @@ namespace Orion.UserInterface
             if (worldView.IsMouseOver)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, worldView.MousePosition.Value);
-                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
+                uiCommander.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
             }
         }
 
@@ -462,9 +453,9 @@ namespace Orion.UserInterface
         {
             if (args.ButtonPressed == MouseButton.Left)
             {
-                if (userInputManager.SelectedCommand != null)
+                if (uiCommander.SelectedCommand != null)
                 {
-                    userInputManager.LaunchMouseCommand(args.Position);
+                    uiCommander.LaunchMouseCommand(args.Position);
                 }
                 else
                 {
@@ -474,7 +465,7 @@ namespace Orion.UserInterface
             }
             else if (args.ButtonPressed == MouseButton.Right)
             {
-                userInputManager.LaunchDefaultCommand(args.Position);
+                uiCommander.LaunchDefaultCommand(args.Position);
             }
         }
 
@@ -510,7 +501,7 @@ namespace Orion.UserInterface
             {
                 if (LocalFaction.GetDiplomaticStance(pair.Key) != pair.Value.SelectedItem)
                 {
-                    LocalCommander.LaunchChangeDiplomacy(pair.Key);
+                    uiCommander.LaunchChangeDiplomacy(pair.Key);
                 }
             }
 
@@ -547,8 +538,8 @@ namespace Orion.UserInterface
 
         private void CreateSingleUnitSelectionPanel()
         {
-            Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, gameGraphics);
+            Unit unit = uiCommander.SelectionManager.SelectedUnits.First();
+            selectionFrame.Renderer = new UnitFrameRenderer(uiCommander.Faction, unit, gameGraphics);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
@@ -567,7 +558,7 @@ namespace Orion.UserInterface
                 selectionFrame.Bounds.Height / 2.2f - paddingY * 2);
             float currentX = paddingX + selectionFrame.Bounds.MinX;
             float currentY = selectionFrame.Bounds.Height - paddingY - frame.Height;
-            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
+            foreach (Unit unit in uiCommander.SelectionManager.SelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
                 renderer.HasFocus = (unit.Type == SelectionManager.SelectedUnitType);

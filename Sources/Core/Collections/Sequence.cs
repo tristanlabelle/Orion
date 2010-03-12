@@ -13,6 +13,11 @@ namespace Orion.Collections
     {
         #region Methods
         #region None
+        public static bool None<T>(this IEnumerable<T> sequence)
+        {
+            return !Enumerable.Any(sequence);
+        }
+
         public static bool None<T>(this IEnumerable<T> sequence, Func<T, bool> predicate)
         {
             return !Enumerable.Any(sequence, predicate);

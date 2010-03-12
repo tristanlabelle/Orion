@@ -26,7 +26,7 @@ namespace Orion.Main
             get { return null; }
         }
 
-        public override void Start(out Match match, out SlaveCommander localCommander)
+        public override void Start(out Match match, out UICommander uiCommander)
         {
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(Seed));
             random = new MersenneTwister(Seed);
@@ -39,7 +39,7 @@ namespace Orion.Main
             localFaction.AlageneAmount = 0;
             localFaction.LocalFogOfWar.Disable();
             localFaction.CreateUnit(world.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
-            localCommander = new SlaveCommander(localFaction);
+            uiCommander = new UICommander(localFaction);
             
             Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
             Commander creepCommander = new CreepWaveCommander(creepFaction, creepPath);
@@ -60,7 +60,7 @@ namespace Orion.Main
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.AddCommander(localCommander);
+            pipeline.AddCommander(uiCommander);
             pipeline.AddCommander(creepCommander);
 
             match.Updated += (sender, args) =>

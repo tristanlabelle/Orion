@@ -42,7 +42,7 @@ namespace Orion.Matchmaking
             if (Faction.Status == FactionStatus.Defeated)
                 return;
 
-            if (!initialized && Faction.Units.Count() > 0)
+            if (!initialized && Faction.Units.Any())
             {
                 Initialize();
             }

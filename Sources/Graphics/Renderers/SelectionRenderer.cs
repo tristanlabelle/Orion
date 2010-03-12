@@ -17,7 +17,7 @@ namespace Orion.Graphics
         private static readonly ColorRgba selectionRectangleStrokeColor = ColorRgba.FromBytes(51, 153, 255);
         private static readonly ColorRgba selectionRectangleFillColor = ColorRgba.FromBytes(51, 153, 255, 100);
 
-        private readonly UserInputManager userInputManager;
+        private readonly UICommander uiCommander;
         #endregion
 
         #region Constructors
@@ -29,22 +29,22 @@ namespace Orion.Graphics
         /// <param name="selectionManager">
         /// The <see cref="SelectionManager"/> which provides selection information.
         /// </param>
-        public SelectionRenderer(UserInputManager manager)
+        public SelectionRenderer(UICommander manager)
         {
             Argument.EnsureNotNull(manager, "manager");
-            userInputManager = manager;
+            uiCommander = manager;
         }
         #endregion
 
         #region Properties
         private SelectionManager SelectionManager
         {
-            get { return userInputManager.SelectionManager; }
+            get { return uiCommander.SelectionManager; }
         }
 
         private Faction Faction
         {
-            get { return userInputManager.LocalCommander.Faction; }
+            get { return uiCommander.Faction; }
         }
         #endregion
 
@@ -80,9 +80,9 @@ namespace Orion.Graphics
         {
             Argument.EnsureNotNull(graphics, "graphics");
             
-            if (userInputManager.SelectionRectangle.HasValue)
+            if (uiCommander.SelectionRectangle.HasValue)
             {
-                Rectangle selectionRectangle = userInputManager.SelectionRectangle.Value;
+                Rectangle selectionRectangle = uiCommander.SelectionRectangle.Value;
                 graphics.Stroke(selectionRectangle, selectionRectangleStrokeColor);
                 graphics.Fill(selectionRectangle, selectionRectangleFillColor);
             }

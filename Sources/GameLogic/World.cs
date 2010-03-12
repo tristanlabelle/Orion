@@ -254,6 +254,14 @@ namespace Orion.GameLogic
             return region.Contains(point);
         }
 
+        public Vector2 ClampWithinSafeBounds(Vector2 point)
+        {
+            point = Bounds.Clamp(point);
+            if (point.X >= Size.Width) point.X = Size.Width - 0.0001f;
+            if (point.Y >= Size.Height) point.Y = Size.Height - 0.0001f;
+            return point;
+        }
+
         /// <summary>
         /// Gets the coordinates of the tile on which a point is, clamped within this <see cref="World"/>'s bounds.
         /// </summary>

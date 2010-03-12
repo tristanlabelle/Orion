@@ -36,11 +36,11 @@ namespace Orion.Main
         protected abstract void Received(SafeTransporter source, NetworkEventArgs args);
         protected abstract void ExitGame(MatchConfigurationUI ui);
 
-        public override void Start(out Match match, out SlaveCommander localCommander)
+        public override void Start(out Match match, out UICommander uiCommander)
         {
             CreateWorld(UserInterface.MapSize);
 
-            localCommander = null;
+            uiCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             List<FactionEndPoint> peers = new List<FactionEndPoint>();
             int colorIndex = 0;
@@ -55,7 +55,7 @@ namespace Orion.Main
 
                 if (slot is LocalPlayerSlot)
                 {
-                    localCommander = new SlaveCommander(faction);
+                    uiCommander = new UICommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
@@ -85,7 +85,7 @@ namespace Orion.Main
             pipeline.PushFilter(new CommandSynchronizer(match, transporter, peers));
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));
-            pipeline.AddCommander(localCommander);
+            pipeline.AddCommander(uiCommander);
 
             match.Updated += (sender, args) =>
                 pipeline.Update(sender.LastSimulationStepNumber, args.TimeDeltaInSeconds);

@@ -12,7 +12,7 @@ namespace Orion.Graphics.Renderers
     public sealed class MatchRenderer : IRenderer, IDisposable
     {
         #region Fields
-        private readonly UserInputManager inputManager;
+        private readonly UICommander uiCommander;
         private readonly GameGraphics gameGraphics;
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
@@ -27,15 +27,15 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics, CreepPath creepPath)
+        public MatchRenderer(UICommander uiCommander, GameGraphics gameGraphics, CreepPath creepPath)
         {
-            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(uiCommander, "uiCommander");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            this.inputManager = inputManager;
+            this.uiCommander = uiCommander;
             this.gameGraphics = gameGraphics;
-            this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics, creepPath);
+            this.selectionRenderer = new SelectionRenderer(uiCommander);
+            this.worldRenderer = new WorldRenderer(uiCommander.Faction, gameGraphics, creepPath);
             this.minimap = new MinimapRenderer(worldRenderer);
 
             World world = Faction.World;
@@ -63,12 +63,12 @@ namespace Orion.Graphics.Renderers
 
         private SelectionManager SelectionManager
         {
-            get { return inputManager.SelectionManager; }
+            get { return uiCommander.SelectionManager; }
         }
 
         private Faction Faction
         {
-            get { return inputManager.LocalCommander.Faction; }
+            get { return uiCommander.Faction; }
         }
         #endregion
 
@@ -86,13 +86,13 @@ namespace Orion.Graphics.Renderers
                 worldRenderer.DrawUnits(context, bounds);
                 selectionRenderer.DrawSelectionMarkers(context);
 
-                if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
-                    HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
+                if (uiCommander.HoveredUnit != null && Faction.CanSee(uiCommander.HoveredUnit))
+                    HealthBarRenderer.Draw(context, uiCommander.HoveredUnit);
 
                 worldRenderer.DrawExplosions(context, bounds);
                 worldRenderer.DrawFogOfWar(context, bounds);
 
-                IRenderer selectedCommandRenderer = inputManager.SelectedCommand as IRenderer;
+                IRenderer selectedCommandRenderer = uiCommander.SelectedCommand as IRenderer;
                 if (selectedCommandRenderer != null)
                     selectedCommandRenderer.Draw(context, bounds);
             }

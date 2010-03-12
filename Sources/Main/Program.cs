@@ -70,9 +70,9 @@ namespace Orion.Main
         {
             MatchConfigurer replayConfigurer = new ReplayMatchConfigurer("Replays/" + fileName);
             Match match;
-            SlaveCommander localCommander;
-            replayConfigurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
+            UICommander uiCommander;
+            replayConfigurer.Start(out match, out uiCommander);
+            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, uiCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -166,9 +166,9 @@ namespace Orion.Main
                 gameUI.RootView.PopDisplay(matchConfigurationUI);
 
             Match match;
-            SlaveCommander localCommander;
-            configurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
+            UICommander uiCommander;
+            configurer.Start(out match, out uiCommander);
+            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, uiCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
@@ -177,8 +177,8 @@ namespace Orion.Main
             gameUI.Display(matchUI);
             match.Start();
 
-            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
-                ?? localCommander.Faction.Units.FirstOrDefault();
+            Unit viewTarget = uiCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+                ?? uiCommander.Faction.Units.FirstOrDefault();
             if (viewTarget != null) matchUI.CenterOn(viewTarget.Center);
         }
 

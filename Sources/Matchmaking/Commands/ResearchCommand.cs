@@ -10,6 +10,9 @@ using Orion.GameLogic.Tasks;
 
 namespace Orion.Matchmaking.Commands
 {
+    /// <summary>
+    /// A command which causes a technology research to be initiated.
+    /// </summary>
     public sealed class ResearchCommand : Command
     {
         #region Fields
@@ -18,18 +21,15 @@ namespace Orion.Matchmaking.Commands
         #endregion
 
         #region Constructors
-
-        public ResearchCommand(Handle researcherHandle, Handle factionHandle, Handle technologyHandle)
-            :base(factionHandle)
+        public ResearchCommand(Handle factionHandle, Handle researcherHandle, Handle technologyHandle)
+            : base(factionHandle)
         {
             this.researcherHandle = researcherHandle;
             this.technologyHandle = technologyHandle;
         }
-
         #endregion
 
         #region Methods
-
         public override bool ValidateHandles(World world)
         {
             Argument.EnsureNotNull(world, "world");
@@ -95,7 +95,7 @@ namespace Orion.Matchmaking.Commands
             Handle researcherHandle = ReadHandle(reader);
             Handle technologyHandle = ReadHandle(reader);
 
-            return new ResearchCommand(researcherHandle, factionHandle, technologyHandle);
+            return new ResearchCommand(factionHandle, researcherHandle, technologyHandle);
         }
         #endregion
     }

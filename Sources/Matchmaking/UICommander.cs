@@ -371,7 +371,7 @@ namespace Orion.Matchmaking
             var movingUnitHandles = movingUnits
                 .Where(unit => !unit.HasSkill<HarvestSkill>())
                 .Select(unit => unit.Handle);
-            if (movingUnitHandles.Any()) GenerateCommand(new MoveCommand(Faction.Handle, harvestingUnitHandles, node.Center));
+            if (movingUnitHandles.Any()) GenerateCommand(new MoveCommand(Faction.Handle, movingUnitHandles, node.Center));
         }
 
         public void LaunchMove(Vector2 destination)

@@ -18,10 +18,11 @@ namespace Orion.Graphics.Renderers
         private readonly WorldRenderer worldRenderer;
         private readonly MinimapRenderer minimap;
 
-        #region Chuck Norris
-        private const float secondsToShakeWhenChuckNorrisSpawns = 5;
-        private float offsetX;
-        private float offsetY;
+        #region Camera
+        private const float shakingDuration = 4;
+        private const float shakingMagnitude = 5;
+        private const float shakingOscillationsPerSecond = 40;
+
         private float shakingSecondsLeft = 0;
         #endregion
         #endregion
@@ -39,8 +40,8 @@ namespace Orion.Graphics.Renderers
             this.minimap = new MinimapRenderer(worldRenderer);
 
             World world = Faction.World;
-            world.Updated += UpdateShaking;
-            world.Entities.Added += CheckForChuckNorris;
+            world.Updated += OnWorldUpdated;
+            world.Entities.Added += OnEntityAdded;
         }
         #endregion
 
@@ -70,6 +71,21 @@ namespace Orion.Graphics.Renderers
         {
             get { return inputManager.LocalFaction; }
         }
+
+        /// <summary>
+        /// Gets the camera offset due to screen shaking.
+        /// </summary>
+        private Vector2 ShakeOffset
+        {
+            get
+            {
+                if (shakingSecondsLeft == 0) return Vector2.Zero;
+                return new Vector2(
+                    (float)Math.Cos(shakingSecondsLeft * (shakingOscillationsPerSecond * 0.8f)),
+                    (float)Math.Sin(shakingSecondsLeft * (shakingOscillationsPerSecond + 1.2f)))
+                     * shakingMagnitude * (shakingSecondsLeft / shakingDuration);
+            }
+        }
         #endregion
 
         #region Methods
@@ -79,7 +95,7 @@ namespace Orion.Graphics.Renderers
 
             minimap.VisibleRect = bounds;
 
-            using (context.PushTranslate(new Vector2(offsetX, offsetY)))
+            using (context.PushTranslate(ShakeOffset))
             {
                 worldRenderer.DrawTerrain(context, bounds);
                 worldRenderer.DrawResources(context, bounds);
@@ -106,31 +122,19 @@ namespace Orion.Graphics.Renderers
         }
 
         #region Chuck Norris
-        private void CheckForChuckNorris(EntityManager manager, Entity entity)
+        private void OnEntityAdded(EntityManager manager, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;
 
             if (unit.Type.Name == "Chuck Norris")
-                shakingSecondsLeft += secondsToShakeWhenChuckNorrisSpawns;
+                shakingSecondsLeft = shakingDuration;
         }
 
-        private void UpdateShaking(World world, SimulationStep step)
+        private void OnWorldUpdated(World world, SimulationStep step)
         {
-            if (shakingSecondsLeft != 0)
-            {
-                offsetX = (float)(world.Random.NextDouble() - 0.5) * 5;
-                offsetY = (float)(world.Random.NextDouble() - 0.5) * 5;
-                Console.WriteLine("{0}, {1}", offsetX, offsetY);
-                shakingSecondsLeft -= step.TimeDeltaInSeconds;
-                if (shakingSecondsLeft < 0)
-                    shakingSecondsLeft = 0;
-            }
-            else
-            {
-                offsetX = 0;
-                offsetY = 0;
-            }
+            shakingSecondsLeft -= step.TimeDeltaInSeconds;
+            if (shakingSecondsLeft < 0) shakingSecondsLeft = 0;
         }
         #endregion
         #endregion

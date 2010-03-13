@@ -98,7 +98,10 @@ namespace Orion.GameLogic
             get { return technologyTree; }
         }
 
-        public Random Random
+        /// <summary>
+        /// Gets the random number generator used within this world.
+        /// </summary>
+        internal Random Random
         {
             get { return random; }
         }

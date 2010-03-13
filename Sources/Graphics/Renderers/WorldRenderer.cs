@@ -17,7 +17,6 @@ namespace Orion.Graphics.Renderers
         private readonly GameGraphics gameGraphics;
 
         private readonly TerrainRenderer terrainRenderer;
-        private readonly CreepPathRenderer creepPathRenderer;
         private readonly ResourcesRenderer resourcesRenderer;
         private readonly RuinsRenderer ruinsRenderer;
         private readonly UnitsRenderer unitsRenderer;
@@ -33,7 +32,7 @@ namespace Orion.Graphics.Renderers
         /// The <see cref="Faction"/> providing the view point to the <see cref="World"/> to be rendered.
         /// </param>
         /// <param name="gameGraphics">The game graphics which provides access to graphics resources.</param>
-        public WorldRenderer(Faction faction, GameGraphics gameGraphics, CreepPath creepPath)
+        public WorldRenderer(Faction faction, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
@@ -42,7 +41,6 @@ namespace Orion.Graphics.Renderers
             this.gameGraphics = gameGraphics;
 
             this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
-            if (creepPath != null) this.creepPathRenderer = new CreepPathRenderer(creepPath, gameGraphics);
             this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
             this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
             this.unitsRenderer = new UnitsRenderer(faction, gameGraphics);
@@ -79,7 +77,6 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             terrainRenderer.Draw(graphicsContext);
-            if (creepPathRenderer != null) creepPathRenderer.Draw(graphicsContext, viewBounds);
         }
 
         public void DrawMiniatureTerrain(GraphicsContext graphicsContext, Rectangle viewBounds)

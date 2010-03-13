@@ -27,7 +27,7 @@ namespace Orion.Graphics.Renderers
         #endregion
 
         #region Constructors
-        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics, CreepPath creepPath)
+        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
@@ -35,7 +35,7 @@ namespace Orion.Graphics.Renderers
             this.inputManager = inputManager;
             this.gameGraphics = gameGraphics;
             this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics, creepPath);
+            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics);
             this.minimap = new MinimapRenderer(worldRenderer);
 
             World world = Faction.World;

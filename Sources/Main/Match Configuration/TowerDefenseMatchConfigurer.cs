@@ -56,7 +56,7 @@ namespace Orion.Main
                     localFaction.AladdiumAmount += (int)(unit.GetStat(UnitStat.AladdiumCost) * 0.1f);
                 };
 
-            match = new Match(random, world, creepPath);
+            match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);

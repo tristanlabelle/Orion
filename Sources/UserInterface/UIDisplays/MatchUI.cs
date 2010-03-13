@@ -82,7 +82,7 @@ namespace Orion.UserInterface
             this.gameGraphics = gameGraphics;
             World world = match.World;
 
-            matchRenderer = new MatchRenderer(userInputManager, gameGraphics, match.CreepPath);
+            matchRenderer = new MatchRenderer(userInputManager, gameGraphics);
 
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
             worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);

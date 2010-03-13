@@ -7,6 +7,7 @@ using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 using Keys = System.Windows.Forms.Keys;
+using System.Diagnostics;
 
 namespace Orion.Matchmaking
 {
@@ -35,33 +36,33 @@ namespace Orion.Matchmaking
         public void LaunchCancel(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new CancelCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+                GenerateCommand(new CancelCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchAttack(IEnumerable<Unit> units, Unit target)
         {
             units = units.Except(target);
             if (units.Count() > 0)
-                GenerateActionCommand(new AttackCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
+                GenerateCommand(new AttackCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
         }
 
         public void LaunchBuild(IEnumerable<Unit> units, UnitType buildingType, Point point)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
+                GenerateCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
         }
 
         public void LaunchHarvest(IEnumerable<Unit> units, ResourceNode node)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new HarvestCommand(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));
+                GenerateCommand(new HarvestCommand(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));
         }
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new MoveCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateCommand(new MoveCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         private Vector2 ClampPosition(Vector2 destination)
@@ -78,71 +79,62 @@ namespace Orion.Matchmaking
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new ChangeRallyPointCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateCommand(new ChangeRallyPointCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
         {
             units = units.Except(repairedUnit);
             if (units.Count() > 0)
-                GenerateActionCommand(new RepairCommand(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
+                GenerateCommand(new RepairCommand(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
         }
 
         public void LaunchTrain(IEnumerable<Unit> buildings, UnitType trainedType)
         {
             if (buildings.Count() > 0)
-                GenerateActionCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
+                GenerateCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
         }
 
         public void LaunchResearch(Unit reseacher, Technology technology)
         {
             if (reseacher != null)
-                GenerateActionCommand(new ResearchCommand(reseacher.Handle, Faction.Handle, technology.Handle));
+                GenerateCommand(new ResearchCommand(reseacher.Handle, Faction.Handle, technology.Handle));
         }
 
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new SuicideCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+                GenerateCommand(new SuicideCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = ClampPosition(destination);
             if (units.Count() > 0)
-                GenerateActionCommand(new ZoneAttackCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
+                GenerateCommand(new ZoneAttackCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void LaunchHeal(IEnumerable<Unit> units, Unit hurtUnit)
         {
             units = units.Except(hurtUnit);
             if (units.Count() > 0)
-                GenerateActionCommand(new HealCommand(Faction.Handle, units.Select(unit => unit.Handle), hurtUnit.Handle));
+                GenerateCommand(new HealCommand(Faction.Handle, units.Select(unit => unit.Handle), hurtUnit.Handle));
         }
 
         public void LaunchStandGuard(IEnumerable<Unit> units)
         {
             if (units.Count() > 0)
-                GenerateActionCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
-        }
-
-        public void GenerateActionCommand(Command command)
-        {
-            Argument.EnsureNotNull(command, "command");
-            if (Faction.Status == FactionStatus.Defeated) return;
-            GenerateCommand(command);
+                GenerateCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchChangeDiplomacy(Faction otherFaction)
         {
             if (otherFaction == null) return;
             if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
-                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
+                GenerateCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
             else
-                GenerateActionCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
+                GenerateCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
-
-        public override void Update(float timeDelta) { }
         #endregion
     }
 }

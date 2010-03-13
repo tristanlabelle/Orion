@@ -32,14 +32,9 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Properties
-        protected SlaveCommander LocalCommander
-        {
-            get { return inputManager.LocalCommander; }
-        }
-
         protected Faction LocalFaction
         {
-            get { return LocalCommander.Faction; }
+            get { return inputManager.LocalFaction; }
         }
 
         protected World World

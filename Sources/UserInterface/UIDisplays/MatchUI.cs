@@ -93,7 +93,7 @@ namespace Orion.UserInterface
             matchAudioRenderer.SetViewBounds(worldView.Bounds);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalCommander.Faction);
+            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalFaction);
             Children.Add(resourceDisplay);
 
             Rectangle pauseButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.69f, 0), new Vector2(0.84f, 1));
@@ -208,14 +208,9 @@ namespace Orion.UserInterface
             get { return userInputManager.SelectionManager; }
         }
 
-        private SlaveCommander LocalCommander
-        {
-            get { return userInputManager.LocalCommander; }
-        }
-
         private Faction LocalFaction
         {
-            get { return LocalCommander.Faction; }
+            get { return userInputManager.LocalFaction; }
         }
 
         private World World
@@ -367,11 +362,8 @@ namespace Orion.UserInterface
         private void SendMessage(TextField chatInput)
         {
             string text = chatInput.Contents;
-            if (text.Length > 0)
-            {
-                SlaveCommander commander = userInputManager.LocalCommander;
-                commander.SendMessage(chatInput.Contents);
-            }
+            if (text.Any(character => !char.IsWhiteSpace(character)))
+                userInputManager.LaunchChatMessage(chatInput.Contents);
 
             Children.Remove(chatInput);
         }
@@ -507,12 +499,8 @@ namespace Orion.UserInterface
         private void AcceptNewDiplomacy(Button bouton)
         {
             foreach (var pair in assocFactionDropList)
-            {
                 if (LocalFaction.GetDiplomaticStance(pair.Key) != pair.Value.SelectedItem)
-                {
-                    LocalCommander.LaunchChangeDiplomacy(pair.Key);
-                }
-            }
+                    userInputManager.LaunchChangeDiplomacy(pair.Key);
 
             // Remove diplomacy panel from view.
             assocFactionDropList.Clear();
@@ -548,7 +536,7 @@ namespace Orion.UserInterface
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalCommander.Faction, unit, gameGraphics);
+            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalFaction, unit, gameGraphics);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;

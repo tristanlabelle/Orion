@@ -94,7 +94,7 @@ namespace Orion.UserInterface.Actions
             Texture texture = gameGraphics.GetUnitTexture(buildingType);
             button.Renderer = new TexturedFrameRenderer(texture);
 
-            Faction faction = inputManager.LocalCommander.Faction;
+            Faction faction = inputManager.LocalFaction;
             int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
             int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
             button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);

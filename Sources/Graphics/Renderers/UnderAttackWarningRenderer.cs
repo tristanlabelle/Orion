@@ -38,7 +38,7 @@ namespace Orion.Graphics.Renderers
         private const float warningCircleDuration = 0.3f;
         private static readonly ColorRgb warningCircleColor = Colors.Red;
 
-        private readonly UnderAttackWarningProvider provider;
+        private readonly UnderAttackMonitor provider;
         private readonly List<AttackWarning> warnings = new List<AttackWarning>();
         private float time;
         #endregion
@@ -48,8 +48,8 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(faction, "faction");
 
-            this.provider = new UnderAttackWarningProvider(faction);
-            this.provider.UnderAttack += OnWarning;
+            this.provider = new UnderAttackMonitor(faction);
+            this.provider.Warning += OnWarning;
             faction.World.Updated += OnWorldUpdated;
         }
         #endregion
@@ -77,7 +77,7 @@ namespace Orion.Graphics.Renderers
             }
         }
 
-        private void OnWarning(UnderAttackWarningProvider sender, Vector2 position)
+        private void OnWarning(UnderAttackMonitor sender, Vector2 position)
         {
             AttackWarning warning = new AttackWarning(time, position);
             warnings.Add(warning);

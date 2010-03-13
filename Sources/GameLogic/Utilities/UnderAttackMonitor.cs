@@ -12,7 +12,7 @@ namespace Orion.GameLogic.Utilities
     /// <summary>
     /// Monitors the attacks to a faction and provides "under attack" warnings.
     /// </summary>
-    public sealed class UnderAttackWarningProvider
+    public sealed class UnderAttackMonitor
     {
         #region Entry
         private struct Entry
@@ -42,7 +42,7 @@ namespace Orion.GameLogic.Utilities
         #endregion
 
         #region Constructors
-        public UnderAttackWarningProvider(Faction faction)
+        public UnderAttackMonitor(Faction faction)
         {
             Argument.EnsureNotNull(faction, "faction");
 
@@ -54,9 +54,9 @@ namespace Orion.GameLogic.Utilities
 
         #region Events
         /// <summary>
-        /// Raised when the monitored faction is under attack.
+        /// Raised to warn that the monitored faction is under attack.
         /// </summary>
-        public event Action<UnderAttackWarningProvider, Vector2> UnderAttack;
+        public event Action<UnderAttackMonitor, Vector2> Warning;
         #endregion
 
         #region Properties
@@ -83,7 +83,7 @@ namespace Orion.GameLogic.Utilities
             Entry entry = new Entry(time, position);
             entries.Enqueue(entry);
 
-            if (UnderAttack != null) UnderAttack(this, position);
+            if (Warning != null) Warning(this, position);
         }
 
         private void OnWorldUnitHit(World sender, HitEventArgs args)

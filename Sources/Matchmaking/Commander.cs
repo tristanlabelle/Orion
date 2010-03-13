@@ -2,6 +2,7 @@ using System;
 using Orion.GameLogic;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
+using System.Diagnostics;
 
 namespace Orion.Matchmaking
 {
@@ -67,6 +68,14 @@ namespace Orion.Matchmaking
         protected void GenerateCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");
+
+            Argument.EnsureNotNull(command, "command");
+            if (Faction.Status == FactionStatus.Defeated)
+            {
+                Debug.Fail("A command was generated after the death of the faction.");
+                return;
+            }
+
             OnCommandGenerated(command);
         }
 
@@ -75,7 +84,7 @@ namespace Orion.Matchmaking
         /// to flush its local pipeline.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public abstract void Update(float timeDelta);
+        public virtual void Update(float timeDelta) { }
 
         public override string ToString()
         {

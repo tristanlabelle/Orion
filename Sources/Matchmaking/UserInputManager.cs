@@ -7,6 +7,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.GameLogic.Technologies;
 using Keys = System.Windows.Forms.Keys;
+using Orion.GameLogic.Utilities;
 
 namespace Orion.Matchmaking
 {
@@ -16,6 +17,7 @@ namespace Orion.Matchmaking
         private static readonly float SingleClickMaxRectangleArea = 0.1f;
 
         private readonly SlaveCommander commander;
+        private readonly UnderAttackMonitor underAttackMonitor;
         private readonly SelectionManager selectionManager;
         private Unit hoveredUnit;
         private UserInputCommand mouseCommand;
@@ -28,14 +30,17 @@ namespace Orion.Matchmaking
         public UserInputManager(SlaveCommander commander)
         {
             Argument.EnsureNotNull(commander, "commander");
+
             this.commander = commander;
+            this.underAttackMonitor = new UnderAttackMonitor(commander.Faction);
             this.selectionManager = new SelectionManager(commander.Faction);
-            commander.Faction.World.Entities.Removed += OnEntityRemoved;
+            this.commander.Faction.World.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
         #region Properties
-        public SlaveCommander LocalCommander
+        [Obsolete("To be fully encapsulated by this UserInputManager")]
+        public Commander LocalCommander
         {
             get { return commander; }
         }
@@ -48,6 +53,11 @@ namespace Orion.Matchmaking
         public World World
         {
             get { return LocalFaction.World; }
+        }
+
+        public UnderAttackMonitor UnderAttackMonitor
+        {
+            get { return underAttackMonitor; }
         }
 
         public SelectionManager SelectionManager
@@ -188,7 +198,6 @@ namespace Orion.Matchmaking
                 case Keys.Escape: mouseCommand = null; break;
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
-                case Keys.F9: ChangeDiplomaticStance(); break;
             }
 
             if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
@@ -432,11 +441,29 @@ namespace Orion.Matchmaking
             commander.LaunchCancel(targetUnits);
         }
 
-        public void ChangeDiplomaticStance()
+        public void LaunchChangeDiplomacy(Faction targetFaction)
         {
-            // For Now I just Test Ally
-            Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
-            commander.LaunchChangeDiplomacy(otherFaction);
+            Argument.EnsureNotNull(targetFaction, "targetFaction");
+
+            DiplomaticStance newStance = LocalFaction.GetDiplomaticStance(targetFaction) == DiplomaticStance.Ally
+                ? DiplomaticStance.Enemy : DiplomaticStance.Ally;
+            LaunchChangeDiplomacy(targetFaction, newStance);
+        }
+
+        public void LaunchChangeDiplomacy(Faction targetFaction, DiplomaticStance newStance)
+        {
+            Argument.EnsureNotNull(targetFaction, "targetFaction");
+
+            if (LocalFaction.GetDiplomaticStance(targetFaction) == newStance) return;
+
+            commander.LaunchChangeDiplomacy(targetFaction);
+        }
+
+        public void LaunchChatMessage(string text)
+        {
+            Argument.EnsureNotNull(text, "text");
+
+            commander.SendMessage(text);
         }
         #endregion
         #endregion

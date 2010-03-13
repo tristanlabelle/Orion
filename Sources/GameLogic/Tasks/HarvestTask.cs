@@ -160,7 +160,7 @@ namespace Orion.GameLogic.Tasks
         {
             return Faction.Units
                 .Where(other => !other.IsUnderConstruction && other.HasSkill<StoreResourcesSkill>())
-                .WithMinOrDefault(unit => Region.SquaredDistance(unit.GridRegion, node.GridRegion));
+                .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Unit.GridRegion));
         }
         #endregion
         #endregion

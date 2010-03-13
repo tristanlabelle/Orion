@@ -6,8 +6,8 @@ namespace Orion.UserInterface.Actions.UserCommands
 {
     public sealed class MoveUserCommand : UserInputCommand
     {
-        public MoveUserCommand(UICommander uiCommander)
-            : base(uiCommander) {}
+        public MoveUserCommand(UserInputManager inputManager)
+            : base(inputManager) {}
 
         public override void OnClick(Vector2 location)
         {

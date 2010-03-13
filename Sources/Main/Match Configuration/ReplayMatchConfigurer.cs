@@ -30,13 +30,13 @@ namespace Orion.Main
             get { return null; }
         }
 
-        public override void Start(out Match match, out UICommander uiCommander)
+        public override void Start(out Match match, out SlaveCommander localCommander)
         {
             CreateWorld(UserInterface.MapSize);
 
             Faction userFaction = world.CreateSpectatorFaction();
             userFaction.LocalFogOfWar.Disable();
-            uiCommander = new UICommander(userFaction);
+            localCommander = new SlaveCommander(userFaction);
 
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)

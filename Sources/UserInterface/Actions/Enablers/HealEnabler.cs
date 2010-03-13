@@ -17,10 +17,10 @@ namespace Orion.UserInterface.Actions.Enablers
         #endregion
 
         #region Constructors
-        public HealEnabler(UICommander uiCommander, ActionFrame actionFrame, GameGraphics gameGraphics)
-            : base(uiCommander, actionFrame, gameGraphics)
+        public HealEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
+            : base(inputManager, actionFrame, gameGraphics)
         {
-            this.userCommand = new HealUserCommand(uiCommander);
+            this.userCommand = new HealUserCommand(inputManager);
         }
         #endregion
 
@@ -29,7 +29,7 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<HealSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, uiCommander, "Heal", Keys.H, gameGraphics);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Heal", Keys.H, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Heal");
             button.Renderer = new TexturedFrameRenderer(texture);
@@ -41,8 +41,8 @@ namespace Orion.UserInterface.Actions.Enablers
 
         private void OnButtonPressed(Button button)
         {
-            uiCommander.SelectedCommand = userCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, uiCommander, gameGraphics));
+            inputManager.SelectedCommand = userCommand;
+            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
         }
         #endregion
     }

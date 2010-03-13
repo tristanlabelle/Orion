@@ -8,8 +8,8 @@ namespace Orion.UserInterface.Actions.UserCommands
 {
     public sealed class HarvestUserCommand : UserInputCommand
     {
-        public HarvestUserCommand(UICommander uiCommander)
-            : base(uiCommander) {}
+        public HarvestUserCommand(UserInputManager inputManager)
+            : base(inputManager) {}
 
         public override void OnClick(Vector2 location)
         {

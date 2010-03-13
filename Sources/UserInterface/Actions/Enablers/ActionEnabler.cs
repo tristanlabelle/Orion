@@ -13,28 +13,33 @@ namespace Orion.UserInterface.Actions.Enablers
     public abstract class ActionEnabler
     {
         #region Fields
-        protected readonly UICommander uiCommander;
+        protected readonly UserInputManager inputManager;
         protected readonly ActionFrame actionFrame;
         protected readonly GameGraphics gameGraphics;
         #endregion
 
         #region Constructors
-        public ActionEnabler(UICommander uiCommander, ActionFrame actionFrame, GameGraphics gameGraphics)
+        public ActionEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
         {
-            Argument.EnsureNotNull(uiCommander, "uiCommander");
+            Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(actionFrame, "actionFrame");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            this.uiCommander = uiCommander;
+            this.inputManager = inputManager;
             this.actionFrame = actionFrame;
             this.gameGraphics = gameGraphics;
         }
         #endregion
 
         #region Properties
+        protected SlaveCommander LocalCommander
+        {
+            get { return inputManager.LocalCommander; }
+        }
+
         protected Faction LocalFaction
         {
-            get { return uiCommander.Faction; }
+            get { return LocalCommander.Faction; }
         }
 
         protected World World

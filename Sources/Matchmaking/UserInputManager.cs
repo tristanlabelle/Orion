@@ -2,24 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Collections;
 using Orion.Geometry;
 using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.GameLogic.Technologies;
-using Orion.Matchmaking.Commands;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Matchmaking
 {
-    /// <summary>
-    /// A commander which generates commands based on user input.
-    /// </summary>
-    public sealed class UICommander : Commander
+    public class UserInputManager
     {
         #region Fields
         private static readonly float SingleClickMaxRectangleArea = 0.1f;
 
+        private readonly SlaveCommander commander;
         private readonly SelectionManager selectionManager;
         private Unit hoveredUnit;
         private UserInputCommand mouseCommand;
@@ -29,15 +25,31 @@ namespace Orion.Matchmaking
         #endregion
 
         #region Constructors
-        public UICommander(Faction faction)
-            : base(faction)
+        public UserInputManager(SlaveCommander commander)
         {
-            this.selectionManager = new SelectionManager(faction);
-            faction.World.Entities.Removed += OnEntityRemoved;
+            Argument.EnsureNotNull(commander, "commander");
+            this.commander = commander;
+            this.selectionManager = new SelectionManager(commander.Faction);
+            commander.Faction.World.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
         #region Properties
+        public SlaveCommander LocalCommander
+        {
+            get { return commander; }
+        }
+
+        public Faction LocalFaction
+        {
+            get { return commander.Faction; }
+        }
+
+        public World World
+        {
+            get { return LocalFaction.World; }
+        }
+
         public SelectionManager SelectionManager
         {
             get { return selectionManager; }
@@ -134,7 +146,7 @@ namespace Orion.Matchmaking
             selectionEnd = null;
 
             Point point = (Point)args.Position;
-            if (!World.IsWithinBounds(point) || Faction.GetTileVisibility(point) != TileVisibility.Visible)
+            if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) != TileVisibility.Visible)
             {
                 selectionManager.ClearSelection();
                 return;
@@ -147,7 +159,7 @@ namespace Orion.Matchmaking
                 return;
             }
 
-            if (clickedUnit.Faction == Faction)
+            if (clickedUnit.Faction == LocalFaction)
                 selectionManager.SelectNearbyUnitsOfType(clickedUnit.Center, clickedUnit.Type);
             else
                 selectionManager.SetSelection(clickedUnit);
@@ -176,6 +188,7 @@ namespace Orion.Matchmaking
                 case Keys.Escape: mouseCommand = null; break;
                 case Keys.ShiftKey: shiftKeyPressed = true; break;
                 case Keys.Delete: LaunchSuicide(); break;
+                case Keys.F9: ChangeDiplomaticStance(); break;
             }
 
             if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
@@ -211,11 +224,11 @@ namespace Orion.Matchmaking
 
         public void LaunchDefaultCommand(Vector2 target)
         {
-            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != Faction);
+            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != LocalFaction);
             if (otherFactionOnlySelection) return;
 
             Point point = (Point)target;
-            if (!World.IsWithinBounds(point) || Faction.GetTileVisibility(point) == TileVisibility.Undiscovered)
+            if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
             {
                 LaunchMove(target);
                 return;
@@ -245,7 +258,7 @@ namespace Orion.Matchmaking
 
         private void LaunchDefaultCommand(Unit target)
         {
-            if (target.Faction == Faction)
+            if (target.Faction == commander.Faction)
             {
                 if (target.HasSkill<ExtractAlageneSkill>())
                 {
@@ -256,7 +269,7 @@ namespace Orion.Matchmaking
                         ResourceNode alageneNode = World.Entities
                             .OfType<ResourceNode>()
                             .First(node => node.Position == target.Position);
-                        if (alageneNode.IsHarvestableByFaction(Faction))
+                        if (alageneNode.IsHarvestableByFaction(LocalFaction))
                             LaunchHarvest(alageneNode);
                     }
                 }
@@ -269,7 +282,7 @@ namespace Orion.Matchmaking
             }
             else
             {
-                if (Faction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
+                if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
                     LaunchMove(target.Center);
                 else
                     LaunchAttack(target);
@@ -278,7 +291,7 @@ namespace Orion.Matchmaking
 
         private void LaunchDefaultCommand(ResourceNode target)
         {
-            if (target.IsHarvestableByFaction(Faction))
+            if (target.IsHarvestableByFaction(LocalFaction))
                 LaunchHarvest(target);
             else
                 LaunchMove(target.Position);
@@ -288,215 +301,142 @@ namespace Orion.Matchmaking
         #region Launching individual commands
         public void Cancel()
         {
-            if (selectionManager.IsSelectionEmpty) return;
-
-            var unitHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction)
-                .Select(unit => unit.Handle);
-
-            if (unitHandles.None()) return;
-            
-            GenerateCommand(new CancelCommand(Faction.Handle, unitHandles));
+            commander.LaunchCancel(selectionManager.SelectedUnits);
         }
 
-        public void LaunchBuild(Point location, UnitType buildingType)
+        public void LaunchBuild(Point location, UnitType unitTypeToBuild)
         {
-            var builderHandles = selectionManager.SelectedUnits
-                .Where(unit =>
-                {
-                    if (unit.Faction != Faction) return false;
-                    BuildSkill buildSkill = unit.GetSkill<BuildSkill>();
-                    return buildSkill != null && buildSkill.Supports(buildingType);
-                })
-                .Select(builder => builder.Handle);
+            IEnumerable<Unit> builders = selectionManager.SelectedUnits.Where(unit =>
+            {
+                BuildSkill buildSkill = unit.GetSkill<BuildSkill>();
+                MoveSkill moveSkill = unit.GetSkill<MoveSkill>();
+                if (buildSkill == null) return false;
+                if (unit.Faction != commander.Faction) return false;
+                if (moveSkill == null) return false;
+                return buildSkill.Supports(unitTypeToBuild);
+            });
 
-            if (builderHandles.None()) return;
-            
-            GenerateCommand(new BuildCommand(Faction.Handle, builderHandles, buildingType.Handle, location));
+
+            commander.LaunchBuild(builders, unitTypeToBuild, location);
         }
 
         public void LaunchAttack(Unit target)
         {
-            Argument.EnsureNotNull(target, "target");
-
-            var units = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction);
-
+            IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
-            var attackingUnitHandles = units
-                .Where(unit => unit.HasSkill<AttackSkill>())
-                .Select(unit => unit.Handle);
-            if (attackingUnitHandles.Any())
-                GenerateCommand(new AttackCommand(Faction.Handle, attackingUnitHandles, target.Handle));
-
-            var movingUnitHandles = units
-                .Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>())
-                .Select(unit => unit.Handle);
-
-            if (movingUnitHandles.Any())
-                GenerateCommand(new MoveCommand(Faction.Handle, movingUnitHandles, target.Center));
+            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
+            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            destination = World.ClampWithinSafeBounds(destination);
-
-            var movingUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<MoveSkill>());
-
-            // Those who can zone attack do so, the others simply move
-            var zoneAttackingUnitHandles = movingUnits
-                .Where(unit => unit.HasSkill<AttackSkill>())
-                .Select(unit => unit.Handle);
-            if (zoneAttackingUnitHandles.Any())
-                GenerateCommand(new ZoneAttackCommand(Faction.Handle, zoneAttackingUnitHandles, destination));
-
-            var movingUnitHandles = movingUnits
-                .Where(unit => !unit.HasSkill<AttackSkill>())
-                .Select(unit => unit.Handle);
-            if (movingUnitHandles.Any())
-                GenerateCommand(new MoveCommand(Faction.Handle, movingUnitHandles, destination));
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+            // Those who can attack do so, the others simply move to the destination
+            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
         }
 
         public void LaunchHarvest(ResourceNode node)
         {
-            var movingUnits = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<MoveSkill>());
-
-            var harvestingUnitHandles = movingUnits
-                .Where(unit => unit.HasSkill<HarvestSkill>())
-                .Select(unit => unit.Handle);
-            if (harvestingUnitHandles.Any()) GenerateCommand(new HarvestCommand(Faction.Handle, harvestingUnitHandles, node.Handle));
-
-            var movingUnitHandles = movingUnits
-                .Where(unit => !unit.HasSkill<HarvestSkill>())
-                .Select(unit => unit.Handle);
-            if (movingUnitHandles.Any()) GenerateCommand(new MoveCommand(Faction.Handle, movingUnitHandles, node.Center));
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+            // Those who can harvest do so, the others simply move to the resource's position
+            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<HarvestSkill>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
-            destination = World.ClampWithinSafeBounds(destination);
-
-            var movingUnitHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<MoveSkill>())
-                .Select(unit => unit.Handle);
-
-            if (movingUnitHandles.None()) return;
-
-            GenerateCommand(new MoveCommand(Faction.Handle, movingUnitHandles, destination));
+            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+            commander.LaunchMove(movableUnits, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            var trainerHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.IsBuilding && unit.HasSkill<TrainSkill>())
-                .Select(trainer => trainer.Handle);
-
-            if (trainerHandles.None()) return;
-
-            GenerateCommand(new ChangeRallyPointCommand(Faction.Handle, trainerHandles, at));
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<TrainSkill>()
+                && unit.IsBuilding);
+            commander.LaunchChangeRallyPoint(targetUnits, at);
         }
 
-        public void LaunchRepair(Unit target)
+        public void LaunchRepair(Unit building)
         {
-            if (target.Faction != Faction || !target.IsBuilding) return;
-
-            var repairerHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<BuildSkill>())
-                .Select(unit => unit.Handle);
-
-            if (repairerHandles.None()) return;
-
-            GenerateCommand(new RepairCommand(Faction.Handle, repairerHandles, target.Handle));
+            if (building.Faction != LocalFaction || !building.IsBuilding) return;
+           
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
+            commander.LaunchRepair(targetUnits, building);
         }
 
-        public void LaunchHeal(Unit target)
+        public void LaunchHeal(Unit hurtUnit)
         {
-            if (target.IsBuilding) return;
+            if (hurtUnit.Type.IsBuilding) return;
 
-            var healerHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<HealSkill>())
-                .Select(unit => unit.Handle);
-
-            if (healerHandles.None()) return;
-
-            GenerateCommand(new HealCommand(Faction.Handle, healerHandles, target.Handle));
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<HealSkill>());
+            if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
+            commander.LaunchHeal(targetUnits, hurtUnit);
         }
 
         public void LaunchTrain(UnitType unitType)
         {
-            var trainerHandles = selectionManager.SelectedUnits
+            IEnumerable<Unit> trainers = selectionManager.SelectedUnits
                 .Where(unit =>
                 {
-                    if (unit.Faction != Faction || unit.IsUnderConstruction) return false;
+                    if (unit.Faction != commander.Faction) return false;
                     TrainSkill train = unit.Type.GetSkill<TrainSkill>();
-                    return train != null && train.Supports(unitType);
-                })
-                .Select(unit => unit.Handle);
-
-            if (trainerHandles.None()) return;
-
-            GenerateCommand(new TrainCommand(Faction.Handle, trainerHandles, unitType.Handle));
+                    if (train == null) return false;
+                    if (unit.IsUnderConstruction) return false;
+                    return train.Supports(unitType);
+                });
+            commander.LaunchTrain(trainers, unitType);
         }
 
         public void LaunchResearch(Technology technology)
         {
-            var researcher = selectionManager.SelectedUnits
+            Unit tristan = selectionManager.SelectedUnits
                 .FirstOrDefault(unit =>
                 {
-                    if (unit.IsUnderConstruction || !unit.IsIdle || unit.Faction != Faction)
-                        return false;
-
+                    if (unit.Faction != commander.Faction) return false;
                     ResearchSkill reseach = unit.Type.GetSkill<ResearchSkill>();
-                    return reseach != null && reseach.Supports(technology);
+                    if (reseach == null) return false;
+                    if (unit.IsUnderConstruction) return false;
+                    if (!unit.IsIdle) return false;
+                    return reseach.Supports(technology);
                 });
-            
-            if (researcher == null) return;
 
-            GenerateCommand(new ResearchCommand(Faction.Handle, researcher.Handle, technology.Handle));
+                commander.LaunchResearch(tristan, technology);
         }
 
         public void LaunchSuicide()
         {
-            var suiciderHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction)
-                .Select(unit => unit.Handle);
-
-            if (suiciderHandles.None()) return;
-
-            GenerateCommand(new SuicideCommand(Faction.Handle, suiciderHandles));
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction);
+            commander.LaunchSuicide(targetUnits);
         }
 
         public void LaunchStandGuard()
         {
-            var guardianHandles = selectionManager.SelectedUnits
-                .Where(unit => unit.Faction == Faction && unit.HasSkill<MoveSkill>() && unit.HasSkill<AttackSkill>())
-                .Select(unit => unit.Handle);
-
-            if (guardianHandles.None()) return;
-
-            GenerateCommand(new StandGuardCommand(Faction.Handle, guardianHandles));
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction)
+                .Where(unit => unit.HasSkill<MoveSkill>());
+            commander.LaunchStandGuard(targetUnits);
         }
 
-        public void LaunchChangeDiplomacy(Faction otherFaction, DiplomaticStance newStance)
+        public void LaunchCancel()
         {
-            if (newStance == Faction.GetDiplomaticStance(otherFaction)) return;
-
-            GenerateCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, newStance));
+            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+                .Where(unit => unit.Faction == commander.Faction);
+            commander.LaunchCancel(targetUnits);
         }
 
-        public void LaunchChangeDiplomacy(Faction otherFaction)
+        public void ChangeDiplomaticStance()
         {
-            DiplomaticStance newStance = Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally
-                ? DiplomaticStance.Enemy : DiplomaticStance.Ally;
-            LaunchChangeDiplomacy(otherFaction, newStance);
-        }
-
-        public void SendMessage(string message)
-        {
-            Argument.EnsureNotNull(message, "message");
-            GenerateCommand(new SendMessageCommand(Faction.Handle, message));
+            // For Now I just Test Ally
+            Faction otherFaction = World.Factions.FirstOrDefault(faction => faction.Name == "Cyan");
+            commander.LaunchChangeDiplomacy(otherFaction);
         }
         #endregion
         #endregion

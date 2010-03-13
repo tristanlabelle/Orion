@@ -19,9 +19,9 @@ namespace Orion.UserInterface.Actions.UserCommands
         #endregion
 
         #region Constructors
-        public BuildUserCommand(UICommander uiCommander, GameGraphics gameGraphics,
+        public BuildUserCommand(UserInputManager inputManager, GameGraphics gameGraphics,
             UnitType buildingType)
-            : base(uiCommander)
+            : base(inputManager)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             Argument.EnsureNotNull(buildingType, "buildingType");

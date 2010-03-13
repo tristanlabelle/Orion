@@ -6,8 +6,8 @@ namespace Orion.UserInterface.Actions.UserCommands
 {
     public sealed class RepairUserCommand : UserInputCommand
     {
-        public RepairUserCommand(UICommander uiCommander)
-            : base(uiCommander) {}
+        public RepairUserCommand(UserInputManager inputManager)
+            : base(inputManager) {}
 
         public override void OnClick(Vector2 location)
         {

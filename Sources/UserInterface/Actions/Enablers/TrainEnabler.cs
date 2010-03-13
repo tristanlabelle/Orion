@@ -13,8 +13,8 @@ namespace Orion.UserInterface.Actions.Enablers
     public sealed class TrainEnabler : ActionEnabler
     {
         #region Constructors
-        public TrainEnabler(UICommander uiCommander, ActionFrame frame, GameGraphics gameGraphics)
-            : base(uiCommander, frame, gameGraphics)
+        public TrainEnabler(UserInputManager inputManager, ActionFrame frame, GameGraphics gameGraphics)
+            : base(inputManager, frame, gameGraphics)
         { }
         #endregion
 
@@ -39,13 +39,13 @@ namespace Orion.UserInterface.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionFrame, uiCommander, traineeType.Name, Keys.None, gameGraphics);
+                ActionButton button = new ActionButton(actionFrame, inputManager, traineeType.Name, Keys.None, gameGraphics);
 
                 Texture texture = gameGraphics.GetUnitTexture(traineeType);
                 button.Renderer = new TexturedFrameRenderer(texture);
 
                 UnitType traineeTypeForClosure = traineeType;
-                button.Triggered += delegate(Button sender) { uiCommander.LaunchTrain(traineeTypeForClosure); };
+                button.Triggered += delegate(Button sender) { inputManager.LaunchTrain(traineeTypeForClosure); };
 
                 int aladdium = LocalFaction.GetStat(traineeType, UnitStat.AladdiumCost);
                 int alagene = LocalFaction.GetStat(traineeType, UnitStat.AlageneCost);

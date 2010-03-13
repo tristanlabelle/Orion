@@ -6,8 +6,8 @@ namespace Orion.UserInterface.Actions.UserCommands
 {
     public sealed class HealUserCommand : UserInputCommand
     {
-        public HealUserCommand(UICommander uiCommander)
-            : base(uiCommander) {}
+        public HealUserCommand(UserInputManager inputManager)
+            : base(inputManager) {}
 
         public override void OnClick(Vector2 location)
         {

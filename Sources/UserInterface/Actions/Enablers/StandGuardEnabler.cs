@@ -13,7 +13,7 @@ namespace Orion.UserInterface.Actions.Enablers
     public sealed class StandGuardEnabler : ActionEnabler
     {
         #region Constructors
-        public StandGuardEnabler(UICommander manager, ActionFrame frame, GameGraphics gameGraphics)
+        public StandGuardEnabler(UserInputManager manager, ActionFrame frame, GameGraphics gameGraphics)
             : base(manager, frame, gameGraphics)
         {}
         #endregion
@@ -23,14 +23,14 @@ namespace Orion.UserInterface.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, uiCommander, "Stand Guard", Keys.G, gameGraphics);
+            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Stand Guard");
             button.Renderer = new TexturedFrameRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                uiCommander.LaunchStandGuard();
+                inputManager.LaunchStandGuard();
             };
 
             buttonsArray[3, 3] = button;

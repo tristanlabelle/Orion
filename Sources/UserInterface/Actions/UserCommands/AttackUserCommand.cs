@@ -16,8 +16,8 @@ namespace Orion.UserInterface.Actions.UserCommands
         #endregion
 
         #region Constructors
-        public AttackUserCommand(UICommander uiCommander, GameGraphics gameGraphics)
-            : base(uiCommander)
+        public AttackUserCommand(UserInputManager inputManager, GameGraphics gameGraphics)
+            : base(inputManager)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
             this.texture = gameGraphics.GetActionTexture("Attack");

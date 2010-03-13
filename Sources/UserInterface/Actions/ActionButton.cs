@@ -16,25 +16,25 @@ namespace Orion.UserInterface.Actions
     {
         #region Fields
         protected readonly ActionFrame actionFrame;
-        protected readonly UICommander uiCommander;
+        protected readonly UserInputManager inputManager;
         protected readonly GameGraphics gameGraphics;
         private string name;
         private string description;
         #endregion
 
         #region Constructors
-        public ActionButton(ActionFrame actionFrame, UICommander uiCommander,
+        public ActionButton(ActionFrame actionFrame, UserInputManager inputManager,
             string name, Keys hotkey, GameGraphics gameGraphics)
             : base(new Rectangle(1,1), string.Empty)
         {
             Argument.EnsureNotNull(actionFrame, "actionFrame");
-            Argument.EnsureNotNull(uiCommander, "uiCommander");
+            Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             base.HotKey = hotkey;
             this.actionFrame = actionFrame;
-            this.uiCommander = uiCommander;
+            this.inputManager = inputManager;
             this.gameGraphics = gameGraphics;
             this.name = name;
         }

@@ -21,7 +21,7 @@ namespace Orion.UserInterface.Actions
     {
         #region Fields
         private readonly ActionFrame actionFrame;
-        private readonly UICommander uiCommander;
+        private readonly UserInputManager inputManager;
         private readonly UnitType unitType;
         private readonly UnitTypeRegistry unitTypeRegistry;
         private readonly GameGraphics gameGraphics;
@@ -29,17 +29,17 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Constructors
-        public BuildActionProvider(ActionFrame actionFrame, UICommander uiCommander, UnitType unitType,
+        public BuildActionProvider(ActionFrame actionFrame, UserInputManager inputManager, UnitType unitType,
             UnitTypeRegistry unitTypeRegistry, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(actionFrame, "actionFrame");
-            Argument.EnsureNotNull(uiCommander, "uiCommander");
+            Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(unitTypeRegistry, "unitTypeRegistry");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.actionFrame = actionFrame;
-            this.uiCommander = uiCommander;
+            this.inputManager = inputManager;
             this.unitType = unitType;
             this.unitTypeRegistry = unitTypeRegistry;
             this.gameGraphics = gameGraphics;
@@ -84,25 +84,25 @@ namespace Orion.UserInterface.Actions
                 }
             }
 
-            buttons[3, 0] = actionFrame.CreateCancelButton(uiCommander, gameGraphics);
+            buttons[3, 0] = actionFrame.CreateCancelButton(inputManager, gameGraphics);
         }
 
         private ActionButton CreateButton(UnitType buildingType)
         {
-            ActionButton button = new ActionButton(actionFrame, uiCommander, buildingType.Name, Keys.None, gameGraphics);
+            ActionButton button = new ActionButton(actionFrame, inputManager, buildingType.Name, Keys.None, gameGraphics);
 
             Texture texture = gameGraphics.GetUnitTexture(buildingType);
             button.Renderer = new TexturedFrameRenderer(texture);
 
-            Faction faction = uiCommander.Faction;
+            Faction faction = inputManager.LocalCommander.Faction;
             int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
             int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
             button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
 
             button.Triggered += delegate(Button sender)
             {
-                uiCommander.SelectedCommand = new BuildUserCommand(uiCommander, gameGraphics, buildingType);
-                actionFrame.Push(new CancelActionProvider(actionFrame, uiCommander, gameGraphics));
+                inputManager.SelectedCommand = new BuildUserCommand(inputManager, gameGraphics, buildingType);
+                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
             };
 
             return button;

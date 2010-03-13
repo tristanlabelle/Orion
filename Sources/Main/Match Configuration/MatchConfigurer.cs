@@ -78,7 +78,7 @@ namespace Orion.Main
             return new ReplayRecorder(replayWriter);
         }
 
-        public abstract void Start(out Match match, out UICommander commander);
+        public abstract void Start(out Match match, out SlaveCommander commander);
         #endregion
     }
 }

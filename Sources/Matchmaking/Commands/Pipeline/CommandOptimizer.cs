@@ -25,7 +25,7 @@ namespace Orion.Matchmaking.Commands.Pipeline
                 IEnumerable<Handle> handles = command.ExecutingEntityHandles;
                 IEnumerable<Handle> availableUnits = handles.Except(concernedHandles);
 
-                if (handles.Any() && availableUnits.Any())
+                if (handles.Count() > 0 && availableUnits.Count() > 0)
                 {
                     IMultipleExecutingEntitiesCommand manyEntitiesCommand = command as IMultipleExecutingEntitiesCommand;
                     if (manyEntitiesCommand != null)

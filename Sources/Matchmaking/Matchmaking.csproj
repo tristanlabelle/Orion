@@ -103,11 +103,12 @@
     <Compile Include="ReplayReader.cs" />
     <Compile Include="ReplayWriter.cs" />
     <Compile Include="SelectionManager.cs" />
+    <Compile Include="SlaveCommander.cs" />
     <Compile Include="TowerDefense\CreepPath.cs" />
     <Compile Include="TowerDefense\CreepTask.cs" />
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="UserInputCommand.cs" />
-    <Compile Include="UICommander.cs" />
+    <Compile Include="UserInputManager.cs" />
     <Compile Include="WorldGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

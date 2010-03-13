@@ -35,10 +35,10 @@ namespace Orion.GameLogic
             Argument.EnsureNotNull(terrain, "terrain");
 
             this.terrain = terrain;
-            entities = new EntityManager(this);
-            pathfinder = new Pathfinder(terrain.Size);
-            technologyTree = new TechnologyTree();
-            technologyTree.PopulateWithBaseTechnologies();
+            this.entities = new EntityManager(this);
+            this.pathfinder = new Pathfinder(terrain.Size);
+            this.technologyTree = new TechnologyTree();
+            this.technologyTree.PopulateWithBaseTechnologies();
             this.random = random;
         }
         #endregion

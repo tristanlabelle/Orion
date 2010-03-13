@@ -31,12 +31,8 @@ namespace Orion.Audio
         private readonly StringBuilder stringBuilder = new StringBuilder();
 
         private bool isGameStarted;
-
-        /// <summary>
-        /// A flag that is set to true if an explosion sound has been played in the current frame.
-        /// This prevents playing multiple explosion sounds in chain reactions.
-        /// </summary>
-        private bool explosionInCurrentFrame;
+        private bool hasExplosionOccuredInFrame;
+        private bool hasSelectionChangedInFrame;
         #endregion
 
         #region Constructors
@@ -143,7 +139,7 @@ namespace Orion.Audio
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            explosionInCurrentFrame = false;
+            hasExplosionOccuredInFrame = false;
 
             if (!isGameStarted && step.TimeInSeconds > 0.5f)
             {
@@ -157,16 +153,21 @@ namespace Orion.Audio
                     soundContext.PlayAndForget(sound, null);
                 }
             }
+
+            if (hasSelectionChangedInFrame)
+            {
+                hasSelectionChangedInFrame = false;
+
+                if (SelectedUnitType == null) return;
+                PlayUnitVoice(SelectedUnitType, "Select");
+            }
         }
 
         private void OnSelectionChanged(SelectionManager sender)
         {
             Debug.Assert(sender == SelectionManager);
 
-            UnitType unitType = SelectedUnitType;
-            if (unitType == null) return;
-
-            PlayUnitVoice(unitType, "Select");
+            hasSelectionChangedInFrame = true;
         }
 
         private void OnCommandGenerated(Commander sender, Command args)
@@ -204,10 +205,10 @@ namespace Orion.Audio
 
         private void OnExplosionOccured(World sender, Circle args)
         {
-            if (explosionInCurrentFrame) return;
+            if (hasExplosionOccuredInFrame) return;
 
             soundContext.PlayAndForgetRandomSoundFromGroup("Explosion", null);
-            explosionInCurrentFrame = true;
+            hasExplosionOccuredInFrame = true;
         }
         #endregion
     }

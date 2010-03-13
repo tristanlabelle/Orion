@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Orion.GameLogic.Utilities
 {
@@ -86,6 +87,41 @@ namespace Orion.GameLogic.Utilities
         public int GetWorldFoodUsageSample(int sampleIndex)
         {
             return samples.Values.Sum(factionSamples => factionSamples[sampleIndex]);
+        }
+
+        /// <summary>
+        /// Dumps the samples recorded by this sampler to a csv file.
+        /// </summary>
+        /// <param name="textWriter">The text writer to be used.</param>
+        public void DumpCsv(TextWriter textWriter)
+        {
+            Argument.EnsureNotNull(textWriter, "textWriter");
+
+            var firstFactionSamples = samples.First().Value;
+            for (int i = 0; i < firstFactionSamples.Count; i++)
+            {
+                TimeSpan sampleTime = TimeSpan.FromSeconds(i * samplingPeriod);
+                textWriter.Write(',');
+                textWriter.Write(sampleTime.ToString());
+            }
+            textWriter.WriteLine();
+
+            foreach (var entry in samples)
+            {
+                textWriter.Write(entry.Key.Name);
+                foreach (int factionSample in entry.Value)
+                {
+                    textWriter.Write(',');
+                    textWriter.Write(factionSample.ToStringInvariant());
+                }
+                textWriter.WriteLine();
+            }
+        }
+
+        public void DumpCsv(string path)
+        {
+            using (StreamWriter writer = new StreamWriter(path, false, Encoding.UTF8))
+                DumpCsv(writer);
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)

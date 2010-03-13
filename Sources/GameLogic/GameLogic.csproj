@@ -137,6 +137,7 @@
     <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />
+    <Compile Include="Utilities\WorldFoodSampler.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

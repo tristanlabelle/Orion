@@ -5,7 +5,7 @@ using Orion.Geometry;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 using PixelFormat = Orion.Engine.Graphics.PixelFormat;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     /// <summary>
     /// Provides methods to draw a <see cref="Terrain"/> on-screen.

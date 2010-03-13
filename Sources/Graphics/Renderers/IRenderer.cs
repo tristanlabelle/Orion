@@ -1,7 +1,7 @@
 ﻿using Orion.Engine.Graphics;
 using Orion.Geometry;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public interface IRenderer
     {

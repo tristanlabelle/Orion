@@ -59,7 +59,6 @@
     <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
     <Compile Include="Renderers\ResourcesRenderer.cs" />
-    <Compile Include="Renderers\Ruin.cs" />
     <Compile Include="Renderers\RuinsRenderer.cs" />
     <Compile Include="Renderers\TexturedFrameRenderer.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />

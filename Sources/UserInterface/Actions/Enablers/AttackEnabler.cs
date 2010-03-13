@@ -4,6 +4,7 @@ using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.Graphics;
+using Orion.Graphics.Renderers;
 using Orion.UserInterface.Actions.UserCommands;
 using Orion.UserInterface.Widgets;
 using Keys = System.Windows.Forms.Keys;

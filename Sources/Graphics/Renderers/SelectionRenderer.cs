@@ -5,7 +5,7 @@ using Orion.Matchmaking;
 using Orion.GameLogic;
 using Orion.Geometry;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     /// <summary>
     /// Draws selection-related information on-screen.

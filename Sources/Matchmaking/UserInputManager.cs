@@ -90,7 +90,7 @@ namespace Orion.Matchmaking
 
         #region Methods
         #region Direct Event Handling
-        public void HandleMouseDown(object responder, MouseEventArgs args)
+        public void HandleMouseDown(MouseEventArgs args)
         {
             if (mouseCommand != null)
             {
@@ -106,7 +106,7 @@ namespace Orion.Matchmaking
                 LaunchDefaultCommand(args.Position);
         }
 
-        public void HandleMouseUp(object responder, MouseEventArgs args)
+        public void HandleMouseUp(MouseEventArgs args)
         {
             if (!this.selectionStart.HasValue) return;
             if (args.ButtonPressed != MouseButton.Left) return;
@@ -150,7 +150,7 @@ namespace Orion.Matchmaking
                 selectionManager.SetSelection(clickedUnit);
         }
 
-        public void HandleMouseDoubleClick(object responder, MouseEventArgs args)
+        public void HandleMouseDoubleClick(MouseEventArgs args)
         {
             selectionStart = null;
             selectionEnd = null;
@@ -175,7 +175,7 @@ namespace Orion.Matchmaking
                 selectionManager.SetSelection(clickedUnit);
         }
 
-        public void HandleMouseMove(object responder, MouseEventArgs args)
+        public void HandleMouseMove(MouseEventArgs args)
         {
             if (mouseCommand != null)
             {
@@ -191,7 +191,7 @@ namespace Orion.Matchmaking
             }
         }
 
-        public void HandleKeyDown(object responder, KeyboardEventArgs args)
+        public void HandleKeyDown(KeyboardEventArgs args)
         {
             switch (args.Key)
             {
@@ -210,7 +210,7 @@ namespace Orion.Matchmaking
             }
         }
 
-        public void HandleKeyUp(object responder, KeyboardEventArgs args)
+        public void HandleKeyUp(KeyboardEventArgs args)
         {
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
         }

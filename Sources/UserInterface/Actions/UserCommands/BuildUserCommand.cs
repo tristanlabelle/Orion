@@ -6,6 +6,7 @@ using Orion.GameLogic;
 using Orion.GameLogic.Skills;
 using Orion.Geometry;
 using Orion.Graphics;
+using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
 
 namespace Orion.UserInterface.Actions.UserCommands

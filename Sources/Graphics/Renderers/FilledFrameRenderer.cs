@@ -2,7 +2,7 @@ using System;
 using Orion.Engine.Graphics;
 using Orion.Geometry;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public sealed class FilledFrameRenderer : FrameRenderer
     {

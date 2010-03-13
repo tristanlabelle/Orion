@@ -41,9 +41,8 @@ namespace Orion.Graphics.Renderers
         private readonly Faction faction;
         private readonly GameGraphics gameGraphics;
         private readonly SpriteAnimation fireAnimation;
-        private readonly Pool<Ruin> ruinPool = new Pool<Ruin>();
-        private readonly List<Ruin> ruins = new List<Ruin>();
         private readonly BuildingMemoryRenderer buildingMemoryRenderer;
+        private readonly RuinsRenderer ruinsRenderer;
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
         #endregion
@@ -58,6 +57,7 @@ namespace Orion.Graphics.Renderers
             this.gameGraphics = gameGraphics;
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
+            this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
 
             World.Updated += OnWorldUpdated;
         }
@@ -91,7 +91,10 @@ namespace Orion.Graphics.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
+            ruinsRenderer.Draw(graphicsContext, viewBounds);
+
             DrawRememberedBuildings(graphicsContext);
+
             DrawGroundUnits(graphicsContext, viewBounds);
             DrawLasers(graphicsContext, viewBounds, CollisionLayer.Ground);
             DrawAirborneUnits(graphicsContext, viewBounds);
@@ -100,11 +103,6 @@ namespace Orion.Graphics.Renderers
 
         #region Miniature
         public void DrawMiniature(GraphicsContext context)
-        {
-            DrawMiniatureUnits(context);
-        }
-
-        private void DrawMiniatureUnits(GraphicsContext context)
         {
             buildingMemoryRenderer.DrawMiniature(context, miniatureUnitSize);
 

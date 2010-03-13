@@ -18,7 +18,6 @@ namespace Orion.Graphics.Renderers
 
         private readonly TerrainRenderer terrainRenderer;
         private readonly ResourcesRenderer resourcesRenderer;
-        private readonly RuinsRenderer ruinsRenderer;
         private readonly UnitsRenderer unitsRenderer;
         private readonly ExplosionRenderer explosionRenderer;
         private readonly FogOfWarRenderer fogOfWarRenderer;
@@ -42,7 +41,6 @@ namespace Orion.Graphics.Renderers
 
             this.terrainRenderer = new TerrainRenderer(World.Terrain, gameGraphics);
             this.resourcesRenderer = new ResourcesRenderer(faction, gameGraphics);
-            this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
             this.unitsRenderer = new UnitsRenderer(faction, gameGraphics);
             this.explosionRenderer = new ExplosionRenderer(faction.World, gameGraphics);
             this.fogOfWarRenderer = new FogOfWarRenderer(faction);
@@ -100,7 +98,6 @@ namespace Orion.Graphics.Renderers
         public void DrawUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            ruinsRenderer.Draw(graphicsContext, viewBounds);
             unitsRenderer.Draw(graphicsContext, viewBounds);
         }
 

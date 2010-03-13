@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Geometry;
 using Orion.Graphics;
+using Orion.Graphics.Renderers;
 using OpenTK.Math;
 
 namespace Orion.UserInterface.Widgets

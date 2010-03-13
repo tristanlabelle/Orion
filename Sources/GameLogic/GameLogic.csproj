@@ -70,6 +70,8 @@
   <ItemGroup>
     <Compile Include="Utilities\FogOfWarMemory.cs" />
     <Compile Include="Utilities\RememberedBuilding.cs" />
+    <Compile Include="Utilities\Ruin.cs" />
+    <Compile Include="Utilities\RuinsMonitor.cs" />
     <Compile Include="Utilities\UnderAttackMonitor.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="HitEventArgs.cs" />

@@ -160,8 +160,8 @@ namespace Orion.UserInterface
             pausePanel.Children.Add(quitGame);
             pausePanel.Children.Add(resumeGame);
 
-            KeyDown += userInputManager.HandleKeyDown;
-            KeyUp += userInputManager.HandleKeyUp;
+            KeyDown += (sender, args) => userInputManager.HandleKeyDown(args);
+            KeyUp += (sender, args) => userInputManager.HandleKeyUp(args);
 
             userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
             userInputManager.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
@@ -330,7 +330,7 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position))
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseDown(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                userInputManager.HandleMouseDown(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
 
             return base.OnMouseDown(args);
@@ -341,7 +341,7 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             }
             else
             {
@@ -354,7 +354,7 @@ namespace Orion.UserInterface
         protected override bool OnMouseUp(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseUp(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            userInputManager.HandleMouseUp(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             mouseDownOnMinimap = false;
             return base.OnMouseUp(args);
         }
@@ -408,7 +408,7 @@ namespace Orion.UserInterface
         protected override bool OnDoubleClick(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDoubleClick(this, new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            userInputManager.HandleMouseDoubleClick(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
             return base.OnDoubleClick(args);
         }
 
@@ -446,7 +446,7 @@ namespace Orion.UserInterface
             if (worldView.IsMouseOver)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, worldView.MousePosition.Value);
-                userInputManager.HandleMouseMove(this, new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
+                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
             }
         }
 

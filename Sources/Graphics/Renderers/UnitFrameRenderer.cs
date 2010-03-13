@@ -11,7 +11,7 @@ using Orion.Geometry;
 using Font = System.Drawing.Font;
 using Orion.GameLogic.Skills;
 
-namespace Orion.Graphics
+namespace Orion.Graphics.Renderers
 {
     public sealed class UnitFrameRenderer : FrameRenderer
     {

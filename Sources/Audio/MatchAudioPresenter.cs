@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using Orion.Collections;
-using Orion.Engine.Audio;
 using Orion.Geometry;
 using Orion.GameLogic;
 using Orion.GameLogic.Utilities;
@@ -20,15 +19,9 @@ namespace Orion.Audio
     public sealed class MatchAudioPresenter : IDisposable
     {
         #region Fields
-        private readonly SoundContext soundContext;
+        private readonly GameAudio gameAudio;
         private readonly Match match;
         private readonly UserInputManager userInputManager;
-        private readonly SoundSource voicesSoundSource;
-
-        /// <summary>
-        /// Reused between calls to minimize object garbage.
-        /// </summary>
-        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
@@ -36,18 +29,15 @@ namespace Orion.Audio
         #endregion
 
         #region Constructors
-        public MatchAudioPresenter(SoundContext audioContext, Match match, UserInputManager userInputManager)
+        public MatchAudioPresenter(GameAudio gameAudio, Match match, UserInputManager userInputManager)
         {
-            Argument.EnsureNotNull(audioContext, "audioContext");
+            Argument.EnsureNotNull(gameAudio, "gameAudio");
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
 
+            this.gameAudio = gameAudio;
             this.match = match;
-            this.soundContext = audioContext;
             this.userInputManager = userInputManager;
-
-            this.voicesSoundSource = audioContext.CreateSource();
-            this.voicesSoundSource.Volume = 0.8f;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
 
@@ -96,32 +86,11 @@ namespace Orion.Audio
         #region Methods
         public void SetViewBounds(Rectangle viewBounds)
         {
-            soundContext.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 50.0f);
+            gameAudio.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 50.0f);
         }
-        
+
         public void Dispose()
         {
-            voicesSoundSource.Dispose();
-        }
-
-        private Sound GetUnitVoiceSound(UnitType unitType, string eventName)
-        {
-            stringBuilder.Clear();
-            stringBuilder.Append(unitType.Name);
-            stringBuilder.Append('.');
-            stringBuilder.Append(eventName);
-
-            string soundGroup = stringBuilder.ToString();
-
-            return soundContext.GetRandomSoundFromGroup(soundGroup);
-        }
-
-        private void PlayUnitVoice(UnitType unitType, string eventName)
-        {
-            Sound sound = GetUnitVoiceSound(unitType, eventName);
-            if (sound == null) return;
-
-            voicesSoundSource.Play(sound);
         }
 
         private void OnEntityAdded(EntityManager arg1, Entity entity)
@@ -131,10 +100,8 @@ namespace Orion.Audio
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != LocalFaction) return;
 
-            Sound sound = GetUnitVoiceSound(unit.Type, "Select");
-            if (sound == null) return;
-
-            soundContext.PlayAndForget(sound, unit.Center);
+            string soundName = gameAudio.GetUnitSoundName(unit.Type, "Select");
+            gameAudio.PlaySfx(soundName, unit.Position);
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)
@@ -146,12 +113,7 @@ namespace Orion.Audio
                 isGameStarted = true;
 
                 if (userInputManager.LocalFaction.Color == Colors.Magenta)
-                {
-                    Sound sound = soundContext.GetRandomSoundFromGroup("Tapette");
-                    if (sound == null) return;
-
-                    soundContext.PlayAndForget(sound, null);
-                }
+                    gameAudio.PlayUISound("Tapette");
             }
 
             if (hasSelectionChangedInFrame)
@@ -159,7 +121,9 @@ namespace Orion.Audio
                 hasSelectionChangedInFrame = false;
 
                 if (SelectedUnitType == null) return;
-                PlayUnitVoice(SelectedUnitType, "Select");
+
+                string soundName = gameAudio.GetUnitSoundName(SelectedUnitType, "Select");
+                gameAudio.PlayUISound(soundName);
             }
         }
 
@@ -179,7 +143,8 @@ namespace Orion.Audio
             if (unitType == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);
-            PlayUnitVoice(unitType, commandName);
+            string soundName = gameAudio.GetUnitSoundName(unitType, commandName);
+            gameAudio.PlayUISound(soundName);
         }
 
         private void OnUnitHitting(World sender, HitEventArgs args)
@@ -188,8 +153,9 @@ namespace Orion.Audio
             if (!isVisible) return;
 
             bool isMelee = args.Hitter.GetStat(UnitStat.AttackRange) == 0;
-            string soundGroup = isMelee ? "MeleeAttack" : "RangeAttack";
-            soundContext.PlayAndForgetRandomSoundFromGroup(soundGroup, args.Hitter.Center);
+            string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
+
+            gameAudio.PlaySfx(soundName, args.Hitter.Center);
         }
 
         private void OnUnderAttackWarning(UnderAttackMonitor sender, Vector2 position)
@@ -199,15 +165,15 @@ namespace Orion.Audio
                 .OfType<Unit>()
                 .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
 
-            string soundGroup = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
-            soundContext.PlayAndForgetRandomSoundFromGroup(soundGroup, null);
+            string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
+            gameAudio.PlayUISound(soundName);
         }
 
         private void OnExplosionOccured(World sender, Circle args)
         {
             if (hasExplosionOccuredInFrame) return;
 
-            soundContext.PlayAndForgetRandomSoundFromGroup("Explosion", null);
+            gameAudio.PlaySfx("Explosion", null);
             hasExplosionOccuredInFrame = true;
         }
         #endregion

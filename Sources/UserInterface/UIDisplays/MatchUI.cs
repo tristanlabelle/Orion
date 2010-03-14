@@ -17,9 +17,7 @@ using Orion.UserInterface.Actions.Enablers;
 using Orion.UserInterface.Widgets;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
-using MatchAudioRenderer = Orion.Audio.MatchAudioPresenter;
 using MouseButtons = System.Windows.Forms.MouseButtons;
-using SoundContext = Orion.Engine.Audio.SoundContext;
 
 namespace Orion.UserInterface
 {
@@ -56,8 +54,8 @@ namespace Orion.UserInterface
         private readonly Match match;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly UserInputManager userInputManager;
-        private readonly SoundContext audioContext;
-        private readonly MatchAudioRenderer matchAudioRenderer;
+        private readonly GameAudio gameAudio;
+        private readonly MatchAudioPresenter matchAudioPresenter;
         private readonly ActionFrame actions;
         private Frame diplomacyFrame;
         private bool isSpaceDown;
@@ -76,8 +74,8 @@ namespace Orion.UserInterface
             this.match.Quitting += Quit;
             this.userInputManager = new UserInputManager(localCommander);
 
-            this.audioContext = new SoundContext();
-            this.matchAudioRenderer = new MatchAudioPresenter(audioContext, match, this.userInputManager);
+            this.gameAudio = new GameAudio();
+            this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, match, this.userInputManager);
 
             this.gameGraphics = gameGraphics;
             World world = match.World;
@@ -90,7 +88,7 @@ namespace Orion.UserInterface
             worldView.MinimumVisibleBounds = new Rectangle(8, 4);
             worldView.BoundsChanged += OnWorldViewBoundsChanged;
             Children.Add(worldView);
-            matchAudioRenderer.SetViewBounds(worldView.Bounds);
+            matchAudioPresenter.SetViewBounds(worldView.Bounds);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalFaction);
@@ -438,7 +436,7 @@ namespace Orion.UserInterface
         private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
         {
             Rectangle newBounds = sender.Bounds;
-            matchAudioRenderer.SetViewBounds(newBounds);
+            matchAudioPresenter.SetViewBounds(newBounds);
             worldView.FullBounds = World.Bounds
                 .TranslatedBy(-newBounds.Extent)
                 .ResizedBy(newBounds.Width, newBounds.Height);

@@ -814,6 +814,37 @@ namespace Orion
                 "Expected argument '{0}' to have type '{1}' but got '{2}'."
                 .FormatInvariant(name, obj.GetType().FullName, baseType.FullName));
         }
+
+        /// <summary>
+        /// Ensures that an argument has a given type.
+        /// </summary>
+        /// <typeparam name="T">The expected base type.</typeparam>
+        /// <param name="obj">The object to be tested.</param>
+        /// <param name="name">The name of the argument</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="obj"/> is null.
+        /// </exception>
+        public static void EnsureBaseType<T>(object obj, string name)
+        {
+            EnsureNotNull(obj, name);
+            EnsureBaseTypeOrNull<T>(obj, name);
+        }
+
+        /// <summary>
+        /// Ensures that an argument is null or has a given type.
+        /// </summary>
+        /// <typeparam name="T">The expected base type.</typeparam>
+        /// <param name="obj">The object to be tested.</param>
+        /// <param name="baseType">The expected base type.</param>
+        /// <param name="name">The name of the argument</param>
+        public static void EnsureBaseTypeOrNull<T>(object obj, string name)
+        {
+            if (obj == null || obj is T) return;
+
+            throw new ArgumentException(
+                "Expected argument '{0}' to have type '{1}' but got '{2}'."
+                .FormatInvariant(name, obj.GetType().FullName, typeof(T).FullName));
+        }
         #endregion
 
         #region Enumerants

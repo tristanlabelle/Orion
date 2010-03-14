@@ -9,15 +9,15 @@ using IrrKlang;
 
 namespace Orion.Engine.Audio
 {
-    public sealed class SoundGroup
+    internal sealed class SoundGroup : IDisposable
     {
         #region Fields
         private readonly string name;
-        private readonly ReadOnlyCollection<Sound> sounds;
+        private readonly ReadOnlyCollection<ISound> sounds;
         #endregion
 
         #region Constructors
-        internal SoundGroup(string name, IEnumerable<Sound> sounds)
+        internal SoundGroup(string name, IEnumerable<ISound> sounds)
         {
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(sounds, "sounds");
@@ -33,7 +33,7 @@ namespace Orion.Engine.Audio
             get { return name; }
         }
 
-        public ReadOnlyCollection<Sound> Sounds
+        public ReadOnlyCollection<ISound> Sounds
         {
             get { return sounds; }
         }
@@ -50,15 +50,20 @@ namespace Orion.Engine.Audio
         #endregion
 
         #region Methods
-        public Sound GetRandomSound(Random random)
+        public ISound GetRandomSoundOrNull(Random random)
         {
             Argument.EnsureNotNull(random, "random");
 
-            if (sounds.Count == 0)
-                throw new InvalidOperationException("Cannot get a random sound from an empty sound group.");
+            if (sounds.Count == 0) return null;
 
             int index = random.Next(sounds.Count);
             return sounds[index];
+        }
+
+        public void Dispose()
+        {
+            foreach (ISound sound in sounds)
+                sound.Dispose();
         }
 
         public override string ToString()

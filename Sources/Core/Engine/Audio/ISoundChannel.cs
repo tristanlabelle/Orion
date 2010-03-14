@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK.Math;
 
 namespace Orion.Engine.Audio
 {
     /// <summary>
     /// Provides means to play back sounds and apply group volume transformations.
     /// </summary>
-    public interface ISoundChannel
+    public interface ISoundChannel : IDisposable
     {
         #region Properties
         /// <summary>
@@ -33,8 +34,10 @@ namespace Orion.Engine.Audio
         /// Starts playing a sound on this channel with the given transform.
         /// </summary>
         /// <param name="sound">The sound to be played.</param>
-        /// <param name="transform">The transform to apply to the sound.</param>
-        void Play(ISound sound, SoundTransform transform);
+        /// <param name="position">
+        /// The 3D position from which to play the sound, or <c>null</c> if the sound is not 3D positioned.
+        /// </param>
+        void Play(ISound sound, Vector3? position);
 
         /// <summary>
         /// Stops all the sounds currently playing in this sound channel.

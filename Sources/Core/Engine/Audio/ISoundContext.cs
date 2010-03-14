@@ -11,7 +11,7 @@ namespace Orion.Engine.Audio
         /// <summary>
         /// Raised when a spatial property of the listener has changed.
         /// </summary>
-        event Action<SoundContext> ListenerChanged;
+        event Action<ISoundContext> ListenerChanged;
         #endregion
 
         #region Properties
@@ -24,11 +24,6 @@ namespace Orion.Engine.Audio
         /// Accesses the global volume multiplier of this sound context, in range [0, 1].
         /// </summary>
         float Volume { get; set; }
-
-        /// <summary>
-        /// Gets a value indicating if this sound context supports 3D sound.
-        /// </summary>
-        bool Supports3D { get; }
 
         /// <summary>
         /// Accesses the listener's spatial matrix.
@@ -44,7 +39,11 @@ namespace Orion.Engine.Audio
         /// <returns>The sound that was loaded.</returns>
         ISound LoadSoundFromFile(string filePath);
 
-        SoundSource CreateSource();
+        /// <summary>
+        /// Creates a new sound channel which can be used to play sounds.
+        /// </summary>
+        /// <returns>A newly created sound channel.</returns>
+        ISoundChannel CreateChannel();
         #endregion
     }
 }

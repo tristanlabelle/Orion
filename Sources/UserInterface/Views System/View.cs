@@ -75,7 +75,10 @@ namespace Orion.UserInterface
 
         protected internal override void Render(GraphicsContext graphicsContext)
         {
-            using (graphicsContext.SetViewTransform(Frame, Bounds))
+            Vector2 scaling = new Vector2(Frame.Width / bounds.Width, Frame.Height / bounds.Height);
+            Vector2 translation = new Vector2(Frame.MinX - bounds.MinX * scaling.X, Frame.MinY - bounds.MinY * scaling.Y);
+
+            using (graphicsContext.PushTransform(translation, 0, scaling))
             {
                 Draw(graphicsContext);
                 base.Render(graphicsContext);

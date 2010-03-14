@@ -58,6 +58,9 @@
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
     <Compile Include="DisposableHandle.cs" />
+    <Compile Include="Engine\Audio\ISound.cs" />
+    <Compile Include="Engine\Audio\ISoundChannel.cs" />
+    <Compile Include="Engine\Audio\ISoundContext.cs" />
     <Compile Include="Engine\Audio\SoundContext.cs" />
     <Compile Include="Engine\Audio\Sound.cs" />
     <Compile Include="Engine\Audio\SoundGroup.cs" />
@@ -67,6 +70,7 @@
     <Compile Include="ColorRgb.cs" />
     <Compile Include="ColorRgba.cs" />
     <Compile Include="Colors.cs" />
+    <Compile Include="Engine\Audio\SoundTransform.cs" />
     <Compile Include="Engine\Graphics\BufferedPixelSurface.cs" />
     <Compile Include="Engine\Graphics\GraphicsContext.cs" />
     <Compile Include="Engine\Graphics\IPixelSurface.cs" />

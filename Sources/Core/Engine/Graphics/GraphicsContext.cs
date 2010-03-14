@@ -68,20 +68,6 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
-        #region OpenGL Context
-        [Obsolete("Superseded by Transform.")]
-        public DisposableHandle SetViewTransform(Rectangle parentSystem, Rectangle bounds)
-        {
-            GL.PushMatrix();
-
-            GL.Translate(parentSystem.MinX, parentSystem.MinY, 0);
-            GL.Scale(parentSystem.Width / bounds.Width, parentSystem.Height / bounds.Height, 1);
-            GL.Translate(-bounds.MinX, -bounds.MinY, 0);
-
-            return new DisposableHandle(() => GL.PopMatrix());
-        }
-        #endregion
-
         #region Clearing
         /// <summary>
         /// Clears the backbuffer to a given color.
@@ -256,11 +242,18 @@ namespace Orion.Engine.Graphics
         public DisposableHandle PushTransform(Transform transform)
         {
             GL.PushMatrix();
+
             GL.Translate(transform.Translation.X, transform.Translation.Y, 0);
-            float rotationAngleInDegrees = (float)(transform.Rotation * 180 / Math.PI);
-            GL.Rotate(rotationAngleInDegrees, Vector3.UnitZ);
+
+            if (transform.Rotation != 0)
+            {
+                float rotationAngleInDegrees = (float)(transform.Rotation * 180 / Math.PI);
+                GL.Rotate(rotationAngleInDegrees, Vector3.UnitZ);
+            }
+
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
-            return new DisposableHandle(() => GL.PopMatrix());
+
+            return new DisposableHandle(GL.PopMatrix);
         }
 
         public DisposableHandle PushTransform(Vector2 translation, float rotation, Vector2 scaling)

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using IrrKlang;
-using System.Diagnostics;
+using IrrKlangSound = IrrKlang.ISound;
 
 namespace Orion.Engine.Audio
 {
@@ -16,7 +17,7 @@ namespace Orion.Engine.Audio
         #region Fields
         private readonly SoundContext context;
         private readonly Action<SoundContext> listenerPositionChangedHandler;
-        private ISound irrKlangSound;
+        private IrrKlangSound irrKlangSound;
         private Sound sound;
         private Vector3? position;
         private float volume = 1;

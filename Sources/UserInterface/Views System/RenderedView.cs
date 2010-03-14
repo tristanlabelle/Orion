@@ -31,7 +31,7 @@ namespace Orion.UserInterface
         #region Methods
         protected internal sealed override void Draw(GraphicsContext graphicsContext)
         {
-            if (Renderer != null) Renderer.Draw(graphicsContext, Bounds);
+            if (renderer != null) renderer.Draw(graphicsContext, Bounds);
         }
         #endregion
     }

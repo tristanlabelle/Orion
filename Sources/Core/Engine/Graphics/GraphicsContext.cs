@@ -229,7 +229,17 @@ namespace Orion.Engine.Graphics
             return new DisposableHandle(() =>
             {
                 scissorStack.Pop();
-                if (scissorStack.Count == 0) GL.Disable(EnableCap.ScissorTest);
+                if (scissorStack.Count == 0)
+                {
+                    GL.Disable(EnableCap.ScissorTest);
+                }
+                else
+                {
+                    Region oldRegion = scissorStack.Peek();
+                    GL.Scissor(
+                        oldRegion.MinX, oldRegion.MinY,
+                        oldRegion.Width, oldRegion.Height);
+                }
             });
         }
         #endregion

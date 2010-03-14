@@ -40,12 +40,7 @@ namespace Orion.Engine.Audio.IrrKlang
             Debug.WriteLine("Using IrrKlang's {0} sound device.".FormatInvariant(irrKlangSoundEngine.Name));
         }
 
-        public SoundContext()
-            : this(SoundOutputDriver.AutoDetect) { }
-        #endregion
-
-        #region Events
-        public event Action<ISoundContext> ListenerChanged;
+        public SoundContext() : this(SoundOutputDriver.AutoDetect) { }
         #endregion
 
         #region Properties
@@ -98,8 +93,6 @@ namespace Orion.Engine.Audio.IrrKlang
                     ToIrrKlangVector(value.Row1.Xyz));
 
                 listenerMatrix = value;
-
-                ListenerChanged.Raise(this);
             }
         }
 

@@ -28,7 +28,7 @@ namespace Orion.Engine.Audio
             this.context = soundContext;
             this.directory = new DirectoryInfo(directoryPath);
 
-            Debug.Assert(directory.Exists);
+            Debug.Assert(directory.Exists, "The sounds directory does not exist.");
         }
         #endregion
 

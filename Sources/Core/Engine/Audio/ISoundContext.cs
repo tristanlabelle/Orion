@@ -7,13 +7,6 @@ namespace Orion.Engine.Audio
     /// </summary>
     public interface ISoundContext : IDisposable
     {
-        #region Events
-        /// <summary>
-        /// Raised when a spatial property of the listener has changed.
-        /// </summary>
-        event Action<ISoundContext> ListenerChanged;
-        #endregion
-
         #region Properties
         /// <summary>
         /// Accesses a value indicating if this sound context is muted.

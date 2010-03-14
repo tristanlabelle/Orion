@@ -64,6 +64,8 @@
     <Compile Include="Engine\Audio\ISoundContext.cs" />
     <Compile Include="Engine\Audio\IrrKlang\SoundContext.cs" />
     <Compile Include="Engine\Audio\IrrKlang\Sound.cs" />
+    <Compile Include="Engine\Audio\Null\SoundChannel.cs" />
+    <Compile Include="Engine\Audio\Null\SoundContext.cs" />
     <Compile Include="Engine\Audio\SoundGroup.cs" />
     <Compile Include="Engine\Audio\SoundManager.cs" />
     <Compile Include="Collections\BitArray2D.cs" />

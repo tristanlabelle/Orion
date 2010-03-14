@@ -6,6 +6,8 @@ using Orion.GameLogic;
 using Orion.Engine.Audio;
 using OpenTK.Math;
 using IrrKlangSoundContext = Orion.Engine.Audio.IrrKlang.SoundContext;
+using NullSoundContext = Orion.Engine.Audio.Null.SoundContext;
+using System.IO;
 
 namespace Orion.Audio
 {
@@ -36,7 +38,11 @@ namespace Orion.Audio
             }
             catch (NotSupportedException)
             {
-                soundContext = IrrKlangSoundContext.CreateNull();
+                soundContext = new NullSoundContext();
+            }
+            catch (FileNotFoundException) // Thrown if the IrrKlang dll is not found.
+            {
+                soundContext = new NullSoundContext();
             }
 
             sfxChannel = soundContext.CreateChannel();

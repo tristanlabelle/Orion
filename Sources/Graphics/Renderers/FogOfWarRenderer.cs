@@ -9,7 +9,8 @@ namespace Orion.Graphics.Renderers
     public sealed class FogOfWarRenderer : IDisposable
     {
         #region Fields
-        private const float FogTransparency = 0.5f;
+        private const float fogTransparency = 0.5f;
+        private static readonly ColorRgb fogColor = ColorRgb.CreateGray(0.1f);
 
         private readonly Faction faction;
         private readonly Texture texture;
@@ -33,10 +34,8 @@ namespace Orion.Graphics.Renderers
             for (int i = 0; i < pixelBuffer.Length; ++i)
                 this.pixelBuffer[i] = 255;
 
-            UpdatePixelBuffer();
-
             this.texture = Texture.FromBuffer(textureSize, PixelFormat.Alpha, pixelBuffer, true, false);
-            texture.Blit((Region)faction.World.Size, pixelBuffer);
+            UpdateTexture((Region)faction.World.Size);
         }
         #endregion
 
@@ -60,18 +59,17 @@ namespace Orion.Graphics.Renderers
         #region Methods
         public void Draw(GraphicsContext graphics)
         {
+            if (!faction.LocalFogOfWar.IsEnabled) return;
+
             if (IsDirty)
             {
                 UpdateTexture(dirtyRegion.Value);
                 dirtyRegion = null;
             }
 
-            if (faction.LocalFogOfWar.IsEnabled)
-            {
-                Rectangle terrainBounds = new Rectangle(0, 0,
-                    faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
-                graphics.Fill(terrainBounds, texture, TextureRectangle, Colors.Black);
-            }
+            Rectangle terrainBounds = new Rectangle(0, 0,
+                faction.LocalFogOfWar.Size.Width, faction.LocalFogOfWar.Size.Height);
+            graphics.Fill(terrainBounds, texture, TextureRectangle, fogColor);
         }
 
         private void OnVisibilityChanged(Faction faction, Region region)
@@ -84,7 +82,7 @@ namespace Orion.Graphics.Renderers
 
         private void UpdatePixelBuffer(Region region)
         {
-            byte fogAlpha = (byte)(FogTransparency * 255.99f);
+            byte fogAlpha = (byte)(fogTransparency * 255.99f);
 
             int exclusiveMaxX = region.ExclusiveMaxX;
             int exclusiveMaxY = region.ExclusiveMaxY;
@@ -133,7 +131,7 @@ namespace Orion.Graphics.Renderers
                     if (visibility == TileVisibility.Visible)
                         surface.Data.Array[pixelIndex] = 0;
                     else if (visibility == TileVisibility.Discovered)
-                        surface.Data.Array[pixelIndex] = (byte)(FogTransparency * 255);
+                        surface.Data.Array[pixelIndex] = (byte)(fogTransparency * 255);
                     else
                         surface.Data.Array[pixelIndex] = 255;
                 }

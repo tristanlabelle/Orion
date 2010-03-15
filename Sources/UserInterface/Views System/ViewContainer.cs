@@ -61,8 +61,7 @@ namespace Orion.UserInterface
         public event Action<ViewContainer, ViewContainer> ChildRemoved;
 
         /// <summary>
-        /// Raised when one of the views in this views' ancestry has been added or removed.
-        /// The argument specifies the view in the ancestry that changed.
+        /// Raised when a view in this view's ascendance was removed from its parent.
         /// </summary>
         public event Action<ViewContainer, ViewContainer> AncestryChanged;
 

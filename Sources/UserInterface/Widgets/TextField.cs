@@ -94,7 +94,9 @@ namespace Orion.UserInterface.Widgets
         protected internal override void OnAncestryChanged(ViewContainer ancestor)
         {
             RootView root = Root as RootView;
-            if(root != null) root.FocusedView = Root == ancestor ? null : this;
+            if (root != null && root.FocusedView == this)
+                root.FocusedView = null;
+
             base.OnAncestryChanged(ancestor);
         }
 

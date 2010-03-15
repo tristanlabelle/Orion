@@ -152,6 +152,8 @@ namespace Orion.Matchmaking
 
         public void HandleMouseDoubleClick(MouseEventArgs args)
         {
+            if ((args.ButtonPressed & MouseButton.Left) == 0) return;
+
             selectionStart = null;
             selectionEnd = null;
 

@@ -86,7 +86,7 @@ namespace Orion.Audio
         #region Methods
         public void SetViewBounds(Rectangle viewBounds)
         {
-            gameAudio.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 50.0f);
+            gameAudio.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 100.0f);
         }
 
         public void Dispose()

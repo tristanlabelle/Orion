@@ -99,7 +99,15 @@ namespace Orion.Engine.Audio.IrrKlang
 
         public void StopAllSounds()
         {
-            while (sounds.Count > 0) sounds[0].Stop();
+            while (sounds.Count > 0)
+            {
+                IrrKlangSound sound = sounds[0];
+
+                sound.Stop();
+                sound.Dispose();
+
+                sounds.Remove(sound);
+            }
         }
 
         public void Dispose()

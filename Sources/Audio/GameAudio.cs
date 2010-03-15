@@ -47,7 +47,7 @@ namespace Orion.Audio
 
             sfxChannel = soundContext.CreateChannel();
             uiChannel = soundContext.CreateChannel();
-            uiChannel.Volume = 0.8f;
+            uiChannel.Volume = 0.7f;
 
             soundManager = new SoundManager(soundContext, "../../../Assets/Sounds");
         }

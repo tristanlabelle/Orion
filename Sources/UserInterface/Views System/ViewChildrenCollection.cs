@@ -16,7 +16,7 @@ namespace Orion.UserInterface
     public sealed class ViewChildrenCollection : Collection<ViewContainer>
     {
         #region Fields
-        private ViewContainer parent;
+        private readonly ViewContainer parent;
         private readonly List<ViewContainer> children;
         #endregion
 
@@ -27,7 +27,6 @@ namespace Orion.UserInterface
         public ViewContainer Parent
         {
             get { return parent; }
-            internal set { parent = value; }
         }
         #endregion
 
@@ -123,8 +122,8 @@ namespace Orion.UserInterface
         {
             Argument.EnsureNotNull(item, "item");
             if (item is RootView) throw new ArgumentException("The root view cannot be added as a child to another view.");
+            if (item.Parent == parent) return;
             if (item.Parent != null) throw new ArgumentException("Expected a view without any parent.");
-            if (Contains(item)) return;
             if (item.IsAncestorOf(parent))
                 throw new ArgumentException("Cannot add an ancestor as a child.");
 

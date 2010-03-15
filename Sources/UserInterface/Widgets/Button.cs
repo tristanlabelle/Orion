@@ -11,9 +11,10 @@ namespace Orion.UserInterface.Widgets
     public class Button : RenderedView
     {
         #region Fields
-        private Label caption;
+        private readonly Label caption;
         private Keys hotKey;
-        private bool enabled;
+        private bool isEnabled = true;
+        private bool isDown;
         private ColorRgba captionUpColor = Colors.White;
         private ColorRgba captionDownColor = Colors.Orange;
         private ColorRgba captionOverColor = Colors.Cyan;
@@ -33,7 +34,6 @@ namespace Orion.UserInterface.Widgets
         {
             this.caption = new Label(caption);
             this.caption.Color = Colors.White;
-            enabled = true;
             AlignCaption();
             Children.Add(this.caption);
         }
@@ -93,8 +93,8 @@ namespace Orion.UserInterface.Widgets
 
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; }
+            get { return isEnabled; }
+            set { isEnabled = value; }
         }
         #endregion
 
@@ -107,28 +107,46 @@ namespace Orion.UserInterface.Widgets
 
         protected override bool OnMouseEnter(MouseEventArgs args)
         {
-            if (enabled) caption.Color = captionOverColor;
+            if (isEnabled) caption.Color = captionOverColor;
             return base.OnMouseEnter(args);
         }
 
         protected override bool OnMouseExit(MouseEventArgs args)
         {
-            if (enabled) caption.Color = captionUpColor;
+            if (isEnabled)
+            {
+                caption.Color = captionUpColor;
+                isDown = false;
+            }
+
             return base.OnMouseExit(args);
         }
 
         protected override bool OnMouseDown(MouseEventArgs args)
         {
-            if (enabled) caption.Color = captionDownColor;
+            if (isEnabled)
+            {
+                caption.Color = captionDownColor;
+                isDown = true;
+            }
+
             base.OnMouseDown(args);
             return false;
         }
 
         protected override bool OnMouseUp(MouseEventArgs args)
         {
-            if (enabled) caption.Color = captionOverColor;
+            bool isClicked = isEnabled && isDown;
+
             base.OnMouseUp(args);
-            OnPress();
+
+            if (isClicked)
+            {
+                caption.Color = captionOverColor;
+                isDown = false;
+                OnPress();
+            }
+
             return false;
         }
 
@@ -151,7 +169,7 @@ namespace Orion.UserInterface.Widgets
 
         protected virtual void OnPress()
         {
-            if (enabled) RaiseTriggered();
+            if (isEnabled) RaiseTriggered();
         }
 
         private void AlignCaption()

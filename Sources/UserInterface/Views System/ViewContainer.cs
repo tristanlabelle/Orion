@@ -29,10 +29,8 @@ namespace Orion.UserInterface
         #endregion
 
         #region Finalizer
-        ~ViewContainer()
-        {
-            Dispose(false);
-        }
+        // Purposefully removed as we only need deterministic cleaning up in the general case.
+        // Having many finalizers which are not needed is not GC-friendly.
         #endregion
 
         #region Events

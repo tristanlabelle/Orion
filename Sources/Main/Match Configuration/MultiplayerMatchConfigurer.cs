@@ -46,26 +46,29 @@ namespace Orion.Main
             int colorIndex = 0;
             foreach (PlayerSlot slot in UserInterface.Players)
             {
-                if (slot is ClosedPlayerSlot) continue;
-                if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
+                if (!slot.NeedsFaction) continue;
 
                 ColorRgb color = Faction.Colors[colorIndex];
-                Faction faction = world.CreateFaction(Colors.GetName(color), color);
                 colorIndex++;
 
                 if (slot is LocalPlayerSlot)
                 {
+                    string hostName = Environment.MachineName;
+                    Faction faction = world.CreateFaction(hostName, color);
                     localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
+                    Faction faction = world.CreateFaction(Colors.GetName(color), color);
                     Commander commander = new AgressiveAICommander(faction, random);
                     // AIs bypass the synchronization filter as they are supposed to be fully deterministic
                     aiCommanders.Add(commander);
                 }
                 else if (slot is RemotePlayerSlot) // no commanders for remote players
                 {
-                    IPv4EndPoint endPoint = ((RemotePlayerSlot)slot).RemoteHost.Value;
+                    RemotePlayerSlot remotePlayerSlot = (RemotePlayerSlot)slot;
+                    IPv4EndPoint endPoint = remotePlayerSlot.HostEndPoint.Value;
+                    Faction faction = world.CreateFaction(remotePlayerSlot.ToString(), color);
                     FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
                     peers.Add(peer);
                 }

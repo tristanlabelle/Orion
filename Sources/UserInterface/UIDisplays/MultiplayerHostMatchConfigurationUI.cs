@@ -46,11 +46,11 @@ namespace Orion.UserInterface
         private void SelectionChanged(DropdownList<PlayerSlot> slot, PlayerSlot value)
         {
             RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
-            if (remoteSlot.RemoteHost.HasValue)
+            if (remoteSlot.HostEndPoint.HasValue)
             {
                 Action<IPv4EndPoint> kickHandler = KickedPlayer;
-                if (kickHandler != null) kickHandler(remoteSlot.RemoteHost.Value);
-                remoteSlot.RemoteHost = null;
+                if (kickHandler != null) kickHandler(remoteSlot.HostEndPoint.Value);
+                remoteSlot.HostEndPoint = null;
             }
             Action<int, PlayerSlot> handler = SlotOccupationChanged;
             if (handler != null) handler(playerSlots.IndexOf(slot), value);

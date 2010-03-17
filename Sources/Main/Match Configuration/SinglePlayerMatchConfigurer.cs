@@ -45,7 +45,7 @@ namespace Orion.Main
             foreach (PlayerSlot slot in UserInterface.Players)
             {
                 if (slot is ClosedPlayerSlot) continue;
-                if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).RemoteHost.HasValue) continue;
+                if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).HostEndPoint.HasValue) continue;
 
                 ColorRgb color = Faction.Colors[colorIndex];
                 Faction faction = world.CreateFaction(Colors.GetName(color), color);

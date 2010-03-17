@@ -120,7 +120,7 @@ namespace Orion.Main
 
         private void Advertise(IPv4EndPoint host)
         {
-            int leftSlots = ui.Players.OfType<RemotePlayerSlot>().Count(slot => !slot.RemoteHost.HasValue);
+            int leftSlots = ui.Players.OfType<RemotePlayerSlot>().Count(slot => !slot.HostEndPoint.HasValue);
             advertiseGameMessage[1] = (byte)leftSlots;
             transporter.SendTo(advertiseGameMessage, host);
         }
@@ -165,7 +165,7 @@ namespace Orion.Main
                 if (slot is RemotePlayerSlot)
                 {
                     RemotePlayerSlot remotePlayer = (RemotePlayerSlot)slot;
-                    if (!remotePlayer.RemoteHost.HasValue)
+                    if (!remotePlayer.HostEndPoint.HasValue)
                     {
                         setSlotMessage[1] = (byte)slotNumber;
                         setSlotMessage[2] = (byte)SlotType.Open;
@@ -173,7 +173,7 @@ namespace Orion.Main
                         continue;
                     }
 
-                    IPv4EndPoint peer = ((RemotePlayerSlot)slot).RemoteHost.Value;
+                    IPv4EndPoint peer = ((RemotePlayerSlot)slot).HostEndPoint.Value;
                     addPeerMessage[1] = (byte)slotNumber;
                     BitConverter.GetBytes(peer.Address.Value).CopyTo(addPeerMessage, 2);
                     BitConverter.GetBytes(peer.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
@@ -214,7 +214,7 @@ namespace Orion.Main
             {
                 if (!(slot is RemotePlayerSlot)) return false;
                 RemotePlayerSlot remote = (RemotePlayerSlot)slot;
-                return remote.RemoteHost.HasValue && remote.RemoteHost.Value == host;
+                return remote.HostEndPoint.HasValue && remote.HostEndPoint.Value == host;
             });
 
             byte[] setSlotMessage = new byte[3];

@@ -16,38 +16,48 @@ namespace Orion.Matchmaking
 
     public sealed class RemotePlayerSlot : PlayerSlot
     {
-        private IPv4EndPoint? remoteHost;
-        private string name;
+        #region Fields
+        private IPv4EndPoint? hostEndPoint;
+        private string hostName;
+        #endregion
 
-        public IPv4EndPoint? RemoteHost
+        #region Properties
+        public IPv4EndPoint? HostEndPoint
         {
-            get { return remoteHost; }
+            get { return hostEndPoint; }
             set
             {
-                remoteHost = value;
-                if (remoteHost.HasValue)
+                hostEndPoint = value;
+                if (hostEndPoint.HasValue)
                 {
-                    IPHostEntry hostEntry = Dns.GetHostEntry(remoteHost.Value.Address);
-                    name = hostEntry == null ? null : hostEntry.HostName;
+                    IPHostEntry hostEntry = Dns.GetHostEntry(hostEndPoint.Value.Address);
+                    hostName = hostEntry == null ? null : hostEntry.HostName;
                 }
                 else
                 {
-                    name = null;
+                    hostName = null;
                 }
             }
         }
 
-        public override bool NeedsFaction
+        public string HostName
         {
-            get { return RemoteHost.HasValue; }
+            get { return hostName; }
         }
 
+        public override bool NeedsFaction
+        {
+            get { return HostEndPoint.HasValue; }
+        }
+        #endregion
+
+        #region Methods
         public override string ToString()
         {
-            if (RemoteHost.HasValue)
-                return name == null ? RemoteHost.Value.ToString() : name;
-            return "Ouvert";
+            if (!hostEndPoint.HasValue) return "Ouvert";
+            return hostName == null ? hostEndPoint.Value.ToString() : hostName;
         }
+        #endregion
     }
 
     public sealed class ClosedPlayerSlot : PlayerSlot

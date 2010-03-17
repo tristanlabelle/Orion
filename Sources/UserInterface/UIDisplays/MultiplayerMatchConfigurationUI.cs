@@ -29,8 +29,8 @@ namespace Orion.UserInterface
             get
             {
                 return Players.OfType<RemotePlayerSlot>()
-                    .Where(slot => slot.RemoteHost.HasValue)
-                    .Select(slot => slot.RemoteHost.Value);
+                    .Where(slot => slot.HostEndPoint.HasValue)
+                    .Select(slot => slot.HostEndPoint.Value);
             }
         }
         #endregion
@@ -43,7 +43,7 @@ namespace Orion.UserInterface
         public void OpenSlot(int slot)
         {
             SelectSlot<RemotePlayerSlot>(slot);
-            ((RemotePlayerSlot)playerSlots[slot].SelectedItem).RemoteHost = null;
+            ((RemotePlayerSlot)playerSlots[slot].SelectedItem).HostEndPoint = null;
         }
 
         public void CloseSlot(int slot)
@@ -64,7 +64,7 @@ namespace Orion.UserInterface
         public void UsePlayerForSlot(int slot, IPv4EndPoint host)
         {
             SelectSlot<RemotePlayerSlot>(slot);
-            ((RemotePlayerSlot)playerSlots[slot].SelectedItem).RemoteHost = host;
+            ((RemotePlayerSlot)playerSlots[slot].SelectedItem).HostEndPoint = host;
         }
 
         private void SelectionChanged(DropdownList<PlayerSlot> sender, PlayerSlot newValue)

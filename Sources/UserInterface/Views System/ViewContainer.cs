@@ -166,6 +166,14 @@ namespace Orion.UserInterface
             }
         }
         #endregion
+
+        /// <summary>
+        /// Gets a value indicating if this view has been disposed.
+        /// </summary>
+        public bool IsDisposed
+        {
+            get { return isDisposed; }
+        }
         #endregion
 
         #region Methods
@@ -223,7 +231,6 @@ namespace Orion.UserInterface
         /// </summary>
         public void Dispose()
         {
-            Debug.WriteLine("{0} is being disposed", this.ToString());
             EnsureNotDisposed();
 
             try

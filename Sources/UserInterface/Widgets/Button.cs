@@ -5,9 +5,13 @@ using Orion.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Keys = System.Windows.Forms.Keys;
+using System.Diagnostics;
 
 namespace Orion.UserInterface.Widgets
 {
+    /// <summary>
+    /// Provides a UI button which can be listened for clicks.
+    /// </summary>
     public class Button : RenderedView
     {
         #region Fields
@@ -44,12 +48,6 @@ namespace Orion.UserInterface.Widgets
         /// Triggered when the button is pressed or when its <see cref="P:HotKey"/> is pressed.
         /// </summary>
         public event Action<Button> Triggered;
-
-        private void RaiseTriggered()
-        {
-            var handler = Triggered;
-            if (handler != null) handler(this);
-        }
         #endregion
 
         #region Properties
@@ -145,6 +143,7 @@ namespace Orion.UserInterface.Widgets
                 caption.Color = captionOverColor;
                 isDown = false;
                 OnPress();
+                Debug.Assert(!IsDisposed, "A button was disposed while executing its Triggered handler.");
             }
 
             return false;
@@ -164,12 +163,13 @@ namespace Orion.UserInterface.Widgets
                 base.OnKeyDown(args);
                 return false;
             }
+
             return base.OnKeyDown(args);
         }
 
         protected virtual void OnPress()
         {
-            if (isEnabled) RaiseTriggered();
+            if (isEnabled) Triggered.Raise(this);
         }
 
         private void AlignCaption()

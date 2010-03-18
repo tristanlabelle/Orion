@@ -7,6 +7,7 @@ using Orion.Engine.Graphics;
 using Orion.Geometry;
 using Orion.Graphics;
 using Keys = System.Windows.Forms.Keys;
+using System.Diagnostics;
 
 namespace Orion.UserInterface.Widgets
 {
@@ -58,8 +59,8 @@ namespace Orion.UserInterface.Widgets
             }
             else if (arg == '\r')
             {
-                Action<TextField> handler = Triggered;
-                if (handler != null) handler(this);
+                Triggered.Raise(this);
+                Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
             }
             else Contents += arg;
 

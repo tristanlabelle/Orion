@@ -92,7 +92,7 @@ namespace Orion.GameLogic.Technologies
 
             Technology islamForce = new TechnologyBuilder
             {
-                Name = "Islam Force",
+                Name = "Force islamique",
                 AladdiumCost = 100,
                 AlageneCost = 250,
                 Predicate = (type => type.Name == "Jedihad" || type.Name == "Allah Skywalker"),

@@ -64,9 +64,11 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="UnitSkill.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
@@ -111,7 +113,6 @@
     <Compile Include="Technologies\Technology.cs" />
     <Compile Include="Technologies\TechnologyBuilder.cs" />
     <Compile Include="Technologies\TechnologyEffect.cs" />
-    <Compile Include="Technologies\TechnologyRequirements.cs" />
     <Compile Include="Technologies\TechnologyTree.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="TileVisibility.cs" />

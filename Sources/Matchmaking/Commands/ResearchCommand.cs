@@ -48,8 +48,8 @@ namespace Orion.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             Unit researcher = (Unit)match.World.Entities.FromHandle(researcherHandle);
 
-            int aladiumCost = technology.Requirements.AladdiumCost;
-            int alageneCost = technology.Requirements.AlageneCost;
+            int aladiumCost = technology.AladdiumCost;
+            int alageneCost = technology.AlageneCost;
 
             if (faction.AladdiumAmount >= aladiumCost && faction.AlageneAmount >= alageneCost)
             {

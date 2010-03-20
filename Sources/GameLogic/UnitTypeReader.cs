@@ -37,12 +37,34 @@ namespace Orion.GameLogic
 
             XmlElement unitTypeElement = document.DocumentElement;
             if (unitTypeElement.Name != "UnitType")
-                throw new InvalidDataException("Expected a root tag of type UnitType.");
+                throw new InvalidDataException("Expected a root <UnitType> tag.");
 
             ReadUnitTypeAttributes(unitTypeElement, unitTypeBuilder);
             ReadSkills(unitTypeElement, unitTypeBuilder);
 
             return unitTypeBuilder;
+        }
+
+        private static void ReadUnitTypeAttributes(XmlElement unitTypeElement, UnitTypeBuilder unitTypeBuilder)
+        {
+            foreach (XmlAttribute attribute in unitTypeElement.Attributes)
+            {
+                PropertyInfo property = typeof(UnitTypeBuilder).GetProperty(attribute.Name,
+                    BindingFlags.Public | BindingFlags.Instance);
+                if (property == null)
+                    throw new InvalidDataException("Invalid UnitType attribute {0}.".FormatInvariant(attribute.Name));
+
+                object value;
+                try { value = Convert.ChangeType(attribute.Value, property.PropertyType, CultureInfo.InvariantCulture); }
+                catch (InvalidCastException e)
+                {
+                    throw new InvalidDataException(
+                        "Invalid value for UnitType attribute {0}, expected type {1}."
+                        .FormatInvariant(attribute.Name, property.PropertyType.Name), e);
+                }
+
+                property.SetValue(unitTypeBuilder, value, null);
+            }
         }
 
         private static void ReadSkills(XmlElement unitTypeElement, UnitTypeBuilder unitTypeBuilder)
@@ -119,28 +141,6 @@ namespace Orion.GameLogic
 
                 var targets = (ICollection<string>)property.GetValue(unitTypeBuilder, null);
                 targets.Add(targetElement.InnerText);
-            }
-        }
-
-        private static void ReadUnitTypeAttributes(XmlElement unitTypeElement, UnitTypeBuilder unitTypeBuilder)
-        {
-            foreach (XmlAttribute attribute in unitTypeElement.Attributes)
-            {
-                PropertyInfo property = typeof(UnitTypeBuilder).GetProperty(attribute.Name,
-                    BindingFlags.Public | BindingFlags.Instance);
-                if (property == null)
-                    throw new InvalidDataException("Invalid UnitType attribute {0}.".FormatInvariant(attribute.Name));
-
-                object value;
-                try { value = Convert.ChangeType(attribute.Value, property.PropertyType, CultureInfo.InvariantCulture); }
-                catch (InvalidCastException e)
-                {
-                    throw new InvalidDataException(
-                        "Invalid value for UnitType attribute {0}, expected type {1}."
-                        .FormatInvariant(attribute.Name, property.PropertyType.Name), e);
-                }
-
-                property.SetValue(unitTypeBuilder, value, null);
             }
         }
         #endregion

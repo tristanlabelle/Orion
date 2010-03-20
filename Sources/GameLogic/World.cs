@@ -21,7 +21,7 @@ namespace Orion.GameLogic
         private readonly EntityManager entities;
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
-        private readonly TechnologyTree technologyTree;
+        private readonly TechnologyTree technologyTree = new TechnologyTree();
         private readonly Random random;
         #endregion
 
@@ -37,8 +37,6 @@ namespace Orion.GameLogic
             this.terrain = terrain;
             this.entities = new EntityManager(this);
             this.pathfinder = new Pathfinder(terrain.Size);
-            this.technologyTree = new TechnologyTree();
-            this.technologyTree.PopulateWithBaseTechnologies();
             this.random = random;
         }
         #endregion

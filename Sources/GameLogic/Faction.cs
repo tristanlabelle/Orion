@@ -284,8 +284,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(technology, "technology");
             return !HasResearched(technology)
-                && !IsResearching(technology)
-                && technology.RequiredTechnologies.All(tech => technologies.Contains(tech));
+                && !IsResearching(technology);
         }
 
         /// <summary>
@@ -297,24 +296,6 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(technology, "technology");
             if (HasResearched(technology)) return;
-
-            Technology firstMissingTechnology = technology.Requirements.Technologies
-                .FirstOrDefault(t => !technologies.Contains(technology));
-            if (firstMissingTechnology != null)
-            {
-                throw new InvalidOperationException(
-                    "Cannot develop technology {0} without {1}."
-                    .FormatInvariant(technology, firstMissingTechnology));
-            }
-
-#if DEBUG
-            // #if'd for performance
-            Debug.Assert(technology.Effects.None(effect =>
-                effect.Stat == UnitStat.SightRange
-                || effect.Stat == UnitStat.StoreFoodCapacity
-                || effect.Stat == UnitStat.FoodCost),
-                "Technologies to change this stat are not supported, they would cause bugs.");
-#endif
 
             technologies.Add(technology);
             RaiseTechnologyResearched(technology);

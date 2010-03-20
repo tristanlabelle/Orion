@@ -206,6 +206,18 @@ namespace Orion.GameLogic
             get { return values; }
         }
         #endregion
+
+        #region Methods
+        public static UnitStat Parse(string str)
+        {
+            Argument.EnsureNotNull(str, "str");
+
+            UnitStat stat = Values.FirstOrDefault(s => s.Name == str);
+            if (stat == null) throw new ArgumentException("Invalid UnitStat name: {0}.".FormatInvariant(str));
+
+            return stat;
+        }
+        #endregion
         #endregion
     }
 }

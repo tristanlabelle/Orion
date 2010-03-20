@@ -54,7 +54,7 @@ namespace Orion.UserInterface.Actions.Enablers
             ActionButton button = new ActionButton(actionFrame, inputManager, string.Empty, Keys.None, gameGraphics);
 
             button.Name = "{0}\nAladdium: {1} Alagene: {2}"
-                .FormatInvariant(technology.Name, technology.Requirements.AladdiumCost, technology.Requirements.AlageneCost);
+                .FormatInvariant(technology.Name, technology.AladdiumCost, technology.AlageneCost);
 
             Texture texture = gameGraphics.GetTechnologyTexture(technology);
             button.Renderer = new TexturedFrameRenderer(texture);

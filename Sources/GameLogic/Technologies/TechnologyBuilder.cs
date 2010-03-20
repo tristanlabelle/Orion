@@ -11,11 +11,17 @@ namespace Orion.GameLogic.Technologies
     {
         #region Fields
         private string name;
-        private HashSet<Technology> requiredTechnologies = new HashSet<Technology>();
         private int aladdiumCost;
         private int alageneCost;
-        private Func<UnitType, bool> predicate = type => true;
-        private HashSet<TechnologyEffect> effects = new HashSet<TechnologyEffect>();
+        private readonly HashSet<string> targets = new HashSet<string>();
+        private readonly HashSet<TechnologyEffect> effects = new HashSet<TechnologyEffect>();
+        #endregion
+
+        #region Constructors
+        public TechnologyBuilder()
+        {
+            Reset();
+        }
         #endregion
 
         #region Properties
@@ -27,11 +33,6 @@ namespace Orion.GameLogic.Technologies
                 Argument.EnsureNotNullNorBlank(value, "Name");
                 name = value;
             }
-        }
-
-        public ICollection<Technology> RequiredTechnologies
-        {
-            get { return requiredTechnologies; }
         }
 
         public int AladdiumCost
@@ -54,41 +55,28 @@ namespace Orion.GameLogic.Technologies
             }
         }
 
-        public Func<UnitType, bool> Predicate
+        public ICollection<string> Targets
         {
-            get { return predicate; }
-            set
-            {
-                Argument.EnsureNotNull(value, "Predicate");
-                predicate = value;
-            }
+            get { return targets; }
         }
 
         public ICollection<TechnologyEffect> Effects
         {
             get { return effects; }
-            set
-            {
-                Argument.EnsureNotNull(value, "Effect");
-                effects.Clear();
-                effects.UnionWith(value);
-            }
         }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Resets this <see cref="TechnologyBuilder"/>'s properties to their default values.
+        /// </summary>
         public void Reset()
         {
             name = null;
-            requiredTechnologies.Clear();
             aladdiumCost = 0;
             alageneCost = 0;
+            targets.Clear();
             effects.Clear();
-        }
-
-        public TechnologyRequirements BuildRequirements()
-        {
-            return new TechnologyRequirements(aladdiumCost, alageneCost, requiredTechnologies);
         }
 
         /// <summary>
@@ -100,8 +88,7 @@ namespace Orion.GameLogic.Technologies
         {
             if (name == null) throw new InvalidOperationException("A name must be set before the technology can be built.");
 
-            TechnologyRequirements requirements = BuildRequirements();
-            return new Technology(handle, name, requirements, predicate, effects);
+            return new Technology(handle, this);
         }
         #endregion
     }

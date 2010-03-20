@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Orion.GameLogic.Technologies
 {
@@ -12,7 +13,7 @@ namespace Orion.GameLogic.Technologies
     /// <remarks>
     /// Possible requirements:
     /// - Resources
-    /// - Other technologies
+    /// - Other technologies (Not implemented)
     /// Possible effects:
     /// - Alter a stat of unit types with a tag
     /// - Unlock a unit type
@@ -23,35 +24,27 @@ namespace Orion.GameLogic.Technologies
         #region Fields
         private readonly Handle handle;
         private readonly string name;
-        private readonly TechnologyRequirements requirements;
-        private readonly Func<UnitType, bool> predicate;
+        private readonly int aladdiumCost;
+        private readonly int alageneCost;
+        private readonly HashSet<string> targets;
         private readonly ReadOnlyCollection<TechnologyEffect> effects;
         #endregion
 
         #region Constructors
-        public Technology(Handle handle, string name,
-            TechnologyRequirements requirements,
-            Func<UnitType, bool> predicate,
-            IEnumerable<TechnologyEffect> effects)
+        internal Technology(Handle handle, TechnologyBuilder builder)
         {
-            Argument.EnsureNotNullNorBlank(name, "name");
-            Argument.EnsureNotNull(requirements, "requirements");
-            Argument.EnsureNotNull(predicate, "predicate");
-            Argument.EnsureNotNull(effects, "effects");
+            Argument.EnsureNotNull(builder, "builder");
 
             this.handle = handle;
-            this.name = name;
-            this.requirements = requirements;
-            this.predicate = predicate;
-            this.effects = effects.ToList().AsReadOnly();
-            Argument.EnsureStrictlyPositive(this.effects.Count, "effects.Count");
-        }
+            this.name = builder.Name;
+            this.aladdiumCost = builder.AladdiumCost;
+            this.alageneCost = builder.AlageneCost;
+            this.targets = new HashSet<string>(builder.Targets);
+            this.effects = builder.Effects.ToList().AsReadOnly();
 
-        public Technology(Handle handle, string name,
-            TechnologyRequirements requirements,
-            Func<UnitType, bool> predicate, params TechnologyEffect[] effects)
-            : this(handle, name, requirements, predicate, (IEnumerable<TechnologyEffect>)effects)
-        { }
+            Debug.Assert(this.targets.Count > 0, "Technology has no targets.");
+            Debug.Assert(this.effects.Count > 0, "Technology has no effects.");
+        }
         #endregion
 
         #region Properties
@@ -68,28 +61,14 @@ namespace Orion.GameLogic.Technologies
             get { return name; }
         }
 
-        /// <summary>
-        /// Gets the <see cref="TechnologyRequirements"/> which describes the preconditions
-        /// needed to research this technology.
-        /// </summary>
-        public TechnologyRequirements Requirements
-        {
-            get { return requirements; }
-        }
-
         public int AladdiumCost
         {
-            get { return requirements.AladdiumCost; }
+            get { return aladdiumCost; }
         }
 
         public int AlageneCost
         {
-            get { return requirements.AlageneCost; }
-        }
-
-        public IEnumerable<Technology> RequiredTechnologies
-        {
-            get { return requirements.Technologies; }
+            get { return alageneCost; }
         }
 
         /// <summary>
@@ -105,7 +84,7 @@ namespace Orion.GameLogic.Technologies
         public bool AppliesTo(UnitType unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
-            return predicate(unitType);
+            return targets.Contains(unitType.Name);
         }
 
         public int GetEffect(UnitType unitType, UnitStat stat)
@@ -113,8 +92,9 @@ namespace Orion.GameLogic.Technologies
             Argument.EnsureNotNull(unitType, "unitType");
             if (!AppliesTo(unitType)) return 0;
 
-            return effects.Where(effect => effect.Stat == stat)
-                .Sum(effect => effect.Value);
+            return effects
+                .Where(effect => effect.Stat == stat)
+                .Sum(effect => effect.Change);
         }
 
         public override string ToString()

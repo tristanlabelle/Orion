@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Technology Name="Sainte Trinité" AladdiumCost="200" AlageneCost="150">
+  <Target>Jésus</Target>
+  <Target>Jésus-raptor</Target>
+  <Effect Stat="MaxHealth" Change="30"/>
+  <Effect Stat="MeleeArmor" Change="1"/>
+  <Effect Stat="RangedArmor" Change="1"/>
+</Technology>

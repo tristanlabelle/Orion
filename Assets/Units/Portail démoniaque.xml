@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Portail démoniaque" Width="3" Height="3">
-	<Stats SightRange="8" MaxHealth="300" MeleeArmor="3" RangedArmor="3" AladdiumCost="180" AlageneCost="70" />
+	<Stats SightRange="8" MaxHealth="300" MeleeArmor="3" RangedArmor="3" AladdiumCost="180" AlageneCost="70"/>
 	<Train Speed="10">
 		<Target>Grippe A(H1N1)</Target>
     <Target>OVNI</Target>

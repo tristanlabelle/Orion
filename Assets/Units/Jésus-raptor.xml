@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <UnitType Name="Jésus-raptor" Width="2" Height="2" IsAirborne="True">
-	<Stats SightRange="8" MaxHealth="160" MeleeArmor="2" RangedArmor="2" FoodCost="2" />
-	<Move Speed="14" />
-	<Heal Speed="6" Range="6" />
-  <Attack Power="14" Range="0" Delay="3" />
+	<Stats SightRange="8" MaxHealth="160" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
+	<Move Speed="14"/>
+	<Heal Speed="6" Range="6"/>
+  <Attack Power="14" Range="0" Delay="3"/>
 </UnitType>

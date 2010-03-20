@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Flying Spaghetti Monster" Width="3" Height="3" IsAirborne="True">
-	<Stats SightRange="10" MaxHealth="150" MeleeArmor="4" RangedArmor="4" AladdiumCost="250" AlageneCost="175" FoodCost="3" />
-	<Move Speed="2" />
-	<Attack Power="16" Range="5" Delay="5" />
+	<Stats SightRange="10" MaxHealth="150" MeleeArmor="4" RangedArmor="4" AladdiumCost="250" AlageneCost="175" FoodCost="3"/>
+	<Move Speed="2"/>
+	<Attack Power="16" Range="5" Delay="5"/>
 </UnitType>

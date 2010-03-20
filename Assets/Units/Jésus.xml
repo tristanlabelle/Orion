@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Jésus" Width="2" Height="2" IsAirborne="True">
-	<Stats SightRange="8" MaxHealth="80" MeleeArmor="1" RangedArmor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2" />
-	<Move Speed="12" />
-	<Heal Speed="3" Range="4" />
+	<Stats SightRange="8" MaxHealth="80" MeleeArmor="1" RangedArmor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
+	<Move Speed="12"/>
+	<Heal Speed="3" Range="4"/>
 </UnitType>

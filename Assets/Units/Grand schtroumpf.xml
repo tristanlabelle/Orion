@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <UnitType Name="Grand schtroumpf" Width="1" Height="1">
-	<Stats SightRange="7" MaxHealth="60" MeleeArmor="1" RangedArmor="2" FoodCost="1" />
-	<Move Speed="8" />
-	<Attack Power="8" Range="0" Delay="4" />
-	<Harvest Speed="5" MaxCarryingAmount="20" />
+	<Stats SightRange="7" MaxHealth="60" MeleeArmor="1" RangedArmor="2" FoodCost="1"/>
+	<Move Speed="8"/>
+	<Attack Power="8" Range="0" Delay="4"/>
+	<Harvest Speed="5" MaxCarryingAmount="20"/>
 	<Build Speed="100">
 		<Target>Pyramide</Target>
 		<Target>Temple de 2012</Target>

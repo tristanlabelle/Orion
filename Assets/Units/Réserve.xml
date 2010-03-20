@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <UnitType Name="Réserve" Width="2" Height="2">
-	<Stats SightRange="4" MaxHealth="80" MeleeArmor="2" RangedArmor="2" AladdiumCost="50" />
-  <StoreFood Capacity="10" />
+	<Stats SightRange="4" MaxHealth="80" MeleeArmor="2" RangedArmor="2" AladdiumCost="50"/>
+  <StoreFood Capacity="10"/>
 </UnitType>

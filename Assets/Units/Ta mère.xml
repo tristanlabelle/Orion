@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Ta mère" Width="3" Height="3" IsAirborne="True">
-	<Stats SightRange="10" MaxHealth="300" MeleeArmor="4" RangedArmor="5" FoodCost="3" />
-	<Move Speed="3" />
-	<Attack Power="50" Range="5" Delay="4" />
+	<Stats SightRange="10" MaxHealth="300" MeleeArmor="4" RangedArmor="5" FoodCost="3"/>
+	<Move Speed="3"/>
+	<Attack Power="50" Range="5" Delay="4"/>
 </UnitType>

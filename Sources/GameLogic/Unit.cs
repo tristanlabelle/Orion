@@ -6,7 +6,6 @@ using OpenTK.Math;
 using Orion.Collections;
 using Orion.Geometry;
 using Orion.GameLogic.Tasks;
-using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic
 {
@@ -282,39 +281,18 @@ namespace Orion.GameLogic
             }
         }
         #endregion
-
-        public bool IsTransportFull
-        {
-            get { return transportedUnits.Count == GetStat(UnitStat.TransportCapacity); }
-        }
         #endregion
 
         #region Methods
-        #region Skills
         /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="Skill"/>.
+        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
         /// </summary>
-        /// <typeparam name="TSkill">
-        /// The <see cref="Skill"/> this <see cref="Unit"/> should have.
-        /// </typeparam>
-        /// <returns>True if this <see cref="Unit"/> has that <see cref="Skill"/>, false if not.</returns>
-        public TSkill GetSkill<TSkill>() where TSkill : Skill
+        /// <param name="skill">The skill to be found.</param>
+        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
+        public bool HasSkill(UnitSkill skill)
         {
-            return Type.GetSkill<TSkill>();
+            return type.HasSkill(skill);
         }
-
-        /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="Skill"/>.
-        /// </summary>
-        /// <typeparam name="TSkill">
-        /// The <see cref="Skill"/> this <see cref="Unit"/> should have.
-        /// </typeparam>
-        /// <returns>True if this <see cref="Unit"/> has that <see cref="Skill"/>, false if not.</returns>
-        public bool HasSkill<TSkill>() where TSkill : Skill
-        {
-            return Type.HasSkill<TSkill>();
-        }
-        #endregion
 
         #region Stats
         /// <summary>
@@ -344,7 +322,7 @@ namespace Orion.GameLogic
         {
             Argument.EnsureNotNull(other, "other");
 
-            if (!HasSkill<AttackSkill>()) return false;
+            if (!HasSkill(UnitSkill.Attack)) return false;
 
             int attackRange = GetStat(UnitStat.AttackRange);
             if (attackRange == 0)
@@ -437,44 +415,6 @@ namespace Orion.GameLogic
             isUnderConstruction = false;
             RaiseConstructionCompleted();
         }
-
-        public void Embark(Unit unit)
-        {
-            Argument.EnsureNotNull(unit, "unit");
-            Argument.EnsureEqual(unit.Faction, faction, "unit.Faction");
-            Debug.Assert(HasSkill<TransportSkill>());
-            Debug.Assert(!IsTransportFull);
-            Debug.Assert(unit != this);
-            Debug.Assert(!transportedUnits.Contains(unit));
-
-            transportedUnits.Push(unit);
-
-            unit.taskQueue.Clear();
-            World.Entities.Remove(unit);
-        }
-
-        public void Disembark()
-        {
-            while (transportedUnits.Count > 0)
-            {
-                Unit transportedUnit = transportedUnits.Peek();
-
-                Point? location = GridRegion.GetAdjacentPoints()
-                    .FirstOrNull(point => World.IsFree(point, transportedUnit.CollisionLayer));
-                if (!location.HasValue)
-                {
-                    faction.RaiseWarning("Pas de place pour le débarquement d'unités");
-                    break;
-                }
-
-                transportedUnits.Pop();
-                // HACK: Change the position directly instead of using SetPosition
-                // because we don't want to raise the Moved event, EntityManager
-                // doesn't like that.
-                transportedUnit.position = location.Value;
-                World.Entities.Add(transportedUnit);
-            }
-        }
         #endregion
 
         #region Spawning
@@ -537,7 +477,7 @@ namespace Orion.GameLogic
         private void ApplyRallyPoint(Vector2 target)
         {
             // Check to see if we can harvest automatically
-            if (HasSkill<HarvestSkill>())
+            if (HasSkill(UnitSkill.Harvest))
             {
                 ResourceNode resourceNode = World.Entities
                     .Intersecting(target)
@@ -569,12 +509,12 @@ namespace Orion.GameLogic
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
-                if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
+                if (HasSkill(UnitSkill.SuicideBomb) && TryExplodeWithNearbyUnit())
                     return;
 
-                if (HasSkill<BuildSkill>() && TryRepairNearbyUnit()) { }
-                else if (HasSkill<HealSkill>() && TryHealNearbyUnit()) { }
-                else if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>()
+                if (HasSkill(UnitSkill.Build) && TryRepairNearbyUnit()) { }
+                else if (HasSkill(UnitSkill.Heal) && TryHealNearbyUnit()) { }
+                else if (!IsUnderConstruction && HasSkill(UnitSkill.Attack) && !HasSkill(UnitSkill.Build)
                     && TryAttackNearbyUnit()) { }
             }
             taskQueue.Update(step);
@@ -582,18 +522,17 @@ namespace Orion.GameLogic
 
         private bool TryExplodeWithNearbyUnit()
         {
-            SuicideBombSkill suicideBombSkill = GetSkill<SuicideBombSkill>();
-
             Unit explodingTarget = World.Entities
                 .Intersecting(Rectangle.FromCenterSize(Center, new Vector2(3, 3)))
                 .OfType<Unit>()
                 .FirstOrDefault(unit => unit != this
-                    && suicideBombSkill.IsExplodingTarget(unit.type)
+                    && type.IsSuicideBombTarget(unit.type)
                     && Region.AreAdjacentOrIntersecting(GridRegion, unit.GridRegion));
 
             if (explodingTarget == null) return false;
 
-            Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, suicideBombSkill.ExplosionRadius);
+            float explosionRadius = GetStat(UnitStat.SuicideBombRadius);
+            Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, explosionRadius);
 
             explodingTarget.Suicide();
             Explode();
@@ -603,8 +542,8 @@ namespace Orion.GameLogic
 
         private void Explode()
         {
-            SuicideBombSkill suicideBombSkill = GetSkill<SuicideBombSkill>();
-            Circle explosionCircle = new Circle(Center, suicideBombSkill.ExplosionRadius);
+            float explosionRadius = GetStat(UnitStat.SuicideBombRadius);
+            Circle explosionCircle = new Circle(Center, explosionRadius);
 
             World.RaiseExplosionOccured(explosionCircle);
             Suicide();
@@ -615,18 +554,19 @@ namespace Orion.GameLogic
                 .Where(unit => unit != this && unit.IsAlive)
                 .ToArray();
 
+            float explosionDamage = GetStat(UnitStat.SuicideBombDamage);
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                if (damagedUnit.HasSkill(UnitSkill.SuicideBomb)) continue;
                 float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
-                    * suicideBombSkill.ExplosionDamage;
+                    * explosionDamage;
                 damagedUnit.Health -= damage;
             }
 
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                if (!damagedUnit.HasSkill(UnitSkill.SuicideBomb)) continue;
                 damagedUnit.Explode();
             }
         }
@@ -645,7 +585,7 @@ namespace Orion.GameLogic
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
                 .WithMinOrDefault(unit => (unit.Position - position).LengthSquared
-                    + (unit.HasSkill<AttackSkill>() ? 0 : 100));
+                    + (unit.HasSkill(UnitSkill.Attack) ? 0 : 100));
 
             if (unitToAttack == null) return false;
         

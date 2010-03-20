@@ -9,7 +9,6 @@ using Orion.Collections;
 using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using BuildTask = Orion.GameLogic.Tasks.BuildTask;
-using ExtractAlageneSkill = Orion.GameLogic.Skills.ExtractAlageneSkill;
 
 namespace Orion.Matchmaking.Commands
 {
@@ -74,7 +73,7 @@ namespace Orion.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
 
-            if (buildingType.HasSkill<ExtractAlageneSkill>())
+            if (buildingType.HasSkill(UnitSkill.ExtractAlagene))
             {
                 ResourceNode node = match.World.Entities
                     .OfType<ResourceNode>()

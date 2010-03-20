@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<UnitType Name="Oeil de Sauron" Width="2" Height="2">
+	<Stats SightRange="16" MaxHealth="100" MeleeArmor="1" RangedArmor="1" AladdiumCost="100" AlageneCost="25" />
+</UnitType>

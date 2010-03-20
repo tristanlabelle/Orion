@@ -31,7 +31,7 @@ namespace Orion.GameLogic.Technologies
                 AladdiumCost = 200,
                 AlageneCost = 50,
                 Predicate = (type => type.Name == "Schtroumpf" || type.Name == "Grand Schtroumpf"),
-                Effects = new[] { new TechnologyEffect(UnitStat.MovementSpeed, 2) }
+                Effects = new[] { new TechnologyEffect(UnitStat.MoveSpeed, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(increasedSchtroumpfSpeed);
@@ -85,7 +85,7 @@ namespace Orion.GameLogic.Technologies
                 AladdiumCost = 200,
                 AlageneCost = 150,
                 Predicate = (type => type.Name == "Flying Spaghetti Monster" || type.Name == "Ta Mère"),
-                Effects = new[] { new TechnologyEffect(UnitStat.MovementSpeed, 2) }
+                Effects = new[] { new TechnologyEffect(UnitStat.MoveSpeed, 2) }
             }.Build(handleGenerator());
 
             technologies.Add(spaghettiAlfredo);

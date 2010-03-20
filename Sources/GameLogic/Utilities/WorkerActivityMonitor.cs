@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.GameLogic.Tasks;
 using System.Diagnostics;
 
@@ -130,7 +129,7 @@ namespace Orion.GameLogic.Utilities
 
         private static bool IsWorker(Unit unit)
         {
-            return unit.HasSkill<BuildSkill>();
+            return unit.HasSkill(UnitSkill.Build);
         }
         #endregion
     }

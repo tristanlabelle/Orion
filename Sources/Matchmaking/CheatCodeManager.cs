@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 
 namespace Orion.Matchmaking
 {
@@ -73,7 +72,6 @@ namespace Orion.Matchmaking
             Default.Register("magiclamp", IncreaseResources);
             Default.Register("twelvehungrymen", IncreaseAvailableFood);
             Default.Register("whosyourdaddy", SpawnChuckNorris);
-            Default.Register("turboturbo", AccelerateUnitDevelopment);
             Default.Register("brinformatique", InstantDefeat);
             Default.Register("itsover9000", InstantVictory);
             Default.Register("catchmymohawk", SpawnMisterT);
@@ -110,16 +108,6 @@ namespace Orion.Matchmaking
             UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
             faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
         }
-
-        private static void AccelerateUnitDevelopment(Match match, Faction faction)
-        {
-            foreach (UnitType type in match.World.UnitTypes)
-            {
-                if (type.HasSkill<TrainSkill>()) type.GetSkill<TrainSkill>().Speed *= 50;
-                if (type.HasSkill<BuildSkill>()) type.GetSkill<BuildSkill>().Speed *= 50;
-            }
-        }
-
         private static void InstantVictory(Match match, Faction faction)
         {
             List<Unit> enemyBuildings = match.World.Entities
@@ -148,7 +136,6 @@ namespace Orion.Matchmaking
             IncreaseResources(match, faction);
             IncreaseAvailableFood(match, faction);
             SpawnChuckNorris(match, faction);
-            AccelerateUnitDevelopment(match, faction);
         }
         #endregion
         #endregion

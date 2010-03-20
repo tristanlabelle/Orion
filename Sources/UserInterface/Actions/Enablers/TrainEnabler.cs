@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
@@ -22,12 +21,11 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            TrainSkill trainSkill = unitType.GetSkill<TrainSkill>();
-            if (trainSkill == null) return;
+            if (!unitType.HasSkill(UnitSkill.Train)) return;
             
             int x = 0;
             int y = 3;
-            foreach (UnitType traineeType in World.UnitTypes.Where(t => !t.IsBuilding && trainSkill.Supports(t)))
+            foreach (UnitType traineeType in World.UnitTypes.Where(t => !t.IsBuilding && unitType.CanTrain(t)))
             {
                 // find an empty slot
                 while (buttonsArray[x, y] != null)

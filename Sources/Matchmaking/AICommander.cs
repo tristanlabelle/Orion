@@ -7,7 +7,6 @@ using Orion.Geometry;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 
 namespace Orion.Matchmaking
 {
@@ -156,8 +155,8 @@ namespace Orion.Matchmaking
             List<Unit> potentialTrainers = allUnits
                 .Where(unit => unit.Faction == Faction
                     && unit.IsIdle
-                    && unit.HasSkill<TrainSkill>()
-                    && unit.GetSkill<TrainSkill>().Supports(toTrain))
+                    && unit.HasSkill(UnitSkill.Train)
+                    && unit.Type.CanTrain(toTrain))
                 .ToList();
             List<Unit> trainers = new List<Unit>();
 
@@ -188,8 +187,8 @@ namespace Orion.Matchmaking
         {
             List<Unit> potentialAttackers = 
                 allUnits.Where(unit => unit.Faction == Faction 
-                && unit.Type.HasSkill<AttackSkill>() 
-                && !unit.Type.HasSkill<HarvestSkill>()
+                && unit.Type.HasSkill(UnitSkill.Attack) 
+                && !unit.Type.HasSkill(UnitSkill.Harvest)
                 && unit.IsIdle
                 ).ToList();
             List<Unit> attackers = new List<Unit>();
@@ -217,7 +216,7 @@ namespace Orion.Matchmaking
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
-                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<HarvestSkill>()).ToList();
+                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill(UnitSkill.Harvest)).ToList();
                 
                 List<Unit> harvesters = new List<Unit>();
 
@@ -247,7 +246,7 @@ namespace Orion.Matchmaking
         {
             UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();
+            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill(UnitSkill.Build)).ToList();
             List<Unit> builders = new List<Unit>();
 
             if (positions.Count <= potentialBuilders.Count)

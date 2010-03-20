@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.GameLogic.Skills;
 using System.Diagnostics;
 
 namespace Orion.GameLogic
@@ -16,16 +15,14 @@ namespace Orion.GameLogic
     {
         #region Fields
         private string name;
-        private SkillCollection skills = new SkillCollection();
-        private bool isAirborne;
-        private int aladdiumCost;
-        private int alageneCost;
-        private int maxHealth;
-        private int meleeArmor;
-        private int rangedArmor;
-        private int sightRange;
-        private int foodCost;
         private Size size;
+        private bool isAirborne;
+        private readonly HashSet<UnitSkill> skills = new HashSet<UnitSkill>();
+        private readonly Dictionary<UnitStat, int> stats = new Dictionary<UnitStat, int>();
+        private readonly HashSet<string> buildTargets = new HashSet<string>();
+        private readonly HashSet<string> trainTargets = new HashSet<string>();
+        private readonly HashSet<string> researchTargets = new HashSet<string>();
+        private readonly HashSet<string> suicideBombTargets = new HashSet<string>();
         #endregion
 
         #region Constructors
@@ -46,77 +43,6 @@ namespace Orion.GameLogic
             }
         }
 
-        public SkillCollection Skills
-        {
-            get { return skills; }
-        }
-
-        public bool IsAirborne
-        {
-            get { return isAirborne; }
-            set { isAirborne = value; }
-        }
-
-        public int AladdiumCost
-        {
-            get { return aladdiumCost; }
-            set
-            {
-                Argument.EnsurePositive(value, "AladdiumCost");
-                this.aladdiumCost = value;
-            }
-        }
-
-        public int AlageneCost
-        {
-            get { return alageneCost; }
-            set
-            {
-                Argument.EnsurePositive(value, "AlageneCost");
-                this.alageneCost = value;
-            }
-        }
-
-        public int MaxHealth
-        {
-            get { return maxHealth; }
-            set
-            {
-                Argument.EnsureStrictlyPositive(value, "MaxHealth");
-                this.maxHealth = value;
-            }
-        }
-
-        public int MeleeArmor
-        {
-            get { return meleeArmor; }
-            set
-            {
-                Argument.EnsurePositive(value, "MeleeArmor");
-                this.meleeArmor = value;
-            }
-        }
-
-        public int RangedArmor
-        {
-            get { return rangedArmor; }
-            set
-            {
-                Argument.EnsurePositive(value, "RangedArmor");
-                this.rangedArmor = value;
-            }
-        }
-
-        public int SightRange
-        {
-            get { return sightRange; }
-            set
-            {
-                Argument.EnsureStrictlyPositive(value, "SightRange");
-                this.sightRange = value;
-            }
-        }
-
         public Size Size
         {
             get { return size; }
@@ -128,14 +54,52 @@ namespace Orion.GameLogic
             }
         }
 
-        public int FoodCost
+        public int Width
         {
-            get { return foodCost; }
-            set 
-            {
-                Argument.EnsureStrictlyPositive(value, "FoodCost");
-                this.foodCost = value;
-            }
+            get { return size.Width; }
+            set { size = new Size(value, size.Height); }
+        }
+
+        public int Height
+        {
+            get { return size.Height; }
+            set { size = new Size(size.Width, value); }
+        }
+
+        public bool IsAirborne
+        {
+            get { return isAirborne; }
+            set { isAirborne = value; }
+        }
+
+        public ICollection<UnitSkill> Skills
+        {
+            get { return skills; }
+        }
+
+        public IDictionary<UnitStat, int> Stats
+        {
+            get { return stats; }
+        }
+
+        public ICollection<string> TrainTargets
+        {
+            get { return trainTargets; }
+        }
+
+        public ICollection<string> BuildTargets
+        {
+            get { return trainTargets; }
+        }
+
+        public ICollection<string> ResearchTargets
+        {
+            get { return researchTargets; }
+        }
+
+        public ICollection<string> SuicideBombTargets
+        {
+            get { return suicideBombTargets; }
         }
         #endregion
 
@@ -146,20 +110,43 @@ namespace Orion.GameLogic
         public void Reset()
         {
             name = null;
-            skills.Clear();
-            aladdiumCost = 0;
-            alageneCost = 0;
-            maxHealth = 1;
-            meleeArmor = 0;
-            rangedArmor = 0;
-            sightRange = 1;
-            foodCost = 0;
             size = new Size(1, 1);
+            isAirborne = false;
+            skills.Clear();
+            stats.Clear();
+        }
+
+        public void Validate()
+        {
+            if (name == null) throw new InvalidOperationException("UnitType has no name.");
+
+            foreach (UnitStat stat in stats.Keys)
+            {
+                if (!stat.HasAssociatedSkill) continue;
+
+                UnitSkill skill = stat.AssociatedSkill;
+                if (skills.Contains(skill)) continue;
+
+                throw new InvalidOperationException("UnitType defines stat {0} without skill {1}."
+                    .FormatInvariant(stat, skill));
+            }
+
+            foreach (UnitSkill skill in skills)
+            {
+                foreach (UnitStat stat in UnitStat.Values.Where(s => s.HasAssociatedSkill && s.AssociatedSkill == skill))
+                {
+                    if (!stats.ContainsKey(stat))
+                    {
+                        throw new InvalidOperationException("UnitTypes has skill {0} but does not define stat {1}."
+                            .FormatInvariant(skills, stat));
+                    }
+                }
+            }
         }
 
         public UnitType Build(Handle handle)
         {
-            if (name == null) throw new InvalidOperationException("Cannot create a new UnitType until a name is set.");
+            Validate();
             return new UnitType(handle, this);
         }
         #endregion

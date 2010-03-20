@@ -41,7 +41,7 @@ namespace Orion.GameLogic.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            if (!unit.HasSkill<Skills.MoveSkill>())
+            if (!unit.HasSkill(UnitSkill.Move))
                 throw new ArgumentException("Cannot walk without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
@@ -91,7 +91,7 @@ namespace Orion.GameLogic.Tasks
 
             if (path == null && !TryRepath()) return;
 
-            float distance = Unit.GetStat(UnitStat.MovementSpeed) * step.TimeDeltaInSeconds;
+            float distance = Unit.GetStat(UnitStat.MoveSpeed) * step.TimeDeltaInSeconds;
 
             Vector2 targetPathPoint = path.Points[targetPathPointIndex];
             Unit.LookAt(targetPathPoint + (Vector2)Unit.Size * 0.5f);

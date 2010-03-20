@@ -2,7 +2,6 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Matchmaking;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 
 namespace Orion.UserInterface.Actions.UserCommands
 {

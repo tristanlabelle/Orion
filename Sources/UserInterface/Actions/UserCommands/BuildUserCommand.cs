@@ -3,7 +3,6 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
@@ -52,7 +51,7 @@ namespace Orion.UserInterface.Actions.UserCommands
                 if (!LocalFaction.HasFullySeen(region))
                     return false;
 
-                if (!buildingType.HasSkill<ExtractAlageneSkill>())
+                if (!buildingType.HasSkill(UnitSkill.ExtractAlagene))
                     return true;
 
                 // Special case for alagene extractors:

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<UnitType Name="Extracteur d'alagène" Width="2" Height="2">
+	<Stats SightRange="4" MaxHealth="75" MeleeArmor="1" RangedArmor="1" AladdiumCost="75" />
+  <ExtractAlagene />
+</UnitType>

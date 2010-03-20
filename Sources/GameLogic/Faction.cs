@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Collections;
 using Orion.Geometry;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
 using Orion.GameLogic.Technologies;
-using Orion.GameLogic.Skills;
 using ColorPalette = Orion.Colors;
 
 namespace Orion.GameLogic
@@ -204,7 +204,7 @@ namespace Orion.GameLogic
 
         private bool IsStuck
         {
-            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<Skills.BuildSkill>()); }
+            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill(UnitSkill.Build)); }
         }
 
         #region Resources
@@ -309,8 +309,11 @@ namespace Orion.GameLogic
 
 #if DEBUG
             // #if'd for performance
-            Debug.Assert(technology.Effects.All(effect => effect.Stat != UnitStat.SightRange && effect.Stat != UnitStat.FoodStorageCapacity),
-                "Sight range and food storage capacity changing technologies are not supported, they would cause bugs.");
+            Debug.Assert(technology.Effects.None(effect =>
+                effect.Stat == UnitStat.SightRange
+                || effect.Stat == UnitStat.StoreFoodCapacity
+                || effect.Stat == UnitStat.FoodCost),
+                "Technologies to change this stat are not supported, they would cause bugs.");
 #endif
 
             technologies.Add(technology);
@@ -367,7 +370,7 @@ namespace Orion.GameLogic
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
-            if (type.HasSkill<Skills.ExtractAlageneSkill>())
+            if (type.HasSkill(UnitSkill.ExtractAlagene))
             {
                 ResourceNode alageneNode = World.Entities
                                 .OfType<ResourceNode>()
@@ -388,7 +391,7 @@ namespace Orion.GameLogic
             }
 
             unit.Moved += unitMovedEventHandler;
-            usedFoodAmount += type.FoodCost;
+            usedFoodAmount += GetStat(type, UnitStat.FoodCost);
 
             return unit;
         }
@@ -417,13 +420,13 @@ namespace Orion.GameLogic
             }
             else
             {
-                if (unit.Type.HasSkill<Skills.StoreFoodSkill>())
-                    totalFoodAmount -= unit.GetStat(UnitStat.FoodStorageCapacity);
+                if (unit.Type.HasSkill(UnitSkill.StoreFood))
+                    totalFoodAmount -= unit.GetStat(UnitStat.StoreFoodCapacity);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }
 
-            usedFoodAmount -= unit.Type.FoodCost;
+            usedFoodAmount -= GetStat(unit.Type, UnitStat.FoodCost);
 
             CheckForDefeat();
         }
@@ -442,7 +445,7 @@ namespace Orion.GameLogic
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
-            if (unit.HasSkill<StoreFoodSkill>()) totalFoodAmount += unit.GetStat(UnitStat.FoodStorageCapacity);
+            if (unit.HasSkill(UnitSkill.StoreFood)) totalFoodAmount += unit.GetStat(UnitStat.StoreFoodCapacity);
         }
         #endregion
 

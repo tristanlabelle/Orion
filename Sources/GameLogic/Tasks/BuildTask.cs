@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Diagnostics;
 using OpenTK.Math;
-using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -23,15 +22,12 @@ namespace Orion.GameLogic.Tasks
             : base(builder)
         {
             Argument.EnsureNotNull(builder, "builder");
-            BuildSkill buildSkill = builder.GetSkill<BuildSkill>();
-            if (buildSkill == null)
-                throw new ArgumentException("Cannot build without the build skill.", "builder");
-            if (!buildSkill.Supports(buildingPlan.BuildingType))
-                throw new ArgumentException("Builder {0} cannot train {1}."
-                    .FormatInvariant(builder, buildingPlan.BuildingType));
-            if (!builder.HasSkill<Skills.BuildSkill>())
-                throw new ArgumentException("Cannot build without the build skill.", "builder");
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
+            if (!builder.HasSkill(UnitSkill.Build))
+                throw new ArgumentException("Cannot build without the build skill.", "builder");
+            if (!builder.Type.CanBuild(buildingPlan.BuildingType))
+                throw new ArgumentException("Builder {0} cannot build {1}."
+                    .FormatInvariant(builder, buildingPlan.BuildingType));
 
             this.buildingPlan = buildingPlan;
             this.move = MoveTask.ToNearRegion(builder, buildingPlan.GridRegion);
@@ -101,7 +97,7 @@ namespace Orion.GameLogic.Tasks
 
             buildingPlan.CreateBuilding();
 
-            if (buildingPlan.Building.HasSkill<ExtractAlageneSkill>())
+            if (buildingPlan.Building.HasSkill(UnitSkill.ExtractAlagene))
             {
                 ResourceNode node = Unit.World.Entities
                     .OfType<ResourceNode>()

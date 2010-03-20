@@ -16,7 +16,6 @@ using Orion.UserInterface;
 using Orion.Audio;
 using System.Threading;
 using Button = Orion.UserInterface.Widgets.Button;
-using Orion.GameLogic.Skills;
 
 namespace Orion.Main
 {
@@ -177,7 +176,7 @@ namespace Orion.Main
             gameUI.Display(matchUI);
             match.Start();
 
-            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill(UnitSkill.Train))
                 ?? localCommander.Faction.Units.FirstOrDefault();
             if (viewTarget != null) matchUI.CenterOn(viewTarget.Center);
         }

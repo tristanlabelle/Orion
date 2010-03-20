@@ -77,7 +77,8 @@ namespace Orion.Matchmaking.Commands
                     continue;
                 }
 
-                if (traineeType.FoodCost > faction.RemainingFoodAmount)
+                int foodCost = faction.GetStat(traineeType, UnitStat.FoodCost);
+                if (foodCost > faction.RemainingFoodAmount)
                 {
                     faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
                         .FormatInvariant(traineeType.Name));

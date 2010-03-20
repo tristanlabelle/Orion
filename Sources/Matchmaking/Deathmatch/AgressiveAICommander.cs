@@ -6,7 +6,6 @@ using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
 using Orion.Geometry;
-using Orion.GameLogic.Skills;
 
 namespace Orion.Matchmaking.Deathmatch
 {
@@ -42,7 +41,7 @@ namespace Orion.Matchmaking.Deathmatch
 
                 InitiateTraining("Viking", 1);
 
-                if (World.Factions.First().Units.Any(unit => unit.HasSkill<AttackSkill>()))
+                if (World.Factions.First().Units.Any(unit => unit.HasSkill(UnitSkill.Attack)))
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 

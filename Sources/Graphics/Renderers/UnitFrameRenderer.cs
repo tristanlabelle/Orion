@@ -9,7 +9,6 @@ using Orion.GameLogic;
 using Orion.GameLogic.Tasks;
 using Orion.Geometry;
 using Font = System.Drawing.Font;
-using Orion.GameLogic.Skills;
 
 namespace Orion.Graphics.Renderers
 {
@@ -24,7 +23,7 @@ namespace Orion.Graphics.Renderers
         {
             UnitStat.AttackPower, UnitStat.AttackRange,
             UnitStat.MeleeArmor, UnitStat.RangedArmor,
-            UnitStat.MovementSpeed, UnitStat.SightRange
+            UnitStat.MoveSpeed, UnitStat.SightRange
         };
         private static readonly Dictionary<UnitStat, string> statNames = new Dictionary<UnitStat, string>();
         private const float firstLineY = 180;
@@ -42,13 +41,13 @@ namespace Orion.Graphics.Renderers
             statNames[UnitStat.AttackDelay] = "Délai d'attaque";
             statNames[UnitStat.AttackPower] = "Puissance d'attaque";
             statNames[UnitStat.AttackRange] = "Portée d'attaque";
-            statNames[UnitStat.BuildingSpeed] = "Vitesse de construction";
-            statNames[UnitStat.ExtractingSpeed] = "Vitesse d'extraction";
-            statNames[UnitStat.FoodStorageCapacity] = "Capacité de stockage";
+            statNames[UnitStat.BuildSpeed] = "Vitesse de construction";
+            statNames[UnitStat.HarvestSpeed] = "Vitesse d'extraction";
+            statNames[UnitStat.StoreFoodCapacity] = "Capacité de stockage";
             statNames[UnitStat.HealSpeed] = "Vitesse de soin";
             statNames[UnitStat.MeleeArmor] = "Armure au corps-à-corps";
             statNames[UnitStat.RangedArmor] = "Armure à distance";
-            statNames[UnitStat.MovementSpeed] = "Vitesse de mouvement";
+            statNames[UnitStat.MoveSpeed] = "Vitesse de mouvement";
             statNames[UnitStat.SightRange] = "Portée de vision";
         }
 
@@ -68,7 +67,7 @@ namespace Orion.Graphics.Renderers
         {
             bool isTraining = false;
 
-            if (unit.HasSkill<TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
+            if (unit.HasSkill(UnitSkill.Train) && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
             {
                 isTraining = true;
 

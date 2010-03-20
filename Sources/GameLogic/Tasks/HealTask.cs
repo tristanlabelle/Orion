@@ -23,7 +23,7 @@ namespace Orion.GameLogic.Tasks
         {
             Argument.EnsureNotNull(healer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!healer.HasSkill<Skills.HealSkill>())
+            if (!healer.HasSkill(UnitSkill.Heal))
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");

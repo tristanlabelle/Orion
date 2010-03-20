@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Collections;
-using Orion.GameLogic.Skills;
+using Orion.GameLogic.Technologies;
 
 namespace Orion.GameLogic
 {
@@ -21,19 +21,18 @@ namespace Orion.GameLogic
         #region Fields
         private readonly Handle handle;
         private readonly string name;
-        private readonly ReadOnlyCollection<Skill> skills;
+
         private readonly Size size;
-
         private readonly bool isAirborne;
-        private readonly bool isBuilding;
 
-        private readonly int aladdiumCost;
-        private readonly int alageneCost;
-        private readonly int maxHealth;
-        private readonly int meleeArmor;
-        private readonly int rangedArmor;
-        private readonly int sightRange;
-        private readonly int foodCost;
+        private readonly HashSet<UnitSkill> skills;
+        private readonly Dictionary<UnitStat, int> stats;
+        private readonly HashSet<string> buildTargets;
+        private readonly HashSet<string> trainTargets;
+        private readonly HashSet<string> researchTargets;
+        private readonly HashSet<string> suicideBombTargets;
+
+        private readonly bool isBuilding;
         #endregion
 
         #region Constructors
@@ -43,23 +42,27 @@ namespace Orion.GameLogic
 
             this.handle = handle;
             this.name = builder.Name;
-            this.skills = builder.Skills.ToList().AsReadOnly();
+
             this.size = builder.Size;
-
             this.isAirborne = builder.IsAirborne;
-            this.isBuilding = builder.Skills.None(skill => skill is MoveSkill);
 
-            this.aladdiumCost = builder.AladdiumCost;
-            this.alageneCost = builder.AlageneCost;
-            this.maxHealth = builder.MaxHealth;
-            this.sightRange = builder.SightRange;
-            this.foodCost = builder.FoodCost;
-            this.meleeArmor = builder.MeleeArmor;
-            this.rangedArmor = builder.RangedArmor;
+            this.skills = new HashSet<UnitSkill>(builder.Skills);
+            this.stats = new Dictionary<UnitStat, int>(builder.Stats);
+            this.buildTargets = new HashSet<string>(builder.BuildTargets);
+            this.trainTargets = new HashSet<string>(builder.TrainTargets);
+            this.researchTargets = new HashSet<string>(builder.ResearchTargets);
+            this.suicideBombTargets = new HashSet<string>(builder.SuicideBombTargets);
 
-            var attackSkill = GetSkill<AttackSkill>();
-            Debug.Assert(attackSkill == null || attackSkill.MaxRange <= sightRange,
+            var unspecifiedStatsWithDefaultValues = UnitStat.Values
+                .Where(stat => stat.HasDefaultValue && !this.stats.ContainsKey(stat));
+            foreach (UnitStat stat in unspecifiedStatsWithDefaultValues) this.stats.Add(stat, stat.DefaultValue);
+
+            this.isBuilding = !skills.Contains(UnitSkill.Move);
+
+#if DEBUG
+            Debug.Assert(!skills.Contains(UnitSkill.Attack) || stats[UnitStat.AttackRange] <= stats[UnitStat.SightRange],
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
+#endif
         }
         #endregion
 
@@ -77,11 +80,6 @@ namespace Orion.GameLogic
         #endregion
 
         #region Skills
-        public ReadOnlyCollection<Skill> Skills
-        {
-            get { return skills; }
-        }
-
         public bool IsBuilding
         {
             get { return isBuilding; }
@@ -115,11 +113,6 @@ namespace Orion.GameLogic
             get { return IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground; }
         }
 
-        public int FoodCost
-        {
-            get { return foodCost; }
-        }
-        
         /// <summary>
         /// Gets a value indicating if this type of unit keeps its <see cref="Faction"/> alive,
         /// that is, the <see cref="Faction"/> isn't defeated until all such units are dead.
@@ -129,51 +122,48 @@ namespace Orion.GameLogic
             get
             {
                 if (IsBuilding)
-                    return HasSkill<TrainSkill>();
+                    return HasSkill(UnitSkill.Train);
                 else
-                    return HasSkill<BuildSkill>() || HasSkill<AttackSkill>();
+                    return HasSkill(UnitSkill.Build) || HasSkill(UnitSkill.Attack);
             }
         }
         #endregion
 
         #region Methods
-        public TSkill GetSkill<TSkill>() where TSkill : Skill
+        public bool HasSkill(UnitSkill skill)
         {
-            // OPTIM: There was a linq query here, but as this method is called quite often
-            // and had processor overhead, a for loop is preferred.
-            for (int i = 0; i < skills.Count; ++i)
-            {
-                TSkill skill = skills[i] as TSkill;
-                if (skill != null) return skill;
-            }
-
-            return null;
-        }
-
-        public bool HasSkill<TSkill>() where TSkill : Skill
-        {
-            return GetSkill<TSkill>() != null;
+            return skills.Contains(skill);
         }
 
         public int GetBaseStat(UnitStat stat)
         {
-            switch (stat)
-            {
-                case UnitStat.AladdiumCost: return aladdiumCost;
-                case UnitStat.AlageneCost: return alageneCost;
-                case UnitStat.MaxHealth: return maxHealth;
-                case UnitStat.SightRange: return sightRange;
-                case UnitStat.MeleeArmor: return meleeArmor;
-                case UnitStat.RangedArmor: return rangedArmor;
-            }
+            int value;
+            stats.TryGetValue(stat, out value);
+            return value;
+        }
 
-            for (int i = 0; i < skills.Count; ++i)
-            {
-                int? value = skills[i].TryGetBaseStat(stat);
-                if (value.HasValue) return value.Value;
-            }
+        public bool CanBuild(UnitType targetType)
+        {
+            Argument.EnsureNotNull(targetType, "targetType");
+            return HasSkill(UnitSkill.Build) && buildTargets.Contains(targetType.Name);
+        }
 
-            return 0;
+        public bool CanTrain(UnitType targetType)
+        {
+            Argument.EnsureNotNull(targetType, "targetType");
+            return HasSkill(UnitSkill.Train) && trainTargets.Contains(targetType.Name);
+        }
+
+        public bool CanResearch(Technology technology)
+        {
+            Argument.EnsureNotNull(technology, "technology");
+            return HasSkill(UnitSkill.Research) && researchTargets.Contains(technology.Name);
+        }
+
+        public bool IsSuicideBombTarget(UnitType targetType)
+        {
+            Argument.EnsureNotNull(targetType, "targetType");
+            return HasSkill(UnitSkill.SuicideBomb) && suicideBombTargets.Contains(targetType.Name);
         }
 
         public override string ToString()

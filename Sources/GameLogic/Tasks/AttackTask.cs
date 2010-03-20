@@ -20,12 +20,12 @@ namespace Orion.GameLogic.Tasks
             : base(attacker)
         {
             Argument.EnsureNotNull(attacker, "attacker");
-            if (!attacker.HasSkill<Skills.AttackSkill>())
+            if (!attacker.HasSkill(UnitSkill.Attack))
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
             this.target = target;
-            if (attacker.HasSkill<Skills.MoveSkill>()) this.follow = new FollowTask(attacker, target);
+            if (attacker.HasSkill(UnitSkill.Move)) this.follow = new FollowTask(attacker, target);
         }
         #endregion
 
@@ -52,7 +52,7 @@ namespace Orion.GameLogic.Tasks
                 if (!Unit.Faction.CanSee(target))
                     return true;
                 if (!Unit.IsWithinAttackRange(target))
-                    return !Unit.HasSkill<Skills.MoveSkill>() || follow.HasEnded;
+                    return !Unit.HasSkill(UnitSkill.Move) || follow.HasEnded;
                 return !target.IsAlive;
             }
         }

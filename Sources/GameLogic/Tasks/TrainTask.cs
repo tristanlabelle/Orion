@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 
 namespace Orion.GameLogic.Tasks
 {
@@ -26,15 +25,14 @@ namespace Orion.GameLogic.Tasks
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            if (trainer.IsUnderConstruction)
-                throw new ArgumentException("Cannot train with an Unit in Construction");
-            TrainSkill trainSkill = trainer.GetSkill<TrainSkill>();
-            if (trainSkill == null)
-                throw new ArgumentException("Cannot train without the train skill.", "trainer");
-            if (!trainSkill.Supports(traineeType))
-                throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
+            if (trainer.IsUnderConstruction)
+                throw new ArgumentException("Cannot train with an building under construction");
+            if (!trainer.HasSkill(UnitSkill.Train))
+                throw new ArgumentException("Cannot train without the train skill.", "trainer");
+            if (!trainer.Type.CanTrain(traineeType))
+                throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
 
             this.traineeType = TryTrainHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
         }
@@ -76,9 +74,9 @@ namespace Orion.GameLogic.Tasks
             if (random.Next(0, 100) == 99)
             {
                 if (traineeType.Name == "Schtroumpf")
-                    return registry.FromName("Grand Schtroumpf");
+                    return registry.FromName("Grand schtroumpf");
                 if (traineeType.Name == "Pirate")
-                    return registry.FromName("Barbe Bleu");
+                    return registry.FromName("Barbe bleue");
                 if (traineeType.Name == "Ninja")
                     return registry.FromName("Léonardo");
                 if (traineeType.Name == "Viking")
@@ -86,22 +84,22 @@ namespace Orion.GameLogic.Tasks
                 if (traineeType.Name == "Jedihad")
                     return registry.FromName("Allah Skywalker");
                 if (traineeType.Name == "Jésus")
-                    return registry.FromName("Jésus-Raptor");
+                    return registry.FromName("Jésus-raptor");
                 if (traineeType.Name == "Flying Spaghetti Monster")
-                    return registry.FromName("Ta Mère");
+                    return registry.FromName("Ta mère");
                 if (traineeType.Name == "Grippe A(H1N1)")
                     return registry.FromName("Anthrax");
                 if (traineeType.Name == "OVNI")
-                    return registry.FromName("Vaisseau Mère");
-                if (traineeType.Name == "Tapis Volant")
-                    return registry.FromName("Le Tapis d'Aladdin");
+                    return registry.FromName("Vaisseau mère");
+                if (traineeType.Name == "Tapis volant")
+                    return registry.FromName("Tapis d'Aladdin");
             }
             return traineeType;
         }
 
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.Faction.RemainingFoodAmount < traineeType.FoodCost)
+            if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, UnitStat.FoodCost))
             {
                 if (!waitingForEnoughFood)
                 {
@@ -117,7 +115,7 @@ namespace Orion.GameLogic.Tasks
             float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
             if (healthPointsTrained < maxHealth)
             {
-                float trainingSpeed = Unit.GetStat(UnitStat.TrainingSpeed);
+                float trainingSpeed = Unit.GetStat(UnitStat.TrainSpeed);
                 healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
                 return;
             }

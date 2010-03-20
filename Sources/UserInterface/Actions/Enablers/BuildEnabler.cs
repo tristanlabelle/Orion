@@ -1,7 +1,6 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
@@ -28,7 +27,7 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            if (!unitType.HasSkill<BuildSkill>()) return;
+            if (!unitType.HasSkill(UnitSkill.Build)) return;
             
             buttonsArray[0, 0] = CreateBuildButton(unitType);
             buttonsArray[1, 0] = CreateRepairButton();

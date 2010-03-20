@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
@@ -68,12 +67,11 @@ namespace Orion.UserInterface.Actions
 
         private void CreateButtons()
         {
-            BuildSkill buildSkill = unitType.GetSkill<BuildSkill>();
-            Debug.Assert(buildSkill != null);
+            Debug.Assert(unitType.HasSkill(UnitSkill.Build));
 
             int x = 0;
             int y = 3;
-            foreach (UnitType buildingType in unitTypeRegistry.Where(u => buildSkill.Supports(u)))
+            foreach (UnitType buildingType in unitTypeRegistry.Where(u => unitType.CanBuild(u)))
             {
                 buttons[x, y] = CreateButton(buildingType);
 

@@ -29,7 +29,7 @@ namespace Orion.GameLogic.Tasks
         public FollowTask(Unit follower, Unit target)
             : base(follower)
         {
-            if (!follower.HasSkill<Skills.MoveSkill>())
+            if (!follower.HasSkill(UnitSkill.Move))
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");

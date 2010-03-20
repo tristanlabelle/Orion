@@ -16,7 +16,7 @@ namespace Orion.GameLogic.Technologies
         #region Constructors
         public TechnologyEffect(UnitStat stat, int value)
         {
-            Argument.EnsureDefined(stat, "stat");
+            Argument.EnsureNotNull(stat, "stat");
             Argument.EnsureNotEqual(value, 0, "value");
 
             this.stat = stat;

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<UnitType Name="Coke diète" Width="1" Height="1">
+	<Stats SightRange="3" MaxHealth="160" MeleeArmor="4" RangedArmor="4" AlageneCost="3000" FoodCost="5" />
+	<Move Speed="3" />
+  <SuicideBomb Radius="10" Damage="400">
+    <Target>Mentos</Target>
+  </SuicideBomb>
+</UnitType>

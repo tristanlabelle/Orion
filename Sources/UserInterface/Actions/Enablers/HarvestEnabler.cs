@@ -1,7 +1,6 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.GameLogic.Skills;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
@@ -28,7 +27,7 @@ namespace Orion.UserInterface.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (!type.HasSkill<HarvestSkill>()) return;
+            if (!type.HasSkill(UnitSkill.Harvest)) return;
 
             ActionButton button = new ActionButton(actionFrame, inputManager, "Harvest", Keys.H, gameGraphics);
 

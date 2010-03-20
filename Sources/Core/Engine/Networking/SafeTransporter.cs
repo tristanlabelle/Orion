@@ -28,7 +28,7 @@ namespace Orion.Engine.Networking
         /// <summary>
         /// The amount of time to block in Socket.ReceiveFrom calls.
         /// </summary>
-        private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(2);
 
         /// <summary>
         /// Winsock error raised if the socket didn't receive anything before it timed out.
@@ -39,12 +39,33 @@ namespace Orion.Engine.Networking
         private readonly List<PeerLink> peers = new List<PeerLink>();
         private readonly HashSet<IPv4EndPoint> timedOutPeerEndPoints = new HashSet<IPv4EndPoint>();
 
+        /// <summary>
+        /// The underlying socket. Accesses are synchronized by locking <see cref="socketMutex"/>.
+        /// </summary>
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private readonly Semaphore socketSemaphore = new Semaphore(2, 2);
+        private readonly object socketMutex = new object();
 
-        private readonly Thread senderThread;
-        private readonly Thread receiverThread;
+        /// <summary>
+        /// The thread which sends and receives data. 
+        /// </summary>
+        /// <remarks>
+        /// Accessed only from the main thread.
+        /// </remarks>
+        private readonly Thread workerThread;
 
+        /// <remarks>
+        /// Accessed only from the worker thread.
+        /// </remarks>
+        private readonly byte[] receptionBuffer = new byte[2048];
+        /// <remarks>
+        /// Accessed only from the worker thread.
+        /// </remarks>
+        private EndPoint senderEndPoint = new IPEndPoint(0, 0);
+
+        /// <remarks>
+        /// Read and written by the main thread, only read by the worker thread.
+        /// Writing is synchronized by the socketMutex.
+        /// </remarks>
         private volatile bool isDisposed;
         #endregion
 
@@ -62,15 +83,11 @@ namespace Orion.Engine.Networking
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
             socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
-            
-            senderThread = new Thread(SenderThreadEntryPoint);
-            receiverThread = new Thread(ReceiverThreadEntryPoint);
-            senderThread.Name = "Sender Thread for {0}".FormatInvariant(this);
-            receiverThread.Name = "Receiver Thread for {0}".FormatInvariant(this);
-            senderThread.IsBackground = true;
-            receiverThread.IsBackground = true;
-            senderThread.Start();
-            receiverThread.Start();
+
+            workerThread = new Thread(WorkerThreadEntryPoint);
+            workerThread.Name = "SafeTransporter worker thread";
+            workerThread.IsBackground = true;
+            workerThread.Start();
         }
         #endregion
 
@@ -120,30 +137,73 @@ namespace Orion.Engine.Networking
                 peer = new PeerLink(ipEndPoint);
                 peers.Add(peer);
             }
+
             return peer;
         }
         #endregion
 
-        #region Receiver Thread
-        private void ReceiverThreadEntryPoint()
+        #region Worker Thread
+        private void WorkerThreadEntryPoint()
         {
-            byte[] packetData = new byte[1024];
-
-            while (!isDisposed)
+            try
             {
-                try
+                while (true)
                 {
-                    IPv4EndPoint senderEndPoint;
-                    int packetLength = WaitForPacket(packetData, out senderEndPoint);
                     if (isDisposed) break;
-                    HandlePacket(senderEndPoint, packetData, packetLength);
+                    UpdateReceiving();
+
+                    if (isDisposed) break;
+                    UpdateSending();
+
+                    if (isDisposed) break;
+                    Thread.Sleep(0);
                 }
-                catch (SocketException exception)
+            }
+            catch (SocketException exception)
+            {
+                Debug.Fail(
+                    "Unexpected socket exception {0}: {1}. Interrupting all worker thread activities."
+                    .FormatInvariant(exception.ErrorCode, exception));
+            }
+        }
+
+        private void UpdateReceiving()
+        {
+            // The socket is locked once even if multiple packets are te be received.
+            // This was chosen over locking while receiving and unlocking while handling
+            // as multiple locking is supposed to be bad performance-wise.
+            lock (socket)
+            {
+                if (isDisposed) return;
+
+                while (true)
                 {
-                    Debug.Fail(
-                        "Unexpected socket exception {0}: {1}"
-                        .FormatInvariant(exception.ErrorCode, exception));
-                    break;
+                    int availableDataLength = socket.Available;
+                    if (availableDataLength == 0) break;
+
+                    Debug.Assert(availableDataLength <= receptionBuffer.Length,
+                        "Available data exceeds the length of the reception buffer. The packet data could be truncated.");
+
+                    try
+                    {
+                        int packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
+                        if (packetLength == 0)
+                        {
+                            Debug.Fail("Unexpected zero-length packet. Ignored.");
+                            break;
+                        }
+
+                        HandlePacket((IPv4EndPoint)senderEndPoint, receptionBuffer, packetLength);
+                    }
+                    catch (SocketException e)
+                    {
+                        if (e.ErrorCode == WSAETIMEDOUT)
+                        {
+                            Debug.Fail("Socket.ReceiveFrom should not time out, we made sure that it had data available.");
+                            break;
+                        }
+                        throw;
+                    }
                 }
             }
         }
@@ -200,91 +260,49 @@ namespace Orion.Engine.Networking
             }
         }
 
-        private int WaitForPacket(byte[] data, out IPv4EndPoint hostEndPoint)
-        {
-            EndPoint endPoint = new IPEndPoint(0, 0);
-            hostEndPoint = IPv4EndPoint.Any;
-
-            while (!isDisposed)
-            {
-                socketSemaphore.WaitOne();
-                try
-                {
-                    if (isDisposed) break;
-                    int packetLength = socket.ReceiveFrom(data, ref endPoint);
-                    hostEndPoint = (IPv4EndPoint)(IPEndPoint)endPoint;
-                    return packetLength;
-                }
-                catch (SocketException e)
-                {
-                    if (e.ErrorCode != WSAETIMEDOUT) throw;
-                }
-                finally
-                {
-                    socketSemaphore.Release();
-                }
-            }
-
-            return -1;
-        }
-
         private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint number)
         {
             byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(number);
 
-            socketSemaphore.WaitOne();
-            try
+            lock (socketMutex)
             {
                 if (isDisposed) return;
                 socket.SendTo(acknowledgementPacketData, hostEndPoint);
-            }
-            finally
-            {
-                socketSemaphore.Release();
             }
         }
         #endregion
 
         #region Sender Thread
-        private void SenderThreadEntryPoint()
+        private void UpdateSending()
         {
-            while (!isDisposed)
+            lock (peers)
             {
-                lock (peers)
+                foreach (PeerLink peer in peers)
                 {
-                    foreach (PeerLink peer in peers)
+                    if (peer.HasTimedOut) continue;
+
+                    foreach (SafePacket packet in peer.PacketsToSend)
                     {
-                        if (peer.HasTimedOut) continue;
-
-                        foreach (SafePacket packet in peer.PacketsToSend)
+                        if (packet.TimeElapsedSinceCreation > SafePacketTimeout)
                         {
-                            if (packet.TimeElapsedSinceCreation > SafePacketTimeout)
+                            peer.MarkAsTimedOut();
+                            timedOutPeerEndPoints.Add(peer.EndPoint);
+                            break;
+                        }
+
+                        TimeSpan resendDelay = GetResendDelay(peer);
+                        if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
+                        {
+                            lock (socketMutex)
                             {
-                                peer.MarkAsTimedOut();
-                                timedOutPeerEndPoints.Add(peer.EndPoint);
-                                break;
+                                if (isDisposed) return;
+                                socket.SendTo(packet.Data, peer.EndPoint);
                             }
 
-                            TimeSpan resendDelay = GetResendDelay(peer);
-                            if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
-                            {
-                                socketSemaphore.WaitOne();
-                                try
-                                {
-                                    if (isDisposed) return;
-                                    socket.SendTo(packet.Data, peer.EndPoint);
-                                }
-                                finally
-                                {
-                                    socketSemaphore.Release();
-                                }
-                                packet.UpdateSendTime();
-                            }
+                            packet.UpdateSendTime();
                         }
                     }
                 }
-
-                Thread.Sleep(0);
             }
         }
 
@@ -348,15 +366,10 @@ namespace Orion.Engine.Networking
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            socketSemaphore.WaitOne();
-            try
+            lock (socketMutex)
             {
                 if (isDisposed) return;
                 socket.SendTo(packetData, broadcastEndPoint);
-            }
-            finally
-            {
-                socketSemaphore.Release();
             }
         }
 
@@ -440,14 +453,11 @@ namespace Orion.Engine.Networking
 
             isDisposed = true;
 
-            socketSemaphore.WaitOne();
-            socketSemaphore.WaitOne();
-
-            socket.Shutdown(SocketShutdown.Both);
-            socket.Close();
-
-            socketSemaphore.Release();
-            socketSemaphore.Release();
+            lock (socketMutex)
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+            }
         }
 
         private void EnsureNotDisposed()

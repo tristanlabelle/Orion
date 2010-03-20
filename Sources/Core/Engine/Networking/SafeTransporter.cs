@@ -40,10 +40,9 @@ namespace Orion.Engine.Networking
         private readonly HashSet<IPv4EndPoint> timedOutPeerEndPoints = new HashSet<IPv4EndPoint>();
 
         /// <summary>
-        /// The underlying socket. Accesses are synchronized by locking <see cref="socketMutex"/>.
+        /// The underlying socket. Accessed by both threads, synchronized by locking this object.
         /// </summary>
         private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private readonly object socketMutex = new object();
 
         /// <summary>
         /// The thread which sends and receives data. 
@@ -264,7 +263,7 @@ namespace Orion.Engine.Networking
         {
             byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(number);
 
-            lock (socketMutex)
+            lock (socket)
             {
                 if (isDisposed) return;
                 socket.SendTo(acknowledgementPacketData, hostEndPoint);
@@ -293,7 +292,7 @@ namespace Orion.Engine.Networking
                         TimeSpan resendDelay = GetResendDelay(peer);
                         if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
                         {
-                            lock (socketMutex)
+                            lock (socket)
                             {
                                 if (isDisposed) return;
                                 socket.SendTo(packet.Data, peer.EndPoint);
@@ -366,7 +365,7 @@ namespace Orion.Engine.Networking
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            lock (socketMutex)
+            lock (socket)
             {
                 if (isDisposed) return;
                 socket.SendTo(packetData, broadcastEndPoint);
@@ -453,7 +452,7 @@ namespace Orion.Engine.Networking
 
             isDisposed = true;
 
-            lock (socketMutex)
+            lock (socket)
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();

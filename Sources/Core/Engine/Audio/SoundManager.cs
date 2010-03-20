@@ -51,7 +51,7 @@ namespace Orion.Engine.Audio
             try
             {
                 var sounds = Directory.GetFiles(directory.FullName, name + "*.*")
-                    .Where(filePath => Regex.IsMatch(Path.GetFileNameWithoutExtension(filePath), name + @"(\.\d+)?$"))
+                    .Where(filePath => Regex.IsMatch(Path.GetFileNameWithoutExtension(filePath), Regex.Escape(name) + @"(\.\d+)?$"))
                     .Select(filePath => TryLoadFromFile(filePath))
                     .Where(sound => sound != null);
                 group = new SoundGroup(name, sounds);

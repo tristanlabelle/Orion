@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Orion</RootNamespace>
-    <AssemblyName>Orion.Core</AssemblyName>
+    <AssemblyName>Orion.Engine</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>Client</TargetFrameworkSubset>

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\GameLogic.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphics", "Graphics\Graphics.csproj", "{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
@@ -19,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audio", "Audio\Audio.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matchmaking", "Matchmaking\Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{87BEE8DC-D12E-441B-A32B-09D225BB873C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -29,10 +31,6 @@ Global
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.ActiveCfg = Debug|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|x86.ActiveCfg = Debug|x86
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Debug|x86.Build.0 = Debug|x86
 		{7C9425D8-46B5-4AAF-BB02-E9953E696ED5}.Release|x86.ActiveCfg = Release|x86
@@ -61,13 +59,17 @@ Global
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.ActiveCfg = Debug|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Main.csproj

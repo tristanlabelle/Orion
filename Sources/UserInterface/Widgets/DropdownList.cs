@@ -6,6 +6,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Graphics;
 
 namespace Orion.UserInterface.Widgets

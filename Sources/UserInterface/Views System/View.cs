@@ -3,6 +3,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using Orion.Graphics;
 
 namespace Orion.UserInterface
@@ -42,7 +43,7 @@ namespace Orion.UserInterface
                 if (IsMouseOver)
                 {
                     Vector2 position = MousePosition.Value;
-                    PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position.X, position.Y, MouseButton.None, 0, 0));
+                    PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position, MouseButton.None, 0, 0));
                 }
 
                 Action<View, Rectangle> boundsEvent = BoundsChanged;
@@ -71,7 +72,7 @@ namespace Orion.UserInterface
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
             coords += Bounds.Min;
 
-            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.Button, args.ClickCount, args.WheelDelta));
+            return base.PropagateMouseEvent(eventType, args.CloneWithNewPosition(coords));
         }
 
         protected internal override void Render(GraphicsContext graphicsContext)

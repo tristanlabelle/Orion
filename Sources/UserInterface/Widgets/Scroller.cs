@@ -1,6 +1,7 @@
 ﻿using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Widgets

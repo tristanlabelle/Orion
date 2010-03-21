@@ -3,9 +3,12 @@ using System.Windows.Forms;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using SysPoint = System.Drawing.Point;
 using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
+using System.Diagnostics;
+using OpenTK.Math;
 
 namespace Orion.UserInterface
 {
@@ -87,7 +90,7 @@ namespace Orion.UserInterface
             {
                 TriggerMouseEvent(MouseEventType.MouseMoved,
                     newGameMousePosition.X, newGameMousePosition.Y,
-                    MouseButtons.None, 0, 0);
+                    MouseButton.None, 0, 0);
                 lastGameMousePosition = newGameMousePosition;
             }
 
@@ -115,7 +118,7 @@ namespace Orion.UserInterface
         private void glControl_MouseWheel(object sender, SysMouseEventArgs args)
         {
             TriggerMouseEvent(MouseEventType.MouseWheelScrolled,
-                args.X, args.Y, args.Button, args.Clicks, args.Delta / 600f);
+                args.X, args.Y, MouseButton.None, 0, args.Delta / 600f);
         }
 
         private void glControl_MouseDoubleClick(object sender, SysMouseEventArgs args)
@@ -130,13 +133,24 @@ namespace Orion.UserInterface
             MouseButton pressedButton = MouseButton.None;
             switch (button)
             {
+                case MouseButtons.None: pressedButton = MouseButton.None; break;
                 case MouseButtons.Left: pressedButton = MouseButton.Left; break;
                 case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
                 case MouseButtons.Right: pressedButton = MouseButton.Right; break;
+                default:
+                    Debug.Fail("Unexpected mouse button: {0}.".FormatInvariant(button));
+                    break;
             }
 
-            rootView.PropagateMouseEvent(type,
-                new Orion.Engine.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clickCount, wheelDelta));
+            TriggerMouseEvent(type, x, y, pressedButton, clickCount, wheelDelta);
+        }
+
+        private void TriggerMouseEvent(MouseEventType type, float x, float y,
+            MouseButton button, int clickCount, float wheelDelta)
+        {
+            Vector2 position = new Vector2(x, (glControl.Height - 1) - y);
+            var eventArgs = new Orion.Engine.Gui.MouseEventArgs(position, button, clickCount, wheelDelta);
+            rootView.PropagateMouseEvent(type, eventArgs);
         }
         #endregion
 
@@ -144,20 +158,24 @@ namespace Orion.UserInterface
         private void glControl_KeyDown(object sender, KeyEventArgs args)
         {
             if (args.Alt) args.Handled = true;
-            if (args.KeyCode == Keys.V && args.Modifiers == Keys.Control && Clipboard.ContainsText())
+
+            if (args.KeyCode == (Keys.V | Keys.Control))
             {
                 string pastedText = Clipboard.GetText();
-                foreach (char pastedCharacter in pastedText)
-                    OnKeyPress(pastedCharacter);
-                return;
+                if (!string.IsNullOrEmpty(pastedText))
+                {
+                    foreach (char pastedCharacter in pastedText)
+                        OnKeyPress(pastedCharacter);
+                    return;
+                }
             }
 
-            TriggerKeyboardEvent(KeyboardEventType.KeyDown, args.KeyCode, args.Alt, args.Control, args.Shift);
+            TriggerKeyboardEvent(KeyboardEventType.ButtonPressed, args.KeyData);
         }
 
         private void glControl_KeyUp(object sender, KeyEventArgs args)
         {
-            TriggerKeyboardEvent(KeyboardEventType.KeyUp, args.KeyCode, args.Alt, args.Control, args.Shift);
+            TriggerKeyboardEvent(KeyboardEventType.ButtonReleased, args.KeyData);
         }
 
         private void glControl_KeyPress(object sender, KeyPressEventArgs args)
@@ -170,9 +188,9 @@ namespace Orion.UserInterface
             rootView.PropagateCharacterTypedEvent(keyChar);
         }
 
-        private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
+        private void TriggerKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
         {
-            KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
+            KeyboardEventArgs args = new KeyboardEventArgs(keyAndModifiers);
             rootView.PropagateKeyboardEvent(type, args);
         }
         #endregion

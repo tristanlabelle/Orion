@@ -4,6 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
 using Orion.GameLogic.Utilities;
@@ -205,7 +206,7 @@ namespace Orion.Matchmaking
             if (args.Key >= Keys.D0 && args.Key <= Keys.D9)
             {
                 int groupNumber = args.Key - Keys.D0;
-                if (args.HasControl)
+                if (args.IsControlModifierDown)
                     selectionManager.SaveSelectionGroup(groupNumber);
                 else
                     selectionManager.TryLoadSelectionGroup(groupNumber);

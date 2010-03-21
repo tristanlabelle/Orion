@@ -5,6 +5,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 
 namespace Orion.UserInterface
@@ -85,11 +86,11 @@ namespace Orion.UserInterface
 
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
-            Vector2 coords = args.Position;
-            coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
+            Vector2 propagatedMousePosition = args.Position;
+            propagatedMousePosition.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
-            bool canSink = TopmostDisplay.PropagateMouseEvent(eventType,
-                new MouseEventArgs(coords.X, coords.Y, args.Button, args.ClickCount, args.WheelDelta));
+            var propagatedArgs = args.CloneWithNewPosition(propagatedMousePosition);
+            bool canSink = TopmostDisplay.PropagateMouseEvent(eventType, propagatedArgs);
 
             return canSink ? DispatchMouseEvent(eventType, args) : false;
         }

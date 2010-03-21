@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.GameLogic.Utilities;
 using Orion.Graphics;
@@ -329,7 +330,7 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position))
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseDown(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
+                userInputManager.HandleMouseDown(args.CloneWithNewPosition(newPosition));
             }
 
             return base.OnMouseButtonPressed(args);
@@ -340,7 +341,7 @@ namespace Orion.UserInterface
             if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
+                userInputManager.HandleMouseMove(args.CloneWithNewPosition(newPosition));
             }
             else
             {
@@ -353,7 +354,7 @@ namespace Orion.UserInterface
         protected override bool OnMouseButtonReleased(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseUp(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
+            userInputManager.HandleMouseUp(args.CloneWithNewPosition(newPosition));
             mouseDownOnMinimap = false;
             return base.OnMouseButtonReleased(args);
         }
@@ -378,9 +379,10 @@ namespace Orion.UserInterface
 
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
-            isShiftDown = args.HasShift;
-            MatchRenderer.DrawAllHealthBars = args.HasAlt;
+            isShiftDown = args.IsShiftModifierDown;
+            MatchRenderer.DrawAllHealthBars = args.IsAltModifierDown;
             isSpaceDown = args.Key == Keys.Space;
+
             if (args.Key == Keys.F9)
             {
                 DisplayPausePanel();
@@ -391,6 +393,7 @@ namespace Orion.UserInterface
                 DisplayDiplomacy();
                 return false;
             }
+
             return base.OnKeyboardButtonPressed(args);
         }
 
@@ -407,14 +410,14 @@ namespace Orion.UserInterface
         protected override bool OnDoubleClick(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDoubleClick(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
+            userInputManager.HandleMouseDoubleClick(args.CloneWithNewPosition(newPosition));
             return base.OnDoubleClick(args);
         }
 
         protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
-            isShiftDown = args.HasShift;
-            ((MatchRenderer)worldView.Renderer).DrawAllHealthBars = args.HasAlt;
+            isShiftDown = args.IsShiftModifierDown;
+            ((MatchRenderer)worldView.Renderer).DrawAllHealthBars = args.IsAltModifierDown;
             isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
             return base.OnKeyboardButtonReleased(args);
         }
@@ -444,7 +447,7 @@ namespace Orion.UserInterface
             if (worldView.IsMouseOver)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, worldView.MousePosition.Value);
-                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, MouseButton.None, 0, 0));
+                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition, MouseButton.None, 0, 0));
             }
         }
 

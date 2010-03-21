@@ -4,6 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 
 namespace Orion.UserInterface
 {
@@ -181,10 +182,11 @@ namespace Orion.UserInterface
             EnsureNotDisposed();
             switch (type)
             {
-                case KeyboardEventType.KeyDown: return OnKeyboardButtonPressed(args);
-                case KeyboardEventType.KeyUp: return OnKeyboardButtonReleased(args);
+                case KeyboardEventType.ButtonPressed: return OnKeyboardButtonPressed(args);
+                case KeyboardEventType.ButtonReleased: return OnKeyboardButtonReleased(args);
             }
-            throw new NotImplementedException(String.Format("Keyboard event type {0} does not have a handler method", type));
+
+            throw new NotImplementedException("Keyboard event type {0} does not have a handler method".FormatInvariant(type));
         }
         #endregion
 

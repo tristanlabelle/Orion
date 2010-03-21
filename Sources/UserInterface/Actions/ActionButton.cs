@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Graphics;
 using Orion.Matchmaking;
 using Orion.UserInterface.Actions.Enablers;

@@ -79,10 +79,10 @@ namespace Orion.UserInterface
             playerSlots[slot].SelectedItem = playerSlots[slot].Items.OfType<T>().First();
         }
 
-        protected override void OnUpdate(UpdateEventArgs args)
+        protected override void Update(float timeDeltaInSeconds)
         {
             transporter.Poll();
-            base.OnUpdate(args);
+            base.Update(timeDeltaInSeconds);
         }
         #endregion
     }

@@ -138,7 +138,7 @@ namespace Orion.UserInterface
             Rectangle chatInputRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputRectangle);
             chatInput.Triggered += SendMessage;
-            chatInput.KeyDown += ChatInputKeyDown;
+            chatInput.KeyboardButtonPressed += ChatInputKeyDown;
 
             Rectangle consoleRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             console = new MatchConsole(consoleRectangle);
@@ -158,13 +158,13 @@ namespace Orion.UserInterface
             pausePanel.Children.Add(quitGame);
             pausePanel.Children.Add(resumeGame);
 
-            KeyDown += (sender, args) => userInputManager.HandleKeyDown(args);
-            KeyUp += (sender, args) => userInputManager.HandleKeyUp(args);
+            KeyboardButtonPressed += (sender, args) => userInputManager.HandleKeyDown(args);
+            KeyboardButtonReleased += (sender, args) => userInputManager.HandleKeyUp(args);
 
             userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
             userInputManager.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
             localCommander.CommandGenerated += OnCommanderGeneratedCommand;
-            minimapFrame.MouseDown += MinimapMouseDown;
+            minimapFrame.MouseButtonPressed += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
             enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
@@ -316,45 +316,45 @@ namespace Orion.UserInterface
             }
         }
 
-        protected override bool OnMouseWheel(MouseEventArgs args)
+        protected override bool OnMouseWheelScrolled(MouseEventArgs args)
         {
-            double scale = 1 - (args.WheelDelta / 600.0);
-            worldView.Zoom(scale, Rectangle.ConvertPoint(Bounds, worldView.Bounds, args.Position));
-            return base.OnMouseWheel(args);
+            float scale = 1 - args.WheelDelta;
+            worldView.Zoom(scale);
+            return base.OnMouseWheelScrolled(args);
         }
 
-        protected override bool OnMouseDown(MouseEventArgs args)
+        protected override bool OnMouseButtonPressed(MouseEventArgs args)
         {
             if (worldView.Frame.ContainsPoint(args.Position))
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseDown(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                userInputManager.HandleMouseDown(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
             }
 
-            return base.OnMouseDown(args);
+            return base.OnMouseButtonPressed(args);
         }
 
-        protected override bool OnMouseMove(MouseEventArgs args)
+        protected override bool OnMouseMoved(MouseEventArgs args)
         {
             if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
             {
                 Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
             }
             else
             {
                 userInputManager.HoveredUnit = null;
             }
 
-            return base.OnMouseMove(args);
+            return base.OnMouseMoved(args);
         }
 
-        protected override bool OnMouseUp(MouseEventArgs args)
+        protected override bool OnMouseButtonReleased(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseUp(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            userInputManager.HandleMouseUp(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
             mouseDownOnMinimap = false;
-            return base.OnMouseUp(args);
+            return base.OnMouseButtonReleased(args);
         }
 
         private void SendMessage(TextField chatInput)
@@ -375,7 +375,7 @@ namespace Orion.UserInterface
             }
         }
 
-        protected override bool OnKeyDown(KeyboardEventArgs args)
+        protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
             isShiftDown = args.HasShift;
             MatchRenderer.DrawAllHealthBars = args.HasAlt;
@@ -390,42 +390,41 @@ namespace Orion.UserInterface
                 DisplayDiplomacy();
                 return false;
             }
-            return base.OnKeyDown(args);
+            return base.OnKeyboardButtonPressed(args);
         }
 
-        protected override bool OnKeyPress(char character)
+        protected override bool OnCharacterPressed(char character)
         {
             if (character == '\r')
             {
                 chatInput.Clear();
                 Children.Add(chatInput);
             }
-            return base.OnKeyPress(character);
+            return base.OnCharacterPressed(character);
         }
 
         protected override bool OnDoubleClick(MouseEventArgs args)
         {
             Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDoubleClick(new MouseEventArgs(newPosition.X, newPosition.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            userInputManager.HandleMouseDoubleClick(new MouseEventArgs(newPosition.X, newPosition.Y, args.Button, args.ClickCount, args.WheelDelta));
             return base.OnDoubleClick(args);
         }
 
-        protected override bool OnKeyUp(KeyboardEventArgs args)
+        protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
             isShiftDown = args.HasShift;
             ((MatchRenderer)worldView.Renderer).DrawAllHealthBars = args.HasAlt;
             isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
-            return base.OnKeyUp(args);
+            return base.OnKeyboardButtonReleased(args);
         }
 
-        protected override void OnUpdate(UpdateEventArgs args)
+        protected override void Update(float timeDeltaInSeconds)
         {
             if (isSpaceDown && !SelectionManager.IsSelectionEmpty)
                 CenterOnSelection();
 
-            console.Update(args.TimeDeltaInSeconds);
-            match.Update(args.TimeDeltaInSeconds);
-            base.OnUpdate(args);
+            match.Update(timeDeltaInSeconds);
+            base.Update(timeDeltaInSeconds);
         }
 
         private void Quit(Match sender)
@@ -450,7 +449,7 @@ namespace Orion.UserInterface
 
         private void MinimapMouseDown(Responder source, MouseEventArgs args)
         {
-            if (args.ButtonPressed == MouseButton.Left)
+            if (args.Button == MouseButton.Left)
             {
                 if (userInputManager.SelectedCommand != null)
                 {
@@ -462,7 +461,7 @@ namespace Orion.UserInterface
                     mouseDownOnMinimap = true;
                 }
             }
-            else if (args.ButtonPressed == MouseButton.Right)
+            else if (args.Button == MouseButton.Right)
             {
                 userInputManager.LaunchDefaultCommand(args.Position);
             }
@@ -511,11 +510,11 @@ namespace Orion.UserInterface
         }
         #endregion
 
-        #region IUIDisplay Implementation
-        internal override void OnShadowed(RootView shadowedFrom)
+        #region UIDisplay Implementation
+        protected internal override void OnShadowed()
         {
-            shadowedFrom.PopDisplay(this);
-            base.OnShadowed(shadowedFrom);
+            Root.PopDisplay(this);
+            base.OnShadowed();
         }
         #endregion
 

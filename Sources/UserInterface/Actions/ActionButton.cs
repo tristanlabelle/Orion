@@ -94,17 +94,17 @@ namespace Orion.UserInterface.Actions
         #endregion
 
         #region Methods
-        protected override bool OnMouseEnter(MouseEventArgs args)
+        protected override bool OnMouseEntered(MouseEventArgs args)
         {
             actionFrame.TooltipFrame.SetDescription(TooltipText);
             actionFrame.ShowTooltip();
-            return base.OnMouseEnter(args);
+            return base.OnMouseEntered(args);
         }
 
-        protected override bool OnMouseExit(MouseEventArgs args)
+        protected override bool OnMouseExited(MouseEventArgs args)
         {
             actionFrame.HideTooltip();
-            return base.OnMouseExit(args);
+            return base.OnMouseExited(args);
         }
         #endregion
     }

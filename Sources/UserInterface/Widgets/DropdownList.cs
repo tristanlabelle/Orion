@@ -40,12 +40,12 @@ namespace Orion.UserInterface.Widgets
             #endregion
 
             #region Methods
-            protected override bool OnMouseUp(MouseEventArgs args)
+            protected override bool OnMouseButtonReleased(MouseEventArgs args)
             {
                 if (parent.Enabled) parent.SelectedItem = this.Value;
 
                 parent.SelectionChanged.Raise(parent, Value);
-                return base.OnMouseUp(args);
+                return base.OnMouseButtonReleased(args);
             }
 
             protected internal override void Draw(GraphicsContext graphicsContext)
@@ -156,28 +156,28 @@ namespace Orion.UserInterface.Widgets
         protected internal override void OnAddToParent(ViewContainer parent)
         {
             latestRespondingAncestor = (Responder)Root;
-            latestRespondingAncestor.MouseUp += parentMouseUp;
+            latestRespondingAncestor.MouseButtonReleased += parentMouseUp;
             base.OnAddToParent(parent);
         }
 
         protected internal override void OnRemovedFromParent(ViewContainer parent)
         {
-            latestRespondingAncestor.MouseUp -= parentMouseUp;
+            latestRespondingAncestor.MouseButtonReleased -= parentMouseUp;
             base.OnRemovedFromParent(parent);
         }
 
         protected internal override void OnAncestryChanged(ViewContainer ancestor)
         {
-            latestRespondingAncestor.MouseUp -= parentMouseUp;
+            latestRespondingAncestor.MouseButtonReleased -= parentMouseUp;
             latestRespondingAncestor = (Responder)Root;
-            latestRespondingAncestor.MouseUp += parentMouseUp;
+            latestRespondingAncestor.MouseButtonReleased += parentMouseUp;
             base.OnAncestryChanged(ancestor);
         }
 
-        protected override bool OnMouseDown(MouseEventArgs args)
+        protected override bool OnMouseButtonPressed(MouseEventArgs args)
         {
             if(Enabled) Parent.Children.Add(menu);
-            return base.OnMouseDown(args);
+            return base.OnMouseButtonPressed(args);
         }
 
         private void ParentMouseUp(Responder source, MouseEventArgs args)

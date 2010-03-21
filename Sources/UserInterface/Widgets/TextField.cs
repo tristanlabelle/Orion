@@ -49,7 +49,7 @@ namespace Orion.UserInterface.Widgets
             contents = new Text(string.Empty);
         }
 
-        protected override bool OnKeyPress(char arg)
+        protected override bool OnCharacterPressed(char arg)
         {
             if (arg == '\b')
             {
@@ -64,14 +64,14 @@ namespace Orion.UserInterface.Widgets
             }
             else Contents += arg;
 
-            base.OnKeyPress(arg);
+            base.OnCharacterPressed(arg);
             return false;
         }
 
-        protected override void OnUpdate(UpdateEventArgs args)
+        protected override void Update(float timeDeltaInSeconds)
         {
             updateCounter++;
-            base.OnUpdate(args);
+            base.Update(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GraphicsContext context)

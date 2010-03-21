@@ -21,12 +21,19 @@ namespace Orion.Engine.Graphics
         #region Instance
         #region Fields
         private readonly Stack<Region> scissorStack = new Stack<Region>();
+        private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
         private Font font = new Font("Trebuchet MS", 14);
         #endregion
 
         #region Constructors
         [Obsolete("To be made internal and created by the engine.")]
-        public GraphicsContext() { }
+        public GraphicsContext()
+        {
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(-1, 1, -1, 1, -1, 1);
+            GL.MatrixMode(MatrixMode.Modelview);
+        }
         #endregion
 
         #region Properties
@@ -42,6 +49,10 @@ namespace Orion.Engine.Graphics
 
                 return new Size(viewportCoordinates[2], viewportCoordinates[3]);
             }
+            internal set
+            {
+                GL.Viewport(0, 0, value.Width, value.Height);
+            }
         }
 
         /// <summary>
@@ -54,6 +65,23 @@ namespace Orion.Engine.Graphics
                 return scissorStack.Count == 0
                 ? new Region(ViewportSize)
                 : scissorStack.Peek();
+            }
+        }
+
+        /// <summary>
+        /// Accesses the bounds of the coordinate system to which the viewport is mapped.
+        /// </summary>
+        public Rectangle ProjectionBounds
+        {
+            get { return projectionBounds; }
+            set
+            {
+                projectionBounds = value;
+                GL.MatrixMode(MatrixMode.Projection);
+                GL.LoadIdentity();
+                GL.Ortho(projectionBounds.MinX, projectionBounds.MaxX,
+                    projectionBounds.MinY, projectionBounds.MaxY, -1, 1);
+                GL.MatrixMode(MatrixMode.Modelview);
             }
         }
 

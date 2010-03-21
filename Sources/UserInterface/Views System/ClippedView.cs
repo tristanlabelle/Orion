@@ -44,14 +44,9 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-        public void Zoom(double factor)
+        public void Zoom(float factor)
         {
-            Zoom(factor, Bounds.Center);
-        }
-
-        public void Zoom(double factor, Vector2 center)
-        {
-            Vector2 scale = new Vector2((float)factor, (float)factor);
+            Vector2 scale = new Vector2(factor, factor);
             Vector2 newSize = Bounds.Size;
             Vector2 newOrigin = Bounds.Min;
             newSize.Scale(scale);
@@ -99,9 +94,9 @@ namespace Orion.UserInterface
             Bounds = new Rectangle(newOrigin, newSize);
         }
 
-        public void ScrollBy(double x, double y)
+        public void ScrollBy(float x, float y)
         {
-            ScrollBy(new Vector2((float)x, (float)y));
+            ScrollBy(new Vector2(x, y));
         }
 
         public void ScrollBy(Vector2 direction)
@@ -109,9 +104,9 @@ namespace Orion.UserInterface
             SetTranslatedBounds(Bounds.TranslatedBy(direction));
         }
 
-        public void ScrollTo(double x, double y)
+        public void ScrollTo(float x, float y)
         {
-            ScrollTo(new Vector2((float)x, (float)y));
+            ScrollTo(new Vector2(x, y));
         }
 
         public void ScrollTo(Vector2 position)

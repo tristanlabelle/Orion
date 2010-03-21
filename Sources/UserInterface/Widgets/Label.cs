@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Orion.Engine.Graphics;
 using Orion.Geometry;
 using Orion.Graphics;
@@ -9,6 +10,7 @@ namespace Orion.UserInterface.Widgets
     /// <summary>
     /// A Label is a visible readonly text field.
     /// </summary>
+    [DebuggerDisplay("{String} label")]
     public class Label : View
     {
         #region Constructors
@@ -45,6 +47,11 @@ namespace Orion.UserInterface.Widgets
         /// Accesses this object's text color.
         /// </summary>
         public ColorRgba Color { get; set; }
+
+        private string String
+        {
+            get { return Text.Value; }
+        }
         #endregion
 
         #region Methods

@@ -44,44 +44,44 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-        protected override bool OnMouseEnter(MouseEventArgs args)
+        protected override bool OnMouseEntered(MouseEventArgs args)
         {
             mouseTriggered = true;
             timeHoveredInSeconds = 0;
-            return base.OnMouseEnter(args);
+            return base.OnMouseEntered(args);
         }
 
-        protected override bool OnMouseExit(MouseEventArgs args)
+        protected override bool OnMouseExited(MouseEventArgs args)
         {
             mouseTriggered = false;
             timeHoveredInSeconds = 0;
-            return base.OnMouseExit(args);
+            return base.OnMouseExited(args);
         }
 
-        protected override bool OnKeyDown(KeyboardEventArgs args)
+        protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
             if (args.Key == keyboardTrigger)
                 keyboardTriggered = true;
             
-            return base.OnKeyDown(args);
+            return base.OnKeyboardButtonPressed(args);
         }
 
-        protected override bool OnKeyUp(KeyboardEventArgs args)
+        protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
             if (args.Key == keyboardTrigger)
                 keyboardTriggered = false;
 
-            return base.OnKeyUp(args);
+            return base.OnKeyboardButtonReleased(args);
         }
 
-        protected override void OnUpdate(UpdateEventArgs args)
+        protected override void Update(float timeDeltaInSeconds)
         {
-            if (mouseTriggered) timeHoveredInSeconds += args.TimeDeltaInSeconds;
+            if (mouseTriggered) timeHoveredInSeconds += timeDeltaInSeconds;
             bool shouldScroll = isEnabled && (keyboardTriggered || (mouseTriggered && timeHoveredInSeconds >= ScrollDelayInSeconds));
             if (shouldScroll)
             {
                 Vector2 scrollFactor = new Vector2(direction.X * scrolledView.Bounds.Width, direction.Y * scrolledView.Bounds.Height);
-                scrolledView.ScrollBy(scrollFactor * args.TimeDeltaInSeconds * ScrollSpeed);
+                scrolledView.ScrollBy(scrollFactor * timeDeltaInSeconds * ScrollSpeed);
             }
         }
         #endregion

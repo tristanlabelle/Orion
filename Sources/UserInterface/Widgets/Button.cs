@@ -12,6 +12,7 @@ namespace Orion.UserInterface.Widgets
     /// <summary>
     /// Provides a UI button which can be listened for clicks.
     /// </summary>
+    [DebuggerDisplay("{Caption} button")]
     public class Button : RenderedView
     {
         #region Fields
@@ -103,13 +104,13 @@ namespace Orion.UserInterface.Widgets
             base.Dispose(disposing);
         }
 
-        protected override bool OnMouseEnter(MouseEventArgs args)
+        protected override bool OnMouseEntered(MouseEventArgs args)
         {
             if (isEnabled) caption.Color = captionOverColor;
-            return base.OnMouseEnter(args);
+            return base.OnMouseEntered(args);
         }
 
-        protected override bool OnMouseExit(MouseEventArgs args)
+        protected override bool OnMouseExited(MouseEventArgs args)
         {
             if (isEnabled)
             {
@@ -117,10 +118,10 @@ namespace Orion.UserInterface.Widgets
                 isDown = false;
             }
 
-            return base.OnMouseExit(args);
+            return base.OnMouseExited(args);
         }
 
-        protected override bool OnMouseDown(MouseEventArgs args)
+        protected override bool OnMouseButtonPressed(MouseEventArgs args)
         {
             if (isEnabled)
             {
@@ -128,15 +129,15 @@ namespace Orion.UserInterface.Widgets
                 isDown = true;
             }
 
-            base.OnMouseDown(args);
+            base.OnMouseButtonPressed(args);
             return false;
         }
 
-        protected override bool OnMouseUp(MouseEventArgs args)
+        protected override bool OnMouseButtonReleased(MouseEventArgs args)
         {
             bool isClicked = isEnabled && isDown;
 
-            base.OnMouseUp(args);
+            base.OnMouseButtonReleased(args);
 
             if (isClicked)
             {
@@ -155,16 +156,16 @@ namespace Orion.UserInterface.Widgets
             return false;
         }
 
-        protected override bool OnKeyDown(KeyboardEventArgs args)
+        protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
             if (args.Key == hotKey)
             {
                 OnPress();
-                base.OnKeyDown(args);
+                base.OnKeyboardButtonPressed(args);
                 return false;
             }
 
-            return base.OnKeyDown(args);
+            return base.OnKeyboardButtonPressed(args);
         }
 
         protected virtual void OnPress()
@@ -178,13 +179,6 @@ namespace Orion.UserInterface.Widgets
             Vector2 captionOrigin = Bounds.Center - textFrame.Center;
             caption.Frame = caption.Frame.TranslatedTo(captionOrigin);
         }
-
-        #region Object Model
-        public override string ToString()
-        {
-            return "Button \"{0}\"".FormatInvariant(caption.Text.Value);
-        }
-        #endregion
         #endregion
     }
 }

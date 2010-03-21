@@ -9,7 +9,7 @@ namespace Orion.UserInterface
     public abstract class Responder : ViewContainer
     {
         #region Fields
-        private Vector2? cursorPosition;
+        internal Vector2? cursorPosition;
         #endregion
 
         #region Constructors
@@ -30,11 +30,6 @@ namespace Orion.UserInterface
                 EnsureNotDisposed();
                 return cursorPosition;
             }
-            set
-            {
-                EnsureNotDisposed();
-                cursorPosition = value;
-            }
         }
 
         public bool IsMouseOver
@@ -48,17 +43,24 @@ namespace Orion.UserInterface
         #endregion
 
         #region Events
-        public event Action<Responder, MouseEventArgs> MouseDown;
-        public event Action<Responder, MouseEventArgs> MouseUp;
+        /// <summary>
+        /// Raised when a mouse button is pressed while the cursor is over this view.
+        /// </summary>
+        public event Action<Responder, MouseEventArgs> MouseButtonPressed;
+
+        /// <summary>
+        /// Raised when a mouse button is released, even if the cursor is not over this view.
+        /// </summary>
+        public event Action<Responder, MouseEventArgs> MouseButtonReleased;
+
         public event Action<Responder, MouseEventArgs> MouseMoved;
-        public event Action<Responder, MouseEventArgs> MouseWheel;
+        public event Action<Responder, MouseEventArgs> MouseWheelScrolled;
         public event Action<Responder, MouseEventArgs> MouseEntered;
         public event Action<Responder, MouseEventArgs> MouseExited;
         public event Action<Responder, MouseEventArgs> DoubleClick;
-        public event Action<Responder, KeyboardEventArgs> KeyDown;
-        public event Action<Responder, KeyboardEventArgs> KeyUp;
-        public event Action<Responder, char> KeyPress;
-        public event Action<Responder, UpdateEventArgs> Updated;
+        public event Action<Responder, KeyboardEventArgs> KeyboardButtonPressed;
+        public event Action<Responder, KeyboardEventArgs> KeyboardButtonReleased;
+        public event Action<Responder, char> CharacterTyped;
         #endregion
 
         #region Methods
@@ -73,6 +75,7 @@ namespace Orion.UserInterface
         protected internal virtual bool PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
         {
             EnsureNotDisposed();
+
             bool eventCanSink = true;
             foreach (Responder child in Children.Reverse())
             {
@@ -81,7 +84,7 @@ namespace Orion.UserInterface
                     if (child.IsMouseOver)
                     {
                         child.PropagateMouseEvent(MouseEventType.MouseExited, args);
-                        child.MousePosition = null;
+                        child.cursorPosition = null;
                     }
                 }
                 else
@@ -92,17 +95,14 @@ namespace Orion.UserInterface
                         {
                             child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
                         }
-                        child.MousePosition = args.Position;
+
+                        child.cursorPosition = args.Position;
                         eventCanSink &= child.PropagateMouseEvent(type, args);
                     }
                 }
             }
 
-            if (eventCanSink)
-            {
-                return DispatchMouseEvent(type, args);
-            }
-            return false;
+            return eventCanSink ? DispatchMouseEvent(type, args) : false;
         }
 
         /// <summary>Propagates a keyboard event to the child views.</summary>
@@ -126,26 +126,29 @@ namespace Orion.UserInterface
             return DispatchKeyboardEvent(type, args);
         }
 
-        protected internal virtual bool PropagateKeyPressEvent(char character)
+        protected internal virtual bool PropagateCharacterTypedEvent(char character)
         {
             EnsureNotDisposed();
             foreach (Responder child in Enumerable.Reverse(Children))
             {
-                bool keepPropagating = child.PropagateKeyPressEvent(character);
+                bool keepPropagating = child.PropagateCharacterTypedEvent(character);
                 if (!keepPropagating) return false;
             }
 
-            return DispatchKeyPressEvent(character);
+            return DispatchCharacterPressedEvent(character);
         }
 
         /// <summary>Propagates an update event to the child views.</summary>
-        /// <param name="args">The <see cref="UpdateEventArgs"/></param>
+        /// <param name="timeDeltaInSeconds">The time elapsed since the last call, in seconds.</param>
         /// <returns>True if this view (and its children) accepts to propagate events; false if they want to interrupt the event sinking</returns>
-        protected internal virtual void PropagateUpdateEvent(UpdateEventArgs args)
+        protected internal virtual void PropagateUpdateEvent(float timeDeltaInSeconds)
         {
             EnsureNotDisposed();
-            foreach (Responder child in Enumerable.Reverse(Children)) child.PropagateUpdateEvent(args);
-            OnUpdate(args);
+
+            foreach (Responder child in Enumerable.Reverse(Children))
+                child.PropagateUpdateEvent(timeDeltaInSeconds);
+
+            Update(timeDeltaInSeconds);
         }
         #endregion
 
@@ -155,21 +158,21 @@ namespace Orion.UserInterface
             EnsureNotDisposed();
             switch (eventType)
             {
-                case MouseEventType.MouseDown: return OnMouseDown(args);
-                case MouseEventType.MouseMoved: return OnMouseMove(args);
-                case MouseEventType.MouseUp: return OnMouseUp(args);
-                case MouseEventType.MouseEntered: return OnMouseEnter(args);
-                case MouseEventType.MouseExited: return OnMouseExit(args);
-                case MouseEventType.MouseWheel: return OnMouseWheel(args);
+                case MouseEventType.MouseButtonPressed: return OnMouseButtonPressed(args);
+                case MouseEventType.MouseMoved: return OnMouseMoved(args);
+                case MouseEventType.MouseButtonReleased: return OnMouseButtonReleased(args);
+                case MouseEventType.MouseEntered: return OnMouseEntered(args);
+                case MouseEventType.MouseExited: return OnMouseExited(args);
+                case MouseEventType.MouseWheelScrolled: return OnMouseWheelScrolled(args);
                 case MouseEventType.DoubleClick: return OnDoubleClick(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
 
-        protected internal bool DispatchKeyPressEvent(char character)
+        protected internal bool DispatchCharacterPressedEvent(char character)
         {
             EnsureNotDisposed();
-            return OnKeyPress(character);
+            return OnCharacterPressed(character);
         }
 
         protected internal bool DispatchKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
@@ -177,8 +180,8 @@ namespace Orion.UserInterface
             EnsureNotDisposed();
             switch (type)
             {
-                case KeyboardEventType.KeyDown: return OnKeyDown(args);
-                case KeyboardEventType.KeyUp: return OnKeyUp(args);
+                case KeyboardEventType.KeyDown: return OnKeyboardButtonPressed(args);
+                case KeyboardEventType.KeyUp: return OnKeyboardButtonReleased(args);
             }
             throw new NotImplementedException(String.Format("Keyboard event type {0} does not have a handler method", type));
         }
@@ -192,9 +195,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseDown(MouseEventArgs args)
+        protected virtual bool OnMouseButtonPressed(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseDown, args);
+            MouseButtonPressed.Raise(this, args);
             return true;
         }
 
@@ -204,9 +207,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseMove(MouseEventArgs args)
+        protected virtual bool OnMouseMoved(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseMoved, args);
+            MouseMoved.Raise(this, args);
             return true;
         }
 
@@ -216,9 +219,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseUp(MouseEventArgs args)
+        protected virtual bool OnMouseButtonReleased(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseUp, args);
+            MouseButtonReleased.Raise(this, args);
             return true;
         }
 
@@ -228,9 +231,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseWheel(MouseEventArgs args)
+        protected virtual bool OnMouseWheelScrolled(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseWheel, args);
+            MouseWheelScrolled.Raise(this, args);
             return true;
         }
 
@@ -240,9 +243,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseEnter(MouseEventArgs args)
+        protected virtual bool OnMouseEntered(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseEntered, args);
+            MouseEntered.Raise(this, args);
             return true;
         }
 
@@ -252,9 +255,9 @@ namespace Orion.UserInterface
         /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
         /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnMouseExit(MouseEventArgs args)
+        protected virtual bool OnMouseExited(MouseEventArgs args)
         {
-            InvokeEventHandlers(MouseExited, args);
+            MouseExited.Raise(this, args);
             return true;
         }
 
@@ -266,14 +269,8 @@ namespace Orion.UserInterface
         /// <returns>True if event sinking is allowed; false otherwise</returns>
         protected virtual bool OnDoubleClick(MouseEventArgs args)
         {
-            InvokeEventHandlers(DoubleClick, args);
+            DoubleClick.Raise(this, args);
             return true;
-        }
-
-        private void InvokeEventHandlers(Action<Responder, MouseEventArgs> handler, MouseEventArgs args)
-        {
-            EnsureNotDisposed();
-            if (handler != null) handler(this, args);
         }
         #endregion
 
@@ -283,9 +280,9 @@ namespace Orion.UserInterface
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnKeyDown(KeyboardEventArgs args)
+        protected virtual bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
-            InvokeEventHandlers(KeyDown, args);
+            KeyboardButtonPressed.Raise(this, args);
             return true;
         }
 
@@ -294,38 +291,23 @@ namespace Orion.UserInterface
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> arguments</param>
         /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnKeyUp(KeyboardEventArgs args)
+        protected virtual bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
-            InvokeEventHandlers(KeyUp, args);
+            KeyboardButtonReleased.Raise(this, args);
             return true;
         }
 
-        protected virtual bool OnKeyPress(char character)
+        protected virtual bool OnCharacterPressed(char character)
         {
-            InvokeEventHandlers(KeyPress, character);
+            CharacterTyped.Raise(this, character);
             return true;
-        }
-
-        private void InvokeEventHandlers(Action<Responder, KeyboardEventArgs> handler, KeyboardEventArgs args)
-        {
-            if (handler != null) handler(this, args);
-        }
-
-        private void InvokeEventHandlers(Action<Responder, char> handler, char arg)
-        {
-            if (handler != null) handler(this, arg);
         }
         #endregion
 
         #region Update Events
-        protected virtual void OnUpdate(UpdateEventArgs args)
+        protected virtual void Update(float timeDeltaInSeconds)
         {
             EnsureNotDisposed();
-            Action<Responder, UpdateEventArgs> handler = Updated;
-            if (handler != null)
-            {
-                handler(this, args);
-            }
         }
         #endregion
 
@@ -337,6 +319,7 @@ namespace Orion.UserInterface
                 cursorPosition = null;
                 PropagateMouseEvent(MouseEventType.MouseExited, new MouseEventArgs());
             }
+
             base.OnRemovedFromParent(parent);
         }
         #endregion
@@ -346,16 +329,15 @@ namespace Orion.UserInterface
         {
             if (disposing)
             {
-                MouseDown = null;
-                MouseUp = null;
+                MouseButtonPressed = null;
+                MouseButtonReleased = null;
                 MouseMoved = null;
-                MouseWheel = null;
+                MouseWheelScrolled = null;
                 MouseEntered = null;
                 MouseExited = null;
-                KeyDown = null;
-                KeyUp = null;
-                KeyPress = null;
-                Updated = null;
+                KeyboardButtonPressed = null;
+                KeyboardButtonReleased = null;
+                CharacterTyped = null;
             }
 
             base.Dispose(disposing);

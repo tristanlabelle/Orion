@@ -34,16 +34,16 @@ namespace Orion.UserInterface.Widgets
         #endregion
 
         #region Methods
-        protected override bool OnMouseDown(MouseEventArgs args)
+        protected override bool OnMouseButtonPressed(MouseEventArgs args)
         {
             if (captureMouseEvents)
             {
-                base.OnMouseDown(args);
+                base.OnMouseButtonPressed(args);
                 return false;
             }
             else
             {
-                return base.OnMouseDown(args);
+                return base.OnMouseButtonPressed(args);
             }
         }
 

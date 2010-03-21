@@ -100,6 +100,7 @@
     <Compile Include="Engine\Networking\IPv4EndPoint.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="Engine\Networking\NetworkTimeoutEventArgs.cs" />
+    <Compile Include="NumericExtensions.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Point16.cs" />
     <Compile Include="PerlinNoise.cs" />

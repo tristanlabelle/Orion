@@ -59,12 +59,12 @@ namespace Orion.UserInterface
             while (topDisplay != displays.Peek())
             {
                 topDisplay = displays.Peek();
-                topDisplay.OnShadowed(this);
+                topDisplay.OnShadowed();
             }
 
             displays.Push(display);
             Children.Add(display);
-            display.OnEntered(this);
+            display.OnEntered();
         }
 
         public void PopDisplay(UIDisplay display)
@@ -74,12 +74,12 @@ namespace Orion.UserInterface
 
             displays.Pop();
             display.Dispose();
-            TopmostDisplay.OnEntered(this);
+            TopmostDisplay.OnEntered();
         }
 
-        public void Update(float delta)
+        public new void Update(float timeDeltaInSeconds)
         {
-            TopmostDisplay.PropagateUpdateEvent(new UpdateEventArgs(delta));
+            TopmostDisplay.PropagateUpdateEvent(timeDeltaInSeconds);
         }
 
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
@@ -88,7 +88,7 @@ namespace Orion.UserInterface
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
 
             bool canSink = TopmostDisplay.PropagateMouseEvent(eventType,
-                new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+                new MouseEventArgs(coords.X, coords.Y, args.Button, args.ClickCount, args.WheelDelta));
 
             return canSink ? DispatchMouseEvent(eventType, args) : false;
         }
@@ -102,18 +102,9 @@ namespace Orion.UserInterface
         protected internal override void Render(GraphicsContext graphicsContext)
         {
             graphicsContext.Clear(Colors.Black);
-            ResetViewport(graphicsContext);
-            displays.Peek().Render(graphicsContext);
-        }
+            graphicsContext.ProjectionBounds = Bounds;
 
-        private void ResetViewport(GraphicsContext graphicsContext)
-        {
-            Rectangle bounds = Bounds;
-            GL.Viewport(0, 0, (int)Frame.Width, (int)Frame.Height);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(bounds.MinX, bounds.Width, bounds.MinY, bounds.Height, -1, 1);
-            GL.MatrixMode(MatrixMode.Modelview);
+            displays.Peek().Render(graphicsContext);
         }
         #endregion
     }

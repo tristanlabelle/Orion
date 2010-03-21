@@ -39,10 +39,10 @@ namespace Orion.UserInterface.Widgets
             bottomArrow.Bounds = new Rectangle(1, 1);
             slider = new Frame(new Rectangle(frame.Width, 1), Colors.Orange);
 
-            slider.MouseDown += SliderMouseDown;
-            topArrow.MouseDown += MoveUp;
-            bottomArrow.MouseDown += MoveDown;
-            Scrollee.MouseWheel += ScrolleeMouseWheel;
+            slider.MouseButtonPressed += SliderMouseDown;
+            topArrow.MouseButtonPressed += MoveUp;
+            bottomArrow.MouseButtonPressed += MoveDown;
+            Scrollee.MouseWheelScrolled += OnMouseWheelScrolled;
             Scrollee.BoundsChanged += RegenerateScrollbar;
             Scrollee.FullBoundsChanged += RegenerateScrollbar;
             RegenerateScrollbarFrame();
@@ -74,9 +74,9 @@ namespace Orion.UserInterface.Widgets
             mouseDownPosition = args.Position.Y;
         }
 
-        private void ScrolleeMouseWheel(Responder sender, MouseEventArgs args)
+        private void OnMouseWheelScrolled(Responder sender, MouseEventArgs args)
         {
-            ScrollBy(args.WheelDelta / 600.0f);
+            ScrollBy(args.WheelDelta);
         }
 
         private void RegenerateScrollbar(View sender, Rectangle newFullBounds)
@@ -94,13 +94,13 @@ namespace Orion.UserInterface.Widgets
             ScrollBy(-slider.Frame.Height / Frame.Height / 10);
         }
 
-        protected override bool OnMouseUp(MouseEventArgs args)
+        protected override bool OnMouseButtonReleased(MouseEventArgs args)
         {
             mouseDownPosition = null;
-            return base.OnMouseUp(args);
+            return base.OnMouseButtonReleased(args);
         }
         
-        protected override bool OnMouseMove(MouseEventArgs args)
+        protected override bool OnMouseMoved(MouseEventArgs args)
         {
             if (mouseDownPosition.HasValue)
             {
@@ -108,7 +108,7 @@ namespace Orion.UserInterface.Widgets
                 ScrollBy(mouseOffset / Bounds.Height);
                 mouseDownPosition = args.Y;
             }
-            return base.OnMouseMove(args);
+            return base.OnMouseMoved(args);
         }
 
         private void ScrollBy(float offset)

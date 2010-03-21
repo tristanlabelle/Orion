@@ -70,7 +70,7 @@ namespace Orion.UserInterface
             coords.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
             coords += Bounds.Min;
 
-            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.ButtonPressed, args.Clicks, args.WheelDelta));
+            return base.PropagateMouseEvent(eventType, new MouseEventArgs(coords.X, coords.Y, args.Button, args.ClickCount, args.WheelDelta));
         }
 
         protected internal override void Render(GraphicsContext graphicsContext)

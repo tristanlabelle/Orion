@@ -4,35 +4,47 @@ namespace Orion.UserInterface
 {
     public abstract class UIDisplay : Responder
     {
+        #region Constructors
         public UIDisplay()
         {
             Frame = RootView.ContentsBounds;
             Bounds = Frame;
         }
+        #endregion
 
-        public event Action<UIDisplay, RootView> Entered;
-        public event Action<UIDisplay, RootView> Shadowed;
+        #region Events
+        /// <summary>
+        /// Raised when this <see cref="UIDisplay"/> is made active.
+        /// </summary>
+        public event Action<UIDisplay> Entered;
 
-        public new ViewChildrenCollection Children
-        {
-            get { return (ViewChildrenCollection)base.Children; }
-        }
+        /// <summary>
+        /// Raised when this <see cref="UIDisplay"/> is made inactive because another one was pushed over it.
+        /// </summary>
+        public event Action<UIDisplay> Shadowed;
+        #endregion
 
+        #region Properties
         public new RootView Parent
         {
             get { return (RootView)base.Parent; }
         }
 
-        internal virtual void OnEntered(RootView enterOn)
+        public new RootView Root
         {
-            Action<UIDisplay, RootView> handler = Entered;
-            if (handler != null) handler(this, enterOn);
+            get { return Parent; }
+        }
+        #endregion
+
+        #region Methods
+        protected internal virtual void OnEntered()
+        {
+            Entered.Raise(this);
         }
 
-        internal virtual void OnShadowed(RootView hiddenOf)
+        protected internal virtual void OnShadowed()
         {
-            Action<UIDisplay, RootView> handler = Shadowed;
-            if (handler != null) handler(this, hiddenOf);
+            Shadowed.Raise(this);
         }
 
         protected override void Dispose(bool disposing)
@@ -45,5 +57,6 @@ namespace Orion.UserInterface
 
             base.Dispose(disposing);
         }
+        #endregion
     }
 }

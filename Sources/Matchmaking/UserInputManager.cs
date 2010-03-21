@@ -93,22 +93,22 @@ namespace Orion.Matchmaking
         {
             if (mouseCommand != null)
             {
-                if (args.ButtonPressed == MouseButton.Left)
+                if (args.Button == MouseButton.Left)
                     LaunchMouseCommand(args.Position);
                 mouseCommand = null;
                 return;
             }
 
-            if (args.ButtonPressed == MouseButton.Left)
+            if (args.Button == MouseButton.Left)
                 selectionStart = args.Position;
-            else if (args.ButtonPressed == MouseButton.Right)
+            else if (args.Button == MouseButton.Right)
                 LaunchDefaultCommand(args.Position);
         }
 
         public void HandleMouseUp(MouseEventArgs args)
         {
             if (!this.selectionStart.HasValue) return;
-            if (args.ButtonPressed != MouseButton.Left) return;
+            if (args.Button != MouseButton.Left) return;
 
             this.selectionEnd = args.Position;
             Vector2 selectionRectangleStart = this.selectionStart.Value;
@@ -151,7 +151,7 @@ namespace Orion.Matchmaking
 
         public void HandleMouseDoubleClick(MouseEventArgs args)
         {
-            if ((args.ButtonPressed & MouseButton.Left) == 0) return;
+            if (args.Button != MouseButton.Left) return;
 
             selectionStart = null;
             selectionEnd = null;

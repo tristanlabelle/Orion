@@ -39,7 +39,7 @@ namespace Orion.UserInterface
             #endregion
 
             #region Methods
-            public void Update(float timeDeltaInSeconds)
+            protected override void Update(float timeDeltaInSeconds)
             {
                 ageInSeconds += timeDeltaInSeconds;
 
@@ -55,6 +55,7 @@ namespace Orion.UserInterface
         }
         #endregion
 
+        #region Instance
         #region Fields
         private static readonly int MaxMessageCount = 15;
 
@@ -96,17 +97,15 @@ namespace Orion.UserInterface
             }
         }
 
-        public void Update(float timeDeltaInSeconds)
+        protected override void Update(float timeDeltaInSeconds)
         {
-            foreach (Message message in messages)
-                message.Update(timeDeltaInSeconds);
-
             while (messages.Count > 0 && messages.Peek().IsDead)
             {
                 Message deadMessage = messages.Dequeue();
                 deadMessage.Dispose();
             }
         }
+        #endregion
         #endregion
     }
 }

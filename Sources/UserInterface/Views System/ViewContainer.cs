@@ -2,15 +2,17 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Orion.Geometry;
+using System.Linq;
+using Orion.Collections;
 using Orion.Engine.Graphics;
+using Orion.Geometry;
 
 namespace Orion.UserInterface
 {
     public abstract class ViewContainer : IDisposable
     {
         #region Fields
-        private readonly Collection<ViewContainer> children;
+        private readonly ICollection<ViewContainer> children;
         private ViewContainer parent;
         private bool isDisposed;
         #endregion
@@ -21,7 +23,7 @@ namespace Orion.UserInterface
             this.children = new ViewChildrenCollection(this);
         }
 
-        public ViewContainer(Collection<ViewContainer> children)
+        public ViewContainer(ICollection<ViewContainer> children)
         {
             Argument.EnsureNotNull(children, "children");
             this.children = children;
@@ -121,12 +123,12 @@ namespace Orion.UserInterface
         /// <summary>
         /// Gets the collection of this view's children.
         /// </summary>
-        public Collection<ViewContainer> Children
+        public ICollection<ViewContainer> Children
         {
             get
             {
                 EnsureNotDisposed();
-                return children;
+                return GetChildren();
             }
         }
 
@@ -223,6 +225,11 @@ namespace Orion.UserInterface
             EnsureNotDisposed();
             if (Parent != null) Parent.Children.Remove(this);
         }
+
+        protected virtual ICollection<ViewContainer> GetChildren()
+        {
+            return children;
+        }
         #endregion
 
         #region Object Model
@@ -257,8 +264,13 @@ namespace Orion.UserInterface
                 EnsureNotDisposed();
                 RemoveFromParent();
 
-                // Children are removed this way as they detach from their parent (this) when removed.
-                while (children.Count > 0) children[0].Dispose();
+                // Children are removed this way as they detach from their parent (this view) when removed.
+                while (true)
+                {
+                    ViewContainer child = children.FirstOrDefault();
+                    if (child == null) break;
+                    child.Dispose();
+                }
 
                 AddedToParent = null;
                 RemovedFromParent = null;
@@ -285,7 +297,7 @@ namespace Orion.UserInterface
         protected void EnsureNotDisposed()
         {
 #warning Cannot properly implement EnsureNotDisposed as many objects depend on usage of disposed views :/
-            Debug.Assert(!isDisposed, "A view is being used after being disposed.");
+            //Debug.Assert(!isDisposed, "A view is being used after being disposed.");
             //if (isDisposed) throw new ObjectDisposedException(null);
         }
         #endregion

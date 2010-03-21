@@ -20,6 +20,12 @@ namespace Orion.UserInterface
             GL.CullFace(CullFaceMode.Back);
         }
 
+        protected override void OnSizeChanged(System.EventArgs e)
+        {
+            GL.Viewport(ClientRectangle);
+            base.OnSizeChanged(e);
+        }
+
         protected override bool IsInputChar(char charCode)
         {
             return true;

@@ -65,7 +65,7 @@ namespace Orion.Main
             if(host == gameHost) ForceExit();
         }
 
-        private void EnterRootView(UIDisplay uiDisplay, RootView root)
+        private void EnterRootView(UIDisplay uiDisplay)
         {
             ui.UsePlayerForSlot(0, gameHost);
         }

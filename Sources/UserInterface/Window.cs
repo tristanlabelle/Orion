@@ -56,8 +56,9 @@ namespace Orion.UserInterface
         /// </summary>
         public override void Refresh()
         {
-            if (Form.ActiveForm == this && !glControl.IsDisposed && !IsDisposed)
-                CheckMouseEvents();
+            if (IsDisposed || glControl.IsDisposed) return;
+
+            if (Form.ActiveForm == this) CheckMouseEvents();
 
             glControl.Refresh();
         }
@@ -104,7 +105,7 @@ namespace Orion.UserInterface
             if ((lastMouseButtons & mouseButton) != (newMouseButtons & mouseButton))
             {
                 bool pressed = (newMouseButtons & mouseButton) == mouseButton;
-                TriggerMouseEvent(pressed ? MouseEventType.MouseDown : MouseEventType.MouseUp,
+                TriggerMouseEvent(pressed ? MouseEventType.MouseButtonPressed : MouseEventType.MouseButtonReleased,
                     lastGameMousePosition.X, lastGameMousePosition.Y,
                     mouseButton, 1, 0);
             }
@@ -112,8 +113,8 @@ namespace Orion.UserInterface
 
         private void glControl_MouseWheel(object sender, SysMouseEventArgs args)
         {
-            TriggerMouseEvent(MouseEventType.MouseWheel,
-                args.X, args.Y, args.Button, args.Clicks, args.Delta);
+            TriggerMouseEvent(MouseEventType.MouseWheelScrolled,
+                args.X, args.Y, args.Button, args.Clicks, args.Delta / 600f);
         }
 
         private void glControl_MouseDoubleClick(object sender, SysMouseEventArgs args)
@@ -122,10 +123,11 @@ namespace Orion.UserInterface
                 args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 
-        private void TriggerMouseEvent(MouseEventType type, float x, float y, MouseButtons argsButton, int clicks, int delta)
+        private void TriggerMouseEvent(MouseEventType type, float x, float y,
+            MouseButtons button, int clickCount, float wheelDelta)
         {
             MouseButton pressedButton = MouseButton.None;
-            switch (argsButton)
+            switch (button)
             {
                 case MouseButtons.Left: pressedButton = MouseButton.Left; break;
                 case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
@@ -133,16 +135,11 @@ namespace Orion.UserInterface
             }
 
             rootView.PropagateMouseEvent(type,
-                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clicks, delta));
+                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clickCount, wheelDelta));
         }
         #endregion
 
-        private void glControl_Paint(object sender, PaintEventArgs e)
-        {
-            rootView.Render(graphicsContext);
-            glControl.SwapBuffers();
-        }
-
+        #region Keyboard Events
         private void glControl_KeyDown(object sender, KeyEventArgs args)
         {
             if (args.Alt) args.Handled = true;
@@ -169,13 +166,28 @@ namespace Orion.UserInterface
 
         private void OnKeyPress(char keyChar)
         {
-            rootView.PropagateKeyPressEvent(keyChar);
+            rootView.PropagateCharacterTypedEvent(keyChar);
         }
 
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys key, bool alt, bool control, bool shift)
         {
             KeyboardEventArgs args = new KeyboardEventArgs(key, alt, control, shift);
             rootView.PropagateKeyboardEvent(type, args);
+        }
+        #endregion
+
+        private void glControl_SizeChanged(object sender, EventArgs e)
+        {
+            if (rootView != null)
+            {
+                rootView.Frame = rootView.Frame.ResizedTo(glControl.ClientSize.Width, glControl.ClientSize.Height);
+            }
+        }
+
+        private void glControl_Paint(object sender, PaintEventArgs e)
+        {
+            rootView.Render(graphicsContext);
+            glControl.SwapBuffers();
         }
 
         /// <summary>
@@ -185,11 +197,8 @@ namespace Orion.UserInterface
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            if (rootView != null)
-            {
-                rootView.Frame = rootView.Frame.ResizedTo(glControl.Width, glControl.Height);
-                glControl.Refresh();
-            }
+
+            glControl.Refresh();
         }
         #endregion
     }

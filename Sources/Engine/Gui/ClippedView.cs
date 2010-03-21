@@ -17,7 +17,7 @@ namespace Orion.Engine.Gui
             : base(frame, renderer)
         {
             this.fullBounds = fullBounds;
-            MinimumVisibleBounds = FullBounds.ScaledBy(0.01f);
+            MinimumVisibleBoundsSize = FullBounds.Size * 0.01f;
             MaximumVisibleBounds = FullBounds;
         }
         #endregion
@@ -27,6 +27,9 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets or sets the full, unclipped size of the view, of which <see cref="Bounds"/> only represents a portion.
+        /// </summary>
         public Rectangle FullBounds
         {
             get { return fullBounds; }
@@ -37,8 +40,14 @@ namespace Orion.Engine.Gui
             }
         }
 
-        public Rectangle MinimumVisibleBounds { get; set; }
+        /// <summary>
+        /// Gets the minimum size of <see cref="Bounds"/>.
+        /// </summary>
+        public Vector2 MinimumVisibleBoundsSize { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maximum area for <see cref="Bounds"/>.
+        /// </summary>
         public Rectangle MaximumVisibleBounds { get; set; }
         #endregion
 
@@ -63,16 +72,16 @@ namespace Orion.Engine.Gui
                 newSize.X = newSize.Y * ratio;
             }
 
-            if (newSize.X < MinimumVisibleBounds.Width)
+            if (newSize.X < MinimumVisibleBoundsSize.X)
             {
                 float ratio = Bounds.Size.Y / Bounds.Size.X;
-                newSize.X = MinimumVisibleBounds.Width;
+                newSize.X = MinimumVisibleBoundsSize.X;
                 newSize.Y = newSize.X * ratio;
             }
-            if (newSize.Y < MinimumVisibleBounds.Height)
+            if (newSize.Y < MinimumVisibleBoundsSize.Y)
             {
                 float ratio = Bounds.Size.X / Bounds.Size.Y;
-                newSize.Y = MinimumVisibleBounds.Height;
+                newSize.Y = MinimumVisibleBoundsSize.Y;
                 newSize.X = newSize.Y * ratio;
             }
 

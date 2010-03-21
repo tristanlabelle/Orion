@@ -2,8 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Collections;
-using Orion.Geometry;
+using Orion.Engine;
+using Orion.Engine.Collections;
+using Orion.Engine.Geometry;
 
 namespace Orion.GameLogic
 {

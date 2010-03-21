@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Delegate for a method which is called when a value gets changed.

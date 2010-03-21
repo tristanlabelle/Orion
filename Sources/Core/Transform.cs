@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Encapsulates a 2D transformation.

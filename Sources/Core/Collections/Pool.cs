@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Orion.Collections
+namespace Orion.Engine.Collections
 {
     /// <summary>
     /// Provides a pool of objects to facilitate reuse.

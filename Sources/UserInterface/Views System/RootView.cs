@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using OpenTK.Graphics;
 using OpenTK.Math;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 
 namespace Orion.UserInterface

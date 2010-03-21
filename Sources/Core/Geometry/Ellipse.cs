@@ -1,8 +1,7 @@
 ﻿using System;
-
 using OpenTK.Math;
 
-namespace Orion.Geometry
+namespace Orion.Engine.Geometry
 {
     /// <summary>
     /// Represents a 2D ellipse shape.

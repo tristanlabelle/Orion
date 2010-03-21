@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides extension methods to simplify the use of format strings.

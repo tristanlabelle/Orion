@@ -1,6 +1,6 @@
 ﻿using System;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 

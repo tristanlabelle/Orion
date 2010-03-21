@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using System.Reflection;
 using System.Globalization;
+using Orion.Engine;
 
 namespace Orion.GameLogic.Technologies
 {

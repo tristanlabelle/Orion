@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Indicates a mouse event type. Internal use only.

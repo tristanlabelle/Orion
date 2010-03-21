@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Orion.Engine;
+using Orion.GameLogic;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Deathmatch;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.GameLogic;
 using Orion.UserInterface;
 
 namespace Orion.Main

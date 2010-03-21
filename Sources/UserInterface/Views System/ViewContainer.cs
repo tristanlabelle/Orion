@@ -3,9 +3,10 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Orion.Collections;
+using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 
 namespace Orion.UserInterface
 {

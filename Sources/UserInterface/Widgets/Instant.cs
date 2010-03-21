@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Keys = System.Windows.Forms.Keys;
-
 using OpenTK.Math;
-using Orion.Geometry;
+using Orion.Engine;
+using Orion.Engine.Geometry;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Widgets
 {

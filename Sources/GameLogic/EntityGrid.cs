@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Orion.Geometry;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 
 namespace Orion.GameLogic
 {

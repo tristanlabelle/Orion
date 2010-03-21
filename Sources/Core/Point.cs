@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Represents an (x,y) 2D integral coordinate pair.

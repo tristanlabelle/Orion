@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Orion.Engine;
 using Orion.GameLogic;
 
 namespace Orion.Matchmaking

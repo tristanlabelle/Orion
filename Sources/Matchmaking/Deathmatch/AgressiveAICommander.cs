@@ -5,7 +5,7 @@ using OpenTK.Math;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 
 namespace Orion.Matchmaking.Deathmatch
 {

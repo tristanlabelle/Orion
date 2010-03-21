@@ -1,7 +1,8 @@
 using System;
 using System.Windows.Forms;
+using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using SysPoint = System.Drawing.Point;
 using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
@@ -135,7 +136,7 @@ namespace Orion.UserInterface
             }
 
             rootView.PropagateMouseEvent(type,
-                new Orion.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clickCount, wheelDelta));
+                new Orion.Engine.MouseEventArgs(x, (glControl.Height - 1) - y, pressedButton, clickCount, wheelDelta));
         }
         #endregion
 

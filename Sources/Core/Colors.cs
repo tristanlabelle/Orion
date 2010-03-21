@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Orion.Collections;
+using Orion.Engine.Collections;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides numerous typical colors.

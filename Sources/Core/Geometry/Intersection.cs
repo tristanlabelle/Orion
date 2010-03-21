@@ -1,7 +1,7 @@
 ﻿
 using OpenTK.Math;
 
-namespace Orion.Geometry
+namespace Orion.Engine.Geometry
 {
     /// <summary>
     /// Provide helper methods to determine if various shapes intersect.

@@ -1,6 +1,6 @@
 ﻿using Keys = System.Windows.Forms.Keys;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Represents possible types of keyboard events.

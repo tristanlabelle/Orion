@@ -32,7 +32,7 @@
 
 using System;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// The Mersenne Twister is a portable random number generator with a high period and decent performances (or at least we'll hope so,

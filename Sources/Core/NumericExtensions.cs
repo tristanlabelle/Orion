@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides extension methods to numeric types.

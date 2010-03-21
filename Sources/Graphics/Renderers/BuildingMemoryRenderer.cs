@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.Geometry;
 using Orion.GameLogic.Utilities;
 
 namespace Orion.Graphics.Renderers

@@ -5,7 +5,8 @@ using OpenTK.Math;
 using Orion.GameLogic;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
-using Orion.Geometry;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 
 namespace Orion.GameLogic.Utilities
 {

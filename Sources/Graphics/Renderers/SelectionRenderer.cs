@@ -1,9 +1,10 @@
 ﻿using System;
 using OpenTK.Math;
+using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Matchmaking;
 using Orion.GameLogic;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 
 namespace Orion.Graphics.Renderers
 {

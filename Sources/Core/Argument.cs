@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides helper methods to deal with argument validation.

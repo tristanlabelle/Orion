@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Collections;
+using Orion.Engine;
+using Orion.Engine.Collections;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.GameLogic.Pathfinding;
 using Orion.GameLogic.Tasks;
-using Orion.Geometry;
 
 namespace Orion.Graphics.Renderers
 {

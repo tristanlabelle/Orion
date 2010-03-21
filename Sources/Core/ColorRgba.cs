@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides functionality to represent and make operations on colors.

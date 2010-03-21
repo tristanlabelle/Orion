@@ -4,7 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using OpenTK.Math;
-using Orion.Geometry;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.GameLogic;
 
 namespace Orion.GameLogic.Utilities

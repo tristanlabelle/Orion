@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Represents the 2D integral dimensions of an object.

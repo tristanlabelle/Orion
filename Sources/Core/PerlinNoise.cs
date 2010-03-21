@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion
+namespace Orion.Engine
 {
     [Serializable]
     public sealed class PerlinNoise

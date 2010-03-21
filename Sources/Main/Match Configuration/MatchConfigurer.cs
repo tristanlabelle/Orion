@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Orion.Engine;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.GameLogic;

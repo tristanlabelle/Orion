@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Orion.Collections
+namespace Orion.Engine.Collections
 {
     /// <summary>
     /// Compactly stores a 2D array of bits.

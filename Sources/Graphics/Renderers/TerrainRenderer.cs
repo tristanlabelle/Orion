@@ -1,7 +1,8 @@
 ﻿using System;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.Geometry;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 using PixelFormat = Orion.Engine.Graphics.PixelFormat;
 

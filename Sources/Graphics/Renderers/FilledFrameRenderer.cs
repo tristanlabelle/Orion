@@ -1,6 +1,7 @@
 using System;
+using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 
 namespace Orion.Graphics.Renderers
 {

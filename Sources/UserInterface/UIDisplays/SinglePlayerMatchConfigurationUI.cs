@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using Orion.Matchmaking;
 using Orion.UserInterface.Widgets;
 

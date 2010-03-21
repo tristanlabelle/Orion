@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
-using Rectangle = Orion.Geometry.Rectangle;
+using Rectangle = Orion.Engine.Geometry.Rectangle;
 using OpenTK.Math;
 using OpenTK.Graphics;
 

@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using OpenTK.Math;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;

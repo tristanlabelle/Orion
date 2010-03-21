@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Orion.Engine;
 
 namespace Orion.GameLogic
 {

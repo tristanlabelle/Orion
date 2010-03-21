@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Regroups informations on an update step of the game.

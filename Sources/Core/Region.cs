@@ -5,9 +5,9 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using OpenTK.Math;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Represents a 2D rectangular region.

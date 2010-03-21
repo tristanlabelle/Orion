@@ -1,7 +1,8 @@
 ﻿using System;
 using OpenTK.Math;
+using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using Orion.Graphics;
 using Orion.UserInterface.Widgets;
 using Font = System.Drawing.Font;

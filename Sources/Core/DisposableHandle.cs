@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Provides a handle which locking a resource which can be disposed.

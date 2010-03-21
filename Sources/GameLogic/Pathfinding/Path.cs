@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Engine;
 
 namespace Orion.GameLogic.Pathfinding
 {

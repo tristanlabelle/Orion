@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// Objects of this structure encapsulate the data of a frame update.

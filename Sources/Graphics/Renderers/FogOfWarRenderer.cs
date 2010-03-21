@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
-using Orion.Geometry;
-using System.Diagnostics;
 
 namespace Orion.Graphics.Renderers
 {

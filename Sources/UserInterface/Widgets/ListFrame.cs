@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Geometry;
+using Orion.Engine.Geometry;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using OpenTK.Math;

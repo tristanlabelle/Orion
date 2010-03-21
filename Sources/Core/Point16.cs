@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using OpenTK.Math;
 
-namespace Orion
+namespace Orion.Engine
 {
     /// <summary>
     /// A point structure holding an X and Y coordinate pair as <see cref="Int16"/>s.

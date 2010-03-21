@@ -1,8 +1,8 @@
 ﻿using System;
-
 using OpenTK.Math;
+using Orion.Engine;
 
-namespace Orion.Geometry
+namespace Orion.Engine.Geometry
 {
     /// <summary>
     /// Represents a triangle, defined by its three 2D vertices.

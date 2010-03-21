@@ -1,13 +1,14 @@
 ﻿using System;
 using OpenTK.Math;
 using Orion.Engine;
-using Orion.Engine.Graphics;
-using Orion.GameLogic;
 using Orion.Engine.Geometry;
+using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
+using Orion.GameLogic;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class UnitButtonRenderer : IRenderer
+    public sealed class UnitButtonRenderer : IViewRenderer
     {
         #region Fields
         private static readonly ColorRgb FocusedStrokeColor = Colors.White;

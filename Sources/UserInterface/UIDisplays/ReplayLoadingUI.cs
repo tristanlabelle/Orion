@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Orion.UserInterface.Widgets;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using OpenTK.Math;
 
 namespace Orion.UserInterface

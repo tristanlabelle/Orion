@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 using Orion.Engine;
 using Orion.Engine.Networking;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.Matchmaking;
 using Orion.Networking;
 using Orion.UserInterface;
-using Orion.UserInterface.Widgets;
 
 namespace Orion.Main
 {

@@ -1,11 +1,10 @@
 ﻿using System;
-using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Engine.Gui
 {
-    public abstract class FrameRenderer : IRenderer
+    public abstract class FrameRenderer : IViewRenderer
     {
         #region Fields
         public readonly ColorRgba StrokeColor;

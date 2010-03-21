@@ -5,11 +5,9 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Provides a UI button which can be listened for clicks.
@@ -36,7 +34,7 @@ namespace Orion.UserInterface.Widgets
             : this(frame, caption, new FilledFrameRenderer())
         { }
 
-        public Button(Rectangle frame, string caption, IRenderer renderer)
+        public Button(Rectangle frame, string caption, IViewRenderer renderer)
             : base(frame, renderer)
         {
             this.caption = new Label(caption);

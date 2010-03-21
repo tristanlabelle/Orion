@@ -71,9 +71,6 @@
     <Compile Include="Actions\Enablers\TrainEnabler.cs" />
     <Compile Include="Actions\IActionProvider.cs" />
     <Compile Include="Actions\UnitActionProvider.cs" />
-    <Compile Include="CustomGLControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="GameUI.cs" />
     <Compile Include="ResourceDisplay.cs" />
     <Compile Include="UIDisplays\HostMultiplayerLobby.cs" />
@@ -86,27 +83,7 @@
     <Compile Include="UIDisplays\MultiplayerMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\ReplayLoadingUI.cs" />
     <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />
-    <Compile Include="UIDisplays\NullUI.cs" />
-    <Compile Include="Views System\ClippedView.cs" />
-    <Compile Include="Views System\RenderedView.cs" />
-    <Compile Include="Views System\Responder.cs" />
-    <Compile Include="Views System\RootView.cs" />
-    <Compile Include="Views System\ViewChildrenCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Widgets\Scrollbar.cs" />
-    <Compile Include="Widgets\Button.cs" />
-    <Compile Include="Widgets\DropdownList.cs" />
-    <Compile Include="Widgets\Frame.cs" />
-    <Compile Include="Widgets\Instant.cs" />
-    <Compile Include="Widgets\Label.cs" />
-    <Compile Include="Widgets\ListFrame.cs" />
-    <Compile Include="Widgets\Scroller.cs" />
-    <Compile Include="UIDisplays\UIDisplay.cs" />
-    <Compile Include="Views System\View.cs" />
-    <Compile Include="Views System\ViewContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Widgets\TextField.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>

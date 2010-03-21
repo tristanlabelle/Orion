@@ -3,8 +3,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using Orion.Graphics;
-using Orion.UserInterface.Widgets;
 using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface
@@ -103,7 +103,7 @@ namespace Orion.UserInterface
             Children.Add(label);
         }
 
-        protected internal override void Render(GraphicsContext graphicsContext)
+        protected override void Render(GraphicsContext graphicsContext)
         {
             graphicsContext.Fill(Bounds, backgroundTexture);
 

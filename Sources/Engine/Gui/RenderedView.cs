@@ -1,19 +1,17 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public class RenderedView : View
     {
         #region Fields
-        private IRenderer renderer;
+        private IViewRenderer renderer;
         #endregion
 
         #region Constructors
-        public RenderedView(Rectangle frame, IRenderer renderer)
+        public RenderedView(Rectangle frame, IViewRenderer renderer)
             : base(frame)
         {
             this.renderer = renderer;
@@ -21,7 +19,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Properties
-        public IRenderer Renderer
+        public IViewRenderer Renderer
         {
             get { return renderer; }
             set { renderer = value; }

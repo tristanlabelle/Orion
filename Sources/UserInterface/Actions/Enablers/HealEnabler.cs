@@ -1,10 +1,10 @@
 ﻿using System;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
 using Orion.Matchmaking;
-using Orion.UserInterface.Widgets;
 using Orion.UserInterface.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 

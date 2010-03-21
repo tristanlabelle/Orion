@@ -7,10 +7,8 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class Scrollbar : Frame
     {

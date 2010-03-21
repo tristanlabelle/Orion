@@ -8,10 +8,10 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Matchmaking;
-using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface
 {
@@ -178,7 +178,7 @@ namespace Orion.UserInterface
         }
 
         #region UIDisplay Implementation
-        protected internal override void OnEntered()
+        protected override void OnEntered()
         {
             InitializeSlots();
             exitButton.Triggered += exitPanel;
@@ -186,7 +186,7 @@ namespace Orion.UserInterface
             base.OnEntered();
         }
 
-        protected internal override void OnShadowed()
+        protected override void OnShadowed()
         {
             exitButton.Triggered -= exitPanel;
             startButton.Triggered -= startGame;

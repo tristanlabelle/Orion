@@ -1,9 +1,8 @@
 using System;
-using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Engine.Gui
 {
     public sealed class FilledFrameRenderer : FrameRenderer
     {

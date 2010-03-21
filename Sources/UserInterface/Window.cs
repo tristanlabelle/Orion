@@ -150,7 +150,7 @@ namespace Orion.UserInterface
         {
             Vector2 position = new Vector2(x, (glControl.Height - 1) - y);
             var eventArgs = new Orion.Engine.Gui.MouseEventArgs(position, button, clickCount, wheelDelta);
-            rootView.PropagateMouseEvent(type, eventArgs);
+            rootView.SendMouseEvent(type, eventArgs);
         }
         #endregion
 
@@ -185,13 +185,13 @@ namespace Orion.UserInterface
 
         private void OnKeyPress(char keyChar)
         {
-            rootView.PropagateCharacterTypedEvent(keyChar);
+            rootView.SendCharacterTypedEvent(keyChar);
         }
 
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
         {
             KeyboardEventArgs args = new KeyboardEventArgs(keyAndModifiers);
-            rootView.PropagateKeyboardEvent(type, args);
+            rootView.SendKeyboardEvent(type, args);
         }
         #endregion
 
@@ -205,7 +205,7 @@ namespace Orion.UserInterface
 
         private void glControl_Paint(object sender, PaintEventArgs e)
         {
-            rootView.Render(graphicsContext);
+            rootView.Draw(graphicsContext);
             glControl.SwapBuffers();
         }
 

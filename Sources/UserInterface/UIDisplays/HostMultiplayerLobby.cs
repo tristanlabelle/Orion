@@ -9,8 +9,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Networking;
+using Orion.Engine.Gui;
 using Orion.Networking;
-using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface
 {
@@ -73,7 +73,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Methods
-        protected internal override void OnEntered()
+        protected override void OnEntered()
         {
             transporter.Received += receptionDelegate;
             transporter.TimedOut += timeoutDelegate;
@@ -81,7 +81,7 @@ namespace Orion.UserInterface
             base.OnEntered();
         }
 
-        protected internal override void OnShadowed()
+        protected override void OnShadowed()
         {
             transporter.Received -= receptionDelegate;
             transporter.TimedOut -= timeoutDelegate;

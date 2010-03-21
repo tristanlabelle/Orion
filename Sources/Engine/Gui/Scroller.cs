@@ -4,7 +4,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class Scroller : Responder
     {

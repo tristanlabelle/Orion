@@ -8,7 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public abstract class ViewContainer : IDisposable
     {

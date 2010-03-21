@@ -1,10 +1,11 @@
 using System;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Matchmaking;
 using Orion.GameLogic;
-using Orion.Engine.Geometry;
 
 namespace Orion.Graphics.Renderers
 {

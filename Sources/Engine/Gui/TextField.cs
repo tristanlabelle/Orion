@@ -7,10 +7,9 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Graphics;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class TextField : View
     {

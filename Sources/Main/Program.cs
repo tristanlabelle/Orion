@@ -16,7 +16,7 @@ using Orion.GameLogic;
 using Orion.Matchmaking;
 using Orion.Networking;
 using Orion.UserInterface;
-using Button = Orion.UserInterface.Widgets.Button;
+using Button = Orion.Engine.Gui.Button;
 
 namespace Orion.Main
 {

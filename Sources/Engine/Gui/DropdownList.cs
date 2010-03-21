@@ -7,9 +7,8 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Graphics;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class DropdownList<T> : Frame
     {

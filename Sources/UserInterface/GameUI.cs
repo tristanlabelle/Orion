@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Graphics;
+
 namespace Orion.UserInterface
 {
     /// <summary>

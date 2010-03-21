@@ -16,7 +16,6 @@ using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
 using Orion.UserInterface.Actions;
 using Orion.UserInterface.Actions.Enablers;
-using Orion.UserInterface.Widgets;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
@@ -515,7 +514,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region UIDisplay Implementation
-        protected internal override void OnShadowed()
+        protected override void OnShadowed()
         {
             Root.PopDisplay(this);
             base.OnShadowed();

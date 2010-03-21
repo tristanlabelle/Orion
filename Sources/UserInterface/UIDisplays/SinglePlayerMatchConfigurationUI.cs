@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Orion.Engine.Geometry;
+using Orion.Engine.Gui;
 using Orion.Matchmaking;
-using Orion.UserInterface.Widgets;
 
 namespace Orion.UserInterface
 {

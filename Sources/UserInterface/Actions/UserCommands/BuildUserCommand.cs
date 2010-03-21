@@ -4,6 +4,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.GameLogic;
 using Orion.Graphics;
 using Orion.Graphics.Renderers;
@@ -11,7 +12,7 @@ using Orion.Matchmaking;
 
 namespace Orion.UserInterface.Actions.UserCommands
 {
-    public sealed class BuildUserCommand : UserInputCommand, IRenderer
+    public sealed class BuildUserCommand : UserInputCommand, IViewRenderer
     {
         #region Fields
         private readonly UnitType buildingType;

@@ -1,13 +1,12 @@
 ﻿using System;
-using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Engine.Gui
 {
     public delegate void RenderingDelegate(GraphicsContext context, Rectangle rectangle);
 
-    public class DelegatedRenderer : IRenderer
+    public class DelegatedRenderer : IViewRenderer
     {
         public readonly RenderingDelegate RenderingDelegate;
 

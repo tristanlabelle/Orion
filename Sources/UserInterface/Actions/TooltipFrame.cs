@@ -6,8 +6,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Graphics;
-using Orion.UserInterface.Widgets;
 using Font = System.Drawing.Font;
 
 namespace Orion.UserInterface.Actions
@@ -50,7 +50,7 @@ namespace Orion.UserInterface.Actions
             Frame = Bounds.TranslatedTo(origin);
         }
 
-        protected internal override void Draw(GraphicsContext context)
+        protected override void Draw(GraphicsContext context)
         {
             context.Fill(Bounds, Colors.Gray);
             context.Stroke(Bounds, Colors.White);

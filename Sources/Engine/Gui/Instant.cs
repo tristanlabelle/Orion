@@ -7,7 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public static class Instant
     {

@@ -9,7 +9,6 @@ using Orion.Engine.Gui;
 using Orion.Graphics;
 using Orion.Matchmaking;
 using Orion.UserInterface.Actions.Enablers;
-using Orion.UserInterface.Widgets;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.UserInterface.Actions

@@ -5,7 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.UserInterface.Widgets;
+using Orion.Engine.Gui;
 
 namespace Orion.UserInterface
 {

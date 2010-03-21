@@ -6,7 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public abstract class Responder : ViewContainer
     {

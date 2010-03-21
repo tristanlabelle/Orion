@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public sealed class NullUI : UIDisplay
     {

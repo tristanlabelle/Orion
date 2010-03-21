@@ -55,16 +55,11 @@
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
-    <Compile Include="Renderers\FilledFrameRenderer.cs" />
     <Compile Include="Renderers\HealthBarRenderer.cs" />
     <Compile Include="Renderers\MinimapRenderer.cs" />
     <Compile Include="Renderers\ResourcesRenderer.cs" />
     <Compile Include="Renderers\RuinsRenderer.cs" />
-    <Compile Include="Renderers\TexturedFrameRenderer.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />
-    <Compile Include="Renderers\FrameRenderer.cs" />
-    <Compile Include="Renderers\DelegatedRenderer.cs" />
-    <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\MatchRenderer.cs" />
     <Compile Include="Renderers\SelectionRenderer.cs" />

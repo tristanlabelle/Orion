@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Geometry;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 using OpenTK.Math;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class ListFrame : ClippedView
     {

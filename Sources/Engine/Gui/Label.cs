@@ -3,10 +3,9 @@ using System.Diagnostics;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Graphics;
 using Font = System.Drawing.Font;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A Label is a visible readonly text field.

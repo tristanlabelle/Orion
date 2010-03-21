@@ -3,10 +3,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public class ClippedView : RenderedView
     {
@@ -15,7 +13,7 @@ namespace Orion.UserInterface
         #endregion
 
         #region Constructors
-        public ClippedView(Rectangle frame, Rectangle fullBounds, IRenderer renderer)
+        public ClippedView(Rectangle frame, Rectangle fullBounds, IViewRenderer renderer)
             : base(frame, renderer)
         {
             this.fullBounds = fullBounds;

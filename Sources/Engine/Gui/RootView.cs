@@ -7,8 +7,9 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
+using System.Collections;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public sealed class RootView : Responder
     {
@@ -79,11 +80,35 @@ namespace Orion.UserInterface
             TopmostDisplay.OnEntered();
         }
 
+        #region Public event generation
+        public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+            PropagateMouseEvent(type, args);
+        }
+
+        public void SendKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+        {
+            PropagateKeyboardEvent(type, args);
+        }
+
+        public void SendCharacterTypedEvent(char character)
+        {
+            PropagateCharacterTypedEvent(character);
+        }
+
         public new void Update(float timeDeltaInSeconds)
         {
             TopmostDisplay.PropagateUpdateEvent(timeDeltaInSeconds);
         }
 
+        public new void Draw(GraphicsContext graphicsContext)
+        {
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            Render(graphicsContext);
+        }
+        #endregion
+
+        #region Protected Overrides
         protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
         {
             Vector2 propagatedMousePosition = args.Position;
@@ -108,6 +133,7 @@ namespace Orion.UserInterface
 
             displays.Peek().Render(graphicsContext);
         }
+        #endregion
         #endregion
     }
 }

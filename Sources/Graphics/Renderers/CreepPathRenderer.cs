@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Matchmaking.TowerDefense;
 
 namespace Orion.Graphics.Renderers
@@ -13,7 +14,7 @@ namespace Orion.Graphics.Renderers
     /// <summary>
     /// Responsible for drawing the path that is followed by the creeps.
     /// </summary>
-    public sealed class CreepPathRenderer : IRenderer
+    public sealed class CreepPathRenderer : IViewRenderer
     {
         #region Fields
         private static readonly float TextureSizeInTiles = 6;

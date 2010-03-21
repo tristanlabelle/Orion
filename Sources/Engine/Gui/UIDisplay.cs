@@ -1,7 +1,7 @@
 ﻿using System;
 using Orion.Engine;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public abstract class UIDisplay : Responder
     {

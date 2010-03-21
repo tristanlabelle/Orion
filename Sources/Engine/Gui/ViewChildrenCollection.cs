@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A collection which manages the children <see cref="View"/>s of a <see cref="View"/>.

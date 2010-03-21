@@ -3,10 +3,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
 
-namespace Orion.UserInterface.Widgets
+namespace Orion.Engine.Gui
 {
     public class Frame : RenderedView
     {
@@ -23,7 +21,7 @@ namespace Orion.UserInterface.Widgets
             : base(frame, new FilledFrameRenderer(fillColor))
         { }
 
-        public Frame(Rectangle frame, IRenderer renderer)
+        public Frame(Rectangle frame, IViewRenderer renderer)
             : base(frame, renderer)
         { }
         #endregion

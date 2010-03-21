@@ -4,9 +4,8 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Graphics;
 
-namespace Orion.UserInterface
+namespace Orion.Engine.Gui
 {
     public abstract class View : Responder
     {

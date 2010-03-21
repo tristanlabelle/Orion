@@ -2,15 +2,15 @@
 using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Matchmaking;
 using Orion.GameLogic;
-using Orion.Engine.Geometry;
-using Orion.Matchmaking.TowerDefense;
 
 namespace Orion.Graphics.Renderers
 {
-    public sealed class MatchRenderer : IRenderer, IDisposable
+    public sealed class MatchRenderer : IViewRenderer, IDisposable
     {
         #region Fields
         private readonly UserInputManager inputManager;
@@ -109,7 +109,7 @@ namespace Orion.Graphics.Renderers
                 worldRenderer.DrawExplosions(context, bounds);
                 worldRenderer.DrawFogOfWar(context, bounds);
 
-                IRenderer selectedCommandRenderer = inputManager.SelectedCommand as IRenderer;
+                IViewRenderer selectedCommandRenderer = inputManager.SelectedCommand as IViewRenderer;
                 if (selectedCommandRenderer != null)
                     selectedCommandRenderer.Draw(context, bounds);
             }

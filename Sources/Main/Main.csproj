@@ -76,6 +76,10 @@
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Game.Matchmaking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Game.Presentation\Game.Presentation.csproj">
+      <Project>{F2382CAC-67F5-4246-B033-D586A1A68FA7}</Project>
+      <Name>Game.Presentation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Game.Simulation\Game.Simulation.csproj">
       <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
       <Name>Game.Simulation</Name>
@@ -83,10 +87,6 @@
     <ProjectReference Include="..\Networking\Networking.csproj">
       <Project>{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}</Project>
       <Name>Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UserInterface\Game.Presentation.csproj">
-      <Project>{F2382CAC-67F5-4246-B033-D586A1A68FA7}</Project>
-      <Name>Game.Presentation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

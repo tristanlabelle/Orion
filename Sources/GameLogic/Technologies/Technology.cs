@@ -5,7 +5,7 @@ using System.Linq;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Technologies
+namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Represents a technology that, when researched, has an effect

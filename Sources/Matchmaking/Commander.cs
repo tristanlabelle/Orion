@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
 

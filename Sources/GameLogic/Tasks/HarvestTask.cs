@@ -5,7 +5,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     [Serializable]
     public sealed class HarvestTask : Task

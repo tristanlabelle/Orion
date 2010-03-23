@@ -4,10 +4,10 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Graphics;
+using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     /// <summary>
     /// The user interface for the main menu of the game.

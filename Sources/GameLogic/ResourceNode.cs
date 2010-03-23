@@ -3,7 +3,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Represents a location from which resources can be harvested.

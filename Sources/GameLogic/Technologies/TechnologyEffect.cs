@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Technologies
+namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Represents one effect that a technology has.

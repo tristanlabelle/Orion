@@ -6,7 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// Represents a queue of <see cref="Task"/>s to be executed by a <see cref="Unit"/>.

@@ -7,10 +7,10 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.GameLogic.Utilities;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Utilities;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Draws the buildings in the fog of war which have already been seen but have become hidden.

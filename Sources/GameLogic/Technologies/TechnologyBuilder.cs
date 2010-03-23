@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Technologies
+namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Provides a mutable equivalent to <see cref="Technology"/> that can be used to build such objects.

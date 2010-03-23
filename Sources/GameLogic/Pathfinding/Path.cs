@@ -4,7 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Pathfinding
+namespace Orion.Game.Simulation.Pathfinding
 {
     public sealed class Path
     {

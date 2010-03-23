@@ -6,9 +6,9 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation.Tasks;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// A collection of <see cref="Entity">entities</see> optimized for spatial queries.

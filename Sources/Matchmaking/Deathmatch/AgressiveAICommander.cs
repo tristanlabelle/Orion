@@ -4,7 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
 
 namespace Orion.Matchmaking.Deathmatch

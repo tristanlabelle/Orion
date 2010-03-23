@@ -6,9 +6,9 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation.Technologies;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Describes a type of unit (including buildings and vehicles).

@@ -8,7 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Manages collection of entities optimized for spacial requests.

@@ -7,7 +7,7 @@ using Orion.Engine.Networking;
 using Orion.Networking;
 using Orion.Matchmaking;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     public class MultiplayerClientMatchConfigurationUI : MultiplayerMatchConfigurationUI
     {

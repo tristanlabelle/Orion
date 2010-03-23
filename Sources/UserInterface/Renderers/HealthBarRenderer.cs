@@ -6,9 +6,9 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Responsible for drawing the health bars of the units.

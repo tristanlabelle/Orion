@@ -116,9 +116,9 @@
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GameLogic\GameLogic.csproj">
+    <ProjectReference Include="..\GameLogic\Game.Simulation.csproj">
       <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
-      <Name>GameLogic</Name>
+      <Name>Game.Simulation</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

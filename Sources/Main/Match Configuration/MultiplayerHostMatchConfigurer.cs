@@ -5,10 +5,10 @@ using System.Net;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Networking;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Networking;
-using Orion.UserInterface;
+using Orion.Game.Presentation;
 
 namespace Orion.Main
 {

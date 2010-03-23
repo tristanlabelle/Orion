@@ -6,7 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Keeps the collection of registered <see cref="UnitType"/>s.

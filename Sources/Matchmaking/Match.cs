@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.Matchmaking.TowerDefense;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking
 {

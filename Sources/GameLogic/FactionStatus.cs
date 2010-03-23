@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Identifies the status of a <see cref="Faction"/>.

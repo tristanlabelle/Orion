@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
-using StandGuardTask = Orion.GameLogic.Tasks.StandGuardTask;
+using Orion.Game.Simulation;
+using StandGuardTask = Orion.Game.Simulation.Tasks.StandGuardTask;
 
 namespace Orion.Matchmaking.Commands
 {

@@ -6,7 +6,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Holds a grid of reference to entities and prevents overlaps.

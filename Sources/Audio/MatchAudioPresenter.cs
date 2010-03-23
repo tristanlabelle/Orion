@@ -7,8 +7,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.GameLogic;
-using Orion.GameLogic.Utilities;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Utilities;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
 

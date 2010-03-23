@@ -7,7 +7,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic.Pathfinding
+namespace Orion.Game.Simulation.Pathfinding
 {
     /// <summary>
     /// Finds paths to go from one point to another in a grid-based environment.

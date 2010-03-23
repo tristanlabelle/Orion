@@ -6,8 +6,8 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
-using MoveTask = Orion.GameLogic.Tasks.MoveTask;
+using Orion.Game.Simulation;
+using MoveTask = Orion.Game.Simulation.Tasks.MoveTask;
 
 namespace Orion.Matchmaking.Commands
 {

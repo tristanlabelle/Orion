@@ -6,9 +6,9 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
-using Orion.GameLogic.Pathfinding;
+using Orion.Game.Simulation.Pathfinding;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// A <see cref="Task"/>, which causes a <see cref="Unit"/>

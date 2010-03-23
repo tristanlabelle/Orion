@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking.Commands.Pipeline
 {

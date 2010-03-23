@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
 using Orion.Engine.Gui;
 
-namespace Orion.Graphics
+namespace Orion.Game.Presentation
 {
     /// <summary>
     /// Central point of access to game graphics. Used for rendering and resource creation.

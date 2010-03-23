@@ -1,9 +1,9 @@
 using System.Linq;
 using OpenTK.Math;
 using Orion.Matchmaking;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
-namespace Orion.UserInterface.Actions.UserCommands
+namespace Orion.Game.Presentation.Actions.UserCommands
 {
     public sealed class HarvestUserCommand : UserInputCommand
     {

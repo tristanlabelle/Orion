@@ -6,7 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Defines a terrain to be drawn in background, parts of this terrain are walkable, others are not.

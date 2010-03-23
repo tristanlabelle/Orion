@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Keeps track of the food usage of each faction over time.

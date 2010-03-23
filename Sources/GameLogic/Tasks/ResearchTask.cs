@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation.Technologies;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// A <see cref="Task"/> which causes a <see cref="Unit"/>

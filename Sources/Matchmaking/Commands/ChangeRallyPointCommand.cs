@@ -7,7 +7,7 @@ using System.Text;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking.Commands
 {

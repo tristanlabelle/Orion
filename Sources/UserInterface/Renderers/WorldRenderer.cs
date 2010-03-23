@@ -3,10 +3,10 @@ using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking.TowerDefense;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Provides methods to draw the game <see cref="World"/>.

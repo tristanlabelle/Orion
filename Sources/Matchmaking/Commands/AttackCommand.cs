@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
-using AttackTask = Orion.GameLogic.Tasks.AttackTask;
+using Orion.Game.Simulation;
+using AttackTask = Orion.Game.Simulation.Tasks.AttackTask;
 
 namespace Orion.Matchmaking.Commands
 {

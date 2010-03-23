@@ -5,15 +5,15 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
-using Orion.GameLogic;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
 using Orion.Matchmaking;
-using Orion.UserInterface.Actions.UserCommands;
+using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Actions.Enablers
+namespace Orion.Game.Presentation.Actions.Enablers
 {
     public sealed class ResearchEnabler : ActionEnabler
     {

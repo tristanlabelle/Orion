@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Provides a memory of the game objects that have been seen in the fog of war.

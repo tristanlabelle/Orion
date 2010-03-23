@@ -6,8 +6,8 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.GameLogic;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Matchmaking

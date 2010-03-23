@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion.GameLogic.Pathfinding
+namespace Orion.Game.Simulation.Pathfinding
 {
     internal sealed class PathNodeQueue
     {

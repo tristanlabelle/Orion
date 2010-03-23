@@ -6,14 +6,14 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Renderers;
 using Orion.Matchmaking;
-using Orion.UserInterface.Actions.UserCommands;
+using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
     /// Provides the buttons to build each <see cref="UnitType"/> that is supported by a builder unit.

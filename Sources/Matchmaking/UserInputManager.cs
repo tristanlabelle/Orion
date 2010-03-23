@@ -5,9 +5,9 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.GameLogic.Technologies;
-using Orion.GameLogic.Utilities;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Matchmaking

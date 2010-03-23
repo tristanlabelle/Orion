@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Networking;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
 

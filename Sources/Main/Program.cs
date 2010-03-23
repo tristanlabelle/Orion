@@ -12,12 +12,11 @@ using Orion.Audio;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
-using Orion.GameLogic;
-using Orion.Graphics;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
 using Orion.Matchmaking;
 using Orion.Networking;
-using Orion.UserInterface;
-using Button = Orion.Engine.Gui.Button;
+
 namespace Orion.Main
 {
     internal class Program : IDisposable

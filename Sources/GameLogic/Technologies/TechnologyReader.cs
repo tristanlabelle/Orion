@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Globalization;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Technologies
+namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Reads <see cref="Technology">technologies</see> from their definitions in files.

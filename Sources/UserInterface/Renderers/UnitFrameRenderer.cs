@@ -8,11 +8,11 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Tasks;
 using Font = System.Drawing.Font;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     public sealed class UnitFrameRenderer : FrameRenderer
     {

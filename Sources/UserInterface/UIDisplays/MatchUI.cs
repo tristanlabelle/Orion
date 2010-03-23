@@ -8,19 +8,19 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.GameLogic.Utilities;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Utilities;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Renderers;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands;
-using Orion.UserInterface.Actions;
-using Orion.UserInterface.Actions.Enablers;
+using Orion.Game.Presentation.Actions;
+using Orion.Game.Presentation.Actions.Enablers;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     public sealed class MatchUI : UIDisplay
     {

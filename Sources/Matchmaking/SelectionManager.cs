@@ -5,7 +5,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking
 {

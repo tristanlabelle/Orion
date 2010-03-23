@@ -7,11 +7,11 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.GameLogic.Utilities;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Utilities;
 using Orion.Matchmaking;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     public sealed class UnderAttackWarningRenderer
     {

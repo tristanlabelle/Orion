@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Orion.GameLogic")]
+[assembly: AssemblyTitle("Orion.Game.Simulation")]
 [assembly: AssemblyDescription("Game Logic for Orion RTS, Fall 2009 Edition")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cégep du Vieux Montréal")]

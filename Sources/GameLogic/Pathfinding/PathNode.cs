@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Orion.GameLogic.Pathfinding
+namespace Orion.Game.Simulation.Pathfinding
 {
     [ImmutableObject(true)]
     [StructLayout(LayoutKind.Sequential, Size = 4 * 3)]

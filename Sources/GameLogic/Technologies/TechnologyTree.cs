@@ -6,7 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Technologies
+namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Stores the technologies that can be developed by factions in a game.

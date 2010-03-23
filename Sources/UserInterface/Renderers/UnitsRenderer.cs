@@ -6,11 +6,11 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.GameLogic.Pathfinding;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Tasks;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Provides functionality to draw <see cref="Unit"/>s on-screen.

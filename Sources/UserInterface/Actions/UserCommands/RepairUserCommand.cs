@@ -1,9 +1,9 @@
 using OpenTK.Math;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 
-namespace Orion.UserInterface.Actions.UserCommands
+namespace Orion.Game.Presentation.Actions.UserCommands
 {
     public sealed class RepairUserCommand : UserInputCommand
     {

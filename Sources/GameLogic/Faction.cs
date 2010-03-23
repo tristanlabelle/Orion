@@ -6,12 +6,12 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.GameLogic.Pathfinding;
-using Orion.GameLogic.Tasks;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Technologies;
 using ColorPalette = Orion.Engine.Colors;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Represents a faction, a group of allied units sharing resources and sharing a goal.

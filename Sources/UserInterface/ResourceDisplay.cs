@@ -4,10 +4,10 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.Graphics;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     public class ResourceDisplay : View
     {

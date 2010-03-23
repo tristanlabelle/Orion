@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// A task which causes a unit (typically a building) to create a unit.

@@ -7,7 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Matchmaking.Commands;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking
 {
@@ -213,7 +213,7 @@ namespace Orion.Matchmaking
         {
             if (node != null)
             {
-                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.TaskQueue.Current is Orion.GameLogic.Tasks.HarvestTask)).ToList();
+                List<Unit> alreadyHarvesting = allUnits.Where(unit => unit.Faction == Faction && (unit.TaskQueue.Current is Orion.Game.Simulation.Tasks.HarvestTask)).ToList();
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 

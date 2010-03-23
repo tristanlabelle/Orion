@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
-using RepairTask = Orion.GameLogic.Tasks.RepairTask;
+using Orion.Game.Simulation;
+using RepairTask = Orion.Game.Simulation.Tasks.RepairTask;
 
 namespace Orion.Matchmaking.Commands
 {

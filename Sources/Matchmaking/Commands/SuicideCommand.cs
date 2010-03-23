@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking.Commands
 {

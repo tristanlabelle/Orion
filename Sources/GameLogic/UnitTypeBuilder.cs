@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Provides a mutable representation of a <see cref="UnitType"/>

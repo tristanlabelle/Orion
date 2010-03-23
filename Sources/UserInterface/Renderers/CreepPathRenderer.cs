@@ -9,7 +9,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Matchmaking.TowerDefense;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Responsible for drawing the path that is followed by the creeps.

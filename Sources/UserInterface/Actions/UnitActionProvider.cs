@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.UserInterface.Actions.Enablers;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Actions.Enablers;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     public sealed class UnitActionProvider : IActionProvider
     {

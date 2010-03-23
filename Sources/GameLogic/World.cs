@@ -5,10 +5,10 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
-using Orion.GameLogic.Pathfinding;
-using Orion.GameLogic.Technologies;
+using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Technologies;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Represents the game map: its terrain and units.

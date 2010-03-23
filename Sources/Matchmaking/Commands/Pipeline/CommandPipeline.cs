@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
 namespace Orion.Matchmaking.Commands.Pipeline
 {

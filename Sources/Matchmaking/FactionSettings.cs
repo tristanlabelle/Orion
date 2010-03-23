@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Stores the values describing a faction to be created.

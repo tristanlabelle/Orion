@@ -7,7 +7,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using OpenTK.Math;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     public class ReplayLoadingUI : UIDisplay
     {

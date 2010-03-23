@@ -4,12 +4,12 @@ using System.Linq;
 using System.Net;
 using Orion.Engine;
 using Orion.Engine.Networking;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Deathmatch;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.Networking;
-using Orion.UserInterface;
+using Orion.Game.Presentation;
 
 namespace Orion.Main
 {

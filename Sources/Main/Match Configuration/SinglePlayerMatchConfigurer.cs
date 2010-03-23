@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Deathmatch;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.UserInterface;
+using Orion.Game.Presentation;
 
 namespace Orion.Main
 {

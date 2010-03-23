@@ -7,10 +7,10 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.GameLogic.Utilities;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Utilities;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Provides functionality to draw the ruins left by destroyed buildings or dead units.

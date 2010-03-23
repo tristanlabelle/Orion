@@ -4,12 +4,12 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Renderers;
 using Orion.Matchmaking;
 
-namespace Orion.UserInterface.Actions.UserCommands
+namespace Orion.Game.Presentation.Actions.UserCommands
 {
     public sealed class AttackUserCommand : UserInputCommand, IViewRenderer
     {

@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
 using Orion.Matchmaking.TowerDefense;
-using Orion.UserInterface;
+using Orion.Game.Presentation;
 
 namespace Orion.Main
 {

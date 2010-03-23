@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// Provides information about a building to be built.

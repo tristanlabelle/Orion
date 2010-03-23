@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Globalization;
 using Orion.Engine;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Reads <see cref="UnitType"/>s from their definitions in files.

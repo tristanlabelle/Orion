@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// A <see cref="Task"/> which causes a <see cref="Unit"/> to repair a target to its full health

@@ -10,7 +10,7 @@ using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using System.Diagnostics;
 using OpenTK.Math;
 
-namespace Orion.Graphics
+namespace Orion.Game.Presentation
 {
     /// <summary>
     /// The base game window class. 

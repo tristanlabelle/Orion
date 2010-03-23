@@ -6,9 +6,9 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation.Tasks;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Represents an in-game unit, which can be a character, a vehicle or a building,

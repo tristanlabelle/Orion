@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.GameLogic;
-using HarvestTask = Orion.GameLogic.Tasks.HarvestTask;
+using Orion.Game.Simulation;
+using HarvestTask = Orion.Game.Simulation.Tasks.HarvestTask;
 
 namespace Orion.Matchmaking.Commands
 {

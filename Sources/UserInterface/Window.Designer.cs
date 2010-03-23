@@ -1,6 +1,6 @@
 ﻿using OpenTK.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Game.Presentation
 {
     partial class Window
     {
@@ -34,7 +34,7 @@ namespace Orion.Graphics
             // 
             // glControl
             // 
-            this.glControl = new Orion.UserInterface.CustomGLControl();
+            this.glControl = new Orion.Game.Presentation.CustomGLControl();
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
@@ -64,6 +64,6 @@ namespace Orion.Graphics
 
         #endregion
 
-        private Orion.UserInterface.CustomGLControl glControl;
+        private Orion.Game.Presentation.CustomGLControl glControl;
     }
 }

@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.GameLogic;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Tasks;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Monitors the activity of workers for a given faction.

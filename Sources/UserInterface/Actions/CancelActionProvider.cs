@@ -5,11 +5,11 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Graphics;
+using Orion.Game.Presentation;
 using Orion.Matchmaking;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
     /// A simple <see cref="IActionProvider"/> which provides a single cancel button.

@@ -3,10 +3,10 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Matchmaking;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
 
-namespace Orion.Graphics.Renderers
+namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Draws selection-related information on-screen.

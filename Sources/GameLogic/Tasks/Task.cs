@@ -1,7 +1,7 @@
 ﻿using System;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
     /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Unit"/> behavior.

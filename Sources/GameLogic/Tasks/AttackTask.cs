@@ -3,7 +3,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic.Tasks
+namespace Orion.Game.Simulation.Tasks
 {    
     /// <summary>
     /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Monitors the death of entities and keeps track of their ruins and skeletons.

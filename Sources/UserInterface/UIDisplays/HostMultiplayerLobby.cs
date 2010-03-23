@@ -12,7 +12,7 @@ using Orion.Engine.Networking;
 using Orion.Engine.Gui;
 using Orion.Networking;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     public sealed class HostMultiplayerLobby : UIDisplay
     {

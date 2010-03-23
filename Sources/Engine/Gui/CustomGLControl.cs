@@ -2,7 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace Orion.UserInterface
+namespace Orion.Game.Presentation
 {
     /// <summary>
     /// A custom version of OpenTK's <see cref="GLControl"/>

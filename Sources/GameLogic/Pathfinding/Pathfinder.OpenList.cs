@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic.Pathfinding
+namespace Orion.Game.Simulation.Pathfinding
 {
     partial class Pathfinder
     {

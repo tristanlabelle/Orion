@@ -6,9 +6,9 @@ using System.Text;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Monitors the attacks to a faction and provides "under attack" warnings.

@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Diagnostics;
 using Orion.Engine;
-using Orion.GameLogic;
-using Orion.GameLogic.Technologies;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Matchmaking.Commands
 {

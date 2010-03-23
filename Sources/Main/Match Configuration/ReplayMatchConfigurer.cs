@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using Orion.Matchmaking;
 using Orion.Matchmaking.Commands.Pipeline;
-using Orion.UserInterface;
+using Orion.Game.Presentation;
 
 namespace Orion.Main
 {

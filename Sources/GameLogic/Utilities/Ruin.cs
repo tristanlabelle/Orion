@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.GameLogic;
-using Orion.GameLogic.Pathfinding;
-using Orion.GameLogic.Tasks;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Tasks;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 
-namespace Orion.GameLogic.Utilities
+namespace Orion.Game.Simulation.Utilities
 {
     /// <summary>
     /// Represents a ruin which is drawn where a building was destroyed or a unit killed.

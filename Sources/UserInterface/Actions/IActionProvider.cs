@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
     /// Responsible of managing the <see cref="ActionButtons"/> available in a context.

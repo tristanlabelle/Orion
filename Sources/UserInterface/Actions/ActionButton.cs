@@ -6,12 +6,12 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Graphics;
+using Orion.Game.Presentation;
 using Orion.Matchmaking;
-using Orion.UserInterface.Actions.Enablers;
+using Orion.Game.Presentation.Actions.Enablers;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     public class ActionButton : Button
     {

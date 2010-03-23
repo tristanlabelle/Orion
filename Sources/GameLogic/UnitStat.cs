@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.GameLogic
+namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Identifies a stat associated with a unit.

@@ -7,10 +7,10 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Graphics;
+using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
 
-namespace Orion.UserInterface.Actions
+namespace Orion.Game.Presentation.Actions
 {
     internal class TooltipFrame : View
     {

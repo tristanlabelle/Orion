@@ -6,7 +6,7 @@ using System.Text;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Audio;
-using Orion.GameLogic;
+using Orion.Game.Simulation;
 using IrrKlangSoundContext = Orion.Engine.Audio.IrrKlang.SoundContext;
 using NullSoundContext = Orion.Engine.Audio.Null.SoundContext;
 

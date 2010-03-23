@@ -1,14 +1,14 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.GameLogic;
-using Orion.Graphics;
-using Orion.Graphics.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Renderers;
 using Orion.Matchmaking;
-using Orion.UserInterface.Actions.UserCommands;
+using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.UserInterface.Actions.Enablers
+namespace Orion.Game.Presentation.Actions.Enablers
 {
     public sealed class HarvestEnabler : ActionEnabler
     {

@@ -7,7 +7,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 
-namespace Orion.Graphics
+namespace Orion.Game.Presentation
 {
     /// <summary>
     /// Provides a series of textures which animate a fire.

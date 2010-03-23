@@ -5,11 +5,11 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.GameLogic;
-using Orion.Graphics;
+using Orion.Game.Simulation;
+using Orion.Game.Presentation;
 using Orion.Matchmaking;
 
-namespace Orion.UserInterface.Actions.Enablers
+namespace Orion.Game.Presentation.Actions.Enablers
 {
     public abstract class ActionEnabler
     {

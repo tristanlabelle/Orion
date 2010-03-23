@@ -26,7 +26,12 @@ namespace Orion.UserInterface.Actions.Enablers
             
             int x = 0;
             int y = 3;
-            foreach (UnitType traineeType in World.UnitTypes.Where(t => !t.IsBuilding && unitType.CanTrain(t)))
+
+            var traineeTypes = World.UnitTypes
+                .Where(traineeType => unitType.CanTrain(traineeType))
+                .OrderBy(traineeType => traineeType.GetBaseStat(UnitStat.AladdiumCost) + traineeType.GetBaseStat(UnitStat.AlageneCost));
+
+            foreach (UnitType traineeType in traineeTypes)
             {
                 // find an empty slot
                 while (buttonsArray[x, y] != null)

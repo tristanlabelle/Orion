@@ -72,7 +72,13 @@ namespace Orion.UserInterface.Actions
 
             int x = 0;
             int y = 3;
-            foreach (UnitType buildingType in unitTypeRegistry.Where(u => unitType.CanBuild(u)))
+
+            var buildingTypes = unitTypeRegistry
+                .Where(buildingType => unitType.CanBuild(buildingType))
+                .OrderByDescending(buildingType => buildingType.HasSkill(UnitSkill.Train))
+                .ThenBy(buildingType => buildingType.GetBaseStat(UnitStat.AladdiumCost) + buildingType.GetBaseStat(UnitStat.AlageneCost));
+
+            foreach (UnitType buildingType in buildingTypes)
             {
                 buttons[x, y] = CreateButton(buildingType);
 

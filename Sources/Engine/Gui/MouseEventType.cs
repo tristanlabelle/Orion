@@ -6,10 +6,9 @@ using System.Text;
 namespace Orion.Engine.Gui
 {
     /// <summary>
-    /// Indicates a type of mouse event. Internal use only.
+    /// Indicates a type of GUI mouse event.
     /// </summary>
     [Serializable]
-    [Obsolete("To be made internal.")]
     public enum MouseEventType
     {
         None,

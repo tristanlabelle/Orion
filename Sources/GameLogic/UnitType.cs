@@ -54,10 +54,6 @@ namespace Orion.GameLogic
             this.researchTargets = new HashSet<string>(builder.ResearchTargets);
             this.suicideBombTargets = new HashSet<string>(builder.SuicideBombTargets);
 
-            var unspecifiedStatsWithDefaultValues = UnitStat.Values
-                .Where(stat => stat.HasDefaultValue && !this.stats.ContainsKey(stat));
-            foreach (UnitStat stat in unspecifiedStatsWithDefaultValues) this.stats.Add(stat, stat.DefaultValue);
-
             this.isBuilding = !skills.Contains(UnitSkill.Move);
 
 #if DEBUG
@@ -139,20 +135,22 @@ namespace Orion.GameLogic
         public int GetBaseStat(UnitStat stat)
         {
             int value;
-            stats.TryGetValue(stat, out value);
+            if (!stats.TryGetValue(stat, out value) && stat.HasDefaultValue)
+                value = stat.DefaultValue;
+
             return value;
         }
 
         public bool CanBuild(UnitType targetType)
         {
             Argument.EnsureNotNull(targetType, "targetType");
-            return HasSkill(UnitSkill.Build) && buildTargets.Contains(targetType.Name);
+            return targetType.IsBuilding && HasSkill(UnitSkill.Build) && buildTargets.Contains(targetType.Name);
         }
 
         public bool CanTrain(UnitType targetType)
         {
             Argument.EnsureNotNull(targetType, "targetType");
-            return HasSkill(UnitSkill.Train) && trainTargets.Contains(targetType.Name);
+            return !targetType.IsBuilding && HasSkill(UnitSkill.Train) && trainTargets.Contains(targetType.Name);
         }
 
         public bool CanResearch(Technology technology)

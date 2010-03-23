@@ -10,7 +10,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Networking;
 using Orion.Engine.Gui;
-using Orion.Networking;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Presentation
 {

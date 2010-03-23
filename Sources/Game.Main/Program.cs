@@ -15,7 +15,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
-using Orion.Networking;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Main
 {

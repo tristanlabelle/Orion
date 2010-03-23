@@ -1,6 +1,6 @@
 using System;
 
-namespace Orion.Networking
+namespace Orion.Game.Matchmaking.Networking
 {
     public enum GameMessageType : byte
     {

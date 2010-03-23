@@ -10,7 +10,7 @@ using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 
-namespace Orion.Networking
+namespace Orion.Game.Matchmaking.Networking
 {
     public class CommandSynchronizer : CommandFilter
     {

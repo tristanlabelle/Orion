@@ -8,7 +8,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Networking;
+using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 
 namespace Orion.Main

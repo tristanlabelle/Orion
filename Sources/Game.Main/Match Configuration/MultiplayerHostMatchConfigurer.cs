@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Networking;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
-using Orion.Networking;
+using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 
 namespace Orion.Main

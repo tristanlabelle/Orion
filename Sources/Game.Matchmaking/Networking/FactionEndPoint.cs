@@ -10,7 +10,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
 
-namespace Orion.Networking
+namespace Orion.Game.Matchmaking.Networking
 {
     public class FactionEndPoint : IDisposable
     {

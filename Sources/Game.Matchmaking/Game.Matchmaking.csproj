@@ -96,6 +96,10 @@
     <Compile Include="Commands\ZoneAttackCommand.cs" />
     <Compile Include="FactionMessage.cs" />
     <Compile Include="Match.cs" />
+    <Compile Include="Networking\CommandSynchronizer.cs" />
+    <Compile Include="Networking\FactionEndPoint.cs" />
+    <Compile Include="Networking\GameMessageType.cs" />
+    <Compile Include="Networking\SetupMessageType.cs" />
     <Compile Include="PlayerSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplayEvent.cs" />

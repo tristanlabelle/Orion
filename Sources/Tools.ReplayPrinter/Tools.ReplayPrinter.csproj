@@ -47,13 +47,13 @@
       <Project>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</Project>
       <Name>Engine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Game.Matchmaking\Game.Matchmaking.csproj">
+      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
+      <Name>Game.Matchmaking</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Game.Simulation\Game.Simulation.csproj">
       <Project>{98074D59-535C-4FBA-A47C-68FFD740C1CB}</Project>
       <Name>Game.Simulation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Matchmaking\Game.Matchmaking.csproj">
-      <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
-      <Name>Game.Matchmaking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,13 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Presentation", "UserIn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.ReplayPrinter", "Tools.ReplayPrinter\Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Matchmaking", "Matchmaking\Game.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{87BEE8DC-D12E-441B-A32B-09D225BB873C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Simulation", "Game.Simulation\Game.Simulation.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Matchmaking", "Game.Matchmaking\Game.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,6 @@ Global
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Debug|x86.Build.0 = Debug|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.ActiveCfg = Release|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.Build.0 = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.ActiveCfg = Debug|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
@@ -51,6 +47,10 @@ Global
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
 		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

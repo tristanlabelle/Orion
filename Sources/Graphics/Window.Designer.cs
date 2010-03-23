@@ -1,6 +1,6 @@
 ﻿using OpenTK.Graphics;
 
-namespace Orion.UserInterface
+namespace Orion.Graphics
 {
     partial class Window
     {

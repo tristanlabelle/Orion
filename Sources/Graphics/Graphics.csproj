@@ -68,6 +68,12 @@
     <Compile Include="Renderers\UnitFrameRenderer.cs" />
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
+    <Compile Include="Window.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Window.Designer.cs">
+      <DependentUpon>Window.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">
@@ -82,6 +88,11 @@
       <Project>{84DCA135-541D-41F5-9118-C83324225E2B}</Project>
       <Name>Matchmaking</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Window.resx">
+      <DependentUpon>Window.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

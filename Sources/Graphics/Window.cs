@@ -10,7 +10,7 @@ using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using System.Diagnostics;
 using OpenTK.Math;
 
-namespace Orion.UserInterface
+namespace Orion.Graphics
 {
     /// <summary>
     /// The base game window class. 
@@ -35,10 +35,11 @@ namespace Orion.UserInterface
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
             this.rootView = new RootView(windowBounds, RootView.ContentsBounds);
 
-            this.graphicsContext = new GraphicsContext();
-
             this.lastGameMousePosition = GetGameMousePosition();
             this.lastMouseButtons = Control.MouseButtons;
+
+            this.CreateControl();
+            this.graphicsContext = new GraphicsContext();
         }
         #endregion
 

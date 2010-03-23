@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.GameLogic;
 using Orion.GameLogic.Technologies;
+using Orion.Engine.Gui;
 
 namespace Orion.Graphics
 {
@@ -16,33 +17,48 @@ namespace Orion.Graphics
     public sealed class GameGraphics : IDisposable
     {
         #region Fields
-        private readonly GraphicsContext graphicsContext;
+        private readonly Window window;
         private readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
-        public GameGraphics(GraphicsContext graphicsContext)
+        public GameGraphics()
         {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-
-            this.graphicsContext = graphicsContext;
-            string rootTexturePath = "..{0}..{0}..{0}Assets{0}Textures".FormatInvariant(Path.DirectorySeparatorChar);
-            this.textureManager = new TextureManager(graphicsContext, rootTexturePath);
+            this.window = new Window();
+            this.window.HandleDestroyed += OnWindowHandleDestroyed;
+            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
+            this.window.Show();
         }
         #endregion
 
         #region Properties
+        public bool IsWindowCreated
+        {
+            get { return window.Created; }
+        }
+
+        public string WindowTitle
+        {
+            get { return window.Text; }
+            set { window.Text = value; }
+        }
+
         /// <summary>
         /// Gets the graphics context which provides graphics to the game.
         /// </summary>
         public GraphicsContext GraphicsContext
         {
-            get { return graphicsContext; }
+            get { return window.GraphicsContext; }
         }
 
         public TextureManager TextureManager
         {
             get { return textureManager; }
+        }
+
+        public RootView RootView
+        {
+            get { return window.RootView; }
         }
 
         public Texture DefaultTexture
@@ -52,6 +68,15 @@ namespace Orion.Graphics
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Causes the window to refresh itself.
+        /// </summary>
+        public void Refresh()
+        {
+            window.Refresh();
+        }
+
+        #region Textures
         /// <summary>
         /// Gets a texture for a miscellaneous game element. 
         /// </summary>
@@ -149,11 +174,18 @@ namespace Orion.Graphics
                 texture = DefaultTexture;
             return texture;
         }
+        #endregion
 
         /// <summary>
         /// Releases all resources used by this object.
         /// </summary>
         public void Dispose()
+        {
+            if (window.Created && !window.IsDisposed)
+                window.Dispose();
+        }
+
+        private void OnWindowHandleDestroyed(object sender, EventArgs e)
         {
             textureManager.Dispose();
         }

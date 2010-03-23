@@ -13,11 +13,11 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
 using Orion.GameLogic;
+using Orion.Graphics;
 using Orion.Matchmaking;
 using Orion.Networking;
 using Orion.UserInterface;
 using Button = Orion.Engine.Gui.Button;
-
 namespace Orion.Main
 {
     internal class Program : IDisposable
@@ -29,7 +29,7 @@ namespace Orion.Main
         private const int DefaultHostPort = 41223;
         private const int DefaultClientPort = 41224;
 
-        private GameUI gameUI;
+        private GameGraphics gameGraphics;
         private SafeTransporter transporter;
         private readonly StringBuilder windowTitleStringBuilder = new StringBuilder();
         #endregion
@@ -40,7 +40,7 @@ namespace Orion.Main
         {
             MatchConfigurer configurer = new SinglePlayerMatchConfigurer();
             configurer.GameStarted += StartGame;
-            gameUI.Display(configurer.UserInterface);
+            gameGraphics.RootView.PushDisplay(configurer.UserInterface);
         }
 
         private void EnterMultiplayerLobby(MainMenuUI sender)
@@ -48,7 +48,7 @@ namespace Orion.Main
             HostMultiplayerLobby lobby = new HostMultiplayerLobby(transporter);
             lobby.HostedGame += BeginHostMultiplayerGame;
             lobby.JoinedGame += JoinedMultiplayerGame;
-            gameUI.Display(lobby);
+            gameGraphics.RootView.PushDisplay(lobby);
         }
 
         private void StartTowerDefenseGame(MainMenuUI sender)
@@ -61,7 +61,7 @@ namespace Orion.Main
         {
             ReplayLoadingUI replayLoader = new ReplayLoadingUI();
             replayLoader.PressedStartReplay += ViewReplay;
-            gameUI.Display(replayLoader);
+            gameGraphics.RootView.PushDisplay(replayLoader);
         }
         #endregion
 
@@ -72,13 +72,13 @@ namespace Orion.Main
             Match match;
             SlaveCommander localCommander;
             replayConfigurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
+            MatchUI matchUI = new MatchUI(gameGraphics, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
             match.WorldConquered += (sender, faction) => matchUI.DisplayVictoryMessage(faction);
 
-            gameUI.Display(matchUI);
+            gameGraphics.RootView.PushDisplay(matchUI);
             match.Start();
         }
         #endregion
@@ -88,14 +88,14 @@ namespace Orion.Main
         {
             MultiplayerHostMatchConfigurer configurer = new MultiplayerHostMatchConfigurer(transporter);
             configurer.GameStarted += StartGame;
-            gameUI.RootView.PushDisplay(configurer.UserInterface);
+            gameGraphics.RootView.PushDisplay(configurer.UserInterface);
         }
 
         private void JoinedMultiplayerGame(HostMultiplayerLobby lobby, IPv4EndPoint host)
         {
             MultiplayerClientMatchConfigurer configurer = new MultiplayerClientMatchConfigurer(transporter, host);
             configurer.GameStarted += StartGame;
-            gameUI.RootView.PushDisplay(configurer.UserInterface);
+            gameGraphics.RootView.PushDisplay(configurer.UserInterface);
         }
         #endregion
 
@@ -148,33 +148,33 @@ namespace Orion.Main
 
             EnableLogging();
 
-            gameUI = new GameUI();
+            gameGraphics = new GameGraphics();
 
-            MainMenuUI menuUI = new MainMenuUI(gameUI.Graphics);
+            MainMenuUI menuUI = new MainMenuUI(gameGraphics);
             menuUI.SinglePlayerSelected += ConfigureSinglePlayerGame;
             menuUI.MultiplayerSelected += EnterMultiplayerLobby;
             menuUI.TowerDefenseSelected += StartTowerDefenseGame;
             menuUI.ViewReplaySelected += EnterReplayViewer;
 
-            gameUI.Display(menuUI);
+            gameGraphics.RootView.PushDisplay(menuUI);
         }
 
         private void StartGame(MatchConfigurer configurer)
         {
             MatchConfigurationUI matchConfigurationUI = configurer.UserInterface;
             if (matchConfigurationUI != null)
-                gameUI.RootView.PopDisplay(matchConfigurationUI);
+                gameGraphics.RootView.PopDisplay(matchConfigurationUI);
 
             Match match;
             SlaveCommander localCommander;
             configurer.Start(out match, out localCommander);
-            MatchUI matchUI = new MatchUI(gameUI.Graphics, match, localCommander);
+            MatchUI matchUI = new MatchUI(gameGraphics, match, localCommander);
 
             match.FactionMessageReceived += (sender, message) => matchUI.DisplayMessage(message);
             match.World.FactionDefeated += (sender, faction) => matchUI.DisplayDefeatMessage(faction);
             match.WorldConquered += (sender, factions) => matchUI.DisplayVictoryMessage(factions);
 
-            gameUI.Display(matchUI);
+            gameGraphics.RootView.PushDisplay(matchUI);
             match.Start();
 
             Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill(UnitSkill.Train))
@@ -196,9 +196,9 @@ namespace Orion.Main
             float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
             float timeAccumulator = 0.0f;
 
-            while (gameUI.IsWindowCreated)
+            while (gameGraphics.IsWindowCreated)
             {
-                bool windowTitleNeedsUpdate = false;
+                bool countersUpdated = false;
 
                 float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                 float actualTimeDelta = newTime - oldTime;
@@ -208,41 +208,41 @@ namespace Orion.Main
 
                 while (timeAccumulator >= TargetSecondsPerFrame)
                 {
-                    gameUI.Update(TargetSecondsPerFrame);
-                    windowTitleNeedsUpdate |= updateRateCounter.Update();
+                    gameGraphics.RootView.Update(TargetSecondsPerFrame);
+                    countersUpdated |= updateRateCounter.Update();
 
                     gameTime += TargetSecondsPerFrame;
                     timeAccumulator -= TargetSecondsPerFrame;
                 }
 
                 Application.DoEvents();
-                gameUI.Refresh();
-                windowTitleNeedsUpdate |= drawRateCounter.Update();
-
-                if (windowTitleNeedsUpdate)
+                gameGraphics.Refresh();
+                countersUpdated |= drawRateCounter.Update();
+                
+#if DEBUG
+                if (countersUpdated)
                     UpdateWindowTitle(updateRateCounter, drawRateCounter);
+#endif
             }
         }
 
         private void UpdateWindowTitle(FrameRateCounter updateRateCounter, FrameRateCounter drawRateCounter)
         {
-#if DEBUG
             windowTitleStringBuilder.Remove(0, windowTitleStringBuilder.Length);
             windowTitleStringBuilder.AppendFormat(CultureInfo.InvariantCulture,
-                "MS/U avg: {0:F2}, peak: {1:F2}; MS/D avg: {2:F2}, peak: {3:F2}",
+                "Orion - MS/U avg: {0:F2}, peak: {1:F2}; MS/D avg: {2:F2}, peak: {3:F2}",
                 updateRateCounter.AverageMillisecondsPerFrame,
                 updateRateCounter.PeakMillisecondsPerFrame,
                 drawRateCounter.AverageMillisecondsPerFrame,
                 drawRateCounter.PeakMillisecondsPerFrame);
-            gameUI.WindowTitle = windowTitleStringBuilder.ToString();
-#endif
+            gameGraphics.WindowTitle = windowTitleStringBuilder.ToString();
         }
         #endregion
 
         #region Object Model
         public void Dispose()
         {
-            gameUI.Dispose();
+            gameGraphics.Dispose();
             transporter.Dispose();
         }
         #endregion

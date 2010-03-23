@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Simulation", "GameLogic\Game.Simulation.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networking", "Networking\Networking.csproj", "{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}"
@@ -17,16 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Simulation", "Game.Simulation\Game.Simulation.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.ActiveCfg = Debug|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.ActiveCfg = Debug|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.Build.0 = Debug|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.ActiveCfg = Release|x86
@@ -51,13 +47,17 @@ Global
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
 		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.ActiveCfg = Debug|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Main.csproj

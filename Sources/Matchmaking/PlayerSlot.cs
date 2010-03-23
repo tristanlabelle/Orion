@@ -6,7 +6,7 @@ using System.Text;
 using Orion.Engine.Networking;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     public abstract class PlayerSlot
     {

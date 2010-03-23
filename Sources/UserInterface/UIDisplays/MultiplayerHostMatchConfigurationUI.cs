@@ -6,7 +6,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Networking;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {

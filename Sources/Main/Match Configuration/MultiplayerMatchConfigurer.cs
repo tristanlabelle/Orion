@@ -5,9 +5,9 @@ using System.Net;
 using Orion.Engine;
 using Orion.Engine.Networking;
 using Orion.Game.Simulation;
-using Orion.Matchmaking;
-using Orion.Matchmaking.Deathmatch;
-using Orion.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking;
+using Orion.Game.Matchmaking.Deathmatch;
+using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Networking;
 using Orion.Game.Presentation;
 

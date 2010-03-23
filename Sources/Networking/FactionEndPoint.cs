@@ -7,8 +7,8 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Networking;
 using Orion.Game.Simulation;
-using Orion.Matchmaking;
-using Orion.Matchmaking.Commands;
+using Orion.Game.Matchmaking;
+using Orion.Game.Matchmaking.Commands;
 
 namespace Orion.Networking
 {

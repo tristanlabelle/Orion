@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
-using Orion.Matchmaking.Commands;
-using Orion.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
 
-namespace Orion.Matchmaking.Deathmatch
+namespace Orion.Game.Matchmaking.Deathmatch
 {
     public class AgressiveAICommander : AICommander
     {

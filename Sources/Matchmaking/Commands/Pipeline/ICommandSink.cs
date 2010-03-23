@@ -1,6 +1,6 @@
 using System;
 
-namespace Orion.Matchmaking.Commands.Pipeline
+namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// Interface for objects which can handle commands and serve as an end point to a command pipeline.

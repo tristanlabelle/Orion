@@ -9,7 +9,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="TrainTask"/> task

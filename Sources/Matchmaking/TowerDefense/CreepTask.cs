@@ -6,7 +6,7 @@ using Orion.Engine;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking.TowerDefense
+namespace Orion.Game.Matchmaking.TowerDefense
 {
     /// <summary>
     /// Implements the logic which makes a creep follow the path as it should.

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking.Commands.Pipeline
+namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// A command sink which executes the <see cref="Command"/>s which reaches it.

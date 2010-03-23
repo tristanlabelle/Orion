@@ -8,7 +8,7 @@ using Orion.Engine.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {

@@ -5,11 +5,11 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
-using Orion.Matchmaking.Commands;
-using Orion.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     public class AICommander : Commander
     {

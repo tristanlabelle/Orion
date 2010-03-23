@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Matchmaking.TowerDefense;
+using Orion.Game.Matchmaking.TowerDefense;
 
 namespace Orion.Game.Presentation.Renderers
 {

@@ -6,7 +6,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Encapsulates a message sent by a faction.

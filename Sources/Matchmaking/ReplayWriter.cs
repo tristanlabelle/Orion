@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Orion.Engine;
-using Orion.Matchmaking.Commands;
+using Orion.Game.Matchmaking.Commands;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Provides means of creating replay files.

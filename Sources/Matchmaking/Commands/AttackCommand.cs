@@ -8,7 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using AttackTask = Orion.Game.Simulation.Tasks.AttackTask;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s

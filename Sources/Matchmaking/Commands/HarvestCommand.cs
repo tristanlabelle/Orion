@@ -8,7 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using HarvestTask = Orion.Game.Simulation.Tasks.HarvestTask;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>

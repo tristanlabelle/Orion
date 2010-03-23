@@ -4,7 +4,7 @@ using Orion.Engine.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 

@@ -9,10 +9,10 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Utilities;
-using Orion.Matchmaking;
-using Orion.Matchmaking.Commands;
+using Orion.Game.Matchmaking;
+using Orion.Game.Matchmaking.Commands;
 
-namespace Orion.Audio
+namespace Orion.Game.Presentation.Audio
 {
     /// <summary>
     /// Provides an audible representation of game logic events.

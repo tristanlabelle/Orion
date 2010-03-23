@@ -6,7 +6,7 @@ using System.IO;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A command which encapsulates some textual message sent by a <see cref="Faction"/>.

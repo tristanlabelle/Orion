@@ -11,7 +11,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
 using BuildTask = Orion.Game.Simulation.Tasks.BuildTask;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes a <see cref="Unit"/>

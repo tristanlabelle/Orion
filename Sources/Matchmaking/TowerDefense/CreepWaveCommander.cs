@@ -6,7 +6,7 @@ using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
 
-namespace Orion.Matchmaking.TowerDefense
+namespace Orion.Game.Matchmaking.TowerDefense
 {
     public sealed class CreepWaveCommander : Commander
     {

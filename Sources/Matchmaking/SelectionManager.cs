@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.

@@ -11,9 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Presentation", "UserIn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.ReplayPrinter", "Tools.ReplayPrinter\Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audio", "Audio\Audio.csproj", "{957AD388-F524-456F-A5DD-B80BAB90A355}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matchmaking", "Matchmaking\Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Matchmaking", "Matchmaking\Game.Matchmaking.csproj", "{84DCA135-541D-41F5-9118-C83324225E2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{87BEE8DC-D12E-441B-A32B-09D225BB873C}"
 EndProject
@@ -45,10 +43,6 @@ Global
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Debug|x86.Build.0 = Debug|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.ActiveCfg = Release|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.Build.0 = Release|x86
-		{957AD388-F524-456F-A5DD-B80BAB90A355}.Debug|x86.ActiveCfg = Debug|x86
-		{957AD388-F524-456F-A5DD-B80BAB90A355}.Debug|x86.Build.0 = Debug|x86
-		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|x86.ActiveCfg = Release|x86
-		{957AD388-F524-456F-A5DD-B80BAB90A355}.Release|x86.Build.0 = Release|x86
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
 		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86

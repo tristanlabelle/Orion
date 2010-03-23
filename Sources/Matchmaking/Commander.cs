@@ -2,10 +2,10 @@ using System;
 using System.Diagnostics;
 using Orion.Engine;
 using Orion.Game.Simulation;
-using Orion.Matchmaking.Commands;
-using Orion.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Matchmaking.Commands.Pipeline;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Abstract base class for commanders, classes responsible of generating

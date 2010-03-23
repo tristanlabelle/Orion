@@ -9,7 +9,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions

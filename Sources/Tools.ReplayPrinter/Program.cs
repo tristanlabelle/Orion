@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Tools.ReplayPrinter
 {

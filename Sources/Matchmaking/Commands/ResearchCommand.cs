@@ -9,7 +9,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Tasks;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     public sealed class ResearchCommand : Command
     {

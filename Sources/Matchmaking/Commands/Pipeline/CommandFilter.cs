@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Orion.Engine;
 
-namespace Orion.Matchmaking.Commands.Pipeline
+namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// Base class for command filters which receive commands, operate on them and forward them to a sink.

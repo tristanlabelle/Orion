@@ -1,7 +1,7 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;

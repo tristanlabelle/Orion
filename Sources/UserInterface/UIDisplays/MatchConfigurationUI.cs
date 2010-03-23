@@ -11,7 +11,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {

@@ -3,7 +3,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Represents a tool which handles the left click to

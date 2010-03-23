@@ -4,7 +4,7 @@ using System;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking.Commands.Pipeline
+namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// Encapsulates the process by which commands go from their source to their destination.

@@ -1,7 +1,7 @@
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Game.Simulation;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {

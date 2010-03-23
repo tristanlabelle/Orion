@@ -9,7 +9,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using MoveTask = Orion.Game.Simulation.Tasks.MoveTask;
 
-namespace Orion.Matchmaking.Commands
+namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which assigns to a set of <see cref="Unit"/>s the

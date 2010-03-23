@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {

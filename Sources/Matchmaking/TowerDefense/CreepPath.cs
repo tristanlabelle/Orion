@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using Orion.Engine;
 using Orion.Engine.Collections;
 
-namespace Orion.Matchmaking.TowerDefense
+namespace Orion.Game.Matchmaking.TowerDefense
 {
     /// <summary>
     /// Represents the path which is followed by the creeps.

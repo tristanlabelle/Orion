@@ -5,7 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// A delegate to a method which applies the effect of a cheat code.

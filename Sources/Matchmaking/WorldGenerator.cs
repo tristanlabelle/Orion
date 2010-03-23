@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using OpenTK.Math;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// Generates random contents in a world.

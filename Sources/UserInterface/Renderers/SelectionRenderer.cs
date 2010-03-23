@@ -2,7 +2,7 @@
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
-using Orion.Matchmaking;
+using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
 

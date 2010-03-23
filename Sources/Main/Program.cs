@@ -8,13 +8,13 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using Orion.Audio;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking;
 using Orion.Game.Presentation;
-using Orion.Matchmaking;
+using Orion.Game.Presentation.Audio;
 using Orion.Networking;
 
 namespace Orion.Main

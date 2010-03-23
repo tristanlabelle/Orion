@@ -10,7 +10,7 @@ using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     public class UserInputManager
     {

@@ -4,13 +4,13 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.Matchmaking.Commands;
-using Orion.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.Matchmaking
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// A behaviorless commander which offers a public interface to create commands.

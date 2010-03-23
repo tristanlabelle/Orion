@@ -8,8 +8,8 @@
     <ProjectGuid>{7C578DB5-788D-426E-B011-D4FD40875846}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Orion.Main</RootNamespace>
-    <AssemblyName>Orion.Main</AssemblyName>
+    <RootNamespace>Orion.Game.Main</RootNamespace>
+    <AssemblyName>Orion.Game.Main</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkSubset>Client</TargetFrameworkSubset>
@@ -64,8 +64,14 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Compile Include="Match Configuration\SinglePlayerMatchConfigurer.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

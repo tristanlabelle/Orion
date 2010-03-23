@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networking", "Networking\Networking.csproj", "{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.ReplayPrinter", "Tools.ReplayPrinter\Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
@@ -17,16 +15,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Matchmaking", "Game.Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Presentation", "Game.Presentation\Game.Presentation.csproj", "{F2382CAC-67F5-4246-B033-D586A1A68FA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Main", "Game.Main\Game.Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.ActiveCfg = Debug|x86
-		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.Build.0 = Debug|x86
-		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.ActiveCfg = Release|x86
-		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.Build.0 = Release|x86
 		{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}.Debug|x86.ActiveCfg = Debug|x86
 		{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}.Debug|x86.Build.0 = Debug|x86
 		{D812E25E-658E-4F6C-9BFC-F0F88A82A2C1}.Release|x86.ActiveCfg = Release|x86
@@ -51,6 +47,10 @@ Global
 		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Debug|x86.Build.0 = Debug|x86
 		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.ActiveCfg = Release|x86
 		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.Build.0 = Release|x86
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.ActiveCfg = Debug|x86
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.Build.0 = Debug|x86
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.ActiveCfg = Release|x86
+		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

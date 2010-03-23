@@ -5,12 +5,13 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
 
-namespace Orion.Game.Matchmaking
+namespace Orion.Game.Presentation
 {
     public class UserInputManager
     {

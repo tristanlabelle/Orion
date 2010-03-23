@@ -91,6 +91,7 @@
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="ResourceDisplay.cs" />
+    <Compile Include="SelectionManager.cs" />
     <Compile Include="SpriteAnimation.cs" />
     <Compile Include="UIDisplays\HostMultiplayerLobby.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="UIDisplays\ReplayLoadingUI.cs" />
     <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserInputCommand.cs" />
+    <Compile Include="UserInputManager.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -8,7 +8,6 @@ using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
-using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Matchmaking
 {

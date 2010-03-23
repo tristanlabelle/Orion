@@ -45,7 +45,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Deathmatch\AgressiveAICommander.cs" />
@@ -102,13 +101,10 @@
     <Compile Include="ReplayEvent.cs" />
     <Compile Include="ReplayReader.cs" />
     <Compile Include="ReplayWriter.cs" />
-    <Compile Include="SelectionManager.cs" />
     <Compile Include="SlaveCommander.cs" />
     <Compile Include="TowerDefense\CreepPath.cs" />
     <Compile Include="TowerDefense\CreepTask.cs" />
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
-    <Compile Include="UserInputCommand.cs" />
-    <Compile Include="UserInputManager.cs" />
     <Compile Include="WorldGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

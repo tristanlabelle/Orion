@@ -99,7 +99,15 @@ namespace Orion.Game.Presentation.Audio
             if (!isGameStarted) return;
 
             Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != LocalFaction) return;
+            if (unit == null) return;
+            
+            if (unit.Type.Name == "Chuck Norris")
+            {
+                gameAudio.PlayUISound("Chuck Norris.Spawn");
+                return;
+            }
+
+            if (unit.Faction != LocalFaction) return;
 
             string soundName = gameAudio.GetUnitSoundName(unit.Type, "Select");
             gameAudio.PlaySfx(soundName, unit.Position);

@@ -281,8 +281,8 @@ namespace Orion.Game.Presentation
                     {
                         ResourceNode alageneNode = World.Entities
                             .OfType<ResourceNode>()
-                            .First(node => node.Position == target.Position);
-                        if (alageneNode.IsHarvestableByFaction(LocalFaction))
+                            .FirstOrDefault(node => node.Position == target.Position);
+                        if (alageneNode != null && alageneNode.IsHarvestableByFaction(LocalFaction))
                             LaunchHarvest(alageneNode);
                     }
                 }

@@ -38,9 +38,9 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Properties
-        private SelectionManager SelectionManager
+        private Selection Selection
         {
-            get { return userInputManager.SelectionManager; }
+            get { return userInputManager.Selection; }
         }
 
         private Faction Faction
@@ -58,14 +58,14 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
-            foreach (Unit unit in SelectionManager.SelectedUnits)
+            foreach (Entity entity in Selection)
             {
-                if (!SelectionManager.Faction.CanSee(unit))
-                    continue;
+                if (!Faction.CanSee(entity)) continue;
 
-                graphics.Stroke(unit.BoundingRectangle, selectionMarkerColor);
+                graphics.Stroke(entity.BoundingRectangle, selectionMarkerColor);
 
-                if (unit.Faction == Faction && unit.HasRallyPoint)
+                Unit unit = entity as Unit;
+                if (unit != null && unit.Faction == Faction && unit.HasRallyPoint)
                 {
                     LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint.Value);
                     graphics.Stroke(lineSegment, selectionMarkerColor);

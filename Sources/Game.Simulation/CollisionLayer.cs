@@ -9,6 +9,9 @@ namespace Orion.Game.Simulation
     /// Specifies the layer of collision in which an <see cref="Entity"/> is.
     /// <see cref="Entity">Entities</see> in different collision layers will not collide together.
     /// </summary>
+    /// <remarks>
+    /// The enumerants are ordered from lowest to highest.
+    /// </remarks>
     [Serializable]
     public enum CollisionLayer
     {

@@ -24,9 +24,14 @@ namespace Orion.Game.Presentation.Audio
         private readonly Match match;
         private readonly UserInputManager userInputManager;
 
+        /// <summary>
+        /// Stores the entities which are last known to be selected.
+        /// Used to determine if entities were added to the selection when it changes.
+        /// </summary>
+        private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
+
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
-        private bool hasSelectionChangedInFrame;
         #endregion
 
         #region Constructors
@@ -46,8 +51,8 @@ namespace Orion.Game.Presentation.Audio
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
             this.match.World.ExplosionOccured += OnExplosionOccured;
-            this.userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
-            this.userInputManager.LocalCommander.CommandGenerated += OnCommandGenerated;
+            this.userInputManager.Selection.Changed += OnSelectionChanged;
+            this.userInputManager.LocalCommander.CommandIssued += OnCommandIssued;
         }
         #endregion
 
@@ -57,9 +62,9 @@ namespace Orion.Game.Presentation.Audio
             get { return userInputManager.SelectionManager; }
         }
 
-        private IEnumerable<Unit> SelectedUnits
+        private Selection Selection
         {
-            get { return SelectionManager.SelectedUnits; }
+            get { return userInputManager.Selection; }
         }
 
         private Faction LocalFaction
@@ -70,17 +75,6 @@ namespace Orion.Game.Presentation.Audio
         private World World
         {
             get { return LocalFaction.World; }
-        }
-
-        private UnitType SelectedUnitType
-        {
-            get
-            {
-                return SelectedUnits
-                    .Select(unit => unit.Type)
-                    .Distinct()
-                    .WithMaxOrDefault(type => SelectedUnits.Count(unit => unit.Type == type));
-            }
         }
         #endregion
 
@@ -124,31 +118,38 @@ namespace Orion.Game.Presentation.Audio
                 if (userInputManager.LocalFaction.Color == Colors.Magenta)
                     gameAudio.PlayUISound("Tapette");
             }
+        }
 
-            if (hasSelectionChangedInFrame)
+        private void OnSelectionChanged(Selection sender)
+        {
+            if (sender.Type != SelectionType.Units)
             {
-                hasSelectionChangedInFrame = false;
-
-                if (SelectedUnitType == null) return;
-
-                string soundName = gameAudio.GetUnitSoundName(SelectedUnitType, "Select");
-                gameAudio.PlayUISound(soundName);
+                previousSelection.Clear();
+                return;
             }
+
+            // Find the most frequent unit type in the newly selected units.
+            var unitTypeGroup = sender.Except(previousSelection)
+                .Cast<Unit>()
+                .GroupBy(unit => unit.Type)
+                .WithMaxOrDefault(group => group.Count());
+
+            UnitType unitType = unitTypeGroup == null ? null : unitTypeGroup.Key;
+
+            previousSelection.Clear();
+            previousSelection.UnionWith(sender);
+
+            if (unitType == null) return;
+
+            string soundName = gameAudio.GetUnitSoundName(unitType, "Select");
+            gameAudio.PlayUISound(soundName);
         }
 
-        private void OnSelectionChanged(SelectionManager sender)
+        private void OnCommandIssued(Commander sender, Command args)
         {
-            Debug.Assert(sender == SelectionManager);
-
-            hasSelectionChangedInFrame = true;
-        }
-
-        private void OnCommandGenerated(Commander sender, Command args)
-        {
-            Debug.Assert(sender == userInputManager.LocalCommander);
             Debug.Assert(args != null);
 
-            UnitType unitType = SelectedUnitType;
+            UnitType unitType = userInputManager.SelectionManager.FocusedUnitType;
             if (unitType == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);

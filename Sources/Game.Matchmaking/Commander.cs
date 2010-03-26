@@ -33,11 +33,11 @@ namespace Orion.Game.Matchmaking
         /// <summary>
         /// Raised when this <see cref="Commander"/> generates a <see cref="Command"/>.
         /// </summary>
-        public event Action<Commander, Command> CommandGenerated;
+        public event Action<Commander, Command> CommandIssued;
 
-        private void OnCommandGenerated(Command command)
+        private void OnCommandIssued(Command command)
         {
-            if (CommandGenerated != null) CommandGenerated(this, command);
+            if (CommandIssued != null) CommandIssued(this, command);
         }
         #endregion
 
@@ -62,7 +62,7 @@ namespace Orion.Game.Matchmaking
 
         #region Methods
         /// <summary>
-        /// Raises the <see cref="E:CommandGenerated"/> event
+        /// Raises the <see cref="E:CommandIssued"/> event
         /// with the <see cref="Command"/> that was generated.
         /// </summary>
         /// <param name="command">The <see cref="Command"/> that was generated.</param>
@@ -77,7 +77,7 @@ namespace Orion.Game.Matchmaking
                 return;
             }
 
-            OnCommandGenerated(command);
+            OnCommandIssued(command);
         }
 
         /// <summary>

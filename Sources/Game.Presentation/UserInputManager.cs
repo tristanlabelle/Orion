@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
@@ -67,6 +68,11 @@ namespace Orion.Game.Presentation
             get { return selectionManager; }
         }
 
+        public Selection Selection
+        {
+            get { return selectionManager.Selection; }
+        }
+
         public Unit HoveredUnit
         {
             get { return hoveredUnit; }
@@ -127,29 +133,29 @@ namespace Orion.Game.Presentation
             else
             {
                 if (shiftKeyPressed)
-                    selectionManager.AddRectangleToSelection(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.AddUnitsInRectangle(selectionRectangleStart, selectionRectangleEnd);
                 else
-                    selectionManager.SelectInRectangle(selectionRectangleStart, selectionRectangleEnd);
+                    Selection.SetToRectangle(selectionRectangleStart, selectionRectangleEnd);
             }
         }
 
         private void HandleMouseClick(Vector2 position)
         {
             Point point = (Point)position;
-            Unit clickedUnit = World.IsWithinBounds(point)
-                ? World.Entities.GetTopmostUnitAt(point)
+            Entity clickedEntity = World.IsWithinBounds(point)
+                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.CollisionLayer)
                 : null;
 
-            if (clickedUnit == null)
+            if (clickedEntity == null)
             {
-                if (!shiftKeyPressed) selectionManager.ClearSelection();
+                if (!shiftKeyPressed) Selection.Clear();
                 return;
             }
 
             if (shiftKeyPressed)
-                selectionManager.ToggleSelection(clickedUnit);
+                Selection.Toggle(clickedEntity);
             else
-                selectionManager.SetSelection(clickedUnit);
+                Selection.Set(clickedEntity);
         }
 
         public void HandleMouseDoubleClick(MouseEventArgs args)
@@ -162,21 +168,21 @@ namespace Orion.Game.Presentation
             Point point = (Point)args.Position;
             if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) != TileVisibility.Visible)
             {
-                selectionManager.ClearSelection();
+                Selection.Clear();
                 return;
             }
 
             Unit clickedUnit = World.Entities.GetTopmostUnitAt(point);
             if (clickedUnit == null)
             {
-                selectionManager.ClearSelection();
+                Selection.Clear();
                 return;
             }
 
             if (clickedUnit.Faction == LocalFaction)
-                selectionManager.SelectNearbyUnitsOfType(clickedUnit.Center, clickedUnit.Type);
+                Selection.SetToNearbySimilar(clickedUnit);
             else
-                selectionManager.SetSelection(clickedUnit);
+                Selection.Set(clickedUnit);
         }
 
         public void HandleMouseMove(MouseEventArgs args)
@@ -237,7 +243,9 @@ namespace Orion.Game.Presentation
 
         public void LaunchDefaultCommand(Vector2 target)
         {
-            bool otherFactionOnlySelection = selectionManager.SelectedUnits.All(unit => unit.Faction != LocalFaction);
+            if (Selection.Type != SelectionType.Units) return;
+
+            bool otherFactionOnlySelection = Selection.Units.All(unit => unit.Faction != LocalFaction);
             if (otherFactionOnlySelection) return;
 
             Point point = (Point)target;
@@ -255,14 +263,14 @@ namespace Orion.Game.Presentation
             else if (targetEntity is ResourceNode)
             {
                 ResourceNode targetResourceNode = (ResourceNode)targetEntity;
-                if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
                     LaunchChangeRallyPoint(targetResourceNode.Center);
                 else
                     LaunchDefaultCommand(targetResourceNode);
             }
             else
             {
-                if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -271,11 +279,13 @@ namespace Orion.Game.Presentation
 
         private void LaunchDefaultCommand(Unit target)
         {
+            if (Selection.Type != SelectionType.Units) return;
+
             if (target.Faction == commander.Faction)
             {
                 if (target.HasSkill(UnitSkill.ExtractAlagene))
                 {
-                    if (selectionManager.SelectedUnits.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                    if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
                         LaunchChangeRallyPoint(target.Center);
                     else
                     {
@@ -314,12 +324,12 @@ namespace Orion.Game.Presentation
         #region Launching individual commands
         public void Cancel()
         {
-            commander.LaunchCancel(selectionManager.SelectedUnits);
+            commander.LaunchCancel(Selection.Units);
         }
 
         public void LaunchBuild(Point location, UnitType buildingType)
         {
-            IEnumerable<Unit> builders = selectionManager.SelectedUnits
+            IEnumerable<Unit> builders = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction
                     && unit.Type.HasSkill(UnitSkill.Build)
                     && unit.Type.CanBuild(buildingType));
@@ -329,7 +339,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchAttack(Unit target)
         {
-            IEnumerable<Unit> selection = selectionManager.SelectedUnits.Where(unit => unit.Faction == commander.Faction);
+            IEnumerable<Unit> selection = Selection.Units.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(unit => unit.HasSkill(UnitSkill.Attack)), target);
             commander.LaunchMove(selection.Where(unit => !unit.HasSkill(UnitSkill.Attack) && unit.HasSkill(UnitSkill.Move)), target.Position);
@@ -337,7 +347,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
             // Those who can attack do so, the others simply move to the destination
             commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill(UnitSkill.Attack)), destination);
@@ -346,7 +356,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchHarvest(ResourceNode node)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
             // Those who can harvest do so, the others simply move to the resource's position
             commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill(UnitSkill.Harvest)), node);
@@ -355,14 +365,14 @@ namespace Orion.Game.Presentation
 
         public void LaunchMove(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
             commander.LaunchMove(movableUnits, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Train)
                 && unit.IsBuilding);
             commander.LaunchChangeRallyPoint(targetUnits, at);
@@ -372,7 +382,7 @@ namespace Orion.Game.Presentation
         {
             if (building.Faction != LocalFaction || !building.IsBuilding) return;
            
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill(UnitSkill.Build));
             commander.LaunchRepair(targetUnits, building);
         }
@@ -381,7 +391,7 @@ namespace Orion.Game.Presentation
         {
             if (hurtUnit.Type.IsBuilding) return;
 
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Heal));
             if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
             commander.LaunchHeal(targetUnits, hurtUnit);
@@ -389,7 +399,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchTrain(UnitType unitType)
         {
-            IEnumerable<Unit> trainers = selectionManager.SelectedUnits
+            IEnumerable<Unit> trainers = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction
                     && !unit.IsUnderConstruction
                     && unit.Type.CanTrain(unitType));
@@ -399,7 +409,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchResearch(Technology technology)
         {
-            Unit researcher = selectionManager.SelectedUnits
+            Unit researcher = Selection.Units
                 .FirstOrDefault(unit => unit.Faction == commander.Faction
                     && !unit.IsUnderConstruction
                     && unit.IsIdle
@@ -410,14 +420,14 @@ namespace Orion.Game.Presentation
 
         public void LaunchSuicide()
         {
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchSuicide(targetUnits);
         }
 
         public void LaunchStandGuard()
         {
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction)
                 .Where(unit => unit.HasSkill(UnitSkill.Move));
             commander.LaunchStandGuard(targetUnits);
@@ -425,7 +435,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchCancel()
         {
-            IEnumerable<Unit> targetUnits = selectionManager.SelectedUnits
+            IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction);
             commander.LaunchCancel(targetUnits);
         }

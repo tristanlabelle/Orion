@@ -162,9 +162,9 @@ namespace Orion.Game.Presentation
             KeyboardButtonPressed += (sender, args) => userInputManager.HandleKeyDown(args);
             KeyboardButtonReleased += (sender, args) => userInputManager.HandleKeyUp(args);
 
-            userInputManager.SelectionManager.SelectionChanged += OnSelectionChanged;
-            userInputManager.SelectionManager.SelectedUnitTypeChanged += OnSelectedUnitTypeChanged;
-            localCommander.CommandGenerated += OnCommanderGeneratedCommand;
+            userInputManager.Selection.Changed += OnSelectionChanged;
+            userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
+            localCommander.CommandIssued += OnCommanderGeneratedCommand;
             minimapFrame.MouseButtonPressed += MinimapMouseDown;
             minimapFrame.MouseMoved += MinimapMouseMove;
 
@@ -205,6 +205,11 @@ namespace Orion.Game.Presentation
         private SelectionManager SelectionManager
         {
             get { return userInputManager.SelectionManager; }
+        }
+
+        private Selection Selection
+        {
+            get { return userInputManager.Selection; }
         }
 
         private Faction LocalFaction
@@ -295,24 +300,23 @@ namespace Orion.Game.Presentation
             var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
             if (isShiftDown)
             {
-                SelectionManager.SetSelection(inactiveWorkers);
+                Selection.Set(inactiveWorkers);
             }
             else
             {
-                IEnumerable<Unit> selectedUnits = userInputManager.SelectionManager.SelectedUnits;
-                if (selectedUnits.Count() == 1)
+                if (Selection.Type == SelectionType.Units && Selection.Count == 1)
                 {
-                    Unit selectedUnit = selectedUnits.First();
+                    Unit selectedUnit = Selection.Units.First();
                     if (inactiveWorkers.Contains(selectedUnit))
                     {
                         int nextIndex = (inactiveWorkers.IndexOf(selectedUnit) + 1) % inactiveWorkers.Count();
-                        userInputManager.SelectionManager.SetSelection(inactiveWorkers.ElementAt(nextIndex));
+                        Selection.Set(inactiveWorkers.ElementAt(nextIndex));
                         CenterOnSelection();
                         return;
                     }
                 }
 
-                userInputManager.SelectionManager.SetSelection(inactiveWorkers.First());
+                Selection.Set(inactiveWorkers.First());
                 CenterOnSelection();
             }
         }
@@ -423,7 +427,7 @@ namespace Orion.Game.Presentation
 
         protected override void Update(float timeDeltaInSeconds)
         {
-            if (isSpaceDown && !SelectionManager.IsSelectionEmpty)
+            if (isSpaceDown && !Selection.IsEmpty)
                 CenterOnSelection();
 
             match.Update(timeDeltaInSeconds);
@@ -475,18 +479,22 @@ namespace Orion.Game.Presentation
             if (mouseDownOnMinimap) MoveWorldView(args.Position);
         }
 
-        private void OnSelectionChanged(SelectionManager selectionManager)
+        private void OnSelectionChanged(Selection selection)
         {
             while (selectionFrame.Children.Count > 0) selectionFrame.Children[0].Dispose();
             selectionFrame.Children.Clear();
+            selectionFrame.Renderer = null;
 
-            if (selectionManager.SelectedUnitCount == 1)
-                CreateSingleUnitSelectionPanel();
-            else
-                CreateMultipleUnitsSelectionPanel();
+            if (selection.Type == SelectionType.Units)
+            {
+                if (selection.Count == 1)
+                    CreateSingleUnitSelectionPanel();
+                else
+                    CreateMultipleUnitsSelectionPanel();
+            }
         }
 
-        private void OnSelectedUnitTypeChanged(SelectionManager selectionManager)
+        private void OnFocusedUnitTypeChanged(SelectionManager selectionManager)
         {
             UpdateSkillsPanel();
         }
@@ -530,12 +538,12 @@ namespace Orion.Game.Presentation
 
         private void CenterOnSelection()
         {
-            CenterOn(SelectionManager.LeadingUnit.Center);
+            CenterOn(SelectionManager.FocusedUnit.Center);
         }
 
         private void CreateSingleUnitSelectionPanel()
         {
-            Unit unit = userInputManager.SelectionManager.SelectedUnits.First();
+            Unit unit = Selection.Units.First();
             selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalFaction, unit, gameGraphics);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
@@ -548,6 +556,22 @@ namespace Orion.Game.Presentation
 
         private void CreateMultipleUnitsSelectionPanel()
         {
+            List<Unit> orderedSelectedUnits = userInputManager.Selection.Units.ToList();
+
+            var selectedUnitTypes = orderedSelectedUnits
+                .GroupBy(unit => unit.Type)
+                .OrderByDescending(group => group.Count())
+                .Select(group => group.Key)
+                .ToList();
+
+            orderedSelectedUnits.Sort((a, b) =>
+            {
+                int comparison = selectedUnitTypes.IndexOf(a.Type)
+                    .CompareTo(selectedUnitTypes.IndexOf(b.Type));
+                if (comparison == 0) comparison = a.Handle.Value.CompareTo(b.Handle.Value);
+                return comparison;
+            });
+
             selectionFrame.Renderer = new FilledFrameRenderer(Colors.DarkGray, Colors.Gray);
             const float paddingX = 5;
             const float paddingY = 15;
@@ -555,10 +579,10 @@ namespace Orion.Game.Presentation
                 selectionFrame.Bounds.Height / 2.2f - paddingY * 2);
             float currentX = paddingX + selectionFrame.Bounds.MinX;
             float currentY = selectionFrame.Bounds.Height - paddingY - frame.Height;
-            foreach (Unit unit in userInputManager.SelectionManager.SelectedUnits)
+            foreach (Unit unit in orderedSelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
-                renderer.HasFocus = (unit.Type == SelectionManager.SelectedUnitType);
+                renderer.HasFocus = (unit.Type == SelectionManager.FocusedUnitType);
                 Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), string.Empty, renderer);
                 float aspectRatio = Bounds.Width / Bounds.Height;
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
@@ -576,18 +600,18 @@ namespace Orion.Game.Presentation
         private void OnUnitButtonPressed(Button button)
         {
             Unit unit = ((UnitButtonRenderer)button.Renderer).Unit;
-            if (unit.Type == SelectionManager.SelectedUnitType || SelectionManager.SelectedUnitCount == 1)
+            if (unit.Type == SelectionManager.FocusedUnitType || SelectionManager.Selection.Count == 1)
             {
-                SelectionManager.SetSelection(unit);
+                SelectionManager.Selection.Set(unit);
                 MoveWorldView(unit.Center);
             }
             else
             {
-                SelectionManager.SelectedUnitType = unit.Type;
+                SelectionManager.FocusedUnitType = unit.Type;
                 foreach (Button unitButton in selectionFrame.Children)
                 {
                     UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
-                    renderer.HasFocus = renderer.Unit.Type == SelectionManager.SelectedUnitType;
+                    renderer.HasFocus = renderer.Unit.Type == SelectionManager.FocusedUnitType;
                 }
             }
         }
@@ -595,11 +619,10 @@ namespace Orion.Game.Presentation
         private void UpdateSkillsPanel()
         {
             actions.Clear();
-            if (SelectionManager.IsSelectionEmpty) return;
+            if (Selection.Type != SelectionType.Units) return;
             
-            IEnumerable<Unit> selectedUnits = SelectionManager.SelectedUnits;
-            if (selectedUnits.All(u => u.Faction == LocalFaction))
-                actions.Push(new UnitActionProvider(enablers, SelectionManager.SelectedUnitType));
+            if (Selection.Units.All(u => u.Faction == LocalFaction))
+                actions.Push(new UnitActionProvider(enablers, SelectionManager.FocusedUnitType));
         }
 
         private void MoveWorldView(Vector2 center)

@@ -57,7 +57,7 @@ namespace Orion.Game.Simulation
             this.isBuilding = !skills.Contains(UnitSkill.Move);
 
 #if DEBUG
-            Debug.Assert(!skills.Contains(UnitSkill.Attack) || stats[UnitStat.AttackRange] <= stats[UnitStat.SightRange],
+            Debug.Assert(GetBaseStat(UnitStat.AttackRange) <= GetBaseStat(UnitStat.SightRange),
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
 #endif
         }

@@ -85,7 +85,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             Argument.EnsureNotNull(commander, "commander");
             Argument.EnsureNotNull(sink, "sink");
             commanders.Add(commander, sink);
-            commander.CommandGenerated += OnCommandGenerated;
+            commander.CommandIssued += OnCommandIssued;
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             AddCommander(commander, TopMostSink);
         }
 
-        private void OnCommandGenerated(Commander commander, Command command)
+        private void OnCommandIssued(Commander commander, Command command)
         {
             Argument.EnsureNotNull(commander, "commander");
             Argument.EnsureNotNull(command, "command");

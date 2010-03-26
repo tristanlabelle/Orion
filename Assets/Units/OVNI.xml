@@ -2,5 +2,5 @@
 <UnitType Name="OVNI" Width="2" Height="2" IsAirborne="True">
 	<Stats SightRange="10" MaxHealth="100" MeleeArmor="1" RangedArmor="3" AladdiumCost="140" AlageneCost="140" FoodCost="2"/>
 	<Move Speed="8"/>
-	<Attack Power="13" Range="8" Delay="6"/>
+	<Attack Power="7" Range="8" Delay="3"/>
 </UnitType>

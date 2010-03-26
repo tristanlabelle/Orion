@@ -3,4 +3,5 @@
   <Target>Flying Spaghetti Monster</Target>
   <Target>Ta mère</Target>
   <Effect Stat="MoveSpeed" Change="2"/>
+  <Effect Stat="AttackDelay" Change="-1"/>
 </Technology>

@@ -21,7 +21,7 @@ namespace Orion.Main
         {
             ui = new SinglePlayerMatchConfigurationUI();
             ui.PressedStartGame += PressStart;
-            Seed = (int)Environment.TickCount;
+            options.Seed = (int)Environment.TickCount;
         }
         #endregion
 

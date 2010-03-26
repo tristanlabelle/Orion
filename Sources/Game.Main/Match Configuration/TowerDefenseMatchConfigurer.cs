@@ -17,7 +17,7 @@ namespace Orion.Main
         #region Constructors
         public TowerDefenseMatchConfigurer()
         {
-            Seed = (int)Environment.TickCount;
+            options.Seed = (int)Environment.TickCount;
         }
         #endregion
 
@@ -29,8 +29,8 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(Seed));
-            random = new MersenneTwister(Seed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.Seed));
+            random = new MersenneTwister(options.Seed);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
             world = new World(terrain, random);
             CreepPath creepPath = CreepPath.Generate(world.Size, new Random());

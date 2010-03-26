@@ -57,7 +57,7 @@ namespace Orion.Game.Matchmaking
         /// </summary>
         /// <param name="worldSeed">The seed of the world.</param>
         /// <param name="factionNames">The names of the factions participating.</param>
-        public void WriteHeader(int worldSeed, IEnumerable<string> factionNames)
+        public void WriteHeader(MatchOptions options, IEnumerable<string> factionNames)
         {
             if (isHeaderWritten) throw new InvalidOperationException("Cannot write more than one replay header.");
 
@@ -65,7 +65,14 @@ namespace Orion.Game.Matchmaking
             List<string> factionNameList = factionNames.ToList();
             Argument.EnsureNoneNull(factionNames, "factionNames");
 
-            writer.Write(worldSeed);
+            writer.Write(options.InitialAladdiumAmount);
+            writer.Write(options.InitialAlageneAmount);
+            writer.Write(options.MapSize.Width);
+            writer.Write(options.MapSize.Height);
+            writer.Write(options.MaximumPopulation);
+            writer.Write(options.RevealTopology);
+            writer.Write(options.Seed);
+            writer.Write((int)options.StartType);
 
             writer.Write(factionNameList.Count);
             foreach (string factionName in factionNameList)

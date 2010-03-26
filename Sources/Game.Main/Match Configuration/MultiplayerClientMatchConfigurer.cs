@@ -106,7 +106,7 @@ namespace Orion.Main
 
         private void SetSeed(byte[] bytes)
         {
-            Seed = BitConverter.ToInt32(bytes, 1);
+            options.Seed = BitConverter.ToInt32(bytes, 1);
         }
 
         private void ForceExit()

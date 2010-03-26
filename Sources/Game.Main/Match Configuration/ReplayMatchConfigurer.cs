@@ -22,7 +22,7 @@ namespace Orion.Main
             BinaryReader replayReader = new BinaryReader(replayFile.OpenRead());
             replay = new ReplayReader(replayReader);
 
-            Seed = replay.WorldSeed;
+            options = replay.Options;
         }
 
         protected override MatchConfigurationUI AbstractUserInterface

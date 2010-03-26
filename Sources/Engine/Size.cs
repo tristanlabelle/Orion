@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using OpenTK.Math;
@@ -117,6 +118,36 @@ namespace Orion.Engine
         public static bool Equals(Size a, Size b)
         {
             return a.Equals(b);
+        }
+
+        /// <summary>
+        /// Parses a Size represented as a <see cref="string"/> with the format "{0}x{1}".
+        /// </summary>
+        /// <param name="size">The formatted string</param>
+        /// <returns></returns>
+        public static Size Parse(string sizeString)
+        {
+            Regex regex = new Regex("([0-9]+)x([0-9]+)", RegexOptions.IgnoreCase);
+            if (regex.IsMatch(sizeString))
+            {
+                Match result = regex.Match(sizeString);
+                return new Size(int.Parse(result.Groups[1].Value), int.Parse(result.Groups[2].Value));
+            }
+            throw new FormatException("Required format for a Size object is {{Width}}x{{Height}}; got {0}".FormatInvariant(sizeString));
+        }
+
+        public static bool TryParse(string sizeString, out Size into)
+        {
+            try
+            {
+                into = Parse(sizeString);
+                return true;
+            }
+            catch (FormatException)
+            {
+                into = new Size(0, 0);
+                return false;
+            }
         }
         #endregion
 

@@ -157,12 +157,9 @@ namespace Orion.Game.Presentation
         {
             if (sizeString == null) return;
 
-            Regex regex = new Regex("([0-9]+)x([0-9]+)", RegexOptions.IgnoreCase);
-            if (regex.IsMatch(sizeString))
+            Size newSize;
+            if(Size.TryParse(sizeString, out newSize))
             {
-                System.Text.RegularExpressions.Match result = regex.Match(sizeString);
-                Size newSize = new Size(int.Parse(result.Groups[1].Value), int.Parse(result.Groups[2].Value));
-
 #if DEBUG
                 // Don't limit sizes when debugging (although it creates more bugs than it fixes...)
                 if (newSize.Width > 0 && newSize.Height > 0)

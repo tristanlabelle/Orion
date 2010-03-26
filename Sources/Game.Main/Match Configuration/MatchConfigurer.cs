@@ -13,10 +13,9 @@ namespace Orion.Main
     abstract class MatchConfigurer
     {
         #region Fields
-        private int seed;
+        protected MatchOptions options;
         protected World world;
         protected Random random;
-        protected int numberOfPlayers = 2;
         #endregion
 
         #region Events
@@ -31,10 +30,9 @@ namespace Orion.Main
             get { return UserInterface.NumberOfPlayers; }
         }
 
-        public int Seed
+        public MatchOptions Options
         {
-            get { return seed; }
-            protected set { seed = value; }
+            get { return options; }
         }
 
         public MatchConfigurationUI UserInterface
@@ -54,8 +52,8 @@ namespace Orion.Main
 
         protected void CreateWorld(Size worldSize)
         {
-            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(seed));
-            random = new MersenneTwister(seed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.Seed));
+            random = new MersenneTwister(options.Seed);
             Terrain terrain = Terrain.Generate(worldSize, random);
             world = new World(terrain, random);
         }
@@ -74,7 +72,7 @@ namespace Orion.Main
             if (replayWriter == null) return null;
 
             replayWriter.AutoFlush = true;
-            replayWriter.WriteHeader(Seed, world.Factions.Select(faction => faction.Name));
+            replayWriter.WriteHeader(options, world.Factions.Select(faction => faction.Name));
 
             return new ReplayRecorder(replayWriter);
         }

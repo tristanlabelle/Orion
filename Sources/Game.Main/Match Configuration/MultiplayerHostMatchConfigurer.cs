@@ -22,7 +22,7 @@ namespace Orion.Main
         public MultiplayerHostMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
-            Seed = (int)Environment.TickCount;
+            options.Seed = (int)Environment.TickCount;
             ui = new MultiplayerHostMatchConfigurationUI(transporter);
             ui.PressedStartGame += PressStartGame;
             ui.PressedExit += ExitGame;
@@ -140,7 +140,7 @@ namespace Orion.Main
 
             byte[] seedMessage = new byte[5];
             seedMessage[0] = (byte)SetupMessageType.SetSeed;
-            BitConverter.GetBytes(Seed).CopyTo(seedMessage, 1);
+            BitConverter.GetBytes(options.Seed).CopyTo(seedMessage, 1);
             transporter.SendTo(seedMessage, host);
 
             int newPeerSlotNumber = (byte)ui.NextAvailableSlot;

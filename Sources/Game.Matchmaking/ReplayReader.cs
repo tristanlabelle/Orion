@@ -16,7 +16,7 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private readonly BinaryReader reader;
-        private readonly int worldSeed;
+        private readonly MatchOptions options = new MatchOptions();
         private readonly ReadOnlyCollection<string> factionNames;
         private int lastUpdateNumber = 0;
         #endregion
@@ -26,7 +26,16 @@ namespace Orion.Game.Matchmaking
         {
             Argument.EnsureNotNull(reader, "reader");
             this.reader = reader;
-            worldSeed = reader.ReadInt32();
+
+            options.InitialAladdiumAmount = reader.ReadInt32();
+            options.InitialAlageneAmount = reader.ReadInt32();
+            int width = reader.ReadInt32();
+            int height = reader.ReadInt32();
+            options.MaximumPopulation = reader.ReadInt32();
+            options.RevealTopology = reader.ReadBoolean();
+            options.Seed = reader.ReadInt32();
+            options.StartType = (MatchStartType)reader.ReadInt32();
+            options.MapSize = new Size(width, height);
 
             int factionCount = reader.ReadInt32();
             factionNames = Enumerable.Range(0, factionCount)
@@ -43,12 +52,9 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the seed used to generate the world.
-        /// </summary>
-        public int WorldSeed
+        public MatchOptions Options
         {
-            get { return worldSeed; }
+            get { return options; }
         }
 
         /// <summary>

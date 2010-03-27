@@ -13,7 +13,7 @@ namespace Orion.Main
     abstract class MatchConfigurer
     {
         #region Fields
-        protected MatchOptions options = new MatchOptions();
+        protected MatchSettings options = new MatchSettings();
         protected World world;
         protected Random random;
         #endregion
@@ -30,7 +30,7 @@ namespace Orion.Main
             get { return UserInterface.NumberOfPlayers; }
         }
 
-        public MatchOptions Options
+        public MatchSettings Options
         {
             get { return options; }
         }

@@ -38,7 +38,7 @@ namespace Orion.Engine.Gui
             : base(frame, renderer)
         {
             this.caption = new Label(caption);
-            this.caption.Color = Colors.White;
+            this.caption.Color = captionUpColor;
             AlignCaption();
             Children.Add(this.caption);
         }
@@ -59,6 +59,7 @@ namespace Orion.Engine.Gui
             {
                 Children.Remove(caption);
                 caption = new Label(value);
+                caption.Color = captionUpColor;
                 AlignCaption();
                 Children.Add(caption);
             }

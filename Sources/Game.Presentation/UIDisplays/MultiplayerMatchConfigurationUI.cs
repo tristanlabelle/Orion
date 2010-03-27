@@ -18,7 +18,7 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MultiplayerMatchConfigurationUI(MatchOptions options, SafeTransporter transporter, bool isHost)
+        public MultiplayerMatchConfigurationUI(MatchSettings options, SafeTransporter transporter, bool isHost)
             : base(options, isHost)
         {
             this.transporter = transporter;
@@ -108,9 +108,15 @@ namespace Orion.Game.Presentation
             if (handler != null) handler(playerSlots.IndexOf(slot), value);
         }
 
-        private void SelectSlot<T>(int slot) where T : PlayerSlot
+        private void SelectSlot<T>(int slot) where T : PlayerSlot, new()
         {
-            playerSlots[slot].SelectedItem = playerSlots[slot].Items.OfType<T>().First();
+            T item = playerSlots[slot].Items.OfType<T>().FirstOrDefault();
+            if(item == null)
+            {
+                item = new T();
+                playerSlots[slot].AddItem(item);
+            }
+            playerSlots[slot].SelectedItem = item;
         }
 
         protected override void Update(float timeDeltaInSeconds)

@@ -10,7 +10,7 @@ namespace Orion.Game.Presentation
 {
     public class SinglePlayerMatchConfigurationUI : MatchConfigurationUI
     {
-        public SinglePlayerMatchConfigurationUI(MatchOptions options)
+        public SinglePlayerMatchConfigurationUI(MatchSettings options)
             : base(options)
         { }
 

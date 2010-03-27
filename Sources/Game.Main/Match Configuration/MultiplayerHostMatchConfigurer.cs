@@ -73,7 +73,7 @@ namespace Orion.Main
             transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
         }
 
-        private void TransferOptionsChanges(MatchOptions options)
+        private void TransferOptionsChanges(MatchSettings options)
         {
             transporter.SendTo(CreateOptionsChangedPacket(), UserInterface.PlayerAddresses);
         }

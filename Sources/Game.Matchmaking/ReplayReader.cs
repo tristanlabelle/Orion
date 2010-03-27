@@ -16,7 +16,7 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private readonly BinaryReader reader;
-        private readonly MatchOptions options = new MatchOptions();
+        private readonly MatchSettings options = new MatchSettings();
         private readonly ReadOnlyCollection<string> factionNames;
         private int lastUpdateNumber = 0;
         #endregion
@@ -52,7 +52,7 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Properties
-        public MatchOptions Options
+        public MatchSettings Options
         {
             get { return options; }
         }

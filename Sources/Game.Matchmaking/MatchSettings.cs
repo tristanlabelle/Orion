@@ -8,7 +8,7 @@ using Orion.Engine;
 
 namespace Orion.Game.Matchmaking
 {
-    public class MatchOptions
+    public class MatchSettings
     {
         #region Static
         #region Fields
@@ -17,7 +17,7 @@ namespace Orion.Game.Matchmaking
 #else
         public static readonly Size SuggestedMinimumMapSize = new Size(50, 50);
 #endif
-        public const int SuggestedMinimumPopulation = 100;
+        public const int SuggestedMinimumPopulation = 4;
         public const int SuggestedMinimumAlagene = 0;
         public const int SuggestedMinimumAladdium = 0;
         #endregion
@@ -35,14 +35,14 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Events
-        public event Action<MatchOptions> MapSizeChanged;
-        public event Action<MatchOptions> StartTypeChanged;
-        public event Action<MatchOptions> MaximumPopulationChanged;
-        public event Action<MatchOptions> RevealTopologyChanged;
-        public event Action<MatchOptions> InitialAladdiumAmountChanged;
-        public event Action<MatchOptions> InitialAlageneAmountChanged;
-        public event Action<MatchOptions> SeedChanged;
-        public event Action<MatchOptions> Changed;
+        public event Action<MatchSettings> MapSizeChanged;
+        public event Action<MatchSettings> StartTypeChanged;
+        public event Action<MatchSettings> MaximumPopulationChanged;
+        public event Action<MatchSettings> RevealTopologyChanged;
+        public event Action<MatchSettings> InitialAladdiumAmountChanged;
+        public event Action<MatchSettings> InitialAlageneAmountChanged;
+        public event Action<MatchSettings> SeedChanged;
+        public event Action<MatchSettings> Changed;
         #endregion
 
         #region Properties
@@ -118,7 +118,7 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        private void TriggerEvent(Action<MatchOptions> eventHandler)
+        private void TriggerEvent(Action<MatchSettings> eventHandler)
         {
             if (eventHandler != null) eventHandler(this);
 

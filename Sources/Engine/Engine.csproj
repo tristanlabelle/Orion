@@ -93,6 +93,8 @@
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureManager.cs" />
     <Compile Include="Gui\Button.cs" />
+    <Compile Include="Gui\Checkbox.cs" />
+    <Compile Include="Gui\CheckboxRenderer.cs" />
     <Compile Include="Gui\ClippedView.cs">
       <SubType>Code</SubType>
     </Compile>

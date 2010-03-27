@@ -57,7 +57,7 @@ namespace Orion.Game.Matchmaking
         /// </summary>
         /// <param name="worldSeed">The seed of the world.</param>
         /// <param name="factionNames">The names of the factions participating.</param>
-        public void WriteHeader(MatchOptions options, IEnumerable<string> factionNames)
+        public void WriteHeader(MatchSettings options, IEnumerable<string> factionNames)
         {
             if (isHeaderWritten) throw new InvalidOperationException("Cannot write more than one replay header.");
 

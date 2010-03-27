@@ -23,7 +23,7 @@ namespace Orion.Game.Presentation
         private Size size = new Size(150, 150);
         private readonly Label sizeField;
 
-        protected MatchOptions options;
+        protected MatchSettings options;
         protected readonly Button startButton;
         protected readonly Button exitButton;
 
@@ -36,11 +36,11 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(MatchOptions options)
+        public MatchConfigurationUI(MatchSettings options)
             : this(options, true)
         { }
 
-        public MatchConfigurationUI(MatchOptions options, bool isGameMaster)
+        public MatchConfigurationUI(MatchSettings options, bool isGameMaster)
         {
             this.isGameMaster = isGameMaster;
             this.options = options;
@@ -77,9 +77,9 @@ namespace Orion.Game.Presentation
                 sizeOption.Children.Add(new Label(optionRect, "Taille du terrain:"));
                 Button changeSizeOption = new Button(valueRect, options.MapSize.ToString());
                 changeSizeOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchOptions.SuggestedMinimumMapSize);
+                string prompt = "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumMapSize);
                 changeSizeOption.Triggered +=
-                    b => Validate(prompt, options.MapSize, ValidateMapSize, () => changeSizeOption.Caption = options.MapSize.ToString());
+                    b => Validate(prompt, options.MapSize, ValidateMapSize);
                 sizeOption.Children.Add(changeSizeOption);
                 optionFrame.Children.Add(sizeOption);
 
@@ -93,9 +93,9 @@ namespace Orion.Game.Presentation
                 populationOption.Children.Add(new Label(optionRect, "Population maximale:"));
                 Button changeMaxPop = new Button(valueRect, options.MaximumPopulation.ToString());
                 changeMaxPop.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle population maximale désirée (minimum {0})".FormatInvariant(MatchOptions.SuggestedMinimumPopulation);
+                string prompt = "Entrez la nouvelle population maximale désirée (minimum {0})".FormatInvariant(MatchSettings.SuggestedMinimumPopulation);
                 changeMaxPop.Triggered +=
-                    b => Validate(prompt, options.MaximumPopulation, ValidateMaximumPopulation, () => changeMaxPop.Caption = options.MaximumPopulation.ToString());
+                    b => Validate(prompt, options.MaximumPopulation, ValidateMaximumPopulation);
                 populationOption.Children.Add(changeMaxPop);
                 optionFrame.Children.Add(populationOption);
 
@@ -109,9 +109,9 @@ namespace Orion.Game.Presentation
                 aladdiumOption.Children.Add(new Label(optionRect, "Quantité initiale d'aladdium:"));
                 Button changeAladdiumOption = new Button(valueRect, options.InitialAladdiumAmount.ToString());
                 changeAladdiumOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle quantité d'aladdium désirée (minimum {0}).".FormatInvariant(MatchOptions.SuggestedMinimumAladdium);
+                string prompt = "Entrez la nouvelle quantité d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium);
                 changeAladdiumOption.Triggered +=
-                    b => Validate(prompt, options.InitialAladdiumAmount, ValidateInitialAladdium, () => changeAladdiumOption.Caption = options.InitialAladdiumAmount.ToString());
+                    b => Validate(prompt, options.InitialAladdiumAmount, ValidateInitialAladdium);
                 aladdiumOption.Children.Add(changeAladdiumOption);
                 optionFrame.Children.Add(aladdiumOption);
 
@@ -125,9 +125,9 @@ namespace Orion.Game.Presentation
                 alageneOption.Children.Add(new Label(optionRect, "Quantité initiale d'alagène:"));
                 Button changeAlageneOption = new Button(valueRect, options.InitialAlageneAmount.ToString());
                 changeAlageneOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle quantité d'alagène désirée (minimum {0}).".FormatInvariant(MatchOptions.SuggestedMinimumAlagene);
+                string prompt = "Entrez la nouvelle quantité d'alagène désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAlagene);
                 changeAlageneOption.Triggered +=
-                    b => Validate(prompt, options.InitialAlageneAmount, ValidateInitialAlagene, () => changeAlageneOption.Caption = options.InitialAlageneAmount.ToString());
+                    b => Validate(prompt, options.InitialAlageneAmount, ValidateInitialAlagene);
                 alageneOption.Children.Add(changeAlageneOption);
                 optionFrame.Children.Add(alageneOption);
 
@@ -143,7 +143,7 @@ namespace Orion.Game.Presentation
                 changeSeedOption.Enabled = isGameMaster;
                 string prompt = "Entrez le nouveau germe de génération aléatoire.";
                 changeSeedOption.Triggered +=
-                    b => Validate(prompt, options.Seed, ValidateSeed, () => changeSeedOption.Caption = options.InitialAlageneAmount.ToString());
+                    b => Validate(prompt, options.Seed, ValidateSeed);
                 seedOption.Children.Add(changeSeedOption);
                 optionFrame.Children.Add(seedOption);
 
@@ -157,7 +157,7 @@ namespace Orion.Game.Presentation
         #region Events
         public event Action<MatchConfigurationUI> PressedStartGame;
         public event Action<MatchConfigurationUI> PressedExit;
-        public event Action<MatchConfigurationUI, MatchOptions> OptionChanged;
+        public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
         #endregion
 
         #region Properties
@@ -228,17 +228,14 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Options Validation
-        private void Validate<TValidatedType>(string prompt, TValidatedType defaultValue, Func<string, bool> validator, Action onValidate)
+        private void Validate<TValidatedType>(string prompt, TValidatedType defaultValue, Func<string, bool> validator)
         {
             Instant.Prompt(this, prompt, defaultValue.ToString(), result =>
             {
                 if (validator(result))
-                {
-                    onValidate();
                     OnOptionChanged();
-                }
                 else
-                    Validate(prompt, defaultValue, validator, onValidate);
+                    Validate(prompt, defaultValue, validator);
             });
         }
 
@@ -255,7 +252,7 @@ namespace Orion.Game.Presentation
         private bool ValidateInitialAladdium(string aladdiumString)
         {
             int aladdium;
-            if (!int.TryParse(aladdiumString, out aladdium) || aladdium < MatchOptions.SuggestedMinimumAladdium)
+            if (!int.TryParse(aladdiumString, out aladdium) || aladdium < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
             options.InitialAladdiumAmount = aladdium;
@@ -265,7 +262,7 @@ namespace Orion.Game.Presentation
         private bool ValidateInitialAlagene(string alageneAmount)
         {
             int alagene;
-            if (!int.TryParse(alageneAmount, out alagene) || alagene < MatchOptions.SuggestedMinimumAladdium)
+            if (!int.TryParse(alageneAmount, out alagene) || alagene < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
             options.InitialAlageneAmount = alagene;
@@ -275,7 +272,7 @@ namespace Orion.Game.Presentation
         private bool ValidateMaximumPopulation(string maxPopString)
         {
             int maxPop;
-            if (!int.TryParse(maxPopString, out maxPop) || maxPop < MatchOptions.SuggestedMinimumPopulation)
+            if (!int.TryParse(maxPopString, out maxPop) || maxPop < MatchSettings.SuggestedMinimumPopulation)
                 return false;
 
             options.MaximumPopulation = maxPop;
@@ -288,7 +285,7 @@ namespace Orion.Game.Presentation
             if (!Size.TryParse(sizeString, out newSize))
                 return false;
 
-            if (newSize.Width < MatchOptions.SuggestedMinimumMapSize.Width || newSize.Height < MatchOptions.SuggestedMinimumMapSize.Height)
+            if (newSize.Width < MatchSettings.SuggestedMinimumMapSize.Width || newSize.Height < MatchSettings.SuggestedMinimumMapSize.Height)
                 return false;
 
             options.MapSize = newSize;

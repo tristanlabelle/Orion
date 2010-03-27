@@ -95,7 +95,7 @@
     <Compile Include="Commands\ZoneAttackCommand.cs" />
     <Compile Include="FactionMessage.cs" />
     <Compile Include="Match.cs" />
-    <Compile Include="MatchOptions.cs" />
+    <Compile Include="MatchSettings.cs" />
     <Compile Include="MatchStartType.cs" />
     <Compile Include="Networking\CommandSynchronizer.cs" />
     <Compile Include="Networking\FactionEndPoint.cs" />

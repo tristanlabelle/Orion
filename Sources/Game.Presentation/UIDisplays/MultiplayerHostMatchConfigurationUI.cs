@@ -14,7 +14,7 @@ namespace Orion.Game.Presentation
     {
         #region Constructors
         public MultiplayerHostMatchConfigurationUI(MatchOptions options, SafeTransporter transporter)
-            : base(options, transporter)
+            : base(options, transporter, true)
         { }
         #endregion
 

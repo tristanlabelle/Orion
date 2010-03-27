@@ -13,7 +13,7 @@ namespace Orion.Game.Presentation
     {
         #region Constructors
         public MultiplayerClientMatchConfigurationUI(MatchOptions options, SafeTransporter transporter)
-            : base(options, transporter)
+            : base(options, transporter, false)
         {
             Children.Remove(startButton);
             Children.Remove(sizeChangeButton);

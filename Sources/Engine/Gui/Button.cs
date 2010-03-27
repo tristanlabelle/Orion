@@ -16,7 +16,7 @@ namespace Orion.Engine.Gui
     public class Button : RenderedView
     {
         #region Fields
-        private readonly Label caption;
+        private Label caption;
         private Keys hotKey;
         private bool isEnabled = true;
         private bool isDown;
@@ -57,8 +57,10 @@ namespace Orion.Engine.Gui
             get { return caption.Text.Value; }
             set
             {
-                caption.Text = new Text(value);
+                Children.Remove(caption);
+                caption = new Label(value);
                 AlignCaption();
+                Children.Add(caption);
             }
         }
 
@@ -135,11 +137,9 @@ namespace Orion.Engine.Gui
 
         protected override bool OnMouseButtonReleased(MouseEventArgs args)
         {
-            bool isClicked = isEnabled && isDown;
-
             base.OnMouseButtonReleased(args);
 
-            if (isClicked)
+            if (isEnabled && isDown)
             {
                 caption.Color = captionOverColor;
                 isDown = false;

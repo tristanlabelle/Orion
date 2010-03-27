@@ -20,7 +20,6 @@ namespace Orion.Game.Simulation
     public sealed class Faction
     {
         #region Fields
-        private const int maxFoodAmount = 200;
         public static ColorRgb[] Colors = new ColorRgb[]
         {
             ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Magenta, ColorPalette.Orange,
@@ -237,7 +236,7 @@ namespace Orion.Game.Simulation
 
         public int MaxFoodAmount
         {
-            get { return Math.Min(maxFoodAmount, totalFoodAmount); }
+            get { return Math.Min(world.MaximumFoodAmount, totalFoodAmount); }
         }
 
         public int RemainingFoodAmount

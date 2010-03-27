@@ -13,7 +13,7 @@ namespace Orion.Main
     abstract class MatchConfigurer
     {
         #region Fields
-        protected MatchOptions options;
+        protected MatchOptions options = new MatchOptions();
         protected World world;
         protected Random random;
         #endregion
@@ -55,7 +55,7 @@ namespace Orion.Main
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.Seed));
             random = new MersenneTwister(options.Seed);
             Terrain terrain = Terrain.Generate(worldSize, random);
-            world = new World(terrain, random);
+            world = new World(terrain, random, options.MaximumPopulation);
         }
 
         protected void TryPushReplayRecorderToPipeline(CommandPipeline pipeline)

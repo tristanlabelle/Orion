@@ -32,7 +32,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(UserInterface.MapSize);
+            CreateWorld(options.MapSize);
 
             Faction userFaction = world.CreateSpectatorFaction();
             userFaction.LocalFogOfWar.Disable();
@@ -41,7 +41,7 @@ namespace Orion.Main
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)
             {
-                world.CreateFaction(factionName, Faction.Colors[colorIndex]);
+                world.CreateFaction(factionName, Faction.Colors[colorIndex], options.InitialAladdiumAmount, options.InitialAlageneAmount);
                 colorIndex++;
             }
 

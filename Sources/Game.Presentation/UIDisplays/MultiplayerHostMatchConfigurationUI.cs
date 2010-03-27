@@ -13,8 +13,8 @@ namespace Orion.Game.Presentation
     public sealed class MultiplayerHostMatchConfigurationUI : MultiplayerMatchConfigurationUI
     {
         #region Constructors
-        public MultiplayerHostMatchConfigurationUI(SafeTransporter transporter)
-            : base(transporter)
+        public MultiplayerHostMatchConfigurationUI(MatchOptions options, SafeTransporter transporter)
+            : base(options, transporter)
         { }
         #endregion
 

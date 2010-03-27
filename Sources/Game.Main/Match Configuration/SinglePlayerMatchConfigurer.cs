@@ -19,9 +19,9 @@ namespace Orion.Main
         #region Constructors
         public SinglePlayerMatchConfigurer()
         {
-            ui = new SinglePlayerMatchConfigurationUI();
-            ui.PressedStartGame += PressStart;
             options.Seed = (int)Environment.TickCount;
+            ui = new SinglePlayerMatchConfigurationUI(options);
+            ui.PressedStartGame += PressStart;
         }
         #endregion
 
@@ -38,7 +38,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(UserInterface.MapSize);
+            CreateWorld(options.MapSize);
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
@@ -49,7 +49,7 @@ namespace Orion.Main
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).HostEndPoint.HasValue) continue;
 
                 ColorRgb color = Faction.Colors[colorIndex];
-                Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                Faction faction = world.CreateFaction(Colors.GetName(color), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
                 colorIndex++;
 
                 if (slot is LocalPlayerSlot)

@@ -12,8 +12,8 @@ namespace Orion.Game.Presentation
     public class MultiplayerClientMatchConfigurationUI : MultiplayerMatchConfigurationUI
     {
         #region Constructors
-        public MultiplayerClientMatchConfigurationUI(SafeTransporter transporter)
-            : base(transporter)
+        public MultiplayerClientMatchConfigurationUI(MatchOptions options, SafeTransporter transporter)
+            : base(options, transporter)
         {
             Children.Remove(startButton);
             Children.Remove(sizeChangeButton);

@@ -39,7 +39,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(UserInterface.MapSize);
+            CreateWorld(options.MapSize);
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
@@ -55,12 +55,12 @@ namespace Orion.Main
                 if (slot is LocalPlayerSlot)
                 {
                     string hostName = Environment.MachineName;
-                    Faction faction = world.CreateFaction(hostName, color);
+                    Faction faction = world.CreateFaction(hostName, color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
                     localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
-                    Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                    Faction faction = world.CreateFaction(Colors.GetName(color), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
                     Commander commander = new AgressiveAICommander(faction, random);
                     // AIs bypass the synchronization filter as they are supposed to be fully deterministic
                     aiCommanders.Add(commander);
@@ -69,7 +69,7 @@ namespace Orion.Main
                 {
                     RemotePlayerSlot remotePlayerSlot = (RemotePlayerSlot)slot;
                     IPv4EndPoint endPoint = remotePlayerSlot.HostEndPoint.Value;
-                    Faction faction = world.CreateFaction(remotePlayerSlot.ToString(), color);
+                    Faction faction = world.CreateFaction(remotePlayerSlot.ToString(), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
                     FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
                     peers.Add(peer);
                 }

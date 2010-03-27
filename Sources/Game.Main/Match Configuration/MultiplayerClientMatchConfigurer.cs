@@ -24,7 +24,7 @@ namespace Orion.Main
             : base(transporter)
         {
             this.gameHost = host;
-            ui = new MultiplayerClientMatchConfigurationUI(transporter);
+            ui = new MultiplayerClientMatchConfigurationUI(options, transporter);
             ui.PressedExit += ExitGame;
             ui.Entered += EnterRootView;
         }
@@ -54,9 +54,8 @@ namespace Orion.Main
             {
                 case SetupMessageType.SetPeer: SetPeer(data); break;
                 case SetupMessageType.SetSlot: SetSlot(data); break;
-                case SetupMessageType.SetSeed: SetSeed(data); break;
                 case SetupMessageType.StartGame: StartGame(); break;
-                case SetupMessageType.ChangeSize: SetSize(args.Host, data); break;
+                case SetupMessageType.ChangeOptions: SetOptions(args.Host, data); break;
                 case SetupMessageType.Exit: ForceExit(); break;
             }
         }
@@ -97,16 +96,19 @@ namespace Orion.Main
             }
         }
 
-        private void SetSize(IPv4EndPoint host, byte[] bytes)
+        private void SetOptions(IPv4EndPoint host, byte[] bytes)
         {
             if (host != gameHost) return;
-            Size size = new Size(BitConverter.ToInt32(bytes, 1), BitConverter.ToInt32(bytes, 1 + sizeof(int)));
-            UserInterface.MapSize = size;
-        }
 
-        private void SetSeed(byte[] bytes)
-        {
-            options.Seed = BitConverter.ToInt32(bytes, 1);
+            int width = BitConverter.ToInt32(bytes, 1);
+            int height = BitConverter.ToInt32(bytes, 1 + sizeof(int));
+            options.MapSize = new Size(width, height);
+            options.StartType = (MatchStartType)BitConverter.ToInt32(bytes, 1 + sizeof(int) * 2);
+            options.MaximumPopulation = BitConverter.ToInt32(bytes, 1 + sizeof(int) * 3);
+            options.RevealTopology = BitConverter.ToBoolean(bytes, 1 + sizeof(int) * 4);
+            options.InitialAladdiumAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 4);
+            options.InitialAlageneAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 5);
+            options.Seed = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 6);
         }
 
         private void ForceExit()

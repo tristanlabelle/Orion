@@ -23,12 +23,12 @@ namespace Orion.Main
             : base(transporter)
         {
             options.Seed = (int)Environment.TickCount;
-            ui = new MultiplayerHostMatchConfigurationUI(transporter);
+            options.Changed += TransferOptionsChanges;
+            ui = new MultiplayerHostMatchConfigurationUI(options, transporter);
             ui.PressedStartGame += PressStartGame;
             ui.PressedExit += ExitGame;
             ui.SlotOccupationChanged += SlotChanged;
             ui.KickedPlayer += KickedPlayer;
-            ui.SizeChanged += TransferSizeChange;
         }
 
         public new MultiplayerHostMatchConfigurationUI UserInterface
@@ -78,19 +78,24 @@ namespace Orion.Main
             transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
         }
 
-        private void TransferSizeChange(MatchConfigurationUI ui, Size size)
+        private void TransferOptionsChanges(MatchOptions options)
         {
-            transporter.SendTo(CreateSizeChangePacket(), UserInterface.PlayerAddresses);
+            transporter.SendTo(CreateOptionsChangedPacket(), UserInterface.PlayerAddresses);
         }
 
-        private byte[] CreateSizeChangePacket()
+        private byte[] CreateOptionsChangedPacket()
         {
-            Size size = UserInterface.MapSize;
-            byte[] sizeMessage = new byte[9];
-            sizeMessage[0] = (byte)SetupMessageType.ChangeSize;
-            BitConverter.GetBytes(size.Width).CopyTo(sizeMessage, 1);
-            BitConverter.GetBytes(size.Height).CopyTo(sizeMessage, 1 + sizeof(int));
-            return sizeMessage;
+            byte[] optionsMessage = new byte[30];
+            optionsMessage[0] = (byte)SetupMessageType.ChangeOptions;
+            BitConverter.GetBytes(options.MapSize.Width).CopyTo(optionsMessage, 1);
+            BitConverter.GetBytes(options.MapSize.Height).CopyTo(optionsMessage, 1 + sizeof(int));
+            BitConverter.GetBytes((int)options.StartType).CopyTo(optionsMessage, 1 + sizeof(int) * 2);
+            BitConverter.GetBytes(options.MaximumPopulation).CopyTo(optionsMessage, 1 + sizeof(int) * 3);
+            BitConverter.GetBytes(options.RevealTopology).CopyTo(optionsMessage, 1 + sizeof(int) * 4);
+            BitConverter.GetBytes(options.InitialAladdiumAmount).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 4);
+            BitConverter.GetBytes(options.InitialAlageneAmount).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 5);
+            BitConverter.GetBytes(options.Seed).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 6);
+            return optionsMessage;
         }
 
         private void KickedPlayer(IPv4EndPoint peer)
@@ -138,10 +143,8 @@ namespace Orion.Main
             accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
             transporter.SendTo(accept, host);
 
-            byte[] seedMessage = new byte[5];
-            seedMessage[0] = (byte)SetupMessageType.SetSeed;
-            BitConverter.GetBytes(options.Seed).CopyTo(seedMessage, 1);
-            transporter.SendTo(seedMessage, host);
+            byte[] options = CreateOptionsChangedPacket();
+            transporter.SendTo(accept, host);
 
             int newPeerSlotNumber = (byte)ui.NextAvailableSlot;
 
@@ -202,7 +205,6 @@ namespace Orion.Main
             setSlotMessage[1] = (byte)newPeerSlotNumber;
             setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
-            transporter.SendTo(CreateSizeChangePacket(), host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);
         }

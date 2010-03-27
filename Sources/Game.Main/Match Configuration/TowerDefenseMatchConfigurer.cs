@@ -18,6 +18,8 @@ namespace Orion.Main
         public TowerDefenseMatchConfigurer()
         {
             options.Seed = (int)Environment.TickCount;
+            options.InitialAladdiumAmount = 500;
+            options.InitialAlageneAmount = 0;
         }
         #endregion
 
@@ -32,17 +34,15 @@ namespace Orion.Main
             Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.Seed));
             random = new MersenneTwister(options.Seed);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
-            world = new World(terrain, random);
+            world = new World(terrain, random, options.MaximumPopulation);
             CreepPath creepPath = CreepPath.Generate(world.Size, new Random());
 
-            Faction localFaction = world.CreateFaction("Player", Colors.Red);
-            localFaction.AladdiumAmount = 500;
-            localFaction.AlageneAmount = 0;
+            Faction localFaction = world.CreateFaction("Player", Colors.Red, options.InitialAladdiumAmount, options.InitialAlageneAmount);
             localFaction.LocalFogOfWar.Disable();
             localFaction.CreateUnit(world.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(localFaction);
             
-            Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
+            Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan, 0, 0);
             Commander creepCommander = new CreepWaveCommander(creepFaction, creepPath);
 
             world.Entities.Removed += (sender, entity) =>

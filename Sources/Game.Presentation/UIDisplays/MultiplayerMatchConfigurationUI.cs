@@ -17,7 +17,8 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MultiplayerMatchConfigurationUI(SafeTransporter transporter)
+        public MultiplayerMatchConfigurationUI(MatchOptions options, SafeTransporter transporter)
+            : base(options)
         {
             this.transporter = transporter;
         }

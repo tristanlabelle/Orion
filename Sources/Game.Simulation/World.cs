@@ -24,6 +24,7 @@ namespace Orion.Game.Simulation
         private readonly Pathfinder pathfinder;
         private readonly TechnologyTree technologyTree = new TechnologyTree();
         private readonly Random random;
+        private readonly int maxFoodAmount;
         #endregion
 
         #region Constructors
@@ -31,10 +32,11 @@ namespace Orion.Game.Simulation
         /// Initializes a new <see cref="World"/>.
         /// </summary>
         /// <param name="terrain">The <see cref="Terrain"/> of this world.</param>
-        public World(Terrain terrain, Random random)
+        public World(Terrain terrain, Random random, int maxFood)
         {
             Argument.EnsureNotNull(terrain, "terrain");
 
+            this.maxFoodAmount = maxFood;
             this.terrain = terrain;
             this.entities = new EntityManager(this);
             this.pathfinder = new Pathfinder(terrain.Size);
@@ -87,6 +89,11 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Properties
+        public int MaximumFoodAmount
+        {
+            get { return maxFoodAmount; }
+        }
+
         public Terrain Terrain
         {
             get { return terrain; }
@@ -211,13 +218,14 @@ namespace Orion.Game.Simulation
         /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
         /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
         /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
-        public Faction CreateFaction(string name, ColorRgb color)
+        public Faction CreateFaction(string name, ColorRgb color, int aladdium, int alagene)
         {
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
             faction.Defeated += RaiseFactionDefeated;
             factions.Add(faction);
-            faction.AladdiumAmount = 200;
+            faction.AladdiumAmount = aladdium;
+            faction.AlageneAmount = alagene;
             return faction;
         }
 

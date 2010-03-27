@@ -41,11 +41,13 @@ namespace Orion.Main
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)
             {
-                world.CreateFaction(factionName, Faction.Colors[colorIndex], options.InitialAladdiumAmount, options.InitialAlageneAmount);
+                Faction faction = world.CreateFaction(factionName, Faction.Colors[colorIndex], options.InitialAladdiumAmount, options.InitialAlageneAmount);
+                if (options.RevealTopology)
+                    faction.LocalFogOfWar.Reveal();
                 colorIndex++;
             }
 
-            WorldGenerator.Generate(world, random);
+            WorldGenerator.Generate(world, random, options.IsNomad);
             match = new Match(random, world);
             match.IsPausable = true;
 

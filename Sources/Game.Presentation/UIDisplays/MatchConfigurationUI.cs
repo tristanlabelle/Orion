@@ -69,6 +69,9 @@ namespace Orion.Game.Presentation
             Rectangle rowFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.375f, 0.035f));
             Rectangle optionRect = Instant.CreateComponentRectangle(rowFrame, new Rectangle(0, 0, 0.70f, 1));
             Rectangle valueRect = Instant.CreateComponentRectangle(rowFrame, new Rectangle(0.70f, 0, 0.3f, 1));
+
+            Rectangle checkboxFrame = new Rectangle(rowFrame.Height, rowFrame.Height).TranslatedBy(3, 3).ResizedBy(-6, -6);
+            Rectangle checkboxLabel = new Rectangle(checkboxFrame.MaxX + 6, 0, rowFrame.Width - checkboxFrame.MaxX - 6, rowFrame.Height);
             Children.Add(optionFrame);
 
             #region Map Size
@@ -148,6 +151,38 @@ namespace Orion.Game.Presentation
                 optionFrame.Children.Add(seedOption);
 
                 options.SeedChanged += o => changeSeedOption.Caption = o.Seed.ToString();
+            }
+            #endregion
+
+            optionFrame.Children.Add(new Frame(rowFrame)); // separator
+
+            #region Reveal Topology
+            {
+                Frame topologyRow = new Frame(rowFrame);
+                topologyRow.Children.Add(new Label(checkboxLabel, "Révéler le terrain"));
+                Checkbox revealTopology = new Checkbox(checkboxFrame);
+                revealTopology.Enabled = isGameMaster;
+                revealTopology.StateChanged += (checkbox, value) => options.RevealTopology = value;
+                topologyRow.MouseButtonPressed += (row, args) => revealTopology.Trigger();
+                topologyRow.Children.Add(revealTopology);
+                optionFrame.Children.Add(topologyRow);
+
+                options.RevealTopologyChanged += o => revealTopology.State = o.RevealTopology;
+            }
+            #endregion
+
+            #region Reveal Topology
+            {
+                Frame nomadRow = new Frame(rowFrame);
+                nomadRow.Children.Add(new Label(checkboxLabel, "Début nomade"));
+                Checkbox nomadCheckbox = new Checkbox(checkboxFrame);
+                nomadCheckbox.Enabled = isGameMaster;
+                nomadCheckbox.StateChanged += (checkbox, value) => options.IsNomad = value;
+                nomadRow.MouseButtonPressed += (row, args) => nomadCheckbox.Trigger();
+                nomadRow.Children.Add(nomadCheckbox);
+                optionFrame.Children.Add(nomadRow);
+
+                options.IsNomadChanged += o => nomadCheckbox.State = o.IsNomad;
             }
             #endregion
             #endregion

@@ -98,12 +98,12 @@ namespace Orion.Main
             int width = BitConverter.ToInt32(bytes, 1);
             int height = BitConverter.ToInt32(bytes, 1 + sizeof(int));
             options.MapSize = new Size(width, height);
-            options.StartType = (MatchStartType)BitConverter.ToInt32(bytes, 1 + sizeof(int) * 2);
-            options.MaximumPopulation = BitConverter.ToInt32(bytes, 1 + sizeof(int) * 3);
-            options.RevealTopology = BitConverter.ToBoolean(bytes, 1 + sizeof(int) * 4);
-            options.InitialAladdiumAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 4);
-            options.InitialAlageneAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 5);
-            options.Seed = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 6);
+            options.IsNomad = BitConverter.ToBoolean(bytes, 1 + sizeof(bool) + sizeof(int) * 2);
+            options.MaximumPopulation = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 2);
+            options.RevealTopology = BitConverter.ToBoolean(bytes, 1 + sizeof(bool) + sizeof(int) * 3);
+            options.InitialAladdiumAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 3);
+            options.InitialAlageneAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 4);
+            options.Seed = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 5);
         }
 
         private void ForceExit()

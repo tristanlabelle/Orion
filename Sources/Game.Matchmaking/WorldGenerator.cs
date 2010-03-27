@@ -21,10 +21,10 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public static void Generate(World world, Random random)
+        public static void Generate(World world, Random random, bool nomad)
         {
             foreach (Faction faction in world.Factions)
-                GenerateFactionCamp(world, faction, random);
+                GenerateFactionCamp(world, faction, random, nomad);
             
             GenerateResourceNodes(world, random);
         }
@@ -53,7 +53,7 @@ namespace Orion.Game.Matchmaking
             }
         }
 
-        private static void GenerateFactionCamp(World world, Faction faction, Random random)
+        private static void GenerateFactionCamp(World world, Faction faction, Random random, bool placePyramid)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(faction, "faction");
@@ -95,14 +95,23 @@ namespace Orion.Game.Matchmaking
                 break;
             }
 
-            CreateCamp(world, faction, campCenter);
+            CreateCamp(world, faction, campCenter, placePyramid);
         }
 
-        private static void CreateCamp(World world, Faction faction, Vector2 campCenter)
+        private static void CreateCamp(World world, Faction faction, Vector2 campCenter, bool placePyramid)
         {
-            Unit building = faction.CreateUnit(world.UnitTypes.FromName("Pyramide"), (Point)campCenter);
-            building.CompleteConstruction();
-            Region buildingRegion = building.GridRegion;
+            Region buildingRegion;
+            UnitType pyramid = world.UnitTypes.FromName("Pyramide");
+            if (placePyramid)
+            {
+                Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
+                building.CompleteConstruction();
+                buildingRegion = building.GridRegion;
+            }
+            else
+            {
+                buildingRegion = new Region((Point)campCenter, pyramid.Size);
+            }
 
             UnitType unitType = world.UnitTypes.FromName("Schtroumpf");
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));

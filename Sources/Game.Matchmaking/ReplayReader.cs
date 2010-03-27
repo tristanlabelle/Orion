@@ -34,7 +34,7 @@ namespace Orion.Game.Matchmaking
             options.MaximumPopulation = reader.ReadInt32();
             options.RevealTopology = reader.ReadBoolean();
             options.Seed = reader.ReadInt32();
-            options.StartType = (MatchStartType)reader.ReadInt32();
+            options.IsNomad = reader.ReadBoolean();
             options.MapSize = new Size(width, height);
 
             int factionCount = reader.ReadInt32();

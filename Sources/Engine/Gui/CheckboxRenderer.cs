@@ -18,6 +18,7 @@ namespace Orion.Engine.Gui
         #region Constructors
         public CheckboxRenderer(Checkbox checkbox, IViewRenderer backgroundRenderer)
         {
+            this.checkbox = checkbox;
             this.backgroundRenderer = backgroundRenderer;
         }
         #endregion
@@ -40,7 +41,7 @@ namespace Orion.Engine.Gui
                 Vector2 topright = bounds.Max;
                 Vector2 bottomright = new Vector2(bounds.MaxX, bounds.MinY);
                 context.Stroke(new LineSegment(topleft, bottomright), Colors.Black);
-                context.Stroke(new Ellipse(topright, bottomleft), Colors.Black);
+                context.Stroke(new LineSegment(topright, bottomleft), Colors.Black);
             }
         }
         #endregion

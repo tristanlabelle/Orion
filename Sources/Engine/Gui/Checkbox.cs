@@ -10,6 +10,8 @@ namespace Orion.Engine.Gui
     {
         #region Fields
         private bool state;
+        private bool isDown;
+        private bool isEnabled = true;
         #endregion
 
         #region Constructors
@@ -25,14 +27,63 @@ namespace Orion.Engine.Gui
             : base(frame, renderer)
         {
             this.state = state;
+            Renderer = new CheckboxRenderer(this, Renderer);
         }
+        #endregion
+
+        #region Events
+        public event Action<Checkbox, bool> StateChanged;
         #endregion
 
         #region Properties
         public bool State
         {
             get { return state; }
-            set { state = value; }
+            set
+            {
+                if (state != value)
+                {
+                    state = value;
+                    OnStateChanged();
+                }
+            }
+        }
+
+        public bool Enabled
+        {
+            get { return isEnabled; }
+            set { isEnabled = value; }
+        }
+        #endregion
+
+        #region Methods
+        public void Trigger()
+        {
+            State ^= isEnabled;
+        }
+
+        private void OnStateChanged()
+        {
+            var handler = StateChanged;
+            if (handler != null) handler(this, state);
+        }
+
+        protected override bool OnMouseButtonPressed(MouseEventArgs args)
+        {
+            isDown = true;
+            base.OnMouseButtonPressed(args);
+            return false;
+        }
+
+        protected override bool OnMouseButtonReleased(MouseEventArgs args)
+        {
+            if (isDown)
+            {
+                Trigger();
+                isDown = false;
+            }
+            base.OnMouseButtonReleased(args);
+            return false;
         }
         #endregion
     }

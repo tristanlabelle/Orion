@@ -26,17 +26,19 @@ namespace Orion.Game.Matchmaking
         #region Instance
         #region Fields
         private Size mapSize = new Size(150, 150);
-        private MatchStartType startType = MatchStartType.Sedentary;
+        
         private int maximumPopulation = 200;
-        private bool revealTopology = false;
         private int initialAladdiumAmount = 200;
         private int initialAlageneAmount = 0;
         private int seed = 0;
+
+        private bool revealTopology = false;
+        private bool isNomad = false;
         #endregion
 
         #region Events
         public event Action<MatchSettings> MapSizeChanged;
-        public event Action<MatchSettings> StartTypeChanged;
+        public event Action<MatchSettings> IsNomadChanged;
         public event Action<MatchSettings> MaximumPopulationChanged;
         public event Action<MatchSettings> RevealTopologyChanged;
         public event Action<MatchSettings> InitialAladdiumAmountChanged;
@@ -56,13 +58,13 @@ namespace Orion.Game.Matchmaking
             }
         }
 
-        public MatchStartType StartType
+        public bool IsNomad
         {
-            get { return startType; }
+            get { return isNomad; }
             set
             {
-                startType = value;
-                TriggerEvent(StartTypeChanged);
+                isNomad = value;
+                TriggerEvent(IsNomadChanged);
             }
         }
 

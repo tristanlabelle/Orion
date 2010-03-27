@@ -96,7 +96,6 @@
     <Compile Include="FactionMessage.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchSettings.cs" />
-    <Compile Include="MatchStartType.cs" />
     <Compile Include="Networking\CommandSynchronizer.cs" />
     <Compile Include="Networking\FactionEndPoint.cs" />
     <Compile Include="Networking\GameMessageType.cs" />

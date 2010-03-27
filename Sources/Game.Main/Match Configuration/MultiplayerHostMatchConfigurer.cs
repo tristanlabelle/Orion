@@ -80,16 +80,16 @@ namespace Orion.Main
 
         private byte[] CreateOptionsChangedPacket()
         {
-            byte[] optionsMessage = new byte[30];
+            byte[] optionsMessage = new byte[27];
             optionsMessage[0] = (byte)SetupMessageType.ChangeOptions;
             BitConverter.GetBytes(options.MapSize.Width).CopyTo(optionsMessage, 1);
             BitConverter.GetBytes(options.MapSize.Height).CopyTo(optionsMessage, 1 + sizeof(int));
-            BitConverter.GetBytes((int)options.StartType).CopyTo(optionsMessage, 1 + sizeof(int) * 2);
-            BitConverter.GetBytes(options.MaximumPopulation).CopyTo(optionsMessage, 1 + sizeof(int) * 3);
-            BitConverter.GetBytes(options.RevealTopology).CopyTo(optionsMessage, 1 + sizeof(int) * 4);
-            BitConverter.GetBytes(options.InitialAladdiumAmount).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 4);
-            BitConverter.GetBytes(options.InitialAlageneAmount).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 5);
-            BitConverter.GetBytes(options.Seed).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 6);
+            BitConverter.GetBytes(options.IsNomad).CopyTo(optionsMessage, 1 + sizeof(int) * 2);
+            BitConverter.GetBytes(options.MaximumPopulation).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 2);
+            BitConverter.GetBytes(options.RevealTopology).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 3);
+            BitConverter.GetBytes(options.InitialAladdiumAmount).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 3);
+            BitConverter.GetBytes(options.InitialAlageneAmount).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 4);
+            BitConverter.GetBytes(options.Seed).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 5);
             return optionsMessage;
         }
 

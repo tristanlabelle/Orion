@@ -72,7 +72,7 @@ namespace Orion.Game.Matchmaking
             writer.Write(options.MaximumPopulation);
             writer.Write(options.RevealTopology);
             writer.Write(options.Seed);
-            writer.Write((int)options.StartType);
+            writer.Write(options.IsNomad);
 
             writer.Write(factionNameList.Count);
             foreach (string factionName in factionNameList)

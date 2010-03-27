@@ -138,9 +138,6 @@ namespace Orion.Main
             accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
             transporter.SendTo(accept, host);
 
-            byte[] options = CreateOptionsChangedPacket();
-            transporter.SendTo(accept, host);
-
             int newPeerSlotNumber = (byte)ui.NextAvailableSlot;
 
             byte[] setSlotMessage = new byte[3];
@@ -200,6 +197,9 @@ namespace Orion.Main
             setSlotMessage[1] = (byte)newPeerSlotNumber;
             setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
+
+            byte[] options = CreateOptionsChangedPacket();
+            transporter.SendTo(accept, host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);
         }

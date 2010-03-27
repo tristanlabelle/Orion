@@ -29,13 +29,11 @@ namespace Orion.Game.Matchmaking
 
             options.InitialAladdiumAmount = reader.ReadInt32();
             options.InitialAlageneAmount = reader.ReadInt32();
-            int width = reader.ReadInt32();
-            int height = reader.ReadInt32();
+            options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
             options.MaximumPopulation = reader.ReadInt32();
             options.RevealTopology = reader.ReadBoolean();
             options.Seed = reader.ReadInt32();
             options.IsNomad = reader.ReadBoolean();
-            options.MapSize = new Size(width, height);
 
             int factionCount = reader.ReadInt32();
             factionNames = Enumerable.Range(0, factionCount)

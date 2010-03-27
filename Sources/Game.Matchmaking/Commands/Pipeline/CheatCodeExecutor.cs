@@ -46,10 +46,10 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 if (message != null && cheatCodeManager.Exists(message.Text))
                 {
                     Faction faction = match.World.FindFactionFromHandle(message.FactionHandle);
+                    faction.RaiseWarning("Code de triche '{0}' appliqué !".FormatInvariant(message.Text));
                     cheatCodeManager.Execute(message.Text, match, faction);
-                    command = new SendMessageCommand(message.FactionHandle, "Code de triche '{0}' appliqué!".FormatInvariant(message.Text));
                 }
-                Flush(command);
+                else Flush(command);
             }
         }
         #endregion

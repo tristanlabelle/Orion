@@ -111,11 +111,11 @@ namespace Orion.Game.Matchmaking
         }
         private static void InstantVictory(Match match, Faction faction)
         {
-            List<Unit> enemyBuildings = match.World.Entities
+            List<Unit> enemyUnits = match.World.Entities
                 .OfType<Unit>()
                 .Where(u => u.Faction != faction)
                 .ToList();
-            foreach (Unit building in enemyBuildings) building.Suicide();
+            foreach (Unit enemy in enemyUnits) enemy.Suicide();
         }
 
         private static void InstantDefeat(Match match, Faction faction)

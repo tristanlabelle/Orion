@@ -6,6 +6,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Simulation
@@ -176,7 +177,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(Center, GetStat(UnitStat.SightRange)); }
+            get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
         }
 
         #region Health
@@ -207,7 +208,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public int MaxHealth
         {
-            get { return GetStat(UnitStat.MaxHealth); }
+            get { return GetStat(BasicSkill.MaxHealthStat); }
         }
 
         /// <summary>
@@ -285,17 +286,17 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
+        #region Skills
         /// <summary>
         /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
         /// </summary>
-        /// <param name="skill">The skill to be found.</param>
+        /// <typeparam name="TSkill">The type of skill to be found.</typeparam>
         /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
-        public bool HasSkill(UnitSkill skill)
+        public bool HasSkill<TSkill>() where TSkill : UnitSkill
         {
-            return type.HasSkill(skill);
+            return type.HasSkill<TSkill>();
         }
 
-        #region Stats
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
         /// </summary>
@@ -323,9 +324,9 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(other, "other");
 
-            if (!HasSkill(UnitSkill.Attack)) return false;
+            if (!HasSkill<AttackSkill>()) return false;
 
-            int attackRange = GetStat(UnitStat.AttackRange);
+            int attackRange = GetStat(AttackSkill.RangeStat);
             if (attackRange == 0)
             {
                 if (!IsAirborne && other.IsAirborne) return false;
@@ -371,7 +372,7 @@ namespace Orion.Game.Simulation
         public bool TryHit(Unit target)
         {
             Argument.EnsureNotNull(target, "target");
-            float hitDelayInSeconds = GetStat(UnitStat.AttackDelay);
+            float hitDelayInSeconds = GetStat(AttackSkill.DelayStat);
             if (timeElapsedSinceLastHitInSeconds < hitDelayInSeconds)
                 return false;
             Hit(target);
@@ -382,9 +383,9 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(target, "target");
 
-            bool isMelee = GetStat(UnitStat.AttackRange) == 0;
-            int targetArmor = target.GetStat(isMelee ? UnitStat.MeleeArmor : UnitStat.RangedArmor);
-            int damage = Math.Max(1, GetStat(UnitStat.AttackPower) - targetArmor);
+            bool isMelee = GetStat(AttackSkill.RangeStat) == 0;
+            int targetArmor = target.GetStat(isMelee ? BasicSkill.MeleeArmorStat : BasicSkill.RangedArmorStat);
+            int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
 
             target.Health -= damage;
 
@@ -478,7 +479,7 @@ namespace Orion.Game.Simulation
         private void ApplyRallyPoint(Vector2 target)
         {
             // Check to see if we can harvest automatically
-            if (HasSkill(UnitSkill.Harvest))
+            if (HasSkill<HarvestSkill>())
             {
                 ResourceNode resourceNode = World.Entities
                     .Intersecting(target)
@@ -510,12 +511,12 @@ namespace Orion.Game.Simulation
             if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
                 % nearbyEnemyCheckPeriod == 0 && IsIdle)
             {
-                if (HasSkill(UnitSkill.SuicideBomb) && TryExplodeWithNearbyUnit())
+                if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
                     return;
 
-                if (HasSkill(UnitSkill.Build) && TryRepairNearbyUnit()) { }
-                else if (HasSkill(UnitSkill.Heal) && TryHealNearbyUnit()) { }
-                else if (!IsUnderConstruction && HasSkill(UnitSkill.Attack) && !HasSkill(UnitSkill.Build)
+                if (HasSkill<BuildSkill>() && TryRepairNearbyUnit()) { }
+                else if (HasSkill<HealSkill>() && TryHealNearbyUnit()) { }
+                else if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>()
                     && TryAttackNearbyUnit()) { }
             }
             taskQueue.Update(step);
@@ -523,16 +524,18 @@ namespace Orion.Game.Simulation
 
         private bool TryExplodeWithNearbyUnit()
         {
+            SuicideBombSkill suicideBombSkill = type.TryGetSkill<SuicideBombSkill>();
+
             Unit explodingTarget = World.Entities
                 .Intersecting(Rectangle.FromCenterSize(Center, new Vector2(3, 3)))
                 .OfType<Unit>()
                 .FirstOrDefault(unit => unit != this
-                    && type.IsSuicideBombTarget(unit.type)
+                    && suicideBombSkill.IsExplodingTarget(unit.type)
                     && Region.AreAdjacentOrIntersecting(GridRegion, unit.GridRegion));
 
             if (explodingTarget == null) return false;
 
-            float explosionRadius = GetStat(UnitStat.SuicideBombRadius);
+            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, explosionRadius);
 
             explodingTarget.Suicide();
@@ -543,7 +546,7 @@ namespace Orion.Game.Simulation
 
         private void Explode()
         {
-            float explosionRadius = GetStat(UnitStat.SuicideBombRadius);
+            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle(Center, explosionRadius);
 
             World.RaiseExplosionOccured(explosionCircle);
@@ -555,10 +558,10 @@ namespace Orion.Game.Simulation
                 .Where(unit => unit != this && unit.IsAlive)
                 .ToArray();
 
-            float explosionDamage = GetStat(UnitStat.SuicideBombDamage);
+            float explosionDamage = GetStat(SuicideBombSkill.DamageStat);
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (damagedUnit.HasSkill(UnitSkill.SuicideBomb)) continue;
+                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
                 float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
                     * explosionDamage;
@@ -567,7 +570,7 @@ namespace Orion.Game.Simulation
 
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (!damagedUnit.HasSkill(UnitSkill.SuicideBomb)) continue;
+                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
                 damagedUnit.Explode();
             }
         }
@@ -580,13 +583,13 @@ namespace Orion.Game.Simulation
                 .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy
                     && IsInLineOfSight(unit));
 
-            if (!IsAirborne && GetStat(UnitStat.AttackRange) == 0)
+            if (!IsAirborne && GetStat(AttackSkill.RangeStat) == 0)
                 attackableUnits = attackableUnits.Where(u => !u.IsAirborne);
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
                 .WithMinOrDefault(unit => (unit.Position - position).LengthSquared
-                    + (unit.HasSkill(UnitSkill.Attack) ? 0 : 100));
+                    + (unit.HasSkill<AttackSkill>() ? 0 : 100));
 
             if (unitToAttack == null) return false;
         

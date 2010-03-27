@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -35,7 +36,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(repairer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!repairer.HasSkill(UnitSkill.Build))
+            if (!repairer.HasSkill<BuildSkill>())
                 throw new ArgumentException("Cannot repair without the repair skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
@@ -94,13 +95,13 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (target.IsUnderConstruction)
             {
-                target.Build(Unit.GetStat(UnitStat.BuildSpeed) * step.TimeDeltaInSeconds);
+                target.Build(Unit.GetStat(BuildSkill.SpeedStat) * step.TimeDeltaInSeconds);
             }
 
             if (!target.IsUnderConstruction)
             {
                 // If we just built an alagene extractor, start harvesting.
-                if (Unit.HasSkill(UnitSkill.Harvest) && target.HasSkill(UnitSkill.ExtractAlagene))
+                if (Unit.HasSkill<HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
                 {
                     // Smells like a hack!
                     ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
@@ -116,10 +117,10 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (!TryGetCredit()) return;
 
-            int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
-            int alageneCost = Target.GetStat(UnitStat.AlageneCost);
+            int aladdiumCost = Target.GetStat(BasicSkill.AladdiumCostStat);
+            int alageneCost = Target.GetStat(BasicSkill.AlageneCostStat);
 
-            float healthToRepair = Unit.GetStat(UnitStat.BuildSpeed) * repairSpeedRatio * step.TimeDeltaInSeconds;
+            float healthToRepair = Unit.GetStat(BuildSkill.SpeedStat) * repairSpeedRatio * step.TimeDeltaInSeconds;
             if (healthToRepair > target.Damage) healthToRepair = target.Damage;
 
             float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;
@@ -144,8 +145,8 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool TryGetCredit()
         {
-            int aladdiumCost = Target.GetStat(UnitStat.AladdiumCost);
-            int alageneCost = Target.GetStat(UnitStat.AlageneCost);
+            int aladdiumCost = Target.GetStat(BasicSkill.AladdiumCostStat);
+            int alageneCost = Target.GetStat(BasicSkill.AlageneCostStat);
 
             bool needsAladdiumCredit = aladdiumCost > 0 && aladdiumCreditRemaining <= 0;
             bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;

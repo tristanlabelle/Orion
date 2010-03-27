@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Technologies
 {

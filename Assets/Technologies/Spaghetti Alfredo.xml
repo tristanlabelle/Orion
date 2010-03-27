@@ -2,6 +2,6 @@
 <Technology Name="Spaghetti Alfredo" AladdiumCost="200" AlageneCost="150">
   <Target>Flying Spaghetti Monster</Target>
   <Target>Ta mère</Target>
-  <Effect Stat="MoveSpeed" Change="2"/>
-  <Effect Stat="AttackDelay" Change="-1"/>
+  <Effect Stat="Move.Speed" Change="2"/>
+  <Effect Stat="Attack.Delay" Change="-1"/>
 </Technology>

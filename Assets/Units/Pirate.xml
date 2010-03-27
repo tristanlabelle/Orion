@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Pirate" HeroUnitType="Barbe bleue" Width="1" Height="1">
-	<Stats SightRange="8" MaxHealth="40" MeleeArmor="2" RangedArmor="1" AladdiumCost="50" FoodCost="1"/>
+	<Basic SightRange="8" MaxHealth="40" MeleeArmor="2" RangedArmor="1" AladdiumCost="50" FoodCost="1"/>
 	<Move Speed="8"/>
 	<Attack Power="5" Range="0" Delay="3"/>
 </UnitType>

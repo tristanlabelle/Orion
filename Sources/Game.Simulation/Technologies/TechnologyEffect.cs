@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Technologies
 {
@@ -24,7 +25,9 @@ namespace Orion.Game.Simulation.Technologies
             this.change = change;
 
             Debug.Assert(change != 0, "Technology effect has a change of zero and will have no effect.");
-            Debug.Assert(stat != UnitStat.SightRange && stat != UnitStat.StoreFoodCapacity && stat != UnitStat.FoodCost,
+            Debug.Assert(stat != BasicSkill.SightRangeStat
+                && stat != ProvideFoodSkill.AmountStat
+                && stat != BasicSkill.FoodCostStat,
                 "Technology effects changing stat {0} are not supported, they would cause bugs.".FormatInvariant(stat));
         }
         #endregion

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Diagnostics;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -24,11 +25,15 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(builder, "builder");
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
-            if (!builder.HasSkill(UnitSkill.Build))
+
+            BuildSkill buildSkill = builder.Type.TryGetSkill<BuildSkill>();
+            if (buildSkill == null)
                 throw new ArgumentException("Cannot build without the build skill.", "builder");
-            if (!builder.Type.CanBuild(buildingPlan.BuildingType))
+            if (!buildSkill.Supports(buildingPlan.BuildingType))
+            {
                 throw new ArgumentException("Builder {0} cannot build {1}."
                     .FormatInvariant(builder, buildingPlan.BuildingType));
+            }
 
             this.buildingPlan = buildingPlan;
             this.move = MoveTask.ToNearRegion(builder, buildingPlan.GridRegion);
@@ -79,8 +84,8 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            int aladdiumCost = Unit.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AladdiumCost);
-            int alageneCost = Unit.Faction.GetStat(buildingPlan.BuildingType, UnitStat.AlageneCost);
+            int aladdiumCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AladdiumCostStat);
+            int alageneCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AlageneCostStat);
             bool hasEnoughResources = Unit.Faction.AladdiumAmount >= aladdiumCost
                 && Unit.Faction.AlageneAmount >= alageneCost;
 
@@ -98,7 +103,7 @@ namespace Orion.Game.Simulation.Tasks
 
             buildingPlan.CreateBuilding();
 
-            if (buildingPlan.Building.HasSkill(UnitSkill.ExtractAlagene))
+            if (buildingPlan.Building.HasSkill<ExtractAlageneSkill>())
             {
                 ResourceNode node = Unit.World.Entities
                     .OfType<ResourceNode>()

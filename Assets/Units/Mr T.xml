@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Mr T" Width="4" Height="4" IsAirborne="True">
-	<Stats SightRange="20" MaxHealth="1000" MeleeArmor="10" RangedArmor="10" FoodCost="10"/>
+	<Basic SightRange="20" MaxHealth="1000" MeleeArmor="10" RangedArmor="10" FoodCost="10"/>
 	<Move Speed="15"/>
 	<Attack Power="50" Range="20" Delay="1"/>
 </UnitType>

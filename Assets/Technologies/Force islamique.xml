@@ -2,6 +2,6 @@
 <Technology Name="Force islamique" AladdiumCost="100" AlageneCost="250">
   <Target>Jedihad</Target>
   <Target>Allah Skywalker</Target>
-  <Effect Stat="AttackPower" Change="2"/>
-  <Effect Stat="AttackDelay" Change="-2"/>
+  <Effect Stat="Attack.Power" Change="2"/>
+  <Effect Stat="Attack.Delay" Change="-2"/>
 </Technology>

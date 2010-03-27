@@ -7,6 +7,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation
 {
@@ -25,16 +26,9 @@ namespace Orion.Game.Simulation
 
         private readonly Size size;
         private readonly bool isAirborne;
-
-        private readonly HashSet<UnitSkill> skills;
-        private readonly Dictionary<UnitStat, int> stats;
-        private readonly HashSet<string> buildTargets;
-        private readonly HashSet<string> trainTargets;
-        private readonly HashSet<string> researchTargets;
-        private readonly HashSet<string> suicideBombTargets;
-        private readonly string heroUnitTypeName;
-
         private readonly bool isBuilding;
+        private readonly Dictionary<Type, UnitSkill> skills;
+        private readonly string heroUnitTypeName;
         #endregion
 
         #region Constructors
@@ -48,19 +42,17 @@ namespace Orion.Game.Simulation
             this.size = builder.Size;
             this.isAirborne = builder.IsAirborne;
 
-            this.skills = new HashSet<UnitSkill>(builder.Skills);
-            this.stats = new Dictionary<UnitStat, int>(builder.Stats);
-            this.buildTargets = new HashSet<string>(builder.BuildTargets);
-            this.trainTargets = new HashSet<string>(builder.TrainTargets);
-            this.researchTargets = new HashSet<string>(builder.ResearchTargets);
-            this.suicideBombTargets = new HashSet<string>(builder.SuicideBombTargets);
+            this.skills = builder.Skills
+                .Select(skill => skill.CreateFrozenClone())
+                .ToDictionary(skill => skill.GetType());
+            this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
 
+            this.isBuilding = !skills.ContainsKey(typeof(MoveSkill));
             this.heroUnitTypeName = builder.HeroUnitType;
 
-            this.isBuilding = !skills.Contains(UnitSkill.Move);
-
 #if DEBUG
-            Debug.Assert(GetBaseStat(UnitStat.AttackRange) <= GetBaseStat(UnitStat.SightRange),
+            Debug.Assert(!HasSkill<AttackSkill>()
+                || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
 #endif
         }
@@ -122,9 +114,9 @@ namespace Orion.Game.Simulation
             get
             {
                 if (IsBuilding)
-                    return HasSkill(UnitSkill.Train);
+                    return HasSkill<TrainSkill>();
                 else
-                    return HasSkill(UnitSkill.Build) || HasSkill(UnitSkill.Attack);
+                    return HasSkill<BuildSkill>() || HasSkill<AttackSkill>();
             }
         }
 
@@ -135,43 +127,66 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        public bool HasSkill(UnitSkill skill)
+        #region Skills
+        public bool HasSkill<TSkill>() where TSkill : UnitSkill
         {
-            return skills.Contains(skill);
+            return skills.ContainsKey(typeof(TSkill));
+        }
+
+        public bool HasSkill(Type skillType)
+        {
+            Argument.EnsureNotNull(skillType, "skillType");
+            return skills.ContainsKey(skillType);
+        }
+
+        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
+        {
+            UnitSkill skill;
+            skills.TryGetValue(typeof(TSkill), out skill);
+            return skill as TSkill;
         }
 
         public int GetBaseStat(UnitStat stat)
         {
-            int value;
-            if (!stats.TryGetValue(stat, out value) && stat.HasDefaultValue)
-                value = stat.DefaultValue;
+            Argument.EnsureNotNull(stat, "stat");
 
-            return value;
+            UnitSkill skill;
+            if (!skills.TryGetValue(stat.SkillType, out skill))
+            {
+                throw new ArgumentException(
+                    "Cannot get base stat {0} without skill {1}."
+                    .FormatInvariant(stat, stat.SkillName));
+            }
+
+            return skill.GetStat(stat);
         }
 
-        public bool CanBuild(UnitType targetType)
+        public bool CanBuild(UnitType buildingType)
         {
-            Argument.EnsureNotNull(targetType, "targetType");
-            return targetType.IsBuilding && HasSkill(UnitSkill.Build) && buildTargets.Contains(targetType.Name);
+            Argument.EnsureNotNull(buildingType, "buildingType");
+            BuildSkill skill = TryGetSkill<BuildSkill>();
+            return buildingType.IsBuilding
+                && skill != null
+                && skill.Supports(buildingType);
         }
 
-        public bool CanTrain(UnitType targetType)
+        public bool CanTrain(UnitType unitType)
         {
-            Argument.EnsureNotNull(targetType, "targetType");
-            return !targetType.IsBuilding && HasSkill(UnitSkill.Train) && trainTargets.Contains(targetType.Name);
+            Argument.EnsureNotNull(unitType, "unitType");
+            TrainSkill skill = TryGetSkill<TrainSkill>();
+            return !unitType.IsBuilding
+                && skill != null
+                && skill.Supports(unitType);
         }
 
         public bool CanResearch(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
-            return HasSkill(UnitSkill.Research) && researchTargets.Contains(technology.Name);
+            ResearchSkill skill = TryGetSkill<ResearchSkill>();
+            return skill != null
+                && skill.Supports(technology);
         }
-
-        public bool IsSuicideBombTarget(UnitType targetType)
-        {
-            Argument.EnsureNotNull(targetType, "targetType");
-            return HasSkill(UnitSkill.SuicideBomb) && suicideBombTargets.Contains(targetType.Name);
-        }
+        #endregion
 
         public override string ToString()
         {

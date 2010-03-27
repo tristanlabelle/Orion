@@ -7,6 +7,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -42,7 +43,7 @@ namespace Orion.Game.Simulation.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            if (!unit.HasSkill(UnitSkill.Move))
+            if (!unit.HasSkill<MoveSkill>())
                 throw new ArgumentException("Cannot walk without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
@@ -92,7 +93,7 @@ namespace Orion.Game.Simulation.Tasks
 
             if (path == null && !TryRepath()) return;
 
-            float distance = Unit.GetStat(UnitStat.MoveSpeed) * step.TimeDeltaInSeconds;
+            float distance = Unit.GetStat(MoveSkill.SpeedStat) * step.TimeDeltaInSeconds;
 
             Vector2 targetPathPoint = path.Points[targetPathPointIndex];
             Unit.LookAt(targetPathPoint + (Vector2)Unit.Size * 0.5f);

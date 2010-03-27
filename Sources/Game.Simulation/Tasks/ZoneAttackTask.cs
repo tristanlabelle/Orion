@@ -3,6 +3,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -33,7 +34,7 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(unit, "unit");
             
             this.destination = destination;
-            this.targetDistance = unit.GetStat(UnitStat.AttackRange);
+            this.targetDistance = unit.GetStat(AttackSkill.RangeStat);
             this.move = new MoveTask(unit, (Point)destination);
         }
         #endregion

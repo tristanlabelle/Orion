@@ -3,6 +3,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Presentation.Actions.UserCommands;
@@ -21,7 +22,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (!type.HasSkill(UnitSkill.Attack) || !type.HasSkill(UnitSkill.Move)) return;
+            if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 
             ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, gameGraphics);
 

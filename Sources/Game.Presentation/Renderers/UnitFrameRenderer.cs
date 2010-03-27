@@ -9,6 +9,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Font = System.Drawing.Font;
 
@@ -23,11 +24,10 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private static readonly UnitStat[] statsToDisplay = new[]
         {
-            UnitStat.AttackPower, UnitStat.AttackRange,
-            UnitStat.MeleeArmor, UnitStat.RangedArmor,
-            UnitStat.MoveSpeed, UnitStat.SightRange
+            AttackSkill.PowerStat, AttackSkill.RangeStat,
+            BasicSkill.MeleeArmorStat, BasicSkill.RangedArmorStat,
+            MoveSkill.SpeedStat, BasicSkill.SightRangeStat
         };
-        private static readonly Dictionary<UnitStat, string> statNames = new Dictionary<UnitStat, string>();
         private const float firstLineY = 180;
 
         private readonly Unit unit;
@@ -36,23 +36,6 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Constructors
-        static UnitFrameRenderer()
-        {
-            statNames[UnitStat.AladdiumCost] = "Coût d'Aladdium";
-            statNames[UnitStat.AlageneCost] = "Coût d'Alagène";
-            statNames[UnitStat.AttackDelay] = "Délai d'attaque";
-            statNames[UnitStat.AttackPower] = "Puissance d'attaque";
-            statNames[UnitStat.AttackRange] = "Portée d'attaque";
-            statNames[UnitStat.BuildSpeed] = "Vitesse de construction";
-            statNames[UnitStat.HarvestSpeed] = "Vitesse d'extraction";
-            statNames[UnitStat.StoreFoodCapacity] = "Capacité de stockage";
-            statNames[UnitStat.HealSpeed] = "Vitesse de soin";
-            statNames[UnitStat.MeleeArmor] = "Armure au corps-à-corps";
-            statNames[UnitStat.RangedArmor] = "Armure à distance";
-            statNames[UnitStat.MoveSpeed] = "Vitesse de mouvement";
-            statNames[UnitStat.SightRange] = "Portée de vision";
-        }
-
         public UnitFrameRenderer(Faction faction, Unit unit, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(unit, "unit");
@@ -69,7 +52,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             bool isTraining = false;
 
-            if (unit.HasSkill(UnitSkill.Train) && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
+            if (unit.HasSkill<TrainSkill>() && unit.TaskQueue.Current is TrainTask && unit.Faction == faction)
             {
                 isTraining = true;
 
@@ -121,10 +104,11 @@ namespace Orion.Game.Presentation.Renderers
             {
                 foreach (UnitStat stat in statsToDisplay)
                 {
-                    if (stat == UnitStat.MaxHealth) continue;
+                    if (!unit.Type.HasSkill(stat.SkillType)) continue;
+
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;
-                    string message = "{0}: {1} ".FormatInvariant(statNames[stat], value);
+                    string message = "{0}: {1} ".FormatInvariant(stat.Description, value);
                     context.Draw(message, new Vector2(150, y), Colors.Black);
                     y -= hp.Frame.Height;
                 }

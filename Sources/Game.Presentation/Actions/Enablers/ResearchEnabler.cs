@@ -5,12 +5,13 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
+using Orion.Game.Matchmaking;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
-using Orion.Game.Matchmaking;
-using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions.Enablers
@@ -26,10 +27,11 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (!type.HasSkill(UnitSkill.Research)) return;
+            ResearchSkill researchSkill = type.TryGetSkill<ResearchSkill>();
+            if (researchSkill == null) return;
 
             var technologies = World.TechnologyTree.Technologies
-                .Where(tech => LocalFaction.IsResearchable(tech) && type.CanResearch(tech));
+                .Where(tech => LocalFaction.IsResearchable(tech) && researchSkill.Supports(tech));
                 
             int x = 0;
             int y = 3;

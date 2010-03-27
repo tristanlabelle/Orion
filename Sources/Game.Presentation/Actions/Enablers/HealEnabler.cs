@@ -1,11 +1,12 @@
 ﻿using System;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
+using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions.Enablers
@@ -27,7 +28,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
-            if (!type.HasSkill(UnitSkill.Heal)) return;
+            if (!type.HasSkill<HealSkill>()) return;
 
             ActionButton button = new ActionButton(actionFrame, inputManager, "Heal", Keys.H, gameGraphics);
 

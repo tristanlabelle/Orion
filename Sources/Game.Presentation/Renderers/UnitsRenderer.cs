@@ -8,6 +8,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Renderers
@@ -216,7 +217,8 @@ namespace Orion.Game.Presentation.Renderers
             if (unit.IsBuilding) return 0;
 
             float baseAngle = unit.Angle - (float)Math.PI * 0.5f;
-            bool isMelee = unit.GetStat(UnitStat.AttackRange) == 0;
+
+            bool isMelee = unit.HasSkill<AttackSkill>() && unit.GetStat(AttackSkill.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
                 return baseAngle;
 
@@ -237,7 +239,7 @@ namespace Orion.Game.Presentation.Renderers
             foreach (AttackTask attackTask in attackTasks)
             {
                 Unit attacker = attackTask.Unit;
-                bool isRanged = attacker.GetStat(UnitStat.AttackRange) > 0;
+                bool isRanged = attacker.GetStat(AttackSkill.RangeStat) > 0;
                 if (!isRanged || attacker.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)
                     continue;
 

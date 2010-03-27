@@ -2,7 +2,7 @@
 <Technology Name="Schtroumpf costaud" AladdiumCost="150" AlageneCost="100">
   <Target>Schtroumpf</Target>
   <Target>Grand schtroumpf</Target>
-  <Effect Stat="AttackPower" Change="1"/>
+  <Effect Stat="Attack.Power" Change="1"/>
   <Effect Stat="MaxHealth" Change="25"/>
   <Effect Stat="MeleeArmor" Change="1"/>
 </Technology>

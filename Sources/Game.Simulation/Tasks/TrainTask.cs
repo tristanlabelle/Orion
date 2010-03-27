@@ -4,6 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -30,9 +31,11 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
             if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an building under construction");
-            if (!trainer.HasSkill(UnitSkill.Train))
+
+            TrainSkill trainSkill = trainer.Type.TryGetSkill<TrainSkill>();
+            if (trainSkill == null)
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
-            if (!trainer.Type.CanTrain(traineeType))
+            if (!trainSkill.Supports(traineeType))
                 throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
 
             this.traineeType = TryTrainHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
@@ -59,7 +62,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             get
             {
-                int maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+                int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
                 return Math.Min(healthPointsTrained / maxHealth, 1);
             }
         }
@@ -83,7 +86,7 @@ namespace Orion.Game.Simulation.Tasks
 
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, UnitStat.FoodCost))
+            if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, BasicSkill.FoodCostStat))
             {
                 if (!waitingForEnoughFood)
                 {
@@ -96,10 +99,10 @@ namespace Orion.Game.Simulation.Tasks
             }
             waitingForEnoughFood = false;
 
-            float maxHealth = Unit.Faction.GetStat(traineeType, UnitStat.MaxHealth);
+            float maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
-                float trainingSpeed = Unit.GetStat(UnitStat.TrainSpeed);
+                float trainingSpeed = Unit.GetStat(TrainSkill.SpeedStat);
                 healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
                 return;
             }

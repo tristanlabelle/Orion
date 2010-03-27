@@ -6,6 +6,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -130,7 +131,7 @@ namespace Orion.Game.Simulation.Utilities
 
         private static bool IsWorker(Unit unit)
         {
-            return unit.HasSkill(UnitSkill.Build);
+            return unit.HasSkill<BuildSkill>();
         }
         #endregion
     }

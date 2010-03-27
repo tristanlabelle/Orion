@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Presentation;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Main
 {
@@ -54,7 +55,7 @@ namespace Orion.Main
 
                     if (!isKilledCreep) return;
 
-                    localFaction.AladdiumAmount += (int)(unit.GetStat(UnitStat.AladdiumCost) * 0.1f);
+                    localFaction.AladdiumAmount += (int)(unit.GetStat(BasicSkill.AladdiumCostStat) * 0.1f);
                 };
 
             match = new Match(random, world);

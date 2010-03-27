@@ -7,6 +7,7 @@ using System.Linq;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking.Commands
@@ -56,8 +57,8 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType traineeType = match.World.UnitTypes.FromHandle(traineeTypeHandle);
 
-            int alageneCost = faction.GetStat(traineeType, UnitStat.AlageneCost);
-            int aladdiumCost = faction.GetStat(traineeType, UnitStat.AladdiumCost);
+            int aladdiumCost = faction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
+            int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
 
             bool taskQueueFullWarningRaised = false;
 
@@ -78,7 +79,7 @@ namespace Orion.Game.Matchmaking.Commands
                     continue;
                 }
 
-                int foodCost = faction.GetStat(traineeType, UnitStat.FoodCost);
+                int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
                 if (foodCost > faction.RemainingFoodAmount)
                 {
                     faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."

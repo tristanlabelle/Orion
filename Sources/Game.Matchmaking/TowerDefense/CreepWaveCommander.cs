@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking.TowerDefense
@@ -43,7 +44,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
             Argument.EnsureNotNull(path, "path");
             this.path = path;
 
-            UnitType worker = World.UnitTypes.First(unit => unit.HasSkill(UnitSkill.Build));
+            UnitType worker = World.UnitTypes.First(unit => unit.HasSkill<BuildSkill>());
             faction.CreateUnit(worker, Point.Zero);
         }
         #endregion

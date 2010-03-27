@@ -12,6 +12,7 @@ using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -68,15 +69,16 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            Debug.Assert(unitType.HasSkill(UnitSkill.Build));
+            BuildSkill buildSkill = unitType.TryGetSkill<BuildSkill>();
+            Debug.Assert(buildSkill != null);
 
             int x = 0;
             int y = 3;
 
             var buildingTypes = unitTypeRegistry
-                .Where(buildingType => unitType.CanBuild(buildingType))
-                .OrderByDescending(buildingType => buildingType.HasSkill(UnitSkill.Train))
-                .ThenBy(buildingType => buildingType.GetBaseStat(UnitStat.AladdiumCost) + buildingType.GetBaseStat(UnitStat.AlageneCost));
+                .Where(buildingType => buildSkill.Supports(buildingType))
+                .OrderByDescending(buildingType => buildingType.HasSkill<TrainSkill>())
+                .ThenBy(buildingType => buildingType.GetBaseStat(BasicSkill.AladdiumCostStat) + buildingType.GetBaseStat(BasicSkill.AlageneCostStat));
 
             foreach (UnitType buildingType in buildingTypes)
             {
@@ -101,8 +103,8 @@ namespace Orion.Game.Presentation.Actions
             button.Renderer = new TexturedFrameRenderer(texture);
 
             Faction faction = inputManager.LocalFaction;
-            int aladdium = faction.GetStat(buildingType, UnitStat.AladdiumCost);
-            int alagene = faction.GetStat(buildingType, UnitStat.AlageneCost);
+            int aladdium = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
+            int alagene = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
             button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
 
             button.Triggered += delegate(Button sender)

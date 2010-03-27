@@ -7,10 +7,11 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Utilities;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Presentation.Audio
 {
@@ -162,7 +163,7 @@ namespace Orion.Game.Presentation.Audio
             bool isVisible = LocalFaction.CanSee(args.Hitter) || LocalFaction.CanSee(args.Target);
             if (!isVisible) return;
 
-            bool isMelee = args.Hitter.GetStat(UnitStat.AttackRange) == 0;
+            bool isMelee = args.Hitter.GetStat(AttackSkill.RangeStat) == 0;
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
             gameAudio.PlaySfx(soundName, args.Hitter.Center);

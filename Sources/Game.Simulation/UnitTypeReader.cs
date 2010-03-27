@@ -7,6 +7,7 @@ using System.Xml;
 using System.Reflection;
 using System.Globalization;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation
 {
@@ -73,74 +74,75 @@ namespace Orion.Game.Simulation
             foreach (XmlElement skillElement in unitTypeElement.ChildNodes)
             {
                 string skillName = skillElement.Name;
-                UnitSkill? skill = null;
-                if (skillName != "Stats")
+
+                UnitSkill skill = null;
+                if (skillName == UnitSkill.GetTypeName(typeof(BasicSkill)))
                 {
-                    try { skill = (UnitSkill)Enum.Parse(typeof(UnitSkill), skillName); }
-                    catch (ArgumentException e)
+                    skill = unitTypeBuilder.BasicSkill;
+                }
+                else
+                {
+                    Type skillType = UnitSkill.GetTypeFromName(skillName);
+                    if (skillType == null)
                     {
                         throw new InvalidDataException(
-                            "Invalid unit skill {0}.".FormatInvariant(skillName), e);
+                            "Invalid unit skill {0}.".FormatInvariant(skillName));
                     }
-                }
 
-                if (skill.HasValue) unitTypeBuilder.Skills.Add(skill.Value);
+                    if (unitTypeBuilder.Skills.Any(s => s.GetType() == skillType))
+                    {
+                        throw new InvalidDataException("Redefined unit skill {0}."
+                            .FormatInvariant(skillName));
+                    }
+
+                    skill = (UnitSkill)Activator.CreateInstance(skillType);
+                    unitTypeBuilder.Skills.Add(skill);
+                }
 
                 ReadSkillStats(skill, skillElement, unitTypeBuilder);
                 ReadSkillTargets(skill, skillElement, unitTypeBuilder);
             }
         }
 
-        private static void ReadSkillStats(UnitSkill? skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadSkillStats(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
         {
             foreach (XmlAttribute statAttribute in skillElement.Attributes)
             {
-                UnitStat unitStat = UnitStat.Values
-                    .FirstOrDefault(stat => stat.Name == statAttribute.Name
-                        || stat.Name == skillElement.Name + statAttribute.Name);
-                if (unitStat == null)
+                UnitStat stat = UnitSkill.GetStat(skill, statAttribute.Name);
+                if (stat == null)
                 {
                     throw new InvalidDataException(
-                        "Invalid unit stat {0} for skill {1}.".FormatInvariant(statAttribute.Name, skillElement.Name));
-                }
-
-                UnitSkill? associatedSkill = unitStat.HasAssociatedSkill ? (UnitSkill?)unitStat.AssociatedSkill : null;
-                if (associatedSkill != skill)
-                {
-                    throw new InvalidDataException(
-                        "Invalid unit stat {0} for skill {1}.".FormatInvariant(statAttribute.Name, skillElement.Name));
+                        "Invalid unit stat {0} for skill {1}."
+                        .FormatInvariant(statAttribute.Name, UnitSkill.GetTypeName(skill)));
                 }
 
                 int value;
                 if (!int.TryParse(statAttribute.Value, NumberStyles.None, NumberFormatInfo.InvariantInfo, out value))
                 {
                     throw new InvalidDataException(
-                        "{0} stat value is not a positive integer.".FormatInvariant(statAttribute.Name));
+                        "{0} stat value is not valid a positive integer."
+                        .FormatInvariant(statAttribute.Name));
                 }
 
-                unitTypeBuilder.Stats.Add(unitStat, value);
+                skill.SetStat(stat, value);
             }
         }
 
-        private static void ReadSkillTargets(UnitSkill? skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadSkillTargets(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
         {
+            PropertyInfo property = skill.GetType()
+                .GetProperty("Targets", BindingFlags.Public | BindingFlags.Instance);
+            var targets = property == null ? null : (ICollection<string>) property.GetValue(skill, null);
+
             foreach (XmlElement targetElement in skillElement.SelectNodes("Target"))
             {
-                PropertyInfo property = null;
-                if (skill.HasValue)
-                {
-                    property = typeof(UnitTypeBuilder)
-                        .GetProperty(skill.Value + "Targets", BindingFlags.Public | BindingFlags.Instance);
-                }
-
-                if (property == null)
+                if (targets == null)
                 {
                     throw new InvalidDataException(
                         "{0} skill does not support targets."
-                        .FormatInvariant(skill.HasValue ? skill.Value.ToString() : "Default"));
+                        .FormatInvariant(UnitSkill.GetTypeName(skill)));
                 }
 
-                var targets = (ICollection<string>)property.GetValue(unitTypeBuilder, null);
                 targets.Add(targetElement.InnerText);
             }
         }

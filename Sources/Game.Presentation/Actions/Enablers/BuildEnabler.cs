@@ -1,11 +1,12 @@
 ﻿using System;
 using Orion.Engine.Graphics;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Engine.Gui;
-using Orion.Game.Matchmaking;
+using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Matchmaking;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions.Enablers
@@ -27,7 +28,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            if (!unitType.HasSkill(UnitSkill.Build)) return;
+            if (!unitType.HasSkill<BuildSkill>()) return;
             
             buttonsArray[0, 0] = CreateBuildButton(unitType);
             buttonsArray[1, 0] = CreateRepairButton();

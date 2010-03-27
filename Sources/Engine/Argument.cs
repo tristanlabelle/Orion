@@ -654,10 +654,9 @@ namespace Orion.Engine
             Argument.EnsureNotNull(referenceValues, "referenceValues");
             if (referenceValues.Contains(value)) return;
 
-            string commaSeparatedValues = referenceValues
+            string commaSeparatedValues = string.Join(", ", referenceValues
                 .Select(v => (v is IFormattable) ? ((IFormattable)v).ToStringInvariant() : v.ToString())
-                .Aggregate(string.Empty, (a,b) => a + ", " + b)
-                .Substring(2);
+                .ToArray());
 
             throw new ArgumentException("Expected one of ({0}) but got {1}."
                 .FormatInvariant(commaSeparatedValues, name));

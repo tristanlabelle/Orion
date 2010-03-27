@@ -4,6 +4,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -37,7 +38,7 @@ namespace Orion.Game.Simulation.Tasks
         public HarvestTask(Unit harvester, ResourceNode node)
             : base(harvester)
         {
-            if (!harvester.HasSkill(UnitSkill.Harvest))
+            if (!harvester.HasSkill<HarvestSkill>())
                 throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
             Argument.EnsureNotNull(node, "node");
 
@@ -88,10 +89,10 @@ namespace Orion.Game.Simulation.Tasks
         {
             Unit.LookAt(node.Center);
 
-            float extractingSpeed = Unit.GetStat(UnitStat.HarvestSpeed);
+            float extractingSpeed = Unit.GetStat(HarvestSkill.SpeedStat);
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
-            int maxCarryingAmount = Unit.GetStat(UnitStat.MaxCarryingAmount);
+            int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
                 if (!node.IsAlive)
@@ -159,7 +160,7 @@ namespace Orion.Game.Simulation.Tasks
         private Unit FindClosestDepot()
         {
             return Faction.Units
-                .Where(other => !other.IsUnderConstruction && other.HasSkill(UnitSkill.StoreResources))
+                .Where(other => !other.IsUnderConstruction && other.HasSkill<StoreResourcesSkill>())
                 .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Unit.GridRegion));
         }
         #endregion

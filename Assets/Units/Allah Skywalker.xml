@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <UnitType Name="Allah Skywalker" HeroUnitType="Chuck Norris" Width="1" Height="1">
-	<Stats SightRange="8" MaxHealth="160" MeleeArmor="3" RangedArmor="5" FoodCost="2"/>
+	<Basic SightRange="8" MaxHealth="160" MeleeArmor="3" RangedArmor="5" FoodCost="2"/>
 	<Move Speed="9"/>
 	<Attack Power="14" Range="3" Delay="3"/>
 </UnitType>

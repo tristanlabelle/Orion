@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using ColorPalette = Orion.Engine.Colors;
@@ -204,7 +205,7 @@ namespace Orion.Game.Simulation
 
         private bool IsStuck
         {
-            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill(UnitSkill.Build)); }
+            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<BuildSkill>()); }
         }
 
         #region Resources
@@ -351,7 +352,7 @@ namespace Orion.Game.Simulation
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
-            if (type.HasSkill(UnitSkill.ExtractAlagene))
+            if (type.HasSkill<ExtractAlageneSkill>())
             {
                 ResourceNode alageneNode = World.Entities
                                 .OfType<ResourceNode>()
@@ -372,7 +373,7 @@ namespace Orion.Game.Simulation
             }
 
             unit.Moved += unitMovedEventHandler;
-            usedFoodAmount += GetStat(type, UnitStat.FoodCost);
+            usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 
             return unit;
         }
@@ -382,7 +383,7 @@ namespace Orion.Game.Simulation
             Unit unit = (Unit)entity;
             Debug.Assert(!unit.IsBuilding);
 
-            int sightRange = unit.GetStat(UnitStat.SightRange);
+            int sightRange = unit.GetStat(BasicSkill.SightRangeStat);
             Vector2 extent = entity.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
@@ -401,13 +402,13 @@ namespace Orion.Game.Simulation
             }
             else
             {
-                if (unit.Type.HasSkill(UnitSkill.StoreFood))
-                    totalFoodAmount -= unit.GetStat(UnitStat.StoreFoodCapacity);
+                if (unit.Type.HasSkill<ProvideFoodSkill>())
+                    totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }
 
-            usedFoodAmount -= GetStat(unit.Type, UnitStat.FoodCost);
+            usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
 
             CheckForDefeat();
         }
@@ -426,7 +427,8 @@ namespace Orion.Game.Simulation
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
-            if (unit.HasSkill(UnitSkill.StoreFood)) totalFoodAmount += unit.GetStat(UnitStat.StoreFoodCapacity);
+            if (unit.HasSkill<ProvideFoodSkill>())
+                totalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
         }
         #endregion
 

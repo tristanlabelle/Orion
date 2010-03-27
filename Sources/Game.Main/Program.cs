@@ -11,11 +11,12 @@ using System.Windows.Forms;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
-using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
+using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
-using Orion.Game.Matchmaking.Networking;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Main
 {
@@ -176,7 +177,7 @@ namespace Orion.Main
             gameGraphics.RootView.PushDisplay(matchUI);
             match.Start();
 
-            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill(UnitSkill.Train))
+            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
                 ?? localCommander.Faction.Units.FirstOrDefault();
             if (viewTarget != null) matchUI.CenterOn(viewTarget.Center);
         }

@@ -64,11 +64,26 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Skills\AttackSkill.cs" />
+    <Compile Include="Skills\BasicSkill.cs" />
+    <Compile Include="Skills\BuildSkill.cs" />
+    <Compile Include="Skills\ExtractAlageneSkill.cs" />
+    <Compile Include="Skills\HarvestSkill.cs" />
+    <Compile Include="Skills\HealSkill.cs" />
+    <Compile Include="Skills\InvalidSkillStatException.cs" />
+    <Compile Include="Skills\MoveSkill.cs" />
+    <Compile Include="Skills\ResearchSkill.cs" />
+    <Compile Include="Skills\Skill.cs" />
+    <Compile Include="Skills\SkillDependencyAttribute.cs" />
+    <Compile Include="Skills\StoreFoodSkill.cs" />
+    <Compile Include="Skills\StoreResourcesSkill.cs" />
+    <Compile Include="Skills\SuicideBombSkill.cs" />
+    <Compile Include="Skills\TrainSkill.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
-    <Compile Include="UnitSkill.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
     <Compile Include="Utilities\RememberedBuilding.cs" />
@@ -117,7 +132,7 @@
     <Compile Include="TileVisibility.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="EntityManager.cs" />
-    <Compile Include="UnitStat.cs" />
+    <Compile Include="Skills\UnitStat.cs" />
     <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />

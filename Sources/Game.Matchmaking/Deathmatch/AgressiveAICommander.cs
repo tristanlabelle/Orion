@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Math;
+using Orion.Engine.Geometry;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
-using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking.Deathmatch
 {
@@ -41,7 +42,7 @@ namespace Orion.Game.Matchmaking.Deathmatch
 
                 InitiateTraining("Viking", 1);
 
-                if (World.Factions.First().Units.Any(unit => unit.HasSkill(UnitSkill.Attack)))
+                if (World.Factions.First().Units.Any(unit => unit.HasSkill<AttackSkill>()))
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 

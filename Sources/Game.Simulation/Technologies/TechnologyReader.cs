@@ -7,6 +7,7 @@ using System.Xml;
 using System.Reflection;
 using System.Globalization;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Technologies
 {
@@ -79,7 +80,13 @@ namespace Orion.Game.Simulation.Technologies
         {
             foreach (XmlElement effectElement in technologyElement.SelectNodes("Effect"))
             {
-                UnitStat stat = UnitStat.Parse(effectElement.GetAttribute("Stat"));
+                string fullStatName = effectElement.GetAttribute("Stat");
+                UnitStat stat = UnitSkill.GetStat(fullStatName);
+                if (stat == null)
+                {
+                    throw new InvalidDataException("Invalid unit stat name: {0}.".FormatInvariant(fullStatName));
+                }
+
                 int change = int.Parse(effectElement.GetAttribute("Change"), NumberFormatInfo.InvariantInfo);
 
                 TechnologyEffect effect = new TechnologyEffect(stat, change);

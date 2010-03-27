@@ -8,6 +8,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
@@ -263,14 +264,14 @@ namespace Orion.Game.Presentation
             else if (targetEntity is ResourceNode)
             {
                 ResourceNode targetResourceNode = (ResourceNode)targetEntity;
-                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                     LaunchChangeRallyPoint(targetResourceNode.Center);
                 else
                     LaunchDefaultCommand(targetResourceNode);
             }
             else
             {
-                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -283,9 +284,9 @@ namespace Orion.Game.Presentation
 
             if (target.Faction == commander.Faction)
             {
-                if (target.HasSkill(UnitSkill.ExtractAlagene))
+                if (target.HasSkill<ExtractAlageneSkill>())
                 {
-                    if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill(UnitSkill.Train)))
+                    if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                         LaunchChangeRallyPoint(target.Center);
                     else
                     {
@@ -331,7 +332,6 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> builders = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction
-                    && unit.Type.HasSkill(UnitSkill.Build)
                     && unit.Type.CanBuild(buildingType));
 
             commander.LaunchBuild(builders, buildingType, location);
@@ -341,39 +341,39 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> selection = Selection.Units.Where(unit => unit.Faction == commander.Faction);
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.HasSkill(UnitSkill.Attack)), target);
-            commander.LaunchMove(selection.Where(unit => !unit.HasSkill(UnitSkill.Attack) && unit.HasSkill(UnitSkill.Move)), target.Position);
+            commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
+            commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can attack do so, the others simply move to the destination
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill(UnitSkill.Attack)), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill(UnitSkill.Attack)), destination);
+            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
         }
 
         public void LaunchHarvest(ResourceNode node)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill(UnitSkill.Harvest)), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill(UnitSkill.Harvest)), node.Position);
+            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<HarvestSkill>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Move));
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             commander.LaunchMove(movableUnits, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Train)
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<TrainSkill>()
                 && unit.IsBuilding);
             commander.LaunchChangeRallyPoint(targetUnits, at);
         }
@@ -383,7 +383,7 @@ namespace Orion.Game.Presentation
             if (building.Faction != LocalFaction || !building.IsBuilding) return;
            
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill(UnitSkill.Build));
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
             commander.LaunchRepair(targetUnits, building);
         }
 
@@ -392,7 +392,7 @@ namespace Orion.Game.Presentation
             if (hurtUnit.Type.IsBuilding) return;
 
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill(UnitSkill.Heal));
+                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<HealSkill>());
             if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
             commander.LaunchHeal(targetUnits, hurtUnit);
         }
@@ -429,7 +429,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction)
-                .Where(unit => unit.HasSkill(UnitSkill.Move));
+                .Where(unit => unit.HasSkill<MoveSkill>());
             commander.LaunchStandGuard(targetUnits);
         }
 

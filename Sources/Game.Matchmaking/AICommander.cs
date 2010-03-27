@@ -8,6 +8,7 @@ using Orion.Engine.Geometry;
 using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking
 {
@@ -141,22 +142,21 @@ namespace Orion.Game.Matchmaking
             int amountOfTrains;
             UnitType toTrain = World.UnitTypes.FromName(unitTypeName);
             //Train the Max depending of the ressources
-            if (toTrain.GetBaseStat(UnitStat.AlageneCost) != 0
-                && Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost) < amountToBeTrained)
+            if (toTrain.GetBaseStat(BasicSkill.AlageneCostStat) != 0
+                && Faction.AlageneAmount / toTrain.GetBaseStat(BasicSkill.AlageneCostStat) < amountToBeTrained)
             {
-                amountToBeTrained = Faction.AlageneAmount / toTrain.GetBaseStat(UnitStat.AlageneCost);
+                amountToBeTrained = Faction.AlageneAmount / toTrain.GetBaseStat(BasicSkill.AlageneCostStat);
             }
 
-            if (toTrain.GetBaseStat(UnitStat.AladdiumCost) != 0
-                && Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost) < amountToBeTrained)
+            if (toTrain.GetBaseStat(BasicSkill.AladdiumCostStat) != 0
+                && Faction.AladdiumAmount / toTrain.GetBaseStat(BasicSkill.AladdiumCostStat) < amountToBeTrained)
             {
-                amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(UnitStat.AladdiumCost);
+                amountToBeTrained = Faction.AladdiumAmount / toTrain.GetBaseStat(BasicSkill.AladdiumCostStat);
             }
 
             List<Unit> potentialTrainers = allUnits
                 .Where(unit => unit.Faction == Faction
                     && unit.IsIdle
-                    && unit.HasSkill(UnitSkill.Train)
                     && unit.Type.CanTrain(toTrain))
                 .ToList();
             List<Unit> trainers = new List<Unit>();
@@ -188,8 +188,8 @@ namespace Orion.Game.Matchmaking
         {
             List<Unit> potentialAttackers = 
                 allUnits.Where(unit => unit.Faction == Faction 
-                && unit.Type.HasSkill(UnitSkill.Attack) 
-                && !unit.Type.HasSkill(UnitSkill.Harvest)
+                && unit.Type.HasSkill<AttackSkill>() 
+                && !unit.Type.HasSkill<HarvestSkill>()
                 && unit.IsIdle
                 ).ToList();
             List<Unit> attackers = new List<Unit>();
@@ -217,7 +217,7 @@ namespace Orion.Game.Matchmaking
                 int amountOfUnitsAlreadyHarvesting = alreadyHarvesting.Where(unit => unit.TaskQueue.Current.Description == "harvesting " + node.Type).ToList().Count;
                 List<Unit> potentialHarvesters = new List<Unit>();
 
-                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill(UnitSkill.Harvest)).ToList();
+                potentialHarvesters = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<HarvestSkill>()).ToList();
                 
                 List<Unit> harvesters = new List<Unit>();
 
@@ -247,7 +247,7 @@ namespace Orion.Game.Matchmaking
         {
             UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill(UnitSkill.Build)).ToList();
+            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();
             List<Unit> builders = new List<Unit>();
 
             if (positions.Count <= potentialBuilders.Count)
@@ -255,13 +255,13 @@ namespace Orion.Game.Matchmaking
             else
                 amountOfBuildings = potentialBuilders.Count;
 
-            if (toBuild.GetBaseStat(UnitStat.AladdiumCost) != 0
-                && amountOfBuildings > Faction.AladdiumAmount / toBuild.GetBaseStat(UnitStat.AladdiumCost))
-                    amountOfBuildings = Faction.AladdiumAmount / toBuild.GetBaseStat(UnitStat.AladdiumCost);
+            if (toBuild.GetBaseStat(BasicSkill.AladdiumCostStat) != 0
+                && amountOfBuildings > Faction.AladdiumAmount / toBuild.GetBaseStat(BasicSkill.AladdiumCostStat))
+                    amountOfBuildings = Faction.AladdiumAmount / toBuild.GetBaseStat(BasicSkill.AladdiumCostStat);
 
-            if (toBuild.GetBaseStat(UnitStat.AlageneCost) != 0
-                && amountOfBuildings > Faction.AlageneAmount / toBuild.GetBaseStat(UnitStat.AlageneCost))
-                amountOfBuildings = Faction.AlageneAmount / toBuild.GetBaseStat(UnitStat.AlageneCost);
+            if (toBuild.GetBaseStat(BasicSkill.AlageneCostStat) != 0
+                && amountOfBuildings > Faction.AlageneAmount / toBuild.GetBaseStat(BasicSkill.AlageneCostStat))
+                amountOfBuildings = Faction.AlageneAmount / toBuild.GetBaseStat(BasicSkill.AlageneCostStat);
 
             for (int i = 0; i < amountOfBuildings; i++)
             {

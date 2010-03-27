@@ -2,6 +2,7 @@
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {    
@@ -21,12 +22,12 @@ namespace Orion.Game.Simulation.Tasks
             : base(attacker)
         {
             Argument.EnsureNotNull(attacker, "attacker");
-            if (!attacker.HasSkill(UnitSkill.Attack))
+            if (!attacker.HasSkill<AttackSkill>())
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
             this.target = target;
-            if (attacker.HasSkill(UnitSkill.Move)) this.follow = new FollowTask(attacker, target);
+            if (attacker.HasSkill<MoveSkill>()) this.follow = new FollowTask(attacker, target);
         }
         #endregion
 
@@ -53,7 +54,7 @@ namespace Orion.Game.Simulation.Tasks
                 if (!Unit.Faction.CanSee(target))
                     return true;
                 if (!Unit.IsWithinAttackRange(target))
-                    return !Unit.HasSkill(UnitSkill.Move) || follow.HasEnded;
+                    return !Unit.HasSkill<MoveSkill>() || follow.HasEnded;
                 return !target.IsAlive;
             }
         }

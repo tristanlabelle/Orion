@@ -8,8 +8,8 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
-using BuildTask = Orion.Game.Simulation.Tasks.BuildTask;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -74,7 +74,7 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             UnitType buildingType = (UnitType)match.World.UnitTypes.FromHandle(buildingTypeHandle);
 
-            if (buildingType.HasSkill(UnitSkill.ExtractAlagene))
+            if (buildingType.HasSkill<ExtractAlageneSkill>())
             {
                 ResourceNode node = match.World.Entities
                     .OfType<ResourceNode>()

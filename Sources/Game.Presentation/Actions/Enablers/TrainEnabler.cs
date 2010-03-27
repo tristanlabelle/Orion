@@ -2,11 +2,12 @@
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
+using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions.Enablers
@@ -22,14 +23,16 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            if (!unitType.HasSkill(UnitSkill.Train)) return;
+            TrainSkill trainSkill = unitType.TryGetSkill<TrainSkill>();
+            if (trainSkill == null) return;
             
             int x = 0;
             int y = 3;
 
+
             var traineeTypes = World.UnitTypes
-                .Where(traineeType => unitType.CanTrain(traineeType))
-                .OrderBy(traineeType => traineeType.GetBaseStat(UnitStat.AladdiumCost) + traineeType.GetBaseStat(UnitStat.AlageneCost));
+                .Where(traineeType => trainSkill.Supports(traineeType))
+                .OrderBy(traineeType => traineeType.GetBaseStat(BasicSkill.AladdiumCostStat) + traineeType.GetBaseStat(BasicSkill.AlageneCostStat));
 
             foreach (UnitType traineeType in traineeTypes)
             {
@@ -52,8 +55,8 @@ namespace Orion.Game.Presentation.Actions.Enablers
                 UnitType traineeTypeForClosure = traineeType;
                 button.Triggered += delegate(Button sender) { inputManager.LaunchTrain(traineeTypeForClosure); };
 
-                int aladdium = LocalFaction.GetStat(traineeType, UnitStat.AladdiumCost);
-                int alagene = LocalFaction.GetStat(traineeType, UnitStat.AlageneCost);
+                int aladdium = LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
+                int alagene = LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
                 button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(traineeType.Name, aladdium, alagene);
 
                 buttonsArray[x, y] = button;

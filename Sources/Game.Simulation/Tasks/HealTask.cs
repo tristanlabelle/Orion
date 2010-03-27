@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -24,7 +25,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(healer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!healer.HasSkill(UnitSkill.Heal))
+            if (!healer.HasSkill<HealSkill>())
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");
@@ -44,7 +45,7 @@ namespace Orion.Game.Simulation.Tasks
 
         public bool IsWithinRange
         {
-            get { return (Unit.Center - target.Center).LengthFast <= Unit.GetStat(UnitStat.HealRange); }
+            get { return (Unit.Center - target.Center).LengthFast <= Unit.GetStat(HealSkill.RangeStat); }
         }
         public Unit Target
         {
@@ -73,7 +74,7 @@ namespace Orion.Game.Simulation.Tasks
             if (IsWithinRange)
             {
                 Unit.LookAt(target.Center);
-                int speed = Unit.GetStat(UnitStat.HealSpeed);
+                int speed = Unit.GetStat(HealSkill.SpeedStat);
                 target.Health += speed * step.TimeDeltaInSeconds;
             }
             else if (!move.HasEnded)

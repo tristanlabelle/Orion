@@ -5,10 +5,11 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
+using Orion.Game.Matchmaking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
-using Orion.Game.Matchmaking;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -40,8 +41,8 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 if (!minLocation.HasValue) return false;
 
-                int aladdiumCost = LocalFaction.GetStat(buildingType, UnitStat.AladdiumCost);
-                int alageneCost = LocalFaction.GetStat(buildingType, UnitStat.AlageneCost);
+                int aladdiumCost = LocalFaction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
+                int alageneCost = LocalFaction.GetStat(buildingType, BasicSkill.AlageneCostStat);
                 if (aladdiumCost > LocalFaction.AladdiumAmount
                     || alageneCost > LocalFaction.AlageneAmount)
                     return false;
@@ -53,7 +54,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 if (!LocalFaction.HasFullySeen(region))
                     return false;
 
-                if (!buildingType.HasSkill(UnitSkill.ExtractAlagene))
+                if (!buildingType.HasSkill<ExtractAlageneSkill>())
                     return true;
 
                 // Special case for alagene extractors:

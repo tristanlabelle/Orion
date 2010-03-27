@@ -120,6 +120,7 @@
     <Compile Include="Gui\RootView.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Gui\RoundedRectangleRenderer.cs" />
     <Compile Include="Gui\Scrollbar.cs" />
     <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Gui\TextField.cs" />

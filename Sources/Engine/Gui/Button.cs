@@ -27,11 +27,11 @@ namespace Orion.Engine.Gui
 
         #region Constructors
         public Button(Rectangle frame)
-            : this(frame, string.Empty, new FilledFrameRenderer())
+            : this(frame, string.Empty)
         { }
 
         public Button(Rectangle frame, string caption)
-            : this(frame, caption, new FilledFrameRenderer())
+            : this(frame, caption, new RoundedRectangleRenderer())
         { }
 
         public Button(Rectangle frame, string caption, IViewRenderer renderer)

@@ -382,6 +382,62 @@ namespace Orion.Engine.Graphics
         }
         #endregion
 
+        #region Rounded Rectangles
+        public void FillRoundedRectangle(Rectangle rectangle, float cornerRadius, ColorRgba color)
+        {
+            CommitColor(color);
+            GL.Begin(BeginMode.TriangleFan);
+            DrawRoundedRectangleVertices(rectangle, cornerRadius);
+            GL.End();
+        }
+
+        public void StrokeRoundedRectangle(Rectangle rectangle, float cornerRadius, ColorRgba color)
+        {
+            CommitColor(color);
+            GL.Begin(BeginMode.LineLoop);
+            DrawRoundedRectangleVertices(rectangle, cornerRadius);
+            GL.End();
+        }
+
+        private void DrawRoundedRectangleVertices(Rectangle rectangle, float cornerRadius)
+        {
+            cornerRadius = Math.Min(Math.Abs(cornerRadius), Math.Min(rectangle.Extent.X, rectangle.Extent.Y));
+            if (cornerRadius < 0.0001f)
+            {
+                DrawVertices(rectangle);
+                return;
+            }
+
+            Rectangle innerRectangle = Rectangle.FromCenterExtent(
+                rectangle.CenterX, rectangle.CenterY,
+                rectangle.HalfWidth - cornerRadius, rectangle.HalfHeight - cornerRadius);
+
+            const int CornerVertexCount = 5;
+            for (int cornerIndex = 0; cornerIndex < 4; ++cornerIndex)
+            {
+                int signX = 1 - (((cornerIndex + 1) / 2) % 2) * 2;
+                int signY = 1 - (cornerIndex / 2) * 2;
+
+#if DEBUG
+                Debug.Assert(Math.Abs(signX * signY) == 1);
+#endif
+
+                Vector2 circleCenter = new Vector2(
+                    innerRectangle.CenterX + innerRectangle.HalfWidth * signX,
+                    innerRectangle.CenterY + innerRectangle.HalfHeight * signY);
+
+                double baseAngle = cornerIndex * Math.PI * 0.5;
+                for (int vertexIndex = 0; vertexIndex < CornerVertexCount; ++vertexIndex)
+                {
+                    double angle = baseAngle + vertexIndex / (double)(CornerVertexCount - 1) * Math.PI * 0.5;
+                    Vector2 direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
+                    Vector2 point = circleCenter + direction * cornerRadius;
+                    DrawVertex(point);
+                }
+            }
+        }
+        #endregion
+
         #region Triangles
         /// <summary>
         /// Fills a <see cref="Triangle"/> shape.

@@ -199,6 +199,22 @@ namespace Orion.Engine.Geometry
         }
 
         /// <summary>
+        /// Gets the half-width of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float HalfWidth
+        {
+            get { return size.X * 0.5f; }
+        }
+
+        /// <summary>
+        /// Gets the half-height of this <see cref="Rectangle"/>.
+        /// </summary>
+        public float HalfHeight
+        {
+            get { return size.Y * 0.5f; }
+        }
+
+        /// <summary>
         /// Gets the area of this <see cref="Rectangle"/>.
         /// </summary>
         public float Area

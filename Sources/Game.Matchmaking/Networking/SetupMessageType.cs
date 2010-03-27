@@ -7,23 +7,23 @@ namespace Orion.Game.Matchmaking.Networking
 {
     public enum SetupMessageType : byte
     {
-        JoinRequest = 101,
-        AcceptJoinRequest = 102,
-        RefuseJoinRequest = 103,
-        LeaveGame = 104,
+        JoinRequest,
+        AcceptJoinRequest,
+        RefuseJoinRequest,
+        LeaveGame,
 
-        Explore = 105,
-        Advertise = 106,
-        RemoveGame = 113,
+        Explore,
+        Advertise,
+        RemoveGame,
 
-        SetPeer = 107,
-        SetSlot = 108,
-        SetSeed = 109,
+        SetPeer,
+        SetSlot,
+        SetSeed,
 
-        Message = 110,
-        ChangeSize = 111,
+        Message,
+        ChangeOptions,
 
-        StartGame = 112,
-        Exit = 114
+        StartGame,
+        Exit
     }
 }

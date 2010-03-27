@@ -76,13 +76,13 @@
     <Compile Include="Skills\HealSkill.cs" />
     <Compile Include="Skills\InvalidSkillStatException.cs" />
     <Compile Include="Skills\MoveSkill.cs" />
+    <Compile Include="Skills\ProvideFoodSkill.cs" />
     <Compile Include="Skills\ResearchSkill.cs" />
-    <Compile Include="Skills\Skill.cs" />
     <Compile Include="Skills\SkillDependencyAttribute.cs" />
-    <Compile Include="Skills\StoreFoodSkill.cs" />
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\SuicideBombSkill.cs" />
     <Compile Include="Skills\TrainSkill.cs" />
+    <Compile Include="Skills\UnitSkill.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />

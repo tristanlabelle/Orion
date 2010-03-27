@@ -16,7 +16,7 @@ namespace Orion.Main
     {
         #region Fields
         private IPv4EndPoint gameHost;
-        private MultiplayerClientMatchConfigurationUI ui;
+        private MultiplayerMatchConfigurationUI ui;
         #endregion
 
         #region Constructors
@@ -24,18 +24,13 @@ namespace Orion.Main
             : base(transporter)
         {
             this.gameHost = host;
-            ui = new MultiplayerClientMatchConfigurationUI(options, transporter);
+            ui = new MultiplayerMatchConfigurationUI(options, transporter, false);
             ui.PressedExit += ExitGame;
             ui.Entered += EnterRootView;
         }
         #endregion
 
         #region Properties
-
-        public new MultiplayerClientMatchConfigurationUI UserInterface
-        {
-            get { return ui; }
-        }
 
         protected override MatchConfigurationUI AbstractUserInterface
         {

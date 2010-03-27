@@ -17,23 +17,18 @@ namespace Orion.Main
         private static readonly byte[] advertiseGameMessage = new byte[2] { (byte)SetupMessageType.Advertise, 12 };
         private static readonly byte[] refuseJoinGameMessage = new byte[] { (byte)SetupMessageType.RefuseJoinRequest };
 
-        private MultiplayerHostMatchConfigurationUI ui;
+        private MultiplayerMatchConfigurationUI ui;
 
         public MultiplayerHostMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
             options.Seed = (int)Environment.TickCount;
             options.Changed += TransferOptionsChanges;
-            ui = new MultiplayerHostMatchConfigurationUI(options, transporter);
+            ui = new MultiplayerMatchConfigurationUI(options, transporter, true);
             ui.PressedStartGame += PressStartGame;
             ui.PressedExit += ExitGame;
             ui.SlotOccupationChanged += SlotChanged;
             ui.KickedPlayer += KickedPlayer;
-        }
-
-        public new MultiplayerHostMatchConfigurationUI UserInterface
-        {
-            get { return ui; }
         }
 
         protected override MatchConfigurationUI AbstractUserInterface

@@ -24,7 +24,6 @@ namespace Orion.Game.Presentation
         private readonly Label sizeField;
 
         protected MatchOptions options;
-        protected readonly Button sizeChangeButton;
         protected readonly Button startButton;
         protected readonly Button exitButton;
 
@@ -32,6 +31,8 @@ namespace Orion.Game.Presentation
         protected DropdownList<PlayerSlot>[] playerSlots
             = new DropdownList<PlayerSlot>[Faction.Colors.Length];
         protected Frame backgroundFrame;
+
+        private readonly bool isGameMaster;
         #endregion
 
         #region Constructors
@@ -41,6 +42,7 @@ namespace Orion.Game.Presentation
 
         public MatchConfigurationUI(MatchOptions options, bool isGameMaster)
         {
+            this.isGameMaster = isGameMaster;
             this.options = options;
 
             backgroundFrame = new Frame(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
@@ -192,6 +194,11 @@ namespace Orion.Game.Presentation
         public new RootView Root
         {
             get { return (RootView)base.Root; }
+        }
+
+        public bool IsGameMaster
+        {
+            get { return isGameMaster; }
         }
         #endregion
 

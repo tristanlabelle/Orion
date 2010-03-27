@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Gui;
+using Orion.Engine.Collections;
 using Orion.Engine.Networking;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {
-    public abstract class MultiplayerMatchConfigurationUI : MatchConfigurationUI
+    public sealed class MultiplayerMatchConfigurationUI : MatchConfigurationUI
     {
         #region Fields
         private SafeTransporter transporter;
@@ -38,9 +39,35 @@ namespace Orion.Game.Presentation
 
         #region Events
         public event Action<int, PlayerSlot> SlotChanged;
+        public event Action<int, PlayerSlot> SlotOccupationChanged;
+        public event Action<IPv4EndPoint> KickedPlayer;
         #endregion
 
         #region Methods
+        protected override void InitializeSlots()
+        {
+            int i = 0;
+            if (IsGameMaster)
+            {
+                LocalPlayerSlot you = new LocalPlayerSlot();
+                playerSlots[i].AddItem(you);
+                playerSlots[i].Enabled = false;
+                i++;
+            }
+
+            while (i < playerSlots.Length)
+            {
+                DropdownList<PlayerSlot> dropdownList = playerSlots[i];
+                dropdownList.AddItem(new AIPlayerSlot());
+                dropdownList.AddItem(new ClosedPlayerSlot());
+                dropdownList.AddItem(new RemotePlayerSlot());
+                dropdownList.SelectedItem = dropdownList.Items.Last();
+                dropdownList.SelectionChanged += SelectionChanged;
+                dropdownList.Enabled = IsGameMaster;
+                i++;
+            }
+        }
+
         public void OpenSlot(int slot)
         {
             SelectSlot<RemotePlayerSlot>(slot);
@@ -68,11 +95,17 @@ namespace Orion.Game.Presentation
             ((RemotePlayerSlot)playerSlots[slot].SelectedItem).HostEndPoint = host;
         }
 
-        private void SelectionChanged(DropdownList<PlayerSlot> sender, PlayerSlot newValue)
+        private void SelectionChanged(DropdownList<PlayerSlot> slot, PlayerSlot value)
         {
-            Action<int, PlayerSlot> handler = SlotChanged;
-            if(handler != null)
-                handler(Array.IndexOf(playerSlots, sender), newValue);
+            RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
+            if (remoteSlot.HostEndPoint.HasValue)
+            {
+                Action<IPv4EndPoint> kickHandler = KickedPlayer;
+                if (kickHandler != null) kickHandler(remoteSlot.HostEndPoint.Value);
+                remoteSlot.HostEndPoint = null;
+            }
+            Action<int, PlayerSlot> handler = SlotOccupationChanged;
+            if (handler != null) handler(playerSlots.IndexOf(slot), value);
         }
 
         private void SelectSlot<T>(int slot) where T : PlayerSlot
@@ -84,6 +117,13 @@ namespace Orion.Game.Presentation
         {
             transporter.Poll();
             base.Update(timeDeltaInSeconds);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) SlotOccupationChanged = null;
+
+            base.Dispose(disposing);
         }
         #endregion
     }

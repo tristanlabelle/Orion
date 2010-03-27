@@ -102,8 +102,6 @@
     <Compile Include="UIDisplays\MatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MatchConsole.cs" />
     <Compile Include="UIDisplays\MatchUI.cs" />
-    <Compile Include="UIDisplays\MultiplayerClientMatchConfigurationUI.cs" />
-    <Compile Include="UIDisplays\MultiplayerHostMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MultiplayerMatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\ReplayLoadingUI.cs" />
     <Compile Include="UIDisplays\SinglePlayerMatchConfigurationUI.cs" />

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Ninja" Width="1" Height="1">
+<UnitType Name="Ninja" HeroUnitType="Leonardo" Width="1" Height="1">
 	<Stats SightRange="8" MaxHealth="40" MeleeArmor="1" RangedArmor="2" AladdiumCost="50" AlageneCost="25" FoodCost="2"/>
 	<Move Speed="10"/>
 	<Attack Power="4" Range="5" Delay="2"/>

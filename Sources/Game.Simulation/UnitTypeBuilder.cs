@@ -24,6 +24,7 @@ namespace Orion.Game.Simulation
         private readonly HashSet<string> trainTargets = new HashSet<string>();
         private readonly HashSet<string> researchTargets = new HashSet<string>();
         private readonly HashSet<string> suicideBombTargets = new HashSet<string>();
+        private string heroUnitType;
         #endregion
 
         #region Constructors
@@ -101,6 +102,12 @@ namespace Orion.Game.Simulation
         public ICollection<string> SuicideBombTargets
         {
             get { return suicideBombTargets; }
+        }
+
+        public string HeroUnitType
+        {
+            get { return heroUnitType; }
+            set { heroUnitType = value; }
         }
         #endregion
 

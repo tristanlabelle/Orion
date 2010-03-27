@@ -68,34 +68,17 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         private UnitType TryTrainHero(Random random, UnitType traineeType, UnitTypeRegistry registry)
         {
-            if (random.Next(0, 10000) == 1337)
+            UnitType expectedType;
+            UnitType spawnedType = traineeType;
+            do
             {
-                return registry.FromName("Chuck Norris");
-            }
-            if (random.Next(0, 100) == 99)
-            {
-                if (traineeType.Name == "Schtroumpf")
-                    return registry.FromName("Grand schtroumpf");
-                if (traineeType.Name == "Pirate")
-                    return registry.FromName("Barbe bleue");
-                if (traineeType.Name == "Ninja")
-                    return registry.FromName("Léonardo");
-                if (traineeType.Name == "Viking")
-                    return registry.FromName("Thor");
-                if (traineeType.Name == "Jedihad")
-                    return registry.FromName("Allah Skywalker");
-                if (traineeType.Name == "Jésus")
-                    return registry.FromName("Jésus-raptor");
-                if (traineeType.Name == "Flying Spaghetti Monster")
-                    return registry.FromName("Ta mère");
-                if (traineeType.Name == "Grippe A(H1N1)")
-                    return registry.FromName("Anthrax");
-                if (traineeType.Name == "OVNI")
-                    return registry.FromName("Vaisseau mère");
-                if (traineeType.Name == "Tapis volant")
-                    return registry.FromName("Tapis d'Aladdin");
-            }
-            return traineeType;
+                expectedType = spawnedType;
+                if (spawnedType.HeroUnitTypeName != null && random.Next(0, 100) == 99)
+                {
+                    spawnedType = registry.FromName(spawnedType.HeroUnitTypeName);
+                }
+            } while (expectedType != spawnedType);
+            return spawnedType;
         }
 
         protected override void DoUpdate(SimulationStep step)

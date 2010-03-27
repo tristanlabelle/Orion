@@ -32,6 +32,7 @@ namespace Orion.Game.Simulation
         private readonly HashSet<string> trainTargets;
         private readonly HashSet<string> researchTargets;
         private readonly HashSet<string> suicideBombTargets;
+        private readonly string heroUnitTypeName;
 
         private readonly bool isBuilding;
         #endregion
@@ -53,6 +54,8 @@ namespace Orion.Game.Simulation
             this.trainTargets = new HashSet<string>(builder.TrainTargets);
             this.researchTargets = new HashSet<string>(builder.ResearchTargets);
             this.suicideBombTargets = new HashSet<string>(builder.SuicideBombTargets);
+
+            this.heroUnitTypeName = builder.HeroUnitType;
 
             this.isBuilding = !skills.Contains(UnitSkill.Move);
 
@@ -123,6 +126,11 @@ namespace Orion.Game.Simulation
                 else
                     return HasSkill(UnitSkill.Build) || HasSkill(UnitSkill.Attack);
             }
+        }
+
+        public string HeroUnitTypeName
+        {
+            get { return heroUnitTypeName; }
         }
         #endregion
 

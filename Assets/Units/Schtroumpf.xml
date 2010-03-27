@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Schtroumpf" Width="1" Height="1">
+<UnitType Name="Schtroumpf" HeroUnitType="Grand schtroumpf" Width="1" Height="1">
 	<Stats SightRange="5" MaxHealth="20" RangedArmor="2" AladdiumCost="50" FoodCost="1"/>
 	<Move Speed="8"/>
 	<Attack Power="8" Range="0" Delay="5"/>

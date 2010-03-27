@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Viking" Width="1" Height="1">
+<UnitType Name="Viking" HeroUnitType="Thor" Width="1" Height="1">
 	<Stats SightRange="8" MaxHealth="70" MeleeArmor="3" RangedArmor="2" AladdiumCost="100" AlageneCost="25" FoodCost="3"/>
 	<Move Speed="6"/>
 	<Attack Power="13" Range="0" Delay="4"/>

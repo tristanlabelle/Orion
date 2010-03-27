@@ -9,6 +9,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
+using System.IO;
 
 namespace Orion.Main
 {
@@ -80,17 +81,21 @@ namespace Orion.Main
 
         private byte[] CreateOptionsChangedPacket()
         {
-            byte[] optionsMessage = new byte[27];
-            optionsMessage[0] = (byte)SetupMessageType.ChangeOptions;
-            BitConverter.GetBytes(options.MapSize.Width).CopyTo(optionsMessage, 1);
-            BitConverter.GetBytes(options.MapSize.Height).CopyTo(optionsMessage, 1 + sizeof(int));
-            BitConverter.GetBytes(options.IsNomad).CopyTo(optionsMessage, 1 + sizeof(int) * 2);
-            BitConverter.GetBytes(options.MaximumPopulation).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 2);
-            BitConverter.GetBytes(options.RevealTopology).CopyTo(optionsMessage, 1 + sizeof(bool) + sizeof(int) * 3);
-            BitConverter.GetBytes(options.InitialAladdiumAmount).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 3);
-            BitConverter.GetBytes(options.InitialAlageneAmount).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 4);
-            BitConverter.GetBytes(options.Seed).CopyTo(optionsMessage, 1 + sizeof(bool) * 2 + sizeof(int) * 5);
-            return optionsMessage;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream))
+                {
+                    writer.Write(options.MapSize.Width);
+                    writer.Write(options.MapSize.Height);
+                    writer.Write(options.IsNomad);
+                    writer.Write(options.MaximumPopulation);
+                    writer.Write(options.RevealTopology);
+                    writer.Write(options.InitialAladdiumAmount);
+                    writer.Write(options.InitialAlageneAmount);
+                    writer.Write(options.Seed);
+                }
+                return stream.GetBuffer();
+            }
         }
 
         private void KickedPlayer(IPv4EndPoint peer)

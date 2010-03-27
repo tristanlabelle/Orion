@@ -9,6 +9,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
+using System.IO;
 
 namespace Orion.Main
 {
@@ -95,15 +96,19 @@ namespace Orion.Main
         {
             if (host != gameHost) return;
 
-            int width = BitConverter.ToInt32(bytes, 1);
-            int height = BitConverter.ToInt32(bytes, 1 + sizeof(int));
-            options.MapSize = new Size(width, height);
-            options.IsNomad = BitConverter.ToBoolean(bytes, 1 + sizeof(bool) + sizeof(int) * 2);
-            options.MaximumPopulation = BitConverter.ToInt32(bytes, 1 + sizeof(bool) + sizeof(int) * 2);
-            options.RevealTopology = BitConverter.ToBoolean(bytes, 1 + sizeof(bool) + sizeof(int) * 3);
-            options.InitialAladdiumAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 3);
-            options.InitialAlageneAmount = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 4);
-            options.Seed = BitConverter.ToInt32(bytes, 1 + sizeof(bool) * 2 + sizeof(int) * 5);
+            using (MemoryStream stream = new MemoryStream(bytes))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
+                    options.IsNomad = reader.ReadBoolean();
+                    options.MaximumPopulation = reader.ReadInt32();
+                    options.RevealTopology = reader.ReadBoolean();
+                    options.InitialAladdiumAmount = reader.ReadInt32();
+                    options.InitialAlageneAmount = reader.ReadInt32();
+                    options.Seed = reader.ReadInt32();
+                }
+            }
         }
 
         private void ForceExit()

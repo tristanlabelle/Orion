@@ -100,6 +100,7 @@ namespace Orion.Main
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
+                    reader.ReadByte(); // SetupMessageType.ChangeOptions
                     options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
                     options.IsNomad = reader.ReadBoolean();
                     options.MaximumPopulation = reader.ReadInt32();

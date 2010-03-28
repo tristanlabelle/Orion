@@ -245,6 +245,7 @@ namespace Orion.Game.Matchmaking
         /// <param name="Positions">Positions at which the buildings will be built</param>
         public void DispatchBuilders(string typeName, List<Vector2> positions)
         {
+            return;
             UnitType toBuild = World.UnitTypes.FromName(typeName);
             int amountOfBuildings;
             List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();

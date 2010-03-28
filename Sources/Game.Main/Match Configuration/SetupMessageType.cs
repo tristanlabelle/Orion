@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 
-namespace Orion.Game.Matchmaking.Networking
+namespace Orion.Main
 {
     public enum SetupMessageType : byte
     {

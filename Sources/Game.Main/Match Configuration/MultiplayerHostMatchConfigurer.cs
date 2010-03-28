@@ -24,7 +24,7 @@ namespace Orion.Main
             : base(transporter)
         {
             options.RandomSeed = (int)Environment.TickCount;
-            options.Changed += TransferOptionsChanges;
+            options.Changed += TransferOptionChanges;
             ui = new MultiplayerMatchConfigurationUI(options, transporter, true);
             ui.PressedStartGame += PressStartGame;
             ui.PressedExit += ExitGame;
@@ -74,17 +74,18 @@ namespace Orion.Main
             transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
         }
 
-        private void TransferOptionsChanges(MatchSettings options)
+        private void TransferOptionChanges(MatchSettings options)
         {
-            transporter.SendTo(CreateOptionsChangedPacket(), UserInterface.PlayerAddresses);
+            transporter.SendTo(CreateOptionsPacket(), UserInterface.PlayerAddresses);
         }
 
-        private byte[] CreateOptionsChangedPacket()
+        private byte[] CreateOptionsPacket()
         {
             using (MemoryStream stream = new MemoryStream())
             {
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
+                    writer.Write((byte)SetupMessageType.ChangeOptions);
                     writer.Write(options.MapSize.Width);
                     writer.Write(options.MapSize.Height);
                     writer.Write(options.IsNomad);
@@ -203,7 +204,7 @@ namespace Orion.Main
             setSlotMessage[2] = (byte)SlotType.Local;
             transporter.SendTo(setSlotMessage, host);
 
-            byte[] options = CreateOptionsChangedPacket();
+            byte[] options = CreateOptionsPacket();
             transporter.SendTo(accept, host);
 
             ui.UsePlayerForSlot(newPeerSlotNumber, host);

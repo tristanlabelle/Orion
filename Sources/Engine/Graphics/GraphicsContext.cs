@@ -29,6 +29,8 @@ namespace Orion.Engine.Graphics
         [Obsolete("To be made internal and created by the engine.")]
         public GraphicsContext()
         {
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             GL.Ortho(-1, 1, -1, 1, -1, 1);

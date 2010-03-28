@@ -99,7 +99,7 @@
     <Compile Include="Gui\ClippedView.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Gui\CustomGLControl.cs">
+    <Compile Include="Graphics\CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Gui\DelegatedRenderer.cs" />

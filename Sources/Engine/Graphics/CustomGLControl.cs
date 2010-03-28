@@ -1,25 +1,23 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace Orion.Game.Presentation
+namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// A custom version of OpenTK's <see cref="GLControl"/>
     /// which properly raises key events.
     /// </summary>
+    [Obsolete("To be made internal to the engine.")]
     public sealed class CustomGLControl : GLControl
     {
+        #region Constructors
         public CustomGLControl()
             : base(GetGraphicsMode(), 2, 0, GetGraphicsContextFlags()) { }
+        #endregion
 
-        protected override void OnHandleCreated(System.EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Back);
-        }
-
+        #region Methods
         protected override void OnSizeChanged(System.EventArgs e)
         {
             GL.Viewport(ClientRectangle);
@@ -55,5 +53,6 @@ namespace Orion.Game.Presentation
             return GraphicsContextFlags.Default;
 #endif
         }
+        #endregion
     }
 }

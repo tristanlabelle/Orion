@@ -34,7 +34,7 @@ namespace Orion.Game.Presentation
             // 
             // glControl
             // 
-            this.glControl = new Orion.Game.Presentation.CustomGLControl();
+            this.glControl = new Orion.Engine.Graphics.CustomGLControl();
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
@@ -64,6 +64,6 @@ namespace Orion.Game.Presentation
 
         #endregion
 
-        private Orion.Game.Presentation.CustomGLControl glControl;
+        private Orion.Engine.Graphics.CustomGLControl glControl;
     }
 }

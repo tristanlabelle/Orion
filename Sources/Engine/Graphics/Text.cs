@@ -12,7 +12,7 @@ namespace Orion.Engine.Graphics
     public struct Text
     {
         #region Fields
-        internal static TextPrinter defaultTextPrinter = new TextPrinter();
+        internal static TextPrinter defaultTextPrinter = new TextPrinter(TextQuality.High);
         public static Font DefaultFont = new Font("Trebuchet MS", 14);
 
         private readonly string value;

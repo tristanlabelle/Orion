@@ -13,7 +13,7 @@ namespace Orion.Game.Matchmaking
         #region Static
         #region Fields
 #if DEBUG
-        public static readonly Size SuggestedMinimumMapSize = new Size(0, 0);
+        public static readonly Size SuggestedMinimumMapSize = new Size(1, 1);
 #else
         public static readonly Size SuggestedMinimumMapSize = new Size(50, 50);
 #endif

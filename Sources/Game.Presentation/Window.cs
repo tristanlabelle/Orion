@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
+using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
@@ -7,8 +9,6 @@ using Orion.Engine.Gui;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using SysPoint = System.Drawing.Point;
 using SysMouseEventArgs = System.Windows.Forms.MouseEventArgs;
-using System.Diagnostics;
-using OpenTK.Math;
 
 namespace Orion.Game.Presentation
 {
@@ -160,13 +160,13 @@ namespace Orion.Game.Presentation
         {
             if (args.Alt) args.Handled = true;
 
-            if (args.KeyCode == (Keys.V | Keys.Control))
+            if (args.KeyData == (Keys.V | Keys.Control))
             {
                 string pastedText = Clipboard.GetText();
                 if (!string.IsNullOrEmpty(pastedText))
                 {
                     foreach (char pastedCharacter in pastedText)
-                        OnKeyPress(pastedCharacter);
+                        rootView.SendCharacterTypedEvent(pastedCharacter);
                     return;
                 }
             }
@@ -181,12 +181,7 @@ namespace Orion.Game.Presentation
 
         private void glControl_KeyPress(object sender, KeyPressEventArgs args)
         {
-            OnKeyPress(args.KeyChar);
-        }
-
-        private void OnKeyPress(char keyChar)
-        {
-            rootView.SendCharacterTypedEvent(keyChar);
+            rootView.SendCharacterTypedEvent(args.KeyChar);
         }
 
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)

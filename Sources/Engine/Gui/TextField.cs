@@ -55,27 +55,54 @@ namespace Orion.Engine.Gui
 
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
-            if (args.Key == Keys.Left && caretIndex > 0) --caretIndex;
-            else if (args.Key == Keys.Right && caretIndex < contents.Length) ++caretIndex;
+            switch (args.Key)
+            {
+                case Keys.Left:
+                    if (caretIndex > 0) --caretIndex;
+                    break;
+                
+                case Keys.Right:
+                    if (caretIndex < contents.Length) ++caretIndex;
+                    break;
+
+                case Keys.Home:
+                case Keys.PageUp:
+                    caretIndex = 0;
+                    break;
+
+                case Keys.End:
+                case Keys.PageDown:
+                    caretIndex = contents.Length;
+                    break;
+                    
+                case Keys.Back:
+                    if (caretIndex > 0)
+                    {
+                        contents = contents.RemoveAt(caretIndex - 1);
+                        --caretIndex;
+                    }
+                    break;
+                    
+                case Keys.Delete:
+                    if (caretIndex < contents.Length)
+                        contents = contents.RemoveAt(caretIndex);
+                    break;
+
+                case Keys.Enter:
+                    Triggered.Raise(this);
+                    Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
+                    break;
+
+                default:
+                    break;
+            }
+
             return base.OnKeyboardButtonPressed(args);
         }
 
         protected override bool OnCharacterPressed(char character)
         {
-            if (character == '\b')
-            {
-                if (caretIndex > 0)
-                {
-                    contents = contents.RemoveAt(caretIndex - 1);
-                    --caretIndex;
-                }
-            }
-            else if (character == '\r')
-            {
-                Triggered.Raise(this);
-                Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
-            }
-            else
+            if (!"\b\n\r".Contains(character))
             {
                 contents = contents.Insert(caretIndex, character);
                 ++caretIndex;

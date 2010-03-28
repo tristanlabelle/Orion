@@ -119,9 +119,7 @@ namespace Orion.Engine.Gui
             foreach (Responder child in Enumerable.Reverse(Children))
             {
                 bool keepPropagating = child.PropagateKeyboardEvent(type, args);
-                if (keepPropagating)
-                    child.DispatchKeyboardEvent(type, args);
-                else return false;
+                if (!keepPropagating) return false;
             }
 
             return DispatchKeyboardEvent(type, args);

@@ -14,18 +14,17 @@ namespace Orion.Engine.Gui
     public class TextField : View
     {
         #region Field
-        private const int cursorBlinkFrequency = 30;
+        private const float caretBlinkFrequency = 0.5f;
 
-        private Text contents;
-        private int updateCounter;
+        private string contents = string.Empty;
+        private int caretIndex;
+        private float time;
         #endregion
 
         #region Constructors
         public TextField(Rectangle frame)
             : base(frame)
-        {
-            contents = new Text(string.Empty);
-        }
+        {}
         #endregion
 
         #region Events
@@ -38,39 +37,57 @@ namespace Orion.Engine.Gui
         #region Properties
         public string Contents
         {
-            get { return contents.Value; }
-            set { contents = new Text(value); }
+            get { return contents; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Contents");
+                contents = value;
+                caretIndex = contents.Length;
+            }
         }
         #endregion
 
         #region Methods
         public void Clear()
         {
-            contents = new Text(string.Empty);
+            Contents = string.Empty;
         }
 
-        protected override bool OnCharacterPressed(char arg)
+        protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
-            if (arg == '\b')
+            if (args.Key == Keys.Left && caretIndex > 0) --caretIndex;
+            else if (args.Key == Keys.Right && caretIndex < contents.Length) ++caretIndex;
+            return base.OnKeyboardButtonPressed(args);
+        }
+
+        protected override bool OnCharacterPressed(char character)
+        {
+            if (character == '\b')
             {
-                string value = Contents;
-                if (value.Length > 0)
-                    Contents = value.Remove(value.Length - 1);
+                if (caretIndex > 0)
+                {
+                    contents = contents.RemoveAt(caretIndex - 1);
+                    --caretIndex;
+                }
             }
-            else if (arg == '\r')
+            else if (character == '\r')
             {
                 Triggered.Raise(this);
                 Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
             }
-            else Contents += arg;
+            else
+            {
+                contents = contents.Insert(caretIndex, character);
+                ++caretIndex;
+            }
 
-            base.OnCharacterPressed(arg);
+            base.OnCharacterPressed(character);
             return false;
         }
 
         protected override void Update(float timeDeltaInSeconds)
         {
-            updateCounter++;
+            time += timeDeltaInSeconds;
             base.Update(timeDeltaInSeconds);
         }
 
@@ -79,15 +96,24 @@ namespace Orion.Engine.Gui
             context.Fill(Bounds, Colors.LightGreen);
             context.Stroke(Bounds, Colors.Gray);
 
-            Text text;
-            if (contents.Value.Length == 1) text = new Text(contents.Value + " ");
-            else text = contents;
-            Rectangle textBounds = new Rectangle(Bounds.Width, Math.Min(Bounds.Height, text.Frame.Height));
-            context.Draw(text, textBounds, Colors.Black);
-            if ((updateCounter / cursorBlinkFrequency) % 2 == 0)
+            if (contents.Length > 0)
             {
-                Rectangle textFrame = contents.Frame;
-                LineSegment lineSegment = new LineSegment(textFrame.Max, new Vector2(textFrame.MaxX, textFrame.MinY));
+                Text text = new Text(contents + " ");
+                Rectangle textBounds = new Rectangle(Bounds.Width, Math.Min(Bounds.Height, text.Frame.Height));
+                context.Draw(text, textBounds, Colors.Black);
+            }
+
+            DrawCaret(context);
+        }
+
+        private void DrawCaret(GraphicsContext context)
+        {
+            if ((int)(time / caretBlinkFrequency) % 2 == 0)
+            {
+                Text textBeforeCaret = new Text(contents.Substring(0, caretIndex));
+                Rectangle textFrame = textBeforeCaret.Frame;
+                float lineX = textFrame.MaxX - (caretIndex == 0 ? 3 : 6); // Account for the offsetting OpenTK induces
+                LineSegment lineSegment = new LineSegment(lineX, textFrame.MinY, lineX, textFrame.MaxY);
                 context.Stroke(lineSegment, Colors.Black);
             }
         }

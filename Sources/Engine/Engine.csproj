@@ -163,6 +163,7 @@
     <Compile Include="Region.cs" />
     <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Size.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="Transform.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />

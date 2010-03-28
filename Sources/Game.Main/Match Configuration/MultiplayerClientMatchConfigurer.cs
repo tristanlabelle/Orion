@@ -84,12 +84,16 @@ namespace Orion.Main
 
         private void SetSlot(byte[] bytes)
         {
-            switch ((SlotType)bytes[2])
+            SlotType slotType = (SlotType)bytes[2];
+            switch (slotType)
             {
                 case SlotType.Closed: UserInterface.CloseSlot(bytes[1]); break;
                 case SlotType.Open: UserInterface.OpenSlot(bytes[1]); break;
                 case SlotType.AI: UserInterface.UseAIForSlot(bytes[1]); break;
                 case SlotType.Local: UserInterface.SetLocalPlayerForSlot(bytes[1]); break;
+                default:
+                    Debug.Fail("Unexpected slot type {0}.".FormatInvariant(slotType));
+                    break;
             }
         }
 

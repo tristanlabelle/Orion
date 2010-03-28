@@ -31,6 +31,8 @@ namespace Orion.Game.Presentation.Audio
         /// </summary>
         private readonly HashSet<Entity> previousSelection = new HashSet<Entity>();
 
+        private readonly Action<Unit> buildingConstructionCompletedEventHandler;
+
         private bool isGameStarted;
         private bool hasExplosionOccuredInFrame;
         #endregion
@@ -45,10 +47,11 @@ namespace Orion.Game.Presentation.Audio
             this.gameAudio = gameAudio;
             this.match = match;
             this.userInputManager = userInputManager;
+            this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
-
             this.match.World.Entities.Added += OnEntityAdded;
+            this.match.World.Entities.Removed += OnEntityRemoved;
             this.match.World.UnitHitting += OnUnitHitting;
             this.match.World.Updated += OnWorldUpdated;
             this.match.World.ExplosionOccured += OnExplosionOccured;
@@ -104,8 +107,30 @@ namespace Orion.Game.Presentation.Audio
 
             if (unit.Faction != LocalFaction) return;
 
+            if (unit.IsBuilding && unit.IsUnderConstruction)
+            {
+                unit.ConstructionCompleted += OnBuildingConstructionCompleted;
+                gameAudio.PlaySfx("UnderConstruction", unit.Center);
+                return;
+            }
+
             string soundName = gameAudio.GetUnitSoundName(unit.Type, "Select");
-            gameAudio.PlaySfx(soundName, unit.Position);
+            gameAudio.PlaySfx(soundName, unit.Center);
+        }
+
+        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit != null && unit.Faction == LocalFaction && unit.IsUnderConstruction)
+                unit.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
+        }
+
+        private void OnBuildingConstructionCompleted(Unit building)
+        {
+            building.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
+
+            string soundName = gameAudio.GetUnitSoundName(building.Type, "Select");
+            gameAudio.PlaySfx(soundName, building.Center);
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)

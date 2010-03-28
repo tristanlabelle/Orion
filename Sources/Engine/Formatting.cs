@@ -64,6 +64,12 @@ namespace Orion.Engine
             Argument.EnsureNotNull(stringBuilder, "stringBuilder");
             stringBuilder.Remove(0, stringBuilder.Length);
         }
+
+        public static StringBuilder AppendFormatInvariant(this StringBuilder stringBuilder,
+            string format, params object[] args)
+        {
+            return stringBuilder.AppendFormat(CultureInfo.InvariantCulture, format, args);
+        }
         #endregion
     }
 }

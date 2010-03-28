@@ -47,19 +47,6 @@ namespace Orion.Engine.Gui
                 return base.OnMouseButtonPressed(args);
             }
         }
-
-        protected override bool OnDoubleClick(MouseEventArgs args)
-        {
-            if (captureMouseEvents)
-            {
-                base.OnDoubleClick(args);
-                return false;
-            }
-            else
-            {
-                return base.OnDoubleClick(args);
-            }
-        }
         #endregion
     }
 }

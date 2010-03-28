@@ -59,7 +59,6 @@ namespace Orion.Engine.Gui
         public event Action<Responder, MouseEventArgs> MouseWheelScrolled;
         public event Action<Responder, MouseEventArgs> MouseEntered;
         public event Action<Responder, MouseEventArgs> MouseExited;
-        public event Action<Responder, MouseEventArgs> DoubleClick;
         public event Action<Responder, KeyboardEventArgs> KeyboardButtonPressed;
         public event Action<Responder, KeyboardEventArgs> KeyboardButtonReleased;
         public event Action<Responder, char> CharacterTyped;
@@ -166,7 +165,6 @@ namespace Orion.Engine.Gui
                 case MouseEventType.MouseEntered: return OnMouseEntered(args);
                 case MouseEventType.MouseExited: return OnMouseExited(args);
                 case MouseEventType.MouseWheelScrolled: return OnMouseWheelScrolled(args);
-                case MouseEventType.DoubleClick: return OnDoubleClick(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
@@ -261,18 +259,6 @@ namespace Orion.Engine.Gui
         protected virtual bool OnMouseExited(MouseEventArgs args)
         {
             MouseExited.Raise(this, args);
-            return true;
-        }
-
-        /// <summary>
-        /// Calls the event handler for mouse Double click. 
-        /// </summary>
-        /// <remarks>The default implementation allows for event sinking by always returning true.</remarks>
-        /// <param name="args">The <see cref="MouseEventArgs"/> arguments</param>
-        /// <returns>True if event sinking is allowed; false otherwise</returns>
-        protected virtual bool OnDoubleClick(MouseEventArgs args)
-        {
-            DoubleClick.Raise(this, args);
             return true;
         }
         #endregion

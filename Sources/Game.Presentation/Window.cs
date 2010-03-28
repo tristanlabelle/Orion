@@ -124,7 +124,7 @@ namespace Orion.Game.Presentation
 
         private void glControl_MouseDoubleClick(object sender, SysMouseEventArgs args)
         {
-            TriggerMouseEvent(MouseEventType.DoubleClick,
+            TriggerMouseEvent(MouseEventType.MouseButtonPressed,
                 args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 

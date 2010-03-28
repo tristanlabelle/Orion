@@ -17,7 +17,6 @@ namespace Orion.Engine.Gui
         MouseMoved,
         MouseEntered,
         MouseExited,
-        MouseWheelScrolled,
-        DoubleClick
+        MouseWheelScrolled
     }
 }

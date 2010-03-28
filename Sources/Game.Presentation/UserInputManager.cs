@@ -109,6 +109,12 @@ namespace Orion.Game.Presentation
                 return;
             }
 
+            if (args.ClickCount > 1)
+            {
+                HandleMouseMultiClick(args);
+                return;
+            }
+
             if (args.Button == MouseButton.Left)
                 selectionStart = args.Position;
             else if (args.Button == MouseButton.Right)
@@ -159,7 +165,7 @@ namespace Orion.Game.Presentation
                 Selection.Set(clickedEntity);
         }
 
-        public void HandleMouseDoubleClick(MouseEventArgs args)
+        private void HandleMouseMultiClick(MouseEventArgs args)
         {
             if (args.Button != MouseButton.Left) return;
 

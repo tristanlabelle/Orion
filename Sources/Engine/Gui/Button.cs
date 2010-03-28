@@ -151,12 +151,6 @@ namespace Orion.Engine.Gui
             return false;
         }
 
-        protected override bool OnDoubleClick(MouseEventArgs args)
-        {
-            base.OnDoubleClick(args);
-            return false;
-        }
-
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
             if (args.Key == hotKey)

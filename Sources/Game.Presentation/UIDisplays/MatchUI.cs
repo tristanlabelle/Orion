@@ -410,13 +410,6 @@ namespace Orion.Game.Presentation
             return base.OnCharacterPressed(character);
         }
 
-        protected override bool OnDoubleClick(MouseEventArgs args)
-        {
-            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseDoubleClick(args.CloneWithNewPosition(newPosition));
-            return base.OnDoubleClick(args);
-        }
-
         protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
             isShiftDown = args.IsShiftModifierDown;

@@ -95,7 +95,7 @@ namespace Orion.Main
                     writer.Write(options.InitialAlageneAmount);
                     writer.Write(options.RandomSeed);
                 }
-                return stream.GetBuffer();
+                return stream.ToArray();
             }
         }
 

@@ -10,6 +10,7 @@ using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using System.IO;
+using System.Diagnostics;
 
 namespace Orion.Main
 {
@@ -100,7 +101,9 @@ namespace Orion.Main
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    reader.ReadByte(); // SetupMessageType.ChangeOptions
+                    SetupMessageType messageType = (SetupMessageType)reader.ReadByte();
+                    Debug.Assert(messageType == SetupMessageType.ChangeOptions);
+
                     options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
                     options.IsNomad = reader.ReadBoolean();
                     options.MaximumPopulation = reader.ReadInt32();
@@ -108,6 +111,8 @@ namespace Orion.Main
                     options.InitialAladdiumAmount = reader.ReadInt32();
                     options.InitialAlageneAmount = reader.ReadInt32();
                     options.RandomSeed = reader.ReadInt32();
+
+                    Debug.Assert(reader.PeekChar() == -1, "Warning: The options packet contained more data than we read.");
                 }
             }
         }

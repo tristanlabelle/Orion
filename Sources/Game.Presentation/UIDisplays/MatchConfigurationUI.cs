@@ -89,7 +89,7 @@ namespace Orion.Game.Presentation
                 Button optionButton = AddLabelButtonOption("Quantité initiale d'aladdium",
                     options.InitialAladdiumAmount.ToString(),
                 "Entrez la nouvelle quantité initiale d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium),
-                ValidateFoodLimit);
+                ValidateInitialAladdiumAmount);
                 options.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
             }
             {

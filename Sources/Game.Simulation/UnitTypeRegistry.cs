@@ -21,7 +21,7 @@ namespace Orion.Game.Simulation
         #region Constructors
         public UnitTypeRegistry()
         {
-            foreach (string filePath in Directory.GetFiles("../../../Assets/Units", "*.xml"))
+            foreach (string filePath in Directory.GetFiles("../../../Assets/Units", "*.xml", SearchOption.AllDirectories))
             {
                 try
                 {

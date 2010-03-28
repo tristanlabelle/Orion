@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Jedihad" HeroUnitType="Allah Skywalker" Width="1" Height="1">
+<UnitType Name="Jedihad" Hero="Allah Skywalker" Width="1" Height="1">
 	<Basic SightRange="8" MaxHealth="65" MeleeArmor="1" RangedArmor="3" AladdiumCost="30" AlageneCost="90" FoodCost="2"/>
 	<Move Speed="9"/>
 	<Attack Power="5" Range="3" Delay="4"/>

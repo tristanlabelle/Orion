@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Thor" HeroUnitType="Chuck Norris" Width="1" Height="1">
+<UnitType Name="Thor" Hero="Chuck Norris" Width="1" Height="1">
 	<Basic SightRange="8" MaxHealth="200" MeleeArmor="6" RangedArmor="3" FoodCost="3"/>
 	<Move Speed="6"/>
 	<Attack Power="50" Range="0" Delay="4"/>

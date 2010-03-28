@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Grand schtroumpf" HeroUnitType="Chuck Norris" Width="1" Height="1">
+<UnitType Name="Grand schtroumpf" Hero="Chuck Norris" Width="1" Height="1">
 	<Basic SightRange="7" MaxHealth="60" MeleeArmor="1" RangedArmor="2" FoodCost="1"/>
 	<Move Speed="8"/>
 	<Attack Power="8" Range="0" Delay="4"/>

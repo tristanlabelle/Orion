@@ -20,9 +20,9 @@ namespace Orion.Game.Simulation
         private string name;
         private Size size;
         private bool isAirborne;
+        private string hero;
         private BasicSkill basicSkill;
         private readonly ICollection<UnitSkill> skills;
-        private string heroUnitType;
         #endregion
 
         #region Constructors
@@ -78,6 +78,12 @@ namespace Orion.Game.Simulation
             set { isAirborne = value; }
         }
 
+        public string Hero
+        {
+            get { return hero; }
+            set { hero = value; }
+        }
+
         public BasicSkill BasicSkill
         {
             get { return basicSkill; }
@@ -86,12 +92,6 @@ namespace Orion.Game.Simulation
         public ICollection<UnitSkill> Skills
         {
             get { return skills; }
-        }
-
-        public string HeroUnitType
-        {
-            get { return heroUnitType; }
-            set { heroUnitType = value; }
         }
         #endregion
 

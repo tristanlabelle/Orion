@@ -76,9 +76,9 @@ namespace Orion.Game.Simulation.Tasks
             do
             {
                 expectedType = spawnedType;
-                if (spawnedType.HeroUnitTypeName != null && random.Next(0, 100) == 99)
+                if (spawnedType.HeroName != null && random.Next(0, 100) == 99)
                 {
-                    spawnedType = registry.FromName(spawnedType.HeroUnitTypeName);
+                    spawnedType = registry.FromName(spawnedType.HeroName);
                 }
             } while (expectedType != spawnedType);
             return spawnedType;

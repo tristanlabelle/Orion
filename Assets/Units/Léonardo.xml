@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<UnitType Name="Léonardo" HeroUnitType="Chuck Norris" Width="1" Height="1">
+<UnitType Name="Léonardo" Hero="Chuck Norris" Width="1" Height="1">
 	<Basic SightRange="8" MaxHealth="120" MeleeArmor="2" RangedArmor="4" FoodCost="2"/>
 	<Move Speed="10"/>
 	<Attack Power="10" Range="5" Delay="2"/>

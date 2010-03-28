@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation
         private readonly bool isAirborne;
         private readonly bool isBuilding;
         private readonly Dictionary<Type, UnitSkill> skills;
-        private readonly string heroUnitTypeName;
+        private readonly string heroName;
         #endregion
 
         #region Constructors
@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation
             this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
 
             this.isBuilding = !skills.ContainsKey(typeof(MoveSkill));
-            this.heroUnitTypeName = builder.HeroUnitType;
+            this.heroName = builder.Hero;
 
 #if DEBUG
             Debug.Assert(!HasSkill<AttackSkill>()
@@ -120,9 +120,12 @@ namespace Orion.Game.Simulation
             }
         }
 
-        public string HeroUnitTypeName
+        /// <summary>
+        /// Gets the name of the unit type which is the hero of this unit.
+        /// </summary>
+        public string HeroName
         {
-            get { return heroUnitTypeName; }
+            get { return heroName; }
         }
         #endregion
 

@@ -72,11 +72,21 @@ namespace Orion.Engine.Gui
 
         public void PopDisplay(UIDisplay display)
         {
+            PopDisplay(display, true);
+        }
+
+        public void PopDisplayWithoutDisposing(UIDisplay display)
+        {
+            PopDisplay(display, false);
+        }
+
+        private void PopDisplay(UIDisplay display, bool dispose)
+        {
             if (displays.Count < 2) throw new InvalidOperationException("Cannot pop the initial display from the stack");
             if (TopmostDisplay != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
 
             displays.Pop();
-            display.Dispose();
+            if (dispose) display.Dispose();
             TopmostDisplay.OnEntered();
         }
 

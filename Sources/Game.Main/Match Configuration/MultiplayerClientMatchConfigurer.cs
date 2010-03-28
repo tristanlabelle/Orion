@@ -106,7 +106,7 @@ namespace Orion.Main
                     options.RevealTopology = reader.ReadBoolean();
                     options.InitialAladdiumAmount = reader.ReadInt32();
                     options.InitialAlageneAmount = reader.ReadInt32();
-                    options.Seed = reader.ReadInt32();
+                    options.RandomSeed = reader.ReadInt32();
                 }
             }
         }

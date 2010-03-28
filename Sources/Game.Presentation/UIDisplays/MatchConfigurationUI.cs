@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,20 +19,20 @@ namespace Orion.Game.Presentation
     public abstract class MatchConfigurationUI : UIDisplay
     {
         #region Fields
+        private static readonly NumberStyles integerParsingStyles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+        private const float checkBoxSize = 6;
+
         private Action<Button> exitPanel;
         private Action<Button> startGame;
         private Size size = new Size(150, 150);
-        private readonly Label sizeField;
 
         protected MatchSettings options;
-        protected readonly Button startButton;
-        protected readonly Button exitButton;
+        private readonly ListFrame optionsListFrame;
+        private readonly Button startButton;
+        private readonly Button exitButton;
 
-        protected Random random;
-        protected DropdownList<PlayerSlot>[] playerSlots
-            = new DropdownList<PlayerSlot>[Faction.Colors.Length];
-        protected Frame backgroundFrame;
-
+        protected readonly DropdownList<PlayerSlot>[] playerSlots;
+        protected readonly Frame backgroundFrame;
         private readonly bool isGameMaster;
         #endregion
 
@@ -48,6 +49,8 @@ namespace Orion.Game.Presentation
             backgroundFrame = new Frame(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
             Children.Add(backgroundFrame);
             Rectangle dropdownListRect = new Rectangle(10, backgroundFrame.Bounds.MaxY - 40, 200, 30);
+
+            playerSlots = new DropdownList<PlayerSlot>[Faction.Colors.Length];
             for (int i = 0; i < playerSlots.Length; i++)
             {
                 playerSlots[i] = new DropdownList<PlayerSlot>(dropdownListRect);
@@ -65,124 +68,58 @@ namespace Orion.Game.Presentation
             Children.Add(startButton);
 
             #region Game Options
-            ListFrame optionFrame = new ListFrame(Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0.1f), new Vector2(0.975f, 0.9f)));
-            Rectangle rowFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.375f, 0.035f));
-            Rectangle optionRect = Instant.CreateComponentRectangle(rowFrame, new Rectangle(0, 0, 0.70f, 1));
-            Rectangle valueRect = Instant.CreateComponentRectangle(rowFrame, new Rectangle(0.70f, 0, 0.3f, 1));
+            optionsListFrame = new ListFrame(Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0.1f), new Vector2(0.975f, 0.9f)));
+            Children.Add(optionsListFrame);
 
-            Rectangle checkboxFrame = new Rectangle(rowFrame.Height, rowFrame.Height).TranslatedBy(3, 3).ResizedBy(-6, -6);
-            Rectangle checkboxLabel = new Rectangle(checkboxFrame.MaxX + 6, 0, rowFrame.Width - checkboxFrame.MaxX - 6, rowFrame.Height);
-            Children.Add(optionFrame);
-
-            #region Map Size
             {
-                Frame sizeOption = new Frame(rowFrame);
-                sizeOption.Children.Add(new Label(optionRect, "Taille du terrain:"));
-                Button changeSizeOption = new Button(valueRect, options.MapSize.ToString());
-                changeSizeOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumMapSize);
-                changeSizeOption.Triggered +=
-                    b => Validate(prompt, options.MapSize, ValidateMapSize);
-                sizeOption.Children.Add(changeSizeOption);
-                optionFrame.Children.Add(sizeOption);
-
-                options.MapSizeChanged += o => changeSizeOption.Caption = o.MapSize.ToString();
+                Button optionButton = AddLabelButtonOption("Taille du terrain",
+                    options.MapSize.ToString(),
+                    "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumMapSize),
+                    ValidateMapSize);
+                options.MapSizeChanged += o => optionButton.Caption = o.MapSize.ToString();
             }
-            #endregion
-
-            #region Maximum Population
             {
-                Frame populationOption = new Frame(rowFrame);
-                populationOption.Children.Add(new Label(optionRect, "Population maximale:"));
-                Button changeMaxPop = new Button(valueRect, options.MaximumPopulation.ToString());
-                changeMaxPop.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle population maximale désirée (minimum {0})".FormatInvariant(MatchSettings.SuggestedMinimumPopulation);
-                changeMaxPop.Triggered +=
-                    b => Validate(prompt, options.MaximumPopulation, ValidateMaximumPopulation);
-                populationOption.Children.Add(changeMaxPop);
-                optionFrame.Children.Add(populationOption);
-
-                options.MaximumPopulationChanged += o => changeMaxPop.Caption = o.MaximumPopulation.ToString();
+                Button optionButton = AddLabelButtonOption("Limite de nourriture",
+                    options.MaximumPopulation.ToString(),
+                "Entrez la nouvelle limite de nourriture désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumPopulation),
+                ValidateFoodLimit);
+                options.MaximumPopulationChanged += o => optionButton.Caption = o.MaximumPopulation.ToString();
             }
-            #endregion
-
-            #region Initial Aladdium Amount
             {
-                Frame aladdiumOption = new Frame(rowFrame);
-                aladdiumOption.Children.Add(new Label(optionRect, "Quantité initiale d'aladdium:"));
-                Button changeAladdiumOption = new Button(valueRect, options.InitialAladdiumAmount.ToString());
-                changeAladdiumOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle quantité d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium);
-                changeAladdiumOption.Triggered +=
-                    b => Validate(prompt, options.InitialAladdiumAmount, ValidateInitialAladdium);
-                aladdiumOption.Children.Add(changeAladdiumOption);
-                optionFrame.Children.Add(aladdiumOption);
-
-                options.InitialAladdiumAmountChanged += o => changeAladdiumOption.Caption = o.InitialAladdiumAmount.ToString();
+                Button optionButton = AddLabelButtonOption("Quantité initiale d'aladdium",
+                    options.InitialAladdiumAmount.ToString(),
+                "Entrez la nouvelle quantité initiale d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium),
+                ValidateFoodLimit);
+                options.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
             }
-            #endregion
-
-            #region Initial Alagene Amount
             {
-                Frame alageneOption = new Frame(rowFrame);
-                alageneOption.Children.Add(new Label(optionRect, "Quantité initiale d'alagène:"));
-                Button changeAlageneOption = new Button(valueRect, options.InitialAlageneAmount.ToString());
-                changeAlageneOption.Enabled = isGameMaster;
-                string prompt = "Entrez la nouvelle quantité d'alagène désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAlagene);
-                changeAlageneOption.Triggered +=
-                    b => Validate(prompt, options.InitialAlageneAmount, ValidateInitialAlagene);
-                alageneOption.Children.Add(changeAlageneOption);
-                optionFrame.Children.Add(alageneOption);
-
-                options.InitialAlageneAmountChanged += o => changeAlageneOption.Caption = o.InitialAlageneAmount.ToString();
+                Button optionButton = AddLabelButtonOption("Quantité initiale d'alagène",
+                    options.InitialAlageneAmount.ToString(),
+                "Entrez la nouvelle quantité initiale d'alagène désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAlagene),
+                ValidateInitialAlageneAmount);
+                options.InitialAlageneAmountChanged += o => optionButton.Caption = o.InitialAlageneAmount.ToString();
             }
-            #endregion
-
-            #region Seed
             {
-                Frame seedOption = new Frame(rowFrame);
-                seedOption.Children.Add(new Label(optionRect, "Germe de génération:"));
-                Button changeSeedOption = new Button(valueRect, options.Seed.ToString());
-                changeSeedOption.Enabled = isGameMaster;
-                string prompt = "Entrez le nouveau germe de génération aléatoire.";
-                changeSeedOption.Triggered +=
-                    b => Validate(prompt, options.Seed, ValidateSeed);
-                seedOption.Children.Add(changeSeedOption);
-                optionFrame.Children.Add(seedOption);
-
-                options.SeedChanged += o => changeSeedOption.Caption = o.Seed.ToString();
+                Button optionButton = AddLabelButtonOption("Germe de génération",
+                    options.RandomSeed.ToString(),
+                "Entrez le nouveau germe de génération aléatoire.",
+                ValidateRandomSeed);
+                options.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
             }
-            #endregion
 
-            optionFrame.Children.Add(new Frame(rowFrame)); // separator
+            optionsListFrame.Children.Add(new Frame(RowFrame)); // separator
 
             #region Reveal Topology
             {
-                Frame topologyRow = new Frame(rowFrame);
-                topologyRow.Children.Add(new Label(checkboxLabel, "Révéler le terrain"));
-                Checkbox revealTopology = new Checkbox(checkboxFrame);
-                revealTopology.Enabled = isGameMaster;
-                revealTopology.StateChanged += (checkbox, value) => options.RevealTopology = value;
-                topologyRow.MouseButtonPressed += (row, args) => revealTopology.Trigger();
-                topologyRow.Children.Add(revealTopology);
-                optionFrame.Children.Add(topologyRow);
-
-                options.RevealTopologyChanged += o => revealTopology.State = o.RevealTopology;
+                Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => options.RevealTopology = value);
+                options.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
             }
             #endregion
 
             #region Reveal Topology
             {
-                Frame nomadRow = new Frame(rowFrame);
-                nomadRow.Children.Add(new Label(checkboxLabel, "Début nomade"));
-                Checkbox nomadCheckbox = new Checkbox(checkboxFrame);
-                nomadCheckbox.Enabled = isGameMaster;
-                nomadCheckbox.StateChanged += (checkbox, value) => options.IsNomad = value;
-                nomadRow.MouseButtonPressed += (row, args) => nomadCheckbox.Trigger();
-                nomadRow.Children.Add(nomadCheckbox);
-                optionFrame.Children.Add(nomadRow);
-
-                options.IsNomadChanged += o => nomadCheckbox.State = o.IsNomad;
+                Checkbox checkbox = AddCheckboxOption("Début nomade", value => options.IsNomad = value);
+                options.IsNomadChanged += o => checkbox.State = o.IsNomad;
             }
             #endregion
             #endregion
@@ -221,11 +158,6 @@ namespace Orion.Game.Presentation
             }
         }
 
-        public Random RandomGenerator
-        {
-            get { return random; }
-        }
-
         public new RootView Root
         {
             get { return (RootView)base.Root; }
@@ -235,79 +167,130 @@ namespace Orion.Game.Presentation
         {
             get { return isGameMaster; }
         }
+
+        private Rectangle RowFrame
+        {
+            get { return Instant.CreateComponentRectangle(Bounds, new Rectangle(0.375f, 0.035f)); }
+        }
         #endregion
 
         #region Methods
-
         protected abstract void InitializeSlots();
+
+        #region Initialization
+        private Button AddLabelButtonOption(string description, string initialValue, string prompt, Func<string, bool> validator)
+        {
+            Rectangle optionRect = Instant.CreateComponentRectangle(RowFrame, new Rectangle(0, 0, 0.70f, 1));
+            Rectangle valueRect = Instant.CreateComponentRectangle(RowFrame, new Rectangle(0.70f, 0, 0.3f, 1));
+
+            Frame optionFrame = new Frame(RowFrame);
+            Label descriptionLabel = new Label(optionRect, description + ':');
+            Button changeButton = new Button(valueRect, initialValue);
+            changeButton.Enabled = isGameMaster;
+
+            optionFrame.Children.Add(descriptionLabel);
+            optionFrame.Children.Add(changeButton);
+            optionsListFrame.Children.Add(optionFrame);
+
+            changeButton.Triggered +=
+                sender => Validate(prompt, changeButton.Caption, validator);
+
+            return changeButton;
+        }
+
+        private Checkbox AddCheckboxOption(string text, Action<bool> changedHandler)
+        {
+            Rectangle checkboxFrame = new Rectangle(
+                checkBoxSize * 0.5f, checkBoxSize * 0.5f,
+                RowFrame.Height - checkBoxSize, RowFrame.Height - checkBoxSize);
+            Rectangle checkboxLabelFrame = new Rectangle(
+                checkboxFrame.MaxX + checkBoxSize, 0,
+                RowFrame.Width - checkboxFrame.MaxX - checkBoxSize, RowFrame.Height);
+
+            Frame optionFrame = new Frame(RowFrame);
+            optionFrame.Children.Add(new Label(checkboxLabelFrame, text));
+
+            Checkbox checkbox = new Checkbox(checkboxFrame);
+            checkbox.Enabled = isGameMaster;
+
+            optionFrame.Children.Add(checkbox);
+            optionsListFrame.Children.Add(optionFrame);
+
+            optionFrame.MouseButtonPressed += (row, args) => checkbox.Trigger();
+
+            checkbox.StateChanged += (sender, value) => changedHandler(value);
+
+            return checkbox;
+        }
+        #endregion
 
         #region Events Handling
         protected virtual void OnOptionChanged()
         {
-            var handler = OptionChanged;
-            if (handler != null) handler(this, options);
+            OptionChanged.Raise(this, options);
         }
 
         protected virtual void OnPressedExit(Button button)
         {
-            Action<MatchConfigurationUI> handler = PressedExit;
-            if (handler != null) handler(this);
+            PressedExit.Raise(this);
             Parent.PopDisplay(this);
         }
 
         protected virtual void OnPressedStartGame(Button button)
         {
-            Action<MatchConfigurationUI> handler = PressedStartGame;
-            if (handler != null) handler(this);
+            PressedStartGame.Raise(this);
         }
         #endregion
 
         #region Options Validation
-        private void Validate<TValidatedType>(string prompt, TValidatedType defaultValue, Func<string, bool> validator)
+        private void Validate(string prompt, string initialValue, Func<string, bool> validator)
         {
-            Instant.Prompt(this, prompt, defaultValue.ToString(), result =>
+            Instant.Prompt(this, prompt, initialValue, result =>
             {
                 if (validator(result))
                     OnOptionChanged();
                 else
-                    Validate(prompt, defaultValue, validator);
+                    Validate(prompt, initialValue, validator);
             });
         }
 
-        private bool ValidateSeed(string seedString)
+        private bool ValidateRandomSeed(string value)
         {
             int seed;
-            if (!int.TryParse(seedString, out seed))
+            if (!int.TryParse(value, integerParsingStyles, NumberFormatInfo.InvariantInfo, out seed))
                 return false;
 
-            options.Seed = seed;
+            options.RandomSeed = seed;
             return true;
         }
 
-        private bool ValidateInitialAladdium(string aladdiumString)
+        private bool ValidateInitialAladdiumAmount(string value)
         {
             int aladdium;
-            if (!int.TryParse(aladdiumString, out aladdium) || aladdium < MatchSettings.SuggestedMinimumAladdium)
+            if (!int.TryParse(value, integerParsingStyles, NumberFormatInfo.InvariantInfo, out aladdium)
+                || aladdium < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
             options.InitialAladdiumAmount = aladdium;
             return true;
         }
 
-        private bool ValidateInitialAlagene(string alageneAmount)
+        private bool ValidateInitialAlageneAmount(string value)
         {
             int alagene;
-            if (!int.TryParse(alageneAmount, out alagene) || alagene < MatchSettings.SuggestedMinimumAladdium)
+            if (!int.TryParse(value, integerParsingStyles, NumberFormatInfo.InvariantInfo, out alagene)
+                || alagene < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
             options.InitialAlageneAmount = alagene;
             return true;
         }
 
-        private bool ValidateMaximumPopulation(string maxPopString)
+        private bool ValidateFoodLimit(string value)
         {
             int maxPop;
-            if (!int.TryParse(maxPopString, out maxPop) || maxPop < MatchSettings.SuggestedMinimumPopulation)
+            if (!int.TryParse(value, integerParsingStyles, NumberFormatInfo.InvariantInfo, out maxPop)
+                || maxPop < MatchSettings.SuggestedMinimumPopulation)
                 return false;
 
             options.MaximumPopulation = maxPop;
@@ -320,7 +303,8 @@ namespace Orion.Game.Presentation
             if (!Size.TryParse(sizeString, out newSize))
                 return false;
 
-            if (newSize.Width < MatchSettings.SuggestedMinimumMapSize.Width || newSize.Height < MatchSettings.SuggestedMinimumMapSize.Height)
+            if (newSize.Width < MatchSettings.SuggestedMinimumMapSize.Width
+                || newSize.Height < MatchSettings.SuggestedMinimumMapSize.Height)
                 return false;
 
             options.MapSize = newSize;

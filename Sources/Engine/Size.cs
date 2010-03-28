@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using OpenTK.Math;
+using System.Globalization;
 
 namespace Orion.Engine
 {
@@ -106,6 +107,9 @@ namespace Orion.Engine
         /// A size with a width and a height of zero.
         /// </summary>
         public static readonly Size Zero = new Size(0, 0);
+
+        private static readonly Regex parsingRegex
+            = new Regex(@"\A\s*([0-9]+)x([0-9]+)\s*\Z", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
         #endregion
 
         #region Methods
@@ -123,17 +127,16 @@ namespace Orion.Engine
         /// <summary>
         /// Parses a Size represented as a <see cref="string"/> with the format "{0}x{1}".
         /// </summary>
-        /// <param name="size">The formatted string</param>
-        /// <returns></returns>
+        /// <param name="size">The formatted string to be parsed.</param>
+        /// <returns>The resulting parsed size.</returns>
         public static Size Parse(string sizeString)
         {
-            Regex regex = new Regex("([0-9]+)x([0-9]+)", RegexOptions.IgnoreCase);
-            if (regex.IsMatch(sizeString))
-            {
-                Match result = regex.Match(sizeString);
-                return new Size(int.Parse(result.Groups[1].Value), int.Parse(result.Groups[2].Value));
-            }
-            throw new FormatException("Required format for a Size object is {{Width}}x{{Height}}; got {0}".FormatInvariant(sizeString));
+            Match result = parsingRegex.Match(sizeString);
+            if (!result.Success) throw new FormatException("Required format for a Size object is {{Width}}x{{Height}}; got {0}.".FormatInvariant(sizeString));
+
+            int width = int.Parse(result.Groups[1].Value, NumberFormatInfo.InvariantInfo);
+            int height = int.Parse(result.Groups[2].Value, NumberFormatInfo.InvariantInfo);
+            return new Size(width, height);
         }
 
         public static bool TryParse(string sizeString, out Size into)
@@ -145,7 +148,7 @@ namespace Orion.Engine
             }
             catch (FormatException)
             {
-                into = new Size(0, 0);
+                into = default(Size);
                 return false;
             }
         }

@@ -19,7 +19,7 @@ namespace Orion.Main
         #region Constructors
         public SinglePlayerMatchConfigurer()
         {
-            options.Seed = (int)Environment.TickCount;
+            options.RandomSeed = (int)Environment.TickCount;
             ui = new SinglePlayerMatchConfigurationUI(options);
             ui.PressedStartGame += PressStart;
         }

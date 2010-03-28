@@ -43,7 +43,7 @@ namespace Orion.Game.Matchmaking
         public event Action<MatchSettings> RevealTopologyChanged;
         public event Action<MatchSettings> InitialAladdiumAmountChanged;
         public event Action<MatchSettings> InitialAlageneAmountChanged;
-        public event Action<MatchSettings> SeedChanged;
+        public event Action<MatchSettings> RandomSeedChanged;
         public event Action<MatchSettings> Changed;
         #endregion
 
@@ -68,13 +68,13 @@ namespace Orion.Game.Matchmaking
             }
         }
 
-        public int Seed
+        public int RandomSeed
         {
             get { return seed; }
             set
             {
                 seed = value;
-                TriggerEvent(SeedChanged);
+                TriggerEvent(RandomSeedChanged);
             }
         }
 
@@ -122,10 +122,8 @@ namespace Orion.Game.Matchmaking
         #region Methods
         private void TriggerEvent(Action<MatchSettings> eventHandler)
         {
-            if (eventHandler != null) eventHandler(this);
-
-            var genericHandler = Changed;
-            if (genericHandler != null) genericHandler(this);
+            eventHandler.Raise(this);
+            Changed.Raise(this);
         }
         #endregion
         #endregion

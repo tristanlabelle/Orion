@@ -71,7 +71,7 @@ namespace Orion.Game.Matchmaking
             writer.Write(options.MapSize.Height);
             writer.Write(options.MaximumPopulation);
             writer.Write(options.RevealTopology);
-            writer.Write(options.Seed);
+            writer.Write(options.RandomSeed);
             writer.Write(options.IsNomad);
 
             writer.Write(factionNameList.Count);

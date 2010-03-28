@@ -13,8 +13,7 @@ namespace Orion.Game.Presentation
     public sealed class MultiplayerMatchConfigurationUI : MatchConfigurationUI
     {
         #region Fields
-        private SafeTransporter transporter;
-        protected ListFrame chatMessages;
+        private readonly SafeTransporter transporter;
         #endregion
 
         #region Constructors
@@ -38,7 +37,6 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<int, PlayerSlot> SlotChanged;
         public event Action<int, PlayerSlot> SlotOccupationChanged;
         public event Action<IPv4EndPoint> KickedPlayer;
         #endregion

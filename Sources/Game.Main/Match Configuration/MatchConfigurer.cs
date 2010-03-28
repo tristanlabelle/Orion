@@ -52,8 +52,8 @@ namespace Orion.Main
 
         protected void CreateWorld(Size worldSize)
         {
-            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.Seed));
-            random = new MersenneTwister(options.Seed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.RandomSeed));
+            random = new MersenneTwister(options.RandomSeed);
             Terrain terrain = Terrain.Generate(worldSize, random);
             world = new World(terrain, random, options.MaximumPopulation);
         }

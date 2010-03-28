@@ -23,7 +23,7 @@ namespace Orion.Main
         public MultiplayerHostMatchConfigurer(SafeTransporter transporter)
             : base(transporter)
         {
-            options.Seed = (int)Environment.TickCount;
+            options.RandomSeed = (int)Environment.TickCount;
             options.Changed += TransferOptionsChanges;
             ui = new MultiplayerMatchConfigurationUI(options, transporter, true);
             ui.PressedStartGame += PressStartGame;
@@ -92,7 +92,7 @@ namespace Orion.Main
                     writer.Write(options.RevealTopology);
                     writer.Write(options.InitialAladdiumAmount);
                     writer.Write(options.InitialAlageneAmount);
-                    writer.Write(options.Seed);
+                    writer.Write(options.RandomSeed);
                 }
                 return stream.GetBuffer();
             }

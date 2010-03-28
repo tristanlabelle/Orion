@@ -46,8 +46,8 @@ namespace Orion.Game.Simulation
 
         private int aladdiumAmount;
         private int alageneAmount;
-        private int totalFoodAmount = 0;
-        private int usedFoodAmount = 0;
+        private int totalFoodAmount;
+        private int usedFoodAmount;
         private FactionStatus status = FactionStatus.Undefeated;
         #endregion
 
@@ -69,12 +69,12 @@ namespace Orion.Game.Simulation
             this.name = name;
             this.color = color;
             this.localFogOfWar = new FogOfWar(world.Size);
+
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
             this.unitMovedEventHandler = OnUnitMoved;
             this.buildingConstructionCompleted = OnBuildingConstructionCompleted;
-
-            world.FactionDefeated += OnFactionDefeated;
+            this.world.FactionDefeated += OnFactionDefeated;
             this.world.Entities.Removed += OnEntityRemoved;
         }
         #endregion

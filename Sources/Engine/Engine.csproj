@@ -106,7 +106,6 @@
     <Compile Include="Gui\DropdownList.cs" />
     <Compile Include="Gui\FilledFrameRenderer.cs" />
     <Compile Include="Gui\Frame.cs" />
-    <Compile Include="Gui\FrameRenderer.cs" />
     <Compile Include="Gui\Instant.cs" />
     <Compile Include="Gui\IViewRenderer.cs" />
     <Compile Include="Gui\KeyboardEventType.cs" />

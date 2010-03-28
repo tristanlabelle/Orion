@@ -15,12 +15,13 @@ using Font = System.Drawing.Font;
 
 namespace Orion.Game.Presentation.Renderers
 {
-    public sealed class UnitFrameRenderer : FrameRenderer
+    public sealed class UnitFrameRenderer : IViewRenderer
     {
         #region Fields
         private static readonly ColorRgb progressBarColor = Colors.Gold;
         private static readonly ColorRgb progressBarBorderColor = Colors.Black;
         private static readonly ColorRgb progressBarBackgroundColor = Colors.Black;
+        private static readonly ColorRgb borderColor = Colors.Gray;
         private static readonly Font statsFont = new Font("Trebuchet MS", 10);
         private static readonly UnitStat[] statsToDisplay = new[]
         {
@@ -48,7 +49,7 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             bool isTraining = false;
 
@@ -87,7 +88,7 @@ namespace Orion.Game.Presentation.Renderers
                     TrainTask currentUnitBeingTrained = (TrainTask)unit.TaskQueue[0];
                     DrawCompletionRect(context, healthRect, currentUnitBeingTrained.Progress);
 
-                    base.Draw(context, bounds);
+                    context.Stroke(bounds, borderColor);
                     firstStartingXPos += 50;
                 }
             }
@@ -114,7 +115,7 @@ namespace Orion.Game.Presentation.Renderers
                 }
             }
 
-            base.Draw(context, bounds);
+            context.Stroke(bounds, borderColor);
         }
 
         private static void DrawCompletionRect(GraphicsContext context, Rectangle bounds, float progress)

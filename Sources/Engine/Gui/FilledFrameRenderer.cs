@@ -4,35 +4,50 @@ using Orion.Engine.Geometry;
 
 namespace Orion.Engine.Gui
 {
-    public sealed class FilledFrameRenderer : FrameRenderer
+    /// <summary>
+    /// A view renderers which renders a rectangle filled with a color and bordered by another.
+    /// </summary>
+    public sealed class FilledFrameRenderer : IViewRenderer
     {
         #region Fields
-        public readonly ColorRgba FillColor;
+        private ColorRgba fillColor = Colors.DarkGray;
+        private ColorRgba borderColor = Colors.Gray;
         #endregion
 
         #region Constructors
-        public FilledFrameRenderer()
-        {
-            FillColor = Colors.DarkGray;
-        }
+        public FilledFrameRenderer() {}
 
         public FilledFrameRenderer(ColorRgba fillColor)
         {
-            FillColor = fillColor;
+            this.fillColor = fillColor;
         }
 
-        public FilledFrameRenderer(ColorRgba fillColor, ColorRgba strokeColor)
-            : base(strokeColor)
+        public FilledFrameRenderer(ColorRgba fillColor, ColorRgba borderColor)
         {
-            FillColor = fillColor;
+            this.fillColor = fillColor;
+            this.borderColor = borderColor;
+        }
+        #endregion
+
+        #region Properties
+        public ColorRgba FillColor
+        {
+            get { return fillColor; }
+            set { fillColor = value; }
+        }
+
+        public ColorRgba BorderColor
+        {
+            get { return borderColor; }
+            set { borderColor = value; }
         }
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             context.Fill(bounds, FillColor);
-            base.Draw(context, bounds);
+            context.Stroke(bounds, BorderColor);
         }
         #endregion
     }

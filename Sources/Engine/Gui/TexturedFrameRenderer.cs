@@ -4,12 +4,13 @@ using Orion.Engine.Geometry;
 
 namespace Orion.Engine.Gui
 {
-    public sealed class TexturedFrameRenderer : FrameRenderer
+    public sealed class TexturedFrameRenderer : IViewRenderer
     {
         #region Fields
         private readonly Texture texture;
-        private readonly ColorRgba tint;
-        private readonly ColorRgba backgroundColor;
+        private readonly ColorRgba tint = Colors.White;
+        private readonly ColorRgba borderColor = Colors.Gray;
+        private readonly ColorRgba backgroundColor = Colors.TransparentBlack;
         #endregion
 
         #region Constructors
@@ -18,33 +19,32 @@ namespace Orion.Engine.Gui
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;
             this.tint = Colors.White;
-            this.backgroundColor = Colors.TransparentBlack;
         }
 
-        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba strokeColor)
-            : base(strokeColor)
+        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;
             this.tint = tint;
-            this.backgroundColor = Colors.TransparentBlack;
+            this.borderColor = borderColor;
         }
 
-        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba strokeColor, ColorRgba backgroundColor)
+        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor, ColorRgba backgroundColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;
             this.tint = tint;
+            this.borderColor = borderColor;
             this.backgroundColor = backgroundColor;
         }
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             context.Fill(bounds, backgroundColor);
             context.Fill(bounds, texture, tint);
-            base.Draw(context, bounds);
+            context.Stroke(bounds, borderColor);
         }
         #endregion
     }

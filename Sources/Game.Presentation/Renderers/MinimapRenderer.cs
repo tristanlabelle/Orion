@@ -9,7 +9,7 @@ using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Renderers
 {
-    public sealed class MinimapRenderer : FrameRenderer
+    public sealed class MinimapRenderer : IViewRenderer
     {
         #region Fields
         private static readonly ColorRgb ViewRectangleColor = Colors.Orange;
@@ -34,7 +34,7 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Methods
-        public override void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(GraphicsContext context, Rectangle bounds)
         {
             worldRenderer.DrawMiniatureTerrain(context, bounds);
             worldRenderer.DrawMiniatureResources(context, bounds);

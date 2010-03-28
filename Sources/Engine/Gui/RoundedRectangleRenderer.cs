@@ -13,21 +13,17 @@ namespace Orion.Engine.Gui
     public sealed class RoundedRectangleRenderer : IViewRenderer
     {
         #region Fields
-        private ColorRgba borderColor;
-        private ColorRgba fillColor;
+        private ColorRgba fillColor = Colors.DarkGray;
+        private ColorRgba borderColor = Colors.Gray;
         #endregion
 
         #region Constructors
-        public RoundedRectangleRenderer()
-        {
-            this.borderColor = Colors.Gray;
-            this.fillColor = Colors.DarkGray;
-        }
+        public RoundedRectangleRenderer() { }
 
-        public RoundedRectangleRenderer(ColorRgba borderColor, ColorRgba fillColor)
+        public RoundedRectangleRenderer(ColorRgba fillColor, ColorRgba borderColor)
         {
-            this.borderColor = borderColor;
             this.fillColor = fillColor;
+            this.borderColor = borderColor;
         }
         #endregion
 

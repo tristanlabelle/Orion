@@ -62,10 +62,14 @@ namespace Orion.Game.Presentation
             exitPanel = OnPressedExit;
             exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
             Children.Add(exitButton);
-            startGame = OnPressedStartGame;
-            startButton = new Button(new Rectangle(Bounds.MaxX - 150, 10, 140, 40), "Commencer");
-            startButton.Enabled = isGameMaster;
-            Children.Add(startButton);
+
+            if (isGameMaster)
+            {
+                startGame = OnPressedStartGame;
+                startButton = new Button(new Rectangle(Bounds.MaxX - 150, 10, 140, 40), "Commencer");
+                startButton.Enabled = isGameMaster;
+                Children.Add(startButton);
+            }
 
             #region Game Options
             optionsListPanel = new ListPanel(Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0.1f), new Vector2(0.975f, 0.9f)));
@@ -319,14 +323,14 @@ namespace Orion.Game.Presentation
         {
             InitializeSlots();
             exitButton.Triggered += exitPanel;
-            startButton.Triggered += startGame;
+            if (startButton != null) startButton.Triggered += startGame;
             base.OnEntered();
         }
 
         protected override void OnShadowed()
         {
             exitButton.Triggered -= exitPanel;
-            startButton.Triggered -= startGame;
+            if (startButton != null) startButton.Triggered -= startGame;
             foreach (DropdownList<PlayerSlot> list in playerSlots) list.Dispose();
             base.OnShadowed();
         }

@@ -108,7 +108,7 @@ namespace Orion.Main
                     SetupMessageType messageType = (SetupMessageType)reader.ReadByte();
                     Debug.Assert(messageType == SetupMessageType.ChangeOptions);
 
-                    settings = MatchSettings.Deserialize(reader);
+                    settings.Deserialize(reader);
 
                     Debug.Assert(reader.PeekChar() == -1, "Warning: The options packet contained more data than we read.");
                 }

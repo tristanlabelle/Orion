@@ -178,6 +178,24 @@ namespace Orion.Game.Matchmaking
             writer.Write(areCheatsEnabled);
         }
 
+        /// <summary>
+        /// Deserializes the binary representation of this object in the current instance.
+        /// </summary>
+        /// <param name="reader">The data reader to be used.</param>
+        public void Deserialize(BinaryReader reader)
+        {
+            Argument.EnsureNotNull(reader, "reader");
+
+            MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
+            FoodLimit = reader.ReadInt32();
+            InitialAladdiumAmount = reader.ReadInt32();
+            InitialAlageneAmount = reader.ReadInt32();
+            RandomSeed = reader.ReadInt32();
+            RevealTopology = reader.ReadBoolean();
+            IsNomad = reader.ReadBoolean();
+            AreCheatsEnabled = reader.ReadBoolean();
+        }
+
         private void TriggerEvent(Action<MatchSettings> eventHandler)
         {
             eventHandler.Raise(this);
@@ -196,29 +214,6 @@ namespace Orion.Game.Matchmaking
         public const int SuggestedMinimumPopulation = 4;
         public const int SuggestedMinimumAlagene = 0;
         public const int SuggestedMinimumAladdium = 0;
-        #endregion
-
-        #region Methods
-        /// <summary>
-        /// Deserializes the binary representation of this object.
-        /// </summary>
-        /// <param name="reader">The data reader to be used.</param>
-        /// <returns>The deserialized data.</returns>
-        public static MatchSettings Deserialize(BinaryReader reader)
-        {
-            Argument.EnsureNotNull(reader, "reader");
-            return new MatchSettings
-            {
-                mapSize = new Size(reader.ReadInt32(), reader.ReadInt32()),
-                foodLimit = reader.ReadInt32(),
-                initialAladdiumAmount = reader.ReadInt32(),
-                initialAlageneAmount = reader.ReadInt32(),
-                randomSeed = reader.ReadInt32(),
-                revealTopology = reader.ReadBoolean(),
-                isNomad = reader.ReadBoolean(),
-                areCheatsEnabled = reader.ReadBoolean()
-            };
-        }
         #endregion
         #endregion
     }

@@ -33,21 +33,21 @@ namespace Orion.Engine.Gui
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
 
-            Rectangle frameRect = CreateComponentRectangle(parent.Bounds, new Vector2(0.25f, 0.33f), new Vector2(0.75f, 0.66f));
-            Rectangle frameBounds = new Rectangle(frameRect.Size);
-            Rectangle labelRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
-            Rectangle buttonRect = CreateComponentRectangle(frameBounds, new Vector2(0.4f, 0.2f), new Vector2(0.6f, 0.3f));
+            Rectangle panelFrame = CreateComponentRectangle(parent.Bounds, new Vector2(0.25f, 0.33f), new Vector2(0.75f, 0.66f));
+            Rectangle panelBounds = new Rectangle(panelFrame.Size);
+            Rectangle labelRect = CreateComponentRectangle(panelBounds, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
+            Rectangle buttonRect = CreateComponentRectangle(panelBounds, new Vector2(0.4f, 0.2f), new Vector2(0.6f, 0.3f));
 
-            Frame container = new Frame(frameRect);
-            Label displayedMessage = new Label(labelRect, message);
+            Panel panel = new Panel(panelFrame);
+            Label messageLabel = new Label(labelRect, message);
             Button okButton = new Button(buttonRect, "Ok");
             okButton.HotKey = Keys.Enter;
-            okButton.Triggered += button => { container.Dispose(); if(action != null) action(); };
+            okButton.Triggered += button => { panel.Dispose(); if(action != null) action(); };
 
-            container.Children.Add(displayedMessage);
-            container.Children.Add(okButton);
+            panel.Children.Add(messageLabel);
+            panel.Children.Add(okButton);
 
-            parent.Children.Add(container);
+            parent.Children.Add(panel);
         }
 
         public static void Prompt(Responder parent, string message, Action<string> onClose)
@@ -60,24 +60,24 @@ namespace Orion.Engine.Gui
             Argument.EnsureNotNull(parent, "parent");
             Argument.EnsureNotNull(message, "message");
 
-            Rectangle frameRect = CreateComponentRectangle(parent.Bounds, new Vector2(0.25f, 0.33f), new Vector2(0.75f, 0.66f));
-            Rectangle frameBounds = new Rectangle(frameRect.Size);
-            Rectangle labelRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
-            Rectangle textFieldRect = CreateComponentRectangle(frameBounds, new Vector2(0.1f, 0.38f), new Vector2(0.9f, 0.5f));
-            Rectangle okButtonRect = CreateComponentRectangle(frameBounds, new Vector2(0.2f, 0.2f), new Vector2(0.4f, 0.3f));
-            Rectangle cancelButtonRect = CreateComponentRectangle(frameBounds, new Vector2(0.5f, 0.2f), new Vector2(0.7f, 0.3f));
+            Rectangle panelFrame = CreateComponentRectangle(parent.Bounds, new Vector2(0.25f, 0.33f), new Vector2(0.75f, 0.66f));
+            Rectangle panelBounds = new Rectangle(panelFrame.Size);
+            Rectangle labelFrame = CreateComponentRectangle(panelBounds, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
+            Rectangle textFieldFrame = CreateComponentRectangle(panelBounds, new Vector2(0.1f, 0.38f), new Vector2(0.9f, 0.5f));
+            Rectangle okButtonFrame = CreateComponentRectangle(panelBounds, new Vector2(0.2f, 0.2f), new Vector2(0.4f, 0.3f));
+            Rectangle cancelButtonFrame = CreateComponentRectangle(panelBounds, new Vector2(0.5f, 0.2f), new Vector2(0.7f, 0.3f));
 
-            Frame container = new Frame(frameRect);
-            Label displayedMessage = new Label(labelRect, message);
-            TextField input = new TextField(textFieldRect);
+            Panel panel = new Panel(panelFrame);
+            Label messageLabel = new Label(labelFrame, message);
+            TextField input = new TextField(textFieldFrame);
             input.Contents = defaultValue;
-            Button okButton = new Button(okButtonRect, "Ok");
-            Button cancelButton = new Button(cancelButtonRect, "Cancel");
+            Button okButton = new Button(okButtonFrame, "Ok");
+            Button cancelButton = new Button(cancelButtonFrame, "Cancel");
 
             Action<Responder> accept = delegate(Responder sender)
             {
                 onClose(input.Contents);
-                container.Dispose();
+                panel.Dispose();
             };
 
             okButton.Triggered += new Action<Button>(accept);
@@ -85,15 +85,15 @@ namespace Orion.Engine.Gui
 
             cancelButton.Triggered += delegate(Button sender)
             {
-                container.Dispose();
+                panel.Dispose();
             };
 
-            container.Children.Add(displayedMessage);
-            container.Children.Add(input);
-            container.Children.Add(okButton);
-            container.Children.Add(cancelButton);
+            panel.Children.Add(messageLabel);
+            panel.Children.Add(input);
+            panel.Children.Add(okButton);
+            panel.Children.Add(cancelButton);
 
-            parent.Children.Add(container);
+            parent.Children.Add(panel);
         }
     }
 }

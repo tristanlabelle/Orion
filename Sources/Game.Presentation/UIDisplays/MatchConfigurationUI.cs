@@ -27,12 +27,12 @@ namespace Orion.Game.Presentation
         private Size size = new Size(150, 150);
 
         protected MatchSettings options;
-        private readonly ListFrame optionsListFrame;
+        private readonly ListPanel optionsListPanel;
         private readonly Button startButton;
         private readonly Button exitButton;
 
         protected readonly DropdownList<PlayerSlot>[] playerSlots;
-        protected readonly Frame backgroundFrame;
+        protected readonly Panel backgroundPanel;
         private readonly bool isGameMaster;
         #endregion
 
@@ -46,9 +46,9 @@ namespace Orion.Game.Presentation
             this.isGameMaster = isGameMaster;
             this.options = options;
 
-            backgroundFrame = new Frame(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
-            Children.Add(backgroundFrame);
-            Rectangle dropdownListRect = new Rectangle(10, backgroundFrame.Bounds.MaxY - 40, 200, 30);
+            backgroundPanel = new Panel(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
+            Children.Add(backgroundPanel);
+            Rectangle dropdownListRect = new Rectangle(10, backgroundPanel.Bounds.MaxY - 40, 200, 30);
 
             playerSlots = new DropdownList<PlayerSlot>[Faction.Colors.Length];
             for (int i = 0; i < playerSlots.Length; i++)
@@ -56,7 +56,7 @@ namespace Orion.Game.Presentation
                 playerSlots[i] = new DropdownList<PlayerSlot>(dropdownListRect);
                 playerSlots[i].TextColor = Faction.Colors[i];
                 dropdownListRect = dropdownListRect.TranslatedBy(0, -40);
-                backgroundFrame.Children.Add(playerSlots[i]);
+                backgroundPanel.Children.Add(playerSlots[i]);
             }
 
             exitPanel = OnPressedExit;
@@ -68,8 +68,8 @@ namespace Orion.Game.Presentation
             Children.Add(startButton);
 
             #region Game Options
-            optionsListFrame = new ListFrame(Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0.1f), new Vector2(0.975f, 0.9f)));
-            Children.Add(optionsListFrame);
+            optionsListPanel = new ListPanel(Instant.CreateComponentRectangle(Bounds, new Vector2(0.6f, 0.1f), new Vector2(0.975f, 0.9f)));
+            Children.Add(optionsListPanel);
 
             {
                 Button optionButton = AddLabelButtonOption("Taille du terrain",
@@ -107,7 +107,7 @@ namespace Orion.Game.Presentation
                 options.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
             }
 
-            optionsListFrame.Children.Add(new Frame(RowFrame)); // separator
+            optionsListPanel.Children.Add(new Panel(RowFrame)); // separator
 
             #region Reveal Topology
             {
@@ -183,14 +183,14 @@ namespace Orion.Game.Presentation
             Rectangle optionRect = Instant.CreateComponentRectangle(RowFrame, new Rectangle(0, 0, 0.70f, 1));
             Rectangle valueRect = Instant.CreateComponentRectangle(RowFrame, new Rectangle(0.70f, 0, 0.3f, 1));
 
-            Frame optionFrame = new Frame(RowFrame);
+            Panel optionPanel = new Panel(RowFrame);
             Label descriptionLabel = new Label(optionRect, description + ':');
             Button changeButton = new Button(valueRect, initialValue);
             changeButton.Enabled = isGameMaster;
 
-            optionFrame.Children.Add(descriptionLabel);
-            optionFrame.Children.Add(changeButton);
-            optionsListFrame.Children.Add(optionFrame);
+            optionPanel.Children.Add(descriptionLabel);
+            optionPanel.Children.Add(changeButton);
+            optionsListPanel.Children.Add(optionPanel);
 
             changeButton.Triggered +=
                 sender => Validate(prompt, changeButton.Caption, validator);
@@ -207,16 +207,16 @@ namespace Orion.Game.Presentation
                 checkboxFrame.MaxX + checkBoxSize, 0,
                 RowFrame.Width - checkboxFrame.MaxX - checkBoxSize, RowFrame.Height);
 
-            Frame optionFrame = new Frame(RowFrame);
-            optionFrame.Children.Add(new Label(checkboxLabelFrame, text));
+            Panel optionPanel = new Panel(RowFrame);
+            optionPanel.Children.Add(new Label(checkboxLabelFrame, text));
 
             Checkbox checkbox = new Checkbox(checkboxFrame);
             checkbox.Enabled = isGameMaster;
 
-            optionFrame.Children.Add(checkbox);
-            optionsListFrame.Children.Add(optionFrame);
+            optionPanel.Children.Add(checkbox);
+            optionsListPanel.Children.Add(optionPanel);
 
-            optionFrame.MouseButtonPressed += (row, args) => checkbox.Trigger();
+            optionPanel.MouseButtonPressed += (row, args) => checkbox.Trigger();
 
             checkbox.StateChanged += (sender, value) => changedHandler(value);
 

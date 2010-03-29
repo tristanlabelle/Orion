@@ -20,7 +20,7 @@ namespace Orion.Engine.Gui
         { }
 
         public Checkbox(Rectangle frame, bool state)
-            : this(frame, state, new FilledFrameRenderer())
+            : this(frame, state, new FilledRenderer())
         { }
 
         public Checkbox(Rectangle frame, bool state, IViewRenderer renderer)

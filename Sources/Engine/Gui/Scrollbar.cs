@@ -10,15 +10,15 @@ using Orion.Engine.Gui;
 
 namespace Orion.Engine.Gui
 {
-    public class Scrollbar : Frame
+    public class Scrollbar : Panel
     {
         #region Fields
         private static readonly Triangle upTriangle = new Triangle(new Vector2(0.2f, 0.2f), new Vector2(0.5f, 0.7f), new Vector2(0.8f, 0.2f));
         private static readonly Triangle downTriangle = new Triangle(new Vector2(0.2f, 0.7f), new Vector2(0.5f, 0.2f), new Vector2(0.8f, 0.7f));
 
-        private readonly Frame topArrow;
-        private readonly Frame bottomArrow;
-        private readonly Frame slider;
+        private readonly Panel topArrowPanel;
+        private readonly Panel bottomArrowPanel;
+        private readonly Panel sliderPanel;
 
         private float? mouseDownPosition;
 
@@ -33,30 +33,30 @@ namespace Orion.Engine.Gui
             Scrollee = scrollee;
 
             Rectangle arrowRect = new Rectangle(frame.Width, frame.Width);
-            bottomArrow = new Frame(arrowRect, new DelegatedRenderer(RenderBottomArrow));
-            topArrow = new Frame(arrowRect.TranslatedBy(0, frame.Height - frame.Width), new DelegatedRenderer(RenderTopArrow));
-            topArrow.Bounds = new Rectangle(1, 1);
-            bottomArrow.Bounds = new Rectangle(1, 1);
-            slider = new Frame(new Rectangle(frame.Width, 1), Colors.Orange);
+            bottomArrowPanel = new Panel(arrowRect, new DelegatedRenderer(RenderBottomArrow));
+            topArrowPanel = new Panel(arrowRect.TranslatedBy(0, frame.Height - frame.Width), new DelegatedRenderer(RenderTopArrow));
+            topArrowPanel.Bounds = new Rectangle(1, 1);
+            bottomArrowPanel.Bounds = new Rectangle(1, 1);
+            sliderPanel = new Panel(new Rectangle(frame.Width, 1), Colors.Orange);
 
-            slider.MouseButtonPressed += SliderMouseDown;
-            topArrow.MouseButtonPressed += MoveUp;
-            bottomArrow.MouseButtonPressed += MoveDown;
+            sliderPanel.MouseButtonPressed += SliderMouseDown;
+            topArrowPanel.MouseButtonPressed += MoveUp;
+            bottomArrowPanel.MouseButtonPressed += MoveDown;
             Scrollee.MouseWheelScrolled += OnMouseWheelScrolled;
             Scrollee.BoundsChanged += RegenerateScrollbar;
             Scrollee.FullBoundsChanged += RegenerateScrollbar;
-            RegenerateScrollbarFrame();
+            RegenerateScrollbarPanel();
 
-            Children.Add(bottomArrow);
-            Children.Add(topArrow);
-            Children.Add(slider);
+            Children.Add(bottomArrowPanel);
+            Children.Add(topArrowPanel);
+            Children.Add(sliderPanel);
         }
         #endregion
 
         #region Methods
-        private void RegenerateScrollbarFrame()
+        private void RegenerateScrollbarPanel()
         {
-            float arrowHeight = topArrow.Frame.Height / Bounds.Height;
+            float arrowHeight = topArrowPanel.Frame.Height / Bounds.Height;
             float maximumSliderHeight = 1 - arrowHeight * 2;
             float invisibleHeight = Scrollee.Bounds.MinY - Scrollee.FullBounds.MinY;
             float visibleHeight = Scrollee.Bounds.Height;
@@ -65,7 +65,7 @@ namespace Orion.Engine.Gui
             float sliderHeight = visibleHeight / Scrollee.FullBounds.Height * maximumSliderHeight;
             if (sliderOrigin < arrowHeight) sliderOrigin = arrowHeight;
             if (sliderHeight > maximumSliderHeight) sliderHeight = maximumSliderHeight;
-            slider.Frame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, sliderOrigin), new Vector2(1, sliderOrigin + sliderHeight));
+            sliderPanel.Frame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, sliderOrigin), new Vector2(1, sliderOrigin + sliderHeight));
         }
 
         #region Event Handling
@@ -81,17 +81,17 @@ namespace Orion.Engine.Gui
 
         private void RegenerateScrollbar(View sender, Rectangle newFullBounds)
         {
-            RegenerateScrollbarFrame();
+            RegenerateScrollbarPanel();
         }
 
         private void MoveUp(Responder sender, MouseEventArgs args)
         {
-            ScrollBy(slider.Frame.Height / Frame.Height / 10);
+            ScrollBy(sliderPanel.Frame.Height / Frame.Height / 10);
         }
 
         private void MoveDown(Responder sender, MouseEventArgs args)
         {
-            ScrollBy(-slider.Frame.Height / Frame.Height / 10);
+            ScrollBy(-sliderPanel.Frame.Height / Frame.Height / 10);
         }
 
         protected override bool OnMouseButtonReleased(MouseEventArgs args)

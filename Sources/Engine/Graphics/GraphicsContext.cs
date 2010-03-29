@@ -20,9 +20,11 @@ namespace Orion.Engine.Graphics
     {
         #region Instance
         #region Fields
+        private static readonly Font defaultFont = new Font("Trebuchet MS", 14);
+
         private readonly Stack<Region> scissorStack = new Stack<Region>();
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
-        private Font font = new Font("Trebuchet MS", 14);
+        private Font font = defaultFont;
         #endregion
 
         #region Constructors

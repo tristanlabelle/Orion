@@ -15,19 +15,19 @@ namespace Orion.Game.Presentation.Actions.Enablers
     {
         #region Fields
         protected readonly UserInputManager inputManager;
-        protected readonly ActionFrame actionFrame;
+        protected readonly ActionPanel actionPanel;
         protected readonly GameGraphics gameGraphics;
         #endregion
 
         #region Constructors
-        public ActionEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
+        public ActionEnabler(UserInputManager inputManager, ActionPanel actionPanel, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
-            Argument.EnsureNotNull(actionFrame, "actionFrame");
+            Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             this.inputManager = inputManager;
-            this.actionFrame = actionFrame;
+            this.actionPanel = actionPanel;
             this.gameGraphics = gameGraphics;
         }
         #endregion

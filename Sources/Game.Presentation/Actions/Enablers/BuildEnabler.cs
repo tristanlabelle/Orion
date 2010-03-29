@@ -18,8 +18,8 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Constructors
-        public BuildEnabler(UserInputManager inputManager, ActionFrame actionFrame, GameGraphics gameGraphics)
-            : base(inputManager, actionFrame, gameGraphics)
+        public BuildEnabler(UserInputManager inputManager, ActionPanel actionPanel, GameGraphics gameGraphics)
+            : base(inputManager, actionPanel, gameGraphics)
         {
             this.repairUserCommand = new RepairUserCommand(inputManager);
         }
@@ -36,14 +36,14 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateBuildButton(UnitType unitType)
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Build", Keys.B, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, inputManager, "Build", Keys.B, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Build");
-            button.Renderer = new TexturedFrameRenderer(texture);
+            button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                actionFrame.Push(new BuildActionProvider(actionFrame, inputManager, unitType, World.UnitTypes, gameGraphics));
+                actionPanel.Push(new BuildActionProvider(actionPanel, inputManager, unitType, World.UnitTypes, gameGraphics));
             };
 
             return button;
@@ -51,15 +51,15 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateRepairButton()
         {
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Repair", Keys.R, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, inputManager, "Repair", Keys.R, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Repair");
-            button.Renderer = new TexturedFrameRenderer(texture);
+            button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
                 inputManager.SelectedCommand = repairUserCommand;
-                actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
+                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, gameGraphics));
             };
 
             return button;

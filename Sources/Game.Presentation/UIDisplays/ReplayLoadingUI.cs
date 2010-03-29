@@ -12,7 +12,7 @@ namespace Orion.Game.Presentation
     public class ReplayLoadingUI : UIDisplay
     {
         #region Fields
-        private readonly ListFrame replaysList;
+        private readonly ListPanel replaysList;
         private readonly Rectangle replayButtonFrame;
         #endregion
 
@@ -20,7 +20,7 @@ namespace Orion.Game.Presentation
         public ReplayLoadingUI()
         {
             Rectangle replaysRectangle = Bounds.TranslatedBy(10, 60).ResizedBy(-60, -70);
-            replaysList = new ListFrame(replaysRectangle, new Vector2(10, 10));
+            replaysList = new ListPanel(replaysRectangle, new Vector2(10, 10));
             Rectangle scrollbarRectangle = new Rectangle(replaysRectangle.MaxX, replaysRectangle.MinY, 30, replaysRectangle.Height);
             Scrollbar replaysScrollbar = new Scrollbar(scrollbarRectangle, replaysList);
             replayButtonFrame = new Rectangle(replaysRectangle.Width - 20, 30);

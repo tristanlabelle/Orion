@@ -6,22 +6,22 @@ using Orion.Engine.Gui;
 
 namespace Orion.Engine.Gui
 {
-    public class Frame : RenderedView
+    public class Panel : RenderedView
     {
         #region Fields
         private bool captureMouseEvents = true;
         #endregion
 
         #region Constructors
-        public Frame(Rectangle frame)
-            : base(frame, new FilledFrameRenderer())
+        public Panel(Rectangle frame)
+            : base(frame, new FilledRenderer())
         { }
 
-        public Frame(Rectangle frame, ColorRgba fillColor)
-            : base(frame, new FilledFrameRenderer(fillColor))
+        public Panel(Rectangle frame, ColorRgba fillColor)
+            : base(frame, new FilledRenderer(fillColor))
         { }
 
-        public Frame(Rectangle frame, IViewRenderer renderer)
+        public Panel(Rectangle frame, IViewRenderer renderer)
             : base(frame, renderer)
         { }
         #endregion

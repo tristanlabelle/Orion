@@ -7,7 +7,7 @@ namespace Orion.Engine.Gui
     /// <summary>
     /// A view renderers which renders a rectangle filled with a color and bordered by another.
     /// </summary>
-    public sealed class FilledFrameRenderer : IViewRenderer
+    public sealed class FilledRenderer : IViewRenderer
     {
         #region Fields
         private ColorRgba fillColor = Colors.DarkGray;
@@ -15,14 +15,14 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Constructors
-        public FilledFrameRenderer() {}
+        public FilledRenderer() {}
 
-        public FilledFrameRenderer(ColorRgba fillColor)
+        public FilledRenderer(ColorRgba fillColor)
         {
             this.fillColor = fillColor;
         }
 
-        public FilledFrameRenderer(ColorRgba fillColor, ColorRgba borderColor)
+        public FilledRenderer(ColorRgba fillColor, ColorRgba borderColor)
         {
             this.fillColor = fillColor;
             this.borderColor = borderColor;

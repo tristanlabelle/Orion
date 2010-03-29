@@ -12,7 +12,7 @@ namespace Orion.Game.Presentation
     /// <summary>
     /// Provides the user interface for the in-game message console.
     /// </summary>
-    public sealed class MatchConsole : Frame
+    public sealed class MatchConsole : Panel
     {
         #region Nested Types
         private sealed class Message : Label

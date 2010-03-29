@@ -10,7 +10,7 @@ using Orion.Engine.Gui;
 
 namespace Orion.Engine.Gui
 {
-    public class DropdownList<T> : Frame
+    public class DropdownList<T> : Panel
     {
         #region Nested Types
         private sealed class DropdownMenuRow : View
@@ -68,7 +68,7 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Fields
-        private readonly ListFrame menu;
+        private readonly ListPanel menu;
         private ColorRgba textColor = Colors.White;
         private Func<T, string> stringConverter = (value) => value.ToString();
         private DropdownMenuRow selectedItem;
@@ -81,7 +81,7 @@ namespace Orion.Engine.Gui
         public DropdownList(Rectangle frame)
             : base(frame)
         {
-            menu = new ListFrame(Bounds);
+            menu = new ListPanel(Bounds);
             parentMouseUp = ParentMouseUp;
         }
         #endregion

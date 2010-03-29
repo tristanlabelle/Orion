@@ -104,13 +104,13 @@
     </Compile>
     <Compile Include="Gui\DelegatedRenderer.cs" />
     <Compile Include="Gui\DropdownList.cs" />
-    <Compile Include="Gui\FilledFrameRenderer.cs" />
-    <Compile Include="Gui\Frame.cs" />
+    <Compile Include="Gui\FilledRenderer.cs" />
+    <Compile Include="Gui\Panel.cs" />
     <Compile Include="Gui\Instant.cs" />
     <Compile Include="Gui\IViewRenderer.cs" />
     <Compile Include="Gui\KeyboardEventType.cs" />
     <Compile Include="Gui\Label.cs" />
-    <Compile Include="Gui\ListFrame.cs" />
+    <Compile Include="Gui\ListPanel.cs" />
     <Compile Include="Gui\MouseButton.cs" />
     <Compile Include="Gui\MouseEventArgs.cs" />
     <Compile Include="Gui\MouseEventType.cs" />
@@ -128,7 +128,7 @@
     <Compile Include="Gui\Scrollbar.cs" />
     <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Gui\TextField.cs" />
-    <Compile Include="Gui\TexturedFrameRenderer.cs" />
+    <Compile Include="Gui\TexturedRenderer.cs" />
     <Compile Include="Gui\UIDisplay.cs" />
     <Compile Include="Gui\View.cs">
       <SubType>Code</SubType>

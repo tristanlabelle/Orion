@@ -52,13 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ActionButton.cs" />
-    <Compile Include="Actions\ActionFrame.cs" />
+    <Compile Include="Actions\ActionPanel.cs" />
     <Compile Include="Actions\BuildActionProvider.cs" />
     <Compile Include="Actions\CancelActionProvider.cs" />
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
     <Compile Include="Actions\Enablers\ResearchEnabler.cs" />
     <Compile Include="Actions\Enablers\StandGuardEnabler.cs" />
-    <Compile Include="Actions\TooltipFrame.cs" />
+    <Compile Include="Actions\TooltipPanel.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
     <Compile Include="Actions\Enablers\ActionEnabler.cs" />
     <Compile Include="Actions\Enablers\AttackEnabler.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
     <Compile Include="Renderers\UnitButtonRenderer.cs" />
-    <Compile Include="Renderers\UnitFrameRenderer.cs" />
+    <Compile Include="Renderers\UnitPanelRenderer.cs" />
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="ResourceDisplay.cs" />

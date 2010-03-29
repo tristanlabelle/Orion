@@ -21,13 +21,13 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Constructor
-        public CancelActionProvider(ActionFrame actionFrame, UserInputManager inputManager, GameGraphics gameGraphics)
+        public CancelActionProvider(ActionPanel actionPanel, UserInputManager inputManager, GameGraphics gameGraphics)
         {
-            Argument.EnsureNotNull(actionFrame, "actionFrame");
+            Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            button = actionFrame.CreateCancelButton(inputManager, gameGraphics);
+            button = actionPanel.CreateCancelButton(inputManager, gameGraphics);
         }
         #endregion
 

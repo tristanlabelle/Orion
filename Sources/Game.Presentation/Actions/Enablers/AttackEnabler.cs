@@ -18,8 +18,8 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Constructors
-        public AttackEnabler(UserInputManager manager, ActionFrame frame, GameGraphics gameGraphics)
-            : base(manager, frame, gameGraphics)
+        public AttackEnabler(UserInputManager manager, ActionPanel actionPanel, GameGraphics gameGraphics)
+            : base(manager, actionPanel, gameGraphics)
         {
             this.userCommand = new AttackUserCommand(inputManager, gameGraphics);
         }
@@ -30,10 +30,10 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Attack", Keys.A, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, inputManager, "Attack", Keys.A, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Attack");
-            button.Renderer = new TexturedFrameRenderer(texture);
+            button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += OnButtonPressed;
 
@@ -43,7 +43,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         private void OnButtonPressed(Button button)
         {
             inputManager.SelectedCommand = userCommand;
-            actionFrame.Push(new CancelActionProvider(actionFrame, inputManager, gameGraphics));
+            actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, gameGraphics));
         }
         #endregion
     }

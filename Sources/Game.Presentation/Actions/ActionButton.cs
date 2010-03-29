@@ -16,7 +16,7 @@ namespace Orion.Game.Presentation.Actions
     public class ActionButton : Button
     {
         #region Fields
-        protected readonly ActionFrame actionFrame;
+        protected readonly ActionPanel actionPanel;
         protected readonly UserInputManager inputManager;
         protected readonly GameGraphics gameGraphics;
         private string name;
@@ -24,17 +24,17 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Constructors
-        public ActionButton(ActionFrame actionFrame, UserInputManager inputManager,
+        public ActionButton(ActionPanel actionPanel, UserInputManager inputManager,
             string name, Keys hotkey, GameGraphics gameGraphics)
             : base(new Rectangle(1,1), string.Empty)
         {
-            Argument.EnsureNotNull(actionFrame, "actionFrame");
+            Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
             base.HotKey = hotkey;
-            this.actionFrame = actionFrame;
+            this.actionPanel = actionPanel;
             this.inputManager = inputManager;
             this.gameGraphics = gameGraphics;
             this.name = name;
@@ -97,14 +97,14 @@ namespace Orion.Game.Presentation.Actions
         #region Methods
         protected override bool OnMouseEntered(MouseEventArgs args)
         {
-            actionFrame.TooltipFrame.SetDescription(TooltipText);
-            actionFrame.ShowTooltip();
+            actionPanel.TooltipPanel.SetDescription(TooltipText);
+            actionPanel.ShowTooltip();
             return base.OnMouseEntered(args);
         }
 
         protected override bool OnMouseExited(MouseEventArgs args)
         {
-            actionFrame.HideTooltip();
+            actionPanel.HideTooltip();
             return base.OnMouseExited(args);
         }
         #endregion

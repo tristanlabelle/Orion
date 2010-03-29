@@ -15,8 +15,8 @@ namespace Orion.Game.Presentation.Actions.Enablers
     public sealed class TrainEnabler : ActionEnabler
     {
         #region Constructors
-        public TrainEnabler(UserInputManager inputManager, ActionFrame frame, GameGraphics gameGraphics)
-            : base(inputManager, frame, gameGraphics)
+        public TrainEnabler(UserInputManager inputManager, ActionPanel actionPanel, GameGraphics gameGraphics)
+            : base(inputManager, actionPanel, gameGraphics)
         { }
         #endregion
 
@@ -47,10 +47,10 @@ namespace Orion.Game.Presentation.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionFrame, inputManager, traineeType.Name, Keys.None, gameGraphics);
+                ActionButton button = new ActionButton(actionPanel, inputManager, traineeType.Name, Keys.None, gameGraphics);
 
                 Texture texture = gameGraphics.GetUnitTexture(traineeType);
-                button.Renderer = new TexturedFrameRenderer(texture);
+                button.Renderer = new TexturedRenderer(texture);
 
                 UnitType traineeTypeForClosure = traineeType;
                 button.Triggered += delegate(Button sender) { inputManager.LaunchTrain(traineeTypeForClosure); };

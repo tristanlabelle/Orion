@@ -14,8 +14,8 @@ namespace Orion.Game.Presentation.Actions.Enablers
     public sealed class StandGuardEnabler : ActionEnabler
     {
         #region Constructors
-        public StandGuardEnabler(UserInputManager manager, ActionFrame frame, GameGraphics gameGraphics)
-            : base(manager, frame, gameGraphics)
+        public StandGuardEnabler(UserInputManager manager, ActionPanel actionPanel, GameGraphics gameGraphics)
+            : base(manager, actionPanel, gameGraphics)
         {}
         #endregion
 
@@ -24,10 +24,10 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionFrame, inputManager, "Stand Guard", Keys.G, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, inputManager, "Stand Guard", Keys.G, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Stand Guard");
-            button.Renderer = new TexturedFrameRenderer(texture);
+            button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {

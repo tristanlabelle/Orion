@@ -14,25 +14,25 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {
-    public class ActionFrame : Frame
+    public class ActionPanel : Panel
     {
         #region Fields
         private readonly Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
-        private readonly TooltipFrame tooltipFrame;
+        private readonly TooltipPanel tooltipPanel;
         #endregion
 
         #region Constructors
-        public ActionFrame(Rectangle frame)
+        public ActionPanel(Rectangle frame)
             : base(frame)
         {
-            tooltipFrame = new TooltipFrame(new Vector2(0, Bounds.MaxY), Bounds.Width);
+            tooltipPanel = new TooltipPanel(new Vector2(0, Bounds.MaxY), Bounds.Width);
         }
         #endregion
 
         #region Properties
-        internal TooltipFrame TooltipFrame
+        internal TooltipPanel TooltipPanel
         {
-            get { return tooltipFrame; }
+            get { return tooltipPanel; }
         }
         #endregion
 
@@ -45,7 +45,7 @@ namespace Orion.Game.Presentation.Actions
             ActionButton button = new ActionButton(this, inputManager, "Cancel", Keys.Escape, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Cancel");
-            button.Renderer = new TexturedFrameRenderer(texture);
+            button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
@@ -94,13 +94,13 @@ namespace Orion.Game.Presentation.Actions
 
         internal void ShowTooltip()
         {
-            if (!Children.Contains(tooltipFrame))
-                Children.Add(tooltipFrame);
+            if (!Children.Contains(tooltipPanel))
+                Children.Add(tooltipPanel);
         }
 
         internal void HideTooltip()
         {
-            Children.Remove(tooltipFrame);
+            Children.Remove(tooltipPanel);
         }
 
         public void Refresh()

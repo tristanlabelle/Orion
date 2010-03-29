@@ -4,7 +4,7 @@ using Orion.Engine.Geometry;
 
 namespace Orion.Engine.Gui
 {
-    public sealed class TexturedFrameRenderer : IViewRenderer
+    public sealed class TexturedRenderer : IViewRenderer
     {
         #region Fields
         private readonly Texture texture;
@@ -14,14 +14,14 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Constructors
-        public TexturedFrameRenderer(Texture texture)
+        public TexturedRenderer(Texture texture)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;
             this.tint = Colors.White;
         }
 
-        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor)
+        public TexturedRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;
@@ -29,7 +29,7 @@ namespace Orion.Engine.Gui
             this.borderColor = borderColor;
         }
 
-        public TexturedFrameRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor, ColorRgba backgroundColor)
+        public TexturedRenderer(Texture texture, ColorRgba tint, ColorRgba borderColor, ColorRgba backgroundColor)
         {
             Argument.EnsureNotNull(texture, "texture");
             this.texture = texture;

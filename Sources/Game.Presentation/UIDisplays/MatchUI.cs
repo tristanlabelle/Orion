@@ -33,16 +33,16 @@ namespace Orion.Game.Presentation
         #region General UI
         private readonly MatchRenderer matchRenderer;
         private readonly ClippedView worldView;
-        private readonly Frame hudFrame;
-        private readonly Frame selectionFrame;
+        private readonly Panel hudPanel;
+        private readonly Panel selectionPanel;
         #endregion
 
         #region Pause
-        private readonly Frame pausePanel;
+        private readonly Panel pausePanel;
         #endregion
 
         #region Minimap
-        private readonly Frame minimapFrame;
+        private readonly Panel minimapPanel;
         private bool mouseDownOnMinimap;
         #endregion
 
@@ -57,8 +57,8 @@ namespace Orion.Game.Presentation
         private readonly UserInputManager userInputManager;
         private readonly GameAudio gameAudio;
         private readonly MatchAudioPresenter matchAudioPresenter;
-        private readonly ActionFrame actions;
-        private Frame diplomacyFrame;
+        private readonly ActionPanel actionPanel;
+        private Panel diplomacyPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
@@ -95,27 +95,27 @@ namespace Orion.Game.Presentation
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalFaction);
             Children.Add(resourceDisplay);
 
-            Rectangle pauseButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.69f, 0), new Vector2(0.84f, 1));
-            Button pauseButton = new Button(pauseButtonRectangle, "Pause");
+            Rectangle pauseButtonFrame = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.69f, 0), new Vector2(0.84f, 1));
+            Button pauseButton = new Button(pauseButtonFrame, "Pause");
             pauseButton.Triggered += b => DisplayPausePanel();
             Children.Add(pauseButton);
 
-            Rectangle diplomacyButtonRectangle = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.85f, 0), new Vector2(1, 1));
-            Button diplomacyButton = new Button(diplomacyButtonRectangle, "Diplomatie");
+            Rectangle diplomacyButtonFrame = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.85f, 0), new Vector2(1, 1));
+            Button diplomacyButton = new Button(diplomacyButtonFrame, "Diplomatie");
             diplomacyButton.Triggered += b => DisplayDiplomacy();
             Children.Add(diplomacyButton);
 
-            Rectangle hudRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
-            hudFrame = new Frame(hudRectangle);
-            Children.Add(hudFrame);
+            Rectangle hudPanelFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
+            hudPanel = new Panel(hudPanelFrame);
+            Children.Add(hudPanel);
 
-            Rectangle selectionFrameRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.25f, 0), new Vector2(0.75f, 1));
-            selectionFrame = new Frame(selectionFrameRectangle, Colors.DarkGray);
-            hudFrame.Children.Add(selectionFrame);
+            Rectangle selectionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Vector2(0.25f, 0), new Vector2(0.75f, 1));
+            selectionPanel = new Panel(selectionPanelFrame, Colors.DarkGray);
+            hudPanel.Children.Add(selectionPanel);
 
-            Rectangle actionsRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds, new Vector2(0.75f, 0), new Vector2(1, 1));
-            actions = new ActionFrame(actionsRectangle);
-            hudFrame.Children.Add(actions);
+            Rectangle actionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Vector2(0.75f, 0), new Vector2(1, 1));
+            actionPanel = new ActionPanel(actionPanelFrame);
+            hudPanel.Children.Add(actionPanel);
 
             Vector2 maxMinimapRectangleSize = new Vector2(0.23f, 0.9f);
             Vector2 minimapRectangleSize = maxMinimapRectangleSize;
@@ -128,36 +128,36 @@ namespace Orion.Game.Presentation
                 0.01f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
                 0.05f + (maxMinimapRectangleSize.Y - minimapRectangleSize.Y) * 0.5f);
 
-            Rectangle minimapRectangle = Instant.CreateComponentRectangle(hudFrame.Bounds,
+            Rectangle minimapFrame = Instant.CreateComponentRectangle(hudPanel.Bounds,
                 minimapRectangleOrigin, minimapRectangleOrigin + minimapRectangleSize);
-            minimapFrame = new Frame(minimapRectangle, matchRenderer.MinimapRenderer);
-            minimapFrame.Bounds = world.Bounds;
-            hudFrame.Children.Add(minimapFrame);
+            minimapPanel = new Panel(minimapFrame, matchRenderer.MinimapRenderer);
+            minimapPanel.Bounds = world.Bounds;
+            hudPanel.Children.Add(minimapPanel);
 
             CreateScrollers();
 
-            Rectangle chatInputRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
-            chatInput = new TextField(chatInputRectangle);
+            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
+            chatInput = new TextField(chatInputFrame);
             chatInput.Triggered += SendMessage;
             chatInput.KeyboardButtonPressed += ChatInputKeyDown;
 
-            Rectangle consoleRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
-            console = new MatchConsole(consoleRectangle);
+            Rectangle consoleFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
+            console = new MatchConsole(consoleFrame);
             Children.Add(console);
 
-            Rectangle pausePanelRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
-            pausePanel = new Frame(pausePanelRectangle);
+            Rectangle pausePanelFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
+            pausePanel = new Panel(pausePanelFrame);
 
-            Rectangle quitGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
-            Button quitGame = new Button(quitGameRectangle, "Quitter");
-            quitGame.Triggered += button => match.Quit();
+            Rectangle quitGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
+            Button quitGameButton = new Button(quitGameButtonFrame, "Quitter");
+            quitGameButton.Triggered += button => match.Quit();
 
-            Rectangle resumeGameRectangle = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
-            Button resumeGame = new Button(resumeGameRectangle, match.IsPausable ? "Reprendre" : "Retour");
-            resumeGame.Triggered += button => HidePausePanel();
+            Rectangle resumeGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
+            Button resumeGameButton = new Button(resumeGameButtonFrame, match.IsPausable ? "Reprendre" : "Retour");
+            resumeGameButton.Triggered += button => HidePausePanel();
 
-            pausePanel.Children.Add(quitGame);
-            pausePanel.Children.Add(resumeGame);
+            pausePanel.Children.Add(quitGameButton);
+            pausePanel.Children.Add(resumeGameButton);
 
             KeyboardButtonPressed += (sender, args) => userInputManager.HandleKeyDown(args);
             KeyboardButtonReleased += (sender, args) => userInputManager.HandleKeyUp(args);
@@ -165,23 +165,23 @@ namespace Orion.Game.Presentation
             userInputManager.Selection.Changed += OnSelectionChanged;
             userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
             localCommander.CommandIssued += OnCommanderGeneratedCommand;
-            minimapFrame.MouseButtonPressed += MinimapMouseDown;
-            minimapFrame.MouseMoved += MinimapMouseMove;
+            minimapPanel.MouseButtonPressed += MinimapMouseDown;
+            minimapPanel.MouseMoved += MinimapMouseMove;
 
-            enablers.Add(new MoveEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new AttackEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new StandGuardEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new BuildEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new HarvestEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new TrainEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new HealEnabler(userInputManager, actions, gameGraphics));
-            enablers.Add(new ResearchEnabler(userInputManager, actions, gameGraphics));
+            enablers.Add(new MoveEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new AttackEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new StandGuardEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new BuildEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new HarvestEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new TrainEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new HealEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new ResearchEnabler(userInputManager, actionPanel, gameGraphics));
 
             workerActivityMonitor = new WorkerActivityMonitor(LocalFaction);
             workerActivityMonitor.WorkerActivityStateChanged += OnWorkerActivityStateChanged;
             Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
             Texture workerTexture = gameGraphics.GetUnitTexture("Schtroumpf");
-            TexturedFrameRenderer workerButtonRenderer = new TexturedFrameRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
+            TexturedRenderer workerButtonRenderer = new TexturedRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
             this.idleWorkerButton = new Button(inactiveWorkerRectangle, string.Empty, workerButtonRenderer);
             this.idleWorkerButton.CaptionUpColor = Colors.Red;
             this.idleWorkerButton.Triggered += OnIdleWorkerButtonTriggered;
@@ -474,9 +474,9 @@ namespace Orion.Game.Presentation
 
         private void OnSelectionChanged(Selection selection)
         {
-            while (selectionFrame.Children.Count > 0) selectionFrame.Children[0].Dispose();
-            selectionFrame.Children.Clear();
-            selectionFrame.Renderer = null;
+            while (selectionPanel.Children.Count > 0) selectionPanel.Children[0].Dispose();
+            selectionPanel.Children.Clear();
+            selectionPanel.Renderer = null;
 
             if (selection.Type == SelectionType.Units)
             {
@@ -494,7 +494,7 @@ namespace Orion.Game.Presentation
 
         private void OnCommanderGeneratedCommand(Commander commander, Command command)
         {
-            actions.Restore();
+            actionPanel.Restore();
         }
 
         private void AcceptNewDiplomacy(Button bouton)
@@ -537,14 +537,14 @@ namespace Orion.Game.Presentation
         private void CreateSingleUnitSelectionPanel()
         {
             Unit unit = Selection.Units.First();
-            selectionFrame.Renderer = new UnitFrameRenderer(userInputManager.LocalFaction, unit, gameGraphics);
+            selectionPanel.Renderer = new UnitPanelRenderer(userInputManager.LocalFaction, unit, gameGraphics);
             UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
             Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
             float aspectRatio = Bounds.Width / Bounds.Height;
             unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
 
             unitButton.Triggered += OnUnitButtonPressed;
-            selectionFrame.Children.Add(unitButton);
+            selectionPanel.Children.Add(unitButton);
         }
 
         private void CreateMultipleUnitsSelectionPanel()
@@ -565,13 +565,13 @@ namespace Orion.Game.Presentation
                 return comparison;
             });
 
-            selectionFrame.Renderer = new FilledFrameRenderer(Colors.DarkGray, Colors.Gray);
+            selectionPanel.Renderer = new FilledRenderer(Colors.DarkGray, Colors.Gray);
             const float paddingX = 5;
             const float paddingY = 15;
-            Rectangle frame = new Rectangle(selectionFrame.Bounds.Width / 11 - paddingX * 2,
-                selectionFrame.Bounds.Height / 2.2f - paddingY * 2);
-            float currentX = paddingX + selectionFrame.Bounds.MinX;
-            float currentY = selectionFrame.Bounds.Height - paddingY - frame.Height;
+            Rectangle frame = new Rectangle(selectionPanel.Bounds.Width / 11 - paddingX * 2,
+                selectionPanel.Bounds.Height / 2.2f - paddingY * 2);
+            float currentX = paddingX + selectionPanel.Bounds.MinX;
+            float currentY = selectionPanel.Bounds.Height - paddingY - frame.Height;
             foreach (Unit unit in orderedSelectedUnits)
             {
                 UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
@@ -581,12 +581,12 @@ namespace Orion.Game.Presentation
                 unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
                 unitButton.Triggered += OnUnitButtonPressed;
                 currentX += frame.Width + paddingX;
-                if (currentX + frame.Width > selectionFrame.Bounds.MaxX)
+                if (currentX + frame.Width > selectionPanel.Bounds.MaxX)
                 {
                     currentY -= frame.Height + paddingY;
-                    currentX = paddingX + selectionFrame.Bounds.MinX;
+                    currentX = paddingX + selectionPanel.Bounds.MinX;
                 }
-                selectionFrame.Children.Add(unitButton);
+                selectionPanel.Children.Add(unitButton);
             }
         }
 
@@ -601,7 +601,7 @@ namespace Orion.Game.Presentation
             else
             {
                 SelectionManager.FocusedUnitType = unit.Type;
-                foreach (Button unitButton in selectionFrame.Children)
+                foreach (Button unitButton in selectionPanel.Children)
                 {
                     UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
                     renderer.HasFocus = renderer.Unit.Type == SelectionManager.FocusedUnitType;
@@ -611,11 +611,11 @@ namespace Orion.Game.Presentation
 
         private void UpdateSkillsPanel()
         {
-            actions.Clear();
+            actionPanel.Clear();
             if (Selection.Type != SelectionType.Units) return;
             
             if (Selection.Units.All(u => u.Faction == LocalFaction))
-                actions.Push(new UnitActionProvider(enablers, SelectionManager.FocusedUnitType));
+                actionPanel.Push(new UnitActionProvider(enablers, SelectionManager.FocusedUnitType));
         }
 
         private void MoveWorldView(Vector2 center)
@@ -656,12 +656,14 @@ namespace Orion.Game.Presentation
 
         private void DisplayDiplomacy()
         {
-            Rectangle diplomacyFrameRectangle = Instant.CreateComponentRectangle(Bounds,new Vector2(0.0f,0.0f), new Vector2(1f,1f));
-            diplomacyFrame = new Frame(diplomacyFrameRectangle);
-            Children.Add(diplomacyFrame);
-            Rectangle listFrameRectangle = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
-            ListFrame listFrame = new ListFrame(listFrameRectangle,new Vector2(0,0));
-            Rectangle rectangleFrame = new Rectangle(listFrame.Bounds.Width, listFrame.Bounds.Height/10);
+            Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds,new Vector2(0.0f,0.0f), new Vector2(1f,1f));
+            diplomacyPanel = new Panel(diplomacyPanelFrame);
+            Children.Add(diplomacyPanel);
+
+            Rectangle listPanelFrame = Instant.CreateComponentRectangle(diplomacyPanel.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
+            ListPanel listPanel = new ListPanel(listPanelFrame,new Vector2(0,0));
+
+            Rectangle factionPanelFrame = new Rectangle(listPanel.Bounds.Width, listPanel.Bounds.Height/10);
 
             assocFactionDropList.Clear();
             foreach (Faction faction in World.Factions)
@@ -669,10 +671,10 @@ namespace Orion.Game.Presentation
                 if (faction == LocalFaction) continue;
                 if (faction.Status == FactionStatus.Defeated) continue;
 
-                Frame frameFaction = new Frame(rectangleFrame, faction.Color);
+                Panel factionPanel = new Panel(factionPanelFrame, faction.Color);
                 
-                Rectangle rectangleFaction = Instant.CreateComponentRectangle(frameFaction.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
-                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(rectangleFaction);
+                Rectangle dropdownListFrame = Instant.CreateComponentRectangle(factionPanel.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
+                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(dropdownListFrame);
                 dropdownList.StringConverter = stance => stance == DiplomaticStance.Ally ? "Allié" : "Ennemi";
                 assocFactionDropList.Add(faction, dropdownList);
 
@@ -680,18 +682,17 @@ namespace Orion.Game.Presentation
                 dropdownList.AddItem(DiplomaticStance.Ally);
                 dropdownList.SelectedItem = LocalFaction.GetDiplomaticStance(faction);
 
-                frameFaction.Children.Add(new Label(faction.Name));
-                frameFaction.Children.Add(dropdownList);
-                
+                factionPanel.Children.Add(new Label(faction.Name));
+                factionPanel.Children.Add(dropdownList);
 
-                listFrame.Children.Add(frameFaction);
+                listPanel.Children.Add(factionPanel);
             }
-            diplomacyFrame.Children.Add(listFrame);
+            diplomacyPanel.Children.Add(listPanel);
 
-            Rectangle rectangleButton = Instant.CreateComponentRectangle(diplomacyFrame.Bounds,new Vector2(0.4f,0.01f), new Vector2(0.6f,0.09f));
-            Button acceptButton = new Button(rectangleButton, "Accepter");
+            Rectangle buttonFrame = Instant.CreateComponentRectangle(diplomacyPanel.Bounds,new Vector2(0.4f,0.01f), new Vector2(0.6f,0.09f));
+            Button acceptButton = new Button(buttonFrame, "Accepter");
             acceptButton.Triggered += AcceptNewDiplomacy;
-            diplomacyFrame.Children.Add(acceptButton);
+            diplomacyPanel.Children.Add(acceptButton);
         }
 
         protected override void Dispose(bool disposing)

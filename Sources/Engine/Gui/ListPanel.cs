@@ -7,7 +7,7 @@ using OpenTK.Math;
 
 namespace Orion.Engine.Gui
 {
-    public class ListFrame : ClippedView
+    public class ListPanel : ClippedView
     {
         #region Fields
         private readonly Action<View, Rectangle> frameChangedHandler;
@@ -15,12 +15,12 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Constructors
-        public ListFrame(Rectangle frame)
+        public ListPanel(Rectangle frame)
             : this(frame, new Vector2(0, 0))
         { }
 
-        public ListFrame(Rectangle frame, Vector2 padding)
-            : base(frame, new Rectangle(0, frame.Height - padding.Y, frame.Width, padding.Y), new FilledFrameRenderer())
+        public ListPanel(Rectangle frame, Vector2 padding)
+            : base(frame, new Rectangle(0, frame.Height - padding.Y, frame.Width, padding.Y), new FilledRenderer())
         {
             this.padding = padding;
             frameChangedHandler = OnChildFrameChanged;

@@ -12,7 +12,7 @@ using Font = System.Drawing.Font;
 
 namespace Orion.Game.Presentation.Actions
 {
-    internal class TooltipFrame : View
+    internal class TooltipPanel : View
     {
         #region Fields
         private readonly Vector2 origin;
@@ -22,7 +22,7 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Constructors
-        public TooltipFrame(Vector2 origin, float width)
+        public TooltipPanel(Vector2 origin, float width)
             : base(new Rectangle(origin.X, origin.Y, width, 0))
         {
             tooltipFont = new Font("Trebuchet MS", 12);

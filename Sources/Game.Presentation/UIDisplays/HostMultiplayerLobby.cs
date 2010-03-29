@@ -28,7 +28,7 @@ namespace Orion.Game.Presentation
         private IPv4EndPoint? requestedJoin;
         private int frameCounter;
 
-        private readonly ListFrame gamesFrame;
+        private readonly ListPanel gameListPanel;
         private readonly Rectangle gameButtonRectangle;
         #endregion
 
@@ -40,12 +40,12 @@ namespace Orion.Game.Presentation
             receptionDelegate = OnReceive;
             timeoutDelegate = OnTimeout;
 
-            Rectangle gamesFrameRect = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            gameButtonRectangle = new Rectangle(gamesFrameRect.Width - 20, 30);
-            gamesFrame = new ListFrame(gamesFrameRect, new Vector2(10, 10));
-            Children.Add(gamesFrame);
+            Rectangle gameListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
+            gameButtonRectangle = new Rectangle(gameListFrame.Width - 20, 30);
+            gameListPanel = new ListPanel(gameListFrame, new Vector2(10, 10));
+            Children.Add(gameListPanel);
 
-            Rectangle hostFrame = new Rectangle(gamesFrameRect.MaxX + 10, gamesFrameRect.MaxY, 200, -50);
+            Rectangle hostFrame = new Rectangle(gameListFrame.MaxX + 10, gameListFrame.MaxY, 200, -50);
             Button hostButton = new Button(hostFrame, "Héberger");
             hostButton.Triggered += PressHostGame;
             Children.Add(hostButton);
@@ -140,7 +140,7 @@ namespace Orion.Game.Presentation
             {
                 Button button = new Button(gameButtonRectangle, caption);
                 button.Triggered += b => { if (!requestedJoin.HasValue) AskJoinGame(host); };
-                gamesFrame.Children.Add(button);
+                gameListPanel.Children.Add(button);
                 hostedGames[host] = button;
             }
             else

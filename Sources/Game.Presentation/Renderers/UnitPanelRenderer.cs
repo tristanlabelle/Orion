@@ -15,7 +15,7 @@ using Font = System.Drawing.Font;
 
 namespace Orion.Game.Presentation.Renderers
 {
-    public sealed class UnitFrameRenderer : IViewRenderer
+    public sealed class UnitPanelRenderer : IViewRenderer
     {
         #region Fields
         private static readonly ColorRgb progressBarColor = Colors.Gold;
@@ -37,7 +37,7 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Constructors
-        public UnitFrameRenderer(Faction faction, Unit unit, GameGraphics gameGraphics)
+        public UnitPanelRenderer(Faction faction, Unit unit, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(unit, "unit");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");

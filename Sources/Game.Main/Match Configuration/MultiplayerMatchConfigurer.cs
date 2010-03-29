@@ -39,7 +39,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(options.MapSize);
+            CreateWorld(settings.MapSize);
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
@@ -55,14 +55,14 @@ namespace Orion.Main
                 if (slot is LocalPlayerSlot)
                 {
                     string hostName = Environment.MachineName;
-                    Faction faction = world.CreateFaction(hostName, color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
-                    if (options.RevealTopology) faction.LocalFogOfWar.Reveal();
+                    Faction faction = world.CreateFaction(hostName, color, settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
+                    if (settings.RevealTopology) faction.LocalFogOfWar.Reveal();
                     localCommander = new SlaveCommander(faction);
                 }
                 else if (slot is AIPlayerSlot)
                 {
-                    Faction faction = world.CreateFaction(Colors.GetName(color), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
-                    if (options.RevealTopology) faction.LocalFogOfWar.Reveal();
+                    Faction faction = world.CreateFaction(Colors.GetName(color), color, settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
+                    if (settings.RevealTopology) faction.LocalFogOfWar.Reveal();
                     Commander commander = new AgressiveAICommander(faction, random);
                     // AIs bypass the synchronization filter as they are supposed to be fully deterministic
                     aiCommanders.Add(commander);
@@ -71,8 +71,8 @@ namespace Orion.Main
                 {
                     RemotePlayerSlot remotePlayerSlot = (RemotePlayerSlot)slot;
                     IPv4EndPoint endPoint = remotePlayerSlot.HostEndPoint.Value;
-                    Faction faction = world.CreateFaction(remotePlayerSlot.ToString(), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
-                    if (options.RevealTopology) faction.LocalFogOfWar.Reveal();
+                    Faction faction = world.CreateFaction(remotePlayerSlot.ToString(), color, settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
+                    if (settings.RevealTopology) faction.LocalFogOfWar.Reveal();
                     FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
                     peers.Add(peer);
                 }
@@ -82,14 +82,15 @@ namespace Orion.Main
                 }
             }
 
-            WorldGenerator.Generate(world, random, !options.IsNomad);
+            WorldGenerator.Generate(world, random, !settings.IsNomad);
             match = new Match(random, world);
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            TryPushReplayRecorderToPipeline(pipeline);
+            TryPushCheatCodeExecutor(pipeline, match);
             ICommandSink aiCommandSink = pipeline.TopMostSink;
-            pipeline.PushFilter(new CommandOptimizer());
+            TryPushReplayRecorder(pipeline);
             pipeline.PushFilter(new CommandSynchronizer(match, transporter, peers));
+            pipeline.PushFilter(new CommandOptimizer());
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander, aiCommandSink));
             pipeline.AddCommander(localCommander);

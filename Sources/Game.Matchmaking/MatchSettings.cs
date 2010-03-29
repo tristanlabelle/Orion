@@ -5,11 +5,187 @@ using System.Text;
 using System.Reflection;
 using System.ComponentModel;
 using Orion.Engine;
+using System.IO;
 
 namespace Orion.Game.Matchmaking
 {
-    public class MatchSettings
+    /// <summary>
+    /// Stores the information needed to setupa deathmatch.
+    /// </summary>
+    [Serializable]
+    public sealed class MatchSettings
     {
+        #region Instance
+        #region Fields
+        private Size mapSize = new Size(150, 150);
+        
+        private int foodLimit = 200;
+        private int initialAladdiumAmount = 200;
+        private int initialAlageneAmount;
+        private int randomSeed = (int)Environment.TickCount;
+
+        private bool revealTopology;
+        private bool isNomad;
+        private bool areCheatsEnabled;
+        #endregion
+
+        #region Events
+        public event Action<MatchSettings> MapSizeChanged;
+        public event Action<MatchSettings> FoodLimitChanged;
+        public event Action<MatchSettings> InitialAladdiumAmountChanged;
+        public event Action<MatchSettings> InitialAlageneAmountChanged;
+        public event Action<MatchSettings> RandomSeedChanged;
+        public event Action<MatchSettings> RevealTopologyChanged;
+        public event Action<MatchSettings> IsNomadChanged;
+        public event Action<MatchSettings> CheatsEnabledChanged;
+        public event Action<MatchSettings> Changed;
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Accesses the size of the world map.
+        /// </summary>
+        public Size MapSize
+        {
+            get { return mapSize; }
+            set
+            {
+                if (value == mapSize) return;
+                mapSize = value;
+                TriggerEvent(MapSizeChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the maximum amount of food that can be used by factions.
+        /// </summary>
+        public int FoodLimit
+        {
+            get { return foodLimit; }
+            set
+            {
+                if (value == foodLimit) return;
+                Argument.EnsurePositive(value, "FoodLimit");
+                foodLimit = value;
+                TriggerEvent(FoodLimitChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the amount of aladdium units factions start with.
+        /// </summary>
+        public int InitialAladdiumAmount
+        {
+            get { return initialAladdiumAmount; }
+            set
+            {
+                if (value == initialAladdiumAmount) return;
+                Argument.EnsurePositive(value, "InitialAladdiumAmount");
+                initialAladdiumAmount = value;
+                TriggerEvent(InitialAladdiumAmountChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the amount of alagene units factions start with.
+        /// </summary>
+        public int InitialAlageneAmount
+        {
+            get { return initialAlageneAmount; }
+            set
+            {
+                if (value == initialAlageneAmount) return;
+                Argument.EnsurePositive(value, "InitialAlageneAmount");
+                initialAlageneAmount = value;
+                TriggerEvent(InitialAlageneAmountChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the value used as the game's random seed.
+        /// </summary>
+        public int RandomSeed
+        {
+            get { return randomSeed; }
+            set
+            {
+                if (value == randomSeed) return;
+                randomSeed = value;
+                TriggerEvent(RandomSeedChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if the topology of the map is visible when the game starts.
+        /// </summary>
+        public bool RevealTopology
+        {
+            get { return revealTopology; }
+            set
+            {
+                if (value == revealTopology) return;
+                revealTopology = value;
+                TriggerEvent(RevealTopologyChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if the factions should start nomad,
+        /// without any buildings.
+        /// </summary>
+        public bool IsNomad
+        {
+            get { return isNomad; }
+            set
+            {
+                if (value == isNomad) return;
+                isNomad = value;
+                TriggerEvent(IsNomadChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if cheats can be used in the game.
+        /// </summary>
+        public bool AreCheatsEnabled
+        {
+            get { return areCheatsEnabled; }
+            set
+            {
+                if (value == areCheatsEnabled) return;
+                areCheatsEnabled = value;
+                TriggerEvent(CheatsEnabledChanged);
+            }
+        }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Serializes this object to its binary representation.
+        /// </summary>
+        /// <param name="writer">The binary writer to which to write the serialized data.</param>
+        public void Serialize(BinaryWriter writer)
+        {
+            Argument.EnsureNotNull(writer, "writer");
+            writer.Write(mapSize.Width);
+            writer.Write(mapSize.Height);
+            writer.Write(foodLimit);
+            writer.Write(initialAladdiumAmount);
+            writer.Write(initialAlageneAmount);
+            writer.Write(randomSeed);
+            writer.Write(revealTopology);
+            writer.Write(isNomad);
+            writer.Write(areCheatsEnabled);
+        }
+
+        private void TriggerEvent(Action<MatchSettings> eventHandler)
+        {
+            eventHandler.Raise(this);
+            Changed.Raise(this);
+        }
+        #endregion
+        #endregion
+
         #region Static
         #region Fields
 #if DEBUG
@@ -21,109 +197,27 @@ namespace Orion.Game.Matchmaking
         public const int SuggestedMinimumAlagene = 0;
         public const int SuggestedMinimumAladdium = 0;
         #endregion
-        #endregion
-
-        #region Instance
-        #region Fields
-        private Size mapSize = new Size(150, 150);
-        
-        private int maximumPopulation = 200;
-        private int initialAladdiumAmount = 200;
-        private int initialAlageneAmount = 0;
-        private int seed = 0;
-
-        private bool revealTopology = false;
-        private bool isNomad = false;
-        #endregion
-
-        #region Events
-        public event Action<MatchSettings> MapSizeChanged;
-        public event Action<MatchSettings> IsNomadChanged;
-        public event Action<MatchSettings> MaximumPopulationChanged;
-        public event Action<MatchSettings> RevealTopologyChanged;
-        public event Action<MatchSettings> InitialAladdiumAmountChanged;
-        public event Action<MatchSettings> InitialAlageneAmountChanged;
-        public event Action<MatchSettings> RandomSeedChanged;
-        public event Action<MatchSettings> Changed;
-        #endregion
-
-        #region Properties
-        public Size MapSize
-        {
-            get { return mapSize; }
-            set
-            {
-                mapSize = value;
-                TriggerEvent(MapSizeChanged);
-            }
-        }
-
-        public bool IsNomad
-        {
-            get { return isNomad; }
-            set
-            {
-                isNomad = value;
-                TriggerEvent(IsNomadChanged);
-            }
-        }
-
-        public int RandomSeed
-        {
-            get { return seed; }
-            set
-            {
-                seed = value;
-                TriggerEvent(RandomSeedChanged);
-            }
-        }
-
-        public int MaximumPopulation
-        {
-            get { return maximumPopulation; }
-            set
-            {
-                maximumPopulation = value;
-                TriggerEvent(MaximumPopulationChanged);
-            }
-        }
-
-        public bool RevealTopology
-        {
-            get { return revealTopology; }
-            set
-            {
-                revealTopology = value;
-                TriggerEvent(RevealTopologyChanged);
-            }
-        }
-
-        public int InitialAladdiumAmount
-        {
-            get { return initialAladdiumAmount; }
-            set
-            {
-                initialAladdiumAmount = value;
-                TriggerEvent(InitialAladdiumAmountChanged);
-            }
-        }
-
-        public int InitialAlageneAmount
-        {
-            get { return initialAlageneAmount; }
-            set
-            {
-                initialAlageneAmount = value;
-                TriggerEvent(InitialAlageneAmountChanged);
-            }
-        }
-        #endregion
 
         #region Methods
-        private void TriggerEvent(Action<MatchSettings> eventHandler)
+        /// <summary>
+        /// Deserializes the binary representation of this object.
+        /// </summary>
+        /// <param name="reader">The data reader to be used.</param>
+        /// <returns>The deserialized data.</returns>
+        public static MatchSettings Deserialize(BinaryReader reader)
         {
-            eventHandler.Raise(this);
-            Changed.Raise(this);
+            Argument.EnsureNotNull(reader, "reader");
+            return new MatchSettings
+            {
+                mapSize = new Size(reader.ReadInt32(), reader.ReadInt32()),
+                foodLimit = reader.ReadInt32(),
+                initialAladdiumAmount = reader.ReadInt32(),
+                initialAlageneAmount = reader.ReadInt32(),
+                randomSeed = reader.ReadInt32(),
+                revealTopology = reader.ReadBoolean(),
+                isNomad = reader.ReadBoolean(),
+                areCheatsEnabled = reader.ReadBoolean()
+            };
         }
         #endregion
         #endregion

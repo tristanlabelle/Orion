@@ -22,7 +22,7 @@ namespace Orion.Main
             BinaryReader replayReader = new BinaryReader(replayFile.OpenRead());
             replay = new ReplayReader(replayReader);
 
-            options = replay.Options;
+            settings = replay.Options;
         }
 
         protected override MatchConfigurationUI AbstractUserInterface
@@ -32,7 +32,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(options.MapSize);
+            CreateWorld(settings.MapSize);
 
             Faction userFaction = world.CreateSpectatorFaction();
             userFaction.LocalFogOfWar.Disable();
@@ -41,18 +41,18 @@ namespace Orion.Main
             int colorIndex = 0;
             foreach (string factionName in replay.FactionNames)
             {
-                Faction faction = world.CreateFaction(factionName, Faction.Colors[colorIndex], options.InitialAladdiumAmount, options.InitialAlageneAmount);
-                if (options.RevealTopology)
+                Faction faction = world.CreateFaction(factionName, Faction.Colors[colorIndex], settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
+                if (settings.RevealTopology)
                     faction.LocalFogOfWar.Reveal();
                 colorIndex++;
             }
 
-            WorldGenerator.Generate(world, random, options.IsNomad);
+            WorldGenerator.Generate(world, random, settings.IsNomad);
             match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
+            TryPushCheatCodeExecutor(pipeline, match);
             pipeline.PushFilter(new ReplayPlayer(replay));
 
             match.Updated += (sender, args) =>

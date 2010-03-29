@@ -69,7 +69,7 @@ namespace Orion.Game.Matchmaking
             writer.Write(options.InitialAlageneAmount);
             writer.Write(options.MapSize.Width);
             writer.Write(options.MapSize.Height);
-            writer.Write(options.MaximumPopulation);
+            writer.Write(options.FoodLimit);
             writer.Write(options.RevealTopology);
             writer.Write(options.RandomSeed);
             writer.Write(options.IsNomad);

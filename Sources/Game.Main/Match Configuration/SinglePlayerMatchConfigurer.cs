@@ -19,8 +19,9 @@ namespace Orion.Main
         #region Constructors
         public SinglePlayerMatchConfigurer()
         {
-            options.RandomSeed = (int)Environment.TickCount;
-            ui = new SinglePlayerMatchConfigurationUI(options);
+            settings.AreCheatsEnabled = true;
+
+            ui = new SinglePlayerMatchConfigurationUI(settings);
             ui.PressedStartGame += PressStart;
         }
         #endregion
@@ -38,7 +39,7 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            CreateWorld(options.MapSize);
+            CreateWorld(settings.MapSize);
 
             localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
@@ -49,8 +50,8 @@ namespace Orion.Main
                 if (slot is RemotePlayerSlot && !((RemotePlayerSlot)slot).HostEndPoint.HasValue) continue;
 
                 ColorRgb color = Faction.Colors[colorIndex];
-                Faction faction = world.CreateFaction(Colors.GetName(color), color, options.InitialAladdiumAmount, options.InitialAlageneAmount);
-                if (options.RevealTopology) faction.LocalFogOfWar.Reveal();
+                Faction faction = world.CreateFaction(Colors.GetName(color), color, settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
+                if (settings.RevealTopology) faction.LocalFogOfWar.Reveal();
                 colorIndex++;
 
                 if (slot is LocalPlayerSlot)
@@ -68,13 +69,13 @@ namespace Orion.Main
                 }
             }
 
-            WorldGenerator.Generate(world, random, !options.IsNomad);
+            WorldGenerator.Generate(world, random, !settings.IsNomad);
             match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
-            pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
-            TryPushReplayRecorderToPipeline(pipeline);
+            TryPushCheatCodeExecutor(pipeline, match);
+            TryPushReplayRecorder(pipeline);
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));
             pipeline.AddCommander(localCommander);

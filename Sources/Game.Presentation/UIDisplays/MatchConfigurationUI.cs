@@ -37,14 +37,14 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(MatchSettings options)
-            : this(options, true)
+        public MatchConfigurationUI(MatchSettings settings)
+            : this(settings, true)
         { }
 
-        public MatchConfigurationUI(MatchSettings options, bool isGameMaster)
+        public MatchConfigurationUI(MatchSettings settings, bool isGameMaster)
         {
             this.isGameMaster = isGameMaster;
-            this.options = options;
+            this.options = settings;
 
             backgroundPanel = new Panel(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
             Children.Add(backgroundPanel);
@@ -73,55 +73,57 @@ namespace Orion.Game.Presentation
 
             {
                 Button optionButton = AddLabelButtonOption("Taille du terrain",
-                    options.MapSize.ToString(),
+                    settings.MapSize.ToString(),
                     "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumMapSize),
                     ValidateMapSize);
-                options.MapSizeChanged += o => optionButton.Caption = o.MapSize.ToString();
+                settings.MapSizeChanged += o => optionButton.Caption = o.MapSize.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Limite de nourriture",
-                    options.MaximumPopulation.ToString(),
+                    settings.FoodLimit.ToString(),
                 "Entrez la nouvelle limite de nourriture désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumPopulation),
                 ValidateFoodLimit);
-                options.MaximumPopulationChanged += o => optionButton.Caption = o.MaximumPopulation.ToString();
+                settings.FoodLimitChanged += o => optionButton.Caption = o.FoodLimit.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Quantité initiale d'aladdium",
-                    options.InitialAladdiumAmount.ToString(),
+                    settings.InitialAladdiumAmount.ToString(),
                 "Entrez la nouvelle quantité initiale d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium),
                 ValidateInitialAladdiumAmount);
-                options.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
+                settings.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Quantité initiale d'alagène",
-                    options.InitialAlageneAmount.ToString(),
+                    settings.InitialAlageneAmount.ToString(),
                 "Entrez la nouvelle quantité initiale d'alagène désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAlagene),
                 ValidateInitialAlageneAmount);
-                options.InitialAlageneAmountChanged += o => optionButton.Caption = o.InitialAlageneAmount.ToString();
+                settings.InitialAlageneAmountChanged += o => optionButton.Caption = o.InitialAlageneAmount.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Germe de génération",
-                    options.RandomSeed.ToString(),
+                    settings.RandomSeed.ToString(),
                 "Entrez le nouveau germe de génération aléatoire.",
                 ValidateRandomSeed);
-                options.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
+                settings.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
             }
 
             optionsListPanel.Children.Add(new Panel(RowFrame)); // separator
 
-            #region Reveal Topology
             {
-                Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => options.RevealTopology = value);
-                options.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
+                Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => settings.RevealTopology = value);
+                checkbox.State = settings.RevealTopology;
+                settings.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
             }
-            #endregion
-
-            #region Reveal Topology
             {
-                Checkbox checkbox = AddCheckboxOption("Début nomade", value => options.IsNomad = value);
-                options.IsNomadChanged += o => checkbox.State = o.IsNomad;
+                Checkbox checkbox = AddCheckboxOption("Début nomade", value => settings.IsNomad = value);
+                checkbox.State = settings.IsNomad;
+                settings.IsNomadChanged += o => checkbox.State = o.IsNomad;
             }
-            #endregion
+            {
+                Checkbox checkbox = AddCheckboxOption("Codes de triche", value => settings.AreCheatsEnabled = value);
+                checkbox.State = settings.AreCheatsEnabled;
+                settings.IsNomadChanged += o => checkbox.State = o.AreCheatsEnabled;
+            }
             #endregion
         }
         #endregion
@@ -293,7 +295,7 @@ namespace Orion.Game.Presentation
                 || maxPop < MatchSettings.SuggestedMinimumPopulation)
                 return false;
 
-            options.MaximumPopulation = maxPop;
+            options.FoodLimit = maxPop;
             return true;
         }
 

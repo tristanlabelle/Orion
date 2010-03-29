@@ -26,7 +26,7 @@ namespace Orion.Main
             : base(transporter)
         {
             this.gameHost = host;
-            ui = new MultiplayerMatchConfigurationUI(options, transporter, false);
+            ui = new MultiplayerMatchConfigurationUI(settings, transporter, false);
             ui.PressedExit += ExitGame;
             ui.Entered += EnterRootView;
         }
@@ -108,13 +108,7 @@ namespace Orion.Main
                     SetupMessageType messageType = (SetupMessageType)reader.ReadByte();
                     Debug.Assert(messageType == SetupMessageType.ChangeOptions);
 
-                    options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
-                    options.IsNomad = reader.ReadBoolean();
-                    options.MaximumPopulation = reader.ReadInt32();
-                    options.RevealTopology = reader.ReadBoolean();
-                    options.InitialAladdiumAmount = reader.ReadInt32();
-                    options.InitialAlageneAmount = reader.ReadInt32();
-                    options.RandomSeed = reader.ReadInt32();
+                    settings = MatchSettings.Deserialize(reader);
 
                     Debug.Assert(reader.PeekChar() == -1, "Warning: The options packet contained more data than we read.");
                 }

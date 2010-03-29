@@ -13,7 +13,7 @@ namespace Orion.Main
     abstract class MatchConfigurer
     {
         #region Fields
-        protected MatchSettings options = new MatchSettings();
+        protected MatchSettings settings = new MatchSettings();
         protected World world;
         protected Random random;
         #endregion
@@ -32,7 +32,7 @@ namespace Orion.Main
 
         public MatchSettings Options
         {
-            get { return options; }
+            get { return settings; }
         }
 
         public MatchConfigurationUI UserInterface
@@ -44,6 +44,8 @@ namespace Orion.Main
         #endregion
 
         #region Methods
+        public abstract void Start(out Match match, out SlaveCommander commander);
+
         protected void StartGame()
         {
             Action<MatchConfigurer> handler = GameStarted;
@@ -52,13 +54,18 @@ namespace Orion.Main
 
         protected void CreateWorld(Size worldSize)
         {
-            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.RandomSeed));
-            random = new MersenneTwister(options.RandomSeed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(settings.RandomSeed));
+            random = new MersenneTwister(settings.RandomSeed);
             Terrain terrain = Terrain.Generate(worldSize, random);
-            world = new World(terrain, random, options.MaximumPopulation);
+            world = new World(terrain, random, settings.FoodLimit);
         }
 
-        protected void TryPushReplayRecorderToPipeline(CommandPipeline pipeline)
+        protected void TryPushCheatCodeExecutor(CommandPipeline pipeline, Match match)
+        {
+            if (settings.AreCheatsEnabled) pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
+        }
+
+        protected void TryPushReplayRecorder(CommandPipeline pipeline)
         {
             Argument.EnsureNotNull(pipeline, "pipeline");
 
@@ -66,18 +73,16 @@ namespace Orion.Main
             if (replayRecorder != null) pipeline.PushFilter(replayRecorder);
         }
 
-        protected ReplayRecorder TryCreateReplayRecorder()
+        private ReplayRecorder TryCreateReplayRecorder()
         {
             ReplayWriter replayWriter = ReplayWriter.TryCreate();
             if (replayWriter == null) return null;
 
             replayWriter.AutoFlush = true;
-            replayWriter.WriteHeader(options, world.Factions.Select(faction => faction.Name));
+            replayWriter.WriteHeader(settings, world.Factions.Select(faction => faction.Name));
 
             return new ReplayRecorder(replayWriter);
         }
-
-        public abstract void Start(out Match match, out SlaveCommander commander);
         #endregion
     }
 }

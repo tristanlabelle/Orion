@@ -30,7 +30,7 @@ namespace Orion.Game.Matchmaking
             options.InitialAladdiumAmount = reader.ReadInt32();
             options.InitialAlageneAmount = reader.ReadInt32();
             options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
-            options.MaximumPopulation = reader.ReadInt32();
+            options.FoodLimit = reader.ReadInt32();
             options.RevealTopology = reader.ReadBoolean();
             options.RandomSeed = reader.ReadInt32();
             options.IsNomad = reader.ReadBoolean();

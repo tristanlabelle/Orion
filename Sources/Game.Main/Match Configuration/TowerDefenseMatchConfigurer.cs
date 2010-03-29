@@ -18,9 +18,9 @@ namespace Orion.Main
         #region Constructors
         public TowerDefenseMatchConfigurer()
         {
-            options.RandomSeed = (int)Environment.TickCount;
-            options.InitialAladdiumAmount = 500;
-            options.InitialAlageneAmount = 0;
+            settings.RandomSeed = (int)Environment.TickCount;
+            settings.InitialAladdiumAmount = 500;
+            settings.InitialAlageneAmount = 0;
         }
         #endregion
 
@@ -32,13 +32,13 @@ namespace Orion.Main
 
         public override void Start(out Match match, out SlaveCommander localCommander)
         {
-            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(options.RandomSeed));
-            random = new MersenneTwister(options.RandomSeed);
+            Debug.WriteLine("Mersenne Twister Seed: {0}.".FormatInvariant(settings.RandomSeed));
+            random = new MersenneTwister(settings.RandomSeed);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
-            world = new World(terrain, random, options.MaximumPopulation);
+            world = new World(terrain, random, settings.FoodLimit);
             CreepPath creepPath = CreepPath.Generate(world.Size, new Random());
 
-            Faction localFaction = world.CreateFaction("Player", Colors.Red, options.InitialAladdiumAmount, options.InitialAlageneAmount);
+            Faction localFaction = world.CreateFaction("Player", Colors.Red, settings.InitialAladdiumAmount, settings.InitialAlageneAmount);
             localFaction.LocalFogOfWar.Disable();
             localFaction.CreateUnit(world.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(localFaction);

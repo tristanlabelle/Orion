@@ -11,7 +11,7 @@ using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using System.IO;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     sealed class MultiplayerHostMatchConfigurer : MultiplayerMatchConfigurer
     {
@@ -25,8 +25,8 @@ namespace Orion.Main
         {
             settings.Changed += TransferOptionChanges;
             ui = new MultiplayerMatchConfigurationUI(settings, transporter, true);
-            ui.PressedStartGame += PressStartGame;
-            ui.PressedExit += ExitGame;
+            ui.StartGamePressed += PressStartGame;
+            ui.ExitPressed += ExitGame;
             ui.SlotOccupationChanged += SlotChanged;
             ui.KickedPlayer += KickedPlayer;
         }

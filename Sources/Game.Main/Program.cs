@@ -18,7 +18,7 @@ using Orion.Game.Presentation.Audio;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     internal class Program : IDisposable
     {
@@ -257,10 +257,49 @@ namespace Orion.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            using (Program program = new Program())
+            //using (Program program = new Program())
+            //{
+            //    program.StartProgram();
+            //    program.Run();
+            //}
+
+            GameGraphics gameGraphics = new GameGraphics();
+            GameStateManager gameStateManager = new GameStateManager();
+            gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            FrameRateCounter updateRateCounter = new FrameRateCounter();
+            FrameRateCounter drawRateCounter = new FrameRateCounter();
+
+            // This run loop uses a fixed time step for the updates and manages
+            // situations where either the rendering or the updating is slow.
+            // Source: http://gafferongames.com/game-physics/fix-your-timestep/
+            float gameTime = 0.0f;
+
+            float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
+            float timeAccumulator = 0.0f;
+
+            while (gameGraphics.IsWindowCreated && gameStateManager.ActiveState != null)
             {
-                program.StartProgram();
-                program.Run();
+                bool countersUpdated = false;
+
+                float newTime = (float)stopwatch.Elapsed.TotalSeconds;
+                float actualTimeDelta = newTime - oldTime;
+                if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
+                timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
+                oldTime = newTime;
+
+                while (timeAccumulator >= TargetSecondsPerFrame)
+                {
+                    gameStateManager.Update(TargetSecondsPerFrame);
+                    countersUpdated |= updateRateCounter.Update();
+
+                    gameTime += TargetSecondsPerFrame;
+                    timeAccumulator -= TargetSecondsPerFrame;
+                }
+
+                gameGraphics.Refresh();
+                countersUpdated |= drawRateCounter.Update();
             }
 
             Debug.Assert(Texture.AliveCount == 0,

@@ -1,4 +1,4 @@
-﻿namespace Orion.Main
+﻿namespace Orion.Game.Main
 {
     enum SlotType : byte
     {

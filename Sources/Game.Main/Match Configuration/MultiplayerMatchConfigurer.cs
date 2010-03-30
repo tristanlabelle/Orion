@@ -11,7 +11,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     abstract class MultiplayerMatchConfigurer : MatchConfigurer, IDisposable
     {

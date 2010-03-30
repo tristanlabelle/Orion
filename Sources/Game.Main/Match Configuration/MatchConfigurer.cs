@@ -8,7 +8,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     abstract class MatchConfigurer
     {

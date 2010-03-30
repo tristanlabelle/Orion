@@ -12,7 +12,7 @@ using Orion.Game.Presentation;
 using System.IO;
 using System.Diagnostics;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     sealed class MultiplayerClientMatchConfigurer : MultiplayerMatchConfigurer
     {
@@ -27,7 +27,7 @@ namespace Orion.Main
         {
             this.gameHost = host;
             ui = new MultiplayerMatchConfigurationUI(settings, transporter, false);
-            ui.PressedExit += ExitGame;
+            ui.ExitPressed += ExitGame;
             ui.Entered += EnterRootView;
         }
         #endregion

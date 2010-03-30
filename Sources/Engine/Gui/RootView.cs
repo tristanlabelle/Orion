@@ -8,6 +8,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Orion.Engine.Gui
 {
@@ -91,17 +92,40 @@ namespace Orion.Engine.Gui
         }
 
         #region Public event generation
-        public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
+        public void SendInputEvent(InputEvent inputEvent)
+        {
+            switch (inputEvent.Type)
+            {
+                case InputEventType.Keyboard:
+                    KeyboardEventType type;
+                    KeyboardEventArgs args;
+                    inputEvent.GetKeyboard(out type, out args);
+                    SendKeyboardEvent(type, args);
+                    break;
+
+                case InputEventType.Mouse:
+                    break;
+
+                case InputEventType.Character:
+                    break;
+
+                default:
+                    Debug.Fail("Unknown input event type: {0}.".FormatInvariant(inputEvent.Type));
+                    break;
+            }
+        }
+        
+        private void SendMouseEvent(MouseEventType type, MouseEventArgs args)
         {
             PropagateMouseEvent(type, args);
         }
 
-        public void SendKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+        private void SendKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
         {
             PropagateKeyboardEvent(type, args);
         }
 
-        public void SendCharacterTypedEvent(char character)
+        private void SendCharacterTypedEvent(char character)
         {
             PropagateCharacterTypedEvent(character);
         }

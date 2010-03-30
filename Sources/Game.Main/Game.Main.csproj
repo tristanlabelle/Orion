@@ -54,6 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameState.cs" />
+    <Compile Include="GameStateManager.cs" />
+    <Compile Include="MainMenuGameState.cs" />
     <Compile Include="Match Configuration\MultiplayerClientMatchConfigurer.cs" />
     <Compile Include="Match Configuration\MultiplayerHostMatchConfigurer.cs" />
     <Compile Include="Match Configuration\MatchConfigurer.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Match Configuration\SinglePlayerMatchConfigurer.cs" />
+    <Compile Include="SinglePlayerDeathmatchSetupGameState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

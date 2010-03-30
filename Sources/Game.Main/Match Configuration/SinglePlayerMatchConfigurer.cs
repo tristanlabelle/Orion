@@ -8,7 +8,7 @@ using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     sealed class SinglePlayerMatchConfigurer : MatchConfigurer
     {
@@ -22,7 +22,7 @@ namespace Orion.Main
             settings.AreCheatsEnabled = true;
 
             ui = new SinglePlayerMatchConfigurationUI(settings);
-            ui.PressedStartGame += PressStart;
+            ui.StartGamePressed += PressStart;
         }
         #endregion
 

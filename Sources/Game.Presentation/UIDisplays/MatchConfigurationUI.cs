@@ -133,8 +133,8 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<MatchConfigurationUI> PressedStartGame;
-        public event Action<MatchConfigurationUI> PressedExit;
+        public event Action<MatchConfigurationUI> StartGamePressed;
+        public event Action<MatchConfigurationUI> ExitPressed;
         public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
         #endregion
 
@@ -238,13 +238,13 @@ namespace Orion.Game.Presentation
 
         protected virtual void OnPressedExit(Button button)
         {
-            PressedExit.Raise(this);
+            ExitPressed.Raise(this);
             Parent.PopDisplay(this);
         }
 
         protected virtual void OnPressedStartGame(Button button)
         {
-            PressedStartGame.Raise(this);
+            StartGamePressed.Raise(this);
         }
         #endregion
 
@@ -341,8 +341,8 @@ namespace Orion.Game.Presentation
         {
             if (disposing)
             {
-                PressedStartGame = null;
-                PressedExit = null;
+                StartGamePressed = null;
+                ExitPressed = null;
             }
 
             base.Dispose(disposing);

@@ -18,7 +18,6 @@ namespace Orion.Game.Presentation
     public partial class Window : Form
     {
         #region Fields
-        private readonly RootView rootView;
         private readonly GraphicsContext graphicsContext;
         private SysPoint lastGameMousePosition;
         private MouseButtons lastMouseButtons;
@@ -33,41 +32,35 @@ namespace Orion.Game.Presentation
             InitializeComponent();
 
             Rectangle windowBounds = new Rectangle(glControl.Width, glControl.Height);
-            this.rootView = new RootView(windowBounds, RootView.ContentsBounds);
 
             this.lastGameMousePosition = GetGameMousePosition();
             this.lastMouseButtons = Control.MouseButtons;
 
             this.CreateControl();
-            this.graphicsContext = new GraphicsContext();
+            this.graphicsContext = new GraphicsContext(glControl.SwapBuffers);
         }
         #endregion
 
-        #region Properties
-        public RootView RootView
-        {
-            get { return rootView; }
-        }
+        #region Events
+        /// <summary>
+        /// Raised when the window has received some kind of input.
+        /// </summary>
+        public event Action<Window, InputEvent> InputReceived;
+        #endregion
 
+        #region Properties
         public GraphicsContext GraphicsContext
         {
             get { return graphicsContext; }
         }
+
+        public Size ViewportSize
+        {
+            get { return new Size(glControl.ClientSize.Width, glControl.ClientSize.Height); }
+        }
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Refreshes this game window, causing a render.
-        /// </summary>
-        public override void Refresh()
-        {
-            if (IsDisposed || glControl.IsDisposed) return;
-
-            if (Form.ActiveForm == this) CheckMouseEvents();
-
-            glControl.Refresh();
-        }
-
         #region Mouse Stuff
         private SysPoint GetGameMousePosition()
         {
@@ -151,25 +144,33 @@ namespace Orion.Game.Presentation
         {
             Vector2 position = new Vector2(x, (glControl.Height - 1) - y);
             var eventArgs = new Orion.Engine.Gui.MouseEventArgs(position, button, clickCount, wheelDelta);
-            rootView.SendMouseEvent(type, eventArgs);
+            InputEvent inputEvent = InputEvent.CreateMouse(type, eventArgs);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
 
         #region Keyboard Events
-        private void glControl_KeyDown(object sender, KeyEventArgs args)
+        protected override void WndProc(ref Message m)
         {
-            if (args.Alt) args.Handled = true;
-
-            if (args.KeyData == (Keys.V | Keys.Control))
+            const int WM_PASTE = 0x0302;
+            if (m.Msg == WM_PASTE)
             {
                 string pastedText = Clipboard.GetText();
                 if (!string.IsNullOrEmpty(pastedText))
                 {
                     foreach (char pastedCharacter in pastedText)
-                        rootView.SendCharacterTypedEvent(pastedCharacter);
+                        TriggerCharacterEvent(pastedCharacter);
+
                     return;
                 }
             }
+
+            base.WndProc(ref m);
+        }
+
+        private void glControl_KeyDown(object sender, KeyEventArgs args)
+        {
+            if (args.Alt) args.Handled = true;
 
             TriggerKeyboardEvent(KeyboardEventType.ButtonPressed, args.KeyData);
         }
@@ -181,40 +182,22 @@ namespace Orion.Game.Presentation
 
         private void glControl_KeyPress(object sender, KeyPressEventArgs args)
         {
-            rootView.SendCharacterTypedEvent(args.KeyChar);
+            TriggerCharacterEvent(args.KeyChar);
         }
 
         private void TriggerKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
         {
             KeyboardEventArgs args = new KeyboardEventArgs(keyAndModifiers);
-            rootView.SendKeyboardEvent(type, args);
+            InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
+            InputReceived.Raise(this, inputEvent);
+        }
+
+        private void TriggerCharacterEvent(char character)
+        {
+            InputEvent inputEvent = InputEvent.CreateCharacter(character);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
-
-        private void glControl_SizeChanged(object sender, EventArgs e)
-        {
-            if (rootView != null)
-            {
-                rootView.Frame = rootView.Frame.ResizedTo(glControl.ClientSize.Width, glControl.ClientSize.Height);
-            }
-        }
-
-        private void glControl_Paint(object sender, PaintEventArgs e)
-        {
-            rootView.Draw(graphicsContext);
-            glControl.SwapBuffers();
-        }
-
-        /// <summary>
-        /// Fires the Resized event to all listener, and resizes the glControl.
-        /// </summary>
-        /// <param name="e">Unused arguments</param>
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-
-            glControl.Refresh();
-        }
         #endregion
     }
 }

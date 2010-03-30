@@ -11,7 +11,7 @@ using Orion.Game.Presentation;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 
-namespace Orion.Main
+namespace Orion.Game.Main
 {
     sealed class TowerDefenseMatchConfigurer : MatchConfigurer
     {

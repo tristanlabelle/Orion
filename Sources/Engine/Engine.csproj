@@ -105,6 +105,8 @@
     <Compile Include="Gui\DelegatedRenderer.cs" />
     <Compile Include="Gui\DropdownList.cs" />
     <Compile Include="Gui\FilledRenderer.cs" />
+    <Compile Include="Gui\InputEvent.cs" />
+    <Compile Include="Gui\InputEventType.cs" />
     <Compile Include="Gui\Panel.cs" />
     <Compile Include="Gui\Instant.cs" />
     <Compile Include="Gui\IViewRenderer.cs" />
@@ -168,20 +170,6 @@
     <Compile Include="MersenneTwister.cs" />
     <Compile Include="SimulationStep.cs" />
     <Compile Include="ValueChangedEventHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Audio\IrrKlang\.svn\prop-base\" />
-    <Folder Include="Audio\IrrKlang\.svn\props\" />
-    <Folder Include="Audio\IrrKlang\.svn\text-base\" />
-    <Folder Include="Audio\IrrKlang\.svn\tmp\prop-base\" />
-    <Folder Include="Audio\IrrKlang\.svn\tmp\props\" />
-    <Folder Include="Audio\IrrKlang\.svn\tmp\text-base\" />
-    <Folder Include="Audio\Null\.svn\prop-base\" />
-    <Folder Include="Audio\Null\.svn\props\" />
-    <Folder Include="Audio\Null\.svn\text-base\" />
-    <Folder Include="Audio\Null\.svn\tmp\prop-base\" />
-    <Folder Include="Audio\Null\.svn\tmp\props\" />
-    <Folder Include="Audio\Null\.svn\tmp\text-base\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

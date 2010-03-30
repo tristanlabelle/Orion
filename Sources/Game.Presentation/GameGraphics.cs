@@ -8,6 +8,8 @@ using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Orion.Engine.Gui;
+using Orion.Engine.Geometry;
+using System.Windows.Forms;
 
 namespace Orion.Game.Presentation
 {
@@ -18,6 +20,7 @@ namespace Orion.Game.Presentation
     {
         #region Fields
         private readonly Window window;
+        private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
 
@@ -25,9 +28,14 @@ namespace Orion.Game.Presentation
         public GameGraphics()
         {
             this.window = new Window();
+            this.window.InputReceived += OnInputReceived;
             this.window.HandleDestroyed += OnWindowHandleDestroyed;
-            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
             this.window.Show();
+
+            Rectangle rootViewFrame = new Rectangle(window.ViewportSize.Width, window.ViewportSize.Height);
+            this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
+
+            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
         }
         #endregion
 
@@ -58,7 +66,7 @@ namespace Orion.Game.Presentation
 
         public RootView RootView
         {
-            get { return window.RootView; }
+            get { return rootView; }
         }
 
         public Texture DefaultTexture
@@ -73,7 +81,11 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void Refresh()
         {
-            window.Refresh();
+            Application.DoEvents();
+            if (!window.Created) return;
+
+            rootView.Draw(GraphicsContext);
+            GraphicsContext.Present();
         }
 
         #region Textures
@@ -183,6 +195,11 @@ namespace Orion.Game.Presentation
         {
             if (window.Created && !window.IsDisposed)
                 window.Dispose();
+        }
+
+        private void OnInputReceived(Window sender, InputEvent inputEvent)
+        {
+            rootView.SendInputEvent(inputEvent);
         }
 
         private void OnWindowHandleDestroyed(object sender, EventArgs e)

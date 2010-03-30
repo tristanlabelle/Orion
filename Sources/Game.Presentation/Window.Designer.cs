@@ -46,8 +46,6 @@ namespace Orion.Game.Presentation
             this.glControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyUp);
             this.glControl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.glControl_KeyPress);
             this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
-            this.glControl.SizeChanged += new System.EventHandler(this.glControl_SizeChanged);
-            this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             // 
             // Window
             // 

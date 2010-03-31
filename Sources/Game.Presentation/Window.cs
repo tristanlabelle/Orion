@@ -82,7 +82,7 @@ namespace Orion.Game.Presentation
 
             if (newGameMousePosition != lastGameMousePosition)
             {
-                TriggerMouseEvent(MouseEventType.MouseMoved,
+                TriggerMouseEvent(MouseEventType.Moved,
                     newGameMousePosition.X, newGameMousePosition.Y,
                     MouseButton.None, 0, 0);
                 lastGameMousePosition = newGameMousePosition;
@@ -103,21 +103,39 @@ namespace Orion.Game.Presentation
             if ((lastMouseButtons & mouseButton) != (newMouseButtons & mouseButton))
             {
                 bool pressed = (newMouseButtons & mouseButton) == mouseButton;
-                TriggerMouseEvent(pressed ? MouseEventType.MouseButtonPressed : MouseEventType.MouseButtonReleased,
+                TriggerMouseEvent(pressed ? MouseEventType.ButtonPressed : MouseEventType.ButtonReleased,
                     lastGameMousePosition.X, lastGameMousePosition.Y,
                     mouseButton, 1, 0);
             }
         }
 
+        private void glControl_MouseMove(object sender, SysMouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.Moved,
+                args.X, args.Y, MouseButton.None, 0, 0);
+        }
+
+        private void glControl_MouseDown(object sender, SysMouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.ButtonPressed,
+                args.X, args.Y, args.Button, 0, 0);
+        }
+
+        private void glControl_MouseUp(object sender, SysMouseEventArgs args)
+        {
+            TriggerMouseEvent(MouseEventType.ButtonReleased,
+                args.X, args.Y, args.Button, 0, 0);
+        }
+
         private void glControl_MouseWheel(object sender, SysMouseEventArgs args)
         {
-            TriggerMouseEvent(MouseEventType.MouseWheelScrolled,
+            TriggerMouseEvent(MouseEventType.WheelScrolled,
                 args.X, args.Y, MouseButton.None, 0, args.Delta / 600f);
         }
 
         private void glControl_MouseDoubleClick(object sender, SysMouseEventArgs args)
         {
-            TriggerMouseEvent(MouseEventType.MouseButtonPressed,
+            TriggerMouseEvent(MouseEventType.ButtonPressed,
                 args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 

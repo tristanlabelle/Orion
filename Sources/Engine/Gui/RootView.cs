@@ -94,24 +94,29 @@ namespace Orion.Engine.Gui
         #region Public event generation
         public void SendInputEvent(InputEvent inputEvent)
         {
-            switch (inputEvent.Type)
+            if (inputEvent.Type == InputEventType.Keyboard)
             {
-                case InputEventType.Keyboard:
-                    KeyboardEventType type;
-                    KeyboardEventArgs args;
-                    inputEvent.GetKeyboard(out type, out args);
-                    SendKeyboardEvent(type, args);
-                    break;
-
-                case InputEventType.Mouse:
-                    break;
-
-                case InputEventType.Character:
-                    break;
-
-                default:
-                    Debug.Fail("Unknown input event type: {0}.".FormatInvariant(inputEvent.Type));
-                    break;
+                KeyboardEventType type;
+                KeyboardEventArgs args;
+                inputEvent.GetKeyboard(out type, out args);
+                SendKeyboardEvent(type, args);
+            }
+            else if (inputEvent.Type == InputEventType.Mouse)
+            {
+                MouseEventType type;
+                MouseEventArgs args;
+                inputEvent.GetMouse(out type, out args);
+                SendMouseEvent(type, args);
+            }
+            else if (inputEvent.Type == InputEventType.Character)
+            {
+                char character;
+                inputEvent.GetCharacter(out character);
+                SendCharacterTypedEvent(character);
+            }
+            else
+            {
+                Debug.Fail("Unknown input event type: {0}.".FormatInvariant(inputEvent.Type));
             }
         }
         

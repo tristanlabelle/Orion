@@ -12,11 +12,11 @@ namespace Orion.Engine.Gui
     public enum MouseEventType
     {
         None,
-        MouseButtonPressed,
-        MouseButtonReleased,
-        MouseMoved,
-        MouseEntered,
-        MouseExited,
-        MouseWheelScrolled
+        ButtonPressed,
+        ButtonReleased,
+        Moved,
+        Entered,
+        Exited,
+        WheelScrolled
     }
 }

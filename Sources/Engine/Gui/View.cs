@@ -42,7 +42,7 @@ namespace Orion.Engine.Gui
                 if (IsMouseOver)
                 {
                     Vector2 position = MousePosition.Value;
-                    PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position, MouseButton.None, 0, 0));
+                    PropagateMouseEvent(MouseEventType.Moved, new MouseEventArgs(position, MouseButton.None, 0, 0));
                 }
 
                 Action<View, Rectangle> boundsEvent = BoundsChanged;

@@ -28,7 +28,6 @@ namespace Orion.Game.Presentation
         public GameGraphics()
         {
             this.window = new Window();
-            this.window.InputReceived += OnInputReceived;
             this.window.HandleDestroyed += OnWindowHandleDestroyed;
             this.window.Show();
 
@@ -195,11 +194,6 @@ namespace Orion.Game.Presentation
         {
             if (window.Created && !window.IsDisposed)
                 window.Dispose();
-        }
-
-        private void OnInputReceived(Window sender, InputEvent inputEvent)
-        {
-            rootView.SendInputEvent(inputEvent);
         }
 
         private void OnWindowHandleDestroyed(object sender, EventArgs e)

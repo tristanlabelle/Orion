@@ -86,6 +86,7 @@
     <Compile Include="Geometry\LineSegment.cs" />
     <Compile Include="Graphics\BufferedPixelSurface.cs" />
     <Compile Include="Graphics\GraphicsContext.cs" />
+    <Compile Include="Graphics\IGameWindow.cs" />
     <Compile Include="Graphics\IPixelSurface.cs" />
     <Compile Include="Graphics\PixelFormat.cs" />
     <Compile Include="Graphics\PixelSurface.cs" />

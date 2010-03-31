@@ -298,6 +298,7 @@ namespace Orion.Game.Main
                     timeAccumulator -= TargetSecondsPerFrame;
                 }
 
+                Application.DoEvents();
                 gameGraphics.Refresh();
                 countersUpdated |= drawRateCounter.Update();
             }

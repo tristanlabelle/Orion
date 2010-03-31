@@ -84,7 +84,7 @@ namespace Orion.Engine.Gui
                 {
                     if (child.IsMouseOver)
                     {
-                        child.PropagateMouseEvent(MouseEventType.MouseExited, args);
+                        child.PropagateMouseEvent(MouseEventType.Exited, args);
                         child.cursorPosition = null;
                     }
                 }
@@ -94,7 +94,7 @@ namespace Orion.Engine.Gui
                     {
                         if (!child.IsMouseOver)
                         {
-                            child.DispatchMouseEvent(MouseEventType.MouseEntered, args);
+                            child.DispatchMouseEvent(MouseEventType.Entered, args);
                         }
 
                         child.cursorPosition = args.Position;
@@ -157,12 +157,12 @@ namespace Orion.Engine.Gui
             EnsureNotDisposed();
             switch (eventType)
             {
-                case MouseEventType.MouseButtonPressed: return OnMouseButtonPressed(args);
-                case MouseEventType.MouseMoved: return OnMouseMoved(args);
-                case MouseEventType.MouseButtonReleased: return OnMouseButtonReleased(args);
-                case MouseEventType.MouseEntered: return OnMouseEntered(args);
-                case MouseEventType.MouseExited: return OnMouseExited(args);
-                case MouseEventType.MouseWheelScrolled: return OnMouseWheelScrolled(args);
+                case MouseEventType.ButtonPressed: return OnMouseButtonPressed(args);
+                case MouseEventType.Moved: return OnMouseMoved(args);
+                case MouseEventType.ButtonReleased: return OnMouseButtonReleased(args);
+                case MouseEventType.Entered: return OnMouseEntered(args);
+                case MouseEventType.Exited: return OnMouseExited(args);
+                case MouseEventType.WheelScrolled: return OnMouseWheelScrolled(args);
             }
             throw new NotImplementedException(String.Format("Mouse event type {0} does not have a handler method", eventType));
         }
@@ -304,7 +304,7 @@ namespace Orion.Engine.Gui
             if (cursorPosition.HasValue)
             {
                 cursorPosition = null;
-                PropagateMouseEvent(MouseEventType.MouseExited, new MouseEventArgs());
+                PropagateMouseEvent(MouseEventType.Exited, new MouseEventArgs());
             }
 
             base.OnRemovedFromParent(parent);

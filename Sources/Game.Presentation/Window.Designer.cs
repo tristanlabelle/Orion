@@ -30,21 +30,25 @@ namespace Orion.Game.Presentation
         /// </summary>
         private void InitializeComponent()
         {
+            this.glControl = new Orion.Engine.Graphics.CustomGLControl();
             this.SuspendLayout();
             // 
             // glControl
             // 
-            this.glControl = new Orion.Engine.Graphics.CustomGLControl();
             this.glControl.BackColor = System.Drawing.Color.Black;
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
             this.glControl.Name = "glControl";
+            this.glControl.Size = new System.Drawing.Size(961, 678);
             this.glControl.TabIndex = 0;
             this.glControl.VSync = true;
             this.glControl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseWheel);
+            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseMove);
             this.glControl.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseDoubleClick);
             this.glControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyUp);
+            this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseDown);
             this.glControl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.glControl_KeyPress);
+            this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseUp);
             this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.glControl_KeyDown);
             // 
             // Window
@@ -54,8 +58,8 @@ namespace Orion.Game.Presentation
             this.ClientSize = new System.Drawing.Size(961, 678);
             this.Controls.Add(this.glControl);
             this.Name = "Window";
-            this.Text = "Orion";
             this.ShowIcon = false;
+            this.Text = "Orion";
             this.ResumeLayout(false);
 
         }

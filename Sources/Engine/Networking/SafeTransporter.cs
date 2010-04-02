@@ -155,7 +155,7 @@ namespace Orion.Engine.Networking
                     UpdateSending();
 
                     if (isDisposed) break;
-                    Thread.Sleep(0);
+                    Thread.Sleep(10);
                 }
             }
             catch (SocketException exception)

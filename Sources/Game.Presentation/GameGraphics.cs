@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation
     public sealed class GameGraphics : IDisposable
     {
         #region Fields
-        private readonly Window window;
+        private readonly IGameWindow window;
         private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
@@ -27,11 +27,9 @@ namespace Orion.Game.Presentation
         #region Constructors
         public GameGraphics()
         {
-            this.window = new Window();
-            this.window.HandleDestroyed += OnWindowHandleDestroyed;
-            this.window.Show();
+            this.window = new WindowsFormsGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
 
-            Rectangle rootViewFrame = new Rectangle(window.ViewportSize.Width, window.ViewportSize.Height);
+            Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
@@ -39,15 +37,9 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Properties
-        public bool IsWindowCreated
+        public IGameWindow Window
         {
-            get { return window.Created; }
-        }
-
-        public string WindowTitle
-        {
-            get { return window.Text; }
-            set { window.Text = value; }
+            get { return window; }
         }
 
         /// <summary>
@@ -81,7 +73,7 @@ namespace Orion.Game.Presentation
         public void Refresh()
         {
             Application.DoEvents();
-            if (!window.Created) return;
+            if (window.WasClosed) return;
 
             rootView.Draw(GraphicsContext);
             GraphicsContext.Present();
@@ -192,13 +184,8 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void Dispose()
         {
-            if (window.Created && !window.IsDisposed)
-                window.Dispose();
-        }
-
-        private void OnWindowHandleDestroyed(object sender, EventArgs e)
-        {
             textureManager.Dispose();
+            window.Dispose();
         }
         #endregion
     }

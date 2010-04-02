@@ -1,0 +1,236 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using OpenTK;
+using OpenTK.Graphics;
+using Orion.Engine.Gui;
+using OpenTK.Platform;
+using System.ComponentModel;
+using OpenTK.Input;
+using System.Windows.Forms;
+using System.Diagnostics;
+using MouseEventArgs = Orion.Engine.Gui.MouseEventArgs;
+using OpenTK.Math;
+
+namespace Orion.Engine.Graphics
+{
+    /// <summary>
+    /// Wraps the GameWindow provided by OpenTK behinds an <see cref="IGameWindow"/> interface.
+    /// </summary>
+    public sealed class OpenTKGameWindow : IGameWindow
+    {
+        #region Fields
+        private readonly GameWindow window;
+        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
+        private GraphicsContext graphicsContext;
+        private bool wasClosed;
+        #endregion
+
+        #region Constructors
+        public OpenTKGameWindow(string title, WindowMode mode, Size clientAreaSize)
+        {
+            Argument.EnsureNotNull(title, "title");
+            Argument.EnsureDefined(mode, "mode");
+
+            ColorFormat colorFormat = new ColorFormat(8, 8, 8, 8);
+            GraphicsMode graphicsMode = new GraphicsMode(colorFormat);
+            GameWindowFlags gameWindowFlags = mode == WindowMode.Fullscreen ? GameWindowFlags.Fullscreen : 0;
+#if DEBUG
+            GraphicsContextFlags flags = GraphicsContextFlags.Debug;
+#else
+            GraphicsContextFlags flags = GraphicsContextFlags.Default;
+#endif
+            window = new GameWindow(clientAreaSize.Width, clientAreaSize.Height,
+                graphicsMode, title, gameWindowFlags, DisplayDevice.Default, 2, 0, flags);
+            window.VSync = VSyncMode.On;
+
+            // Give the window a chance to create its context.
+            window.ProcessEvents();
+
+            Debug.Assert(window.Exists && window.Context != null,
+                "No OpenGL context is available for the OpenTK GameWindow, this might be bad.");
+
+            window.Resize += OnWindowResized;
+            window.Closing += OnWindowClosing;
+
+            window.Keyboard.KeyDown += OnKeyboardKeyDown;
+            window.Keyboard.KeyUp += OnKeyboardKeyUp;
+
+            window.Mouse.Move += OnMouseMoved;
+            window.Mouse.ButtonDown += OnMouseButtonPressed;
+            window.Mouse.ButtonUp += OnMouseButtonReleased;
+            window.Mouse.WheelChanged += OnMouseWheelChanged;
+
+            graphicsContext = new GraphicsContext(window.Context.SwapBuffers);
+        }
+        #endregion
+
+        #region Events
+        public event Action<IGameWindow> Resized;
+
+        public event Action<IGameWindow> Closing;
+        #endregion
+
+        #region Properties
+        public string Title
+        {
+            get { return window.Title; }
+            set { window.Title = value; }
+        }
+
+        public Size ClientAreaSize
+        {
+            get { return new Size(window.Width, window.Height); }
+        }
+
+        public WindowMode Mode
+        {
+            get { return window.WindowState == WindowState.Fullscreen ? WindowMode.Fullscreen : WindowMode.Windowed; }
+        }
+
+        public GraphicsContext GraphicsContext
+        {
+            get { return graphicsContext; }
+        }
+
+        public bool IsInputEventAvailable
+        {
+            get { return inputEventQueue.Count > 0; }
+        }
+
+        public bool WasClosed
+        {
+            get { return wasClosed || window.IsExiting || !window.Exists; }
+        }
+        #endregion
+
+        #region Methods
+        #region IGameWindow Interface
+        public InputEvent DequeueInputEvent()
+        {
+            return inputEventQueue.Dequeue();
+        }
+
+        public void SetWindowed(Size clientAreaSize)
+        {
+            if (window.WindowState == WindowState.Fullscreen)
+                window.WindowState = WindowState.Normal;
+
+            window.Width = clientAreaSize.Width;
+            window.Height = clientAreaSize.Height;
+        }
+
+        public void SetFullscreen(Size resolution)
+        {
+            if (window.WindowState == WindowState.Fullscreen
+                && window.Width == resolution.Width
+                && window.Height == resolution.Height)
+                return;
+
+            window.Width = resolution.Width;
+            window.Height = resolution.Height;
+
+            if (window.WindowState != WindowState.Fullscreen)
+                window.WindowState = WindowState.Fullscreen;
+        }
+
+        public void Update()
+        {
+            window.ProcessEvents();
+        }
+
+        public void Dispose()
+        {
+            window.Dispose();
+        }
+        #endregion
+
+        #region Event Handling
+        #region Keyboard
+        private void OnKeyboardKeyDown(KeyboardDevice sender, Key key)
+        {
+            EnqueueKeyboardEvent(KeyboardEventType.ButtonPressed, key);
+        }
+
+        private void OnKeyboardKeyUp(KeyboardDevice sender, Key key)
+        {
+            EnqueueKeyboardEvent(KeyboardEventType.ButtonReleased, key);
+        }
+
+        private void EnqueueKeyboardEvent(KeyboardEventType type, Key key)
+        {
+            KeyboardEventArgs args = new KeyboardEventArgs((Keys)(int)key);
+            InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+        #endregion
+
+        #region Mouse
+        private void OnMouseButtonPressed(object sender, MouseButtonEventArgs e)
+        {
+            EnqueueMouseButtonEvent(MouseEventType.ButtonPressed,
+                e.Position, e.Button, 1);
+        }
+
+        private void OnMouseButtonReleased(object sender, MouseButtonEventArgs e)
+        {
+            EnqueueMouseButtonEvent(MouseEventType.ButtonReleased,
+                e.Position, e.Button, 1);
+        }
+
+        private void OnMouseMoved(object sender, MouseMoveEventArgs e)
+        {
+            EnqueueMouseEvent(MouseEventType.Moved, e.Position,
+                Orion.Engine.Gui.MouseButton.None, 0, 0);
+        }
+
+        private void OnMouseWheelChanged(object sender, MouseWheelEventArgs e)
+        {
+            EnqueueMouseEvent(MouseEventType.WheelScrolled, e.Position,
+                Orion.Engine.Gui.MouseButton.None, 0, e.Delta);
+        }
+
+        private static Orion.Engine.Gui.MouseButton GetMouseButton(OpenTK.Input.MouseButton button)
+        {
+            if (button == OpenTK.Input.MouseButton.Left) return Orion.Engine.Gui.MouseButton.Left;
+            if (button == OpenTK.Input.MouseButton.Right) return Orion.Engine.Gui.MouseButton.Right;
+            if (button == OpenTK.Input.MouseButton.Middle) return Orion.Engine.Gui.MouseButton.Middle;
+            return Orion.Engine.Gui.MouseButton.None;
+        }
+
+        private void EnqueueMouseButtonEvent(MouseEventType type, System.Drawing.Point screenPoint,
+            OpenTK.Input.MouseButton button, int clickCount)
+        {
+            Orion.Engine.Gui.MouseButton orionButton = GetMouseButton(button);
+            if (orionButton == Orion.Engine.Gui.MouseButton.None) return;
+
+            EnqueueMouseEvent(type, screenPoint, orionButton, clickCount, 0);
+        }
+
+        private void EnqueueMouseEvent(MouseEventType type, System.Drawing.Point screenPoint,
+            Orion.Engine.Gui.MouseButton button, int clickCount, int wheelDelta)
+        {
+            System.Drawing.Point clientPoint = window.PointToClient(screenPoint);
+            MouseEventArgs args = new MouseEventArgs(
+                new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta / 600.0f);
+            InputEvent inputEvent = InputEvent.CreateMouse(type, args);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+        #endregion
+
+        private void OnWindowResized(object sender, ResizeEventArgs e)
+        {
+            Resized.Raise(this);
+        }
+
+        private void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true;
+            wasClosed = true;
+            Closing.Raise(this);
+        }
+        #endregion
+        #endregion
+    }
+}

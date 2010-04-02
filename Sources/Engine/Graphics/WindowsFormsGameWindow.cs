@@ -1,0 +1,300 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Forms;
+using OpenTK.Math;
+using Orion.Engine.Gui;
+using WinForms = System.Windows.Forms;
+using OpenTK.Graphics;
+using Orion.Engine.Collections;
+
+namespace Orion.Engine.Graphics
+{
+    /// <summary>
+    /// A game window implemented upon windows forms. 
+    /// </summary>
+    public sealed class WindowsFormsGameWindow : IGameWindow
+    {
+        #region Instance
+        #region Fields
+        private readonly GameWindowForm form;
+        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
+        private readonly GraphicsContext graphicsContext;
+        private WindowMode mode = WindowMode.Windowed;
+        private bool wasClosed;
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new game window from the desired title text and client size. 
+        /// </summary>
+        /// <param name="title">The title text of the window.</param>
+        /// <param name="mode">The initial mode of the window. This is a hint.</param>
+        /// <param name="clientAreaSize">The size of the client area of the window.</param>
+        public WindowsFormsGameWindow(string title, WindowMode mode, Size clientAreaSize)
+        {
+            Argument.EnsureNotNull(title, "title");
+            
+            this.mode = mode;
+            if (this.mode == WindowMode.Fullscreen && !TryChangePrimaryScreenResolution(clientAreaSize))
+            {
+                Debug.Fail("Failed to switch to a {0} resolution, falling back to windowed mode.".FormatInvariant(clientAreaSize));
+                this.mode = WindowMode.Windowed;
+            }
+
+            form = new GameWindowForm();
+
+            form.Text = title;
+            form.ClientSize = new System.Drawing.Size(clientAreaSize.Width, clientAreaSize.Height);
+            if (this.mode == WindowMode.Fullscreen) SetFullscreenStyle();
+
+            form.Resize += OnResized;
+            form.FormClosing += OnClosing;
+            form.TextPasted += OnTextPasted;
+
+            form.GLControl.MouseMove += OnMouseMoved;
+            form.GLControl.MouseDown += OnMouseButtonPressed;
+            form.GLControl.MouseUp += OnMouseButtonReleased;
+            form.GLControl.MouseDoubleClick += OnMouseButtonDoubleClicked;
+            form.GLControl.MouseWheel += OnMouseWheelScrolled;
+            form.GLControl.KeyUp += OnKeyboardKeyReleased;
+            form.GLControl.KeyPress += OnCharacter;
+            form.GLControl.KeyDown += OnKeyboardKeyPressed;
+
+            graphicsContext = new GraphicsContext(form.GLControl.SwapBuffers);
+        }
+        #endregion
+
+        #region Events
+        public event Action<IGameWindow> Resized;
+        public event Action<IGameWindow> Closing;
+        #endregion
+
+        #region Properties
+        public string Title
+        {
+            get { return form.Text; }
+            set { form.Text = value; }
+        }
+
+        public WindowMode Mode
+        {
+            get { return mode; }
+        }
+
+        public Size ClientAreaSize
+        {
+            get { return new Size(form.GLControl.ClientSize.Width, form.GLControl.ClientSize.Height); }
+        }
+
+        public GraphicsContext GraphicsContext
+        {
+            get { return graphicsContext; }
+        }
+
+        public bool IsInputEventAvailable
+        {
+            get { return inputEventQueue.Count > 0; }
+        }
+
+        public bool WasClosed
+        {
+            get { return wasClosed; }
+        }
+        #endregion
+
+        #region Methods
+        #region IGameWindow Interface
+        public InputEvent DequeueInputEvent()
+        {
+            return inputEventQueue.Dequeue();
+        }
+
+        public void SetWindowed(Size clientAreaSize)
+        {
+            if (mode == WindowMode.Fullscreen)
+            {
+                try { DisplayDevice.Default.RestoreResolution(); }
+                catch (GraphicsModeException e)
+                {
+                    Debug.Fail("Failed to restore resolution: {0}.".FormatInvariant(e));
+                }
+
+                mode = WindowMode.Windowed;
+                form.TopMost = false;
+                form.FormBorderStyle = FormBorderStyle.Sizable;
+                form.Location = System.Drawing.Point.Empty;
+            }
+
+            form.ClientSize = new System.Drawing.Size(clientAreaSize.Width, clientAreaSize.Height);
+        }
+
+        public void SetFullscreen(Size resolution)
+        {
+            if (!TryChangePrimaryScreenResolution(resolution))
+            {
+                throw new NotSupportedException("Fullscreen resolution not supported: {0}.".FormatInvariant(resolution));
+            }
+
+            SetFullscreenStyle();
+        }
+
+        private void SetFullscreenStyle()
+        {
+
+            form.TopMost = true;
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Location = System.Drawing.Point.Empty;
+        }
+
+        public void Update()
+        {
+            Application.DoEvents();
+        }
+
+        public void Dispose()
+        {
+            form.Dispose();
+        }
+        #endregion
+
+        #region Event Handlers
+        #region Mouse Stuff
+        private void OnMouseMoved(object sender, WinForms.MouseEventArgs args)
+        {
+            EnqueueMouseEvent(MouseEventType.Moved,
+                args.X, args.Y, MouseButton.None, 0, 0);
+        }
+
+        private void OnMouseButtonPressed(object sender, WinForms.MouseEventArgs args)
+        {
+            EnqueueMouseEvent(MouseEventType.ButtonPressed,
+                args.X, args.Y, args.Button, 0, 0);
+        }
+
+        private void OnMouseButtonReleased(object sender, WinForms.MouseEventArgs args)
+        {
+            EnqueueMouseEvent(MouseEventType.ButtonReleased,
+                args.X, args.Y, args.Button, 0, 0);
+        }
+
+        private void OnMouseWheelScrolled(object sender, WinForms.MouseEventArgs args)
+        {
+            EnqueueMouseEvent(MouseEventType.WheelScrolled,
+                args.X, args.Y, MouseButton.None, 0, args.Delta / 600f);
+        }
+
+        private void OnMouseButtonDoubleClicked(object sender, WinForms.MouseEventArgs args)
+        {
+            EnqueueMouseEvent(MouseEventType.ButtonPressed,
+                args.X, args.Y, args.Button, args.Clicks, args.Delta);
+        }
+
+        private void EnqueueMouseEvent(MouseEventType type, float x, float y,
+            MouseButtons button, int clickCount, float wheelDelta)
+        {
+            MouseButton pressedButton = MouseButton.None;
+            switch (button)
+            {
+                case MouseButtons.None: pressedButton = MouseButton.None; break;
+                case MouseButtons.Left: pressedButton = MouseButton.Left; break;
+                case MouseButtons.Middle: pressedButton = MouseButton.Middle; break;
+                case MouseButtons.Right: pressedButton = MouseButton.Right; break;
+                default:
+                    Debug.Fail("Unexpected mouse button: {0}.".FormatInvariant(button));
+                    break;
+            }
+
+            EnqueueMouseEvent(type, x, y, pressedButton, clickCount, wheelDelta);
+        }
+
+        private void EnqueueMouseEvent(MouseEventType type, float x, float y,
+            MouseButton button, int clickCount, float wheelDelta)
+        {
+            Vector2 position = new Vector2(x, (form.GLControl.Height - 1) - y);
+            var eventArgs = new Orion.Engine.Gui.MouseEventArgs(position, button, clickCount, wheelDelta);
+            InputEvent inputEvent = InputEvent.CreateMouse(type, eventArgs);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+        #endregion
+
+        #region Keyboard Events
+        private void OnTextPasted(GameWindowForm sender, string text)
+        {
+            foreach (char character in text) EnqueueCharacterEvent(character);
+        }
+
+        private void OnKeyboardKeyPressed(object sender, KeyEventArgs args)
+        {
+            if (args.Alt) args.Handled = true;
+
+            EnqueueKeyboardEvent(KeyboardEventType.ButtonPressed, args.KeyData);
+        }
+
+        private void OnKeyboardKeyReleased(object sender, KeyEventArgs args)
+        {
+            EnqueueKeyboardEvent(KeyboardEventType.ButtonReleased, args.KeyData);
+        }
+
+        private void OnCharacter(object sender, KeyPressEventArgs args)
+        {
+            EnqueueCharacterEvent(args.KeyChar);
+        }
+
+        private void EnqueueKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
+        {
+            KeyboardEventArgs args = new KeyboardEventArgs(keyAndModifiers);
+            InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+
+        private void EnqueueCharacterEvent(char character)
+        {
+            InputEvent inputEvent = InputEvent.CreateCharacter(character);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+        #endregion
+
+        private void OnResized(object sender, EventArgs e)
+        {
+            Resized.Raise(this);
+        }
+
+        private void OnClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            form.Hide();
+            wasClosed = true;
+            Closing.Raise(this);
+        }
+        #endregion
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        private static bool TryChangePrimaryScreenResolution(Size size)
+        {
+            DisplayResolution resolution = DisplayDevice.Default.AvailableResolutions
+                .Where(res => res.Width == size.Width
+                    && res.Height == size.Height
+                    && res.BitsPerPixel == 32)
+                .WithMaxOrDefault(res => res.RefreshRate);
+
+            if (resolution == null) return false;
+
+            try
+            {
+                DisplayDevice.Default.ChangeResolution(resolution);
+                return true;
+            }
+            catch (GraphicsModeException e)
+            {
+                return false;
+            }
+        }
+        #endregion
+        #endregion
+    }
+}

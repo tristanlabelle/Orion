@@ -29,8 +29,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Constructors
-        [Obsolete("To be made internal and created by the engine.")]
-        public GraphicsContext(Action backbufferSwapper)
+        internal GraphicsContext(Action backbufferSwapper)
         {
             Argument.EnsureNotNull(backbufferSwapper, "backbufferSwapper");
 

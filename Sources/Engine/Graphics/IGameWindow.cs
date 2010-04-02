@@ -19,14 +19,14 @@ namespace Orion.Engine.Graphics
         string Title { get; set; }
 
         /// <summary>
-        /// Gets the size of the viewport which can be drawn into within the window.
+        /// Gets the size of the client area of the window.
         /// </summary>
-        Size ViewportSize { get; }
+        Size ClientAreaSize { get; }
 
         /// <summary>
-        /// Gets a value indicating if the window is running fullscreen.
+        /// Gets a value indicating the current window mode.
         /// </summary>
-        bool IsFullScreen { get; }
+        WindowMode Mode { get; }
 
         /// <summary>
         /// Gets the graphics context that can be used to draw to this window.
@@ -37,11 +37,16 @@ namespace Orion.Engine.Graphics
         /// Gets a value indicating if an input event is available for dequeuing.
         /// </summary>
         bool IsInputEventAvailable { get; }
+
+        /// <summary>
+        /// Gets a value indicating if this window has been closed.
+        /// </summary>
+        bool WasClosed { get; }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when the window is being resized.
+        /// Raised when the window has been or is being resized.
         /// </summary>
         event Action<IGameWindow> Resized;
 
@@ -57,6 +62,18 @@ namespace Orion.Engine.Graphics
         /// </summary>
         /// <returns>The input event that was enqueued.</returns>
         InputEvent DequeueInputEvent();
+
+        /// <summary>
+        /// Switches to windowed mode with a given client size.
+        /// </summary>
+        /// <param name="clientAreaSize">The size of the client area of the window.</param>
+        void SetWindowed(Size clientAreaSize);
+
+        /// <summary>
+        /// Switches to fullscreen mode with a given screen resolution.
+        /// </summary>
+        /// <param name="resolution">The resolution to which to switch.</param>
+        void SetFullscreen(Size resolution);
 
         /// <summary>
         /// Updates this window, giving it the chance to handle OS events.

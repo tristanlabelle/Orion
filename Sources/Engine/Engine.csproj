@@ -85,6 +85,13 @@
     <Compile Include="Geometry\Intersection.cs" />
     <Compile Include="Geometry\LineSegment.cs" />
     <Compile Include="Graphics\BufferedPixelSurface.cs" />
+    <Compile Include="Graphics\GameWindowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Graphics\OpenTKGameWindow.cs" />
+    <Compile Include="Graphics\WindowsFormsGameWindow.cs">
+    </Compile>
+    <Compile Include="Graphics\WindowMode.cs" />
     <Compile Include="Graphics\GraphicsContext.cs" />
     <Compile Include="Graphics\IGameWindow.cs" />
     <Compile Include="Graphics\IPixelSurface.cs" />

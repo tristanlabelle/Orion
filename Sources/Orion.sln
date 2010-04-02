@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.ReplayPrinter", "Tools.ReplayPrinter\Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{87BEE8DC-D12E-441B-A32B-09D225BB873C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Simulation", "Game.Simulation\Game.Simulation.csproj", "{98074D59-535C-4FBA-A47C-68FFD740C1CB}"
@@ -50,8 +48,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_Active = 0
 		CodeStyleEnforcer_RulesLocation = 
+		CodeStyleEnforcer_Active = 0
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Orion.Main\Main.csproj

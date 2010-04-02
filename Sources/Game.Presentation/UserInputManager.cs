@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;

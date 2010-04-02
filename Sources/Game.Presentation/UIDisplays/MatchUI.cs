@@ -7,6 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Utilities;
 using Orion.Game.Presentation;

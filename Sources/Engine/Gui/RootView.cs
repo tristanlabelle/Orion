@@ -1,14 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using System.Diagnostics;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
-using System.Collections;
-using System.Diagnostics;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui
 {

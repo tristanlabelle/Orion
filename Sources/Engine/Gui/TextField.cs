@@ -7,6 +7,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui

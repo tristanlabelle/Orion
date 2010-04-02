@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using OpenTK.Math;
 
-namespace Orion.Engine.Gui
+namespace Orion.Engine.Input
 {
     /// <summary>
     /// This immutable structure encapsulates all necessary informations about a mouse click event:

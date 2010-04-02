@@ -6,7 +6,7 @@ using System.ComponentModel;
 using OpenTK.Math;
 using System.Runtime.InteropServices;
 
-namespace Orion.Engine.Gui
+namespace Orion.Engine.Input
 {
     /// <summary>
     /// Represents a keyboard or mouse event that occured on the window.

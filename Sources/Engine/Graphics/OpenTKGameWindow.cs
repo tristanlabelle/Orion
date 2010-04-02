@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
-using Orion.Engine.Gui;
-using OpenTK.Platform;
-using System.ComponentModel;
 using OpenTK.Input;
-using System.Windows.Forms;
-using System.Diagnostics;
-using MouseEventArgs = Orion.Engine.Gui.MouseEventArgs;
 using OpenTK.Math;
+using OpenTK.Platform;
+using Orion.Engine.Gui;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Graphics
 {
@@ -182,37 +182,37 @@ namespace Orion.Engine.Graphics
         private void OnMouseMoved(object sender, MouseMoveEventArgs e)
         {
             EnqueueMouseEvent(MouseEventType.Moved, e.Position,
-                Orion.Engine.Gui.MouseButton.None, 0, 0);
+                Orion.Engine.Input.MouseButton.None, 0, 0);
         }
 
         private void OnMouseWheelChanged(object sender, MouseWheelEventArgs e)
         {
             EnqueueMouseEvent(MouseEventType.WheelScrolled, e.Position,
-                Orion.Engine.Gui.MouseButton.None, 0, e.Delta);
+                Orion.Engine.Input.MouseButton.None, 0, e.Delta);
         }
 
-        private static Orion.Engine.Gui.MouseButton GetMouseButton(OpenTK.Input.MouseButton button)
+        private static Orion.Engine.Input.MouseButton GetMouseButton(OpenTK.Input.MouseButton button)
         {
-            if (button == OpenTK.Input.MouseButton.Left) return Orion.Engine.Gui.MouseButton.Left;
-            if (button == OpenTK.Input.MouseButton.Right) return Orion.Engine.Gui.MouseButton.Right;
-            if (button == OpenTK.Input.MouseButton.Middle) return Orion.Engine.Gui.MouseButton.Middle;
-            return Orion.Engine.Gui.MouseButton.None;
+            if (button == OpenTK.Input.MouseButton.Left) return Orion.Engine.Input.MouseButton.Left;
+            if (button == OpenTK.Input.MouseButton.Right) return Orion.Engine.Input.MouseButton.Right;
+            if (button == OpenTK.Input.MouseButton.Middle) return Orion.Engine.Input.MouseButton.Middle;
+            return Orion.Engine.Input.MouseButton.None;
         }
 
         private void EnqueueMouseButtonEvent(MouseEventType type, System.Drawing.Point screenPoint,
             OpenTK.Input.MouseButton button, int clickCount)
         {
-            Orion.Engine.Gui.MouseButton orionButton = GetMouseButton(button);
-            if (orionButton == Orion.Engine.Gui.MouseButton.None) return;
+            Orion.Engine.Input.MouseButton orionButton = GetMouseButton(button);
+            if (orionButton == Orion.Engine.Input.MouseButton.None) return;
 
             EnqueueMouseEvent(type, screenPoint, orionButton, clickCount, 0);
         }
 
         private void EnqueueMouseEvent(MouseEventType type, System.Drawing.Point screenPoint,
-            Orion.Engine.Gui.MouseButton button, int clickCount, int wheelDelta)
+            Orion.Engine.Input.MouseButton button, int clickCount, int wheelDelta)
         {
             System.Drawing.Point clientPoint = window.PointToClient(screenPoint);
-            MouseEventArgs args = new MouseEventArgs(
+            Orion.Engine.Input.MouseEventArgs args = new Orion.Engine.Input.MouseEventArgs(
                 new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta / 600.0f);
             InputEvent inputEvent = InputEvent.CreateMouse(type, args);
             inputEventQueue.Enqueue(inputEvent);

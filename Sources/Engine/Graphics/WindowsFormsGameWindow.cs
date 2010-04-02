@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using OpenTK.Math;
-using Orion.Engine.Gui;
-using WinForms = System.Windows.Forms;
 using OpenTK.Graphics;
+using OpenTK.Math;
 using Orion.Engine.Collections;
+using Orion.Engine.Gui;
+using Orion.Engine.Input;
+using WinForms = System.Windows.Forms;
 
 namespace Orion.Engine.Graphics
 {
@@ -213,7 +214,7 @@ namespace Orion.Engine.Graphics
             MouseButton button, int clickCount, float wheelDelta)
         {
             Vector2 position = new Vector2(x, (form.GLControl.Height - 1) - y);
-            var eventArgs = new Orion.Engine.Gui.MouseEventArgs(position, button, clickCount, wheelDelta);
+            var eventArgs = new Orion.Engine.Input.MouseEventArgs(position, button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, eventArgs);
             inputEventQueue.Enqueue(inputEvent);
         }

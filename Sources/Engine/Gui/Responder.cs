@@ -5,6 +5,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui
 {

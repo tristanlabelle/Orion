@@ -38,7 +38,7 @@ namespace Orion.Game.Simulation.Tasks
             if (!trainSkill.Supports(traineeType))
                 throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
 
-            this.traineeType = TryTrainHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
+            this.traineeType = TryGetHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
         }
         #endregion
 
@@ -69,19 +69,24 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Methods
-        private UnitType TryTrainHero(Random random, UnitType traineeType, UnitTypeRegistry registry)
+        private UnitType TryGetHero(Random random, UnitType unitType, UnitTypeRegistry registry)
         {
-            UnitType expectedType;
-            UnitType spawnedType = traineeType;
-            do
+            while (unitType.HeroName != null && random.Next(0, 100) == 0)
             {
-                expectedType = spawnedType;
-                if (spawnedType.HeroName != null && random.Next(0, 100) == 99)
+                UnitType heroUnitType = registry.FromName(unitType.HeroName);
+                if (heroUnitType == null)
                 {
-                    spawnedType = registry.FromName(spawnedType.HeroName);
+#if DEBUG
+                    Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
+                        .FormatInvariant(unitType.HeroName, unitType.Name));
+#endif
+                    return unitType;
                 }
-            } while (expectedType != spawnedType);
-            return spawnedType;
+
+                unitType = heroUnitType;
+            }
+
+            return unitType;
         }
 
         protected override void DoUpdate(SimulationStep step)

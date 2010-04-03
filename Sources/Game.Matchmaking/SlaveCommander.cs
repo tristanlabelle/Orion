@@ -30,7 +30,18 @@ namespace Orion.Game.Matchmaking
         public void SendMessage(string message)
         {
             Argument.EnsureNotNull(message, "message");
-            GenerateCommand(new SendMessageCommand(Faction.Handle, message));
+
+            GenerateCommand(new SendMessageCommand(Faction.Handle, Faction.World.Factions.Select(f => f.Handle), message));
+        }
+
+        public void SendAllyMessage(string message)
+        {
+            Argument.EnsureNotNull(message, "message");
+
+            var allyFactionHandles = Faction.World.Factions
+                .Where(f => Faction.GetDiplomaticStance(f) == DiplomaticStance.Ally)
+                .Select(f => f.Handle);
+            GenerateCommand(new SendMessageCommand(Faction.Handle, allyFactionHandles, message));
         }
 
         public void LaunchCancel(IEnumerable<Unit> units)

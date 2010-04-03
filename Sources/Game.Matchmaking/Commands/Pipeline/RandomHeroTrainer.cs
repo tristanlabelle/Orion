@@ -1,0 +1,108 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Orion.Engine;
+using Orion.Game.Simulation;
+using System.Diagnostics;
+
+namespace Orion.Game.Matchmaking.Commands.Pipeline
+{
+    /// <summary>
+    /// Randomly swaps units to be trained with their heroes.
+    /// </summary>
+    public sealed class RandomHeroTrainer : CommandFilter
+    {
+        #region Fields
+        public static readonly float DefaultProbability = 0.01f;
+
+        private readonly Match match;
+        private readonly float probability;
+        private readonly Queue<Command> accumulatedCommands = new Queue<Command>();
+        #endregion
+
+        #region Constructors
+        public RandomHeroTrainer(Match match, float probability)
+        {
+            Argument.EnsureNotNull(match, "match");
+            Argument.EnsureWithin(probability, 0, 1, "probability");
+
+            this.match = match;
+            this.probability = probability;
+        }
+
+        public RandomHeroTrainer(Match match)
+            : this(match, DefaultProbability) { }
+        #endregion
+
+        #region Properties
+        public float Probability
+        {
+            get { return probability; }
+        }
+
+        private UnitTypeRegistry UnitTypes
+        {
+            get { return match.World.UnitTypes; }
+        }
+        #endregion
+
+        #region Methods
+        public override void Handle(Command command)
+        {
+            Argument.EnsureNotNull(command, "command");
+            accumulatedCommands.Enqueue(command);
+        }
+
+        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        {
+            while (accumulatedCommands.Count > 0)
+            {
+                Command command = accumulatedCommands.Dequeue();
+                TrainCommand trainCommand = command as TrainCommand;
+                if (trainCommand != null)
+                {
+                    UnitType traineeType = UnitTypes.FromHandle(trainCommand.TraineeTypeHandle);
+                    if (traineeType == null)
+                    {
+                        Debug.Fail("Failed to resolve unit type from handle {0}."
+                            .FormatInvariant(trainCommand.TraineeTypeHandle));
+                    }
+                    else
+                    {
+                        UnitType heroType = RandomizeHero(traineeType);
+                        if (heroType != traineeType)
+                        {
+                            trainCommand = new TrainCommand(trainCommand.FactionHandle,
+                                trainCommand.ExecutingEntityHandles, heroType.Handle);
+                            command = trainCommand;
+                        }
+                    }
+                }
+
+                Flush(command);
+            }
+        }
+
+        private UnitType RandomizeHero(UnitType unitType)
+        {
+            while (unitType.HeroName != null && match.Random.NextDouble() <= probability)
+            {
+                UnitType heroUnitType = UnitTypes.FromName(unitType.HeroName);
+                if (heroUnitType == null)
+                {
+#if DEBUG
+                    Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
+                        .FormatInvariant(unitType.HeroName, unitType.Name));
+#endif
+                    break;
+                }
+
+                unitType = heroUnitType;
+            }
+
+            return unitType;
+        }
+        #endregion
+    }
+}

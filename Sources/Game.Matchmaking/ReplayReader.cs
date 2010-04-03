@@ -33,7 +33,7 @@ namespace Orion.Game.Matchmaking
             options.FoodLimit = reader.ReadInt32();
             options.RevealTopology = reader.ReadBoolean();
             options.RandomSeed = reader.ReadInt32();
-            options.IsNomad = reader.ReadBoolean();
+            options.StartNomad = reader.ReadBoolean();
 
             int factionCount = reader.ReadInt32();
             factionNames = Enumerable.Range(0, factionCount)

@@ -47,12 +47,13 @@ namespace Orion.Main
                 colorIndex++;
             }
 
-            WorldGenerator.Generate(world, random, settings.IsNomad);
+            WorldGenerator.Generate(world, random, settings.StartNomad);
             match = new Match(random, world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushCheatCodeExecutor(pipeline, match);
+            TryPushRandomHeroTrainer(pipeline, match);
             pipeline.PushFilter(new ReplayPlayer(replay));
 
             match.Updated += (sender, args) =>

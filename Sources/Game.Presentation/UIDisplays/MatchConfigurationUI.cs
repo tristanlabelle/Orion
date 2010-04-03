@@ -119,14 +119,19 @@ namespace Orion.Game.Presentation
                 settings.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
             }
             {
-                Checkbox checkbox = AddCheckboxOption("Début nomade", value => settings.IsNomad = value);
-                checkbox.State = settings.IsNomad;
-                settings.IsNomadChanged += o => checkbox.State = o.IsNomad;
+                Checkbox checkbox = AddCheckboxOption("Début nomade", value => settings.StartNomad = value);
+                checkbox.State = settings.StartNomad;
+                settings.StartNomadChanged += o => checkbox.State = o.StartNomad;
             }
             {
                 Checkbox checkbox = AddCheckboxOption("Codes de triche", value => settings.AreCheatsEnabled = value);
                 checkbox.State = settings.AreCheatsEnabled;
-                settings.IsNomadChanged += o => checkbox.State = o.AreCheatsEnabled;
+                settings.AreCheatsEnabledChanged += o => checkbox.State = o.AreCheatsEnabled;
+            }
+            {
+                Checkbox checkbox = AddCheckboxOption("Héros aléatoires", value => settings.AreRandomHeroesEnabled = value);
+                checkbox.State = settings.AreRandomHeroesEnabled;
+                settings.AreRandomHeroesEnabledChanged += o => checkbox.State = o.AreRandomHeroesEnabled;
             }
             #endregion
         }

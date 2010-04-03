@@ -38,7 +38,7 @@ namespace Orion.Game.Simulation.Tasks
             if (!trainSkill.Supports(traineeType))
                 throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
 
-            this.traineeType = TryGetHero(trainer.Faction.World.Random, traineeType, trainer.Faction.World.UnitTypes);
+            this.traineeType = traineeType;
         }
         #endregion
 
@@ -69,26 +69,6 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Methods
-        private UnitType TryGetHero(Random random, UnitType unitType, UnitTypeRegistry registry)
-        {
-            while (unitType.HeroName != null && random.Next(0, 100) == 0)
-            {
-                UnitType heroUnitType = registry.FromName(unitType.HeroName);
-                if (heroUnitType == null)
-                {
-#if DEBUG
-                    Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
-                        .FormatInvariant(unitType.HeroName, unitType.Name));
-#endif
-                    return unitType;
-                }
-
-                unitType = heroUnitType;
-            }
-
-            return unitType;
-        }
-
         protected override void DoUpdate(SimulationStep step)
         {
             if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, BasicSkill.FoodCostStat))

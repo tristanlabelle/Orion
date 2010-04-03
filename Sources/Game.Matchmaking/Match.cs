@@ -112,6 +112,17 @@ namespace Orion.Game.Matchmaking
         {
             get { return lastSimulationStep; }
         }
+
+        /// <summary>
+        /// Gets the random number generator used in this match.
+        /// </summary>
+        /// <remarks>
+        /// Internal to minimize chances of invalid usage outside the matchmaking logic.
+        /// </remarks>
+        internal Random Random
+        {
+            get { return random; }
+        }
         #endregion
 
         #region Methods

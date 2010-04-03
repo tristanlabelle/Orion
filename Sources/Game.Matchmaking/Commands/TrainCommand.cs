@@ -38,6 +38,11 @@ namespace Orion.Game.Matchmaking.Commands
         {
             get { return trainerHandles; }
         }
+
+        public Handle TraineeTypeHandle
+        {
+            get { return traineeTypeHandle; }
+        }
         #endregion
 
         #region Methods

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Pirate" Hero="Barbe bleue" Width="1" Height="1">
 	<Basic SightRange="8" MaxHealth="40" MeleeArmor="2" RangedArmor="1" AladdiumCost="50" FoodCost="1"/>
 	<Move Speed="8"/>

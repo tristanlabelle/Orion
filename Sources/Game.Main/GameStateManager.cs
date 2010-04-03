@@ -6,6 +6,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
+using Orion.Game.Presentation;
 
 namespace Orion.Game.Main
 {
@@ -161,7 +162,7 @@ namespace Orion.Game.Main
             ExecuteDeferredActions();
         }
 
-        public void Draw(GraphicsContext graphics)
+        public void Draw(GameGraphics graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 

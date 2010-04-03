@@ -83,7 +83,7 @@ namespace Orion.Game.Main
             }
 
             WorldGenerator.Generate(world, random, !settings.IsNomad);
-            match = new Match(random, world);
+            match = new Match(world);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushCheatCodeExecutor(pipeline, match);

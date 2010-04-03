@@ -10,6 +10,7 @@ using Orion.Game.Simulation.Technologies;
 using Orion.Engine.Gui;
 using Orion.Engine.Geometry;
 using System.Windows.Forms;
+using Orion.Engine.Input;
 
 namespace Orion.Game.Presentation
 {
@@ -20,6 +21,7 @@ namespace Orion.Game.Presentation
     {
         #region Fields
         private readonly IGameWindow window;
+        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
         private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
@@ -28,6 +30,7 @@ namespace Orion.Game.Presentation
         public GameGraphics()
         {
             this.window = new WindowsFormsGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
+            this.window.InputReceived += OnInputReceived;
 
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
@@ -45,7 +48,7 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets the graphics context which provides graphics to the game.
         /// </summary>
-        public GraphicsContext GraphicsContext
+        public GraphicsContext Context
         {
             get { return window.GraphicsContext; }
         }
@@ -67,18 +70,6 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Causes the window to refresh itself.
-        /// </summary>
-        public void Refresh()
-        {
-            Application.DoEvents();
-            if (window.WasClosed) return;
-
-            rootView.Draw(GraphicsContext);
-            GraphicsContext.Present();
-        }
-
         #region Textures
         /// <summary>
         /// Gets a texture for a miscellaneous game element. 
@@ -179,6 +170,15 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
+        public void DispatchInputEvents()
+        {
+            while (inputEventQueue.Count > 0)
+            {
+                InputEvent inputEvent = inputEventQueue.Dequeue();
+                rootView.SendInputEvent(inputEvent);
+            }
+        }
+
         /// <summary>
         /// Releases all resources used by this object.
         /// </summary>
@@ -186,6 +186,38 @@ namespace Orion.Game.Presentation
         {
             textureManager.Dispose();
             window.Dispose();
+        }
+
+        private void OnInputReceived(IGameWindow sender, InputEvent inputEvent)
+        {
+            HandleInput(inputEvent);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+
+        private void HandleInput(InputEvent inputEvent)
+        {
+            if (inputEvent.Type == InputEventType.Keyboard)
+            {
+                KeyboardEventType type;
+                KeyboardEventArgs args;
+                inputEvent.GetKeyboard(out type, out args);
+
+                if (type == KeyboardEventType.ButtonPressed && args.IsAltModifierDown && args.Key == Keys.Enter)
+                    ToggleFullscreen();
+            }
+        }
+
+        private void ToggleFullscreen()
+        {
+            if (window.Mode == WindowMode.Windowed)
+            {
+                try { window.SetFullscreen(new Size(1024, 768)); }
+                catch (NotSupportedException) { }
+            }
+            else
+            {
+                window.SetWindowed(window.ClientAreaSize);
+            }
         }
         #endregion
     }

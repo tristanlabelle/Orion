@@ -35,17 +35,17 @@ namespace Orion.Engine.Graphics
         GraphicsContext GraphicsContext { get; }
 
         /// <summary>
-        /// Gets a value indicating if an input event is available for dequeuing.
-        /// </summary>
-        bool IsInputEventAvailable { get; }
-
-        /// <summary>
         /// Gets a value indicating if this window has been closed.
         /// </summary>
         bool WasClosed { get; }
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when a mous or keyboard event has been received by this window.
+        /// </summary>
+        event Action<IGameWindow, InputEvent> InputReceived;
+
         /// <summary>
         /// Raised when the window has been or is being resized.
         /// </summary>
@@ -58,12 +58,6 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Gets the next input event that was enqueued by this window.
-        /// </summary>
-        /// <returns>The input event that was enqueued.</returns>
-        InputEvent DequeueInputEvent();
-
         /// <summary>
         /// Switches to windowed mode with a given client size.
         /// </summary>

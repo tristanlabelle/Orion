@@ -239,7 +239,6 @@ namespace Orion.Game.Presentation
         protected virtual void OnPressedExit(Button button)
         {
             ExitPressed.Raise(this);
-            Parent.PopDisplay(this);
         }
 
         protected virtual void OnPressedStartGame(Button button)

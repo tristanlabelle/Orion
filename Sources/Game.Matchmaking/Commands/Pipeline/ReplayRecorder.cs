@@ -13,6 +13,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
     /// </summary>
     public sealed class ReplayRecorder : CommandFilter
     {
+        #region Instance
         #region Fields
         private readonly Queue<Command> commandQueue = new Queue<Command>();
         private readonly ReplayWriter writer;
@@ -42,6 +43,28 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 Flush(command);
             }
         }
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        public static ReplayRecorder TryCreate(MatchSettings settings, World world)
+        {
+            Argument.EnsureNotNull(settings, "settings");
+            Argument.EnsureNotNull(world, "world");
+
+            ReplayWriter replayWriter = ReplayWriter.TryCreate();
+            if (replayWriter == null) return null;
+
+#if DEBUG
+            replayWriter.AutoFlush = true;
+#endif
+
+            replayWriter.WriteHeader(settings, world.Factions.Select(faction => faction.Name));
+
+            return new ReplayRecorder(replayWriter);
+        }
+        #endregion
         #endregion
     }
 }

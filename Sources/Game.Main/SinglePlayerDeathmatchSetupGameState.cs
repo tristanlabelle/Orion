@@ -30,6 +30,7 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
             this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
+            this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
         }
         #endregion
@@ -59,12 +60,26 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDelta)
         {
+            graphics.DispatchInputEvents();
             RootView.Update(timeDelta);
+        }
+
+        protected internal override void Draw(GameGraphics graphics)
+        {
+            RootView.Draw(graphics.Context);
         }
 
         public override void Dispose()
         {
             ui.Dispose();
+        }
+
+        private void OnStartGamePressed(MatchConfigurationUI sender)
+        {
+            GameState targetGameState = new SinglePlayerDeathmatchGameState(
+                Manager, graphics, ui.Players.ToList(), matchSettings);
+            Manager.Push(targetGameState);
+                
         }
 
         private void OnExitPressed(MatchConfigurationUI sender)

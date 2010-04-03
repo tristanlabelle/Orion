@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Technology Name="Sainte Trinité" AladdiumCost="200" AlageneCost="150">
   <Target>Jésus</Target>
   <Target>Jésus-raptor</Target>

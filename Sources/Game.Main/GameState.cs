@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
+using Orion.Game.Presentation;
 
 namespace Orion.Game.Main
 {
@@ -55,7 +56,7 @@ namespace Orion.Game.Main
         /// Invoked each rendering frame to refresh the screen.
         /// </summary>
         /// <param name="graphics">The graphics to be used.</param>
-        protected internal virtual void Draw(GraphicsContext graphics) { }
+        protected internal virtual void Draw(GameGraphics graphics) { }
 
         /// <summary>
         /// Invoked when a game state is pushed over this game state.

@@ -8,15 +8,16 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Engine.Input;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Utilities;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Audio;
-using Orion.Game.Presentation.Actions;
-using Orion.Game.Presentation.Actions.Enablers;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Actions;
+using Orion.Game.Presentation.Actions.Enablers;
+using Orion.Game.Presentation.Audio;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Utilities;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
@@ -189,6 +190,10 @@ namespace Orion.Game.Presentation
             UpdateWorkerActivityButton();
 
             LocalFaction.Warning += OnLocalFactionWarning;
+
+            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+                ?? localCommander.Faction.Units.FirstOrDefault();
+            if (viewTarget != null) CenterOn(viewTarget.Center);
         }
         #endregion
 

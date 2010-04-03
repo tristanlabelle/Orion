@@ -17,7 +17,6 @@ namespace Orion.Game.Matchmaking
     public sealed class Match
     {
         #region Fields
-        private readonly Random random;
         private readonly World world;
         private SimulationStep lastSimulationStep;
         private bool isPausable;
@@ -25,14 +24,11 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Constructors
-        public Match(Random random, World world)
+        public Match(World world)
         {
-            Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
 
-            this.random = random;
             this.world = world;
-
             world.FactionDefeated += OnFactionDefeated;
         }
         #endregion

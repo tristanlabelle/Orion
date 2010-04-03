@@ -184,46 +184,7 @@ namespace Orion.Game.Main
 
         private void Run()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            FrameRateCounter updateRateCounter = new FrameRateCounter();
-            FrameRateCounter drawRateCounter = new FrameRateCounter();
 
-            // This run loop uses a fixed time step for the updates and manages
-            // situations where either the rendering or the updating is slow.
-            // Source: http://gafferongames.com/game-physics/fix-your-timestep/
-            float gameTime = 0.0f;
-
-            float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
-            float timeAccumulator = 0.0f;
-
-            while (!gameGraphics.Window.WasClosed)
-            {
-                bool countersUpdated = false;
-
-                float newTime = (float)stopwatch.Elapsed.TotalSeconds;
-                float actualTimeDelta = newTime - oldTime;
-                if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
-                timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
-                oldTime = newTime;
-
-                while (timeAccumulator >= TargetSecondsPerFrame)
-                {
-                    gameGraphics.RootView.Update(TargetSecondsPerFrame);
-                    countersUpdated |= updateRateCounter.Update();
-
-                    gameTime += TargetSecondsPerFrame;
-                    timeAccumulator -= TargetSecondsPerFrame;
-                }
-
-                Application.DoEvents();
-                gameGraphics.Refresh();
-                countersUpdated |= drawRateCounter.Update();
-                
-#if DEBUG
-                if (countersUpdated)
-                    UpdateWindowTitle(updateRateCounter, drawRateCounter);
-#endif
-            }
         }
 
         private void UpdateWindowTitle(FrameRateCounter updateRateCounter, FrameRateCounter drawRateCounter)
@@ -282,8 +243,6 @@ namespace Orion.Game.Main
 
                 while (!gameGraphics.Window.WasClosed && gameStateManager.ActiveState != null)
                 {
-                    bool countersUpdated = false;
-
                     float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                     float actualTimeDelta = newTime - oldTime;
                     if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
@@ -293,15 +252,21 @@ namespace Orion.Game.Main
                     while (timeAccumulator >= TargetSecondsPerFrame)
                     {
                         gameStateManager.Update(TargetSecondsPerFrame);
-                        countersUpdated |= updateRateCounter.Update();
+                        updateRateCounter.Update();
 
                         gameTime += TargetSecondsPerFrame;
                         timeAccumulator -= TargetSecondsPerFrame;
                     }
 
-                    Application.DoEvents();
-                    gameGraphics.Refresh();
-                    countersUpdated |= drawRateCounter.Update();
+                    gameGraphics.Window.Update();
+                    if (gameStateManager.ActiveState == null) continue;
+
+                    gameGraphics.Context.Clear(Colors.Black);
+
+                    gameStateManager.Draw(gameGraphics);
+                    gameGraphics.Context.Present();
+                    
+                    drawRateCounter.Update();
                 }
             }
 

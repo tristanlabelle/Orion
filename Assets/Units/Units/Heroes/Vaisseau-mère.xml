@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Vaisseau-mère" Hero="Chuck Norris" Width="3" Height="3" IsAirborne="True">
 	<Basic SightRange="10" MaxHealth="250" MeleeArmor="2" RangedArmor="8" FoodCost="2"/>
 	<Move Speed="6"/>

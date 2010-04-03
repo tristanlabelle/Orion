@@ -22,7 +22,6 @@ namespace Orion.Engine.Graphics
     {
         #region Fields
         private readonly GameWindow window;
-        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
         private GraphicsContext graphicsContext;
         private bool wasClosed;
         #endregion
@@ -67,8 +66,8 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Events
+        public event Action<IGameWindow, InputEvent> InputReceived;
         public event Action<IGameWindow> Resized;
-
         public event Action<IGameWindow> Closing;
         #endregion
 
@@ -94,11 +93,6 @@ namespace Orion.Engine.Graphics
             get { return graphicsContext; }
         }
 
-        public bool IsInputEventAvailable
-        {
-            get { return inputEventQueue.Count > 0; }
-        }
-
         public bool WasClosed
         {
             get { return wasClosed || window.IsExiting || !window.Exists; }
@@ -107,11 +101,6 @@ namespace Orion.Engine.Graphics
 
         #region Methods
         #region IGameWindow Interface
-        public InputEvent DequeueInputEvent()
-        {
-            return inputEventQueue.Dequeue();
-        }
-
         public void SetWindowed(Size clientAreaSize)
         {
             if (window.WindowState == WindowState.Fullscreen)
@@ -150,44 +139,44 @@ namespace Orion.Engine.Graphics
         #region Keyboard
         private void OnKeyboardKeyDown(KeyboardDevice sender, Key key)
         {
-            EnqueueKeyboardEvent(KeyboardEventType.ButtonPressed, key);
+            RaiseKeyboardEvent(KeyboardEventType.ButtonPressed, key);
         }
 
         private void OnKeyboardKeyUp(KeyboardDevice sender, Key key)
         {
-            EnqueueKeyboardEvent(KeyboardEventType.ButtonReleased, key);
+            RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, key);
         }
 
-        private void EnqueueKeyboardEvent(KeyboardEventType type, Key key)
+        private void RaiseKeyboardEvent(KeyboardEventType type, Key key)
         {
             KeyboardEventArgs args = new KeyboardEventArgs((Keys)(int)key);
             InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
-            inputEventQueue.Enqueue(inputEvent);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
 
         #region Mouse
         private void OnMouseButtonPressed(object sender, MouseButtonEventArgs e)
         {
-            EnqueueMouseButtonEvent(MouseEventType.ButtonPressed,
+            RaiseMouseButtonEvent(MouseEventType.ButtonPressed,
                 e.Position, e.Button, 1);
         }
 
         private void OnMouseButtonReleased(object sender, MouseButtonEventArgs e)
         {
-            EnqueueMouseButtonEvent(MouseEventType.ButtonReleased,
+            RaiseMouseButtonEvent(MouseEventType.ButtonReleased,
                 e.Position, e.Button, 1);
         }
 
         private void OnMouseMoved(object sender, MouseMoveEventArgs e)
         {
-            EnqueueMouseEvent(MouseEventType.Moved, e.Position,
+            RaiseMouseEvent(MouseEventType.Moved, e.Position,
                 Orion.Engine.Input.MouseButton.None, 0, 0);
         }
 
         private void OnMouseWheelChanged(object sender, MouseWheelEventArgs e)
         {
-            EnqueueMouseEvent(MouseEventType.WheelScrolled, e.Position,
+            RaiseMouseEvent(MouseEventType.WheelScrolled, e.Position,
                 Orion.Engine.Input.MouseButton.None, 0, e.Delta);
         }
 
@@ -199,23 +188,23 @@ namespace Orion.Engine.Graphics
             return Orion.Engine.Input.MouseButton.None;
         }
 
-        private void EnqueueMouseButtonEvent(MouseEventType type, System.Drawing.Point screenPoint,
+        private void RaiseMouseButtonEvent(MouseEventType type, System.Drawing.Point screenPoint,
             OpenTK.Input.MouseButton button, int clickCount)
         {
             Orion.Engine.Input.MouseButton orionButton = GetMouseButton(button);
             if (orionButton == Orion.Engine.Input.MouseButton.None) return;
 
-            EnqueueMouseEvent(type, screenPoint, orionButton, clickCount, 0);
+            RaiseMouseEvent(type, screenPoint, orionButton, clickCount, 0);
         }
 
-        private void EnqueueMouseEvent(MouseEventType type, System.Drawing.Point screenPoint,
+        private void RaiseMouseEvent(MouseEventType type, System.Drawing.Point screenPoint,
             Orion.Engine.Input.MouseButton button, int clickCount, int wheelDelta)
         {
             System.Drawing.Point clientPoint = window.PointToClient(screenPoint);
             Orion.Engine.Input.MouseEventArgs args = new Orion.Engine.Input.MouseEventArgs(
                 new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta / 600.0f);
             InputEvent inputEvent = InputEvent.CreateMouse(type, args);
-            inputEventQueue.Enqueue(inputEvent);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
 

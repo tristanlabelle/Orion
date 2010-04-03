@@ -20,7 +20,6 @@ namespace Orion.Engine.Graphics
         #region Instance
         #region Fields
         private readonly GameWindowForm form;
-        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
         private readonly GraphicsContext graphicsContext;
         private WindowMode mode = WindowMode.Windowed;
         private bool wasClosed;
@@ -52,6 +51,7 @@ namespace Orion.Engine.Graphics
 
             form.Resize += OnResized;
             form.FormClosing += OnClosing;
+            form.FormClosed += OnClosed;
             form.TextPasted += OnTextPasted;
 
             form.GLControl.MouseMove += OnMouseMoved;
@@ -68,6 +68,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Events
+        public event Action<IGameWindow, InputEvent> InputReceived;
         public event Action<IGameWindow> Resized;
         public event Action<IGameWindow> Closing;
         #endregion
@@ -94,11 +95,6 @@ namespace Orion.Engine.Graphics
             get { return graphicsContext; }
         }
 
-        public bool IsInputEventAvailable
-        {
-            get { return inputEventQueue.Count > 0; }
-        }
-
         public bool WasClosed
         {
             get { return wasClosed; }
@@ -107,11 +103,6 @@ namespace Orion.Engine.Graphics
 
         #region Methods
         #region IGameWindow Interface
-        public InputEvent DequeueInputEvent()
-        {
-            return inputEventQueue.Dequeue();
-        }
-
         public void SetWindowed(Size clientAreaSize)
         {
             if (mode == WindowMode.Fullscreen)
@@ -139,11 +130,11 @@ namespace Orion.Engine.Graphics
             }
 
             SetFullscreenStyle();
+            mode = WindowMode.Fullscreen;
         }
 
         private void SetFullscreenStyle()
         {
-
             form.TopMost = true;
             form.FormBorderStyle = FormBorderStyle.None;
             form.Location = System.Drawing.Point.Empty;
@@ -164,35 +155,35 @@ namespace Orion.Engine.Graphics
         #region Mouse Stuff
         private void OnMouseMoved(object sender, WinForms.MouseEventArgs args)
         {
-            EnqueueMouseEvent(MouseEventType.Moved,
+            RaiseMouseEvent(MouseEventType.Moved,
                 args.X, args.Y, MouseButton.None, 0, 0);
         }
 
         private void OnMouseButtonPressed(object sender, WinForms.MouseEventArgs args)
         {
-            EnqueueMouseEvent(MouseEventType.ButtonPressed,
+            RaiseMouseEvent(MouseEventType.ButtonPressed,
                 args.X, args.Y, args.Button, 0, 0);
         }
 
         private void OnMouseButtonReleased(object sender, WinForms.MouseEventArgs args)
         {
-            EnqueueMouseEvent(MouseEventType.ButtonReleased,
+            RaiseMouseEvent(MouseEventType.ButtonReleased,
                 args.X, args.Y, args.Button, 0, 0);
         }
 
         private void OnMouseWheelScrolled(object sender, WinForms.MouseEventArgs args)
         {
-            EnqueueMouseEvent(MouseEventType.WheelScrolled,
+            RaiseMouseEvent(MouseEventType.WheelScrolled,
                 args.X, args.Y, MouseButton.None, 0, args.Delta / 600f);
         }
 
         private void OnMouseButtonDoubleClicked(object sender, WinForms.MouseEventArgs args)
         {
-            EnqueueMouseEvent(MouseEventType.ButtonPressed,
+            RaiseMouseEvent(MouseEventType.ButtonPressed,
                 args.X, args.Y, args.Button, args.Clicks, args.Delta);
         }
 
-        private void EnqueueMouseEvent(MouseEventType type, float x, float y,
+        private void RaiseMouseEvent(MouseEventType type, float x, float y,
             MouseButtons button, int clickCount, float wheelDelta)
         {
             MouseButton pressedButton = MouseButton.None;
@@ -207,67 +198,81 @@ namespace Orion.Engine.Graphics
                     break;
             }
 
-            EnqueueMouseEvent(type, x, y, pressedButton, clickCount, wheelDelta);
+            RaiseMouseEvent(type, x, y, pressedButton, clickCount, wheelDelta);
         }
 
-        private void EnqueueMouseEvent(MouseEventType type, float x, float y,
+        private void RaiseMouseEvent(MouseEventType type, float x, float y,
             MouseButton button, int clickCount, float wheelDelta)
         {
             Vector2 position = new Vector2(x, (form.GLControl.Height - 1) - y);
             var eventArgs = new Orion.Engine.Input.MouseEventArgs(position, button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, eventArgs);
-            inputEventQueue.Enqueue(inputEvent);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
 
         #region Keyboard Events
         private void OnTextPasted(GameWindowForm sender, string text)
         {
-            foreach (char character in text) EnqueueCharacterEvent(character);
+            foreach (char character in text) RaiseCharacterEvent(character);
         }
 
         private void OnKeyboardKeyPressed(object sender, KeyEventArgs args)
         {
-            if (args.Alt) args.Handled = true;
+            if (args.KeyCode == Keys.Menu) args.Handled = true;
 
-            EnqueueKeyboardEvent(KeyboardEventType.ButtonPressed, args.KeyData);
+            RaiseKeyboardEvent(KeyboardEventType.ButtonPressed, args.KeyData);
         }
 
         private void OnKeyboardKeyReleased(object sender, KeyEventArgs args)
         {
-            EnqueueKeyboardEvent(KeyboardEventType.ButtonReleased, args.KeyData);
+            if (args.KeyCode == Keys.Menu) args.Handled = true;
+
+            RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, args.KeyData);
         }
 
         private void OnCharacter(object sender, KeyPressEventArgs args)
         {
-            EnqueueCharacterEvent(args.KeyChar);
+            RaiseCharacterEvent(args.KeyChar);
         }
 
-        private void EnqueueKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
+        private void RaiseKeyboardEvent(KeyboardEventType type, Keys keyAndModifiers)
         {
             KeyboardEventArgs args = new KeyboardEventArgs(keyAndModifiers);
             InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
-            inputEventQueue.Enqueue(inputEvent);
+            InputReceived.Raise(this, inputEvent);
         }
 
-        private void EnqueueCharacterEvent(char character)
+        private void RaiseCharacterEvent(char character)
         {
             InputEvent inputEvent = InputEvent.CreateCharacter(character);
-            inputEventQueue.Enqueue(inputEvent);
+            InputReceived.Raise(this, inputEvent);
         }
         #endregion
 
-        private void OnResized(object sender, EventArgs e)
+        private void OnResized(object sender, EventArgs args)
         {
             Resized.Raise(this);
         }
 
-        private void OnClosing(object sender, FormClosingEventArgs e)
+        private void OnClosing(object sender, FormClosingEventArgs args)
         {
-            e.Cancel = true;
+            args.Cancel = true;
             form.Hide();
             wasClosed = true;
             Closing.Raise(this);
+        }
+
+        private void OnClosed(object sender, FormClosedEventArgs args)
+        {
+            if (mode == WindowMode.Fullscreen)
+            {
+                try { DisplayDevice.Default.RestoreResolution(); }
+                catch (GraphicsModeException e)
+                {
+                    Debug.Fail("Failed to restore the display resolution: {0}".FormatInvariant(e));
+                }
+            }
         }
         #endregion
         #endregion

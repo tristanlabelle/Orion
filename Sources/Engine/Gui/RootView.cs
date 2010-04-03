@@ -166,7 +166,6 @@ namespace Orion.Engine.Gui
 
         protected internal override void Render(GraphicsContext graphicsContext)
         {
-            graphicsContext.Clear(Colors.Black);
             graphicsContext.ProjectionBounds = Bounds;
 
             displays.Peek().Render(graphicsContext);

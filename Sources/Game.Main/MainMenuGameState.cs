@@ -58,7 +58,13 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDelta)
         {
+            graphics.DispatchInputEvents();
             RootView.Update(timeDelta);
+        }
+
+        protected internal override void Draw(GameGraphics graphics)
+        {
+            RootView.Draw(graphics.Context);
         }
 
         public override void Dispose()
@@ -68,7 +74,7 @@ namespace Orion.Game.Main
 
         private void OnSinglePlayerSelected(MainMenuUI sender)
         {
-            Manager.Push(new MainMenuGameState(Manager, graphics));
+            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
         }
 
         private void OnMultiplayerSelected(MainMenuUI sender)

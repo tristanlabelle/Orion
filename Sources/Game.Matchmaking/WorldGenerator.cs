@@ -21,10 +21,10 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public static void Generate(World world, Random random, bool nomad)
+        public static void Generate(World world, Random random, bool createPyramids)
         {
             foreach (Faction faction in world.Factions)
-                GenerateFactionCamp(world, faction, random, nomad);
+                GenerateFactionCamp(world, faction, random, createPyramids);
             
             GenerateResourceNodes(world, random);
         }

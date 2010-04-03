@@ -65,12 +65,12 @@ namespace Orion.Game.Main
                 }
                 else
                 {
-                    throw new InvalidOperationException("Multiplayer games only support remote, local and AI players");
+                    throw new InvalidOperationException("Single-player games only support local and AI players");
                 }
             }
 
             WorldGenerator.Generate(world, random, !settings.IsNomad);
-            match = new Match(random, world);
+            match = new Match(world);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);

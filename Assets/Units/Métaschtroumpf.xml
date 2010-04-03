@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Tower defense unit -->
 <UnitType Name="Métaschtroumpf" Width="2" Height="2">
 	<Move Speed="20"/>

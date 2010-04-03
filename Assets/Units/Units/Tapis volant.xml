@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Tapis volant" Hero="Tapis d'Aladdin" Width="2" Height="2" IsAirborne="True">
 	<Basic SightRange="8" MaxHealth="75" MeleeArmor="1" RangedArmor="1" AladdiumCost="25" AlageneCost="50" FoodCost="2"/>
 	<Move Speed="10"/>

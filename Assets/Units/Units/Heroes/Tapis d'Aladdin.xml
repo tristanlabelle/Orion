@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Tapis d'Aladdin" Hero="Chuck Norris" Width="2" Height="2" IsAirborne="True">
 	<Basic SightRange="8" MaxHealth="140" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
 	<Move Speed="15"/>

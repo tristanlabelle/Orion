@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="OVNI" Hero="Vaisseau mère" Width="2" Height="2" IsAirborne="True">
 	<Basic SightRange="10" MaxHealth="100" MeleeArmor="1" RangedArmor="3" AladdiumCost="140" AlageneCost="140" FoodCost="2"/>
 	<Move Speed="8"/>

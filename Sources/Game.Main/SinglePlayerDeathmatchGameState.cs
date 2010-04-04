@@ -72,9 +72,9 @@ namespace Orion.Game.Main
                 }
             }
 
-            WorldGenerator.Generate(world, random, !settings.IsNomad);
+            WorldGenerator.Generate(world, random, !settings.StartNomad);
 
-            match = new Match(world);
+            match = new Match(world, random);
             match.IsPausable = true;
 
             commandPipeline = new CommandPipeline(match);

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="Turbo turbo">
+  <Target>Schtroumpf</Target>
+  <Target>Grand schtroumpf</Target>
+  <Target>Pyramide</Target>
+  <Target>Temple de 2012</Target>
+  <Target>Portail démoniaque</Target>
+  <Target>Centre de propagande</Target>
+  <Target>Maison de Tristan</Target>
+  <Effect Stat="Build.Speed" Change="150"/>
+  <Effect Stat="Train.Speed" Change="100"/>
+</Technology>

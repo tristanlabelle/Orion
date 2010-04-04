@@ -471,6 +471,13 @@ namespace Orion.Game.Presentation
 
             commander.SendMessage(text);
         }
+
+        public void LaunchAllyChatMessage(string text)
+        {
+            Argument.EnsureNotNull(text, "text");
+
+            commander.SendAllyMessage(text);
+        }
         #endregion
         #endregion
     }

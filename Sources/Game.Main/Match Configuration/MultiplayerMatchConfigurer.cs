@@ -82,13 +82,14 @@ namespace Orion.Game.Main
                 }
             }
 
-            WorldGenerator.Generate(world, random, !settings.IsNomad);
-            match = new Match(world);
+            WorldGenerator.Generate(world, random, !settings.StartNomad);
+            match = new Match(world, random);
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushCheatCodeExecutor(pipeline, match);
-            ICommandSink aiCommandSink = pipeline.TopMostSink;
+            TryPushRandomHeroTrainer(pipeline, match);
             TryPushReplayRecorder(pipeline);
+            ICommandSink aiCommandSink = pipeline.TopMostSink;
             pipeline.PushFilter(new CommandSynchronizer(match, transporter, peers));
             pipeline.PushFilter(new CommandOptimizer());
 

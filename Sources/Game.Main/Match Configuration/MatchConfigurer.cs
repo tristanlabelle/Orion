@@ -65,6 +65,11 @@ namespace Orion.Game.Main
             if (settings.AreCheatsEnabled) pipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
         }
 
+        protected void TryPushRandomHeroTrainer(CommandPipeline pipeline, Match match)
+        {
+            if (settings.AreRandomHeroesEnabled) pipeline.PushFilter(new RandomHeroTrainer(match));
+        }
+
         protected void TryPushReplayRecorder(CommandPipeline pipeline)
         {
             Argument.EnsureNotNull(pipeline, "pipeline");

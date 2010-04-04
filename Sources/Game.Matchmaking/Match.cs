@@ -18,18 +18,21 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private readonly World world;
+        private readonly Random random;
         private SimulationStep lastSimulationStep;
         private bool isPausable;
         private bool isRunning;
         #endregion
 
         #region Constructors
-        public Match(World world)
+        public Match(World world, Random random)
         {
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(random, "random");
 
             this.world = world;
-            world.FactionDefeated += OnFactionDefeated;
+            this.random = random;
+            this.world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -107,6 +110,17 @@ namespace Orion.Game.Matchmaking
         public SimulationStep LastSimulationStep
         {
             get { return lastSimulationStep; }
+        }
+
+        /// <summary>
+        /// Gets the random number generator used in this match.
+        /// </summary>
+        /// <remarks>
+        /// Internal to minimize chances of invalid usage outside the matchmaking logic.
+        /// </remarks>
+        internal Random Random
+        {
+            get { return random; }
         }
         #endregion
 

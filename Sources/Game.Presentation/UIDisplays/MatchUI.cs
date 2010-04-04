@@ -370,9 +370,14 @@ namespace Orion.Game.Presentation
 
         private void SendMessage(TextField chatInput)
         {
-            string text = chatInput.Contents;
+            string text = chatInput.Contents.Trim();
             if (text.Any(character => !char.IsWhiteSpace(character)))
-                userInputManager.LaunchChatMessage(chatInput.Contents);
+            {
+                if (text[0] == '#')
+                    userInputManager.LaunchAllyChatMessage(text.Substring(1));
+                else
+                    userInputManager.LaunchChatMessage(chatInput.Contents);
+            }
 
             Children.Remove(chatInput);
         }

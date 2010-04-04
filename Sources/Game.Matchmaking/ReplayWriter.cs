@@ -72,7 +72,7 @@ namespace Orion.Game.Matchmaking
             writer.Write(options.FoodLimit);
             writer.Write(options.RevealTopology);
             writer.Write(options.RandomSeed);
-            writer.Write(options.IsNomad);
+            writer.Write(options.StartNomad);
 
             writer.Write(factionNameList.Count);
             foreach (string factionName in factionNameList)

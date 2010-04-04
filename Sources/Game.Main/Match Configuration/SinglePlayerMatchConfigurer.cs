@@ -69,12 +69,13 @@ namespace Orion.Game.Main
                 }
             }
 
-            WorldGenerator.Generate(world, random, !settings.IsNomad);
-            match = new Match(world);
+            WorldGenerator.Generate(world, random, !settings.StartNomad);
+            match = new Match(world, random);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);
             TryPushCheatCodeExecutor(pipeline, match);
+            TryPushRandomHeroTrainer(pipeline, match);
             TryPushReplayRecorder(pipeline);
 
             aiCommanders.ForEach(commander => pipeline.AddCommander(commander));

@@ -6,11 +6,18 @@ using Orion.Game.Simulation;
 
 namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
-    public class CommandOptimizer : CommandFilter
+    /// <summary>
+    /// Removes duplicate commands on the same units to minimize bandwidth usage
+    /// when Mathieu clicks like a madman to move his units.
+    /// </summary>
+    public sealed class CommandOptimizer : CommandFilter
     {
-        private Stack<Command> commands = new Stack<Command>();
-        private List<Handle> concernedHandles = new List<Handle>();
+        #region Fields
+        private readonly Stack<Command> commands = new Stack<Command>();
+        private readonly List<Handle> concernedHandles = new List<Handle>();
+        #endregion
 
+        #region Methods
         public override void Handle(Command command)
         {
             commands.Push(command);
@@ -44,5 +51,6 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             concernedHandles.AddRange(command.ExecutingEntityHandles);
             Flush(command);
         }
+        #endregion
     }
 }

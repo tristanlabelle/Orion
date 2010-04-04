@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
+using System.Diagnostics;
 
 namespace Orion.Game.Matchmaking
 {
@@ -74,6 +76,7 @@ namespace Orion.Game.Matchmaking
             Default.Register("twelvehungrymen", IncreaseAvailableFood);
             Default.Register("whosyourdaddy", SpawnChuckNorris);
             Default.Register("brinformatique", InstantDefeat);
+            Default.Register("turboturbo", IncreaseBuildAndTrainSpeed);
             Default.Register("itsover9000", InstantVictory);
             Default.Register("catchmymohawk", SpawnMisterT);
 #if DEBUG
@@ -106,9 +109,16 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnChuckNorris(Match match, Faction faction)
         {
-            UnitType heroUnitType = match.World.UnitTypes.FromName("Chuck Norris");
-            faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
+            UnitType unitType = match.World.UnitTypes.FromName("Chuck Norris");
+            if (unitType == null)
+            {
+                Debug.Fail("Failed to find hero unit type.");
+                return;
+            }
+
+            faction.CreateUnit(unitType, (Point)match.World.Bounds.Center);
         }
+
         private static void InstantVictory(Match match, Faction faction)
         {
             List<Unit> enemyUnits = match.World.Entities
@@ -116,6 +126,19 @@ namespace Orion.Game.Matchmaking
                 .Where(u => u.Faction != faction)
                 .ToList();
             foreach (Unit enemy in enemyUnits) enemy.Suicide();
+        }
+
+        private static void IncreaseBuildAndTrainSpeed(Match match, Faction faction)
+        {
+            Technology technology = match.World.TechnologyTree.Technologies
+                .FirstOrDefault(tech => tech.Name == "Turbo turbo");
+            if (technology == null)
+            {
+                Debug.Fail("Failed to find fast build & train technology.");
+                return;
+            }
+
+            faction.AddResearchedTechnology(technology);
         }
 
         private static void InstantDefeat(Match match, Faction faction)

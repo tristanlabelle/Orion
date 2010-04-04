@@ -25,8 +25,9 @@ namespace Orion.Game.Matchmaking
         private int randomSeed = (int)Environment.TickCount;
 
         private bool revealTopology;
-        private bool isNomad;
+        private bool startNomad;
         private bool areCheatsEnabled;
+        private bool areRandomHeroesEnabled = true;
         #endregion
 
         #region Events
@@ -36,8 +37,9 @@ namespace Orion.Game.Matchmaking
         public event Action<MatchSettings> InitialAlageneAmountChanged;
         public event Action<MatchSettings> RandomSeedChanged;
         public event Action<MatchSettings> RevealTopologyChanged;
-        public event Action<MatchSettings> IsNomadChanged;
-        public event Action<MatchSettings> CheatsEnabledChanged;
+        public event Action<MatchSettings> StartNomadChanged;
+        public event Action<MatchSettings> AreCheatsEnabledChanged;
+        public event Action<MatchSettings> AreRandomHeroesEnabledChanged;
         public event Action<MatchSettings> Changed;
         #endregion
 
@@ -133,14 +135,14 @@ namespace Orion.Game.Matchmaking
         /// Accesses a value indicating if the factions should start nomad,
         /// without any buildings.
         /// </summary>
-        public bool IsNomad
+        public bool StartNomad
         {
-            get { return isNomad; }
+            get { return startNomad; }
             set
             {
-                if (value == isNomad) return;
-                isNomad = value;
-                TriggerEvent(IsNomadChanged);
+                if (value == startNomad) return;
+                startNomad = value;
+                TriggerEvent(StartNomadChanged);
             }
         }
 
@@ -154,7 +156,21 @@ namespace Orion.Game.Matchmaking
             {
                 if (value == areCheatsEnabled) return;
                 areCheatsEnabled = value;
-                TriggerEvent(CheatsEnabledChanged);
+                TriggerEvent(AreCheatsEnabledChanged);
+            }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if heroes can randomly spawn instead of their basic unit type.
+        /// </summary>
+        public bool AreRandomHeroesEnabled
+        {
+            get { return areRandomHeroesEnabled; }
+            set
+            {
+                if (value == areRandomHeroesEnabled) return;
+                areRandomHeroesEnabled = value;
+                TriggerEvent(AreCheatsEnabledChanged);
             }
         }
         #endregion
@@ -174,8 +190,9 @@ namespace Orion.Game.Matchmaking
             writer.Write(initialAlageneAmount);
             writer.Write(randomSeed);
             writer.Write(revealTopology);
-            writer.Write(isNomad);
+            writer.Write(startNomad);
             writer.Write(areCheatsEnabled);
+            writer.Write(areRandomHeroesEnabled);
         }
 
         /// <summary>
@@ -192,8 +209,9 @@ namespace Orion.Game.Matchmaking
             InitialAlageneAmount = reader.ReadInt32();
             RandomSeed = reader.ReadInt32();
             RevealTopology = reader.ReadBoolean();
-            IsNomad = reader.ReadBoolean();
+            StartNomad = reader.ReadBoolean();
             AreCheatsEnabled = reader.ReadBoolean();
+            AreRandomHeroesEnabled = reader.ReadBoolean();
         }
 
         private void TriggerEvent(Action<MatchSettings> eventHandler)

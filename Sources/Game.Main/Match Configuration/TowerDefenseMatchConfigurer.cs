@@ -58,7 +58,7 @@ namespace Orion.Game.Main
                     localFaction.AladdiumAmount += (int)(unit.GetStat(BasicSkill.AladdiumCostStat) * 0.1f);
                 };
 
-            match = new Match(world);
+            match = new Match(world, random);
             match.IsPausable = true;
 
             CommandPipeline pipeline = new CommandPipeline(match);

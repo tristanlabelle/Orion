@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using OpenTK.Math;
+using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
-using OpenTK.Math;
 
 namespace Orion.Game.Presentation
 {
-    public class ReplayLoadingUI : UIDisplay
+    /// <summary>
+    /// Provides a user interface which allows to browse the saved replays.
+    /// </summary>
+    public sealed class ReplayBrowserUI : MaximizedPanel
     {
         #region Fields
         private readonly ListPanel replaysList;
@@ -17,7 +21,7 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public ReplayLoadingUI()
+        public ReplayBrowserUI()
         {
             Rectangle replaysRectangle = Bounds.TranslatedBy(10, 60).ResizedBy(-60, -70);
             replaysList = new ListPanel(replaysRectangle, new Vector2(10, 10));
@@ -26,8 +30,7 @@ namespace Orion.Game.Presentation
             replayButtonFrame = new Rectangle(replaysRectangle.Width - 20, 30);
 
             Button exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
-
-            exitButton.Triggered += PressedExitButton;
+            exitButton.Triggered += (sender) => PressedExit.Raise(this);
 
             Children.Add(exitButton);
             Children.Add(replaysList);
@@ -38,11 +41,11 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<ReplayLoadingUI, string> PressedStartReplay;
+        public event Action<ReplayBrowserUI, string> PressedStartReplay;
+        public event Action<ReplayBrowserUI> PressedExit;
         #endregion
 
         #region Methods
-
         private void ShowReplayFiles()
         {
             DirectoryInfo replays = new DirectoryInfo("Replays");
@@ -51,23 +54,11 @@ namespace Orion.Game.Presentation
                 foreach (FileInfo file in replays.GetFiles("*.replay").OrderBy(file => file.Name))
                 {
                     Button replayButton = new Button(replayButtonFrame, file.Name);
-                    replayButton.Triggered += StartReplay;
+                    replayButton.Triggered += (sender) => PressedStartReplay.Raise(this, file.FullName);
                     replaysList.Children.Add(replayButton);
                 }
             }
         }
-
-        private void PressedExitButton(Button sender)
-        {
-            Parent.PopDisplay(this);
-        }
-
-        private void StartReplay(Button sender)
-        {
-            if (PressedStartReplay != null)
-                PressedStartReplay(this, sender.Caption);
-        }
-
         #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace Orion.Game.Presentation
     /// <summary>
     /// The user interface for the main menu of the game.
     /// </summary>
-    public sealed class MainMenuUI : UIDisplay
+    public sealed class MainMenuUI : MaximizedPanel
     {
         #region Fields
         // HACK: Add whitespace to then end of strings because the last word ends up clipped otherwise.

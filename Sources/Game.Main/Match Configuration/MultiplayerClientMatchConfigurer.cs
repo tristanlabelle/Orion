@@ -28,7 +28,7 @@ namespace Orion.Game.Main
             this.gameHost = host;
             ui = new MultiplayerMatchConfigurationUI(settings, transporter, false);
             ui.ExitPressed += ExitGame;
-            ui.Entered += EnterRootView;
+            ui.UsePlayerForSlot(0, gameHost);
         }
         #endregion
 
@@ -60,11 +60,6 @@ namespace Orion.Game.Main
         protected override void TimedOut(SafeTransporter source, IPv4EndPoint host)
         {
             if(host == gameHost) ForceExit();
-        }
-
-        private void EnterRootView(UIDisplay uiDisplay)
-        {
-            ui.UsePlayerForSlot(0, gameHost);
         }
 
         protected override void ExitGame(MatchConfigurationUI ui)
@@ -118,10 +113,9 @@ namespace Orion.Game.Main
         private void ForceExit()
         {
             RootView root = ui.Root;
-            ui.Root.PopDisplay(ui);
             ui.Dispose();
             Dispose();
-            Instant.DisplayAlert(root.TopmostDisplay, "You've been disconnected.");
+            Instant.DisplayAlert(root, "You've been disconnected.");
         }
         #endregion
     }

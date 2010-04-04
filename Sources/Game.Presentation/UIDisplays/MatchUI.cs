@@ -24,7 +24,7 @@ using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Presentation
 {
-    public sealed class MatchUI : UIDisplay
+    public sealed class MatchUI : MaximizedPanel
     {
         #region Fields
         #region Chat
@@ -74,7 +74,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.match = match;
-            this.match.Quitting += Quit;
+            this.match.FactionMessageReceived += OnFactionMessageReceived;
             this.userInputManager = new UserInputManager(localCommander);
 
             this.gameAudio = new GameAudio();
@@ -251,8 +251,8 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        #region Messages
-        public void DisplayMessage(FactionMessage message)
+        #region Event Handling
+        private void OnFactionMessageReceived(Match sender, FactionMessage message)
         {
             Argument.EnsureNotNull(message, "message");
 
@@ -260,30 +260,6 @@ namespace Orion.Game.Presentation
             console.AddMessage(text, message.Faction.Color);
         }
 
-        public void DisplayDefeatMessage(Faction faction)
-        {
-            Argument.EnsureNotNull(faction, "faction");
-
-            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
-            console.AddMessage(text, faction.Color);
-
-            if (faction != LocalFaction) return;
-            
-            if (match.IsPausable) match.Pause();
-            Instant.DisplayAlert(this, "Vous avez perdu le match.", () => Parent.PopDisplay(this));
-        }
-
-        public void DisplayVictoryMessage(IEnumerable<Faction> factions)
-        {
-            Argument.EnsureNotNull(factions, "factions");
-            if (!factions.Contains(LocalFaction)) return;
-            
-            if (match.IsPausable) match.Pause();
-            Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
-        }
-        #endregion
-
-        #region Event Handling
         private void OnWorkerActivityStateChanged(WorkerActivityMonitor sender, Unit worker)
         {
             UpdateWorkerActivityButton();
@@ -438,11 +414,6 @@ namespace Orion.Game.Presentation
             base.Update(timeDeltaInSeconds);
         }
 
-        private void Quit(Match sender)
-        {
-            Parent.PopDisplay(this);
-        }
-
         private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
         {
             Rectangle newBounds = sender.Bounds;
@@ -525,15 +496,28 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        #region UIDisplay Implementation
-        protected override void OnShadowed()
-        {
-            Root.PopDisplay(this);
-            base.OnShadowed();
-        }
-        #endregion
-
         #region Methods
+        public void DisplayDefeatMessage(Faction faction, Action callback)
+        {
+            Argument.EnsureNotNull(callback, "callback");
+
+            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
+            console.AddMessage(text, faction.Color);
+
+            if (faction != LocalFaction) return;
+
+            if (match.IsPausable) match.Pause();
+            Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
+        }
+
+        public void DisplayVictoryMessage(Action callback)
+        {
+            Argument.EnsureNotNull(callback, "callback");
+
+            if (match.IsPausable) match.Pause();
+            Instant.DisplayAlert(this, "VICTOIRE !", callback);
+        }
+
         public void CenterOn(Vector2 position)
         {
             Vector2 worldBoundsExtent = worldView.Bounds.Extent;

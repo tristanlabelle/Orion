@@ -106,12 +106,12 @@ namespace Orion.Game.Main
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.PushDisplay(ui);
+            RootView.Children.Add(ui);
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.PopDisplayWithoutDisposing(ui);
+            RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()

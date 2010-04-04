@@ -32,7 +32,6 @@ namespace Orion.Game.Matchmaking
 
             this.world = world;
             this.random = random;
-            this.world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -40,6 +39,7 @@ namespace Orion.Game.Matchmaking
         /// <summary>
         /// Raised when this <see cref="Match"/> gets updated for a frame.
         /// </summary>
+        [Obsolete("Only the command pipeline uses this, and it should be updated by the GameStates.")]
         public event Action<Match, UpdateEventArgs> Updated;
 
         /// <summary>
@@ -47,36 +47,8 @@ namespace Orion.Game.Matchmaking
         /// </summary>
         public event Action<Match, FactionMessage> FactionMessageReceived;
 
-        /// <summary>
-        /// Raised when allied factions defeat all their enemies.
-        /// </summary>
-        public event Action<Match, IEnumerable<Faction>> WorldConquered;
-
+        [Obsolete("To be handled in GameStates.")]
         public event Action<Match> Quitting;
-
-        private void RaiseUpdated(float timeDeltaInSeconds)
-        {
-            var handler = Updated;
-            if (handler != null) handler(this, new UpdateEventArgs(timeDeltaInSeconds));
-        }
-
-        private void RaiseFactionMessageReceived(FactionMessage message)
-        {
-            var handler = FactionMessageReceived;
-            if (handler != null) handler(this, message);
-        }
-
-        private void RaiseWorldConquered(IEnumerable<Faction> faction)
-        {
-            var handler = WorldConquered;
-            if (handler != null) handler(this, faction);
-        }
-
-        private void RaiseQuitting()
-        {
-            var handler = Quitting;
-            if (handler != null) handler(this);
-        }
         #endregion
 
         #region Properties
@@ -125,9 +97,28 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
+        [Obsolete("To be handled in GameStates.")]
         public void Start()
         {
             isRunning = true;
+        }
+
+        [Obsolete("To be handled in GameStates.")]
+        public void Pause()
+        {
+            isRunning = false;
+        }
+
+        [Obsolete("To be handled in GameStates.")]
+        public void Resume()
+        {
+            isRunning = true;
+        }
+
+        [Obsolete("To be handled in GameStates.")]
+        public void Quit()
+        {
+            Quitting.Raise(this);
         }
 
         /// <summary>
@@ -146,13 +137,7 @@ namespace Orion.Game.Matchmaking
                 world.Update(lastSimulationStep);
             }
 
-            RaiseUpdated(timeDeltaInSeconds);
-        }
-
-        #region Faction Stuff
-        private void OnFactionDefeated(World sender, Faction args)
-        {
-            CheckForWorldConquered();
+            Updated.Raise(this, new UpdateEventArgs(timeDeltaInSeconds));
         }
 
         /// <summary>
@@ -162,44 +147,8 @@ namespace Orion.Game.Matchmaking
         public void PostFactionMessage(FactionMessage message)
         {
             Argument.EnsureNotNull(message, "message");
-            RaiseFactionMessageReceived(message);
+            FactionMessageReceived.Raise(this, message);
         }
-
-        private void CheckForWorldConquered()
-        {
-            List<Faction> aliveFactions = world.Factions.Where(faction => faction.Status == FactionStatus.Undefeated).ToList();
-            for (int i = 0; i < aliveFactions.Count; i++)
-            {
-                Faction referenceFaction = aliveFactions[i];
-                for (int j = i + 1; j < aliveFactions.Count; j++)
-                {
-                    Faction checkedFaction = aliveFactions[j];
-                    DiplomaticStance referenceDiplomaticStance = referenceFaction.GetDiplomaticStance(checkedFaction);
-                    DiplomaticStance checkedDiplomaticStance = checkedFaction.GetDiplomaticStance(referenceFaction);
-                    if (referenceDiplomaticStance != DiplomaticStance.Ally || checkedDiplomaticStance != DiplomaticStance.Ally)
-                        return;
-                }
-            }
-            RaiseWorldConquered(aliveFactions);
-        }
-        #endregion
-
-        #region Pause/Resume/Quit
-        public void Pause()
-        {
-            isRunning = false;
-        }
-
-        public void Resume()
-        {
-            isRunning = true;
-        }
-
-        public void Quit()
-        {
-            RaiseQuitting();
-        }
-        #endregion
         #endregion
     }
 }

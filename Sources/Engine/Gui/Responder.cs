@@ -293,7 +293,7 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Update Events
-        protected virtual void Update(float timeDeltaInSeconds)
+        protected internal virtual void Update(float timeDeltaInSeconds)
         {
             EnsureNotDisposed();
         }

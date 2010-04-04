@@ -42,7 +42,7 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
-        protected override void InitializeSlots()
+        public override void InitializeSlots()
         {
             int i = 0;
             if (IsGameMaster)

@@ -14,7 +14,7 @@ using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Presentation
 {
-    public sealed class HostMultiplayerLobby : UIDisplay
+    public sealed class MultiplayerLobby : MaximizedPanel
     {
         #region Fields
         private static readonly byte[] explorePacket = new byte[] { (byte)SetupMessageType.Explore };
@@ -33,7 +33,7 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public HostMultiplayerLobby(SafeTransporter transporter)
+        public MultiplayerLobby(SafeTransporter transporter)
         {
             port = transporter.Port;
             this.transporter = transporter;
@@ -47,7 +47,7 @@ namespace Orion.Game.Presentation
 
             Rectangle hostFrame = new Rectangle(gameListFrame.MaxX + 10, gameListFrame.MaxY, 200, -50);
             Button hostButton = new Button(hostFrame, "Héberger");
-            hostButton.Triggered += PressHostGame;
+            hostButton.Triggered += (sender) => { if (!requestedJoin.HasValue) HostPressed.Raise(this); };
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
@@ -57,7 +57,7 @@ namespace Orion.Game.Presentation
 
             Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
             Button backButton = new Button(backButtonFrame, "Retour");
-            backButton.Triggered += PressBack;
+            backButton.Triggered += (sender) => BackPressed.Raise(this);
             Children.Add(backButton);
 
             Rectangle pingButtonFrame = joinRemoteFrame.TranslatedBy(0, -joinRemoteFrame.Height - 10);
@@ -68,24 +68,35 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<HostMultiplayerLobby> HostedGame;
-        public event Action<HostMultiplayerLobby, IPv4EndPoint> JoinedGame;
+        /// <summary>
+        /// Raised when the user decided to go back through the UI.
+        /// </summary>
+        public event Action<MultiplayerLobby> BackPressed;
+
+        /// <summary>
+        /// Raised when the user decided to host a game through the UI.
+        /// </summary>
+        public event Action<MultiplayerLobby> HostPressed;
+
+        /// <summary>
+        /// Raised when the user decided to go join a game through the UI.
+        /// </summary>
+        public event Action<MultiplayerLobby, IPv4EndPoint> JoinPressed;
         #endregion
 
         #region Methods
-        protected override void OnEntered()
+#warning UIDisplay stuff to move to GameStates
+        protected void OnEntered()
         {
             transporter.Received += receptionDelegate;
             transporter.TimedOut += timeoutDelegate;
             transporter.Broadcast(explorePacket, port);
-            base.OnEntered();
         }
 
-        protected override void OnShadowed()
+        protected void OnShadowed()
         {
             transporter.Received -= receptionDelegate;
             transporter.TimedOut -= timeoutDelegate;
-            base.OnShadowed();
         }
 
         protected override void Update(float timeDeltaInSeconds)
@@ -114,7 +125,7 @@ namespace Orion.Game.Presentation
                 case SetupMessageType.AcceptJoinRequest:
                     if (requestedJoin.HasValue && args.Host == requestedJoin.Value)
                     {
-                        JoinGame(requestedJoin.Value);
+                        JoinPressed.Raise(this, requestedJoin.Value);
                     }
                     break;
 
@@ -168,31 +179,10 @@ namespace Orion.Game.Presentation
             requestedJoin = host;
         }
 
-        private void JoinGame(IPv4EndPoint host)
-        {
-            Action<HostMultiplayerLobby, IPv4EndPoint> handler = JoinedGame;
-            if (handler != null)
-            {
-                handler(this, host);
-            }
-        }
-
         private void PressJoinRemoteGame(Button sender)
         {
             if (!requestedJoin.HasValue)
                 Instant.Prompt(this, "Quelle adresse voulez-vous jointer?", JoinAddress);
-        }
-
-        private void PressHostGame(Button sender)
-        {
-            Action<HostMultiplayerLobby> handler = HostedGame;
-            if (handler != null && !requestedJoin.HasValue) handler(this);
-        }
-
-        private void PressBack(Button sender)
-        {
-            if (!requestedJoin.HasValue)
-                Parent.PopDisplay(this);
         }
 
         private void JoinAddress(string address)
@@ -328,8 +318,9 @@ namespace Orion.Game.Presentation
             if (disposing)
             {
                 transporter.Received -= receptionDelegate;
-                HostedGame = null;
-                JoinedGame = null;
+                BackPressed = null;
+                HostPressed = null;
+                JoinPressed = null;
             }
 
             base.Dispose(disposing);

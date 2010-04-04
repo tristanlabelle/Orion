@@ -113,7 +113,7 @@ namespace Orion.Engine.Gui
             return false;
         }
 
-        protected override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(float timeDeltaInSeconds)
         {
             time += timeDeltaInSeconds;
             base.Update(timeDeltaInSeconds);

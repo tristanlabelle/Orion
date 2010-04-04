@@ -124,7 +124,6 @@
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Input\MouseEventType.cs" />
-    <Compile Include="Gui\NullUI.cs" />
     <Compile Include="Gui\RenderedView.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -139,7 +138,6 @@
     <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Gui\TextField.cs" />
     <Compile Include="Gui\TexturedRenderer.cs" />
-    <Compile Include="Gui\UIDisplay.cs" />
     <Compile Include="Gui\View.cs">
       <SubType>Code</SubType>
     </Compile>

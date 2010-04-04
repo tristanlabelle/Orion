@@ -30,6 +30,7 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
             this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
+            this.ui.InitializeSlots();
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
         }
@@ -45,12 +46,12 @@ namespace Orion.Game.Main
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.PushDisplay(ui);
+            RootView.Children.Add(ui);
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.PopDisplayWithoutDisposing(ui);
+            RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()
@@ -79,7 +80,6 @@ namespace Orion.Game.Main
             GameState targetGameState = new SinglePlayerDeathmatchGameState(
                 Manager, graphics, ui.Players.ToList(), matchSettings);
             Manager.Push(targetGameState);
-                
         }
 
         private void OnExitPressed(MatchConfigurationUI sender)

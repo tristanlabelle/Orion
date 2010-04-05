@@ -21,7 +21,6 @@ namespace Orion.Game.Matchmaking
         private readonly World world;
         private readonly Random random;
         private bool isRunning = true;
-        private bool isPausable;
         #endregion
 
         #region Constructors
@@ -62,13 +61,6 @@ namespace Orion.Game.Matchmaking
         }
 
         [Obsolete("To be handled in GameStates.")]
-        public bool IsPausable
-        {
-            get { return isPausable; }
-            set { isPausable = value; }
-        }
-
-        [Obsolete("To be handled in GameStates.")]
         public bool IsRunning
         {
             get { return isRunning; }
@@ -97,12 +89,6 @@ namespace Orion.Game.Matchmaking
         public void Resume()
         {
             isRunning = true;
-        }
-
-        [Obsolete("To be handled in GameStates.")]
-        public void Quit()
-        {
-            Quitting.Raise(this);
         }
 
         /// <summary>

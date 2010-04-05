@@ -30,7 +30,7 @@ namespace Orion.Game.Presentation
             replayButtonFrame = new Rectangle(replaysRectangle.Width - 20, 30);
 
             Button exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
-            exitButton.Triggered += (sender) => PressedExit.Raise(this);
+            exitButton.Triggered += (sender) => ExitPressed.Raise(this);
 
             Children.Add(exitButton);
             Children.Add(replaysList);
@@ -41,8 +41,8 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<ReplayBrowserUI, string> PressedStartReplay;
-        public event Action<ReplayBrowserUI> PressedExit;
+        public event Action<ReplayBrowserUI, string> StartPressed;
+        public event Action<ReplayBrowserUI> ExitPressed;
         #endregion
 
         #region Methods
@@ -54,7 +54,7 @@ namespace Orion.Game.Presentation
                 foreach (FileInfo file in replays.GetFiles("*.replay").OrderBy(file => file.Name))
                 {
                     Button replayButton = new Button(replayButtonFrame, file.Name);
-                    replayButton.Triggered += (sender) => PressedStartReplay.Raise(this, file.FullName);
+                    replayButton.Triggered += (sender) => StartPressed.Raise(this, file.FullName);
                     replaysList.Children.Add(replayButton);
                 }
             }

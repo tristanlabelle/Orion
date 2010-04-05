@@ -1,42 +1,38 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine;
 using Orion.Game.Presentation;
-using Orion.Game.Matchmaking;
+using Orion.Engine;
 using Orion.Engine.Gui;
+using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using System.Diagnostics;
 
 namespace Orion.Game.Main
 {
     /// <summary>
     /// Handles the initialization, updating and cleanup logic of
-    /// the single player menus to setup a deatchmatch.
+    /// the menu which lists the available replays.
     /// </summary>
-    public sealed class SinglePlayerDeathmatchSetupGameState : GameState
+    public sealed class ReplayBrowserGameState : GameState
     {
         #region Fields
         private readonly GameGraphics graphics;
-        private readonly MatchSettings matchSettings;
-        private readonly SinglePlayerMatchConfigurationUI ui;
+        private readonly ReplayBrowserUI ui;
         #endregion
 
         #region Constructors
-        public SinglePlayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics)
+        public ReplayBrowserGameState(GameStateManager manager, GameGraphics graphics)
             : base(manager)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.matchSettings = new MatchSettings();
-            this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
-            this.ui.InitializeSlots();
-            this.ui.StartGamePressed += OnStartGamePressed;
+            this.ui = new ReplayBrowserUI();
+
             this.ui.ExitPressed += OnExitPressed;
+            this.ui.StartPressed += OnStartPressed;
         }
         #endregion
 
@@ -80,67 +76,48 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        private void OnStartGamePressed(MatchConfigurationUI sender)
+        private void OnExitPressed(ReplayBrowserUI sender)
         {
+            Manager.Pop();
+        }
+
+        private void OnStartPressed(ReplayBrowserUI sender, string replayFilePath)
+        {
+            ReplayReader replayReader = new ReplayReader(replayFilePath);
+            MatchSettings matchSettings = replayReader.Settings;
+
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
             Terrain terrain = Terrain.Generate(matchSettings.MapSize, random);
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
-            SlaveCommander localCommander = null;
-            List<Commander> aiCommanders = new List<Commander>();
+            Faction localFaction = world.CreateSpectatorFaction();
+            localFaction.LocalFogOfWar.Disable();
+            SlaveCommander localCommander = new SlaveCommander(localFaction);
+
             int colorIndex = 0;
-            foreach (PlayerSlot playerSlot in ui.Players)
+            foreach (string factionName in replayReader.FactionNames)
             {
-                if (playerSlot is ClosedPlayerSlot) continue;
-
                 ColorRgb color = Faction.Colors[colorIndex];
-                colorIndex++;
+                ++colorIndex;
 
-                Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                Faction faction = world.CreateFaction(factionName, color);
                 faction.AladdiumAmount = matchSettings.InitialAladdiumAmount;
                 faction.AlageneAmount = matchSettings.InitialAlageneAmount;
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
-
-                if (playerSlot is LocalPlayerSlot)
-                {
-                    localCommander = new SlaveCommander(faction);
-                }
-                else if (playerSlot is AIPlayerSlot)
-                {
-                    Commander commander = new AgressiveAICommander(faction, random);
-                    aiCommanders.Add(commander);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Single-player games only support local and AI players");
-                }
             }
 
-            Debug.Assert(localCommander != null, "No local player slot.");
-
             WorldGenerator.Generate(world, random, !matchSettings.StartNomad);
-
             Match match = new Match(world, random);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
             if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
+            commandPipeline.PushFilter(new ReplayPlayer(replayReader));
 
-            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, world);
-            if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
-
-            aiCommanders.ForEach(commander => commandPipeline.AddCommander(commander));
-            commandPipeline.AddCommander(localCommander);
-
-            GameState targetGameState = new DeathmatchGameState(
-                Manager, graphics, match, commandPipeline, localCommander);
+            GameState targetGameState = new DeathmatchGameState(Manager, graphics,
+                match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
-        }
-
-        private void OnExitPressed(MatchConfigurationUI sender)
-        {
-            Manager.Pop();
         }
         #endregion
     }

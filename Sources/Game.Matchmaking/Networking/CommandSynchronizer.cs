@@ -47,14 +47,11 @@ namespace Orion.Game.Matchmaking.Networking
 
             this.transporter = transporter;
             this.match = match;
-            match.Quitting += LeaveGame;
             peers = endPoints.ToList();
             previousFramesDuration.Enqueue(defaultUpdatesPerFrame);
 
             foreach (Faction faction in match.World.Factions)
-            {
                 faction.Defeated += FactionDefeated;
-            }
         }
         #endregion
 
@@ -139,6 +136,11 @@ namespace Orion.Game.Matchmaking.Networking
             }
         }
 
+        public override void Dispose()
+        {
+            peers.ForEach(peer => peer.SendLeave());
+        }
+
         private void AdaptUpdatesPerCommandFrame()
         {
             updatesForCommandFrame.AddRange(peers.Select(peer => peer.GetUpdatesForCommandFrame(commandFrameNumber)));
@@ -171,11 +173,6 @@ namespace Orion.Game.Matchmaking.Networking
                 associatedEndPoint.Dispose();
                 peers.Remove(associatedEndPoint);
             }
-        }
-
-        private void LeaveGame(Match sender)
-        {
-            peers.ForEach(peer => peer.SendLeave());
         }
         #endregion
     }

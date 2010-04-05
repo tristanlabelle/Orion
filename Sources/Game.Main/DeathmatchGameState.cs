@@ -88,8 +88,7 @@ namespace Orion.Game.Main
                 lastSimulationStep = step;
             }
 
-            graphics.DispatchInputEvents();
-            RootView.Update(timeDeltaInSeconds);
+            graphics.UpdateRootView(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
@@ -100,6 +99,7 @@ namespace Orion.Game.Main
         public override void Dispose()
         {
             ui.Dispose();
+            commandPipeline.Dispose();
         }
 
         private void OnQuitPressed(MatchUI sender)

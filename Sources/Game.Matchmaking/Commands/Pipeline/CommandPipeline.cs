@@ -2,14 +2,16 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
     /// <summary>
     /// Encapsulates the process by which commands go from their source to their destination.
     /// </summary>
-    public sealed class CommandPipeline
+    public sealed class CommandPipeline : IDisposable
     {
         #region Fields
         private readonly Match match;
@@ -55,6 +57,15 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 if (filters.Count == 0) return sink;
                 else return filters[0];
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the command pipeline process supports
+        /// being paused.
+        /// </summary>
+        public bool IsPausable
+        {
+            get { return filters.None(f => f is CommandSynchronizer); }
         }
         #endregion
 
@@ -126,6 +137,20 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 filter.Update(simulationUpdateNumber, timeDeltaInSeconds);
 
             sink.Update(simulationUpdateNumber, timeDeltaInSeconds);
+        }
+
+        /// <summary>
+        /// Releases all resources used by this pipeline and its filters/sinks.
+        /// </summary>
+        public void Dispose()
+        {
+            foreach (CommandFilter filter in filters)
+                filter.Dispose();
+            filters.Clear();
+
+            sink.Dispose();
+
+            commanders.Clear();
         }
         #endregion
     }

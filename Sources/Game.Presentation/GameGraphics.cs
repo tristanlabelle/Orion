@@ -170,13 +170,14 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        public void DispatchInputEvents()
+        /// <summary>
+        /// Updates the root view for a frame, allowing it to process queued input.
+        /// </summary>
+        /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
+        public void UpdateRootView(float timeDeltaInSeconds)
         {
-            while (inputEventQueue.Count > 0)
-            {
-                InputEvent inputEvent = inputEventQueue.Dequeue();
-                rootView.SendInputEvent(inputEvent);
-            }
+            DispatchInputEvents();
+            RootView.Update(timeDeltaInSeconds);
         }
 
         /// <summary>
@@ -186,6 +187,15 @@ namespace Orion.Game.Presentation
         {
             textureManager.Dispose();
             window.Dispose();
+        }
+
+        private void DispatchInputEvents()
+        {
+            while (inputEventQueue.Count > 0)
+            {
+                InputEvent inputEvent = inputEventQueue.Dequeue();
+                rootView.SendInputEvent(inputEvent);
+            }
         }
 
         private void OnInputReceived(IGameWindow sender, InputEvent inputEvent)

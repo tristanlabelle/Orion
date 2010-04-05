@@ -59,8 +59,7 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
-            graphics.DispatchInputEvents();
-            RootView.Update(timeDeltaInSeconds);
+            graphics.UpdateRootView(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)

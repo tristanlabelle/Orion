@@ -43,6 +43,11 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 Flush(command);
             }
         }
+
+        public override void Dispose()
+        {
+            writer.Dispose();
+        }
         #endregion
         #endregion
 

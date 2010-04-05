@@ -156,7 +156,7 @@ namespace Orion.Game.Presentation
             quitGameButton.Triggered += button => QuitPressed.Raise(this);
 
             Rectangle resumeGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
-            Button resumeGameButton = new Button(resumeGameButtonFrame, match.IsPausable ? "Reprendre" : "Retour");
+            Button resumeGameButton = new Button(resumeGameButtonFrame, "Retour");
             resumeGameButton.Triggered += button => HidePausePanel();
 
             pausePanel.Children.Add(quitGameButton);

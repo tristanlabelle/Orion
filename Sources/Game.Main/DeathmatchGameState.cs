@@ -82,11 +82,12 @@ namespace Orion.Game.Main
                     lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
                     timeDeltaInSeconds);
 
-                commandPipeline.Update(step.Number, step.TimeDeltaInSeconds);
                 match.World.Update(step);
 
                 lastSimulationStep = step;
             }
+
+            commandPipeline.Update(lastSimulationStep.Number, timeDeltaInSeconds);
 
             graphics.UpdateRootView(timeDeltaInSeconds);
         }

@@ -55,6 +55,7 @@ namespace Orion.Game.Main
             this.ui.InitializeSlots();
             if (hostEndPoint.HasValue) this.ui.UsePlayerForSlot(0, hostEndPoint.Value);
 
+            this.matchSettings.Changed += OnSettingsChanged;
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
             this.ui.SlotOccupationChanged += OnSlotOccupationChanged;
@@ -357,7 +358,7 @@ namespace Orion.Game.Main
             }
         }
 
-        private void TransferOptionChanges(MatchSettings options)
+        private void OnSettingsChanged(MatchSettings settings)
         {
             transporter.SendTo(CreateSettingsPacket(), ui.PlayerAddresses);
         }

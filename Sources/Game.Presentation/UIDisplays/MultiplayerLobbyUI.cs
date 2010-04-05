@@ -137,8 +137,11 @@ namespace Orion.Game.Presentation
                     }
                     break;
 
+                case SetupMessageType.Explore:
+                    break;
+
                 default:
-                    Debug.Fail("Unexpected packet message type: {0}.".FormatInvariant(messageType));
+                    //Debug.Fail("Unexpected packet message type: {0}.".FormatInvariant(messageType));
                     break;
             }
         }

@@ -160,6 +160,7 @@ namespace Orion.Game.Main
                     throw new InvalidOperationException("Multiplayer games only support remote, local and AI players");
                 }
             }
+            Debug.Assert(localCommander != null);
 
             WorldGenerator.Generate(world, match.UnitTypes, random, !matchSettings.StartNomad);
 
@@ -340,7 +341,7 @@ namespace Orion.Game.Main
                     break;
 
                 default:
-                    Debug.Fail("Unexpected setup message type {0}.".FormatInvariant(setupMessageType));
+                    //Debug.Fail("Unexpected setup message type {0}.".FormatInvariant(setupMessageType));
                     break;
             }
         }

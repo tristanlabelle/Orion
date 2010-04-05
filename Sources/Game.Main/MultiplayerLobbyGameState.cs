@@ -4,6 +4,7 @@ using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Game.Presentation;
+using System.Net.Sockets;
 
 namespace Orion.Game.Main
 {
@@ -14,6 +15,8 @@ namespace Orion.Game.Main
     public sealed class MultiplayerLobbyGameState : GameState
     {
         #region Fields
+        private static readonly int defaultPort = 41223;
+
         private readonly GameGraphics graphics;
         private readonly SafeTransporter transporter;
         private readonly MultiplayerLobbyUI ui;
@@ -26,11 +29,12 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.transporter = new SafeTransporter(41223);
+            try { this.transporter = new SafeTransporter(defaultPort); }
+            catch (SocketException) { this.transporter = new SafeTransporter(); }
             this.ui = new MultiplayerLobbyUI(transporter);
             this.ui.BackPressed += OnBackPressed;
-            this.ui.HostPressed += new Action<MultiplayerLobbyUI>(OnHostPressed);
-            this.ui.JoinPressed += new Action<MultiplayerLobbyUI, IPv4EndPoint>(OnJoinPressed);
+            this.ui.HostPressed += OnHostPressed;
+            this.ui.JoinPressed += OnJoinPressed;
         }
         #endregion
 

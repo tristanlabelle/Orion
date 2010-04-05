@@ -91,7 +91,7 @@ namespace Orion.Engine.Gui
 
                 case Keys.Enter:
                     Triggered.Raise(this);
-                    Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
+                    //Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
                     break;
 
                 default:

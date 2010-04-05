@@ -146,7 +146,7 @@ namespace Orion.Engine.Gui
                 caption.Color = captionOverColor;
                 isDown = false;
                 OnPress();
-                Debug.Assert(!IsDisposed, "A button was disposed while executing its Triggered handler.");
+                //Debug.Assert(!IsDisposed, "A button was disposed while executing its Triggered handler.");
             }
 
             return false;

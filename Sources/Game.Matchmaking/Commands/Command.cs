@@ -65,13 +65,18 @@ namespace Orion.Game.Matchmaking.Commands
         /// <summary>
         /// Checks if the handles referenced in this <see cref="Command"/> are still valid.
         /// </summary>
-        /// <param name="world">The <see cref="World"/> providing a context in which to test the handles.</param>
+        /// <param name="world">The <see cref="Match"/> providing a context in which to test the handles.</param>
         /// <returns><c>True</c> if all handles of this <see cref="Command"/> are still valid, false otherwise.</returns>
-        public abstract bool ValidateHandles(World world);
+        public abstract bool ValidateHandles(Match match);
 
         protected bool IsValidFactionHandle(World world, Handle handle)
         {
             return world.FindFactionFromHandle(handle) != null;
+        }
+
+        protected bool IsValidFactionHandle(Match match, Handle handle)
+        {
+            return IsValidFactionHandle(match.World, handle);
         }
 
         protected bool IsValidEntityHandle(World world, Handle handle)
@@ -79,14 +84,19 @@ namespace Orion.Game.Matchmaking.Commands
             return world.Entities.FromHandle(handle) != null;
         }
 
-        protected bool IsValidTechnologyHandle(World world, Handle handle)
+        protected bool IsValidEntityHandle(Match match, Handle handle)
         {
-            return world.TechnologyTree.FromHandle(handle) != null;
+            return IsValidEntityHandle(match.World, handle);
         }
 
-        protected bool IsValidUnitTypeHandle(World world, Handle handle)
+        protected bool IsValidTechnologyHandle(Match match, Handle handle)
         {
-            return world.UnitTypes.FromHandle(handle) != null;
+            return match.TechnologyTree.FromHandle(handle) != null;
+        }
+
+        protected bool IsValidUnitTypeHandle(Match match, Handle handle)
+        {
+            return match.UnitTypes.FromHandle(handle) != null;
         }
         #endregion
 

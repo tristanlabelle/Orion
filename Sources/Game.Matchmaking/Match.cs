@@ -20,6 +20,8 @@ namespace Orion.Game.Matchmaking
         #region Fields
         private readonly World world;
         private readonly Random random;
+        private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
+        private readonly TechnologyTree technologyTree = new TechnologyTree();
         private bool isRunning = true;
         #endregion
 
@@ -45,19 +47,28 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the simulation world used by this match.
+        /// </summary>
         public World World
         {
             get { return world; }
         }
 
+        /// <summary>
+        /// Gets the collection of unit types available in this match.
+        /// </summary>
         public UnitTypeRegistry UnitTypes
         {
-            get { return world.UnitTypes; }
+            get { return unitTypes; }
         }
 
+        /// <summary>
+        /// Gets the technology tree which provides the technologies available in this match.
+        /// </summary>
         public TechnologyTree TechnologyTree
         {
-            get { return world.TechnologyTree; }
+            get { return technologyTree; }
         }
 
         [Obsolete("To be handled in GameStates.")]

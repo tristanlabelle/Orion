@@ -18,20 +18,15 @@ namespace Orion.Game.Matchmaking
         protected ResourceNode startingNode;
         protected ResourceNode alageneStartingNode;
         private List<Circle> regions = new List<Circle>();
-        protected Random random;
         protected List<Unit> allUnits = new List<Unit>();
         private List<Command> commands = new List<Command>();
         private bool initialized = false;
         #endregion
 
         #region Contructors
-
-        public AICommander(Faction faction, Random random)
-            : base(faction)
-        {
-            this.random = random;
-        }
-
+        public AICommander(Match match, Faction faction)
+            : base(match, faction)
+        {}
         #endregion
 
         #region Properties
@@ -140,7 +135,7 @@ namespace Orion.Game.Matchmaking
         public void InitiateTraining(string unitTypeName, int amountToBeTrained)
         {
             int amountOfTrains;
-            UnitType toTrain = World.UnitTypes.FromName(unitTypeName);
+            UnitType toTrain = Match.UnitTypes.FromName(unitTypeName);
             //Train the Max depending of the ressources
             if (toTrain.GetBaseStat(BasicSkill.AlageneCostStat) != 0
                 && Faction.AlageneAmount / toTrain.GetBaseStat(BasicSkill.AlageneCostStat) < amountToBeTrained)
@@ -246,7 +241,7 @@ namespace Orion.Game.Matchmaking
         public void DispatchBuilders(string typeName, List<Vector2> positions)
         {
             return;
-            UnitType toBuild = World.UnitTypes.FromName(typeName);
+            UnitType toBuild = Match.UnitTypes.FromName(typeName);
             int amountOfBuildings;
             List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();
             List<Unit> builders = new List<Unit>();

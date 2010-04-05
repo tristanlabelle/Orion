@@ -24,14 +24,14 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, inputManager, "Stand Guard", Keys.G, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, "Stand Guard", Keys.G, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Stand Guard");
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.LaunchStandGuard();
+                userInputManager.LaunchStandGuard();
             };
 
             buttonsArray[3, 3] = button;

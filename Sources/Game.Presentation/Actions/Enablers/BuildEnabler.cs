@@ -36,14 +36,14 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateBuildButton(UnitType unitType)
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, "Build", Keys.B, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, "Build", Keys.B, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Build");
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                actionPanel.Push(new BuildActionProvider(actionPanel, inputManager, unitType, World.UnitTypes, gameGraphics));
+                actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, unitType, Match.UnitTypes, gameGraphics));
             };
 
             return button;
@@ -51,15 +51,15 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateRepairButton()
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, "Repair", Keys.R, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, "Repair", Keys.R, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Repair");
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.SelectedCommand = repairUserCommand;
-                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, gameGraphics));
+                userInputManager.SelectedCommand = repairUserCommand;
+                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, gameGraphics));
             };
 
             return button;

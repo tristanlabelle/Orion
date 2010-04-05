@@ -37,7 +37,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             {
                 Command command = commandQueue.Dequeue();
 
-                if (command.ValidateHandles(match.World))
+                if (command.ValidateHandles(match))
                 {
 #if DEBUG
                     // #if'd so FormatInvariant is not executed in release

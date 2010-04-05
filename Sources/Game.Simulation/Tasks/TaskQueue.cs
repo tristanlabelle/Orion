@@ -33,12 +33,6 @@ namespace Orion.Game.Simulation.Tasks
         /// Raised when the contents of this task queue has changed.
         /// </summary>
         public event Action<TaskQueue> Changed;
-
-        private void RaiseChanged()
-        {
-            var handler = Changed;
-            if (handler != null) handler(this);
-        }
         #endregion
 
         #region Properties
@@ -110,7 +104,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 task.Dispose();
                 if (Current == task) tasks.RemoveAt(0);
-                RaiseChanged();
+                Changed.Raise(this);
             }
         }
 
@@ -129,7 +123,7 @@ namespace Orion.Game.Simulation.Tasks
 
             tasks.Add(task);
 
-            RaiseChanged();
+            Changed.Raise(this);
         }
 
         public void Enqueue(Task task)
@@ -142,7 +136,7 @@ namespace Orion.Game.Simulation.Tasks
 
             tasks.Add(task);
 
-            RaiseChanged();
+            Changed.Raise(this);
         }
 
         public List<Task>.Enumerator GetEnumerator()
@@ -158,7 +152,7 @@ namespace Orion.Game.Simulation.Tasks
                 task.Dispose();
             tasks.Clear();
 
-            RaiseChanged();
+            Changed.Raise(this);
         }
         #endregion
 

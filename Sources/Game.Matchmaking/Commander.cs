@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking.Commands;
@@ -14,6 +15,7 @@ namespace Orion.Game.Matchmaking
     public abstract class Commander
     {
         #region Fields
+        private readonly Match match;
         private readonly Faction faction;
         #endregion
 
@@ -21,10 +23,17 @@ namespace Orion.Game.Matchmaking
         /// <summary>
         /// Initializes a new <see cref="Commander"/> from the <see cref="Faction"/> it controls.
         /// </summary>
+        /// <param name="match">The <see cref="Match"/> in which the <see cref="Commander"/> operates.</param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Commander"/> controls.</param>
-        protected Commander(Faction faction)
+        protected Commander(Match match, Faction faction)
         {
+            Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(faction, "faction");
+
+            if (!match.World.Factions.Contains(faction))
+                throw new ArgumentException("Cannot create a commander from a faction which doesn't belong to the match.");
+
+            this.match = match;
             this.faction = faction;
         }
         #endregion
@@ -34,14 +43,17 @@ namespace Orion.Game.Matchmaking
         /// Raised when this <see cref="Commander"/> generates a <see cref="Command"/>.
         /// </summary>
         public event Action<Commander, Command> CommandIssued;
-
-        private void OnCommandIssued(Command command)
-        {
-            if (CommandIssued != null) CommandIssued(this, command);
-        }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Match"/> in which this <see cref="Commander"/> operates;
+        /// </summary>
+        public Match Match
+        {
+            get { return match; }
+        }
+
         /// <summary>
         /// Gets the <see cref="Faction"/> that this <see cref="Commander"/> is in control of.
         /// </summary>
@@ -51,12 +63,11 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// Gets the <see cref="World"/> of the <see cref="Faction"/>
-        /// which is controlled by this <see cref="Commander"/>.
+        /// Gets the <see cref="World"/> in which this <see cref="Commander"/> operates.
         /// </summary>
         public World World
         {
-            get { return faction.World; }
+            get { return match.World; }
         }
         #endregion
 
@@ -77,7 +88,7 @@ namespace Orion.Game.Matchmaking
                 return;
             }
 
-            OnCommandIssued(command);
+            CommandIssued.Raise(this, command);
         }
 
         /// <summary>

@@ -91,9 +91,11 @@ namespace Orion.Game.Main
             Terrain terrain = Terrain.Generate(matchSettings.MapSize, random);
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
+            Match match = new Match(world, random);
+
             Faction localFaction = world.CreateSpectatorFaction();
             localFaction.LocalFogOfWar.Disable();
-            SlaveCommander localCommander = new SlaveCommander(localFaction);
+            SlaveCommander localCommander = new SlaveCommander(match, localFaction);
 
             int colorIndex = 0;
             foreach (string factionName in replayReader.FactionNames)
@@ -107,8 +109,7 @@ namespace Orion.Game.Main
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
             }
 
-            WorldGenerator.Generate(world, random, !matchSettings.StartNomad);
-            Match match = new Match(world, random);
+            WorldGenerator.Generate(world, match.UnitTypes, random, !matchSettings.StartNomad);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

@@ -30,15 +30,15 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, inputManager, "Move", Keys.M, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, "Move", Keys.M, gameGraphics);
 
             Texture texture = gameGraphics.GetActionTexture("Move");
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.SelectedCommand = userCommand;
-                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, gameGraphics));
+                userInputManager.SelectedCommand = userCommand;
+                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, gameGraphics));
             };
 
             buttonsArray[0, 3] = button;

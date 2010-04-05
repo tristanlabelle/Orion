@@ -42,12 +42,12 @@ namespace Orion.Game.Matchmaking.Commands
             return new StandGuardCommand(FactionHandle, entityHandles);
         }
 
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && guardHandles.All(handle => IsValidEntityHandle(world, handle));
+            return IsValidFactionHandle(match, FactionHandle)
+                && guardHandles.All(handle => IsValidEntityHandle(match, handle));
         }
 
         public override void Execute(Match match)

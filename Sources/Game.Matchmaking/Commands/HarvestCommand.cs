@@ -49,13 +49,13 @@ namespace Orion.Game.Matchmaking.Commands
             return new HarvestCommand(FactionHandle, entityHandles, resourceNodeHandle);
         }
 
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && harvesterHandles.All(handle => IsValidEntityHandle(world, handle))
-                && IsValidEntityHandle(world, resourceNodeHandle);
+            return IsValidFactionHandle(match, FactionHandle)
+                && harvesterHandles.All(handle => IsValidEntityHandle(match, handle))
+                && IsValidEntityHandle(match, resourceNodeHandle);
         }
 
         public override void Execute(Match match)

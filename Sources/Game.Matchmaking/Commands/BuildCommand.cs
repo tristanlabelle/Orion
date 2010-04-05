@@ -58,13 +58,13 @@ namespace Orion.Game.Matchmaking.Commands
             return new BuildCommand(FactionHandle, entityHandles, buildingTypeHandle, location);
         }
 
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && builderHandles.All(builderHandle => IsValidEntityHandle(world, builderHandle))
-                && IsValidUnitTypeHandle(world, buildingTypeHandle);
+            return IsValidFactionHandle(match, FactionHandle)
+                && builderHandles.All(builderHandle => IsValidEntityHandle(match, builderHandle))
+                && IsValidUnitTypeHandle(match, buildingTypeHandle);
         }
 
         public override void Execute(Match match)

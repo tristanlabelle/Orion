@@ -87,6 +87,8 @@ namespace Orion.Game.Main
             Terrain terrain = Terrain.Generate(matchSettings.MapSize, random);
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
+            Match match = new Match(world, random);
+
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             int colorIndex = 0;
@@ -104,11 +106,11 @@ namespace Orion.Game.Main
 
                 if (playerSlot is LocalPlayerSlot)
                 {
-                    localCommander = new SlaveCommander(faction);
+                    localCommander = new SlaveCommander(match, faction);
                 }
                 else if (playerSlot is AIPlayerSlot)
                 {
-                    Commander commander = new AgressiveAICommander(faction, random);
+                    Commander commander = new AgressiveAICommander(match, faction);
                     aiCommanders.Add(commander);
                 }
                 else
@@ -119,9 +121,7 @@ namespace Orion.Game.Main
 
             Debug.Assert(localCommander != null, "No local player slot.");
 
-            WorldGenerator.Generate(world, random, !matchSettings.StartNomad);
-
-            Match match = new Match(world, random);
+            WorldGenerator.Generate(world, match.UnitTypes, random, !matchSettings.StartNomad);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

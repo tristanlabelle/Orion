@@ -30,7 +30,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
             ResearchSkill researchSkill = type.TryGetSkill<ResearchSkill>();
             if (researchSkill == null) return;
 
-            var technologies = World.TechnologyTree.Technologies
+            var technologies = Match.TechnologyTree.Technologies
                 .Where(tech => LocalFaction.IsResearchable(tech) && researchSkill.Supports(tech));
                 
             int x = 0;
@@ -54,7 +54,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateButton(Technology technology)
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, string.Empty, Keys.None, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, string.Empty, Keys.None, gameGraphics);
 
             button.Name = "{0}\nAladdium: {1} Alagene: {2}"
                 .FormatInvariant(technology.Name, technology.AladdiumCost, technology.AlageneCost);
@@ -64,7 +64,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.LaunchResearch(technology);
+                userInputManager.LaunchResearch(technology);
             };
 
             return button;

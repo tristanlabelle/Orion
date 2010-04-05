@@ -16,11 +16,15 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation
 {
-    public class UserInputManager
+    /// <summary>
+    /// Handles the keyboard and mouse input on the world.
+    /// </summary>
+    public sealed class UserInputManager
     {
         #region Fields
         private static readonly float SingleClickMaxRectangleArea = 0.1f;
 
+        private readonly Match match;
         private readonly SlaveCommander commander;
         private readonly UnderAttackMonitor underAttackMonitor;
         private readonly SelectionManager selectionManager;
@@ -32,10 +36,12 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public UserInputManager(SlaveCommander commander)
+        public UserInputManager(Match match, SlaveCommander commander)
         {
+            Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(commander, "commander");
 
+            this.match = match;
             this.commander = commander;
             this.underAttackMonitor = new UnderAttackMonitor(commander.Faction);
             this.selectionManager = new SelectionManager(commander.Faction);
@@ -44,6 +50,11 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Properties
+        public Match Match
+        {
+            get { return match; }
+        }
+
         [Obsolete("To be fully encapsulated by this UserInputManager")]
         public Commander LocalCommander
         {
@@ -57,7 +68,7 @@ namespace Orion.Game.Presentation
 
         public World World
         {
-            get { return LocalFaction.World; }
+            get { return match.World; }
         }
 
         public UnderAttackMonitor UnderAttackMonitor

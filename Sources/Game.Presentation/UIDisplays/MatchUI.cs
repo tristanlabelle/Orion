@@ -75,7 +75,7 @@ namespace Orion.Game.Presentation
 
             this.match = match;
             this.match.FactionMessageReceived += OnFactionMessageReceived;
-            this.userInputManager = new UserInputManager(localCommander);
+            this.userInputManager = new UserInputManager(match, localCommander);
 
             this.gameAudio = new GameAudio();
             this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, match, this.userInputManager);

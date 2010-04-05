@@ -38,12 +38,12 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && IsValidFactionHandle(world, targetFactionHandle);
+            return IsValidFactionHandle(match, FactionHandle)
+                && IsValidFactionHandle(match, targetFactionHandle);
         }
 
         public override void Execute(Match match)

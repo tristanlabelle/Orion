@@ -13,8 +13,8 @@ namespace Orion.Game.Matchmaking.Deathmatch
     public class AgressiveAICommander : AICommander
     {
         #region Constructors
-        public AgressiveAICommander(Faction faction, Random random)
-            : base(faction, random)
+        public AgressiveAICommander(Match match, Faction faction)
+            : base(match, faction)
         {
         }
         #endregion

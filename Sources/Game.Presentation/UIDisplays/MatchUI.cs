@@ -381,21 +381,12 @@ namespace Orion.Game.Presentation
             {
                 chatInput.Clear();
                 Children.Remove(chatInput);
-                actionPanel.AreKeyboardShortcutsEnabled = true;
                 return false;
             }
             else if (args.Key == Keys.Enter)
             {
                 chatInput.Clear();
-                if (Children.Remove(chatInput))
-                {
-                    actionPanel.AreKeyboardShortcutsEnabled = true;
-                }
-                else
-                {
-                    Children.Add(chatInput);
-                    actionPanel.AreKeyboardShortcutsEnabled = false;
-                }
+                if (!Children.Remove(chatInput)) Children.Add(chatInput);
                 return false;
             }
             else if (args.Key == Keys.F9)

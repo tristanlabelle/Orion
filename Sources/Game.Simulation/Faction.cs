@@ -397,7 +397,7 @@ namespace Orion.Game.Simulation
 
         private void OnFactionDefeated(World world, Faction faction)
         {
-            if(faction == this) return;
+            if (faction == this) return;
             factionsWeRegardAsAllies.Remove(faction);
         }
 
@@ -414,7 +414,7 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        public void GiveUp()
+        public void MassSuicide()
         {
             Unit[] units = Units.OfType<Unit>().ToArray();
             foreach (Unit unit in units)

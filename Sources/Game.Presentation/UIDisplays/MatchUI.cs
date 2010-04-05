@@ -141,8 +141,7 @@ namespace Orion.Game.Presentation
 
             Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
-            chatInput.Triggered += SendMessage;
-            chatInput.KeyboardButtonPressed += ChatInputKeyDown;
+            chatInput.Triggered += OnChatInputTriggered;
 
             Rectangle consoleFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             console = new MatchConsole(consoleFrame);
@@ -358,7 +357,7 @@ namespace Orion.Game.Presentation
             return base.OnMouseButtonReleased(args);
         }
 
-        private void SendMessage(TextField chatInput)
+        private void OnChatInputTriggered(TextField chatInput)
         {
             string text = chatInput.Contents.Trim();
             if (text.Any(character => !char.IsWhiteSpace(character)))
@@ -369,16 +368,7 @@ namespace Orion.Game.Presentation
                     userInputManager.LaunchChatMessage(chatInput.Contents);
             }
 
-            Children.Remove(chatInput);
-        }
-
-        private void ChatInputKeyDown(Responder sender, KeyboardEventArgs args)
-        {
-            if (args.Key == Keys.Escape)
-            {
-                chatInput.Clear();
-                Children.Remove(chatInput);
-            }
+            chatInput.Clear();
         }
 
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
@@ -387,10 +377,25 @@ namespace Orion.Game.Presentation
             MatchRenderer.DrawAllHealthBars = args.IsAltModifierDown;
             isSpaceDown = args.Key == Keys.Space;
 
-            if (args.Key == Keys.Enter)
+            if (args.Key == Keys.Escape)
             {
                 chatInput.Clear();
-                Children.Add(chatInput);
+                Children.Remove(chatInput);
+                actionPanel.AreKeyboardShortcutsEnabled = true;
+                return false;
+            }
+            else if (args.Key == Keys.Enter)
+            {
+                chatInput.Clear();
+                if (Children.Remove(chatInput))
+                {
+                    actionPanel.AreKeyboardShortcutsEnabled = true;
+                }
+                else
+                {
+                    Children.Add(chatInput);
+                    actionPanel.AreKeyboardShortcutsEnabled = false;
+                }
                 return false;
             }
             else if (args.Key == Keys.F9)

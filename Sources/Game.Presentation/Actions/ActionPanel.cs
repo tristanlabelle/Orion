@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
@@ -19,6 +20,7 @@ namespace Orion.Game.Presentation.Actions
         #region Fields
         private readonly Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
         private readonly TooltipPanel tooltipPanel;
+        private bool areKeyboardShortcutsEnabled = true;
         #endregion
 
         #region Constructors
@@ -30,6 +32,12 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Properties
+        public bool AreKeyboardShortcutsEnabled
+        {
+            get { return areKeyboardShortcutsEnabled; }
+            set { areKeyboardShortcutsEnabled = value; }
+        }
+
         internal TooltipPanel TooltipPanel
         {
             get { return tooltipPanel; }
@@ -129,6 +137,12 @@ namespace Orion.Game.Presentation.Actions
                     origin.X += padding.X + templateSize.Width;
                 }
             }
+        }
+
+        protected override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
+        {
+            if (!areKeyboardShortcutsEnabled) return true;
+            return base.PropagateKeyboardEvent(type, args);
         }
 
         protected override void Dispose(bool disposing)

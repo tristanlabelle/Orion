@@ -45,6 +45,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +102,7 @@
     <Compile Include="Networking\CommandSynchronizer.cs" />
     <Compile Include="Networking\FactionEndPoint.cs" />
     <Compile Include="Networking\GameMessageType.cs" />
+    <Compile Include="Networking\PlayerSlotType.cs" />
     <Compile Include="Networking\SetupMessageType.cs" />
     <Compile Include="PlayerSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

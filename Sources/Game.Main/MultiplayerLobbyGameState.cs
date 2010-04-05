@@ -1,35 +1,36 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Game.Presentation;
 using Orion.Engine.Gui;
+using Orion.Engine.Networking;
+using Orion.Game.Presentation;
 
 namespace Orion.Game.Main
 {
     /// <summary>
-    /// Handles the updating logic of the game when in the main menu.
+    /// Handles the initialization, updating and cleanup logic of
+    /// the single player menus to setup a deatchmatch.
     /// </summary>
-    public sealed class MainMenuGameState : GameState
+    public sealed class MultiplayerLobbyGameState : GameState
     {
         #region Fields
         private readonly GameGraphics graphics;
-        private readonly MainMenuUI ui;
+        private readonly SafeTransporter transporter;
+        private readonly MultiplayerLobby ui;
         #endregion
 
         #region Constructors
-        public MainMenuGameState(GameStateManager manager, GameGraphics graphics)
+        public MultiplayerLobbyGameState(GameStateManager manager, GameGraphics graphics)
             : base(manager)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.ui = new MainMenuUI(graphics);
-            this.ui.SinglePlayerSelected += OnSinglePlayerSelected;
-            this.ui.MultiplayerSelected += OnMultiplayerSelected;
-            this.ui.TowerDefenseSelected += OnTowerDefenseSelected;
-            this.ui.ViewReplaySelected += OnViewReplaySelected;
+            this.transporter = new SafeTransporter(41223);
+            this.ui = new MultiplayerLobby(transporter);
+            this.ui.BackPressed += OnBackPressed;
+            this.ui.HostPressed += new Action<MultiplayerLobby>(OnHostPressed);
+            this.ui.JoinPressed += new Action<MultiplayerLobby, IPv4EndPoint>(OnJoinPressed);
         }
         #endregion
 
@@ -70,26 +71,22 @@ namespace Orion.Game.Main
         public override void Dispose()
         {
             ui.Dispose();
+            transporter.Dispose();
         }
 
-        private void OnSinglePlayerSelected(MainMenuUI sender)
+        private void OnBackPressed(MultiplayerLobby sender)
         {
-            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
+            Manager.Pop();
         }
 
-        private void OnMultiplayerSelected(MainMenuUI sender)
+        private void OnHostPressed(MultiplayerLobby sender)
         {
-            Manager.Push(new MultiplayerLobbyGameState(Manager, graphics));
+            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, null));
         }
 
-        private void OnTowerDefenseSelected(MainMenuUI sender)
+        private void OnJoinPressed(MultiplayerLobby sender, IPv4EndPoint targetEndPoint)
         {
-            throw new NotImplementedException();
-        }
-
-        private void OnViewReplaySelected(MainMenuUI sender)
-        {
-            throw new NotImplementedException();
+            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, targetEndPoint));
         }
         #endregion
     }

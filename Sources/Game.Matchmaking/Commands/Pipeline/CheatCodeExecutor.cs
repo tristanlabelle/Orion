@@ -28,6 +28,9 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             this.cheatCodeManager = cheatCodeManager;
             this.match = match;
         }
+
+        public CheatCodeExecutor(Match match)
+            : this(CheatCodeManager.Default, match) { }
         #endregion
 
         #region Methods

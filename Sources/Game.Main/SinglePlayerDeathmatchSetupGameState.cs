@@ -48,6 +48,7 @@ namespace Orion.Game.Main
         #endregion
 
         #region Methods
+        #region Overrides
         protected internal override void OnEntered()
         {
             RootView.Children.Add(ui);
@@ -78,6 +79,7 @@ namespace Orion.Game.Main
         {
             ui.Dispose();
         }
+        #endregion
 
         private void OnStartGamePressed(MatchConfigurationUI sender)
         {
@@ -124,8 +126,8 @@ namespace Orion.Game.Main
             match.IsPausable = true;
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
-            if (matchSettings.AreCheatsEnabled)
-                commandPipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
+            if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
+            if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
 
             ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, world);
             if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);

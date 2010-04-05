@@ -98,7 +98,7 @@
     <Compile Include="SelectionType.cs" />
     <Compile Include="SpriteAnimation.cs" />
     <Compile Include="UIDisplays\MaximizedPanel.cs" />
-    <Compile Include="UIDisplays\MultiplayerLobby.cs" />
+    <Compile Include="UIDisplays\MultiplayerLobbyUI.cs" />
     <Compile Include="UIDisplays\MainMenuUI.cs" />
     <Compile Include="UIDisplays\MatchConfigurationUI.cs" />
     <Compile Include="UIDisplays\MatchConsole.cs" />

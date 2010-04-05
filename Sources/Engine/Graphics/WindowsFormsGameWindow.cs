@@ -295,7 +295,7 @@ namespace Orion.Engine.Graphics
                 DisplayDevice.Default.ChangeResolution(resolution);
                 return true;
             }
-            catch (GraphicsModeException e)
+            catch (GraphicsModeException)
             {
                 return false;
             }

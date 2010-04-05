@@ -234,43 +234,16 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
-        /// This method creates Build commands to build buildings of the specified types at given positions.  If the faction has less builders than the amount of positions specified, it will create commands for the positions in order until there is no more available builders.
+        /// This method creates Build commands to build buildings of the specified types at given positions.
+        /// If the faction has less builders than the amount of positions specified,
+        /// it will create commands for the positions in order until there is no more available builders.
         /// </summary>
         /// <param name="buildingType">name of the type of building to be built</param>
         /// <param name="Positions">Positions at which the buildings will be built</param>
         public void DispatchBuilders(string typeName, List<Vector2> positions)
         {
-            return;
-            UnitType toBuild = Match.UnitTypes.FromName(typeName);
-            int amountOfBuildings;
-            List<Unit> potentialBuilders = allUnits.Where(unit => unit.Faction == Faction && unit.IsIdle && unit.Type.HasSkill<BuildSkill>()).ToList();
-            List<Unit> builders = new List<Unit>();
 
-            if (positions.Count <= potentialBuilders.Count)
-                amountOfBuildings = positions.Count;
-            else
-                amountOfBuildings = potentialBuilders.Count;
-
-            if (toBuild.GetBaseStat(BasicSkill.AladdiumCostStat) != 0
-                && amountOfBuildings > Faction.AladdiumAmount / toBuild.GetBaseStat(BasicSkill.AladdiumCostStat))
-                    amountOfBuildings = Faction.AladdiumAmount / toBuild.GetBaseStat(BasicSkill.AladdiumCostStat);
-
-            if (toBuild.GetBaseStat(BasicSkill.AlageneCostStat) != 0
-                && amountOfBuildings > Faction.AlageneAmount / toBuild.GetBaseStat(BasicSkill.AlageneCostStat))
-                amountOfBuildings = Faction.AlageneAmount / toBuild.GetBaseStat(BasicSkill.AlageneCostStat);
-
-            for (int i = 0; i < amountOfBuildings; i++)
-            {
-                builders.Add(potentialBuilders[0]);
-                potentialBuilders.Remove(potentialBuilders[0]);
-            }
-
-            for (int i = 0; i < amountOfBuildings; i++)
-            {
-                commands.Add(new BuildCommand(Faction.Handle, builders.Select(unit => unit.Handle), toBuild.Handle, (Point)positions[i]));
-            }
         }
-
 
         /// <summary>
         /// Initializes certain variables that can't be initialized at construction since the things they refer to aren't created yet.

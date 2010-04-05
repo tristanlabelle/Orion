@@ -16,7 +16,7 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly SafeTransporter transporter;
-        private readonly MultiplayerLobby ui;
+        private readonly MultiplayerLobbyUI ui;
         #endregion
 
         #region Constructors
@@ -27,10 +27,10 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
             this.transporter = new SafeTransporter(41223);
-            this.ui = new MultiplayerLobby(transporter);
+            this.ui = new MultiplayerLobbyUI(transporter);
             this.ui.BackPressed += OnBackPressed;
-            this.ui.HostPressed += new Action<MultiplayerLobby>(OnHostPressed);
-            this.ui.JoinPressed += new Action<MultiplayerLobby, IPv4EndPoint>(OnJoinPressed);
+            this.ui.HostPressed += new Action<MultiplayerLobbyUI>(OnHostPressed);
+            this.ui.JoinPressed += new Action<MultiplayerLobbyUI, IPv4EndPoint>(OnJoinPressed);
         }
         #endregion
 
@@ -73,17 +73,17 @@ namespace Orion.Game.Main
             transporter.Dispose();
         }
 
-        private void OnBackPressed(MultiplayerLobby sender)
+        private void OnBackPressed(MultiplayerLobbyUI sender)
         {
             Manager.Pop();
         }
 
-        private void OnHostPressed(MultiplayerLobby sender)
+        private void OnHostPressed(MultiplayerLobbyUI sender)
         {
             Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, null));
         }
 
-        private void OnJoinPressed(MultiplayerLobby sender, IPv4EndPoint targetEndPoint)
+        private void OnJoinPressed(MultiplayerLobbyUI sender, IPv4EndPoint targetEndPoint)
         {
             Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, targetEndPoint));
         }

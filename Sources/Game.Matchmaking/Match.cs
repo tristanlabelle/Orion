@@ -41,9 +41,6 @@ namespace Orion.Game.Matchmaking
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
         public event Action<Match, FactionMessage> FactionMessageReceived;
-
-        [Obsolete("To be handled in GameStates.")]
-        public event Action<Match> Quitting;
         #endregion
 
         #region Properties
@@ -71,7 +68,6 @@ namespace Orion.Game.Matchmaking
             get { return technologyTree; }
         }
 
-        [Obsolete("To be handled in GameStates.")]
         public bool IsRunning
         {
             get { return isRunning; }
@@ -90,13 +86,11 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        [Obsolete("To be handled in GameStates.")]
         public void Pause()
         {
             isRunning = false;
         }
 
-        [Obsolete("To be handled in GameStates.")]
         public void Resume()
         {
             isRunning = true;

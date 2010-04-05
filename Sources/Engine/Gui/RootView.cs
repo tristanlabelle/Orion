@@ -98,16 +98,12 @@ namespace Orion.Engine.Gui
             PropagateUpdateEvent(timeDeltaInSeconds);
         }
 
-        public new void Draw(GraphicsContext graphicsContext)
+        public void Draw(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            Render(graphicsContext);
-        }
 
-        protected internal override void Render(GraphicsContext graphicsContext)
-        {
             graphicsContext.ProjectionBounds = Bounds;
-            base.Render(graphicsContext);
+            Render(graphicsContext);
         }
         #endregion
     }

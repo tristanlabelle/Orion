@@ -14,14 +14,14 @@ using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Presentation
 {
-    public sealed class MultiplayerLobby : MaximizedPanel
+    public sealed class MultiplayerLobbyUI : MaximizedPanel
     {
         #region Fields
         private static readonly byte[] explorePacket = new byte[] { (byte)SetupMessageType.Explore };
         private const int repollAfterFrames = 250;
 
-        private readonly Action<SafeTransporter, NetworkEventArgs> receptionDelegate;
-        private readonly Action<SafeTransporter, IPv4EndPoint> timeoutDelegate;
+        private readonly Action<SafeTransporter, NetworkEventArgs> packetReceivedEventHandler;
+        private readonly Action<SafeTransporter, IPv4EndPoint> peerTimedOutEventHandler;
         private readonly Dictionary<IPv4EndPoint, Button> hostedGames = new Dictionary<IPv4EndPoint, Button>();
         private readonly int port;
         private SafeTransporter transporter;
@@ -33,12 +33,12 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MultiplayerLobby(SafeTransporter transporter)
+        public MultiplayerLobbyUI(SafeTransporter transporter)
         {
             port = transporter.Port;
             this.transporter = transporter;
-            receptionDelegate = OnReceive;
-            timeoutDelegate = OnTimeout;
+            packetReceivedEventHandler = OnPacketReceived;
+            peerTimedOutEventHandler = OnPeerTimedOut;
 
             Rectangle gameListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
             gameButtonRectangle = new Rectangle(gameListFrame.Width - 20, 30);
@@ -71,32 +71,32 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Raised when the user decided to go back through the UI.
         /// </summary>
-        public event Action<MultiplayerLobby> BackPressed;
+        public event Action<MultiplayerLobbyUI> BackPressed;
 
         /// <summary>
         /// Raised when the user decided to host a game through the UI.
         /// </summary>
-        public event Action<MultiplayerLobby> HostPressed;
+        public event Action<MultiplayerLobbyUI> HostPressed;
 
         /// <summary>
         /// Raised when the user decided to go join a game through the UI.
         /// </summary>
-        public event Action<MultiplayerLobby, IPv4EndPoint> JoinPressed;
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinPressed;
         #endregion
 
         #region Methods
-#warning UIDisplay stuff to move to GameStates
-        protected void OnEntered()
+#warning HACK: This should by handled by the MultiplayerLobbyGameState
+        protected override void OnAddToParent(ViewContainer parent)
         {
-            transporter.Received += receptionDelegate;
-            transporter.TimedOut += timeoutDelegate;
+            transporter.Received += packetReceivedEventHandler;
+            transporter.TimedOut += peerTimedOutEventHandler;
             transporter.Broadcast(explorePacket, port);
         }
 
-        protected void OnShadowed()
+        protected override void OnRemovedFromParent(ViewContainer parent)
         {
-            transporter.Received -= receptionDelegate;
-            transporter.TimedOut -= timeoutDelegate;
+            transporter.Received -= packetReceivedEventHandler;
+            transporter.TimedOut -= peerTimedOutEventHandler;
         }
 
         protected override void Update(float timeDeltaInSeconds)
@@ -109,9 +109,10 @@ namespace Orion.Game.Presentation
             base.Update(timeDeltaInSeconds);
         }
 
-        private void OnReceive(SafeTransporter source, NetworkEventArgs args)
+        private void OnPacketReceived(SafeTransporter source, NetworkEventArgs args)
         {
-            switch ((SetupMessageType)args.Data[0])
+            SetupMessageType messageType = (SetupMessageType)args.Data[0];
+            switch (messageType)
             {
                 case SetupMessageType.Advertise:
                     ShowGame(args.Host, args.Data[1]);
@@ -135,10 +136,14 @@ namespace Orion.Game.Presentation
                         Instant.DisplayAlert(this, "L'hôte a refusé votre demande.");
                     }
                     break;
+
+                default:
+                    Debug.Fail("Unexpected packet message type: {0}.".FormatInvariant(messageType));
+                    break;
             }
         }
 
-        private void OnTimeout(SafeTransporter transporter, IPv4EndPoint host)
+        private void OnPeerTimedOut(SafeTransporter transporter, IPv4EndPoint host)
         {
             Instant.DisplayAlert(this, "Impossible de rejointer {0}.".FormatInvariant(ResolveHostAddress(host)));
             requestedJoin = null;
@@ -317,7 +322,7 @@ namespace Orion.Game.Presentation
         {
             if (disposing)
             {
-                transporter.Received -= receptionDelegate;
+                transporter.Received -= packetReceivedEventHandler;
                 BackPressed = null;
                 HostPressed = null;
                 JoinPressed = null;

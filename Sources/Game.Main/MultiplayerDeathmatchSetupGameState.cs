@@ -78,9 +78,14 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
-            this.transporter.Received += this.packetReceivedEventHandler;
-            this.transporter.TimedOut += this.peerTimedOutEventHandler;
+            OnUnshadowed();
+
+            if (!IsHost)
+            {
+                byte[] data = new byte[1];
+                data[0] = (byte)SetupMessageType.GetSetup;
+                transporter.SendTo(data, hostEndPoint.Value);
+            }
         }
 
         protected internal override void OnShadowed()
@@ -92,7 +97,9 @@ namespace Orion.Game.Main
 
         protected internal override void OnUnshadowed()
         {
-            OnEntered();
+            RootView.Children.Add(ui);
+            this.transporter.Received += this.packetReceivedEventHandler;
+            this.transporter.TimedOut += this.peerTimedOutEventHandler;
         }
 
         protected internal override void Update(float timeDeltaInSeconds)
@@ -336,6 +343,10 @@ namespace Orion.Game.Main
                     TryJoin(args.Host);
                     break;
 
+                case SetupMessageType.GetSetup:
+                    SendSetup(args.Host);
+                    break;
+
                 case SetupMessageType.LeaveGame:
                     TryLeave(args.Host);
                     break;
@@ -388,23 +399,31 @@ namespace Orion.Game.Main
                 return;
             }
 
+            // Send a message indicating we accept the request
             byte[] accept = new byte[1];
             accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
             transporter.SendTo(accept, host);
 
-            int newPeerSlotNumber = (byte)ui.NextAvailableSlot;
+            // Set the slot as occupied
+            int slotIndex = (byte)ui.NextAvailableSlot;
+            ui.UsePlayerForSlot(slotIndex, host);
 
-            byte[] setSlotMessage = new byte[3];
-            setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
+            // Tell the others that a new guy has joined
             byte[] addPeerMessage = new byte[8];
             addPeerMessage[0] = (byte)SetupMessageType.SetPeer;
-            addPeerMessage[1] = (byte)newPeerSlotNumber;
+            addPeerMessage[1] = (byte)slotIndex;
             BitConverter.GetBytes(host.Address.Value).CopyTo(addPeerMessage, 2);
             BitConverter.GetBytes(host.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
-            foreach (IPv4EndPoint peer in ui.PlayerAddresses)
-            {
-                transporter.SendTo(addPeerMessage, peer);
-            }
+            transporter.SendTo(addPeerMessage, ui.PlayerAddresses.Except(host));
+        }
+
+        public void SendSetup(IPv4EndPoint targetEndPoint)
+        {
+            byte[] setSlotMessage = new byte[3];
+            setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
+
+            byte[] addPeerMessage = new byte[8];
+            addPeerMessage[0] = (byte)SetupMessageType.SetPeer;
 
             int slotNumber = -1;
             foreach (PlayerSlot slot in ui.Players)
@@ -419,7 +438,15 @@ namespace Orion.Game.Main
                     {
                         setSlotMessage[1] = (byte)slotNumber;
                         setSlotMessage[2] = (byte)PlayerSlotType.Open;
-                        transporter.SendTo(setSlotMessage, host);
+                        transporter.SendTo(setSlotMessage, targetEndPoint);
+                        continue;
+                    }
+
+                    if (remotePlayer.HostEndPoint == targetEndPoint)
+                    {
+                        setSlotMessage[1] = (byte)slotNumber;
+                        setSlotMessage[2] = (byte)PlayerSlotType.Local;
+                        transporter.SendTo(setSlotMessage, targetEndPoint);
                         continue;
                     }
 
@@ -427,7 +454,7 @@ namespace Orion.Game.Main
                     addPeerMessage[1] = (byte)slotNumber;
                     BitConverter.GetBytes(peer.Address.Value).CopyTo(addPeerMessage, 2);
                     BitConverter.GetBytes(peer.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
-                    transporter.SendTo(addPeerMessage, host);
+                    transporter.SendTo(addPeerMessage, targetEndPoint);
                     continue;
                 }
 
@@ -435,7 +462,7 @@ namespace Orion.Game.Main
                 {
                     setSlotMessage[1] = (byte)slotNumber;
                     setSlotMessage[2] = (byte)PlayerSlotType.Closed;
-                    transporter.SendTo(setSlotMessage, host);
+                    transporter.SendTo(setSlotMessage, targetEndPoint);
                     continue;
                 }
 
@@ -443,18 +470,12 @@ namespace Orion.Game.Main
                 {
                     setSlotMessage[1] = (byte)slotNumber;
                     setSlotMessage[2] = (byte)PlayerSlotType.AI;
-                    transporter.SendTo(setSlotMessage, host);
+                    transporter.SendTo(setSlotMessage, targetEndPoint);
                     continue;
                 }
             }
 
-            setSlotMessage[1] = (byte)newPeerSlotNumber;
-            setSlotMessage[2] = (byte)PlayerSlotType.Local;
-            transporter.SendTo(setSlotMessage, host);
-
-            transporter.SendTo(CreateSettingsPacket(), host);
-
-            ui.UsePlayerForSlot(newPeerSlotNumber, host);
+            transporter.SendTo(CreateSettingsPacket(), targetEndPoint);
         }
 
         private void TryLeave(IPv4EndPoint host)

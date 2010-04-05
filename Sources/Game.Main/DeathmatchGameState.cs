@@ -44,6 +44,9 @@ namespace Orion.Game.Main
             this.localCommander = localCommander;
             this.ui = new MatchUI(graphics, match, localCommander);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
+
+            this.ui.QuitPressed += OnQuitPressed;
+            this.match.World.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -97,6 +100,28 @@ namespace Orion.Game.Main
         public override void Dispose()
         {
             ui.Dispose();
+        }
+
+        private void OnQuitPressed(MatchUI sender)
+        {
+            Manager.PopTo<MainMenuGameState>();
+        }
+
+        private void OnFactionDefeated(World sender, Faction faction)
+        {
+            if (faction == localCommander.Faction)
+            {
+                ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
+                return;
+            }
+
+            bool allEnemyFactionsDefeated = sender.Factions
+                .Where(f => localCommander.Faction.GetDiplomaticStance(f) == DiplomaticStance.Enemy)
+                .All(f => f == faction || f.Status == FactionStatus.Defeated);
+            if (allEnemyFactionsDefeated)
+            {
+                ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
+            }
         }
         #endregion
     }

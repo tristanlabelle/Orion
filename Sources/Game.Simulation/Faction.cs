@@ -83,35 +83,18 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Raised when this <see cref="Faction"/> gets defeated.
         /// </summary>
+        [Obsolete("Should be detected by the game states.")]
         public event Action<Faction> Defeated;
-
-        private void RaiseDefeated()
-        {
-            var handler = Defeated;
-            if (handler != null) handler(this);
-        }
 
         /// <summary>
         /// Raised when the area of the world that is visible by this faction changes.
         /// </summary>
         public event Action<Faction, Region> VisibilityChanged;
 
-        private void RaiseVisibilityChanged(Region region)
-        {
-            var handler = VisibilityChanged;
-            if (handler != null) handler(this, region);
-        }
-
         /// <summary>
         /// Raised when a new <see cref="Technology"/> has been researched.
         /// </summary>
         public event Action<Faction, Technology> TechnologyResearched;
-
-        private void RaiseTechnologyResearched(Technology technology)
-        {
-            var handler = TechnologyResearched;
-            if (handler != null) handler(this, technology);
-        }
 
         public event Action<Faction, string> Warning;
 
@@ -124,8 +107,7 @@ namespace Orion.Game.Simulation
             Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
 #endif
 
-            var handler = Warning;
-            if (handler != null) handler(source, message);
+            Warning.Raise(source, message);
         }
 
         public void RaiseWarning(string message)
@@ -299,7 +281,7 @@ namespace Orion.Game.Simulation
             if (HasResearched(technology)) return;
 
             technologies.Add(technology);
-            RaiseTechnologyResearched(technology);
+            TechnologyResearched.Raise(this, technology);
         }
 
         public bool HasResearched(Technology technology)
@@ -334,7 +316,7 @@ namespace Orion.Game.Simulation
             bool wasRemoved = researches.Remove(technology);
             Debug.Assert(wasRemoved);
             technologies.Add(technology);
-            RaiseTechnologyResearched(technology);
+            TechnologyResearched.Raise(this, technology);
             RaiseWarning("La technologie {0} est maintenant disponible.".FormatInvariant(technology.Name));
         }
         #endregion
@@ -439,6 +421,7 @@ namespace Orion.Game.Simulation
                 unit.Suicide();
         }
 
+        [Obsolete("This logic belongs to the game states.")]
         private void CheckForDefeat()
         {
             if (status == FactionStatus.Defeated) return;
@@ -447,7 +430,7 @@ namespace Orion.Game.Simulation
             if (!hasKeepAliveUnit || IsStuck)
             {
                 status = FactionStatus.Defeated;
-                RaiseDefeated();
+                Defeated.Raise(this);
                 return;
             }
         }
@@ -520,7 +503,7 @@ namespace Orion.Game.Simulation
             }
 
             // Invalidate the whole visibility to take into account new allies.
-            RaiseVisibilityChanged((Region)world.Size);
+            VisibilityChanged.Raise(this, (Region)world.Size);
         }
         #endregion
 
@@ -608,7 +591,7 @@ namespace Orion.Game.Simulation
                 DiscoverFromOtherFogOfWar(sender, region);
             }
 
-            RaiseVisibilityChanged(region);
+            VisibilityChanged.Raise(this, region);
         }
 
         private void DiscoverFromOtherFogOfWar(FogOfWar other, Region region)

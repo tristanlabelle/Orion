@@ -39,8 +39,9 @@ namespace Orion.Game.Presentation
         private readonly Panel selectionPanel;
         #endregion
 
-        #region Pause
+        #region Pause & Diplomacy
         private readonly Panel pausePanel;
+        private Panel diplomacyPanel;
         #endregion
 
         #region Minimap
@@ -60,7 +61,6 @@ namespace Orion.Game.Presentation
         private readonly GameAudio gameAudio;
         private readonly MatchAudioPresenter matchAudioPresenter;
         private readonly ActionPanel actionPanel;
-        private Panel diplomacyPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
@@ -82,6 +82,7 @@ namespace Orion.Game.Presentation
 
             this.gameGraphics = gameGraphics;
             World world = match.World;
+            world.FactionDefeated += OnFactionDefeated;
 
             matchRenderer = new MatchRenderer(userInputManager, gameGraphics);
 
@@ -152,7 +153,7 @@ namespace Orion.Game.Presentation
 
             Rectangle quitGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
             Button quitGameButton = new Button(quitGameButtonFrame, "Quitter");
-            quitGameButton.Triggered += button => match.Quit();
+            quitGameButton.Triggered += button => QuitPressed.Raise(this);
 
             Rectangle resumeGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
             Button resumeGameButton = new Button(resumeGameButtonFrame, match.IsPausable ? "Reprendre" : "Retour");
@@ -195,6 +196,13 @@ namespace Orion.Game.Presentation
                 ?? localCommander.Faction.Units.FirstOrDefault();
             if (viewTarget != null) CenterOn(viewTarget.Center);
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the user has quitted the match through the UI.
+        /// </summary>
+        public event Action<MatchUI> QuitPressed;
         #endregion
 
         #region Properties
@@ -252,6 +260,12 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Event Handling
+        private void OnFactionDefeated(World sender, Faction faction)
+        {
+            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
+            console.AddMessage(text, faction.Color);
+        }
+
         private void OnFactionMessageReceived(Match sender, FactionMessage message)
         {
             Argument.EnsureNotNull(message, "message");
@@ -492,24 +506,15 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
-        public void DisplayDefeatMessage(Faction faction, Action callback)
+        public void DisplayDefeatMessage(Action callback)
         {
             Argument.EnsureNotNull(callback, "callback");
-
-            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
-            console.AddMessage(text, faction.Color);
-
-            if (faction != LocalFaction) return;
-
-            if (match.IsPausable) match.Pause();
             Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
         }
 
         public void DisplayVictoryMessage(Action callback)
         {
             Argument.EnsureNotNull(callback, "callback");
-
-            if (match.IsPausable) match.Pause();
             Instant.DisplayAlert(this, "VICTOIRE !", callback);
         }
 

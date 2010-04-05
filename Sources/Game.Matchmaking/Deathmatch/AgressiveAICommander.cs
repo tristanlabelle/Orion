@@ -20,7 +20,7 @@ namespace Orion.Game.Matchmaking.Deathmatch
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        public override void Update(float timeDeltaInSeconds)
         {
             if (Faction.Status == FactionStatus.Defeated)
                 return;
@@ -46,7 +46,7 @@ namespace Orion.Game.Matchmaking.Deathmatch
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 
-            base.Update(timeDelta);
+            base.Update(timeDeltaInSeconds);
         }
 
         #endregion

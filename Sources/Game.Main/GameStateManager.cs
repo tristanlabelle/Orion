@@ -143,7 +143,7 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        public void Update(float timeDelta)
+        public void Update(float timeDeltaInSeconds)
         {
             if (IsEmpty) return;
 
@@ -152,7 +152,7 @@ namespace Orion.Game.Main
             try
             {
                 deferActions = true;
-                activeState.Update(timeDelta);
+                activeState.Update(timeDeltaInSeconds);
             }
             finally
             {

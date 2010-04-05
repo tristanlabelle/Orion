@@ -95,9 +95,7 @@ namespace Orion.Engine.Gui
 
         public new void Update(float timeDeltaInSeconds)
         {
-#warning Kind of an hack... can't we merge Responder and ViewContainer?
-            foreach (var child in Children.OfType<Responder>())
-                child.Update(timeDeltaInSeconds);
+            PropagateUpdateEvent(timeDeltaInSeconds);
         }
 
         public new void Draw(GraphicsContext graphicsContext)

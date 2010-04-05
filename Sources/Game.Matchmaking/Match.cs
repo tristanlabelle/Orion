@@ -8,6 +8,7 @@ using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
 
 namespace Orion.Game.Matchmaking
 {
@@ -19,9 +20,8 @@ namespace Orion.Game.Matchmaking
         #region Fields
         private readonly World world;
         private readonly Random random;
-        private SimulationStep lastSimulationStep;
+        private bool isRunning = true;
         private bool isPausable;
-        private bool isRunning;
         #endregion
 
         #region Constructors
@@ -37,12 +37,6 @@ namespace Orion.Game.Matchmaking
 
         #region Events
         /// <summary>
-        /// Raised when this <see cref="Match"/> gets updated for a frame.
-        /// </summary>
-        [Obsolete("Only the command pipeline uses this, and it should be updated by the GameStates.")]
-        public event Action<Match, UpdateEventArgs> Updated;
-
-        /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
         public event Action<Match, FactionMessage> FactionMessageReceived;
@@ -57,31 +51,27 @@ namespace Orion.Game.Matchmaking
             get { return world; }
         }
 
+        public UnitTypeRegistry UnitTypes
+        {
+            get { return world.UnitTypes; }
+        }
+
+        public TechnologyTree TechnologyTree
+        {
+            get { return world.TechnologyTree; }
+        }
+
+        [Obsolete("To be handled in GameStates.")]
         public bool IsPausable
         {
             get { return isPausable; }
             set { isPausable = value; }
         }
 
+        [Obsolete("To be handled in GameStates.")]
         public bool IsRunning
         {
             get { return isRunning; }
-        }
-
-        /// <summary>
-        /// Gets the number of the last simulation step that was run.
-        /// </summary>
-        public int LastSimulationStepNumber
-        {
-            get { return lastSimulationStep.Number; }
-        }
-
-        /// <summary>
-        /// Gets the information associated with the last step of the game simulation.
-        /// </summary>
-        public SimulationStep LastSimulationStep
-        {
-            get { return lastSimulationStep; }
         }
 
         /// <summary>
@@ -98,12 +88,6 @@ namespace Orion.Game.Matchmaking
 
         #region Methods
         [Obsolete("To be handled in GameStates.")]
-        public void Start()
-        {
-            isRunning = true;
-        }
-
-        [Obsolete("To be handled in GameStates.")]
         public void Pause()
         {
             isRunning = false;
@@ -119,25 +103,6 @@ namespace Orion.Game.Matchmaking
         public void Quit()
         {
             Quitting.Raise(this);
-        }
-
-        /// <summary>
-        /// Updates this <see cref="Match"/> for the duration of a frame.
-        /// </summary>
-        /// <param name="timeDelta">The time elapsed, in seconds, since the last frame.</param>
-        public void Update(float timeDeltaInSeconds)
-        {
-            if (IsRunning)
-            {
-                lastSimulationStep = new SimulationStep(
-                    lastSimulationStep.Number + 1,
-                    lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
-                    timeDeltaInSeconds);
-
-                world.Update(lastSimulationStep);
-            }
-
-            Updated.Raise(this, new UpdateEventArgs(timeDeltaInSeconds));
         }
 
         /// <summary>

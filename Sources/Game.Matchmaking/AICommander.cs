@@ -38,7 +38,7 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        public override void Update(float timeDeltaInSeconds)
         {
             if (Faction.Status == FactionStatus.Defeated)
                 return;

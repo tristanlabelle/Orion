@@ -99,6 +99,7 @@ namespace Orion.Game.Simulation
             get { return terrain; }
         }
 
+        [Obsolete("Use Match.TechnologyTree.")]
         public TechnologyTree TechnologyTree
         {
             get { return technologyTree; }
@@ -128,6 +129,7 @@ namespace Orion.Game.Simulation
             get { return entities; }
         }
 
+        [Obsolete("Use Match.UnitTypes.")]
         public UnitTypeRegistry UnitTypes
         {
             get { return unitTypes; }
@@ -218,14 +220,12 @@ namespace Orion.Game.Simulation
         /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
         /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
         /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
-        public Faction CreateFaction(string name, ColorRgb color, int aladdium, int alagene)
+        public Faction CreateFaction(string name, ColorRgb color)
         {
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
             faction.Defeated += RaiseFactionDefeated;
             factions.Add(faction);
-            faction.AladdiumAmount = aladdium;
-            faction.AlageneAmount = alagene;
             return faction;
         }
 

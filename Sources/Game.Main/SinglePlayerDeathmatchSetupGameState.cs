@@ -6,6 +6,10 @@ using Orion.Engine;
 using Orion.Game.Presentation;
 using Orion.Game.Matchmaking;
 using Orion.Engine.Gui;
+using Orion.Game.Simulation;
+using Orion.Game.Matchmaking.Deathmatch;
+using Orion.Game.Matchmaking.Commands.Pipeline;
+using System.Diagnostics;
 
 namespace Orion.Game.Main
 {
@@ -59,10 +63,10 @@ namespace Orion.Game.Main
             OnEntered();
         }
 
-        protected internal override void Update(float timeDelta)
+        protected internal override void Update(float timeDeltaInSeconds)
         {
             graphics.DispatchInputEvents();
-            RootView.Update(timeDelta);
+            RootView.Update(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
@@ -77,8 +81,60 @@ namespace Orion.Game.Main
 
         private void OnStartGamePressed(MatchConfigurationUI sender)
         {
-            GameState targetGameState = new SinglePlayerDeathmatchGameState(
-                Manager, graphics, ui.Players.ToList(), matchSettings);
+            Random random = new MersenneTwister(matchSettings.RandomSeed);
+
+            Terrain terrain = Terrain.Generate(matchSettings.MapSize, random);
+            World world = new World(terrain, random, matchSettings.FoodLimit);
+
+            SlaveCommander localCommander = null;
+            List<Commander> aiCommanders = new List<Commander>();
+            int colorIndex = 0;
+            foreach (PlayerSlot playerSlot in ui.Players)
+            {
+                if (playerSlot is ClosedPlayerSlot) continue;
+
+                ColorRgb color = Faction.Colors[colorIndex];
+                colorIndex++;
+
+                Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                faction.AladdiumAmount = matchSettings.InitialAladdiumAmount;
+                faction.AlageneAmount = matchSettings.InitialAlageneAmount;
+                if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
+
+                if (playerSlot is LocalPlayerSlot)
+                {
+                    localCommander = new SlaveCommander(faction);
+                }
+                else if (playerSlot is AIPlayerSlot)
+                {
+                    Commander commander = new AgressiveAICommander(faction, random);
+                    aiCommanders.Add(commander);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Single-player games only support local and AI players");
+                }
+            }
+
+            Debug.Assert(localCommander != null, "No local player slot.");
+
+            WorldGenerator.Generate(world, random, !matchSettings.StartNomad);
+
+            Match match = new Match(world, random);
+            match.IsPausable = true;
+
+            CommandPipeline commandPipeline = new CommandPipeline(match);
+            if (matchSettings.AreCheatsEnabled)
+                commandPipeline.PushFilter(new CheatCodeExecutor(CheatCodeManager.Default, match));
+
+            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, world);
+            if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
+
+            aiCommanders.ForEach(commander => commandPipeline.AddCommander(commander));
+            commandPipeline.AddCommander(localCommander);
+
+            GameState targetGameState = new DeathmatchGameState(
+                Manager, graphics, match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
         }
 

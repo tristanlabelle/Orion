@@ -103,7 +103,8 @@ namespace Orion.Engine.Gui
 
         protected override bool OnCharacterPressed(char character)
         {
-            if (!"\b\n\r".Contains(character))
+            // Ignore \0, \n, \r, \b, etc.
+            if (!char.IsControl(character))
             {
                 contents = contents.Insert(caretIndex, character);
                 ++caretIndex;

@@ -12,6 +12,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
     public sealed class CommandPipeline
     {
         #region Fields
+        private readonly Match match;
         private readonly ICommandSink sink;
         private readonly List<CommandFilter> filters = new List<CommandFilter>();
         private readonly Dictionary<Commander, ICommandSink> commanders
@@ -23,18 +24,27 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
         /// Initializes a new <see cref="CommandPipeline"/>
         /// from its final <see cref="ICommandSink"/>.
         /// </summary>
+        /// <param name="match">The match in which the commands are executed.</param>
         /// <param name="sink">The final <see cref="ICommandSink"/> of this <see cref="CommandPipeline"/>.</param>
-        public CommandPipeline(ICommandSink sink)
+        public CommandPipeline(Match match, ICommandSink sink)
         {
+            Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(sink, "sink");
+
+            this.match = match;
             this.sink = sink;
         }
 
         public CommandPipeline(Match match)
-            : this(new CommandExecutor(match)) { }
+            : this(match, new CommandExecutor(match)) { }
         #endregion
 
         #region Properties
+        public Match Match
+        {
+            get { return match; }
+        }
+
         /// <summary>
         /// Gets the command sink that was last pushed on this pipeline.
         /// </summary>

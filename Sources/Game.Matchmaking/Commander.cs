@@ -85,7 +85,7 @@ namespace Orion.Game.Matchmaking
         /// to flush its local pipeline.
         /// </summary>
         /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public virtual void Update(float timeDelta) { }
+        public virtual void Update(float timeDeltaInSeconds) { }
 
         public override string ToString()
         {

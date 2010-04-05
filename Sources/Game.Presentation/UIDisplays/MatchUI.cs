@@ -373,7 +373,13 @@ namespace Orion.Game.Presentation
             MatchRenderer.DrawAllHealthBars = args.IsAltModifierDown;
             isSpaceDown = args.Key == Keys.Space;
 
-            if (args.Key == Keys.F9)
+            if (args.Key == Keys.Enter)
+            {
+                chatInput.Clear();
+                Children.Add(chatInput);
+                return false;
+            }
+            else if (args.Key == Keys.F9)
             {
                 DisplayPausePanel();
                 return false;
@@ -385,16 +391,6 @@ namespace Orion.Game.Presentation
             }
 
             return base.OnKeyboardButtonPressed(args);
-        }
-
-        protected override bool OnCharacterPressed(char character)
-        {
-            if (character == '\r')
-            {
-                chatInput.Clear();
-                Children.Add(chatInput);
-            }
-            return base.OnCharacterPressed(character);
         }
 
         protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
@@ -410,7 +406,6 @@ namespace Orion.Game.Presentation
             if (isSpaceDown && !Selection.IsEmpty)
                 CenterOnSelection();
 
-            match.Update(timeDeltaInSeconds);
             base.Update(timeDeltaInSeconds);
         }
 

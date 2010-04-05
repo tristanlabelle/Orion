@@ -61,7 +61,7 @@ namespace Orion.Engine.Input
             this.mouseArgs = default(MouseEventArgs);
             this.keyboardArgs = default(KeyboardEventArgs);
 
-            this.character = default(char);
+            this.character = character;
         }
         #endregion
 

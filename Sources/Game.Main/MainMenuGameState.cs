@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Presentation;
 using Orion.Engine.Gui;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Gui;
 
 namespace Orion.Game.Main
 {

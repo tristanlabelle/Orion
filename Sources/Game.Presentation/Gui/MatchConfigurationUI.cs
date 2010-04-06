@@ -14,7 +14,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 using Orion.Game.Matchmaking;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     public abstract class MatchConfigurationUI : MaximizedPanel
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Sockets;
 using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Game.Presentation;
-using System.Net.Sockets;
+using Orion.Game.Presentation.Gui;
 
 namespace Orion.Game.Main
 {

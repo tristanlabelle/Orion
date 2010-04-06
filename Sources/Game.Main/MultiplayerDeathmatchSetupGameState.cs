@@ -13,6 +13,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
 
 namespace Orion.Game.Main

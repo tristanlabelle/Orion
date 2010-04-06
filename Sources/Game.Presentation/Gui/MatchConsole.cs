@@ -7,7 +7,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// Provides the user interface for the in-game message console.

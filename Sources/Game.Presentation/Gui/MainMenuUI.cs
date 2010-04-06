@@ -7,7 +7,7 @@ using Orion.Engine.Gui;
 using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// The user interface for the main menu of the game.

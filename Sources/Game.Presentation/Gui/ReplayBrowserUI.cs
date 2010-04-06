@@ -8,7 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// Provides a user interface which allows to browse the saved replays.

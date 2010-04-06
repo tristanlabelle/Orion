@@ -22,7 +22,7 @@ using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     public sealed class MatchUI : MaximizedPanel
     {

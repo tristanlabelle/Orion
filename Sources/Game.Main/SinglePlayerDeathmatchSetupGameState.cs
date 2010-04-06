@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Presentation;
-using Orion.Game.Matchmaking;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Matchmaking.Deathmatch;
+using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using System.Diagnostics;
+using Orion.Game.Matchmaking.Deathmatch;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Gui;
+using Orion.Game.Simulation;
 
 namespace Orion.Game.Main
 {

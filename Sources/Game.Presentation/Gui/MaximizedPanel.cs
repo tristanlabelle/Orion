@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Gui;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// A panel which takes the whole screen area.

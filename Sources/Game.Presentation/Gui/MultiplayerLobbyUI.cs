@@ -12,7 +12,7 @@ using Orion.Engine.Networking;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking.Networking;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     public sealed class MultiplayerLobbyUI : MaximizedPanel
     {

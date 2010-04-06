@@ -6,7 +6,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     public class SinglePlayerMatchConfigurationUI : MatchConfigurationUI
     {

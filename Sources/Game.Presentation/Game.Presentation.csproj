@@ -92,7 +92,7 @@
     <Compile Include="Renderers\UnitPanelRenderer.cs" />
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
-    <Compile Include="ResourceDisplay.cs" />
+    <Compile Include="Gui\ResourceDisplay.cs" />
     <Compile Include="Selection.cs" />
     <Compile Include="SelectionManager.cs" />
     <Compile Include="SelectionType.cs" />

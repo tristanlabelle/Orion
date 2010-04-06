@@ -7,7 +7,7 @@ using Orion.Engine.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation;
 
-namespace Orion.Game.Presentation
+namespace Orion.Game.Presentation.Gui
 {
     public class ResourceDisplay : View
     {

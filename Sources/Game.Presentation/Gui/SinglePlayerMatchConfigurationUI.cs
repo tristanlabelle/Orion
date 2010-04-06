@@ -22,7 +22,7 @@ namespace Orion.Game.Presentation.Gui
 
             for (int i = 1; i < playerSlots.Length; i++)
             {
-                DropdownList<PlayerSlot> slotList = playerSlots[i];
+                FuckedUpDropdownList<PlayerSlot> slotList = playerSlots[i];
                 slotList.AddItem(new AIPlayerSlot());
                 slotList.AddItem(new ClosedPlayerSlot());
                 slotList.SelectedItem = slotList.Items.Last();

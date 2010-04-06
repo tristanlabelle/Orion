@@ -63,7 +63,7 @@ namespace Orion.Game.Presentation.Gui
         private readonly ActionPanel actionPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
-        private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
+        private Dictionary<Faction, FuckedUpDropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, FuckedUpDropdownList<DiplomaticStance>>();
         #endregion
 
         #region Constructors
@@ -676,7 +676,7 @@ namespace Orion.Game.Presentation.Gui
                 Panel factionPanel = new Panel(factionPanelFrame, faction.Color);
                 
                 Rectangle dropdownListFrame = Instant.CreateComponentRectangle(factionPanel.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
-                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(dropdownListFrame);
+                FuckedUpDropdownList<DiplomaticStance> dropdownList = new FuckedUpDropdownList<DiplomaticStance>(dropdownListFrame);
                 dropdownList.StringConverter = stance => stance == DiplomaticStance.Ally ? "Allié" : "Ennemi";
                 assocFactionDropList.Add(faction, dropdownList);
 

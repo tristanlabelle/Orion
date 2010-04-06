@@ -56,7 +56,7 @@ namespace Orion.Game.Presentation.Gui
 
             while (i < playerSlots.Length)
             {
-                DropdownList<PlayerSlot> dropdownList = playerSlots[i];
+                FuckedUpDropdownList<PlayerSlot> dropdownList = playerSlots[i];
                 dropdownList.AddItem(new AIPlayerSlot());
                 dropdownList.AddItem(new ClosedPlayerSlot());
                 dropdownList.AddItem(new RemotePlayerSlot());
@@ -94,7 +94,7 @@ namespace Orion.Game.Presentation.Gui
             ((RemotePlayerSlot)playerSlots[slot].SelectedItem).HostEndPoint = host;
         }
 
-        private void SelectionChanged(DropdownList<PlayerSlot> slot, PlayerSlot value)
+        private void SelectionChanged(FuckedUpDropdownList<PlayerSlot> slot, PlayerSlot value)
         {
             RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
             if (remoteSlot.HostEndPoint.HasValue)

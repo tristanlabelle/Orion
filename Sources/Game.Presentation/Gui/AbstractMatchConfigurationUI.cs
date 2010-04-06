@@ -27,7 +27,7 @@ namespace Orion.Game.Presentation.Gui
         private readonly Button startButton;
         private readonly Button exitButton;
 
-        protected readonly DropdownList<PlayerSlot>[] playerSlots;
+        protected readonly FuckedUpDropdownList<PlayerSlot>[] playerSlots;
         protected readonly Panel backgroundPanel;
         private readonly bool isGameMaster;
         #endregion
@@ -46,10 +46,10 @@ namespace Orion.Game.Presentation.Gui
             Children.Add(backgroundPanel);
             Rectangle dropdownListRect = new Rectangle(10, backgroundPanel.Bounds.MaxY - 40, 200, 30);
 
-            playerSlots = new DropdownList<PlayerSlot>[Faction.Colors.Length];
+            playerSlots = new FuckedUpDropdownList<PlayerSlot>[Faction.Colors.Length];
             for (int i = 0; i < playerSlots.Length; i++)
             {
-                playerSlots[i] = new DropdownList<PlayerSlot>(dropdownListRect);
+                playerSlots[i] = new FuckedUpDropdownList<PlayerSlot>(dropdownListRect);
                 playerSlots[i].TextColor = Faction.Colors[i];
                 dropdownListRect = dropdownListRect.TranslatedBy(0, -40);
                 backgroundPanel.Children.Add(playerSlots[i]);
@@ -160,7 +160,7 @@ namespace Orion.Game.Presentation.Gui
             get
             {
                 RemotePlayerSlot firstEmpty = Players.OfType<RemotePlayerSlot>().Where(slot => !slot.NeedsFaction).First();
-                DropdownList<PlayerSlot> emptySlot = playerSlots.First(list => list.SelectedItem == firstEmpty);
+                FuckedUpDropdownList<PlayerSlot> emptySlot = playerSlots.First(list => list.SelectedItem == firstEmpty);
                 return playerSlots.IndexOf(emptySlot);
             }
         }

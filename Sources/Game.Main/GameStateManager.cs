@@ -13,7 +13,7 @@ namespace Orion.Game.Main
     /// <summary>
     /// Maintains a stack of game states and manages the transitions between them.
     /// </summary>
-    public sealed class GameStateManager
+    public sealed class GameStateManager : IDisposable
     {
         #region Fields
         private readonly Stack<GameState> states = new Stack<GameState>();
@@ -181,6 +181,15 @@ namespace Orion.Game.Main
             }
 
             ExecuteDeferredActions();
+        }
+
+        public void Dispose()
+        {
+            while (!IsEmpty)
+            {
+                GameState gameState = states.Pop();
+                gameState.Dispose();
+            }
         }
         #endregion
     }

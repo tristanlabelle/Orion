@@ -70,15 +70,9 @@ namespace Orion.Game.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //using (Program program = new Program())
-            //{
-            //    program.StartProgram();
-            //    program.Run();
-            //}
-
             using (GameGraphics gameGraphics = new GameGraphics())
+            using (GameStateManager gameStateManager = new GameStateManager())
             {
-                GameStateManager gameStateManager = new GameStateManager();
                 gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
 
                 Stopwatch stopwatch = Stopwatch.StartNew();

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Tasks;
 
@@ -405,7 +406,8 @@ namespace Orion.Game.Simulation
                 return null;
             }
 
-            return airGrid[point] ?? groundGrid[point];
+            return Intersecting(point)
+                .WithMaxOrDefault(e => e.CollisionLayer);
         }
 
         public Unit GetTopmostUnitAt(Point point)

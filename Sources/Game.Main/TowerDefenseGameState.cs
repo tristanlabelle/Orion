@@ -62,9 +62,11 @@ namespace Orion.Game.Main
 
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new TowerDefenseMatchRenderer(userInputManager, graphics, creepPath);
+
             ui = new MatchUI(graphics, userInputManager, matchRenderer);
 
             world.Entities.Removed += OnEntityRemoved;
+            ui.QuitPressed += OnQuitPressed;
         }
         #endregion
 

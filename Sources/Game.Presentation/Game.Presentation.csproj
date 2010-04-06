@@ -77,6 +77,7 @@
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
+    <Compile Include="Renderers\CreepMoneyRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />

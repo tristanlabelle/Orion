@@ -34,6 +34,7 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
+            this.matchSettings.AreCheatsEnabled = true;
             this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
             this.ui.InitializeSlots();
             this.ui.StartGamePressed += OnStartGamePressed;

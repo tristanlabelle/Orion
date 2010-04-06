@@ -22,6 +22,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly SelectionRenderer selectionRenderer;
         private readonly WorldRenderer worldRenderer;
         private readonly CreepPathRenderer creepPathRenderer;
+        private readonly CreepMoneyRenderer creepMoneyRenderer;
         #endregion
 
         #region Constructors
@@ -37,6 +38,7 @@ namespace Orion.Game.Presentation.Renderers
             this.selectionRenderer = new SelectionRenderer(inputManager);
             this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, graphics);
             this.creepPathRenderer = new CreepPathRenderer(creepPath, graphics);
+            this.creepMoneyRenderer = new CreepMoneyRenderer(inputManager.LocalFaction);
         }
         #endregion
 
@@ -78,6 +80,7 @@ namespace Orion.Game.Presentation.Renderers
 
             worldRenderer.DrawExplosions(context, visibleBounds);
             worldRenderer.DrawFogOfWar(context, visibleBounds);
+            creepMoneyRenderer.Draw(context, visibleBounds);
 
             IViewRenderer selectedCommandRenderer = inputManager.SelectedCommand as IViewRenderer;
             if (selectedCommandRenderer != null)
@@ -93,6 +96,7 @@ namespace Orion.Game.Presentation.Renderers
             worldRenderer.DrawMiniatureResources(graphics.Context);
             worldRenderer.DrawMiniatureUnits(graphics.Context);
             worldRenderer.DrawFogOfWar(graphics.Context, World.Bounds);
+            creepMoneyRenderer.Draw(graphics.Context, World.Bounds);
         }
 
         public void Dispose()

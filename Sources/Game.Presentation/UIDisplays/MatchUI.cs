@@ -142,6 +142,7 @@ namespace Orion.Game.Presentation
             Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
             chatInput.Triggered += OnChatInputTriggered;
+            chatInput.KeyboardButtonPressed += OnChatInputKeyboardButtonPressed;
 
             Rectangle consoleFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             console = new MatchConsole(consoleFrame);
@@ -357,6 +358,15 @@ namespace Orion.Game.Presentation
             return base.OnMouseButtonReleased(args);
         }
 
+        private void OnChatInputKeyboardButtonPressed(Responder sender, KeyboardEventArgs args)
+        {
+            if (args.Key == Keys.Escape)
+            {
+                chatInput.Clear();
+                Children.Remove(chatInput);
+            }
+        }
+
         private void OnChatInputTriggered(TextField chatInput)
         {
             string text = chatInput.Contents.Trim();
@@ -369,6 +379,7 @@ namespace Orion.Game.Presentation
             }
 
             chatInput.Clear();
+            Children.Remove(chatInput);
         }
 
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
@@ -386,7 +397,7 @@ namespace Orion.Game.Presentation
             else if (args.Key == Keys.Enter)
             {
                 chatInput.Clear();
-                if (!Children.Remove(chatInput)) Children.Add(chatInput);
+                Children.Add(chatInput);
                 return false;
             }
             else if (args.Key == Keys.F9)

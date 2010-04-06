@@ -98,7 +98,9 @@ namespace Orion.Engine.Gui
                     break;
             }
 
-            return base.OnKeyboardButtonPressed(args);
+            base.OnKeyboardButtonPressed(args);
+            // Always return false so sibling controls don't get the event.
+            return false;
         }
 
         protected override bool OnCharacterPressed(char character)

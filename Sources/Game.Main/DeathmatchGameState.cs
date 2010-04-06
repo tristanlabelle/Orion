@@ -46,6 +46,7 @@ namespace Orion.Game.Main
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             this.ui.QuitPressed += OnQuitPressed;
+            this.match.World.Entities.Removed += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
         }
         #endregion
@@ -108,8 +109,24 @@ namespace Orion.Game.Main
             Manager.PopTo<MainMenuGameState>();
         }
 
+        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            Faction faction = unit.Faction;
+            if (faction.Status == FactionStatus.Defeated) return;
+
+            bool hasKeepAliveUnit = faction.Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
+            if (hasKeepAliveUnit) return;
+            
+            faction.MarkAsDefeated();
+        }
+
         private void OnFactionDefeated(World sender, Faction faction)
         {
+            faction.MassSuicide();
+
             if (faction == localCommander.Faction)
             {
                 ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
@@ -119,10 +136,9 @@ namespace Orion.Game.Main
             bool allEnemyFactionsDefeated = sender.Factions
                 .Where(f => localCommander.Faction.GetDiplomaticStance(f) == DiplomaticStance.Enemy)
                 .All(f => f == faction || f.Status == FactionStatus.Defeated);
-            if (allEnemyFactionsDefeated)
-            {
-                ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
-            }
+            if (!allEnemyFactionsDefeated) return;
+            
+            ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
         }
         #endregion
     }

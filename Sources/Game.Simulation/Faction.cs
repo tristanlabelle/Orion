@@ -185,11 +185,6 @@ namespace Orion.Game.Simulation
             get { return status; }
         }
 
-        private bool IsStuck
-        {
-            get { return MaxFoodAmount == 0 && !Units.Any(u => u.HasSkill<BuildSkill>()); }
-        }
-
         #region Resources
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.
@@ -391,8 +386,6 @@ namespace Orion.Game.Simulation
             }
 
             usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
-
-            CheckForDefeat();
         }
 
         private void OnFactionDefeated(World world, Faction faction)
@@ -414,6 +407,9 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
+        /// <summary>
+        /// Suicides all units in this faction.
+        /// </summary>
         public void MassSuicide()
         {
             Unit[] units = Units.OfType<Unit>().ToArray();
@@ -421,18 +417,15 @@ namespace Orion.Game.Simulation
                 unit.Suicide();
         }
 
-        [Obsolete("This logic belongs to the game states.")]
-        private void CheckForDefeat()
+        /// <summary>
+        /// Marks this faction as defeated. Does not cause a mass suicide.
+        /// </summary>
+        public void MarkAsDefeated()
         {
             if (status == FactionStatus.Defeated) return;
 
-            bool hasKeepAliveUnit = Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
-            if (!hasKeepAliveUnit || IsStuck)
-            {
-                status = FactionStatus.Defeated;
-                Defeated.Raise(this);
-                return;
-            }
+            status = FactionStatus.Defeated;
+            Defeated.Raise(this);
         }
 
         #region Diplomacy

@@ -12,7 +12,11 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 
 namespace Orion.Game.Matchmaking.Networking
 {
-    public class CommandSynchronizer : CommandFilter
+    /// <summary>
+    /// A command filter which ensures that commands coming in
+    /// are synchronized and executed simultaneously on every host in the game.
+    /// </summary>
+    public sealed class CommandSynchronizer : CommandFilter
     {
         #region Fields
         #region Updates Rate Management

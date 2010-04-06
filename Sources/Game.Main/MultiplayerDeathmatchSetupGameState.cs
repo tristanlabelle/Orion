@@ -55,8 +55,8 @@ namespace Orion.Game.Main
 
             this.ui.InitializeSlots();
             if (hostEndPoint.HasValue) this.ui.UsePlayerForSlot(0, hostEndPoint.Value);
+            else this.matchSettings.Changed += OnSettingsChanged;
 
-            this.matchSettings.Changed += OnSettingsChanged;
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
             this.ui.SlotOccupationChanged += OnSlotOccupationChanged;

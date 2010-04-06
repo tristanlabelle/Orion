@@ -22,10 +22,10 @@ namespace Orion.Game.Matchmaking.TowerDefense
             "Ninja",
             "Jedihad",
             "Viking",
-            "Tapis Volant",
+            "Tapis volant",
             "OVNI",
             "Jésus",
-            "Jésus-Raptor",
+            "Jésus-raptor",
             "Mentos",
             "Coke diète",
             "Flying Spaghetti Monster",
@@ -45,10 +45,8 @@ namespace Orion.Game.Matchmaking.TowerDefense
             : base(match, faction)
         {
             Argument.EnsureNotNull(path, "path");
-            this.path = path;
 
-            UnitType worker = match.UnitTypes.First(unit => unit.HasSkill<BuildSkill>());
-            faction.CreateUnit(worker, Point.Zero);
+            this.path = path;
         }
         #endregion
 

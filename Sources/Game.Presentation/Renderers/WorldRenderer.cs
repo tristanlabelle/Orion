@@ -78,7 +78,7 @@ namespace Orion.Game.Presentation.Renderers
             terrainRenderer.Draw(graphicsContext);
         }
 
-        public void DrawMiniatureTerrain(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawMiniatureTerrain(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             terrainRenderer.DrawMiniature(graphicsContext);
@@ -90,10 +90,10 @@ namespace Orion.Game.Presentation.Renderers
             resourcesRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureResources(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawMiniatureResources(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            resourcesRenderer.DrawMiniature(graphicsContext, viewBounds);
+            resourcesRenderer.DrawMiniature(graphicsContext);
         }
 
         public void DrawUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
@@ -102,7 +102,7 @@ namespace Orion.Game.Presentation.Renderers
             unitsRenderer.Draw(graphicsContext, viewBounds);
         }
 
-        public void DrawMiniatureUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawMiniatureUnits(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             unitsRenderer.DrawMiniature(graphicsContext);

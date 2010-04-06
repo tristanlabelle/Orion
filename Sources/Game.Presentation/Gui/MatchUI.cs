@@ -33,7 +33,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region General UI
-        private readonly MatchRenderer matchRenderer;
+        private readonly IMatchRenderer matchRenderer;
         private readonly ClippedView worldView;
         private readonly Panel hudPanel;
         private readonly Panel selectionPanel;
@@ -45,6 +45,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Minimap
+        private readonly MinimapRenderer minimapRenderer;
         private readonly Panel minimapPanel;
         private bool mouseDownOnMinimap;
         #endregion
@@ -55,10 +56,9 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         private readonly GameGraphics gameGraphics;
-        private readonly Match match;
-        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly UserInputManager userInputManager;
         private readonly GameAudio gameAudio;
+        private readonly UserInputManager userInputManager;
+        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
         private readonly MatchAudioPresenter matchAudioPresenter;
         private readonly ActionPanel actionPanel;
         private bool isSpaceDown;
@@ -67,27 +67,29 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI(GameGraphics gameGraphics, Match match, SlaveCommander localCommander)
+        public MatchUI(GameGraphics gameGraphics, UserInputManager userInputManager,
+            IMatchRenderer matchRenderer)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
-            Argument.EnsureNotNull(match, "match");
-            Argument.EnsureNotNull(localCommander, "localCommander");
-
-            this.match = match;
-            this.match.FactionMessageReceived += OnFactionMessageReceived;
-            this.userInputManager = new UserInputManager(match, localCommander);
-
-            this.gameAudio = new GameAudio();
-            this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, match, this.userInputManager);
+            Argument.EnsureNotNull(userInputManager, "userInputManager");
+            Argument.EnsureNotNull(matchRenderer, "matchRenderer");
 
             this.gameGraphics = gameGraphics;
-            World world = match.World;
+            this.gameAudio = new GameAudio();
+            this.userInputManager = userInputManager;
+
+            Match.FactionMessageReceived += OnFactionMessageReceived;
+
+            this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, Match, this.userInputManager);
+
+            World world = Match.World;
             world.FactionDefeated += OnFactionDefeated;
 
-            matchRenderer = new MatchRenderer(userInputManager, gameGraphics);
+            this.matchRenderer = matchRenderer;
 
             Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
-            worldView = new ClippedView(worldFrame, world.Bounds, matchRenderer);
+            worldView = new ClippedView(worldFrame, world.Bounds, null);
+            worldView.Renderer = new DelegatedRenderer((c, bounds) => matchRenderer.Draw(bounds));
             worldView.Bounds = new Rectangle(40, 20);
             worldView.MinimumVisibleBoundsSize = new Vector2(8, 4);
             worldView.BoundsChanged += OnWorldViewBoundsChanged;
@@ -122,10 +124,10 @@ namespace Orion.Game.Presentation.Gui
 
             Vector2 maxMinimapRectangleSize = new Vector2(0.23f, 0.9f);
             Vector2 minimapRectangleSize = maxMinimapRectangleSize;
-            if (match.World.Width > match.World.Height)
-                minimapRectangleSize.Y *= match.World.Height / (float)match.World.Width;
+            if (Match.World.Width > Match.World.Height)
+                minimapRectangleSize.Y *= Match.World.Height / (float)Match.World.Width;
             else
-                minimapRectangleSize.X *= match.World.Width / (float)match.World.Height;
+                minimapRectangleSize.X *= Match.World.Width / (float)Match.World.Height;
 
             Vector2 minimapRectangleOrigin = new Vector2(
                 0.01f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
@@ -133,7 +135,8 @@ namespace Orion.Game.Presentation.Gui
 
             Rectangle minimapFrame = Instant.CreateComponentRectangle(hudPanel.Bounds,
                 minimapRectangleOrigin, minimapRectangleOrigin + minimapRectangleSize);
-            minimapPanel = new Panel(minimapFrame, matchRenderer.MinimapRenderer);
+            minimapRenderer = new MinimapRenderer(() => worldView.Bounds, LocalFaction, matchRenderer);
+            minimapPanel = new Panel(minimapFrame, minimapRenderer);
             minimapPanel.Bounds = world.Bounds;
             hudPanel.Children.Add(minimapPanel);
 
@@ -167,7 +170,7 @@ namespace Orion.Game.Presentation.Gui
 
             userInputManager.Selection.Changed += OnSelectionChanged;
             userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
-            localCommander.CommandIssued += OnCommanderGeneratedCommand;
+            LocalCommander.CommandIssued += OnCommanderGeneratedCommand;
             minimapPanel.MouseButtonPressed += MinimapMouseDown;
             minimapPanel.MouseMoved += MinimapMouseMove;
 
@@ -192,30 +195,20 @@ namespace Orion.Game.Presentation.Gui
 
             LocalFaction.Warning += OnLocalFactionWarning;
 
-            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
-                ?? localCommander.Faction.Units.FirstOrDefault();
+            Unit viewTarget = LocalFaction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+                ?? LocalFaction.Units.FirstOrDefault();
             if (viewTarget != null) CenterOn(viewTarget.Center);
         }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when the user has quitted the match through the UI.
+        /// Raised when the user has quitted the Match through the UI.
         /// </summary>
         public event Action<MatchUI> QuitPressed;
         #endregion
 
         #region Properties
-        private MatchRenderer MatchRenderer
-        {
-            get { return (MatchRenderer)worldView.Renderer; }
-        }
-
-        private WorldRenderer WorldRenderer
-        {
-            get { return MatchRenderer.WorldRenderer; }
-        }
-
         private SelectionManager SelectionManager
         {
             get { return userInputManager.SelectionManager; }
@@ -226,6 +219,11 @@ namespace Orion.Game.Presentation.Gui
             get { return userInputManager.Selection; }
         }
 
+        private Commander LocalCommander
+        {
+            get { return userInputManager.LocalCommander; }
+        }
+
         private Faction LocalFaction
         {
             get { return userInputManager.LocalFaction; }
@@ -234,6 +232,11 @@ namespace Orion.Game.Presentation.Gui
         private World World
         {
             get { return LocalFaction.World; }
+        }
+
+        private Match Match
+        {
+            get { return userInputManager.Match; }
         }
         #endregion
 
@@ -385,7 +388,7 @@ namespace Orion.Game.Presentation.Gui
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
         {
             isShiftDown = args.IsShiftModifierDown;
-            MatchRenderer.DrawAllHealthBars = args.IsAltModifierDown;
+            matchRenderer.WorldRenderer.DrawHealthBars = args.IsAltModifierDown;
             isSpaceDown = args.Key == Keys.Space;
 
             if (args.Key == Keys.Escape)
@@ -417,7 +420,7 @@ namespace Orion.Game.Presentation.Gui
         protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
         {
             isShiftDown = args.IsShiftModifierDown;
-            ((MatchRenderer)worldView.Renderer).DrawAllHealthBars = args.IsAltModifierDown;
+            matchRenderer.WorldRenderer.DrawHealthBars = args.IsAltModifierDown;
             isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
             return base.OnKeyboardButtonReleased(args);
         }
@@ -516,7 +519,7 @@ namespace Orion.Game.Presentation.Gui
         public void DisplayDefeatMessage(Action callback)
         {
             Argument.EnsureNotNull(callback, "callback");
-            Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
+            Instant.DisplayAlert(this, "Vous avez perdu le Match.", callback);
         }
 
         public void DisplayVictoryMessage(Action callback)
@@ -637,8 +640,8 @@ namespace Orion.Game.Presentation.Gui
         {
             if (Children.Contains(pausePanel)) return;
 
-            match.Pause();
-            if (!match.IsRunning)
+            Match.Pause();
+            if (!Match.IsRunning)
             {
                 foreach (Scroller scroller in Children.OfType<Scroller>())
                     scroller.IsEnabled = false;
@@ -653,7 +656,7 @@ namespace Orion.Game.Presentation.Gui
                 scroller.IsEnabled = true;
 
             Children.Remove(pausePanel);
-            match.Resume();
+            Match.Resume();
         }
 
         private void DisplayDiplomacy()

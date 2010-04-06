@@ -64,6 +64,7 @@
     <Compile Include="DeathmatchGameState.cs" />
     <Compile Include="ReplayBrowserGameState.cs" />
     <Compile Include="SinglePlayerDeathmatchSetupGameState.cs" />
+    <Compile Include="TowerDefenseGameState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

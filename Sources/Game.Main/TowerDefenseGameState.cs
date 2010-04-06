@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Engine.Gui;
+using System.Diagnostics;
+using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation.Renderers;
 
@@ -17,42 +18,53 @@ namespace Orion.Game.Main
 {
     /// <summary>
     /// Handles the initialisation, updating and clean up of the state of the game when
-    /// a single player deathmatch is being played.
+    /// a tower defense game is being played.
     /// </summary>
-    public sealed class DeathmatchGameState : GameState
+    public sealed class TowerDefenseGameState : GameState
     {
         #region Fields
         private readonly GameGraphics graphics;
+        private readonly CreepPath creepPath;
         private readonly Match match;
-        private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
+        private readonly CreepWaveCommander creepCommander;
+        private readonly CommandPipeline commandPipeline;
         private readonly MatchUI ui;
         private SimulationStep lastSimulationStep;
         #endregion
 
         #region Constructors
-        public DeathmatchGameState(GameStateManager manager, GameGraphics graphics,
-            Match match, CommandPipeline commandPipeline, SlaveCommander localCommander)
+        public TowerDefenseGameState(GameStateManager manager, GameGraphics graphics)
             : base(manager)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            Argument.EnsureNotNull(match, "match");
-            Argument.EnsureNotNull(commandPipeline, "commandPipeline");
-            Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.graphics = graphics;
-            this.match = match;
-            this.commandPipeline = commandPipeline;
-            this.localCommander = localCommander;
+
+            Random random = new MersenneTwister(Environment.TickCount);
+            Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
+            World world = new World(terrain, random, 200);
+            match = new Match(world, random);
+            creepPath = CreepPath.Generate(world.Size, random);
+
+            Faction localFaction = world.CreateFaction("Player", Colors.Red);
+            localFaction.AladdiumAmount = 200;
+            localFaction.LocalFogOfWar.Disable();
+            localFaction.CreateUnit(match.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
+            localCommander = new SlaveCommander(match, localFaction);
+
+            Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
+            creepCommander = new CreepWaveCommander(match, creepFaction, creepPath);
+
+            commandPipeline = new CommandPipeline(match);
+            commandPipeline.AddCommander(localCommander);
+            commandPipeline.AddCommander(creepCommander);
 
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
-            var matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
-            this.ui = new MatchUI(graphics, userInputManager, matchRenderer);
-            this.lastSimulationStep = new SimulationStep(-1, 0, 0);
+            var matchRenderer = new TowerDefenseMatchRenderer(userInputManager, graphics, creepPath);
+            ui = new MatchUI(graphics, userInputManager, matchRenderer);
 
-            this.ui.QuitPressed += OnQuitPressed;
-            this.match.World.Entities.Removed += OnEntityRemoved;
-            this.match.World.FactionDefeated += OnFactionDefeated;
+            world.Entities.Removed += OnEntityRemoved;
         }
         #endregion
 
@@ -60,6 +72,16 @@ namespace Orion.Game.Main
         public RootView RootView
         {
             get { return graphics.RootView; }
+        }
+
+        private Faction LocalFaction
+        {
+            get { return localCommander.Faction; }
+        }
+
+        private Faction CreepFaction
+        {
+            get { return creepCommander.Faction; }
         }
         #endregion
 
@@ -117,33 +139,20 @@ namespace Orion.Game.Main
         private void OnEntityRemoved(EntityManager sender, Entity entity)
         {
             Unit unit = entity as Unit;
-            if (unit == null) return;
+            Debug.Assert(unit != null);
 
-            Faction faction = unit.Faction;
-            if (faction.Status == FactionStatus.Defeated) return;
-
-            bool hasKeepAliveUnit = faction.Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
-            if (hasKeepAliveUnit) return;
-            
-            faction.MarkAsDefeated();
-        }
-
-        private void OnFactionDefeated(World sender, Faction faction)
-        {
-            faction.MassSuicide();
-
-            if (faction == localCommander.Faction)
+            if (unit.Faction == LocalFaction)
             {
+                LocalFaction.MarkAsDefeated();
                 ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
-                return;
             }
+            else
+            {
+                bool isKilledCreep = !unit.GridRegion.Contains(creepPath.Points[creepPath.Points.Count - 1]);
+                if (!isKilledCreep) return;
 
-            bool allEnemyFactionsDefeated = sender.Factions
-                .Where(f => localCommander.Faction.GetDiplomaticStance(f) == DiplomaticStance.Enemy)
-                .All(f => f == faction || f.Status == FactionStatus.Defeated);
-            if (!allEnemyFactionsDefeated) return;
-            
-            ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
+                LocalFaction.AladdiumAmount += unit.GetStat(BasicSkill.AladdiumCostStat);
+            }
         }
         #endregion
     }

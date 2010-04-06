@@ -15,34 +15,33 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly ColorRgb ViewRectangleColor = Colors.Orange;
         private static readonly ColorRgb BorderColor = Colors.Gray;
 
-        private readonly WorldRenderer worldRenderer;
-        private readonly UnderAttackWarningRenderer attackWarningRenderer;
+        private readonly Func<Rectangle> visibleBoundsGetter;
+        private readonly IMatchRenderer matchRenderer;
+        private readonly UnderAttackWarningRenderer underAttackWarningRenderer;
         #endregion
 
         #region Constructors
-        public MinimapRenderer(WorldRenderer worldRenderer)
+        public MinimapRenderer(Func<Rectangle> visibleBoundsGetter,
+            Faction localFaction, IMatchRenderer matchRenderer)
         {
-            Argument.EnsureNotNull(worldRenderer, "worldRenderer");
+            Argument.EnsureNotNull(visibleBoundsGetter, "visibleBoundsGetter");
+            Argument.EnsureNotNull(localFaction, "localFaction");
+            Argument.EnsureNotNull(matchRenderer, "matchRenderer");
 
-            this.worldRenderer = worldRenderer;
-            this.attackWarningRenderer = new UnderAttackWarningRenderer(worldRenderer.Faction);
+            this.visibleBoundsGetter = visibleBoundsGetter;
+            this.matchRenderer = matchRenderer;
+            this.underAttackWarningRenderer = new UnderAttackWarningRenderer(localFaction);
         }
-        #endregion
-
-        #region Properties
-        internal Rectangle VisibleRect { get; set; }
         #endregion
 
         #region Methods
         public void Draw(GraphicsContext context, Rectangle bounds)
         {
-            worldRenderer.DrawMiniatureTerrain(context, bounds);
-            worldRenderer.DrawMiniatureResources(context, bounds);
-            worldRenderer.DrawMiniatureUnits(context, bounds);
-            worldRenderer.DrawFogOfWar(context, bounds);
-            attackWarningRenderer.Draw(context);
+            matchRenderer.DrawMinimap();
+            underAttackWarningRenderer.Draw(context);
 
-            Rectangle intersection = Rectangle.Intersection(bounds, VisibleRect).GetValueOrDefault();
+            Rectangle visibleBounds = visibleBoundsGetter();
+            Rectangle intersection = Rectangle.Intersection(bounds, visibleBounds).GetValueOrDefault();
             context.Stroke(intersection, ViewRectangleColor);
             context.Stroke(bounds, BorderColor);
         }

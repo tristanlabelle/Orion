@@ -84,7 +84,7 @@ namespace Orion.Game.Main
 
         private void OnTowerDefenseSelected(MainMenuUI sender)
         {
-            throw new NotImplementedException();
+            Manager.Push(new TowerDefenseGameState(Manager, graphics));
         }
 
         private void OnViewReplaySelected(MainMenuUI sender)

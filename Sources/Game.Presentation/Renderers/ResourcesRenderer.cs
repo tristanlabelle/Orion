@@ -47,9 +47,9 @@ namespace Orion.Game.Presentation.Renderers
             DrawClipped(graphicsContext, viewBounds, DrawUnclipped);
         }
 
-        public void DrawMiniature(GraphicsContext graphicsContext, Rectangle viewBounds)
+        public void DrawMiniature(GraphicsContext graphicsContext)
         {
-            DrawClipped(graphicsContext, viewBounds, DrawMiniatureUnclipped);
+            DrawClipped(graphicsContext, World.Bounds, DrawMiniatureUnclipped);
         }
 
         private void DrawClipped(GraphicsContext graphicsContext, Rectangle viewBounds,

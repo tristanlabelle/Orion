@@ -10,35 +10,33 @@ using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Renderers
 {
-    public sealed class MatchRenderer : IViewRenderer, IDisposable
+    /// <summary>
+    /// Draws a deathmatch to the main view and minimap.
+    /// </summary>
+    public sealed class DeathmatchRenderer : IMatchRenderer
     {
         #region Fields
-        private readonly UserInputManager inputManager;
-        private readonly GameGraphics gameGraphics;
-        private readonly SelectionRenderer selectionRenderer;
-        private readonly WorldRenderer worldRenderer;
-        private readonly MinimapRenderer minimap;
-
-        #region Camera
         private const float shakingDuration = 4;
         private const float shakingMagnitude = 5;
         private const float shakingOscillationsPerSecond = 40;
 
+        private readonly UserInputManager inputManager;
+        private readonly GameGraphics graphics;
+        private readonly SelectionRenderer selectionRenderer;
+        private readonly WorldRenderer worldRenderer;
         private float shakingSecondsLeft = 0;
-        #endregion
         #endregion
 
         #region Constructors
-        public MatchRenderer(UserInputManager inputManager, GameGraphics gameGraphics)
+        public DeathmatchRenderer(UserInputManager inputManager, GameGraphics graphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
-            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
+            Argument.EnsureNotNull(graphics, "graphics");
 
             this.inputManager = inputManager;
-            this.gameGraphics = gameGraphics;
+            this.graphics = graphics;
             this.selectionRenderer = new SelectionRenderer(inputManager);
-            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, gameGraphics);
-            this.minimap = new MinimapRenderer(worldRenderer);
+            this.worldRenderer = new WorldRenderer(inputManager.LocalFaction, graphics);
 
             World world = Faction.World;
             world.Updated += OnWorldUpdated;
@@ -47,20 +45,9 @@ namespace Orion.Game.Presentation.Renderers
         #endregion
 
         #region Properties
-        public MinimapRenderer MinimapRenderer
-        {
-            get { return minimap; }
-        }
-
         public WorldRenderer WorldRenderer
         {
             get { return worldRenderer; }
-        }
-
-        public bool DrawAllHealthBars
-        {
-            get { return worldRenderer.DrawHealthBars; }
-            set { worldRenderer.DrawHealthBars = value; }
         }
 
         private SelectionManager SelectionManager
@@ -87,34 +74,45 @@ namespace Orion.Game.Presentation.Renderers
                      * shakingMagnitude * (shakingSecondsLeft / shakingDuration);
             }
         }
+
+        private World World
+        {
+            get { return inputManager.World; }
+        }
         #endregion
 
         #region Methods
-        public void Draw(GraphicsContext context, Rectangle bounds)
+        public void Draw(Rectangle visibleBounds)
         {
-            Argument.EnsureNotNull(context, "context");
-
-            minimap.VisibleRect = bounds;
+            GraphicsContext context = graphics.Context;
 
             using (context.PushTranslate(ShakeOffset))
             {
-                worldRenderer.DrawTerrain(context, bounds);
-                worldRenderer.DrawResources(context, bounds);
-                worldRenderer.DrawUnits(context, bounds);
+                worldRenderer.DrawTerrain(context, visibleBounds);
+                worldRenderer.DrawResources(context, visibleBounds);
+                worldRenderer.DrawUnits(context, visibleBounds);
                 selectionRenderer.DrawSelectionMarkers(context);
 
                 if (inputManager.HoveredUnit != null && Faction.CanSee(inputManager.HoveredUnit))
                     HealthBarRenderer.Draw(context, inputManager.HoveredUnit);
 
-                worldRenderer.DrawExplosions(context, bounds);
-                worldRenderer.DrawFogOfWar(context, bounds);
+                worldRenderer.DrawExplosions(context, visibleBounds);
+                worldRenderer.DrawFogOfWar(context, visibleBounds);
 
                 IViewRenderer selectedCommandRenderer = inputManager.SelectedCommand as IViewRenderer;
                 if (selectedCommandRenderer != null)
-                    selectedCommandRenderer.Draw(context, bounds);
+                    selectedCommandRenderer.Draw(context, visibleBounds);
             }
 
             selectionRenderer.DrawSelectionRectangle(context);
+        }
+
+        public void DrawMinimap()
+        {
+            worldRenderer.DrawMiniatureTerrain(graphics.Context);
+            worldRenderer.DrawMiniatureResources(graphics.Context);
+            worldRenderer.DrawMiniatureUnits(graphics.Context);
+            worldRenderer.DrawFogOfWar(graphics.Context, World.Bounds);
         }
 
         public void Dispose()

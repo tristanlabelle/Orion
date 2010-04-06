@@ -3,7 +3,7 @@ using Keys = System.Windows.Forms.Keys;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Orion.Engine.Gui
+namespace Orion.Engine.Input
 {
     /// <summary>
     /// This immutable structure encapsulates data about a keyboard event.

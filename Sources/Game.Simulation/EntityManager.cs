@@ -109,24 +109,15 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when an <see cref="Entity"/> gets added to the world.
+        /// </summary>
         public event Action<EntityManager, Entity> Added;
 
-        private void RaiseAdded(Entity entity)
-        {
-            var handler = Added;
-            if (handler != null) handler(this, entity);
-        }
-
         /// <summary>
-        /// Raised when an <see cref="Entity"/> gets removed.
+        /// Raised when an <see cref="Entity"/> gets removed from the world.
         /// </summary>
         public event Action<EntityManager, Entity> Removed;
-
-        private void RaiseRemoved(Entity entity)
-        {
-            var handler = Removed;
-            if (handler != null) handler(this, entity);
-        }
         #endregion
 
         #region Properties
@@ -330,7 +321,7 @@ namespace Orion.Game.Simulation
         {
             entities.Add(entity.Handle, entity);
             zoneManager.Add(entity);
-            RaiseAdded(entity);
+            Added.Raise(this, entity);
         }
 
         private void CommitMove(Entity entity, Vector2 oldPosition)
@@ -343,7 +334,7 @@ namespace Orion.Game.Simulation
         {
             entities.Remove(entity.Handle);
             zoneManager.Remove(entity);
-            RaiseRemoved(entity);
+            Removed.Raise(this, entity);
         }
         #endregion
         #endregion

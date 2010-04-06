@@ -43,7 +43,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
         private UnitTypeRegistry UnitTypes
         {
-            get { return match.World.UnitTypes; }
+            get { return match.UnitTypes; }
         }
         #endregion
 

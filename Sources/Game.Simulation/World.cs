@@ -20,9 +20,7 @@ namespace Orion.Game.Simulation
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityManager entities;
-        private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly Pathfinder pathfinder;
-        private readonly TechnologyTree technologyTree = new TechnologyTree();
         private readonly Random random;
         private readonly int maxFoodAmount;
         #endregion
@@ -49,12 +47,6 @@ namespace Orion.Game.Simulation
         /// Raised after this <see cref="World"/> has been updated.
         /// </summary>
         public event Action<World, SimulationStep> Updated;
-
-        private void RaiseUpdated(SimulationStep step)
-        {
-            var handler = Updated;
-            if (handler != null) handler(this, step);
-        }
 
         /// <summary>
         /// Raised when a unit hits another unit.
@@ -99,11 +91,6 @@ namespace Orion.Game.Simulation
             get { return terrain; }
         }
 
-        public TechnologyTree TechnologyTree
-        {
-            get { return technologyTree; }
-        }
-
         /// <summary>
         /// Gets the random number generator used within this world.
         /// </summary>
@@ -126,11 +113,6 @@ namespace Orion.Game.Simulation
         public EntityManager Entities
         {
             get { return entities; }
-        }
-
-        public UnitTypeRegistry UnitTypes
-        {
-            get { return unitTypes; }
         }
 
         #region Size/Bounds
@@ -218,14 +200,12 @@ namespace Orion.Game.Simulation
         /// <param name="name">The name of the <see cref="Faction"/> to be created.</param>
         /// <param name="color">The <see cref="Color"/> of the <see cref="Faction"/> to be created.</param>
         /// <returns>A newly created <see cref="Faction"/> with that name and color.</returns>
-        public Faction CreateFaction(string name, ColorRgb color, int aladdium, int alagene)
+        public Faction CreateFaction(string name, ColorRgb color)
         {
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
             faction.Defeated += RaiseFactionDefeated;
             factions.Add(faction);
-            faction.AladdiumAmount = aladdium;
-            faction.AlageneAmount = alagene;
             return faction;
         }
 
@@ -290,7 +270,7 @@ namespace Orion.Game.Simulation
         public void Update(SimulationStep step)
         {
             entities.Update(step);
-            RaiseUpdated(step);
+            Updated.Raise(this, step);
         }
         #endregion
     }

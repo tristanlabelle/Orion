@@ -2,6 +2,7 @@
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui
@@ -76,7 +77,7 @@ namespace Orion.Engine.Gui
             return base.OnKeyboardButtonReleased(args);
         }
 
-        protected override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(float timeDeltaInSeconds)
         {
             if (mouseTriggered) timeHoveredInSeconds += timeDeltaInSeconds;
             bool shouldScroll = isEnabled && (keyboardTriggered || (mouseTriggered && timeHoveredInSeconds >= ScrollDelayInSeconds));

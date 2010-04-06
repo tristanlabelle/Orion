@@ -8,6 +8,7 @@ using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Technologies;
 
 namespace Orion.Game.Matchmaking
 {
@@ -17,100 +18,59 @@ namespace Orion.Game.Matchmaking
     public sealed class Match
     {
         #region Fields
-        private readonly Random random;
         private readonly World world;
-        private SimulationStep lastSimulationStep;
-        private bool isPausable;
-        private bool isRunning;
+        private readonly Random random;
+        private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
+        private readonly TechnologyTree technologyTree = new TechnologyTree();
+        private bool isRunning = true;
         #endregion
 
         #region Constructors
-        public Match(Random random, World world)
+        public Match(World world, Random random)
         {
-            Argument.EnsureNotNull(random, "random");
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(random, "random");
 
-            this.random = random;
             this.world = world;
-
-            world.FactionDefeated += OnFactionDefeated;
+            this.random = random;
         }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when this <see cref="Match"/> gets updated for a frame.
-        /// </summary>
-        public event Action<Match, UpdateEventArgs> Updated;
-
-        /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
         public event Action<Match, FactionMessage> FactionMessageReceived;
-
-        /// <summary>
-        /// Raised when allied factions defeat all their enemies.
-        /// </summary>
-        public event Action<Match, IEnumerable<Faction>> WorldConquered;
-
-        public event Action<Match> Quitting;
-
-        private void RaiseUpdated(float timeDeltaInSeconds)
-        {
-            var handler = Updated;
-            if (handler != null) handler(this, new UpdateEventArgs(timeDeltaInSeconds));
-        }
-
-        private void RaiseFactionMessageReceived(FactionMessage message)
-        {
-            var handler = FactionMessageReceived;
-            if (handler != null) handler(this, message);
-        }
-
-        private void RaiseWorldConquered(IEnumerable<Faction> faction)
-        {
-            var handler = WorldConquered;
-            if (handler != null) handler(this, faction);
-        }
-
-        private void RaiseQuitting()
-        {
-            var handler = Quitting;
-            if (handler != null) handler(this);
-        }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the simulation world used by this match.
+        /// </summary>
         public World World
         {
             get { return world; }
         }
 
-        public bool IsPausable
+        /// <summary>
+        /// Gets the collection of unit types available in this match.
+        /// </summary>
+        public UnitTypeRegistry UnitTypes
         {
-            get { return isPausable; }
-            set { isPausable = value; }
+            get { return unitTypes; }
+        }
+
+        /// <summary>
+        /// Gets the technology tree which provides the technologies available in this match.
+        /// </summary>
+        public TechnologyTree TechnologyTree
+        {
+            get { return technologyTree; }
         }
 
         public bool IsRunning
         {
             get { return isRunning; }
-        }
-
-        /// <summary>
-        /// Gets the number of the last simulation step that was run.
-        /// </summary>
-        public int LastSimulationStepNumber
-        {
-            get { return lastSimulationStep.Number; }
-        }
-
-        /// <summary>
-        /// Gets the information associated with the last step of the game simulation.
-        /// </summary>
-        public SimulationStep LastSimulationStep
-        {
-            get { return lastSimulationStep; }
         }
 
         /// <summary>
@@ -126,66 +86,6 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public void Start()
-        {
-            isRunning = true;
-        }
-
-        /// <summary>
-        /// Updates this <see cref="Match"/> for the duration of a frame.
-        /// </summary>
-        /// <param name="timeDelta">The time elapsed, in seconds, since the last frame.</param>
-        public void Update(float timeDeltaInSeconds)
-        {
-            if (IsRunning)
-            {
-                lastSimulationStep = new SimulationStep(
-                    lastSimulationStep.Number + 1,
-                    lastSimulationStep.TimeInSeconds + timeDeltaInSeconds,
-                    timeDeltaInSeconds);
-
-                world.Update(lastSimulationStep);
-            }
-
-            RaiseUpdated(timeDeltaInSeconds);
-        }
-
-        #region Faction Stuff
-        private void OnFactionDefeated(World sender, Faction args)
-        {
-            CheckForWorldConquered();
-        }
-
-        /// <summary>
-        /// Notifies this <see cref="Match"/> that a message from a <see cref="Faction"/> has been received.
-        /// </summary>
-        /// <param name="message">The message that was received.</param>
-        public void PostFactionMessage(FactionMessage message)
-        {
-            Argument.EnsureNotNull(message, "message");
-            RaiseFactionMessageReceived(message);
-        }
-
-        private void CheckForWorldConquered()
-        {
-            List<Faction> aliveFactions = world.Factions.Where(faction => faction.Status == FactionStatus.Undefeated).ToList();
-            for (int i = 0; i < aliveFactions.Count; i++)
-            {
-                Faction referenceFaction = aliveFactions[i];
-                for (int j = i + 1; j < aliveFactions.Count; j++)
-                {
-                    Faction checkedFaction = aliveFactions[j];
-                    DiplomaticStance referenceDiplomaticStance = referenceFaction.GetDiplomaticStance(checkedFaction);
-                    DiplomaticStance checkedDiplomaticStance = checkedFaction.GetDiplomaticStance(referenceFaction);
-                    if (referenceDiplomaticStance != DiplomaticStance.Ally || checkedDiplomaticStance != DiplomaticStance.Ally)
-                        return;
-                }
-            }
-            RaiseWorldConquered(aliveFactions);
-        }
-        #endregion
-
-        #region Pause/Resume/Quit
         public void Pause()
         {
             isRunning = false;
@@ -196,11 +96,15 @@ namespace Orion.Game.Matchmaking
             isRunning = true;
         }
 
-        public void Quit()
+        /// <summary>
+        /// Notifies this <see cref="Match"/> that a message from a <see cref="Faction"/> has been received.
+        /// </summary>
+        /// <param name="message">The message that was received.</param>
+        public void PostFactionMessage(FactionMessage message)
         {
-            RaiseQuitting();
+            Argument.EnsureNotNull(message, "message");
+            FactionMessageReceived.Raise(this, message);
         }
-        #endregion
         #endregion
     }
 }

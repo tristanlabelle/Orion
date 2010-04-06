@@ -128,7 +128,7 @@ namespace Orion.Game.Matchmaking.Networking
             if (args.Host != Host) return;
 
             if (args.Data[0] == (byte)GameMessageType.Quit)
-                Faction.GiveUp();
+                Faction.MassSuicide();
             else
             {
                 if (args.Data[0] == (byte)GameMessageType.Commands)
@@ -148,8 +148,9 @@ namespace Orion.Game.Matchmaking.Networking
         private void OnTimedOut(SafeTransporter transporter, IPv4EndPoint endPoint)
         {
             if (endPoint != Host) return;
-            Faction.RaiseWarning("Perdu la connexion à {0}".FormatInvariant(endPoint));
-            Faction.GiveUp();
+
+            Faction.RaiseWarning("Perdu la connexion à {0}.".FormatInvariant(endPoint));
+            Faction.MarkAsDefeated();
         }
 
         public void Dispose()

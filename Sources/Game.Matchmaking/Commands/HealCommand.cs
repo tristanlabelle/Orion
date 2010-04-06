@@ -48,13 +48,13 @@ namespace Orion.Game.Matchmaking.Commands
             return new HealCommand(FactionHandle, entityHandles, targetHandle);
         }
 
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && unitHandles.All(handle => IsValidEntityHandle(world, handle))
-                && IsValidEntityHandle(world, targetHandle);
+            return IsValidFactionHandle(match, FactionHandle)
+                && unitHandles.All(handle => IsValidEntityHandle(match, handle))
+                && IsValidEntityHandle(match, targetHandle);
         }
 
         public override void Execute(Match match)

@@ -4,6 +4,7 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui
 {
@@ -42,7 +43,7 @@ namespace Orion.Engine.Gui
                 if (IsMouseOver)
                 {
                     Vector2 position = MousePosition.Value;
-                    PropagateMouseEvent(MouseEventType.MouseMoved, new MouseEventArgs(position, MouseButton.None, 0, 0));
+                    PropagateMouseEvent(MouseEventType.Moved, new MouseEventArgs(position, MouseButton.None, 0, 0));
                 }
 
                 Action<View, Rectangle> boundsEvent = BoundsChanged;

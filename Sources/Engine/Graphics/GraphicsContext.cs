@@ -22,15 +22,19 @@ namespace Orion.Engine.Graphics
         #region Fields
         private static readonly Font defaultFont = new Font("Trebuchet MS", 14);
 
+        private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
         private Font font = defaultFont;
         #endregion
 
         #region Constructors
-        [Obsolete("To be made internal and created by the engine.")]
-        public GraphicsContext()
+        internal GraphicsContext(Action backbufferSwapper)
         {
+            Argument.EnsureNotNull(backbufferSwapper, "backbufferSwapper");
+
+            this.backbufferSwapper = backbufferSwapper;
+
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.MatrixMode(MatrixMode.Projection);
@@ -100,7 +104,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
-        #region Clearing
+        #region Clearing & Presenting
         /// <summary>
         /// Clears the backbuffer to a given color.
         /// </summary>
@@ -111,6 +115,14 @@ namespace Orion.Engine.Graphics
             GL.ClearColor(color.R, color.G, color.B, 0);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.ColorMask(true, true, true, false);
+        }
+
+        /// <summary>
+        /// Presents what has been drawn to the screen by swapping the front and back buffers.
+        /// </summary>
+        public void Present()
+        {
+            backbufferSwapper();
         }
         #endregion
 

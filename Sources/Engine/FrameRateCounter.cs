@@ -56,13 +56,12 @@ namespace Orion.Engine
         /// <summary>
         /// Updates this <see cref="FrameRateCounter"/> for a frame.
         /// </summary>
-        /// <returns>A value indicating if average and peak times have been updated.</returns>
-        public bool Update()
+        public void Update()
         {
             if (stopwatch == null)
             {
                 stopwatch = Stopwatch.StartNew();
-                return false;
+                return;
             }
 
             float timeDelta = (float)stopwatch.Elapsed.TotalSeconds;
@@ -73,15 +72,13 @@ namespace Orion.Engine
             timeAccumulator += timeDelta;
             if (timeDelta > peakTimeDelta) peakTimeDelta = timeDelta;
 
-            if (timeAccumulator < 1) return false;
+            if (timeAccumulator < 1) return;
             
             averageSecondsPerFrame = timeAccumulator / frameAccumulator;
             peakSecondsPerFrame = peakTimeDelta;
             timeAccumulator = 0;
             frameAccumulator = 0;
             peakTimeDelta = 0;
-
-            return true;
         }
 
         private static float SpfToFps(float spf)

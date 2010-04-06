@@ -76,22 +76,10 @@ namespace Orion.Game.Simulation
         /// </summary>
         public event Action<Unit> DamageChanged;
 
-        private void RaiseDamageChanged()
-        {
-            var handler = DamageChanged;
-            if (handler != null) handler(this);
-        }
-
         /// <summary>
         /// Raised when the construction of this <see cref="Unit"/> is completed.
         /// </summary>
         public event Action<Unit> ConstructionCompleted;
-
-        private void RaiseConstructionCompleted()
-        {
-            var handler = ConstructionCompleted;
-            if (handler != null) handler(this);
-        }
 
         /// <summary>
         /// Raised when this <see cref="Unit"/> hits another <see cref="Unit"/>.
@@ -196,7 +184,7 @@ namespace Orion.Game.Simulation
 
                 damage = value;
 
-                RaiseDamageChanged();
+                DamageChanged.Raise(this);
                 if (damage == MaxHealth) Die();
                 else if (damage == 0 && IsUnderConstruction)
                     isUnderConstruction = false;
@@ -402,20 +390,33 @@ namespace Orion.Game.Simulation
         public void Build(float amount)
         {
             Argument.EnsurePositive(amount, "amount");
+
+            if (!isUnderConstruction)
+            {
+                Debug.Fail("Cannot build a building not under construction.");
+                return;
+            }
+
             Health += amount;
             healthBuilt += amount;
             if (healthBuilt >= MaxHealth)
             {
                 isUnderConstruction = false;
-                RaiseConstructionCompleted();
+                ConstructionCompleted.Raise(this);
             }
         }
 
         public void CompleteConstruction()
         {
+            if (!isUnderConstruction)
+            {
+                Debug.Fail("Cannot complete the construction of a building not under construction.");
+                return;
+            }
+
             Health = MaxHealth;
             isUnderConstruction = false;
-            RaiseConstructionCompleted();
+            ConstructionCompleted.Raise(this);
         }
         #endregion
 

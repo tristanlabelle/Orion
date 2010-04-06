@@ -17,12 +17,8 @@ namespace Orion.Game.Matchmaking
     public class SlaveCommander : Commander
     {
         #region Constructors
-        /// <summary>
-        /// Constructor For a commander that can listen input to create commands
-        /// </summary>
-        /// <param name="faction">the faction of the player.</param>
-        public SlaveCommander(Faction faction)
-            : base(faction)
+        public SlaveCommander(Match match, Faction faction)
+            : base(match, faction)
         { }
         #endregion
 

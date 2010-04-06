@@ -21,10 +21,11 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public static void Generate(World world, Random random, bool nomad)
+        public static void Generate(World world, UnitTypeRegistry unitTypes,
+            Random random, bool createPyramids)
         {
             foreach (Faction faction in world.Factions)
-                GenerateFactionCamp(world, faction, random, nomad);
+                GenerateFactionCamp(world, unitTypes, faction, random, createPyramids);
             
             GenerateResourceNodes(world, random);
         }
@@ -43,7 +44,8 @@ namespace Orion.Game.Matchmaking
             GenerateResourceNodes(world, resourceNodeCount, resourceNodeCount, random);
         }
 
-        private static void GenerateResourceNodes(World world, int aladdiumNodeCount, int alageneNodeCount, Random random)
+        private static void GenerateResourceNodes(World world,
+            int aladdiumNodeCount, int alageneNodeCount, Random random)
         {
             for (int i = 0; i < aladdiumNodeCount + alageneNodeCount; i++)
             {
@@ -53,7 +55,8 @@ namespace Orion.Game.Matchmaking
             }
         }
 
-        private static void GenerateFactionCamp(World world, Faction faction, Random random, bool placePyramid)
+        private static void GenerateFactionCamp(World world, UnitTypeRegistry unitTypes,
+            Faction faction, Random random, bool placePyramid)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(faction, "faction");
@@ -95,13 +98,14 @@ namespace Orion.Game.Matchmaking
                 break;
             }
 
-            CreateCamp(world, faction, campCenter, placePyramid);
+            CreateCamp(world, unitTypes, faction, campCenter, placePyramid);
         }
 
-        private static void CreateCamp(World world, Faction faction, Vector2 campCenter, bool placePyramid)
+        private static void CreateCamp(World world, UnitTypeRegistry unitTypes,
+            Faction faction, Vector2 campCenter, bool placePyramid)
         {
             Region buildingRegion;
-            UnitType pyramid = world.UnitTypes.FromName("Pyramide");
+            UnitType pyramid = unitTypes.FromName("Pyramide");
             if (placePyramid)
             {
                 Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
@@ -113,7 +117,7 @@ namespace Orion.Game.Matchmaking
                 buildingRegion = new Region((Point)campCenter, pyramid.Size);
             }
 
-            UnitType unitType = world.UnitTypes.FromName("Schtroumpf");
+            UnitType unitType = unitTypes.FromName("Schtroumpf");
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));

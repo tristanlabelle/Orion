@@ -9,6 +9,9 @@ using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking.TowerDefense
 {
+    /// <summary>
+    /// A tower defense commander which creates creeps and makes them follow a path.
+    /// </summary>
     public sealed class CreepWaveCommander : Commander
     {
         #region Fields
@@ -38,21 +41,21 @@ namespace Orion.Game.Matchmaking.TowerDefense
         #endregion
 
         #region Constructors
-        public CreepWaveCommander(Faction faction, CreepPath path)
-            : base(faction)
+        public CreepWaveCommander(Match match, Faction faction, CreepPath path)
+            : base(match, faction)
         {
             Argument.EnsureNotNull(path, "path");
             this.path = path;
 
-            UnitType worker = World.UnitTypes.First(unit => unit.HasSkill<BuildSkill>());
+            UnitType worker = match.UnitTypes.First(unit => unit.HasSkill<BuildSkill>());
             faction.CreateUnit(worker, Point.Zero);
         }
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        public override void Update(float timeDeltaInSeconds)
         {
-            timeBeforeNextCreep -= timeDelta;
+            timeBeforeNextCreep -= timeDeltaInSeconds;
             if (timeBeforeNextCreep > 0) return;
 
             if (!TrySpawnCreep()) return;
@@ -70,7 +73,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
         private bool TrySpawnCreep()
         {
             string creepTypeName = WaveCreepTypeNames[waveIndex];
-            UnitType creepType = World.UnitTypes.FromName(creepTypeName);
+            UnitType creepType = Match.UnitTypes.FromName(creepTypeName);
 
             Point spawnPoint = path.Points[0];
             Region spawnRegion = new Region(spawnPoint, creepType.Size);

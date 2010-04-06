@@ -58,6 +58,11 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 nextReplayCommand = reader.ReadCommand();
             }
         }
+
+        public override void Dispose()
+        {
+            reader.Dispose();
+        }
         #endregion
     }
 }

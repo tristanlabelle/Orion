@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Engine.Gui
+namespace Orion.Engine.Input
 {
     /// <summary>
     /// Indicates a type of GUI mouse event.
@@ -12,11 +12,11 @@ namespace Orion.Engine.Gui
     public enum MouseEventType
     {
         None,
-        MouseButtonPressed,
-        MouseButtonReleased,
-        MouseMoved,
-        MouseEntered,
-        MouseExited,
-        MouseWheelScrolled
+        ButtonPressed,
+        ButtonReleased,
+        Moved,
+        Entered,
+        Exited,
+        WheelScrolled
     }
 }

@@ -14,7 +14,7 @@ namespace Orion.Game.Presentation
             : base(options)
         { }
 
-        protected override void InitializeSlots()
+        public override void InitializeSlots()
         {
             LocalPlayerSlot you = new LocalPlayerSlot();
             playerSlots[0].AddItem(you);

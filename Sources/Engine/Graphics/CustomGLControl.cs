@@ -9,8 +9,7 @@ namespace Orion.Engine.Graphics
     /// A custom version of OpenTK's <see cref="GLControl"/>
     /// which properly raises key events.
     /// </summary>
-    [Obsolete("To be made internal to the engine.")]
-    public sealed class CustomGLControl : GLControl
+    internal sealed class CustomGLControl : GLControl
     {
         #region Constructors
         public CustomGLControl()

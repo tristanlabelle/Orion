@@ -52,12 +52,12 @@ namespace Orion.Game.Matchmaking.Commands
             return new MoveCommand(FactionHandle, entityHandles, destination);
         }
 
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidFactionHandle(world, FactionHandle)
-                && unitHandles.All(handle => IsValidEntityHandle(world, handle));
+            return IsValidFactionHandle(match, FactionHandle)
+                && unitHandles.All(handle => IsValidEntityHandle(match, handle));
         }
 
         public override void Execute(Match match)

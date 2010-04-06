@@ -16,7 +16,7 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private readonly BinaryReader reader;
-        private readonly MatchSettings options = new MatchSettings();
+        private readonly MatchSettings settings = new MatchSettings();
         private readonly ReadOnlyCollection<string> factionNames;
         private int lastUpdateNumber = 0;
         #endregion
@@ -27,13 +27,13 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(reader, "reader");
             this.reader = reader;
 
-            options.InitialAladdiumAmount = reader.ReadInt32();
-            options.InitialAlageneAmount = reader.ReadInt32();
-            options.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
-            options.FoodLimit = reader.ReadInt32();
-            options.RevealTopology = reader.ReadBoolean();
-            options.RandomSeed = reader.ReadInt32();
-            options.StartNomad = reader.ReadBoolean();
+            settings.InitialAladdiumAmount = reader.ReadInt32();
+            settings.InitialAlageneAmount = reader.ReadInt32();
+            settings.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
+            settings.FoodLimit = reader.ReadInt32();
+            settings.RevealTopology = reader.ReadBoolean();
+            settings.RandomSeed = reader.ReadInt32();
+            settings.StartNomad = reader.ReadBoolean();
 
             int factionCount = reader.ReadInt32();
             factionNames = Enumerable.Range(0, factionCount)
@@ -50,9 +50,9 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Properties
-        public MatchSettings Options
+        public MatchSettings Settings
         {
-            get { return options; }
+            get { return settings; }
         }
 
         /// <summary>

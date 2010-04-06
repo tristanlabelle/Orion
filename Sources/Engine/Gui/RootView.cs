@@ -1,23 +1,24 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using System.Diagnostics;
+using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using GraphicsContext = Orion.Engine.Graphics.GraphicsContext;
-using System.Collections;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui
 {
     public sealed class RootView : Responder
     {
         #region Fields
+        [Obsolete("Game Specific, to be moved out of the engine.")]
         public static readonly Rectangle ContentsBounds = new Rectangle(1024, 768);
 
         private Rectangle frame;
-        private Stack<UIDisplay> displays;
         private Responder focusedView;
         #endregion
 
@@ -31,17 +32,10 @@ namespace Orion.Engine.Gui
         {
             this.Frame = frame;
             this.Bounds = bounds;
-            this.displays = new Stack<UIDisplay>();
-            this.displays.Push(new NullUI());
         }
         #endregion
 
         #region Properties
-        public UIDisplay TopmostDisplay
-        {
-            get { return displays.Peek(); }
-        }
-
         public override Rectangle Frame
         {
             get { return frame; }
@@ -56,41 +50,34 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Methods
-        public void PushDisplay(UIDisplay display)
+        public void SendInputEvent(InputEvent inputEvent)
         {
-            UIDisplay topDisplay = null;
-            while (topDisplay != displays.Peek())
+            if (inputEvent.Type == InputEventType.Keyboard)
             {
-                topDisplay = displays.Peek();
-                topDisplay.OnShadowed();
+                KeyboardEventType type;
+                KeyboardEventArgs args;
+                inputEvent.GetKeyboard(out type, out args);
+                SendKeyboardEvent(type, args);
             }
-
-            displays.Push(display);
-            Children.Add(display);
-            display.OnEntered();
+            else if (inputEvent.Type == InputEventType.Mouse)
+            {
+                MouseEventType type;
+                MouseEventArgs args;
+                inputEvent.GetMouse(out type, out args);
+                SendMouseEvent(type, args);
+            }
+            else if (inputEvent.Type == InputEventType.Character)
+            {
+                char character;
+                inputEvent.GetCharacter(out character);
+                SendCharacterTypedEvent(character);
+            }
+            else
+            {
+                Debug.Fail("Unknown input event type: {0}.".FormatInvariant(inputEvent.Type));
+            }
         }
-
-        public void PopDisplay(UIDisplay display)
-        {
-            PopDisplay(display, true);
-        }
-
-        public void PopDisplayWithoutDisposing(UIDisplay display)
-        {
-            PopDisplay(display, false);
-        }
-
-        private void PopDisplay(UIDisplay display, bool dispose)
-        {
-            if (displays.Count < 2) throw new InvalidOperationException("Cannot pop the initial display from the stack");
-            if (TopmostDisplay != display) throw new InvalidOperationException("Cannot pop a display from the stack unless it's the current one");
-
-            displays.Pop();
-            if (dispose) display.Dispose();
-            TopmostDisplay.OnEntered();
-        }
-
-        #region Public event generation
+        
         public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
         {
             PropagateMouseEvent(type, args);
@@ -108,42 +95,16 @@ namespace Orion.Engine.Gui
 
         public new void Update(float timeDeltaInSeconds)
         {
-            TopmostDisplay.PropagateUpdateEvent(timeDeltaInSeconds);
+            PropagateUpdateEvent(timeDeltaInSeconds);
         }
 
-        public new void Draw(GraphicsContext graphicsContext)
+        public void Draw(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+
+            graphicsContext.ProjectionBounds = Bounds;
             Render(graphicsContext);
         }
-        #endregion
-
-        #region Protected Overrides
-        protected internal override bool PropagateMouseEvent(MouseEventType eventType, MouseEventArgs args)
-        {
-            Vector2 propagatedMousePosition = args.Position;
-            propagatedMousePosition.Scale(Bounds.Width / Frame.Width, Bounds.Height / Frame.Height);
-
-            var propagatedArgs = args.CloneWithNewPosition(propagatedMousePosition);
-            bool canSink = TopmostDisplay.PropagateMouseEvent(eventType, propagatedArgs);
-
-            return canSink ? DispatchMouseEvent(eventType, args) : false;
-        }
-
-        protected internal override bool PropagateKeyboardEvent(KeyboardEventType type, KeyboardEventArgs args)
-        {
-            if (focusedView == null) return TopmostDisplay.PropagateKeyboardEvent(type, args);
-            return focusedView.PropagateKeyboardEvent(type, args);
-        }
-
-        protected internal override void Render(GraphicsContext graphicsContext)
-        {
-            graphicsContext.Clear(Colors.Black);
-            graphicsContext.ProjectionBounds = Bounds;
-
-            displays.Peek().Render(graphicsContext);
-        }
-        #endregion
         #endregion
     }
 }

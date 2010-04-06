@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Engine.Collections;
 using Orion.Engine.Networking;
@@ -17,8 +18,8 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public MultiplayerMatchConfigurationUI(MatchSettings options, SafeTransporter transporter, bool isHost)
-            : base(options, isHost)
+        public MultiplayerMatchConfigurationUI(MatchSettings settings, SafeTransporter transporter, bool isHost)
+            : base(settings, isHost)
         {
             this.transporter = transporter;
         }
@@ -37,12 +38,12 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<int, PlayerSlot> SlotOccupationChanged;
-        public event Action<IPv4EndPoint> KickedPlayer;
+        public event Action<MultiplayerMatchConfigurationUI, int, PlayerSlot> SlotOccupationChanged;
+        public event Action<MultiplayerMatchConfigurationUI, IPv4EndPoint> PlayerKicked;
         #endregion
 
         #region Methods
-        protected override void InitializeSlots()
+        public override void InitializeSlots()
         {
             int i = 0;
             if (IsGameMaster)
@@ -98,12 +99,11 @@ namespace Orion.Game.Presentation
             RemotePlayerSlot remoteSlot = slot.Items.OfType<RemotePlayerSlot>().First();
             if (remoteSlot.HostEndPoint.HasValue)
             {
-                Action<IPv4EndPoint> kickHandler = KickedPlayer;
-                if (kickHandler != null) kickHandler(remoteSlot.HostEndPoint.Value);
+                PlayerKicked.Raise(this, remoteSlot.HostEndPoint.Value);
                 remoteSlot.HostEndPoint = null;
             }
-            Action<int, PlayerSlot> handler = SlotOccupationChanged;
-            if (handler != null) handler(playerSlots.IndexOf(slot), value);
+
+            SlotOccupationChanged.Raise(this, playerSlots.IndexOf(slot), value);
         }
 
         private void SelectSlot<T>(int slot) where T : PlayerSlot, new()

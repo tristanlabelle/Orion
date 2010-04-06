@@ -5,6 +5,7 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui
@@ -145,7 +146,7 @@ namespace Orion.Engine.Gui
                 caption.Color = captionOverColor;
                 isDown = false;
                 OnPress();
-                Debug.Assert(!IsDisposed, "A button was disposed while executing its Triggered handler.");
+                //Debug.Assert(!IsDisposed, "A button was disposed while executing its Triggered handler.");
             }
 
             return false;

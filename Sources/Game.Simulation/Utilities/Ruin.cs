@@ -78,9 +78,9 @@ namespace Orion.Game.Simulation.Utilities
         #endregion
 
         #region Methods
-        internal void Update(float timeDelta)
+        internal void Update(float timeDeltaInSeconds)
         {
-            remainingTimeToLive -= timeDelta;
+            remainingTimeToLive -= timeDeltaInSeconds;
             if (remainingTimeToLive < 0) remainingTimeToLive = 0;
         }
         #endregion

@@ -88,6 +88,12 @@ namespace Orion.Engine.Networking
             workerThread.IsBackground = true;
             workerThread.Start();
         }
+
+        /// <summary>
+        /// Creates a new Transporter whose UDP socket is bound to a random port on all interfaces.
+        /// </summary>
+        public SafeTransporter()
+            : this(0) { }
         #endregion
 
         #region Events

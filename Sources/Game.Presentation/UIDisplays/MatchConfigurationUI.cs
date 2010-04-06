@@ -16,14 +16,12 @@ using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {
-    public abstract class MatchConfigurationUI : UIDisplay
+    public abstract class MatchConfigurationUI : MaximizedPanel
     {
         #region Fields
         private static readonly NumberStyles integerParsingStyles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
         private const float checkBoxSize = 6;
 
-        private Action<Button> exitPanel;
-        private Action<Button> startGame;
         private Size size = new Size(150, 150);
 
         protected MatchSettings options;
@@ -59,15 +57,15 @@ namespace Orion.Game.Presentation
                 backgroundPanel.Children.Add(playerSlots[i]);
             }
 
-            exitPanel = OnPressedExit;
             exitButton = new Button(new Rectangle(10, 10, 100, 40), "Retour");
+            exitButton.Triggered += (sender) => ExitPressed.Raise(this);
             Children.Add(exitButton);
 
             if (isGameMaster)
             {
-                startGame = OnPressedStartGame;
                 startButton = new Button(new Rectangle(Bounds.MaxX - 150, 10, 140, 40), "Commencer");
                 startButton.Enabled = isGameMaster;
+                startButton.Triggered += (sender) => StartGamePressed.Raise(this);
                 Children.Add(startButton);
             }
 
@@ -138,8 +136,8 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Events
-        public event Action<MatchConfigurationUI> PressedStartGame;
-        public event Action<MatchConfigurationUI> PressedExit;
+        public event Action<MatchConfigurationUI> StartGamePressed;
+        public event Action<MatchConfigurationUI> ExitPressed;
         public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
         #endregion
 
@@ -186,7 +184,7 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
-        protected abstract void InitializeSlots();
+        public abstract void InitializeSlots();
 
         #region Initialization
         private Button AddLabelButtonOption(string description, string initialValue, string prompt, Func<string, bool> validator)
@@ -239,17 +237,6 @@ namespace Orion.Game.Presentation
         protected virtual void OnOptionChanged()
         {
             OptionChanged.Raise(this, options);
-        }
-
-        protected virtual void OnPressedExit(Button button)
-        {
-            PressedExit.Raise(this);
-            Parent.PopDisplay(this);
-        }
-
-        protected virtual void OnPressedStartGame(Button button)
-        {
-            PressedStartGame.Raise(this);
         }
         #endregion
 
@@ -323,31 +310,13 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        #region UIDisplay Implementation
-        protected override void OnEntered()
-        {
-            InitializeSlots();
-            exitButton.Triggered += exitPanel;
-            if (startButton != null) startButton.Triggered += startGame;
-            base.OnEntered();
-        }
-
-        protected override void OnShadowed()
-        {
-            exitButton.Triggered -= exitPanel;
-            if (startButton != null) startButton.Triggered -= startGame;
-            foreach (DropdownList<PlayerSlot> list in playerSlots) list.Dispose();
-            base.OnShadowed();
-        }
-        #endregion
-
         #region Object Model
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                PressedStartGame = null;
-                PressedExit = null;
+                StartGamePressed = null;
+                ExitPressed = null;
             }
 
             base.Dispose(disposing);

@@ -7,6 +7,7 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui
@@ -90,19 +91,22 @@ namespace Orion.Engine.Gui
 
                 case Keys.Enter:
                     Triggered.Raise(this);
-                    Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
+                    //Debug.Assert(!IsDisposed, "A text field was disposed while executing its Triggered handler.");
                     break;
 
                 default:
                     break;
             }
 
-            return base.OnKeyboardButtonPressed(args);
+            base.OnKeyboardButtonPressed(args);
+            // Always return false so sibling controls don't get the event.
+            return false;
         }
 
         protected override bool OnCharacterPressed(char character)
         {
-            if (!"\b\n\r".Contains(character))
+            // Ignore \0, \n, \r, \b, etc.
+            if (!char.IsControl(character))
             {
                 contents = contents.Insert(caretIndex, character);
                 ++caretIndex;
@@ -112,7 +116,7 @@ namespace Orion.Engine.Gui
             return false;
         }
 
-        protected override void Update(float timeDeltaInSeconds)
+        protected internal override void Update(float timeDeltaInSeconds)
         {
             time += timeDeltaInSeconds;
             base.Update(timeDeltaInSeconds);

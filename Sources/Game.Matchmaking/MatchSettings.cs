@@ -170,7 +170,7 @@ namespace Orion.Game.Matchmaking
             {
                 if (value == areRandomHeroesEnabled) return;
                 areRandomHeroesEnabled = value;
-                TriggerEvent(AreCheatsEnabledChanged);
+                TriggerEvent(AreRandomHeroesEnabledChanged);
             }
         }
         #endregion

@@ -13,14 +13,14 @@ namespace Orion.Game.Matchmaking.Deathmatch
     public class AgressiveAICommander : AICommander
     {
         #region Constructors
-        public AgressiveAICommander(Faction faction, Random random)
-            : base(faction, random)
+        public AgressiveAICommander(Match match, Faction faction)
+            : base(match, faction)
         {
         }
         #endregion
 
         #region Methods
-        public override void Update(float timeDelta)
+        public override void Update(float timeDeltaInSeconds)
         {
             if (Faction.Status == FactionStatus.Defeated)
                 return;
@@ -46,7 +46,7 @@ namespace Orion.Game.Matchmaking.Deathmatch
                     DispatchAttackers(amountOfAttackers, World.Factions.First().Units.First());
             }
 
-            base.Update(timeDelta);
+            base.Update(timeDeltaInSeconds);
         }
 
         #endregion

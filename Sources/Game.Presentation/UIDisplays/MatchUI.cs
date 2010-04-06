@@ -7,22 +7,24 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Utilities;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Audio;
-using Orion.Game.Presentation.Actions;
-using Orion.Game.Presentation.Actions.Enablers;
-using Orion.Game.Presentation.Renderers;
+using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Actions;
+using Orion.Game.Presentation.Actions.Enablers;
+using Orion.Game.Presentation.Audio;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Utilities;
 using Control = System.Windows.Forms.Control;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Presentation
 {
-    public sealed class MatchUI : UIDisplay
+    public sealed class MatchUI : MaximizedPanel
     {
         #region Fields
         #region Chat
@@ -37,8 +39,9 @@ namespace Orion.Game.Presentation
         private readonly Panel selectionPanel;
         #endregion
 
-        #region Pause
+        #region Pause & Diplomacy
         private readonly Panel pausePanel;
+        private Panel diplomacyPanel;
         #endregion
 
         #region Minimap
@@ -58,7 +61,6 @@ namespace Orion.Game.Presentation
         private readonly GameAudio gameAudio;
         private readonly MatchAudioPresenter matchAudioPresenter;
         private readonly ActionPanel actionPanel;
-        private Panel diplomacyPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
         private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
@@ -72,14 +74,15 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.match = match;
-            this.match.Quitting += Quit;
-            this.userInputManager = new UserInputManager(localCommander);
+            this.match.FactionMessageReceived += OnFactionMessageReceived;
+            this.userInputManager = new UserInputManager(match, localCommander);
 
             this.gameAudio = new GameAudio();
             this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, match, this.userInputManager);
 
             this.gameGraphics = gameGraphics;
             World world = match.World;
+            world.FactionDefeated += OnFactionDefeated;
 
             matchRenderer = new MatchRenderer(userInputManager, gameGraphics);
 
@@ -138,8 +141,8 @@ namespace Orion.Game.Presentation
 
             Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
             chatInput = new TextField(chatInputFrame);
-            chatInput.Triggered += SendMessage;
-            chatInput.KeyboardButtonPressed += ChatInputKeyDown;
+            chatInput.Triggered += OnChatInputTriggered;
+            chatInput.KeyboardButtonPressed += OnChatInputKeyboardButtonPressed;
 
             Rectangle consoleFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
             console = new MatchConsole(consoleFrame);
@@ -150,10 +153,10 @@ namespace Orion.Game.Presentation
 
             Rectangle quitGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
             Button quitGameButton = new Button(quitGameButtonFrame, "Quitter");
-            quitGameButton.Triggered += button => match.Quit();
+            quitGameButton.Triggered += button => QuitPressed.Raise(this);
 
             Rectangle resumeGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
-            Button resumeGameButton = new Button(resumeGameButtonFrame, match.IsPausable ? "Reprendre" : "Retour");
+            Button resumeGameButton = new Button(resumeGameButtonFrame, "Retour");
             resumeGameButton.Triggered += button => HidePausePanel();
 
             pausePanel.Children.Add(quitGameButton);
@@ -188,7 +191,18 @@ namespace Orion.Game.Presentation
             UpdateWorkerActivityButton();
 
             LocalFaction.Warning += OnLocalFactionWarning;
+
+            Unit viewTarget = localCommander.Faction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
+                ?? localCommander.Faction.Units.FirstOrDefault();
+            if (viewTarget != null) CenterOn(viewTarget.Center);
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the user has quitted the match through the UI.
+        /// </summary>
+        public event Action<MatchUI> QuitPressed;
         #endregion
 
         #region Properties
@@ -245,8 +259,14 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        #region Messages
-        public void DisplayMessage(FactionMessage message)
+        #region Event Handling
+        private void OnFactionDefeated(World sender, Faction faction)
+        {
+            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
+            console.AddMessage(text, faction.Color);
+        }
+
+        private void OnFactionMessageReceived(Match sender, FactionMessage message)
         {
             Argument.EnsureNotNull(message, "message");
 
@@ -254,30 +274,6 @@ namespace Orion.Game.Presentation
             console.AddMessage(text, message.Faction.Color);
         }
 
-        public void DisplayDefeatMessage(Faction faction)
-        {
-            Argument.EnsureNotNull(faction, "faction");
-
-            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
-            console.AddMessage(text, faction.Color);
-
-            if (faction != LocalFaction) return;
-            
-            if (match.IsPausable) match.Pause();
-            Instant.DisplayAlert(this, "Vous avez perdu le match.", () => Parent.PopDisplay(this));
-        }
-
-        public void DisplayVictoryMessage(IEnumerable<Faction> factions)
-        {
-            Argument.EnsureNotNull(factions, "factions");
-            if (!factions.Contains(LocalFaction)) return;
-            
-            if (match.IsPausable) match.Pause();
-            Instant.DisplayAlert(this, "VICTOIRE !", () => Parent.PopDisplay(this));
-        }
-        #endregion
-
-        #region Event Handling
         private void OnWorkerActivityStateChanged(WorkerActivityMonitor sender, Unit worker)
         {
             UpdateWorkerActivityButton();
@@ -362,7 +358,16 @@ namespace Orion.Game.Presentation
             return base.OnMouseButtonReleased(args);
         }
 
-        private void SendMessage(TextField chatInput)
+        private void OnChatInputKeyboardButtonPressed(Responder sender, KeyboardEventArgs args)
+        {
+            if (args.Key == Keys.Escape)
+            {
+                chatInput.Clear();
+                Children.Remove(chatInput);
+            }
+        }
+
+        private void OnChatInputTriggered(TextField chatInput)
         {
             string text = chatInput.Contents.Trim();
             if (text.Any(character => !char.IsWhiteSpace(character)))
@@ -373,16 +378,8 @@ namespace Orion.Game.Presentation
                     userInputManager.LaunchChatMessage(chatInput.Contents);
             }
 
+            chatInput.Clear();
             Children.Remove(chatInput);
-        }
-
-        private void ChatInputKeyDown(Responder sender, KeyboardEventArgs args)
-        {
-            if (args.Key == Keys.Escape)
-            {
-                chatInput.Clear();
-                Children.Remove(chatInput);
-            }
         }
 
         protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
@@ -391,7 +388,19 @@ namespace Orion.Game.Presentation
             MatchRenderer.DrawAllHealthBars = args.IsAltModifierDown;
             isSpaceDown = args.Key == Keys.Space;
 
-            if (args.Key == Keys.F9)
+            if (args.Key == Keys.Escape)
+            {
+                chatInput.Clear();
+                Children.Remove(chatInput);
+                return false;
+            }
+            else if (args.Key == Keys.Enter)
+            {
+                chatInput.Clear();
+                Children.Add(chatInput);
+                return false;
+            }
+            else if (args.Key == Keys.F9)
             {
                 DisplayPausePanel();
                 return false;
@@ -403,16 +412,6 @@ namespace Orion.Game.Presentation
             }
 
             return base.OnKeyboardButtonPressed(args);
-        }
-
-        protected override bool OnCharacterPressed(char character)
-        {
-            if (character == '\r')
-            {
-                chatInput.Clear();
-                Children.Add(chatInput);
-            }
-            return base.OnCharacterPressed(character);
         }
 
         protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
@@ -428,13 +427,7 @@ namespace Orion.Game.Presentation
             if (isSpaceDown && !Selection.IsEmpty)
                 CenterOnSelection();
 
-            match.Update(timeDeltaInSeconds);
             base.Update(timeDeltaInSeconds);
-        }
-
-        private void Quit(Match sender)
-        {
-            Parent.PopDisplay(this);
         }
 
         private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
@@ -519,15 +512,19 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        #region UIDisplay Implementation
-        protected override void OnShadowed()
-        {
-            Root.PopDisplay(this);
-            base.OnShadowed();
-        }
-        #endregion
-
         #region Methods
+        public void DisplayDefeatMessage(Action callback)
+        {
+            Argument.EnsureNotNull(callback, "callback");
+            Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
+        }
+
+        public void DisplayVictoryMessage(Action callback)
+        {
+            Argument.EnsureNotNull(callback, "callback");
+            Instant.DisplayAlert(this, "VICTOIRE !", callback);
+        }
+
         public void CenterOn(Vector2 position)
         {
             Vector2 worldBoundsExtent = worldView.Bounds.Extent;

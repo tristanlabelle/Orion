@@ -8,6 +8,9 @@ using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Orion.Engine.Gui;
+using Orion.Engine.Geometry;
+using System.Windows.Forms;
+using Orion.Engine.Input;
 
 namespace Orion.Game.Presentation
 {
@@ -17,36 +20,35 @@ namespace Orion.Game.Presentation
     public sealed class GameGraphics : IDisposable
     {
         #region Fields
-        private readonly Window window;
+        private readonly IGameWindow window;
+        private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
+        private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
 
         #region Constructors
         public GameGraphics()
         {
-            this.window = new Window();
-            this.window.HandleDestroyed += OnWindowHandleDestroyed;
+            this.window = new WindowsFormsGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
+            this.window.InputReceived += OnInputReceived;
+
+            Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
+            this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
+
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
-            this.window.Show();
         }
         #endregion
 
         #region Properties
-        public bool IsWindowCreated
+        public IGameWindow Window
         {
-            get { return window.Created; }
-        }
-
-        public string WindowTitle
-        {
-            get { return window.Text; }
-            set { window.Text = value; }
+            get { return window; }
         }
 
         /// <summary>
         /// Gets the graphics context which provides graphics to the game.
         /// </summary>
-        public GraphicsContext GraphicsContext
+        public GraphicsContext Context
         {
             get { return window.GraphicsContext; }
         }
@@ -58,7 +60,7 @@ namespace Orion.Game.Presentation
 
         public RootView RootView
         {
-            get { return window.RootView; }
+            get { return rootView; }
         }
 
         public Texture DefaultTexture
@@ -68,14 +70,6 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Causes the window to refresh itself.
-        /// </summary>
-        public void Refresh()
-        {
-            window.Refresh();
-        }
-
         #region Textures
         /// <summary>
         /// Gets a texture for a miscellaneous game element. 
@@ -177,17 +171,63 @@ namespace Orion.Game.Presentation
         #endregion
 
         /// <summary>
+        /// Updates the root view for a frame, allowing it to process queued input.
+        /// </summary>
+        /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
+        public void UpdateRootView(float timeDeltaInSeconds)
+        {
+            DispatchInputEvents();
+            RootView.Update(timeDeltaInSeconds);
+        }
+
+        /// <summary>
         /// Releases all resources used by this object.
         /// </summary>
         public void Dispose()
         {
-            if (window.Created && !window.IsDisposed)
-                window.Dispose();
+            textureManager.Dispose();
+            window.Dispose();
         }
 
-        private void OnWindowHandleDestroyed(object sender, EventArgs e)
+        private void DispatchInputEvents()
         {
-            textureManager.Dispose();
+            while (inputEventQueue.Count > 0)
+            {
+                InputEvent inputEvent = inputEventQueue.Dequeue();
+                rootView.SendInputEvent(inputEvent);
+            }
+        }
+
+        private void OnInputReceived(IGameWindow sender, InputEvent inputEvent)
+        {
+            HandleInput(inputEvent);
+            inputEventQueue.Enqueue(inputEvent);
+        }
+
+        private void HandleInput(InputEvent inputEvent)
+        {
+            if (inputEvent.Type == InputEventType.Keyboard)
+            {
+                KeyboardEventType type;
+                KeyboardEventArgs args;
+                inputEvent.GetKeyboard(out type, out args);
+
+                if (type == KeyboardEventType.ButtonPressed && args.IsAltModifierDown && args.Key == Keys.Enter)
+                    ToggleFullscreen();
+            }
+        }
+
+        private void ToggleFullscreen()
+        {
+            if (window.Mode == WindowMode.Windowed)
+            {
+                try { window.SetFullscreen(new Size(1024, 768)); }
+                catch (NotSupportedException) { }
+            }
+            else
+            {
+                window.SetWindowed(window.ClientAreaSize);
+            }
         }
         #endregion
     }

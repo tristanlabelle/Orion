@@ -30,22 +30,20 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-
-        public override bool ValidateHandles(World world)
+        public override bool ValidateHandles(Match match)
         {
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(match, "match");
 
-            return IsValidTechnologyHandle(world, technologyHandle)
-                && IsValidFactionHandle(world, FactionHandle)
-                && IsValidEntityHandle(world, researcherHandle);
-
+            return IsValidTechnologyHandle(match, technologyHandle)
+                && IsValidFactionHandle(match, FactionHandle)
+                && IsValidEntityHandle(match, researcherHandle);
         }
 
         public override void Execute(Match match)
         {
             Argument.EnsureNotNull(match, "match");
 
-            Technology technology = match.World.TechnologyTree.FromHandle(technologyHandle);
+            Technology technology = match.TechnologyTree.FromHandle(technologyHandle);
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             Unit researcher = (Unit)match.World.Entities.FromHandle(researcherHandle);
 

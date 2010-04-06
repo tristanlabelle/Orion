@@ -14,19 +14,19 @@ namespace Orion.Game.Presentation.Actions.Enablers
     public abstract class ActionEnabler
     {
         #region Fields
-        protected readonly UserInputManager inputManager;
+        protected readonly UserInputManager userInputManager;
         protected readonly ActionPanel actionPanel;
         protected readonly GameGraphics gameGraphics;
         #endregion
 
         #region Constructors
-        public ActionEnabler(UserInputManager inputManager, ActionPanel actionPanel, GameGraphics gameGraphics)
+        public ActionEnabler(UserInputManager userInputManager, ActionPanel actionPanel, GameGraphics gameGraphics)
         {
-            Argument.EnsureNotNull(inputManager, "inputManager");
+            Argument.EnsureNotNull(userInputManager, "userInputManager");
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            this.inputManager = inputManager;
+            this.userInputManager = userInputManager;
             this.actionPanel = actionPanel;
             this.gameGraphics = gameGraphics;
         }
@@ -35,12 +35,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Properties
         protected Faction LocalFaction
         {
-            get { return inputManager.LocalFaction; }
+            get { return userInputManager.LocalFaction; }
         }
 
         protected World World
         {
-            get { return LocalFaction.World; }
+            get { return userInputManager.World; }
+        }
+
+        protected Match Match
+        {
+            get { return userInputManager.Match; }
         }
         #endregion
 

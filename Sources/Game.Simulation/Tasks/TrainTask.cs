@@ -32,11 +32,12 @@ namespace Orion.Game.Simulation.Tasks
             if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an building under construction");
 
-            TrainSkill trainSkill = trainer.Type.TryGetSkill<TrainSkill>();
-            if (trainSkill == null)
+            if (!trainer.Type.HasSkill<TrainSkill>())
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
-            if (!trainSkill.Supports(traineeType))
-                throw new ArgumentException("Trainer {0} cannot train {1}.".FormatInvariant(trainer, traineeType));
+
+            // Normally we'd check if the train skill supports the trainee type, but as the trainee type
+            // can be a hero, which is not explicitely specified in the skill targets, that check has
+            // been delegated to the TrainCommand level. Please update your bookmarks.
 
             this.traineeType = traineeType;
         }

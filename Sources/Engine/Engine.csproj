@@ -112,6 +112,7 @@
     </Compile>
     <Compile Include="Gui\DelegatedRenderer.cs" />
     <Compile Include="Gui\DropdownList.cs" />
+    <Compile Include="Gui\FuckedUpDropdownList.cs" />
     <Compile Include="Gui\FilledRenderer.cs" />
     <Compile Include="Input\InputEvent.cs" />
     <Compile Include="Input\InputEventType.cs" />

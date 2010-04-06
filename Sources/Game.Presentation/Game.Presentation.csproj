@@ -76,6 +76,7 @@
     <Compile Include="Audio\GameAudio.cs" />
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="GameGraphics.cs" />
+    <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="Gui\MaximizedPanel.cs" />
     <Compile Include="Gui\MultiplayerLobbyUI.cs" />
     <Compile Include="Gui\MainMenuUI.cs" />
-    <Compile Include="Gui\MatchConfigurationUI.cs" />
+    <Compile Include="Gui\AbstractMatchConfigurationUI.cs" />
     <Compile Include="Gui\MatchConsole.cs" />
     <Compile Include="Gui\MatchUI.cs" />
     <Compile Include="Gui\MultiplayerMatchConfigurationUI.cs" />

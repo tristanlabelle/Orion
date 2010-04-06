@@ -212,7 +212,7 @@ namespace Orion.Game.Main
             }
         }
 
-        private void OnStartGamePressed(MatchConfigurationUI sender)
+        private void OnStartGamePressed(AbstractMatchConfigurationUI sender)
         {
             Debug.Assert(IsHost);
 
@@ -224,7 +224,7 @@ namespace Orion.Game.Main
             StartGame();
         }
 
-        private void OnExitPressed(MatchConfigurationUI sender)
+        private void OnExitPressed(AbstractMatchConfigurationUI sender)
         {
             if (IsHost) SendQuitMessageToClients();
             else SendQuitMessageToHost();

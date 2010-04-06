@@ -81,7 +81,7 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        private void OnStartGamePressed(MatchConfigurationUI sender)
+        private void OnStartGamePressed(AbstractMatchConfigurationUI sender)
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -139,7 +139,7 @@ namespace Orion.Game.Main
             Manager.Push(targetGameState);
         }
 
-        private void OnExitPressed(MatchConfigurationUI sender)
+        private void OnExitPressed(AbstractMatchConfigurationUI sender)
         {
             Manager.Pop();
         }

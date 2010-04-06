@@ -11,7 +11,7 @@ using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public sealed class MultiplayerMatchConfigurationUI : MatchConfigurationUI
+    public sealed class MultiplayerMatchConfigurationUI : AbstractMatchConfigurationUI
     {
         #region Fields
         private readonly SafeTransporter transporter;

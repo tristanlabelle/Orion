@@ -8,7 +8,7 @@ using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public class SinglePlayerMatchConfigurationUI : MatchConfigurationUI
+    public class SinglePlayerMatchConfigurationUI : AbstractMatchConfigurationUI
     {
         public SinglePlayerMatchConfigurationUI(MatchSettings options)
             : base(options)

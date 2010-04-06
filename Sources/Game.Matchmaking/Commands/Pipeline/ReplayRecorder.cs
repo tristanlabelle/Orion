@@ -58,14 +58,9 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             Argument.EnsureNotNull(settings, "settings");
             Argument.EnsureNotNull(world, "world");
 
-            ReplayWriter replayWriter = ReplayWriter.TryCreate();
+            var factionNames = world.Factions.Select(faction => faction.Name);
+            ReplayWriter replayWriter = ReplayWriter.TryCreate(settings, factionNames);
             if (replayWriter == null) return null;
-
-#if DEBUG
-            replayWriter.AutoFlush = true;
-#endif
-
-            replayWriter.WriteHeader(settings, world.Factions.Select(faction => faction.Name));
 
             return new ReplayRecorder(replayWriter);
         }

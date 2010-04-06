@@ -17,26 +17,44 @@ namespace Orion.Game.Matchmaking
         #region Fields
         private readonly BinaryWriter writer;
         private bool autoFlush;
-        private bool isHeaderWritten;
         private int lastUpdateNumber = 0;
         #endregion
 
         #region Constructors
-        public ReplayWriter(BinaryWriter writer)
+        /// <summary>
+        /// Initializes a new replay writer from the initial match settings.
+        /// </summary>
+        /// <param name="writer">The binary writer to be used.</param>
+        /// <param name="settings">The initial match settings.</param>
+        /// <param name="factionNames">The names of the participating factions.</param>
+        public ReplayWriter(BinaryWriter writer, MatchSettings settings, IEnumerable<string> factionNames)
         {
             Argument.EnsureNotNull(writer, "writer");
-            this.writer = writer;
+            Argument.EnsureNotNull(settings, "settings");
 
-#if !DEBUG
+            Argument.EnsureNotNull(factionNames, "factionNames");
+            List<string> factionNameList = factionNames.ToList();
+            Argument.EnsureNoneNull(factionNames, "factionNames");
+
+            this.writer = writer;
+#if DEBUG
             this.autoFlush = true;
 #endif
+
+            settings.Serialize(writer);
+
+            writer.Write(factionNameList.Count);
+            foreach (string factionName in factionNameList)
+                writer.Write(factionName);
+
+            if (autoFlush) writer.Flush();
         }
 
-        public ReplayWriter(Stream stream)
-            : this(new BinaryWriter(stream)) {}
+        public ReplayWriter(Stream stream, MatchSettings settings, IEnumerable<string> factionNames)
+            : this(new BinaryWriter(stream), settings, factionNames) {}
 
-        public ReplayWriter(string filePath)
-            : this(new BinaryWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))) { }
+        public ReplayWriter(string filePath, MatchSettings settings, IEnumerable<string> factionNames)
+            : this(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read), settings, factionNames) { }
         #endregion
 
         #region Properties
@@ -53,46 +71,13 @@ namespace Orion.Game.Matchmaking
 
         #region Methods
         /// <summary>
-        /// Writes the header of the replay.
-        /// </summary>
-        /// <param name="worldSeed">The seed of the world.</param>
-        /// <param name="factionNames">The names of the factions participating.</param>
-        public void WriteHeader(MatchSettings options, IEnumerable<string> factionNames)
-        {
-            if (isHeaderWritten) throw new InvalidOperationException("Cannot write more than one replay header.");
-
-            Argument.EnsureNotNull(factionNames, "factionNames");
-            List<string> factionNameList = factionNames.ToList();
-            Argument.EnsureNoneNull(factionNames, "factionNames");
-
-            writer.Write(options.InitialAladdiumAmount);
-            writer.Write(options.InitialAlageneAmount);
-            writer.Write(options.MapSize.Width);
-            writer.Write(options.MapSize.Height);
-            writer.Write(options.FoodLimit);
-            writer.Write(options.RevealTopology);
-            writer.Write(options.RandomSeed);
-            writer.Write(options.StartNomad);
-
-            writer.Write(factionNameList.Count);
-            foreach (string factionName in factionNameList)
-                writer.Write(factionName);
-
-            if (autoFlush) writer.Flush();
-
-            isHeaderWritten = true;
-        }
-
-        /// <summary>
         /// Adds a <see cref="Command"/> to the replay data.
         /// </summary>
         /// <param name="updateNumber">The update number where the <see cref="Command"/> occured.</param>
         /// <param name="command">The <see cref="Command"/> to be written.</param>
         public void WriteCommand(int updateNumber, Command command)
         {
-            if (!isHeaderWritten) throw new InvalidOperationException("Cannot write a command without a replay header.");
-
-            if (updateNumber < lastUpdateNumber) throw new ArgumentException("Updates should be increasing.");
+            if (updateNumber < lastUpdateNumber) throw new ArgumentException("Update numbers should be increasing.");
             Argument.EnsureNotNull(command, "command");
 
             writer.Write(updateNumber);
@@ -126,12 +111,12 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public static ReplayWriter TryCreate()
+        public static ReplayWriter TryCreate(MatchSettings settings, IEnumerable<string> factionNames)
         {
             Stream stream = TryOpenFileStream();
             if (stream == null) return null;
 
-            return new ReplayWriter(stream);
+            return new ReplayWriter(stream, settings, factionNames);
         }
 
         private static Stream TryOpenFileStream()

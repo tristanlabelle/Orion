@@ -27,13 +27,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(reader, "reader");
             this.reader = reader;
 
-            settings.InitialAladdiumAmount = reader.ReadInt32();
-            settings.InitialAlageneAmount = reader.ReadInt32();
-            settings.MapSize = new Size(reader.ReadInt32(), reader.ReadInt32());
-            settings.FoodLimit = reader.ReadInt32();
-            settings.RevealTopology = reader.ReadBoolean();
-            settings.RandomSeed = reader.ReadInt32();
-            settings.StartNomad = reader.ReadBoolean();
+            settings.Deserialize(reader);
 
             int factionCount = reader.ReadInt32();
             factionNames = Enumerable.Range(0, factionCount)
@@ -46,7 +40,7 @@ namespace Orion.Game.Matchmaking
             : this(new BinaryReader(stream)) { }
 
         public ReplayReader(string filePath)
-            : this(new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))) { }
+            : this(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)) { }
         #endregion
 
         #region Properties
@@ -83,7 +77,7 @@ namespace Orion.Game.Matchmaking
             Command command = Command.Deserialize(reader);
 
             if (updateNumber < lastUpdateNumber)
-                throw new InvalidDataException("Commands aren't in order in replay.");
+                throw new InvalidDataException("Replay command numbers are not ascending .");
             lastUpdateNumber = updateNumber;
 
             return new ReplayEvent(updateNumber, command);

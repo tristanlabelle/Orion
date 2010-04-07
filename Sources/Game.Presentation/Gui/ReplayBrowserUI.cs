@@ -54,7 +54,8 @@ namespace Orion.Game.Presentation.Gui
                 foreach (FileInfo file in replays.GetFiles("*.replay").OrderBy(file => file.Name))
                 {
                     Button replayButton = new Button(replayButtonFrame, file.Name);
-                    replayButton.Triggered += (sender) => StartPressed.Raise(this, file.FullName);
+                    string filePathForClosure = file.FullName;
+                    replayButton.Triggered += (sender) => StartPressed.Raise(this, filePathForClosure);
                     replaysList.Children.Add(replayButton);
                 }
             }

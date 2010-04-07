@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 
 namespace Orion.Game.Matchmaking.Commands.Pipeline
@@ -50,9 +51,14 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 {
                     Faction faction = match.World.FindFactionFromHandle(message.FactionHandle);
                     faction.RaiseWarning("Code de triche '{0}' appliqué !".FormatInvariant(message.Text));
+                    foreach (Faction otherFaction in match.World.Factions.Except(faction))
+                        otherFaction.RaiseWarning("{0} a triché !".FormatInvariant(faction.Name));
                     cheatCodeManager.Execute(message.Text, match, faction);
                 }
-                else Flush(command);
+                else
+                {
+                    Flush(command);
+                }
             }
         }
         #endregion

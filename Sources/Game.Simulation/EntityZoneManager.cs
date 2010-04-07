@@ -109,7 +109,7 @@ namespace Orion.Game.Simulation
 
         public IEnumerable<Entity> Intersecting(Vector2 point)
         {
-            Rectangle rectangle = new Rectangle(point.X, point.Y, float.Epsilon, float.Epsilon);
+            Rectangle rectangle = new Rectangle(point.X, point.Y, 0, 0);
             return Intersecting(rectangle);
         }
         #endregion

@@ -27,7 +27,7 @@ namespace Orion.Game.Matchmaking
         {
             Argument.EnsureNotNull(message, "message");
 
-            GenerateCommand(new SendMessageCommand(Faction.Handle, Faction.World.Factions.Select(f => f.Handle), message));
+            GenerateCommand(new SendMessageCommand(Faction.Handle, message));
         }
 
         public void SendAllyMessage(string message)

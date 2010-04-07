@@ -55,7 +55,6 @@ namespace Orion.Game.Presentation
             get { return match; }
         }
 
-        [Obsolete("To be fully encapsulated by this UserInputManager")]
         public Commander LocalCommander
         {
             get { return commander; }

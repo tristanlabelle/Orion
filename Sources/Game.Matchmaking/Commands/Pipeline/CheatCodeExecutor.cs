@@ -52,7 +52,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                     Faction faction = match.World.FindFactionFromHandle(message.FactionHandle);
                     faction.RaiseWarning("Code de triche '{0}' appliqué !".FormatInvariant(message.Text));
                     foreach (Faction otherFaction in match.World.Factions.Except(faction))
-                        otherFaction.RaiseWarning("{0} a triché !".FormatInvariant(faction.Name));
+                        otherFaction.RaiseWarning("{0} a triché !".FormatInvariant(faction.Name), faction);
                     cheatCodeManager.Execute(message.Text, match, faction);
                 }
                 else

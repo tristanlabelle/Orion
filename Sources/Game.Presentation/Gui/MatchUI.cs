@@ -273,8 +273,8 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(message, "message");
 
-            string text = "{0}: {1}".FormatInvariant(message.Faction.Name, message.Text);
-            console.AddMessage(text, message.Faction.Color);
+            string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
+            console.AddMessage(text, message.Sender.Color);
         }
 
         private void OnWorkerActivityStateChanged(WorkerActivityMonitor sender, Unit worker)

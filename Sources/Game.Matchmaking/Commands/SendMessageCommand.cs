@@ -29,6 +29,9 @@ namespace Orion.Game.Matchmaking.Commands
             this.recipientFactionHandles = recipientFactionHandles.ToList().AsReadOnly();
             this.text = text;
         }
+
+        public SendMessageCommand(Handle factionHandle, string text)
+            : this(factionHandle, Enumerable.Empty<Handle>(), text) { }
         #endregion
 
         #region Properties
@@ -55,9 +58,11 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            FactionMessage factionMessage = new FactionMessage(faction, text);
-            match.PostFactionMessage(factionMessage);
+            Faction senderFaction = match.World.FindFactionFromHandle(FactionHandle);
+            var recipientFactions = recipientFactionHandles.Select(handle => match.World.FindFactionFromHandle(handle));
+            
+            FactionMessage factionMessage = new FactionMessage(senderFaction, recipientFactions, text);
+            match.Post(factionMessage);
         }
 
         public override string ToString()

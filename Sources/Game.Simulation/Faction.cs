@@ -100,7 +100,7 @@ namespace Orion.Game.Simulation
 
         public event Action<Faction, string> Warning;
 
-        private void RaiseWarning(string message, Faction source)
+        public void RaiseWarning(string message, Faction source)
         {
 #warning Ugly hack, event sender should always be the event owner!
 

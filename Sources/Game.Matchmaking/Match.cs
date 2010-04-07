@@ -100,7 +100,7 @@ namespace Orion.Game.Matchmaking
         /// Notifies this <see cref="Match"/> that a message from a <see cref="Faction"/> has been received.
         /// </summary>
         /// <param name="message">The message that was received.</param>
-        public void PostFactionMessage(FactionMessage message)
+        public void Post(FactionMessage message)
         {
             Argument.EnsureNotNull(message, "message");
             FactionMessageReceived.Raise(this, message);

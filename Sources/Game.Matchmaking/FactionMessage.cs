@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using System.Collections.ObjectModel;
 
 namespace Orion.Game.Matchmaking
 {
@@ -16,28 +17,34 @@ namespace Orion.Game.Matchmaking
     public sealed class FactionMessage
     {
         #region Fields
-        private readonly Faction faction;
+        private readonly Faction sender;
+        private readonly ReadOnlyCollection<Faction> recipients;
         private readonly string text;
         #endregion
 
         #region Constructors
-        public FactionMessage(Faction faction, string text)
+        public FactionMessage(Faction sender, IEnumerable<Faction> recipients, string text)
         {
-            Argument.EnsureNotNull(faction, "faction");
+            Argument.EnsureNotNull(sender, "sender");
+            Argument.EnsureNotNull(recipients, "recipients");
             Argument.EnsureNotNull(text, "text");
 
-            this.faction = faction;
+            this.sender = sender;
+            this.recipients = recipients.ToList().AsReadOnly();
             this.text = text;
         }
+
+        public FactionMessage(Faction faction, string text)
+            : this(faction, Enumerable.Empty<Faction>(), text) { }
         #endregion
 
         #region Properties
         /// <summary>
         /// Gets the faction which sent this message.
         /// </summary>
-        public Faction Faction
+        public Faction Sender
         {
-            get { return faction; }
+            get { return sender; }
         }
 
         /// <summary>
@@ -50,9 +57,16 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
+        public bool IsRecipient(Faction faction)
+        {
+            Argument.EnsureNotNull(faction, "faction");
+
+            return recipients.Count == 0 || recipients.Contains(faction);
+        }
+
         public override string ToString()
         {
-            return "{0}: {1}".FormatInvariant(faction, text);
+            return "{0}: {1}".FormatInvariant(sender, text);
         }
         #endregion
     }

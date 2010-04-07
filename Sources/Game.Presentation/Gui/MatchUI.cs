@@ -273,6 +273,8 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(message, "message");
 
+            if (!message.IsRecipient(LocalFaction)) return;
+
             string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
             console.AddMessage(text, message.Sender.Color);
         }

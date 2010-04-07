@@ -406,7 +406,8 @@ namespace Orion.Game.Simulation
                 return null;
             }
 
-            return Intersecting(point)
+            Vector2 tileCenter = new Vector2(point.X + 0.5f, point.Y + 0.5f);
+            return Intersecting(tileCenter)
                 .WithMaxOrDefault(e => e.CollisionLayer);
         }
 

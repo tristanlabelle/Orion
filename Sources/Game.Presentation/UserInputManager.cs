@@ -121,16 +121,17 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (args.ClickCount > 1)
-            {
-                HandleMouseMultiClick(args);
-                return;
-            }
-
             if (args.Button == MouseButton.Left)
-                selectionStart = args.Position;
+            {
+                if (args.ClickCount > 1)
+                    HandleMouseMultiClick(args);
+                else
+                    selectionStart = args.Position;
+            }
             else if (args.Button == MouseButton.Right)
+            {
                 LaunchDefaultCommand(args.Position);
+            }
         }
 
         public void HandleMouseUp(MouseEventArgs args)

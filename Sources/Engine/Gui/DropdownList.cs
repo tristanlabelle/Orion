@@ -14,6 +14,7 @@ namespace Orion.Engine.Gui
         private T selectedItem;
         private ListPanel options;
         private Func<T, string> toStringer;
+        private Action<Responder, MouseEventArgs> closeDropdownList;
         #endregion
 
         #region Constructors
@@ -21,6 +22,7 @@ namespace Orion.Engine.Gui
             : base(frame)
         {
             items = new T[0];
+            closeDropdownList = CloseDropdownList;
         }
 
         public DropdownList(Rectangle frame, IEnumerable<T> items)
@@ -53,6 +55,22 @@ namespace Orion.Engine.Gui
             get { return toStringer; }
             set { toStringer = value; }
         }
+
+        private Responder HighestResponder
+        {
+            get
+            {
+                Responder parent = this;
+                Responder checkedParent;
+                do
+                {
+                    checkedParent = parent.Parent as Responder;
+                    if (checkedParent != null)
+                        parent = checkedParent;
+                } while (parent != null);
+                return parent;
+            }
+        }
         #endregion
 
         #region Events
@@ -80,8 +98,17 @@ namespace Orion.Engine.Gui
                 Label title = new Label(Frame, toStringer(item));
                 row.Children.Add(title);
             }
+            Parent.Children.Add(options);
+            HighestResponder.MouseButtonReleased += closeDropdownList;
             
             return false;
+        }
+
+        private void CloseDropdownList(Responder sender, MouseEventArgs args)
+        {
+            Parent.Children.Remove(options);
+            options = null;
+            HighestResponder.MouseButtonReleased -= closeDropdownList;
         }
         #endregion
         #endregion

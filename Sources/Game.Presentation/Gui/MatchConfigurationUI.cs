@@ -25,17 +25,19 @@ namespace Orion.Game.Presentation.Gui
         private readonly ListPanel optionsListPanel;
         private readonly Button startButton;
         private readonly Button exitButton;
+        private readonly IEnumerable<ColorRgb> availableColors;
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(MatchSettings settings)
-            : this(settings, true)
+        public MatchConfigurationUI(MatchSettings settings, IEnumerable<ColorRgb> availableColors)
+            : this(settings, availableColors, true)
         { }
 
-        public MatchConfigurationUI(MatchSettings settings, bool isGameMaster)
+        public MatchConfigurationUI(MatchSettings settings, IEnumerable<ColorRgb> availableColors, bool isGameMaster)
             : this(settings, isGameMaster, new List<PlayerSlot>())
         {
             AddPlayer(new LocalPlayerSlot());
+            this.availableColors = availableColors;
         }
 
         public MatchConfigurationUI(MatchSettings settings, bool isGameMaster, List<PlayerSlot> slots)

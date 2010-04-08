@@ -15,9 +15,8 @@ namespace Orion.Game.Presentation.Gui
     public sealed class MainMenuUI : MaximizedPanel
     {
         #region Fields
-        // HACK: Add whitespace to then end of strings because the last word ends up clipped otherwise.
-        private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle       ";
-        private const string artistName = "Guillaume Lacasse ";
+        private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
+        private const string artistName = "Guillaume Lacasse";
 
         private readonly Texture backgroundTexture;
         #endregion
@@ -32,10 +31,11 @@ namespace Orion.Game.Presentation.Gui
             Font titleFont = new Font("Impact", 48);
             AddCenteredLabel("Orion", titleFont, Colors.White, 700);
 
-            CreateButton(0.38f, "Monojoueur", () => SinglePlayerSelected);
-            CreateButton(0.31f, "Multijoueur", () => MultiplayerSelected);
-            CreateButton(0.24f, "Tower Defense", () => TowerDefenseSelected);
-            CreateButton(0.17f, "Visionner une partie", () => ViewReplaySelected);
+            CreateButton(0.45f, "Monojoueur", () => SinglePlayerSelected);
+            CreateButton(0.38f, "Multijoueur", () => MultiplayerSelected);
+            CreateButton(0.31f, "Tower Defense", () => TowerDefenseSelected);
+            CreateButton(0.24f, "Visionner une partie", () => ViewReplaySelected);
+            CreateButton(0.17f, "Quitter", () => QuitGameSelected);
 
             Font creditsFont = new Font("Trebuchet MS", 11);
             AddCenteredLabel("Programmeurs ", creditsFont, Colors.Orange, 90);
@@ -65,6 +65,11 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the user has chosen to view a replay.
         /// </summary>
         public event Action<MainMenuUI> ViewReplaySelected;
+
+        /// <summary>
+        /// Raised when the user has chosen to quit the game.
+        /// </summary>
+        public event Action<MainMenuUI> QuitGameSelected;
         #endregion
 
         #region Methods
@@ -82,13 +87,7 @@ namespace Orion.Game.Presentation.Gui
             Button button = new Button(rectangle, caption);
 
             if (eventGetter != null)
-            {
-                button.Triggered += sender => 
-                {
-                    Action<MainMenuUI> @event = eventGetter();
-                    if (@event != null) @event(this);
-                };
-            }
+                button.Triggered += sender => eventGetter().Raise(this);
 
             Children.Add(button);
         }

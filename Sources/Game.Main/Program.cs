@@ -87,7 +87,7 @@ namespace Orion.Game.Main
                 float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
                 float timeAccumulator = 0.0f;
 
-                while (!gameGraphics.Window.WasClosed && gameStateManager.ActiveState != null)
+                while (!gameGraphics.Window.WasClosed && !gameStateManager.IsEmpty)
                 {
                     float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                     float actualTimeDelta = newTime - oldTime;

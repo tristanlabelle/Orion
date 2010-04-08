@@ -31,6 +31,7 @@ namespace Orion.Game.Main
             this.ui.MultiplayerSelected += OnMultiplayerSelected;
             this.ui.TowerDefenseSelected += OnTowerDefenseSelected;
             this.ui.ViewReplaySelected += OnViewReplaySelected;
+            this.ui.QuitGameSelected += OnQuitGameSelected;
         }
         #endregion
 
@@ -90,6 +91,11 @@ namespace Orion.Game.Main
         private void OnViewReplaySelected(MainMenuUI sender)
         {
             Manager.Push(new ReplayBrowserGameState(Manager, graphics));
+        }
+
+        private void OnQuitGameSelected(MainMenuUI sender)
+        {
+            Manager.Pop();
         }
         #endregion
     }

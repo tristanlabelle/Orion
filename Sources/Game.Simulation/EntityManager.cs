@@ -214,13 +214,13 @@ namespace Orion.Game.Simulation
                 isUpdating = true;
                 foreach (Entity entity in entities.Values)
                     entity.Update(step);
-
-                CommitDeferredChanges();
             }
             finally
             {
                 isUpdating = false;
             }
+
+            CommitDeferredChanges();
         }
 
         #region Collection Modifications

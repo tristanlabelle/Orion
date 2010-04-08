@@ -55,9 +55,9 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         /// <summary>
-        /// Gets a sequence of handles to <see cref="Entity">entities</see> executing in this command.
+        /// Gets a sequence of handles to <see cref="Unit">units</see> executing in this command.
         /// </summary>
-        public abstract IEnumerable<Handle> ExecutingEntityHandles { get; }
+        public abstract IEnumerable<Handle> ExecutingUnitHandles { get; }
         #endregion
 
         #region Methods

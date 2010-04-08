@@ -31,10 +31,13 @@ namespace Orion.Game.Matchmaking.Commands
             this.trainerHandles = trainerHandles.Distinct().ToList().AsReadOnly();
             this.traineeTypeHandle = traineeTypeHandle;
         }
+
+        public TrainCommand(Handle factionHandle, Handle trainerHandle, Handle traineeTypeHandle)
+            : this(factionHandle, new[] { trainerHandle }, traineeTypeHandle) { }
         #endregion
 
         #region Properties
-        public override IEnumerable<Handle> ExecutingEntityHandles
+        public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return trainerHandles; }
         }

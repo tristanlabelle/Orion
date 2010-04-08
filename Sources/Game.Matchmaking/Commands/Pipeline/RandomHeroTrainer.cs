@@ -60,27 +60,31 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             {
                 Command command = accumulatedCommands.Dequeue();
                 TrainCommand trainCommand = command as TrainCommand;
-                if (trainCommand != null)
+                if (trainCommand == null)
                 {
-                    UnitType traineeType = UnitTypes.FromHandle(trainCommand.TraineeTypeHandle);
-                    if (traineeType == null)
-                    {
-                        Debug.Fail("Failed to resolve unit type from handle {0}."
-                            .FormatInvariant(trainCommand.TraineeTypeHandle));
-                    }
-                    else
-                    {
-                        UnitType heroType = RandomizeHero(traineeType);
-                        if (heroType != traineeType)
-                        {
-                            trainCommand = new TrainCommand(trainCommand.FactionHandle,
-                                trainCommand.ExecutingEntityHandles, heroType.Handle);
-                            command = trainCommand;
-                        }
-                    }
+                    Flush(command);
+                    continue;
                 }
 
-                Flush(command);
+                UnitType traineeType = UnitTypes.FromHandle(trainCommand.TraineeTypeHandle);
+                if (traineeType == null)
+                {
+                    Debug.Fail("Failed to resolve unit type from handle {0}."
+                        .FormatInvariant(trainCommand.TraineeTypeHandle));
+                    Flush(command);
+                    continue;
+                }
+                
+                // Split the command into one command per training,
+                // randomizing the heroes for each one.
+                foreach (Handle executingEntityHandle in trainCommand.ExecutingUnitHandles)
+                {
+                    TrainCommand generatedCommand = new TrainCommand(
+                        trainCommand.FactionHandle,
+                        executingEntityHandle,
+                        RandomizeHero(traineeType).Handle);
+                    Flush(generatedCommand);
+                }
             }
         }
 

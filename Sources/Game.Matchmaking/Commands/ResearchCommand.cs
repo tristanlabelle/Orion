@@ -78,12 +78,9 @@ namespace Orion.Game.Matchmaking.Commands
             WriteHandle(writer, technologyHandle);
         }
 
-        public override IEnumerable<Handle> ExecutingEntityHandles
+        public override IEnumerable<Handle> ExecutingUnitHandles
         {
-            get { List<Handle> handles = new List<Handle>();
-            handles.Add(researcherHandle);
-                return handles;
-            }
+            get { return new[] { researcherHandle }; }
         }
 
         public static ResearchCommand DeserializeSpecific(BinaryReader reader)

@@ -29,7 +29,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             while (commands.Count > 0)
             {
                 Command command = commands.Pop();
-                IEnumerable<Handle> handles = command.ExecutingEntityHandles;
+                IEnumerable<Handle> handles = command.ExecutingUnitHandles;
                 IEnumerable<Handle> availableUnits = handles.Except(concernedHandles);
 
                 if (handles.Count() > 0 && availableUnits.Count() > 0)
@@ -48,7 +48,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
         private void FlushOptimized(Command command)
         {
-            concernedHandles.AddRange(command.ExecutingEntityHandles);
+            concernedHandles.AddRange(command.ExecutingUnitHandles);
             Flush(command);
         }
         #endregion

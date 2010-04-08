@@ -32,7 +32,7 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
-        public override IEnumerable<Handle> ExecutingEntityHandles
+        public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return harvesterHandles; }
         }

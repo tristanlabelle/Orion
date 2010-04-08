@@ -101,12 +101,9 @@
     <Compile Include="Gui\MaximizedPanel.cs" />
     <Compile Include="Gui\MultiplayerLobbyUI.cs" />
     <Compile Include="Gui\MainMenuUI.cs" />
-    <Compile Include="Gui\AbstractMatchConfigurationUI.cs" />
     <Compile Include="Gui\MatchConsole.cs" />
     <Compile Include="Gui\MatchUI.cs" />
-    <Compile Include="Gui\MultiplayerMatchConfigurationUI.cs" />
     <Compile Include="Gui\ReplayBrowserUI.cs" />
-    <Compile Include="Gui\SinglePlayerMatchConfigurationUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInputCommand.cs" />
     <Compile Include="UserInputManager.cs" />

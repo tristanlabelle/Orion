@@ -10,8 +10,11 @@ namespace Orion.Engine.Gui
     public class DropdownList<T> : Panel
     {
         #region Fields
+        private bool enabled = true;
+
         private IEnumerable<T> items;
         private T selectedItem;
+        
         private ListPanel options;
         private Func<T, string> toStringer;
         private Action<Responder, MouseEventArgs> closeDropdownList;
@@ -23,12 +26,13 @@ namespace Orion.Engine.Gui
         {
             items = new T[0];
             closeDropdownList = CloseDropdownList;
+            toStringer = t => t.ToString();
         }
 
         public DropdownList(Rectangle frame, IEnumerable<T> items)
             : this(frame)
         {
-            this.items = items;
+            Items = items;
         }
         #endregion
 
@@ -36,7 +40,11 @@ namespace Orion.Engine.Gui
         public IEnumerable<T> Items
         {
             get { return items; }
-            set { items = value; }
+            set
+            {
+                items = value;
+                SelectedItem = items.First();
+            }
         }
 
         public T SelectedItem
@@ -44,10 +52,18 @@ namespace Orion.Engine.Gui
             get { return selectedItem; }
             set
             {
-                Argument.EnsureIn(value, items, "value");
-                selectedItem = value;
-                OnSelectionChanged(selectedItem);
+                if (!object.Equals(selectedItem, value))
+                {
+                    selectedItem = value;
+                    OnSelectionChanged(selectedItem);
+                }
             }
+        }
+
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { enabled = value; }
         }
 
         public Func<T, string> ToStringDelegate
@@ -56,7 +72,7 @@ namespace Orion.Engine.Gui
             set { toStringer = value; }
         }
 
-        private Responder HighestResponder
+        private Responder TopmostResponder
         {
             get
             {
@@ -89,26 +105,37 @@ namespace Orion.Engine.Gui
         {
             base.OnMouseButtonPressed(args);
 
-            T[] itemArray = items.ToArray();
-            Rectangle listRectangle = Frame.ScaledBy(1, itemArray.Length);
-            options = new ListPanel(listRectangle);
-            foreach (T item in itemArray)
+            if (enabled)
             {
-                Panel row = new Panel(Frame);
-                Label title = new Label(Frame, toStringer(item));
-                row.Children.Add(title);
+                T[] itemArray = items.ToArray();
+                Rectangle listRectangle = Frame.ScaledBy(1, itemArray.Length);
+                options = new ListPanel(listRectangle);
+                foreach (T item in itemArray)
+                    options.Children.Add(CreateRow(item));
+
+                Parent.Children.Add(options);
+                TopmostResponder.MouseButtonReleased += closeDropdownList;
             }
-            Parent.Children.Add(options);
-            HighestResponder.MouseButtonReleased += closeDropdownList;
             
             return false;
+        }
+
+        private Panel CreateRow(T item)
+        {
+            Panel row = new Panel(Frame);
+            row.MouseButtonReleased += (r, args) => SelectedItem = item;
+            row.MouseButtonReleased += closeDropdownList;
+
+            Label title = new Label(Frame, toStringer(item));
+            row.Children.Add(title);
+            return row;
         }
 
         private void CloseDropdownList(Responder sender, MouseEventArgs args)
         {
             Parent.Children.Remove(options);
             options = null;
-            HighestResponder.MouseButtonReleased -= closeDropdownList;
+            TopmostResponder.MouseButtonReleased -= closeDropdownList;
         }
         #endregion
         #endregion

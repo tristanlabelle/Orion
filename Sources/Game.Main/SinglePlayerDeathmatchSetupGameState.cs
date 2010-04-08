@@ -23,7 +23,7 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
-        private readonly SinglePlayerMatchConfigurationUI ui;
+        private readonly MatchConfigurationUI ui;
         #endregion
 
         #region Constructors
@@ -34,8 +34,9 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
-            this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
-            this.ui.InitializeSlots();
+            this.matchSettings.AddPlayer(new LocalPlayer(Faction.Colors.First()));
+            IEnumerable<ColorRgb> colors = Faction.Colors.Except(matchSettings.Players.Select(p => p.Color));
+            this.ui = new MatchConfigurationUI(matchSettings, colors);
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
         }
@@ -81,7 +82,7 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        private void OnStartGamePressed(AbstractMatchConfigurationUI sender)
+        private void OnStartGamePressed(MatchConfigurationUI sender)
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -93,10 +94,8 @@ namespace Orion.Game.Main
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
             int colorIndex = 0;
-            foreach (PlayerSlot playerSlot in ui.Players)
+            foreach (Player playerSlot in matchSettings.Players)
             {
-                if (playerSlot is ClosedPlayerSlot) continue;
-
                 ColorRgb color = Faction.Colors[colorIndex];
                 colorIndex++;
 
@@ -105,11 +104,11 @@ namespace Orion.Game.Main
                 faction.AlageneAmount = matchSettings.InitialAlageneAmount;
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
 
-                if (playerSlot is LocalPlayerSlot)
+                if (playerSlot is LocalPlayer)
                 {
                     localCommander = new SlaveCommander(match, faction);
                 }
-                else if (playerSlot is AIPlayerSlot)
+                else if (playerSlot is AIPlayer)
                 {
                     Commander commander = new AgressiveAICommander(match, faction);
                     aiCommanders.Add(commander);
@@ -139,7 +138,7 @@ namespace Orion.Game.Main
             Manager.Push(targetGameState);
         }
 
-        private void OnExitPressed(AbstractMatchConfigurationUI sender)
+        private void OnExitPressed(MatchConfigurationUI sender)
         {
             Manager.Pop();
         }

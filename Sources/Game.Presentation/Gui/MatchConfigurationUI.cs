@@ -11,7 +11,7 @@ using OpenTK.Math;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public class MatchConfigurationUI : MaximizedPanel
+    public sealed class MatchConfigurationUI : MaximizedPanel
     {
         #region Fields
         private const NumberStyles integerParsingStyles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -26,6 +26,9 @@ namespace Orion.Game.Presentation.Gui
         private readonly Button startButton;
         private readonly Button exitButton;
         private readonly IEnumerable<ColorRgb> availableColors;
+
+        private readonly Dictionary<Player, Panel> playerToRowMapping = new Dictionary<Player,Panel>();
+        private readonly Dictionary<Player, DropdownList<ColorRgb>> playerToColorDropdownListMapping = new Dictionary<Player,DropdownList<ColorRgb>>();
         #endregion
 
         #region Constructors
@@ -34,15 +37,9 @@ namespace Orion.Game.Presentation.Gui
         { }
 
         public MatchConfigurationUI(MatchSettings settings, IEnumerable<ColorRgb> availableColors, bool isGameMaster)
-            : this(settings, isGameMaster, new List<PlayerSlot>())
-        {
-            AddPlayer(new LocalPlayerSlot());
-            this.availableColors = availableColors;
-        }
-
-        public MatchConfigurationUI(MatchSettings settings, bool isGameMaster, List<PlayerSlot> slots)
         {
             this.settings = settings;
+            this.availableColors = availableColors;
             this.isGameMaster = isGameMaster;
 
             backgroundPanel = new Panel(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
@@ -61,10 +58,14 @@ namespace Orion.Game.Presentation.Gui
             }
 
             #region Players
+            settings.PlayerJoined += OnPlayerJoined;
+            settings.PlayerLeft += OnPlayerLeft;
+            settings.PlayerChanged += OnPlayerColorChanged;
             playersPanel = new ListPanel(Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.1f), new Vector2(0.5f, 0.9f)));
             backgroundPanel.Children.Add(playersPanel);
-            foreach (PlayerSlot slot in slots)
-                AddPlayer(slot);
+
+            foreach (Player player in settings.Players)
+                AddPlayerRow(player);
             #endregion
 
             #region Game Options
@@ -153,11 +154,31 @@ namespace Orion.Game.Presentation.Gui
 
         #region Methods
 
-        public void AddPlayer(PlayerSlot slot)
+        private void AddPlayerRow(Player player)
         {
-            Panel row = new Panel(RowFrame);
-            Label playerName = new Label(Instant.CreateComponentRectangle(row.Bounds, new Rectangle(0.8f, 1)), slot.ToString());
-            row.Children.Add(row);
+            Rectangle playerRect = Instant.CreateComponentRectangle(playersPanel.Bounds, new Rectangle(1, 0.125f));
+            Rectangle playerNameRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.75f, 1));
+            Rectangle colorDropdownRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.75f, 0, 0.15f, 1));
+            Rectangle kickRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.9f, 0, 0.1f, 1));
+
+            Panel row = new Panel(playerRect);
+            Label playerName = new Label(playerNameRect, player.ToString());
+            DropdownList<ColorRgb> colors = new DropdownList<ColorRgb>(colorDropdownRect, availableColors);
+            colors.SelectedItem = player.Color;
+            colors.Enabled = isGameMaster || player is LocalPlayer;
+            colors.SelectionChanged += (dropdown, color) => player.Color = color;
+            if(isGameMaster)
+            {
+                Button kick = new Button(kickRect, "X");
+                kick.Triggered += (sender) => settings.RemovePlayer(player);
+                row.Children.Add(kick);
+            }
+            row.Children.Add(playerName);
+            row.Children.Add(colors);
+            playersPanel.Children.Add(row);
+
+            playerToRowMapping.Add(player, row);
+            playerToColorDropdownListMapping.Add(player, colors);
         }
 
         #region Initialization
@@ -278,7 +299,23 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Events Handling
-        protected virtual void OnOptionChanged()
+        private void OnPlayerJoined(MatchSettings settings, Player player)
+        {
+            AddPlayerRow(player);
+        }
+
+        private void OnPlayerLeft(MatchSettings settings, Player player)
+        {
+            playersPanel.Children.Remove(playerToRowMapping[player]);
+            playerToRowMapping.Remove(player);
+        }
+
+        private void OnPlayerColorChanged(MatchSettings settings, Player player)
+        {
+            playerToColorDropdownListMapping[player].SelectedItem = player.Color;
+        }
+
+        private void OnOptionChanged()
         {
             OptionChanged.Raise(this, settings);
         }

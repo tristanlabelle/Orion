@@ -17,6 +17,9 @@ namespace Orion.Game.Simulation
     public sealed class World
     {
         #region Fields
+        private const int minimumPathfindingNodeCount = 150;
+        private const int maximumPathfindingNodeCount = 5000;
+
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
         private readonly EntityManager entities;
@@ -185,11 +188,13 @@ namespace Orion.Game.Simulation
             if (!Bounds.ContainsPoint(source))
                 throw new ArgumentOutOfRangeException("source");
 
-            int maxNumberOfNodes = (int)(destinationDistanceEvaluator(source) * 40);
-            if (maxNumberOfNodes < 25) maxNumberOfNodes = 100;
-            if (maxNumberOfNodes > 5000) maxNumberOfNodes = 5000;
+            int nodeLimit = (int)(destinationDistanceEvaluator(source) * 40);
+            if (nodeLimit < minimumPathfindingNodeCount)
+                nodeLimit = minimumPathfindingNodeCount;
+            else if (nodeLimit > maximumPathfindingNodeCount)
+                nodeLimit = maximumPathfindingNodeCount;
 
-            return pathfinder.Find(source, destinationDistanceEvaluator, isWalkable, maxNumberOfNodes);
+            return pathfinder.Find(source, destinationDistanceEvaluator, isWalkable, nodeLimit);
         }
         #endregion
 

@@ -20,14 +20,14 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Instance
         #region Fields
-        private const int maxConsecutiveFailCount = 3;
-        private const float timeBeforeRepathfinding = 0.5f;
+        private const float maxPathingFailureTime = 1.3f;
+        private const float timeBetweenRepathings = 0.4f;
 
         private readonly Func<Point, float> destinationDistanceEvaluator;
         private Path path;
         private int targetPathPointIndex;
-        private int consecutiveFailCount;
-        private float timeSinceLastPathfinding;
+        private float timeSinceLastPathing = float.PositiveInfinity;
+        private float timeSinceLastSuccessfulPathing;
         #endregion
 
         #region Constructors
@@ -44,13 +44,12 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(unit, "unit");
             if (!unit.HasSkill<MoveSkill>())
-                throw new ArgumentException("Cannot walk without the move skill.", "unit");
+                throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
             Debug.Assert(unit.IsAirborne || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
-            Repath();
         }
 
         public MoveTask(Unit unit, Point destination)
@@ -68,20 +67,20 @@ namespace Orion.Game.Simulation.Tasks
 
         public override bool HasEnded
         {
-            get { return path == null ? consecutiveFailCount >= maxConsecutiveFailCount : HasReachedDestination; }
+            get { return path == null ? timeSinceLastSuccessfulPathing >= maxPathingFailureTime : HasReachedDestination; }
         }
 
         public bool HasReachedDestination
         {
-            get { return path != null && path.IsComplete && Unit.Position == path.End; }
+            get { return path != null && path.IsComplete && targetPathPointIndex == path.PointCount; }
         }
 
         public override string Description
         {
             get
             {
-                if (path == null) return "walking";
-                return "walking to " + path.End.ToStringInvariant();
+                if (path == null) return "moving";
+                return "moving to " + path.End.ToStringInvariant();
             }
         }
         #endregion
@@ -89,9 +88,11 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            timeSinceLastPathfinding += step.TimeDeltaInSeconds;
+            timeSinceLastPathing += step.TimeDeltaInSeconds;
+            timeSinceLastSuccessfulPathing += step.TimeDeltaInSeconds;
 
-            if (path == null && !TryRepath()) return;
+            bool needsNewPath = (path == null || targetPathPointIndex == path.PointCount);
+            if (needsNewPath && !Repath()) return;
 
             float distance = Unit.GetStat(MoveSkill.SpeedStat) * step.TimeDeltaInSeconds;
 
@@ -104,7 +105,7 @@ namespace Orion.Game.Simulation.Tasks
             if (distance > deltaToPathPoint.LengthFast)
             {
                 targetPosition = targetPathPoint;
-                this.targetPathPointIndex = Math.Min(path.PointCount - 1, targetPathPointIndex + 1);
+                ++targetPathPointIndex;
             }
             else
             {
@@ -122,7 +123,7 @@ namespace Orion.Game.Simulation.Tasks
             else
             {
                 // An obstacle is blocking us
-                TryRepath();
+                Repath();
             }
         }
 
@@ -130,21 +131,30 @@ namespace Orion.Game.Simulation.Tasks
         {
             foreach (Point point in targetRegion.Points)
             {
-                if (!Unit.IsAirborne && !Unit.World.Terrain.IsWalkable(point)) return false;
-                Entity entity = Unit.World.Entities.GetEntityAt(point, Unit.CollisionLayer);
+                if (!Unit.IsAirborne && !World.Terrain.IsWalkable(point)) return false;
+                Entity entity = World.Entities.GetEntityAt(point, Unit.CollisionLayer);
                 if (entity != null && entity != Unit) return false;
             }
+
             return true;
         }
 
-        private void Repath()
+        private bool Repath()
         {
-            this.path = Unit.World.FindPath(Unit.GridRegion.Min,
-                destinationDistanceEvaluator, GetWalkabilityTester());
-            this.targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
+            path = null;
+            if (timeSinceLastPathing < timeBetweenRepathings)
+                return false;
 
-            if (path.Source == path.End && !path.IsComplete)
-                this.path = null;
+            path = Unit.World.FindPath(Unit.GridRegion.Min, destinationDistanceEvaluator, GetWalkabilityTester());
+            targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
+            timeSinceLastPathing = 0;
+
+            if (!path.IsComplete && path.Source == path.End)
+                return false;
+
+            timeSinceLastSuccessfulPathing = 0;
+
+            return true;
         }
 
         private Func<Point, bool> GetWalkabilityTester()
@@ -178,18 +188,6 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             return true;
-        }
-
-        private bool TryRepath()
-        {
-            if (timeSinceLastPathfinding < timeBeforeRepathfinding) return false;
-
-            Repath();
-            timeSinceLastPathfinding = 0;
-            if (this.path == null) ++consecutiveFailCount;
-            else consecutiveFailCount = 0;
-
-            return path != null;
         }
         #endregion
         #endregion

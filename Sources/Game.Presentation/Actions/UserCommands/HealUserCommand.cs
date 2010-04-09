@@ -12,11 +12,18 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
         public override void OnClick(Vector2 location)
         {
-            Point point = (Point)location;;
+            Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            Unit target = World.Entities.GetTopmostUnitAt(point);
-            if (target != null) InputManager.LaunchHeal(target);
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+            {
+                Unit target = World.Entities.GetTopmostUnitAt(point);
+                if (target != null) InputManager.LaunchHeal(target);
+            }
+            else
+            {
+                InputManager.LaunchMove(location);
+            }
         }
     }
 }

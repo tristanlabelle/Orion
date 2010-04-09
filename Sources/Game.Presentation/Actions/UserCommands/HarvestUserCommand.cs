@@ -2,6 +2,7 @@ using System.Linq;
 using OpenTK.Math;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
+using Orion.Engine;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -12,13 +13,23 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
         public override void OnClick(Vector2 location)
         {
-            ResourceNode resourceNode = World.Entities
-                .Intersecting(location)
-                .OfType<ResourceNode>()
-                .FirstOrDefault(node => node.IsHarvestableByFaction(LocalFaction));
-            if (resourceNode == null) return;
+            Point point = (Point)location;
+            if (!World.IsWithinBounds(point)) return;
 
-            InputManager.LaunchHarvest(resourceNode);
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+            {
+                ResourceNode resourceNode = World.Entities
+                    .Intersecting(location)
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault(node => node.IsHarvestableByFaction(LocalFaction));
+                if (resourceNode == null) return;
+
+                InputManager.LaunchHarvest(resourceNode);
+            }
+            else
+            {
+                InputManager.LaunchMove(location);
+            }
         }
     }
 }

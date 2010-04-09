@@ -15,8 +15,15 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Point point = (Point)location;
             if (!World.IsWithinBounds(point)) return;
 
-            Unit target = World.Entities.GetTopmostUnitAt(point);
-            if (target != null) InputManager.LaunchRepair(target);
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
+            {
+                Unit target = World.Entities.GetTopmostUnitAt(point);
+                if (target != null) InputManager.LaunchRepair(target);
+            }
+            else
+            {
+                InputManager.LaunchMove(location);
+            }
         }
     }
 }

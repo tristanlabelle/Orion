@@ -18,7 +18,6 @@ namespace Orion.Engine.Gui
         [Obsolete("Game Specific, to be moved out of the engine.")]
         public static readonly Rectangle ContentsBounds = new Rectangle(1024, 768);
 
-        private Rectangle frame;
         private Responder focusedView;
         #endregion
 
@@ -36,12 +35,6 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Properties
-        public override Rectangle Frame
-        {
-            get { return frame; }
-            set { frame = value; }
-        }
-
         public Responder FocusedView
         {
             get { return focusedView; }

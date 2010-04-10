@@ -76,6 +76,7 @@
     <Compile Include="Audio\GameAudio.cs" />
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="GameGraphics.cs" />
+    <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepMoneyRenderer.cs" />
     <Compile Include="Renderers\CreepPathRenderer.cs" />

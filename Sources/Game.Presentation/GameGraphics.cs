@@ -31,6 +31,7 @@ namespace Orion.Game.Presentation
         {
             this.window = new WindowsFormsGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             this.window.InputReceived += OnInputReceived;
+            this.window.Resized += OnWindowResized;
 
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
@@ -202,6 +203,11 @@ namespace Orion.Game.Presentation
         {
             HandleInput(inputEvent);
             inputEventQueue.Enqueue(inputEvent);
+        }
+
+        private void OnWindowResized(IGameWindow sender)
+        {
+            rootView.Frame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
         }
 
         private void HandleInput(InputEvent inputEvent)

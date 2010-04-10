@@ -151,25 +151,27 @@ namespace Orion.Engine.Gui
 
         protected internal override void OnAncestryChanged(ViewContainer ancestor)
         {
-            RootView root = Root as RootView;
-            if (root != null && root.FocusedView == this)
-                root.FocusedView = null;
-
+            Unfocus();
             base.OnAncestryChanged(ancestor);
         }
 
         protected internal override void OnAddToParent(ViewContainer parent)
         {
-            RootView root = Root as RootView;
-            if (root != null) root.FocusedView = this;
+            Unfocus();
             base.OnAddToParent(parent);
         }
 
         protected internal override void OnRemovedFromParent(ViewContainer parent)
         {
-            RootView root = Root as RootView;
-            if (root != null) root.FocusedView = null;
+            Unfocus();
             base.OnRemovedFromParent(parent);
+        }
+
+        private void Unfocus()
+        {
+            RootView root = Root as RootView;
+            if (root != null && root.FocusedView == this)
+                root.FocusedView = null;
         }
         #endregion
     }

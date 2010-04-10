@@ -135,7 +135,6 @@
     </Compile>
     <Compile Include="Gui\RoundedRectangleRenderer.cs" />
     <Compile Include="Gui\Scrollbar.cs" />
-    <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Gui\TextField.cs" />
     <Compile Include="Gui\TexturedRenderer.cs" />
     <Compile Include="Gui\View.cs">

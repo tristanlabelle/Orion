@@ -160,7 +160,6 @@ namespace Orion.Game.Matchmaking
             IncreaseResources(match, faction);
             IncreaseAvailableFood(match, faction);
             IncreaseBuildAndTrainSpeed(match, faction);
-            SpawnChuckNorris(match, faction);
         }
         #endregion
         #endregion

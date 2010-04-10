@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Geometry;
 using Orion.Engine.Input;
+using OpenTK.Math;
 
 namespace Orion.Engine.Gui
 {
@@ -16,6 +17,8 @@ namespace Orion.Engine.Gui
         private T selectedItem;
         
         private ListPanel options;
+        private Label shownTitle;
+
         private Func<T, string> toStringer;
         private Action<Responder, MouseEventArgs> closeDropdownList;
         #endregion
@@ -83,7 +86,7 @@ namespace Orion.Engine.Gui
                     checkedParent = parent.Parent as Responder;
                     if (checkedParent != null)
                         parent = checkedParent;
-                } while (parent != null);
+                } while (checkedParent != null);
                 return parent;
             }
         }
@@ -97,6 +100,12 @@ namespace Orion.Engine.Gui
         #region Event Handling
         private void OnSelectionChanged(T selection)
         {
+            if (shownTitle != null)
+                Children.Remove(shownTitle);
+
+            shownTitle = new Label(toStringer(selectedItem));
+            Children.Add(shownTitle);
+
             var handler = SelectionChanged;
             if (handler != null) handler(this, selection);
         }
@@ -108,12 +117,16 @@ namespace Orion.Engine.Gui
             if (enabled)
             {
                 T[] itemArray = items.ToArray();
-                Rectangle listRectangle = Frame.ScaledBy(1, itemArray.Length);
+                Rectangle listRectangle = Frame;
+                Vector2 top = new Vector2(listRectangle.MinX, listRectangle.MaxY);
+                listRectangle = listRectangle.TranslatedTo(0, 0).ScaledBy(1, itemArray.Length);
+                listRectangle = listRectangle.TranslatedTo(top.X, top.Y - listRectangle.Height);
+                listRectangle = ConvertToTopmostCoordinatesSystem(listRectangle);
                 options = new ListPanel(listRectangle);
                 foreach (T item in itemArray)
                     options.Children.Add(CreateRow(item));
 
-                Parent.Children.Add(options);
+                TopmostResponder.Children.Add(options);
                 TopmostResponder.MouseButtonReleased += closeDropdownList;
             }
             
@@ -124,18 +137,29 @@ namespace Orion.Engine.Gui
         {
             Panel row = new Panel(Frame);
             row.MouseButtonReleased += (r, args) => SelectedItem = item;
-            row.MouseButtonReleased += closeDropdownList;
 
-            Label title = new Label(Frame, toStringer(item));
+            Label title = new Label(toStringer(item));
             row.Children.Add(title);
             return row;
         }
 
         private void CloseDropdownList(Responder sender, MouseEventArgs args)
         {
-            Parent.Children.Remove(options);
+            TopmostResponder.Children.Remove(options);
             options = null;
             TopmostResponder.MouseButtonReleased -= closeDropdownList;
+        }
+
+        private Rectangle ConvertToTopmostCoordinatesSystem(Rectangle rect)
+        {
+            Responder parent = this.Parent as Responder;
+            while (parent != null)
+            {
+                Vector2 scaleBy = new Vector2(parent.Bounds.Width / parent.Frame.Width, parent.Bounds.Height / parent.Frame.Height);
+                rect = rect.TranslatedBy(parent.Frame.Min).ScaledBy(scaleBy).TranslatedBy(-parent.Bounds.Min);
+                parent = parent.Parent as Responder;
+            }
+            return rect;
         }
         #endregion
         #endregion

@@ -156,14 +156,15 @@ namespace Orion.Game.Presentation.Gui
 
         private void AddPlayerRow(Player player)
         {
-            Rectangle playerRect = Instant.CreateComponentRectangle(playersPanel.Bounds, new Rectangle(1, 0.125f));
-            Rectangle playerNameRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.75f, 1));
-            Rectangle colorDropdownRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.75f, 0, 0.15f, 1));
+            Rectangle playerRect = Instant.CreateComponentRectangle(playersPanel.Bounds, new Rectangle(1, 0.0375f));
+            Rectangle playerNameRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.7f, 1));
+            Rectangle colorDropdownRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.7f, 0, 0.2f, 1));
             Rectangle kickRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.9f, 0, 0.1f, 1));
 
             Panel row = new Panel(playerRect);
             Label playerName = new Label(playerNameRect, player.ToString());
             DropdownList<ColorRgb> colors = new DropdownList<ColorRgb>(colorDropdownRect, availableColors);
+            colors.ToStringDelegate = (color) => Colors.GetName(color);
             colors.SelectedItem = player.Color;
             colors.Enabled = isGameMaster || player is LocalPlayer;
             colors.SelectionChanged += (dropdown, color) => player.Color = color;

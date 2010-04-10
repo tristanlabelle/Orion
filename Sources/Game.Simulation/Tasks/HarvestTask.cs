@@ -31,7 +31,6 @@ namespace Orion.Game.Simulation.Tasks
         private MoveTask move;
         private Unit depot;
         private Mode mode = Mode.Extracting;
-        private bool depotAvailable = true;
         #endregion
 
         #region Constructors
@@ -65,10 +64,11 @@ namespace Orion.Game.Simulation.Tasks
             if (!move.HasEnded)
             {
                 move.Update(step);
-                if (move.HasEnded && !move.HasReachedDestination)
-                    MarkAsEnded();
                 return;
             }
+
+            if (!move.HasReachedDestination)
+                MarkAsEnded();
 
             if (mode == Mode.Extracting)
                 UpdateExtracting(step);
@@ -80,7 +80,13 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (!node.IsAlive || !node.IsHarvestableByFaction(Unit.Faction))
             {
-                MarkAsEnded();
+                if (amountCarrying == 0)
+                {
+                    MarkAsEnded();
+                    return;
+                }
+
+                mode = Mode.Delivering;
                 return;
             }
 
@@ -130,8 +136,13 @@ namespace Orion.Game.Simulation.Tasks
             if (!depot.IsAlive)
             {
                 depot = FindClosestDepot();
-                if (depot == null) MarkAsEnded();
-                else move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                if (depot == null)
+                {
+                    MarkAsEnded();
+                    return;
+                }
+
+                move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                 return;
             }
 
@@ -148,7 +159,12 @@ namespace Orion.Game.Simulation.Tasks
                 Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
-            if (!node.IsAlive) return;
+            if (!node.IsAlive || !node.IsHarvestableByFaction(Unit.Faction))
+            {
+                Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
+                MarkAsEnded();
+                return;
+            }
 
             move = MoveTask.ToNearRegion(Unit, node.GridRegion);
             mode = Mode.Extracting;

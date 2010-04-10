@@ -70,7 +70,8 @@ namespace Orion.Game.Simulation.Tasks
             if (Unit.IsWithinHealingRange(target))
             {
                 Unit.LookAt(target.Center);
-                Unit.TryHit(target);
+                int speed = Unit.GetStat(HealSkill.SpeedStat);
+                target.Health += speed * step.TimeDeltaInSeconds;
                 return;
             }
             else

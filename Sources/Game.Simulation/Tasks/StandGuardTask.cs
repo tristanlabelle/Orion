@@ -25,24 +25,13 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Constructors
         public StandGuardTask(Unit guard)
-            : base(guard)
-        {}
+            : base(guard) {}
         #endregion
 
         #region Properties
-        public Unit Target
-        {
-            get { return target; }
-        }
-
         public override string Description
         {
             get { return "standing guard"; }
-        }
-
-        public override bool HasEnded
-        {
-            get { return false; }
         }
         #endregion
 

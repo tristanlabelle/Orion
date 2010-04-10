@@ -65,11 +65,6 @@ namespace Orion.Game.Simulation.Tasks
             get { return path; }
         }
 
-        public override bool HasEnded
-        {
-            get { return path == null ? timeSinceLastSuccessfulPathing >= maxPathingFailureTime : HasReachedDestination; }
-        }
-
         public bool HasReachedDestination
         {
             get { return path != null && path.IsComplete && targetPathPointIndex == path.PointCount; }
@@ -90,6 +85,13 @@ namespace Orion.Game.Simulation.Tasks
         {
             timeSinceLastPathing += step.TimeDeltaInSeconds;
             timeSinceLastSuccessfulPathing += step.TimeDeltaInSeconds;
+
+            if (HasReachedDestination
+                || (path == null && timeSinceLastSuccessfulPathing >= maxPathingFailureTime))
+            {
+                MarkAsEnded();
+                return;
+            }
 
             bool needsNewPath = (path == null || targetPathPointIndex == path.PointCount);
             if (needsNewPath && !Repath()) return;

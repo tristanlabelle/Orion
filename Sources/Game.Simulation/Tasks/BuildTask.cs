@@ -16,7 +16,6 @@ namespace Orion.Game.Simulation.Tasks
         #region Fields
         private readonly BuildingPlan buildingPlan;
         private MoveTask move;
-        private bool hasEnded = false;
         #endregion
 
         #region Constructors
@@ -45,11 +44,6 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "Building {0}".FormatInvariant(buildingPlan.BuildingType); }
         }
-
-        public override bool HasEnded
-        {
-            get { return hasEnded; }
-        }
         #endregion
 
         #region Methods
@@ -64,7 +58,7 @@ namespace Orion.Game.Simulation.Tasks
             // Test if we're in the building's surrounding area
             if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, Unit.GridRegion))
             {
-                hasEnded = true;
+                MarkAsEnded();
                 return;
             }
 
@@ -72,7 +66,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth)
                     Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
-                hasEnded = true;
+                MarkAsEnded();
                 return;
             }
 
@@ -80,7 +74,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);
-                hasEnded = true;
+                MarkAsEnded();
                 return;
             }
 
@@ -94,7 +88,7 @@ namespace Orion.Game.Simulation.Tasks
                 string warning = "Pas assez de ressources pour construire le bâtiment {0}"
                     .FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);
-                hasEnded = true;
+                MarkAsEnded();
                 return;
             }
 
@@ -112,7 +106,7 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
-            hasEnded = true;
+            MarkAsEnded();
         }
         #endregion
     }

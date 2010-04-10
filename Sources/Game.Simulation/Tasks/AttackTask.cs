@@ -46,30 +46,41 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "attacking"; }
         }
-
-        public override bool HasEnded
-        {
-            get
-            {
-                if (!Unit.Faction.CanSee(target))
-                    return true;
-                if (!Unit.IsWithinAttackRange(target))
-                    return !Unit.HasSkill<MoveSkill>() || follow.HasEnded;
-                return !target.IsAlive;
-            }
-        }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            if (!Unit.Faction.CanSee(target))
+            {
+                MarkAsEnded();
+                return;
+            }
+
+            if (!target.IsAlive)
+            {
+                // If the target has died while we weren't yet in attack range,
+                // but were coming, complete the motion with a move task.
+                if (follow != null && !Unit.IsWithinAttackRange(target))
+                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
+                MarkAsEnded();
+                return;
+            }
+
             if (Unit.IsWithinAttackRange(target))
             {
                 Unit.LookAt(target.Center);
                 Unit.TryHit(target);
+                return;
             }
-            else if (follow != null)
+            else
             {
+                if (follow == null || follow.HasEnded)
+                {
+                    MarkAsEnded();
+                    return;
+                }
+
                 follow.Update(step);
             }
         }

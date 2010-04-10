@@ -30,11 +30,6 @@ namespace Orion.Game.Matchmaking.TowerDefense
         #endregion
 
         #region Properties
-        public override bool HasEnded
-        {
-            get { return false; }
-        }
-
         public override string Description
         {
             get { return "following creep path"; }

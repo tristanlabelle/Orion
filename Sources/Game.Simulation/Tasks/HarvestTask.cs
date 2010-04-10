@@ -57,17 +57,6 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "harvesting " + node.Type; }
         }
-
-        public override bool HasEnded
-        {
-            get
-            {
-                return (move.HasEnded && !move.HasReachedDestination)
-                    || !node.IsAlive
-                    || !node.IsHarvestableByFaction(Unit.Faction)
-                    || !depotAvailable;
-            }
-        }
         #endregion
 
         #region Methods
@@ -76,6 +65,8 @@ namespace Orion.Game.Simulation.Tasks
             if (!move.HasEnded)
             {
                 move.Update(step);
+                if (move.HasEnded && !move.HasReachedDestination)
+                    MarkAsEnded();
                 return;
             }
 
@@ -87,6 +78,12 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateExtracting(SimulationStep step)
         {
+            if (!node.IsAlive || !node.IsHarvestableByFaction(Unit.Faction))
+            {
+                MarkAsEnded();
+                return;
+            }
+
             Unit.LookAt(node.Center);
 
             float extractingSpeed = Unit.GetStat(HarvestSkill.SpeedStat);
@@ -115,7 +112,7 @@ namespace Orion.Game.Simulation.Tasks
                     depot = FindClosestDepot();
                     if (depot == null)
                     {
-                        depotAvailable = false;
+                        MarkAsEnded();
                     }
                     else
                     {
@@ -133,7 +130,7 @@ namespace Orion.Game.Simulation.Tasks
             if (!depot.IsAlive)
             {
                 depot = FindClosestDepot();
-                if (depot == null) depotAvailable = false;
+                if (depot == null) MarkAsEnded();
                 else move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                 return;
             }

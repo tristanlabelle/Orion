@@ -39,11 +39,6 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "Researching " + technology.Name; }
         }
-
-        public override bool HasEnded
-        {
-            get { return timeElapsed >= researchTimeInSeconds; }
-        }
         #endregion
 
         #region Methods
@@ -51,7 +46,10 @@ namespace Orion.Game.Simulation.Tasks
         {
             timeElapsed += step.TimeDeltaInSeconds;
             if (timeElapsed >= researchTimeInSeconds)
+            {
                 Unit.Faction.CompleteResearch(technology);
+                MarkAsEnded();
+            }
         }
 
         public override void Dispose()

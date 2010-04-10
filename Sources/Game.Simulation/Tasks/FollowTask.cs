@@ -51,32 +51,13 @@ namespace Orion.Game.Simulation.Tasks
             get { return target; }
         }
 
-        public bool IsInRange
-        {
-            get { return (target.Position - Unit.Position).Length <= 1; }
-        }
-
         /// <summary>
         /// Gets the current distance remaining between this <see cref="Unit"/>
         /// and the followed <see cref="Unit"/>.
         /// </summary>
         public float CurrentDistance
         {
-            get { return (target.Position - Unit.Position).Length; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if the following <see cref="Unit"/>
-        /// is within the target range of its <see cref="target"/>.
-        /// </summary>
-        public override bool HasEnded
-        {
-            get
-            {
-                // This task never ends as even if we get in range at one point in time,
-                // the target may move again later.
-                return target == null || moveTask.HasEnded || !target.IsAlive;
-            }
+            get { return Region.Distance(Unit.GridRegion, target.GridRegion); }
         }
 
         public override string Description
@@ -88,6 +69,15 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            if (!target.IsAlive || !Unit.Faction.CanSee(target))
+            {
+                MarkAsEnded();
+                return;
+            }
+
+            if (Region.AreAdjacentOrIntersecting(Unit.GridRegion, target.GridRegion))
+                return;
+
             float targetDisplacementLength = (target.Position - oldTargetPosition).LengthFast;
             float distanceToTarget = (target.Position - Unit.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
@@ -96,7 +86,7 @@ namespace Orion.Game.Simulation.Tasks
                 oldTargetPosition = target.Position;
             }
 
-            moveTask.Update(step);
+            if (!moveTask.HasEnded) moveTask.Update(step);
         }
         #endregion
     }

@@ -15,8 +15,7 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Unit target;
-        private readonly MoveTask move;     
-       
+        private readonly FollowTask follow;    
         #endregion
 
         #region Constructors
@@ -29,24 +28,15 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");
-
-            // TODO: check against repairability itself instead of the Building type,
-            // since otherwise mechanical units could be repaired too
             if (target.Type.IsBuilding)
-                throw new ArgumentException("Can only heal non buildings units.", "target");
-            Debug.Assert(healer.Faction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally);
+                throw new ArgumentException("Cannot heal buildings.", "target");
 
             this.target = target;
-            this.move = MoveTask.ToNearRegion(healer, target.GridRegion);
+            if (healer.HasSkill<MoveSkill>()) this.follow = new FollowTask(healer, target);
         }
         #endregion
 
         #region Properties
-
-        public bool IsWithinRange
-        {
-            get { return (Unit.Center - target.Center).LengthFast <= Unit.GetStat(HealSkill.RangeStat); }
-        }
         public Unit Target
         {
             get { return target; }
@@ -56,36 +46,44 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "healing {0}".FormatInvariant(target); }
         }
-
-        public override bool HasEnded
-        {
-            get
-            {
-                if (!target.IsAlive) return true;
-                if (move.HasEnded && !IsWithinRange) return true;
-                return target.Health >= target.MaxHealth;
-            }
-        }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (IsWithinRange)
+            if (!Unit.Faction.CanSee(target))
             {
-                Unit.LookAt(target.Center);
-                int speed = Unit.GetStat(HealSkill.SpeedStat);
-                target.Health += speed * step.TimeDeltaInSeconds;
-            }
-            else if (!move.HasEnded)
-            {
-                move.Update(step);
+                MarkAsEnded();
                 return;
             }
-            
-           
-        }
 
+            if (!target.IsAlive)
+            {
+                // If the target has died while we weren't yet in attack range,
+                // but were coming, complete the motion with a move task.
+                if (follow != null && !Unit.IsWithinHealingRange(target))
+                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
+                MarkAsEnded();
+                return;
+            }
+
+            if (Unit.IsWithinHealingRange(target))
+            {
+                Unit.LookAt(target.Center);
+                Unit.TryHit(target);
+                return;
+            }
+            else
+            {
+                if (follow == null || follow.HasEnded)
+                {
+                    MarkAsEnded();
+                    return;
+                }
+
+                follow.Update(step);
+            }
+        }
         #endregion
     }
 }

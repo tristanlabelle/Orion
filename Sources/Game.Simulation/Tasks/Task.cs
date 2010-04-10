@@ -1,5 +1,6 @@
 ﻿using System;
 using Orion.Engine;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -11,6 +12,7 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Unit unit;
+        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -34,7 +36,10 @@ namespace Orion.Game.Simulation.Tasks
         /// Gets a value indicating if this <see cref="Task"/> has terminated its execution,
         /// rendering the unit idle.
         /// </summary>
-        public abstract bool HasEnded { get; }
+        public bool HasEnded
+        {
+            get { return hasEnded; }
+        }
 
         /// <summary>
         /// Gets a human-readable string describing this <see cref="Task"/>.
@@ -59,10 +64,14 @@ namespace Orion.Game.Simulation.Tasks
         /// <param name="step">Information on the simulation step.</param>
         public void Update(SimulationStep step)
         {
-            if (!HasEnded) DoUpdate(step);
+            if (hasEnded)
+            {
+                Debug.Fail("Task was updated even though it was ended.");
+                return;
+            }
+                
+            DoUpdate(step);
         }
-
-        protected abstract void DoUpdate(SimulationStep step);
 
         /// <summary>
         /// Releases all resources used by this <see cref="Task"/>.
@@ -73,6 +82,17 @@ namespace Orion.Game.Simulation.Tasks
         {
             return Description;
         }
+
+        /// <summary>
+        /// Marks this task as having ended.
+        /// </summary>
+        protected void MarkAsEnded()
+        {
+            Debug.Assert(!hasEnded, "Task has ended more than once.");
+            hasEnded = true;
+        }
+
+        protected abstract void DoUpdate(SimulationStep step);
         #endregion
     }
 }

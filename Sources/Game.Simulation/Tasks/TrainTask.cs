@@ -19,7 +19,6 @@ namespace Orion.Game.Simulation.Tasks
         private float healthPointsTrained;
         private bool attemptingToPlaceUnit;
         private bool waitingForEnoughFood;
-        private bool hasEnded;
         #endregion
 
         #region Constructors
@@ -47,11 +46,6 @@ namespace Orion.Game.Simulation.Tasks
         public override string Description
         {
             get { return "Training"; }
-        }
-
-        public override bool HasEnded
-        {
-            get { return hasEnded; }
         }
 
         public UnitType TraineeType
@@ -97,7 +91,7 @@ namespace Orion.Game.Simulation.Tasks
             if (trainee != null)
             {
                 attemptingToPlaceUnit = false;
-                hasEnded = true;
+                MarkAsEnded();
             }
             else if (!attemptingToPlaceUnit)
             {

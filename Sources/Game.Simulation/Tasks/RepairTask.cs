@@ -64,25 +64,22 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "repairing {0}".FormatInvariant(target); }
         }
-
-        public override bool HasEnded
-        {
-            get
-            {
-                return hasEnded
-                    || !target.IsAlive
-                    || (move.HasEnded && !move.HasReachedDestination)
-                    || (!building && target.Health >= target.MaxHealth);
-            }
-        }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            if (!target.IsAlive)
+            {
+                MarkAsEnded();
+                return;
+            }
+
             if (!move.HasEnded)
             {
                 move.Update(step);
+                if (move.HasEnded && !move.HasReachedDestination)
+                    MarkAsEnded();
                 return;
             }
 
@@ -109,7 +106,7 @@ namespace Orion.Game.Simulation.Tasks
                     Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
                 }
 
-                hasEnded = true;
+                MarkAsEnded();
             }
         }
 
@@ -141,6 +138,8 @@ namespace Orion.Game.Simulation.Tasks
             target.Health += healthToRepair;
             aladdiumCreditRemaining -= frameAladdiumCost;
             alageneCreditRemaining -= frameAlageneCost;
+
+            if (target.Damage < 0.001f) MarkAsEnded();
         }
 
         private bool TryGetCredit()

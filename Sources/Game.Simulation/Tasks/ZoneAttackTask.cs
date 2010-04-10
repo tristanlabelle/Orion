@@ -40,11 +40,6 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Properties
-        public override bool HasEnded
-        {
-            get { return move.HasEnded && (attack == null || attack.HasEnded); }
-        }
-
         public override string Description
         {
             get { return "attacking while moving to {0}".FormatInvariant(destination); }
@@ -72,25 +67,27 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (attack != null) attack.Update(step);
-
-            if (attack == null || attack.HasEnded)
+            if (attack == null && Unit.CanPerformProximityChecks(step))
             {
-                if (TryAttack()) attack.Update(step);
-                else move.Update(step);
+                Unit target = Unit.World.Entities
+                    .Intersecting(Unit.LineOfSight)
+                    .OfType<Unit>()
+                    .FirstOrDefault(other => Unit.IsInLineOfSight(other)
+                        && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
+
+                if (target != null) attack = new AttackTask(Unit, target);
             }
-        }
 
-        public bool TryAttack()
-        {
-            Unit target = Unit.World.Entities
-                .Intersecting(Unit.LineOfSight)
-                .OfType<Unit>()
-                .FirstOrDefault(other => Unit.IsInLineOfSight(other)
-                    && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
-
-            if (target != null) attack = new AttackTask(Unit, target);
-            return target != null;
+            if (attack == null)
+            {
+                move.Update(step);
+                if (move.HasEnded) MarkAsEnded();
+            }
+            else
+            {
+                attack.Update(step);
+                if (attack.HasEnded) attack = null;
+            }
         }
         #endregion
     }

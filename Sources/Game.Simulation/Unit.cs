@@ -20,7 +20,7 @@ namespace Orion.Game.Simulation
     {
         #region Fields
         /// <summary>
-        /// The number of frames between successive checks for nearby enemies.
+        /// The number of frames between successive proximity checks.
         /// Used as an optimization.
         /// </summary>
         private const int nearbyEnemyCheckPeriod = 8;
@@ -311,17 +311,25 @@ namespace Orion.Game.Simulation
         public bool IsWithinAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
+            Debug.Assert(HasSkill<AttackSkill>());
 
-            if (!HasSkill<AttackSkill>()) return false;
-
-            int attackRange = GetStat(AttackSkill.RangeStat);
-            if (attackRange == 0)
+            int range = GetStat(AttackSkill.RangeStat);
+            if (range == 0)
             {
                 if (!IsAirborne && other.IsAirborne) return false;
                 return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             }
 
-            return Region.SquaredDistance(GridRegion, other.GridRegion) <= attackRange * attackRange + 0.001f;
+            return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
+        }
+
+        public bool IsWithinHealingRange(Unit other)
+        {
+            Argument.EnsureNotNull(other, "other");
+            Debug.Assert(HasSkill<HealSkill>());
+
+            int range = GetStat(HealSkill.RangeStat);
+            return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
         }
         #endregion
 
@@ -509,8 +517,7 @@ namespace Orion.Game.Simulation
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.
-            if ((step.Number + (int)Handle.Value % nearbyEnemyCheckPeriod)
-                % nearbyEnemyCheckPeriod == 0 && IsIdle)
+            if (CanPerformProximityChecks(step) && IsIdle)
             {
                 if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
                     return;
@@ -521,6 +528,17 @@ namespace Orion.Game.Simulation
                     && TryAttackNearbyUnit()) { }
             }
             taskQueue.Update(step);
+        }
+
+        /// <summary>
+        /// Tests if a frame is one in which this unit can perform proximity tests.
+        /// This is used to limit the number of such operations and distribute them in time.
+        /// </summary>
+        /// <param name="step">The current simulation step.</param>
+        /// <returns>A value indicating if proximity checks can be performed.</returns>
+        internal bool CanPerformProximityChecks(SimulationStep step)
+        {
+            return (step.Number + (int)Handle.Value) % nearbyEnemyCheckPeriod == 0;
         }
 
         private bool TryExplodeWithNearbyUnit()

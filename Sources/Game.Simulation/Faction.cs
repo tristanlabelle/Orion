@@ -85,7 +85,6 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Raised when this <see cref="Faction"/> gets defeated.
         /// </summary>
-        [Obsolete("Should be detected by the game states.")]
         public event Action<Faction> Defeated;
 
         /// <summary>

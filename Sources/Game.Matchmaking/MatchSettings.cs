@@ -17,8 +17,6 @@ namespace Orion.Game.Matchmaking
     {
         #region Instance
         #region Fields
-        private Action<Player> onColorChanged;
-
         private Size mapSize = new Size(150, 150);
         
         private int foodLimit = 200;
@@ -30,21 +28,11 @@ namespace Orion.Game.Matchmaking
         private bool startNomad;
         private bool areCheatsEnabled;
         private bool areRandomHeroesEnabled = true;
-
-        private List<Player> players = new List<Player>();
         #endregion
 
         #region Constructors
         public MatchSettings()
-        {
-            onColorChanged = OnColorChanged;
-        }
-
-        public MatchSettings(IEnumerable<Player> players)
-            : this()
-        {
-            this.players.AddRange(players);
-        }
+        { }
         #endregion
 
         #region Events
@@ -57,9 +45,6 @@ namespace Orion.Game.Matchmaking
         public event Action<MatchSettings> StartNomadChanged;
         public event Action<MatchSettings> AreCheatsEnabledChanged;
         public event Action<MatchSettings> AreRandomHeroesEnabledChanged;
-        public event Action<MatchSettings, Player> PlayerJoined;
-        public event Action<MatchSettings, Player> PlayerLeft;
-        public event Action<MatchSettings, Player> PlayerChanged;
         public event Action<MatchSettings> Changed;
         #endregion
 
@@ -193,31 +178,9 @@ namespace Orion.Game.Matchmaking
                 TriggerEvent(AreRandomHeroesEnabledChanged);
             }
         }
-
-        /// <summary>
-        /// Accesses the list of players that joined the game.
-        /// </summary>
-        public IEnumerable<Player> Players
-        {
-            get { return players; }
-        }
         #endregion
 
         #region Methods
-        public void AddPlayer(Player player)
-        {
-            players.Add(player);
-            player.ColorChanged += onColorChanged;
-            TriggerEvent(PlayerJoined, player);
-        }
-
-        public void RemovePlayer(Player player)
-        {
-            players.Remove(player);
-            player.ColorChanged -= onColorChanged;
-            TriggerEvent(PlayerLeft, player);
-        }
-
         /// <summary>
         /// Serializes this object to its binary representation.
         /// </summary>
@@ -235,10 +198,6 @@ namespace Orion.Game.Matchmaking
             writer.Write(startNomad);
             writer.Write(areCheatsEnabled);
             writer.Write(areRandomHeroesEnabled);
-
-            writer.Write(players.Count);
-            foreach (float component in players.SelectMany(player => player.Color.ToArray()))
-                writer.Write(component);
         }
 
         /// <summary>
@@ -258,33 +217,12 @@ namespace Orion.Game.Matchmaking
             StartNomad = reader.ReadBoolean();
             AreCheatsEnabled = reader.ReadBoolean();
             AreRandomHeroesEnabled = reader.ReadBoolean();
-
-            int numberOfPlayers = reader.ReadInt32();
-            players = new List<Player>(numberOfPlayers);
-            for(int i = 0; i < numberOfPlayers; i++)
-            {
-                float r = reader.ReadSingle();
-                float g = reader.ReadSingle();
-                float b = reader.ReadSingle();
-                players.Add(new LocalPlayer(new ColorRgb(r, g, b)));
-            }
         }
 
         #region Events Handling
-        private void OnColorChanged(Player player)
-        {
-            TriggerEvent(PlayerChanged, player);
-        }
-
         private void TriggerEvent(Action<MatchSettings> eventHandler)
         {
             eventHandler.Raise(this);
-            Changed.Raise(this);
-        }
-
-        private void TriggerEvent(Action<MatchSettings, Player> eventHandler, Player player)
-        {
-            eventHandler.Raise(this, player);
             Changed.Raise(this);
         }
         #endregion

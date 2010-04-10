@@ -7,7 +7,6 @@ using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
@@ -23,6 +22,7 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
+        private readonly PlayerSettings playerSettings;
         private readonly MatchConfigurationUI ui;
         #endregion
 
@@ -34,9 +34,23 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
-            this.matchSettings.AddPlayer(new LocalPlayer(Faction.Colors.First()));
-            IEnumerable<ColorRgb> colors = Faction.Colors.Except(matchSettings.Players.Select(p => p.Color));
-            this.ui = new MatchConfigurationUI(matchSettings, colors);
+            this.matchSettings.AreCheatsEnabled = true;
+
+            this.playerSettings = new PlayerSettings();
+            this.playerSettings.AddPlayer(new LocalPlayer(Faction.Colors.First()));
+
+            IEnumerable<ColorRgb> colors = Faction.Colors.Except(playerSettings.Players.Select(p => p.Color));
+            List<PlayerBuilder> builders = new List<PlayerBuilder>();
+            builders.Add(new PlayerBuilder("Noop Computer", color => new AIPlayer(color)));
+
+            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, colors, builders);
+            this.ui.AddingPlayer += (sender, playerType) =>
+            {
+                if(colors.Count() > 0)
+                    playerSettings.AddPlayer(playerType.Create(colors.First()));
+            };
+            
+            this.ui.RemovingPlayer += (sender, player) => playerSettings.RemovePlayer(player);
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
         }
@@ -93,24 +107,20 @@ namespace Orion.Game.Main
 
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
-            int colorIndex = 0;
-            foreach (Player playerSlot in matchSettings.Players)
+            foreach (Player player in playerSettings.Players)
             {
-                ColorRgb color = Faction.Colors[colorIndex];
-                colorIndex++;
-
-                Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                Faction faction = world.CreateFaction(Colors.GetName(player.Color), player.Color);
                 faction.AladdiumAmount = matchSettings.InitialAladdiumAmount;
                 faction.AlageneAmount = matchSettings.InitialAlageneAmount;
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
 
-                if (playerSlot is LocalPlayer)
+                if (player is LocalPlayer)
                 {
                     localCommander = new SlaveCommander(match, faction);
                 }
-                else if (playerSlot is AIPlayer)
+                else if (player is AIPlayer)
                 {
-                    Commander commander = new AgressiveAICommander(match, faction);
+                    Commander commander = new AICommander(match, faction);
                     aiCommanders.Add(commander);
                 }
                 else

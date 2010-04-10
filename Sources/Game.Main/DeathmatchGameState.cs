@@ -6,7 +6,6 @@ using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;

@@ -19,7 +19,7 @@ namespace Orion.Engine.Gui
         private ListPanel options;
         private Label shownTitle;
 
-        private Func<T, string> toStringer;
+        private Func<T, string> stringConverter;
         private Action<Responder, MouseEventArgs> closeDropdownList;
         #endregion
 
@@ -29,7 +29,7 @@ namespace Orion.Engine.Gui
         {
             items = new T[0];
             closeDropdownList = CloseDropdownList;
-            toStringer = t => t.ToString();
+            stringConverter = t => t.ToString();
         }
 
         public DropdownList(Rectangle frame, IEnumerable<T> items)
@@ -69,10 +69,10 @@ namespace Orion.Engine.Gui
             set { enabled = value; }
         }
 
-        public Func<T, string> ToStringDelegate
+        public Func<T, string> StringConverter
         {
-            get { return toStringer; }
-            set { toStringer = value; }
+            get { return stringConverter; }
+            set { stringConverter = value; }
         }
 
         private Responder TopmostResponder
@@ -103,7 +103,7 @@ namespace Orion.Engine.Gui
             if (shownTitle != null)
                 Children.Remove(shownTitle);
 
-            shownTitle = new Label(toStringer(selectedItem));
+            shownTitle = new Label(stringConverter(selectedItem));
             Children.Add(shownTitle);
 
             var handler = SelectionChanged;
@@ -138,7 +138,7 @@ namespace Orion.Engine.Gui
             Panel row = new Panel(Frame);
             row.MouseButtonReleased += (r, args) => SelectedItem = item;
 
-            Label title = new Label(toStringer(item));
+            Label title = new Label(stringConverter(item));
             row.Children.Add(title);
             return row;
         }

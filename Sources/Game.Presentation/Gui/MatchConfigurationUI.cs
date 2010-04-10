@@ -17,7 +17,8 @@ namespace Orion.Game.Presentation.Gui
         private const NumberStyles integerParsingStyles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
         private const float checkBoxSize = 6;
 
-        private MatchSettings settings;
+        private MatchSettings matchSettings;
+        private PlayerSettings playerSettings;
         private readonly bool isGameMaster;
 
         private readonly Panel backgroundPanel;
@@ -25,6 +26,7 @@ namespace Orion.Game.Presentation.Gui
         private readonly ListPanel optionsListPanel;
         private readonly Button startButton;
         private readonly Button exitButton;
+
         private readonly IEnumerable<ColorRgb> availableColors;
 
         private readonly Dictionary<Player, Panel> playerToRowMapping = new Dictionary<Player,Panel>();
@@ -32,13 +34,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(MatchSettings settings, IEnumerable<ColorRgb> availableColors)
-            : this(settings, availableColors, true)
+        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings, IEnumerable<ColorRgb> availableColors, IEnumerable<PlayerBuilder> playerBuilders)
+            : this(matchSettings, playerSettings, availableColors, playerBuilders, true)
         { }
 
-        public MatchConfigurationUI(MatchSettings settings, IEnumerable<ColorRgb> availableColors, bool isGameMaster)
+        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings, IEnumerable<ColorRgb> availableColors, IEnumerable<PlayerBuilder> playerBuilders, bool isGameMaster)
         {
-            this.settings = settings;
+            this.matchSettings = matchSettings;
             this.availableColors = availableColors;
             this.isGameMaster = isGameMaster;
 
@@ -58,14 +60,27 @@ namespace Orion.Game.Presentation.Gui
             }
 
             #region Players
-            settings.PlayerJoined += OnPlayerJoined;
-            settings.PlayerLeft += OnPlayerLeft;
-            settings.PlayerChanged += OnPlayerColorChanged;
+            playerSettings.PlayerJoined += OnPlayerJoined;
+            playerSettings.PlayerLeft += OnPlayerLeft;
+            playerSettings.PlayerChanged += OnPlayerColorChanged;
             playersPanel = new ListPanel(Instant.CreateComponentRectangle(Bounds, new Vector2(0.025f, 0.1f), new Vector2(0.5f, 0.9f)));
             backgroundPanel.Children.Add(playersPanel);
 
-            foreach (Player player in settings.Players)
+            foreach (Player player in playerSettings.Players)
                 AddPlayerRow(player);
+
+            if (playerBuilders.Count() > 0)
+            {
+                Rectangle dropdownListRectangle = Instant.CreateComponentRectangle(playersPanel.Frame, new Rectangle(0.3f, 0, 0.45f, 0.0375f));
+                Rectangle addButtonRect = Instant.CreateComponentRectangle(playersPanel.Frame, new Rectangle(0.75f, 0, 0.25f, 0.0375f));
+                dropdownListRectangle = dropdownListRectangle.TranslatedBy(0, -dropdownListRectangle.Height);
+                addButtonRect = addButtonRect.TranslatedBy(0, -addButtonRect.Height);
+                DropdownList<PlayerBuilder> addPlayerDropdownList = new DropdownList<PlayerBuilder>(dropdownListRectangle, playerBuilders);
+                Button addPlayerButton = new Button(addButtonRect, "Ajouter");
+                addPlayerButton.Triggered += button => AddingPlayer.Raise(this, addPlayerDropdownList.SelectedItem);
+                backgroundPanel.Children.Add(addPlayerDropdownList);
+                backgroundPanel.Children.Add(addPlayerButton);
+            }
             #endregion
 
             #region Game Options
@@ -74,61 +89,61 @@ namespace Orion.Game.Presentation.Gui
 
             {
                 Button optionButton = AddLabelButtonOption("Taille du terrain",
-                    settings.MapSize.ToString(),
+                    matchSettings.MapSize.ToString(),
                     "Entrez la nouvelle taille désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumMapSize),
                     ValidateMapSize);
-                settings.MapSizeChanged += o => optionButton.Caption = o.MapSize.ToString();
+                matchSettings.MapSizeChanged += o => optionButton.Caption = o.MapSize.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Limite de nourriture",
-                    settings.FoodLimit.ToString(),
+                    matchSettings.FoodLimit.ToString(),
                 "Entrez la nouvelle limite de nourriture désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumPopulation),
                 ValidateFoodLimit);
-                settings.FoodLimitChanged += o => optionButton.Caption = o.FoodLimit.ToString();
+                matchSettings.FoodLimitChanged += o => optionButton.Caption = o.FoodLimit.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Quantité initiale d'aladdium",
-                    settings.InitialAladdiumAmount.ToString(),
+                    matchSettings.InitialAladdiumAmount.ToString(),
                 "Entrez la nouvelle quantité initiale d'aladdium désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAladdium),
                 ValidateInitialAladdiumAmount);
-                settings.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
+                matchSettings.InitialAladdiumAmountChanged += o => optionButton.Caption = o.InitialAladdiumAmount.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Quantité initiale d'alagène",
-                    settings.InitialAlageneAmount.ToString(),
+                    matchSettings.InitialAlageneAmount.ToString(),
                 "Entrez la nouvelle quantité initiale d'alagène désirée (minimum {0}).".FormatInvariant(MatchSettings.SuggestedMinimumAlagene),
                 ValidateInitialAlageneAmount);
-                settings.InitialAlageneAmountChanged += o => optionButton.Caption = o.InitialAlageneAmount.ToString();
+                matchSettings.InitialAlageneAmountChanged += o => optionButton.Caption = o.InitialAlageneAmount.ToString();
             }
             {
                 Button optionButton = AddLabelButtonOption("Germe de génération",
-                    settings.RandomSeed.ToString(),
+                    matchSettings.RandomSeed.ToString(),
                 "Entrez le nouveau germe de génération aléatoire.",
                 ValidateRandomSeed);
-                settings.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
+                matchSettings.RandomSeedChanged += o => optionButton.Caption = o.RandomSeed.ToString();
             }
 
             optionsListPanel.Children.Add(new Panel(RowFrame)); // separator
 
             {
-                Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => settings.RevealTopology = value);
-                checkbox.State = settings.RevealTopology;
-                settings.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
+                Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => matchSettings.RevealTopology = value);
+                checkbox.State = matchSettings.RevealTopology;
+                matchSettings.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
             }
             {
-                Checkbox checkbox = AddCheckboxOption("Début nomade", value => settings.StartNomad = value);
-                checkbox.State = settings.StartNomad;
-                settings.StartNomadChanged += o => checkbox.State = o.StartNomad;
+                Checkbox checkbox = AddCheckboxOption("Début nomade", value => matchSettings.StartNomad = value);
+                checkbox.State = matchSettings.StartNomad;
+                matchSettings.StartNomadChanged += o => checkbox.State = o.StartNomad;
             }
             {
-                Checkbox checkbox = AddCheckboxOption("Codes de triche", value => settings.AreCheatsEnabled = value);
-                checkbox.State = settings.AreCheatsEnabled;
-                settings.AreCheatsEnabledChanged += o => checkbox.State = o.AreCheatsEnabled;
+                Checkbox checkbox = AddCheckboxOption("Codes de triche", value => matchSettings.AreCheatsEnabled = value);
+                checkbox.State = matchSettings.AreCheatsEnabled;
+                matchSettings.AreCheatsEnabledChanged += o => checkbox.State = o.AreCheatsEnabled;
             }
             {
-                Checkbox checkbox = AddCheckboxOption("Héros aléatoires", value => settings.AreRandomHeroesEnabled = value);
-                checkbox.State = settings.AreRandomHeroesEnabled;
-                settings.AreRandomHeroesEnabledChanged += o => checkbox.State = o.AreRandomHeroesEnabled;
+                Checkbox checkbox = AddCheckboxOption("Héros aléatoires", value => matchSettings.AreRandomHeroesEnabled = value);
+                checkbox.State = matchSettings.AreRandomHeroesEnabled;
+                matchSettings.AreRandomHeroesEnabledChanged += o => checkbox.State = o.AreRandomHeroesEnabled;
             }
             #endregion
         }
@@ -138,6 +153,8 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchConfigurationUI> StartGamePressed;
         public event Action<MatchConfigurationUI> ExitPressed;
         public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
+        public event Action<MatchConfigurationUI, PlayerBuilder> AddingPlayer;
+        public event Action<MatchConfigurationUI, Player> RemovingPlayer;
         #endregion
 
         #region Properties
@@ -164,14 +181,14 @@ namespace Orion.Game.Presentation.Gui
             Panel row = new Panel(playerRect);
             Label playerName = new Label(playerNameRect, player.ToString());
             DropdownList<ColorRgb> colors = new DropdownList<ColorRgb>(colorDropdownRect, availableColors);
-            colors.ToStringDelegate = (color) => Colors.GetName(color);
+            colors.StringConverter = (color) => Colors.GetName(color);
             colors.SelectedItem = player.Color;
             colors.Enabled = isGameMaster || player is LocalPlayer;
             colors.SelectionChanged += (dropdown, color) => player.Color = color;
-            if(isGameMaster)
+            if(isGameMaster && !(player is LocalPlayer))
             {
                 Button kick = new Button(kickRect, "X");
-                kick.Triggered += (sender) => settings.RemovePlayer(player);
+                kick.Triggered += sender => RemovingPlayer.Raise(this, player);
                 row.Children.Add(kick);
             }
             row.Children.Add(playerName);
@@ -247,7 +264,7 @@ namespace Orion.Game.Presentation.Gui
             if (!int.TryParse(value, integerParsingStyles, NumberFormatInfo.InvariantInfo, out seed))
                 return false;
 
-            settings.RandomSeed = seed;
+            matchSettings.RandomSeed = seed;
             return true;
         }
 
@@ -258,7 +275,7 @@ namespace Orion.Game.Presentation.Gui
                 || aladdium < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
-            settings.InitialAladdiumAmount = aladdium;
+            matchSettings.InitialAladdiumAmount = aladdium;
             return true;
         }
 
@@ -269,7 +286,7 @@ namespace Orion.Game.Presentation.Gui
                 || alagene < MatchSettings.SuggestedMinimumAladdium)
                 return false;
 
-            settings.InitialAlageneAmount = alagene;
+            matchSettings.InitialAlageneAmount = alagene;
             return true;
         }
 
@@ -280,7 +297,7 @@ namespace Orion.Game.Presentation.Gui
                 || maxPop < MatchSettings.SuggestedMinimumPopulation)
                 return false;
 
-            settings.FoodLimit = maxPop;
+            matchSettings.FoodLimit = maxPop;
             return true;
         }
 
@@ -294,31 +311,31 @@ namespace Orion.Game.Presentation.Gui
                 || newSize.Height < MatchSettings.SuggestedMinimumMapSize.Height)
                 return false;
 
-            settings.MapSize = newSize;
+            matchSettings.MapSize = newSize;
             return true;
         }
         #endregion
 
         #region Events Handling
-        private void OnPlayerJoined(MatchSettings settings, Player player)
+        private void OnPlayerJoined(PlayerSettings settings, Player player)
         {
             AddPlayerRow(player);
         }
 
-        private void OnPlayerLeft(MatchSettings settings, Player player)
+        private void OnPlayerLeft(PlayerSettings settings, Player player)
         {
             playersPanel.Children.Remove(playerToRowMapping[player]);
             playerToRowMapping.Remove(player);
         }
 
-        private void OnPlayerColorChanged(MatchSettings settings, Player player)
+        private void OnPlayerColorChanged(PlayerSettings settings, Player player)
         {
             playerToColorDropdownListMapping[player].SelectedItem = player.Color;
         }
 
         private void OnOptionChanged()
         {
-            OptionChanged.Raise(this, settings);
+            OptionChanged.Raise(this, matchSettings);
         }
         #endregion
         #endregion

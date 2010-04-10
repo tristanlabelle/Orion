@@ -10,7 +10,6 @@ using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
@@ -32,6 +31,7 @@ namespace Orion.Game.Main
         private readonly GameGraphics graphics;
         private readonly SafeTransporter transporter;
         private readonly IPv4EndPoint? hostEndPoint;
+        private readonly PlayerSettings playerSettings;
         private readonly MatchSettings matchSettings;
         private readonly MatchConfigurationUI ui;
         private Action<SafeTransporter, NetworkEventArgs> packetReceivedEventHandler;
@@ -49,9 +49,15 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.transporter = transporter;
             this.hostEndPoint = hostEndPoint;
+
+            this.playerSettings = new PlayerSettings();
             this.matchSettings = new MatchSettings();
-            IEnumerable<ColorRgb> colors = Faction.Colors.Except(matchSettings.Players.Select(p => p.Color));
-            this.ui = new MatchConfigurationUI(matchSettings, colors);
+            
+            IEnumerable<ColorRgb> colors = Faction.Colors.Except(playerSettings.Players.Select(p => p.Color));
+            List<PlayerBuilder> builders = new List<PlayerBuilder>();
+
+            builders.Add(new PlayerBuilder("Noop Computer", color => new AIPlayer(color)));
+            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, colors, builders);
             this.packetReceivedEventHandler = OnPacketReceived;
             this.peerTimedOutEventHandler = OnPeerTimedOut;
         }
@@ -70,7 +76,7 @@ namespace Orion.Game.Main
 
         private IEnumerable<IPv4EndPoint> PlayerAddresses
         {
-            get { return matchSettings.Players.OfType<RemotePlayer>().Select(p => p.HostEndPoint); }
+            get { return playerSettings.Players.OfType<RemotePlayer>().Select(p => p.HostEndPoint); }
         }
         #endregion
 
@@ -133,7 +139,7 @@ namespace Orion.Game.Main
             List<Commander> aiCommanders = new List<Commander>();
             List<FactionEndPoint> peers = new List<FactionEndPoint>();
             int colorIndex = 0;
-            foreach (Player slot in matchSettings.Players)
+            foreach (Player slot in playerSettings.Players)
             {
                 ColorRgb color = Faction.Colors[colorIndex];
                 colorIndex++;
@@ -150,7 +156,7 @@ namespace Orion.Game.Main
                 }
                 else if (slot is AIPlayer)
                 {
-                    Commander commander = new AgressiveAICommander(match, faction);
+                    Commander commander = new AICommander(match, faction);
                     aiCommanders.Add(commander);
                 }
                 else if (slot is RemotePlayer) // no commanders for remote players
@@ -367,14 +373,14 @@ namespace Orion.Game.Main
 
         private void Advertise(IPv4EndPoint host)
         {
-            int leftSlots = matchSettings.Players.Count() - maximumPlayersCount;
+            int leftSlots = playerSettings.Players.Count() - maximumPlayersCount;
             advertiseGameMessage[1] = (byte)leftSlots;
             transporter.SendTo(advertiseGameMessage, host);
         }
 
         private void TryJoin(IPv4EndPoint host)
         {
-            if (matchSettings.Players.Count() >= maximumPlayersCount)
+            if (playerSettings.Players.Count() >= maximumPlayersCount)
             {
                 transporter.SendTo(refuseJoinGameMessage, host);
                 return;
@@ -403,7 +409,7 @@ namespace Orion.Game.Main
             addPeerMessage[0] = (byte)SetupMessageType.SetPeer;
 
             int slotNumber = -1;
-            foreach (Player slot in matchSettings.Players)
+            foreach (Player slot in playerSettings.Players)
             {
                 slotNumber++;
                 if (slotNumber == 0) continue;
@@ -441,7 +447,7 @@ namespace Orion.Game.Main
 
         private void TryLeave(IPv4EndPoint host)
         {
-            int slotNumber = matchSettings.Players.IndexOf(delegate(Player slot)
+            int slotNumber = playerSettings.Players.IndexOf(delegate(Player slot)
             {
                 if (!(slot is RemotePlayer)) return false;
                 RemotePlayer remote = (RemotePlayer)slot;

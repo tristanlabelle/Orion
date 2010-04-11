@@ -76,14 +76,14 @@ namespace Orion.Game.Matchmaking.Commands
         }
                         
         #region Serialization
-        protected override void SerializeSpecific(BinaryWriter writer)
+        protected override void DoSerialize(BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
             WriteLengthPrefixedHandleArray(writer, unitHandles);
             WriteHandle(writer, targetHandle);
         }
 
-        public static HealCommand DeserializeSpecific(BinaryReader reader)
+        public static new HealCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

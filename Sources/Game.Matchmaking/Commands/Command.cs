@@ -21,13 +21,11 @@ namespace Orion.Game.Matchmaking.Commands
         private struct CommandType
         {
             public readonly Type Type;
-            public readonly byte Code;
             public readonly Func<BinaryReader, Command> Deserializer;
 
-            public CommandType(Type type, byte code, Func<BinaryReader, Command> deserializer)
+            public CommandType(Type type, Func<BinaryReader, Command> deserializer)
             {
                 this.Type = type;
-                this.Code = code;
                 this.Deserializer = deserializer;
             }
         }
@@ -118,16 +116,23 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(writer, "writer");
 
             Type type = GetType();
-            byte code = (byte)commandTypes.IndexOf(t => t.Type == type);
-            writer.Write(code);
-            SerializeSpecific(writer);
+            int index = commandTypes.IndexOf(t => t.Type == type);
+            if (index == -1)
+            {
+                throw new InvalidOperationException(
+                    "Cannot serialize commands of type {0} as it was not registered to the serialization system."
+                    .FormatInvariant(type.FullName));
+            }
+
+            writer.Write((byte)index);
+            DoSerialize(writer);
         }
 
         /// <summary>
         /// Serializes command type-specific information to a stream.
         /// </summary>
         /// <param name="writer">The <see cref="BinaryWriter"/> where to write.</param>
-        protected abstract void SerializeSpecific(BinaryWriter writer);
+        protected abstract void DoSerialize(BinaryWriter writer);
 
         protected static void WriteHandle(BinaryWriter writer, Handle handle)
         {
@@ -185,14 +190,16 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Type type in types)
             {
                 Debug.Assert(type.IsPublic);
-                MethodInfo method = type.GetMethod("DeserializeSpecific",
-                    BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder,
-                    argumentTypes, null);
-                Debug.Assert(method != null);
+
+                MethodInfo method = type.GetMethod("Deserialize",
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly,
+                    Type.DefaultBinder, argumentTypes, null);
+                Debug.Assert(method != null, "{0} lacks a Deserialize method".FormatInvariant(type.FullName));
                 Debug.Assert(typeof(Command).IsAssignableFrom(method.ReturnType));
+
                 var deserializer = (Func<BinaryReader, Command>)
                     Delegate.CreateDelegate(typeof(Func<BinaryReader, Command>), method);
-                commandTypes.Add(new CommandType(type, (byte)commandTypes.Count, deserializer));
+                commandTypes.Add(new CommandType(type, deserializer));
             }
         }
         #endregion

@@ -71,7 +71,7 @@ namespace Orion.Game.Matchmaking.Commands
                 .FormatInvariant(FactionHandle, researcherHandle, technologyHandle);
         }
 
-        protected override void SerializeSpecific(System.IO.BinaryWriter writer)
+        protected override void DoSerialize(System.IO.BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
             WriteHandle(writer, researcherHandle);
@@ -80,13 +80,10 @@ namespace Orion.Game.Matchmaking.Commands
 
         public override IEnumerable<Handle> ExecutingEntityHandles
         {
-            get { List<Handle> handles = new List<Handle>();
-            handles.Add(researcherHandle);
-                return handles;
-            }
+            get { return new[] { researcherHandle }; }
         }
 
-        public static ResearchCommand DeserializeSpecific(BinaryReader reader)
+        public static new ResearchCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

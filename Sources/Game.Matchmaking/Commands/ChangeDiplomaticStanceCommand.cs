@@ -61,14 +61,14 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        protected override void SerializeSpecific(BinaryWriter writer)
+        protected override void DoSerialize(BinaryWriter writer)
         {
             WriteHandle(writer, FactionHandle);
             WriteHandle(writer, targetFactionHandle);
             writer.Write((byte)diplomaticStance);
         }
 
-        public static ChangeDiplomaticStanceCommand DeserializeSpecific(BinaryReader reader)
+        public static new ChangeDiplomaticStanceCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

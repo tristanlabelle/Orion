@@ -6,25 +6,31 @@ using Orion.Engine;
 
 namespace Orion.Game.Matchmaking
 {
-    public class PlayerBuilder
+    /// <summary>
+    /// Provides an opaque way to build a new player.
+    /// </summary>
+    public sealed class PlayerBuilder
     {
         #region Fields
-        private Func<ColorRgb, Player> buildDelegate;
+        private Func<string, ColorRgb, Player> buildDelegate;
         private readonly string name;
         #endregion
 
         #region Constructors
-        public PlayerBuilder(string name, Func<ColorRgb, Player> buildDelegate)
+        public PlayerBuilder(string name, Func<string, ColorRgb, Player> buildDelegate)
         {
+            Argument.EnsureNotNull(name, "name");
+            Argument.EnsureNotNull(buildDelegate, "buildDelegate");
+
             this.name = name;
             this.buildDelegate = buildDelegate;
         }
         #endregion
 
         #region Methods
-        public Player Create(ColorRgb color)
+        public Player Build(ColorRgb color)
         {
-            return buildDelegate(color);
+            return buildDelegate(name, color);
         }
 
         public override string ToString()

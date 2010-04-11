@@ -50,7 +50,7 @@ namespace Orion.Engine
 
             entries = new List<Entry>();
             tempMemoryStream = new MemoryStream();
-            tempBinaryWriter = new BinaryWriter(tempMemoryStream);
+            tempBinaryWriter = new BinaryWriter(tempMemoryStream, Encoding.UTF8);
 
             var serializeMethodArgumentTypes = new[] { null, typeof(BinaryWriter) };
             var deserializeMethodArgumentTypes = new[] { typeof(BinaryReader) };

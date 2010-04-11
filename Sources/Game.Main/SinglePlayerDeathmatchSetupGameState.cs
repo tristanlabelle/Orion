@@ -37,20 +37,18 @@ namespace Orion.Game.Main
             this.matchSettings.AreCheatsEnabled = true;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(Faction.Colors.First()));
+            this.playerSettings.AddPlayer(new LocalPlayer(Faction.Colors[0]));
 
-            IEnumerable<ColorRgb> colors = Faction.Colors.Except(playerSettings.Players.Select(p => p.Color));
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
-            builders.Add(new PlayerBuilder("Noop Computer", color => new AIPlayer(color)));
+            builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
 
-            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, colors, builders);
-            this.ui.AddingPlayer += (sender, playerType) =>
+            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
+            this.ui.AddPlayerPressed += (sender, player) =>
             {
-                if(colors.Count() > 0)
-                    playerSettings.AddPlayer(playerType.Create(colors.First()));
+                playerSettings.AddPlayer(player);
             };
             
-            this.ui.RemovingPlayer += (sender, player) => playerSettings.RemovePlayer(player);
+            this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
             this.ui.StartGamePressed += OnStartGamePressed;
             this.ui.ExitPressed += OnExitPressed;
         }

@@ -104,7 +104,7 @@ namespace Orion.Game.Matchmaking.Networking
         public void SendCommands(int commandFrame, IEnumerable<Command> commands)
         {
             var stream = new MemoryStream();
-            var writer = new BinaryWriter(stream);
+            var writer = new BinaryWriter(stream, Encoding.UTF8);
 
             writer.Write((byte)GameMessageType.Commands);
             writer.Write(commandFrame);

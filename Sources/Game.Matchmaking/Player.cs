@@ -1,32 +1,71 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using Orion.Engine.Networking;
-using Orion.Game.Simulation;
 using Orion.Engine;
+using System.IO;
 
 namespace Orion.Game.Matchmaking
 {
+    /// <summary>
+    /// Base class for classes which provide the description of a specific type of match participant.
+    /// </summary>
     public abstract class Player
     {
+        #region Instance
         #region Fields
+        /// <summary>
+        /// The maximum length of player names.
+        /// </summary>
+        /// <remarks>
+        /// This limits exists for networking purposes.
+        /// </remarks>
+        public static readonly int MaximumNameLength = 20;
+
+        private string name;
         private ColorRgb color;
         #endregion
 
         #region Constructors
-        public Player(ColorRgb color)
+        public Player(string name, ColorRgb color)
         {
-            this.color = color;
+            Argument.EnsureNotNull(name, "name");
+
+            this.Name = name;
+            this.color = ColorRgb.Clamp(color);
         }
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised after the name of this player has changed.
+        /// </summary>
+        public event Action<Player> NameChanged;
+
+        /// <summary>
+        /// Raised after the color of this player has changed.
+        /// </summary>
         public event Action<Player> ColorChanged;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the name of this player.
+        /// </summary>
+        public string Name
+        {
+            get { return name; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Name");
+                if (value.Length > MaximumNameLength)
+                    throw new ArgumentException("The name exceeds the maximum length.", "Name");
+
+                this.name = value;
+                NameChanged.Raise(this);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the color of this player's faction.
+        /// </summary>
         public ColorRgb Color
         {
             get { return color; }
@@ -39,69 +78,42 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public abstract override string ToString();
-        #endregion
-    }
-
-    public sealed class LocalPlayer : Player
-    {
-        public LocalPlayer(ColorRgb color)
-            : base(color)
-        { }
-
         public override string ToString()
         {
-            return "Vous";
+            return name;
         }
-    }
+        #endregion
+        #endregion
 
-    public sealed class RemotePlayer : Player
-    {
+        #region Static
         #region Fields
-        private readonly IPv4EndPoint hostEndPoint;
-        private readonly string hostName;
+        public static readonly BinarySerializer<Player> Serializer;
         #endregion
 
-        #region Constructors
-        public RemotePlayer(ColorRgb color, IPv4EndPoint endPoint)
-            : base(color)
+        #region Constructor
+        static Player()
         {
-            this.hostEndPoint = endPoint;
-            IPHostEntry hostEntry = Dns.GetHostEntry(endPoint.Address);
-            hostName = hostEntry == null ? null : hostEntry.HostName;
-        }
-
-        #endregion
-
-        #region Properties
-        public IPv4EndPoint HostEndPoint
-        {
-            get { return hostEndPoint; }
-        }
-
-        public string HostName
-        {
-            get { return hostName; }
+            Serializer = BinarySerializer<Player>.FromCallingAssemblyExportedTypes();
         }
         #endregion
 
         #region Methods
-        public override string ToString()
+        protected static void SerializeNameAndColor(Player player, BinaryWriter writer)
         {
-            return hostName ?? hostEndPoint.ToString();
+            writer.Write(player.name);
+            writer.Write(player.color.R);
+            writer.Write(player.color.G);
+            writer.Write(player.color.B);
+        }
+
+        protected static ColorRgb DeserializeColor(BinaryReader reader)
+        {
+            return new ColorRgb(
+                reader.ReadSingle(),
+                reader.ReadSingle(),
+                reader.ReadSingle());
         }
         #endregion
-    }
-
-    public sealed class AIPlayer : Player
-    {
-        public AIPlayer(ColorRgb color)
-            : base(color)
-        { }
-
-        public override string ToString()
-        {
-            return "Ordinateur";
-        }
+        #endregion
     }
 }

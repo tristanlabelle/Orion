@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 using Orion.Game.Matchmaking;
+using Orion.Engine.Collections;
 using Orion.Engine.Gui;
 using Orion.Engine.Geometry;
 using Orion.Engine;
 using OpenTK.Math;
+using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -17,31 +19,33 @@ namespace Orion.Game.Presentation.Gui
         private const NumberStyles integerParsingStyles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
         private const float checkBoxSize = 6;
 
-        private MatchSettings matchSettings;
-        private PlayerSettings playerSettings;
+        private readonly MatchSettings matchSettings;
+        private readonly PlayerSettings playerSettings;
         private readonly bool isGameMaster;
 
         private readonly Panel backgroundPanel;
         private readonly ListPanel playersPanel;
+        private readonly DropdownList<PlayerBuilder> addPlayerDropdownList;
         private readonly ListPanel optionsListPanel;
         private readonly Button startButton;
         private readonly Button exitButton;
 
-        private readonly IEnumerable<ColorRgb> availableColors;
-
         private readonly Dictionary<Player, Panel> playerToRowMapping = new Dictionary<Player,Panel>();
-        private readonly Dictionary<Player, DropdownList<ColorRgb>> playerToColorDropdownListMapping = new Dictionary<Player,DropdownList<ColorRgb>>();
+        private readonly Dictionary<Player, DropdownList<ColorRgb>> playerToColorDropdownListMapping
+            = new Dictionary<Player,DropdownList<ColorRgb>>();
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings, IEnumerable<ColorRgb> availableColors, IEnumerable<PlayerBuilder> playerBuilders)
-            : this(matchSettings, playerSettings, availableColors, playerBuilders, true)
+        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings,
+            IEnumerable<PlayerBuilder> playerBuilders)
+            : this(matchSettings, playerSettings, playerBuilders, true)
         { }
 
-        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings, IEnumerable<ColorRgb> availableColors, IEnumerable<PlayerBuilder> playerBuilders, bool isGameMaster)
+        public MatchConfigurationUI(MatchSettings matchSettings, PlayerSettings playerSettings,
+            IEnumerable<PlayerBuilder> playerBuilders, bool isGameMaster)
         {
             this.matchSettings = matchSettings;
-            this.availableColors = availableColors;
+            this.playerSettings = playerSettings;
             this.isGameMaster = isGameMaster;
 
             backgroundPanel = new Panel(Bounds.TranslatedBy(10, 60).ResizedBy(-20, -70));
@@ -75,9 +79,9 @@ namespace Orion.Game.Presentation.Gui
                 Rectangle addButtonRect = Instant.CreateComponentRectangle(playersPanel.Frame, new Rectangle(0.75f, 0, 0.25f, 0.0375f));
                 dropdownListRectangle = dropdownListRectangle.TranslatedBy(0, -dropdownListRectangle.Height);
                 addButtonRect = addButtonRect.TranslatedBy(0, -addButtonRect.Height);
-                DropdownList<PlayerBuilder> addPlayerDropdownList = new DropdownList<PlayerBuilder>(dropdownListRectangle, playerBuilders);
+                addPlayerDropdownList = new DropdownList<PlayerBuilder>(dropdownListRectangle, playerBuilders);
                 Button addPlayerButton = new Button(addButtonRect, "Ajouter");
-                addPlayerButton.Triggered += button => AddingPlayer.Raise(this, addPlayerDropdownList.SelectedItem);
+                addPlayerButton.Triggered += OnAddPlayerButtonPressed;
                 backgroundPanel.Children.Add(addPlayerDropdownList);
                 backgroundPanel.Children.Add(addPlayerButton);
             }
@@ -153,8 +157,8 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchConfigurationUI> StartGamePressed;
         public event Action<MatchConfigurationUI> ExitPressed;
         public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
-        public event Action<MatchConfigurationUI, PlayerBuilder> AddingPlayer;
-        public event Action<MatchConfigurationUI, Player> RemovingPlayer;
+        public event Action<MatchConfigurationUI, Player> AddPlayerPressed;
+        public event Action<MatchConfigurationUI, Player> KickPlayerPressed;
         #endregion
 
         #region Properties
@@ -170,7 +174,6 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
-
         private void AddPlayerRow(Player player)
         {
             Rectangle playerRect = Instant.CreateComponentRectangle(playersPanel.Bounds, new Rectangle(1, 0.0375f));
@@ -179,24 +182,25 @@ namespace Orion.Game.Presentation.Gui
             Rectangle kickRect = Instant.CreateComponentRectangle(playerRect, new Rectangle(0.9f, 0, 0.1f, 1));
 
             Panel row = new Panel(playerRect);
-            Label playerName = new Label(playerNameRect, player.ToString());
-            DropdownList<ColorRgb> colors = new DropdownList<ColorRgb>(colorDropdownRect, availableColors);
-            colors.StringConverter = (color) => Colors.GetName(color);
-            colors.SelectedItem = player.Color;
-            colors.Enabled = isGameMaster || player is LocalPlayer;
-            colors.SelectionChanged += (dropdown, color) => player.Color = color;
+            string playerNameLabelText = player is LocalPlayer ? "Vous" : player.Name;
+            Label playerNameLabel = new Label(playerNameRect, playerNameLabelText);
+            DropdownList<ColorRgb> colorsDropdownList = new DropdownList<ColorRgb>(colorDropdownRect, Faction.Colors);
+            colorsDropdownList.StringConverter = (color) => Colors.GetName(color);
+            colorsDropdownList.SelectedItem = player.Color;
+            colorsDropdownList.Enabled = isGameMaster || player is LocalPlayer;
+            colorsDropdownList.SelectionChanged += (dropdown, color) => player.Color = color;
             if(isGameMaster && !(player is LocalPlayer))
             {
                 Button kick = new Button(kickRect, "X");
-                kick.Triggered += sender => RemovingPlayer.Raise(this, player);
+                kick.Triggered += sender => KickPlayerPressed.Raise(this, player);
                 row.Children.Add(kick);
             }
-            row.Children.Add(playerName);
-            row.Children.Add(colors);
+            row.Children.Add(playerNameLabel);
+            row.Children.Add(colorsDropdownList);
             playersPanel.Children.Add(row);
 
             playerToRowMapping.Add(player, row);
-            playerToColorDropdownListMapping.Add(player, colors);
+            playerToColorDropdownListMapping.Add(player, colorsDropdownList);
         }
 
         #region Initialization
@@ -317,6 +321,18 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Events Handling
+        private void OnAddPlayerButtonPressed(Button sender)
+        {
+            PlayerBuilder playerBuilder = addPlayerDropdownList.SelectedItem;
+            ColorRgb? color = Faction.Colors
+                .Select(c => (ColorRgb?)c)
+                .FirstOrDefault(c => playerSettings.Players.None(p => p.Color == c));
+            if (!color.HasValue) return;
+
+            Player player = playerBuilder.Build(color.Value);
+            AddPlayerPressed.Raise(this, player);
+        }
+
         private void OnPlayerJoined(PlayerSettings settings, Player player)
         {
             AddPlayerRow(player);

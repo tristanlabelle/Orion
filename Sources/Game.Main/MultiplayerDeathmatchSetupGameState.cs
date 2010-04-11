@@ -53,11 +53,10 @@ namespace Orion.Game.Main
             this.playerSettings = new PlayerSettings();
             this.matchSettings = new MatchSettings();
             
-            IEnumerable<ColorRgb> colors = Faction.Colors.Except(playerSettings.Players.Select(p => p.Color));
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
 
-            builders.Add(new PlayerBuilder("Noop Computer", color => new AIPlayer(color)));
-            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, colors, builders);
+            builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
+            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
             this.packetReceivedEventHandler = OnPacketReceived;
             this.peerTimedOutEventHandler = OnPeerTimedOut;
         }
@@ -76,7 +75,7 @@ namespace Orion.Game.Main
 
         private IEnumerable<IPv4EndPoint> PlayerAddresses
         {
-            get { return playerSettings.Players.OfType<RemotePlayer>().Select(p => p.HostEndPoint); }
+            get { return playerSettings.Players.OfType<RemotePlayer>().Select(p => p.EndPoint); }
         }
         #endregion
 
@@ -162,7 +161,7 @@ namespace Orion.Game.Main
                 else if (slot is RemotePlayer) // no commanders for remote players
                 {
                     RemotePlayer remotePlayerSlot = (RemotePlayer)slot;
-                    IPv4EndPoint endPoint = remotePlayerSlot.HostEndPoint;
+                    IPv4EndPoint endPoint = remotePlayerSlot.EndPoint;
                     FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
                     peers.Add(peer);
                 }
@@ -353,7 +352,7 @@ namespace Orion.Game.Main
         {
             using (MemoryStream stream = new MemoryStream())
             {
-                using (BinaryWriter writer = new BinaryWriter(stream))
+                using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
                 {
                     writer.Write((byte)SetupMessageType.ChangeOptions);
                     matchSettings.Serialize(writer);
@@ -417,7 +416,7 @@ namespace Orion.Game.Main
                 if (slot is RemotePlayer)
                 {
                     RemotePlayer remotePlayer = (RemotePlayer)slot;
-                    if (remotePlayer.HostEndPoint == targetEndPoint)
+                    if (remotePlayer.EndPoint == targetEndPoint)
                     {
                         setSlotMessage[1] = (byte)slotNumber;
                         setSlotMessage[2] = (byte)PlayerSlotType.Local;
@@ -425,7 +424,7 @@ namespace Orion.Game.Main
                         continue;
                     }
 
-                    IPv4EndPoint peer = ((RemotePlayer)slot).HostEndPoint;
+                    IPv4EndPoint peer = ((RemotePlayer)slot).EndPoint;
                     addPeerMessage[1] = (byte)slotNumber;
                     BitConverter.GetBytes(peer.Address.Value).CopyTo(addPeerMessage, 2);
                     BitConverter.GetBytes(peer.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
@@ -451,7 +450,7 @@ namespace Orion.Game.Main
             {
                 if (!(slot is RemotePlayer)) return false;
                 RemotePlayer remote = (RemotePlayer)slot;
-                return remote.HostEndPoint == host;
+                return remote.EndPoint == host;
             });
 
             byte[] setSlotMessage = new byte[3];

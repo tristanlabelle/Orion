@@ -30,7 +30,7 @@ namespace Orion.Game.Matchmaking.Networking
             try { transporter = new SafeTransporter(preferredPort); }
             catch (SocketException) { transporter = new SafeTransporter(); }
 
-            packetWriter = new BinaryWriter(packetMemoryStream);
+            packetWriter = new BinaryWriter(packetMemoryStream, Encoding.UTF8);
 
             transporter.Received += OnPacketReceived;
             transporter.TimedOut += OnPeerTimedOut;

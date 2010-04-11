@@ -51,7 +51,7 @@ namespace Orion.Game.Matchmaking
         }
 
         public ReplayWriter(Stream stream, MatchSettings settings, IEnumerable<string> factionNames)
-            : this(new BinaryWriter(stream), settings, factionNames) {}
+            : this(new BinaryWriter(stream, Encoding.UTF8), settings, factionNames) { }
 
         public ReplayWriter(string filePath, MatchSettings settings, IEnumerable<string> factionNames)
             : this(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read), settings, factionNames) { }

@@ -15,31 +15,38 @@ namespace Orion.Engine.Gui
 
         private IEnumerable<T> items;
         private T selectedItem;
-        
-        private ListPanel options;
-        private Label shownTitle;
-
+        private bool isItemSelected;
         private Func<T, string> stringConverter;
-        private Action<Responder, MouseEventArgs> closeDropdownList;
+
+        private readonly Label shownTitleLabel;
+        private ListPanel optionsListPanel;
+
+        private readonly Action<Responder, MouseEventArgs> rootMouseButtonReleasedEventHandler;
         #endregion
 
         #region Constructors
         public DropdownList(Rectangle frame)
             : base(frame)
         {
-            items = new T[0];
-            closeDropdownList = CloseDropdownList;
-            stringConverter = t => t.ToString();
+            this.items = Enumerable.Empty<T>();
+            this.stringConverter = t => t.ToString();
+            this.shownTitleLabel = new Label(new Rectangle(frame.Size), string.Empty);
+            this.rootMouseButtonReleasedEventHandler = OnRootMouseButtonReleased;
+
+            Children.Add(this.shownTitleLabel);
         }
 
         public DropdownList(Rectangle frame, IEnumerable<T> items)
             : this(frame)
         {
-            Items = items;
+            this.Items = items;
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets or sets the sequence of items used as a source of elements for this list.
+        /// </summary>
         public IEnumerable<T> Items
         {
             get { return items; }
@@ -50,29 +57,58 @@ namespace Orion.Engine.Gui
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating if an item is currently selected.
+        /// </summary>
+        public bool IsItemSelected
+        {
+            get { return isItemSelected; }
+        }
+
+        /// <summary>
+        /// Gets the currently selected item if there's one.
+        /// </summary>
         public T SelectedItem
         {
-            get { return selectedItem; }
+            get
+            {
+                if (!isItemSelected) throw new InvalidOperationException("Cannot get the selected item when none is.");
+                return selectedItem;
+            }
             set
             {
-                if (!object.Equals(selectedItem, value))
-                {
-                    selectedItem = value;
-                    OnSelectionChanged(selectedItem);
-                }
+                if (EqualityComparer<T>.Default.Equals(selectedItem, value))
+                    return;
+                
+                selectedItem = value;
+                isItemSelected = true;
+                OnSelectionChanged(selectedItem);
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating if this <see cref="DropdownList{T}"/>
+        /// can be manipulated by the user.
+        /// </summary>
         public bool Enabled
         {
             get { return enabled; }
             set { enabled = value; }
         }
 
+        /// <summary>
+        /// Accesses the delegate to the method used to convert elements of this list
+        /// to their string representation.
+        /// </summary>
         public Func<T, string> StringConverter
         {
             get { return stringConverter; }
-            set { stringConverter = value; }
+            set
+            {
+                Argument.EnsureNotNull(value, "StringConverter");
+                stringConverter = value;
+                shownTitleLabel.Text = value(selectedItem);
+            }
         }
 
         private Responder TopmostResponder
@@ -100,11 +136,11 @@ namespace Orion.Engine.Gui
         #region Event Handling
         private void OnSelectionChanged(T selection)
         {
-            if (shownTitle != null)
-                Children.Remove(shownTitle);
+            if (shownTitleLabel != null)
+                Children.Remove(shownTitleLabel);
 
-            shownTitle = new Label(stringConverter(selectedItem));
-            Children.Add(shownTitle);
+            shownTitleLabel.Text = stringConverter(selectedItem);
+            Children.Add(shownTitleLabel);
 
             var handler = SelectionChanged;
             if (handler != null) handler(this, selection);
@@ -122,15 +158,27 @@ namespace Orion.Engine.Gui
                 listRectangle = listRectangle.TranslatedTo(0, 0).ScaledBy(1, itemArray.Length);
                 listRectangle = listRectangle.TranslatedTo(top.X, top.Y - listRectangle.Height);
                 listRectangle = ConvertToTopmostCoordinatesSystem(listRectangle);
-                options = new ListPanel(listRectangle);
+                optionsListPanel = new ListPanel(listRectangle);
                 foreach (T item in itemArray)
-                    options.Children.Add(CreateRow(item));
+                    optionsListPanel.Children.Add(CreateRow(item));
 
-                TopmostResponder.Children.Add(options);
-                TopmostResponder.MouseButtonReleased += closeDropdownList;
+                TopmostResponder.Children.Add(optionsListPanel);
+                TopmostResponder.MouseButtonReleased += rootMouseButtonReleasedEventHandler;
             }
             
             return false;
+        }
+
+        private void OnRootMouseButtonReleased(Responder sender, MouseEventArgs args)
+        {
+            Close();
+        }
+
+        private void Close()
+        {
+            TopmostResponder.Children.Remove(optionsListPanel);
+            optionsListPanel = null;
+            TopmostResponder.MouseButtonReleased -= rootMouseButtonReleasedEventHandler;
         }
 
         private Panel CreateRow(T item)
@@ -143,12 +191,6 @@ namespace Orion.Engine.Gui
             return row;
         }
 
-        private void CloseDropdownList(Responder sender, MouseEventArgs args)
-        {
-            TopmostResponder.Children.Remove(options);
-            options = null;
-            TopmostResponder.MouseButtonReleased -= closeDropdownList;
-        }
 
         private Rectangle ConvertToTopmostCoordinatesSystem(Rectangle rect)
         {

@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIPlayer.cs" />
     <Compile Include="Commands\Pipeline\RandomHeroTrainer.cs" />
     <Compile Include="AICommander.cs" />
     <Compile Include="Commands\IMultipleExecutingEntitiesCommand.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Commands\TrainCommand.cs" />
     <Compile Include="Commands\ZoneAttackCommand.cs" />
     <Compile Include="FactionMessage.cs" />
+    <Compile Include="LocalPlayer.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchSettings.cs" />
     <Compile Include="Networking\CommandSynchronizer.cs" />
@@ -115,12 +117,14 @@
     <Compile Include="Networking\Packets\QuittingPacket.cs" />
     <Compile Include="Networking\Packets\StartingMatchPacket.cs" />
     <Compile Include="Networking\Packets\UpdateMatchSettingsPacket.cs" />
+    <Compile Include="Networking\Packets\UpdatePlayersPacket.cs" />
     <Compile Include="Networking\PlayerSlotType.cs" />
     <Compile Include="Networking\SetupMessageType.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerBuilder.cs" />
     <Compile Include="PlayerSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemotePlayer.cs" />
     <Compile Include="ReplayEvent.cs" />
     <Compile Include="ReplayReader.cs" />
     <Compile Include="ReplayWriter.cs" />

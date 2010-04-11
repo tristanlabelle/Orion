@@ -31,13 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL" Condition="'$(Configuration)'=='Debug'">
+    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Debug\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK, Version=0.9.8.3, Culture=neutral, processorArchitecture=MSIL" Condition="'$(Configuration)'=='Release'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Release\OpenTK.dll</HintPath>
+      <HintPath>..\References\$(Configuration)\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="irrKlang.NET, Version=1.1.3.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
       <SpecificVersion>False</SpecificVersion>

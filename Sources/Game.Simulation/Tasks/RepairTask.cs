@@ -20,7 +20,6 @@ namespace Orion.Game.Simulation.Tasks
         private readonly Action<Entity> targetDiedEventHandler;
         private readonly MoveTask move;
         private readonly bool building;
-        private bool hasEnded;
         
         /// <summary>
         /// Remaining amount of aladdium that has been taken from the <see cref="Faction"/>'s coffers

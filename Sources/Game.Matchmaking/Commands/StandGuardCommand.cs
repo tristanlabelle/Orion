@@ -68,13 +68,16 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        protected override void DoSerialize(BinaryWriter writer)
+        public static void Serialize(StandGuardCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteLengthPrefixedHandleArray(writer, guardHandles);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, command.guardHandles);
         }
 
-        public static new StandGuardCommand Deserialize(BinaryReader reader)
+        public static StandGuardCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

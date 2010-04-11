@@ -67,15 +67,18 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        protected override void DoSerialize(BinaryWriter writer)
+        public static void Serialize(ChangeRallyPointCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteLengthPrefixedHandleArray(writer, buildingHandles);
-            writer.Write(position.X);
-            writer.Write(position.Y);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, command.buildingHandles);
+            writer.Write(command.position.X);
+            writer.Write(command.position.Y);
         }
 
-        public static new ChangeRallyPointCommand Deserialize(BinaryReader reader)
+        public static ChangeRallyPointCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

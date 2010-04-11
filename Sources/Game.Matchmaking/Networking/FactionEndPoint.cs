@@ -9,6 +9,7 @@ using Orion.Engine.Networking;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
+using Orion.Engine.Collections;
 
 namespace Orion.Game.Matchmaking.Networking
 {
@@ -86,41 +87,32 @@ namespace Orion.Game.Matchmaking.Networking
 
         private List<Command> DeserializeCommandDatagram(byte[] data, int startIndex)
         {
-            using (MemoryStream stream = new MemoryStream(data, startIndex, data.Length - startIndex))
+            Subarray<byte> subarray = new Subarray<byte>(data, startIndex);
+            List<Command> commands = Command.Serializer.DeserializeToEnd(subarray);
+
+            Command firstMindControlledCommand = commands
+                .FirstOrDefault(c => c.FactionHandle != Faction.Handle);
+            if (firstMindControlledCommand != null)
             {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    List<Command> commands = new List<Command>();
-                    while (stream.Position != stream.Length)
-                    {
-                        Command deserializedCommand = Command.Deserialize(reader);
-
-#if DEBUG
-                        // #if'd so FormatInvariant is not executed in release
-                        Debug.Assert(deserializedCommand.FactionHandle == Faction.Handle,
-                            "Faction #{0} attempted mind control".FormatInvariant(deserializedCommand.FactionHandle));
-#endif
-
-                        commands.Add(deserializedCommand);
-                    }
-                    return commands;
-                }
+                Debug.Fail("Faction {0} is mind controlling faction {1}."
+                    .FormatInvariant(Faction.Handle, firstMindControlledCommand.FactionHandle));
             }
+
+            return commands;
         }
 
         public void SendCommands(int commandFrame, IEnumerable<Command> commands)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    writer.Write((byte)GameMessageType.Commands);
-                    writer.Write(commandFrame);
-                    foreach (Command command in commands)
-                        command.Serialize(writer);
-                }
-                transporter.SendTo(stream.ToArray(), Host);
-            }
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+
+            writer.Write((byte)GameMessageType.Commands);
+            writer.Write(commandFrame);
+            foreach (Command command in commands)
+                Command.Serializer.Serialize(command, writer);
+
+            writer.Flush();
+            transporter.SendTo(stream.ToArray(), Host);
         }
 
         private void OnReceived(SafeTransporter transporter, NetworkEventArgs args)

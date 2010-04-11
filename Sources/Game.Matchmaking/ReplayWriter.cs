@@ -81,7 +81,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(command, "command");
 
             writer.Write(updateNumber);
-            command.Serialize(writer);
+            Command.Serializer.Serialize(command, writer);
             if (autoFlush) writer.Flush();
             
             lastUpdateNumber = updateNumber;

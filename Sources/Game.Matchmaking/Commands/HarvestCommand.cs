@@ -77,14 +77,17 @@ namespace Orion.Game.Matchmaking.Commands
         }
         
         #region Serialization
-        protected override void DoSerialize(BinaryWriter writer)
+        public static void Serialize(HarvestCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteLengthPrefixedHandleArray(writer, harvesterHandles);
-            WriteHandle(writer, resourceNodeHandle);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, command.harvesterHandles);
+            WriteHandle(writer, command.resourceNodeHandle);
         }
 
-        public static new HarvestCommand Deserialize(BinaryReader reader)
+        public static HarvestCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

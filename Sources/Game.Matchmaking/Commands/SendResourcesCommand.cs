@@ -70,15 +70,18 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        protected override void DoSerialize(BinaryWriter writer)
+        public static void Serialize(SendResourcesCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteHandle(writer, targetFactionHandle);
-            writer.Write(aladdiumAmount);
-            writer.Write(alageneAmount);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteHandle(writer, command.targetFactionHandle);
+            writer.Write(command.aladdiumAmount);
+            writer.Write(command.alageneAmount);
         }
 
-        public static new SendResourcesCommand Deserialize(BinaryReader reader)
+        public static SendResourcesCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

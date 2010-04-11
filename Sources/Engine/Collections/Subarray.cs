@@ -138,7 +138,7 @@ namespace Orion.Engine.Collections
         #endregion
 
         #region Methods
-        #region Collection
+        #region Conversions
         /// <summary>
         /// Converts this <see cref="Subarray{T}"/> to an array.
         /// </summary>
@@ -158,7 +158,9 @@ namespace Orion.Engine.Collections
         {
             return new ArraySegment<T>(array, Offset, Count);
         }
+        #endregion
 
+        #region Collection
         /// <summary>
         /// Gets an enumerator which enumerates the elements in this <see cref="Subarray{T}"/>.
         /// </summary>

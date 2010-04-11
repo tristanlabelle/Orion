@@ -29,6 +29,13 @@ namespace Orion.Game.Matchmaking.Commands
 
         #endregion
 
+        #region Properties
+        public override IEnumerable<Handle> ExecutingEntityHandles
+        {
+            get { return new[] { researcherHandle }; }
+        }
+        #endregion
+
         #region Methods
         public override bool ValidateHandles(Match match)
         {
@@ -71,19 +78,18 @@ namespace Orion.Game.Matchmaking.Commands
                 .FormatInvariant(FactionHandle, researcherHandle, technologyHandle);
         }
 
-        protected override void DoSerialize(System.IO.BinaryWriter writer)
+        #region Serialization
+        public static void Serialize(ResearchCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteHandle(writer, researcherHandle);
-            WriteHandle(writer, technologyHandle);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteHandle(writer, command.researcherHandle);
+            WriteHandle(writer, command.technologyHandle);
         }
 
-        public override IEnumerable<Handle> ExecutingEntityHandles
-        {
-            get { return new[] { researcherHandle }; }
-        }
-
-        public static new ResearchCommand Deserialize(BinaryReader reader)
+        public static ResearchCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 
@@ -93,6 +99,7 @@ namespace Orion.Game.Matchmaking.Commands
 
             return new ResearchCommand(researcherHandle, factionHandle, technologyHandle);
         }
+        #endregion
         #endregion
     }
 }

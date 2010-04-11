@@ -99,16 +99,19 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        protected override void DoSerialize(BinaryWriter writer)
+        public static void Serialize(BuildCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteLengthPrefixedHandleArray(writer, builderHandles);
-            WriteHandle(writer, buildingTypeHandle);
-            writer.Write((short)location.X);
-            writer.Write((short)location.Y);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, command.builderHandles);
+            WriteHandle(writer, command.buildingTypeHandle);
+            writer.Write((short)command.location.X);
+            writer.Write((short)command.location.Y);
         }
 
-        public static new BuildCommand Deserialize(BinaryReader reader)
+        public static BuildCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

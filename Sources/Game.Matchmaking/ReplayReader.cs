@@ -74,7 +74,7 @@ namespace Orion.Game.Matchmaking
         public ReplayEvent ReadCommand()
         {
             int updateNumber = reader.ReadInt32();
-            Command command = Command.Deserialize(reader);
+            Command command = Command.Serializer.Deserialize(reader);
 
             if (updateNumber < lastUpdateNumber)
                 throw new InvalidDataException("Replay command numbers are not ascending .");

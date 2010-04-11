@@ -77,7 +77,7 @@ namespace Orion.Game.Matchmaking.Commands
             writer.Write(command.text);
         }
 
-        public static new SendMessageCommand Deserialize(BinaryReader reader)
+        public static SendMessageCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

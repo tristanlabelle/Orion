@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Net.Sockets;
+using Orion.Engine.Collections;
 
 namespace Orion.Engine.Networking
 {
@@ -19,9 +20,9 @@ namespace Orion.Engine.Networking
         #endregion
 
         #region Constructors
-        public SafePacket(uint number, byte[] message)
+        public SafePacket(uint number, Subarray<byte> message)
         {
-            Argument.EnsureNotNull(message, "message");
+            Argument.EnsureNotNull(message.Array, "message.Array");
 
             this.data = Protocol.CreateDataPacket(message, number);
         }

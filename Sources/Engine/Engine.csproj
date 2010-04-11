@@ -69,6 +69,7 @@
     <Compile Include="Audio\Null\SoundContext.cs" />
     <Compile Include="Audio\SoundGroup.cs" />
     <Compile Include="Audio\SoundManager.cs" />
+    <Compile Include="Collections\Subarray.cs" />
     <Compile Include="Collections\ValidatingCollection.cs" />
     <Compile Include="DisposableHandle.cs" />
     <Compile Include="Collections\BitArray2D.cs" />

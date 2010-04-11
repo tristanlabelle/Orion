@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.IO;
+using Orion.Engine.Collections;
 using Orion.Engine.Networking;
 
 namespace Orion.Engine.Networking
@@ -329,11 +330,11 @@ namespace Orion.Engine.Networking
         /// <param name="remoteHost">
         /// The host to which the message is addressed.
         /// </param>
-        public void SendTo(byte[] message, IPv4EndPoint hostEndPoint)
+        public void SendTo(Subarray<byte> message, IPv4EndPoint hostEndPoint)
         {
             EnsureNotDisposed();
-            Argument.EnsureNotNull(message, "message");
-            Debug.Assert(message.Length < 512, "Warning: A network message exceeded 512 bytes.");
+            Argument.EnsureNotNull(message.Array, "message.Array");
+            Debug.Assert(message.Count < 512, "Warning: A network message exceeded 512 bytes.");
 
             lock (peers)
             {
@@ -342,10 +343,10 @@ namespace Orion.Engine.Networking
             }
         }
 
-        public void SendTo(byte[] message, IEnumerable<IPv4EndPoint> hostEndPoints)
+        public void SendTo(Subarray<byte> message, IEnumerable<IPv4EndPoint> hostEndPoints)
         {
             EnsureNotDisposed();
-            Argument.EnsureNotNull(message, "message");
+            Argument.EnsureNotNull(message.Array, "message.Array");
             Argument.EnsureNotNull(hostEndPoints, "hostEndPoints");
 
             foreach (IPv4EndPoint endPoint in hostEndPoints)
@@ -361,12 +362,12 @@ namespace Orion.Engine.Networking
         /// Broadcasted packets are inherently unreliable as it is impossible to know who didn't receive them.
         /// Consequently, they are sent only once with only integrity being garanteed.
         /// </remarks>
-        public void Broadcast(byte[] message, int port)
+        public void Broadcast(Subarray<byte> message, int port)
         {
             EnsureNotDisposed();
-            Argument.EnsureNotNull(message, "message");
+            Argument.EnsureNotNull(message.Array, "message.Array");
             Argument.EnsureWithin(port, 1, ushort.MaxValue, "port");
-            Debug.Assert(message.Length < 512, "Warning: A network broadcast message exceeded 512 bytes.");
+            Debug.Assert(message.Count < 512, "Warning: A network broadcast message exceeded 512 bytes.");
 
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);

@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
+using Orion.Engine.Collections;
 using Orion.Engine.Networking;
 
 namespace Orion.Engine.Networking
@@ -104,7 +105,7 @@ namespace Orion.Engine.Networking
         }
         #endregion
 
-        public SafePacket CreatePacket(byte[] data)
+        public SafePacket CreatePacket(Subarray<byte> data)
         {
             uint packetNumber = nextPacketNumber;
             ++nextPacketNumber;

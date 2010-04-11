@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
+using Orion.Engine.Collections;
 
 namespace Orion.Engine.Networking
 {
@@ -20,10 +21,10 @@ namespace Orion.Engine.Networking
 
         #region Methods
         #region Encoding
-        public static byte[] CreateDataPacket(byte[] message, uint number)
+        public static byte[] CreateDataPacket(Subarray<byte> message, uint number)
         {
-            Argument.EnsureNotNull(message, "message");
-            byte[] packetData = new byte[6 + message.Length];
+            Argument.EnsureNotNull(message.Array, "message.Array");
+            byte[] packetData = new byte[6 + message.Count];
             packetData[0] = MagicIdentifier;
             packetData[1] = (byte)PacketType.Message;
             BitConverter.GetBytes(number).CopyTo(packetData, 2);
@@ -40,10 +41,10 @@ namespace Orion.Engine.Networking
             return packetData;
         }
 
-        public static byte[] CreateBroadcastPacket(byte[] message)
+        public static byte[] CreateBroadcastPacket(Subarray<byte> message)
         {
-            Argument.EnsureNotNull(message, "message");
-            byte[] packetData = new byte[2 + message.Length];
+            Argument.EnsureNotNull(message.Array, "message.Array");
+            byte[] packetData = new byte[2 + message.Count];
             packetData[0] = MagicIdentifier;
             packetData[1] = (byte)PacketType.Broadcast;
             message.CopyTo(packetData, 2);

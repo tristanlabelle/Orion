@@ -75,6 +75,16 @@ namespace Orion.Game.Matchmaking.Networking
             transporter.Broadcast(data, preferredPort);
         }
 
+        public void Ping(IPv4EndPoint endPoint)
+        {
+            transporter.Ping(endPoint);
+        }
+
+        public void Poll()
+        {
+            transporter.Poll();
+        }
+
         public void Dispose()
         {
             transporter.Dispose();
@@ -93,9 +103,7 @@ namespace Orion.Game.Matchmaking.Networking
         {
             if (PacketReceived == null) return;
 
-            var stream = new MemoryStream(args.Data, 1, args.Data.Length - 1);
-            var reader = new BinaryReader(stream);
-            GamePacket packet = GamePacket.Serializer.Deserialize(reader);
+            GamePacket packet = GamePacket.Serializer.Deserialize(args.Data);
 
             GamePacketEventArgs eventArgs = new GamePacketEventArgs(args.Host, packet);
             PacketReceived(this, eventArgs);

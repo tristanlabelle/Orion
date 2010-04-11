@@ -100,7 +100,7 @@ namespace Orion.Engine
             Argument.EnsureNotNull(@object, "object");
             Argument.EnsureNotNull(writer, "writer");
 
-            Type type = GetType();
+            Type type = @object.GetType();
             int index = entries.IndexOf(t => t.Type == type);
             if (index == -1)
             {

@@ -254,6 +254,20 @@ namespace Orion.Engine.Networking
             try { return Parse(addressString); }
             catch (FormatException) { return null; }
         }
+
+        public static bool TryParse(string addressString, out IPv4Address address)
+        {
+            try
+            {
+                address = Parse(addressString);
+                return true;
+            }
+            catch (FormatException)
+            {
+                address = default(IPv4Address);
+                return false;
+            }
+        }
         #endregion
 
         #region Equality/Comparison

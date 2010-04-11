@@ -100,11 +100,14 @@
     <Compile Include="LocalPlayer.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchSettings.cs" />
+    <Compile Include="Networking\AdvertizedMatch.cs" />
     <Compile Include="Networking\CommandSynchronizer.cs" />
     <Compile Include="Networking\FactionEndPoint.cs" />
     <Compile Include="Networking\GameMessageType.cs" />
     <Compile Include="Networking\GameNetworking.cs" />
     <Compile Include="Networking\GamePacketEventArgs.cs" />
+    <Compile Include="Networking\JoinResponseEventArgs.cs" />
+    <Compile Include="Networking\MultiplayerLobby.cs" />
     <Compile Include="Networking\Packets\AdvertizeMatchPacket.cs" />
     <Compile Include="Networking\Packets\CommandFrameCompletedPacket.cs" />
     <Compile Include="Networking\Packets\CommandsPacket.cs" />

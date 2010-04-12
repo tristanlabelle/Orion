@@ -116,6 +116,7 @@
     <Compile Include="Networking\Packets\JoinRequestPacket.cs" />
     <Compile Include="Networking\Packets\JoinResponsePacket.cs" />
     <Compile Include="Networking\Packets\KickedPacket.cs" />
+    <Compile Include="Networking\Packets\MatchSettingsPacket.cs" />
     <Compile Include="Networking\Packets\MatchSettingsRequestPacket.cs" />
     <Compile Include="Networking\Packets\QuittingPacket.cs" />
     <Compile Include="Networking\Packets\StartingMatchPacket.cs" />

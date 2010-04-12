@@ -157,6 +157,7 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchConfigurationUI> StartGamePressed;
         public event Action<MatchConfigurationUI> ExitPressed;
         public event Action<MatchConfigurationUI, MatchSettings> OptionChanged;
+        public event Action<MatchConfigurationUI, Player, ColorRgb> PlayerColorChanged;
         public event Action<MatchConfigurationUI, Player> AddPlayerPressed;
         public event Action<MatchConfigurationUI, Player> KickPlayerPressed;
         #endregion
@@ -184,11 +185,11 @@ namespace Orion.Game.Presentation.Gui
             Panel row = new Panel(playerRect);
             string playerNameLabelText = player is LocalPlayer ? "Vous" : player.Name;
             Label playerNameLabel = new Label(playerNameRect, playerNameLabelText);
-            DropdownList<ColorRgb> colorsDropdownList = new DropdownList<ColorRgb>(colorDropdownRect, Faction.Colors);
+            DropdownList<ColorRgb> colorsDropdownList = new DropdownList<ColorRgb>(colorDropdownRect, playerSettings.AvailableColors);
             colorsDropdownList.StringConverter = (color) => Colors.GetName(color);
             colorsDropdownList.SelectedItem = player.Color;
             colorsDropdownList.Enabled = isGameMaster || player is LocalPlayer;
-            colorsDropdownList.SelectionChanged += (dropdown, color) => player.Color = color;
+            colorsDropdownList.SelectionChanged += (dropdown, color) => PlayerColorChanged.Raise(this, player, color);
             if(isGameMaster && !(player is LocalPlayer))
             {
                 Button kick = new Button(kickRect, "X");

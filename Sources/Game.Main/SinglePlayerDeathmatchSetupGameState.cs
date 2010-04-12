@@ -37,19 +37,17 @@ namespace Orion.Game.Main
             this.matchSettings.AreCheatsEnabled = true;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(Faction.Colors[0]));
+            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
 
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
             builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
 
             this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
-            this.ui.AddPlayerPressed += (sender, player) =>
-            {
-                playerSettings.AddPlayer(player);
-            };
+            this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
             
             this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
             this.ui.StartGamePressed += OnStartGamePressed;
+            this.ui.PlayerColorChanged += OnPlayerColorChanged;
             this.ui.ExitPressed += OnExitPressed;
         }
         #endregion
@@ -144,6 +142,11 @@ namespace Orion.Game.Main
             GameState targetGameState = new DeathmatchGameState(
                 Manager, graphics, match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
+        }
+
+        private void OnPlayerColorChanged(MatchConfigurationUI ui, Player player, ColorRgb color)
+        {
+            player.Color = color;
         }
 
         private void OnExitPressed(MatchConfigurationUI sender)

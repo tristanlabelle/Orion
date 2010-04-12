@@ -108,7 +108,7 @@ namespace Orion.Game.Main
         {
             if (args.WasAccepted)
             {
-                //Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, args.EndPoint));
+                Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, args.EndPoint));
             }
             else
             {
@@ -124,7 +124,7 @@ namespace Orion.Game.Main
 
         private void OnHostPressed(MultiplayerLobbyUI sender)
         {
-            //Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, null));
+            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, null));
         }
 
         private void OnJoinPressed(MultiplayerLobbyUI sender, AdvertizedMatch match)

@@ -13,6 +13,9 @@ namespace Orion.Game.Matchmaking.Networking.Packets
     public sealed class JoinResponsePacket : GamePacket
     {
         #region Fields
+        public static readonly JoinResponsePacket Accepted = new JoinResponsePacket(true);
+        public static readonly JoinResponsePacket Refused = new JoinResponsePacket(false);
+
         private readonly bool wasAccepted;
         #endregion
 
@@ -47,7 +50,7 @@ namespace Orion.Game.Matchmaking.Networking.Packets
             Argument.EnsureNotNull(reader, "reader");
 
             bool wasAccepted = reader.ReadBoolean();
-            return new JoinResponsePacket(wasAccepted);
+            return wasAccepted ? Accepted : Refused;
         }
         #endregion
     }

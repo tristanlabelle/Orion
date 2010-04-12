@@ -15,19 +15,27 @@ namespace Orion.Game.Matchmaking.Networking.Packets
     public sealed class CommandsPacket : GamePacket
     {
         #region Fields
+        private int commandFrameNumber;
         private readonly ReadOnlyCollection<Command> commands;
         #endregion
 
         #region Constructors
-        public CommandsPacket(IEnumerable<Command> commands)
+        public CommandsPacket(int commandFrameNumber, IEnumerable<Command> commands)
         {
+            Argument.EnsurePositive(commandFrameNumber, "commandFrameNumber");
             Argument.EnsureNotNull(commands, "commands");
 
+            this.commandFrameNumber = commandFrameNumber;
             this.commands = commands.ToList().AsReadOnly();
         }
         #endregion
 
         #region Properties
+        public int CommandFrameNumber
+        {
+            get { return commandFrameNumber; }
+        }
+
         public ReadOnlyCollection<Command> Commands
         {
             get { return commands; }
@@ -40,6 +48,7 @@ namespace Orion.Game.Matchmaking.Networking.Packets
             Argument.EnsureNotNull(packet, "packet");
             Argument.EnsureNotNull(writer, "writer");
 
+            writer.Write(packet.commandFrameNumber);
             writer.Write(packet.commands.Count);
             foreach (Command command in packet.commands)
                 Command.Serializer.Serialize(command, writer);
@@ -47,10 +56,11 @@ namespace Orion.Game.Matchmaking.Networking.Packets
 
         public static CommandsPacket Deserialize(BinaryReader reader)
         {
+            int commandFrameNumber = reader.ReadInt32();
             int commandCount = reader.ReadInt32();
             var commands = Enumerable.Range(0, commandCount)
                 .Select(i => Command.Serializer.Deserialize(reader));
-            return new CommandsPacket(commands);
+            return new CommandsPacket(commandFrameNumber, commands);
         }
         #endregion
     }

@@ -14,19 +14,27 @@ namespace Orion.Game.Matchmaking.Networking.Packets
     public sealed class AdvertizeMatchPacket : GamePacket
     {
         #region Fields
+        private readonly string name;
         private readonly int openSlotCount;
         #endregion
 
         #region Constructors
-        public AdvertizeMatchPacket(int openSlotCount)
+        public AdvertizeMatchPacket(string name, int openSlotCount)
         {
+            Argument.EnsureNotNull(name, "name");
             Argument.EnsurePositive(openSlotCount, "openSlotCount");
 
+            this.name = name;
             this.openSlotCount = openSlotCount;
         }
         #endregion
 
         #region Properties
+        public string Name
+        {
+            get { return name; }
+        }
+
         public int OpenSlotCount
         {
             get { return openSlotCount; }
@@ -39,6 +47,7 @@ namespace Orion.Game.Matchmaking.Networking.Packets
             Argument.EnsureNotNull(packet, "packet");
             Argument.EnsureNotNull(writer, "writer");
 
+            writer.Write(packet.name);
             writer.Write(packet.openSlotCount);
         }
 
@@ -46,8 +55,9 @@ namespace Orion.Game.Matchmaking.Networking.Packets
         {
             Argument.EnsureNotNull(reader, "reader");
 
+            string name = reader.ReadString();
             int openSlotCount = reader.ReadInt32();
-            return new AdvertizeMatchPacket(openSlotCount);
+            return new AdvertizeMatchPacket(name, openSlotCount);
         }
         #endregion
     }

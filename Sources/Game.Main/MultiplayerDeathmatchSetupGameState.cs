@@ -14,6 +14,7 @@ using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking.Networking.Packets;
 
 namespace Orion.Game.Main
 {
@@ -24,30 +25,28 @@ namespace Orion.Game.Main
     public sealed class MultiplayerDeathmatchSetupGameState : GameState
     {
         #region Fields
-        private static readonly int maximumPlayersCount = Faction.Colors.Count() - 1;
-        private static readonly byte[] advertiseGameMessage = new byte[2] { (byte)SetupMessageType.Advertise, 12 };
-        private static readonly byte[] refuseJoinGameMessage = new byte[] { (byte)SetupMessageType.RefuseJoinRequest };
-        
+        private static readonly int maximumPlayerCount = Faction.Colors.Count() - 1;
+
         private readonly GameGraphics graphics;
-        private readonly SafeTransporter transporter;
+        private readonly GameNetworking networking;
         private readonly IPv4EndPoint? hostEndPoint;
         private readonly PlayerSettings playerSettings;
         private readonly MatchSettings matchSettings;
         private readonly MatchConfigurationUI ui;
-        private Action<SafeTransporter, NetworkEventArgs> packetReceivedEventHandler;
-        private Action<SafeTransporter, IPv4EndPoint> peerTimedOutEventHandler;
+        private Action<GameNetworking, GamePacketEventArgs> packetReceivedEventHandler;
+        private Action<GameNetworking, IPv4EndPoint> peerTimedOutEventHandler;
         #endregion
 
         #region Constructors
         public MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics,
-            SafeTransporter transporter, IPv4EndPoint? hostEndPoint)
+            GameNetworking networking, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
             Argument.EnsureNotNull(graphics, "graphics");
-            Argument.EnsureNotNull(transporter, "transporter");
+            Argument.EnsureNotNull(networking, "networking");
 
             this.graphics = graphics;
-            this.transporter = transporter;
+            this.networking = networking;
             this.hostEndPoint = hostEndPoint;
 
             this.playerSettings = new PlayerSettings();
@@ -73,7 +72,7 @@ namespace Orion.Game.Main
             get { return !hostEndPoint.HasValue; }
         }
 
-        private IEnumerable<IPv4EndPoint> PlayerAddresses
+        private IEnumerable<IPv4EndPoint> PlayerEndPoints
         {
             get { return playerSettings.Players.OfType<RemotePlayer>().Select(p => p.EndPoint); }
         }
@@ -87,24 +86,22 @@ namespace Orion.Game.Main
 
             if (!IsHost)
             {
-                byte[] data = new byte[1];
-                data[0] = (byte)SetupMessageType.GetSetup;
-                transporter.SendTo(data, hostEndPoint.Value);
+                networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
             }
         }
 
         protected internal override void OnShadowed()
         {
-            transporter.Received -= packetReceivedEventHandler;
-            transporter.TimedOut -= peerTimedOutEventHandler;
+            networking.PacketReceived -= packetReceivedEventHandler;
+            networking.PeerTimedOut -= peerTimedOutEventHandler;
             RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()
         {
             RootView.Children.Add(ui);
-            this.transporter.Received += this.packetReceivedEventHandler;
-            this.transporter.TimedOut += this.peerTimedOutEventHandler;
+            this.networking.PacketReceived += this.packetReceivedEventHandler;
+            this.networking.PeerTimedOut += this.peerTimedOutEventHandler;
         }
 
         protected internal override void Update(float timeDeltaInSeconds)
@@ -162,7 +159,7 @@ namespace Orion.Game.Main
                 {
                     RemotePlayer remotePlayerSlot = (RemotePlayer)slot;
                     IPv4EndPoint endPoint = remotePlayerSlot.EndPoint;
-                    FactionEndPoint peer = new FactionEndPoint(transporter, faction, endPoint);
+                    FactionEndPoint peer = new FactionEndPoint(networking, faction, endPoint);
                     peers.Add(peer);
                 }
                 else
@@ -181,7 +178,7 @@ namespace Orion.Game.Main
             if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
 
             ICommandSink aiCommandSink = commandPipeline.TopMostSink;
-            commandPipeline.PushFilter(new CommandSynchronizer(match, transporter, peers));
+            commandPipeline.PushFilter(new CommandSynchronizer(match, networking, peers));
             commandPipeline.PushFilter(new CommandOptimizer());
 
             aiCommanders.ForEach(commander => commandPipeline.AddCommander(commander, aiCommandSink));
@@ -194,17 +191,17 @@ namespace Orion.Game.Main
         #endregion
 
         #region Event Handlers
-        private void OnPacketReceived(SafeTransporter sender, NetworkEventArgs args)
+        private void OnPacketReceived(GameNetworking sender, GamePacketEventArgs args)
         {
             if (IsHost) HandlePacketAsHost(args);
             else HandlePacketAsClient(args);
         }
 
-        private void OnPeerTimedOut(SafeTransporter sender, IPv4EndPoint timedOutHostEndPoint)
+        private void OnPeerTimedOut(GameNetworking sender, IPv4EndPoint timedOutHostEndPoint)
         {
             if (IsHost)
             {
-                if (PlayerAddresses.Contains(timedOutHostEndPoint))
+                if (PlayerEndPoints.Contains(timedOutHostEndPoint))
                     TryLeave(timedOutHostEndPoint);
             }
             else
@@ -217,11 +214,8 @@ namespace Orion.Game.Main
         {
             Debug.Assert(IsHost);
 
-            byte[] startGameMessage = new byte[1];
-            startGameMessage[0] = (byte)SetupMessageType.RemoveGame;
-            transporter.Broadcast(startGameMessage, transporter.Port);
-            startGameMessage[0] = (byte)SetupMessageType.StartGame;
-            transporter.SendTo(startGameMessage, PlayerAddresses);
+            networking.Broadcast(StartingMatchPacket.Instance);
+            networking.Send(StartingMatchPacket.Instance, PlayerEndPoints);
             StartGame();
         }
 
@@ -246,42 +240,44 @@ namespace Orion.Game.Main
             //transporter.SendTo(setSlotMessage, ui.PlayerAddresses);
         }
 
-        private void OnPlayerKicked(MatchConfigurationUI sender, IPv4EndPoint peer)
+        private void OnPlayerKicked(MatchConfigurationUI sender, IPv4EndPoint endPoint)
         {
-            byte[] kickMessage = new byte[1];
-            kickMessage[0] = (byte)SetupMessageType.Exit;
-            transporter.SendTo(kickMessage, peer);
+            networking.Send(KickedPacket.Instance, endPoint);
         }
         #endregion
 
         #region Client
-        private void HandlePacketAsClient(NetworkEventArgs args)
+        private void HandlePacketAsClient(GamePacketEventArgs args)
         {
-            if (args.Host != hostEndPoint.Value)
+            if (args.SenderEndPoint != hostEndPoint.Value)
             {
-                Debug.Fail("Received a packet from an unexpected peer.");
+                Debug.Fail("PacketReceived a packet from an unexpected peer.");
                 return;
             }
 
-            byte[] data = args.Data;
-            SetupMessageType setupMessageType = (SetupMessageType)data[0];
-            switch (setupMessageType)
+            if (args.Packet is StartingMatchPacket)
             {
-                case SetupMessageType.SetPeer: SetPeer(data); break;
-                case SetupMessageType.StartGame: StartGame(); break;
-                case SetupMessageType.ChangeOptions: SetOptions(args.Host, data); break;
-                case SetupMessageType.Exit: ForceExit(); break;
-                default:
-                    Debug.Fail("Unexpected setup message type {0}.".FormatInvariant(setupMessageType));
-                    break;
+                StartGame();
+            }
+            else if (args.Packet is UpdateMatchSettingsPacket)
+            {
+                var packet = (UpdateMatchSettingsPacket)args.Packet;
+                UpdateSettings(packet);
+            }
+            else if (args.Packet is KickedPacket)
+            {
+                ForceExit();
+            }
+            else if (args.Packet is UpdatePlayersPacket)
+            {
+                var packet = (UpdatePlayersPacket)args.Packet;
+                SetPeer(packet);
             }
         }
 
         private void SendQuitMessageToHost()
         {
-            byte[] quitMessage = new byte[1];
-            quitMessage[0] = (byte)SetupMessageType.LeaveGame;
-            transporter.SendTo(quitMessage, hostEndPoint.Value);
+            networking.Send(QuittingPacket.Instance, hostEndPoint.Value);
         }
 
         private void SetPeer(byte[] bytes)
@@ -289,23 +285,21 @@ namespace Orion.Game.Main
             uint address = BitConverter.ToUInt32(bytes, 2);
             ushort port = BitConverter.ToUInt16(bytes, 2 + sizeof(uint));
             IPv4EndPoint peer = new IPv4EndPoint(new IPv4Address(address), port);
-            //ui.UsePlayerForSlot(bytes[1], peer);
+            ui.UsePlayerForSlot(bytes[1], peer);
         }
 
-        private void SetOptions(IPv4EndPoint host, byte[] bytes)
+        private void UpdateSettings(UpdateMatchSettingsPacket packet)
         {
-            using (MemoryStream stream = new MemoryStream(bytes))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    SetupMessageType messageType = (SetupMessageType)reader.ReadByte();
-                    Debug.Assert(messageType == SetupMessageType.ChangeOptions);
+#warning HACK: Copying MatchSettings through serialization >.<
+            var stream = new MemoryStream();
 
-                    matchSettings.Deserialize(reader);
+            var writer = new BinaryWriter(stream);
+            packet.Settings.Serialize(writer);
+            writer.Flush();
 
-                    Debug.Assert(reader.PeekChar() == -1, "Warning: The options packet contained more data than we read.");
-                }
-            }
+            stream.Position = 0;
+            var reader = new BinaryReader(stream, Encoding.UTF8);
+            matchSettings.Deserialize(reader);
         }
 
         private void ForceExit()
@@ -315,37 +309,30 @@ namespace Orion.Game.Main
         #endregion
 
         #region Host
-        private void HandlePacketAsHost(NetworkEventArgs args)
+        private void HandlePacketAsHost(GamePacketEventArgs args)
         {
-            byte[] message = args.Data;
-            SetupMessageType setupMessageType = (SetupMessageType)message[0];
-            switch (setupMessageType)
+            if (args.Packet is ExploreMatchesPacket)
             {
-                case SetupMessageType.Explore:
-                    Advertise(args.Host);
-                    break;
-
-                case SetupMessageType.JoinRequest:
-                    TryJoin(args.Host);
-                    break;
-
-                case SetupMessageType.GetSetup:
-                    SendSetup(args.Host);
-                    break;
-
-                case SetupMessageType.LeaveGame:
-                    TryLeave(args.Host);
-                    break;
-
-                default:
-                    //Debug.Fail("Unexpected setup message type {0}.".FormatInvariant(setupMessageType));
-                    break;
+                Advertize(args.SenderEndPoint);
+            }
+            else if (args.Packet is JoinRequestPacket)
+            {
+                TryJoin(args.SenderEndPoint);
+            }
+            else if (args.Packet is MatchSettingsRequestPacket)
+            {
+                SendSetup(args.SenderEndPoint);
+            }
+            else if (args.Packet is QuittingPacket)
+            {
+                TryLeave(args.SenderEndPoint);
             }
         }
 
         private void OnSettingsChanged(MatchSettings settings)
         {
-            transporter.SendTo(CreateSettingsPacket(), PlayerAddresses);
+            var packet = new UpdateMatchSettingsPacket(settings);
+            networking.Send(packet, PlayerEndPoints);
         }
 
         private byte[] CreateSettingsPacket()
@@ -364,31 +351,27 @@ namespace Orion.Game.Main
 
         private void SendQuitMessageToClients()
         {
-            byte[] exitMessage = new byte[1];
-            exitMessage[0] = (byte)SetupMessageType.Exit;
-            transporter.SendTo(exitMessage, PlayerAddresses);
-            transporter.Broadcast(exitMessage, transporter.Port);
+            networking.Send(QuittingPacket.Instance, PlayerEndPoints);
+            networking.Broadcast(QuittingPacket.Instance);
         }
 
-        private void Advertise(IPv4EndPoint host)
+        private void Advertize(IPv4EndPoint host)
         {
-            int leftSlots = playerSettings.Players.Count() - maximumPlayersCount;
-            advertiseGameMessage[1] = (byte)leftSlots;
-            transporter.SendTo(advertiseGameMessage, host);
+            int openSlotCount = playerSettings.Players.Count() - maximumPlayerCount;
+            var packet = new AdvertizeMatchPacket("Foo", openSlotCount);
+            networking.Send(packet, host);
         }
 
         private void TryJoin(IPv4EndPoint host)
         {
-            if (playerSettings.Players.Count() >= maximumPlayersCount)
+            if (playerSettings.Players.Count() >= maximumPlayerCount)
             {
-                transporter.SendTo(refuseJoinGameMessage, host);
+                networking.Send(JoinResponsePacket.Refused, host);
                 return;
             }
 
             // Send a message indicating we accept the request
-            byte[] accept = new byte[1];
-            accept[0] = (byte)SetupMessageType.AcceptJoinRequest;
-            transporter.SendTo(accept, host);
+            networking.Send(JoinResponsePacket.Accepted, host);
 
             // Tell the others that a new guy has joined
             byte[] addPeerMessage = new byte[8];
@@ -396,7 +379,7 @@ namespace Orion.Game.Main
             //addPeerMessage[1] = (byte)slotIndex;
             BitConverter.GetBytes(host.Address.Value).CopyTo(addPeerMessage, 2);
             BitConverter.GetBytes(host.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
-            transporter.SendTo(addPeerMessage, PlayerAddresses.Except(host));
+            networking.Send(addPeerMessage, PlayerEndPoints.Except(host));
         }
 
         public void SendSetup(IPv4EndPoint targetEndPoint)
@@ -420,7 +403,7 @@ namespace Orion.Game.Main
                     {
                         setSlotMessage[1] = (byte)slotNumber;
                         setSlotMessage[2] = (byte)PlayerSlotType.Local;
-                        transporter.SendTo(setSlotMessage, targetEndPoint);
+                        networking.Send(setSlotMessage, targetEndPoint);
                         continue;
                     }
 
@@ -428,7 +411,7 @@ namespace Orion.Game.Main
                     addPeerMessage[1] = (byte)slotNumber;
                     BitConverter.GetBytes(peer.Address.Value).CopyTo(addPeerMessage, 2);
                     BitConverter.GetBytes(peer.Port).CopyTo(addPeerMessage, 2 + sizeof(uint));
-                    transporter.SendTo(addPeerMessage, targetEndPoint);
+                    networking.Send(addPeerMessage, targetEndPoint);
                     continue;
                 }
 
@@ -436,12 +419,12 @@ namespace Orion.Game.Main
                 {
                     setSlotMessage[1] = (byte)slotNumber;
                     setSlotMessage[2] = (byte)PlayerSlotType.AI;
-                    transporter.SendTo(setSlotMessage, targetEndPoint);
+                    networking.Send(setSlotMessage, targetEndPoint);
                     continue;
                 }
             }
 
-            transporter.SendTo(CreateSettingsPacket(), targetEndPoint);
+            networking.Send(CreateSettingsPacket(), targetEndPoint);
         }
 
         private void TryLeave(IPv4EndPoint host)
@@ -457,8 +440,8 @@ namespace Orion.Game.Main
             setSlotMessage[0] = (byte)SetupMessageType.SetSlot;
             setSlotMessage[1] = (byte)slotNumber;
             setSlotMessage[2] = (byte)PlayerSlotType.Open;
-            foreach (IPv4EndPoint peer in PlayerAddresses)
-                transporter.SendTo(setSlotMessage, peer);
+            foreach (IPv4EndPoint peer in PlayerEndPoints)
+                networking.Send(setSlotMessage, peer);
         }
         #endregion
         #endregion

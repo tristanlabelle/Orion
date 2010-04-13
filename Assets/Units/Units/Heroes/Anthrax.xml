@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Anthrax" Hero="Chuck Norris" Width="2" Height="2" IsAirborne="True">
-	<Basic SightRange="9" MaxHealth="100" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
-	<Move Speed="15"/>
-	<Attack Power="5" Range="9" Delay="1"/>
+	<Skills>
+		<Basic SightRange="9" MaxHealth="100" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
+		<Move Speed="15"/>
+		<Attack Power="5" Range="9" Delay="1"/>
+	</Skills>
 </UnitType>

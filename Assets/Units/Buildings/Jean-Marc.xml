@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Jean-Marc" Width="3" Height="3">
-	<Basic SightRange="7" MaxHealth="120" MeleeArmor="1" RangedArmor="1" AladdiumCost="120" AlageneCost="40"/>
-  <Attack Power="8" Range="7" Delay="2"/>
+	<Skills>
+		<Basic SightRange="7" MaxHealth="120" MeleeArmor="1" RangedArmor="1" AladdiumCost="120" AlageneCost="40"/>
+		<Attack Power="8" Range="7" Delay="2"/>
+	</Skills>
 </UnitType>

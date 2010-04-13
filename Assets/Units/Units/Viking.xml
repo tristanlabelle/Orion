@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Viking" Hero="Thor" Width="1" Height="1">
-	<Basic SightRange="8" MaxHealth="70" MeleeArmor="3" RangedArmor="2" AladdiumCost="100" AlageneCost="25" FoodCost="3"/>
-	<Move Speed="6"/>
-	<Attack Power="13" Range="0" Delay="4"/>
+	<Skills>
+		<Basic SightRange="8" MaxHealth="70" MeleeArmor="3" RangedArmor="2" AladdiumCost="100" AlageneCost="25" FoodCost="3"/>
+		<Move Speed="6"/>
+		<Attack Power="13" Range="0" Delay="4"/>
+	</Skills>
 </UnitType>

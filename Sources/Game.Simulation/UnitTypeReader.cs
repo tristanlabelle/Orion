@@ -42,7 +42,9 @@ namespace Orion.Game.Simulation
                 throw new InvalidDataException("Expected a root <UnitType> tag.");
 
             ReadUnitTypeAttributes(unitTypeElement, unitTypeBuilder);
-            ReadSkills(unitTypeElement, unitTypeBuilder);
+
+            XmlElement skillsElement = (XmlElement)unitTypeElement.SelectSingleNode("Skills");
+            if (skillsElement != null) ReadSkills(skillsElement, unitTypeBuilder);
 
             return unitTypeBuilder;
         }
@@ -69,9 +71,9 @@ namespace Orion.Game.Simulation
             }
         }
 
-        private static void ReadSkills(XmlElement unitTypeElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadSkills(XmlElement skillsElement, UnitTypeBuilder unitTypeBuilder)
         {
-            foreach (XmlElement skillElement in unitTypeElement.ChildNodes)
+            foreach (XmlElement skillElement in skillsElement.ChildNodes)
             {
                 string skillName = skillElement.Name;
 

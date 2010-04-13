@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Jésus" Hero="Jésus-raptor" Width="2" Height="2" IsAirborne="True">
-	<Basic SightRange="8" MaxHealth="80" MeleeArmor="1" RangedArmor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
-	<Move Speed="12"/>
-	<Heal Speed="3" Range="4"/>
+	<Skills>
+		<Basic SightRange="8" MaxHealth="80" MeleeArmor="1" RangedArmor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
+		<Move Speed="12"/>
+		<Heal Speed="3" Range="4"/>
+	</Skills>
 </UnitType>

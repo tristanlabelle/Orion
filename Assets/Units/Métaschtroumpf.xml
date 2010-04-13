@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Tower defense unit -->
 <UnitType Name="Métaschtroumpf" Width="2" Height="2" IsAirborne="True">
-	<Move Speed="20"/>
-	<Build Speed="200">
-		<Target>Tour de défense</Target>
-	</Build>
+	<Skills>
+		<Move Speed="20"/>
+		<Build Speed="200">
+			<Target>Tour de défense</Target>
+		</Build>
+	</Skills>
 </UnitType>

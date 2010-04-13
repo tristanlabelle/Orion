@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Pyramide" Width="3" Height="3">
-	<Basic SightRange="8" MaxHealth="400" MeleeArmor="4" RangedArmor="4" AladdiumCost="250"/>
-	<ProvideFood Amount="10"/>
-	<StoreResources/>
-	<Train Speed="10">
-		<Target>Schtroumpf</Target>
-	</Train>
+	<Skills>
+		<Basic SightRange="8" MaxHealth="400" MeleeArmor="4" RangedArmor="4" AladdiumCost="250"/>
+		<ProvideFood Amount="10"/>
+		<StoreResources/>
+		<Train Speed="10">
+			<Target>Schtroumpf</Target>
+		</Train>
+	</Skills>
 </UnitType>

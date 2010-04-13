@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Col bleu" Width="1" Height="1">
+<UnitType Name="Schtroumpf col bleu" Width="1" Height="1">
 	<Skills>
 		<Basic SightRange="3" MaxHealth="50" RangedArmor="2" MeleeArmor="2" FoodCost="5"/>
 		<Move Speed="2"/>

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Anthrax" Hero="Chuck Norris" Width="2" Height="2" IsAirborne="True">
+<UnitType Name="Anthrax" Width="2" Height="2" IsAirborne="True">
 	<Skills>
 		<Basic SightRange="9" MaxHealth="100" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
 		<Move Speed="15"/>
 		<Attack Power="5" Range="9" Delay="1"/>
 	</Skills>
+	<Upgrades>
+		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
 </UnitType>

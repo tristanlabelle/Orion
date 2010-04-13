@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Grippe A(H1N1)" Hero="Anthrax" Width="1" Height="1" IsAirborne="True">
+<UnitType Name="Grippe A(H1N1)" Width="1" Height="1" IsAirborne="True">
 	<Skills>
 		<Basic SightRange="7" MaxHealth="70" MeleeArmor="1" RangedArmor="1" AlageneCost="80" FoodCost="1"/>
 		<Move Speed="14"/>
 		<Attack Power="2" Range="7" Delay="1"/>
 	</Skills>
+	<Upgrades>
+		<Upgrade Target="Anthrax" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
 </UnitType>

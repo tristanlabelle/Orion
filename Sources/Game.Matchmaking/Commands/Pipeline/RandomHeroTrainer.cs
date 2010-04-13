@@ -14,7 +14,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
     public sealed class RandomHeroTrainer : CommandFilter
     {
         #region Fields
-        public static readonly float DefaultProbability = 0.01f;
+        public static readonly float DefaultProbability = 0.4f;
 
         private readonly Match match;
         private readonly float probability;
@@ -90,9 +90,15 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
         private UnitType RandomizeHero(UnitType unitType)
         {
-            while (unitType.HeroName != null && match.Random.NextDouble() <= probability)
+            while (true)
             {
-                UnitType heroUnitType = UnitTypes.FromName(unitType.HeroName);
+                UnitTypeUpgrade upgrade = unitType.Upgrades
+                    .FirstOrDefault(u => u.AladdiumCost == 0
+                        && u.AlageneCost == 0
+                        && match.Random.NextDouble() <= probability);
+                if (upgrade == null) break;
+
+                UnitType heroUnitType = UnitTypes.FromName(upgrade.Target);
                 if (heroUnitType == null)
                 {
 #if DEBUG

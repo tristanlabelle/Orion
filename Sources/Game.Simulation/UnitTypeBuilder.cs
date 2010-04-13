@@ -20,19 +20,22 @@ namespace Orion.Game.Simulation
         private string name;
         private Size size;
         private bool isAirborne;
-        private string hero;
         private BasicSkill basicSkill;
         private readonly ICollection<UnitSkill> skills;
+        private readonly ICollection<UnitTypeUpgrade> upgrades;
         #endregion
 
         #region Constructors
         public UnitTypeBuilder()
         {
-            Func<UnitSkill, bool> predicate = item =>
+            skills = new ValidatingCollection<UnitSkill>(item =>
                 item != null
                 && skills.None(skill => skill.GetType() == item.GetType())
-                && item.GetType() != typeof(BasicSkill);
-            skills = new ValidatingCollection<UnitSkill>(new HashSet<UnitSkill>(), predicate);
+                && item.GetType() != typeof(BasicSkill));
+
+            upgrades = new ValidatingCollection<UnitTypeUpgrade>(item =>
+                item != null
+                && upgrades.None(upgrade => upgrade.Target == item.Target));
 
             Reset();
         }
@@ -78,12 +81,6 @@ namespace Orion.Game.Simulation
             set { isAirborne = value; }
         }
 
-        public string Hero
-        {
-            get { return hero; }
-            set { hero = value; }
-        }
-
         public BasicSkill BasicSkill
         {
             get { return basicSkill; }
@@ -92,6 +89,11 @@ namespace Orion.Game.Simulation
         public ICollection<UnitSkill> Skills
         {
             get { return skills; }
+        }
+
+        public ICollection<UnitTypeUpgrade> Upgrades
+        {
+            get { return upgrades; }
         }
         #endregion
 

@@ -7,6 +7,7 @@ using System.Xml;
 using System.Reflection;
 using System.Globalization;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation
@@ -35,21 +36,24 @@ namespace Orion.Game.Simulation
                 throw new InvalidDataException("Invalid unit type file.", e);
             }
 
-            UnitTypeBuilder unitTypeBuilder = new UnitTypeBuilder();
+            UnitTypeBuilder builder = new UnitTypeBuilder();
 
             XmlElement unitTypeElement = document.DocumentElement;
             if (unitTypeElement.Name != "UnitType")
                 throw new InvalidDataException("Expected a root <UnitType> tag.");
 
-            ReadUnitTypeAttributes(unitTypeElement, unitTypeBuilder);
+            ReadUnitTypeAttributes(unitTypeElement, builder);
 
             XmlElement skillsElement = (XmlElement)unitTypeElement.SelectSingleNode("Skills");
-            if (skillsElement != null) ReadSkills(skillsElement, unitTypeBuilder);
+            if (skillsElement != null) ReadSkills(skillsElement, builder);
 
-            return unitTypeBuilder;
+            XmlElement upgradesElement = (XmlElement)unitTypeElement.SelectSingleNode("Upgrades");
+            if (upgradesElement != null) ReadUpgrades(upgradesElement, builder);
+
+            return builder;
         }
 
-        private static void ReadUnitTypeAttributes(XmlElement unitTypeElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadUnitTypeAttributes(XmlElement unitTypeElement, UnitTypeBuilder builder)
         {
             foreach (XmlAttribute attribute in unitTypeElement.Attributes)
             {
@@ -64,14 +68,15 @@ namespace Orion.Game.Simulation
                 {
                     throw new InvalidDataException(
                         "Invalid value for UnitType attribute {0}, expected type {1}."
-                        .FormatInvariant(attribute.Name, property.PropertyType.Name), e);
+                        .FormatInvariant(attribute.Name, property.PropertyType.FullName), e);
                 }
 
-                property.SetValue(unitTypeBuilder, value, null);
+                property.SetValue(builder, value, null);
             }
         }
 
-        private static void ReadSkills(XmlElement skillsElement, UnitTypeBuilder unitTypeBuilder)
+        #region Skills
+        private static void ReadSkills(XmlElement skillsElement, UnitTypeBuilder builder)
         {
             foreach (XmlElement skillElement in skillsElement.ChildNodes)
             {
@@ -80,7 +85,7 @@ namespace Orion.Game.Simulation
                 UnitSkill skill = null;
                 if (skillName == UnitSkill.GetTypeName(typeof(BasicSkill)))
                 {
-                    skill = unitTypeBuilder.BasicSkill;
+                    skill = builder.BasicSkill;
                 }
                 else
                 {
@@ -91,22 +96,22 @@ namespace Orion.Game.Simulation
                             "Invalid unit skill {0}.".FormatInvariant(skillName));
                     }
 
-                    if (unitTypeBuilder.Skills.Any(s => s.GetType() == skillType))
+                    if (builder.Skills.Any(s => s.GetType() == skillType))
                     {
                         throw new InvalidDataException("Redefined unit skill {0}."
                             .FormatInvariant(skillName));
                     }
 
                     skill = (UnitSkill)Activator.CreateInstance(skillType);
-                    unitTypeBuilder.Skills.Add(skill);
+                    builder.Skills.Add(skill);
                 }
 
-                ReadSkillStats(skill, skillElement, unitTypeBuilder);
-                ReadSkillTargets(skill, skillElement, unitTypeBuilder);
+                ReadSkillStats(skill, skillElement, builder);
+                ReadSkillTargets(skill, skillElement, builder);
             }
         }
 
-        private static void ReadSkillStats(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadSkillStats(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder builder)
         {
             foreach (XmlAttribute statAttribute in skillElement.Attributes)
             {
@@ -130,7 +135,7 @@ namespace Orion.Game.Simulation
             }
         }
 
-        private static void ReadSkillTargets(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder unitTypeBuilder)
+        private static void ReadSkillTargets(UnitSkill skill, XmlElement skillElement, UnitTypeBuilder builder)
         {
             PropertyInfo property = skill.GetType()
                 .GetProperty("Targets", BindingFlags.Public | BindingFlags.Instance);
@@ -148,6 +153,69 @@ namespace Orion.Game.Simulation
                 targets.Add(targetElement.InnerText);
             }
         }
+        #endregion
+
+        #region Upgrades
+        private static void ReadUpgrades(XmlElement upgradesElement, UnitTypeBuilder builder)
+        {
+            var parameters = typeof(UnitTypeUpgrade)
+                .GetConstructors()[0]
+                .GetParameters();
+            object[] values = new object[parameters.Length];
+
+            foreach (XmlElement upgradeElement in upgradesElement.SelectNodes("Upgrade"))
+            {
+                Array.Clear(values, 0, values.Length);
+
+                foreach (XmlAttribute attribute in upgradeElement.Attributes)
+                {
+                    string constructorParameterName = char.ToLowerInvariant(attribute.Name[0]) + attribute.Name.Substring(1);
+
+                    int parameterIndex = parameters.IndexOf(p => p.Name == constructorParameterName);
+                    if (parameterIndex == -1)
+                    {
+                        throw new InvalidDataException(
+                            "Invalid unit type upgrade element, unrecognized attribute {0}."
+                            .FormatInvariant(attribute.Name));
+                    }
+
+                    if (values[parameterIndex] != null)
+                    {
+                        throw new InvalidDataException(
+                            "Invalid unit type upgrade element, attribute {0} already specified."
+                            .FormatInvariant(attribute.Name));
+                    }
+
+                    var parameter = parameters[parameterIndex];
+                    try
+                    {
+                        values[parameterIndex] = Convert.ChangeType(attribute.Value,
+                            parameter.ParameterType,
+                            CultureInfo.InvariantCulture);
+                    }
+                    catch (InvalidCastException e)
+                    {
+                        throw new InvalidDataException(
+                            "Invalid value for upgrade attribute {0}, expected type {1}."
+                            .FormatInvariant(attribute.Name, parameter.ParameterType.FullName), e);
+                    }
+                }
+
+                int firstUnspecifiedParameterIndex = values.IndexOf((object)null);
+                if (firstUnspecifiedParameterIndex != -1)
+                {
+                    string unspecifiedParameterName = parameters[firstUnspecifiedParameterIndex].Name;
+                    string unspecifiedAttributeName = char.ToUpperInvariant(unspecifiedParameterName[0]) + unspecifiedParameterName.Substring(1);
+                    throw new InvalidDataException(
+                        "Upgrade does not specify a value for attribute {0}."
+                        .FormatInvariant(unspecifiedAttributeName));
+                }
+
+                UnitTypeUpgrade upgrade = (UnitTypeUpgrade)Activator.CreateInstance(typeof(UnitTypeUpgrade), values);
+                builder.Upgrades.Add(upgrade);
+            }
+        }
+        #endregion
         #endregion
     }
 }

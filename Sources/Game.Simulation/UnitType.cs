@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation
         private readonly bool isAirborne;
         private readonly bool isBuilding;
         private readonly Dictionary<Type, UnitSkill> skills;
-        private readonly string heroName;
+        private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades;
         #endregion
 
         #region Constructors
@@ -46,9 +46,9 @@ namespace Orion.Game.Simulation
                 .Select(skill => skill.CreateFrozenClone())
                 .ToDictionary(skill => skill.GetType());
             this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
+            this.upgrades = builder.Upgrades.ToList().AsReadOnly();
 
             this.isBuilding = !skills.ContainsKey(typeof(MoveSkill));
-            this.heroName = builder.Hero;
 
 #if DEBUG
             Debug.Assert(!HasSkill<AttackSkill>()
@@ -59,7 +59,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Properties
-        #region Identification
         public Handle Handle
         {
             get { return handle; }
@@ -69,9 +68,7 @@ namespace Orion.Game.Simulation
         {
             get { return name; }
         }
-        #endregion
 
-        #region Skills
         public bool IsBuilding
         {
             get { return isBuilding; }
@@ -81,7 +78,11 @@ namespace Orion.Game.Simulation
         {
             get { return isAirborne; }
         }
-        #endregion
+
+        public ReadOnlyCollection<UnitTypeUpgrade> Upgrades
+        {
+            get { return upgrades; }
+        }
 
         #region Size
         public Size Size
@@ -118,14 +119,6 @@ namespace Orion.Game.Simulation
                 else
                     return HasSkill<BuildSkill>() || HasSkill<AttackSkill>();
             }
-        }
-
-        /// <summary>
-        /// Gets the name of the unit type which is the hero of this unit.
-        /// </summary>
-        public string HeroName
-        {
-            get { return heroName; }
         }
         #endregion
 

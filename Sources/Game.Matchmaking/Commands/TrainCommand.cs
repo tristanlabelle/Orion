@@ -73,7 +73,6 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle trainerHandle in trainerHandles)
             {
                 Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
-                EnsureTrainingSupported(match, trainer, traineeType);
 
                 if (trainer.TaskQueue.IsFull)
                 {
@@ -108,34 +107,6 @@ namespace Orion.Game.Matchmaking.Commands
                 faction.AladdiumAmount -= aladdiumCost;
                 trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
             }
-        }
-
-        private void EnsureTrainingSupported(Match match, Unit trainer, UnitType traineeType)
-        {
-            TrainSkill trainSkill = trainer.Type.TryGetSkill<TrainSkill>();
-            if (trainSkill == null)
-            {
-                throw new InvalidOperationException(
-                    "{0} cannot train a {1} without the train skill."
-                    .FormatInvariant(trainer, traineeType));
-            }
-
-            foreach (string target in trainSkill.Targets)
-            {
-                UnitType unitType = match.UnitTypes.FromName(target);
-                if (unitType == null) continue;
-
-                do
-                {
-                    if (traineeType == unitType) return;
-                    if (unitType.HeroName == null) break;
-                    unitType = match.UnitTypes.FromName(unitType.HeroName);
-                } while (unitType != null);
-            }
-
-            throw new InvalidOperationException(
-                "{0} does not support training {1}."
-                .FormatInvariant(trainer, traineeType));
         }
 
         public override string ToString()

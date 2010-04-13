@@ -20,6 +20,6 @@
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Grand schtroumpf" AladdiumCost="0" AlageneCost="0"/>
-		<Upgrade Target="Col bleu" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="Schtroumpf col bleu" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

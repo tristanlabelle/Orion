@@ -47,9 +47,9 @@ namespace Orion.Game.Presentation.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionPanel, userInputManager, traineeType.Name, Keys.None, gameGraphics);
+                ActionButton button = new ActionButton(actionPanel, userInputManager, traineeType.Name, Keys.None, graphics);
 
-                Texture texture = gameGraphics.GetUnitTexture(traineeType);
+                Texture texture = graphics.GetUnitTexture(traineeType);
                 button.Renderer = new TexturedRenderer(texture);
 
                 UnitType traineeTypeForClosure = traineeType;

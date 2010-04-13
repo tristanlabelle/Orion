@@ -489,6 +489,15 @@ namespace Orion.Game.Presentation
 
             commander.SendAllyMessage(text);
         }
+
+        public void LaunchUpgrade(UnitType targetType)
+        {
+            Argument.EnsureNotNull(targetType, "targetType");
+
+            var targetUnits = Selection.Units
+                .Where(unit => unit.Type.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
+            commander.LaunchUpgrade(targetUnits, targetType);
+        }
         #endregion
         #endregion
     }

@@ -54,7 +54,9 @@
     <Compile Include="Actions\Enablers\BuildEnabler.cs" />
     <Compile Include="Actions\Enablers\ResearchEnabler.cs" />
     <Compile Include="Actions\Enablers\StandGuardEnabler.cs" />
+    <Compile Include="Actions\Enablers\UpgradeEnabler.cs" />
     <Compile Include="Actions\TooltipPanel.cs" />
+    <Compile Include="Actions\UpgradeActionProvider.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
     <Compile Include="Actions\Enablers\ActionEnabler.cs" />
     <Compile Include="Actions\Enablers\AttackEnabler.cs" />

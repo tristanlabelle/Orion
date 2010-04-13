@@ -8,6 +8,7 @@ using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
+using System;
 
 namespace Orion.Game.Matchmaking
 {
@@ -141,6 +142,12 @@ namespace Orion.Game.Matchmaking
                 GenerateCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
             else
                 GenerateCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
+        }
+
+        public void LaunchUpgrade(IEnumerable<Unit> units, UnitType targetType)
+        {
+            if (units.Count() > 0)
+                throw new NotImplementedException();
         }
         #endregion
     }

@@ -30,9 +30,9 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<HarvestSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Harvest", Keys.H, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, "Harvest", Keys.H, graphics);
 
-            Texture texture = gameGraphics.GetActionTexture("Harvest");
+            Texture texture = graphics.GetActionTexture("Harvest");
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += OnButtonPressed;
@@ -43,7 +43,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         private void OnButtonPressed(Button button)
         {
             userInputManager.SelectedCommand = userCommand;
-            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, gameGraphics));
+            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
         }
         #endregion
     }

@@ -54,12 +54,12 @@ namespace Orion.Game.Presentation.Actions.Enablers
 
         private ActionButton CreateButton(Technology technology)
         {
-            ActionButton button = new ActionButton(actionPanel, userInputManager, string.Empty, Keys.None, gameGraphics);
+            ActionButton button = new ActionButton(actionPanel, userInputManager, string.Empty, Keys.None, graphics);
 
             button.Name = "{0}\nAladdium: {1} Alagene: {2}"
                 .FormatInvariant(technology.Name, technology.AladdiumCost, technology.AlageneCost);
 
-            Texture texture = gameGraphics.GetTechnologyTexture(technology);
+            Texture texture = graphics.GetTechnologyTexture(technology);
             button.Renderer = new TexturedRenderer(texture);
 
             button.Triggered += delegate(Button sender)

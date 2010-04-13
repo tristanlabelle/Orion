@@ -6,20 +6,20 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
+using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
-using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
     /// Provides the buttons to build each <see cref="UnitType"/> that is supported by a builder unit.
     /// </summary>
-    public sealed class BuildActionProvider : IActionProvider
+    public sealed class UpgradeActionProvider : IActionProvider
     {
         #region Fields
         private readonly ActionPanel actionPanel;
@@ -30,7 +30,7 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Constructors
-        public BuildActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
+        public UpgradeActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
             GameGraphics graphics, UnitType unitType)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
@@ -72,14 +72,12 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            var buildingTypes = inputManager.Match.UnitTypes
-                .Where(buildingType => buildSkill.Supports(buildingType))
-                .OrderByDescending(buildingType => buildingType.HasSkill<TrainSkill>())
-                .ThenBy(buildingType => buildingType.GetBaseStat(BasicSkill.AladdiumCostStat) + buildingType.GetBaseStat(BasicSkill.AlageneCostStat));
-
-            foreach (UnitType buildingType in buildingTypes)
+            foreach (UnitTypeUpgrade upgrade in unitType.Upgrades)
             {
-                buttons[x, y] = CreateButton(buildingType);
+                UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
+                if (targetType == null) continue;
+
+                buttons[x, y] = CreateButton(upgrade, targetType);
 
                 x++;
                 if (x == 4)
@@ -92,22 +90,19 @@ namespace Orion.Game.Presentation.Actions
             buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(UnitType buildingType)
+        private ActionButton CreateButton(UnitTypeUpgrade upgrade, UnitType targetType)
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, buildingType.Name, Keys.None, graphics);
+            ActionButton button = new ActionButton(actionPanel, inputManager, targetType.Name, Keys.None, graphics);
 
-            Texture texture = graphics.GetUnitTexture(buildingType);
+            Texture texture = graphics.GetUnitTexture(targetType);
             button.Renderer = new TexturedRenderer(texture);
 
-            Faction faction = inputManager.LocalFaction;
-            int aladdium = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-            int alagene = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
-            button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
+            button.Name = "{0}\nAladdium: {1} / Alagene: {2}"
+                .FormatInvariant(upgrade.Target, upgrade.AladdiumCost, upgrade.AlageneCost);
 
             button.Triggered += delegate(Button sender)
             {
-                inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
-                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
+                inputManager.LaunchUpgrade(targetType);
             };
 
             return button;

@@ -14,7 +14,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
     public sealed class RandomHeroTrainer : CommandFilter
     {
         #region Fields
-        public static readonly float DefaultProbability = 0.4f;
+        public static readonly float DefaultProbability = 0.01f;
 
         private readonly Match match;
         private readonly float probability;

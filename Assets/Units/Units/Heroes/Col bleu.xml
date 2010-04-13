@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Schtroumpf" Width="1" Height="1">
+<UnitType Name="Col bleu" Width="1" Height="1">
 	<Skills>
-		<Basic SightRange="5" MaxHealth="20" RangedArmor="2" AladdiumCost="50" FoodCost="1"/>
-		<Move Speed="8"/>
-		<Attack Power="8" Range="0" Delay="5"/>
-		<Harvest Speed="1" MaxCarryingAmount="10"/>
-		<Build Speed="20">
+		<Basic SightRange="3" MaxHealth="50" RangedArmor="2" MeleeArmor="2" FoodCost="5"/>
+		<Move Speed="2"/>
+		<Attack Power="1" Range="0" Delay="10"/>
+		<Build Speed="2">
 			<Target>Pyramide</Target>
 			<Target>Temple de 2012</Target>
 			<Target>Portail démoniaque</Target>
@@ -18,8 +17,4 @@
 			<Target>Costco des Hells</Target>
 		</Build>
 	</Skills>
-	<Upgrades>
-		<Upgrade Target="Grand schtroumpf" AladdiumCost="0" AlageneCost="0"/>
-		<Upgrade Target="Col bleu" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
 </UnitType>

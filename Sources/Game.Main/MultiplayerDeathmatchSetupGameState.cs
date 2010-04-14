@@ -163,6 +163,7 @@ namespace Orion.Game.Main
         protected internal override void Update(float timeDeltaInSeconds)
         {
             graphics.UpdateRootView(timeDeltaInSeconds);
+            networking.Poll();
         }
 
         protected internal override void Draw(GameGraphics graphics)

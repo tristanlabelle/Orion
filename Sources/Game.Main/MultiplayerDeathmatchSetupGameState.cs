@@ -147,6 +147,11 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
+            if (!IsHost)
+            {
+                networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
+            }
+
             RootView.Children.Add(ui);
         }
 
@@ -274,10 +279,10 @@ namespace Orion.Game.Main
                 allPlayers[0] = new RemotePlayer(hostEndPoint.Value, allPlayers[0].Color);
                 allPlayers[indexOfSelf] = new LocalPlayer(allPlayers[indexOfSelf].Color);
 
-                foreach (Player player in allPlayers)
+                foreach (Player player in playerSettings.Players.ToArray())
                     playerSettings.RemovePlayer(player);
 
-                foreach (Player player in newSettings.Players)
+                foreach (Player player in allPlayers)
                     playerSettings.AddPlayer(player);
 
                 return;

@@ -54,6 +54,7 @@ namespace Orion.Game.Main
                 this.playerSettings.PlayerJoined += OnPlayerAdded;
                 this.playerSettings.PlayerLeft += OnPlayerRemoved;
                 this.playerSettings.PlayerChanged += OnColorChanged;
+                this.matchSettings.Changed += OnMatchSettingsChanged;
                 this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
                 this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
                 this.ui.StartGamePressed += OnStartGamePressed;
@@ -177,6 +178,11 @@ namespace Orion.Game.Main
         #endregion
 
         #region Events Handling
+        private void OnMatchSettingsChanged(MatchSettings settings)
+        {
+            networking.Send(new MatchSettingsPacket(settings), Clients);
+        }
+
         private void OnPacketReceived(GameNetworking networking, GamePacketEventArgs args)
         {
             if (IsHost)

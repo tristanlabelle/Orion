@@ -95,7 +95,7 @@ namespace Orion.Game.Matchmaking.Networking
             packetMemoryStream.SetLength(0);
             packetMemoryStream.Position = 0;
             GamePacket.Serializer.Serialize(packet, packetWriter);
-
+            packetWriter.Flush();
             return packetMemoryStream.ToArray();
         }
 

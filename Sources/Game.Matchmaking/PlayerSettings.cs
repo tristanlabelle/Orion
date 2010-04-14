@@ -88,7 +88,7 @@ namespace Orion.Game.Matchmaking
         {
             writer.Write(players.Count);
             foreach (Player player in players)
-                Player.Serializer.Serialize(player);
+                Player.Serializer.Serialize(player, writer);
         }
 
         public void Deserialize(BinaryReader reader)

@@ -20,7 +20,7 @@ namespace Orion.Game.Matchmaking
 
         private Action<Player> onColorChanged;
         private List<Player> players = new List<Player>();
-        private int maxPlayers;
+        private int maxPlayers = colors.Length;
         #endregion
 
         #region Constructors

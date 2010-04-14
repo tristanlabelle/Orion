@@ -103,7 +103,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 {
 #if DEBUG
                     Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
-                        .FormatInvariant(unitType.HeroName, unitType.Name));
+                        .FormatInvariant(upgrade.Target, unitType.Name));
 #endif
                     break;
                 }

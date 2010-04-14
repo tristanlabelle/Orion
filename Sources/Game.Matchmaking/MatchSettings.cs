@@ -182,6 +182,23 @@ namespace Orion.Game.Matchmaking
 
         #region Methods
         /// <summary>
+        /// Copies another matchsettings object to this one.
+        /// </summary>
+        /// <param name="newSettings">The object to be copied.</param>
+        public void CopyFrom(MatchSettings newSettings)
+        {
+            Argument.EnsureNotNull(newSettings, "newSettings");
+
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+            Serialize(writer);
+            writer.Flush();
+            stream.Position = 0;
+            var reader = new BinaryReader(stream);
+            Deserialize(reader);
+        }
+
+        /// <summary>
         /// Serializes this object to its binary representation.
         /// </summary>
         /// <param name="writer">The binary writer to which to write the serialized data.</param>

@@ -254,15 +254,7 @@ namespace Orion.Game.Main
             if (packet is MatchSettingsPacket)
             {
                 MatchSettings newSettings = ((MatchSettingsPacket)packet).Settings;
-                matchSettings.AreCheatsEnabled = newSettings.AreCheatsEnabled;
-                matchSettings.AreRandomHeroesEnabled = newSettings.AreRandomHeroesEnabled;
-                matchSettings.FoodLimit = newSettings.FoodLimit;
-                matchSettings.InitialAladdiumAmount = newSettings.InitialAladdiumAmount;
-                matchSettings.InitialAlageneAmount = newSettings.InitialAlageneAmount;
-                matchSettings.MapSize = newSettings.MapSize;
-                matchSettings.RandomSeed = newSettings.RandomSeed;
-                matchSettings.RevealTopology = newSettings.RevealTopology;
-                matchSettings.StartNomad = newSettings.StartNomad;
+                matchSettings.CopyFrom(newSettings);
                 return;
             }
 

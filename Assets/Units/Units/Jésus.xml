@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="8" MaxHealth="80" MeleeArmor="1" RangedArmor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
 		<Move Speed="12"/>
-		<Heal Speed="3" Range="4"/>
+		<Heal Speed="2" Range="4"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Jésus-raptor" AladdiumCost="0" AlageneCost="0"/>

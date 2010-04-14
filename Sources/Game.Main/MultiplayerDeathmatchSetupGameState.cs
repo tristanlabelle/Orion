@@ -39,7 +39,6 @@ namespace Orion.Game.Main
             this.networking = networking;
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
-            this.matchSettings.AreCheatsEnabled = true;
             this.hostEndPoint = hostEndPoint;
 
             this.playerSettings = new PlayerSettings();
@@ -277,7 +276,7 @@ namespace Orion.Game.Main
                 allPlayers[0] = new RemotePlayer(hostEndPoint.Value, allPlayers[0].Color);
                 allPlayers[indexOfSelf] = new LocalPlayer(allPlayers[indexOfSelf].Color);
 
-                foreach (Player player in playerSettings.Players.ToArray())
+                foreach (Player player in allPlayers)
                     playerSettings.RemovePlayer(player);
 
                 foreach (Player player in newSettings.Players)
@@ -335,9 +334,9 @@ namespace Orion.Game.Main
                 {
                     if (playerSettings.PlayersCount < playerSettings.MaximumNumberOfPlayers)
                     {
-                        networking.Send(new JoinResponsePacket(true), client);
                         RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
+                        networking.Send(new JoinResponsePacket(true), client);
                     }
                     else networking.Send(new JoinResponsePacket(false), client);
                 }
@@ -363,7 +362,7 @@ namespace Orion.Game.Main
             if (packet is MatchSettingsRequestPacket)
             {
                 networking.Send(new MatchSettingsPacket(matchSettings), client);
-                SendPlayerSettingsChanges();
+                networking.Send(new PlayerSettingsPacket(playerSettings, IndexOfClient(client)), client);
                 return;
             }
 
@@ -374,20 +373,6 @@ namespace Orion.Game.Main
                 if (target is RemotePlayer && ((RemotePlayer)target).EndPoint == client)
                     playerSettings.RemovePlayer(target);
                 return;
-            }
-        }
-
-        private void SendPlayerSettingsChanges()
-        {
-            int index = -1;
-            foreach (Player player in playerSettings.Players)
-            {
-                index++;
-                RemotePlayer remotePlayer = player as RemotePlayer;
-                if (remotePlayer == null) continue;
-
-                PlayerSettingsPacket playerSettingsPacket = new PlayerSettingsPacket(playerSettings, index);
-                networking.Send(playerSettingsPacket, remotePlayer.EndPoint);
             }
         }
 

@@ -35,7 +35,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(reader, "reader");
 
             string name = reader.ReadString();
-            ColorRgb color = DeserializeColor(reader);
+            ColorRgb color = ColorRgb.Deserialize(reader);
             return new LocalPlayer(name, color);
         }
         #endregion

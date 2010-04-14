@@ -57,7 +57,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(reader, "reader");
 
             string name = reader.ReadString();
-            ColorRgb color = DeserializeColor(reader);
+            ColorRgb color = ColorRgb.Deserialize(reader);
             IPv4EndPoint endPoint = new IPv4EndPoint( reader.ReadUInt32(), reader.ReadUInt16());
 
             return new RemotePlayer(endPoint, name, color);

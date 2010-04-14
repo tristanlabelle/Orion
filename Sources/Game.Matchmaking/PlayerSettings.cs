@@ -38,8 +38,8 @@ namespace Orion.Game.Matchmaking
 
         #region Events
         public event Action<PlayerSettings, Player> PlayerJoined;
-        public event Action<PlayerSettings, Player> PlayerLeft;
-        public event Action<PlayerSettings, Player> PlayerChanged;
+        public event Action<PlayerSettings, Player, int> PlayerLeft;
+        public event Action<PlayerSettings, Player, int> PlayerChanged;
         #endregion
 
         #region Properties
@@ -78,9 +78,10 @@ namespace Orion.Game.Matchmaking
 
         public void RemovePlayer(Player player)
         {
+            int index = players.IndexOf(player);
             players.Remove(player);
             player.ColorChanged -= onColorChanged;
-            TriggerEvent(PlayerLeft, player);
+            TriggerEvent(PlayerLeft, player, index);
         }
 
         public void Serialize(BinaryWriter writer)
@@ -100,12 +101,18 @@ namespace Orion.Game.Matchmaking
 
         private void OnColorChanged(Player player)
         {
-            TriggerEvent(PlayerChanged, player);
+            int index = players.IndexOf(player);
+            TriggerEvent(PlayerChanged, player, index);
         }
 
         private void TriggerEvent(Action<PlayerSettings, Player> eventHandler, Player player)
         {
             eventHandler.Raise(this, player);
+        }
+
+        private void TriggerEvent(Action<PlayerSettings, Player, int> eventHandler, Player player, int index)
+        {
+            eventHandler.Raise(this, player, index);
         }
         #endregion
     }

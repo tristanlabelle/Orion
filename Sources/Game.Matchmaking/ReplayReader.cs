@@ -16,7 +16,8 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private readonly BinaryReader reader;
-        private readonly MatchSettings settings = new MatchSettings();
+        private readonly MatchSettings matchSettings = new MatchSettings();
+        private readonly PlayerSettings playerSettings = new PlayerSettings();
         private readonly ReadOnlyCollection<string> factionNames;
         private int lastUpdateNumber = 0;
         #endregion
@@ -27,13 +28,8 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(reader, "reader");
             this.reader = reader;
 
-            settings.Deserialize(reader);
-
-            int factionCount = reader.ReadInt32();
-            factionNames = Enumerable.Range(0, factionCount)
-                .Select(i => reader.ReadString())
-                .ToList()
-                .AsReadOnly();
+            matchSettings.Deserialize(reader);
+            playerSettings.Deserialize(reader);
         }
 
         public ReplayReader(Stream stream)
@@ -44,9 +40,14 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Properties
-        public MatchSettings Settings
+        public MatchSettings MatchSettings
         {
-            get { return settings; }
+            get { return matchSettings; }
+        }
+
+        public PlayerSettings PlayerSettings
+        {
+            get { return playerSettings; }
         }
 
         /// <summary>

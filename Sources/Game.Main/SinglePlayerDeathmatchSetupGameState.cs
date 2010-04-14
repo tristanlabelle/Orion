@@ -10,6 +10,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Main
 {
@@ -133,7 +134,7 @@ namespace Orion.Game.Main
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
             if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
 
-            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, world);
+            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, playerSettings);
             if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
 
             aiCommanders.ForEach(commander => commandPipeline.AddCommander(commander));

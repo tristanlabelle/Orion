@@ -85,7 +85,8 @@ namespace Orion.Game.Main
         private void OnStartPressed(ReplayBrowserUI sender, string replayFilePath)
         {
             ReplayReader replayReader = new ReplayReader(replayFilePath);
-            MatchSettings matchSettings = replayReader.Settings;
+            MatchSettings matchSettings = replayReader.MatchSettings;
+            PlayerSettings playerSettings = replayReader.PlayerSettings;
 
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -99,9 +100,10 @@ namespace Orion.Game.Main
             SlaveCommander localCommander = new SlaveCommander(match, localFaction);
 
             int colorIndex = 0;
-            foreach (string factionName in replayReader.FactionNames)
+            foreach (Player player in playerSettings.Players)
             {
-                ColorRgb color = Faction.Colors[colorIndex];
+                ColorRgb color = player.Color;
+                string factionName = player.Name;
                 ++colorIndex;
 
                 Faction faction = world.CreateFaction(factionName, color);

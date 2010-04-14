@@ -101,17 +101,7 @@ namespace Orion.Game.Matchmaking
         protected static void SerializeNameAndColor(Player player, BinaryWriter writer)
         {
             writer.Write(player.name);
-            writer.Write(player.color.R);
-            writer.Write(player.color.G);
-            writer.Write(player.color.B);
-        }
-
-        protected static ColorRgb DeserializeColor(BinaryReader reader)
-        {
-            return new ColorRgb(
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle());
+            player.color.Serialize(writer);
         }
         #endregion
         #endregion

@@ -325,12 +325,9 @@ namespace Orion.Game.Presentation.Gui
         private void OnAddPlayerButtonPressed(Button sender)
         {
             PlayerBuilder playerBuilder = addPlayerDropdownList.SelectedItem;
-            ColorRgb? color = Faction.Colors
-                .Select(c => (ColorRgb?)c)
-                .FirstOrDefault(c => playerSettings.Players.None(p => p.Color == c));
-            if (!color.HasValue) return;
 
-            Player player = playerBuilder.Build(color.Value);
+            if (playerSettings.AvailableColors.Count() == 0) return;
+            Player player = playerBuilder.Build(playerSettings.AvailableColors.First());
             AddPlayerPressed.Raise(this, player);
         }
 
@@ -339,13 +336,13 @@ namespace Orion.Game.Presentation.Gui
             AddPlayerRow(player);
         }
 
-        private void OnPlayerLeft(PlayerSettings settings, Player player)
+        private void OnPlayerLeft(PlayerSettings settings, Player player, int index)
         {
             playersPanel.Children.Remove(playerToRowMapping[player]);
             playerToRowMapping.Remove(player);
         }
 
-        private void OnPlayerColorChanged(PlayerSettings settings, Player player)
+        private void OnPlayerColorChanged(PlayerSettings settings, Player player, int index)
         {
             playerToColorDropdownListMapping[player].SelectedItem = player.Color;
         }

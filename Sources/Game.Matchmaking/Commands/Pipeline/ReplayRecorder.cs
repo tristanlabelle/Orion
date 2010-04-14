@@ -53,13 +53,12 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
         #region Static
         #region Methods
-        public static ReplayRecorder TryCreate(MatchSettings settings, World world)
+        public static ReplayRecorder TryCreate(MatchSettings settings, PlayerSettings playerSettings)
         {
             Argument.EnsureNotNull(settings, "settings");
-            Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(playerSettings, "playerSettings");
 
-            var factionNames = world.Factions.Select(faction => faction.Name);
-            ReplayWriter replayWriter = ReplayWriter.TryCreate(settings, factionNames);
+            ReplayWriter replayWriter = ReplayWriter.TryCreate(settings, playerSettings);
             if (replayWriter == null) return null;
 
             return new ReplayRecorder(replayWriter);

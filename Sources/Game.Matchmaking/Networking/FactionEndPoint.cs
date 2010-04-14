@@ -81,7 +81,7 @@ namespace Orion.Game.Matchmaking.Networking
 
         public void SendLeave()
         {
-            networking.Send(QuittingPacket.Instance, hostEndPoint);
+            networking.Send(new RemovePlayerPacket(), hostEndPoint);
         }
 
         public void SendDone(int commandFrame, int numberOfUpdates)
@@ -116,7 +116,7 @@ namespace Orion.Game.Matchmaking.Networking
         {
             if (args.SenderEndPoint != hostEndPoint) return;
 
-            if (args.Packet is QuittingPacket)
+            if (args.Packet is RemovePlayerPacket)
             {
                 faction.MassSuicide();
             }

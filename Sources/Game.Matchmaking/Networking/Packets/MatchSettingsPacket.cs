@@ -9,43 +9,34 @@ namespace Orion.Game.Matchmaking.Networking.Packets
     public class MatchSettingsPacket : GamePacket
     {
         #region Fields
-        private readonly PlayerSettings playerSettings;
-        private readonly MatchSettings matchSettings;
-        private readonly int recipientPlayerIndex;
+        private readonly MatchSettings settings;
         #endregion
 
         #region Constructors
-        public MatchSettingsPacket(PlayerSettings playerSettings, MatchSettings matchSettings, int recipientPlayerIndex)
+        public MatchSettingsPacket(MatchSettings matchSettings)
         {
-            this.playerSettings = playerSettings;
-            this.matchSettings = matchSettings;
-            this.recipientPlayerIndex = recipientPlayerIndex;
+            this.settings = matchSettings;
         }
         #endregion
 
         #region Properties
-        public PlayerSettings PlayerSettings
+        public MatchSettings Settings
         {
-            get { return playerSettings; }
+            get { return settings; }
         }
         #endregion
 
         #region Methods
         public static void Serialize(MatchSettingsPacket packet, BinaryWriter writer)
         {
-            writer.Write(packet.recipientPlayerIndex);
-            packet.playerSettings.Serialize(writer);
-            packet.matchSettings.Serialize(writer);
+            packet.settings.Serialize(writer);
         }
 
         public static MatchSettingsPacket Deserialize(BinaryReader reader)
         {
-            int playerIndex = reader.ReadInt32();
-            PlayerSettings playerSettings = new PlayerSettings();
-            playerSettings.Deserialize(reader);
             MatchSettings matchSettings = new MatchSettings();
             matchSettings.Deserialize(reader);
-            return new MatchSettingsPacket(playerSettings, matchSettings, playerIndex);
+            return new MatchSettingsPacket(matchSettings);
         }
         #endregion
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Orion.Engine
 {
@@ -99,6 +100,13 @@ namespace Orion.Engine
         public ColorRgba ToRgba(float alpha)
         {
             return new ColorRgba(this, alpha);
+        }
+
+        public void Serialize(BinaryWriter writer)
+        {
+            writer.Write(R);
+            writer.Write(G);
+            writer.Write(B);
         }
 
         #region Object Model
@@ -266,6 +274,11 @@ namespace Orion.Engine
         #endregion
 
         #region Helpers
+        public static ColorRgb Deserialize(BinaryReader reader)
+        {
+            return new ColorRgb(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+        }
+
         private static byte FloatToByte(float value)
         {
             if (value < 0) return 0;

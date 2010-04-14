@@ -25,8 +25,6 @@ namespace Orion.Game.Main
         private readonly GameNetworking networking;
         private readonly MultiplayerLobby lobby;
         private readonly MultiplayerLobbyUI ui;
-
-        private float timeSinceLastExplored;
         #endregion
 
         #region Constructors

@@ -72,6 +72,11 @@ namespace Orion.Game.Main
             get { return !hostEndPoint.HasValue; }
         }
 
+        public RootView RootView
+        {
+            get { return graphics.RootView; }
+        }
+
         private IEnumerable<IPv4EndPoint> Clients
         {
             get { return playerSettings.Players.OfType<RemotePlayer>().Select(p => p.EndPoint); }
@@ -138,6 +143,38 @@ namespace Orion.Game.Main
                 match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
         }
+
+        #region Overrides
+        protected internal override void OnEntered()
+        {
+            RootView.Children.Add(ui);
+        }
+
+        protected internal override void OnShadowed()
+        {
+            RootView.Children.Remove(ui);
+        }
+
+        protected internal override void OnUnshadowed()
+        {
+            OnEntered();
+        }
+
+        protected internal override void Update(float timeDeltaInSeconds)
+        {
+            graphics.UpdateRootView(timeDeltaInSeconds);
+        }
+
+        protected internal override void Draw(GameGraphics graphics)
+        {
+            RootView.Draw(graphics.Context);
+        }
+
+        public override void Dispose()
+        {
+            ui.Dispose();
+        }
+        #endregion
 
         #region Events Handling
         private void OnPacketReceived(GameNetworking networking, GamePacketEventArgs args)

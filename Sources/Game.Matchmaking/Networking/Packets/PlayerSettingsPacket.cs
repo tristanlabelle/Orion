@@ -34,10 +34,10 @@ namespace Orion.Game.Matchmaking.Networking.Packets
         #endregion
 
         #region Methods
-        public void Serialize(BinaryWriter writer)
+        public static void Serialize(PlayerSettingsPacket packet, BinaryWriter writer)
         {
-            writer.Write(playerIndex);
-            settings.Serialize(writer);
+            writer.Write(packet.playerIndex);
+            packet.settings.Serialize(writer);
         }
 
         public static PlayerSettingsPacket Deserialize(BinaryReader reader)

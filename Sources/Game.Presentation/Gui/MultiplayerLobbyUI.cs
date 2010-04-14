@@ -82,15 +82,15 @@ namespace Orion.Game.Presentation.Gui
         #region Properties
         public bool IsEnabled
         {
-            get { return Children.OfType<Button>().First().Enabled; }
+            get { return Children.OfType<Button>().First().IsEnabled; }
             set
             {
                 if (value == IsEnabled) return;
 
                 foreach (Button button in Children.OfType<Button>())
-                    button.Enabled = value;
+                    button.IsEnabled = value;
                 foreach (Button button in matchListPanel.Children.OfType<Button>())
-                    button.Enabled = value;
+                    button.IsEnabled = value;
             }
         }
         #endregion
@@ -98,12 +98,7 @@ namespace Orion.Game.Presentation.Gui
         #region Methods
         public void ClearMatches()
         {
-            while (Children.Count > 0)
-            {
-                ViewContainer child = Children.First();
-                Children.Remove(child);
-                child.Dispose();
-            }
+            matchListPanel.DisposeAllChildren();
         }
 
         public void AddMatch(AdvertizedMatch match)

@@ -58,7 +58,7 @@ namespace Orion.Game.Presentation.Gui
             if (isGameMaster)
             {
                 startButton = new Button(new Rectangle(Bounds.MaxX - 150, 10, 140, 40), "Commencer");
-                startButton.Enabled = isGameMaster;
+                startButton.IsEnabled = isGameMaster;
                 startButton.Triggered += (sender) => StartGamePressed.Raise(this);
                 Children.Add(startButton);
             }
@@ -213,7 +213,7 @@ namespace Orion.Game.Presentation.Gui
             Panel optionPanel = new Panel(RowFrame);
             Label descriptionLabel = new Label(optionRect, description + ':');
             Button changeButton = new Button(valueRect, initialValue);
-            changeButton.Enabled = isGameMaster;
+            changeButton.IsEnabled = isGameMaster;
 
             optionPanel.Children.Add(descriptionLabel);
             optionPanel.Children.Add(changeButton);

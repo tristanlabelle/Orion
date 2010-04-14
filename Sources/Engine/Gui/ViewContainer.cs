@@ -227,6 +227,14 @@ namespace Orion.Engine.Gui
             if (Parent != null) Parent.Children.Remove(this);
         }
 
+        /// <summary>
+        /// Removes all children from this view and disposes them.
+        /// </summary>
+        public void DisposeAllChildren()
+        {
+            while (Children.Count > 0) Children.First().Dispose();
+        }
+
         protected virtual ICollection<ViewContainer> GetChildren()
         {
             return children;

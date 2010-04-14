@@ -94,7 +94,7 @@ namespace Orion.Engine.Gui
             set { hotKey = value; }
         }
 
-        public bool Enabled
+        public bool IsEnabled
         {
             get { return isEnabled; }
             set { isEnabled = value; }

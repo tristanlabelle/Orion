@@ -677,7 +677,7 @@ namespace Orion.Game.Presentation.Gui
 
                 Panel factionPanel = new Panel(factionPanelFrame, faction.Color);
                 
-                Rectangle dropdownListFrame = Instant.CreateComponentRectangle(factionPanel.Bounds,new Vector2(0.7f,0.7f), new Vector2(1f,1f));
+                Rectangle dropdownListFrame = Instant.CreateComponentRectangle(factionPanel.Bounds,new Vector2(0.7f,0.65f), new Vector2(1f,1f));
                 DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(dropdownListFrame, stances);
                 dropdownList.StringConverter = stance => stance == DiplomaticStance.Ally ? "Allié" : "Ennemi";
                 dropdownList.SelectedItem = LocalFaction.GetDiplomaticStance(faction);

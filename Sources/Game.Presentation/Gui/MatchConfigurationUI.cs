@@ -73,7 +73,7 @@ namespace Orion.Game.Presentation.Gui
             foreach (Player player in playerSettings.Players)
                 AddPlayerRow(player);
 
-            if (playerBuilders.Count() > 0)
+            if (isGameMaster && playerBuilders.Count() > 0)
             {
                 Rectangle dropdownListRectangle = Instant.CreateComponentRectangle(playersPanel.Frame, new Rectangle(0.3f, 0, 0.45f, 0.0375f));
                 Rectangle addButtonRect = Instant.CreateComponentRectangle(playersPanel.Frame, new Rectangle(0.75f, 0, 0.25f, 0.0375f));

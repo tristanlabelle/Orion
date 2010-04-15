@@ -31,7 +31,7 @@ namespace Orion.Engine.Gui
             this.items = Enumerable.Empty<T>();
             this.stringConverter = t => t.ToString();
             this.shownTitleLabel = new Label(new Rectangle(frame.Size), string.Empty);
-            this.rootMouseButtonReleasedEventHandler = OnRootMouseButtonReleased;
+            this.rootMouseButtonReleasedEventHandler = (s, a) => Close();
 
             Children.Add(this.shownTitleLabel);
         }
@@ -169,11 +169,6 @@ namespace Orion.Engine.Gui
             return false;
         }
 
-        private void OnRootMouseButtonReleased(Responder sender, MouseEventArgs args)
-        {
-            Close();
-        }
-
         private void Close()
         {
             TopmostResponder.Children.Remove(optionsListPanel);
@@ -184,7 +179,7 @@ namespace Orion.Engine.Gui
         private Panel CreateRow(T item)
         {
             Panel row = new Panel(Frame);
-            row.MouseButtonReleased += (r, args) => SelectedItem = item;
+            row.MouseButtonReleased += (r, args) => { SelectedItem = item; Close(); };
 
             Label title = new Label(stringConverter(item));
             row.Children.Add(title);

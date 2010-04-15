@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,12 @@ namespace Orion.Engine.Networking
         /// <summary>
         /// The underlying socket. Accessed by both threads, synchronized by locking this object.
         /// </summary>
-        private readonly Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private readonly Socket socket;
+
+        /// <summary>
+        /// A collection of addresses assigned to this computer.
+        /// </summary>
+        private readonly ReadOnlyCollection<IPv4Address> localAddresses;
 
         /// <summary>
         /// The thread which sends and receives data. 
@@ -78,11 +84,29 @@ namespace Orion.Engine.Networking
         /// </param>
         public SafeTransporter(int port)
         {
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(new IPEndPoint(IPAddress.Any, port));
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
             socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
+            socket.MulticastLoopback = false;
+
+            // Attempt to find the addresses of this computer to detect
+            // broadcasts which come back to this computer and ignore them.
+            try
+            {
+                string hostName = Dns.GetHostName();
+                localAddresses = Dns.GetHostAddresses(hostName)
+                    .Where(address => address.AddressFamily == AddressFamily.InterNetwork)
+                    .Select(address => (IPv4Address)address)
+                    .ToList()
+                    .AsReadOnly();
+            }
+            catch (SocketException)
+            {
+                localAddresses = new ReadOnlyCollection<IPv4Address>(new IPv4Address[0]);
+            }
 
             workerThread = new Thread(WorkerThreadEntryPoint);
             workerThread.Name = "SafeTransporter worker thread";
@@ -199,7 +223,15 @@ namespace Orion.Engine.Networking
                             break;
                         }
 
-                        HandlePacket((IPv4EndPoint)senderEndPoint, receptionBuffer, packetLength);
+                        IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
+                        if (localAddresses.Contains(ipv4SenderEndPoint.Address)
+                            && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
+                        {
+                            // Ignore packets we broadcasted ourself.
+                            return;
+                        }
+
+                        HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
                     }
                     catch (SocketException e)
                     {
@@ -335,6 +367,7 @@ namespace Orion.Engine.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message.Array, "message.Array");
             Debug.Assert(message.Count < 512, "Warning: A network message exceeded 512 bytes.");
+            Debug.Assert(localAddresses.Contains(hostEndPoint.Address), "Sending a packet to ourself.");
 
             lock (peers)
             {

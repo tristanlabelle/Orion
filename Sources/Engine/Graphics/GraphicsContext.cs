@@ -10,6 +10,7 @@ using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Image = System.Drawing.Image;
+using Orion.Engine.Collections;
 
 namespace Orion.Engine.Graphics
 {
@@ -134,7 +135,7 @@ namespace Orion.Engine.Graphics
         /// <param name="pixelFormat">The pixel format of the texture data.</param>
         /// <param name="pixelData">The pixel data used to initialize the texture.</param>
         /// <returns>A newly created texture.</returns>
-        public Texture CreateTexture<T>(Size size, PixelFormat pixelFormat, ArraySegment<T> pixelData) where T : struct
+        public Texture CreateTexture<T>(Size size, PixelFormat pixelFormat, Subarray<T> pixelData) where T : struct
         {
             Argument.EnsureNotNull(pixelData.Array, "pixelData.Array");
 

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 using GLPixelFormat = OpenTK.Graphics.PixelFormat;
 using SysImage = System.Drawing.Image;
+using Orion.Engine.Collections;
 
 namespace Orion.Engine.Graphics
 {
@@ -269,7 +270,7 @@ namespace Orion.Engine.Graphics
                 }
 
                 BufferedPixelSurface surface = new BufferedPixelSurface(region.Size, pixelFormat,
-                    new ArraySegment<byte>(data), access);
+                    new Subarray<byte>(data), access);
                 surface.Lock(region, access, accessor);
 
                 if ((access & Access.Write) == Access.Write)

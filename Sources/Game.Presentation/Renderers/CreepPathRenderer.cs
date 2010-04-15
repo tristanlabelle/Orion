@@ -47,7 +47,8 @@ namespace Orion.Game.Presentation.Renderers
                 }
             }
 
-            this.maskTexture = gameGraphics.Context.CreateTexture(textureSize, PixelFormat.Alpha, new ArraySegment<byte>(pixelData));
+            this.maskTexture = gameGraphics.Context.CreateTexture(textureSize, PixelFormat.Alpha,
+                (Subarray<byte>)pixelData);
             this.maskTexture.SetSmooth(true);
             this.pathTexture = gameGraphics.GetMiscTexture("Path");
             this.pathTexture.SetSmooth(true);

@@ -56,7 +56,8 @@ namespace Orion.Game.Matchmaking
             {
                 Argument.EnsureNotNull(value, "Name");
                 if (value.Length > MaximumNameLength)
-                    throw new ArgumentException("The name exceeds the maximum length.", "Name");
+                    //throw new ArgumentException("The name exceeds the maximum length.", "Name");
+                    value = value.Substring(0, MaximumNameLength);
 
                 this.name = value;
                 NameChanged.Raise(this);

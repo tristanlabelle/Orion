@@ -54,7 +54,7 @@ namespace Orion.Game.Matchmaking.Networking
         {
             Argument.EnsureNotNull(packet, "packet");
 
-            byte[] data = GetPacketData(packet);
+            ArraySegment<byte> data = GetPacketData(packet);
             transporter.SendTo(data, target);
         }
 
@@ -63,7 +63,7 @@ namespace Orion.Game.Matchmaking.Networking
             Argument.EnsureNotNull(packet, "packet");
             Argument.EnsureNotNull(targets, "targets");
 
-            byte[] data = GetPacketData(packet);
+            ArraySegment<byte> data = GetPacketData(packet);
             transporter.SendTo(data, targets);
         }
 
@@ -71,7 +71,7 @@ namespace Orion.Game.Matchmaking.Networking
         {
             Argument.EnsureNotNull(packet, "packet");
 
-            byte[] data = GetPacketData(packet);
+            ArraySegment<byte> data = GetPacketData(packet);
             transporter.Broadcast(data, preferredPort);
         }
 
@@ -90,13 +90,13 @@ namespace Orion.Game.Matchmaking.Networking
             transporter.Dispose();
         }
 
-        private byte[] GetPacketData(GamePacket packet)
+        private ArraySegment<byte> GetPacketData(GamePacket packet)
         {
             packetMemoryStream.SetLength(0);
             packetMemoryStream.Position = 0;
             GamePacket.Serializer.Serialize(packet, packetWriter);
             packetWriter.Flush();
-            return packetMemoryStream.ToArray();
+            return new ArraySegment<byte>(packetMemoryStream.ToArray(), 0, (int)packetMemoryStream.Length);
         }
 
         private void OnPacketReceived(SafeTransporter sender, NetworkEventArgs args)

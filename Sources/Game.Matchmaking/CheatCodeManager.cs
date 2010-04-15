@@ -159,7 +159,6 @@ namespace Orion.Game.Matchmaking
             DisableFogOfWar(match, faction);
             IncreaseResources(match, faction);
             IncreaseAvailableFood(match, faction);
-            SpawnChuckNorris(match, faction);
         }
         #endregion
         #endregion

@@ -191,7 +191,7 @@ namespace Orion.Game.Matchmaking
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
-            Serialize(writer);
+            newSettings.Serialize(writer);
             writer.Flush();
             stream.Position = 0;
             var reader = new BinaryReader(stream);

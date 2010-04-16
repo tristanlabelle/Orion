@@ -77,7 +77,7 @@ namespace Orion.Engine.Gui
             }
             set
             {
-                if (EqualityComparer<T>.Default.Equals(selectedItem, value))
+                if (IsItemSelected && EqualityComparer<T>.Default.Equals(selectedItem, value))
                     return;
                 
                 selectedItem = value;

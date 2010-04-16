@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Matchmaking.Networking.Packets;
 using Orion.Engine.Networking;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
+using Orion.Game.Matchmaking.Networking.Packets;
 
 namespace Orion.Game.Matchmaking.Networking
 {
@@ -138,7 +138,7 @@ namespace Orion.Game.Matchmaking.Networking
             {
                 HandleAdvertizeMatchPacket(args.SenderEndPoint, (AdvertizeMatchPacket)args.Packet);
             }
-            else if (args.Packet is StartingMatchPacket || args.Packet is RemovePlayerPacket)
+            else if (args.Packet is StartingMatchPacket || args.Packet is CancelGamePacket)
             {
                 int removedMatchCount = matches.RemoveAll(m => m.EndPoint == args.SenderEndPoint);
                 MatchesChanged.Raise(this);

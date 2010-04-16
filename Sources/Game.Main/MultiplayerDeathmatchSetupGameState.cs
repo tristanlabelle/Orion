@@ -147,10 +147,10 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
-            if (!IsHost)
-            {
+            if (IsHost)
+                AdvertizeMatch();
+            else
                 networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
-            }
 
             RootView.Children.Add(ui);
         }
@@ -330,8 +330,7 @@ namespace Orion.Game.Main
             {
                 if (packet is ExploreMatchesPacket)
                 {
-                    AdvertizeMatchPacket answer = new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayersCount);
-                    networking.Send(answer, client);
+                    AdvertizeMatch();
                 }
                 else if (packet is JoinRequestPacket)
                 {
@@ -340,7 +339,7 @@ namespace Orion.Game.Main
                         RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
                         networking.Send(new JoinResponsePacket(true), client);
-                        networking.Broadcast(new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayersCount));
+                        AdvertizeMatch();
                     }
                     else networking.Send(new JoinResponsePacket(false), client);
                 }
@@ -378,6 +377,12 @@ namespace Orion.Game.Main
                     playerSettings.RemovePlayer(target);
                 return;
             }
+        }
+
+        private void AdvertizeMatch()
+        {
+            AdvertizeMatchPacket advertize = new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayersCount);
+            networking.Broadcast(advertize);
         }
 
         private int IndexOfClient(IPv4EndPoint endPoint)

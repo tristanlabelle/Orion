@@ -9,7 +9,7 @@ namespace Orion.Game.Matchmaking.Networking.Packets
     public class CancelGamePacket : GamePacket
     {
         #region Fields
-        private static CancelGamePacket instance = new CancelGamePacket();
+        public static readonly CancelGamePacket instance = new CancelGamePacket();
         #endregion
 
         #region Methods

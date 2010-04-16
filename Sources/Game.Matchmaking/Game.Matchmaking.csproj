@@ -110,6 +110,7 @@
     <Compile Include="Networking\MultiplayerLobby.cs" />
     <Compile Include="Networking\Packets\AddPlayerPacket.cs" />
     <Compile Include="Networking\Packets\AdvertizeMatchPacket.cs" />
+    <Compile Include="Networking\Packets\CancelGamePacket.cs" />
     <Compile Include="Networking\Packets\ColorChangePacket.cs" />
     <Compile Include="Networking\Packets\CommandFrameCompletedPacket.cs" />
     <Compile Include="Networking\Packets\CommandsPacket.cs" />

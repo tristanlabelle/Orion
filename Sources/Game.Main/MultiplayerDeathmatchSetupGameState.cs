@@ -207,21 +207,15 @@ namespace Orion.Game.Main
 
         private void OnExitPressed(MatchConfigurationUI ui)
         {
-            Manager.Pop();
+            if (IsHost) networking.Broadcast(new CancelGamePacket());
+            else networking.Send(new RemovePlayerPacket(), hostEndPoint.Value);
 
-            if (IsHost)
-            {
-                foreach (RemotePlayer remotePlayer in playerSettings.Players.OfType<RemotePlayer>())
-                    networking.Send(new RemovePlayerPacket(IndexOfPlayer(remotePlayer)), remotePlayer.EndPoint);
-                networking.Broadcast(new RemovePlayerPacket());
-            }
-            else
-                networking.Send(new RemovePlayerPacket(), hostEndPoint.Value);
+            Manager.Pop();
         }
 
         private void OnStartGamePressed(MatchConfigurationUI ui)
         {
-            networking.Send(new StartingMatchPacket(), Clients);
+            networking.Broadcast(new StartingMatchPacket());
             StartMatch();
         }
         #endregion
@@ -288,6 +282,12 @@ namespace Orion.Game.Main
                 return;
             }
 
+            if (packet is CancelGamePacket)
+            {
+                Manager.Pop();
+                return;
+            }
+
             if (packet is RemovePlayerPacket)
             {
                 RemovePlayerPacket remove = (RemovePlayerPacket)packet;
@@ -340,6 +340,7 @@ namespace Orion.Game.Main
                         RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
                         networking.Send(new JoinResponsePacket(true), client);
+                        networking.Broadcast(new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayersCount));
                     }
                     else networking.Send(new JoinResponsePacket(false), client);
                 }

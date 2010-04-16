@@ -367,7 +367,7 @@ namespace Orion.Engine.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message.Array, "message.Array");
             Debug.Assert(message.Count < 512, "Warning: A network message exceeded 512 bytes.");
-            Debug.Assert(localAddresses.Contains(hostEndPoint.Address), "Sending a packet to ourself.");
+            Debug.Assert(!localAddresses.Contains(hostEndPoint.Address), "Sending a packet to ourself.");
 
             lock (peers)
             {

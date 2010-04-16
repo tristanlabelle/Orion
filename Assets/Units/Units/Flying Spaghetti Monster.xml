@@ -6,6 +6,6 @@
 		<Attack Power="20" Range="5" Delay="5"/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="Ta Mère" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="Ta mère" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

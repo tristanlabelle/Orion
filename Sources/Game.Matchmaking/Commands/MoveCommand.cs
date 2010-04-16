@@ -79,15 +79,18 @@ namespace Orion.Game.Matchmaking.Commands
         }
                 
         #region Serialization
-        protected override void SerializeSpecific(BinaryWriter writer)
+        public static void Serialize(MoveCommand command, BinaryWriter writer)
         {
-            WriteHandle(writer, FactionHandle);
-            WriteLengthPrefixedHandleArray(writer, unitHandles);
-            writer.Write(destination.X);
-            writer.Write(destination.Y);
+            Argument.EnsureNotNull(command, "command");
+            Argument.EnsureNotNull(writer, "writer");
+
+            WriteHandle(writer, command.FactionHandle);
+            WriteLengthPrefixedHandleArray(writer, command.unitHandles);
+            writer.Write(command.destination.X);
+            writer.Write(command.destination.Y);
         }
 
-        public static MoveCommand DeserializeSpecific(BinaryReader reader)
+        public static MoveCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 

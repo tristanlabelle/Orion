@@ -52,7 +52,7 @@ namespace Orion.Game.Main
 
             if (deferActions)
             {
-                Debug.Assert(deferredAction == null);
+                Debug.Assert(deferredAction == null, "Deferred action is not currently null.");
                 deferredAction = () => CommitPush(state);
                 return;
             }
@@ -104,7 +104,7 @@ namespace Orion.Game.Main
         {
             if (deferActions)
             {
-                Debug.Assert(deferredAction == null);
+                Debug.Assert(deferredAction == null, "Deferred action is not currently null.");
                 deferredAction = () => CommitPopTo<TGameState>();
                 return;
             }

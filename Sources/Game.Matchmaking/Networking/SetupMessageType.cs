@@ -23,7 +23,6 @@ namespace Orion.Game.Matchmaking.Networking
         SetPeer,
         SetSlot,
 
-        Message,
         ChangeOptions,
 
         StartGame,

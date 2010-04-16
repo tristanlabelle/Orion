@@ -7,10 +7,10 @@ using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Deathmatch;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Main
 {
@@ -23,7 +23,8 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
-        private readonly SinglePlayerMatchConfigurationUI ui;
+        private readonly PlayerSettings playerSettings;
+        private readonly MatchConfigurationUI ui;
         #endregion
 
         #region Constructors
@@ -35,9 +36,19 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
             this.matchSettings.AreCheatsEnabled = true;
-            this.ui = new SinglePlayerMatchConfigurationUI(matchSettings);
-            this.ui.InitializeSlots();
+
+            this.playerSettings = new PlayerSettings();
+            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
+
+            List<PlayerBuilder> builders = new List<PlayerBuilder>();
+            builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
+
+            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
+            this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
+            
+            this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
             this.ui.StartGamePressed += OnStartGamePressed;
+            this.ui.PlayerColorChanged += OnPlayerColorChanged;
             this.ui.ExitPressed += OnExitPressed;
         }
         #endregion
@@ -93,26 +104,20 @@ namespace Orion.Game.Main
 
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
-            int colorIndex = 0;
-            foreach (PlayerSlot playerSlot in ui.Players)
+            foreach (Player player in playerSettings.Players)
             {
-                if (playerSlot is ClosedPlayerSlot) continue;
-
-                ColorRgb color = Faction.Colors[colorIndex];
-                colorIndex++;
-
-                Faction faction = world.CreateFaction(Colors.GetName(color), color);
+                Faction faction = world.CreateFaction(Colors.GetName(player.Color), player.Color);
                 faction.AladdiumAmount = matchSettings.InitialAladdiumAmount;
                 faction.AlageneAmount = matchSettings.InitialAlageneAmount;
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
 
-                if (playerSlot is LocalPlayerSlot)
+                if (player is LocalPlayer)
                 {
                     localCommander = new SlaveCommander(match, faction);
                 }
-                else if (playerSlot is AIPlayerSlot)
+                else if (player is AIPlayer)
                 {
-                    Commander commander = new AgressiveAICommander(match, faction);
+                    Commander commander = new AICommander(match, faction);
                     aiCommanders.Add(commander);
                 }
                 else
@@ -129,7 +134,7 @@ namespace Orion.Game.Main
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
             if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
 
-            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, world);
+            ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, playerSettings);
             if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
 
             aiCommanders.ForEach(commander => commandPipeline.AddCommander(commander));
@@ -138,6 +143,11 @@ namespace Orion.Game.Main
             GameState targetGameState = new DeathmatchGameState(
                 Manager, graphics, match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
+        }
+
+        private void OnPlayerColorChanged(MatchConfigurationUI ui, Player player, ColorRgb color)
+        {
+            player.Color = color;
         }
 
         private void OnExitPressed(MatchConfigurationUI sender)

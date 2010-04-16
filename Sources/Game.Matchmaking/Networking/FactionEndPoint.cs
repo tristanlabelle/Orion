@@ -9,40 +9,49 @@ using Orion.Engine.Networking;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
+using Orion.Engine.Collections;
+using Orion.Game.Matchmaking.Networking.Packets;
 
 namespace Orion.Game.Matchmaking.Networking
 {
-    public class FactionEndPoint : IDisposable
+    public sealed class FactionEndPoint : IDisposable
     {
         #region Fields
-        private readonly byte[] doneMessage;
-
-        private Action<SafeTransporter, NetworkEventArgs> receive;
-        private Action<SafeTransporter, IPv4EndPoint> timeout;
-        private readonly SafeTransporter transporter;
+        private readonly GameNetworking networking;
+        private readonly IPv4EndPoint hostEndPoint;
+        private readonly Faction faction;
 
         private readonly Dictionary<int, List<Command>> availableCommands = new Dictionary<int, List<Command>>();
         private readonly Dictionary<int, int> updatesForDone = new Dictionary<int, int>();
 
-        public readonly IPv4EndPoint Host;
-        public readonly Faction Faction;
+        private Action<GameNetworking, GamePacketEventArgs> packetReceivedEventHandler;
+        private Action<GameNetworking, IPv4EndPoint> peerTimedOutEventHandler;
         #endregion
 
         #region Constructors
-        public FactionEndPoint(SafeTransporter transporter, Faction faction, IPv4EndPoint host)
+        public FactionEndPoint(GameNetworking networking, Faction faction, IPv4EndPoint hostEndPoint)
         {
-            this.transporter = transporter;
-            receive = OnReceived;
-            timeout = OnTimedOut;
+            Argument.EnsureNotNull(networking, "networking");
+            Argument.EnsureNotNull(faction, "faction");
 
-            transporter.Received += receive;
-            transporter.TimedOut += timeout;
-            Faction = faction;
-            Host = host;
+            this.networking = networking;
+            this.faction = faction;
+            this.hostEndPoint = hostEndPoint;
+
+            this.packetReceivedEventHandler = OnPacketReceived;
+            this.peerTimedOutEventHandler = OnPeerTimedOut;
+
+            this.networking.PacketReceived += packetReceivedEventHandler;
+            this.networking.PeerTimedOut += peerTimedOutEventHandler;
 
             availableCommands[0] = new List<Command>();
-            doneMessage = new byte[1 + sizeof(int) * 2];
-            doneMessage[0] = (byte)GameMessageType.Done;
+        }
+        #endregion
+
+        #region Properties
+        public Faction Faction
+        {
+            get { return faction; }
         }
         #endregion
 
@@ -72,91 +81,69 @@ namespace Orion.Game.Matchmaking.Networking
 
         public void SendLeave()
         {
-            byte[] quitMessage = new byte[1];
-            quitMessage[0] = (byte)GameMessageType.Quit;
-            transporter.SendTo(quitMessage, Host);
+            networking.Send(new RemovePlayerPacket(), hostEndPoint);
         }
 
         public void SendDone(int commandFrame, int numberOfUpdates)
         {
-            BitConverter.GetBytes(commandFrame).CopyTo(doneMessage, 1);
-            BitConverter.GetBytes(numberOfUpdates).CopyTo(doneMessage, 1 + sizeof(int));
-            transporter.SendTo(doneMessage, Host);
+            var packet = new CommandFrameCompletedPacket(commandFrame, numberOfUpdates);
+            networking.Send(packet, hostEndPoint);
         }
 
         private List<Command> DeserializeCommandDatagram(byte[] data, int startIndex)
         {
-            using (MemoryStream stream = new MemoryStream(data, startIndex, data.Length - startIndex))
+            Subarray<byte> subarray = new Subarray<byte>(data, startIndex);
+            List<Command> commands = Command.Serializer.DeserializeToEnd(subarray);
+
+            Command firstMindControlledCommand = commands
+                .FirstOrDefault(c => c.FactionHandle != faction.Handle);
+            if (firstMindControlledCommand != null)
             {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    List<Command> commands = new List<Command>();
-                    while (stream.Position != stream.Length)
-                    {
-                        Command deserializedCommand = Command.Deserialize(reader);
+                Debug.Fail("Faction {0} is mind controlling faction {1}."
+                    .FormatInvariant(faction.Handle, firstMindControlledCommand.FactionHandle));
+            }
 
-#if DEBUG
-                        // #if'd so FormatInvariant is not executed in release
-                        Debug.Assert(deserializedCommand.FactionHandle == Faction.Handle,
-                            "Faction #{0} attempted mind control".FormatInvariant(deserializedCommand.FactionHandle));
-#endif
+            return commands;
+        }
 
-                        commands.Add(deserializedCommand);
-                    }
-                    return commands;
-                }
+        public void SendCommands(int commandFrameNumber, IEnumerable<Command> commands)
+        {
+            var packet = new CommandsPacket(commandFrameNumber, commands);
+            networking.Send(packet, hostEndPoint);
+        }
+
+        private void OnPacketReceived(GameNetworking networking, GamePacketEventArgs args)
+        {
+            if (args.SenderEndPoint != hostEndPoint) return;
+
+            if (args.Packet is RemovePlayerPacket)
+            {
+                faction.MassSuicide();
+            }
+            else if (args.Packet is CommandsPacket)
+            {
+                var packet = (CommandsPacket)args.Packet;
+                availableCommands[packet.CommandFrameNumber] = packet.Commands.ToList();
+            }
+            else if (args.Packet is CommandFrameCompletedPacket)
+            {
+                var packet = (CommandFrameCompletedPacket)args.Packet;
+                updatesForDone[packet.CommandFrameNumber] = packet.UpdateFrameCount;
             }
         }
 
-        public void SendCommands(int commandFrame, IEnumerable<Command> commands)
+        private void OnPeerTimedOut(GameNetworking networking, IPv4EndPoint endPoint)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    writer.Write((byte)GameMessageType.Commands);
-                    writer.Write(commandFrame);
-                    foreach (Command command in commands)
-                        command.Serialize(writer);
-                }
-                transporter.SendTo(stream.ToArray(), Host);
-            }
-        }
+            if (endPoint != hostEndPoint) return;
 
-        private void OnReceived(SafeTransporter transporter, NetworkEventArgs args)
-        {
-            if (args.Host != Host) return;
-
-            if (args.Data[0] == (byte)GameMessageType.Quit)
-                Faction.MassSuicide();
-            else
-            {
-                if (args.Data[0] == (byte)GameMessageType.Commands)
-                {
-                    int commandFrame = BitConverter.ToInt32(args.Data, 1);
-                    availableCommands[commandFrame] = DeserializeCommandDatagram(args.Data, 1 + sizeof(int));
-                }
-                else if (args.Data[0] == (byte)GameMessageType.Done)
-                {
-                    int commandFrame = BitConverter.ToInt32(args.Data, 1);
-                    int updates = BitConverter.ToInt32(args.Data, 1 + sizeof(int));
-                    updatesForDone[commandFrame] = updates;
-                }
-            }
-        }
-
-        private void OnTimedOut(SafeTransporter transporter, IPv4EndPoint endPoint)
-        {
-            if (endPoint != Host) return;
-
-            Faction.RaiseWarning("Perdu la connexion à {0}.".FormatInvariant(endPoint));
-            Faction.MarkAsDefeated();
+            faction.RaiseWarning("Perdu la connexion à {0}.".FormatInvariant(endPoint));
+            faction.MarkAsDefeated();
         }
 
         public void Dispose()
         {
-            transporter.Received -= receive;
-            transporter.TimedOut -= timeout;
+            networking.PacketReceived -= packetReceivedEventHandler;
+            networking.PeerTimedOut -= peerTimedOutEventHandler;
         }
         #endregion
     }

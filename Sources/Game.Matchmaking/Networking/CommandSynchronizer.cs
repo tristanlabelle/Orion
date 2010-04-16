@@ -19,37 +19,34 @@ namespace Orion.Game.Matchmaking.Networking
     public sealed class CommandSynchronizer : CommandFilter
     {
         #region Fields
-        #region Updates Rate Management
         private const int retentionDelay = 4;
         private const int updatesPerSecond = 40;
         private const int defaultUpdatesPerFrame = 6;
         private const int maxUpdatesPerFrame = 10;
+
+        private readonly Match match;
+        private readonly GameNetworking networking;
+        private readonly List<FactionEndPoint> peers;
+
         private readonly List<int> updatesForCommandFrame = new List<int>();
         private readonly Queue<int> previousFramesDuration = new Queue<int>();
+
+        private readonly List<Command> localCommands = new List<Command>();
+        private readonly List<Command> commandsToSend = new List<Command>();
+        private readonly List<Command> commandsToExecute = new List<Command>();
+
         private int updatesSinceLastCommandFrame = defaultUpdatesPerFrame - 1;
         private int commandFrameNumber = 0;
         #endregion
 
-        #region Peers Handling
-        private readonly List<FactionEndPoint> peers;
-        private readonly SafeTransporter transporter;
-        #endregion
-
-        #region Commands
-        private readonly Match match;
-        private readonly List<Command> localCommands = new List<Command>();
-        private readonly List<Command> commandsToSend = new List<Command>();
-        private readonly List<Command> commandsToExecute = new List<Command>();
-        #endregion
-        #endregion
-
         #region Constructors
-        public CommandSynchronizer(Match match, SafeTransporter transporter, IEnumerable<FactionEndPoint> endPoints)
+        public CommandSynchronizer(Match match, GameNetworking networking,
+            IEnumerable<FactionEndPoint> endPoints)
         {
             Argument.EnsureNotNull(endPoints, "endPoints");
-            Argument.EnsureNotNull(transporter, "transporter");
+            Argument.EnsureNotNull(networking, "networking");
 
-            this.transporter = transporter;
+            this.networking = networking;
             this.match = match;
             peers = endPoints.ToList();
             previousFramesDuration.Enqueue(defaultUpdatesPerFrame);
@@ -91,7 +88,7 @@ namespace Orion.Game.Matchmaking.Networking
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
-            transporter.Poll();
+            networking.Poll();
             updatesSinceLastCommandFrame++;
 
             if (updatesSinceLastCommandFrame == TargetUpdatesPerCommandFrame)

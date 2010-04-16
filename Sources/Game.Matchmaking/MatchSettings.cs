@@ -30,6 +30,11 @@ namespace Orion.Game.Matchmaking
         private bool areRandomHeroesEnabled = true;
         #endregion
 
+        #region Constructors
+        public MatchSettings()
+        { }
+        #endregion
+
         #region Events
         public event Action<MatchSettings> MapSizeChanged;
         public event Action<MatchSettings> FoodLimitChanged;
@@ -177,6 +182,23 @@ namespace Orion.Game.Matchmaking
 
         #region Methods
         /// <summary>
+        /// Copies another matchsettings object to this one.
+        /// </summary>
+        /// <param name="newSettings">The object to be copied.</param>
+        public void CopyFrom(MatchSettings newSettings)
+        {
+            Argument.EnsureNotNull(newSettings, "newSettings");
+
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+            newSettings.Serialize(writer);
+            writer.Flush();
+            stream.Position = 0;
+            var reader = new BinaryReader(stream);
+            Deserialize(reader);
+        }
+
+        /// <summary>
         /// Serializes this object to its binary representation.
         /// </summary>
         /// <param name="writer">The binary writer to which to write the serialized data.</param>
@@ -214,11 +236,13 @@ namespace Orion.Game.Matchmaking
             AreRandomHeroesEnabled = reader.ReadBoolean();
         }
 
+        #region Events Handling
         private void TriggerEvent(Action<MatchSettings> eventHandler)
         {
             eventHandler.Raise(this);
             Changed.Raise(this);
         }
+        #endregion
         #endregion
         #endregion
 

@@ -23,13 +23,6 @@ namespace Orion.Game.Simulation
         #region Fields
         private const int minimumPopulationLimit = 10;
 
-        public static ColorRgb[] Colors = new ColorRgb[]
-        {
-            ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Magenta, ColorPalette.Orange,
-            ColorPalette.Green, ColorPalette.Yellow, ColorPalette.Gray, ColorPalette.Blue,
-            ColorPalette.Lime, ColorPalette.Indigo, ColorPalette.White, ColorPalette.Chocolate
-        };
-
         private readonly Handle handle;
         private readonly World world;
         private readonly string name;

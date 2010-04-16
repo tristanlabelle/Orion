@@ -27,14 +27,11 @@ namespace Orion.Game.Matchmaking
         /// <param name="writer">The binary writer to be used.</param>
         /// <param name="settings">The initial match settings.</param>
         /// <param name="factionNames">The names of the participating factions.</param>
-        public ReplayWriter(BinaryWriter writer, MatchSettings settings, IEnumerable<string> factionNames)
+        public ReplayWriter(BinaryWriter writer, MatchSettings settings, PlayerSettings playerSettings)
         {
             Argument.EnsureNotNull(writer, "writer");
             Argument.EnsureNotNull(settings, "settings");
-
-            Argument.EnsureNotNull(factionNames, "factionNames");
-            List<string> factionNameList = factionNames.ToList();
-            Argument.EnsureNoneNull(factionNames, "factionNames");
+            Argument.EnsureNotNull(playerSettings, "playerSettings");
 
             this.writer = writer;
 #if DEBUG
@@ -42,19 +39,16 @@ namespace Orion.Game.Matchmaking
 #endif
 
             settings.Serialize(writer);
-
-            writer.Write(factionNameList.Count);
-            foreach (string factionName in factionNameList)
-                writer.Write(factionName);
+            playerSettings.Serialize(writer);
 
             if (autoFlush) writer.Flush();
         }
 
-        public ReplayWriter(Stream stream, MatchSettings settings, IEnumerable<string> factionNames)
-            : this(new BinaryWriter(stream), settings, factionNames) {}
+        public ReplayWriter(Stream stream, MatchSettings settings, PlayerSettings playerSettings)
+            : this(new BinaryWriter(stream, Encoding.UTF8), settings, playerSettings) { }
 
-        public ReplayWriter(string filePath, MatchSettings settings, IEnumerable<string> factionNames)
-            : this(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read), settings, factionNames) { }
+        public ReplayWriter(string filePath, MatchSettings settings, PlayerSettings playerSettings)
+            : this(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read), settings, playerSettings) { }
         #endregion
 
         #region Properties
@@ -81,7 +75,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(command, "command");
 
             writer.Write(updateNumber);
-            command.Serialize(writer);
+            Command.Serializer.Serialize(command, writer);
             if (autoFlush) writer.Flush();
             
             lastUpdateNumber = updateNumber;
@@ -111,12 +105,12 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Methods
-        public static ReplayWriter TryCreate(MatchSettings settings, IEnumerable<string> factionNames)
+        public static ReplayWriter TryCreate(MatchSettings settings, PlayerSettings playerSettings)
         {
             Stream stream = TryOpenFileStream();
             if (stream == null) return null;
 
-            return new ReplayWriter(stream, settings, factionNames);
+            return new ReplayWriter(stream, settings, playerSettings);
         }
 
         private static Stream TryOpenFileStream()

@@ -7,6 +7,7 @@ using System.Text;
 using SysImage = System.Drawing.Image;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 using System.Drawing.Imaging;
+using Orion.Engine.Collections;
 
 namespace Orion.Engine.Graphics
 {
@@ -19,7 +20,7 @@ namespace Orion.Engine.Graphics
         #region Fields
         private readonly Size size;
         private readonly PixelFormat pixelFormat;
-        private readonly ArraySegment<byte> data;
+        private readonly Subarray<byte> data;
         private readonly int stride;
         private readonly Access allowedAccess;
         #endregion
@@ -37,13 +38,13 @@ namespace Orion.Engine.Graphics
 
             this.size = size;
             this.pixelFormat = pixelFormat;
-            this.data = new ArraySegment<byte>(new byte[size.Area * pixelFormat.GetBytesPerPixel()]);
+            this.data = new Subarray<byte>(new byte[size.Area * pixelFormat.GetBytesPerPixel()]);
             this.stride = data.Count;
             this.allowedAccess = Access.ReadWrite;
         }
 
         public BufferedPixelSurface(Size size, PixelFormat pixelFormat,
-            ArraySegment<byte> data, int stride, Access allowedAccess)
+            Subarray<byte> data, int stride, Access allowedAccess)
         {
             Argument.EnsureStrictlyPositive(size.Area, "size.Area");
             Argument.EnsureDefined(pixelFormat, "pixelFormat");
@@ -62,7 +63,7 @@ namespace Orion.Engine.Graphics
         }
 
         public BufferedPixelSurface(Size size, PixelFormat pixelFormat,
-            ArraySegment<byte> data, Access allowedAccess)
+            Subarray<byte> data, Access allowedAccess)
             : this(size, pixelFormat, data, size.Width * pixelFormat.GetBytesPerPixel(), allowedAccess) { }
         #endregion
 
@@ -86,7 +87,7 @@ namespace Orion.Engine.Graphics
         /// <summary>
         /// Gets the buffer in which this surface's raw pixel data is stored.
         /// </summary>
-        public ArraySegment<byte> Data
+        public Subarray<byte> Data
         {
             get { return data; }
         }
@@ -222,7 +223,7 @@ namespace Orion.Engine.Graphics
                 }
             }
 
-            return new BufferedPixelSurface(size, PixelFormat.Rgb, new ArraySegment<byte>(pixelData), Access.Read);
+            return new BufferedPixelSurface(size, PixelFormat.Rgb, new Subarray<byte>(pixelData), Access.Read);
         }
 
 

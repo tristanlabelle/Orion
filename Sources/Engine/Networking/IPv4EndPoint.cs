@@ -66,6 +66,14 @@ namespace Orion.Engine.Networking
         /// <param name="port">The port of the end point.</param>
         public IPv4EndPoint(byte w, byte x, byte y, byte z, int port)
             : this(new IPv4Address(x, y, z, w), port) { }
+
+        /// <summary>
+        /// Initializes a new <see cref="IPv4EndPoint"/> from the packed address representation and a port number.
+        /// </summary>
+        /// <param name="w">The packed address representation.</param>
+        /// <param name="port">The port of the end point.</param>
+        public IPv4EndPoint(uint address, ushort port)
+            : this(new IPv4Address(address), port) { }
         #endregion
 
         #region Properties

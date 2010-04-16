@@ -11,48 +11,33 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Networking;
 using Orion.Engine.Gui;
 using Orion.Game.Matchmaking.Networking;
+using System.Globalization;
 
 namespace Orion.Game.Presentation.Gui
 {
     public sealed class MultiplayerLobbyUI : MaximizedPanel
     {
         #region Fields
-        private static readonly byte[] explorePacket = new byte[] { (byte)SetupMessageType.Explore };
-        private const int repollAfterFrames = 250;
-
-        private readonly Action<SafeTransporter, NetworkEventArgs> packetReceivedEventHandler;
-        private readonly Action<SafeTransporter, IPv4EndPoint> peerTimedOutEventHandler;
-        private readonly Dictionary<IPv4EndPoint, Button> hostedGames = new Dictionary<IPv4EndPoint, Button>();
-        private readonly int port;
-        private SafeTransporter transporter;
-        private IPv4EndPoint? requestedJoin;
-        private int frameCounter;
-
-        private readonly ListPanel gameListPanel;
-        private readonly Rectangle gameButtonRectangle;
+        private readonly ListPanel matchListPanel;
+        private readonly Rectangle matchButtonFrame;
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyUI(SafeTransporter transporter)
+        public MultiplayerLobbyUI()
         {
-            port = transporter.Port;
-            this.transporter = transporter;
-            packetReceivedEventHandler = OnPacketReceived;
-            peerTimedOutEventHandler = OnPeerTimedOut;
+            Rectangle matchListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
+            matchButtonFrame = new Rectangle(matchListFrame.Width - 20, 30);
+            matchListPanel = new ListPanel(matchListFrame, new Vector2(10, 10));
+            Children.Add(matchListPanel);
 
-            Rectangle gameListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            gameButtonRectangle = new Rectangle(gameListFrame.Width - 20, 30);
-            gameListPanel = new ListPanel(gameListFrame, new Vector2(10, 10));
-            Children.Add(gameListPanel);
-
-            Rectangle hostFrame = new Rectangle(gameListFrame.MaxX + 10, gameListFrame.MaxY, 200, -50);
+            Rectangle hostFrame = new Rectangle(matchListFrame.MaxX + 10, matchListFrame.MaxY, 200, -50);
             Button hostButton = new Button(hostFrame, "Héberger");
-            hostButton.Triggered += (sender) => { if (!requestedJoin.HasValue) HostPressed.Raise(this); };
+            hostButton.Triggered += (sender) => HostPressed.Raise(this);
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
             Button joinRemoteButton = new Button(joinRemoteFrame, "Jointer par IP");
-            joinRemoteButton.Triggered += PressJoinRemoteGame;
+            joinRemoteButton.Triggered += OnJoinByIPPressed;
             Children.Add(joinRemoteButton);
 
             Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
@@ -62,7 +47,7 @@ namespace Orion.Game.Presentation.Gui
 
             Rectangle pingButtonFrame = joinRemoteFrame.TranslatedBy(0, -joinRemoteFrame.Height - 10);
             Button pingButton = new Button(pingButtonFrame, "Ping");
-            pingButton.Triggered += PressPing;
+            pingButton.Triggered += OnPingButtonPressed;
             Children.Add(pingButton);
         }
         #endregion
@@ -79,256 +64,130 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MultiplayerLobbyUI> HostPressed;
 
         /// <summary>
-        /// Raised when the user decided to go join a game through the UI.
+        /// Raised when the user decided to join a game through the UI.
         /// </summary>
-        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinPressed;
+        public event Action<MultiplayerLobbyUI, AdvertizedMatch> JoinPressed;
+
+        /// <summary>
+        /// Raised when the user decided to join a game by entering its IP end point.
+        /// </summary>
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinByIpPressed;
+
+        /// <summary>
+        /// Raised when the user has entered an address to be pinged.
+        /// </summary>
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> PingPressed;
+        #endregion
+
+        #region Properties
+        public bool IsEnabled
+        {
+            get { return Children.OfType<Button>().First().IsEnabled; }
+            set
+            {
+                if (value == IsEnabled) return;
+
+                foreach (Button button in Children.OfType<Button>())
+                    button.IsEnabled = value;
+                foreach (Button button in matchListPanel.Children.OfType<Button>())
+                    button.IsEnabled = value;
+            }
+        }
         #endregion
 
         #region Methods
-#warning HACK: This should by handled by the MultiplayerLobbyGameState
-        protected override void OnAddToParent(ViewContainer parent)
+        public void ClearMatches()
         {
-            transporter.Received += packetReceivedEventHandler;
-            transporter.TimedOut += peerTimedOutEventHandler;
-            transporter.Broadcast(explorePacket, port);
+            matchListPanel.DisposeAllChildren();
         }
 
-        protected override void OnRemovedFromParent(ViewContainer parent)
+        public void AddMatch(AdvertizedMatch match)
         {
-            transporter.Received -= packetReceivedEventHandler;
-            transporter.TimedOut -= peerTimedOutEventHandler;
+            Argument.EnsureNotNull(match, "match");
+
+            string caption = "{0} ({1} places libres)".FormatInvariant(match.Name, match.OpenSlotCount);
+            Button button = new Button(matchButtonFrame, caption);
+            button.Triggered += b => JoinPressed.Raise(this, match);
+            matchListPanel.Children.Add(button);
         }
 
-        protected override void Update(float timeDeltaInSeconds)
+        private void OnJoinByIPPressed(Button sender)
         {
-            transporter.Poll();
-            frameCounter++;
-            if (frameCounter % repollAfterFrames == 0)
-                transporter.Broadcast(explorePacket, port);
-
-            base.Update(timeDeltaInSeconds);
+            Instant.Prompt(this, "Quelle adresse voulez-vous jointer?", JoinAddress);
         }
 
-        private void OnPacketReceived(SafeTransporter source, NetworkEventArgs args)
+        private void JoinAddress(string endPointString)
         {
-            SetupMessageType messageType = (SetupMessageType)args.Data[0];
-            switch (messageType)
+            IPv4EndPoint? endPoint = ParseEndPointWithAlerts(endPointString);
+            if (!endPoint.HasValue) return;
+
+            JoinByIpPressed.Raise(this, endPoint.Value);
+        }
+
+        private IPv4EndPoint? ParseEndPointWithAlerts(string endPointString)
+        {
+            string[] parts = endPointString.Split(':');
+            if (parts.Length > 2)
             {
-                case SetupMessageType.Advertise:
-                    ShowGame(args.Host, args.Data[1]);
-                    break;
+                Instant.DisplayAlert(this, "Adresse invalide, trop de ':'.");
+                return null;
+            }
 
-                case SetupMessageType.RemoveGame:
-                case SetupMessageType.Exit:
-                    RemoveGame(args.Host);
-                    break;
-
-                case SetupMessageType.AcceptJoinRequest:
-                    if (requestedJoin.HasValue && args.Host == requestedJoin.Value)
+            IPv4Address address;
+            if (!IPv4Address.TryParse(parts[0], out address))
+            {
+                // Attempt to resolve as a host name
+                try
+                {
+                    IPAddress resolvedAddress = Dns.GetHostAddresses(parts[0])
+                        .FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+                    if (resolvedAddress == null)
                     {
-                        JoinPressed.Raise(this, requestedJoin.Value);
+                        Instant.DisplayAlert(this, "L'hôte {0} n'a pas d'addresse IPv4.".FormatInvariant(parts[0]));
+                        return null;
                     }
-                    break;
 
-                case SetupMessageType.RefuseJoinRequest:
-                    if (args.Host == requestedJoin)
-                    {
-                        Instant.DisplayAlert(this, "L'hôte a refusé votre demande.");
-                    }
-                    break;
-
-                case SetupMessageType.Explore:
-                    break;
-
-                default:
-                    //Debug.Fail("Unexpected packet message type: {0}.".FormatInvariant(messageType));
-                    break;
-            }
-        }
-
-        private void OnPeerTimedOut(SafeTransporter transporter, IPv4EndPoint host)
-        {
-            Instant.DisplayAlert(this, "Impossible de rejointer {0}.".FormatInvariant(ResolveHostAddress(host)));
-            requestedJoin = null;
-        }
-
-        private void ShowGame(IPv4EndPoint host, int numberOfPlacesLeft)
-        {
-            string caption = "{0} ({1} places libres)".FormatInvariant(ResolveHostAddress(host), numberOfPlacesLeft);
-            if (!hostedGames.ContainsKey(host))
-            {
-                Button button = new Button(gameButtonRectangle, caption);
-                button.Triggered += b => { if (!requestedJoin.HasValue) AskJoinGame(host); };
-                gameListPanel.Children.Add(button);
-                hostedGames[host] = button;
-            }
-            else
-            {
-                hostedGames[host].Caption = caption;
-            }
-        }
-
-        private void RemoveGame(IPv4EndPoint host)
-        {
-            if (hostedGames.ContainsKey(host))
-            {
-                hostedGames[host].Dispose();
-                hostedGames.Remove(host);
-            }
-        }
-
-        private void AskJoinGame(IPv4EndPoint host)
-        {
-            Debug.WriteLine("Asking {0} to join the game.".FormatInvariant(host));
-
-            byte[] packet = new byte[1];
-            packet[0] = (byte)SetupMessageType.JoinRequest;
-            transporter.SendTo(packet, host);
-            requestedJoin = host;
-        }
-
-        private void PressJoinRemoteGame(Button sender)
-        {
-            if (!requestedJoin.HasValue)
-                Instant.Prompt(this, "Quelle adresse voulez-vous jointer?", JoinAddress);
-        }
-
-        private void JoinAddress(string address)
-        {
-            IPv4Address hostAddress;
-            ushort port;
-
-            if (address.Contains(':'))
-            {
-                string[] parts = address.Split(':');
-                try
-                {
-                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])
-                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    port = ushort.Parse(parts[1]);
-                }
-                catch (FormatException)
-                {
-                    Instant.DisplayAlert(this, "La valeur {0} est un nom de port invalide.".FormatInvariant(parts[1]));
-                    return;
+                    address = (IPv4Address)resolvedAddress;
                 }
                 catch (SocketException)
                 {
-                    Instant.DisplayAlert(this, "Impossible de résoudre le nom ou l'adresse {0}.".FormatInvariant(parts[0]));
-                    return;
-                }
-            }
-            else
-            {
-                try
-                {
-                    hostAddress = (IPv4Address)Dns.GetHostAddresses(address)
-                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    port = transporter.Port;
-                }
-                catch (SocketException)
-                {
-                    Instant.DisplayAlert(this, "Impossible de résoudre le nom ou l'adresse {0}.".FormatInvariant(address));
-                    return;
-                }
-                catch (InvalidOperationException)
-                {
-                    Instant.DisplayAlert(this, "Impossible de trouver une adresse IPv4 pour l'hôte {0}".FormatInvariant(address));
-                    return;
-                }
-            }
-
-            AskJoinGame(new IPv4EndPoint(hostAddress, port));
-        }
-
-        private string ResolveHostAddress(IPEndPoint endPoint)
-        {
-            string hostName;
-            try
-            {
-                IPHostEntry hostEntry = Dns.GetHostEntry((IPAddress)endPoint.Address);
-                hostName = hostEntry.HostName;
-            }
-            catch (SocketException)
-            {
-                hostName = endPoint.Address.ToString();
-            }
-            if (endPoint.Port != transporter.Port)
-            {
-                hostName += ":{0}".FormatInvariant(endPoint.Port);
-            }
-            return hostName;
-        }
-
-        private IPv4EndPoint? TryParseAddress(string address)
-        {
-            IPv4Address hostAddress;
-            ushort port;
-
-            if (address.Contains(':'))
-            {
-                string[] parts = address.Split(':');
-                try
-                {
-                    hostAddress = (IPv4Address)Dns.GetHostAddresses(parts[0])
-                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    port = ushort.Parse(parts[1]);
-                }
-                catch (FormatException)
-                {
-                    return null;
-                }
-                catch (SocketException)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                try
-                {
-                    hostAddress = (IPv4Address)Dns.GetHostAddresses(address)
-                        .First(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    port = transporter.Port;
-                }
-                catch (SocketException)
-                {
-                    return null;
-                }
-                catch (InvalidOperationException)
-                {
+                    Instant.DisplayAlert(this, "Impossible de résoudre le nom d'hôte {0}.".FormatInvariant(parts[0]));
                     return null;
                 }
             }
 
-            return new IPv4EndPoint(hostAddress, port);
+            ushort port = 0;
+            if (parts.Length == 2 && !ushort.TryParse(parts[1], NumberStyles.None, NumberFormatInfo.InvariantInfo, out port))
+            {
+                Instant.DisplayAlert(this, "Format de port invalide.".FormatInvariant(address));
+                return null;
+            }
+
+            return new IPv4EndPoint(address, port);
         }
 
-        private void PressPing(Button sender)
+        private void OnPingButtonPressed(Button sender)
         {
             Instant.Prompt(this, "Entrez l'adresse IP à pinger:", Ping);
         }
 
-        private void Ping(string address)
+        private void Ping(string endPointString)
         {
-            IPv4EndPoint? endPoint = TryParseAddress(address);
-            if (!endPoint.HasValue)
-            {
-                Instant.DisplayAlert(this, "Impossible de résoudre {0}.".FormatInvariant(address));
-            }
+            IPv4EndPoint? endPoint = ParseEndPointWithAlerts(endPointString);
+            if (!endPoint.HasValue) return;
 
-            transporter.Ping(endPoint.Value);
-            Instant.DisplayAlert(this, "{0} a été pingé avec succès.".FormatInvariant(endPoint.Value));
+            PingPressed.Raise(this, endPoint.Value);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                transporter.Received -= packetReceivedEventHandler;
                 BackPressed = null;
                 HostPressed = null;
                 JoinPressed = null;
+                JoinByIpPressed = null;
+                PingPressed = null;
             }
 
             base.Dispose(disposing);

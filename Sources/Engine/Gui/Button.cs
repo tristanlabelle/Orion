@@ -55,7 +55,7 @@ namespace Orion.Engine.Gui
         #region Properties
         public string Caption
         {
-            get { return caption.Text.Value; }
+            get { return caption.Text; }
             set
             {
                 Children.Remove(caption);
@@ -94,7 +94,7 @@ namespace Orion.Engine.Gui
             set { hotKey = value; }
         }
 
-        public bool Enabled
+        public bool IsEnabled
         {
             get { return isEnabled; }
             set { isEnabled = value; }
@@ -171,7 +171,7 @@ namespace Orion.Engine.Gui
 
         private void AlignCaption()
         {
-            Rectangle textFrame = caption.Text.Frame;
+            Rectangle textFrame = caption.TextObject.Frame;
             Vector2 captionOrigin = Bounds.Center - textFrame.Center;
             caption.Frame = caption.Frame.TranslatedTo(captionOrigin);
         }

@@ -59,13 +59,13 @@ namespace Orion.Engine.Gui
                 View view = child as View;
                 if (view != null) view.BoundsChanged -= frameChangedHandler;
 
-                float yTranslation = -child.Frame.Height - padding.Y;
+                float yTranslation = child.Frame.Height + padding.Y;
                 for (int index = Children.IndexOf(child) + 1; index < Children.Count; index++)
                 {
                     ViewContainer container = Children[index];
                     container.Frame = container.Frame.TranslatedBy(0, yTranslation);
                 }
-                FullBounds = FullBounds.ResizedBy(0, yTranslation);
+                FullBounds = FullBounds.TranslatedBy(0, yTranslation).ResizedBy(0, -yTranslation);
             }
             base.OnChildRemoved(child);
         }

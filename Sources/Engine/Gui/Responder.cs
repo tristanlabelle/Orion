@@ -94,9 +94,7 @@ namespace Orion.Engine.Gui
                     if (eventCanSink)
                     {
                         if (!child.IsMouseOver)
-                        {
                             child.DispatchMouseEvent(MouseEventType.Entered, args);
-                        }
 
                         child.cursorPosition = args.Position;
                         eventCanSink &= child.PropagateMouseEvent(type, args);

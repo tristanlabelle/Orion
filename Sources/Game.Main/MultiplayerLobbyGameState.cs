@@ -6,6 +6,9 @@ using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
+using Orion.Game.Matchmaking.Networking;
+using Orion.Game.Matchmaking.Networking.Packets;
+using System.Diagnostics;
 
 namespace Orion.Game.Main
 {
@@ -19,7 +22,8 @@ namespace Orion.Game.Main
         private static readonly int defaultPort = 41223;
 
         private readonly GameGraphics graphics;
-        private readonly SafeTransporter transporter;
+        private readonly GameNetworking networking;
+        private readonly MultiplayerLobby lobby;
         private readonly MultiplayerLobbyUI ui;
         #endregion
 
@@ -30,12 +34,20 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            try { this.transporter = new SafeTransporter(defaultPort); }
-            catch (SocketException) { this.transporter = new SafeTransporter(); }
-            this.ui = new MultiplayerLobbyUI(transporter);
+            this.networking = new GameNetworking();
+            this.lobby = new MultiplayerLobby(this.networking);
+            this.ui = new MultiplayerLobbyUI();
+
+            this.lobby.IsEnabled = false;
+
+            this.lobby.MatchesChanged += OnLobbyMatchesChanged;
+            this.lobby.JoinResponseReceived += OnJoinResponseReceived;
+
             this.ui.BackPressed += OnBackPressed;
             this.ui.HostPressed += OnHostPressed;
             this.ui.JoinPressed += OnJoinPressed;
+            this.ui.JoinByIpPressed += OnJoinByIPPressed;
+            this.ui.PingPressed += OnPingPressed;
         }
         #endregion
 
@@ -49,21 +61,25 @@ namespace Orion.Game.Main
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            OnUnshadowed();
         }
 
         protected internal override void OnShadowed()
         {
+            lobby.IsEnabled = false;
             RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()
         {
-            OnEntered();
+            RootView.Children.Add(ui);
+            ui.IsEnabled = true;
+            lobby.IsEnabled = true;
         }
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
+            lobby.Update();
             graphics.UpdateRootView(timeDeltaInSeconds);
         }
 
@@ -74,8 +90,29 @@ namespace Orion.Game.Main
 
         public override void Dispose()
         {
+            OnShadowed();
             ui.Dispose();
-            transporter.Dispose();
+            networking.Dispose();
+        }
+
+        private void OnLobbyMatchesChanged(MultiplayerLobby sender)
+        {
+            ui.ClearMatches();
+            foreach (AdvertizedMatch match in lobby.Matches)
+                ui.AddMatch(match);
+        }
+
+        private void OnJoinResponseReceived(MultiplayerLobby sender, JoinResponseEventArgs args)
+        {
+            if (args.WasAccepted)
+            {
+                Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, args.EndPoint));
+            }
+            else
+            {
+                Instant.DisplayAlert(ui, "Impossible de rejointer {0}.".FormatInvariant(args.EndPoint),
+                    () => ui.IsEnabled = true);
+            }
         }
 
         private void OnBackPressed(MultiplayerLobbyUI sender)
@@ -85,12 +122,30 @@ namespace Orion.Game.Main
 
         private void OnHostPressed(MultiplayerLobbyUI sender)
         {
-            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, null));
+            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, null));
         }
 
-        private void OnJoinPressed(MultiplayerLobbyUI sender, IPv4EndPoint targetEndPoint)
+        private void OnJoinPressed(MultiplayerLobbyUI sender, AdvertizedMatch match)
         {
-            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, transporter, targetEndPoint));
+            Join(match.EndPoint);
+        }
+
+        private void OnJoinByIPPressed(MultiplayerLobbyUI sender, IPv4EndPoint endPoint)
+        {
+            if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
+            Join(endPoint);
+        }
+
+        private void OnPingPressed(MultiplayerLobbyUI sender, IPv4EndPoint endPoint)
+        {
+            if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
+            networking.Ping(endPoint);
+        }
+
+        private void Join(IPv4EndPoint endPoint)
+        {
+            ui.IsEnabled = false;
+            lobby.Join(endPoint);
         }
         #endregion
     }

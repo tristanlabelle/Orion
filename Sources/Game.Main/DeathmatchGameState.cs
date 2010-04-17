@@ -11,6 +11,7 @@ using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation.Renderers;
+using Orion.Game.Presentation.Audio;
 
 namespace Orion.Game.Main
 {
@@ -22,10 +23,12 @@ namespace Orion.Game.Main
     {
         #region Fields
         private readonly GameGraphics graphics;
+        private readonly GameAudio audio;
         private readonly Match match;
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
         private readonly MatchUI ui;
+        private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         #endregion
 
@@ -40,6 +43,7 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.graphics = graphics;
+            this.audio = new GameAudio();
             this.match = match;
             this.commandPipeline = commandPipeline;
             this.localCommander = localCommander;
@@ -47,6 +51,7 @@ namespace Orion.Game.Main
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.ui = new MatchUI(graphics, userInputManager, matchRenderer);
+            this.audioPresenter = new MatchAudioPresenter(audio, match, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             this.ui.QuitPressed += OnQuitPressed;
@@ -95,6 +100,7 @@ namespace Orion.Game.Main
             commandPipeline.Update(lastSimulationStep.Number, timeDeltaInSeconds);
 
             graphics.UpdateRootView(timeDeltaInSeconds);
+            audioPresenter.SetViewBounds(ui.CameraBounds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
@@ -104,8 +110,10 @@ namespace Orion.Game.Main
 
         public override void Dispose()
         {
+            audioPresenter.Dispose();
             ui.Dispose();
             commandPipeline.Dispose();
+            audio.Dispose();
         }
 
         private void OnQuitPressed(MatchUI sender)
@@ -133,6 +141,7 @@ namespace Orion.Game.Main
 
             if (faction == localCommander.Faction)
             {
+                audioPresenter.PlayDefeatSound();
                 ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
                 return;
             }
@@ -141,7 +150,8 @@ namespace Orion.Game.Main
                 .Where(f => localCommander.Faction.GetDiplomaticStance(f) == DiplomaticStance.Enemy)
                 .All(f => f == faction || f.Status == FactionStatus.Defeated);
             if (!allEnemyFactionsDefeated) return;
-            
+
+            audioPresenter.PlayVictorySound();
             ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
         }
         #endregion

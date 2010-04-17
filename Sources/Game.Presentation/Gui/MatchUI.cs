@@ -56,10 +56,8 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         private readonly GameGraphics gameGraphics;
-        private readonly GameAudio gameAudio;
         private readonly UserInputManager userInputManager;
         private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly MatchAudioPresenter matchAudioPresenter;
         private readonly ActionPanel actionPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
@@ -75,12 +73,9 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(matchRenderer, "matchRenderer");
 
             this.gameGraphics = gameGraphics;
-            this.gameAudio = new GameAudio();
             this.userInputManager = userInputManager;
 
             Match.FactionMessageReceived += OnFactionMessageReceived;
-
-            this.matchAudioPresenter = new MatchAudioPresenter(gameAudio, Match, this.userInputManager);
 
             World world = Match.World;
             world.FactionDefeated += OnFactionDefeated;
@@ -94,7 +89,6 @@ namespace Orion.Game.Presentation.Gui
             worldView.MinimumVisibleBoundsSize = new Vector2(8, 4);
             worldView.BoundsChanged += OnWorldViewBoundsChanged;
             Children.Add(worldView);
-            matchAudioPresenter.SetViewBounds(worldView.Bounds);
 
             Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
             ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalFaction);
@@ -209,6 +203,11 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Properties
+        public Rectangle CameraBounds
+        {
+            get { return worldView.Bounds; }
+        }
+
         private SelectionManager SelectionManager
         {
             get { return userInputManager.SelectionManager; }
@@ -438,7 +437,6 @@ namespace Orion.Game.Presentation.Gui
         private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
         {
             Rectangle newBounds = sender.Bounds;
-            matchAudioPresenter.SetViewBounds(newBounds);
             worldView.FullBounds = World.Bounds
                 .TranslatedBy(-newBounds.Extent)
                 .ResizedBy(newBounds.Width, newBounds.Height);

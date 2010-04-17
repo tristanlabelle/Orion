@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Audio
     public sealed class MatchAudioPresenter : IDisposable
     {
         #region Fields
-        private readonly GameAudio gameAudio;
+        private readonly GameAudio audio;
         private readonly Match match;
         private readonly UserInputManager userInputManager;
 
@@ -38,13 +38,13 @@ namespace Orion.Game.Presentation.Audio
         #endregion
 
         #region Constructors
-        public MatchAudioPresenter(GameAudio gameAudio, Match match, UserInputManager userInputManager)
+        public MatchAudioPresenter(GameAudio audio, Match match, UserInputManager userInputManager)
         {
-            Argument.EnsureNotNull(gameAudio, "gameAudio");
+            Argument.EnsureNotNull(audio, "audio");
             Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
 
-            this.gameAudio = gameAudio;
+            this.audio = audio;
             this.match = match;
             this.userInputManager = userInputManager;
             this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
@@ -85,7 +85,17 @@ namespace Orion.Game.Presentation.Audio
         #region Methods
         public void SetViewBounds(Rectangle viewBounds)
         {
-            gameAudio.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 100.0f);
+            audio.ListenerPosition = new Vector3(viewBounds.CenterX, viewBounds.CenterY, viewBounds.Width / 100.0f);
+        }
+
+        public void PlayDefeatSound()
+        {
+            audio.PlayUISound("Defeat");
+        }
+
+        public void PlayVictorySound()
+        {
+            audio.PlayUISound("Victory");
         }
 
         public void Dispose()
@@ -101,7 +111,7 @@ namespace Orion.Game.Presentation.Audio
             
             if (unit.Type.Name == "Chuck Norris")
             {
-                gameAudio.PlayUISound("Chuck Norris.Spawn");
+                audio.PlayUISound("Chuck Norris.Spawn");
                 return;
             }
 
@@ -110,12 +120,12 @@ namespace Orion.Game.Presentation.Audio
             if (unit.IsBuilding && unit.IsUnderConstruction)
             {
                 unit.ConstructionCompleted += OnBuildingConstructionCompleted;
-                gameAudio.PlaySfx("UnderConstruction", unit.Center);
+                audio.PlaySfx("UnderConstruction", unit.Center);
                 return;
             }
 
-            string soundName = gameAudio.GetUnitSoundName(unit.Type, "Select");
-            gameAudio.PlaySfx(soundName, unit.Center);
+            string soundName = audio.GetUnitSoundName(unit.Type, "Select");
+            audio.PlaySfx(soundName, unit.Center);
         }
 
         private void OnEntityRemoved(EntityManager sender, Entity entity)
@@ -129,8 +139,8 @@ namespace Orion.Game.Presentation.Audio
         {
             building.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
 
-            string soundName = gameAudio.GetUnitSoundName(building.Type, "Select");
-            gameAudio.PlaySfx(soundName, building.Center);
+            string soundName = audio.GetUnitSoundName(building.Type, "Select");
+            audio.PlaySfx(soundName, building.Center);
         }
 
         private void OnWorldUpdated(World sender, SimulationStep step)
@@ -142,7 +152,7 @@ namespace Orion.Game.Presentation.Audio
                 isGameStarted = true;
 
                 if (userInputManager.LocalFaction.Color == Colors.Magenta)
-                    gameAudio.PlayUISound("Tapette");
+                    audio.PlayUISound("Tapette");
             }
         }
 
@@ -167,8 +177,8 @@ namespace Orion.Game.Presentation.Audio
 
             if (unitType == null) return;
 
-            string soundName = gameAudio.GetUnitSoundName(unitType, "Select");
-            gameAudio.PlayUISound(soundName);
+            string soundName = audio.GetUnitSoundName(unitType, "Select");
+            audio.PlayUISound(soundName);
         }
 
         private void OnCommandIssued(Commander sender, Command args)
@@ -179,8 +189,8 @@ namespace Orion.Game.Presentation.Audio
             if (unitType == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);
-            string soundName = gameAudio.GetUnitSoundName(unitType, commandName);
-            gameAudio.PlayUISound(soundName);
+            string soundName = audio.GetUnitSoundName(unitType, commandName);
+            audio.PlayUISound(soundName);
         }
 
         private void OnUnitHitting(World sender, HitEventArgs args)
@@ -191,7 +201,7 @@ namespace Orion.Game.Presentation.Audio
             bool isMelee = args.Hitter.GetStat(AttackSkill.RangeStat) == 0;
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
-            gameAudio.PlaySfx(soundName, args.Hitter.Center);
+            audio.PlaySfx(soundName, args.Hitter.Center);
         }
 
         private void OnUnderAttackWarning(UnderAttackMonitor sender, Vector2 position)
@@ -202,14 +212,14 @@ namespace Orion.Game.Presentation.Audio
                 .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
 
             string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
-            gameAudio.PlayUISound(soundName);
+            audio.PlayUISound(soundName);
         }
 
         private void OnExplosionOccured(World sender, Circle args)
         {
             if (hasExplosionOccuredInFrame) return;
 
-            gameAudio.PlaySfx("Explosion", null);
+            audio.PlaySfx("Explosion", null);
             hasExplosionOccuredInFrame = true;
         }
         #endregion

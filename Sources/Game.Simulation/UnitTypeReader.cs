@@ -9,6 +9,7 @@ using System.Globalization;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Skills;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation
 {
@@ -21,7 +22,18 @@ namespace Orion.Game.Simulation
         public static UnitTypeBuilder Read(string path)
         {
             using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                return Read(stream);
+            {
+                UnitTypeBuilder unitTypeBuilder = Read(stream);
+
+#if DEBUG
+                if (unitTypeBuilder.Name != Path.GetFileNameWithoutExtension(path))
+                {
+                    Debug.Fail("Unit {0} is defined in a file with a different name.".FormatInvariant(unitTypeBuilder.Name));
+                }
+#endif
+
+                return unitTypeBuilder;
+            }
         }
 
         public static UnitTypeBuilder Read(Stream stream)

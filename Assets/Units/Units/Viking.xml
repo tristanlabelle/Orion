@@ -7,5 +7,6 @@
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Thor" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="Obélix" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

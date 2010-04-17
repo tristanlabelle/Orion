@@ -43,26 +43,25 @@ namespace Orion.Game.Main
             this.hostEndPoint = hostEndPoint;
 
             this.playerSettings = new PlayerSettings();
-            this.matchSettings.Changed += OnMatchSettingsChanged;
-            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
 
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
             builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
 
             this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders, IsHost);
+            this.ui.PlayerColorChanged += OnColorChanged;
+            this.ui.ExitPressed += OnExitPressed;
 
             if (IsHost)
             {
                 this.playerSettings.PlayerJoined += OnPlayerAdded;
                 this.playerSettings.PlayerLeft += OnPlayerRemoved;
                 this.playerSettings.PlayerChanged += OnColorChanged;
+                this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
                 this.matchSettings.Changed += OnMatchSettingsChanged;
                 this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
                 this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
                 this.ui.StartGamePressed += OnStartGamePressed;
             }
-            this.ui.PlayerColorChanged += OnColorChanged;
-            this.ui.ExitPressed += OnExitPressed;
 
             this.networking.PacketReceived += OnPacketReceived;
         }
@@ -202,7 +201,10 @@ namespace Orion.Game.Main
         private void OnColorChanged(MatchConfigurationUI ui, Player player, ColorRgb newColor)
         {
             if (IsHost)
+            {
+                player.Color = newColor;
                 networking.Send(new ColorChangePacket(IndexOfPlayer(player), newColor), Clients);
+            }
             else if (player is LocalPlayer)
                 networking.Send(new ColorChangeRequestPacket(newColor), hostEndPoint.Value);
         }

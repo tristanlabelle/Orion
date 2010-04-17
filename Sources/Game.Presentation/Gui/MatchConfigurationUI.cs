@@ -189,7 +189,7 @@ namespace Orion.Game.Presentation.Gui
             colorsDropdownList.StringConverter = (color) => Colors.GetName(color);
             colorsDropdownList.SelectedItem = player.Color;
             colorsDropdownList.Enabled = isGameMaster || player is LocalPlayer;
-            colorsDropdownList.SelectionChanged += (dropdown, color) => PlayerColorChanged.Raise(this, player, color);
+            colorsDropdownList.SelectionChanged += (dropdown, color) =>PlayerColorChanged.Raise(this, player, color);
             if(isGameMaster && !(player is LocalPlayer))
             {
                 Button kick = new Button(kickRect, "X");

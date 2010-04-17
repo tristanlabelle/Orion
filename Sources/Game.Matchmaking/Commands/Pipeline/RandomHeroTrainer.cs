@@ -92,11 +92,15 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
         {
             while (true)
             {
-                UnitTypeUpgrade upgrade = unitType.Upgrades
-                    .FirstOrDefault(u => u.AladdiumCost == 0
-                        && u.AlageneCost == 0
-                        && match.Random.NextDouble() <= probability);
-                if (upgrade == null) break;
+                var heroUpgrades = unitType.Upgrades
+                    .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
+
+                int upgradeCount = heroUpgrades.Count();
+                if (match.Random.NextDouble() >= probability)
+                    break;
+
+                int upgradeIndex = match.Random.Next(upgradeCount);
+                UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
 
                 UnitType heroUnitType = UnitTypes.FromName(upgrade.Target);
                 if (heroUnitType == null)

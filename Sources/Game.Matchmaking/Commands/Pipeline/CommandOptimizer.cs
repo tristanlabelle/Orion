@@ -25,6 +25,8 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
         public override void Update(int updateNumber, float timeDeltaInSeconds)
         {
+            if (commands.Count == 0) return;
+
             RemoveSameUnitCommands();
             AggregateTrainCommands();
 
@@ -33,36 +35,47 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             commands.Clear();
         }
 
+        /// <summary>
+        /// Removes commands concerning units which are assigned another command right after.
+        /// </summary>
         private void RemoveSameUnitCommands()
         {
-            for (int i = commands.Count - 1; i > 0; --i)
+            for (int i = 0; i < commands.Count - 1;)
             {
                 Command command = commands[i];
-                if (command.IsMandatory) continue;
+                if (command.IsMandatory)
+                {
+                    ++i;
+                    continue;
+                }
 
                 concernedHandles.Clear();
                 concernedHandles.UnionWith(command.ExecutingUnitHandles);
 
-                int optimizeableCount = 0;
-                do
+                Command nextCommand = commands[i + 1];
+                if (nextCommand.IsMandatory)
                 {
-                    Command previousCommand = commands[i - 1 - optimizeableCount];
-                    if (previousCommand.IsMandatory) break;
-
-                    bool isOptimizeable = command.FactionHandle == previousCommand.FactionHandle
-                        && concernedHandles.SetEquals(previousCommand.ExecutingUnitHandles);
-                    if (!isOptimizeable) break;
-
-                    ++optimizeableCount;
-                } while (i - optimizeableCount > 0);
-
-                if (optimizeableCount > 0)
-                {
-                    commands.RemoveRange(i - optimizeableCount, optimizeableCount);
+                    i += 2;
+                    continue;
                 }
+
+                bool isOptimizeable = command.FactionHandle == nextCommand.FactionHandle
+                    && concernedHandles.SetEquals(nextCommand.ExecutingUnitHandles);
+                if (!isOptimizeable)
+                {
+                    ++i;
+                    continue;
+                }
+
+                // Remove the current command as the next one concerns the same units.
+                commands.RemoveAt(i);
             }
         }
 
+        /// <summary>
+        /// Merges successive train commands involving the same trainers and the
+        /// same trainee type to single commands with a greater trainee count.
+        /// </summary>
         private void AggregateTrainCommands()
         {
             for (int i = 0; i < commands.Count - 1; ++i)
@@ -73,7 +86,6 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 concernedHandles.Clear();
                 concernedHandles.UnionWith(trainCommand.ExecutingUnitHandles);
 
-                int aggregateableCount = 0;
                 int aggregatedTraineeCount = trainCommand.TraineeCount;
                 do
                 {
@@ -85,13 +97,12 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                         && concernedHandles.SetEquals(nextTrainCommand.ExecutingUnitHandles);
                     if (!isAggregateable) break;
 
-                    ++aggregateableCount;
                     aggregatedTraineeCount += nextTrainCommand.TraineeCount;
+                    commands.RemoveAt(i + 1);
                 } while (i < commands.Count - 1);
 
-                if (aggregateableCount > 0)
+                if (aggregatedTraineeCount > trainCommand.TraineeCount)
                 {
-                    commands.RemoveRange(i + 1, aggregateableCount);
                     commands[i] = new TrainCommand(trainCommand.FactionHandle, concernedHandles,
                         trainCommand.TraineeTypeHandle, aggregatedTraineeCount);
                 }

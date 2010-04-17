@@ -300,40 +300,38 @@ namespace Orion.Game.Presentation
         {
             if (Selection.Type != SelectionType.Units) return;
 
-            if (target.Faction == commander.Faction)
+            if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Enemy)
             {
-                if (target.HasSkill<ExtractAlageneSkill>())
+                LaunchAttack(target);
+                return;
+            }
+
+            if (target.HasSkill<ExtractAlageneSkill>())
+            {
+                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                 {
-                    if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
-                        LaunchChangeRallyPoint(target.Center);
-                    else
-                    {
-                        ResourceNode alageneNode = World.Entities
-                            .OfType<ResourceNode>()
-                            .FirstOrDefault(node => node.Position == target.Position);
-                        if (alageneNode != null && alageneNode.IsHarvestableByFaction(LocalFaction))
-                            LaunchHarvest(alageneNode);
-                    }
+                    LaunchChangeRallyPoint(target.Center);
                 }
-                else if (target.IsBuilding)
-                    LaunchRepair(target);
-                else if (!target.IsBuilding && target.Damage > 0)
-                    LaunchHeal(target);
                 else
-                    LaunchMove(target.Position);
+                {
+                    ResourceNode alageneNode = World.Entities
+                        .OfType<ResourceNode>()
+                        .FirstOrDefault(node => node.Position == target.Position);
+                    if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
+                        LaunchHarvest(alageneNode);
+                }
             }
+            else if (target.IsBuilding && target.Damage > 0)
+                LaunchRepair(target);
+            else if (!target.IsBuilding && target.Damage > 0)
+                LaunchHeal(target);
             else
-            {
-                if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Ally)
-                    LaunchMove(target.Center);
-                else
-                    LaunchAttack(target);
-            }
+                LaunchMove(target.Position);
         }
 
         private void LaunchDefaultCommand(ResourceNode target)
         {
-            if (target.IsHarvestableByFaction(LocalFaction))
+            if (LocalFaction.CanHarvest(target))
                 LaunchHarvest(target);
             else
                 LaunchMove(target.Position);
@@ -390,29 +388,33 @@ namespace Orion.Game.Presentation
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<TrainSkill>()
-                && unit.IsBuilding);
-            commander.LaunchChangeRallyPoint(targetUnits, at);
+            IEnumerable<Unit> targets = Selection.Units
+                .Where(unit => unit.Faction == LocalFaction
+                    && unit.IsBuilding
+                    && unit.HasSkill<TrainSkill>());
+            commander.LaunchChangeRallyPoint(targets, at);
         }
 
         public void LaunchRepair(Unit building)
         {
-            if (building.Faction != LocalFaction || !building.IsBuilding) return;
+            Argument.EnsureNotNull(building, "building");
+
+            if (!building.IsBuilding) return;
            
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
             commander.LaunchRepair(targetUnits, building);
         }
 
-        public void LaunchHeal(Unit hurtUnit)
+        public void LaunchHeal(Unit target)
         {
-            if (hurtUnit.Type.IsBuilding) return;
+            Argument.EnsureNotNull(target, "target");
+            if (target.Type.IsBuilding) return;
 
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<HealSkill>());
-            if (targetUnits.Any(unit => unit.Faction != hurtUnit.Faction)) return;
-            commander.LaunchHeal(targetUnits, hurtUnit);
+            IEnumerable<Unit> healers = Selection.Units
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<HealSkill>());
+            if (healers.Any(unit => unit.Faction != target.Faction)) return;
+            commander.LaunchHeal(healers, target);
         }
 
         public void LaunchTrain(UnitType unitType)

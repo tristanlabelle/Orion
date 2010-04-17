@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 ResourceNode resourceNode = World.Entities
                     .Intersecting(location)
                     .OfType<ResourceNode>()
-                    .FirstOrDefault(node => node.IsHarvestableByFaction(LocalFaction));
+                    .FirstOrDefault(node => LocalFaction.CanHarvest(node));
                 if (resourceNode == null) return;
 
                 InputManager.LaunchHarvest(resourceNode);

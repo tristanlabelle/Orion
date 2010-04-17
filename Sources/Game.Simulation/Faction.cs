@@ -322,17 +322,6 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
-
-            if (type.HasSkill<ExtractAlageneSkill>())
-            {
-                ResourceNode alageneNode = World.Entities
-                                .OfType<ResourceNode>()
-                                .First(node => node.Position == point
-                                && node.Type == ResourceType.Alagene);
-
-                alageneNode.Extractor = unit;
-            }
-
             if (unit.IsBuilding)
             {
                 unit.ConstructionCompleted += buildingConstructionCompleted;
@@ -399,7 +388,6 @@ namespace Orion.Game.Simulation
             if (unit.HasSkill<ProvideFoodSkill>())
                 totalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
         }
-        #endregion
 
         /// <summary>
         /// Suicides all units in this faction.
@@ -410,6 +398,24 @@ namespace Orion.Game.Simulation
             foreach (Unit unit in units)
                 unit.Suicide();
         }
+
+        /// <summary>
+        /// Tests if a given resource node can be harvested by harvesters of this faction.
+        /// </summary>
+        /// <param name="node">The resource node to be tested.</param>
+        /// <returns><c>True</c> if the resource node can be harvested, <c>false</c> otherwise.</returns>
+        public bool CanHarvest(ResourceNode node)
+        {
+            Argument.EnsureNotNull(node, "node");
+
+            if (node.Type == ResourceType.Aladdium) return true;
+
+            Unit extractor = world.Entities.GetGroundEntityAt(node.Position) as Unit;
+            return extractor != null
+                && extractor.HasSkill<ExtractAlageneSkill>()
+                && GetDiplomaticStance(extractor.Faction) == DiplomaticStance.Ally;
+        }
+        #endregion
 
         /// <summary>
         /// Marks this faction as defeated. Does not cause a mass suicide.

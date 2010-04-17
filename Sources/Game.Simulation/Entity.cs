@@ -106,7 +106,10 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets the position of the origin of this <see cref="Entity"/>.
         /// </summary>
-        public abstract Vector2 Position { get; }
+        public Vector2 Position
+        {
+            get { return GetPosition(); }
+        }
 
         /// <summary>
         /// Gets the position of the center of this <see cref="Entity"/>.
@@ -191,6 +194,8 @@ namespace Orion.Game.Simulation
         {
             if (IsAlive) DoUpdate(step);
         }
+
+        protected abstract Vector2 GetPosition();
 
         protected virtual void DoUpdate(SimulationStep step) { }
         #endregion

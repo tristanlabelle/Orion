@@ -19,7 +19,6 @@ namespace Orion.Game.Simulation
         private readonly int totalAmount;
         private readonly Point position;
         private int amountRemaining;
-        private Unit extractor = null;
         #endregion
 
         #region Constructors
@@ -58,7 +57,7 @@ namespace Orion.Game.Simulation
             get { return DefaultSize; }
         }
 
-        public override Vector2 Position
+        public new Point Position
         {
             get { return position; }
         }
@@ -66,17 +65,6 @@ namespace Orion.Game.Simulation
         public override CollisionLayer CollisionLayer
         {
             get { return type == ResourceType.Alagene ? CollisionLayer.None : CollisionLayer.Ground; }
-        }
-
-        public Unit Extractor
-        {
-            get { return extractor; }
-            set 
-            {
-                Argument.EnsureNotNull(value, "Extractor");
-                extractor = value;
-                extractor.Died += new Action<Entity>(OnExtractorDied);
-            }
         }
         #endregion
 
@@ -103,15 +91,9 @@ namespace Orion.Game.Simulation
             return "{0} {1} node".FormatInvariant(Handle, type);
         }
 
-        public bool IsHarvestableByFaction(Faction faction)
+        protected override Vector2 GetPosition()
         {
-            return (type != ResourceType.Alagene)
-                || (extractor != null && extractor.Faction == faction);
-        }
-
-        private void OnExtractorDied(Entity sender)
-        {
-            extractor = null;
+            return position;
         }
         #endregion
     }

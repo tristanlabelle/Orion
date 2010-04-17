@@ -36,14 +36,11 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(repairer, "unit");
             Argument.EnsureNotNull(target, "target");
             if (!repairer.HasSkill<BuildSkill>())
-                throw new ArgumentException("Cannot repair without the repair skill.", "unit");
+                throw new ArgumentException("Cannot repair without the build skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
-
             if (!target.Type.IsBuilding)
                 throw new ArgumentException("Can only repair buildings.", "target");
-            if (repairer.Faction != target.Faction)
-                throw new ArgumentException("Cannot repair other faction buildings.", "target");
 
             this.target = target;
             this.targetDiedEventHandler = OnBuildingDied;

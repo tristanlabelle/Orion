@@ -120,7 +120,7 @@ namespace Orion.Game.Simulation.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
-                Unit.SetPosition(targetPosition);
+                Unit.Position = targetPosition;
             }
             else
             {

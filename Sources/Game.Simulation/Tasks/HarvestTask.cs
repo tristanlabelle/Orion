@@ -78,7 +78,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateExtracting(SimulationStep step)
         {
-            if (!node.IsAlive || !node.IsHarvestableByFaction(Unit.Faction))
+            if (!node.IsAlive || !Unit.Faction.CanHarvest(node))
             {
                 if (amountCarrying == 0)
                 {
@@ -159,7 +159,7 @@ namespace Orion.Game.Simulation.Tasks
                 Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
-            if (!node.IsAlive || !node.IsHarvestableByFaction(Unit.Faction))
+            if (!node.IsAlive || !Unit.Faction.CanHarvest(node))
             {
                 Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
                 MarkAsEnded();

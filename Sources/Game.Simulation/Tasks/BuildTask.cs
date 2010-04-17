@@ -97,14 +97,6 @@ namespace Orion.Game.Simulation.Tasks
 
             buildingPlan.CreateBuilding();
 
-            if (buildingPlan.Building.HasSkill<ExtractAlageneSkill>())
-            {
-                ResourceNode node = Unit.World.Entities
-                    .OfType<ResourceNode>()
-                    .First(n => n.BoundingRectangle.ContainsPoint(buildingPlan.Location));
-                node.Extractor = buildingPlan.Building;
-            }
-
             Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
             MarkAsEnded();
         }

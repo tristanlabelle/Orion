@@ -144,9 +144,22 @@ namespace Orion.Game.Simulation
             get { return type.Size; }
         }
 
-        public override Vector2 Position
+        public new Vector2 Position
         {
             get { return position; }
+            set
+            {
+                if (value == position) return;
+                if (!World.Bounds.ContainsPoint(value))
+                {
+                    Debug.Fail("Position out of bounds.");
+                    value = World.Bounds.Clamp(value);
+                }
+
+                Vector2 oldPosition = position;
+                position = value;
+                RaiseMoved(oldPosition, position);
+            }
         }
 
         /// <summary>
@@ -334,22 +347,9 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Position/Angle
-        /// <summary>
-        /// Changes the position of this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="value">A new world</param>
-        public void SetPosition(Vector2 value)
+        protected override Vector2 GetPosition()
         {
-            if (value == position) return;
-            if (!World.Bounds.ContainsPoint(value))
-            {
-                Debug.Fail("Position out of bounds.");
-                value = World.Bounds.Clamp(value);
-            }
-
-            Vector2 oldPosition = position;
-            position = value;
-            RaiseMoved(oldPosition, position);
+            return Position;
         }
 
         /// <summary>
@@ -495,7 +495,7 @@ namespace Orion.Game.Simulation
                     .OfType<ResourceNode>()
                     .FirstOrDefault();
 
-                if (resourceNode != null && resourceNode.IsHarvestableByFaction(faction))
+                if (resourceNode != null && faction.CanHarvest(resourceNode))
                 {
                     HarvestTask harvestTask = new HarvestTask(this, resourceNode);
                     taskQueue.OverrideWith(harvestTask);

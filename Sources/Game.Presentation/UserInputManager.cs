@@ -306,7 +306,14 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (target.HasSkill<ExtractAlageneSkill>())
+            if (target.Damage > 0)
+            {
+                if (target.IsBuilding) LaunchRepair(target);
+                else LaunchHeal(target);
+
+                return;
+            }
+            else if (target.HasSkill<ExtractAlageneSkill>())
             {
                 if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
                 {
@@ -319,14 +326,14 @@ namespace Orion.Game.Presentation
                         .FirstOrDefault(node => node.Position == target.Position);
                     if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
                         LaunchHarvest(alageneNode);
+                    else
+                        LaunchMove(target.Position);
                 }
+
+                return;
             }
-            else if (target.IsBuilding && target.Damage > 0)
-                LaunchRepair(target);
-            else if (!target.IsBuilding && target.Damage > 0)
-                LaunchHeal(target);
-            else
-                LaunchMove(target.Position);
+            
+            LaunchMove(target.Position);
         }
 
         private void LaunchDefaultCommand(ResourceNode target)

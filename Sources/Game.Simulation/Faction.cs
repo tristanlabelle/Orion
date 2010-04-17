@@ -413,6 +413,7 @@ namespace Orion.Game.Simulation
             Unit extractor = world.Entities.GetGroundEntityAt(node.Position) as Unit;
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()
+                && !extractor.IsUnderConstruction
                 && GetDiplomaticStance(extractor.Faction) == DiplomaticStance.Ally;
         }
         #endregion

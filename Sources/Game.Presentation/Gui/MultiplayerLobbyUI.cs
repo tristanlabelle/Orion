@@ -20,11 +20,13 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly ListPanel matchListPanel;
         private readonly Rectangle matchButtonFrame;
+        private readonly string defaultGameName;
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyUI()
+        public MultiplayerLobbyUI(string defaultGameName)
         {
+            this.defaultGameName = defaultGameName;
             Rectangle matchListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
             matchButtonFrame = new Rectangle(matchListFrame.Width - 20, 30);
             matchListPanel = new ListPanel(matchListFrame, new Vector2(10, 10));
@@ -32,7 +34,7 @@ namespace Orion.Game.Presentation.Gui
 
             Rectangle hostFrame = new Rectangle(matchListFrame.MaxX + 10, matchListFrame.MaxY, 200, -50);
             Button hostButton = new Button(hostFrame, "Héberger");
-            hostButton.Triggered += (sender) => HostPressed.Raise(this);
+            hostButton.Triggered += OnHostButtonPressed;
             Children.Add(hostButton);
 
             Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
@@ -61,7 +63,7 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the user decided to host a game through the UI.
         /// </summary>
-        public event Action<MultiplayerLobbyUI> HostPressed;
+        public event Action<MultiplayerLobbyUI, string> HostPressed;
 
         /// <summary>
         /// Raised when the user decided to join a game through the UI.
@@ -109,6 +111,11 @@ namespace Orion.Game.Presentation.Gui
             Button button = new Button(matchButtonFrame, caption);
             button.Triggered += b => JoinPressed.Raise(this, match);
             matchListPanel.Children.Add(button);
+        }
+
+        private void OnHostButtonPressed(Button sender)
+        {
+            Instant.Prompt(this, "Entrez le nom de la partie à créer.", defaultGameName, str => HostPressed.Raise(this, str));
         }
 
         private void OnJoinByIPPressed(Button sender)

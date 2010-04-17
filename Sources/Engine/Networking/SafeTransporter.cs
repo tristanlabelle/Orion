@@ -47,6 +47,11 @@ namespace Orion.Engine.Networking
         private readonly Socket socket;
 
         /// <summary>
+        /// The port on which the underlying socket is bound.
+        /// </summary>
+        private readonly ushort port;
+
+        /// <summary>
         /// A collection of addresses assigned to this computer.
         /// </summary>
         private readonly ReadOnlyCollection<IPv4Address> localAddresses;
@@ -91,6 +96,8 @@ namespace Orion.Engine.Networking
             socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
             socket.MulticastLoopback = false;
+
+            port = ((IPEndPoint)socket.LocalEndPoint).Port;
 
             // Attempt to find the addresses of this computer to detect
             // broadcasts which come back to this computer and ignore them.
@@ -153,7 +160,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public ushort Port
         {
-            get { return (ushort)((IPEndPoint)socket.LocalEndPoint).Port; }
+            get { return port; }
         }
         #endregion
 
@@ -224,7 +231,7 @@ namespace Orion.Engine.Networking
                         }
 
                         IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
-                        if (localAddresses.Contains(ipv4SenderEndPoint.Address)
+                        if (localAddresses.Contains(ipv4SenderEndPoint.Address) && ipv4SenderEndPoint.Port == Port
                             && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
                         {
                             // Ignore packets we broadcasted ourself.
@@ -367,7 +374,7 @@ namespace Orion.Engine.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message.Array, "message.Array");
             Debug.Assert(message.Count < 512, "Warning: A network message exceeded 512 bytes.");
-            Debug.Assert(!localAddresses.Contains(hostEndPoint.Address), "Sending a packet to ourself.");
+            Debug.Assert(!(localAddresses.Contains(hostEndPoint.Address) && hostEndPoint.Port == Port), "Sending a packet to ourself.");
 
             lock (peers)
             {

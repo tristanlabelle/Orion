@@ -25,13 +25,14 @@ namespace Orion.Game.Main
         private readonly MatchConfigurationUI ui;
         private readonly GameNetworking networking;
         private readonly IPv4EndPoint? hostEndPoint;
-        private readonly string matchName = "Foo";
+        private readonly string matchName;
         #endregion
 
         #region Constructors
-        public MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics, GameNetworking networking, IPv4EndPoint? hostEndPoint)
+        public MultiplayerDeathmatchSetupGameState(GameStateManager manager, string matchName, GameGraphics graphics, GameNetworking networking, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
+            this.matchName = matchName;
             Argument.EnsureNotNull(manager, "manager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(networking, "networking");
@@ -42,8 +43,8 @@ namespace Orion.Game.Main
             this.hostEndPoint = hostEndPoint;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
             this.matchSettings.Changed += OnMatchSettingsChanged;
+            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
 
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
             builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));

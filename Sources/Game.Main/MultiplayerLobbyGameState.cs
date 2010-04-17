@@ -9,6 +9,7 @@ using Orion.Game.Presentation.Gui;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Matchmaking.Networking.Packets;
 using System.Diagnostics;
+using System.Net;
 
 namespace Orion.Game.Main
 {
@@ -36,7 +37,7 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.networking = new GameNetworking();
             this.lobby = new MultiplayerLobby(this.networking);
-            this.ui = new MultiplayerLobbyUI();
+            this.ui = new MultiplayerLobbyUI(Dns.GetHostName());
 
             this.lobby.IsEnabled = false;
 
@@ -106,7 +107,8 @@ namespace Orion.Game.Main
         {
             if (args.WasAccepted)
             {
-                Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, args.EndPoint));
+                string matchName = lobby.GetMatchByAddress(args.EndPoint).Name;
+                Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, matchName, graphics, networking, args.EndPoint));
             }
             else
             {
@@ -120,9 +122,9 @@ namespace Orion.Game.Main
             Manager.Pop();
         }
 
-        private void OnHostPressed(MultiplayerLobbyUI sender)
+        private void OnHostPressed(MultiplayerLobbyUI sender, string matchName)
         {
-            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, graphics, networking, null));
+            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, matchName, graphics, networking, null));
         }
 
         private void OnJoinPressed(MultiplayerLobbyUI sender, AdvertizedMatch match)

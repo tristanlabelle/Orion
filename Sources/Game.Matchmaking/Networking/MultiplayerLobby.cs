@@ -168,7 +168,7 @@ namespace Orion.Game.Matchmaking.Networking
                 .FirstOrDefault(m => m.EndPoint == senderEndPoint);
             if (match == null)
             {
-                match = new AdvertizedMatch(senderEndPoint, senderEndPoint.ToString(), packet.OpenSlotCount);
+                match = new AdvertizedMatch(senderEndPoint, packet.Name, packet.OpenSlotCount);
                 matches.Add(match);
             }
             else

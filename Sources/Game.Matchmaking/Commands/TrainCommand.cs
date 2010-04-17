@@ -21,19 +21,30 @@ namespace Orion.Game.Matchmaking.Commands
         #region Fields
         private readonly ReadOnlyCollection<Handle> trainerHandles;
         private readonly Handle traineeTypeHandle;
+        private readonly int traineeCount;
         #endregion
 
         #region Constructors
-        public TrainCommand(Handle factionHandle, IEnumerable<Handle> trainerHandles, Handle traineeTypeHandle)
+        public TrainCommand(Handle factionHandle, IEnumerable<Handle> trainerHandles, Handle traineeTypeHandle, int traineeCount)
             : base(factionHandle)
         {
             Argument.EnsureNotNull(trainerHandles, "trainerHandles");
+            Argument.EnsureStrictlyPositive(traineeCount, "traineeCount");
+            Debug.Assert(traineeCount <= byte.MaxValue);
+
             this.trainerHandles = trainerHandles.Distinct().ToList().AsReadOnly();
             this.traineeTypeHandle = traineeTypeHandle;
+            this.traineeCount = traineeCount;
         }
 
+        public TrainCommand(Handle factionHandle, Handle trainerHandle, Handle traineeTypeHandle, int traineeCount)
+            : this(factionHandle, new[] { trainerHandle }, traineeTypeHandle, traineeCount) { }
+
+        public TrainCommand(Handle factionHandle, IEnumerable<Handle> trainerHandles, Handle traineeTypeHandle)
+            : this(factionHandle, trainerHandles, traineeTypeHandle, 1) { }
+
         public TrainCommand(Handle factionHandle, Handle trainerHandle, Handle traineeTypeHandle)
-            : this(factionHandle, new[] { trainerHandle }, traineeTypeHandle) { }
+            : this(factionHandle, trainerHandle, traineeTypeHandle, 1) { }
         #endregion
 
         #region Properties
@@ -45,6 +56,14 @@ namespace Orion.Game.Matchmaking.Commands
         public Handle TraineeTypeHandle
         {
             get { return traineeTypeHandle; }
+        }
+
+        /// <summary>
+        /// Gets the number of trainees to be queued for training.
+        /// </summary>
+        public int TraineeCount
+        {
+            get { return traineeCount; }
         }
         #endregion
 
@@ -69,43 +88,45 @@ namespace Orion.Game.Matchmaking.Commands
             int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
 
             bool taskQueueFullWarningRaised = false;
-
-            foreach (Handle trainerHandle in trainerHandles)
+            for (int i = 0; i < traineeCount; ++i)
             {
-                Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
-
-                if (trainer.TaskQueue.IsFull)
+                foreach (Handle trainerHandle in trainerHandles)
                 {
-                    // Prevent multiple "task queue full" warnings, the player only needs to know it once,
-                    // even when it applies to multiple trainers.
-                    if (!taskQueueFullWarningRaised)
+                    Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
+
+                    if (trainer.TaskQueue.IsFull)
                     {
-                        faction.RaiseWarning("Impossible d'entraîner un {0}, la queue de tâches est pleine."
-                            .FormatInvariant(traineeType.Name));
-                        taskQueueFullWarningRaised = true;
+                        // Prevent multiple "task queue full" warnings, the player only needs to know it once,
+                        // even when it applies to multiple trainers.
+                        if (!taskQueueFullWarningRaised)
+                        {
+                            faction.RaiseWarning("Impossible d'entraîner un {0}, la queue de tâches est pleine."
+                                .FormatInvariant(traineeType.Name));
+                            taskQueueFullWarningRaised = true;
+                        }
+
+                        continue;
                     }
 
-                    continue;
-                }
+                    int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
+                    if (foodCost > faction.RemainingFoodAmount)
+                    {
+                        faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
+                            .FormatInvariant(traineeType.Name));
+                        return;
+                    }
 
-                int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
-                if (foodCost > faction.RemainingFoodAmount)
-                {
-                    faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
-                        .FormatInvariant(traineeType.Name));
-                    break;
-                }
+                    if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
+                    {
+                        faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
+                            .FormatInvariant(traineeType.Name));
+                        return;
+                    }
 
-                if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
-                {
-                    faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
-                        .FormatInvariant(traineeType.Name));
-                    break;
+                    faction.AlageneAmount -= alageneCost;
+                    faction.AladdiumAmount -= aladdiumCost;
+                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
                 }
-
-                faction.AlageneAmount -= alageneCost;
-                faction.AladdiumAmount -= aladdiumCost;
-                trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
             }
         }
 
@@ -124,6 +145,7 @@ namespace Orion.Game.Matchmaking.Commands
             WriteHandle(writer, command.FactionHandle);
             WriteLengthPrefixedHandleArray(writer, command.trainerHandles);
             WriteHandle(writer, command.traineeTypeHandle);
+            writer.Write((byte)command.traineeCount);
         }
 
         public static TrainCommand Deserialize(BinaryReader reader)
@@ -133,7 +155,8 @@ namespace Orion.Game.Matchmaking.Commands
             Handle factionHandle = ReadHandle(reader);
             var trainerHandles = ReadLengthPrefixedHandleArray(reader);
             Handle traineeTypeHandle = ReadHandle(reader);
-            return new TrainCommand(factionHandle, trainerHandles, traineeTypeHandle);
+            int traineeCount = reader.ReadByte();
+            return new TrainCommand(factionHandle, trainerHandles, traineeTypeHandle, traineeCount);
         }
         #endregion
         #endregion

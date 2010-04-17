@@ -346,11 +346,6 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Launching individual commands
-        public void Cancel()
-        {
-            commander.LaunchCancel(Selection.Units);
-        }
-
         public void LaunchBuild(Point location, UnitType buildingType)
         {
             IEnumerable<Unit> builders = Selection.Units
@@ -463,7 +458,7 @@ namespace Orion.Game.Presentation
         public void LaunchCancel()
         {
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction);
+                .Where(unit => unit.Faction == LocalFaction);
             commander.LaunchCancel(targetUnits);
         }
 

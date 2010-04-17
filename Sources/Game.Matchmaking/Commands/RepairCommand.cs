@@ -14,7 +14,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to attack another <see cref="Unit"/>.
     /// </summary>
-    public sealed class RepairCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class RepairCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -35,6 +35,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return unitHandles; }
@@ -47,11 +52,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new RepairCommand(FactionHandle, entityHandles, targetHandle);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

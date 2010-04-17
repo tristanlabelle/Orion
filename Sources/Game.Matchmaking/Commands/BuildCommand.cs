@@ -17,7 +17,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// A <see cref="Command"/> which causes a <see cref="Unit"/>
     /// to be assigned the <see cref="BuildTask"/> task.
     /// </summary>
-    public sealed class BuildCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class BuildCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> builderHandles;
@@ -36,6 +36,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return builderHandles; }
@@ -53,11 +58,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new BuildCommand(FactionHandle, entityHandles, buildingTypeHandle, location);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

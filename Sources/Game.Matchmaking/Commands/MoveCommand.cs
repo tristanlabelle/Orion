@@ -16,7 +16,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// <see cref="Task"/> to move to a destination.
     /// </summary>
     [Serializable]
-    public sealed class MoveCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class MoveCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -35,6 +35,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return unitHandles; }
@@ -47,10 +52,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new MoveCommand(FactionHandle, entityHandles, destination);
-        }
 
         public override bool ValidateHandles(Match match)
         {

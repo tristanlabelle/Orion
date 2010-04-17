@@ -10,7 +10,7 @@ using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking.Commands
 {
-    public sealed class HealCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class HealCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -31,6 +31,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return unitHandles; }
@@ -43,11 +48,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new HealCommand(FactionHandle, entityHandles, targetHandle);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

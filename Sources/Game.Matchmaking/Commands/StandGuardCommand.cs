@@ -14,7 +14,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to attack another <see cref="Unit"/> without ever following it.
     /// </summary>
-    public sealed class StandGuardCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class StandGuardCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> guardHandles;
@@ -30,6 +30,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return guardHandles; }
@@ -37,11 +42,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new StandGuardCommand(FactionHandle, entityHandles);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

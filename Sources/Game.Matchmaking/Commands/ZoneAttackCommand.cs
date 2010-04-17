@@ -15,7 +15,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
     /// to move to a location and attack enemies on their way.
     /// </summary>
-    public sealed class ZoneAttackCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class ZoneAttackCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> attackerHandles;
@@ -34,6 +34,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return attackerHandles; }
@@ -46,11 +51,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new ZoneAttackCommand(FactionHandle, entityHandles, destination);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

@@ -14,7 +14,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>
     /// to be assigned to some <see cref="Unit"/>s.
     /// </summary>
-    public sealed class HarvestCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class HarvestCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> harvesterHandles;
@@ -32,6 +32,11 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Properties
+        public override bool IsMandatory
+        {
+            get { return false; }
+        }
+
         public override IEnumerable<Handle> ExecutingUnitHandles
         {
             get { return harvesterHandles; }
@@ -44,11 +49,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new HarvestCommand(FactionHandle, entityHandles, resourceNodeHandle);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

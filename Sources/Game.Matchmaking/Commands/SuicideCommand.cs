@@ -13,7 +13,7 @@ namespace Orion.Game.Matchmaking.Commands
     /// <summary>
     /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.
     /// </summary>
-    public sealed class SuicideCommand : Command, IMultipleExecutingEntitiesCommand
+    public sealed class SuicideCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
@@ -36,11 +36,6 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Methods
-        public IMultipleExecutingEntitiesCommand CopyWithEntities(IEnumerable<Handle> entityHandles)
-        {
-            return new SuicideCommand(FactionHandle, entityHandles);
-        }
-
         public override bool ValidateHandles(Match match)
         {
             Argument.EnsureNotNull(match, "match");

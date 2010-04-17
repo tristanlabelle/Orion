@@ -39,6 +39,16 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         /// <summary>
+        /// Gets a value indicating if this <see cref="Command"/>
+        /// must be executed even if other commands for the same units
+        /// are issued within a short lapse of time.
+        /// </summary>
+        public virtual bool IsMandatory
+        {
+            get { return true; }
+        }
+
+        /// <summary>
         /// Gets a sequence of handles to <see cref="Unit">units</see> executing in this command.
         /// </summary>
         public abstract IEnumerable<Handle> ExecutingUnitHandles { get; }

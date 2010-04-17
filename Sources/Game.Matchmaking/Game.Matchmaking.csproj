@@ -48,7 +48,6 @@
     <Compile Include="AIPlayer.cs" />
     <Compile Include="Commands\Pipeline\RandomHeroTrainer.cs" />
     <Compile Include="AICommander.cs" />
-    <Compile Include="Commands\IMultipleExecutingEntitiesCommand.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">
       <SubType>Code</SubType>
     </Compile>

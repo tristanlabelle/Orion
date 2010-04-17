@@ -111,6 +111,7 @@ namespace Orion.Game.Presentation.Renderers
         public void Dispose()
         {
             obstacleMaskTexture.Dispose();
+            splattingMaskTexture.Dispose();
         }
 
         private static Texture CreateObstacleMaskTexture(Terrain terrain)

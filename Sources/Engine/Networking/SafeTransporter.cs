@@ -165,17 +165,23 @@ namespace Orion.Engine.Networking
         #endregion
 
         #region Methods
-        #region Peer Link Management
-        private PeerLink GetOrCreatePeerLink(IPv4EndPoint ipEndPoint)
+        #region Private Helpers
+        private PeerLink GetOrCreatePeerLink(IPv4EndPoint endPoint)
         {
-            PeerLink peer = peers.FirstOrDefault(p => p.EndPoint == ipEndPoint);
+            PeerLink peer = peers.FirstOrDefault(p => p.EndPoint == endPoint);
             if (peer == null)
             {
-                peer = new PeerLink(ipEndPoint);
+                peer = new PeerLink(endPoint);
                 peers.Add(peer);
             }
 
             return peer;
+        }
+
+        private bool IsSelf(IPv4EndPoint endPoint)
+        {
+            return localAddresses.Contains(endPoint.Address)
+                && endPoint.Port == port;
         }
         #endregion
 
@@ -184,15 +190,14 @@ namespace Orion.Engine.Networking
         {
             try
             {
-                while (true)
+                while (!isDisposed)
                 {
-                    if (isDisposed) break;
                     UpdateReceiving();
-
                     if (isDisposed) break;
+
                     UpdateSending();
-
                     if (isDisposed) break;
+
                     Thread.Sleep(10);
                 }
             }
@@ -206,49 +211,40 @@ namespace Orion.Engine.Networking
 
         private void UpdateReceiving()
         {
-            // The socket is locked once even if multiple packets are te be received.
-            // This was chosen over locking while receiving and unlocking while handling
-            // as multiple locking is supposed to be bad performance-wise.
-            lock (socket)
+            while (!isDisposed)
             {
-                if (isDisposed) return;
+                int availableDataLength = socket.Available;
+                if (availableDataLength == 0) break;
 
-                while (true)
+                Debug.Assert(availableDataLength <= receptionBuffer.Length,
+                    "Available data exceeds the length of the reception buffer. The packet data could be truncated.");
+
+                try
                 {
-                    int availableDataLength = socket.Available;
-                    if (availableDataLength == 0) break;
-
-                    Debug.Assert(availableDataLength <= receptionBuffer.Length,
-                        "Available data exceeds the length of the reception buffer. The packet data could be truncated.");
-
-                    try
+                    int packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
+                    if (packetLength == 0)
                     {
-                        int packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
-                        if (packetLength == 0)
-                        {
-                            Debug.Fail("Unexpected zero-length packet. Ignored.");
-                            break;
-                        }
-
-                        IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
-                        if (localAddresses.Contains(ipv4SenderEndPoint.Address) && ipv4SenderEndPoint.Port == Port
-                            && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
-                        {
-                            // Ignore packets we broadcasted ourself.
-                            return;
-                        }
-
-                        HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
+                        Debug.Fail("Unexpected zero-length packet. Ignored.");
+                        break;
                     }
-                    catch (SocketException e)
+
+                    IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
+                    if (IsSelf(ipv4SenderEndPoint) && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
                     {
-                        if (e.ErrorCode == WSAETIMEDOUT)
-                        {
-                            Debug.Fail("Socket.ReceiveFrom should not time out, we made sure that it had data available.");
-                            break;
-                        }
-                        throw;
+                        // Ignore packets we broadcasted ourself.
+                        return;
                     }
+
+                    HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
+                }
+                catch (SocketException e)
+                {
+                    if (e.ErrorCode == WSAETIMEDOUT)
+                    {
+                        Debug.Fail("Socket.ReceiveFrom should not time out, we made sure that it had data available.");
+                        break;
+                    }
+                    throw;
                 }
             }
         }
@@ -308,12 +304,7 @@ namespace Orion.Engine.Networking
         private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint number)
         {
             byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(number);
-
-            lock (socket)
-            {
-                if (isDisposed) return;
-                socket.SendTo(acknowledgementPacketData, hostEndPoint);
-            }
+            socket.SendTo(acknowledgementPacketData, hostEndPoint);
         }
         #endregion
 
@@ -338,12 +329,7 @@ namespace Orion.Engine.Networking
                         TimeSpan resendDelay = GetResendDelay(peer);
                         if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
                         {
-                            lock (socket)
-                            {
-                                if (isDisposed) return;
-                                socket.SendTo(packet.Data, peer.EndPoint);
-                            }
-
+                            socket.SendTo(packet.Data, peer.EndPoint);
                             packet.UpdateSendTime();
                         }
                     }
@@ -374,7 +360,7 @@ namespace Orion.Engine.Networking
             EnsureNotDisposed();
             Argument.EnsureNotNull(message.Array, "message.Array");
             Debug.Assert(message.Count < 512, "Warning: A network message exceeded 512 bytes.");
-            Debug.Assert(!(localAddresses.Contains(hostEndPoint.Address) && hostEndPoint.Port == Port), "Sending a packet to ourself.");
+            Debug.Assert(!IsSelf(hostEndPoint), "Sending a packet to ourself.");
 
             lock (peers)
             {
@@ -412,13 +398,13 @@ namespace Orion.Engine.Networking
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            lock (socket)
-            {
-                if (isDisposed) return;
-                socket.SendTo(packetData, broadcastEndPoint);
-            }
+            socket.SendTo(packetData, broadcastEndPoint);
         }
 
+        /// <summary>
+        /// Pings a given end point. Used to open firewall ports.
+        /// </summary>
+        /// <param name="endPoint">The end point to be pinged.</param>
         public void Ping(IPv4EndPoint endPoint)
         {
             socket.SendTo(Protocol.CreatePingPacket(), endPoint);
@@ -499,11 +485,13 @@ namespace Orion.Engine.Networking
 
             isDisposed = true;
 
-            lock (socket)
-            {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
-            }
+            // Block until the worker threads terminates, with a timeout
+            bool terminated = workerThread.Join(TimeSpan.FromSeconds(1));
+            Debug.Assert(terminated, "The SafeTransporter worker thread termination has timed out.");
+
+            // Kill the socket
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
         }
 
         private void EnsureNotDisposed()
@@ -513,7 +501,7 @@ namespace Orion.Engine.Networking
 
         public override string ToString()
         {
-            return string.Format("{{Transporter:{0}}}", Port);
+            return "SafeTransporter on port {0}".FormatInvariant(port);
         }
         #endregion
         #endregion

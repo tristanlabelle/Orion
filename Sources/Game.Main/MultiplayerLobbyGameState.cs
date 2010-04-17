@@ -107,12 +107,13 @@ namespace Orion.Game.Main
         {
             if (args.WasAccepted)
             {
-                string matchName = lobby.GetMatchByAddress(args.EndPoint).Name;
-                Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, matchName, graphics, networking, args.EndPoint));
+                var gameState = MultiplayerDeathmatchSetupGameState.CreateAsClient(
+                    Manager, graphics, networking, args.HostEndPoint);
+                Manager.Push(gameState);
             }
             else
             {
-                Instant.DisplayAlert(ui, "Impossible de rejointer {0}.".FormatInvariant(args.EndPoint),
+                Instant.DisplayAlert(ui, "Impossible de rejointer {0}.".FormatInvariant(args.HostEndPoint),
                     () => ui.IsEnabled = true);
             }
         }
@@ -124,7 +125,8 @@ namespace Orion.Game.Main
 
         private void OnHostPressed(MultiplayerLobbyUI sender, string matchName)
         {
-            Manager.Push(new MultiplayerDeathmatchSetupGameState(Manager, matchName, graphics, networking, null));
+            var gameState = MultiplayerDeathmatchSetupGameState.CreateAsHost(Manager, graphics, networking, matchName);
+            Manager.Push(gameState);
         }
 
         private void OnJoinPressed(MultiplayerLobbyUI sender, AdvertizedMatch match)

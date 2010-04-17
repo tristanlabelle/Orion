@@ -104,11 +104,6 @@ namespace Orion.Game.Matchmaking.Networking
             networking.Poll();
         }
 
-        public AdvertizedMatch GetMatchByAddress(IPv4EndPoint matchEndPoint)
-        {
-            return matches.First(match => match.EndPoint == matchEndPoint);
-        }
-
         public void Join(IPv4EndPoint endPoint)
         {
             if (IsJoining) throw new InvalidOperationException("Cannot join when already in the process of joining.");

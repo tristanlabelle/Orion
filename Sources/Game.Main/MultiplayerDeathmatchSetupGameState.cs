@@ -16,23 +16,28 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 
 namespace Orion.Game.Main
 {
-    public class MultiplayerDeathmatchSetupGameState : GameState
+    public sealed class MultiplayerDeathmatchSetupGameState : GameState
     {
+        #region Instance
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
         private readonly PlayerSettings playerSettings;
         private readonly MatchConfigurationUI ui;
         private readonly GameNetworking networking;
+
+        /// <remarks>Defined only for clients.</remarks>
         private readonly IPv4EndPoint? hostEndPoint;
+
+        /// <remarks>Defined only for the host.</remarks>
         private readonly string matchName;
         #endregion
 
         #region Constructors
-        public MultiplayerDeathmatchSetupGameState(GameStateManager manager, string matchName, GameGraphics graphics, GameNetworking networking, IPv4EndPoint? hostEndPoint)
+        private MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics,
+            GameNetworking networking, string matchName, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
-            this.matchName = matchName;
             Argument.EnsureNotNull(manager, "manager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(networking, "networking");
@@ -41,6 +46,7 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.matchSettings = new MatchSettings();
             this.hostEndPoint = hostEndPoint;
+            this.matchName = matchName;
 
             this.playerSettings = new PlayerSettings();
 
@@ -412,6 +418,28 @@ namespace Orion.Game.Main
                     break;
             }
             return index;
+        }
+        #endregion
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        public static MultiplayerDeathmatchSetupGameState CreateAsHost(
+            GameStateManager manager, GameGraphics graphics,
+            GameNetworking networking, string matchName)
+        {
+            Argument.EnsureNotNull(matchName, "matchName");
+            return new MultiplayerDeathmatchSetupGameState(manager, graphics,
+                networking, matchName, null);
+        }
+
+        public static MultiplayerDeathmatchSetupGameState CreateAsClient(
+            GameStateManager manager, GameGraphics graphics,
+            GameNetworking networking, IPv4EndPoint hostEndPoint)
+        {
+            return new MultiplayerDeathmatchSetupGameState(manager, graphics,
+                networking, null, hostEndPoint);
         }
         #endregion
         #endregion

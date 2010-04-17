@@ -132,8 +132,9 @@ namespace Orion.Game.Matchmaking.Commands
 
         public override string ToString()
         {
-            return "Faction {0} trains {1} with {2}"
-                .FormatInvariant(FactionHandle, traineeTypeHandle, trainerHandles.ToCommaSeparatedValues());
+            return "Faction {0} trains {1} {2} with {3}"
+                .FormatInvariant(FactionHandle, traineeCount, traineeTypeHandle,
+                trainerHandles.ToCommaSeparatedValues());
         }
         
         #region Serialization

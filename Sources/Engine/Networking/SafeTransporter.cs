@@ -31,11 +31,6 @@ namespace Orion.Engine.Networking
         /// The amount of time to block in Socket.ReceiveFrom calls.
         /// </summary>
         private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(2);
-
-        /// <summary>
-        /// Winsock error raised if the socket didn't receive anything before it timed out.
-        /// </summary>
-        private const int WSAETIMEDOUT = 10060;
         #endregion
 
         private readonly List<PeerLink> peers = new List<PeerLink>();
@@ -89,22 +84,22 @@ namespace Orion.Engine.Networking
         /// </param>
         public SafeTransporter(int port)
         {
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.Bind(new IPEndPoint(IPAddress.Any, port));
-            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-            socket.SetSocketOption(SocketOptionLevel.Socket,
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            this.socket.Bind(new IPEndPoint(IPAddress.Any, port));
+            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+            this.socket.SetSocketOption(SocketOptionLevel.Socket,
                 SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
-            socket.MulticastLoopback = false;
+            this.socket.MulticastLoopback = false;
 
-            port = ((IPEndPoint)socket.LocalEndPoint).Port;
+            this.port = (ushort)((IPEndPoint)socket.LocalEndPoint).Port;
 
             // Attempt to find the addresses of this computer to detect
             // broadcasts which come back to this computer and ignore them.
             try
             {
                 string hostName = Dns.GetHostName();
-                localAddresses = Dns.GetHostAddresses(hostName)
+                this.localAddresses = Dns.GetHostAddresses(hostName)
                     .Where(address => address.AddressFamily == AddressFamily.InterNetwork)
                     .Select(address => (IPv4Address)address)
                     .ToList()
@@ -112,13 +107,13 @@ namespace Orion.Engine.Networking
             }
             catch (SocketException)
             {
-                localAddresses = new ReadOnlyCollection<IPv4Address>(new IPv4Address[0]);
+                this.localAddresses = new ReadOnlyCollection<IPv4Address>(new IPv4Address[0]);
             }
 
-            workerThread = new Thread(WorkerThreadEntryPoint);
-            workerThread.Name = "SafeTransporter worker thread";
-            workerThread.IsBackground = true;
-            workerThread.Start();
+            this.workerThread = new Thread(WorkerThreadEntryPoint);
+            this.workerThread.Name = "SafeTransporter worker thread";
+            this.workerThread.IsBackground = true;
+            this.workerThread.Start();
         }
 
         /// <summary>
@@ -219,33 +214,42 @@ namespace Orion.Engine.Networking
                 Debug.Assert(availableDataLength <= receptionBuffer.Length,
                     "Available data exceeds the length of the reception buffer. The packet data could be truncated.");
 
+                int packetLength = -1;
                 try
                 {
-                    int packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
-                    if (packetLength == 0)
-                    {
-                        Debug.Fail("Unexpected zero-length packet. Ignored.");
-                        break;
-                    }
-
-                    IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
-                    if (IsSelf(ipv4SenderEndPoint) && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
-                    {
-                        // Ignore packets we broadcasted ourself.
-                        return;
-                    }
-
-                    HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
+                    packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
                 }
                 catch (SocketException e)
                 {
-                    if (e.ErrorCode == WSAETIMEDOUT)
+                    if (e.SocketErrorCode == SocketError.ConnectionReset)
+                    {
+                        Debug.Fail("Connection reset in Socket.ReceiveFrom. This might be non-critical.");
+                        continue;
+                    }
+
+                    if (e.SocketErrorCode == SocketError.TimedOut)
                     {
                         Debug.Fail("Socket.ReceiveFrom should not time out, we made sure that it had data available.");
                         break;
                     }
+
                     throw;
                 }
+
+                if (packetLength == 0)
+                {
+                    Debug.Fail("Unexpected zero-length packet. Ignored.");
+                    break;
+                }
+
+                IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
+                if (IsSelf(ipv4SenderEndPoint) && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
+                {
+                    // Ignore packets we broadcasted ourself.
+                    return;
+                }
+
+                HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
             }
         }
 

@@ -348,10 +348,10 @@ namespace Orion.Game.Main
                     {
                         RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
-                        networking.Send(new JoinResponsePacket(true), client);
+                        networking.Send(JoinResponsePacket.Accepted, client);
                         AdvertizeMatch();
                     }
-                    else networking.Send(new JoinResponsePacket(false), client);
+                    else networking.Send(JoinResponsePacket.Refused, client);
                 }
                 return;
             }

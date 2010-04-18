@@ -63,9 +63,8 @@ namespace Orion.Game.Simulation
             foreach (Point point in region.Points)
             {
 #if DEBUG
-                // #if'd so the FormatInvariant is not executed in release.
-                Debug.Assert(this[point] == null,
-                    "Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
+                if (this[point] != null)
+                    Debug.Fail("Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
 #endif
                 this[point] = entity;
             }
@@ -80,16 +79,20 @@ namespace Orion.Game.Simulation
         public void Remove(Entity entity, Region region)
         {
             Argument.EnsureNotNull(entity, "entity");
-            Debug.Assert(entity.CollisionLayer != CollisionLayer.None,
-                "A non-collidable entity is being removed from the grid.");
+            if (entity.CollisionLayer == CollisionLayer.None)
+            {
+                Debug.Fail("A non-collidable entity is being removed from the grid.");
+                return;
+            }
 
             foreach (Point point in region.Points)
             {
 #if DEBUG
-                // #if'd so the FormatInvariant is not executed in release.
-                Debug.Assert(this[point] == entity,
-                    "Cell {0} should have been occupied by {1} but was occupied by {2}."
-                    .FormatInvariant(point, entity, this[point]));
+                if (this[point] != entity)
+                {
+                    Debug.Fail("Cell {0} should have been occupied by {1} but was occupied by {2}."
+                        .FormatInvariant(point, entity, this[point]));
+                }
 #endif
                 this[point] = null;
             }

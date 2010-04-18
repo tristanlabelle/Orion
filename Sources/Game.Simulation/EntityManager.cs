@@ -143,11 +143,6 @@ namespace Orion.Game.Simulation
         private void OnEntityDied(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-#if DEBUG
-            // #if'd so the FormatInvariant is not executed in release.
-            Debug.WriteLine("Entity {0} died.".FormatInvariant(entity));
-#endif
-
             Remove(entity);
         }
         #endregion
@@ -166,11 +161,6 @@ namespace Orion.Game.Simulation
             Handle handle = handleGenerator();
             Unit unit = new Unit(handle, type, faction, point);
             InitializeEntity(unit);
-            
-#if DEBUG
-            // #if'd so the FormatInvariant is not executed in release.
-            Debug.WriteLine("Created unit: {0} at {1}.".FormatInvariant(unit, point));
-#endif
 
             return unit;
         }
@@ -180,11 +170,6 @@ namespace Orion.Game.Simulation
             Handle handle = handleGenerator();
             ResourceNode node = new ResourceNode(world, handle, type, ResourceNode.DefaultTotalAmount, point);
             InitializeEntity(node);
-
-#if DEBUG
-            // #if'd so the FormatInvariant is not executed in release.
-            Debug.WriteLine("Created resource node: {0} at {1}.".FormatInvariant(node, point));
-#endif
 
             return node;
         }

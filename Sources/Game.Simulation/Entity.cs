@@ -51,8 +51,11 @@ namespace Orion.Game.Simulation
         protected virtual void RaiseMoved(Vector2 oldPosition, Vector2 newPosition)
         {
 #if DEBUG
-            // #if'd so the FormatInvariant is not executed in release.
-            Debug.Assert(!isDead, "{0} is dead and yet moves.".FormatInvariant(this));
+            if (isDead)
+            {
+                // #if'd so the FormatInvariant is not executed in release.
+                Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
+            }
 #endif
             var handler = Moved;
             if (handler != null) handler(this, oldPosition, newPosition);

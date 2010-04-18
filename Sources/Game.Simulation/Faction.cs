@@ -95,12 +95,6 @@ namespace Orion.Game.Simulation
         public void RaiseWarning(string message, Faction source)
         {
 #warning Ugly hack, event sender should always be the event owner!
-
-#if DEBUG
-            // #if'd so the FormatInvariant is not executed in release.
-            Debug.WriteLine("{0} faction warning: {1}".FormatInvariant(this, message));
-#endif
-
             Warning.Raise(source, message);
         }
 

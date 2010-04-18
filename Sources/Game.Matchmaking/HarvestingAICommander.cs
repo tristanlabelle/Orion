@@ -18,7 +18,7 @@ namespace Orion.Game.Matchmaking
     public sealed class HarvestingAICommander : Commander
     {
         #region Fields
-        private const float updatePeriod = 1;
+        private const float updatePeriod = 1.5f;
 
         private readonly UnitType workerUnitType;
         private readonly UnitType foodSupplyUnitType;
@@ -31,6 +31,7 @@ namespace Orion.Game.Matchmaking
         {
             workerUnitType = match.UnitTypes.FromName("Schtroumpf");
             foodSupplyUnitType = match.UnitTypes.FromName("Réserve");
+            lastUpdateTime = faction.Handle.Value / (float)match.World.Factions.Count() * updatePeriod;
         }
         #endregion
 

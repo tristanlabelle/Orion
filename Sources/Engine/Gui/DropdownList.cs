@@ -52,8 +52,17 @@ namespace Orion.Engine.Gui
             get { return items; }
             set
             {
+                Argument.EnsureNotNull(value, "Items");
+
                 items = value;
-                SelectedItem = items.First();
+                
+                isItemSelected = false;
+                foreach (T item in value)
+                {
+                    selectedItem = item;
+                    isItemSelected = true;
+                    break;
+                }
             }
         }
 

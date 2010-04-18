@@ -138,7 +138,7 @@ namespace Orion.Game.Matchmaking.Networking
             {
                 HandleAdvertizeMatchPacket(args.SenderEndPoint, (AdvertizeMatchPacket)args.Packet);
             }
-            else if (args.Packet is StartingMatchPacket || args.Packet is CancelGamePacket)
+            else if (args.Packet is DelistMatchPacket)
             {
                 int removedMatchCount = matches.RemoveAll(m => m.EndPoint == args.SenderEndPoint);
                 MatchesChanged.Raise(this);

@@ -217,7 +217,7 @@ namespace Orion.Game.Main
 
         private void OnExitPressed(MatchConfigurationUI ui)
         {
-            if (IsHost) networking.Broadcast(new CancelGamePacket());
+            if (IsHost) networking.Broadcast(DelistMatchPacket.Instance);
             else networking.Send(new RemovePlayerPacket(), hostEndPoint.Value);
 
             Manager.Pop();
@@ -225,7 +225,8 @@ namespace Orion.Game.Main
 
         private void OnStartGamePressed(MatchConfigurationUI ui)
         {
-            networking.Broadcast(new StartingMatchPacket());
+            networking.Broadcast(DelistMatchPacket.Instance);
+            networking.Send(StartingMatchPacket.Instance, Clients);
             StartMatch();
         }
         #endregion
@@ -292,7 +293,7 @@ namespace Orion.Game.Main
                 return;
             }
 
-            if (packet is CancelGamePacket)
+            if (packet is DelistMatchPacket)
             {
                 Manager.Pop();
                 return;

@@ -68,7 +68,10 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             if (!move.HasReachedDestination)
+            {
                 MarkAsEnded();
+                return;
+            }
 
             if (mode == Mode.Extracting)
                 UpdateExtracting(step);
@@ -133,7 +136,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateDelivering(SimulationStep step)
         {
-            if (!depot.IsAlive)
+            if (depot == null || !depot.IsAlive)
             {
                 depot = FindClosestDepot();
                 if (depot == null)

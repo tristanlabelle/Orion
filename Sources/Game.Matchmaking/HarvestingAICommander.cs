@@ -74,7 +74,7 @@ namespace Orion.Game.Matchmaking
                     {
                         Point buildingLocation = new Point(
                             (int)unit.Center.X + Random.Next(-10, 11),
-                            (int)unit.Center.X + Random.Next(-10, 11));
+                            (int)unit.Center.Y + Random.Next(-10, 11));
                         buildingLocation = new Region(
                             World.Width - foodSupplyUnitType.Width,
                             World.Height - foodSupplyUnitType.Height)

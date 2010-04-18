@@ -488,6 +488,28 @@ namespace Orion.Engine.Graphics
             DrawVertex(triangle.Vertex2);
             DrawVertex(triangle.Vertex3);
         }
+
+        public void FillTriangleStrip(Vector2[] vertices, ColorRgba color)
+        {
+            Argument.EnsureNotNull(vertices, "vertices");
+
+            CommitColor(color);
+
+            GCHandle pinningHandle = GCHandle.Alloc(vertices, GCHandleType.Pinned);
+            try
+            {
+                IntPtr pointer = pinningHandle.AddrOfPinnedObject();
+                GL.EnableClientState(EnableCap.VertexArray);
+                GL.VertexPointer(2, VertexPointerType.Float, 0, pointer);
+                GL.DrawArrays(BeginMode.TriangleStrip, 0, vertices.Length);
+                GL.VertexPointer(2, VertexPointerType.Float, 0, IntPtr.Zero);
+                GL.DisableClientState(EnableCap.VertexArray);
+            }
+            finally
+            {
+                pinningHandle.Free();
+            }
+        }
         #endregion
 
         #region Lines

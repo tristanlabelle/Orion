@@ -86,6 +86,7 @@
     <Compile Include="Graphics\GameWindowForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Graphics\NormalizedZoneChartRenderer.cs" />
     <Compile Include="Graphics\OpenTKGameWindow.cs" />
     <Compile Include="Graphics\WindowsFormsGameWindow.cs">
     </Compile>
@@ -111,6 +112,7 @@
     <Compile Include="Gui\DelegatedRenderer.cs" />
     <Compile Include="Gui\DropdownList.cs" />
     <Compile Include="Gui\FilledRenderer.cs" />
+    <Compile Include="Data\ChartModel.cs" />
     <Compile Include="Input\InputEvent.cs" />
     <Compile Include="Input\InputEventType.cs" />
     <Compile Include="Gui\Panel.cs" />

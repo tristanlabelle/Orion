@@ -127,7 +127,7 @@ namespace Orion.Game.Simulation.Utilities
 
         private void OnWorldUpdated(World sender, SimulationStep step)
         {
-            bool shouldSample = (int)(step.TimeInSeconds % samplingPeriod) != (int)(lastSimulationTime % samplingPeriod);
+            bool shouldSample = (int)(step.TimeInSeconds / samplingPeriod) != (int)(lastSimulationTime / samplingPeriod);
             lastSimulationTime = step.TimeInSeconds;
             if (!shouldSample) return;
 

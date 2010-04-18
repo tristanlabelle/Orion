@@ -41,7 +41,7 @@ namespace Orion.Game.Main
             this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
 
             List<PlayerBuilder> builders = new List<PlayerBuilder>();
-            builders.Add(new PlayerBuilder("Noop Computer", (name, color) => new AIPlayer(name, color)));
+            builders.Add(new PlayerBuilder("Harvesting Computer", (name, color) => new AIPlayer(name, color)));
 
             this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
             this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
@@ -117,7 +117,7 @@ namespace Orion.Game.Main
                 }
                 else if (player is AIPlayer)
                 {
-                    Commander commander = new AICommander(match, faction);
+                    Commander commander = new HarvestingAICommander(match, faction);
                     aiCommanders.Add(commander);
                 }
                 else

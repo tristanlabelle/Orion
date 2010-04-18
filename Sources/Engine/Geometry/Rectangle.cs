@@ -485,6 +485,17 @@ namespace Orion.Engine.Geometry
         }
         #endregion
 
+        #region Misc
+        public Vector2 RandomPointInside(Random random)
+        {
+            Argument.EnsureNotNull(random, "random");
+
+            return new Vector2(
+                MinX + (float)(random.NextDouble() * Width),
+                MinY + (float)(random.NextDouble() * Height));
+        }
+        #endregion
+
         #region Object Model
         /// <summary>
         /// Gets a string representation of this <see cref="Rectangle"/>.

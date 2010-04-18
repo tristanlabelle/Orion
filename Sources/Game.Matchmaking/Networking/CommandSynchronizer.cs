@@ -86,7 +86,7 @@ namespace Orion.Game.Matchmaking.Networking
             localCommands.Add(command);
         }
 
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
             networking.Poll();
             updatesSinceLastCommandFrame++;

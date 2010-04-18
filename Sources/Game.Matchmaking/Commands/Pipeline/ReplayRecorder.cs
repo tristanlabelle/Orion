@@ -34,12 +34,12 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             commandQueue.Enqueue(command);
         }
 
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
             while (commandQueue.Count > 0)
             {
                 Command command = commandQueue.Dequeue();
-                writer.WriteCommand(updateNumber, command);
+                writer.WriteCommand(step.Number, command);
                 Flush(command);
             }
         }

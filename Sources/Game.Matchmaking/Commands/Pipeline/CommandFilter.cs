@@ -25,7 +25,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
         }
 
         public abstract void Handle(Command command);
-        public abstract void Update(int updateNumber, float timeDeltaInSeconds);
+        public abstract void Update(SimulationStep step);
         public virtual void Dispose() { }
         #endregion
     }

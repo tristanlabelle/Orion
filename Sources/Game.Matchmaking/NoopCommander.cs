@@ -12,23 +12,19 @@ using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking
 {
-    public class AICommander : Commander
+    /// <summary>
+    /// A commander which never issues any command.
+    /// </summary>
+    public sealed class NoopCommander : Commander
     {
-        #region Fields
-        #endregion
-
         #region Contructors
-        public AICommander(Match match, Faction faction)
+        public NoopCommander(Match match, Faction faction)
             : base(match, faction)
         {}
         #endregion
 
-        #region Properties
-        #endregion
-
         #region Methods
-        public override void Update(float timeDeltaInSeconds)
-        {}
+        public override void Update(SimulationStep step) { }
         #endregion
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Orion.Engine;
 
 namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
@@ -8,6 +9,6 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
     public interface ICommandSink : IDisposable
     {
         void Handle(Command command);
-        void Update(int updateNumber, float timeDeltaInSeconds);
+        void Update(SimulationStep step);
     }
 }

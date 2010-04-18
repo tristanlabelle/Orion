@@ -47,7 +47,8 @@
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
     <Compile Include="Commands\Pipeline\RandomHeroTrainer.cs" />
-    <Compile Include="AICommander.cs" />
+    <Compile Include="HarvestingAICommander.cs" />
+    <Compile Include="NoopCommander.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -41,7 +41,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             accumulatedCommands.Enqueue(command);
         }
 
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
             while (accumulatedCommands.Count > 0)
             {

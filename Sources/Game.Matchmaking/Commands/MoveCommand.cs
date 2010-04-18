@@ -32,6 +32,9 @@ namespace Orion.Game.Matchmaking.Commands
             this.unitHandles = unitHandles.Distinct().ToList().AsReadOnly();
             this.destination = destination;
         }
+
+        public MoveCommand(Handle factionHandle, Handle unitHandle, Vector2 destination)
+            : this(factionHandle, new[] { unitHandle }, destination) { }
         #endregion
 
         #region Properties

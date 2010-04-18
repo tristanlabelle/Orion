@@ -51,9 +51,9 @@ namespace Orion.Game.Matchmaking.TowerDefense
         #endregion
 
         #region Methods
-        public override void Update(float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
-            timeBeforeNextCreep -= timeDeltaInSeconds;
+            timeBeforeNextCreep -= step.TimeDeltaInSeconds;
             if (timeBeforeNextCreep > 0) return;
 
             if (!TrySpawnCreep()) return;

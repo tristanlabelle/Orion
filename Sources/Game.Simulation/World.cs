@@ -243,6 +243,16 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
+        public Vector2 Clamp(Vector2 destination)
+        {
+            // Clamp the destination within the world bounds.
+            // The world bounds maximums are be exclusive.
+            destination = Bounds.Clamp(destination);
+            if (destination.X >= Width) destination.X = Width - 0.0001f;
+            if (destination.Y >= Size.Height) destination.Y = Height - 0.0001f;
+            return destination;
+        }
+
         public bool IsWithinBounds(Point point)
         {
             Region region = (Region)Size;

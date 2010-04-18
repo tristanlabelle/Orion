@@ -71,10 +71,10 @@ namespace Orion.Game.Matchmaking
         #region Methods
         /// <summary>
         /// Raises the <see cref="E:CommandIssued"/> event
-        /// with the <see cref="Command"/> that was generated.
+        /// with the <see cref="Command"/> that was issued.
         /// </summary>
-        /// <param name="command">The <see cref="Command"/> that was generated.</param>
-        protected void GenerateCommand(Command command)
+        /// <param name="command">The <see cref="Command"/> that was issued.</param>
+        protected void IssueCommand(Command command)
         {
             Argument.EnsureNotNull(command, "command");
 
@@ -92,8 +92,8 @@ namespace Orion.Game.Matchmaking
         /// Called by the pipeline to update this <see cref="Commander"/> for a frame, giving it a chance
         /// to flush its local pipeline.
         /// </summary>
-        /// <param name="timeDelta">The time elapsed since the last frame, in seconds.</param>
-        public virtual void Update(float timeDeltaInSeconds) { }
+        /// <param name="step">The current simulation step.</param>
+        public virtual void Update(SimulationStep step) { }
 
         public override string ToString()
         {

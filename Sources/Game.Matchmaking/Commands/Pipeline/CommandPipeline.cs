@@ -128,15 +128,15 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
         }
         #endregion
 
-        public void Update(int simulationUpdateNumber, float timeDeltaInSeconds)
+        public void Update(SimulationStep step)
         {
             foreach (Commander commander in commanders.Keys)
-                commander.Update(timeDeltaInSeconds);
+                commander.Update(step);
 
             foreach (CommandFilter filter in filters)
-                filter.Update(simulationUpdateNumber, timeDeltaInSeconds);
+                filter.Update(step);
 
-            sink.Update(simulationUpdateNumber, timeDeltaInSeconds);
+            sink.Update(step);
         }
 
         /// <summary>

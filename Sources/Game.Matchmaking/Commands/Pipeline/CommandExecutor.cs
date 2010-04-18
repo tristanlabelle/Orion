@@ -31,7 +31,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             commandQueue.Enqueue(command);
         }
 
-        public void Update(int updateNumber, float timeDeltaInSeconds)
+        public void Update(SimulationStep step)
         {
             while (commandQueue.Count > 0)
             {
@@ -41,7 +41,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 {
 #if DEBUG
                     // #if'd so FormatInvariant is not executed in release
-                    Debug.WriteLine("Update #{0}: {1}.".FormatInvariant(updateNumber, command));
+                    Debug.WriteLine("Update #{0}: {1}.".FormatInvariant(step.Number, command));
 #endif
                     command.Execute(match);
                 }
@@ -49,7 +49,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 {
 #if DEBUG
                     // #if'd so FormatInvariant is not executed in release
-                    Debug.WriteLine("Update #{0}: Discarding {1}.".FormatInvariant(updateNumber, command));
+                    Debug.WriteLine("Update #{0}: Discarding {1}.".FormatInvariant(step.Number, command));
 #endif
                 }
             }

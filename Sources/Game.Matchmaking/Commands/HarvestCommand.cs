@@ -22,13 +22,16 @@ namespace Orion.Game.Matchmaking.Commands
         #endregion
 
         #region Constructors
-        public HarvestCommand(Handle factionHandle, IEnumerable<Handle> harvestersHandles, Handle resourceNodeHandle)
+        public HarvestCommand(Handle factionHandle, IEnumerable<Handle> harvesterHandles, Handle resourceNodeHandle)
             : base(factionHandle)
         {
-            Argument.EnsureNotNull(harvestersHandles, "harvestersHandles");
-            this.harvesterHandles = harvestersHandles.Distinct().ToList().AsReadOnly();
+            Argument.EnsureNotNull(harvesterHandles, "harvesterHandles");
+            this.harvesterHandles = harvesterHandles.Distinct().ToList().AsReadOnly();
             this.resourceNodeHandle = resourceNodeHandle;
         }
+
+        public HarvestCommand(Handle factionHandle, Handle harvesterHandle, Handle resourceNodeHandle)
+            : this(factionHandle, new[] { harvesterHandle }, resourceNodeHandle) { }
         #endregion
 
         #region Properties

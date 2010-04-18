@@ -37,7 +37,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             accumulatedCommands.Enqueue(command);
         }
 
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
             while (accumulatedCommands.Count > 0)
             {
@@ -45,9 +45,9 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                 Flush(command);
             }
 
-            while (nextReplayCommand != null && nextReplayCommand.Value.UpdateNumber <= updateNumber)
+            while (nextReplayCommand != null && nextReplayCommand.Value.UpdateNumber <= step.Number)
             {
-                Debug.Assert(nextReplayCommand.Value.UpdateNumber == updateNumber);
+                Debug.Assert(nextReplayCommand.Value.UpdateNumber == step.Number);
                 Flush(nextReplayCommand.Value.Command);
                 if (reader.IsEndOfStreamReached)
                 {

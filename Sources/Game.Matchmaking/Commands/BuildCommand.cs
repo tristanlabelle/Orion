@@ -33,6 +33,9 @@ namespace Orion.Game.Matchmaking.Commands
             this.buildingTypeHandle = buildingTypeHandle;
             this.location = location;
         }
+
+        public BuildCommand(Handle factionHandle, Handle builderHandle, Handle buildingTypeHandle, Point location)
+            : this(factionHandle, new[] { builderHandle }, buildingTypeHandle, location) { }
         #endregion
 
         #region Properties

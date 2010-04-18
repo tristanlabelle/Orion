@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Game.Simulation;
+using Orion.Engine;
 
 namespace Orion.Game.Matchmaking.Commands.Pipeline
 {
@@ -23,7 +24,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
             commands.Add(command);
         }
 
-        public override void Update(int updateNumber, float timeDeltaInSeconds)
+        public override void Update(SimulationStep step)
         {
             if (commands.Count == 0) return;
 

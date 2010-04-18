@@ -97,7 +97,7 @@ namespace Orion.Game.Main
                 lastSimulationStep = step;
             }
 
-            commandPipeline.Update(lastSimulationStep.Number, timeDeltaInSeconds);
+            commandPipeline.Update(lastSimulationStep);
 
             graphics.UpdateRootView(timeDeltaInSeconds);
             audioPresenter.SetViewBounds(ui.CameraBounds);

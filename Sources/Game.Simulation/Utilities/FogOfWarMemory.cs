@@ -55,7 +55,7 @@ namespace Orion.Game.Simulation.Utilities
             foreach (Entity entity in faction.World.Entities.Intersecting(region.ToRectangle()))
             {
                 Unit unit = entity as Unit;
-                if (unit == null || unit.Faction == faction || !unit.IsBuilding)
+                if (unit == null || unit.Faction == faction || !unit.IsBuilding || Faction.CanSee(unit))
                     continue;
 
                 RememberedBuilding building = new RememberedBuilding(unit);

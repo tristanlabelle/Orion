@@ -96,7 +96,7 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
                     .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
 
                 int upgradeCount = heroUpgrades.Count();
-                if (match.Random.NextDouble() >= probability)
+                if (upgradeCount == 0 || match.Random.NextDouble() >= probability)
                     break;
 
                 int upgradeIndex = match.Random.Next(upgradeCount);

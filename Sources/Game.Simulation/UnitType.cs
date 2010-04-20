@@ -23,6 +23,8 @@ namespace Orion.Game.Simulation
         #region Fields
         private readonly Handle handle;
         private readonly string name;
+        private readonly string graphicsTemplate;
+        private readonly string voicesTemplate;
 
         private readonly Size size;
         private readonly bool isAirborne;
@@ -38,6 +40,8 @@ namespace Orion.Game.Simulation
 
             this.handle = handle;
             this.name = builder.Name;
+            this.graphicsTemplate = builder.GraphicsTemplate ?? builder.Name;
+            this.voicesTemplate = builder.VoicesTemplate ?? builder.Name;
 
             this.size = builder.Size;
             this.isAirborne = builder.IsAirborne;
@@ -67,6 +71,16 @@ namespace Orion.Game.Simulation
         public string Name
         {
             get { return name; }
+        }
+
+        public string GraphicsTemplate
+        {
+            get { return graphicsTemplate; }
+        }
+
+        public string VoicesTemplate
+        {
+            get { return voicesTemplate; }
         }
 
         public bool IsBuilding

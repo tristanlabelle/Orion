@@ -88,7 +88,7 @@ namespace Orion.Game.Presentation.Audio
             Argument.EnsureNotNull(eventName, "eventName");
 
             stringBuilder.Clear();
-            stringBuilder.Append(unitType.Name);
+            stringBuilder.Append(unitType.VoicesTemplate);
             stringBuilder.Append('.');
             stringBuilder.Append(eventName);
 

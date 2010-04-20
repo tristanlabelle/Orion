@@ -18,6 +18,8 @@ namespace Orion.Game.Simulation
     {
         #region Fields
         private string name;
+        private string graphicsTemplate;
+        private string voicesTemplateName;
         private Size size;
         private bool isAirborne;
         private BasicSkill basicSkill;
@@ -48,8 +50,20 @@ namespace Orion.Game.Simulation
             set
             {
                 Argument.EnsureNotNullNorBlank(value, "Name");
-                this.name = value;
+                name = value;
             }
+        }
+
+        public string GraphicsTemplate
+        {
+            get { return graphicsTemplate; }
+            set { graphicsTemplate = value; }
+        }
+
+        public string VoicesTemplate
+        {
+            get { return voicesTemplateName; }
+            set { voicesTemplateName = value; }
         }
 
         public Size Size
@@ -59,7 +73,7 @@ namespace Orion.Game.Simulation
             {
                 Argument.EnsureWithin(value.Width, 0, Entity.MaxSize, "Size.Width");
                 Argument.EnsureWithin(value.Height, 0, Entity.MaxSize, "Size.Height");
-                this.size = value;
+                size = value;
             }
         }
 

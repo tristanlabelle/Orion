@@ -103,7 +103,7 @@ namespace Orion.Game.Presentation
         public Texture GetUnitTexture(UnitType unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
-            return GetUnitTexture(unitType.Name);
+            return GetUnitTexture(unitType.GraphicsTemplate);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Orion.Game.Presentation
         public Texture GetUnitTexture(Unit unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            return GetUnitTexture(unit.Type.Name);
+            return GetUnitTexture(unit.Type);
         }
 
         /// <summary>

@@ -519,7 +519,7 @@ namespace Orion.Game.Presentation.Gui
         public void DisplayDefeatMessage(Action callback)
         {
             Argument.EnsureNotNull(callback, "callback");
-            Instant.DisplayAlert(this, "Vous avez perdu le Match.", callback);
+            Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
         }
 
         public void DisplayVictoryMessage(Action callback)

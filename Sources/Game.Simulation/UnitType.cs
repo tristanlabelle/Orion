@@ -28,6 +28,7 @@ namespace Orion.Game.Simulation
 
         private readonly Size size;
         private readonly bool isAirborne;
+        private readonly bool isSuicidable;
         private readonly bool isBuilding;
         private readonly Dictionary<Type, UnitSkill> skills;
         private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades;
@@ -45,14 +46,14 @@ namespace Orion.Game.Simulation
 
             this.size = builder.Size;
             this.isAirborne = builder.IsAirborne;
+            this.isSuicidable = builder.IsSuicidable;
+            this.isBuilding = !builder.Skills.OfType<MoveSkill>().Any();
 
             this.skills = builder.Skills
                 .Select(skill => skill.CreateFrozenClone())
                 .ToDictionary(skill => skill.GetType());
             this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
             this.upgrades = builder.Upgrades.ToList().AsReadOnly();
-
-            this.isBuilding = !skills.ContainsKey(typeof(MoveSkill));
 
 #if DEBUG
             Debug.Assert(!HasSkill<AttackSkill>()
@@ -91,6 +92,11 @@ namespace Orion.Game.Simulation
         public bool IsAirborne
         {
             get { return isAirborne; }
+        }
+
+        public bool IsSuicidable
+        {
+            get { return isSuicidable; }
         }
 
         public ReadOnlyCollection<UnitTypeUpgrade> Upgrades

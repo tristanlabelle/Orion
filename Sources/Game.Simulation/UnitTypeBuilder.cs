@@ -22,6 +22,7 @@ namespace Orion.Game.Simulation
         private string voicesTemplateName;
         private Size size;
         private bool isAirborne;
+        private bool isSuicidable = true;
         private BasicSkill basicSkill;
         private readonly ICollection<UnitSkill> skills;
         private readonly ICollection<UnitTypeUpgrade> upgrades;
@@ -93,6 +94,12 @@ namespace Orion.Game.Simulation
         {
             get { return isAirborne; }
             set { isAirborne = value; }
+        }
+
+        public bool IsSuicidable
+        {
+            get { return isSuicidable; }
+            set { isSuicidable = value; }
         }
 
         public BasicSkill BasicSkill

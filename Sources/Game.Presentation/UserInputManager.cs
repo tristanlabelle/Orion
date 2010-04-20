@@ -454,7 +454,7 @@ namespace Orion.Game.Presentation
         public void LaunchSuicide()
         {
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction);
+                .Where(unit => unit.Faction == LocalFaction && unit.Type.IsSuicidable);
             commander.LaunchSuicide(targetUnits);
         }
 

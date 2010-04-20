@@ -52,7 +52,10 @@ namespace Orion.Game.Matchmaking.TowerDefense
                 return;
             }
 
-            moveTask = new MoveTask(Unit, path.Points[currentPointIndex + 1]);
+            Point targetPoint = path.Points[currentPointIndex + 1];
+            Region targetRegion = new Region(targetPoint.X, targetPoint.Y, 1, 1);
+            moveTask = MoveTask.ToNearRegion(Unit, targetRegion);
+            moveTask.Update(step);
         }
         #endregion
     }

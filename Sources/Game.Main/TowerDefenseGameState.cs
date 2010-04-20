@@ -145,8 +145,11 @@ namespace Orion.Game.Main
 
             if (unit.Faction == LocalFaction)
             {
-                LocalFaction.MarkAsDefeated();
-                ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
+                if (unit.Type.Name == "Métaschtroumpf")
+                {
+                    LocalFaction.MarkAsDefeated();
+                    ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
+                }
             }
             else
             {

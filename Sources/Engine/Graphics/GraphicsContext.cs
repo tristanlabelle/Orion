@@ -42,6 +42,7 @@ namespace Orion.Engine.Graphics
             GL.LoadIdentity();
             GL.Ortho(-1, 1, -1, 1, -1, 1);
             GL.MatrixMode(MatrixMode.Modelview);
+            GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
         }
         #endregion
 

@@ -61,9 +61,16 @@ namespace Orion.Game.Presentation.Renderers
             foreach (Entity entity in Selection)
             {
                 if (!Faction.CanSee(entity)) continue;
-
                 graphics.Stroke(entity.BoundingRectangle, selectionMarkerColor);
+            }
+        }
 
+        public void DrawRallyPointMarkers(GraphicsContext graphics)
+        {
+            Argument.EnsureNotNull(graphics, "graphics");
+
+            foreach (Entity entity in Selection)
+            {
                 Unit unit = entity as Unit;
                 if (unit != null && unit.Faction == Faction && unit.HasRallyPoint)
                 {

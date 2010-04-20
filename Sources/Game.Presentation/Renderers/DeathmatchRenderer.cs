@@ -98,6 +98,7 @@ namespace Orion.Game.Presentation.Renderers
 
                 worldRenderer.DrawExplosions(context, visibleBounds);
                 worldRenderer.DrawFogOfWar(context, visibleBounds);
+                selectionRenderer.DrawRallyPointMarkers(context);
 
                 IViewRenderer selectedCommandRenderer = inputManager.SelectedCommand as IViewRenderer;
                 if (selectedCommandRenderer != null)

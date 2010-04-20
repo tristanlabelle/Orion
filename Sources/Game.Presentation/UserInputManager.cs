@@ -13,6 +13,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation
 {
@@ -268,9 +269,18 @@ namespace Orion.Game.Presentation
             if (otherFactionOnlySelection) return;
 
             Point point = (Point)target;
-            if (!World.IsWithinBounds(point) || LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
+            if (!World.IsWithinBounds(point))
             {
                 LaunchMove(target);
+                return;
+            }
+            
+            if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
+            {
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
+                    LaunchChangeRallyPoint(target);
+                else
+                    LaunchMove(target);
                 return;
             }
 
@@ -282,14 +292,15 @@ namespace Orion.Game.Presentation
             else if (targetEntity is ResourceNode)
             {
                 ResourceNode targetResourceNode = (ResourceNode)targetEntity;
-                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(targetResourceNode.Center);
                 else
                     LaunchDefaultCommand(targetResourceNode);
             }
             else
             {
-                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                Debug.Assert(targetEntity == null);
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -315,7 +326,7 @@ namespace Orion.Game.Presentation
             }
             else if (target.HasSkill<ExtractAlageneSkill>())
             {
-                if (Selection.Units.All(unit => unit.Type.IsBuilding && unit.Type.HasSkill<TrainSkill>()))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                 {
                     LaunchChangeRallyPoint(target.Center);
                 }

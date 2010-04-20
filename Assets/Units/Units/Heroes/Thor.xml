@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Thor" Width="1" Height="1">
+<UnitType Name="Thor" VoicesTemplate="Viking" Width="1" Height="1">
 	<Skills>
 		<Basic SightRange="8" MaxHealth="200" MeleeArmor="6" RangedArmor="3" FoodCost="3"/>
 		<Move Speed="6"/>

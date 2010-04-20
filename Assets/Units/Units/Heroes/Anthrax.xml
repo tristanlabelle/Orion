@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Anthrax" Width="2" Height="2" IsAirborne="True">
+<UnitType Name="Anthrax" VoicesTemplate="Grippe A(H1N1)" Width="2" Height="2" IsAirborne="True">
 	<Skills>
 		<Basic SightRange="9" MaxHealth="100" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
 		<Move Speed="15"/>

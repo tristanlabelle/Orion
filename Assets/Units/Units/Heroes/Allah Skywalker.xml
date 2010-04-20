@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Allah Skywalker" Width="1" Height="1">
+<UnitType Name="Allah Skywalker" VoicesTemplate="Jedihad" Width="1" Height="1">
 	<Skills>
 		<Basic SightRange="8" MaxHealth="160" MeleeArmor="3" RangedArmor="5" FoodCost="2"/>
 		<Move Speed="9"/>

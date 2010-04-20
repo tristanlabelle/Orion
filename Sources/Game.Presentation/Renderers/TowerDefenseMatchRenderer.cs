@@ -96,7 +96,6 @@ namespace Orion.Game.Presentation.Renderers
             worldRenderer.DrawMiniatureResources(graphics.Context);
             worldRenderer.DrawMiniatureUnits(graphics.Context);
             worldRenderer.DrawFogOfWar(graphics.Context, World.Bounds);
-            creepMoneyRenderer.Draw(graphics.Context, World.Bounds);
         }
 
         public void Dispose()

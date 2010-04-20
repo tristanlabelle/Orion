@@ -35,6 +35,8 @@ namespace Orion.Game.Presentation.Renderers
 
         #region Fields
         private static readonly float duration = 1;
+        private static readonly float textScale = 0.1f;
+        private static readonly float textSpeed = 3;
 
         private readonly Faction localFaction;
         private readonly Queue<Entry> entries = new Queue<Entry>();
@@ -63,9 +65,10 @@ namespace Orion.Game.Presentation.Renderers
                 float age = time - entry.SpawnTime;
                 Text text = new Text(entry.Text);
                 Rectangle textFrame = text.Frame;
-                Vector2 position = new Vector2(entry.Position.X - textFrame.Width * 0.5f,
-                    entry.Position.Y + age);
-                graphicsContext.Draw(entry.Text, Colors.Yellow);
+                Vector2 position = new Vector2(entry.Position.X, entry.Position.Y + age * textSpeed)
+                    - textFrame.Size * textScale;
+                using (graphicsContext.PushTransform(position, 0, textScale))
+                    graphicsContext.Draw(entry.Text, position, Colors.Yellow);
             }
         }
 
@@ -82,7 +85,8 @@ namespace Orion.Game.Presentation.Renderers
             if (args.Target.Faction != localFaction
                 && args.Target.Health <= 0)
             {
-                Entry entry = new Entry(args.Target.Center, time, "+" + args.Target.GetStat(BasicSkill.AladdiumCostStat));
+                Vector2 position = new Vector2(args.Target.Center.X, args.Target.Position.Y);
+                Entry entry = new Entry(position, time, "+" + args.Target.GetStat(BasicSkill.AladdiumCostStat));
                 entries.Enqueue(entry);
             }
         }

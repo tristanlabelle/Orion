@@ -211,13 +211,16 @@ namespace Orion.Engine.Networking
                 int availableDataLength = socket.Available;
                 if (availableDataLength == 0) break;
 
-                Debug.Assert(availableDataLength <= receptionBuffer.Length,
-                    "Available data exceeds the length of the reception buffer. The packet data could be truncated.");
-
                 int packetLength = -1;
                 try
                 {
                     packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
+                    if (packetLength >= receptionBuffer.Length)
+                    {
+                        throw new ApplicationException(
+                            "A {0}-bytes packet was received and truncated."
+                            .FormatInvariant(packetLength));
+                    }
                 }
                 catch (SocketException e)
                 {

@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
+using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
-using Orion.Game.Simulation;
-using Orion.Engine.Gui;
-using System.Diagnostics;
-using Orion.Game.Matchmaking.TowerDefense;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Main
 {
@@ -44,13 +44,13 @@ namespace Orion.Game.Main
             Random random = new MersenneTwister(Environment.TickCount);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
             World world = new World(terrain, random, 200);
-            match = new Match(world, random);
             creepPath = CreepPath.Generate(world.Size, random);
+            match = new Match(world, random, p => !creepPath.Contains(p));
 
             Faction localFaction = world.CreateFaction("Player", Colors.Red);
             localFaction.AladdiumAmount = 200;
             localFaction.LocalFogOfWar.Disable();
-            localFaction.CreateUnit(match.UnitTypes.FromName("Métaschtroumpf"), new Point(world.Width / 2, world.Height / 2));
+            localFaction.CreateUnit(match.UnitTypes.FromName("Créateur"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(match, localFaction);
 
             Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
@@ -145,7 +145,7 @@ namespace Orion.Game.Main
 
             if (unit.Faction == LocalFaction)
             {
-                if (unit.Type.Name == "Métaschtroumpf")
+                if (unit.Type.Name == "Créateur")
                 {
                     LocalFaction.MarkAsDefeated();
                     ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());

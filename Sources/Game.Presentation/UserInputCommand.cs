@@ -2,6 +2,7 @@ using System;
 using OpenTK.Math;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation
 {
@@ -27,6 +28,11 @@ namespace Orion.Game.Presentation
         protected UserInputManager InputManager
         {
             get { return inputManager; }
+        }
+
+        protected Match Match
+        {
+            get { return inputManager.Match; }
         }
 
         protected World World

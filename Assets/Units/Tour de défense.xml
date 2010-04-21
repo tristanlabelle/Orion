@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Tour de défense" Width="3" Height="3">
-	<Skills>
-		<Basic AladdiumCost="60" SightRange="7"/>
-		<Attack Power="15" Range="7" Delay="2"/>
-	</Skills>
-</UnitType>

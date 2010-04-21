@@ -20,20 +20,25 @@ namespace Orion.Game.Matchmaking
         #region Fields
         private readonly World world;
         private readonly Random random;
+        private readonly Func<Point, bool> canBuildPredicate;
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly TechnologyTree technologyTree = new TechnologyTree();
         private bool isRunning = true;
         #endregion
 
         #region Constructors
-        public Match(World world, Random random)
+        public Match(World world, Random random, Func<Point, bool> canBuildPredicate)
         {
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNull(random, "random");
 
             this.world = world;
             this.random = random;
+            this.canBuildPredicate = canBuildPredicate;
         }
+
+        public Match(World world, Random random)
+            : this(world, random, null) { }
         #endregion
 
         #region Events
@@ -68,6 +73,9 @@ namespace Orion.Game.Matchmaking
             get { return technologyTree; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if the match is currently updating.
+        /// </summary>
         public bool IsRunning
         {
             get { return isRunning; }
@@ -94,6 +102,12 @@ namespace Orion.Game.Matchmaking
         public void Resume()
         {
             isRunning = true;
+        }
+
+        public bool CanBuild(Region region)
+        {
+            return world.IsFree(region, CollisionLayer.Ground)
+                && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
         }
 
         /// <summary>

@@ -48,7 +48,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                     return false;
 
                 Region region = new Region(minLocation.Value, buildingType.Size);
-                if (!World.IsFree(region, CollisionLayer.Ground))
+                if (!Match.CanBuild(region))
                     return false;
 
                 if (!LocalFaction.HasFullySeen(region))

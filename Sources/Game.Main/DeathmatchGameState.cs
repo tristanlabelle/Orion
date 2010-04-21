@@ -51,7 +51,7 @@ namespace Orion.Game.Main
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.ui = new MatchUI(graphics, userInputManager, matchRenderer);
-            this.audioPresenter = new MatchAudioPresenter(audio, match, userInputManager);
+            this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             this.ui.QuitPressed += OnQuitPressed;

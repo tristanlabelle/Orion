@@ -13,6 +13,7 @@ using Orion.Game.Presentation.Gui;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Presentation.Audio;
 
 namespace Orion.Game.Main
 {
@@ -24,12 +25,14 @@ namespace Orion.Game.Main
     {
         #region Fields
         private readonly GameGraphics graphics;
+        private readonly GameAudio audio;
         private readonly CreepPath creepPath;
         private readonly Match match;
         private readonly SlaveCommander localCommander;
         private readonly CreepWaveCommander creepCommander;
         private readonly CommandPipeline commandPipeline;
         private readonly MatchUI ui;
+        private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         #endregion
 
@@ -40,6 +43,7 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
+            this.audio = new GameAudio();
 
             Random random = new MersenneTwister(Environment.TickCount);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
@@ -64,6 +68,7 @@ namespace Orion.Game.Main
             var matchRenderer = new TowerDefenseMatchRenderer(userInputManager, graphics, creepPath);
 
             ui = new MatchUI(graphics, userInputManager, matchRenderer);
+            audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
             world.Entities.Removed += OnEntityRemoved;
             ui.QuitPressed += OnQuitPressed;
@@ -129,7 +134,9 @@ namespace Orion.Game.Main
 
         public override void Dispose()
         {
+            audioPresenter.Dispose();
             ui.Dispose();
+            audio.Dispose();
             commandPipeline.Dispose();
         }
 

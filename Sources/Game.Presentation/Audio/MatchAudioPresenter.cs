@@ -22,7 +22,6 @@ namespace Orion.Game.Presentation.Audio
     {
         #region Fields
         private readonly GameAudio audio;
-        private readonly Match match;
         private readonly UserInputManager userInputManager;
 
         /// <summary>
@@ -38,23 +37,21 @@ namespace Orion.Game.Presentation.Audio
         #endregion
 
         #region Constructors
-        public MatchAudioPresenter(GameAudio audio, Match match, UserInputManager userInputManager)
+        public MatchAudioPresenter(GameAudio audio, UserInputManager userInputManager)
         {
             Argument.EnsureNotNull(audio, "audio");
-            Argument.EnsureNotNull(match, "match");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
 
             this.audio = audio;
-            this.match = match;
             this.userInputManager = userInputManager;
             this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
-            this.match.World.Entities.Added += OnEntityAdded;
-            this.match.World.Entities.Removed += OnEntityRemoved;
-            this.match.World.UnitHitting += OnUnitHitting;
-            this.match.World.Updated += OnWorldUpdated;
-            this.match.World.ExplosionOccured += OnExplosionOccured;
+            this.World.Entities.Added += OnEntityAdded;
+            this.World.Entities.Removed += OnEntityRemoved;
+            this.World.UnitHitting += OnUnitHitting;
+            this.World.Updated += OnWorldUpdated;
+            this.World.ExplosionOccured += OnExplosionOccured;
             this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.LocalCommander.CommandIssued += OnCommandIssued;
         }
@@ -74,6 +71,11 @@ namespace Orion.Game.Presentation.Audio
         private Faction LocalFaction
         {
             get { return userInputManager.LocalFaction; }
+        }
+
+        private Match Match
+        {
+            get { return userInputManager.Match; }
         }
 
         private World World

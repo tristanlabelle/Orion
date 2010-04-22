@@ -56,7 +56,7 @@ namespace Orion.Game.Matchmaking
             get { return colors.Except(players.Select(p => p.Color)); }
         }
 
-        public int PlayersCount
+        public int PlayerCount
         {
             get { return players.Count; }
         }

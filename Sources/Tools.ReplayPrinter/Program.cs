@@ -52,9 +52,7 @@ namespace Orion.Tools.ReplayPrinter
         static void PrintHeader(ReplayReader replay, TextWriter output)
         {
             output.WriteLine("Game seed is {0}", replay.MatchSettings.RandomSeed);
-            output.WriteLine("There are {0} factions:", replay.FactionNames.Count());
-            foreach (string factionName in replay.FactionNames)
-                output.WriteLine("  - {0}", factionName);
+            output.WriteLine("There are {0} factions:", replay.PlayerSettings.PlayerCount);
         }
 
         static void PrintCommands(ReplayReader replay, TextWriter output)

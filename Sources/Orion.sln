@@ -23,26 +23,29 @@ Global
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Debug|x86.Build.0 = Debug|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.ActiveCfg = Release|x86
 		{4761E0C8-AB6A-42BC-9789-05275E6E5F08}.Release|x86.Build.0 = Release|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.ActiveCfg = Debug|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
-		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.ActiveCfg = Debug|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
-		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
-		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
-		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Debug|x86.ActiveCfg = Debug|x86
-		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Debug|x86.Build.0 = Debug|x86
-		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.ActiveCfg = Release|x86
-		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.Build.0 = Release|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.ActiveCfg = Debug|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.Build.0 = Debug|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.ActiveCfg = Release|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.Build.0 = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.ActiveCfg = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Debug|x86.Build.0 = Debug|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.ActiveCfg = Release|x86
+		{84DCA135-541D-41F5-9118-C83324225E2B}.Release|x86.Build.0 = Release|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.ActiveCfg = Debug|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Debug|x86.Build.0 = Debug|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.ActiveCfg = Release|x86
+		{98074D59-535C-4FBA-A47C-68FFD740C1CB}.Release|x86.Build.0 = Release|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.ActiveCfg = Debug|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Debug|x86.Build.0 = Debug|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.ActiveCfg = Release|x86
+		{B45D29E4-B452-4850-8C4E-FB0564E071AB}.Release|x86.Build.0 = Release|x86
+		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Debug|x86.ActiveCfg = Debug|x86
+		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Debug|x86.Build.0 = Debug|x86
+		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.ActiveCfg = Release|x86
+		{F2382CAC-67F5-4246-B033-D586A1A68FA7}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Game.Main\Game.Main.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,8 +53,5 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Orion.Main\Main.csproj
 	EndGlobalSection
 EndGlobal

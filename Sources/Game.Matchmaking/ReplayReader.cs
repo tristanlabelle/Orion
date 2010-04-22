@@ -18,7 +18,6 @@ namespace Orion.Game.Matchmaking
         private readonly BinaryReader reader;
         private readonly MatchSettings matchSettings = new MatchSettings();
         private readonly PlayerSettings playerSettings = new PlayerSettings();
-        private readonly ReadOnlyCollection<string> factionNames;
         private int lastUpdateNumber = 0;
         #endregion
 
@@ -48,14 +47,6 @@ namespace Orion.Game.Matchmaking
         public PlayerSettings PlayerSettings
         {
             get { return playerSettings; }
-        }
-
-        /// <summary>
-        /// Gets the names of the factions in the game.
-        /// </summary>
-        public IEnumerable<string> FactionNames
-        {
-            get { return factionNames; }
         }
 
         /// <summary>

@@ -48,6 +48,7 @@
     <Compile Include="AIPlayer.cs" />
     <Compile Include="Commands\Pipeline\RandomHeroTrainer.cs" />
     <Compile Include="HarvestingAICommander.cs" />
+    <Compile Include="Networking\Packets\CancelMatchPacket.cs" />
     <Compile Include="NoopCommander.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">
       <SubType>Code</SubType>

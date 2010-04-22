@@ -217,8 +217,15 @@ namespace Orion.Game.Main
 
         private void OnExitPressed(MatchConfigurationUI ui)
         {
-            if (IsHost) networking.Broadcast(DelistMatchPacket.Instance);
-            else networking.Send(new RemovePlayerPacket(), hostEndPoint.Value);
+            if (IsHost)
+            {
+            	networking.Send(CancelMatchPacket.Instance, Clients);
+            	networking.Broadcast(DelistMatchPacket.Instance);
+            }
+            else
+            {
+            	networking.Send(new RemovePlayerPacket(), hostEndPoint.Value);
+            }
 
             Manager.Pop();
         }
@@ -292,11 +299,11 @@ namespace Orion.Game.Main
 
                 return;
             }
-
-            if (packet is DelistMatchPacket)
+            
+            if (packet is CancelMatchPacket)
             {
-                Manager.Pop();
-                return;
+                Instant.DisplayAlert(ui, "Le match a été annulé.", () => Manager.Pop());
+            	return;
             }
 
             if (packet is RemovePlayerPacket)
@@ -345,7 +352,7 @@ namespace Orion.Game.Main
                 }
                 else if (packet is JoinRequestPacket)
                 {
-                    if (playerSettings.PlayersCount < playerSettings.MaximumNumberOfPlayers)
+                    if (playerSettings.PlayerCount < playerSettings.MaximumNumberOfPlayers)
                     {
                         RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
@@ -392,7 +399,7 @@ namespace Orion.Game.Main
 
         private void AdvertizeMatch()
         {
-            AdvertizeMatchPacket advertize = new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayersCount);
+            AdvertizeMatchPacket advertize = new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayerCount);
             networking.Broadcast(advertize);
         }
 

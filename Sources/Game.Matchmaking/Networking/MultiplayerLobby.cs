@@ -72,8 +72,7 @@ namespace Orion.Game.Matchmaking.Networking
                 if (isEnabled)
                 {
                     AttachEventHandlers();
-                    networking.Broadcast(ExploreMatchesPacket.Instance);
-                    lastExploredTime = DateTime.Now;
+                    Explore();
                 }
                 else
                 {
@@ -104,7 +103,16 @@ namespace Orion.Game.Matchmaking.Networking
             networking.Poll();
         }
 
-        public void Join(IPv4EndPoint endPoint)
+        /// <summary>
+        /// Sends a packet to discover if some matches exist on the local network.
+        /// </summary>
+        public void Explore()
+        {
+            networking.Broadcast(ExploreMatchesPacket.Instance);
+            lastExploredTime = DateTime.Now;
+        }
+
+        public void BeginJoining(IPv4EndPoint endPoint)
         {
             if (IsJoining) throw new InvalidOperationException("Cannot join when already in the process of joining.");
 

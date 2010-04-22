@@ -110,6 +110,7 @@ namespace Orion.Game.Presentation.Gui
             string caption = "{0} ({1} places libres)".FormatInvariant(match.Name, match.OpenSlotCount);
             Button button = new Button(matchButtonFrame, caption);
             button.Triggered += b => JoinPressed.Raise(this, match);
+            button.IsEnabled = IsEnabled;
             matchListPanel.Children.Add(button);
         }
 

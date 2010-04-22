@@ -68,6 +68,7 @@ namespace Orion.Game.Main
         protected internal override void OnShadowed()
         {
             lobby.IsEnabled = false;
+            ui.ClearMatches();
             RootView.Children.Remove(ui);
         }
 
@@ -76,6 +77,7 @@ namespace Orion.Game.Main
             RootView.Children.Add(ui);
             ui.IsEnabled = true;
             lobby.IsEnabled = true;
+            lobby.Explore();
         }
 
         protected internal override void Update(float timeDeltaInSeconds)
@@ -149,7 +151,7 @@ namespace Orion.Game.Main
         private void Join(IPv4EndPoint endPoint)
         {
             ui.IsEnabled = false;
-            lobby.Join(endPoint);
+            lobby.BeginJoining(endPoint);
         }
         #endregion
     }

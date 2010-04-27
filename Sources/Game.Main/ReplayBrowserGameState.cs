@@ -94,6 +94,7 @@ namespace Orion.Game.Main
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
             Match match = new Match(world, random);
+            match.AreRandomHeroesEnabled = matchSettings.AreRandomHeroesEnabled;
 
             Faction localFaction = world.CreateSpectatorFaction();
             localFaction.LocalFogOfWar.Disable();
@@ -116,7 +117,6 @@ namespace Orion.Game.Main
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
-            if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
             commandPipeline.PushFilter(new ReplayPlayer(replayReader));
 
             GameState targetGameState = new DeathmatchGameState(Manager, graphics,

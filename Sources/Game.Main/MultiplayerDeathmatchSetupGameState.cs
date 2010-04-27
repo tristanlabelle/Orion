@@ -99,6 +99,7 @@ namespace Orion.Game.Main
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
             Match match = new Match(world, random);
+            match.AreRandomHeroesEnabled = matchSettings.AreRandomHeroesEnabled;
 
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
@@ -135,7 +136,6 @@ namespace Orion.Game.Main
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));
-            if (matchSettings.AreRandomHeroesEnabled) commandPipeline.PushFilter(new RandomHeroTrainer(match));
             ReplayRecorder replayRecorder = ReplayRecorder.TryCreate(matchSettings, playerSettings);
             if (replayRecorder != null) commandPipeline.PushFilter(replayRecorder);
 

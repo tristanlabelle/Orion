@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
-    <Compile Include="Commands\Pipeline\RandomHeroTrainer.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="Networking\Packets\CancelMatchPacket.cs" />
     <Compile Include="NoopCommander.cs" />

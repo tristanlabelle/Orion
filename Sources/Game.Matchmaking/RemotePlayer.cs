@@ -25,7 +25,6 @@ namespace Orion.Game.Matchmaking
             this.endPoint = endPoint;
         }
 
-        [Obsolete("A name should be provided instead of using DNS resolution.")]
         public RemotePlayer(IPv4EndPoint endPoint, ColorRgb color)
             : this(endPoint, Dns.GetHostEntry(endPoint.Address).HostName, color)
         { }

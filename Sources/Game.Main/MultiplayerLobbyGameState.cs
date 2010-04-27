@@ -20,8 +20,6 @@ namespace Orion.Game.Main
     public sealed class MultiplayerLobbyGameState : GameState
     {
         #region Fields
-        private static readonly int defaultPort = 41223;
-
         private readonly GameGraphics graphics;
         private readonly GameNetworking networking;
         private readonly MultiplayerLobby lobby;

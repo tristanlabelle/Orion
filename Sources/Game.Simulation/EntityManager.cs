@@ -190,7 +190,7 @@ namespace Orion.Game.Simulation
         /// <remarks>
         /// Used by <see cref="World"/>.
         /// </remarks>
-        public void Update(SimulationStep step)
+        internal void Update(SimulationStep step)
         {
             if (isUpdating) throw new InvalidOperationException("Cannot nest Update calls.");
 
@@ -238,6 +238,10 @@ namespace Orion.Game.Simulation
             }
         }
 
+        /// <summary>
+        /// Removes an entity from this world.
+        /// </summary>
+        /// <param name="entity">The entity to be removed.</param>
         public void Remove(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
@@ -318,7 +322,9 @@ namespace Orion.Game.Simulation
 
         private void CommitRemove(Entity entity)
         {
-            entities.Remove(entity.Handle);
+            bool wasRemoved = entities.Remove(entity.Handle);
+            if (!wasRemoved) return;
+
             zoneManager.Remove(entity);
             Removed.Raise(this, entity);
         }

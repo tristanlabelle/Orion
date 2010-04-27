@@ -17,7 +17,6 @@ namespace Orion.Game.Simulation.Tasks
         private const float repairSpeedRatio = 0.25f;
 
         private readonly Unit target;
-        private readonly Action<Entity> targetDiedEventHandler;
         private readonly MoveTask move;
         private readonly bool building;
         
@@ -43,8 +42,6 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Can only repair buildings.", "target");
 
             this.target = target;
-            this.targetDiedEventHandler = OnBuildingDied;
-            this.target.Died += targetDiedEventHandler;
             this.move = MoveTask.ToNearRegion(repairer, target.GridRegion);
             this.building = target.IsUnderConstruction;
         }
@@ -168,17 +165,6 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             return true;
-        }
-
-        public override void Dispose()
-        {
-            target.Died -= targetDiedEventHandler;
-        }
-
-        private void OnBuildingDied(Entity entity)
-        {
-            Debug.Assert(entity == target);
-            target.Died -= targetDiedEventHandler;
         }
         #endregion
     }

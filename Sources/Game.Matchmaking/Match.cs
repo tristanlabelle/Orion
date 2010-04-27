@@ -18,12 +18,15 @@ namespace Orion.Game.Matchmaking
     public sealed class Match
     {
         #region Fields
+        private const float defaultRandomHeroProbability = 0.015f;
+
         private readonly World world;
         private readonly Random random;
         private readonly Func<Point, bool> canBuildPredicate;
         private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
         private readonly TechnologyTree technologyTree = new TechnologyTree();
         private bool isRunning = true;
+        private bool areRandomHeroesEnabled = true;
         #endregion
 
         #region Constructors
@@ -82,6 +85,23 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
+        /// Accesses a value indicating if random heroes are enabled.
+        /// </summary>
+        public bool AreRandomHeroesEnabled
+        {
+            get { return areRandomHeroesEnabled; }
+            set { areRandomHeroesEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets the probabily to get a hero when training a unit.
+        /// </summary>
+        public float RandomHeroProbability
+        {
+            get { return areRandomHeroesEnabled ? defaultRandomHeroProbability : 0; }
+        }
+
+        /// <summary>
         /// Gets the random number generator used in this match.
         /// </summary>
         /// <remarks>
@@ -108,6 +128,44 @@ namespace Orion.Game.Matchmaking
         {
             return world.IsFree(region, CollisionLayer.Ground)
                 && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
+        }
+
+        /// <summary>
+        /// Gets a random hero unit type from a given unit type.
+        /// </summary>
+        /// <param name="unitType">The original unit type.</param>
+        /// <returns>One of the heroes of the original unit type, or that unit type itself.</returns>
+        public UnitType RandomizeHero(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            if (!areRandomHeroesEnabled) return unitType;
+
+            while (true)
+            {
+                var heroUpgrades = unitType.Upgrades
+                    .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
+
+                int upgradeCount = heroUpgrades.Count();
+                if (upgradeCount == 0 || random.NextDouble() >= RandomHeroProbability)
+                    break;
+
+                int upgradeIndex = random.Next(upgradeCount);
+                UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
+
+                UnitType heroUnitType = UnitTypes.FromName(upgrade.Target);
+                if (heroUnitType == null)
+                {
+#if DEBUG
+                    Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
+                        .FormatInvariant(upgrade.Target, unitType.Name));
+#endif
+                    break;
+                }
+
+                unitType = heroUnitType;
+            }
+
+            return unitType;
         }
 
         /// <summary>

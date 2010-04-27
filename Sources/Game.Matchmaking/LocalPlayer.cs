@@ -16,7 +16,6 @@ namespace Orion.Game.Matchmaking
         public LocalPlayer(string name, ColorRgb color)
             : base(name, color) { }
 
-        [Obsolete("A name should be provided instead of using the local machine name.")]
         public LocalPlayer(ColorRgb color)
             : this(Environment.MachineName, color) { }
         #endregion

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK.Math;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 
@@ -71,7 +72,7 @@ namespace Orion.Game.Simulation.Tasks
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
-                    string warning = "Pas assez de nourriture pour créer l'unité {0}".FormatInvariant(traineeType.Name);
+                    string warning = "Pas assez de nourriture pour entraîner un {0}".FormatInvariant(traineeType.Name);
                     Faction.RaiseWarning(warning);
                 }
 
@@ -79,7 +80,7 @@ namespace Orion.Game.Simulation.Tasks
             }
             waitingForEnoughFood = false;
 
-            float maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
+            int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
                 float trainingSpeed = Unit.GetStat(TrainSkill.SpeedStat);
@@ -87,18 +88,92 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            Unit trainee = Unit.TrySpawn(traineeType);
-            if (trainee != null)
+            Unit trainee = TrySpawn(traineeType);
+            if (trainee == null)
             {
-                attemptingToPlaceUnit = false;
-                MarkAsEnded();
+                if (!attemptingToPlaceUnit)
+                {
+                    attemptingToPlaceUnit = true;
+                    string warning = "Pas de place pour faire apparaître un {0}".FormatInvariant(traineeType.Name);
+                    Faction.RaiseWarning(warning);
+                }
+                return;
             }
-            else if (!attemptingToPlaceUnit)
+
+            TryApplyRallyPoint(trainee, Unit.RallyPoint.Value);
+
+            MarkAsEnded();
+        }
+
+        private Point? TryGetFreeSurroundingSpawnPoint(UnitType spawneeType)
+        {
+            Argument.EnsureNotNull(spawneeType, "spawneeType");
+
+            Region trainerRegion = Unit.GridRegion;
+
+            Region spawnRegion = new Region(
+                trainerRegion.MinX - spawneeType.Size.Width,
+                trainerRegion.MinY - spawneeType.Size.Height,
+                trainerRegion.Size.Width + spawneeType.Size.Width,
+                trainerRegion.Size.Height + spawneeType.Size.Height);
+            var potentialSpawnPoints = spawnRegion.InternalBorderPoints
+                .Where(point =>
+                {
+                    Region region = new Region(point, spawneeType.Size);
+                    return new Region(World.Size).Contains(region)
+                        && World.IsFree(new Region(point, spawneeType.Size), spawneeType.CollisionLayer);
+                });
+
+            if (Unit.HasRallyPoint)
             {
-                attemptingToPlaceUnit = true;
-                string warning = "Pas de place pour faire apparaître l'unité {0}".FormatInvariant(traineeType.Name);
-                Faction.RaiseWarning(warning);
+                return potentialSpawnPoints
+                    .Select(point => (Point?)point)
+                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint.Value).LengthSquared);
             }
+            else
+            {
+                return potentialSpawnPoints.FirstOrNull();
+            }
+        }
+
+        private Unit TrySpawn(UnitType spawneeType)
+        {
+            Argument.EnsureNotNull(spawneeType, "spawneeType");
+
+            Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
+            if (!point.HasValue) return null;
+
+            Unit spawnee = Unit.Faction.CreateUnit(spawneeType, point.Value);
+            Vector2 traineeDelta = spawnee.Center - Unit.Center;
+            spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+
+            return spawnee;
+        }
+
+        private void TryApplyRallyPoint(Unit unit, Vector2 target)
+        {
+            if (!Unit.HasRallyPoint) return;
+
+            Task rallyPointTask = null;
+            // Check to see if we can harvest automatically
+            if (unit.HasSkill<HarvestSkill>())
+            {
+                ResourceNode resourceNode = World.Entities
+                    .Intersecting(target)
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault();
+
+                if (resourceNode != null && unit.Faction.CanHarvest(resourceNode))
+                    rallyPointTask = new HarvestTask(unit, resourceNode);
+            }
+            
+            if (rallyPointTask == null)
+            {
+                Point targetPoint = (Point)target;
+                rallyPointTask = new MoveTask(unit, targetPoint);
+            }
+
+            unit.TaskQueue.OverrideWith(rallyPointTask);
         }
         #endregion
     }

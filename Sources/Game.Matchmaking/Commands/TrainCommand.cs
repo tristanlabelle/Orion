@@ -82,10 +82,16 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            UnitType traineeType = match.UnitTypes.FromHandle(traineeTypeHandle);
 
+            UnitType traineeType = match.UnitTypes.FromHandle(traineeTypeHandle);
+            int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
             int aladdiumCost = faction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
             int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
+
+            // The hero randomization is done after the aladdium/alagene stat querying because
+            // if the hero doesn't cost as much as its base unit type, that fact can be exploited
+            // to farm heroes.
+            traineeType = match.RandomizeHero(traineeType);
 
             bool taskQueueFullWarningRaised = false;
             for (int i = 0; i < traineeCount; ++i)
@@ -108,17 +114,16 @@ namespace Orion.Game.Matchmaking.Commands
                         continue;
                     }
 
-                    int foodCost = faction.GetStat(traineeType, BasicSkill.FoodCostStat);
-                    if (foodCost > faction.RemainingFoodAmount)
+                    if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
                     {
-                        faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
+                        faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
                             .FormatInvariant(traineeType.Name));
                         return;
                     }
 
-                    if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
+                    if (foodCost > faction.RemainingFoodAmount)
                     {
-                        faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
+                        faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
                             .FormatInvariant(traineeType.Name));
                         return;
                     }

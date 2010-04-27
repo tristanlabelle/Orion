@@ -5,4 +5,7 @@
 		<Attack Power="10" Range="7" Delay="2"/>
 		<Sellable AladdiumValue="30"/>
 	</Skills>
+	<Upgrades>
+		<Upgrade Target="British Jean-Marc" AladdiumCost="80" AlageneCost="0"/>
+	</Upgrades>
 </UnitType>

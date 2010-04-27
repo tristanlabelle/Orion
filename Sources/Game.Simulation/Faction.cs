@@ -70,7 +70,7 @@ namespace Orion.Game.Simulation
             this.unitMovedEventHandler = OnUnitMoved;
             this.buildingConstructionCompleted = OnBuildingConstructionCompleted;
             this.world.FactionDefeated += OnFactionDefeated;
-            this.world.Entities.Removed += OnEntityRemoved;
+            this.world.UnitDied += OnUnitDied;
         }
         #endregion
 
@@ -344,7 +344,7 @@ namespace Orion.Game.Simulation
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnUnitDied(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != this) return;

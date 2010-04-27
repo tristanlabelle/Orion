@@ -40,6 +40,7 @@ namespace Orion.Game.Simulation
             this.maxFoodAmount = maxFood;
             this.terrain = terrain;
             this.entities = new EntityManager(this);
+            this.entities.Added += OnEntityAdded;
             this.pathfinder = new Pathfinder(terrain.Size);
             this.random = random;
         }
@@ -59,6 +60,16 @@ namespace Orion.Game.Simulation
         internal void RaiseUnitHitting(HitEventArgs args)
         {
             if (UnitHitting != null) UnitHitting(this, args);
+        }
+
+        /// <summary>
+        /// Raised when an unit died.
+        /// </summary>
+        public event Action<World, Unit> UnitDied;
+
+        internal void RaiseUnitDied(Unit deadUnit)
+        {
+            UnitDied.Raise(this, deadUnit);
         }
 
         /// <summary>
@@ -240,6 +251,17 @@ namespace Orion.Game.Simulation
         {
             if (handle.Value < 0 || handle.Value >= factions.Count) return null;
             return factions[(int)handle.Value];
+        }
+        #endregion
+
+        #region Units
+        private void OnEntityAdded(EntityManager manager, Entity entity)
+        {
+            if (entity is Unit)
+            {
+                Unit unit = (Unit)entity;
+                unit.Died += u => UnitDied.Raise(this, unit);
+            }
         }
         #endregion
 

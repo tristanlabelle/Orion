@@ -34,7 +34,7 @@ namespace Orion.Game.Simulation.Utilities
             this.readOnlyRuins = new ReadOnlyCollection<Ruin>(ruins);
 
             this.world.Updated += OnWorldUpdated;
-            this.world.Entities.Removed += OnEntityRemoved;
+            this.world.UnitDied += OnUnitDied;
         }
         #endregion
 
@@ -59,7 +59,7 @@ namespace Orion.Game.Simulation.Utilities
             }
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity args)
+        private void OnUnitDied(World sender, Entity args)
         {
             Unit unit = args as Unit;
             if (unit == null) return;

@@ -25,7 +25,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         private const int nearbyEnemyCheckPeriod = 8;
 
-        private readonly UnitType type;
+        private UnitType type;
         private readonly Faction faction;
         private readonly TaskQueue taskQueue;
         private Vector2 position;
@@ -72,6 +72,11 @@ namespace Orion.Game.Simulation
 
         #region Events
         /// <summary>
+        /// Raised when the type of this unit changes.
+        /// </summary>
+        public event ValueChangedEventHandler<Unit, UnitType> TypeChanged;
+
+        /// <summary>
         /// Raised when this <see cref="Unit"/> gets damaged or healed.
         /// </summary>
         public event Action<Unit> DamageChanged;
@@ -94,6 +99,12 @@ namespace Orion.Game.Simulation
 
             World.RaiseUnitHitting(args);
         }
+
+        private void RaiseTypeChanged(UnitType oldType, UnitType newType)
+        {
+            if (TypeChanged != null)
+                TypeChanged(this, oldType, newType);
+        }
         #endregion
 
         #region Properties
@@ -104,6 +115,26 @@ namespace Orion.Game.Simulation
         public UnitType Type
         {
             get { return type; }
+            set
+            {
+                Argument.EnsureNotNull(value, "Type");
+                if (value == type) return;
+
+                if (value.IsAirborne != type.IsAirborne)
+                    throw new ArgumentException("A unit type upgrade cannot change airborneness.", "Type");
+                if (value.Size != type.Size)
+                    throw new ArgumentException("A unit type upgrade cannot change the unit size.", "Type");
+                if (faction.GetStat(value, BasicSkill.FoodCostStat) != faction.GetStat(type, BasicSkill.FoodCostStat))
+                    throw new ArgumentException("A unit type upgrade cannot change the food cost.", "Type");
+                if (faction.GetStat(value, BasicSkill.SightRangeStat) != faction.GetStat(type, BasicSkill.SightRangeStat))
+                    throw new ArgumentException("A unit type upgrade cannot change the sight range.", "Type");
+
+                taskQueue.Clear();
+
+                UnitType oldType = type;
+                type = value;
+                RaiseTypeChanged(oldType, value);
+            }
         }
 
         /// <summary>

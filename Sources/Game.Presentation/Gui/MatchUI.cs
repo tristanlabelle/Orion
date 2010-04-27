@@ -172,6 +172,7 @@ namespace Orion.Game.Presentation.Gui
             enablers.Add(new AttackEnabler(userInputManager, actionPanel, gameGraphics));
             enablers.Add(new StandGuardEnabler(userInputManager, actionPanel, gameGraphics));
             enablers.Add(new BuildEnabler(userInputManager, actionPanel, gameGraphics));
+            enablers.Add(new UpgradeEnabler(userInputManager, actionPanel, gameGraphics));
             enablers.Add(new SellEnabler(userInputManager, actionPanel, gameGraphics));
             enablers.Add(new HarvestEnabler(userInputManager, actionPanel, gameGraphics));
             enablers.Add(new TrainEnabler(userInputManager, actionPanel, gameGraphics));

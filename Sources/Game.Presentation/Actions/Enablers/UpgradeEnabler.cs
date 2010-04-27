@@ -23,7 +23,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (unitType.Upgrades.Count == 0) return;
 
-            buttonsArray[0, 0] = CreateUpgradeButton(unitType);
+            buttonsArray[2, 0] = CreateUpgradeButton(unitType);
         }
 
         private ActionButton CreateUpgradeButton(UnitType unitType)

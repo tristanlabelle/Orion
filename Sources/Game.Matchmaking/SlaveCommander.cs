@@ -137,7 +137,7 @@ namespace Orion.Game.Matchmaking
         public void LaunchUpgrade(IEnumerable<Unit> units, UnitType targetType)
         {
             if (units.Count() > 0)
-                throw new NotImplementedException();
+                IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetType.Handle));
         }
         #endregion
     }

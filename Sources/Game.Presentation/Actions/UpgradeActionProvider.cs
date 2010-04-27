@@ -66,9 +66,6 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            BuildSkill buildSkill = unitType.TryGetSkill<BuildSkill>();
-            Debug.Assert(buildSkill != null);
-
             int x = 0;
             int y = 3;
 

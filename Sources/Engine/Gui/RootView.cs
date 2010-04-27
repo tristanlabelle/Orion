@@ -73,6 +73,12 @@ namespace Orion.Engine.Gui
         
         public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
         {
+            Vector2 position = args.Position;
+            position = new Vector2(
+                position.X / Frame.Width * Bounds.Width,
+                position.Y / Frame.Height * Bounds.Height);
+            args = args.CloneWithNewPosition(position);
+
             PropagateMouseEvent(type, args);
         }
 

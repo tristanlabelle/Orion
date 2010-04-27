@@ -7,6 +7,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -50,6 +51,15 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
+
+                if (unit.HasSkill<SellableSkill>())
+                {
+                    int aladdiumValue = unit.GetStat(SellableSkill.AladdiumValueStat);
+                    int alageneValue = unit.GetStat(SellableSkill.AlageneValueStat);
+                    unit.Faction.AladdiumAmount += aladdiumValue;
+                    unit.Faction.AlageneAmount += alageneValue;
+                }
+
                 unit.Suicide();
             }
         }

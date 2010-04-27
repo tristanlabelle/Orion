@@ -461,9 +461,17 @@ namespace Orion.Game.Presentation
         public void LaunchStandGuard()
         {
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction)
+                .Where(unit => unit.Faction == LocalFaction)
                 .Where(unit => unit.HasSkill<MoveSkill>());
             commander.LaunchStandGuard(targetUnits);
+        }
+
+        public void LaunchSell()
+        {
+            IEnumerable<Unit> targetUnits = Selection.Units
+                .Where(unit => unit.Faction == LocalFaction)
+                .Where(unit => unit.HasSkill<SellableSkill>());
+            commander.LaunchSuicide(targetUnits);
         }
 
         public void LaunchCancel()

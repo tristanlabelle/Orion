@@ -3,5 +3,6 @@
 	<Skills>
 		<Basic AladdiumCost="60" SightRange="7"/>
 		<Attack Power="10" Range="7" Delay="2"/>
+		<Sellable AladdiumValue="30"/>
 	</Skills>
 </UnitType>

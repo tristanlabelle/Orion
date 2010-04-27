@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -75,6 +75,7 @@
     <Compile Include="Skills\MoveSkill.cs" />
     <Compile Include="Skills\ProvideFoodSkill.cs" />
     <Compile Include="Skills\ResearchSkill.cs" />
+    <Compile Include="Skills\SellableSkill.cs" />
     <Compile Include="Skills\SkillDependencyAttribute.cs" />
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\SuicideBombSkill.cs" />

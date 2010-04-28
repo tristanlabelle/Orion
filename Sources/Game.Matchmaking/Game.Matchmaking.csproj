@@ -46,8 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
+    <Compile Include="AI\ResourceNodeData.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
-    <Compile Include="HarvestingAICommander.cs" />
+    <Compile Include="AI\HarvestingAICommander.cs" />
     <Compile Include="Networking\Packets\CancelMatchPacket.cs" />
     <Compile Include="NoopCommander.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">

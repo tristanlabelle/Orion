@@ -65,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ResourceAmount.cs" />
     <Compile Include="Skills\AttackSkill.cs" />
     <Compile Include="Skills\BasicSkill.cs" />
     <Compile Include="Skills\BuildSkill.cs" />

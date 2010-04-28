@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation
         #region Nested Types
         private sealed class Generator
         {
-            private uint nextValue;
+            private uint nextValue = 1;
 
             public Handle Generate()
             {

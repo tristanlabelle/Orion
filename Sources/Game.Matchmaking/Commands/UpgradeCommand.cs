@@ -69,7 +69,7 @@ namespace Orion.Game.Matchmaking.Commands
                 int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);
 
                 if (targetUnitTypeFoodCost > unitFoodCost
-                    && faction.UsedFoodAmount - unitFoodCost + targetUnitTypeFoodCost > faction.MaxFoodAmount)
+                    && targetUnitTypeFoodCost - unitFoodCost > faction.RemainingFoodAmount)
                 {
                     faction.RaiseWarning("Not enough food to upgrade to {0}.".FormatInvariant(targetUnitType.Name));
                     return;

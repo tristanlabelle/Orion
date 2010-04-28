@@ -4,4 +4,7 @@
 		<Basic SightRange="7" MaxHealth="120" MeleeArmor="1" RangedArmor="1" AladdiumCost="120" AlageneCost="40"/>
 		<Attack Power="8" Range="7" Delay="2"/>
 	</Skills>
+	<Upgrades>
+		<Upgrade Target="British Jean-Marc" AladdiumCost="80" AlageneCost="120"/>
+	</Upgrades>
 </UnitType>

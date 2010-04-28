@@ -69,7 +69,7 @@ namespace Orion.Game.Presentation.Actions
             int x = 0;
             int y = 3;
 
-            foreach (UnitTypeUpgrade upgrade in unitType.Upgrades)
+            foreach (UnitTypeUpgrade upgrade in unitType.Upgrades.Where(u => !u.IsFree))
             {
                 UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
                 if (targetType == null) continue;

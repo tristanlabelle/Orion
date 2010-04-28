@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Game.Presentation.Actions.UserCommands;
-using Orion.Game.Simulation;
+using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
+using Orion.Game.Presentation.Actions.UserCommands;
+using Orion.Game.Simulation;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions.Enablers
@@ -21,7 +22,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #region Methods
         public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
         {
-            if (unitType.Upgrades.Count == 0) return;
+            if (unitType.Upgrades.All(u => u.IsFree)) return;
 
             buttonsArray[2, 0] = CreateUpgradeButton(unitType);
         }

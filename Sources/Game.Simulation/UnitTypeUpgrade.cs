@@ -54,6 +54,14 @@ namespace Orion.Game.Simulation
         {
             get { return alageneCost; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this upgrade is free.
+        /// </summary>
+        public bool IsFree
+        {
+            get { return aladdiumCost + alageneCost == 0; }
+        }
         #endregion
 
         #region Methods

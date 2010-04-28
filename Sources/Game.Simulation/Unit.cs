@@ -34,9 +34,9 @@ namespace Orion.Game.Simulation
         private Vector2? rallyPoint;
         /// <summary>
         /// The amount of health that has been built.
-        /// A value of <see cref="float.PositiveInfinity"/> indicates that the construction has completed.
+        /// A value of <see cref="float.NaN"/> indicates that the construction has completed.
         /// </summary>
-        private float healthBuilt;
+        private float healthBuilt = float.NaN;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Stack<Unit> transportedUnits = new Stack<Unit>();
         #endregion
@@ -257,7 +257,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool IsUnderConstruction
         {
-            get { return !float.IsPositiveInfinity(healthBuilt); }
+            get { return !float.IsNaN(healthBuilt); }
         }
 
         /// <summary>
@@ -285,7 +285,6 @@ namespace Orion.Game.Simulation
         {
             get { return taskQueue.Count == 0; }
         }
-        #endregion
 
         /// <summary>
         /// Accesses the time elapsed since this <see cref="Unit"/> last hit something, in seconds.
@@ -294,6 +293,7 @@ namespace Orion.Game.Simulation
         {
             get { return timeElapsedSinceLastHitInSeconds; }
         }
+        #endregion
 
         #region Rally Point
         /// <summary>
@@ -465,7 +465,7 @@ namespace Orion.Game.Simulation
         private void OnConstructionCompleted()
         {
             Debug.Assert(IsUnderConstruction);
-            healthBuilt = float.PositiveInfinity;
+            healthBuilt = float.NaN;
             ConstructionCompleted.Raise(this);
             faction.OnBuildingConstructionCompleted(this);
         }

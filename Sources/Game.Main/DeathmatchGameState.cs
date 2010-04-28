@@ -55,7 +55,7 @@ namespace Orion.Game.Main
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             this.ui.QuitPressed += OnQuitPressed;
-            this.match.World.Entities.Removed += OnEntityRemoved;
+            this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
         }
         #endregion
@@ -121,7 +121,7 @@ namespace Orion.Game.Main
             Manager.PopTo<MainMenuGameState>();
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;

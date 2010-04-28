@@ -47,8 +47,8 @@ namespace Orion.Game.Presentation.Audio
             this.buildingConstructionCompletedEventHandler = OnBuildingConstructionCompleted;
 
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
-            this.World.Entities.Added += OnEntityAdded;
-            this.World.Entities.Removed += OnEntityRemoved;
+            this.World.EntityAdded += OnEntityAdded;
+            this.World.EntityRemoved += OnEntityRemoved;
             this.World.UnitHitting += OnUnitHitting;
             this.World.Updated += OnWorldUpdated;
             this.World.ExplosionOccured += OnExplosionOccured;
@@ -104,7 +104,7 @@ namespace Orion.Game.Presentation.Audio
         {
         }
 
-        private void OnEntityAdded(EntityManager arg1, Entity entity)
+        private void OnEntityAdded(World sender, Entity entity)
         {
             if (!isGameStarted) return;
 
@@ -130,7 +130,7 @@ namespace Orion.Game.Presentation.Audio
             audio.PlaySfx(soundName, unit.Center);
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit != null && unit.Faction == LocalFaction && unit.IsUnderConstruction)

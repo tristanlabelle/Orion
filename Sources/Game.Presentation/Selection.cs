@@ -33,7 +33,7 @@ namespace Orion.Game.Presentation
             this.localFaction = localFaction;
             this.limit = limit;
 
-            localFaction.World.Entities.Removed += OnEntityRemoved;
+            localFaction.World.EntityRemoved += OnEntityRemoved;
             localFaction.World.Updated += OnWorldUpdated;
         }
         #endregion
@@ -348,7 +348,7 @@ namespace Orion.Game.Presentation
                 && !(Type == SelectionType.Units && entity is ResourceNode);
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Remove(entity);
         }

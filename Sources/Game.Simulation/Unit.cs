@@ -189,7 +189,7 @@ namespace Orion.Game.Simulation
 
                 Vector2 oldPosition = position;
                 position = value;
-                RaiseMoved(oldPosition, position);
+                OnMoved(oldPosition, position);
             }
         }
 
@@ -517,7 +517,7 @@ namespace Orion.Game.Simulation
             float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle(Center, explosionRadius);
 
-            World.RaiseExplosionOccured(explosionCircle);
+            World.OnExplosionOccured(explosionCircle);
             Suicide();
 
             Unit[] damagedUnits = World.Entities
@@ -604,10 +604,11 @@ namespace Orion.Game.Simulation
             return true;
         }
 
-        private new void Die()
+        protected override void OnDied()
         {
             taskQueue.Clear();
-            base.Die();
+            base.OnDied();
+            World.OnUnitDied(this);
         }
 
         public override string ToString()

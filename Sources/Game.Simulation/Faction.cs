@@ -421,6 +421,7 @@ namespace Orion.Game.Simulation
 
             status = FactionStatus.Defeated;
             Defeated.Raise(this);
+            World.OnFactionDefeated(this);
         }
 
         #region Diplomacy

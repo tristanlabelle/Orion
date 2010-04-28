@@ -37,29 +37,10 @@ namespace Orion.Game.Simulation
         /// </summary>
         public event Action<Entity> Died;
 
-        private void RaiseDied()
-        {
-            var handler = Died;
-            if (handler != null) handler(this);
-        }
-
         /// <summary>
         /// Raised when the <see cref="Entity"/> moves.
         /// </summary>
         public event ValueChangedEventHandler<Entity, Vector2> Moved;
-
-        protected virtual void RaiseMoved(Vector2 oldPosition, Vector2 newPosition)
-        {
-#if DEBUG
-            if (isDead)
-            {
-                // #if'd so the FormatInvariant is not executed in release.
-                Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
-            }
-#endif
-            var handler = Moved;
-            if (handler != null) handler(this, oldPosition, newPosition);
-        }
         #endregion
 
         #region Properties
@@ -183,7 +164,25 @@ namespace Orion.Game.Simulation
             }
 
             isDead = true;
-            RaiseDied();
+            OnDied();
+        }
+
+        protected virtual void OnDied()
+        {
+            Died.Raise(this);
+        }
+
+        protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
+        {
+#if DEBUG
+            if (isDead)
+            {
+                // #if'd so the FormatInvariant is not executed in release.
+                Debug.Fail("{0} is dead and yet moves.".FormatInvariant(this));
+            }
+#endif
+            var handler = Moved;
+            if (handler != null) handler(this, oldPosition, newPosition);
         }
 
         /// <summary>

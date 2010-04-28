@@ -36,7 +36,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
-            this.faction.World.Entities.Removed += OnEntityRemoved;
+            this.faction.World.EntityRemoved += OnEntityRemoved;
 
             this.selection = new Selection(faction, SelectionLimit);
             this.selection.Changed += new Action<Selection>(OnSelectionChanged);
@@ -204,7 +204,7 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
-        private void OnEntityRemoved(EntityManager source, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;

@@ -40,7 +40,7 @@ namespace Orion.Game.Presentation.Renderers
 
             World world = Faction.World;
             world.Updated += OnWorldUpdated;
-            world.Entities.Added += OnEntityAdded;
+            world.EntityAdded += OnEntityAdded;
         }
         #endregion
 
@@ -122,7 +122,7 @@ namespace Orion.Game.Presentation.Renderers
         }
 
         #region Chuck Norris
-        private void OnEntityAdded(EntityManager manager, Entity entity)
+        private void OnEntityAdded(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;

@@ -46,7 +46,7 @@ namespace Orion.Game.Presentation
             this.commander = commander;
             this.underAttackMonitor = new UnderAttackMonitor(commander.Faction);
             this.selectionManager = new SelectionManager(commander.Faction);
-            this.commander.Faction.World.Entities.Removed += OnEntityRemoved;
+            this.commander.Faction.World.EntityRemoved += OnEntityRemoved;
         }
         #endregion
 
@@ -245,7 +245,7 @@ namespace Orion.Game.Presentation
             if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
         }
 
-        private void OnEntityRemoved(EntityManager source, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null) return;

@@ -28,8 +28,8 @@ namespace Orion.Game.Simulation.Utilities
             Argument.EnsureNotNull(faction, "faction");
 
             this.faction = faction;
-            this.faction.World.Entities.Added += OnEntityAdded;
-            this.faction.World.Entities.Removed += OnEntityRemoved;
+            this.faction.World.EntityAdded += OnEntityAdded;
+            this.faction.World.EntityRemoved += OnEntityRemoved;
 
             this.workerTaskQueueChangedEventHandler = OnWorkerTaskQueueChanged;
 
@@ -85,7 +85,7 @@ namespace Orion.Game.Simulation.Utilities
             worker.TaskQueue.Changed += workerTaskQueueChangedEventHandler;
         }
 
-        private void OnEntityAdded(EntityManager sender, Entity entity)
+        private void OnEntityAdded(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;
@@ -95,7 +95,7 @@ namespace Orion.Game.Simulation.Utilities
             WorkerActivityStateChanged.Raise(this, unit);
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;

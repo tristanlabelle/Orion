@@ -70,7 +70,7 @@ namespace Orion.Game.Main
             ui = new MatchUI(graphics, userInputManager, matchRenderer);
             audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
-            world.Entities.Removed += OnEntityRemoved;
+            world.EntityRemoved += OnEntityRemoved;
             ui.QuitPressed += OnQuitPressed;
         }
         #endregion
@@ -145,7 +145,7 @@ namespace Orion.Game.Main
             Manager.PopTo<MainMenuGameState>();
         }
 
-        private void OnEntityRemoved(EntityManager sender, Entity entity)
+        private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
             Debug.Assert(unit != null);

@@ -14,7 +14,7 @@ namespace Orion.Game.Simulation
     /// Represents the game map: its terrain and units.
     /// </summary>
     [Serializable]
-    public sealed class World
+    public sealed partial class World
     {
         #region Fields
         private const int minimumPathfindingNodeCount = 150;
@@ -22,7 +22,7 @@ namespace Orion.Game.Simulation
 
         private readonly Terrain terrain;
         private readonly List<Faction> factions = new List<Faction>();
-        private readonly EntityManager entities;
+        private readonly EntityCollection entities;
         private readonly Pathfinder pathfinder;
         private readonly Random random;
         private readonly int maxFoodAmount;
@@ -39,14 +39,23 @@ namespace Orion.Game.Simulation
 
             this.maxFoodAmount = maxFood;
             this.terrain = terrain;
-            this.entities = new EntityManager(this);
-            this.entities.Added += OnEntityAdded;
+            this.entities = new EntityCollection(this);
             this.pathfinder = new Pathfinder(terrain.Size);
             this.random = random;
         }
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when an entity gets added to this world.
+        /// </summary>
+        public event Action<World, Entity> EntityAdded;
+
+        /// <summary>
+        /// Raised when an entity has been removed from this world.
+        /// </summary>
+        public event Action<World, Entity> EntityRemoved;
+
         /// <summary>
         /// Raised after this <see cref="World"/> has been updated.
         /// </summary>
@@ -55,43 +64,31 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Raised when a unit hits another unit.
         /// </summary>
+        /// <remarks>
+        /// Convenience aggregator of the <see cref="Unit.Hitting"/> event.
+        /// </remarks>
         public event Action<World, HitEventArgs> UnitHitting;
-
-        internal void RaiseUnitHitting(HitEventArgs args)
-        {
-            if (UnitHitting != null) UnitHitting(this, args);
-        }
 
         /// <summary>
         /// Raised when an unit died.
         /// </summary>
+        /// <remarks>
+        /// Convenience aggregator of the <see cref="Unit.Died"/> event.
+        /// </remarks>
         public event Action<World, Unit> UnitDied;
 
-        internal void RaiseUnitDied(Unit deadUnit)
-        {
-            UnitDied.Raise(this, deadUnit);
-        }
-
         /// <summary>
-        /// Raised when an explosion occurs!
+        /// Raised when an explosion occurs.
         /// </summary>
         public event Action<World, Circle> ExplosionOccured;
-
-        internal void RaiseExplosionOccured(Circle circle)
-        {
-            if (ExplosionOccured != null) ExplosionOccured(this, circle);
-        }
 
         /// <summary>
         /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s has been defeated.
         /// </summary>
+        /// <remarks>
+        /// Convenience aggregator of the <see cref="Faction.Defeated"/> event.
+        /// </remarks>
         public event Action<World, Faction> FactionDefeated;
-
-        private void RaiseFactionDefeated(Faction faction)
-        {
-            var handler = FactionDefeated;
-            if (handler != null) handler(this, faction);
-        }
         #endregion
 
         #region Properties
@@ -124,7 +121,7 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Gets the <see cref="EntityRegistry"/> containing the <see cref="Entities"/>s of this <see cref="World"/>.
         /// </summary>
-        public EntityManager Entities
+        public EntityCollection Entities
         {
             get { return entities; }
         }
@@ -220,7 +217,6 @@ namespace Orion.Game.Simulation
         {
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
-            faction.Defeated += RaiseFactionDefeated;
             factions.Add(faction);
             return faction;
         }
@@ -254,17 +250,7 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Units
-        private void OnEntityAdded(EntityManager manager, Entity entity)
-        {
-            if (entity is Unit)
-            {
-                Unit unit = (Unit)entity;
-                unit.Died += u => UnitDied.Raise(this, unit);
-            }
-        }
-        #endregion
-
+        #region Location
         public Vector2 Clamp(Vector2 destination)
         {
             // Clamp the destination within the world bounds.
@@ -299,6 +285,7 @@ namespace Orion.Game.Simulation
 
             return new Point16((short)x, (short)y);
         }
+        #endregion
 
         /// <summary>
         /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
@@ -309,6 +296,44 @@ namespace Orion.Game.Simulation
             entities.Update(step);
             Updated.Raise(this, step);
         }
+
+        #region Event Raising and listening
+        /// <remarks>Invoked by World.EntityCollection.</remarks>
+        private void OnEntityAdded(Entity entity)
+        {
+            EntityAdded.Raise(this, entity);
+        }
+
+        /// <remarks>Invoked by World.EntityCollection.</remarks>
+        private void OnEntityRemoved(Entity entity)
+        {
+            EntityRemoved.Raise(this, entity);
+        }
+
+        /// <remarks>Invoked by Unit.</remarks>
+        internal void RaiseUnitHitting(HitEventArgs args)
+        {
+            if (UnitHitting != null) UnitHitting(this, args);
+        }
+
+        /// <remarks>Invoked by Unit.</remarks>
+        internal void OnUnitDied(Unit unit)
+        {
+            UnitDied.Raise(this, unit);
+        }
+
+        /// <remarks>Invoked by Unit.</remarks>
+        internal void OnExplosionOccured(Circle circle)
+        {
+            if (ExplosionOccured != null) ExplosionOccured(this, circle);
+        }
+
+        /// <remarks>Invoked by Faction.</remarks>
+        internal void OnFactionDefeated(Faction faction)
+        {
+            FactionDefeated.Raise(this, faction);
+        }
+        #endregion
         #endregion
     }
 }

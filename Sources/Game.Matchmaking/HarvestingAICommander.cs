@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Game.Simulation;
-using Orion.Engine.Collections;
-using Orion.Engine;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Matchmaking.Commands;
-using Orion.Game.Simulation.Skills;
 using OpenTK.Math;
+using Orion.Engine;
+using Orion.Engine.Collections;
+using Orion.Game.Matchmaking.Commands;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking
 {
@@ -19,9 +19,11 @@ namespace Orion.Game.Matchmaking
     {
         #region Fields
         private const float updatePeriod = 1.5f;
+        private const float minimumBuildingDistance = 4;
 
         private readonly UnitType workerUnitType;
         private readonly UnitType foodSupplyUnitType;
+        private readonly HashSet<Unit> buildings = new HashSet<Unit>();
         private float lastUpdateTime;
         #endregion
 
@@ -32,6 +34,9 @@ namespace Orion.Game.Matchmaking
             workerUnitType = match.UnitTypes.FromName("Schtroumpf");
             foodSupplyUnitType = match.UnitTypes.FromName("Réserve");
             lastUpdateTime = faction.Handle.Value / (float)match.World.Factions.Count() * updatePeriod;
+
+            match.World.EntityAdded += OnEntityAdded;
+            match.World.EntityRemoved += OnEntityRemoved;
         }
         #endregion
 
@@ -82,7 +87,11 @@ namespace Orion.Game.Matchmaking
                             .Clamp(buildingLocation);
 
                         Region buildingRegion = new Region(buildingLocation, foodSupplyUnitType.Size);
-                        if (Faction.CanSee(buildingRegion) && World.IsFree(buildingRegion, CollisionLayer.Ground))
+                        bool isNearOtherBuilding = buildings
+                            .Any(b => Region.Distance(b.GridRegion, buildingRegion) < minimumBuildingDistance);
+                        if (Faction.CanSee(buildingRegion)
+                            && World.IsFree(buildingRegion, CollisionLayer.Ground)
+                            && !isNearOtherBuilding)
                         {
                             var command = new BuildCommand(Faction.Handle, unit.Handle, foodSupplyUnitType.Handle, buildingLocation);
                             IssueCommand(command);
@@ -128,8 +137,8 @@ namespace Orion.Game.Matchmaking
                 if (unit.HasSkill<MoveSkill>())
                 {
                     Vector2 destination = new Vector2(
-                        unit.Center.X + (float)(Match.Random.NextDouble() * 10 - 5),
-                        unit.Center.Y + (float)(Match.Random.NextDouble() * 10 - 5));
+                        unit.Center.X + (float)(Match.Random.NextDouble() * 20 - 10),
+                        unit.Center.Y + (float)(Match.Random.NextDouble() * 20 - 10));
                     destination = World.Clamp(destination);
                     var command = new MoveCommand(Faction.Handle, unit.Handle, destination);
                     IssueCommand(command);
@@ -151,6 +160,24 @@ namespace Orion.Game.Matchmaking
 
             return maximum;
         }
+
+        #region Event Handlers
+        private void OnEntityAdded(World sender, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null || unit.Faction != Faction) return;
+
+            if (unit.IsBuilding) buildings.Add(unit);
+        }
+
+        private void OnEntityRemoved(World sender, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null || unit.Faction != Faction) return;
+
+            if (unit.IsBuilding) buildings.Remove(unit);
+        }
+        #endregion
         #endregion
     }
 }

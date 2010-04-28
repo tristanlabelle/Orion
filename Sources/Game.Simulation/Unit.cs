@@ -25,15 +25,18 @@ namespace Orion.Game.Simulation
         /// </summary>
         private const int nearbyEnemyCheckPeriod = 8;
 
-        private UnitType type;
         private readonly Faction faction;
         private readonly TaskQueue taskQueue;
+        private UnitType type;
         private Vector2 position;
         private float angle;
         private float damage;
         private Vector2? rallyPoint;
+        /// <summary>
+        /// The amount of health that has been built.
+        /// A value of <see cref="float.PositiveInfinity"/> indicates that the construction has completed.
+        /// </summary>
         private float healthBuilt;
-        private bool isUnderConstruction;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Stack<Unit> transportedUnits = new Stack<Unit>();
         #endregion
@@ -65,7 +68,6 @@ namespace Orion.Game.Simulation
             {
                 Health = 1;
                 healthBuilt = 1;
-                isUnderConstruction = true;
             }
         }
         #endregion
@@ -230,8 +232,6 @@ namespace Orion.Game.Simulation
 
                 DamageChanged.Raise(this);
                 if (damage == MaxHealth) Die();
-                else if (damage == 0 && IsUnderConstruction)
-                    isUnderConstruction = false;
             }
         }
 
@@ -252,9 +252,12 @@ namespace Orion.Game.Simulation
             set { Damage = MaxHealth - value; }
         }
 
+        /// <summary>
+        /// Gets a value indicating if this unit is under construction.
+        /// </summary>
         public bool IsUnderConstruction
         {
-            get { return isUnderConstruction; }
+            get { return !float.IsPositiveInfinity(healthBuilt); }
         }
 
         /// <summary>
@@ -262,7 +265,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float ConstructionProgress
         {
-            get { return isUnderConstruction ? Math.Min(healthBuilt / MaxHealth, 1) : 1; }
+            get { return IsUnderConstruction ? Math.Min(healthBuilt / MaxHealth, 1) : 1; }
         }
         #endregion
 
@@ -378,11 +381,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Position/Angle
-        protected override Vector2 GetPosition()
-        {
-            return Position;
-        }
-
         /// <summary>
         /// Rotates this <see cref="Unit"/> so that it faces a target.
         /// </summary>
@@ -392,6 +390,17 @@ namespace Orion.Game.Simulation
             Vector2 delta = target - Center;
             if (delta.LengthSquared < 0.01f) return;
             Angle = (float)Math.Atan2(delta.Y, delta.X);
+        }
+
+        protected override Vector2 GetPosition()
+        {
+            return Position;
+        }
+
+        protected override void OnMoved(Vector2 oldPosition, Vector2 newPosition)
+        {
+            faction.OnUnitMoved(this, oldPosition, newPosition);
+            base.OnMoved(oldPosition, newPosition);
         }
         #endregion
 
@@ -430,7 +439,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsurePositive(amount, "amount");
 
-            if (!isUnderConstruction)
+            if (!IsUnderConstruction)
             {
                 Debug.Fail("Cannot build a building not under construction.");
                 return;
@@ -438,24 +447,27 @@ namespace Orion.Game.Simulation
 
             Health += amount;
             healthBuilt += amount;
-            if (healthBuilt >= MaxHealth)
-            {
-                isUnderConstruction = false;
-                ConstructionCompleted.Raise(this);
-            }
+            if (healthBuilt >= MaxHealth) OnConstructionCompleted();
         }
 
         public void CompleteConstruction()
         {
-            if (!isUnderConstruction)
+            if (!IsUnderConstruction)
             {
                 Debug.Fail("Cannot complete the construction of a building not under construction.");
                 return;
             }
 
             Health = MaxHealth;
-            isUnderConstruction = false;
+            OnConstructionCompleted();
+        }
+
+        private void OnConstructionCompleted()
+        {
+            Debug.Assert(IsUnderConstruction);
+            healthBuilt = float.PositiveInfinity;
             ConstructionCompleted.Raise(this);
+            faction.OnBuildingConstructionCompleted(this);
         }
         #endregion
 
@@ -608,6 +620,7 @@ namespace Orion.Game.Simulation
         {
             taskQueue.Clear();
             base.OnDied();
+            Faction.OnUnitDied(this);
             World.OnUnitDied(this);
         }
 

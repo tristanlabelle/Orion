@@ -36,8 +36,6 @@ namespace Orion.Game.Simulation
         private readonly HashSet<Technology> technologies = new HashSet<Technology>();
 
         private readonly Action<FogOfWar, Region> fogOfWarChangedEventHandler;
-        private readonly ValueChangedEventHandler<Entity, Vector2> unitMovedEventHandler;
-        private readonly Action<Unit> buildingConstructionCompleted;
 
         private int aladdiumAmount;
         private int alageneAmount;
@@ -67,10 +65,7 @@ namespace Orion.Game.Simulation
 
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-            this.unitMovedEventHandler = OnUnitMoved;
-            this.buildingConstructionCompleted = OnBuildingConstructionCompleted;
             this.world.FactionDefeated += OnFactionDefeated;
-            this.world.UnitDied += OnUnitDied;
         }
         #endregion
 
@@ -316,42 +311,33 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
-            if (unit.IsBuilding)
-            {
-                unit.ConstructionCompleted += buildingConstructionCompleted;
-                localFogOfWar.AddRegion(unit.GridRegion);
-            }
-            else
-            {
-                localFogOfWar.AddLineOfSight(unit.LineOfSight);
-            }
+            if (unit.IsBuilding) localFogOfWar.AddRegion(unit.GridRegion);
+            else localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
-            unit.Moved += unitMovedEventHandler;
             usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 
             return unit;
         }
 
-        private void OnUnitMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
+        #region Notifications invoked by Unit
+        /// <remarks>Invoked by Unit.</remarks>
+        internal void OnUnitMoved(Unit unit, Vector2 oldPosition, Vector2 newPosition)
         {
-            Unit unit = (Unit)entity;
-            Debug.Assert(!unit.IsBuilding);
+            Debug.Assert(unit != null && unit.Faction == this && !unit.IsBuilding);
 
             int sightRange = unit.GetStat(BasicSkill.SightRangeStat);
-            Vector2 extent = entity.BoundingRectangle.Extent;
+            Vector2 extent = unit.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
-        private void OnUnitDied(World sender, Entity entity)
+        internal void OnUnitDied(Unit unit)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != this) return;
+            Debug.Assert(unit != null && unit.Faction == this);
 
             if (unit.IsUnderConstruction)
             {
-                unit.ConstructionCompleted -= buildingConstructionCompleted;
                 localFogOfWar.RemoveRegion(unit.GridRegion);
             }
             else
@@ -365,22 +351,23 @@ namespace Orion.Game.Simulation
             usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
         }
 
-        private void OnFactionDefeated(World world, Faction faction)
-        {
-            if (faction == this) return;
-            factionsWeRegardAsAllies.Remove(faction);
-        }
-
-        private void OnBuildingConstructionCompleted(Unit unit)
+        /// <remarks>Invoked by Unit.</remarks>
+        internal void OnBuildingConstructionCompleted(Unit unit)
         {
             Debug.Assert(unit != null && unit.Faction == this);
 
-            unit.ConstructionCompleted -= buildingConstructionCompleted;
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
             if (unit.HasSkill<ProvideFoodSkill>())
                 totalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
+        }
+        #endregion
+
+        private void OnFactionDefeated(World world, Faction faction)
+        {
+            if (faction == this) return;
+            factionsWeRegardAsAllies.Remove(faction);
         }
 
         /// <summary>

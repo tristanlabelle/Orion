@@ -364,6 +364,9 @@ namespace Orion.Game.Simulation
             Debug.Assert(newType != null);
             Debug.Assert(oldType != newType);
 
+            UsedFoodAmount -= GetStat(oldType, BasicSkill.FoodCostStat);
+            UsedFoodAmount += GetStat(newType, BasicSkill.FoodCostStat);
+
             if (unit.IsUnderConstruction)
             {
                 Region oldRegion = Entity.GetGridRegion(unit.Position, oldType.Size);

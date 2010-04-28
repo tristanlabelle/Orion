@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using System.IO;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -57,10 +58,23 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
+            Faction faction = match.World.FindFactionFromHandle(FactionHandle);
+
             UnitType targetUnitType = match.UnitTypes.FromHandle(targetUnitTypeHandle);
+            int targetUnitTypeFoodCost = faction.GetStat(targetUnitType, BasicSkill.FoodCostStat);
+
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
+                int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);
+
+                if (targetUnitTypeFoodCost > unitFoodCost
+                    && faction.UsedFoodAmount - unitFoodCost + targetUnitTypeFoodCost > faction.MaxFoodAmount)
+                {
+                    faction.RaiseWarning("Not enough food to upgrade to {0}.".FormatInvariant(targetUnitType.Name));
+                    return;
+                }
+
                 unit.Type = targetUnitType;
             }
         }

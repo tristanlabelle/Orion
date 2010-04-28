@@ -111,8 +111,6 @@ namespace Orion.Game.Simulation
                     throw new ArgumentException("A unit type upgrade cannot change airborneness.", "Type");
                 if (value.Size != type.Size)
                     throw new ArgumentException("A unit type upgrade cannot change the unit size.", "Type");
-                if (faction.GetStat(value, BasicSkill.FoodCostStat) != faction.GetStat(type, BasicSkill.FoodCostStat))
-                    throw new ArgumentException("A unit type upgrade cannot change the food cost.", "Type");
 
                 UnitType oldType = type;
                 type = value;

@@ -100,7 +100,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            TryApplyRallyPoint(trainee, Unit.RallyPoint.Value);
+            TryApplyRallyPoint(trainee);
 
             MarkAsEnded();
         }
@@ -150,7 +150,7 @@ namespace Orion.Game.Simulation.Tasks
             return spawnee;
         }
 
-        private void TryApplyRallyPoint(Unit unit, Vector2 target)
+        private void TryApplyRallyPoint(Unit unit)
         {
             if (!Unit.HasRallyPoint) return;
 
@@ -159,7 +159,7 @@ namespace Orion.Game.Simulation.Tasks
             if (unit.HasSkill<HarvestSkill>())
             {
                 ResourceNode resourceNode = World.Entities
-                    .Intersecting(target)
+                    .Intersecting(Unit.RallyPoint.Value)
                     .OfType<ResourceNode>()
                     .FirstOrDefault();
 
@@ -169,7 +169,7 @@ namespace Orion.Game.Simulation.Tasks
             
             if (rallyPointTask == null)
             {
-                Point targetPoint = (Point)target;
+                Point targetPoint = (Point)Unit.RallyPoint.Value;
                 rallyPointTask = new MoveTask(unit, targetPoint);
             }
 

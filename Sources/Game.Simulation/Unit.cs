@@ -92,21 +92,6 @@ namespace Orion.Game.Simulation
         /// Raised when this <see cref="Unit"/> hits another <see cref="Unit"/>.
         /// </summary>
         public event Action<Unit, HitEventArgs> Hitting;
-
-        private void RaiseHitting(Unit target, float damage)
-        {
-            HitEventArgs args = new HitEventArgs(this, target, damage);
-
-            if (Hitting != null) Hitting(this, args);
-
-            World.RaiseUnitHitting(args);
-        }
-
-        private void RaiseTypeChanged(UnitType oldType, UnitType newType)
-        {
-            if (TypeChanged != null)
-                TypeChanged(this, oldType, newType);
-        }
         #endregion
 
         #region Properties
@@ -128,14 +113,10 @@ namespace Orion.Game.Simulation
                     throw new ArgumentException("A unit type upgrade cannot change the unit size.", "Type");
                 if (faction.GetStat(value, BasicSkill.FoodCostStat) != faction.GetStat(type, BasicSkill.FoodCostStat))
                     throw new ArgumentException("A unit type upgrade cannot change the food cost.", "Type");
-                if (faction.GetStat(value, BasicSkill.SightRangeStat) != faction.GetStat(type, BasicSkill.SightRangeStat))
-                    throw new ArgumentException("A unit type upgrade cannot change the sight range.", "Type");
-
-                taskQueue.Clear();
 
                 UnitType oldType = type;
                 type = value;
-                RaiseTypeChanged(oldType, value);
+                OnTypeChanged(oldType, value);
             }
         }
 
@@ -321,7 +302,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        #region Skills
+        #region Skills/Type
         /// <summary>
         /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
         /// </summary>
@@ -378,6 +359,14 @@ namespace Orion.Game.Simulation
             int range = GetStat(HealSkill.RangeStat);
             return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
         }
+
+        private void OnTypeChanged(UnitType oldType, UnitType newType)
+        {
+            taskQueue.Clear();
+            if (TypeChanged != null)
+                TypeChanged(this, oldType, newType);
+            Faction.OnUnitTypeChanged(this, oldType, newType);
+        }
         #endregion
 
         #region Position/Angle
@@ -404,7 +393,7 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Actions
+        #region Hitting
         public bool TryHit(Unit target)
         {
             Argument.EnsureNotNull(target, "target");
@@ -427,14 +416,20 @@ namespace Orion.Game.Simulation
 
             timeElapsedSinceLastHitInSeconds = 0;
 
-            RaiseHitting(target, damage);
+            OnHitting(target, damage);
         }
 
-        public void Suicide()
+        private void OnHitting(Unit target, float damage)
         {
-            Health = 0;
-        }
+            HitEventArgs args = new HitEventArgs(this, target, damage);
 
+            if (Hitting != null) Hitting(this, args);
+
+            World.RaiseUnitHitting(args);
+        }
+        #endregion
+
+        #region Building
         public void Build(float amount)
         {
             Argument.EnsurePositive(amount, "amount");
@@ -471,6 +466,55 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
+        #region Exploding
+        private void Explode()
+        {
+            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
+            Circle explosionCircle = new Circle(Center, explosionRadius);
+
+            World.OnExplosionOccured(explosionCircle);
+            Suicide();
+
+            Unit[] damagedUnits = World.Entities
+                .Intersecting(explosionCircle)
+                .OfType<Unit>()
+                .Where(unit => unit != this && unit.IsAlive)
+                .ToArray();
+
+            float explosionDamage = GetStat(SuicideBombSkill.DamageStat);
+            foreach (Unit damagedUnit in damagedUnits)
+            {
+                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
+                float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
+                    * explosionDamage;
+                damagedUnit.Health -= damage;
+            }
+
+            foreach (Unit damagedUnit in damagedUnits)
+            {
+                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                damagedUnit.Explode();
+            }
+        }
+        #endregion
+
+        #region Dying
+        public void Suicide()
+        {
+            Health = 0;
+        }
+
+        protected override void OnDied()
+        {
+            taskQueue.Clear();
+            base.OnDied();
+            Faction.OnUnitDied(this);
+            World.OnUnitDied(this);
+        }
+        #endregion
+
+        #region Updating
         protected override void DoUpdate(SimulationStep step)
         {
             timeElapsedSinceLastHitInSeconds += step.TimeDeltaInSeconds;
@@ -522,37 +566,6 @@ namespace Orion.Game.Simulation
             Explode();
 
             return true;
-        }
-
-        private void Explode()
-        {
-            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
-            Circle explosionCircle = new Circle(Center, explosionRadius);
-
-            World.OnExplosionOccured(explosionCircle);
-            Suicide();
-
-            Unit[] damagedUnits = World.Entities
-                .Intersecting(explosionCircle)
-                .OfType<Unit>()
-                .Where(unit => unit != this && unit.IsAlive)
-                .ToArray();
-
-            float explosionDamage = GetStat(SuicideBombSkill.DamageStat);
-            foreach (Unit damagedUnit in damagedUnits)
-            {
-                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
-                float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
-                float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
-                    * explosionDamage;
-                damagedUnit.Health -= damage;
-            }
-
-            foreach (Unit damagedUnit in damagedUnits)
-            {
-                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
-                damagedUnit.Explode();
-            }
         }
 
         private bool TryAttackNearbyUnit()
@@ -615,14 +628,7 @@ namespace Orion.Game.Simulation
             taskQueue.OverrideWith(repairTask);
             return true;
         }
-
-        protected override void OnDied()
-        {
-            taskQueue.Clear();
-            base.OnDied();
-            Faction.OnUnitDied(this);
-            World.OnUnitDied(this);
-        }
+        #endregion
 
         public override string ToString()
         {

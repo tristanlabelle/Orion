@@ -323,7 +323,9 @@ namespace Orion.Game.Simulation
         /// <remarks>Invoked by Unit.</remarks>
         internal void OnUnitMoved(Unit unit, Vector2 oldPosition, Vector2 newPosition)
         {
-            Debug.Assert(unit != null && unit.Faction == this && !unit.IsBuilding);
+            Debug.Assert(unit != null);
+            Debug.Assert(unit.Faction == this);
+            Debug.Assert(!unit.IsBuilding);
 
             int sightRange = unit.GetStat(BasicSkill.SightRangeStat);
             Vector2 extent = unit.BoundingRectangle.Extent;
@@ -332,9 +334,11 @@ namespace Orion.Game.Simulation
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
+        /// <remarks>Invoked by Unit.</remarks>
         internal void OnUnitDied(Unit unit)
         {
-            Debug.Assert(unit != null && unit.Faction == this);
+            Debug.Assert(unit != null);
+            Debug.Assert(unit.Faction == this);
 
             if (unit.IsUnderConstruction)
             {
@@ -352,9 +356,40 @@ namespace Orion.Game.Simulation
         }
 
         /// <remarks>Invoked by Unit.</remarks>
+        internal void OnUnitTypeChanged(Unit unit, UnitType oldType, UnitType newType)
+        {
+            Debug.Assert(unit != null);
+            Debug.Assert(unit.Faction == this);
+            Debug.Assert(oldType != null);
+            Debug.Assert(newType != null);
+            Debug.Assert(oldType != newType);
+
+            if (unit.IsUnderConstruction)
+            {
+                Region oldRegion = Entity.GetGridRegion(unit.Position, oldType.Size);
+                Region newRegion = Entity.GetGridRegion(unit.Position, newType.Size);
+                localFogOfWar.RemoveRegion(oldRegion);
+                localFogOfWar.AddRegion(newRegion);
+            }
+            else
+            {
+                Vector2 oldCenter = unit.Position + (Vector2)oldType.Size * 0.5f;
+                int oldSightRange = GetStat(oldType, BasicSkill.SightRangeStat);
+                
+                Vector2 newCenter = unit.Position + (Vector2)newType.Size * 0.5f;
+                int newSightRange = GetStat(newType, BasicSkill.SightRangeStat);
+
+                localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
+                localFogOfWar.AddLineOfSight(new Circle(newCenter, newSightRange));
+            }
+        }
+
+        /// <remarks>Invoked by Unit.</remarks>
         internal void OnBuildingConstructionCompleted(Unit unit)
         {
-            Debug.Assert(unit != null && unit.Faction == this);
+            Debug.Assert(unit != null);
+            Debug.Assert(unit.Faction == this);
+            Debug.Assert(unit.IsBuilding);
 
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.LineOfSight);

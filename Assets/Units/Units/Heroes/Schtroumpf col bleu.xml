@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Schtroumpf col bleu" VoicesTemplate="Schtroumpf" Width="1" Height="1" IsSuicidable="False">
 	<Skills>
-		<Basic SightRange="3" MaxHealth="50" RangedArmor="2" MeleeArmor="2" FoodCost="5"/>
+		<Basic SightRange="3" MaxHealth="50" RangedArmor="2" MeleeArmor="2" FoodCost="1"/>
 		<Move Speed="2"/>
 		<Attack Power="1" Range="0" Delay="10"/>
 		<Build Speed="2">

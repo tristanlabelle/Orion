@@ -27,8 +27,9 @@ namespace Orion.Game.Matchmaking.AI
         private readonly UnitType workerUnitType;
         private readonly UnitType foodSupplyUnitType;
         private readonly UnitType resourceDepotUnitType;
+        private readonly UnitType alageneExtractorUnitType;
         private readonly HashSet<Unit> buildings = new HashSet<Unit>();
-        private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodes
+        private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodesData
             = new Dictionary<ResourceNode, ResourceNodeData>();
 
         /// <summary>
@@ -46,6 +47,7 @@ namespace Orion.Game.Matchmaking.AI
             workerUnitType = match.UnitTypes.FromName("Schtroumpf");
             foodSupplyUnitType = match.UnitTypes.FromName("Réserve");
             resourceDepotUnitType = match.UnitTypes.FromName("Costco des Hells");
+            alageneExtractorUnitType = match.UnitTypes.First(t => t.HasSkill<ExtractAlageneSkill>());
             lastUpdateTime = faction.Handle.Value / (float)match.World.Factions.Count() * updatePeriod;
 
             match.World.EntityAdded += OnEntityAdded;
@@ -70,21 +72,6 @@ namespace Orion.Game.Matchmaking.AI
                     yield return node;
                 }
             }
-        }
-
-        private ResourceAmount WorkerCost
-        {
-            get { return ResourceAmount.FromUnitCost(workerUnitType, Faction); }
-        }
-
-        private ResourceAmount FoodSupplyCost
-        {
-            get { return ResourceAmount.FromUnitCost(foodSupplyUnitType, Faction); }
-        }
-
-        private ResourceAmount ResourceDepotCost
-        {
-            get { return ResourceAmount.FromUnitCost(resourceDepotUnitType, Faction); }
         }
 
         private IEnumerable<Unit> IdleUnits
@@ -129,63 +116,90 @@ namespace Orion.Game.Matchmaking.AI
                 && Faction.MaxFoodAmount != World.MaximumFoodAmount;
             if (isLowOnFood)
             {
-                if (budget >= FoodSupplyCost)
+                var foodSupplyCost = GetCost(foodSupplyUnitType);
+                if (budget >= foodSupplyCost)
                 {
                     Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(foodSupplyUnitType));
                     if (unit != null && TryBuildNear(unit, foodSupplyUnitType, unit.Center))
                         assignedUnits.Add(unit);
                 }
 
-                budget -= FoodSupplyCost;
+                budget -= foodSupplyCost;
             }
         }
 
         private void UpdateResourceNodes(ref ResourceAmount budget)
         {
-            foreach (ResourceNodeData data in resourceNodes.Values)
+            foreach (ResourceNodeData data in resourceNodesData.Values)
                 data.HarvesterCount = 0;
 
             var harvestTasks = Faction.Units
                 .Select(u => u.TaskQueue.FirstOrDefault() as HarvestTask)
-                .Where(t => t != null && t.ResourceNode.Type == ResourceType.Aladdium);
+                .Where(t => t != null);
             foreach (HarvestTask harvestTask in harvestTasks)
             {
-                ResourceNodeData nodeData = resourceNodes[harvestTask.ResourceNode];
+                ResourceNodeData nodeData;
+                if (!resourceNodesData.TryGetValue(harvestTask.ResourceNode, out nodeData))
+                {
+                    // This can happen when a node depletes.
+                    continue;
+                }
+
                 ++nodeData.HarvesterCount;
             }
 
-            var aladdiumNodes = World.Entities
-                .OfType<ResourceNode>()
-                .Where(node => node.Type == ResourceType.Aladdium);
-            foreach (ResourceNode node in aladdiumNodes)
+            var resourceNodes = World.Entities.OfType<ResourceNode>();
+            foreach (ResourceNode node in resourceNodes)
             {
                 ResourceNodeData nodeData;
-                if (!resourceNodes.TryGetValue(node, out nodeData) && Faction.CanSee(node))
-                    resourceNodes.Add(node, new ResourceNodeData(node));
+                if (!resourceNodesData.TryGetValue(node, out nodeData))
+                {
+                    if (!Faction.CanSee(node)) continue;
 
-                if (nodeData == null
-                    || nodeData.HarvesterCount == 0
-                    || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAlive))
+                    nodeData = new ResourceNodeData(node);
+                    resourceNodesData.Add(node, nodeData);
+                }
+
+                if (nodeData.Node.Type == ResourceType.Alagene
+                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAlive)
+                    && World.IsFree(node.GridRegion, CollisionLayer.Ground))
+                {
+                    var alageneExtractorCost = GetCost(alageneExtractorUnitType);
+                    if (budget >= alageneExtractorCost)
+                    {
+                        Unit builder = GetNearbyUnit(u => u.Type.CanBuild(alageneExtractorUnitType), node.Center);
+                        if (builder != null)
+                        {
+                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorUnitType.Handle, node.Position);
+                            IssueCommand(command);
+                            assignedUnits.Add(builder);
+                        }
+                    }
+
+                    budget -= alageneExtractorCost;
+                }
+                
+                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAlive))
                     continue;
 
                 // Find a nearby depot;
                 nodeData.NearbyDepot = World.Entities
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
                     .OfType<Unit>()
-                    .Where(u => u.Faction == Faction
-                        && u.HasSkill<StoreResourcesSkill>())
+                    .Where(u => u.Faction == Faction && u.HasSkill<StoreResourcesSkill>())
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
                 // Build a nearby depot
-                if (budget >= ResourceDepotCost)
+                var resourceDepotCost = GetCost(resourceDepotUnitType);
+                if (budget >= resourceDepotCost)
                 {
                     Unit builder = GetNearbyUnit(u => u.Type.CanBuild(resourceDepotUnitType), node.Center);
                     if (builder != null && TryBuildNear(builder, resourceDepotUnitType, node.Center))
                         assignedUnits.Add(builder);
                 }
 
-                budget -= ResourceDepotCost;
+                budget -= resourceDepotCost;
             }
         }
 
@@ -193,19 +207,20 @@ namespace Orion.Game.Matchmaking.AI
         {
             if (unit.Type.CanTrain(workerUnitType))
             {
-                int workerToCreateCount = budget.GetQuotient(WorkerCost);
+                var workerCost = GetCost(workerUnitType);
+                int workerToCreateCount = budget.GetQuotient(workerCost);
                 if (workerToCreateCount > 0)
                 {
                     var command = new TrainCommand(Faction.Handle, unit.Handle, workerUnitType.Handle, workerToCreateCount);
                     IssueCommand(command);
-                    budget -= WorkerCost * workerToCreateCount;
+                    budget -= workerCost * workerToCreateCount;
                     return;
                 }
             }
 
             if (unit.HasSkill<HarvestSkill>())
             {
-                var nodeData = resourceNodes.Values
+                var nodeData = resourceNodesData.Values
                     .Where(d => d.HarvesterCount < maximumHarvestersPerResourceNode)
                     .WithMinOrDefault(d => Region.Distance(unit.GridRegion, d.Node.GridRegion) + d.HarvesterCount * 2);
                 if (nodeData != null)
@@ -232,6 +247,11 @@ namespace Orion.Game.Matchmaking.AI
         #endregion
 
         #region Helpers
+        private ResourceAmount GetCost(UnitType unitType)
+        {
+            return ResourceAmount.FromUnitCost(unitType, Faction);
+        }
+
         private Unit GetNearbyUnit(Func<Unit, bool> predicate, Vector2 location)
         {
             return Faction.Units
@@ -285,7 +305,19 @@ namespace Orion.Game.Matchmaking.AI
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != Faction) return;
 
-            if (unit.IsBuilding) buildings.Add(unit);
+            if (unit.IsBuilding)
+            {
+                buildings.Add(unit);
+                if (unit.Type == alageneExtractorUnitType)
+                {
+                    ResourceNode node = World.Entities.Intersecting(unit.Center)
+                        .OfType<ResourceNode>()
+                        .First();
+
+                    var nodeData = resourceNodesData[node];
+                    nodeData.Extractor = unit;
+                }
+            }
         }
 
         private void OnEntityRemoved(World sender, Entity entity)
@@ -293,7 +325,7 @@ namespace Orion.Game.Matchmaking.AI
             ResourceNode node = entity as ResourceNode;
             if (node != null)
             {
-                resourceNodes.Remove(node);
+                resourceNodesData.Remove(node);
                 return;
             }
 

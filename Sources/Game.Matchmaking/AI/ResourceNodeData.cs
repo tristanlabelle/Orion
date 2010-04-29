@@ -14,39 +14,17 @@ namespace Orion.Game.Matchmaking.AI
     internal sealed class ResourceNodeData
     {
         #region Fields
-        private readonly ResourceNode node;
-        private int harvesterCount;
-        private Unit nearbyDepot;
+        public readonly ResourceNode Node;
+        public int HarvesterCount;
+        public Unit NearbyDepot;
+        public Unit Extractor;
         #endregion
 
         #region Constructors
         public ResourceNodeData(ResourceNode node)
         {
             Argument.EnsureNotNull(node, "node");
-            this.node = node;
-        }
-        #endregion
-
-        #region Properties
-        public ResourceNode Node
-        {
-            get { return node; }
-        }
-
-        public int HarvesterCount
-        {
-            get { return harvesterCount; }
-            set
-            {
-                Argument.EnsurePositive(value, "HarvesterCount");
-                harvesterCount = value;
-            }
-        }
-
-        public Unit NearbyDepot
-        {
-            get { return nearbyDepot; }
-            set { nearbyDepot = value; }
+            this.Node = node;
         }
         #endregion
     }

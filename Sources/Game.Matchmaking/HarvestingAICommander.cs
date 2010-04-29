@@ -11,23 +11,56 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Engine.Geometry;
 
-namespace Orion.Game.Matchmaking.AI
+namespace Orion.Game.Matchmaking
 {
     /// <summary>
     /// An AI commander which is pretty much helpless.
     /// </summary>
     public sealed class HarvestingAICommander : Commander
     {
+        #region Nested Types
+        #region ResourceNodeData
+        private sealed class ResourceNodeData
+        {
+            public readonly ResourceNode Node;
+            public int HarvesterCount;
+            public Unit NearbyDepot;
+            public Unit Extractor;
+
+            public ResourceNodeData(ResourceNode node)
+            {
+                Argument.EnsureNotNull(node, "node");
+                this.Node = node;
+            }
+        }
+        #endregion
+
+        #region PlaceToExplore
+        private sealed class PlaceToExplore
+        {
+            public readonly Point Point;
+            public float TimeLastExplorerSent;
+
+            public PlaceToExplore(Point point) { this.Point = point; }
+        }
+        #endregion
+        #endregion
+
         #region Fields
+        private const int explorationZoneSize = 8;
         private const float updatePeriod = 1.5f;
         private const int maximumHarvestersPerResourceNode = 4;
         private const float minimumBuildingDistance = 4;
-        private const float maximumResourceDepotDistance = 15;
+        private const float maximumResourceDepotDistance = 12;
+        private const float minimumPyramidDistance = 30;
 
         private readonly UnitType workerUnitType;
         private readonly UnitType foodSupplyUnitType;
         private readonly UnitType resourceDepotUnitType;
         private readonly UnitType alageneExtractorUnitType;
+        private readonly UnitType pyramidUnitType;
+
+        private readonly List<PlaceToExplore> placesToExplore = new List<PlaceToExplore>();
         private readonly HashSet<Unit> buildings = new HashSet<Unit>();
         private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodesData
             = new Dictionary<ResourceNode, ResourceNodeData>();
@@ -47,7 +80,20 @@ namespace Orion.Game.Matchmaking.AI
             workerUnitType = match.UnitTypes.FromName("Schtroumpf");
             foodSupplyUnitType = match.UnitTypes.FromName("Réserve");
             resourceDepotUnitType = match.UnitTypes.FromName("Costco des Hells");
-            alageneExtractorUnitType = match.UnitTypes.First(t => t.HasSkill<ExtractAlageneSkill>());
+            alageneExtractorUnitType = match.UnitTypes.FromName("Extracteur d'alagène");
+            pyramidUnitType = match.UnitTypes.FromName("Pyramide");
+
+            for (int y = 0; y < World.Height / explorationZoneSize; ++y)
+            {
+                for (int x = 0; x < World.Width / explorationZoneSize; ++x)
+                {
+                    Point point = new Point(
+                        x * explorationZoneSize + explorationZoneSize / 2,
+                        y * explorationZoneSize + explorationZoneSize / 2);
+                    placesToExplore.Add(new PlaceToExplore(point));
+                }
+            }
+
             lastUpdateTime = faction.Handle.Value / (float)match.World.Factions.Count() * updatePeriod;
 
             match.World.EntityAdded += OnEntityAdded;
@@ -102,10 +148,11 @@ namespace Orion.Game.Matchmaking.AI
 
             UpdateFoodSupplies(ref budget);
             UpdateResourceNodes(ref budget);
+            UpdateExploration();
 
             foreach (Unit unit in IdleUnits)
             {
-                UpdateIdleUnit(unit, ref budget);
+                UpdateIdleUnit(step, unit, ref budget);
             }
         }
 
@@ -190,21 +237,36 @@ namespace Orion.Game.Matchmaking.AI
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
-                // Build a nearby depot
-                var resourceDepotCost = GetCost(resourceDepotUnitType);
-                if (budget >= resourceDepotCost)
+                // Build a nearby depot or pyramid
+                UnitType buildingType = resourceDepotUnitType;
+
+                Unit nearestPyramid = buildings
+                    .Where(building => building.Type == pyramidUnitType)
+                    .WithMinOrDefault(pyramid => (pyramid.Center - node.Center).LengthSquared);
+                if (nearestPyramid == null || (nearestPyramid.Center - node.Center).LengthFast > minimumPyramidDistance)
+                    buildingType = pyramidUnitType;
+
+                var buildingCost = GetCost(buildingType);
+                if (budget >= buildingCost)
                 {
-                    Unit builder = GetNearbyUnit(u => u.Type.CanBuild(resourceDepotUnitType), node.Center);
-                    if (builder != null && TryBuildNear(builder, resourceDepotUnitType, node.Center))
+                    Unit builder = GetNearbyUnit(u => u.Type.CanBuild(buildingType), node.Center);
+                    if (builder != null && TryBuildNear(builder, buildingType, node.Center))
                         assignedUnits.Add(builder);
                 }
 
-                budget -= resourceDepotCost;
+                budget -= buildingCost;
             }
         }
 
-        private void UpdateIdleUnit(Unit unit, ref ResourceAmount budget)
+        private void UpdateExploration()
         {
+            placesToExplore.RemoveAll(place => Faction.GetTileVisibility(place.Point) != TileVisibility.Undiscovered);
+        }
+
+        private void UpdateIdleUnit(SimulationStep step, Unit unit, ref ResourceAmount budget)
+        {
+            if (unit.IsUnderConstruction) return;
+
             if (unit.Type.CanTrain(workerUnitType))
             {
                 var workerCost = GetCost(workerUnitType);
@@ -221,7 +283,7 @@ namespace Orion.Game.Matchmaking.AI
             if (unit.HasSkill<HarvestSkill>())
             {
                 var nodeData = resourceNodesData.Values
-                    .Where(d => d.HarvesterCount < maximumHarvestersPerResourceNode)
+                    .Where(d => Faction.CanHarvest(d.Node) && d.HarvesterCount < maximumHarvestersPerResourceNode)
                     .WithMinOrDefault(d => Region.Distance(unit.GridRegion, d.Node.GridRegion) + d.HarvesterCount * 2);
                 if (nodeData != null)
                 {
@@ -235,11 +297,11 @@ namespace Orion.Game.Matchmaking.AI
 
             if (unit.HasSkill<MoveSkill>())
             {
-                Vector2 destination = new Vector2(
-                    unit.Center.X + (float)(Match.Random.NextDouble() * 20 - 10),
-                    unit.Center.Y + (float)(Match.Random.NextDouble() * 20 - 10));
-                destination = World.Clamp(destination);
-                var command = new MoveCommand(Faction.Handle, unit.Handle, destination);
+                var place = placesToExplore
+                    .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > 5)
+                    .WithMin(p => (unit.Center - p.Point).LengthSquared);
+                place.TimeLastExplorerSent = step.TimeInSeconds;
+                var command = new MoveCommand(Faction.Handle, unit.Handle, place.Point);
                 IssueCommand(command);
                 return;
             }
@@ -269,9 +331,9 @@ namespace Orion.Game.Matchmaking.AI
         private float GetOccupationImportance(Unit unit)
         {
             Task task = unit.TaskQueue.FirstOrDefault();
-            if (task == null) return 0;
+            if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
-            if (task is BuildTask) return 6;
+            if (task is BuildTask) return 12;
             return 2;
         }
 

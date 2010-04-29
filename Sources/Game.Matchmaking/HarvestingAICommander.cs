@@ -206,7 +206,7 @@ namespace Orion.Game.Matchmaking
         
         private void UpdateTechnologies(ref ResourceAmount budget)
         {
-        	if (Faction.UsedFoodAmount < 80) return;
+        	if (Faction.UsedFoodAmount < 50) return;
         	if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
         	
         	var laboratoryCost = GetCost(laboratoryUnitType);
@@ -423,7 +423,7 @@ namespace Orion.Game.Matchmaking
             Task task = unit.TaskQueue.FirstOrDefault();
             if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
-            if (task is BuildTask) return 20;
+            if (task is BuildTask) return 30;
             return 2;
         }
 

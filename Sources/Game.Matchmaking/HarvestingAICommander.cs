@@ -62,8 +62,11 @@ namespace Orion.Game.Matchmaking
         private readonly UnitType resourceDepotUnitType;
         private readonly UnitType alageneExtractorUnitType;
         private readonly UnitType pyramidUnitType;
+        private readonly UnitType defenseTowerUnitType;
+        private readonly UnitType laboratoryUnitType;
 
         private readonly List<PlaceToExplore> placesToExplore = new List<PlaceToExplore>();
+        private readonly HashSet<UnitType> createdUnitTypes = new HashSet<UnitType>();
         private readonly HashSet<Unit> buildings = new HashSet<Unit>();
         private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodesData
             = new Dictionary<ResourceNode, ResourceNodeData>();
@@ -85,6 +88,8 @@ namespace Orion.Game.Matchmaking
             resourceDepotUnitType = match.UnitTypes.FromName("Costco des Hells");
             alageneExtractorUnitType = match.UnitTypes.FromName("Extracteur d'alagène");
             pyramidUnitType = match.UnitTypes.FromName("Pyramide");
+            defenseTowerUnitType = match.UnitTypes.FromName("Jean-Marc");
+            laboratoryUnitType = match.UnitTypes.FromName("Maison de Tristan");
 
             for (int y = 0; y < World.Height / explorationZoneSize; ++y)
             {
@@ -150,6 +155,8 @@ namespace Orion.Game.Matchmaking
                 Faction.RemainingFoodAmount);
 
             UpdateFoodSupplies(ref budget);
+            UpdateDefense(ref budget);
+            UpdateTechnologies(ref budget);
             UpdateResourceNodes(ref budget);
             UpdateExploration();
 
@@ -176,6 +183,41 @@ namespace Orion.Game.Matchmaking
 
                 budget -= foodSupplyCost;
             }
+        }
+        
+        private void UpdateDefense(ref ResourceAmount budget)
+        {
+        	var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
+        		.FirstOrDefault(u => Faction.CanSee(u)
+        		    && Faction.GetDiplomaticStance(u.Faction) == DiplomaticStance.Enemy
+        		    && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
+        	if (firstUnthreatenedVisibleEnemy == null) return;
+        	
+        	var defenseTowerCost = GetCost(defenseTowerUnitType);
+        	if (budget >= defenseTowerCost)
+        	{
+    		    Unit unit = GetNearbyUnit(u => u.Type.CanBuild(defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
+                if (unit != null && TryBuildNear(unit, defenseTowerUnitType, firstUnthreatenedVisibleEnemy.Center))
+                    assignedUnits.Add(unit);
+        	}
+        	
+        	budget -= defenseTowerCost;
+        }
+        
+        private void UpdateTechnologies(ref ResourceAmount budget)
+        {
+        	if (Faction.UsedFoodAmount < 80) return;
+        	if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
+        	
+        	var laboratoryCost = GetCost(laboratoryUnitType);
+        	if (budget >= laboratoryCost)
+        	{
+    		    Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(laboratoryUnitType));
+                if (unit != null && TryBuildNear(unit, laboratoryUnitType, unit.Center))
+                    assignedUnits.Add(unit);
+        	}
+        	
+        	budget -= laboratoryCost;
         }
 
         private void UpdateResourceNodes(ref ResourceAmount budget)
@@ -316,6 +358,43 @@ namespace Orion.Game.Matchmaking
                     return;
                 }
             }
+            
+            if (unit.HasSkill<ResearchSkill>())
+            {
+            	foreach (var technology in Match.TechnologyTree.Technologies)
+            	{
+            		if (!unit.Type.CanResearch(technology)) continue;
+                    if (Faction.HasResearched(technology)) continue;
+            		if (createdUnitTypes.None(type => technology.AppliesTo(type))) continue;
+            		
+            		var cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost);
+            		if (!(budget >= cost)) continue;
+            		
+	            	var command = new ResearchCommand(Faction.Handle, unit.Handle, technology.Handle);
+	            	IssueCommand(command);
+            		
+            		budget -= cost;
+            		
+            		break;
+            	}
+            }
+            
+            foreach (UnitTypeUpgrade upgrade in unit.Type.Upgrades)
+            {
+            	if (upgrade.IsFree) continue;
+            	
+            	var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
+            	if (!(budget >= upgradeCost)) continue;
+            	
+            	var upgradedUnitType = Match.UnitTypes.FromName(upgrade.Target);
+            	if (upgradedUnitType == null) continue;
+            	
+            	var command = new UpgradeCommand(Faction.Handle, unit.Handle, upgradedUnitType.Handle);
+            	IssueCommand(command);
+            	
+            	budget -= upgradeCost;
+            	break;
+            }
         }
         #endregion
 
@@ -344,7 +423,7 @@ namespace Orion.Game.Matchmaking
             Task task = unit.TaskQueue.FirstOrDefault();
             if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
-            if (task is BuildTask) return 16;
+            if (task is BuildTask) return 20;
             return 2;
         }
 
@@ -378,6 +457,8 @@ namespace Orion.Game.Matchmaking
             Unit unit = entity as Unit;
             if (unit == null || unit.Faction != Faction) return;
 
+            createdUnitTypes.Add(unit.Type);
+            
             if (unit.IsBuilding)
             {
                 buildings.Add(unit);

@@ -30,6 +30,9 @@ namespace Orion.Game.Matchmaking.Commands
             this.unitHandles = unitHandles.Distinct().ToList().AsReadOnly();
             this.targetUnitTypeHandle = targetUnitTypeHandle;
         }
+
+        public UpgradeCommand(Handle factionHandle, Handle unitHandle, Handle targetUnitTypeHandle)
+            : this(factionHandle, new[] { unitHandle }, targetUnitTypeHandle) { }
         #endregion
 
         #region Properties

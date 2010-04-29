@@ -40,6 +40,7 @@ namespace Orion.Game.Matchmaking
         {
             public readonly Point Point;
             public float TimeLastExplorerSent;
+            public int ExplorationCount;
 
             public PlaceToExplore(Point point) { this.Point = point; }
         }
@@ -53,6 +54,8 @@ namespace Orion.Game.Matchmaking
         private const float minimumBuildingDistance = 4;
         private const float maximumResourceDepotDistance = 12;
         private const float minimumPyramidDistance = 30;
+        private const float minimumTimeBetweenSuccessiveExplorations = 10;
+        private const int maximumExplorationCount = 6;
 
         private readonly UnitType workerUnitType;
         private readonly UnitType foodSupplyUnitType;
@@ -297,13 +300,21 @@ namespace Orion.Game.Matchmaking
 
             if (unit.HasSkill<MoveSkill>())
             {
-                var place = placesToExplore
-                    .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > 5)
-                    .WithMin(p => (unit.Center - p.Point).LengthSquared);
-                place.TimeLastExplorerSent = step.TimeInSeconds;
-                var command = new MoveCommand(Faction.Handle, unit.Handle, place.Point);
-                IssueCommand(command);
-                return;
+                var placeToExplore = placesToExplore
+                    .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > minimumTimeBetweenSuccessiveExplorations)
+                    .WithMinOrDefault(p => (unit.Center - p.Point).LengthSquared);
+                if (placeToExplore != null)
+                {
+                    placeToExplore.TimeLastExplorerSent = step.TimeInSeconds;
+                    ++placeToExplore.ExplorationCount;
+                    if (placeToExplore.ExplorationCount >= maximumExplorationCount)
+                        placesToExplore.Remove(placeToExplore);
+
+                    var command = new MoveCommand(Faction.Handle, unit.Handle, placeToExplore.Point);
+                    IssueCommand(command);
+
+                    return;
+                }
             }
         }
         #endregion
@@ -333,7 +344,7 @@ namespace Orion.Game.Matchmaking
             Task task = unit.TaskQueue.FirstOrDefault();
             if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
-            if (task is BuildTask) return 12;
+            if (task is BuildTask) return 16;
             return 2;
         }
 

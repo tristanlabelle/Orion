@@ -88,11 +88,6 @@ namespace Orion.Game.Matchmaking.Commands
             int aladdiumCost = faction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
             int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
 
-            // The hero randomization is done after the aladdium/alagene stat querying because
-            // if the hero doesn't cost as much as its base unit type, that fact can be exploited
-            // to farm heroes.
-            traineeType = match.RandomizeHero(traineeType);
-
             bool taskQueueFullWarningRaised = false;
             for (int i = 0; i < traineeCount; ++i)
             {
@@ -130,7 +125,11 @@ namespace Orion.Game.Matchmaking.Commands
 
                     faction.AlageneAmount -= alageneCost;
                     faction.AladdiumAmount -= aladdiumCost;
-                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, traineeType));
+
+                    // The hero randomization must be done here to so that every individual train
+                    // an be a hero or not. Otherwise, heroes are created on all training units.
+                    var actualTraineeType = match.RandomizeHero(traineeType);
+                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, actualTraineeType));
                 }
             }
         }

@@ -17,16 +17,19 @@ namespace Orion.Game.Presentation
         static ProfanityFilter()
         {
             regexes = @"f+u+c*k+
+a+s+(h+o+l+e+)?
 m+[ae]+r+d+e*
 r+o+u+x+
 c+a+v+e+
 l+a+i+d+
 s+h+i+t+
-f+u+c*k+
+f+u+c*k+(é+|e+r+)?
 s+a+l+(e+|o+p+e*)
 c+h+i+(a+s+e+|[ée]+r*)
 c+o+n+(e+|a+r+d*)?
-g+u*a+(y+|i+)".Split('\n')
+g+u*a+(y+|i+)
+t+a+p+e+t+e*
+f+i+f+(e+|o+n+)?".Split('\n')
               .Select(s => new Regex(@"\b" + s.Trim() + @"\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled))
               .ToArray();
          }

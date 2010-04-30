@@ -378,10 +378,12 @@ namespace Orion.Game.Presentation.Gui
             string text = chatInput.Contents.Trim();
             if (text.Any(character => !char.IsWhiteSpace(character)))
             {
+                text = ProfanityFilter.Filter(text);
+
                 if (text[0] == '#')
                     userInputManager.LaunchAllyChatMessage(text.Substring(1));
                 else
-                    userInputManager.LaunchChatMessage(chatInput.Contents);
+                    userInputManager.LaunchChatMessage(text);
             }
 
             chatInput.Clear();

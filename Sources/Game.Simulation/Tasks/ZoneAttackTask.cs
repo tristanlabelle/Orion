@@ -69,10 +69,13 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (attack == null && Unit.CanPerformProximityChecks(step))
             {
+                bool isRanged = Unit.Type.TryGetSkill<AttackSkill>().IsRanged;
+
                 Unit target = Unit.World.Entities
                     .Intersecting(Unit.LineOfSight)
                     .OfType<Unit>()
                     .FirstOrDefault(other => Unit.IsInLineOfSight(other)
+                        && (isRanged || !other.IsAirborne)
                         && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
 
                 if (target != null) attack = new AttackTask(Unit, target);

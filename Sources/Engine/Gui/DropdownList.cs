@@ -207,6 +207,12 @@ namespace Orion.Engine.Gui
             }
             return rect;
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (optionsListPanel != null) Close();
+            base.Dispose(disposing);
+        }
         #endregion
         #endregion
     }

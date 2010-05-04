@@ -34,6 +34,7 @@ namespace Orion.Game.Main
         private readonly MatchUI ui;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
+        private int lifeCount = 10;
         #endregion
 
         #region Constructors
@@ -59,6 +60,7 @@ namespace Orion.Game.Main
 
             Faction creepFaction = world.CreateFaction("Creeps", Colors.Cyan);
             creepCommander = new CreepWaveCommander(match, creepFaction, creepPath);
+            creepCommander.CreepLeaked += OnCreepLeaked;
 
             commandPipeline = new CommandPipeline(match);
             commandPipeline.AddCommander(localCommander);
@@ -141,10 +143,15 @@ namespace Orion.Game.Main
             commandPipeline.Dispose();
         }
 
+        private void OnCreepLeaked(CreepWaveCommander obj)
+        {
+            --lifeCount;
+        }
+
         private string GetResourcesLabelText()
         {
-            string text = "Aladdium: {0}    Vague: {1}"
-                .FormatInvariant(LocalFaction.AladdiumAmount, creepCommander.WaveIndex + 1);
+            string text = "Aladdium: {0}    Vies: {1}    Vague: {2}"
+                .FormatInvariant(LocalFaction.AladdiumAmount, lifeCount, creepCommander.WaveIndex + 1);
 
             if (creepCommander.IsBetweenWaves)
             {

@@ -31,7 +31,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
             "Flying Spaghetti Monster",
         };
         private static readonly int CreepsPerWave = 10;
-        private static readonly float TimeBetweenWaves = 20;
+        private static readonly float TimeBetweenWaves = 15;
         private static readonly float TimeBetweenCreeps = 0.75f;
 
         private readonly CreepPath path;
@@ -50,7 +50,19 @@ namespace Orion.Game.Matchmaking.TowerDefense
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when a creep successfully escapes.
+        /// </summary>
+        public event Action<CreepWaveCommander> CreepLeaked;
+        #endregion
+
         #region Properties
+        public CreepPath Path
+        {
+            get { return path; }
+        }
+
         public int WaveIndex
         {
             get { return waveIndex; }
@@ -68,6 +80,11 @@ namespace Orion.Game.Matchmaking.TowerDefense
         #endregion
 
         #region Methods
+        internal void RaiseCreepLeaked()
+        {
+            CreepLeaked.Raise(this);
+        }
+
         public override void Update(SimulationStep step)
         {
             if (spawnedCreepCount == CreepsPerWave && Faction.Units.Count() > 0)
@@ -102,7 +119,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
                 return false;
 
             Unit creep = Faction.CreateUnit(creepType, spawnPoint);
-            creep.TaskQueue.OverrideWith(new CreepTask(creep, path));
+            creep.TaskQueue.OverrideWith(new CreepTask(creep, this));
             return true;
         }
         #endregion

@@ -7,5 +7,6 @@
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="British JMD" AladdiumCost="80" AlageneCost="0"/>
+		<Upgrade Target="Super-Sayen JMD" AladdiumCost="240" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

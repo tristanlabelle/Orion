@@ -31,12 +31,12 @@ namespace Orion.Game.Matchmaking.TowerDefense
             "Flying Spaghetti Monster",
         };
         private static readonly int CreepsPerWave = 10;
-        private static readonly float TimeBetweenWaves = 10;
-        private static readonly float TimeBetweenCreeps = 1;
+        private static readonly float TimeBetweenWaves = 20;
+        private static readonly float TimeBetweenCreeps = 0.75f;
 
         private readonly CreepPath path;
-        private int waveIndex;
-        private int spawnedCreepCount;
+        private int waveIndex = -1;
+        private int spawnedCreepCount = CreepsPerWave;
         private float timeBeforeNextCreep = TimeBetweenWaves;
         #endregion
 
@@ -55,13 +55,31 @@ namespace Orion.Game.Matchmaking.TowerDefense
         {
             get { return waveIndex; }
         }
+
+        public bool IsBetweenWaves
+        {
+            get { return Faction.Units.Count() == 0; }
+        }
+
+        public float TimeBeforeNextWave
+        {
+            get { return timeBeforeNextCreep; }
+        }
         #endregion
 
         #region Methods
         public override void Update(SimulationStep step)
         {
+            if (spawnedCreepCount == CreepsPerWave && Faction.Units.Count() > 0)
+                return;
+
             timeBeforeNextCreep -= step.TimeDeltaInSeconds;
             if (timeBeforeNextCreep > 0) return;
+            if (spawnedCreepCount == CreepsPerWave)
+            {
+                spawnedCreepCount = 0;
+                ++waveIndex;
+            }
 
             if (!TrySpawnCreep()) return;
 
@@ -70,8 +88,6 @@ namespace Orion.Game.Matchmaking.TowerDefense
 
             if (spawnedCreepCount < CreepsPerWave) return;
 
-            ++waveIndex;
-            spawnedCreepCount = 0;
             timeBeforeNextCreep = TimeBetweenWaves;
         }
 

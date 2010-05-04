@@ -52,7 +52,7 @@ namespace Orion.Game.Main
             match = new Match(world, random, p => !creepPath.Contains(p));
 
             Faction localFaction = world.CreateFaction("Player", Colors.Red);
-            localFaction.AladdiumAmount = 200;
+            localFaction.AladdiumAmount = 300;
             localFaction.LocalFogOfWar.Disable();
             localFaction.CreateUnit(match.UnitTypes.FromName("Créateur"), new Point(world.Width / 2, world.Height / 2));
             localCommander = new SlaveCommander(match, localFaction);
@@ -143,8 +143,17 @@ namespace Orion.Game.Main
 
         private string GetResourcesLabelText()
         {
-            return "Aladdium: {0}    Creep Wave: {1}"
+            string text = "Aladdium: {0}    Vague: {1}"
                 .FormatInvariant(LocalFaction.AladdiumAmount, creepCommander.WaveIndex + 1);
+
+            if (creepCommander.IsBetweenWaves)
+            {
+                int secondsBeforeNextWave = (int)Math.Ceiling(creepCommander.TimeBeforeNextWave);
+                text += "    Prochaine vague dans {0} {1}"
+                    .FormatInvariant(secondsBeforeNextWave, secondsBeforeNextWave > 1 ? "secondes" : "seconde");
+            }
+
+            return text;
         }
 
         private void OnQuitPressed(MatchUI sender)

@@ -10,7 +10,7 @@ namespace Orion.Engine.Gui
     public class Checkbox : RenderedView
     {
         #region Fields
-        private bool state;
+        private bool isChecked;
         private bool isDown;
         private bool isEnabled = true;
         #endregion
@@ -27,7 +27,7 @@ namespace Orion.Engine.Gui
         public Checkbox(Rectangle frame, bool state, IViewRenderer renderer)
             : base(frame, renderer)
         {
-            this.state = state;
+            this.isChecked = state;
             Renderer = new CheckboxRenderer(this, Renderer);
         }
         #endregion
@@ -37,20 +37,20 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Properties
-        public bool State
+        public bool IsChecked
         {
-            get { return state; }
+            get { return isChecked; }
             set
             {
-                if (state != value)
+                if (isChecked != value)
                 {
-                    state = value;
+                    isChecked = value;
                     OnStateChanged();
                 }
             }
         }
 
-        public bool Enabled
+        public bool IsEnabled
         {
             get { return isEnabled; }
             set { isEnabled = value; }
@@ -58,15 +58,15 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Methods
-        public void Trigger()
+        public void Toggle()
         {
-            State ^= isEnabled;
+            IsChecked ^= isEnabled;
         }
 
         private void OnStateChanged()
         {
             var handler = StateChanged;
-            if (handler != null) handler(this, state);
+            if (handler != null) handler(this, isChecked);
         }
 
         protected override bool OnMouseButtonPressed(MouseEventArgs args)
@@ -80,7 +80,7 @@ namespace Orion.Engine.Gui
         {
             if (isDown)
             {
-                Trigger();
+                Toggle();
                 isDown = false;
             }
             base.OnMouseButtonReleased(args);

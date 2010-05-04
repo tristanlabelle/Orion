@@ -41,7 +41,7 @@ namespace Orion.Game.Presentation.Gui
 
         #region Pause & Diplomacy
         private readonly Panel pausePanel;
-        private Panel diplomacyPanel;
+        private DiplomacyPanel diplomacyPanel; // Lazy initialized
         #endregion
 
         #region Minimap
@@ -61,7 +61,6 @@ namespace Orion.Game.Presentation.Gui
         private readonly ActionPanel actionPanel;
         private bool isSpaceDown;
         private bool isShiftDown;
-        private Dictionary<Faction, DropdownList<DiplomaticStance>> assocFactionDropList = new Dictionary<Faction, DropdownList<DiplomaticStance>>();
         #endregion
 
         #region Constructors
@@ -502,17 +501,6 @@ namespace Orion.Game.Presentation.Gui
             actionPanel.Restore();
         }
 
-        private void AcceptNewDiplomacy(Button bouton)
-        {
-            foreach (var pair in assocFactionDropList)
-                if (LocalFaction.GetDiplomaticStance(pair.Key) != pair.Value.SelectedItem)
-                    userInputManager.LaunchChangeDiplomacy(pair.Key);
-
-            // Remove diplomacy panel from view.
-            assocFactionDropList.Clear();
-            bouton.Parent.RemoveFromParent();
-        }
-
         private void OnLocalFactionWarning(Faction sender, string args)
         {
             console.AddMessage(args, sender.Color);
@@ -665,42 +653,15 @@ namespace Orion.Game.Presentation.Gui
 
         private void DisplayDiplomacy()
         {
-            Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds,new Vector2(0.0f,0.0f), new Vector2(1f,1f));
-            diplomacyPanel = new Panel(diplomacyPanelFrame);
-            Children.Add(diplomacyPanel);
-
-            Rectangle listPanelFrame = Instant.CreateComponentRectangle(diplomacyPanel.Bounds,new Vector2(0.0f,0.1f), new Vector2(1f,1f));
-            ListPanel listPanel = new ListPanel(listPanelFrame,new Vector2(0,0));
-
-            Rectangle factionPanelFrame = new Rectangle(listPanel.Bounds.Width, listPanel.Bounds.Height/10);
-
-            assocFactionDropList.Clear();
-            DiplomaticStance[] stances = Enum.GetValues(typeof(DiplomaticStance)).OfType<DiplomaticStance>().ToArray();
-
-            foreach (Faction faction in World.Factions)
+            if (diplomacyPanel == null)
             {
-                if (faction == LocalFaction) continue;
-                if (faction.Status == FactionStatus.Defeated) continue;
 
-                Panel factionPanel = new Panel(factionPanelFrame, faction.Color);
-                
-                Rectangle dropdownListFrame = Instant.CreateComponentRectangle(factionPanel.Bounds,new Vector2(0.7f,0.65f), new Vector2(1f,1f));
-                DropdownList<DiplomaticStance> dropdownList = new DropdownList<DiplomaticStance>(dropdownListFrame, stances);
-                dropdownList.StringConverter = stance => stance == DiplomaticStance.Ally ? "Allié" : "Ennemi";
-                dropdownList.SelectedItem = LocalFaction.GetDiplomaticStance(faction);
-                assocFactionDropList.Add(faction, dropdownList);
-
-                factionPanel.Children.Add(new Label(faction.Name));
-                factionPanel.Children.Add(dropdownList);
-
-                listPanel.Children.Add(factionPanel);
+                Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.2f, 0.3f, 0.6f, 0.6f));
+                diplomacyPanel = new DiplomacyPanel(diplomacyPanelFrame, userInputManager);
+                diplomacyPanel.Accepted += (sender) => Children.Remove(diplomacyPanel);
             }
-            diplomacyPanel.Children.Add(listPanel);
 
-            Rectangle buttonFrame = Instant.CreateComponentRectangle(diplomacyPanel.Bounds,new Vector2(0.4f,0.01f), new Vector2(0.6f,0.09f));
-            Button acceptButton = new Button(buttonFrame, "Accepter");
-            acceptButton.Triggered += AcceptNewDiplomacy;
-            diplomacyPanel.Children.Add(acceptButton);
+            Children.Add(diplomacyPanel);
         }
 
         protected override void Dispose(bool disposing)

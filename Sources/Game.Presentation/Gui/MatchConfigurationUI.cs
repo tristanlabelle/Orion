@@ -131,23 +131,23 @@ namespace Orion.Game.Presentation.Gui
 
             {
                 Checkbox checkbox = AddCheckboxOption("Révéler le terrain", value => matchSettings.RevealTopology = value);
-                checkbox.State = matchSettings.RevealTopology;
-                matchSettings.RevealTopologyChanged += o => checkbox.State = o.RevealTopology;
+                checkbox.IsChecked = matchSettings.RevealTopology;
+                matchSettings.RevealTopologyChanged += o => checkbox.IsChecked = o.RevealTopology;
             }
             {
                 Checkbox checkbox = AddCheckboxOption("Début nomade", value => matchSettings.StartNomad = value);
-                checkbox.State = matchSettings.StartNomad;
-                matchSettings.StartNomadChanged += o => checkbox.State = o.StartNomad;
+                checkbox.IsChecked = matchSettings.StartNomad;
+                matchSettings.StartNomadChanged += o => checkbox.IsChecked = o.StartNomad;
             }
             {
                 Checkbox checkbox = AddCheckboxOption("Codes de triche", value => matchSettings.AreCheatsEnabled = value);
-                checkbox.State = matchSettings.AreCheatsEnabled;
-                matchSettings.AreCheatsEnabledChanged += o => checkbox.State = o.AreCheatsEnabled;
+                checkbox.IsChecked = matchSettings.AreCheatsEnabled;
+                matchSettings.AreCheatsEnabledChanged += o => checkbox.IsChecked = o.AreCheatsEnabled;
             }
             {
                 Checkbox checkbox = AddCheckboxOption("Héros aléatoires", value => matchSettings.AreRandomHeroesEnabled = value);
-                checkbox.State = matchSettings.AreRandomHeroesEnabled;
-                matchSettings.AreRandomHeroesEnabledChanged += o => checkbox.State = o.AreRandomHeroesEnabled;
+                checkbox.IsChecked = matchSettings.AreRandomHeroesEnabled;
+                matchSettings.AreRandomHeroesEnabledChanged += o => checkbox.IsChecked = o.AreRandomHeroesEnabled;
             }
             #endregion
         }
@@ -238,12 +238,12 @@ namespace Orion.Game.Presentation.Gui
             optionPanel.Children.Add(new Label(checkboxLabelFrame, text));
 
             Checkbox checkbox = new Checkbox(checkboxFrame);
-            checkbox.Enabled = isGameMaster;
+            checkbox.IsEnabled = isGameMaster;
 
             optionPanel.Children.Add(checkbox);
             optionsListPanel.Children.Add(optionPanel);
 
-            optionPanel.MouseButtonPressed += (row, args) => checkbox.Trigger();
+            optionPanel.MouseButtonPressed += (row, args) => checkbox.Toggle();
 
             checkbox.StateChanged += (sender, value) => changedHandler(value);
 

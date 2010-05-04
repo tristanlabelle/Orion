@@ -16,20 +16,20 @@ namespace Orion.Game.Presentation
 
         static ProfanityFilter()
         {
-            regexes = @"f+u+c*k+
-a+s+(h+o+l+e+)?
-m+[ae]+r+d+e*
-r+o+u+x+
-c+a+v+e+
-l+a+i+d+
-s+h+i+t+
-f+u+c*k+(é+|e+r+)?
-s+a+l+(e+|o+p+e*)
-c+h+i+(a+s+e+|[ée]+r*)
-c+o+n+(e+|a+r+d*)?
-g+u*a+(y+|i+)
-t+a+p+e+t+e*
-f+i+f+(e+|o+n+)?".Split('\n')
+            regexes = @"as(hole)?
+bitch
+cave
+chi(e|é|er)
+con(e|ard?)?
+(mother|mutha)?fuc?k(é|er)?
+gu?a(y|i)
+laid
+m[ae]rde
+roux
+sal(e|ope?)
+shit
+tapette
+fiff?(e|on)?".Split('\n')
               .Select(s => new Regex(@"\b" + s.Trim() + @"\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled))
               .ToArray();
          }

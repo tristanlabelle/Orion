@@ -76,6 +76,7 @@
     <Compile Include="Audio\GameAudio.cs" />
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="GameGraphics.cs" />
+    <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\Scroller.cs" />
     <Compile Include="ProfanityFilter.cs" />

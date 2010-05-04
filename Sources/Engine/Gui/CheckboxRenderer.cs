@@ -34,7 +34,7 @@ namespace Orion.Engine.Gui
         public void Draw(GraphicsContext context, Rectangle bounds)
         {
             backgroundRenderer.Draw(context, bounds);
-            if (checkbox.State == true)
+            if (checkbox.IsChecked == true)
             {
                 Vector2 topleft = new Vector2(bounds.MinX, bounds.MaxY);
                 Vector2 bottomleft = bounds.Min;

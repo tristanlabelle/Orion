@@ -87,7 +87,7 @@ namespace Orion.Game.Matchmaking.Commands
                 }
 
                 faction.AladdiumAmount -= aladdiumCost;
-                faction.AlageneAmount -= aladdiumCost;
+                faction.AlageneAmount -= alageneCost;
                 unit.Type = targetUnitType;
             }
         }

@@ -50,6 +50,13 @@ namespace Orion.Game.Matchmaking.TowerDefense
         }
         #endregion
 
+        #region Properties
+        public int WaveIndex
+        {
+            get { return waveIndex; }
+        }
+        #endregion
+
         #region Methods
         public override void Update(SimulationStep step)
         {
@@ -63,14 +70,14 @@ namespace Orion.Game.Matchmaking.TowerDefense
 
             if (spawnedCreepCount < CreepsPerWave) return;
 
-            waveIndex = (waveIndex + 1) % WaveCreepTypeNames.Length;
+            ++waveIndex;
             spawnedCreepCount = 0;
             timeBeforeNextCreep = TimeBetweenWaves;
         }
 
         private bool TrySpawnCreep()
         {
-            string creepTypeName = WaveCreepTypeNames[waveIndex];
+            string creepTypeName = WaveCreepTypeNames[waveIndex % WaveCreepTypeNames.Length];
             UnitType creepType = Match.UnitTypes.FromName(creepTypeName);
 
             Point spawnPoint = path.Points[0];

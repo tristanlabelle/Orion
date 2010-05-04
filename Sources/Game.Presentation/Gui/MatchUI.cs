@@ -10,10 +10,8 @@ using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands;
-using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Actions.Enablers;
-using Orion.Game.Presentation.Audio;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
@@ -39,9 +37,11 @@ namespace Orion.Game.Presentation.Gui
         private readonly Panel selectionPanel;
         #endregion
 
-        #region Pause & Diplomacy
+        #region Top bar
+        private readonly Label resourcesLabel;
         private readonly Panel pausePanel;
         private DiplomacyPanel diplomacyPanel; // Lazy initialized
+        private Func<string> resourcesLabelTextGetter;
         #endregion
 
         #region Minimap
@@ -89,29 +89,33 @@ namespace Orion.Game.Presentation.Gui
             worldView.BoundsChanged += OnWorldViewBoundsChanged;
             Children.Add(worldView);
 
-            Rectangle resourceDisplayFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.96f), new Vector2(1, 1));
-            ResourceDisplay resourceDisplay = new ResourceDisplay(resourceDisplayFrame, userInputManager.LocalFaction);
-            Children.Add(resourceDisplay);
+            Rectangle topBarFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0, 0.96f, 1, 0.04f));
+            Panel topBarPanel = new Panel(topBarFrame);
+            Children.Add(topBarPanel);
 
-            Rectangle pauseButtonFrame = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.69f, 0), new Vector2(0.84f, 1));
+            this.resourcesLabel = new Label(topBarPanel.Bounds);
+            topBarPanel.Children.Add(resourcesLabel);
+            this.resourcesLabelTextGetter = GetDefaultResourcesLabelText;
+
+            Rectangle pauseButtonFrame = Instant.CreateComponentRectangle(topBarPanel.Bounds, new Rectangle(0.69f, 0, 0.15f, 1));
             Button pauseButton = new Button(pauseButtonFrame, "Pause");
             pauseButton.Triggered += b => DisplayPausePanel();
-            Children.Add(pauseButton);
+            topBarPanel.Children.Add(pauseButton);
 
-            Rectangle diplomacyButtonFrame = Instant.CreateComponentRectangle(resourceDisplayFrame, new Vector2(0.85f, 0), new Vector2(1, 1));
+            Rectangle diplomacyButtonFrame = Instant.CreateComponentRectangle(topBarPanel.Bounds, new Rectangle(0.85f, 0, 0.15f, 1));
             Button diplomacyButton = new Button(diplomacyButtonFrame, "Diplomatie");
             diplomacyButton.Triggered += b => DisplayDiplomacy();
-            Children.Add(diplomacyButton);
+            topBarPanel.Children.Add(diplomacyButton);
 
-            Rectangle hudPanelFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, 0.29f));
+            Rectangle hudPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(1, 0.29f));
             hudPanel = new Panel(hudPanelFrame);
             Children.Add(hudPanel);
 
-            Rectangle selectionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Vector2(0.25f, 0), new Vector2(0.75f, 1));
+            Rectangle selectionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Rectangle(0.25f, 0, 0.5f, 1));
             selectionPanel = new Panel(selectionPanelFrame, Colors.DarkGray);
             hudPanel.Children.Add(selectionPanel);
 
-            Rectangle actionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Vector2(0.75f, 0), new Vector2(1, 1));
+            Rectangle actionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Rectangle(0.75f, 0, 0.25f, 1));
             actionPanel = new ActionPanel(actionPanelFrame);
             hudPanel.Children.Add(actionPanel);
 
@@ -434,6 +438,8 @@ namespace Orion.Game.Presentation.Gui
             if (isSpaceDown && !Selection.IsEmpty)
                 CenterOnSelection();
 
+            resourcesLabel.Text = resourcesLabelTextGetter();
+
             base.Update(timeDeltaInSeconds);
         }
 
@@ -508,6 +514,19 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
+        public void SetResourcesLabelTextGetter(Func<string> getter)
+        {
+            Argument.EnsureNotNull(getter, "getter");
+            this.resourcesLabelTextGetter = getter;
+        }
+
+        private string GetDefaultResourcesLabelText()
+        {
+            return "Aladdium: {0}    Alagene: {1}    Population: {2}/{3}"
+                .FormatInvariant(LocalFaction.AladdiumAmount, LocalFaction.AlageneAmount,
+                LocalFaction.UsedFoodAmount, LocalFaction.MaxFoodAmount);
+        }
+
         public void DisplayDefeatMessage(Action callback)
         {
             Argument.EnsureNotNull(callback, "callback");

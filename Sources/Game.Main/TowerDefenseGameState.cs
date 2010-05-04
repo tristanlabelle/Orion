@@ -68,6 +68,7 @@ namespace Orion.Game.Main
             var matchRenderer = new TowerDefenseMatchRenderer(userInputManager, graphics, creepPath);
 
             ui = new MatchUI(graphics, userInputManager, matchRenderer);
+            ui.SetResourcesLabelTextGetter(GetResourcesLabelText);
             audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
             world.EntityRemoved += OnEntityRemoved;
@@ -138,6 +139,12 @@ namespace Orion.Game.Main
             ui.Dispose();
             audio.Dispose();
             commandPipeline.Dispose();
+        }
+
+        private string GetResourcesLabelText()
+        {
+            return "Aladdium: {0}    Creep Wave: {1}"
+                .FormatInvariant(LocalFaction.AladdiumAmount, creepCommander.WaveIndex + 1);
         }
 
         private void OnQuitPressed(MatchUI sender)

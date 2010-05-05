@@ -24,10 +24,8 @@ namespace Orion.Game.Simulation.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(transporter, "transporter");
-            if (!unit.HasSkill<MoveSkill>() || unit.HasSkill<TransportSkill>())
-                throw new ArgumentException("A {0} cannot be transported.".FormatInvariant(unit));
-            if (!transporter.HasSkill<TransportSkill>())
-                throw new ArgumentException("Cannot embark in a {0}.".FormatInvariant(transporter));
+            if (!transporter.Type.CanTransport(unit.Type))
+                throw new ArgumentException("A {0} cannot transport a {1}.".FormatInvariant(transporter, unit));
 
             this.transporter = transporter;
             this.followTask = new FollowTask(unit, transporter);

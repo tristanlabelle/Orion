@@ -537,7 +537,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(transporter, "transporter");
 
             var embarkers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<MoveSkill>() && !unit.HasSkill<TransportSkill>());
+                .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
             commander.LaunchEmbark(embarkers, transporter);
         }
         #endregion

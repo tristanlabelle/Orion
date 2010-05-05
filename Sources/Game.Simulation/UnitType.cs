@@ -143,7 +143,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        #region Skills
+        #region Skills & Stats
         public bool HasSkill<TSkill>() where TSkill : UnitSkill
         {
             return skills.ContainsKey(typeof(TSkill));
@@ -175,6 +175,17 @@ namespace Orion.Game.Simulation
             }
 
             return skill.GetStat(stat);
+        }
+        #endregion
+        
+        #region Can*** Testing
+        public bool CanTransport(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            return HasSkill<TransportSkill>()
+            	&& unitType.HasSkill<MoveSkill>()
+            	&& !unitType.IsAirborne
+            	&& !unitType.HasSkill<TransportSkill>();
         }
 
         public bool CanBuild(UnitType buildingType)

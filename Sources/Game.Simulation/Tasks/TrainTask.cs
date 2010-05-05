@@ -128,7 +128,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 return potentialSpawnPoints
                     .Select(point => (Point?)point)
-                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint.Value).LengthSquared);
+                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint).LengthSquared);
             }
             else
             {
@@ -159,7 +159,7 @@ namespace Orion.Game.Simulation.Tasks
             if (unit.HasSkill<HarvestSkill>())
             {
                 ResourceNode resourceNode = World.Entities
-                    .Intersecting(Unit.RallyPoint.Value)
+                    .Intersecting(Unit.RallyPoint)
                     .OfType<ResourceNode>()
                     .FirstOrDefault();
 
@@ -169,7 +169,7 @@ namespace Orion.Game.Simulation.Tasks
             
             if (rallyPointTask == null)
             {
-                Point targetPoint = (Point)Unit.RallyPoint.Value;
+                Point targetPoint = (Point)Unit.RallyPoint;
                 rallyPointTask = new MoveTask(unit, targetPoint);
             }
 

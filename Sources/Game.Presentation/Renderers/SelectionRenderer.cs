@@ -74,7 +74,7 @@ namespace Orion.Game.Presentation.Renderers
                 Unit unit = entity as Unit;
                 if (unit != null && unit.Faction == Faction && unit.HasRallyPoint)
                 {
-                    LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint.Value);
+                    LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint);
                     graphics.Stroke(lineSegment, selectionMarkerColor);
                 }
             }

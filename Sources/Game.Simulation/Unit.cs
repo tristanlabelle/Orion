@@ -31,7 +31,7 @@ namespace Orion.Game.Simulation
         private Vector2 position;
         private float angle;
         private float damage;
-        private Vector2? rallyPoint;
+        private Vector2 rallyPoint;
         /// <summary>
         /// The amount of health that has been built.
         /// A value of <see cref="float.NaN"/> indicates that the construction has completed.
@@ -63,6 +63,7 @@ namespace Orion.Game.Simulation
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
             this.position = position;
+            this.rallyPoint = Center;
 
             if (type.IsBuilding)
             {
@@ -289,19 +290,19 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool HasRallyPoint
         {
-            get { return rallyPoint.HasValue; }
+            get { return type.HasSkill<TrainSkill>() && !BoundingRectangle.ContainsPoint(rallyPoint); }
         }
 
         /// <summary>
         /// Accesses the rally point of this <see cref="Unit"/>, in absolute coordinates.
         /// This is used for buildings.
         /// </summary>
-        public Vector2? RallyPoint
+        public Vector2 RallyPoint
         {
             get { return rallyPoint; }
             set
             {
-                Debug.Assert(type.IsBuilding);
+                Debug.Assert(type.HasSkill<TrainSkill>());
                 rallyPoint = value;
             }
         }

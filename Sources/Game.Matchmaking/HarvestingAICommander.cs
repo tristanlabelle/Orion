@@ -253,7 +253,7 @@ namespace Orion.Game.Matchmaking
                 }
 
                 if (nodeData.Node.Type == ResourceType.Alagene
-                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAlive)
+                    && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
                     && World.IsFree(node.GridRegion, CollisionLayer.Ground))
                 {
                     var alageneExtractorCost = GetCost(alageneExtractorUnitType);
@@ -271,7 +271,7 @@ namespace Orion.Game.Matchmaking
                     budget -= alageneExtractorCost;
                 }
                 
-                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAlive))
+                if (nodeData.HarvesterCount == 0 || (nodeData.NearbyDepot != null && nodeData.NearbyDepot.IsAliveInWorld))
                     continue;
 
                 // Find a nearby depot;

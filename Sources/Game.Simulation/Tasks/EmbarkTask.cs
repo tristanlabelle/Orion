@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!transporter.IsAlive)
+            if (!transporter.IsAliveInWorld)
             {
                 MarkAsEnded();
                 return;

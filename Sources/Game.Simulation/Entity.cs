@@ -142,6 +142,16 @@ namespace Orion.Game.Simulation
         {
             get { return !isDead; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this entity is alive and in the world.
+        /// An entity is out of the world when it has died or when it is temporarily
+        /// not interactible with (such as a unit being transported).
+        /// </summary>
+        public virtual bool IsAliveInWorld
+        {
+            get { return IsAlive; }
+        }
         #endregion
 
         #region Methods
@@ -170,6 +180,7 @@ namespace Orion.Game.Simulation
         protected virtual void OnDied()
         {
             Died.Raise(this);
+            World.OnEntityDied(this);
         }
 
         protected virtual void OnMoved(Vector2 oldPosition, Vector2 newPosition)
@@ -183,6 +194,7 @@ namespace Orion.Game.Simulation
 #endif
             var handler = Moved;
             if (handler != null) handler(this, oldPosition, newPosition);
+            world.OnEntityMoved(this, oldPosition, newPosition);
         }
 
         /// <summary>
@@ -194,7 +206,13 @@ namespace Orion.Game.Simulation
         /// </remarks>
         internal void Update(SimulationStep step)
         {
-            if (IsAlive) DoUpdate(step);
+            if (!IsAliveInWorld)
+            {
+                Debug.Fail("{0} was updated when it wasn't alive and in the world.".FormatInvariant(this));
+                return;
+            }
+                
+            DoUpdate(step);
         }
 
         protected abstract Vector2 GetPosition();

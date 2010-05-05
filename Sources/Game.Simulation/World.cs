@@ -70,12 +70,12 @@ namespace Orion.Game.Simulation
         public event Action<World, HitEventArgs> UnitHitting;
 
         /// <summary>
-        /// Raised when an unit died.
+        /// Raised when an entity has died.
         /// </summary>
         /// <remarks>
-        /// Convenience aggregator of the <see cref="Unit.Died"/> event.
+        /// Convenience aggregator of the <see cref="Entity.Died"/> event.
         /// </remarks>
-        public event Action<World, Unit> UnitDied;
+        public event Action<World, Entity> EntityDied;
 
         /// <summary>
         /// Raised when an explosion occurs.
@@ -310,16 +310,25 @@ namespace Orion.Game.Simulation
             EntityRemoved.Raise(this, entity);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void RaiseUnitHitting(HitEventArgs args)
+        /// <remarks>Invoked by Entity.</remarks>
+        internal void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
-            if (UnitHitting != null) UnitHitting(this, args);
+            entities.MoveFrom(entity, oldPosition);
+        }
+
+        /// <remarks>Invoked by Entity.</remarks>
+        internal void OnEntityDied(Entity entity)
+        {
+            EntityDied.Raise(this, entity);
+
+            bool isEmbarkedUnit = entity is Unit && ((Unit)entity).IsEmbarked;
+            if (!isEmbarkedUnit) entities.Remove(entity);
         }
 
         /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitDied(Unit unit)
+        internal void OnUnitHitting(HitEventArgs args)
         {
-            UnitDied.Raise(this, unit);
+            UnitHitting.Raise(this, args);
         }
 
         /// <remarks>Invoked by Unit.</remarks>

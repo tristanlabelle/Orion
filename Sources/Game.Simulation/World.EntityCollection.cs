@@ -85,9 +85,6 @@ namespace Orion.Game.Simulation
             private bool isUpdating;
             private readonly Dictionary<Entity, DeferredChange> deferredChanges
                 = new Dictionary<Entity, DeferredChange>();
-
-            private readonly Action<Entity> entityDiedEventHandler;
-            private readonly ValueChangedEventHandler<Entity, Vector2> entityMovedEventHandler;
             #endregion
 
             #region Constructors
@@ -106,8 +103,6 @@ namespace Orion.Game.Simulation
                 this.groundGrid = new EntityGrid(world.Size);
                 this.airGrid = new EntityGrid(world.Size);
                 this.zoneManager = new EntityZoneManager(world.Size);
-                this.entityDiedEventHandler = OnEntityDied;
-                this.entityMovedEventHandler = OnEntityMoved;
             }
             #endregion
 
@@ -122,21 +117,6 @@ namespace Orion.Game.Simulation
             #endregion
 
             #region Methods
-            #region Event Handlers
-            private void OnEntityMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
-            {
-                Argument.EnsureNotNull(entity, "entity");
-
-                Move(entity, oldPosition);
-            }
-
-            private void OnEntityDied(Entity entity)
-            {
-                Argument.EnsureNotNull(entity, "entity");
-                Remove(entity);
-            }
-            #endregion
-
             #region Entity Creation
             /// <summary>
             /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
@@ -150,7 +130,7 @@ namespace Orion.Game.Simulation
             {
                 Handle handle = handleGenerator();
                 Unit unit = new Unit(handle, type, faction, point);
-                InitializeEntity(unit);
+                Add(unit);
 
                 return unit;
             }
@@ -159,17 +139,9 @@ namespace Orion.Game.Simulation
             {
                 Handle handle = handleGenerator();
                 ResourceNode node = new ResourceNode(world, handle, type, ResourceNode.DefaultTotalAmount, point);
-                InitializeEntity(node);
+                Add(node);
 
                 return node;
-            }
-
-            private void InitializeEntity(Entity entity)
-            {
-                entity.Moved += entityMovedEventHandler;
-                entity.Died += entityDiedEventHandler;
-
-                Add(entity);
             }
             #endregion
 
@@ -210,7 +182,7 @@ namespace Orion.Game.Simulation
                 if (grid != null) grid.Add(entity);
             }
 
-            private void Move(Entity entity, Vector2 oldPosition)
+            internal void MoveFrom(Entity entity, Vector2 oldPosition)
             {
                 if (isUpdating) DeferMove(entity, oldPosition);
                 else CommitMove(entity, oldPosition);

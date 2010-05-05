@@ -39,6 +39,7 @@ namespace Orion.Game.Simulation
         private float healthBuilt = float.NaN;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Stack<Unit> transportedUnits;
+        private Unit transporter;
         #endregion
 
         #region Constructors
@@ -141,7 +142,12 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Faction
+        #region World & Faction
+        public override bool IsAliveInWorld
+        {
+            get { return IsAlive && transporter == null; }
+        }
+
         /// <summary>
         /// Accesses the <see cref="Faction"/> which this <see cref="Unit"/> is a member of.
         /// </summary>
@@ -194,6 +200,18 @@ namespace Orion.Game.Simulation
             get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
         }
 
+        #region Transport
+        /// <summary>
+        /// Gets a value indicating if this unit is embarked in another unit.
+        /// </summary>
+        public bool IsEmbarked
+        {
+            get { return transporter != null; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this transporter unit is at full capacity.
+        /// </summary>
         public bool IsTransportFull
         {
             get
@@ -202,6 +220,7 @@ namespace Orion.Game.Simulation
                 return transportedUnits != null && transportedUnits.Count == GetStat(TransportSkill.CapacityStat);
             }
         }
+        #endregion
 
         #region Health
         /// <summary>
@@ -433,7 +452,7 @@ namespace Orion.Game.Simulation
 
             if (Hitting != null) Hitting(this, args);
 
-            World.RaiseUnitHitting(args);
+            World.OnUnitHitting(args);
         }
         #endregion
 
@@ -495,6 +514,7 @@ namespace Orion.Game.Simulation
             unit.taskQueue.Clear();
             World.Entities.Remove(unit);
             transportedUnits.Push(unit);
+            unit.transporter = this;
         }
 
         /// <summary>
@@ -523,6 +543,7 @@ namespace Orion.Game.Simulation
                 // The position field is changed directly instead of using the property
                 // because we don't want to raise the Moved event.
                 transportedUnit.position = location.Value;
+                transportedUnit.transporter = null;
                 World.Entities.Add(transportedUnit);
             }
         }
@@ -540,7 +561,7 @@ namespace Orion.Game.Simulation
             Unit[] damagedUnits = World.Entities
                 .Intersecting(explosionCircle)
                 .OfType<Unit>()
-                .Where(unit => unit != this && unit.IsAlive)
+                .Where(unit => unit != this && unit.IsAliveInWorld)
                 .ToArray();
 
             float explosionDamage = GetStat(SuicideBombSkill.DamageStat);
@@ -569,10 +590,15 @@ namespace Orion.Game.Simulation
 
         protected override void OnDied()
         {
+            if (transportedUnits != null)
+            {
+                while (transportedUnits.Count > 0)
+                    transportedUnits.Pop().Suicide();
+            }
+
             taskQueue.Clear();
             base.OnDied();
             Faction.OnUnitDied(this);
-            World.OnUnitDied(this);
         }
         #endregion
 

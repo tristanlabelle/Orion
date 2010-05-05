@@ -58,7 +58,7 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(entity, "entity");
             Debug.Assert(entity.CollisionLayer != CollisionLayer.None,
                 "A non-collidable entity is being added to the grid.");
-            Debug.Assert(entity.IsAlive, "A dead entity is being added to the grid.");
+            Debug.Assert(entity.IsAliveInWorld, "An entity that is not alive in the world is being added to the grid.");
 
             foreach (Point point in region.Points)
             {

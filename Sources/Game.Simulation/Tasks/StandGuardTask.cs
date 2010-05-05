@@ -66,7 +66,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool IsTargetValid(Unit target)
         {
-            return target != null && target.IsAlive && Unit.IsWithinAttackRange(target);
+            return target != null && target.IsAliveInWorld && Unit.IsWithinAttackRange(target);
         }
         #endregion
     }

@@ -343,7 +343,7 @@ namespace Orion.Game.Presentation
         {
             return !IsFull
                 && !Contains(entity)
-                && entity.IsAlive
+                && entity.IsAliveInWorld
                 && (localFaction == null || localFaction.CanSee(entity))
                 && !(Type == SelectionType.Units && entity is ResourceNode);
         }

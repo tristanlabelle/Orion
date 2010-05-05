@@ -62,7 +62,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!target.IsAlive)
+            if (!target.IsAliveInWorld)
             {
                 MarkAsEnded();
                 return;

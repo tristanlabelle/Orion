@@ -57,7 +57,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            if (!target.IsAlive)
+            if (!target.IsAliveInWorld)
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.

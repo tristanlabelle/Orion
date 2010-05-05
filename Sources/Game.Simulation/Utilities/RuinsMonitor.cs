@@ -34,7 +34,7 @@ namespace Orion.Game.Simulation.Utilities
             this.readOnlyRuins = new ReadOnlyCollection<Ruin>(ruins);
 
             this.world.Updated += OnWorldUpdated;
-            this.world.UnitDied += OnUnitDied;
+            this.world.EntityDied += OnEntityDied;
         }
         #endregion
 
@@ -59,10 +59,10 @@ namespace Orion.Game.Simulation.Utilities
             }
         }
 
-        private void OnUnitDied(World sender, Entity args)
+        private void OnEntityDied(World sender, Entity args)
         {
             Unit unit = args as Unit;
-            if (unit == null) return;
+            if (unit == null || unit.IsEmbarked) return;
 
             float lifeSpan = unit.IsBuilding ? buildingRuinLifeSpan : unitRuinLifeSpan;
             Ruin ruin = new Ruin(unit.Faction, unit.Type, unit.Center, lifeSpan);

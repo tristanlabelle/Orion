@@ -81,7 +81,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateExtracting(SimulationStep step)
         {
-            if (!node.IsAlive || !Unit.Faction.CanHarvest(node))
+            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
             {
                 if (amountCarrying == 0)
                 {
@@ -101,7 +101,7 @@ namespace Orion.Game.Simulation.Tasks
             int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
-                if (!node.IsAlive)
+                if (!node.IsAliveInWorld)
                 {
                     Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(node.Type));
                     move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
@@ -136,7 +136,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateDelivering(SimulationStep step)
         {
-            if (depot == null || !depot.IsAlive)
+            if (depot == null || !depot.IsAliveInWorld)
             {
                 depot = FindClosestDepot();
                 if (depot == null)
@@ -162,7 +162,7 @@ namespace Orion.Game.Simulation.Tasks
                 Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
-            if (!node.IsAlive || !Unit.Faction.CanHarvest(node))
+            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
             {
                 Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
                 MarkAsEnded();

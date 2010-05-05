@@ -103,8 +103,7 @@ namespace Orion.Game.Simulation.Tasks
             if (task.HasEnded)
             {
                 task.Dispose();
-                if (Current == task) tasks.RemoveAt(0);
-                Changed.Raise(this);
+                if (tasks.Remove(task)) Changed.Raise(this);
             }
         }
 

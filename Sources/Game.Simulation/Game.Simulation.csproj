@@ -81,7 +81,9 @@
     <Compile Include="Skills\StoreResourcesSkill.cs" />
     <Compile Include="Skills\SuicideBombSkill.cs" />
     <Compile Include="Skills\TrainSkill.cs" />
+    <Compile Include="Skills\TransportSkill.cs" />
     <Compile Include="Skills\UnitSkill.cs" />
+    <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />

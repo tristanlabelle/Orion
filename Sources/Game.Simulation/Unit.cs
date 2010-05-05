@@ -38,7 +38,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         private float healthBuilt = float.NaN;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
-        private Stack<Unit> transportedUnits = new Stack<Unit>();
+        private Stack<Unit> transportedUnits;
         #endregion
 
         #region Constructors
@@ -191,6 +191,15 @@ namespace Orion.Game.Simulation
         public Circle LineOfSight
         {
             get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
+        }
+
+        public bool IsTransportFull
+        {
+            get
+            {
+                Debug.Assert(HasSkill<TransportSkill>());
+                return transportedUnits != null && transportedUnits.Count == GetStat(TransportSkill.CapacityStat);
+            }
         }
 
         #region Health
@@ -461,6 +470,60 @@ namespace Orion.Game.Simulation
             healthBuilt = float.NaN;
             ConstructionCompleted.Raise(this);
             faction.OnBuildingConstructionCompleted(this);
+        }
+        #endregion
+
+        #region Embarking
+        /// <summary>
+        /// Embarks another unit in this one.
+        /// </summary>
+        /// <param name="unit">The unit to be embarked.</param>
+        internal void Embark(Unit unit)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureEqual(unit.Faction, faction, "unit.Faction");
+            Debug.Assert(HasSkill<TransportSkill>());
+
+            if (transportedUnits == null) transportedUnits = new Stack<Unit>();
+
+            int transportCapacity = GetStat(TransportSkill.CapacityStat);
+            Debug.Assert(transportedUnits.Count < transportCapacity);
+            Debug.Assert(!transportedUnits.Contains(unit));
+            Debug.Assert(unit != this);
+
+            unit.taskQueue.Clear();
+            World.Entities.Remove(unit);
+            transportedUnits.Push(unit);
+        }
+
+        /// <summary>
+        /// Disembarks transported units.
+        /// </summary>
+        public void Disembark()
+        {
+            Debug.Assert(HasSkill<TransportSkill>());
+
+            if (transportedUnits == null) return;
+
+            while (transportedUnits.Count > 0)
+            {
+                Unit transportedUnit = transportedUnits.Peek();
+
+                Point? location = GridRegion.Points
+                    .Concat(GridRegion.GetAdjacentPoints())
+                    .FirstOrNull(point => World.IsFree(point, transportedUnit.CollisionLayer));
+                if (!location.HasValue)
+                {
+                    faction.RaiseWarning("Pas de place pour le débarquement d'unités");
+                    break;
+                }
+
+                transportedUnits.Pop();
+                // The position field is changed directly instead of using the property
+                // because we don't want to raise the Moved event.
+                transportedUnit.position = location.Value;
+                World.Entities.Add(transportedUnit);
+            }
         }
         #endregion
 

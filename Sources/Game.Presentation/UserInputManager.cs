@@ -317,29 +317,32 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (target.Damage > 0)
-            {
-                if (target.IsBuilding) LaunchRepair(target);
-                else LaunchHeal(target);
-
-                return;
-            }
-            else if (target.HasSkill<ExtractAlageneSkill>())
+            if (target.HasSkill<ExtractAlageneSkill>())
             {
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
                 {
                     LaunchChangeRallyPoint(target.Center);
+                    return;
                 }
-                else
+
+                ResourceNode alageneNode = World.Entities
+                    .OfType<ResourceNode>()
+                    .FirstOrDefault(node => node.Position == target.Position);
+                if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
                 {
-                    ResourceNode alageneNode = World.Entities
-                        .OfType<ResourceNode>()
-                        .FirstOrDefault(node => node.Position == target.Position);
-                    if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
-                        LaunchHarvest(alageneNode);
-                    else
-                        LaunchMove(target.Position);
+                    LaunchHarvest(alageneNode);
+                    return;
                 }
+            }
+            else if (target.HasSkill<TransportSkill>())
+            {
+                LaunchEmbark(target);
+                return;
+            }
+            else if (target.Damage > 0)
+            {
+                if (target.IsBuilding) LaunchRepair(target);
+                else LaunchHeal(target);
 
                 return;
             }
@@ -518,8 +521,24 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(targetType, "targetType");
 
             var targetUnits = Selection.Units
-                .Where(unit => unit.Type.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
+                .Where(unit => unit.Faction == LocalFaction && unit.Type.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
             commander.LaunchUpgrade(targetUnits, targetType);
+        }
+
+        public void LaunchDisembark()
+        {
+            var transporters = Selection.Units
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<TransportSkill>());
+            commander.LaunchDisembark(transporters);
+        }
+
+        public void LaunchEmbark(Unit transporter)
+        {
+            Argument.EnsureNotNull(transporter, "transporter");
+
+            var embarkers = Selection.Units
+                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<MoveSkill>() && !unit.HasSkill<TransportSkill>());
+            commander.LaunchEmbark(embarkers, transporter);
         }
         #endregion
         #endregion

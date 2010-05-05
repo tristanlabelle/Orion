@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
+    <Compile Include="Commands\DisembarkCommand.cs" />
+    <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="Networking\Packets\CancelMatchPacket.cs" />

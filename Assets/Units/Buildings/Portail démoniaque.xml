@@ -5,7 +5,7 @@
 		<Train Speed="10">
 			<Target>Grippe A(H1N1)</Target>
 			<Target>OVNI</Target>
-			<Target>Tapis Volant</Target>
+			<Target>Tapis volant</Target>
 		</Train>
 	</Skills>
 </UnitType>

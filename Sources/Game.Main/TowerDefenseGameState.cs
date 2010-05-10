@@ -145,7 +145,10 @@ namespace Orion.Game.Main
 
         private void OnCreepLeaked(CreepWaveCommander obj)
         {
+            if (lifeCount == 0) return;
+
             --lifeCount;
+            if (lifeCount == 0) ui.DisplayDefeatMessage(() => Manager.Pop());
         }
 
         private string GetResourcesLabelText()

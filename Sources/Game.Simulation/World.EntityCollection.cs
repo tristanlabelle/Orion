@@ -160,7 +160,8 @@ namespace Orion.Game.Simulation
                 {
                     isUpdating = true;
                     foreach (Entity entity in entities.Values)
-                        entity.Update(step);
+                        if (entity.IsAliveInWorld)
+                            entity.Update(step);
                 }
                 finally
                 {

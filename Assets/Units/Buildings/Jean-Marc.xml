@@ -5,6 +5,6 @@
 		<Attack Power="8" Range="7" Delay="2"/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="British Jean-Marc" AladdiumCost="80" AlageneCost="120"/>
+		<Upgrade Target="British Jean-Marc" AladdiumCost="220" AlageneCost="140"/>
 	</Upgrades>
 </UnitType>

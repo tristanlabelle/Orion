@@ -15,7 +15,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
     public sealed class CreepWaveCommander : Commander
     {
         #region Fields
-        private static readonly string[] WaveCreepTypeNames = new[]
+        internal static readonly string[] WaveCreepTypeNames = new[]
         {
             "Schtroumpf",
             "Pirate",
@@ -119,7 +119,9 @@ namespace Orion.Game.Matchmaking.TowerDefense
                 return false;
 
             Unit creep = Faction.CreateUnit(creepType, spawnPoint);
-            creep.TaskQueue.OverrideWith(new CreepTask(creep, this));
+            var task = new CreepTask(creep, path);
+            task.Leaked += s => RaiseCreepLeaked();
+            creep.TaskQueue.OverrideWith(task);
             return true;
         }
         #endregion

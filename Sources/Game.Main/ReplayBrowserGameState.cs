@@ -97,7 +97,6 @@ namespace Orion.Game.Main
             match.AreRandomHeroesEnabled = matchSettings.AreRandomHeroesEnabled;
 
             Faction localFaction = world.CreateSpectatorFaction();
-            localFaction.LocalFogOfWar.Disable();
             SlaveCommander localCommander = new SlaveCommander(match, localFaction);
 
             int colorIndex = 0;

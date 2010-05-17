@@ -30,6 +30,7 @@ namespace Orion.Game.Main
             this.ui.SinglePlayerSelected += OnSinglePlayerSelected;
             this.ui.MultiplayerSelected += OnMultiplayerSelected;
             this.ui.TowerDefenseSelected += OnTowerDefenseSelected;
+            this.ui.TypingDefenseSelected += OnTypingDefenseSelected;
             this.ui.ViewReplaySelected += OnViewReplaySelected;
             this.ui.QuitGameSelected += OnQuitGameSelected;
         }
@@ -86,6 +87,11 @@ namespace Orion.Game.Main
         private void OnTowerDefenseSelected(MainMenuUI sender)
         {
             Manager.Push(new TowerDefenseGameState(Manager, graphics));
+        }
+
+        private void OnTypingDefenseSelected(MainMenuUI sender)
+        {
+            Manager.Push(new TypingDefenseGameState(Manager, graphics));
         }
 
         private void OnViewReplaySelected(MainMenuUI sender)

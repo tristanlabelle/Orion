@@ -233,6 +233,7 @@ namespace Orion.Game.Simulation
 
             Handle handle = new Handle(0xFFFFFFFF);
             Faction faction = new Faction(handle, this, spectatorFactionName, spectatorFactionColor);
+            faction.LocalFogOfWar.Disable();
             return faction;
         }
 

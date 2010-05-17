@@ -14,20 +14,24 @@ namespace Orion.Game.Matchmaking.TowerDefense
     public sealed class CreepTask : Task
     {
         #region Fields
-        private readonly CreepWaveCommander commander;
+        private readonly CreepPath path;
         private int currentPointIndex;
         private MoveTask moveTask;
         #endregion
 
         #region Constructors
-        public CreepTask(Unit creep, CreepWaveCommander commander)
+        public CreepTask(Unit creep, CreepPath path)
             : base(creep)
         {
-            Argument.EnsureNotNull(commander, "commander");
+            Argument.EnsureNotNull(path, "path");
 
-            this.commander = commander;
-            this.moveTask = new MoveTask(creep, commander.Path.Points[1]);
+            this.path = path;
+            this.moveTask = new MoveTask(creep, path.Points[1]);
         }
+        #endregion
+
+        #region Events
+        public event Action<CreepTask> Leaked;
         #endregion
 
         #region Properties
@@ -47,14 +51,14 @@ namespace Orion.Game.Matchmaking.TowerDefense
             }
 
             ++currentPointIndex;
-            if (currentPointIndex == commander.Path.Points.Count - 1)
+            if (currentPointIndex == path.Points.Count - 1)
             {
                 Unit.Suicide();
-                commander.RaiseCreepLeaked();
+                Leaked.Raise(this);
                 return;
             }
 
-            Point targetPoint = commander.Path.Points[currentPointIndex + 1];
+            Point targetPoint = path.Points[currentPointIndex + 1];
             Region targetRegion = new Region(targetPoint.X, targetPoint.Y, 1, 1);
             moveTask = MoveTask.ToNearRegion(Unit, targetRegion);
             moveTask.Update(step);

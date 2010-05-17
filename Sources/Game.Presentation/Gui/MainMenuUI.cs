@@ -31,9 +31,10 @@ namespace Orion.Game.Presentation.Gui
             Font titleFont = new Font("Impact", 48);
             AddCenteredLabel("Orion", titleFont, Colors.White, 700);
 
-            CreateButton(0.45f, "Monojoueur", () => SinglePlayerSelected);
-            CreateButton(0.38f, "Multijoueur", () => MultiplayerSelected);
-            CreateButton(0.31f, "Tower Defense", () => TowerDefenseSelected);
+            CreateButton(0.52f, "Monojoueur", () => SinglePlayerSelected);
+            CreateButton(0.45f, "Multijoueur", () => MultiplayerSelected);
+            CreateButton(0.38f, "Tower Defense", () => TowerDefenseSelected);
+            CreateButton(0.31f, "Typing Defense", () => TypingDefenseSelected);
             CreateButton(0.24f, "Visionner une partie", () => ViewReplaySelected);
             CreateButton(0.17f, "Quitter", () => QuitGameSelected);
 
@@ -60,6 +61,11 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the user has chosen to launch a tower defense game.
         /// </summary>
         public event Action<MainMenuUI> TowerDefenseSelected;
+
+        /// <summary>
+        /// Raised when the user has chosen to launch a typing defense game.
+        /// </summary>
+        public event Action<MainMenuUI> TypingDefenseSelected;
 
         /// <summary>
         /// Raised when the user has chosen to view a replay.

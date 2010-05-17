@@ -96,6 +96,7 @@
     <Compile Include="Renderers\SelectionRenderer.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
     <Compile Include="Renderers\TowerDefenseMatchRenderer.cs" />
+    <Compile Include="Renderers\TypingDefenseMatchRenderer.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
     <Compile Include="Renderers\UnitButtonRenderer.cs" />
     <Compile Include="Renderers\UnitPanelRenderer.cs" />

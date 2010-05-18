@@ -96,25 +96,22 @@ namespace Orion.Game.Presentation.Renderers
 
                 Text text = new Text(phrase.Text);
                 Text typedText = new Text(phrase.Text.Substring(0, phrase.TypedCharacterCount));
-                Text untypedText = new Text(phrase.Text.Substring(phrase.TypedCharacterCount));
 
-                Vector2 typedTextSize = typedText.Frame.Size;
-                Vector2 untypedTextSize = untypedText.Frame.Size;
-                Vector2 size = new Vector2(typedTextSize.X +untypedTextSize.X, Math.Max(typedTextSize.Y, untypedTextSize.Y));
-                Vector2 extent = size * 0.5f;;
+                Vector2 size = text.Frame.Size;
+                Vector2 extent = size * 0.5f;
 
                 using (graphics.Context.PushTransform(creep.Center, 0, textScale))
                 {
                     float offsetY = 5;
                     Rectangle rectangle = new Rectangle(-extent.X, offsetY, extent.X * 2, extent.Y * 2);
                     graphics.Context.FillRoundedRectangle(rectangle, 1, Colors.Black);
-                    graphics.Context.StrokeRoundedRectangle(rectangle, 1, Colors.White);
-                    graphics.Context.Draw(typedText.Value,
-                        new Vector2(-extent.X, offsetY),
-                        phrase.IsFocused ? Colors.White : Colors.Orange);
-                    graphics.Context.Draw(untypedText.Value,
-                        new Vector2(-extent.X + typedTextSize.X, offsetY),
+                    graphics.Context.Draw(text.Value,
+                        new Vector2(-extent.X + 1, offsetY),
                         phrase.IsFocused ? Colors.Cyan : Colors.Red);
+                    graphics.Context.Draw(typedText.Value,
+                        new Vector2(-extent.X + 1, offsetY),
+                        phrase.IsFocused ? Colors.White : Colors.Orange);
+                    graphics.Context.StrokeRoundedRectangle(rectangle, 1, phrase.IsFocused ? Colors.Yellow : Colors.White);
                 }
             }
         }

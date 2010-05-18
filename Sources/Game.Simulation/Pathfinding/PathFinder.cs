@@ -123,17 +123,31 @@ namespace Orion.Game.Simulation.Pathfinding
         private void FindPathPointsTo(Point endPoint)
         {
             int currentPointIndex = PointToIndex(endPoint);
+            Point beforePreviousPoint = IndexToPoint(currentPointIndex);
+            Point previousPoint = beforePreviousPoint;
+            Point currentPoint = beforePreviousPoint;
             while (true)
             {
-                Point currentPoint = IndexToPoint(currentPointIndex);
-                points.Add(currentPoint);
-
                 PathNode currentNode = nodes[currentPointIndex];
-
                 int parentNodeIndex = currentNode.ParentNodeIndex;
-                if (parentNodeIndex == -1) break;
+                if (parentNodeIndex != -1
+                    && points.Count > 0
+                    && Math.Sign(currentPoint.X - previousPoint.X) == Math.Sign(previousPoint.X - beforePreviousPoint.X)
+                    && Math.Sign(currentPoint.Y - previousPoint.Y) == Math.Sign(previousPoint.Y - beforePreviousPoint.Y))
+                {
+                    // The path isn't changing directions, just override the last point.
+                    points[points.Count - 1] = currentPoint;
+                }
+                else
+                {
+                    points.Add(currentPoint);
+                    if (parentNodeIndex == -1) break;
+                }
 
                 currentPointIndex = parentNodeIndex;
+                beforePreviousPoint = previousPoint;
+                previousPoint = currentPoint;
+                currentPoint = IndexToPoint(currentPointIndex);
             }
 
             points.Reverse();

@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="10" MaxHealth="300" MeleeArmor="4" RangedArmor="5" FoodCost="3"/>
 		<Move Speed="3"/>
-		<Attack Power="50" Range="5" Delay="4"/>
+		<Attack Power="50" Range="8" Delay="4"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>

@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="10" MaxHealth="150" MeleeArmor="4" RangedArmor="4" AladdiumCost="250" AlageneCost="175" FoodCost="3"/>
 		<Move Speed="2"/>
-		<Attack Power="20" Range="5" Delay="5"/>
+		<Attack Power="24" Range="6" Delay="5"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Ta mère" AladdiumCost="0" AlageneCost="0"/>

@@ -25,7 +25,6 @@ namespace Orion.Game.Matchmaking.Commands
             : base(factionHandle)
         {
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
-            Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
             this.targetFactionHandle = targetFactionHandle;
             this.diplomaticStance = diplomaticStance;
         }

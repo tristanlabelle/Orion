@@ -69,11 +69,18 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);
-                int aladdiumCost = unit.GetStat(BasicSkill.AladdiumCostStat);
-                int alageneCost = unit.GetStat(BasicSkill.AlageneCostStat);
+                UnitTypeUpgrade upgrade = unit.Type.Upgrades
+                    .FirstOrDefault(u => u.Target == targetUnitType.Name);
+                if (upgrade == null)
+                {
+                    throw new InvalidOperationException(
+                        "Unit {0} cannot upgrade to {1}."
+                        .FormatInvariant(unit.Type.Name, upgrade.Target));
+                }
 
-                if (aladdiumCost > faction.AladdiumAmount || alageneCost > faction.AlageneAmount)
+                int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);
+
+                if (upgrade.AladdiumCost > faction.AladdiumAmount || upgrade.AlageneCost > faction.AlageneAmount)
                 {
                     faction.RaiseWarning("Pas assez de ressources pour upgrader à {0}.".FormatInvariant(targetUnitType.Name));
                     return;
@@ -86,8 +93,8 @@ namespace Orion.Game.Matchmaking.Commands
                     return;
                 }
 
-                faction.AladdiumAmount -= aladdiumCost;
-                faction.AlageneAmount -= alageneCost;
+                faction.AladdiumAmount -= upgrade.AladdiumCost;
+                faction.AlageneAmount -= upgrade.AlageneCost;
                 unit.Type = targetUnitType;
             }
         }

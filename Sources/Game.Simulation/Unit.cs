@@ -661,7 +661,7 @@ namespace Orion.Game.Simulation
             IEnumerable<Unit> attackableUnits = World.Entities
                 .Intersecting(LineOfSight)
                 .OfType<Unit>()
-                .Where(unit => Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Enemy
+                .Where(unit => !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                     && IsInLineOfSight(unit));
 
             if (!IsAirborne && GetStat(AttackSkill.RangeStat) == 0)
@@ -687,7 +687,7 @@ namespace Orion.Game.Simulation
                .Where(unit => unit != this
                    && unit.Damage > 0
                    && !unit.IsBuilding
-                   && Faction.GetDiplomaticStance(unit.Faction) == DiplomaticStance.Ally
+                   && !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                    && IsInLineOfSight(unit))
                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 

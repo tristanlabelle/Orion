@@ -6,9 +6,25 @@ using System.Text;
 namespace Orion.Game.Simulation
 {
     [Serializable]
+    [Flags]
     public enum DiplomaticStance
     {
-        Enemy,
-        Ally
+        Enemy           = 0,
+        SharedVision    = (1 << 0),
+        AlliedVictory   = (1 << 1),
+        SharedControl   = (1 << 2) | SharedVision | AlliedVictory
+    }
+
+    public static class DiplomaticStanceExtensionMethods
+    {
+        public static bool HasFlag(this DiplomaticStance stance, DiplomaticStance flag)
+        {
+            return ((long)stance & (long)flag) == (long)flag;
+        }
+
+        public static DiplomaticStance Exclude(this DiplomaticStance stance, DiplomaticStance flag)
+        {
+            return (DiplomaticStance)((long)stance & ~(long)flag);
+        }
     }
 }

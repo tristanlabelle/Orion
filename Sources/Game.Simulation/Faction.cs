@@ -29,8 +29,7 @@ namespace Orion.Game.Simulation
         private readonly ColorRgb color;
         private readonly FogOfWar localFogOfWar;
 
-        private readonly HashSet<Faction> factionsWeRegardAsAllies = new HashSet<Faction>();
-        private readonly HashSet<Faction> factionsRegardingUsAsAllies = new HashSet<Faction>();
+        private readonly Dictionary<Faction, DiplomaticStance> diplomaticStances = new Dictionary<Faction, DiplomaticStance>();
 
         private readonly HashSet<Technology> researches = new HashSet<Technology>();
         private readonly HashSet<Technology> technologies = new HashSet<Technology>();
@@ -168,6 +167,11 @@ namespace Orion.Game.Simulation
         public FactionStatus Status
         {
             get { return status; }
+        }
+
+        private IEnumerable<Faction> FactionsSharingTheirVision
+        {
+            get { return diplomaticStances.Where(kv => kv.Value.HasFlag(DiplomaticStance.SharedVision)).Select(kv => kv.Key); }
         }
 
         #region Resources
@@ -423,10 +427,7 @@ namespace Orion.Game.Simulation
         }
 
         private void OnFactionDefeated(World world, Faction faction)
-        {
-            if (faction == this) return;
-            factionsWeRegardAsAllies.Remove(faction);
-        }
+        { }
 
         /// <summary>
         /// Suicides all units in this faction.
@@ -453,7 +454,7 @@ namespace Orion.Game.Simulation
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()
                 && !extractor.IsUnderConstruction
-                && GetDiplomaticStance(extractor.Faction) == DiplomaticStance.Ally;
+                && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
         }
         #endregion
 
@@ -481,24 +482,35 @@ namespace Orion.Game.Simulation
         public void SetDiplomaticStance(Faction target, DiplomaticStance stance)
         {
             Argument.EnsureNotNull(target, "target");
-            if (target == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
             Argument.EnsureDefined(stance, "stance");
+            if (target == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
 
-            if (factionsWeRegardAsAllies.Contains(target) == (stance == DiplomaticStance.Ally))
-                return;
+            if (GetDiplomaticStance(target).HasFlag(DiplomaticStance.SharedControl)
+                && target.GetDiplomaticStance(target).HasFlag(DiplomaticStance.SharedControl))
+                throw new InvalidOperationException("Cannot change the diplomatic stance once it's been set to Shared Control");
 
-            if (stance == DiplomaticStance.Ally)
+            DiplomaticStance previousStance = GetDiplomaticStance(target);
+            DiplomaticStance otherFactionStance = target.GetDiplomaticStance(this);
+
+            if (stance.HasFlag(DiplomaticStance.SharedControl))
             {
-                factionsWeRegardAsAllies.Add(target);
-                target.RaiseWarning("{0} est maintenant votre allié.".FormatInvariant(this), this);
+                target.RaiseWarning("{0} désire partager le contrôle avec vous.".FormatInvariant(this), this);
             }
             else
             {
-                factionsWeRegardAsAllies.Remove(target);
-                target.SetDiplomaticStance(this, DiplomaticStance.Enemy);
-                target.RaiseWarning("{0} est maintenant hostile à votre égard.".FormatInvariant(this), this);
+                if (stance.HasFlag(DiplomaticStance.SharedVision) && !previousStance.HasFlag(DiplomaticStance.SharedVision))
+                    target.RaiseWarning("{0} partage sa vision avec vous.".FormatInvariant(this), this);
+                else if (!stance.HasFlag(DiplomaticStance.SharedVision) && previousStance.HasFlag(DiplomaticStance.SharedVision))
+                    target.RaiseWarning("{0} ne partage plus sa vision avec vous.".FormatInvariant(this), this);
+
+
+                if (stance.HasFlag(DiplomaticStance.AlliedVictory) && !previousStance.HasFlag(DiplomaticStance.AlliedVictory))
+                    target.RaiseWarning("{0} désire partager la victoire avec vous.".FormatInvariant(this), this);
+                else if (!stance.HasFlag(DiplomaticStance.AlliedVictory) && previousStance.HasFlag(DiplomaticStance.AlliedVictory))
+                    target.RaiseWarning("{0} ne partagera plus la victoire avec vous.".FormatInvariant(this), this);
             }
 
+            diplomaticStances[target] = stance;
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
 
@@ -513,27 +525,30 @@ namespace Orion.Game.Simulation
         public DiplomaticStance GetDiplomaticStance(Faction faction)
         {
             Debug.Assert(faction != null);
-            return faction == this || factionsWeRegardAsAllies.Contains(faction)
-                ? DiplomaticStance.Ally : DiplomaticStance.Enemy;
+            if (!diplomaticStances.ContainsKey(faction))
+                diplomaticStances.Add(faction, DiplomaticStance.Enemy);
+            return diplomaticStances[faction];
         }
 
         private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
         {
-            if (stance == DiplomaticStance.Ally)
-            {
-                // As another faction has set us as allies, so we see what they do.
-                source.localFogOfWar.Changed += fogOfWarChangedEventHandler;
-                DiscoverFromOtherFogOfWar(source.localFogOfWar, (Region)world.Size);
+            DiplomaticStance currentStance = GetDiplomaticStance(source);
 
-                Debug.Assert(!factionsRegardingUsAsAllies.Contains(source));
-                factionsRegardingUsAsAllies.Add(source);
+            if (stance.HasFlag(DiplomaticStance.SharedVision))
+            {
+                source.LocalFogOfWar.Changed += fogOfWarChangedEventHandler;
+                DiscoverFromOtherFogOfWar(source.localFogOfWar, (Region)world.Size);
             }
             else
             {
-                source.localFogOfWar.Changed -= fogOfWarChangedEventHandler;
+                source.LocalFogOfWar.Changed -= fogOfWarChangedEventHandler;
+                if (currentStance.HasFlag(DiplomaticStance.SharedVision))
+                    SetDiplomaticStance(source, currentStance.Exclude(DiplomaticStance.SharedVision));
+            }
 
-                Debug.Assert(factionsRegardingUsAsAllies.Contains(source));
-                factionsRegardingUsAsAllies.Remove(source);
+            if (!stance.HasFlag(DiplomaticStance.AlliedVictory) && currentStance.HasFlag(DiplomaticStance.AlliedVictory))
+            {
+                SetDiplomaticStance(source, currentStance.Exclude(DiplomaticStance.AlliedVictory));
             }
 
             // Invalidate the whole visibility to take into account new allies.
@@ -589,7 +604,7 @@ namespace Orion.Game.Simulation
             TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
             if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
 
-            foreach (Faction faction in factionsRegardingUsAsAllies)
+            foreach (Faction faction in FactionsSharingTheirVision)
             {
                 if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
                     return TileVisibility.Visible;
@@ -609,7 +624,7 @@ namespace Orion.Game.Simulation
         {
             if (localFogOfWar.IsDiscovered(point)) return true;
 
-            foreach (Faction faction in factionsRegardingUsAsAllies)
+            foreach (Faction faction in FactionsSharingTheirVision)
                 if (faction.localFogOfWar.IsDiscovered(point))
                     return true;
 

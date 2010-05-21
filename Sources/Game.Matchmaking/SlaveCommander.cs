@@ -36,7 +36,7 @@ namespace Orion.Game.Matchmaking
             Argument.EnsureNotNull(message, "message");
 
             var allyFactionHandles = Faction.World.Factions
-                .Where(f => Faction.GetDiplomaticStance(f) == DiplomaticStance.Ally)
+                .Where(f => Faction.GetDiplomaticStance(f) != DiplomaticStance.Enemy)
                 .Select(f => f.Handle);
             IssueCommand(new SendMessageCommand(Faction.Handle, allyFactionHandles, message));
         }
@@ -78,6 +78,11 @@ namespace Orion.Game.Matchmaking
             destination = World.Clamp(destination);
             if (units.Count() > 0)
                 IssueCommand(new ChangeRallyPointCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
+        }
+
+        public void LaunchChangeDiplomacy(Faction targetFaction, DiplomaticStance newStance)
+        {
+            IssueCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, targetFaction.Handle, newStance));
         }
 
         public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
@@ -123,15 +128,6 @@ namespace Orion.Game.Matchmaking
         {
             if (units.Count() > 0)
                 IssueCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
-        }
-
-        public void LaunchChangeDiplomacy(Faction otherFaction)
-        {
-            if (otherFaction == null) return;
-            if (Faction.GetDiplomaticStance(otherFaction) == DiplomaticStance.Ally)
-                IssueCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Enemy));
-            else
-                IssueCommand(new ChangeDiplomaticStanceCommand(Faction.Handle, otherFaction.Handle, DiplomaticStance.Ally));
         }
 
         public void LaunchUpgrade(IEnumerable<Unit> units, UnitType targetType)

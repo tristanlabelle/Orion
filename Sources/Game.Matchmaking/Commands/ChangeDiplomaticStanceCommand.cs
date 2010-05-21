@@ -25,6 +25,7 @@ namespace Orion.Game.Matchmaking.Commands
             : base(factionHandle)
         {
             Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
+            Argument.EnsureDefined(diplomaticStance, "diplomaticStance");
             this.targetFactionHandle = targetFactionHandle;
             this.diplomaticStance = diplomaticStance;
         }
@@ -78,6 +79,8 @@ namespace Orion.Game.Matchmaking.Commands
             Handle factionHandle = ReadHandle(reader);
             Handle otherFactionHandle = ReadHandle(reader);
             DiplomaticStance stance = (DiplomaticStance)reader.ReadByte();
+            if (!Enum.IsDefined(typeof(DiplomaticStance), stance))
+                throw new InvalidCastException("{0} is not a member of DiplomaticStance".FormatInvariant(stance));
 
             return new ChangeDiplomaticStanceCommand(factionHandle, otherFactionHandle, stance);
         }

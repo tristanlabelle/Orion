@@ -484,22 +484,13 @@ namespace Orion.Game.Presentation
             commander.LaunchCancel(targetUnits);
         }
 
-        public void LaunchChangeDiplomacy(Faction targetFaction)
-        {
-            Argument.EnsureNotNull(targetFaction, "targetFaction");
-
-            DiplomaticStance newStance = LocalFaction.GetDiplomaticStance(targetFaction) == DiplomaticStance.Ally
-                ? DiplomaticStance.Enemy : DiplomaticStance.Ally;
-            LaunchChangeDiplomacy(targetFaction, newStance);
-        }
-
         public void LaunchChangeDiplomacy(Faction targetFaction, DiplomaticStance newStance)
         {
             Argument.EnsureNotNull(targetFaction, "targetFaction");
 
             if (LocalFaction.GetDiplomaticStance(targetFaction) == newStance) return;
-
-            commander.LaunchChangeDiplomacy(targetFaction);
+            
+            commander.LaunchChangeDiplomacy(targetFaction, newStance);
         }
 
         public void LaunchChatMessage(string text)

@@ -189,7 +189,6 @@ namespace Orion.Game.Matchmaking
         {
         	var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
         		.FirstOrDefault(u => Faction.CanSee(u)
-        		    && Faction.GetDiplomaticStance(u.Faction) == DiplomaticStance.Enemy
         		    && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
         	if (firstUnthreatenedVisibleEnemy == null) return;
         	

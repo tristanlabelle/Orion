@@ -18,24 +18,49 @@ namespace Orion.Game.Presentation.Gui
         {
             #region Fields
             private readonly Faction faction;
-            private readonly Checkbox alliedCheckbox;
+            private readonly Checkbox alliedVictoryCheckbox;
+            private readonly Checkbox sharedVisionCheckbox;
+            private readonly Checkbox sharedControlCheckbox;
             #endregion
 
             #region Constructors
-            public FactionPanel(Rectangle frame, Faction faction)
-                : base(frame, faction.Color)
+            public FactionPanel(Rectangle frame, Faction localFaction, Faction otherFaction)
+                : base(frame, otherFaction.Color)
             {
-                Argument.EnsureNotNull(faction, "faction");
+                Argument.EnsureNotNull(otherFaction, "faction");
 
-                this.faction = faction;
+                this.faction = otherFaction;
 
-                Children.Add(new Label(faction.Name));
+                Children.Add(new Label(otherFaction.Name));
 
-                Rectangle checkboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.95f, 0, 0.05f, 1));
-                this.alliedCheckbox = new Checkbox(checkboxFrame, false);
-                Children.Add(alliedCheckbox);
+                DiplomaticStance stance = localFaction.GetDiplomaticStance(otherFaction);
 
-                Children.Add(new Label(Instant.CreateComponentRectangle(Bounds, new Rectangle(0.87f, 0, 1, 1)), "Allié"));
+                Rectangle alliedVictoryCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.6f, 0, 0.05f, 1));
+                Rectangle sharedVisionCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.75f, 0, 0.05f, 1));
+                Rectangle sharedControlCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.90f, 0, 0.05f, 1));
+
+                alliedVictoryCheckbox = new Checkbox(alliedVictoryCheckboxFrame, stance.HasFlag(DiplomaticStance.AlliedVictory));
+                sharedVisionCheckbox = new Checkbox(sharedVisionCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedVision));
+                sharedControlCheckbox = new Checkbox(sharedControlCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedControl));
+
+                if (stance.HasFlag(DiplomaticStance.SharedControl))
+                {
+                    alliedVictoryCheckbox.IsEnabled = false;
+                    sharedVisionCheckbox.IsEnabled = false;
+                    sharedControlCheckbox.IsEnabled = false;
+                }
+                else
+                {
+                    sharedControlCheckbox.StateChanged += (checkbox, state) =>
+                    {
+                        alliedVictoryCheckbox.IsChecked = state;
+                        sharedVisionCheckbox.IsChecked = state;
+                    };
+                }
+
+                Children.Add(alliedVictoryCheckbox);
+                Children.Add(sharedVisionCheckbox);
+                Children.Add(sharedControlCheckbox);
             }
             #endregion
 
@@ -45,10 +70,19 @@ namespace Orion.Game.Presentation.Gui
                 get { return faction; }
             }
 
-            public bool IsAlliedChecked
+            public bool IsAlliedVictoryChecked
             {
-                get { return alliedCheckbox.IsChecked; }
-                set { alliedCheckbox.IsChecked = value; }
+                get { return alliedVictoryCheckbox.IsChecked; }
+            }
+
+            public bool IsSharedVisionChecked
+            {
+                get { return sharedVisionCheckbox.IsChecked; }
+            }
+
+            public bool IsSharedControlChecked
+            {
+                get { return sharedControlCheckbox.IsChecked; }
             }
             #endregion
         }
@@ -72,6 +106,7 @@ namespace Orion.Game.Presentation.Gui
             this.factionListPanel = new ListPanel(listPanelFrame, Vector2.Zero);
             this.Children.Add(factionListPanel);
 
+            CreateTitle();
             CreateFactionPanels();
 
             Rectangle buttonFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.4f, 0.01f, 0.2f, 0.08f));
@@ -104,6 +139,24 @@ namespace Orion.Game.Presentation.Gui
             if (factionPanel != null) factionListPanel.Children.Remove(factionPanel);
         }
 
+        private void CreateTitle()
+        {
+            Rectangle headerFrame = Instant.CreateComponentRectangle(factionListPanel.Bounds, new Rectangle(1, 0.07f));
+            Panel header = new Panel(headerFrame);
+
+            Rectangle alliedVictoryFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.45f, 0, 0.6f, 1));
+            Rectangle sharedVisionFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.65f, 0, 0.80f, 1));
+            Rectangle sharedControlFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.85f, 0, 1, 1));
+            Label alliedVictoryLabel = new Label(alliedVictoryFrame, "Victoire alliée");
+            Label sharedVisionLabel = new Label(sharedVisionFrame, "Vision partagée");
+            Label sharedControlLabel = new Label(sharedControlFrame, "Contrôle partagé");
+
+            header.Children.Add(alliedVictoryLabel);
+            header.Children.Add(sharedVisionLabel);
+            header.Children.Add(sharedControlLabel);
+            factionListPanel.Children.Add(header);
+        }
+
         private void CreateFactionPanels()
         {
             var otherFactions = LocalFaction.World.Factions
@@ -113,7 +166,7 @@ namespace Orion.Game.Presentation.Gui
             Rectangle factionPanelFrame = Instant.CreateComponentRectangle(factionListPanel.Bounds, new Rectangle(1, 0.07f));
             foreach (Faction faction in otherFactions)
             {
-                FactionPanel factionPanel = new FactionPanel(factionPanelFrame, faction);
+                FactionPanel factionPanel = new FactionPanel(factionPanelFrame, LocalFaction, faction);
                 factionListPanel.Children.Add(factionPanel);
             }
         }
@@ -128,10 +181,12 @@ namespace Orion.Game.Presentation.Gui
         {
             foreach (FactionPanel factionPanel in factionListPanel.Children.OfType<FactionPanel>())
             {
-                bool isAlly = LocalFaction.GetDiplomaticStance(factionPanel.Faction) == DiplomaticStance.Ally;
-                if (factionPanel.IsAlliedChecked == isAlly) continue;
+                DiplomaticStance newStance = DiplomaticStance.Enemy;
+                if (factionPanel.IsAlliedVictoryChecked) newStance |= DiplomaticStance.AlliedVictory;
+                if (factionPanel.IsSharedVisionChecked) newStance |= DiplomaticStance.SharedVision;
+                if (factionPanel.IsSharedControlChecked) newStance |= DiplomaticStance.SharedControl;
 
-                userInputManager.LaunchChangeDiplomacy(factionPanel.Faction);
+                userInputManager.LaunchChangeDiplomacy(factionPanel.Faction, newStance);
             }
         }
         #endregion

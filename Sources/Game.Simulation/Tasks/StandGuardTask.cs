@@ -49,7 +49,7 @@ namespace Orion.Game.Simulation.Tasks
                         .Intersecting(Unit.LineOfSight)
                         .OfType<Unit>()
                         .FirstOrDefault(other => Unit.IsWithinAttackRange(other)
-                            && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
+                            && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
                 }
                 else
                 {

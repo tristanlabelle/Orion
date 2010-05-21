@@ -76,7 +76,7 @@ namespace Orion.Game.Simulation.Tasks
                     .OfType<Unit>()
                     .FirstOrDefault(other => Unit.IsInLineOfSight(other)
                         && (isRanged || !other.IsAirborne)
-                        && Unit.Faction.GetDiplomaticStance(other.Faction) == DiplomaticStance.Enemy);
+                        && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
 
                 if (target != null) attack = new AttackTask(Unit, target);
             }

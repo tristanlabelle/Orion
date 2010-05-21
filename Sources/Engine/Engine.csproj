@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -79,6 +79,7 @@
     <Compile Include="Colors.cs" />
     <Compile Include="Collections\PooledList.cs" />
     <Compile Include="EventsExtensions.cs" />
+    <Compile Include="EnumFlagsExtensionMethods.cs" />
     <Compile Include="FrameRateCounter.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Ellipse.cs" />

@@ -171,7 +171,14 @@ namespace Orion.Game.Simulation
 
         private IEnumerable<Faction> FactionsSharingTheirVision
         {
-            get { return diplomaticStances.Where(kv => kv.Value.HasFlag(DiplomaticStance.SharedVision)).Select(kv => kv.Key); }
+            get
+            {
+                foreach (KeyValuePair<Faction, DiplomaticStance> pair in diplomaticStances)
+                {
+                    if (pair.Value.HasFlag(DiplomaticStance.SharedVision))
+                        yield return pair.Key;
+                }
+            }
         }
 
         #region Resources

@@ -65,6 +65,8 @@ namespace Orion.Game.Simulation
 
             this.fogOfWarChangedEventHandler = OnFogOfWarChanged;
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
+            this.world.EntityAdded += OnWorldEntityAdded;
+            this.world.EntityRemoved += OnWorldEntityRemoved;
             this.world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
@@ -311,8 +313,6 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
-            if (unit.IsBuilding) localFogOfWar.AddRegion(unit.GridRegion);
-            else localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
             usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 
@@ -340,17 +340,8 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
 
-            if (unit.IsUnderConstruction)
-            {
-                localFogOfWar.RemoveRegion(unit.GridRegion);
-            }
-            else
-            {
-                if (unit.Type.HasSkill<ProvideFoodSkill>())
-                    totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
-
-                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
-            }
+            if (unit.Type.HasSkill<ProvideFoodSkill>())
+                totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
 
             usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
         }
@@ -401,6 +392,35 @@ namespace Orion.Game.Simulation
                 totalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
         }
         #endregion
+
+        private void OnWorldEntityRemoved(World world, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null || unit.Faction != this) return;
+
+            if (unit.IsUnderConstruction)
+            {
+                localFogOfWar.RemoveRegion(unit.GridRegion);
+            }
+            else
+            {
+                if (unit.Type.HasSkill<ProvideFoodSkill>())
+                    totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
+
+                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
+            }
+        }
+
+        private void OnWorldEntityAdded(World world, Entity entity)
+        {
+            Unit unit = entity as Unit;
+            if (unit == null || unit.Faction != this) return;
+
+            if (unit.IsBuilding && unit.IsUnderConstruction)
+                localFogOfWar.AddRegion(unit.GridRegion);
+            else
+                localFogOfWar.AddLineOfSight(unit.LineOfSight);
+        }
 
         private void OnFactionDefeated(World world, Faction faction)
         {

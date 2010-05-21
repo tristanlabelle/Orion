@@ -56,6 +56,8 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNullNorBlank(name, "name");
 
+            diplomaticStances[this] = DiplomaticStance.SharedControl;
+
             this.handle = handle;
             this.world = world;
             this.name = name;

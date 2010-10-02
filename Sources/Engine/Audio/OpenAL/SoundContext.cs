@@ -5,6 +5,8 @@ using System.Text;
 using OpenTK;
 using OpenTK.Audio;
 using OpenTK.Math;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Orion.Engine.Audio.OpenAL
 {
@@ -100,7 +102,25 @@ namespace Orion.Engine.Audio.OpenAL
         #region Methods
         public ISound LoadSoundFromFile(string filePath)
         {
-            throw new NotImplementedException();
+            using (Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                SoundBuffer soundBuffer = SoundBuffer.FromOggVorbis(stream, SoundSampleFormat.SignedShort);
+                int bufferHandle = AL.GenBuffer();
+
+                ALFormat format = soundBuffer.ChannelCount == 2 ? ALFormat.Stereo16 : ALFormat.Mono16;
+                GCHandle pinningHandle = GCHandle.Alloc(soundBuffer.Buffer, GCHandleType.Pinned);
+                try
+                {
+                    AL.BufferData(bufferHandle, format, pinningHandle.AddrOfPinnedObject(),
+                        soundBuffer.Buffer.Length, (int)soundBuffer.Frequency);
+                }
+                finally
+                {
+                    pinningHandle.Free();
+                }
+
+                return new Sound(bufferHandle);
+            }
         }
 
         public ISoundChannel CreateChannel()

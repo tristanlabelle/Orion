@@ -7,8 +7,10 @@ using OpenTK.Math;
 using Orion.Engine;
 using Orion.Engine.Audio;
 using Orion.Game.Simulation;
+using OpenALSoundContext = Orion.Engine.Audio.OpenAL.SoundContext;
 using IrrKlangSoundContext = Orion.Engine.Audio.IrrKlang.SoundContext;
 using NullSoundContext = Orion.Engine.Audio.Null.SoundContext;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Audio
 {
@@ -35,15 +37,20 @@ namespace Orion.Game.Presentation.Audio
         {
             try
             {
-                soundContext = new IrrKlangSoundContext();
+                soundContext = new OpenALSoundContext();
             }
-            catch (NotSupportedException)
+            catch (Exception exception1)
             {
-                soundContext = new NullSoundContext();
-            }
-            catch (FileNotFoundException) // Thrown if the IrrKlang dll is not found.
-            {
-                soundContext = new NullSoundContext();
+                Debug.WriteLine("Failed to create an OpenAL sound context: " + exception1.Message);
+                try
+                {
+                    soundContext = new IrrKlangSoundContext();
+                }
+                catch (Exception exception2)
+                {
+                    Debug.WriteLine("Failed to create an IrrKlang sound context: " + exception2.Message);
+                    soundContext = new NullSoundContext();
+                }
             }
 
             sfxChannel = soundContext.CreateChannel();

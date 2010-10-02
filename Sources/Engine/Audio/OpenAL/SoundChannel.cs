@@ -73,7 +73,19 @@ namespace Orion.Engine.Audio.OpenAL
         #region Methods
         public void Play(ISound sound, Vector3? position)
         {
-            throw new NotImplementedException();
+            Argument.EnsureBaseType<Sound>(sound, "sound");
+
+            int sourceHandle = AL.GenSource();
+            AL.BindBufferToSource(sourceHandle, ((Sound)sound).Handle);
+
+            AL.Source(sourceHandle, ALSourceb.SourceRelative, !position.HasValue);
+            if (position.HasValue) AL.Source(sourceHandle, ALSource3f.Position, position.Value.X, position.Value.Y, position.Value.Z);
+            else AL.Source(sourceHandle, ALSource3f.Position, 0, 0, 0);
+
+            AL.Source(sourceHandle, ALSourcef.Gain, isMuted ? 0 : volume);
+            if (!isPaused) AL.SourcePlay(sourceHandle);
+
+            sourceHandles.Add(sourceHandle);
         }
 
         public void StopAllSounds()

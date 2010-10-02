@@ -87,11 +87,16 @@
     <Compile Include="Audio\ISoundContext.cs" />
     <Compile Include="Audio\Null\SoundChannel.cs" />
     <Compile Include="Audio\Null\SoundContext.cs" />
+    <Compile Include="Audio\OggVorbis\Ogg.cs" />
+    <Compile Include="Audio\OggVorbis\Vorbis.cs" />
+    <Compile Include="Audio\OggVorbis\VorbisFile.cs" />
+    <Compile Include="Audio\SoundBuffer.cs" />
     <Compile Include="Audio\OpenAL\Sound.cs" />
     <Compile Include="Audio\OpenAL\SoundChannel.cs" />
     <Compile Include="Audio\OpenAL\SoundContext.cs" />
     <Compile Include="Audio\SoundGroup.cs" />
     <Compile Include="Audio\SoundManager.cs" />
+    <Compile Include="Audio\SoundSampleFormat.cs" />
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Collections\Subarray.cs" />
     <Compile Include="Collections\ValidatingCollection.cs" />
@@ -222,10 +227,20 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Audio\OpenAL\OpenAL32.dll">
+    <Content Include="libogg.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vorbis.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vorbisfile.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OpenAL32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

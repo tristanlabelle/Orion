@@ -83,11 +83,11 @@ namespace Orion.Engine.Audio.OpenAL
                     right.X, right.Y, right.Z, 0,
                     up.X, up.Y, up.Z, 0,
                     at.X, at.Y, at.Z, 0,
-                    position.X, position.Y, position.Z, 1);
+                    -position.X, position.Y, position.Z, 1);
             }
             set
             {
-                AL.Listener(ALListener3f.Position, value.M41, value.M42, value.M43);
+                AL.Listener(ALListener3f.Position, -value.M41, value.M42, value.M43);
                 Vector3 at = new Vector3(value.M31, value.M32, value.M33);
                 Vector3 up = new Vector3(value.M21, value.M22, value.M23);
                 AL.Listener(ALListenerfv.Orientation, ref at, ref up);

@@ -19,9 +19,6 @@ namespace Orion.Engine.Audio.OpenAL
         private bool isPaused;
         #endregion
 
-        #region Constructors
-        #endregion
-
         #region Properties
         public bool IsMuted
         {
@@ -75,17 +72,24 @@ namespace Orion.Engine.Audio.OpenAL
         {
             Argument.EnsureBaseType<Sound>(sound, "sound");
 
+            RemoveCompletedSounds();
+
             int sourceHandle = AL.GenSource();
             AL.BindBufferToSource(sourceHandle, ((Sound)sound).Handle);
 
             AL.Source(sourceHandle, ALSourceb.SourceRelative, !position.HasValue);
-            if (position.HasValue) AL.Source(sourceHandle, ALSource3f.Position, position.Value.X, position.Value.Y, position.Value.Z);
-            else AL.Source(sourceHandle, ALSource3f.Position, 0, 0, 1);
+            if (position.HasValue) AL.Source(sourceHandle, ALSource3f.Position, -position.Value.X, position.Value.Y, position.Value.Z);
+            else AL.Source(sourceHandle, ALSource3f.Position, 0, 0, 0);
 
             AL.Source(sourceHandle, ALSourcef.Gain, isMuted ? 0 : volume);
             if (!isPaused) AL.SourcePlay(sourceHandle);
 
             sourceHandles.Add(sourceHandle);
+        }
+
+        private void RemoveCompletedSounds()
+        {
+            sourceHandles.RemoveAll(sourceHandle => AL.GetSourceState(sourceHandle) == ALSourceState.Stopped);
         }
 
         public void StopAllSounds()

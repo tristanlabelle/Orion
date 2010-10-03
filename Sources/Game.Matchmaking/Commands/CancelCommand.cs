@@ -31,7 +31,7 @@ namespace Orion.Game.Matchmaking.Commands
         #region Properties
         public override bool IsMandatory
         {
-            get { return false; }
+            get { return true; }
         }
 
         public override IEnumerable<Handle> ExecutingUnitHandles

@@ -53,7 +53,7 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="TaskQueue"/> is at its maximum capacity.
+        /// Gets a value indicating if this <see cref="TaskQueue"/> is at its maximum capacity. *HACKHACK*
         /// </summary>
         public bool IsFull
         {
@@ -143,7 +143,7 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(task, "task");
             if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
             if (tasks.Contains(task)) throw new InvalidOperationException("Cannot add a task already present.");
-            if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
+            //if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
             Debug.Assert(!unit.IsUnderConstruction);
 
             tasks.Add(task);

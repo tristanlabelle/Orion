@@ -675,7 +675,7 @@ namespace Orion.Game.Simulation
             if (unitToAttack == null) return false;
         
             AttackTask attackTask = new AttackTask(this, unitToAttack);
-            taskQueue.OverrideWith(attackTask);
+            taskQueue.Enqueue(attackTask);
             return true;
         }
 

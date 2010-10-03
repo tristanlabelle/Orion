@@ -66,7 +66,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle attackerHandle in attackerHandles)
             {
                 Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.TaskQueue.OverrideWith(new ZoneAttackTask(attacker, destination));
+                attacker.TaskQueue.Enqueue(new ZoneAttackTask(attacker, destination));
             }
         }
 

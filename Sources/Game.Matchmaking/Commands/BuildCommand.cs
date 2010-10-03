@@ -90,7 +90,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unit in builderHandles)
             {
                 Unit builder = (Unit)match.World.Entities.FromHandle(unit);
-                builder.TaskQueue.OverrideWith(new BuildTask(builder, plan));
+                builder.TaskQueue.Enqueue(new BuildTask(builder, plan));
             }
         }
 

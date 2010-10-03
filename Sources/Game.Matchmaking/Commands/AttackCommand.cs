@@ -70,7 +70,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle attackerHandle in attackerHandles)
             {
                 Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.TaskQueue.OverrideWith(new AttackTask(attacker, target));
+                attacker.TaskQueue.Enqueue(new AttackTask(attacker, target));
             }
         }
 

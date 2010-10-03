@@ -69,7 +69,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle harvesterHandle in harvesterHandles)
             {
                 Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);
-                harvester.TaskQueue.OverrideWith(new HarvestTask(harvester, resourceNode));
+                harvester.TaskQueue.Enqueue(new HarvestTask(harvester, resourceNode));
             }
         }
 

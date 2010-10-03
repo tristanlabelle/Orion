@@ -96,7 +96,8 @@ namespace Orion.Game.Simulation.Tasks
                     // Smells like a hack!
                     ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
-                    Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
+                    if (Unit.TaskQueue.Count == 1)
+                        Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
                 }
 
                 MarkAsEnded();

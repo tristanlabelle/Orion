@@ -61,7 +61,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.
-                if (follow != null && !Unit.IsWithinAttackRange(target))
+                if (follow != null && !Unit.IsWithinAttackRange(target) && Unit.TaskQueue.Count == 1)
                     Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
                 MarkAsEnded();
                 return;

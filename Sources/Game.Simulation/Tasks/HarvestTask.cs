@@ -164,7 +164,8 @@ namespace Orion.Game.Simulation.Tasks
 
             if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
             {
-                Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
+                if (Unit.TaskQueue.Count == 1)
+                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
                 MarkAsEnded();
                 return;
             }

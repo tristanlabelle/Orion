@@ -115,13 +115,26 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(task, "task");
             if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
-            Debug.Assert(Count <= 1, "More than one task was overriden, is this voluntary?");
+            // This can now voluntarily happen, so I'm commenting out the assert
+            // Debug.Assert(Count <= 1, "More than one task was overriden, is this voluntary?");
             Debug.Assert(!unit.IsUnderConstruction);
 
             Clear();
 
             tasks.Add(task);
 
+            Changed.Raise(this);
+        }
+
+        /// <summary>
+        /// Replaces the current task of this <see cref="Unit"/> with the given task.
+        /// </summary>
+        /// <param name="task">The new task that must now be completed.</param>
+        public void ReplaceWith(Task task)
+        {
+            if (tasks.Count == 0)
+                throw new InvalidOperationException("Cannot replace the first task of the queue if the queue is empty");
+            tasks[0] = task;
             Changed.Raise(this);
         }
 

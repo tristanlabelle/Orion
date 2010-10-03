@@ -65,7 +65,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.TaskQueue.OverrideWith(new HealTask(unit, target));
+                unit.TaskQueue.Enqueue(new HealTask(unit, target));
             }
         }
 

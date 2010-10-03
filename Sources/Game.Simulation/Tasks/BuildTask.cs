@@ -64,7 +64,7 @@ namespace Orion.Game.Simulation.Tasks
 
             if (buildingPlan.IsBuildingCreated)
             {
-                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth)
+                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth && Unit.TaskQueue.Count == 1)
                     Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
                 MarkAsEnded();
                 return;
@@ -97,7 +97,7 @@ namespace Orion.Game.Simulation.Tasks
 
             buildingPlan.CreateBuilding();
 
-            Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
+            Unit.TaskQueue.ReplaceWith(new RepairTask(Unit, buildingPlan.Building));
             MarkAsEnded();
         }
         #endregion

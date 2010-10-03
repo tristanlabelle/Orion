@@ -34,6 +34,7 @@ namespace Orion.Game.Presentation
         private Vector2? selectionStart;
         private Vector2? selectionEnd;
         private bool shiftKeyPressed;
+        private bool launchedCommandsWithShift;
         #endregion
 
         #region Constructors
@@ -117,7 +118,12 @@ namespace Orion.Game.Presentation
             {
                 if (args.Button == MouseButton.Left)
                     LaunchMouseCommand(args.Position);
-                mouseCommand = null;
+
+                if (!shiftKeyPressed)
+                    mouseCommand = null;
+                else
+                    launchedCommandsWithShift = true;
+
                 return;
             }
 
@@ -242,7 +248,15 @@ namespace Orion.Game.Presentation
 
         public void HandleKeyUp(KeyboardEventArgs args)
         {
-            if (args.Key == Keys.ShiftKey) shiftKeyPressed = false;
+            if (args.Key == Keys.ShiftKey)
+            {
+                shiftKeyPressed = false;
+                if (launchedCommandsWithShift)
+                {
+                    launchedCommandsWithShift = false;
+                    mouseCommand = null;
+                }
+            }
         }
 
         private void OnEntityRemoved(World sender, Entity entity)
@@ -258,7 +272,10 @@ namespace Orion.Game.Presentation
         public void LaunchMouseCommand(Vector2 location)
         {
             mouseCommand.OnClick(location);
-            mouseCommand = null;
+            if (!shiftKeyPressed)
+                mouseCommand = null;
+            else
+                launchedCommandsWithShift = true;
         }
 
         public void LaunchDefaultCommand(Vector2 target)
@@ -360,12 +377,23 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Launching individual commands
+        private void OverrideIfNecessary()
+        {
+            if (!shiftKeyPressed)
+            {
+                IEnumerable<Unit> units = Selection.Units
+                    .Where(unit => unit.Faction == commander.Faction && !unit.Type.IsBuilding);
+                commander.LaunchCancel(units);
+            }
+        }
+
         public void LaunchBuild(Point location, UnitType buildingType)
         {
             IEnumerable<Unit> builders = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction
                     && unit.Type.CanBuild(buildingType));
 
+            OverrideIfNecessary();
             commander.LaunchBuild(builders, buildingType, location);
         }
 
@@ -382,6 +410,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can attack do so, the others simply move to the destination
+            OverrideIfNecessary();
             commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
         }
@@ -391,6 +420,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position
+            OverrideIfNecessary();
             commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<HarvestSkill>()), node.Position);
         }
@@ -399,6 +429,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+            OverrideIfNecessary();
             commander.LaunchMove(movableUnits, destination);
         }
 
@@ -408,6 +439,7 @@ namespace Orion.Game.Presentation
                 .Where(unit => unit.Faction == LocalFaction
                     && unit.IsBuilding
                     && unit.HasSkill<TrainSkill>());
+            OverrideIfNecessary();
             commander.LaunchChangeRallyPoint(targets, at);
         }
 
@@ -419,6 +451,7 @@ namespace Orion.Game.Presentation
            
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<BuildSkill>());
+            OverrideIfNecessary();
             commander.LaunchRepair(targetUnits, building);
         }
 
@@ -430,6 +463,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> healers = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<HealSkill>());
             if (healers.Any(unit => unit.Faction != target.Faction)) return;
+            OverrideIfNecessary();
             commander.LaunchHeal(healers, target);
         }
 
@@ -440,6 +474,7 @@ namespace Orion.Game.Presentation
                     && !unit.IsUnderConstruction
                     && unit.Type.CanTrain(unitType));
 
+            OverrideIfNecessary();
             commander.LaunchTrain(trainers, unitType);
         }
 
@@ -451,6 +486,7 @@ namespace Orion.Game.Presentation
                     && unit.IsIdle
                     && unit.Type.CanResearch(technology));
 
+            OverrideIfNecessary();
             commander.LaunchResearch(researcher, technology);
         }
 
@@ -458,6 +494,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.Type.IsSuicidable);
+            OverrideIfNecessary();
             commander.LaunchSuicide(targetUnits);
         }
 
@@ -466,6 +503,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction)
                 .Where(unit => unit.HasSkill<MoveSkill>());
+            OverrideIfNecessary();
             commander.LaunchStandGuard(targetUnits);
         }
 

@@ -57,7 +57,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle guardHandle in guardHandles)
             {
                 Unit guard = (Unit)match.World.Entities.FromHandle(guardHandle);
-                guard.TaskQueue.OverrideWith(new StandGuardTask(guard));
+                guard.TaskQueue.Enqueue(new StandGuardTask(guard));
             }
         }
 

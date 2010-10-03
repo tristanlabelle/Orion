@@ -72,7 +72,7 @@ namespace Orion.Game.Matchmaking.Commands
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
                 MoveTask task = new MoveTask(unit, (Point)destination);
-                unit.TaskQueue.OverrideWith(task);
+                unit.TaskQueue.Enqueue(task);
             }
         }
 

@@ -6,6 +6,7 @@ using Orion.Engine.Collections;
 using System.IO;
 using Orion.Engine.Audio.OggVorbis;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Orion.Engine.Audio
 {
@@ -53,14 +54,27 @@ namespace Orion.Engine.Audio
 
             byte[] buffer = new byte[64];
 
-            VorbisFile.ov_callbacks callbacks = new VorbisFile.ov_callbacks();
-            callbacks.read_func = (IntPtr ptr, IntPtr size, IntPtr nmemb, IntPtr datasource) =>
+            VorbisFile.ov_callbacks callbacks = new VorbisFile.ov_callbacks
             {
-                int length = (int)size * (int)nmemb;
-                if (buffer.Length < length) buffer = new byte[length];
-                int bytesRead = stream.Read(buffer, 0, length);
-                Marshal.Copy(buffer, 0, ptr, bytesRead);
-                return (IntPtr)bytesRead;
+                read_func = (IntPtr ptr, IntPtr size, IntPtr nmemb, IntPtr datasource) =>
+                {
+                    int length = (int)size * (int)nmemb;
+                    if (buffer.Length < length) buffer = new byte[length];
+                    int bytesRead = stream.Read(buffer, 0, length);
+                    Marshal.Copy(buffer, 0, ptr, bytesRead);
+                    return (IntPtr)bytesRead;
+                },
+                tell_func = (IntPtr datasource) => checked((int)stream.Position),
+                seek_func = (IntPtr datasource, long offset, int whence) =>
+                {
+                    if (whence == 0) return (int)stream.Seek(offset, SeekOrigin.Begin);
+                    if (whence == 1) return (int)stream.Seek(offset, SeekOrigin.Current);
+                    if (whence == 2) return (int)stream.Seek(offset, SeekOrigin.End);
+
+                    // This is not a good place to throw a managed exception
+                    Debug.Fail("Unexpected seek origin in Ogg Vorbis callback.");
+                    return -1;
+                },
             };
 
             VorbisFile.OggVorbis_File file = new VorbisFile.OggVorbis_File();
@@ -81,12 +95,22 @@ namespace Orion.Engine.Audio
                 try
                 {
                     IntPtr ptr = pinningHandle.AddrOfPinnedObject();
-                    int bitstream = 0;
-                    result = VorbisFile.ov_read(ref file, ptr,
-                        soundBuffer.Buffer.Length,
-                        0, sampleFormat.SizeInBytes,
-                        sampleFormat.Type == SoundSampleType.Signed ? 1 : 0, ref bitstream);
-                    if (result < 0) throw VorbisFile.GetErrorException(result, "ov_read");
+                    int byteOffset = 0;
+                    while (byteOffset < soundBuffer.Buffer.Length)
+                    {
+                        int bitstream = 0;
+                        result = VorbisFile.ov_read(ref file, (IntPtr)((long)ptr + byteOffset),
+                            soundBuffer.Buffer.Length - byteOffset, 0, sampleFormat.SizeInBytes,
+                            sampleFormat.Type == SoundSampleType.Signed ? 1 : 0, ref bitstream);
+                        if (result < 0) throw VorbisFile.GetErrorException(result, "ov_read");
+                        if (result == 0)
+                        {
+                            Debug.Fail("The ogg vorbis file contains less stuff than expected.");
+                            break;
+                        }
+
+                        byteOffset += result;
+                    }
                 }
                 finally
                 {

@@ -15,7 +15,7 @@ namespace Orion.Engine.Audio.OpenAL
         #region Fields
         private readonly List<int> sourceHandles = new List<int>();
         private bool isMuted;
-        private float volume;
+        private float volume = 1;
         private bool isPaused;
         #endregion
 
@@ -80,7 +80,7 @@ namespace Orion.Engine.Audio.OpenAL
 
             AL.Source(sourceHandle, ALSourceb.SourceRelative, !position.HasValue);
             if (position.HasValue) AL.Source(sourceHandle, ALSource3f.Position, position.Value.X, position.Value.Y, position.Value.Z);
-            else AL.Source(sourceHandle, ALSource3f.Position, 0, 0, 0);
+            else AL.Source(sourceHandle, ALSource3f.Position, 0, 0, 1);
 
             AL.Source(sourceHandle, ALSourcef.Gain, isMuted ? 0 : volume);
             if (!isPaused) AL.SourcePlay(sourceHandle);

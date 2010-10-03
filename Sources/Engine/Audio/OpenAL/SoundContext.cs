@@ -19,7 +19,7 @@ namespace Orion.Engine.Audio.OpenAL
         private readonly IntPtr deviceHandle;
         private readonly ContextHandle contextHandle;
         private bool isMuted;
-        private float volume;
+        private float volume = 1;
         #endregion
 
         #region Constructors
@@ -27,11 +27,7 @@ namespace Orion.Engine.Audio.OpenAL
         {
             try
             {
-                AlcGetString defaultDeviceFlag = Alc.IsExtensionPresent(IntPtr.Zero, "ALC_ENUMERATE_ALL_EXT")
-                    ? AlcGetString.DefaultAllDevicesSpecifier : AlcGetString.DefaultDeviceSpecifier;
-                string defaultDeviceName = Alc.GetString(IntPtr.Zero, defaultDeviceFlag);
-
-                deviceHandle = Alc.OpenDevice(defaultDeviceName);
+                deviceHandle = Alc.OpenDevice(null);
                 contextHandle = Alc.CreateContext(deviceHandle, (int[])null);
                 Alc.MakeContextCurrent(contextHandle);
                 if (Alc.GetError(deviceHandle) != AlcError.NoError) throw new NotSupportedException("OpenAL is fucked up.");

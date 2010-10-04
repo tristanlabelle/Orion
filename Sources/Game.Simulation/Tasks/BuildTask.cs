@@ -44,6 +44,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "Building {0}".FormatInvariant(buildingPlan.BuildingType); }
         }
+
+        public BuildingPlan BuildingPlan
+        {
+            get { return buildingPlan; }
+        }
         #endregion
 
         #region Methods

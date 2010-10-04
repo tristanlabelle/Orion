@@ -90,6 +90,7 @@ namespace Orion.Game.Presentation.Renderers
             {
                 worldRenderer.DrawTerrain(context, visibleBounds);
                 worldRenderer.DrawResources(context, visibleBounds);
+                worldRenderer.DrawBlueprints(context, visibleBounds);
                 worldRenderer.DrawUnits(context, visibleBounds);
                 selectionRenderer.DrawSelectionMarkers(context);
 

@@ -5,6 +5,8 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Matchmaking.TowerDefense;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -118,6 +120,28 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
             fogOfWarRenderer.Draw(graphicsContext);
+        }
+
+        public void DrawBlueprints(GraphicsContext graphicsContext, Rectangle viewBounds)
+        {
+            var plans = World.Entities
+                .OfType<Unit>()
+                .Where(u => u.HasSkill<BuildSkill>())
+                .SelectMany(u => u.TaskQueue)
+                .OfType<BuildTask>()
+                .Select(t => t.BuildingPlan)
+                .Where(p => Rectangle.Intersects(
+                    p.GridRegion.ToRectangle(),
+                    viewBounds))
+                .Distinct();
+
+            ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);
+            foreach (BuildingPlan plan in plans)
+            {
+                Texture buildingTexture = gameGraphics.GetUnitTexture(plan.BuildingType.Name);
+                Rectangle buildingRectangle = plan.GridRegion.ToRectangle();
+                graphicsContext.Fill(buildingRectangle, buildingTexture, tint);
+            }
         }
 
         public void Dispose()

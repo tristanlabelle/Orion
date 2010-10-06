@@ -74,6 +74,7 @@
     <Compile Include="GameState.cs" />
     <Compile Include="GameStateManager.cs" />
     <Compile Include="MainMenuGameState.cs" />
+    <Compile Include="MasterServerQuerier.cs" />
     <Compile Include="MultiplayerDeathmatchSetupGameState.cs">
       <SubType>Code</SubType>
     </Compile>

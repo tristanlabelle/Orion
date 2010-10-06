@@ -37,7 +37,7 @@ namespace Orion.Game.Main
             this.lobby = new MultiplayerLobby(this.networking);
             this.ui = new MultiplayerLobbyUI(Dns.GetHostName());
 
-            this.lobby.IsEnabled = false;
+            this.lobby.Disable();
 
             this.lobby.MatchesChanged += OnLobbyMatchesChanged;
             this.lobby.JoinResponseReceived += OnJoinResponseReceived;
@@ -65,7 +65,7 @@ namespace Orion.Game.Main
 
         protected internal override void OnShadowed()
         {
-            lobby.IsEnabled = false;
+            lobby.Disable();
             ui.ClearMatches();
             RootView.Children.Remove(ui);
         }
@@ -74,8 +74,7 @@ namespace Orion.Game.Main
         {
             RootView.Children.Add(ui);
             ui.IsEnabled = true;
-            lobby.IsEnabled = true;
-            lobby.Explore();
+            lobby.Enable();
         }
 
         protected internal override void Update(float timeDeltaInSeconds)

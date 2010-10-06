@@ -71,6 +71,9 @@
     <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
+    <Compile Include="Networking\IMatchFinder.cs" />
+    <Compile Include="Networking\LocalNetworkQuerier.cs" />
+    <Compile Include="Networking\MasterServerQuerier.cs" />
     <Compile Include="Networking\Packets\CancelMatchPacket.cs" />
     <Compile Include="NoopCommander.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">

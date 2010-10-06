@@ -19,14 +19,9 @@ namespace Orion.Game.Matchmaking.Networking
         private static readonly TimeSpan timeBeforeReExploring = TimeSpan.FromSeconds(5);
         private static readonly TimeSpan matchListingTimeout = TimeSpan.FromSeconds(15);
 
+        private readonly List<IMatchQuerier> matchFinders = new List<IMatchQuerier>();
         private readonly GameNetworking networking;
-        private readonly List<AdvertizedMatch> matches = new List<AdvertizedMatch>();
-        private readonly ReadOnlyCollection<AdvertizedMatch> readOnlyMatches;
 
-        private readonly Action<GameNetworking, GamePacketEventArgs> packetReceivedEventHandler;
-        private readonly Action<GameNetworking, IPv4EndPoint> peerTimedOutEventHandler;
-
-        private bool isEnabled = true;
         private DateTime lastExploredTime = DateTime.Now;
         private IPv4EndPoint? joiningEndPoint;
         #endregion
@@ -35,13 +30,11 @@ namespace Orion.Game.Matchmaking.Networking
         public MultiplayerLobby(GameNetworking networking)
         {
             Argument.EnsureNotNull(networking, "networking");
-
             this.networking = networking;
-            this.readOnlyMatches = matches.AsReadOnly();
-            this.packetReceivedEventHandler = OnPacketReceived;
-            this.peerTimedOutEventHandler = OnPeerTimedOut;
+            matchFinders.Add(new LocalNetworkQuerier(networking, timeBeforeReExploring));
 
-            AttachEventHandlers();
+            networking.PacketReceived += OnPacketReceived;
+            networking.PeerTimedOut += OnPeerTimedOut;
         }
         #endregion
 
@@ -51,65 +44,37 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Properties
-        public ReadOnlyCollection<AdvertizedMatch> Matches
+        public IEnumerable<AdvertizedMatch> Matches
         {
-            get { return readOnlyMatches; }
+            get { return matchFinders.SelectMany(f => f.Matches); }
         }
 
         public bool IsJoining
         {
             get { return joiningEndPoint.HasValue; }
         }
-
-        public bool IsEnabled
-        {
-            get { return isEnabled; }
-            set
-            {
-                if (value == isEnabled) return;
-
-                isEnabled = value;
-                if (isEnabled)
-                {
-                    AttachEventHandlers();
-                    Explore();
-                }
-                else
-                {
-                    DetachEventHandlers();
-                    matches.Clear();
-                }
-            }
-        }
         #endregion
 
         #region Methods
-        public void Update()
+        public void Enable()
         {
-            DateTime now = DateTime.Now;
-            
-            // Removed timed out matches
-            int removedMatchCount = matches
-                .RemoveAll(m => now - m.LastUpdateTime > matchListingTimeout);
-            if (removedMatchCount > 0) MatchesChanged.Raise(this);
-
-            // Explore matches
-            if (now - lastExploredTime > timeBeforeReExploring)
-            {
-                networking.Broadcast(ExploreMatchesPacket.Instance);
-                lastExploredTime = now;
-            }
-
-            networking.Poll();
+            matchFinders.ForEach(f => f.IsEnabled = true);
         }
 
-        /// <summary>
-        /// Sends a packet to discover if some matches exist on the local network.
-        /// </summary>
-        public void Explore()
+        public void Disable()
         {
-            networking.Broadcast(ExploreMatchesPacket.Instance);
-            lastExploredTime = DateTime.Now;
+            matchFinders.ForEach(f => f.IsEnabled = false);
+        }
+
+        public void Update()
+        {
+            bool matchesChanged = false;
+            foreach (IMatchQuerier finder in matchFinders)
+            {
+                if (finder.Update())
+                    matchesChanged = true;
+            }
+            if (matchesChanged) MatchesChanged.Raise(this);
         }
 
         public void BeginJoining(IPv4EndPoint endPoint)
@@ -122,36 +87,14 @@ namespace Orion.Game.Matchmaking.Networking
 
         public void Dispose()
         {
-            DetachEventHandlers();
-            MatchesChanged = null;
-            matches.Clear();
+            matchFinders.ForEach(f => f.Dispose());
+            matchFinders.Clear();
         }
 
         #region Event Handling
-        private void AttachEventHandlers()
-        {
-            networking.PacketReceived += packetReceivedEventHandler;
-            networking.PeerTimedOut += peerTimedOutEventHandler;
-        }
-
-        private void DetachEventHandlers()
-        {
-            networking.PacketReceived -= packetReceivedEventHandler;
-            networking.PeerTimedOut -= peerTimedOutEventHandler;
-        }
-
         private void OnPacketReceived(GameNetworking sender, GamePacketEventArgs args)
         {
-            if (args.Packet is AdvertizeMatchPacket)
-            {
-                HandleAdvertizeMatchPacket(args.SenderEndPoint, (AdvertizeMatchPacket)args.Packet);
-            }
-            else if (args.Packet is DelistMatchPacket)
-            {
-                int removedMatchCount = matches.RemoveAll(m => m.EndPoint == args.SenderEndPoint);
-                MatchesChanged.Raise(this);
-            }
-            else if (args.Packet is JoinResponsePacket)
+            if (args.Packet is JoinResponsePacket)
             {
                 HandleJoinResponsePacket(args.SenderEndPoint, (JoinResponsePacket)args.Packet);
             }
@@ -165,27 +108,6 @@ namespace Orion.Game.Matchmaking.Networking
                 JoinResponseEventArgs eventArgs = new JoinResponseEventArgs(endPoint, false);
                 JoinResponseReceived.Raise(this, eventArgs);
             }
-
-            int removedMatchCount = matches.RemoveAll(m => m.EndPoint == endPoint);
-            if (removedMatchCount > 0) MatchesChanged.Raise(this);
-        }
-
-        private void HandleAdvertizeMatchPacket(IPv4EndPoint senderEndPoint, AdvertizeMatchPacket packet)
-        {
-            AdvertizedMatch match = matches
-                .FirstOrDefault(m => m.EndPoint == senderEndPoint);
-            if (match == null)
-            {
-                match = new AdvertizedMatch(senderEndPoint, packet.Name, packet.OpenSlotCount);
-                matches.Add(match);
-            }
-            else
-            {
-                match.OpenSlotCount = packet.OpenSlotCount;
-                match.KeepAlive();
-            }
-
-            MatchesChanged.Raise(this);
         }
 
         private void HandleJoinResponsePacket(IPv4EndPoint senderEndPoint, JoinResponsePacket packet)

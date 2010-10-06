@@ -13,6 +13,7 @@ namespace Orion.Game.Matchmaking.Networking
     public sealed class AdvertizedMatch
     {
         #region Fields
+        private readonly IMatchQuerier source;
         private readonly IPv4EndPoint endPoint;
         private string name;
         private int openSlotCount;
@@ -20,11 +21,13 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Constructors
-        public AdvertizedMatch(IPv4EndPoint endPoint, string name, int openSlotCount)
+        public AdvertizedMatch(IMatchQuerier source, IPv4EndPoint endPoint, string name, int openSlotCount)
         {
+            Argument.EnsureNotNull(source, "source");
             Argument.EnsureNotNull(name, "name");
             Argument.EnsurePositive(openSlotCount, "openSlotCount");
 
+            this.source = source;
             this.endPoint = endPoint;
             this.name = name;
             this.openSlotCount = openSlotCount;
@@ -32,6 +35,11 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Properties
+        public IMatchQuerier Source
+        {
+            get { return source; }
+        }
+
         public IPv4EndPoint EndPoint
         {
             get { return endPoint; }

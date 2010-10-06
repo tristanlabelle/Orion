@@ -36,6 +36,13 @@ namespace Orion.Game.Main
         #endregion
 
         #region Properties
+        public string Tag { get { return "WAN"; } }
+
+        public ReadOnlyCollection<AdvertizedMatch> Matches
+        {
+            get { return readOnlyMatches; }
+        }
+
         public Uri ServerUri
         {
             get { return serverUri; }
@@ -58,6 +65,8 @@ namespace Orion.Game.Main
             }
             return false;
         }
+
+        public void Dispose() { }
         #endregion
     }
 }

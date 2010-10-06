@@ -40,6 +40,8 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Properties
+        public string Tag { get { return "LAN"; } }
+
         public ReadOnlyCollection<AdvertizedMatch> Matches
         {
             get { return readOnlyMatches; }
@@ -136,7 +138,7 @@ namespace Orion.Game.Matchmaking.Networking
                 .FirstOrDefault(m => m.EndPoint == senderEndPoint);
             if (match == null)
             {
-                match = new AdvertizedMatch(senderEndPoint, packet.Name, packet.OpenSlotCount);
+                match = new AdvertizedMatch(this, senderEndPoint, packet.Name, packet.OpenSlotCount);
                 matches.Add(match);
             }
             else

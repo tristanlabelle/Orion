@@ -13,7 +13,7 @@ namespace Orion.Game.Matchmaking.Networking
         /// <summary>
         /// Gets the read-only list of matches offered by this IMatchFinder.
         /// </summary>
-        public ReadOnlyCollection<AdvertizedMatch> Matches { get; }
+        ReadOnlyCollection<AdvertizedMatch> Matches { get; }
 
         /// <summary>
         /// Gets or sets the activity state of this IMatchFinder.
@@ -22,7 +22,7 @@ namespace Orion.Game.Matchmaking.Networking
         /// A disabled IMatchFinder does nothing to find matches, and throws an
         /// InvalidOperationException if its Update method is called.
         /// </remarks>
-        public bool IsEnabled { get; set; }
+        bool IsEnabled { get; set; }
 
         /// <summary>
         /// Gets the tag of this IMatchFinder.
@@ -32,7 +32,7 @@ namespace Orion.Game.Matchmaking.Networking
         /// with the games to mark if the game is, say, from a remote server, or from the local
         /// network.
         /// </remarks>
-        public string Tag { get; }
+        string Tag { get; }
         #endregion
 
         #region Methods
@@ -41,7 +41,7 @@ namespace Orion.Game.Matchmaking.Networking
         /// least tries to do so.
         /// </summary>
         /// <returns></returns>
-        public bool Update();
+        bool Update();
         #endregion
     }
 }

@@ -179,6 +179,7 @@
     <Compile Include="Gui\ViewContainer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />
     <Compile Include="Networking\Http\HttpRequestMethod.cs" />

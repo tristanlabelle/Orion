@@ -26,7 +26,7 @@ namespace Orion.Engine.Networking.Http
                 if (!Char.IsUpper(headerName[location - 1]))
                 {
                     if (result.Length > 0) result.Append('-');
-                    result.Append(headerName.Substring(lastMatch, location));
+                    result.Append(headerName.Substring(lastMatch, location - lastMatch));
                     lastMatch = location;
                 }
             }

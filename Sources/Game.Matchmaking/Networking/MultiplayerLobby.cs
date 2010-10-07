@@ -32,6 +32,7 @@ namespace Orion.Game.Matchmaking.Networking
             Argument.EnsureNotNull(networking, "networking");
             this.networking = networking;
             matchFinders.Add(new LocalNetworkQuerier(networking, timeBeforeReExploring, matchListingTimeout));
+            matchFinders.Add(new MasterServerQuerier("http://www.laissemoichercherca.com/ets/orion.php", matchListingTimeout));
 
             networking.PacketReceived += OnPacketReceived;
             networking.PeerTimedOut += OnPeerTimedOut;

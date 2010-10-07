@@ -11,8 +11,11 @@ namespace Orion.Engine.Networking.Http
     public class HttpResponse
     {
         #region Fields
-        private static Regex headerRegex = new Regex(@"([^:]+)\s*(.+))", RegexOptions.Compiled);
+        private static Regex headerRegex = new Regex(@"([^:]+):\s*(.+)", RegexOptions.Compiled);
+        private static Regex responseCodeRegex = new Regex(@"HTTP/\d\.\d\s*(\d+)\s*(.+)", RegexOptions.Compiled);
 
+        private int resultCode;
+        private string resultString;
         private readonly Dictionary<string, string> responseHeaders = new Dictionary<string,string>();
         private string body;
         #endregion
@@ -22,10 +25,16 @@ namespace Orion.Engine.Networking.Http
         {
             StreamReader reader = new StreamReader(stream);
             string line = reader.ReadLine();
-            while (line != HttpRequest.crlf)
+
+            Match response = responseCodeRegex.Match(line);
+            resultCode = int.Parse(response.Groups[1].Value);
+            resultString = response.Groups[2].Value;
+
+            while (line != string.Empty)
             {
-                Match result = headerRegex.Match(line.Trim());
-                responseHeaders[result.Groups[0].Value] = result.Groups[1].Value;
+                line = reader.ReadLine();
+                Match result = headerRegex.Match(line);
+                responseHeaders[result.Groups[1].Value] = result.Groups[2].Value;
             }
 
             ReadBody(stream);
@@ -33,6 +42,16 @@ namespace Orion.Engine.Networking.Http
         #endregion
 
         #region Properties
+        public int ResultCode
+        {
+            get { return resultCode; }
+        }
+
+        public string ResultString
+        {
+            get { return resultString; }
+        }
+
         public string Body
         {
             get { return body; }
@@ -57,7 +76,7 @@ namespace Orion.Engine.Networking.Http
         private Encoding GetEncoding()
         {
             string contentType = responseHeaders[HttpEnumMethods.ToString(HttpRequestHeader.ContentType)];
-            int semicolon = contentType.IndexOf(';');
+            int semicolon = contentType.IndexOf('=');
             if (semicolon == -1) return Encoding.GetEncoding("ISO-8859-1");
             return Encoding.GetEncoding(contentType.Substring(semicolon + 1).Trim());
         }

@@ -5,12 +5,12 @@ using System.Text;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Networking;
 using System.Collections.ObjectModel;
-using System.Net;
 using System.IO;
 using Orion.Engine.Networking;
 using System.Text.RegularExpressions;
+using Orion.Engine.Networking.Http;
 
-namespace Orion.Game.Main
+namespace Orion.Game.Matchmaking.Networking
 {
     public class MasterServerQuerier : IMatchQuerier
     {
@@ -19,7 +19,7 @@ namespace Orion.Game.Main
 
         private readonly Uri serverUri;
         private readonly TimeSpan timeBeforeReExploring;
-        private readonly WebClient httpClient = new WebClient();
+        private readonly HttpRequest httpClient;
         private DateTime lastPoll = DateTime.MinValue;
         private bool isEnabled;
 
@@ -34,7 +34,7 @@ namespace Orion.Game.Main
             this.timeBeforeReExploring = timeBeforeReExploring;
             this.serverUri = serverUri;
             this.readOnlyMatches = matches.AsReadOnly();
-            httpClient.OpenReadCompleted += OnReadCompleted;
+            httpClient = new HttpRequest(serverUri.DnsSafeHost);
         }
 
         public MasterServerQuerier(string serverUri, TimeSpan timeBeforeReExploring)
@@ -81,31 +81,30 @@ namespace Orion.Game.Main
             if (now - lastPoll > timeBeforeReExploring)
             {
                 lastPoll = now;
-                httpClient.OpenReadAsync(serverUri);
+                httpClient.ExecuteAsync(HttpRequestMethod.Get, serverUri.AbsolutePath, OnReadCompleted);
             }
             return updated;
         }
 
         public void Dispose()
-        {
-            httpClient.Dispose();
-        }
+        { }
 
-        private void OnReadCompleted(object sender, OpenReadCompletedEventArgs args)
+        private void OnReadCompleted(HttpResponse response)
         {
             List<AdvertizedMatch> matches = new List<AdvertizedMatch>();
-            Stream stream = args.Result;
-            using (StreamReader reader = new StreamReader(stream))
             lock (pendingMatches)
             {
-                System.Text.RegularExpressions.Match match = returnLineRegex.Match(reader.ReadLine());
-                int ipAddress = int.Parse(match.Groups[0].Value);
-                int placesLeft = int.Parse(match.Groups[1].Value);
-                IPv4EndPoint endPoint = new IPv4EndPoint((uint)ipAddress, 41223);
-                AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[2].Value, placesLeft);
-                matches.Add(advertisement);
+                System.Text.RegularExpressions.Match match = returnLineRegex.Match(response.Body);
+                while (match.Success)
+                {
+                    int ipAddress = int.Parse(match.Groups[1].Value);
+                    int placesLeft = int.Parse(match.Groups[2].Value);
+                    IPv4EndPoint endPoint = new IPv4EndPoint((uint)ipAddress, 41223);
+                    AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
+                    matches.Add(advertisement);
+                    match = match.NextMatch();
+                }
             }
-            stream.Close(); // documentation says *we* have to close it
         }
         #endregion
     }

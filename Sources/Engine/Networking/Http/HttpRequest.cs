@@ -17,7 +17,7 @@ namespace Orion.Engine.Networking.Http
         private static readonly Regex headerValueValidator = new Regex(@"^([^\r\n]+)$", RegexOptions.Compiled);
         private static readonly Regex headerNameValidator = new Regex(@"^([a-zA-Z\-_]+)$", RegexOptions.Compiled);
         private static readonly Regex charsToEscape = new Regex(@"[^a-zA-Z0-9$\-@.!*""'()]", RegexOptions.Compiled);
-        internal static readonly string crlf = "\r\n";
+        private static readonly string crlf = "\r\n";
 
         private readonly Dictionary<string, string> headers = new Dictionary<string, string>();
         private readonly IPv4EndPoint hostEndPoint;
@@ -33,9 +33,8 @@ namespace Orion.Engine.Networking.Http
         {
             IPAddress[] addresses = Dns.GetHostAddresses(hostNameOrAddress);
             if (addresses.Length == 0) throw new ArgumentException("Could not resolve hostname " + hostNameOrAddress);
-            byte[] address = addresses[0].GetAddressBytes();
 
-            hostEndPoint = new IPv4EndPoint(address[0], address[1], address[2], address[3], port);
+            hostEndPoint = new IPv4EndPoint((IPv4Address)addresses[0], port);
             socket.Connect(hostEndPoint);
             
             headers[HttpEnumMethods.ToString(HttpRequestHeader.Host)] = hostNameOrAddress.Trim();
@@ -138,7 +137,6 @@ namespace Orion.Engine.Networking.Http
                         foreach (KeyValuePair<string, string> header in headers)
                             writer.Write("{0}: {1}" + crlf, header.Key, header.Value);
                         writer.Write(crlf);
-                        writer.Write(crlf);
 
                         if (fieldsStream.Length > 0)
                         {
@@ -146,6 +144,8 @@ namespace Orion.Engine.Networking.Http
                             writer.Write(crlf);
                         }
 
+                        writer.Flush();
+                        socketStream.Flush();
                         return new HttpResponse(this, socketStream);
                     }
                 }

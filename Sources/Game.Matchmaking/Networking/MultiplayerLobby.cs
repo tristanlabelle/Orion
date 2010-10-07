@@ -11,7 +11,7 @@ using Orion.Game.Matchmaking.Networking.Packets;
 namespace Orion.Game.Matchmaking.Networking
 {
     /// <summary>
-    /// Provides the listing of multiplayer games.
+    /// Provides the listing of multiplayer games through composited IMatchQueriers.
     /// </summary>
     public sealed class MultiplayerLobby : IDisposable
     {
@@ -31,7 +31,7 @@ namespace Orion.Game.Matchmaking.Networking
         {
             Argument.EnsureNotNull(networking, "networking");
             this.networking = networking;
-            matchFinders.Add(new LocalNetworkQuerier(networking, timeBeforeReExploring));
+            matchFinders.Add(new LocalNetworkQuerier(networking, timeBeforeReExploring, matchListingTimeout));
 
             networking.PacketReceived += OnPacketReceived;
             networking.PeerTimedOut += OnPeerTimedOut;
@@ -94,10 +94,9 @@ namespace Orion.Game.Matchmaking.Networking
         #region Event Handling
         private void OnPacketReceived(GameNetworking sender, GamePacketEventArgs args)
         {
-            if (args.Packet is JoinResponsePacket)
-            {
-                HandleJoinResponsePacket(args.SenderEndPoint, (JoinResponsePacket)args.Packet);
-            }
+            JoinResponsePacket joinPacket = args.Packet as JoinResponsePacket;
+            if (joinPacket != null)
+                HandleJoinResponsePacket(args.SenderEndPoint, joinPacket);
         }
 
         private void OnPeerTimedOut(GameNetworking sender, IPv4EndPoint endPoint)

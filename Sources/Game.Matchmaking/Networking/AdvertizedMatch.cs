@@ -77,6 +77,18 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Methods
+        public static bool operator ==(AdvertizedMatch a, AdvertizedMatch b)
+        {
+            if (a == null) return b == null;
+            if (b == null) return false;
+            return a.endPoint == b.endPoint && a.name == b.name;
+        }
+
+        public static bool operator !=(AdvertizedMatch a, AdvertizedMatch b)
+        {
+            return !(a == b);
+        }
+
         public void KeepAlive()
         {
             lastUpdateTime = DateTime.Now;

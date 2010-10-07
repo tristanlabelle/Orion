@@ -12,6 +12,7 @@ namespace Orion.Game.Matchmaking.Networking
     {
         #region Fields
         private readonly TimeSpan timeBeforeReExploring;
+        private readonly TimeSpan timeBeforeExpiring;
 
         private readonly GameNetworking networking;
         private readonly List<AdvertizedMatch> matches = new List<AdvertizedMatch>();
@@ -26,8 +27,9 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Constructors
-        public LocalNetworkQuerier(GameNetworking networking, TimeSpan timeBeforeReExploring)
+        public LocalNetworkQuerier(GameNetworking networking, TimeSpan timeBeforeReExploring, TimeSpan timeBeforeExpiring)
         {
+            this.timeBeforeExpiring = timeBeforeExpiring;
             this.timeBeforeReExploring = timeBeforeReExploring;
             this.networking = networking;
             this.readOnlyMatches = matches.AsReadOnly();
@@ -79,7 +81,7 @@ namespace Orion.Game.Matchmaking.Networking
 
             // Removed timed out matches
             int removedMatchCount = matches
-                .RemoveAll(m => now - m.LastUpdateTime > timeBeforeReExploring);
+                .RemoveAll(m => now - m.LastUpdateTime > timeBeforeExpiring);
 
             // Explore matches
             if (now - lastExploredTime > timeBeforeReExploring)

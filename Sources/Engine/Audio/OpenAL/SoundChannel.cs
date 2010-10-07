@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK.Audio;
 using OpenTK.Math;
+using System.Diagnostics;
 
 namespace Orion.Engine.Audio.OpenAL
 {
@@ -76,6 +77,7 @@ namespace Orion.Engine.Audio.OpenAL
 
             int sourceHandle = AL.GenSource();
             AL.BindBufferToSource(sourceHandle, ((Sound)sound).Handle);
+            Debug.Assert(AL.GetError() == ALError.NoError, "Non-critical error while creating OpenAL audio source.");
 
             AL.Source(sourceHandle, ALSourceb.SourceRelative, !position.HasValue);
             if (position.HasValue) AL.Source(sourceHandle, ALSource3f.Position, -position.Value.X, position.Value.Y, position.Value.Z);
@@ -89,7 +91,16 @@ namespace Orion.Engine.Audio.OpenAL
 
         private void RemoveCompletedSounds()
         {
-            sourceHandles.RemoveAll(sourceHandle => AL.GetSourceState(sourceHandle) == ALSourceState.Stopped);
+            for (int i = sourceHandles.Count - 1; i >= 0; --i)
+            {
+                int sourceHandle = sourceHandles[i];
+                if (AL.GetSourceState(sourceHandle) == ALSourceState.Stopped)
+                {
+                    AL.DeleteSource(sourceHandle);
+                    Debug.Assert(AL.GetError() == ALError.NoError, "Non-critical error while deleting OpenAL audio source.");
+                    sourceHandles.RemoveAt(i);
+                }
+            }
         }
 
         public void StopAllSounds()

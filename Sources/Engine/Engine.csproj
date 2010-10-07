@@ -179,6 +179,11 @@
     <Compile Include="Gui\ViewContainer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Networking\Http\HttpRequest.cs" />
+    <Compile Include="Networking\Http\HttpRequestHeader.cs" />
+    <Compile Include="Networking\Http\HttpRequestMethod.cs" />
+    <Compile Include="Networking\Http\HttpResponse.cs" />
+    <Compile Include="Networking\Http\HttpResponseHeader.cs" />
     <Compile Include="Networking\IPv4Address.cs" />
     <Compile Include="Networking\IPv4EndPoint.cs" />
     <Compile Include="Networking\NetworkEventArgs.cs" />

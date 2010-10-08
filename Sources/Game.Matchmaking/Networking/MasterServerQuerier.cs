@@ -97,9 +97,10 @@ namespace Orion.Game.Matchmaking.Networking
                 System.Text.RegularExpressions.Match match = returnLineRegex.Match(response.Body);
                 while (match.Success)
                 {
-                    int ipAddress = int.Parse(match.Groups[1].Value);
+                    uint ipAddress = uint.Parse(match.Groups[1].Value);
                     int placesLeft = int.Parse(match.Groups[2].Value);
-                    IPv4EndPoint endPoint = new IPv4EndPoint((uint)ipAddress, 41223);
+#warning Port number was hard-coded here
+                    IPv4EndPoint endPoint = new IPv4EndPoint(ipAddress, 41223);
                     AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
                     matches.Add(advertisement);
                     match = match.NextMatch();

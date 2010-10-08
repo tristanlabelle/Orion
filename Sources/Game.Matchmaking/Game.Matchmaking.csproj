@@ -71,9 +71,14 @@
     <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
+    <Compile Include="Networking\CompositeMatchAdvertiser.cs" />
+    <Compile Include="Networking\IMatchAdvertizer.cs" />
     <Compile Include="Networking\IMatchQuerier.cs" />
+    <Compile Include="Networking\LocalNetworkAdvertizer.cs" />
     <Compile Include="Networking\LocalNetworkQuerier.cs" />
+    <Compile Include="Networking\MasterServerAdvertizer.cs" />
     <Compile Include="Networking\MasterServerQuerier.cs" />
+    <Compile Include="Networking\NullMatchAdvertizer.cs" />
     <Compile Include="Networking\Packets\CancelMatchPacket.cs" />
     <Compile Include="NoopCommander.cs" />
     <Compile Include="Commands\Pipeline\CheatCodeExecutor.cs">

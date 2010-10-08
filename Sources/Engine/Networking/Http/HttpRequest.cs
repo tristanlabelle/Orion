@@ -13,10 +13,11 @@ namespace Orion.Engine.Networking.Http
     public class HttpRequest
     {
         #region Fields
+        private const string formMimeType = "application/x-www-form-urlencoded";
         private static readonly Dictionary<string, string> emptyFields = new Dictionary<string, string>();
         private static readonly Regex headerValueValidator = new Regex(@"^([^\r\n]+)$", RegexOptions.Compiled);
         private static readonly Regex headerNameValidator = new Regex(@"^([a-zA-Z\-_]+)$", RegexOptions.Compiled);
-        private static readonly Regex charsToEscape = new Regex(@"[^a-zA-Z0-9$\-@.!*""'()]", RegexOptions.Compiled);
+        private static readonly Regex charsToEscape = new Regex(@"[$&+,/:;=?@ <>#%{}|\\^~\[\]`]", RegexOptions.Compiled);
         private static readonly string crlf = "\r\n";
 
         private readonly Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -63,7 +64,7 @@ namespace Orion.Engine.Networking.Http
         #region Methods
         private static string Escape(string valueToEscape)
         {
-            return charsToEscape.Replace(valueToEscape, match => string.Format("%{0:X}", match.Value[0]));
+            return charsToEscape.Replace(valueToEscape, match => string.Format("%{0:X}", (int)match.Value[0]));
         }
 
         public string GetRequestHeaderValue(string header)
@@ -123,6 +124,7 @@ namespace Orion.Engine.Networking.Http
                     StreamWriter fieldWriter = new StreamWriter(fieldsStream);
                     foreach (KeyValuePair<string, string> field in fields)
                         fieldWriter.Write("{0}={1}&", Escape(field.Key), Escape(field.Value));
+                    fieldWriter.Flush();
                 }
 
                 using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
@@ -130,20 +132,25 @@ namespace Orion.Engine.Networking.Http
                     socket.Connect(hostEndPoint);
                     using (NetworkStream socketStream = new NetworkStream(socket))
                     {
-                        StreamWriter writer = new StreamWriter(socketStream);
+                        StreamWriter writer = new StreamWriter(socketStream, new UTF8Encoding(false));
                         // this is kinda cheap, but most servers can cope with receiving non-ascii chars
                         // (we can't escape the whole path because we need to keep slashes as-is)
                         writer.Write("{0} {1} HTTP/1.1" + crlf, HttpEnumMethods.ToString(method), path.Replace(" ", "%20"));
                         foreach (KeyValuePair<string, string> header in headers)
                             writer.Write("{0}: {1}" + crlf, header.Key, header.Value);
-                        writer.Write(crlf);
 
                         if (fieldsStream.Length > 0)
                         {
-                            writer.BaseStream.Write(fieldsStream.GetBuffer(), 0, (int)fieldsStream.Length);
+                            string contentTypeName = HttpEnumMethods.ToString(HttpRequestHeader.ContentType);
+                            if (!headers.ContainsKey(contentTypeName))
+                                writer.Write("{0}: {1}; charset={2}" + crlf, contentTypeName, formMimeType, writer.Encoding.HeaderName);
+                            writer.Write("{0}: {1}" + crlf, HttpEnumMethods.ToString(HttpRequestHeader.ContentLength), fieldsStream.Length);
                             writer.Write(crlf);
+                            writer.Flush();
+                            writer.BaseStream.Write(fieldsStream.GetBuffer(), 0, (int)fieldsStream.Length);
                         }
 
+                        writer.Write(crlf);
                         writer.Flush();
                         socketStream.Flush();
                         return new HttpResponse(this, socketStream);
@@ -155,6 +162,12 @@ namespace Orion.Engine.Networking.Http
         public void ExecuteAsync(HttpRequestMethod method, string path, Action<HttpResponse> onReceive)
         {
             Thread requestThread = new Thread(() => onReceive(Execute(method, path)));
+            requestThread.Start();
+        }
+
+        public void ExecuteAsync(HttpRequestMethod method, string path, IDictionary<string, string> fields)
+        {
+            Thread requestThread = new Thread(() => Execute(method, path, fields));
             requestThread.Start();
         }
 

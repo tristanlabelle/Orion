@@ -25,6 +25,7 @@ namespace Orion.Game.Main
         private readonly PlayerSettings playerSettings;
         private readonly MatchConfigurationUI ui;
         private readonly GameNetworking networking;
+        private readonly IMatchAdvertizer advertizer;
 
         /// <remarks>Defined only for clients.</remarks>
         private readonly IPv4EndPoint? hostEndPoint;
@@ -35,15 +36,17 @@ namespace Orion.Game.Main
 
         #region Constructors
         private MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics,
-            GameNetworking networking, string matchName, IPv4EndPoint? hostEndPoint)
+            GameNetworking networking, IMatchAdvertizer advertizer, string matchName, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
             Argument.EnsureNotNull(manager, "manager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(networking, "networking");
+            Argument.EnsureNotNull(advertizer, "advertizer");
 
             this.networking = networking;
             this.graphics = graphics;
+            this.advertizer = advertizer;
             this.matchSettings = new MatchSettings();
             this.hostEndPoint = hostEndPoint;
             this.matchName = matchName;
@@ -399,8 +402,8 @@ namespace Orion.Game.Main
 
         private void AdvertizeMatch()
         {
-            AdvertizeMatchPacket advertize = new AdvertizeMatchPacket(matchName, playerSettings.MaximumNumberOfPlayers - playerSettings.PlayerCount);
-            networking.Broadcast(advertize);
+            int openSlotsCount = playerSettings.MaximumNumberOfPlayers - playerSettings.PlayerCount;
+            advertizer.Advertize(matchName, openSlotsCount);
         }
 
         private int IndexOfClient(IPv4EndPoint endPoint)
@@ -437,9 +440,12 @@ namespace Orion.Game.Main
             GameStateManager manager, GameGraphics graphics,
             GameNetworking networking, string matchName)
         {
+            CompositeMatchAdvertizer advertizer = new CompositeMatchAdvertizer();
+            advertizer.AddAdvertiser(new LocalNetworkAdvertizer(networking));
+            advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
             Argument.EnsureNotNull(matchName, "matchName");
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, matchName, null);
+                networking, advertizer, matchName, null);
         }
 
         public static MultiplayerDeathmatchSetupGameState CreateAsClient(
@@ -447,7 +453,7 @@ namespace Orion.Game.Main
             GameNetworking networking, IPv4EndPoint hostEndPoint)
         {
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, null, hostEndPoint);
+                networking, new NullMatchAdvertizer(), null, hostEndPoint);
         }
         #endregion
         #endregion

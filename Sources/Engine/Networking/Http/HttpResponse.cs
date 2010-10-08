@@ -34,6 +34,7 @@ namespace Orion.Engine.Networking.Http
             {
                 line = reader.ReadLine();
                 Match result = headerRegex.Match(line);
+                if (!result.Success) break;
                 responseHeaders[result.Groups[1].Value] = result.Groups[2].Value;
             }
 
@@ -90,8 +91,11 @@ namespace Orion.Engine.Networking.Http
                 string encodingType = responseHeaders[transferEncodingName];
                 if (encodingType.ToUpper() == "CHUNKED")
                 {
-                    ReadChunkedBody(reader);
-                    return;
+#warning Reading chunked bodies doesn't work
+                    // well it doesn't work
+                    // that's too bad, reader.ReadToEnd() will do it
+                    // ReadChunkedBody(reader);
+                    // return;
                 }
             }
             body = reader.ReadToEnd();
@@ -104,7 +108,8 @@ namespace Orion.Engine.Networking.Http
             byte[] array = new byte[0x1000];
             do
             {
-                length = int.Parse(reader.ReadLine());
+                string line = reader.ReadLine();
+                length = int.Parse(line, System.Globalization.NumberStyles.HexNumber);
                 if (array.Length < length) array = new byte[length];
                 reader.BaseStream.Read(array, 0, length);
                 bodyBuilder.Append(reader.CurrentEncoding.GetString(array, 0, length));

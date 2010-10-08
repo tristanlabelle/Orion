@@ -558,6 +558,7 @@ namespace Orion.Game.Presentation
         {
             var transporters = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<TransportSkill>());
+            OverrideIfNecessary();
             commander.LaunchDisembark(transporters);
         }
 
@@ -567,6 +568,7 @@ namespace Orion.Game.Presentation
 
             var embarkers = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
+            OverrideIfNecessary();
             commander.LaunchEmbark(embarkers, transporter);
         }
         #endregion

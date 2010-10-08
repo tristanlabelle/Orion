@@ -687,7 +687,7 @@ namespace Orion.Game.Simulation
                .Where(unit => unit != this
                    && unit.Damage > 0
                    && !unit.IsBuilding
-                   && !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
+                   && Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                    && IsInLineOfSight(unit))
                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 

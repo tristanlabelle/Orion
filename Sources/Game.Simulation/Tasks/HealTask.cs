@@ -72,6 +72,7 @@ namespace Orion.Game.Simulation.Tasks
                 Unit.LookAt(target.Center);
                 int speed = Unit.GetStat(HealSkill.SpeedStat);
                 target.Health += speed * step.TimeDeltaInSeconds;
+                if (target.Health == target.MaxHealth) MarkAsEnded();
                 return;
             }
             else

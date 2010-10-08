@@ -79,8 +79,8 @@ namespace Orion.Game.Matchmaking.Networking
         #region Methods
         public static bool operator ==(AdvertizedMatch a, AdvertizedMatch b)
         {
-            if (a == null) return b == null;
-            if (b == null) return false;
+            if (object.ReferenceEquals(a, null)) return object.ReferenceEquals(b, null);
+            if (object.ReferenceEquals(b, null)) return false;
             return a.endPoint == b.endPoint && a.name == b.name;
         }
 

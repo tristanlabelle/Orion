@@ -273,7 +273,6 @@ namespace Orion.Engine.Graphics
             keyToKeys.Add(Key.Tab, Keys.Tab);
             keyToKeys.Add(Key.CapsLock, Keys.Capital);
             keyToKeys.Add(Key.ControlLeft, Keys.LControlKey);
-            keyToKeys.Add(Key.ShiftLeft, Keys.LShiftKey);
             keyToKeys.Add(Key.WinLeft, Keys.LWin);
             keyToKeys.Add(Key.AltLeft, Keys.LMenu);
             keyToKeys.Add(Key.Space, Keys.Space);
@@ -281,9 +280,14 @@ namespace Orion.Engine.Graphics
             keyToKeys.Add(Key.WinRight, Keys.RWin);
             keyToKeys.Add(Key.Menu, Keys.Apps);
             keyToKeys.Add(Key.ControlRight, Keys.RControlKey);
-            keyToKeys.Add(Key.ShiftRight, Keys.RShiftKey);
             keyToKeys.Add(Key.Enter, Keys.Return);
             keyToKeys.Add(Key.BackSpace, Keys.Back);
+
+            // those are commented out because we need to get Keys.ShiftKey instead of LShiftKey or RShiftKey
+            // keyToKeys.Add(Key.ShiftLeft, Keys.LShiftKey);
+            // keyToKeys.Add(Key.ShiftRight, Keys.RShiftKey);
+            keyToKeys.Add(Key.ShiftLeft, Keys.ShiftKey);
+            keyToKeys.Add(Key.ShiftRight, Keys.ShiftKey);
 
             keyToKeys.Add(Key.Semicolon, Keys.Oem1);      // Varies by keyboard, ;: on Win2K/US
             keyToKeys.Add(Key.Slash, Keys.Oem2);          // Varies by keyboard, /? on Win2K/US

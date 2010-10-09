@@ -32,6 +32,8 @@ namespace Orion.Game.Main
 
         /// <remarks>Defined only for the host.</remarks>
         private readonly string matchName;
+
+        private float elapsedSecondsSinceLastAdvertize;
         #endregion
 
         #region Constructors
@@ -157,10 +159,8 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
-            if (IsHost)
-                AdvertizeMatch();
-            else
-                networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
+            if (IsHost) AdvertizeMatch();
+            else networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
 
             RootView.Children.Add(ui);
         }
@@ -179,6 +179,15 @@ namespace Orion.Game.Main
         {
             graphics.UpdateRootView(timeDeltaInSeconds);
             networking.Poll();
+            if (IsHost)
+            {
+                elapsedSecondsSinceLastAdvertize += timeDeltaInSeconds;
+                if (elapsedSecondsSinceLastAdvertize > advertizeFrequency)
+                {
+                    elapsedSecondsSinceLastAdvertize %= advertizeFrequency;
+                    AdvertizeMatch();
+                }
+            }
         }
 
         protected internal override void Draw(GameGraphics graphics)
@@ -435,6 +444,10 @@ namespace Orion.Game.Main
         #endregion
 
         #region Static
+        #region Fields
+        private const float advertizeFrequency = 5;
+        #endregion
+
         #region Methods
         public static MultiplayerDeathmatchSetupGameState CreateAsHost(
             GameStateManager manager, GameGraphics graphics,

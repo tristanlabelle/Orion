@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Networking.Http;
+using System.Diagnostics;
 
 namespace Orion.Game.Matchmaking.Networking
 {
@@ -37,7 +38,8 @@ namespace Orion.Game.Matchmaking.Networking
             fields[nameField] = name;
             fields[openSlotsField] = openSlotsCount.ToString();
             fields[timeToLiveField] = defaultTimeToLive.ToString();
-            masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields);
+            masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields,
+                r => Debug.WriteLine(r.Body));
         }
         #endregion
     }

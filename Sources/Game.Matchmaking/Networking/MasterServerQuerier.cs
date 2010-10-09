@@ -15,7 +15,7 @@ namespace Orion.Game.Matchmaking.Networking
     public class MasterServerQuerier : IMatchQuerier
     {
         #region Fields
-        private static readonly Regex returnLineRegex = new Regex(@"^(\d+)\s+(\d+)\s(.+)$", RegexOptions.Compiled);
+        private static readonly Regex returnLineRegex = new Regex(@"^(\d+)\s+(\d+)\s+(.+)$", RegexOptions.Compiled);
 
         private readonly Uri serverUri;
         private readonly TimeSpan timeBeforeReExploring;
@@ -72,9 +72,10 @@ namespace Orion.Game.Matchmaking.Networking
             {
                 if (pendingMatches.Count > 0)
                 {
-                    updated = matches.SequenceEqual(pendingMatches);
+                    updated = !matches.SequenceEqual(pendingMatches);
                     matches.Clear();
                     matches.AddRange(pendingMatches);
+                    pendingMatches.Clear();
                 }
             }
 
@@ -92,19 +93,17 @@ namespace Orion.Game.Matchmaking.Networking
         private void OnReadCompleted(HttpResponse response)
         {
             List<AdvertizedMatch> matches = new List<AdvertizedMatch>();
+            System.Text.RegularExpressions.Match match = returnLineRegex.Match(response.Body);
             lock (pendingMatches)
+            while (match.Success)
             {
-                System.Text.RegularExpressions.Match match = returnLineRegex.Match(response.Body);
-                while (match.Success)
-                {
-                    uint ipAddress = uint.Parse(match.Groups[1].Value);
-                    int placesLeft = int.Parse(match.Groups[2].Value);
+                uint ipAddress = uint.Parse(match.Groups[1].Value);
+                int placesLeft = int.Parse(match.Groups[2].Value);
 #warning Port number was hard-coded here
-                    IPv4EndPoint endPoint = new IPv4EndPoint(ipAddress, 41223);
-                    AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
-                    matches.Add(advertisement);
-                    match = match.NextMatch();
-                }
+                IPv4EndPoint endPoint = new IPv4EndPoint(ipAddress, 41223);
+                AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
+                pendingMatches.Add(advertisement);
+                match = match.NextMatch();
             }
         }
         #endregion

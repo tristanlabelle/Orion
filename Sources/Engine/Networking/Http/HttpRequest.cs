@@ -153,7 +153,7 @@ namespace Orion.Engine.Networking.Http
                         writer.Write(crlf);
                         writer.Flush();
                         socketStream.Flush();
-                        return new HttpResponse(this, socketStream);
+                        return new HttpResponse(this, socket);
                     }
                 }
             }
@@ -162,18 +162,21 @@ namespace Orion.Engine.Networking.Http
         public void ExecuteAsync(HttpRequestMethod method, string path, Action<HttpResponse> onReceive)
         {
             Thread requestThread = new Thread(() => onReceive(Execute(method, path)));
+            requestThread.Name = "HTTP Request Thread";
             requestThread.Start();
         }
 
         public void ExecuteAsync(HttpRequestMethod method, string path, IDictionary<string, string> fields)
         {
             Thread requestThread = new Thread(() => Execute(method, path, fields));
+            requestThread.Name = "HTTP Request Thread";
             requestThread.Start();
         }
 
         public void ExecuteAsync(HttpRequestMethod method, string path, IDictionary<string, string> fields, Action<HttpResponse> onReceive)
         {
             Thread requestThread = new Thread(() => onReceive(Execute(method, path, fields)));
+            requestThread.Name = "HTTP Request Thread";
             requestThread.Start();
         }
         #endregion

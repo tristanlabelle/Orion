@@ -21,24 +21,41 @@ namespace Orion.Engine.Networking.Http
         #endregion
 
         #region Constructors
-        internal HttpResponse(HttpRequest request, NetworkStream stream)
+        internal HttpResponse(HttpRequest request, Socket socket)
         {
-            StreamReader reader = new StreamReader(stream);
-            string line = reader.ReadLine();
-
-            Match response = responseCodeRegex.Match(line);
-            resultCode = int.Parse(response.Groups[1].Value);
-            resultString = response.Groups[2].Value;
-
-            while (line != string.Empty)
+            using (MemoryStream streamBuffer = new MemoryStream())
             {
-                line = reader.ReadLine();
-                Match result = headerRegex.Match(line);
-                if (!result.Success) break;
-                responseHeaders[result.Groups[1].Value] = result.Groups[2].Value;
-            }
+                byte[] array = new byte[0x100];
+                int read;
+                bool hasData;
+                do
+                {
+                    hasData = socket.Poll(1000, SelectMode.SelectRead);
+                    read = socket.Receive(array);
+                    streamBuffer.Write(array, 0, read);
+                } while (!(hasData && read == 0));
+                streamBuffer.Seek(0, SeekOrigin.Begin);
 
-            ReadBody(stream);
+                StreamReader reader = new StreamReader(streamBuffer);
+                string line = reader.ReadLine();
+                int readChars = line.Length + 2;
+
+                Match response = responseCodeRegex.Match(line.Trim());
+                resultCode = int.Parse(response.Groups[1].Value);
+                resultString = response.Groups[2].Value;
+
+                while (true)
+                {
+                    line = reader.ReadLine();
+                    readChars += line.Length + 2;
+                    Match result = headerRegex.Match(line.Trim());
+                    if (!result.Success) break;
+                    responseHeaders[result.Groups[1].Value] = result.Groups[2].Value;
+                }
+
+                streamBuffer.Seek(readChars, SeekOrigin.Begin);
+                ReadBody(streamBuffer);
+            }
         }
         #endregion
 
@@ -82,38 +99,52 @@ namespace Orion.Engine.Networking.Http
             return Encoding.GetEncoding(contentType.Substring(semicolon + 1).Trim());
         }
 
-        private void ReadBody(NetworkStream stream)
+        private void ReadBody(MemoryStream stream)
         {
-            StreamReader reader = new StreamReader(stream, GetEncoding());
             string transferEncodingName = HttpEnumMethods.ToString(HttpResponseHeader.TransferEncoding);
             if (responseHeaders.ContainsKey(transferEncodingName))
             {
-                string encodingType = responseHeaders[transferEncodingName];
-                if (encodingType.ToUpper() == "CHUNKED")
-                {
-#warning Reading chunked bodies doesn't work
-                    // well it doesn't work
-                    // that's too bad, reader.ReadToEnd() will do it
-                    // ReadChunkedBody(reader);
-                    // return;
-                }
+                string transferEncoding = responseHeaders[transferEncodingName];
+                if (transferEncoding.ToUpper() == "CHUNKED")
+                    ReadChunkedBody(stream);
             }
-            body = reader.ReadToEnd();
+            else
+            {
+                StreamReader reader = new StreamReader(stream);
+                body = reader.ReadToEnd();
+            }
         }
 
-        private void ReadChunkedBody(StreamReader reader)
+        private void ReadChunkedBody(MemoryStream stream)
         {
+            Encoding encoding = GetEncoding();
+            byte[] charBuffer = new byte[0x100];
+            BinaryReader reader = new BinaryReader(stream);
             StringBuilder bodyBuilder = new StringBuilder();
-            int length = 0;
-            byte[] array = new byte[0x1000];
+            int chunkSize;
             do
             {
-                string line = reader.ReadLine();
-                length = int.Parse(line, System.Globalization.NumberStyles.HexNumber);
-                if (array.Length < length) array = new byte[length];
-                reader.BaseStream.Read(array, 0, length);
-                bodyBuilder.Append(reader.CurrentEncoding.GetString(array, 0, length));
-            } while (length != 0);
+                chunkSize = 0;
+                byte currentByte = reader.ReadByte();
+                while (!Char.IsWhiteSpace((char)currentByte))
+                {
+                    if (currentByte >= 'a') currentByte -= 'a' - 10;
+                    if (currentByte >= 'A') currentByte -= 'A' - 10;
+                    if (currentByte >= '0') currentByte -= (byte)'0';
+                    chunkSize *= 16;
+                    chunkSize += currentByte;
+                    currentByte = reader.ReadByte();
+                }
+                if (chunkSize > charBuffer.Length) charBuffer = new byte[chunkSize];
+
+                reader.ReadByte(); // skip one byte
+                if (chunkSize > 0)
+                {
+                    reader.Read(charBuffer, 0, chunkSize);
+                    reader.ReadInt16(); // skip 2 bytes
+                    bodyBuilder.Append(encoding.GetString(charBuffer, 0, chunkSize));
+                }
+            } while (chunkSize != 0);
             body = bodyBuilder.ToString();
         }
         #endregion

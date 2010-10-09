@@ -25,6 +25,11 @@ namespace Orion.Game.Matchmaking.Networking
             AdvertizeMatchPacket advertize = new AdvertizeMatchPacket(name, openSlotsCount);
             networking.Broadcast(advertize);
         }
+
+        public void Delist(string name)
+        {
+            networking.Broadcast(DelistMatchPacket.Instance);
+        }
         #endregion
     }
 }

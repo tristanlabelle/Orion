@@ -232,7 +232,7 @@ namespace Orion.Game.Main
             if (IsHost)
             {
             	networking.Send(CancelMatchPacket.Instance, Clients);
-            	networking.Broadcast(DelistMatchPacket.Instance);
+                advertizer.Delist(matchName);
             }
             else
             {

@@ -8,5 +8,6 @@ namespace Orion.Game.Matchmaking.Networking
     public class NullMatchAdvertizer : IMatchAdvertizer
     {
         public void Advertize(string name, int openSlotsCount) { }
+        public void Delist(string name) { }
     }
 }

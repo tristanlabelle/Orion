@@ -26,6 +26,11 @@ namespace Orion.Game.Matchmaking.Networking
         {
             advertizers.ForEach(a => a.Advertize(name, openSlotsCount));
         }
+
+        public void Delist(string name)
+        {
+            advertizers.ForEach(a => a.Delist(name));
+        }
         #endregion
     }
 }

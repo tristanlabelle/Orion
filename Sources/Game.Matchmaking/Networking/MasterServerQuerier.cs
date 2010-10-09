@@ -70,13 +70,9 @@ namespace Orion.Game.Matchmaking.Networking
 
             lock (pendingMatches)
             {
-                if (pendingMatches.Count > 0)
-                {
-                    updated = !matches.SequenceEqual(pendingMatches);
-                    matches.Clear();
-                    matches.AddRange(pendingMatches);
-                    pendingMatches.Clear();
-                }
+                updated = !matches.SequenceEqual(pendingMatches);
+                matches.Clear();
+                matches.AddRange(pendingMatches);
             }
 
             if (now - lastPoll > timeBeforeReExploring)
@@ -95,15 +91,18 @@ namespace Orion.Game.Matchmaking.Networking
             List<AdvertizedMatch> matches = new List<AdvertizedMatch>();
             System.Text.RegularExpressions.Match match = returnLineRegex.Match(response.Body);
             lock (pendingMatches)
-            while (match.Success)
             {
-                uint ipAddress = uint.Parse(match.Groups[1].Value);
-                int placesLeft = int.Parse(match.Groups[2].Value);
+                pendingMatches.Clear();
+                while (match.Success)
+                {
+                    uint ipAddress = uint.Parse(match.Groups[1].Value);
+                    int placesLeft = int.Parse(match.Groups[2].Value);
 #warning Port number was hard-coded here
-                IPv4EndPoint endPoint = new IPv4EndPoint(ipAddress, 41223);
-                AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
-                pendingMatches.Add(advertisement);
-                match = match.NextMatch();
+                    IPv4EndPoint endPoint = new IPv4EndPoint(ipAddress, 41223);
+                    AdvertizedMatch advertisement = new AdvertizedMatch(this, endPoint, match.Groups[3].Value, placesLeft);
+                    pendingMatches.Add(advertisement);
+                    match = match.NextMatch();
+                }
             }
         }
         #endregion

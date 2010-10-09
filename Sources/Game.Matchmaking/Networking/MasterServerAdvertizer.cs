@@ -13,6 +13,7 @@ namespace Orion.Game.Matchmaking.Networking
         private const string nameField = "name";
         private const string openSlotsField = "places";
         private const string timeToLiveField = "ttl";
+        private const string cancelMatch = "cancel";
         private const int defaultTimeToLive = 10;
 
         private readonly HttpRequest masterServerRequest;
@@ -35,11 +36,18 @@ namespace Orion.Game.Matchmaking.Networking
         #region Methods
         public void Advertize(string name, int openSlotsCount)
         {
+            fields.Clear();
             fields[nameField] = name;
             fields[openSlotsField] = openSlotsCount.ToString();
             fields[timeToLiveField] = defaultTimeToLive.ToString();
-            masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields,
-                r => Debug.WriteLine(r.Body));
+            masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields);
+        }
+
+        public void Delist(string name)
+        {
+            fields[nameField] = name;
+            fields[cancelMatch] = "true";
+            masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields);
         }
         #endregion
     }

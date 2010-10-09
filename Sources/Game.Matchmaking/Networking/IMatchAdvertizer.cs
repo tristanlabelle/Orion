@@ -8,5 +8,6 @@ namespace Orion.Game.Matchmaking.Networking
     public interface IMatchAdvertizer
     {
         void Advertize(string name, int openSlotsCount);
+        void Delist(string name);
     }
 }

@@ -353,9 +353,6 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
 
-            if (unit.Type.HasSkill<ProvideFoodSkill>())
-                totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
-
             usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
         }
 

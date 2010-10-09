@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 
 namespace Orion.Game.Simulation.Pathfinding

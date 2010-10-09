@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using OpenTK.Graphics;
-using OpenTK.Math;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using RectangleF = System.Drawing.RectangleF;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using Image = System.Drawing.Image;
-using Orion.Engine.Collections;
 
 namespace Orion.Engine.Graphics
 {
     /// <summary>
     /// Represents a space in which it is possible to draw. Methods to fill and stroke shapes are supplied.
     /// </summary>
-    public sealed class GraphicsContext
+    public sealed class GraphicsContext : IDisposable
     {
         #region Instance
         #region Fields
@@ -25,6 +25,7 @@ namespace Orion.Engine.Graphics
 
         private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
+        private readonly TextRenderer textRenderer;
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
         private Font font = defaultFont;
         #endregion
@@ -35,6 +36,7 @@ namespace Orion.Engine.Graphics
             Argument.EnsureNotNull(backbufferSwapper, "backbufferSwapper");
 
             this.backbufferSwapper = backbufferSwapper;
+            this.textRenderer = new TextRenderer(this, new Font("Trebuchet MS", 24, System.Drawing.GraphicsUnit.Pixel));
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
@@ -573,17 +575,18 @@ namespace Orion.Engine.Graphics
         /// <param name="color">The color with which to draw the text.</param>
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            GL.PushMatrix();
-            GL.Translate(origin.X, origin.Y, 0);
-            GL.Scale(1, -1, 1);
-            RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
+            textRenderer.Draw(text.Value, text.Font.Height, origin, color);
+            //GL.PushMatrix();
+            //GL.Translate(origin.X, origin.Y, 0);
+            //GL.Scale(1, -1, 1);
+            //RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
 
-            Color systemColor = Color.FromArgb(color.ByteA, color.ByteR, color.ByteG, color.ByteB);
+            //Color systemColor = Color.FromArgb(color.ByteA, color.ByteR, color.ByteG, color.ByteB);
 
-            // We could enable blending here when alpha < 255 but OpenTK doesn't support it :(.
-            Text.defaultTextPrinter.Print(text.Value, text.Font, systemColor, renderInto);
+            //// We could enable blending here when alpha < 255 but OpenTK doesn't support it :(.
+            //Text.defaultTextPrinter.Print(text.Value, text.Font, systemColor, renderInto);
 
-            GL.PopMatrix();
+            //GL.PopMatrix();
         }
         #endregion
 
@@ -674,6 +677,13 @@ namespace Orion.Engine.Graphics
             DrawTexturedQuad(rectangle, Rectangle.Unit);
         }
         #endregion
+        #endregion
+
+        #region Disposing
+        public void Dispose()
+        {
+            textRenderer.Dispose();
+        }
         #endregion
 
         #region Non-Public

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Math;
+using OpenTK;
 
 namespace Orion.Engine.Audio.Null
 {

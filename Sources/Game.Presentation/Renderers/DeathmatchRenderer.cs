@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;

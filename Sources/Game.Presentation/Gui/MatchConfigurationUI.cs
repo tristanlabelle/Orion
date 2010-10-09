@@ -8,7 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Gui;
 using Orion.Engine.Geometry;
 using Orion.Engine;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Gui

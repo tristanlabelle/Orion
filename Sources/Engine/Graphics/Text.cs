@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
-using Rectangle = Orion.Engine.Geometry.Rectangle;
-using OpenTK.Math;
+using OpenTK;
 using OpenTK.Graphics;
+using Rectangle = Orion.Engine.Geometry.Rectangle;
 
 namespace Orion.Engine.Graphics
 {
     public struct Text
     {
         #region Fields
-        internal static TextPrinter defaultTextPrinter = new TextPrinter(TextQuality.High);
         public static Font DefaultFont = new Font("Trebuchet MS", 14);
 
         private readonly string value;
@@ -39,11 +38,7 @@ namespace Orion.Engine.Graphics
 
         public Rectangle Frame
         {
-            get
-            {
-                RectangleF extents = defaultTextPrinter.Measure(value, Font).BoundingBox;
-                return new Rectangle(extents.X, 0, extents.Width, extents.Height);
-            }
+            get { return new Rectangle(value.Length * Font.Height * 0.4f, Font.Height); }
         }
         #endregion
 
@@ -62,8 +57,7 @@ namespace Orion.Engine.Graphics
         
         private Rectangle MeasureConstrained(RectangleF constraint)
         {
-            RectangleF extents = defaultTextPrinter.Measure(value, Font, constraint).BoundingBox;
-            return new Rectangle(extents.X, 0, extents.Width, extents.Height);
+            return Frame;
         }
 
         #region Object Model

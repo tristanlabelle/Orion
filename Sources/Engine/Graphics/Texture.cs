@@ -5,10 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Runtime.InteropServices;
-using OpenTK.Graphics;
-using GLPixelFormat = OpenTK.Graphics.PixelFormat;
-using SysImage = System.Drawing.Image;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using Orion.Engine.Collections;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using SysImage = System.Drawing.Image;
 
 namespace Orion.Engine.Graphics
 {
@@ -54,7 +55,7 @@ namespace Orion.Engine.Graphics
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
                     PixelInternalFormat glInternalFormat = GetGLInternalPixelFormat(this.pixelFormat);
-                    OpenTK.Graphics.PixelFormat glPixelFormat = GetGLPixelFormat(this.pixelFormat);
+                    GLPixelFormat glPixelFormat = GetGLPixelFormat(this.pixelFormat);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
                         size.Width, size.Height, 0, glPixelFormat, PixelType.UnsignedByte,
                         dataPointer);
@@ -263,20 +264,18 @@ namespace Orion.Engine.Graphics
 
             BindWhile(() =>
             {
-                if ((access & Access.Read) == Access.Read)
-                {
-                    GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
-                    GL.GetTexImage(TextureTarget.Texture2D, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
-                }
+                GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
+                GL.GetTexImage(TextureTarget.Texture2D, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
 
-                BufferedPixelSurface surface = new BufferedPixelSurface(region.Size, pixelFormat,
+                BufferedPixelSurface surface = new BufferedPixelSurface(size, pixelFormat,
                     new Subarray<byte>(data), access);
                 surface.Lock(region, access, accessor);
 
                 if ((access & Access.Write) == Access.Write)
                 {
                     GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-                    throw new NotImplementedException("Texture locking to write.");
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, GetGLInternalPixelFormat(pixelFormat),
+                        size.Width, size.Height, 0, GetGLPixelFormat(pixelFormat), PixelType.UnsignedByte, data);
                 }
             });
         }

@@ -1,5 +1,5 @@
 ﻿using System;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;

@@ -1,5 +1,5 @@
 ﻿using System;
-using OpenTK.Math;
+using OpenTK;
 namespace Orion.Engine.Audio
 {
     /// <summary>

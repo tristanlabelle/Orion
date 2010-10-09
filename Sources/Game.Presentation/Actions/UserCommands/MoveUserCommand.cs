@@ -1,4 +1,4 @@
-using OpenTK.Math;
+using OpenTK;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 

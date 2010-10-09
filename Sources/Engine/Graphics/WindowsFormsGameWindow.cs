@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using OpenTK.Graphics;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine.Collections;
 using Orion.Engine.Gui;
 using Orion.Engine.Input;
@@ -147,6 +147,7 @@ namespace Orion.Engine.Graphics
 
         public void Dispose()
         {
+            graphicsContext.Dispose();
             form.Dispose();
         }
         #endregion
@@ -231,7 +232,7 @@ namespace Orion.Engine.Graphics
             RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, args.KeyData);
         }
 
-        private void OnCharacter(object sender, KeyPressEventArgs args)
+        private void OnCharacter(object sender, WinForms.KeyPressEventArgs args)
         {
             RaiseCharacterEvent(args.KeyChar);
         }

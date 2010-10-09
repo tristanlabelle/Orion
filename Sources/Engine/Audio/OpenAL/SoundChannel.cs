@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using OpenTK.Audio;
-using OpenTK.Math;
-using System.Diagnostics;
+using OpenTK;
+using OpenTK.Audio.OpenAL;
 
 namespace Orion.Engine.Audio.OpenAL
 {

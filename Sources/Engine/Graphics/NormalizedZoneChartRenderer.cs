@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Gui;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine.Geometry;
 
 namespace Orion.Engine.Graphics

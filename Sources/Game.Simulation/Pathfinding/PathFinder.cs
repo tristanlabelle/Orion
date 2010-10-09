@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using System.Diagnostics;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 

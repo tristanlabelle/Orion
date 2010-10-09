@@ -8,7 +8,7 @@ using Orion.Game.Simulation;
 using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Game.Matchmaking.TowerDefense;
-using OpenTK.Math;
+using OpenTK;
 
 namespace Orion.Game.Presentation.Renderers
 {

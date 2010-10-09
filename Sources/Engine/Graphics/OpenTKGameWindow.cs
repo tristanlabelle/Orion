@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using OpenTK.Math;
+using OpenTK;
 using OpenTK.Platform;
 using Orion.Engine.Gui;
 using Orion.Engine.Input;
@@ -131,20 +131,21 @@ namespace Orion.Engine.Graphics
 
         public void Dispose()
         {
+            graphicsContext.Dispose();
             window.Dispose();
         }
         #endregion
 
         #region Event Handling
         #region Keyboard
-        private void OnKeyboardKeyDown(KeyboardDevice sender, Key key)
+        private void OnKeyboardKeyDown(object sender, KeyboardKeyEventArgs key)
         {
-            RaiseKeyboardEvent(KeyboardEventType.ButtonPressed, key);
+            RaiseKeyboardEvent(KeyboardEventType.ButtonPressed, key.Key);
         }
 
-        private void OnKeyboardKeyUp(KeyboardDevice sender, Key key)
+        private void OnKeyboardKeyUp(object sender, KeyboardKeyEventArgs key)
         {
-            RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, key);
+            RaiseKeyboardEvent(KeyboardEventType.ButtonReleased, key.Key);
         }
 
         private void RaiseKeyboardEvent(KeyboardEventType type, Key key)
@@ -208,7 +209,7 @@ namespace Orion.Engine.Graphics
         }
         #endregion
 
-        private void OnWindowResized(object sender, ResizeEventArgs e)
+        private void OnWindowResized(object sender, EventArgs e)
         {
             Resized.Raise(this);
         }

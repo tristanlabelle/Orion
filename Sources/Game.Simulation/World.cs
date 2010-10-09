@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;

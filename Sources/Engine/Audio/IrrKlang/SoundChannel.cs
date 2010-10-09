@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using IrrKlang;
-using OpenTK.Math;
+using OpenTK;
 using IrrKlangSound = IrrKlang.ISound;
 
 namespace Orion.Engine.Audio.IrrKlang

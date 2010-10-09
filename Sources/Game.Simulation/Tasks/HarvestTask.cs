@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Skills;

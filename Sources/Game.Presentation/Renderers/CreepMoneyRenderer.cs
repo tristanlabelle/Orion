@@ -7,7 +7,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
 using Orion.Engine;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Presentation.Renderers

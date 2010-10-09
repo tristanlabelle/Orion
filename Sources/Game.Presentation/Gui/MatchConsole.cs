@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation.Gui
         {
             #region Fields
             private static readonly TimeSpan LifeSpan = new TimeSpan(0, 0, 10);
-            private static readonly TimeSpan FadeOutDuration = new TimeSpan(0, 0, 1);
+            private static readonly TimeSpan FadeOutDuration = new TimeSpan(0, 0, 2);
 
             private float ageInSeconds;
             #endregion

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using OpenTK.Math;
+using OpenTK;
 
 namespace Orion.Engine.Input
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Math;
+using OpenTK;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Engine;

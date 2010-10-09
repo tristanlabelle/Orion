@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
-using OpenTK.Math;
+using OpenTK;
 using System.Runtime.InteropServices;
 
 namespace Orion.Engine.Input

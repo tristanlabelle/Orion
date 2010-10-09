@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using OpenTK.Math;
+using OpenTK;
 
 namespace Orion.Engine
 {

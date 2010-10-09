@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 
 namespace Orion.Engine.Graphics
 {
@@ -19,7 +20,7 @@ namespace Orion.Engine.Graphics
         #region Methods
         protected override void OnSizeChanged(System.EventArgs e)
         {
-            GL.Viewport(ClientRectangle);
+            if (Created) GL.Viewport(ClientRectangle);
             base.OnSizeChanged(e);
         }
 

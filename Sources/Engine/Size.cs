@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using OpenTK.Math;
+using OpenTK;
 using System.Globalization;
 
 namespace Orion.Engine

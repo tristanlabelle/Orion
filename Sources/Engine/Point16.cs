@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using OpenTK.Math;
+using OpenTK;
 
 namespace Orion.Engine
 {

@@ -29,7 +29,7 @@ namespace Orion.Game.Presentation
         #region Constructors
         public GameGraphics()
         {
-            this.window = new WindowsFormsGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
+            this.window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
 

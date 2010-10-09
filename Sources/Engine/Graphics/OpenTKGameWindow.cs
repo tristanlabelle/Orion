@@ -8,10 +8,10 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using OpenTK;
 using OpenTK.Platform;
 using Orion.Engine.Gui;
 using Orion.Engine.Input;
+using OpenTK.Graphics.OpenGL;
 
 namespace Orion.Engine.Graphics
 {
@@ -45,6 +45,7 @@ namespace Orion.Engine.Graphics
             window.VSync = VSyncMode.On;
 
             // Give the window a chance to create its context.
+            window.Visible = true;
             window.ProcessEvents();
 
             Debug.Assert(window.Exists && window.Context != null,
@@ -55,6 +56,7 @@ namespace Orion.Engine.Graphics
 
             window.Keyboard.KeyDown += OnKeyboardKeyDown;
             window.Keyboard.KeyUp += OnKeyboardKeyUp;
+            window.KeyPress += OnKeyPress;
 
             window.Mouse.Move += OnMouseMoved;
             window.Mouse.ButtonDown += OnMouseButtonPressed;
@@ -150,8 +152,25 @@ namespace Orion.Engine.Graphics
 
         private void RaiseKeyboardEvent(KeyboardEventType type, Key key)
         {
-            KeyboardEventArgs args = new KeyboardEventArgs((Keys)(int)key);
+            Keys keys;
+            if (!keyToKeys.TryGetValue(key, out keys))
+            {
+                string message = "OpenTK.Input.Key {0} has no mapping to a System.Windows.Forms.Keys value, key ignored."
+                    .FormatInvariant(key);
+                Debug.Fail(message);
+                return;
+            }
+
+            keys |= Control.ModifierKeys;
+
+            KeyboardEventArgs args = new KeyboardEventArgs(keys);
             InputEvent inputEvent = InputEvent.CreateKeyboard(type, args);
+            InputReceived.Raise(this, inputEvent);
+        }
+
+        private void OnKeyPress(object sender, OpenTK.KeyPressEventArgs e)
+        {
+            InputEvent inputEvent = InputEvent.CreateCharacter(e.KeyChar);
             InputReceived.Raise(this, inputEvent);
         }
         #endregion
@@ -178,7 +197,7 @@ namespace Orion.Engine.Graphics
         private void OnMouseWheelChanged(object sender, MouseWheelEventArgs e)
         {
             RaiseMouseEvent(MouseEventType.WheelScrolled, e.Position,
-                Orion.Engine.Input.MouseButton.None, 0, e.Delta);
+                Orion.Engine.Input.MouseButton.None, 0, e.DeltaPrecise);
         }
 
         private static Orion.Engine.Input.MouseButton GetMouseButton(OpenTK.Input.MouseButton button)
@@ -189,21 +208,20 @@ namespace Orion.Engine.Graphics
             return Orion.Engine.Input.MouseButton.None;
         }
 
-        private void RaiseMouseButtonEvent(MouseEventType type, System.Drawing.Point screenPoint,
+        private void RaiseMouseButtonEvent(MouseEventType type, System.Drawing.Point clientPoint,
             OpenTK.Input.MouseButton button, int clickCount)
         {
             Orion.Engine.Input.MouseButton orionButton = GetMouseButton(button);
             if (orionButton == Orion.Engine.Input.MouseButton.None) return;
 
-            RaiseMouseEvent(type, screenPoint, orionButton, clickCount, 0);
+            RaiseMouseEvent(type, clientPoint, orionButton, clickCount, 0);
         }
 
-        private void RaiseMouseEvent(MouseEventType type, System.Drawing.Point screenPoint,
-            Orion.Engine.Input.MouseButton button, int clickCount, int wheelDelta)
+        private void RaiseMouseEvent(MouseEventType type, System.Drawing.Point clientPoint,
+            Orion.Engine.Input.MouseButton button, int clickCount, float wheelDelta)
         {
-            System.Drawing.Point clientPoint = window.PointToClient(screenPoint);
             Orion.Engine.Input.MouseEventArgs args = new Orion.Engine.Input.MouseEventArgs(
-                new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta / 600.0f);
+                new Vector2(clientPoint.X, ClientAreaSize.Height - clientPoint.Y), button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, args);
             InputReceived.Raise(this, inputEvent);
         }
@@ -211,6 +229,7 @@ namespace Orion.Engine.Graphics
 
         private void OnWindowResized(object sender, EventArgs e)
         {
+            GL.Viewport(0, 0, ClientAreaSize.Width, ClientAreaSize.Height);
             Resized.Raise(this);
         }
 
@@ -221,6 +240,96 @@ namespace Orion.Engine.Graphics
             Closing.Raise(this);
         }
         #endregion
+        #endregion
+
+        #region Key->Keys Conversion
+        private static readonly Dictionary<Key, Keys> keyToKeys;
+
+        static OpenTKGameWindow()
+        {
+            keyToKeys = new Dictionary<Key, Keys>();
+
+            // The following is taken from OpenTK's source (and reversed)
+            keyToKeys.Add(Key.Escape, Keys.Escape);
+
+            // Function keys
+            for (int i = 0; i < 24; i++)
+            {
+                keyToKeys.Add(Key.F1 + i, (Keys)((int)Keys.F1 + i));
+            }
+
+            // Number keys (0-9)
+            for (int i = 0; i <= 9; i++)
+            {
+                keyToKeys.Add(Key.Number0 + i, (Keys)(0x30 + i));
+            }
+
+            // Letters (A-Z)
+            for (int i = 0; i < 26; i++)
+            {
+                keyToKeys.Add(Key.A + i, (Keys)(0x41 + i));
+            }
+
+            keyToKeys.Add(Key.Tab, Keys.Tab);
+            keyToKeys.Add(Key.CapsLock, Keys.Capital);
+            keyToKeys.Add(Key.ControlLeft, Keys.LControlKey);
+            keyToKeys.Add(Key.ShiftLeft, Keys.LShiftKey);
+            keyToKeys.Add(Key.WinLeft, Keys.LWin);
+            keyToKeys.Add(Key.AltLeft, Keys.LMenu);
+            keyToKeys.Add(Key.Space, Keys.Space);
+            keyToKeys.Add(Key.AltRight, Keys.RMenu);
+            keyToKeys.Add(Key.WinRight, Keys.RWin);
+            keyToKeys.Add(Key.Menu, Keys.Apps);
+            keyToKeys.Add(Key.ControlRight, Keys.RControlKey);
+            keyToKeys.Add(Key.ShiftRight, Keys.RShiftKey);
+            keyToKeys.Add(Key.Enter, Keys.Return);
+            keyToKeys.Add(Key.BackSpace, Keys.Back);
+
+            keyToKeys.Add(Key.Semicolon, Keys.Oem1);      // Varies by keyboard, ;: on Win2K/US
+            keyToKeys.Add(Key.Slash, Keys.Oem2);          // Varies by keyboard, /? on Win2K/US
+            keyToKeys.Add(Key.Tilde, Keys.Oem3);          // Varies by keyboard, `~ on Win2K/US
+            keyToKeys.Add(Key.BracketLeft, Keys.Oem4);    // Varies by keyboard, [{ on Win2K/US
+            keyToKeys.Add(Key.BackSlash, Keys.Oem5);      // Varies by keyboard, \| on Win2K/US
+            keyToKeys.Add(Key.BracketRight, Keys.Oem6);   // Varies by keyboard, ]} on Win2K/US
+            keyToKeys.Add(Key.Quote, Keys.Oem7);          // Varies by keyboard, '" on Win2K/US
+            keyToKeys.Add(Key.Plus, Keys.Oemplus);        // Invariant: +
+            keyToKeys.Add(Key.Comma, Keys.Oemcomma);      // Invariant: ,
+            keyToKeys.Add(Key.Minus, Keys.OemMinus);      // Invariant: -
+            keyToKeys.Add(Key.Period, Keys.OemPeriod);    // Invariant: .
+
+            keyToKeys.Add(Key.Home, Keys.Home);
+            keyToKeys.Add(Key.End, Keys.End);
+            keyToKeys.Add(Key.Delete, Keys.Delete);
+            keyToKeys.Add(Key.PageUp, Keys.Prior);
+            keyToKeys.Add(Key.PageDown, Keys.Next);
+            keyToKeys.Add(Key.PrintScreen, Keys.Print);
+            keyToKeys.Add(Key.Pause, Keys.Pause);
+            keyToKeys.Add(Key.NumLock, Keys.NumLock);
+
+            keyToKeys.Add(Key.ScrollLock, Keys.Scroll);
+            keyToKeys.Add(Key.Clear, Keys.Clear);
+            keyToKeys.Add(Key.Insert, Keys.Insert);
+
+            keyToKeys.Add(Key.Sleep, Keys.Sleep);
+
+            // Keypad
+            for (int i = 0; i <= 9; i++)
+            {
+                keyToKeys.Add(Key.Keypad0 + i, (Keys)((int)Keys.NumPad0 + i));
+            }
+
+            keyToKeys.Add(Key.KeypadDecimal, Keys.Decimal);
+            keyToKeys.Add(Key.KeypadAdd, Keys.Add);
+            keyToKeys.Add(Key.KeypadSubtract, Keys.Subtract);
+            keyToKeys.Add(Key.KeypadDivide, Keys.Divide);
+            keyToKeys.Add(Key.KeypadMultiply, Keys.Multiply);
+
+            // Navigation
+            keyToKeys.Add(Key.Up, Keys.Up);
+            keyToKeys.Add(Key.Down, Keys.Down);
+            keyToKeys.Add(Key.Left, Keys.Left);
+            keyToKeys.Add(Key.Right, Keys.Right);
+        }
         #endregion
     }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="Hélicoptère TVA" Width="2" Height="2" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="12" MaxHealth="75" MeleeArmor="1" RangedArmor="1" AladdiumCost="25" AlageneCost="25" FoodCost="1"/>
+		<Move Speed="15"/>
+	</Skills>
+</UnitType>

@@ -7,22 +7,41 @@ using System.Text;
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using OpenTK.Platform;
 using Orion.Engine.Gui;
 using Orion.Engine.Input;
-using OpenTK.Graphics.OpenGL;
+using TKMouseButton = OpenTK.Input.MouseButton;
 
 namespace Orion.Engine.Graphics
 {
+    using Point = System.Drawing.Point;
+
     /// <summary>
     /// Wraps the GameWindow provided by OpenTK behinds an <see cref="IGameWindow"/> interface.
     /// </summary>
     public sealed class OpenTKGameWindow : IGameWindow
     {
+        private struct MouseDownInfo
+        {
+            public readonly Point ScreenLocation;
+            public readonly TKMouseButton Button;
+            public readonly DateTime Time;
+
+            public MouseDownInfo(Point screenLocation, TKMouseButton button, DateTime time)
+            {
+                this.ScreenLocation = screenLocation;
+                this.Button = button;
+                this.Time = time;
+            }
+        }
+
         #region Fields
         private readonly GameWindow window;
-        private GraphicsContext graphicsContext;
+        private readonly GraphicsContext graphicsContext;
+        private MouseDownInfo lastMouseDown = new MouseDownInfo(Point.Empty, TKMouseButton.Left, DateTime.MinValue);
+        private int multiClickCount = 1;
         private bool wasClosed;
         #endregion
 
@@ -178,14 +197,21 @@ namespace Orion.Engine.Graphics
         #region Mouse
         private void OnMouseButtonPressed(object sender, MouseButtonEventArgs e)
         {
-            RaiseMouseButtonEvent(MouseEventType.ButtonPressed,
-                e.Position, e.Button, 1);
+            Point screenLocation = window.PointToScreen(e.Position);
+            bool isMultiClick = e.Button == lastMouseDown.Button
+                && (DateTime.Now - lastMouseDown.Time).TotalMilliseconds < SystemInformation.DoubleClickTime
+                && Math.Abs(screenLocation.X - lastMouseDown.ScreenLocation.X) < SystemInformation.DoubleClickSize.Width / 2
+                && Math.Abs(screenLocation.Y - lastMouseDown.ScreenLocation.Y) < SystemInformation.DoubleClickSize.Height / 2;
+
+            multiClickCount = isMultiClick ? multiClickCount + 1 : 1;
+
+            lastMouseDown = new MouseDownInfo(screenLocation, e.Button, DateTime.Now);
+            RaiseMouseButtonEvent(MouseEventType.ButtonPressed, e.Position, e.Button, multiClickCount);
         }
 
         private void OnMouseButtonReleased(object sender, MouseButtonEventArgs e)
         {
-            RaiseMouseButtonEvent(MouseEventType.ButtonReleased,
-                e.Position, e.Button, 1);
+            RaiseMouseButtonEvent(MouseEventType.ButtonReleased, e.Position, e.Button, 1);
         }
 
         private void OnMouseMoved(object sender, MouseMoveEventArgs e)
@@ -272,22 +298,18 @@ namespace Orion.Engine.Graphics
 
             keyToKeys.Add(Key.Tab, Keys.Tab);
             keyToKeys.Add(Key.CapsLock, Keys.Capital);
-            keyToKeys.Add(Key.ControlLeft, Keys.LControlKey);
+            keyToKeys.Add(Key.ControlLeft, Keys.ControlKey);
+            keyToKeys.Add(Key.ShiftLeft, Keys.ShiftKey);
             keyToKeys.Add(Key.WinLeft, Keys.LWin);
-            keyToKeys.Add(Key.AltLeft, Keys.LMenu);
+            keyToKeys.Add(Key.AltLeft, Keys.Menu);
             keyToKeys.Add(Key.Space, Keys.Space);
-            keyToKeys.Add(Key.AltRight, Keys.RMenu);
+            keyToKeys.Add(Key.AltRight, Keys.Menu);
             keyToKeys.Add(Key.WinRight, Keys.RWin);
             keyToKeys.Add(Key.Menu, Keys.Apps);
-            keyToKeys.Add(Key.ControlRight, Keys.RControlKey);
+            keyToKeys.Add(Key.ControlRight, Keys.ControlKey);
+            keyToKeys.Add(Key.ShiftRight, Keys.ShiftKey);
             keyToKeys.Add(Key.Enter, Keys.Return);
             keyToKeys.Add(Key.BackSpace, Keys.Back);
-
-            // those are commented out because we need to get Keys.ShiftKey instead of LShiftKey or RShiftKey
-            // keyToKeys.Add(Key.ShiftLeft, Keys.LShiftKey);
-            // keyToKeys.Add(Key.ShiftRight, Keys.RShiftKey);
-            keyToKeys.Add(Key.ShiftLeft, Keys.ShiftKey);
-            keyToKeys.Add(Key.ShiftRight, Keys.ShiftKey);
 
             keyToKeys.Add(Key.Semicolon, Keys.Oem1);      // Varies by keyboard, ;: on Win2K/US
             keyToKeys.Add(Key.Slash, Keys.Oem2);          // Varies by keyboard, /? on Win2K/US

@@ -575,18 +575,7 @@ namespace Orion.Engine.Graphics
         /// <param name="color">The color with which to draw the text.</param>
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            textRenderer.Draw(text.Value, text.Font.Height, origin, color);
-            //GL.PushMatrix();
-            //GL.Translate(origin.X, origin.Y, 0);
-            //GL.Scale(1, -1, 1);
-            //RectangleF renderInto = new RectangleF(0, -clippingRect.Height, clippingRect.Width, clippingRect.Height);
-
-            //Color systemColor = Color.FromArgb(color.ByteA, color.ByteR, color.ByteG, color.ByteB);
-
-            //// We could enable blending here when alpha < 255 but OpenTK doesn't support it :(.
-            //Text.defaultTextPrinter.Print(text.Value, text.Font, systemColor, renderInto);
-
-            //GL.PopMatrix();
+            textRenderer.Draw(text.Value, text.Font.GetHeight(), origin, color);
         }
         #endregion
 

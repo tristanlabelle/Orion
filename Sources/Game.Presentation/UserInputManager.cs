@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
@@ -13,7 +14,6 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
-using System.Diagnostics;
 
 namespace Orion.Game.Presentation
 {

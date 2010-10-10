@@ -73,6 +73,7 @@ namespace Orion.Engine.Graphics
             window.Resize += OnWindowResized;
             window.Closing += OnWindowClosing;
 
+            window.Keyboard.KeyRepeat = true;
             window.Keyboard.KeyDown += OnKeyboardKeyDown;
             window.Keyboard.KeyUp += OnKeyboardKeyUp;
             window.KeyPress += OnKeyPress;

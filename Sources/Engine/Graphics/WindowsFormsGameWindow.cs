@@ -175,7 +175,7 @@ namespace Orion.Engine.Graphics
         private void OnMouseWheelScrolled(object sender, WinForms.MouseEventArgs args)
         {
             RaiseMouseEvent(MouseEventType.WheelScrolled,
-                args.X, args.Y, MouseButton.None, 0, args.Delta / 600f);
+                args.X, args.Y, MouseButton.None, 0, args.Delta / 120f);
         }
 
         private void OnMouseButtonDoubleClicked(object sender, WinForms.MouseEventArgs args)

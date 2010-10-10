@@ -329,7 +329,7 @@ namespace Orion.Game.Presentation.Gui
 
         protected override bool OnMouseWheelScrolled(MouseEventArgs args)
         {
-            float scale = 1 - args.WheelDelta;
+            float scale = 1 - args.WheelDelta / 5;
             worldView.Zoom(scale);
             return base.OnMouseWheelScrolled(args);
         }

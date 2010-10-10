@@ -51,16 +51,10 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.Faction.CanSee(target))
-            {
-                MarkAsEnded();
-                return;
-            }
-
-            if (!target.IsAliveInWorld)
+            if (!target.IsAliveInWorld || !Unit.Faction.CanSee(target))
             {
                 // If the target has died while we weren't yet in attack range,
-                // but were coming, complete the motion with a move task.
+                // or if the unit moved out of sight,  but we're coming, complete the motion with a move task.
                 if (follow != null && !Unit.IsWithinAttackRange(target) && Unit.TaskQueue.Count == 1)
                     Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
                 MarkAsEnded();

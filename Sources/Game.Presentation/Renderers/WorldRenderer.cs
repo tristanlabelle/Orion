@@ -126,13 +126,12 @@ namespace Orion.Game.Presentation.Renderers
         {
             var plans = World.Entities
                 .OfType<Unit>()
-                .Where(u => u.HasSkill<BuildSkill>())
+                .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
+                    && u.HasSkill<BuildSkill>())
                 .SelectMany(u => u.TaskQueue)
                 .OfType<BuildTask>()
                 .Select(t => t.BuildingPlan)
-                .Where(p => Rectangle.Intersects(
-                    p.GridRegion.ToRectangle(),
-                    viewBounds))
+                .Where(p => Rectangle.Intersects(p.GridRegion.ToRectangle(), viewBounds))
                 .Distinct();
 
             ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);

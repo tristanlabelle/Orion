@@ -68,7 +68,6 @@ namespace Orion.Game.Simulation
             this.localFogOfWar.Changed += fogOfWarChangedEventHandler;
             this.world.EntityAdded += OnWorldEntityAdded;
             this.world.EntityRemoved += OnWorldEntityRemoved;
-            this.world.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -432,9 +431,6 @@ namespace Orion.Game.Simulation
                 localFogOfWar.AddLineOfSight(unit.LineOfSight);
         }
 
-        private void OnFactionDefeated(World world, Faction faction)
-        { }
-
         /// <summary>
         /// Suicides all units in this faction.
         /// </summary>
@@ -531,9 +527,10 @@ namespace Orion.Game.Simulation
         public DiplomaticStance GetDiplomaticStance(Faction faction)
         {
             Debug.Assert(faction != null);
-            if (!diplomaticStances.ContainsKey(faction))
-                diplomaticStances.Add(faction, DiplomaticStance.Enemy);
-            return diplomaticStances[faction];
+
+            DiplomaticStance diplomaticStance;
+            return diplomaticStances.TryGetValue(faction, out diplomaticStance)
+                ? diplomaticStance : DiplomaticStance.Enemy;
         }
 
         private void OnOtherFactionDiplomaticStanceChanged(Faction source, DiplomaticStance stance)
@@ -565,14 +562,32 @@ namespace Orion.Game.Simulation
         #region FogOfWar
         public bool HasPartiallySeen(Region region)
         {
-            return region.Points
-                .Any(point => GetTileVisibility(point) != TileVisibility.Undiscovered);
+            for (int offsetY = 0; offsetY < region.Height; ++offsetY)
+            {
+                for (int offsetX = 0; offsetX < region.Width; ++offsetX)
+                {
+                    Point point = new Point(region.MinX + offsetX, region.MinY + offsetY);
+                    if (GetTileVisibility(point) != TileVisibility.Undiscovered)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         public bool HasFullySeen(Region region)
         {
-            return region.Points
-                .All(point => GetTileVisibility(point) != TileVisibility.Undiscovered);
+            for (int offsetY = 0; offsetY < region.Height; ++offsetY)
+            {
+                for (int offsetX = 0; offsetX < region.Width; ++offsetX)
+                {
+                    Point point = new Point(region.MinX + offsetX, region.MinY + offsetY);
+                    if (GetTileVisibility(point) == TileVisibility.Undiscovered)
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -582,10 +597,15 @@ namespace Orion.Game.Simulation
         /// <returns>A value indicating if that region is at least partially visible.</returns>
         public bool CanSee(Region region)
         {
-            for (int x = region.MinX; x < region.ExclusiveMaxX; ++x)
-                for (int y = region.MinY; y < region.ExclusiveMaxY; ++y)
-                    if (GetTileVisibility(new Point(x, y)) == TileVisibility.Visible)
+            for (int offsetY = 0; offsetY < region.Height; ++offsetY)
+            {
+                for (int offsetX = 0; offsetX < region.Width; ++offsetX)
+                {
+                    Point point = new Point(region.MinX + offsetX, region.MinY + offsetY);
+                    if (GetTileVisibility(point) == TileVisibility.Visible)
                         return true;
+                }
+            }
             return false;
         }
 

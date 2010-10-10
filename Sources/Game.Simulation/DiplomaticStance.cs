@@ -12,7 +12,8 @@ namespace Orion.Game.Simulation
         Enemy           = 0,
         SharedVision    = (1 << 0),
         AlliedVictory   = (1 << 1),
-        SharedControl   = (1 << 2) | SharedVision | AlliedVictory
+        SharedControl   = (1 << 2),
+        ForeverAllied   = SharedVision | AlliedVictory | SharedControl
     }
 
     public static class DiplomaticStanceExtensionMethods

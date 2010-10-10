@@ -43,7 +43,7 @@ namespace Orion.Game.Presentation.Gui
                 sharedVisionCheckbox = new Checkbox(sharedVisionCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedVision));
                 sharedControlCheckbox = new Checkbox(sharedControlCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedControl));
 
-                if (stance.HasFlag(DiplomaticStance.SharedControl))
+                if (stance.HasFlag(DiplomaticStance.ForeverAllied))
                 {
                     alliedVictoryCheckbox.IsEnabled = false;
                     sharedVisionCheckbox.IsEnabled = false;
@@ -182,9 +182,11 @@ namespace Orion.Game.Presentation.Gui
             foreach (FactionPanel factionPanel in factionListPanel.Children.OfType<FactionPanel>())
             {
                 DiplomaticStance newStance = DiplomaticStance.Enemy;
-                if (factionPanel.IsAlliedVictoryChecked) newStance |= DiplomaticStance.AlliedVictory;
-                if (factionPanel.IsSharedVisionChecked) newStance |= DiplomaticStance.SharedVision;
                 if (factionPanel.IsSharedControlChecked) newStance |= DiplomaticStance.SharedControl;
+                if (factionPanel.IsSharedControlChecked || factionPanel.IsAlliedVictoryChecked)
+                    newStance |= DiplomaticStance.AlliedVictory;
+                if (factionPanel.IsSharedControlChecked || factionPanel.IsSharedVisionChecked)
+                    newStance |= DiplomaticStance.SharedVision;
 
                 userInputManager.LaunchChangeDiplomacy(factionPanel.Faction, newStance);
             }

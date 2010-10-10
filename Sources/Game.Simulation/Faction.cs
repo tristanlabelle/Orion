@@ -56,7 +56,7 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(world, "world");
             Argument.EnsureNotNullNorBlank(name, "name");
 
-            diplomaticStances[this] = DiplomaticStance.SharedControl;
+            diplomaticStances[this] = DiplomaticStance.ForeverAllied;
 
             this.handle = handle;
             this.world = world;
@@ -488,12 +488,12 @@ namespace Orion.Game.Simulation
         public void SetDiplomaticStance(Faction target, DiplomaticStance stance)
         {
             Argument.EnsureNotNull(target, "target");
-            Argument.EnsureDefined(stance, "stance");
+            Argument.EnsurePossibleValue(stance, "stance");
             if (target == this) throw new ArgumentException("Cannot change the diplomatic stance against oneself.");
 
-            if (GetDiplomaticStance(target).HasFlag(DiplomaticStance.SharedControl)
-                && target.GetDiplomaticStance(target).HasFlag(DiplomaticStance.SharedControl))
-                throw new InvalidOperationException("Cannot change the diplomatic stance once it's been set to Shared Control");
+            if (GetDiplomaticStance(target).HasFlag(DiplomaticStance.ForeverAllied)
+                && target.GetDiplomaticStance(target).HasFlag(DiplomaticStance.ForeverAllied))
+                throw new InvalidOperationException("Cannot change the diplomatic stance once Shared Control has been set");
 
             DiplomaticStance previousStance = GetDiplomaticStance(target);
             DiplomaticStance otherFactionStance = target.GetDiplomaticStance(this);

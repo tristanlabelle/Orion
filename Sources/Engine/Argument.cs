@@ -848,7 +848,7 @@ namespace Orion.Engine
 
         #region Enumerants
         /// <summary>
-        /// Ensures that an argument is within an inclusive range.
+        /// Ensures that an enum argument's value is defined in its declaring enum.
         /// </summary>
         /// <param name="value">The value to be tested.</param>
         /// <param name="name">The name of the argument.</param>
@@ -861,6 +861,38 @@ namespace Orion.Engine
 
             int integralValue = Convert.ToInt32(value, NumberFormatInfo.InvariantInfo);
             throw new InvalidEnumArgumentException(name, integralValue, value.GetType());
+        }
+
+        /// <summary>
+        /// Ensures that an enum argument's value has a possible value, considering the Flags attribute.
+        /// </summary>
+        /// <remarks>
+        /// If the enum does not have the Flags attribute, this method behaves the same as <see cref="M:EnsureDefined"/>.
+        /// This method assumes that all the enum members are either a single-bit pattern, or are defined in terms of previously-defined
+        /// enum members. If this is not the case, it may miss positives.
+        /// </remarks>
+        /// <param name="value">The value to be tested.</param>
+        /// <param name="name">The name of the argument.</param>
+        /// <exception cref="InvalidEnumArgumentException">
+        /// Thrown if <paramref name="value"/> cannot be defined by bitwise-ORing the members of the enumeration type.
+        /// </exception>
+        public static void EnsurePossibleValue(Enum value, string name)
+        {
+            object[] attributes = value.GetType().GetCustomAttributes(false);
+            foreach (object attribute in attributes)
+            {
+                if (attribute is FlagsAttribute)
+                {
+                    int integralValue = Convert.ToInt32(value, NumberFormatInfo.InvariantInfo);
+                    int bitfield = 0;
+                    foreach (int member in Enum.GetValues(value.GetType())) bitfield |= member;
+                    if ((integralValue & bitfield) != integralValue)
+                        throw new InvalidEnumArgumentException(name, integralValue, value.GetType());
+                    return;
+                }
+            }
+
+            EnsureDefined(value, name);
         }
 
         /// <summary>

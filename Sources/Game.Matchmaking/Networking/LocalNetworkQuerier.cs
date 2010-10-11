@@ -88,7 +88,9 @@ namespace Orion.Game.Matchmaking.Networking
                 Explore();
 
             networking.Poll();
-            return listingChanged || removedMatchCount > 0;
+            bool updated = listingChanged || removedMatchCount > 0;
+            listingChanged = false;
+            return updated;
         }
 
         private void Explore()

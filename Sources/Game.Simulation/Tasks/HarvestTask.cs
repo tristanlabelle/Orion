@@ -170,6 +170,9 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
+            // if the unit was enqueued other tasks, stop harvesting
+            if (Unit.TaskQueue.Count > 1) MarkAsEnded();
+
             move = MoveTask.ToNearRegion(Unit, node.GridRegion);
             mode = Mode.Extracting;
         }

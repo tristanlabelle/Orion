@@ -446,21 +446,22 @@ namespace Orion.Game.Simulation
             int splashRadius = GetStat(AttackSkill.SplashRadiusStat);
             if (splashRadius != 0)
             {
-                Vector2 targetCenter = target.Center;
-                int radiusSquared = splashRadius * splashRadius;
-                IEnumerable<Unit> splashedUnits = World.Entities
-                    .OfType<Unit>()
-                    .Where(u =>
-                        (u.Center - targetCenter).LengthSquared <= radiusSquared
-                        && !Faction.GetDiplomaticStance(u.Faction).HasFlag(DiplomaticStance.AlliedVictory));
+                Circle splashCircle = new Circle(target.Center, splashRadius);
+                IEnumerable<Unit> potentiallySplashedUnits = World.Entities
+                    .Intersecting(splashCircle)
+                    .OfType<Unit>();
 
-                foreach (Unit splashedUnit in splashedUnits)
+                foreach (Unit potentiallySplashedUnit in potentiallySplashedUnits)
                 {
-                    if (splashedUnit == target) continue;
-                    float distance = (targetCenter - splashedUnit.Center).Length;
-                    int splashedTargetArmor = splashedUnit.GetStat(armorStat);
+                    if (potentiallySplashedUnit == target) continue;
+                    if (Faction.GetDiplomaticStance(potentiallySplashedUnit.Faction).HasFlag(DiplomaticStance.AlliedVictory)) continue;
+
+                    float distance = (splashCircle.Center - potentiallySplashedUnit.Center).LengthFast;
+                    if (distance > splashRadius) continue;
+
+                    int splashedTargetArmor = potentiallySplashedUnit.GetStat(armorStat);
                     int splashDamage = (int)(Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor) * (1 - distance / splashRadius));
-                    splashedUnit.Health -= splashDamage;
+                    potentiallySplashedUnit.Health -= splashDamage;
                 }
             }
 

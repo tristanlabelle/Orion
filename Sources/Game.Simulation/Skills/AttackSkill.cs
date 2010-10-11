@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation.Skills
         private int power = 1;
         private int range;
         private int delay = 1;
-        private int splashRadius = 0;
+        private int splashRadius;
         #endregion
 
         #region Properties

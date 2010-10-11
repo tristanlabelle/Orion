@@ -60,9 +60,9 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 // Special case for alagene extractors:
                 // They can only be build on alagene nodes.
                 return World.Entities
+                    .Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One))
                     .OfType<ResourceNode>()
-                    .Any(node => node.Type == ResourceType.Alagene
-                        && (Point)node.Position == minLocation.Value);
+                    .Any(node => node.Type == ResourceType.Alagene && (Point)node.Position == minLocation.Value);
             }
         }
         #endregion

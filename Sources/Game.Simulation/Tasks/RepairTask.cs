@@ -94,8 +94,11 @@ namespace Orion.Game.Simulation.Tasks
                 if (Unit.HasSkill<HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
                 {
                     // Smells like a hack!
-                    ResourceNode node = Unit.World.Entities.OfType<ResourceNode>()
+                    ResourceNode node = Unit.World.Entities
+                        .Intersecting(target.BoundingRectangle)
+                        .OfType<ResourceNode>()
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
+
                     if (Unit.TaskQueue.Count == 1)
                         Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
                 }

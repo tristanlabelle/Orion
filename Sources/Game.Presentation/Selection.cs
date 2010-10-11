@@ -319,8 +319,8 @@ namespace Orion.Game.Presentation
             Rectangle rectangle = Rectangle.FromPoints(rectangleStart, rectangleEnd);
 
             List<Unit> units = localFaction.World.Entities
+                .Intersecting(rectangle)
                 .OfType<Unit>()
-                .Where(unit => Rectangle.Intersects(rectangle, unit.BoundingRectangle))
                 .OrderBy(unit => (unit.Center - rectangleStart).LengthSquared)
                 .ToList();
 

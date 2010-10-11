@@ -341,6 +341,7 @@ namespace Orion.Game.Presentation
                 }
 
                 ResourceNode alageneNode = World.Entities
+                    .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
                     .OfType<ResourceNode>()
                     .FirstOrDefault(node => node.Position == target.Position);
                 if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))

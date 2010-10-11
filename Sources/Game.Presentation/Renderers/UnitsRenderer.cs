@@ -128,9 +128,9 @@ namespace Orion.Game.Presentation.Renderers
         private IEnumerable<Unit> GetClippedVisibleUnits(Rectangle clippingBounds)
         {
             return World.Entities
+                .Intersecting(clippingBounds)
                 .OfType<Unit>()
-                .Where(unit => Rectangle.Intersects(clippingBounds, unit.BoundingRectangle)
-                    && faction.CanSee(unit));
+                .Where(unit => faction.CanSee(unit));
         }
 
         private void DrawGroundUnits(GraphicsContext graphicsContext, Rectangle viewBounds)

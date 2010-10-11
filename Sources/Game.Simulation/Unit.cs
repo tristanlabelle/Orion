@@ -459,7 +459,7 @@ namespace Orion.Game.Simulation
                     if (splashedUnit == target) continue;
                     float distance = (targetCenter - splashedUnit.Center).Length;
                     int splashedTargetArmor = splashedUnit.GetStat(armorStat);
-                    int splashDamage = (int)(Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor) * distance / splashRadius);
+                    int splashDamage = (int)(Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor) * (1 - distance / splashRadius));
                     splashedUnit.Health -= splashDamage;
                 }
             }

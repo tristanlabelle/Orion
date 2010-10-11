@@ -281,9 +281,7 @@ namespace Orion.Game.Presentation
         public void LaunchDefaultCommand(Vector2 target)
         {
             if (Selection.Type != SelectionType.Units) return;
-
-            bool otherFactionOnlySelection = Selection.Units.All(unit => unit.Faction != LocalFaction);
-            if (otherFactionOnlySelection) return;
+            if (!Selection.Units.Any(unit => IsUnitControllable(unit))) return;
 
             Point point = (Point)target;
             if (!World.IsWithinBounds(point))
@@ -377,12 +375,17 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Launching individual commands
+        private bool IsUnitControllable(Unit unit)
+        {
+            return LocalFaction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.SharedControl);
+        }
+
         private void OverrideIfNecessary()
         {
             if (!shiftKeyPressed)
             {
                 IEnumerable<Unit> units = Selection.Units
-                    .Where(unit => unit.Faction == commander.Faction && !unit.Type.IsBuilding);
+                    .Where(unit => IsUnitControllable(unit) && !unit.Type.IsBuilding);
                 commander.LaunchCancel(units);
             }
         }
@@ -390,8 +393,7 @@ namespace Orion.Game.Presentation
         public void LaunchBuild(Point location, UnitType buildingType)
         {
             IEnumerable<Unit> builders = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction
-                    && unit.Type.CanBuild(buildingType));
+                .Where(unit => IsUnitControllable(unit) && unit.Type.CanBuild(buildingType));
 
             OverrideIfNecessary();
             commander.LaunchBuild(builders, buildingType, location);
@@ -399,7 +401,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchAttack(Unit target)
         {
-            IEnumerable<Unit> selection = Selection.Units.Where(unit => unit.Faction == commander.Faction);
+            IEnumerable<Unit> selection = Selection.Units.Where(unit => IsUnitControllable(unit));
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
             commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);
@@ -408,7 +410,7 @@ namespace Orion.Game.Presentation
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
             // Those who can attack do so, the others simply move to the destination
             OverrideIfNecessary();
             commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasSkill<AttackSkill>()), destination);
@@ -418,7 +420,7 @@ namespace Orion.Game.Presentation
         public void LaunchHarvest(ResourceNode node)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position
             OverrideIfNecessary();
             commander.LaunchHarvest(movableUnits.Where(unit => unit.HasSkill<HarvestSkill>()), node);
@@ -428,7 +430,7 @@ namespace Orion.Game.Presentation
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction && unit.HasSkill<MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
             OverrideIfNecessary();
             commander.LaunchMove(movableUnits, destination);
         }
@@ -470,7 +472,7 @@ namespace Orion.Game.Presentation
         public void LaunchTrain(UnitType unitType)
         {
             IEnumerable<Unit> trainers = Selection.Units
-                .Where(unit => unit.Faction == commander.Faction
+                .Where(unit => IsUnitControllable(unit)
                     && !unit.IsUnderConstruction
                     && unit.Type.CanTrain(unitType));
 
@@ -481,7 +483,7 @@ namespace Orion.Game.Presentation
         public void LaunchResearch(Technology technology)
         {
             Unit researcher = Selection.Units
-                .FirstOrDefault(unit => unit.Faction == commander.Faction
+                .FirstOrDefault(unit => unit.Faction == commander.Faction // I unilaterally decided you can't research from buildings that aren't yours
                     && !unit.IsUnderConstruction
                     && unit.IsIdle
                     && unit.Type.CanResearch(technology));

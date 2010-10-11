@@ -325,9 +325,9 @@ namespace Orion.Game.Presentation
                 .ToList();
 
             // Filter out factions
-            bool containsUnitsFromThisFaction = units.Any(unit => unit.Faction == localFaction);
-            if (containsUnitsFromThisFaction)
-                units.RemoveAll(unit => unit.Faction != localFaction);
+            bool containsControllableUnits = units.Any(unit => unit.Faction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
+            if (containsControllableUnits)
+                units.RemoveAll(unit => !unit.Faction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
             else if (units.Count > 1)
                 units.RemoveRange(1, units.Count - 1);
 

@@ -631,7 +631,7 @@ namespace Orion.Game.Presentation.Gui
             actionPanel.Clear();
             if (Selection.Type != SelectionType.Units) return;
             
-            if (Selection.Units.All(u => u.Faction == LocalFaction))
+            if (Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl)))
                 actionPanel.Push(new UnitActionProvider(enablers, SelectionManager.FocusedUnitType));
         }
 

@@ -39,7 +39,7 @@ namespace Orion.Game.Presentation
             this.faction.World.EntityRemoved += OnEntityRemoved;
 
             this.selection = new Selection(faction, SelectionLimit);
-            this.selection.Changed += new Action<Selection>(OnSelectionChanged);
+            this.selection.Changed += OnSelectionChanged;
 
             this.groups = new HashSet<Unit>[GroupCount];
             for (int i = 0; i < this.groups.Length; ++i)

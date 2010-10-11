@@ -403,6 +403,7 @@ namespace Orion.Game.Presentation
         public void LaunchAttack(Unit target)
         {
             IEnumerable<Unit> selection = Selection.Units.Where(unit => IsUnitControllable(unit));
+            OverrideIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
             commander.LaunchAttack(selection.Where(unit => unit.HasSkill<AttackSkill>()), target);
             commander.LaunchMove(selection.Where(unit => !unit.HasSkill<AttackSkill>() && unit.HasSkill<MoveSkill>()), target.Position);

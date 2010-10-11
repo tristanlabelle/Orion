@@ -673,13 +673,12 @@ namespace Orion.Game.Presentation.Gui
 
         private void DisplayDiplomacy()
         {
-            if (diplomacyPanel == null)
-            {
+            if (diplomacyPanel != null && Children.Contains(diplomacyPanel))
+                Children.Remove(diplomacyPanel);
 
-                Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.2f, 0.3f, 0.6f, 0.6f));
-                diplomacyPanel = new DiplomacyPanel(diplomacyPanelFrame, userInputManager);
-                diplomacyPanel.Accepted += (sender) => Children.Remove(diplomacyPanel);
-            }
+            Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.2f, 0.3f, 0.6f, 0.6f));
+            diplomacyPanel = new DiplomacyPanel(diplomacyPanelFrame, userInputManager);
+            diplomacyPanel.Accepted += (sender) => Children.Remove(diplomacyPanel);
 
             Children.Add(diplomacyPanel);
         }

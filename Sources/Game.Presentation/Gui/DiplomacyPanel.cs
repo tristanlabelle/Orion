@@ -43,7 +43,7 @@ namespace Orion.Game.Presentation.Gui
                 sharedVisionCheckbox = new Checkbox(sharedVisionCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedVision));
                 sharedControlCheckbox = new Checkbox(sharedControlCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedControl));
 
-                if (stance.HasFlag(DiplomaticStance.ForeverAllied))
+                if (stance.HasFlag(DiplomaticStance.SharedControl))
                 {
                     alliedVictoryCheckbox.IsEnabled = false;
                     sharedVisionCheckbox.IsEnabled = false;

@@ -4,6 +4,6 @@
 	<Skills>
 		<Basic SightRange="20" MaxHealth="500" MeleeArmor="5" RangedArmor="5" FoodCost="10"/>
 		<Move Speed="20"/>
-		<Attack Power="75" Range="0" Delay="1"/>
+		<Attack Power="75" Range="0" Delay="1" SplashRadius="15"/>
 	</Skills>
 </UnitType>

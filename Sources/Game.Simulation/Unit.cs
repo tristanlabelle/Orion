@@ -436,21 +436,42 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(target, "target");
 
             bool isMelee = GetStat(AttackSkill.RangeStat) == 0;
-            int targetArmor = target.GetStat(isMelee ? BasicSkill.MeleeArmorStat : BasicSkill.RangedArmorStat);
-            int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
+            UnitStat armorStat = isMelee ? BasicSkill.MeleeArmorStat : BasicSkill.RangedArmorStat;
 
+            int targetArmor = target.GetStat(armorStat);
+            int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
             target.Health -= damage;
+            OnHitting(target, damage);
+
+            int splashRadius = GetStat(AttackSkill.SplashRadiusStat);
+            if (splashRadius != 0)
+            {
+                Vector2 targetCenter = target.Center;
+                int radiusSquared = splashRadius * splashRadius;
+                IEnumerable<Unit> splashedUnits = World.Entities
+                    .OfType<Unit>()
+                    .Where(u =>
+                        (u.Center - targetCenter).LengthSquared <= radiusSquared
+                        && !Faction.GetDiplomaticStance(u.Faction).HasFlag(DiplomaticStance.AlliedVictory));
+
+                foreach (Unit splashedUnit in splashedUnits)
+                {
+                    if (splashedUnit == target) continue;
+                    float distance = (targetCenter - splashedUnit.Center).Length;
+                    int splashedTargetArmor = splashedUnit.GetStat(armorStat);
+                    int splashDamage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
+                    splashedUnit.Health -= splashDamage;
+                }
+            }
 
             timeElapsedSinceLastHitInSeconds = 0;
-
-            OnHitting(target, damage);
         }
 
         private void OnHitting(Unit target, float damage)
         {
             HitEventArgs args = new HitEventArgs(this, target, damage);
 
-            if (Hitting != null) Hitting(this, args);
+            Hitting.Raise(this, args);
 
             World.OnUnitHitting(args);
         }

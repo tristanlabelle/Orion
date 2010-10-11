@@ -13,10 +13,12 @@ namespace Orion.Game.Simulation.Skills
         public static readonly UnitStat PowerStat = new UnitStat(typeof(AttackSkill), "Power", "Puissance d'attaque");
         public static readonly UnitStat RangeStat = new UnitStat(typeof(AttackSkill), "Range", "Portée d'attaque");
         public static readonly UnitStat DelayStat = new UnitStat(typeof(AttackSkill), "Delay", "Délai d'attaque");
+        public static readonly UnitStat SplashRadiusStat = new UnitStat(typeof(AttackSkill), "SplashRadius", "Rayon de dégâts");
 
         private int power = 1;
         private int range;
         private int delay = 1;
+        private int splashRadius = 0;
         #endregion
 
         #region Properties
@@ -64,6 +66,20 @@ namespace Orion.Game.Simulation.Skills
         }
 
         /// <summary>
+        /// Accesses the radius in which other enemy units are damaged after an attack.
+        /// </summary>
+        public int SplashRadius
+        {
+            get { return splashRadius; }
+            set
+            {
+                EnsureNotFrozen();
+                Argument.EnsurePositive(value, "SplashRadius");
+                splashRadius = value;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating if this skill represents a melee attacker.
         /// </summary>
         public bool IsMelee
@@ -78,6 +94,14 @@ namespace Orion.Game.Simulation.Skills
         {
             get { return range > 0; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this skill represents an attacker that does splash damage.
+        /// </summary>
+        public bool HasSplashDamage
+        {
+            get { return splashRadius > 0; }
+        }
         #endregion
 
         #region Methods
@@ -87,7 +111,8 @@ namespace Orion.Game.Simulation.Skills
             {
                 power = power,
                 range = range,
-                delay = delay
+                delay = delay,
+                splashRadius = splashRadius,
             };
         }
 
@@ -96,6 +121,7 @@ namespace Orion.Game.Simulation.Skills
             if (stat == PowerStat) return power;
             if (stat == RangeStat) return range;
             if (stat == DelayStat) return delay;
+            if (stat == SplashRadiusStat) return splashRadius;
             return base.GetStat(stat);
         }
 
@@ -104,6 +130,7 @@ namespace Orion.Game.Simulation.Skills
             if (stat == PowerStat) Power = value;
             else if (stat == RangeStat) Range = value;
             else if (stat == DelayStat) Delay = value;
+            else if (stat == SplashRadiusStat) SplashRadius = value;
             else base.DoSetStat(stat, value);
         }
         #endregion

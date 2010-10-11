@@ -125,9 +125,8 @@ namespace Orion.Game.Presentation.Renderers
         public void DrawBlueprints(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             var plans = World.Entities
-                .Intersecting(viewBounds)
                 .OfType<Unit>()
-                .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
+                .Where(u => faction.GetDiplomaticStance(u.Faction).HasFlag(DiplomaticStance.SharedVision)
                     && u.HasSkill<BuildSkill>())
                 .SelectMany(u => u.TaskQueue)
                 .OfType<BuildTask>()

@@ -49,6 +49,7 @@ namespace Orion.Game.Presentation.Audio
             this.userInputManager.UnderAttackMonitor.Warning += OnUnderAttackWarning;
             this.World.EntityAdded += OnEntityAdded;
             this.World.EntityRemoved += OnEntityRemoved;
+            this.World.EntityDied += OnEntityDied;
             this.World.UnitHitting += OnUnitHitting;
             this.World.Updated += OnWorldUpdated;
             this.World.ExplosionOccured += OnExplosionOccured;
@@ -127,6 +128,15 @@ namespace Orion.Game.Presentation.Audio
             }
 
             string soundName = audio.GetUnitSoundName(unit.Type, "Select");
+            audio.PlaySfx(soundName, unit.Center);
+        }
+
+        private void OnEntityDied(World arg1, Entity arg2)
+        {
+            Unit unit = arg2 as Unit;
+            if (unit == null) return;
+
+            string soundName = audio.GetUnitSoundName(unit.Type, "Die");
             audio.PlaySfx(soundName, unit.Center);
         }
 

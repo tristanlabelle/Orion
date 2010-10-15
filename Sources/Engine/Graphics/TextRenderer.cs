@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -79,7 +79,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
-        public void Draw(IEnumerable<char> text, float size, Vector2 origin, ColorRgba tint, float maxWidth = float.PositiveInfinity)
+        public void Draw(IEnumerable<char> text, float size, Vector2 origin, ColorRgba tint, float maxWidth)
         {
             Argument.EnsureNotNull(text, "text");
             Argument.EnsureStrictlyPositive(size, "size");

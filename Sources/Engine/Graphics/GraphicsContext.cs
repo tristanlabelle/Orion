@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -575,7 +575,7 @@ namespace Orion.Engine.Graphics
         /// <param name="color">The color with which to draw the text.</param>
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            textRenderer.Draw(text.Value, text.Font.GetHeight(), origin, color);
+            textRenderer.Draw(text.Value, text.Font.GetHeight(), origin, color, float.PositiveInfinity);
         }
         #endregion
 

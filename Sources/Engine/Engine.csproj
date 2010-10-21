@@ -136,6 +136,15 @@
     <Compile Include="Graphics\Text.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureManager.cs" />
+    <Compile Include="Gui2\Alignment.cs" />
+    <Compile Include="Gui2\Label.cs" />
+    <Compile Include="Gui2\Panel.cs" />
+    <Compile Include="Gui2\Borders.cs" />
+    <Compile Include="Gui2\Orientation.cs" />
+    <Compile Include="Gui2\StackPanel.cs" />
+    <Compile Include="Gui2\UIElement.cs" />
+    <Compile Include="Gui2\UIElementVisibility.cs" />
+    <Compile Include="Gui2\UIManager.cs" />
     <Compile Include="Gui\Button.cs" />
     <Compile Include="Gui\Checkbox.cs" />
     <Compile Include="Gui\CheckboxRenderer.cs" />

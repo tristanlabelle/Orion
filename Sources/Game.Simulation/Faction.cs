@@ -21,7 +21,7 @@ namespace Orion.Game.Simulation
     public sealed class Faction
     {
     	#region Static
-    	public bool HaveAlliedVictory(Faction a, Faction b)
+    	public static bool HaveAlliedVictory(Faction a, Faction b)
     	{
     		return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
     			&& b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);

@@ -15,7 +15,7 @@ namespace Orion.Game.Simulation
     public sealed class FogOfWar
     {
         #region Nested Types
-        private struct RoundedCircle : IEquatable<RoundedCircle>
+        private struct IntegerCircle : IEquatable<IntegerCircle>
         {
             #region Instance
             #region Fields
@@ -25,7 +25,7 @@ namespace Orion.Game.Simulation
             #endregion
 
             #region Constructors
-            public RoundedCircle(Circle circle)
+            public IntegerCircle(Circle circle)
             {
                 this.centerX = (int)Math.Round(circle.Center.X);
                 this.centerY = (int)Math.Round(circle.Center.Y);
@@ -51,7 +51,7 @@ namespace Orion.Game.Simulation
             #endregion
 
             #region Methods
-            public bool Equals(RoundedCircle other)
+            public bool Equals(IntegerCircle other)
             {
                 return centerX == other.centerX
                     && centerY == other.centerY
@@ -72,19 +72,19 @@ namespace Orion.Game.Simulation
 
             #region Static
             #region Methods
-            public static bool Equals(RoundedCircle a, RoundedCircle b)
+            public static bool Equals(IntegerCircle a, IntegerCircle b)
             {
                 return a.Equals(b);
             }
             #endregion
 
             #region Operators
-            public static bool operator ==(RoundedCircle lhs, RoundedCircle rhs)
+            public static bool operator ==(IntegerCircle lhs, IntegerCircle rhs)
             {
                 return Equals(lhs, rhs);
             }
 
-            public static bool operator !=(RoundedCircle lhs, RoundedCircle rhs)
+            public static bool operator !=(IntegerCircle lhs, IntegerCircle rhs)
             {
                 return !Equals(lhs, rhs);
             }
@@ -219,8 +219,8 @@ namespace Orion.Game.Simulation
         {
             if (!isEnabled) return;
 
-            RoundedCircle roundedOldLineOfSight = new RoundedCircle(oldLineOfSight);
-            RoundedCircle roundedNewLineOfSight = new RoundedCircle(newLineOfSight);
+            IntegerCircle roundedOldLineOfSight = new IntegerCircle(oldLineOfSight);
+            IntegerCircle roundedNewLineOfSight = new IntegerCircle(newLineOfSight);
 
             if (roundedNewLineOfSight == roundedOldLineOfSight) return;
 
@@ -232,7 +232,7 @@ namespace Orion.Game.Simulation
         {
             if (!isEnabled) return;
 
-            RoundedCircle roundedLineOfSight = new RoundedCircle(lineOfSight);
+            IntegerCircle roundedLineOfSight = new IntegerCircle(lineOfSight);
             ModifyLineOfSight(roundedLineOfSight, true);
         }
 
@@ -240,7 +240,7 @@ namespace Orion.Game.Simulation
         {
             if (!isEnabled) return;
 
-            RoundedCircle roundedLineOfSight = new RoundedCircle(lineOfSight);
+            IntegerCircle roundedLineOfSight = new IntegerCircle(lineOfSight);
             ModifyLineOfSight(roundedLineOfSight, false);
         }
 
@@ -325,7 +325,7 @@ namespace Orion.Game.Simulation
             return bitmap;
         }
 
-        private CircleLookup GetCircleLookup(RoundedCircle circle)
+        private CircleLookup GetCircleLookup(IntegerCircle circle)
         {
             BitArray2D bitmap = GetCircleBitmap(circle.Radius);
 
@@ -335,7 +335,7 @@ namespace Orion.Game.Simulation
             return new CircleLookup(minX, minY, bitmap);
         }
 
-        private void ModifyLineOfSight(RoundedCircle lineOfSight, bool addOrRemove)
+        private void ModifyLineOfSight(IntegerCircle lineOfSight, bool addOrRemove)
         {
             if (!isEnabled) return;
 

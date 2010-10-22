@@ -147,7 +147,7 @@ namespace Orion.Game.Main
             }
 
             bool allEnemyFactionsDefeated = sender.Factions
-                .Where(f => !localCommander.Faction.GetDiplomaticStance(f).HasFlag(DiplomaticStance.AlliedVictory))
+            	.Where(f => !Faction.HaveAlliedVictory(localCommander.Faction, f))
                 .All(f => f == faction || f.Status == FactionStatus.Defeated);
             if (!allEnemyFactionsDefeated) return;
 

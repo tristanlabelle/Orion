@@ -20,6 +20,15 @@ namespace Orion.Game.Simulation
     [Serializable]
     public sealed class Faction
     {
+    	#region Static
+    	public bool HaveAlliedVictory(Faction a, Faction b)
+    	{
+    		return a.GetDiplomaticStance(b).HasFlag(DiplomaticStance.AlliedVictory)
+    			&& b.GetDiplomaticStance(a).HasFlag(DiplomaticStance.AlliedVictory);
+    	}
+    	#endregion
+    	
+    	#region Instance
         #region Fields
         private const int minimumPopulationLimit = 10;
 
@@ -176,7 +185,7 @@ namespace Orion.Game.Simulation
             {
                 foreach (KeyValuePair<Faction, DiplomaticStance> pair in diplomaticStances)
                 {
-                    if (pair.Value.HasFlag(DiplomaticStance.SharedVision))
+                	if (pair.Key.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
                         yield return pair.Key;
                 }
             }
@@ -681,6 +690,7 @@ namespace Orion.Game.Simulation
         {
             return name;
         }
+        #endregion
         #endregion
     }
 }

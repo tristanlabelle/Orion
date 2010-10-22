@@ -126,7 +126,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             var plans = World.Entities
                 .OfType<Unit>()
-                .Where(u => faction.GetDiplomaticStance(u.Faction).HasFlag(DiplomaticStance.SharedVision)
+                .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
                     && u.HasSkill<BuildSkill>())
                 .SelectMany(u => u.TaskQueue)
                 .OfType<BuildTask>()

@@ -502,11 +502,11 @@ namespace Orion.Engine.Graphics
             try
             {
                 IntPtr pointer = pinningHandle.AddrOfPinnedObject();
-                GL.EnableClientState(EnableCap.VertexArray);
+                GL.EnableClientState(ArrayCap.VertexArray);
                 GL.VertexPointer(2, VertexPointerType.Float, 0, pointer);
                 GL.DrawArrays(BeginMode.TriangleStrip, 0, vertices.Length);
                 GL.VertexPointer(2, VertexPointerType.Float, 0, IntPtr.Zero);
-                GL.DisableClientState(EnableCap.VertexArray);
+                GL.DisableClientState(ArrayCap.VertexArray);
             }
             finally
             {

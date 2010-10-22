@@ -32,8 +32,13 @@ namespace Orion.Game.Matchmaking.Networking
             Argument.EnsureNotNull(networking, "networking");
             this.networking = networking;
             matchFinders.Add(new LocalNetworkQuerier(networking, timeBeforeReExploring, matchListingTimeout));
-            matchFinders.Add(new MasterServerQuerier("http://www.laissemoichercherca.com/ets/orion.php", matchListingTimeout));
-
+#warning Identify the thrown exception and catch just it
+            try
+            {
+            	matchFinders.Add(new MasterServerQuerier("http://www.laissemoichercherca.com/ets/orion.php", matchListingTimeout));
+            }
+            catch
+            { /* too bad */ }
             networking.PacketReceived += OnPacketReceived;
             networking.PeerTimedOut += OnPeerTimedOut;
         }

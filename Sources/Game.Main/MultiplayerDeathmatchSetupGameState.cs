@@ -455,7 +455,13 @@ namespace Orion.Game.Main
         {
             CompositeMatchAdvertizer advertizer = new CompositeMatchAdvertizer();
             advertizer.AddAdvertiser(new LocalNetworkAdvertizer(networking));
-            advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
+#warning Identify the thrown exception and catch just it
+            try
+            {
+            	advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
+            }
+            catch
+            { /* too bad */ }
             Argument.EnsureNotNull(matchName, "matchName");
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
                 networking, advertizer, matchName, null);

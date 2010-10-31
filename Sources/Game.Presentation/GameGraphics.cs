@@ -37,6 +37,7 @@ namespace Orion.Game.Presentation
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
+            this.textureManager.PreloadByExtension("png");
         }
         #endregion
 

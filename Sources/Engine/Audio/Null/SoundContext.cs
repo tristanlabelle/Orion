@@ -12,6 +12,10 @@ namespace Orion.Engine.Audio.Null
     /// </summary>
     public sealed class SoundContext : ISoundContext
     {
+        #region Fields
+        public static readonly SoundContext Instance = new SoundContext();
+        #endregion
+
         #region Constructors
         public SoundContext()
         {
@@ -26,6 +30,11 @@ namespace Orion.Engine.Audio.Null
         public float Volume { get; set; }
 
         public Matrix4 ListenerMatrix { get; set; }
+
+        public bool IsSoundLoadingThreadSafe
+        {
+            get { return true; }
+        }
         #endregion
 
         #region Methods

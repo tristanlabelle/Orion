@@ -92,6 +92,11 @@ namespace Orion.Engine.Audio.OpenAL
                 AL.Listener(ALListenerfv.Orientation, ref at, ref up);
             }
         }
+
+        public bool IsSoundLoadingThreadSafe
+        {
+            get { return true; } // OpenAL is supposed to be thread-safe from version 1.1
+        }
         #endregion
 
         #region Methods

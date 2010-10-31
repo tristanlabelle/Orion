@@ -5,6 +5,8 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Orion.Engine.Audio
 {
@@ -14,8 +16,10 @@ namespace Orion.Engine.Audio
     public sealed class SoundManager : IDisposable
     {
         #region Fields
+        private static readonly Regex groupNameRegex = new Regex(@"\A(.*?)(\.\d+)?\Z", RegexOptions.Compiled);
         private readonly ISoundContext context;
         private readonly DirectoryInfo directory;
+        private readonly CancellationTokenSource canceller = new CancellationTokenSource();
         private readonly Dictionary<string, SoundGroup> groups = new Dictionary<string, SoundGroup>();
         #endregion
 
@@ -29,6 +33,21 @@ namespace Orion.Engine.Audio
             this.directory = new DirectoryInfo(directoryPath);
 
             Debug.Assert(directory.Exists, "The sounds directory does not exist.");
+
+            if (directory.Exists)
+            {
+                var groups = directory.GetFiles("*.ogg", SearchOption.TopDirectoryOnly)
+                        .Select(fileInfo => fileInfo.FullName)
+                        .GroupBy(filePath => groupNameRegex.Match(Path.GetFileNameWithoutExtension(filePath)).Groups[1].Value)
+                        .Select(group => new SoundGroup(group.Key,
+                            group.Select(filePath => new Task<ISound>(() => soundContext.LoadSoundFromFile(filePath), canceller.Token))));
+                foreach (SoundGroup group in groups)
+                {
+                    this.groups.Add(group.Name, group);
+
+                    if (soundContext.IsSoundLoadingThreadSafe) group.Preload();
+                }
+            }
         }
         #endregion
 
@@ -45,29 +64,15 @@ namespace Orion.Engine.Audio
             Argument.EnsureNotNull(random, "random");
 
             SoundGroup group;
-            if (groups.TryGetValue(name, out group))
-                return group.GetRandomSoundOrNull(random);
+            if (!groups.TryGetValue(name, out group)) return null;
 
-            try
-            {
-                var sounds = Directory.GetFiles(directory.FullName, name + "*.*")
-                    .Where(filePath => Regex.IsMatch(Path.GetFileNameWithoutExtension(filePath), Regex.Escape(name) + @"(\.\d+)?$"))
-                    .Select(filePath => TryLoadFromFile(filePath))
-                    .Where(sound => sound != null);
-                group = new SoundGroup(name, sounds);
-            }
-            catch (IOException)
-            {
-                group = new SoundGroup(name, Enumerable.Empty<ISound>());
-            }
-
-            groups.Add(name, group);
-
+            if (!context.IsSoundLoadingThreadSafe) group.Load();
             return group.GetRandomSoundOrNull(random);
         }
 
         public void Dispose()
         {
+            canceller.Cancel();
             foreach (SoundGroup group in groups.Values)
                 group.Dispose();
             groups.Clear();

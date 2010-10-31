@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using SysPixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Orion.Engine.Graphics
@@ -15,10 +17,71 @@ namespace Orion.Engine.Graphics
     /// </summary>
     public sealed class TextureManager : IDisposable
     {
+        private sealed class Item : IDisposable
+        {
+            private readonly GraphicsContext graphicsContext;
+            private Task<Image> loadingTask;
+            private Texture texture;
+
+            public Item(GraphicsContext graphicsContext, string filePath, CancellationToken cancellationToken)
+            {
+                Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+                Argument.EnsureNotNull(filePath, "filePath");
+
+                this.graphicsContext = graphicsContext;
+
+                loadingTask = Task.Factory.StartNew<Image>(() => Image.FromFile(filePath), cancellationToken);
+            }
+
+            public Item(GraphicsContext graphicsContext, Texture texture)
+            {
+                Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+
+                this.graphicsContext = graphicsContext;
+                this.texture = texture;
+            }
+
+            public Texture Texture
+            {
+                get
+                {
+                    if (loadingTask != null)
+                    {
+                        loadingTask.Wait();
+
+                        if (loadingTask.Status == TaskStatus.RanToCompletion)
+                        {
+                            using (Image image = loadingTask.Result)
+                            {
+                                texture = graphicsContext.CreateTexture(image);
+                                texture.SetSmooth(true);
+                                texture.SetRepeat(false);
+                            }
+                        }
+
+                        loadingTask = null;
+                    }
+
+                    return texture;
+                }
+            }
+
+            public void Dispose()
+            {
+                if (loadingTask != null)
+                {
+                    loadingTask.ContinueWith(imageTask => imageTask.Result.Dispose());
+                }
+
+                if (texture != null) texture.Dispose();
+            }
+        }
+
         #region Fields
         private readonly GraphicsContext graphicsContext;
         private readonly DirectoryInfo directory;
-        private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+        private readonly CancellationTokenSource canceller = new CancellationTokenSource();
+        private readonly Dictionary<string, Item> textures = new Dictionary<string, Item>();
         private readonly Texture defaultTexture;
         #endregion
 
@@ -60,13 +123,29 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
+        public void PreloadByExtension(string extension)
+        {
+            foreach (FileInfo fileInfo in Directory.GetFiles("*." + extension, SearchOption.AllDirectories))
+            {
+                int directoryPathPartLength = directory.FullName.Length + 1;
+                int extensionPathPartLength = extension.Length + 1;
+                string filePath = fileInfo.FullName;
+                string name = filePath.Substring(directoryPathPartLength, filePath.Length - directoryPathPartLength - extensionPathPartLength);
+
+                if (textures.ContainsKey(name)) continue;
+
+                Item item = new Item(graphicsContext, filePath, canceller.Token);
+                textures.Add(name, item);
+            }
+        }
+
         public Texture Get(string name)
         {
             Argument.EnsureNotNull(name, "name");
 
-            Texture texture;
-            if (textures.TryGetValue(name, out texture))
-                return texture ?? defaultTexture;
+            Item item;
+            if (textures.TryGetValue(name, out item))
+                return item == null || item.Texture == null ? defaultTexture : item.Texture;
 
             if (!directory.Exists)
             {
@@ -84,12 +163,13 @@ namespace Orion.Engine.Graphics
 
             try
             {
-                texture = graphicsContext.CreateTextureFromFile(filePath);
+                Texture texture = graphicsContext.CreateTextureFromFile(filePath);
 
                 texture.SetSmooth(true);
                 texture.SetRepeat(false);
 
-                textures.Add(name, texture);
+                textures.Add(name, new Item(graphicsContext, texture));
+
                 return texture;
             }
             catch (IOException)
@@ -99,41 +179,20 @@ namespace Orion.Engine.Graphics
             }
         }
 
-        [Obsolete("Superseded by GameGraphics.GetUnitTexture")]
-        public Texture GetUnit(string unitTypeName)
-        {
-            return Get(Path.Combine("Units", unitTypeName));
-        }
-
-        [Obsolete("Superseded by GameGraphics.GetActionTexture")]
-        public Texture GetAction(string actionName)
-        {
-            return Get(Path.Combine("Actions", actionName));
-        }
-
-        [Obsolete("Superseded by GameGraphics.GetTechnologyTexture")]
-        public Texture GetTechnology(string technologyName)
-        {
-            return Get(Path.Combine("Technologies", technologyName));
-        }
-
         /// <summary>
         /// Disposes all textures loaded by this texture manager.
         /// </summary>
         public void Dispose()
         {
-            bool defaultTextureWasDisposed = false;
-            foreach (Texture texture in textures.Values)
+            canceller.Cancel();
+
+            foreach (Item item in textures.Values)
             {
-                if (texture != null)
-                {
-                    if (texture == defaultTexture) defaultTextureWasDisposed = true;
-                    texture.Dispose();
-                }
+                if (item != null) item.Dispose();
             }
             textures.Clear();
 
-            if (!defaultTextureWasDisposed && defaultTexture != null)
+            if (defaultTexture != null)
                 defaultTexture.Dispose();
         }
 

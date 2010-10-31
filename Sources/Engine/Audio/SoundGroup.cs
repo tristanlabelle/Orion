@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using IrrKlang;
 
 namespace Orion.Engine.Audio
@@ -13,11 +14,11 @@ namespace Orion.Engine.Audio
     {
         #region Fields
         private readonly string name;
-        private readonly ReadOnlyCollection<ISound> sounds;
+        private readonly ReadOnlyCollection<Task<ISound>> sounds;
         #endregion
 
         #region Constructors
-        internal SoundGroup(string name, IEnumerable<ISound> sounds)
+        internal SoundGroup(string name, IEnumerable<Task<ISound>> sounds)
         {
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(sounds, "sounds");
@@ -32,43 +33,45 @@ namespace Orion.Engine.Audio
         {
             get { return name; }
         }
-
-        public ReadOnlyCollection<ISound> Sounds
-        {
-            get { return sounds; }
-        }
-
-        public int SoundCount
-        {
-            get { return sounds.Count; }
-        }
-
-        public bool IsEmpty
-        {
-            get { return sounds.Count == 0; }
-        }
         #endregion
 
         #region Methods
+        public void Preload()
+        {
+            foreach (Task<ISound> soundTask in sounds)
+                soundTask.Start();
+        }
+
+        public void Load()
+        {
+            foreach (Task<ISound> soundTask in sounds)
+                if (soundTask.Status == TaskStatus.Created)
+                    soundTask.RunSynchronously();
+        }
+
         public ISound GetRandomSoundOrNull(Random random)
         {
             Argument.EnsureNotNull(random, "random");
 
             if (sounds.Count == 0) return null;
 
-            int index = random.Next(sounds.Count);
-            return sounds[index];
+            int completedCount = sounds.Count(sound => sound.Status == TaskStatus.RanToCompletion);
+            if (completedCount == 0) return null;
+
+            int completedIndex = random.Next(completedCount);
+            return sounds.Where(sound => sound.Status == TaskStatus.RanToCompletion)
+                .ElementAt(completedIndex)
+                .Result;
         }
 
         public void Dispose()
         {
-            foreach (ISound sound in sounds)
-                sound.Dispose();
-        }
-
-        public override string ToString()
-        {
-            return "{0} ({1} sounds(s))".FormatInvariant(name, SoundCount);
+            foreach (Task<ISound> soundTask in sounds)
+            {
+                soundTask.Wait();
+                if (soundTask.Status == TaskStatus.RanToCompletion)
+                    soundTask.Result.Dispose();
+            }
         }
         #endregion
     }

@@ -75,15 +75,15 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Threading, Version=1.0.2787.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\References\System.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
-    <Compile Include="Audio\IrrKlang\Sound.cs" />
-    <Compile Include="Audio\IrrKlang\SoundChannel.cs" />
-    <Compile Include="Audio\IrrKlang\SoundContext.cs" />
     <Compile Include="Audio\ISound.cs" />
     <Compile Include="Audio\ISoundChannel.cs" />
     <Compile Include="Audio\ISoundContext.cs" />

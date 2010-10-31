@@ -22,6 +22,11 @@ namespace Orion.Engine.Audio
         /// Accesses the listener's spatial matrix.
         /// </summary>
         Matrix4 ListenerMatrix { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating if loading sounds can be done on multiple threads simultaneously.
+        /// </summary>
+        bool IsSoundLoadingThreadSafe { get; }
         #endregion
 
         #region Methods

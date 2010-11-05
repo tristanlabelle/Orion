@@ -69,11 +69,10 @@ namespace Orion.Game.Main
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            using (GameGraphics gameGraphics = new GameGraphics())
-            using (GameStateManager gameStateManager = new GameStateManager())
+            
+            using (GameStateManager gameStateManager = new GameStateManager(GetAssetsPath()))
             {
-                gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
+                gameStateManager.Push(new MainMenuGameState(gameStateManager));
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 FrameRateCounter updateRateCounter = new FrameRateCounter();
@@ -87,7 +86,7 @@ namespace Orion.Game.Main
                 float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
                 float timeAccumulator = 0.0f;
 
-                while (!gameGraphics.Window.WasClosed && !gameStateManager.IsEmpty)
+                while (!gameStateManager.Graphics.Window.WasClosed && !gameStateManager.IsEmpty)
                 {
                     float newTime = (float)stopwatch.Elapsed.TotalSeconds;
                     float actualTimeDelta = newTime - oldTime;
@@ -104,13 +103,13 @@ namespace Orion.Game.Main
                         timeAccumulator -= TargetSecondsPerFrame;
                     }
 
-                    gameGraphics.Window.Update();
+                    gameStateManager.Graphics.Window.Update();
                     if (gameStateManager.ActiveState == null) continue;
 
-                    gameGraphics.Context.Clear(Colors.Black);
+                    gameStateManager.Graphics.Context.Clear(Colors.Black);
 
-                    gameStateManager.Draw(gameGraphics);
-                    gameGraphics.Context.Present();
+                    gameStateManager.Draw(gameStateManager.Graphics);
+                    gameStateManager.Graphics.Context.Present();
                     
                     drawRateCounter.Update();
                 }
@@ -119,6 +118,23 @@ namespace Orion.Game.Main
             Debug.Assert(Texture.AliveCount == 0,
                 "Congratulations! You've leaked {0} textures!"
                 .FormatInvariant(Texture.AliveCount));
+        }
+        
+        private static string GetAssetsPath()
+        {
+            string lastAbsolutePath = null;
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string assetsPath = "Assets";
+            string absolutePath = Path.GetFullPath(Path.Combine(currentDirectory, assetsPath));
+            while (!Directory.Exists(assetsPath))
+            {
+            	assetsPath = "../" + assetsPath;
+            	lastAbsolutePath = absolutePath;
+            	absolutePath = Path.GetFullPath(Path.Combine(currentDirectory, assetsPath));
+            	if (absolutePath == lastAbsolutePath)
+            		throw new FileNotFoundException("Could not find the assets folder!");
+            }
+            return assetsPath;
         }
         #endregion
         #endregion

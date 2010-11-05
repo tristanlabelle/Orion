@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Audio;
 
 namespace Orion.Game.Main
 {
@@ -16,16 +17,34 @@ namespace Orion.Game.Main
     public sealed class GameStateManager : IDisposable
     {
         #region Fields
+        private readonly GameAudio audio;
+        private readonly GameGraphics graphics;
         private readonly Stack<GameState> states = new Stack<GameState>();
         private bool deferActions;
         private Action deferredAction;
         #endregion
 
         #region Constructors
-        public GameStateManager() { }
+        public GameStateManager(string assetsPath)
+        {
+        	Argument.EnsureNotNull(assetsPath, "assetsPath");
+        	
+        	this.audio = new GameAudio(assetsPath + "/Sounds");
+        	this.graphics = new GameGraphics(assetsPath + "/Textures");
+        }
         #endregion
 
         #region Properties
+        public GameAudio Audio
+        {
+        	get { return audio; }
+        }
+        
+        public GameGraphics Graphics
+        {
+        	get { return graphics; }
+        }
+        
         public GameState ActiveState
         {
             get { return states.Count == 0 ? null : states.Peek(); }
@@ -190,6 +209,8 @@ namespace Orion.Game.Main
                 GameState gameState = states.Pop();
                 gameState.Dispose();
             }
+            audio.Dispose();
+            graphics.Dispose();
         }
         #endregion
     }

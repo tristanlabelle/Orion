@@ -27,16 +27,17 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public GameGraphics()
+        public GameGraphics(string assetsPath)
         {
+        	Argument.EnsureNotNull(assetsPath, "assetsPath");
             this.window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
 
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
-
-            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
+            
+            this.textureManager = new TextureManager(window.GraphicsContext, assetsPath);
             this.textureManager.PreloadByExtension("png");
         }
         #endregion

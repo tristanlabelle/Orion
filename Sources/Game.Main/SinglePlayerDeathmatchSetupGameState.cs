@@ -28,12 +28,10 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public SinglePlayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics)
+        public SinglePlayerDeathmatchSetupGameState(GameStateManager manager)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.matchSettings = new MatchSettings();
             this.matchSettings.AreCheatsEnabled = true;
 

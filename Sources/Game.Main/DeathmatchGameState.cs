@@ -43,7 +43,7 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(localCommander, "localCommander");
 
             this.graphics = graphics;
-            this.audio = new GameAudio();
+            this.audio = manager.Audio;
             this.match = match;
             this.commandPipeline = commandPipeline;
             this.localCommander = localCommander;
@@ -113,7 +113,6 @@ namespace Orion.Game.Main
             audioPresenter.Dispose();
             ui.Dispose();
             commandPipeline.Dispose();
-            audio.Dispose();
         }
 
         private void OnQuitPressed(MatchUI sender)

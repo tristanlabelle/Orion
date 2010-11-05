@@ -35,13 +35,11 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public TypingDefenseGameState(GameStateManager manager, GameGraphics graphics)
+        public TypingDefenseGameState(GameStateManager manager)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            this.graphics = graphics;
-            this.audio = new GameAudio();
+            this.graphics = manager.Graphics;
+            this.audio = manager.Audio;
 
             Random random = new MersenneTwister(Environment.TickCount);
             Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
@@ -134,7 +132,6 @@ namespace Orion.Game.Main
         {
             audioPresenter.Dispose();
             ui.Dispose();
-            audio.Dispose();
             commandPipeline.Dispose();
         }
 

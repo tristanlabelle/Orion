@@ -27,12 +27,10 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyGameState(GameStateManager manager, GameGraphics graphics)
+        public MultiplayerLobbyGameState(GameStateManager manager)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.networking = new GameNetworking();
             this.lobby = new MultiplayerLobby(this.networking);
             this.ui = new MultiplayerLobbyUI(Dns.GetHostName());

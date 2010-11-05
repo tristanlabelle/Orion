@@ -24,12 +24,10 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public ReplayBrowserGameState(GameStateManager manager, GameGraphics graphics)
+        public ReplayBrowserGameState(GameStateManager manager)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.ui = new ReplayBrowserUI();
 
             this.ui.ExitPressed += OnExitPressed;

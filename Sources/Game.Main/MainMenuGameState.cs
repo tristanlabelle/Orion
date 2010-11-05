@@ -20,12 +20,10 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public MainMenuGameState(GameStateManager manager, GameGraphics graphics)
+        public MainMenuGameState(GameStateManager manager)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
-
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.ui = new MainMenuUI(graphics);
             this.ui.SinglePlayerSelected += OnSinglePlayerSelected;
             this.ui.MultiplayerSelected += OnMultiplayerSelected;
@@ -76,27 +74,27 @@ namespace Orion.Game.Main
 
         private void OnSinglePlayerSelected(MainMenuUI sender)
         {
-            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
+            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager));
         }
 
         private void OnMultiplayerSelected(MainMenuUI sender)
         {
-            Manager.Push(new MultiplayerLobbyGameState(Manager, graphics));
+            Manager.Push(new MultiplayerLobbyGameState(Manager));
         }
 
         private void OnTowerDefenseSelected(MainMenuUI sender)
         {
-            Manager.Push(new TowerDefenseGameState(Manager, graphics));
+            Manager.Push(new TowerDefenseGameState(Manager));
         }
 
         private void OnTypingDefenseSelected(MainMenuUI sender)
         {
-            Manager.Push(new TypingDefenseGameState(Manager, graphics));
+            Manager.Push(new TypingDefenseGameState(Manager));
         }
 
         private void OnViewReplaySelected(MainMenuUI sender)
         {
-            Manager.Push(new ReplayBrowserGameState(Manager, graphics));
+            Manager.Push(new ReplayBrowserGameState(Manager));
         }
 
         private void OnQuitGameSelected(MainMenuUI sender)

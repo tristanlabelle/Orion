@@ -37,17 +37,16 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        private MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics,
-            GameNetworking networking, IMatchAdvertizer advertizer, string matchName, IPv4EndPoint? hostEndPoint)
+        private MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameNetworking networking,
+            IMatchAdvertizer advertizer, string matchName, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
             Argument.EnsureNotNull(manager, "manager");
-            Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(networking, "networking");
             Argument.EnsureNotNull(advertizer, "advertizer");
 
             this.networking = networking;
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.advertizer = advertizer;
             this.matchSettings = new MatchSettings();
             this.hostEndPoint = hostEndPoint;
@@ -463,16 +462,14 @@ namespace Orion.Game.Main
             catch
             { /* too bad */ }
             Argument.EnsureNotNull(matchName, "matchName");
-            return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, advertizer, matchName, null);
+            return new MultiplayerDeathmatchSetupGameState(manager, networking, advertizer, matchName, null);
         }
 
         public static MultiplayerDeathmatchSetupGameState CreateAsClient(
             GameStateManager manager, GameGraphics graphics,
             GameNetworking networking, IPv4EndPoint hostEndPoint)
         {
-            return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, new NullMatchAdvertizer(), null, hostEndPoint);
+            return new MultiplayerDeathmatchSetupGameState(manager, networking, new NullMatchAdvertizer(), null, hostEndPoint);
         }
         #endregion
         #endregion

@@ -83,13 +83,12 @@ namespace Orion.Game.Main
         #endregion
 
         #region Constructors
-        public DeathmatchStatsGameState(GameStateManager manager, GameGraphics graphics, WorldFoodSampler sampler)
+        public DeathmatchStatsGameState(GameStateManager manager, WorldFoodSampler sampler)
             : base(manager)
         {
-            Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(sampler, "sampler");
 
-            this.graphics = graphics;
+            this.graphics = manager.Graphics;
             this.chartModel = new FactionFoodChartModel(sampler);
             this.renderer = new NormalizedZoneChartRenderer(this.chartModel, 50);
         }

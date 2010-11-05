@@ -6,7 +6,6 @@ using System.IO;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using IrrKlang;
 
 namespace Orion.Engine.Audio
 {

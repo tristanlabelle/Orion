@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Networking;
@@ -17,6 +16,8 @@ using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Engine.Gui2;
+using Application = System.Windows.Forms.Application;
 
 namespace Orion.Game.Main
 {
@@ -71,48 +72,63 @@ namespace Orion.Game.Main
             Application.SetCompatibleTextRenderingDefault(false);
 
             using (GameGraphics gameGraphics = new GameGraphics())
-            using (GameStateManager gameStateManager = new GameStateManager())
             {
-                gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
+                UIManager uiManager = new UIManager(gameGraphics.Context);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                FrameRateCounter updateRateCounter = new FrameRateCounter();
-                FrameRateCounter drawRateCounter = new FrameRateCounter();
+                StackPanel stackPanel = new StackPanel();
+                stackPanel.Children.Add(new Label() { Text = "Foo" });
+                stackPanel.Children.Add(new Label() { Text = "Bar" });
+                uiManager.Children.Add(stackPanel);
 
-                // This run loop uses a fixed time step for the updates and manages
-                // situations where either the rendering or the updating is slow.
-                // Source: http://gafferongames.com/game-physics/fix-your-timestep/
-                float gameTime = 0.0f;
-
-                float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
-                float timeAccumulator = 0.0f;
-
-                while (!gameGraphics.Window.WasClosed && !gameStateManager.IsEmpty)
+                while (true)
                 {
-                    float newTime = (float)stopwatch.Elapsed.TotalSeconds;
-                    float actualTimeDelta = newTime - oldTime;
-                    if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
-                    timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
-                    oldTime = newTime;
-
-                    while (timeAccumulator >= TargetSecondsPerFrame)
-                    {
-                        gameStateManager.Update(TargetSecondsPerFrame);
-                        updateRateCounter.Update();
-
-                        gameTime += TargetSecondsPerFrame;
-                        timeAccumulator -= TargetSecondsPerFrame;
-                    }
-
                     gameGraphics.Window.Update();
-                    if (gameStateManager.ActiveState == null) continue;
+                    uiManager.Draw();
+                }
 
-                    gameGraphics.Context.Clear(Colors.Black);
+                using (GameStateManager gameStateManager = new GameStateManager())
+                {
+                    gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
 
-                    gameStateManager.Draw(gameGraphics);
-                    gameGraphics.Context.Present();
-                    
-                    drawRateCounter.Update();
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    FrameRateCounter updateRateCounter = new FrameRateCounter();
+                    FrameRateCounter drawRateCounter = new FrameRateCounter();
+
+                    // This run loop uses a fixed time step for the updates and manages
+                    // situations where either the rendering or the updating is slow.
+                    // Source: http://gafferongames.com/game-physics/fix-your-timestep/
+                    float gameTime = 0.0f;
+
+                    float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
+                    float timeAccumulator = 0.0f;
+
+                    while (!gameGraphics.Window.WasClosed && !gameStateManager.IsEmpty)
+                    {
+                        float newTime = (float)stopwatch.Elapsed.TotalSeconds;
+                        float actualTimeDelta = newTime - oldTime;
+                        if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
+                        timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
+                        oldTime = newTime;
+
+                        while (timeAccumulator >= TargetSecondsPerFrame)
+                        {
+                            gameStateManager.Update(TargetSecondsPerFrame);
+                            updateRateCounter.Update();
+
+                            gameTime += TargetSecondsPerFrame;
+                            timeAccumulator -= TargetSecondsPerFrame;
+                        }
+
+                        gameGraphics.Window.Update();
+                        if (gameStateManager.ActiveState == null) continue;
+
+                        gameGraphics.Context.Clear(Colors.Black);
+
+                        gameStateManager.Draw(gameGraphics);
+                        gameGraphics.Context.Present();
+
+                        drawRateCounter.Update();
+                    }
                 }
             }
 

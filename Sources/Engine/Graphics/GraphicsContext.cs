@@ -22,6 +22,7 @@ namespace Orion.Engine.Graphics
         #region Instance
         #region Fields
         private static readonly Font defaultFont = new Font("Trebuchet MS", 14);
+        private static readonly Font textRendererFont = new Font("Trebuchet MS", 18, System.Drawing.GraphicsUnit.Pixel);
 
         private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
@@ -36,7 +37,7 @@ namespace Orion.Engine.Graphics
             Argument.EnsureNotNull(backbufferSwapper, "backbufferSwapper");
 
             this.backbufferSwapper = backbufferSwapper;
-            this.textRenderer = new TextRenderer(this, new Font("Trebuchet MS", 24, System.Drawing.GraphicsUnit.Pixel));
+            this.textRenderer = new TextRenderer(this);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
@@ -575,7 +576,14 @@ namespace Orion.Engine.Graphics
         /// <param name="color">The color with which to draw the text.</param>
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            textRenderer.Draw(text.Value, text.Font.GetHeight(), origin, color, float.PositiveInfinity);
+            var options = new TextRenderingOptions
+            {
+                Font = textRendererFont,
+                Origin = (Point)origin,
+                Color = color
+            };
+
+            textRenderer.Draw(text.Value, ref options);
         }
         #endregion
 

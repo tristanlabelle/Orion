@@ -123,7 +123,11 @@
     </Compile>
     <Compile Include="Graphics\NormalizedZoneChartRenderer.cs" />
     <Compile Include="Graphics\OpenTKGameWindow.cs" />
+    <Compile Include="Graphics\TextOverflowPolicy.cs" />
     <Compile Include="Graphics\TextRenderer.cs" />
+    <Compile Include="Graphics\TextRenderer.Glyph.cs" />
+    <Compile Include="Graphics\TextRenderer.RenderedFont.cs" />
+    <Compile Include="Graphics\TextRenderingOptions.cs" />
     <Compile Include="Graphics\WindowsFormsGameWindow.cs">
     </Compile>
     <Compile Include="Graphics\WindowMode.cs" />
@@ -141,6 +145,7 @@
     <Compile Include="Gui2\Panel.cs" />
     <Compile Include="Gui2\Borders.cs" />
     <Compile Include="Gui2\Orientation.cs" />
+    <Compile Include="Gui2\StackPanel.ChildCollection.cs" />
     <Compile Include="Gui2\StackPanel.cs" />
     <Compile Include="Gui2\UIElement.cs" />
     <Compile Include="Gui2\UIElementVisibility.cs" />

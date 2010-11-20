@@ -8,6 +8,9 @@ using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// A UIElement which displays text.
+    /// </summary>
     public sealed class Label : UIElement
     {
         #region Fields
@@ -38,41 +41,40 @@ namespace Orion.Engine.Gui2
         
         public ColorRgba Color
         {
-        	get
-        	{
-        		if (customColor.HasValue) return customColor.Value;
-        		return Manager == null ? Colors.Black : Manager.DefaultTextColor;
-        	}
+            get
+            {
+                if (customColor.HasValue) return customColor.Value;
+                return Manager == null ? Colors.Black : Manager.DefaultTextColor;
+            }
         }
         
         public Font CustomFont
         {
-        	get { return customFont; }
-        	set { customFont = value; }
+            get { return customFont; }
+            set { customFont = value; }
         }
         
         public Font Font
         {
-        	get
-        	{
-        		if (customFont != null) return customFont;
-        		return Manager == null ? null : Manager.DefaultFont;
-        	}
+            get
+            {
+                if (customFont != null) return customFont;
+                return Manager == null ? null : Manager.DefaultFont;
+            }
         }
         #endregion
 
         #region Methods
-        protected override Size MeasurePreferredSizeWithoutMargin()
+        protected override Size MeasureWithoutMargin()
         {
-        	return Manager.MeasureString(text);
+            return Manager.MeasureString(text);
         }
-        
-		protected override void DoDraw(GraphicsContext graphicsContext)
-		{
-			Region region = GetRegion();
-			
-			graphicsContext.Draw(text, (Vector2)region.Min, Color);
-		}
+
+        protected override void DoDraw(GraphicsContext graphicsContext)
+        {
+            Region rectangle = GetActualRectangle();
+            graphicsContext.Draw(text, (Vector2)rectangle.Min, Color);
+        }
         #endregion
     }
 }

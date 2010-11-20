@@ -4,24 +4,24 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
+using System.Diagnostics;
 
 namespace Orion.Engine.Gui2
 {
-	/// <summary>
-	/// Base class of the UI hierarchy.
-	/// </summary>
+    /// <summary>
+    /// Base class of the UI hierarchy.
+    /// </summary>
     public abstract class UIElement
     {
         #region Fields
+        private static readonly UIElement[] emptyArray = new UIElement[0];
+
         private UIManager manager;
         private UIElement parent;
         private Borders margin;
         private UIElementVisibility visibility;
-        private Region? cachedRegion;
-        private Size? cachedPreferredSize;
-        #endregion
-
-        #region Constructors
+        private Size? cachedDesiredSize;
+        private Region? cachedActualRectangle;
         #endregion
 
         #region Properties
@@ -41,26 +41,35 @@ namespace Orion.Engine.Gui2
             get { return parent; }
         }
 
+        /// <summary>
+        /// Accesses the margins around this <see cref="UIElement"/>.
+        /// </summary>
         public virtual Borders Margin
         {
             get { return margin; }
             set
             {
                 this.margin = value;
-                SetPreferredSizeDirty();
+                InvalidateMeasure();
             }
         }
 
+        /// <summary>
+        /// Accesses the current visibility of this <see cref="UIElement"/>.
+        /// </summary>
         public UIElementVisibility Visibility
         {
             get { return visibility; }
             set
             {
                 visibility = value;
-                SetPreferredSizeDirty();
+                InvalidateMeasure();
             }
         }
 
+        /// <summary>
+        /// Gets the collection of children of this <see cref="UIElement"/>.
+        /// </summary>
         public ICollection<UIElement> Children
         {
             get { return GetChildren(); }
@@ -74,9 +83,9 @@ namespace Orion.Engine.Gui2
         /// <returns>The children collection of this <see cref="UIElement"/>.</returns>
         protected virtual ICollection<UIElement> GetChildren()
         {
-        	return EmptyArray<UIElement>.Rank1;
+            return emptyArray;
         }
-        
+
         /// <summary>
         /// Finds a direct child of this <see cref="UIElement"/> from a point.
         /// </summary>
@@ -84,7 +93,8 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual UIElement GetChildAt(Point point)
         {
-        	return Children.FirstOrDefault(child => child.GetRegion().Contains(point));
+            if (!GetActualRectangle().Contains(point)) return null;
+            return Children.FirstOrDefault(child => child.GetActualRectangle().Contains(point));
         }
 
         /// <summary>
@@ -93,101 +103,120 @@ namespace Orion.Engine.Gui2
         /// <param name="parent">The new parent of this <see cref="UIElement"/>.</param>
         protected virtual void SetParent(UIElement parent)
         {
-        	if (this is UIManager) throw new InvalidOperationException("The UI manager cannot be a child.");
-        	
+            if (this is UIManager) throw new InvalidOperationException("The UI manager cannot be a child.");
+            
             this.parent = parent;
             if (parent == null)
             {
-            	manager = null;
-            	cachedRegion = null;
-            	cachedPreferredSize = null;
+                manager = null;
+                cachedActualRectangle = null;
+                cachedDesiredSize = null;
             }
         }
 
-        /// <summary>
-        /// Measures the preferred size of this <see cref="UIElement"/>, excluding its margin.
-        /// </summary>
-        /// <returns>The preferred size of this <see cref="UIElement"/>.</returns>
-        protected virtual Size MeasurePreferredSizeWithoutMargin()
+        protected void AdoptChild(UIElement child)
         {
-        	throw new NotImplementedException();
+            child.SetParent(this);
         }
+
+        protected void AbandonChild(UIElement child)
+        {
+            Debug.Assert(child.Parent == this);
+            child.SetParent(null);
+        }
+
+        /// <summary>
+        /// Measures the desired size of this <see cref="UIElement"/>, excluding its margin.
+        /// </summary>
+        /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
+        protected abstract Size MeasureWithoutMargin();
         
         /// <summary>
-        /// Measures the preferred size of this <see cref="UIElement"/>.
+        /// Measures the desired size of this <see cref="UIElement"/>.
         /// </summary>
-        /// <returns>The preferred size of this <see cref="UIElement"/>.</returns>
-        protected virtual Size MeasurePreferredSize()
+        /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
+        public Size Measure()
         {
-            Size sizeWithoutMargin = MeasurePreferredSizeWithoutMargin();
+            if (!cachedDesiredSize.HasValue) cachedDesiredSize = Measure();
+
+            Size sizeWithoutMargin = MeasureWithoutMargin();
             return new Size(
                 sizeWithoutMargin.Width + Margin.MinX + margin.MaxX,
                 sizeWithoutMargin.Height + Margin.MinY + margin.MaxY);
         }
 
-        /// <summary>
-        /// Obtains the preferred size of this <see cref="UIElement"/>,
-        /// measuring it if needed.
-        /// This method should only be called once a <see cref="UIManager"/> is set.
-        /// </summary>
-        /// <returns>The preferred size of the <see cref="UIElement"/>.</returns>
-        protected Size GetPreferredSize()
+        public Region GetActualRectangle()
         {
-        	AssertUIManagerForMeasurement();
-        	if (!cachedPreferredSize.HasValue) cachedPreferredSize = MeasurePreferredSize();
-        	return cachedPreferredSize.Value;
-        }
-        
-        protected Region GetRegion()
-        {
-        	AssertUIManagerForMeasurement();
-        	if (!cachedRegion.HasValue)
-        	{
-        		if (parent == null)
-        			cachedRegion = new Region(GetPreferredSize());
-        		else
-        			cachedRegion = parent.MeasureChildRegion(this);
-        	}
-        	
-        	return cachedRegion.Value;
+            if (!cachedActualRectangle.HasValue)
+            {
+                if (parent == null)
+                    cachedActualRectangle = new Region(Measure());
+                else
+                    parent.ArrangeChild(this);
+            }
+
+            return cachedActualRectangle.Value;
         }
 
         /// <summary>
-        /// Sets the preferred size of this <see cref="UIElement"/> as dirty.
+        /// Marks the desired size of this <see cref="UIElement"/> as dirty.
         /// </summary>
-        protected void SetPreferredSizeDirty()
+        protected void InvalidateMeasure()
         {
-        	cachedPreferredSize = null;
-        	if (parent != null) parent.OnChildPreferredSizeSetDirty(this);
+            cachedDesiredSize = null;
+            if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
-        
-        protected virtual void OnChildPreferredSizeSetDirty(UIElement child) { }
-        
-        protected virtual Region MeasureChildRegion(UIElement child)
+
+        protected virtual void OnChildMeasureInvalidated(UIElement child) { }
+
+        protected virtual void ArrangeChildren()
         {
-        	throw new NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        protected virtual void ArrangeChild(UIElement child)
+        {
+            ArrangeChildren();
+        }
+
+        protected void SetChildRectangle(UIElement child, Region rectangle)
+        {
+            Debug.Assert(child != null);
+            Debug.Assert(child.Parent == this);
+
+            child.cachedActualRectangle = rectangle;
         }
 
         protected void Draw(GraphicsContext graphicsContext)
         {
-        	if (visibility != UIElementVisibility.Visible || GetRegion().Area == 0) return;
-        	DoDraw(graphicsContext);
+            if (visibility != UIElementVisibility.Visible || GetActualRectangle().Area == 0) return;
+
+            DoDraw(graphicsContext);
         }
-        
+
         protected virtual void DoDraw(GraphicsContext graphicsContext)
         {
-        	DrawChildren(graphicsContext);
-        }
-        
-        protected void DrawChildren(GraphicsContext graphicsContext)
-        {
-        	foreach (UIElement child in Children)
-        		child.Draw(graphicsContext);
+            Region rectangle = GetActualRectangle();
+
+            DisposableHandle? scissorBoxHandle = null;
+            foreach (UIElement child in Children)
+            {
+                if (!scissorBoxHandle.HasValue)
+                {
+                    Region childRectangle = child.GetActualRectangle();
+                    if (!rectangle.Contains(childRectangle))
+                        scissorBoxHandle = graphicsContext.PushScissorRegion(rectangle);
+                }
+
+                child.Draw(graphicsContext);
+            }
+
+            if (scissorBoxHandle.HasValue) scissorBoxHandle.Value.Dispose();
         }
         
         private void AssertUIManagerForMeasurement()
         {
-        	if (manager == null) throw new InvalidOperationException("Cannot get the measure a UI element without a UI manager.");
+            if (manager == null) throw new InvalidOperationException("Cannot get the measure a UI element without a UI manager.");
         }
         #endregion
     }

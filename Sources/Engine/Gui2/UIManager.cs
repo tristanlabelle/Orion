@@ -7,6 +7,9 @@ using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// Root of the UI element hierarchy.
+    /// </summary>
     public sealed class UIManager : UIElement
     {
         #region Fields
@@ -19,10 +22,10 @@ namespace Orion.Engine.Gui2
         #region Constructors
         public UIManager(GraphicsContext graphicsContext)
         {
-        	Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-        	
-        	this.graphicsContext = graphicsContext;
-        	this.size = graphicsContext.ViewportSize;
+            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            
+            this.graphicsContext = graphicsContext;
+            this.size = graphicsContext.ViewportSize;
         }
         #endregion
 
@@ -32,36 +35,36 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Size Size
         {
-        	get { return size; }
-        	set
-        	{
-        		size = value;
-        		SetPreferredSizeDirty();
-        	}
+            get { return size; }
+            set
+            {
+                size = value;
+                InvalidateMeasure();
+            }
         }
         
         public Font DefaultFont
         {
-        	get { return defaultFont; }
-        	set
-        	{
-        		Argument.EnsureNotNull(value, "DefaultFont");
-        		defaultFont = value;
-        	}
+            get { return defaultFont; }
+            set
+            {
+                Argument.EnsureNotNull(value, "DefaultFont");
+                defaultFont = value;
+            }
         }
         
         public ColorRgba DefaultTextColor
         {
-        	get { return defaultTextColor; }
-        	set { defaultTextColor = value; }
+            get { return defaultTextColor; }
+            set { defaultTextColor = value; }
         }
         #endregion
 
         #region Methods
         public Size MeasureString(IEnumerable<char> text)
         {
-        	Argument.EnsureNotNull(text, "text");
-        	throw new NotImplementedException();
+            Argument.EnsureNotNull(text, "text");
+            throw new NotImplementedException();
         }
         
         /// <summary>
@@ -69,13 +72,13 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public void Draw()
         {
-        	Draw(graphicsContext);
+            Draw(graphicsContext);
         }
         
-		protected override Size MeasurePreferredSize()
-		{
-			return size;
-		}
+        protected override Size MeasureWithoutMargin()
+        {
+            return size;
+        }
         #endregion
     }
 }

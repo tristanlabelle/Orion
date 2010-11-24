@@ -67,7 +67,14 @@ namespace Orion.Engine.Audio
         {
             foreach (Task<ISound> soundTask in sounds)
             {
-                soundTask.Wait();
+                if (soundTask.IsCanceled || soundTask.IsFaulted) continue;
+
+                try { soundTask.Wait(); }
+                catch (AggregateException)
+                {
+                    // The sound failed to load. So what? We're being destroyed anyways.
+                }
+
                 if (soundTask.Status == TaskStatus.RanToCompletion)
                     soundTask.Result.Dispose();
             }

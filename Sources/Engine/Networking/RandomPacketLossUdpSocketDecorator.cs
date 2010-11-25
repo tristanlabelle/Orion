@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Sockets;
 using Orion.Engine.Collections;
 
 namespace Orion.Engine.Networking
@@ -12,7 +13,7 @@ namespace Orion.Engine.Networking
     public sealed class RandomPacketLossUdpSocketDecorator : UdpSocket
     {
         #region Fields
-        private static readonly byte[] dummyBuffer = new byte[0];
+        private static readonly byte[] dummyBuffer = new byte[1024];
 
         private readonly UdpSocket socket;
         private readonly Random random;
@@ -68,7 +69,13 @@ namespace Orion.Engine.Networking
 
                         // Drop packet
                         IPv4EndPoint dummyEndPoint;
-                        socket.Receive(dummyBuffer, out dummyEndPoint);
+                        try { socket.Receive(dummyBuffer, out dummyEndPoint); }
+                        catch (SocketException exception)
+                        {
+                        	// Ignore when the reception buffer is too small for the packet.
+                        	// We are dropping it anyways.
+                        	if (exception.SocketErrorCode != (SocketError)10040) throw;
+                        }
                     }
 
                     return dataLength;

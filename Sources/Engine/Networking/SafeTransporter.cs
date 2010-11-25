@@ -24,8 +24,9 @@ namespace Orion.Engine.Networking
         #region Fields
         #region Constants
         private static readonly TimeSpan SafePacketTimeout = TimeSpan.FromSeconds(10);
-        private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(100);
+        private static readonly TimeSpan DefaultPacketResendDelay = TimeSpan.FromMilliseconds(50);
         private static readonly TimeSpan MinimumPacketResendDelay = TimeSpan.FromMilliseconds(1);
+        private static readonly TimeSpan MaximumPacketResendDelay = TimeSpan.FromMilliseconds(200);
 
         /// <summary>
         /// The amount of time to block in Socket.ReceiveFrom calls.
@@ -79,7 +80,7 @@ namespace Orion.Engine.Networking
         {
             this.socket = new UdpSocketAdaptor((ushort)port);
             if (packetLossProbability > 0)
-                socket = new RandomPacketLossUdpSocketDecorator(socket, new Random(), packetLossProbability);
+                socket = new RandomPacketLossUdpSocketDecorator(socket, new Random(), packetLossProbability, 0);
 
             // Attempt to find the addresses of this computer to detect
             // broadcasts which come back to this computer and ignore them.
@@ -334,8 +335,12 @@ namespace Orion.Engine.Networking
         private TimeSpan GetResendDelay(PeerLink peer)
         {
             if (!peer.HasPingData) return DefaultPacketResendDelay;
+            
             TimeSpan resendDelay = peer.AveragePing + peer.AveragePingDeviation;
-            return resendDelay < MinimumPacketResendDelay ? MinimumPacketResendDelay : resendDelay;
+            
+            if (resendDelay < MinimumPacketResendDelay) return MinimumPacketResendDelay;
+            if (resendDelay > MaximumPacketResendDelay) return MaximumPacketResendDelay;
+            return resendDelay;
         }
         #endregion
 

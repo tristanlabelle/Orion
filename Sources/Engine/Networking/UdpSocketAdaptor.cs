@@ -83,9 +83,8 @@ namespace Orion.Engine.Networking
         {
             if (data.Count == 0) return;
 
-            SocketFlags flags = endPoint.Address == IPv4Address.Broadcast ? SocketFlags.Broadcast : SocketFlags.None;
             IPEndPoint ipEndPoint = GetIPEndPoint(endPoint);
-            int sentDataLength = socket.SendTo(data.Array, data.Offset, data.Count, flags, ipEndPoint);
+            int sentDataLength = socket.SendTo(data.Array, data.Offset, data.Count, SocketFlags.None, ipEndPoint);
 
             Debug.Assert(sentDataLength == data.Count, "Socket.SendTo sent a different amount of data than it was supposed to.");
         }

@@ -190,6 +190,7 @@
     <Compile Include="Networking\Http\HttpResponseHeader.cs" />
     <Compile Include="Networking\IPv4Address.cs" />
     <Compile Include="Networking\IPv4EndPoint.cs" />
+    <Compile Include="Networking\UdpSocket.cs" />
     <Compile Include="Networking\NetworkEventArgs.cs" />
     <Compile Include="Networking\NetworkTimeoutEventArgs.cs" />
     <Compile Include="Networking\PacketType.cs" />
@@ -198,6 +199,8 @@
     <Compile Include="Networking\Protocol.cs" />
     <Compile Include="Networking\SafePacket.cs" />
     <Compile Include="Networking\SafeTransporter.cs" />
+    <Compile Include="Networking\UdpSocketAdaptor.cs" />
+    <Compile Include="Networking\RandomPacketLossUdpSocketDecorator.cs" />
     <Compile Include="NumericExtensions.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Point16.cs" />

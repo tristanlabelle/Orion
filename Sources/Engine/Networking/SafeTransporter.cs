@@ -31,20 +31,17 @@ namespace Orion.Engine.Networking
         /// The amount of time to block in Socket.ReceiveFrom calls.
         /// </summary>
         private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(2);
+
+        private static readonly float packetLossProbability = 0;
         #endregion
 
         private readonly List<PeerLink> peers = new List<PeerLink>();
         private readonly HashSet<IPv4EndPoint> timedOutPeerEndPoints = new HashSet<IPv4EndPoint>();
 
         /// <summary>
-        /// The underlying socket. Accessed by both threads, synchronized by locking this object.
+        /// The underlying UDP socket. Accessed by both threads but disposed by the main thread.
         /// </summary>
-        private readonly Socket socket;
-
-        /// <summary>
-        /// The port on which the underlying socket is bound.
-        /// </summary>
-        private readonly ushort port;
+        private readonly UdpSocket socket;
 
         /// <summary>
         /// A collection of addresses assigned to this computer.
@@ -63,10 +60,6 @@ namespace Orion.Engine.Networking
         /// Accessed only from the worker thread.
         /// </remarks>
         private readonly byte[] receptionBuffer = new byte[2048];
-        /// <remarks>
-        /// Accessed only from the worker thread.
-        /// </remarks>
-        private EndPoint senderEndPoint = new IPEndPoint(0, 0);
 
         /// <remarks>
         /// Read and written by the main thread, only read by the worker thread.
@@ -84,15 +77,9 @@ namespace Orion.Engine.Networking
         /// </param>
         public SafeTransporter(int port)
         {
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            this.socket.Bind(new IPEndPoint(IPAddress.Any, port));
-            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-            this.socket.SetSocketOption(SocketOptionLevel.Socket,
-                SocketOptionName.ReceiveTimeout, (int)ReceiveTimeout.TotalMilliseconds);
-            this.socket.MulticastLoopback = false;
-
-            this.port = (ushort)((IPEndPoint)socket.LocalEndPoint).Port;
+            this.socket = new UdpSocketAdaptor((ushort)port);
+            if (packetLossProbability > 0)
+                socket = new RandomPacketLossUdpSocketDecorator(socket, new Random(), packetLossProbability);
 
             // Attempt to find the addresses of this computer to detect
             // broadcasts which come back to this computer and ignore them.
@@ -155,7 +142,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public ushort Port
         {
-            get { return port; }
+            get { return socket.LocalPort; }
         }
         #endregion
 
@@ -176,7 +163,7 @@ namespace Orion.Engine.Networking
         private bool IsSelf(IPv4EndPoint endPoint)
         {
             return localAddresses.Contains(endPoint.Address)
-                && endPoint.Port == port;
+                && endPoint.Port == socket.LocalPort;
         }
         #endregion
 
@@ -208,19 +195,20 @@ namespace Orion.Engine.Networking
         {
             while (!isDisposed)
             {
-                int availableDataLength = socket.Available;
-                if (availableDataLength == 0) break;
+                int packetLength = socket.AvailableDataLength;
+                if (packetLength == 0) break;
 
-                int packetLength = -1;
+                IPv4EndPoint senderEndPoint;
                 try
                 {
-                    packetLength = socket.ReceiveFrom(receptionBuffer, ref senderEndPoint);
-                    if (packetLength >= receptionBuffer.Length)
+                    if (receptionBuffer.Length < packetLength)
                     {
-                        throw new ApplicationException(
-                            "A {0}-bytes packet was received and truncated."
-                            .FormatInvariant(packetLength));
+                        string message = "Cannot receive a packet of {0} bytes, the reception buffer is {1} bytes long."
+                            .FormatInvariant(packetLength, receptionBuffer.Length);
+                        throw new NotImplementedException(message);
                     }
+
+                    socket.Receive(receptionBuffer, out senderEndPoint);
                 }
                 catch (SocketException e)
                 {
@@ -245,14 +233,13 @@ namespace Orion.Engine.Networking
                     break;
                 }
 
-                IPv4EndPoint ipv4SenderEndPoint = (IPv4EndPoint)senderEndPoint;
-                if (IsSelf(ipv4SenderEndPoint) && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
+                if (IsSelf(senderEndPoint) && Protocol.GetPacketType(receptionBuffer) == PacketType.Broadcast)
                 {
                     // Ignore packets we broadcasted ourself.
                     return;
                 }
 
-                HandlePacket(ipv4SenderEndPoint, receptionBuffer, packetLength);
+                HandlePacket(senderEndPoint, receptionBuffer, packetLength);
             }
         }
 
@@ -311,7 +298,7 @@ namespace Orion.Engine.Networking
         private void SendAcknowledgement(IPv4EndPoint hostEndPoint, uint number)
         {
             byte[] acknowledgementPacketData = Protocol.CreateAcknowledgementPacket(number);
-            socket.SendTo(acknowledgementPacketData, hostEndPoint);
+            socket.Send(acknowledgementPacketData, hostEndPoint);
         }
         #endregion
 
@@ -336,7 +323,7 @@ namespace Orion.Engine.Networking
                         TimeSpan resendDelay = GetResendDelay(peer);
                         if (!packet.WasSent || packet.TimeElapsedSinceLastSend >= resendDelay)
                         {
-                            socket.SendTo(packet.Data, peer.EndPoint);
+                            socket.Send(packet.Data, peer.EndPoint);
                             packet.UpdateSendTime();
                         }
                     }
@@ -405,7 +392,7 @@ namespace Orion.Engine.Networking
             IPv4EndPoint broadcastEndPoint = new IPv4EndPoint(IPv4Address.Broadcast, port);
             byte[] packetData = Protocol.CreateBroadcastPacket(message);
 
-            socket.SendTo(packetData, broadcastEndPoint);
+            socket.Send(packetData, broadcastEndPoint);
         }
 
         /// <summary>
@@ -414,7 +401,7 @@ namespace Orion.Engine.Networking
         /// <param name="endPoint">The end point to be pinged.</param>
         public void Ping(IPv4EndPoint endPoint)
         {
-            socket.SendTo(Protocol.CreatePingPacket(), endPoint);
+            socket.Send(Protocol.CreatePingPacket(), endPoint);
         }
         #endregion
 
@@ -497,7 +484,6 @@ namespace Orion.Engine.Networking
             Debug.Assert(terminated, "The SafeTransporter worker thread termination has timed out.");
 
             // Kill the socket
-            socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
 
@@ -508,7 +494,7 @@ namespace Orion.Engine.Networking
 
         public override string ToString()
         {
-            return "SafeTransporter on port {0}".FormatInvariant(port);
+            return "SafeTransporter on port {0}".FormatInvariant(socket.LocalPort);
         }
         #endregion
         #endregion

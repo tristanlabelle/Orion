@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.ReplayPrinter", "Tools.ReplayPrinter\Tools.ReplayPrinter.csproj", "{4761E0C8-AB6A-42BC-9789-05275E6E5F08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{B45D29E4-B452-4850-8C4E-FB0564E071AB}"

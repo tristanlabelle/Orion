@@ -10,10 +10,12 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Root of the UI element hierarchy.
     /// </summary>
-    public sealed class UIManager : UIElement
+    public sealed partial class UIManager : UIElement
     {
         #region Fields
         private readonly GraphicsContext graphicsContext;
+        private readonly ChildCollection childCollection;
+        private UIElement root;
         private Size size;
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
@@ -26,6 +28,7 @@ namespace Orion.Engine.Gui2
             
             this.graphicsContext = graphicsContext;
             this.size = graphicsContext.ViewportSize;
+            this.childCollection = new ChildCollection(this);
         }
         #endregion
 
@@ -58,13 +61,38 @@ namespace Orion.Engine.Gui2
             get { return defaultTextColor; }
             set { defaultTextColor = value; }
         }
+
+        /// <summary>
+        /// Accesses the root element of the UI hierarchy.
+        /// </summary>
+        public UIElement Root
+        {
+            get { return root; }
+            set
+            {
+                if (value == root) return;
+
+                if (root != null)
+                {
+                    AbandonChild(root);
+                    root = null;
+                }
+                
+                if (value != null)
+                {
+                    AdoptChild(value);
+                    root = value;
+                }
+            }
+        }
         #endregion
 
         #region Methods
-        public Size MeasureString(IEnumerable<char> text)
+        public Size MeasureString(string text)
         {
             Argument.EnsureNotNull(text, "text");
-            throw new NotImplementedException();
+            OpenTK.Vector2 size = new Text(text).Frame.Size;
+            return new Size((int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
         }
         
         /// <summary>
@@ -74,7 +102,12 @@ namespace Orion.Engine.Gui2
         {
             Draw(graphicsContext);
         }
-        
+
+        protected override ICollection<UIElement> GetChildren()
+        {
+            return childCollection;
+        }
+
         protected override Size MeasureWithoutMargin()
         {
             return size;

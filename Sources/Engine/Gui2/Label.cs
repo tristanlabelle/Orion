@@ -72,7 +72,7 @@ namespace Orion.Engine.Gui2
 
         protected override void DoDraw(GraphicsContext graphicsContext)
         {
-            Region rectangle = GetActualRectangle();
+            Region rectangle = Arrange();
             graphicsContext.Draw(text, (Vector2)rectangle.Min, Color);
         }
         #endregion

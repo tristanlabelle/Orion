@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace Orion.Engine.Gui2
 {
@@ -19,9 +20,18 @@ namespace Orion.Engine.Gui2
         private UIManager manager;
         private UIElement parent;
         private Borders margin;
-        private UIElementVisibility visibility;
-        private Size? cachedDesiredSize;
-        private Region? cachedActualRectangle;
+        private Visibility visibility;
+        private Alignment horizontalAlignment;
+        private Alignment verticalAlignment;
+        private Size? cachedMeasuredSize;
+        private Region? cachedArrangedRectangle;
+        #endregion
+
+        #region Constructors
+        protected UIElement()
+        {
+            manager = this as UIManager;
+        }
         #endregion
 
         #region Properties
@@ -30,7 +40,11 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public UIManager Manager
         {
-            get { return manager; }
+            get
+            {
+                if (manager == null && parent != null) manager = parent.Manager;
+                return manager;
+            }
         }
 
         /// <summary>
@@ -57,13 +71,47 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Accesses the current visibility of this <see cref="UIElement"/>.
         /// </summary>
-        public UIElementVisibility Visibility
+        public Visibility Visibility
         {
             get { return visibility; }
             set
             {
                 visibility = value;
                 InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Accesses the horizontal alignment hint for this <see cref="UIElement"/>.
+        /// The parent element is charged of honoring or not this value.
+        /// </summary>
+        public Alignment HorizontalAlignment
+        {
+            get { return horizontalAlignment; }
+            set
+            {
+                if (value == horizontalAlignment) return;
+                Argument.EnsureDefined(value, "HorizontalAlignment");
+
+                horizontalAlignment = value;
+                InvalidateArrange();
+            }
+        }
+
+        /// <summary>
+        /// Accesses the vertical alignment hint for this <see cref="UIElement"/>.
+        /// The parent element is charged of honoring or not this value.
+        /// </summary>
+        public Alignment VerticalAlignment
+        {
+            get { return verticalAlignment; }
+            set
+            {
+                if (value == verticalAlignment) return;
+                Argument.EnsureDefined(value, "VerticalAlignment");
+
+                verticalAlignment = value;
+                InvalidateArrange();
             }
         }
 
@@ -77,6 +125,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
+        #region Hierarchy
         /// <summary>
         /// Obtains the collection of children of this <see cref="UIElement"/>.
         /// </summary>
@@ -93,8 +142,8 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual UIElement GetChildAt(Point point)
         {
-            if (!GetActualRectangle().Contains(point)) return null;
-            return Children.FirstOrDefault(child => child.GetActualRectangle().Contains(point));
+            if (!Arrange().Contains(point)) return null;
+            return Children.FirstOrDefault(child => child.Arrange().Contains(point));
         }
 
         /// <summary>
@@ -104,14 +153,15 @@ namespace Orion.Engine.Gui2
         protected virtual void SetParent(UIElement parent)
         {
             if (this is UIManager) throw new InvalidOperationException("The UI manager cannot be a child.");
-            
+
             this.parent = parent;
             if (parent == null)
             {
                 manager = null;
-                cachedActualRectangle = null;
-                cachedDesiredSize = null;
+                cachedMeasuredSize = null;
             }
+
+            cachedArrangedRectangle = null;
         }
 
         protected void AdoptChild(UIElement child)
@@ -124,7 +174,9 @@ namespace Orion.Engine.Gui2
             Debug.Assert(child.Parent == this);
             child.SetParent(null);
         }
+        #endregion
 
+        #region Measure
         /// <summary>
         /// Measures the desired size of this <see cref="UIElement"/>, excluding its margin.
         /// </summary>
@@ -137,25 +189,15 @@ namespace Orion.Engine.Gui2
         /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
         public Size Measure()
         {
-            if (!cachedDesiredSize.HasValue) cachedDesiredSize = Measure();
-
-            Size sizeWithoutMargin = MeasureWithoutMargin();
-            return new Size(
-                sizeWithoutMargin.Width + Margin.MinX + margin.MaxX,
-                sizeWithoutMargin.Height + Margin.MinY + margin.MaxY);
-        }
-
-        public Region GetActualRectangle()
-        {
-            if (!cachedActualRectangle.HasValue)
+            if (!cachedMeasuredSize.HasValue)
             {
-                if (parent == null)
-                    cachedActualRectangle = new Region(Measure());
-                else
-                    parent.ArrangeChild(this);
+                Size sizeWithoutMargin = MeasureWithoutMargin();
+                cachedMeasuredSize = new Size(
+                    sizeWithoutMargin.Width + Margin.MinX + margin.MaxX,
+                    sizeWithoutMargin.Height + Margin.MinY + margin.MaxY);
             }
 
-            return cachedActualRectangle.Value;
+            return cachedMeasuredSize.Value;
         }
 
         /// <summary>
@@ -163,15 +205,32 @@ namespace Orion.Engine.Gui2
         /// </summary>
         protected void InvalidateMeasure()
         {
-            cachedDesiredSize = null;
+            cachedMeasuredSize = null;
+            cachedArrangedRectangle = null;
             if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
 
         protected virtual void OnChildMeasureInvalidated(UIElement child) { }
+        #endregion
+
+        #region Arrange
+        public Region Arrange()
+        {
+            if (!cachedArrangedRectangle.HasValue)
+            {
+                if (parent == null)
+                    cachedArrangedRectangle = new Region(Measure());
+                else
+                    parent.ArrangeChild(this);
+            }
+
+            return cachedArrangedRectangle.Value;
+        }
 
         protected virtual void ArrangeChildren()
         {
-            throw new NotImplementedException();
+            foreach (UIElement child in Children)
+                DefaultArrangeChild(child);
         }
 
         protected virtual void ArrangeChild(UIElement child)
@@ -179,31 +238,89 @@ namespace Orion.Engine.Gui2
             ArrangeChildren();
         }
 
+        protected void DefaultArrangeChild(UIElement child)
+        {
+            Region parentRectangle = Arrange();
+
+            Region childRectangle = DefaultArrange(parentRectangle.Size, child);
+            childRectangle = new Region(
+                parentRectangle.MinX + childRectangle.MinX,
+                parentRectangle.MinY + childRectangle.MinY,
+                childRectangle.Width, childRectangle.Height);
+
+            SetChildRectangle(child, childRectangle);
+        }
+
         protected void SetChildRectangle(UIElement child, Region rectangle)
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
 
-            child.cachedActualRectangle = rectangle;
+            child.cachedArrangedRectangle = rectangle;
         }
+
+        protected void InvalidateArrange()
+        {
+            cachedArrangedRectangle = null;
+        }
+
+        public static void DefaultArrange(int availableSize, Alignment alignment, int desiredSize, out int min, out int actualSize)
+        {
+            if (alignment == Alignment.Stretch || desiredSize >= availableSize)
+            {
+                min = 0;
+                actualSize = availableSize;
+                return;
+            }
+
+            actualSize = Math.Min(availableSize, desiredSize);
+
+            switch (alignment)
+            {
+                case Alignment.Min:
+                    min = 0;
+                    break;
+
+                case Alignment.Center:
+                    min = availableSize / 2 - desiredSize / 2;
+                    break;
+
+                case Alignment.Max:
+                    min = availableSize - actualSize;
+                    break;
+
+                default: throw new InvalidEnumArgumentException("alignment", (int)alignment, typeof(Alignment));
+            }
+        }
+
+        public static Region DefaultArrange(Size availableSpace, UIElement element)
+        {
+            Size desiredSize = element.Measure();
+
+            int x, y, width, height;
+            DefaultArrange(availableSpace.Width, element.HorizontalAlignment, desiredSize.Width, out x, out width);
+            DefaultArrange(availableSpace.Height, element.VerticalAlignment, desiredSize.Height, out y, out height);
+            return new Region(x, y, width, height);
+        }
+        #endregion
 
         protected void Draw(GraphicsContext graphicsContext)
         {
-            if (visibility != UIElementVisibility.Visible || GetActualRectangle().Area == 0) return;
+            if (visibility != Visibility.Visible || Arrange().Area == 0) return;
 
             DoDraw(graphicsContext);
         }
 
         protected virtual void DoDraw(GraphicsContext graphicsContext)
         {
-            Region rectangle = GetActualRectangle();
+            Region rectangle = Arrange();
 
             DisposableHandle? scissorBoxHandle = null;
             foreach (UIElement child in Children)
             {
                 if (!scissorBoxHandle.HasValue)
                 {
-                    Region childRectangle = child.GetActualRectangle();
+                    Region childRectangle = child.Arrange();
                     if (!rectangle.Contains(childRectangle))
                         scissorBoxHandle = graphicsContext.PushScissorRegion(rectangle);
                 }

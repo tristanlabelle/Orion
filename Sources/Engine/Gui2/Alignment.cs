@@ -5,11 +5,29 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// Specifies how a <see cref="UIElement"/> occupies space within its parent.
+    /// </summary>
     public enum Alignment
     {
+        /// <summary>
+        /// Specifies that the <see cref="UIElement"/> should be stretched to fill the whole available size.
+        /// </summary>
         Stretch,
+
+        /// <summary>
+        /// Specifies that the <see cref="UIElement"/> should be aligned on the minimum side of the axis.
+        /// </summary>
         Min,
+
+        /// <summary>
+        /// Specifies that the <see cref="UIElement"/> should be centered within its parent.
+        /// </summary>
         Center,
+
+        /// <summary>
+        /// Specifies that the <see cref="UIElement"/> should be aligned on the maximum side of the axis.
+        /// </summary>
         Max
     }
 }

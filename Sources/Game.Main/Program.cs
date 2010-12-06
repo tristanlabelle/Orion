@@ -75,15 +75,24 @@ namespace Orion.Game.Main
             {
                 UIManager uiManager = new UIManager(gameGraphics.Context);
 
-                StackPanel stackPanel = new StackPanel();
-                stackPanel.Children.Add(new Label() { Text = "Foo" });
-                stackPanel.Children.Add(new Label() { Text = "Bar" });
-                uiManager.Children.Add(stackPanel);
+                StackPanel stackPanel = new StackPanel
+                {
+                    HorizontalAlignment = Alignment.Center,
+                    VerticalAlignment = Alignment.Center,
+                    ItemGap = 10
+                };
+
+                stackPanel.Children.Add(new Label { Text = "Foo" });
+                stackPanel.Children.Add(new Label { Text = "Bar" });
+                uiManager.Root = stackPanel;
 
                 while (true)
                 {
                     gameGraphics.Window.Update();
+                    gameGraphics.Context.Clear(Colors.Green);
+                    gameGraphics.Context.ProjectionBounds = new Engine.Geometry.Rectangle(0, 0, uiManager.Size.Width, uiManager.Size.Height);
                     uiManager.Draw();
+                    gameGraphics.Context.Present();
                 }
 
                 using (GameStateManager gameStateManager = new GameStateManager())

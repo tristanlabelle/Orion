@@ -10,8 +10,7 @@ namespace Orion.Engine.Gui2
         #region Fields
         private readonly ChildCollection children;
         private Orientation orientation = Orientation.Vertical;
-        private Alignment itemAlignment = Alignment.Stretch;
-        private int itemSpacing;
+        private int itemGap;
         #endregion
 
         #region Constructors
@@ -32,23 +31,13 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        public Alignment ItemAlignment
+        public int ItemGap
         {
-            get { return itemAlignment; }
-            set
-            {
-                Argument.EnsureDefined(value, "ItemAlignment");
-                itemAlignment = value;
-            }
-        }
-
-        public int ItemSpacing
-        {
-            get { return itemSpacing; }
+            get { return itemGap; }
             set
             {
                 Argument.EnsurePositive(value, "ItemPadding");
-                itemSpacing = value;
+                itemGap = value;
             }
         }
         #endregion
@@ -67,7 +56,7 @@ namespace Orion.Engine.Gui2
             {
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) height += itemSpacing;
+                    if (i > 0) height += itemGap;
 
                     Size childSize = children[i].Measure();
                     height += childSize.Height;
@@ -78,7 +67,7 @@ namespace Orion.Engine.Gui2
             {
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) width += itemSpacing;
+                    if (i > 0) width += itemGap;
 
                     Size childSize = children[i].Measure();
                     width += childSize.Width;
@@ -91,7 +80,7 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Region rectangle = GetActualRectangle();
+            Region rectangle = Arrange();
 
             if (orientation == Orientation.Vertical)
             {
@@ -100,31 +89,20 @@ namespace Orion.Engine.Gui2
                 int y = 0;
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) y += itemSpacing;
+                    if (i > 0) y += itemGap;
 
                     UIElement child = children[i];
                     Size childSize = child.Measure();
 
-                    int x = 0;
-                    int width = 0;
-                    if (itemAlignment == Alignment.Center)
-                    {
-                        x = rectangle.MinX + Margin.MinX;
-                        width = internalWidth;
-                    }
-                    else
-                    {
-                        width = Math.Min(childSize.Width, internalWidth);
+                    int x;
+                    int width;
+                    DefaultArrange(internalWidth, child.HorizontalAlignment, childSize.Width, out x, out width);
 
-                        if (itemAlignment == Alignment.Min)
-                            x = rectangle.MinX + Margin.MinX;
-                        else if (itemAlignment == Alignment.Max)
-                            x = rectangle.ExclusiveMaxX - Margin.MaxX - width;
-                        else if (itemAlignment == Alignment.Center)
-                            x = (rectangle.MinX + Margin.MinX + rectangle.ExclusiveMaxX - Margin.MaxX) / 2 - width / 2;
-                    }
-
-                    SetChildRectangle(child, new Region(x, y, width, childSize.Height));
+                    Region childRectangle = new Region(
+                        rectangle.MinX + Margin.MinX + x,
+                        rectangle.MinY + Margin.MinY + y,
+                        width, childSize.Height);
+                    SetChildRectangle(child, childRectangle);
 
                     y += childSize.Height;
                 }

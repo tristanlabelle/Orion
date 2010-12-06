@@ -25,7 +25,7 @@ namespace Orion.Engine.Graphics
 
         public Text(string text, Font font)
         {
-            value = text + " ";
+            value = text;
             Font = font;
         }
         #endregion
@@ -33,7 +33,7 @@ namespace Orion.Engine.Graphics
         #region Properties
         public string Value
         {
-            get { return value.Substring(0, value.Length - 1); }
+            get { return value; }
         }
 
         public Rectangle Frame

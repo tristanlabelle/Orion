@@ -1,5 +1,6 @@
 ﻿using System;
 using Orion.Engine;
+using System.Collections.Generic;
 
 namespace Orion.Game.Simulation.Skills
 {
@@ -14,11 +15,15 @@ namespace Orion.Game.Simulation.Skills
         public static readonly UnitStat RangeStat = new UnitStat(typeof(AttackSkill), "Range", "Portée d'attaque");
         public static readonly UnitStat DelayStat = new UnitStat(typeof(AttackSkill), "Delay", "Délai d'attaque");
         public static readonly UnitStat SplashRadiusStat = new UnitStat(typeof(AttackSkill), "SplashRadius", "Rayon de dégâts");
+        public static readonly UnitStat SuperEffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "EffectiveAgainst", "Super puissant contre");
+        public static readonly UnitStat InffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "IneffectiveAgainst", "Impuissant contre");
 
         private int power = 1;
         private int range;
         private int delay = 1;
         private int splashRadius;
+        private List<BasicSkill.ArmorTypes> superEffectiveAgainst = new List<BasicSkill.ArmorTypes>();
+        private List<BasicSkill.ArmorTypes> ineffectiveAgainst = new List<BasicSkill.ArmorTypes>();
         #endregion
 
         #region Properties
@@ -33,6 +38,32 @@ namespace Orion.Game.Simulation.Skills
                 EnsureNotFrozen();
                 Argument.EnsureStrictlyPositive(value, "Power");
                 power = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of armor types this attack skill is very effective against
+        /// </summary>
+        public List<BasicSkill.ArmorTypes> SuperEffectiveAgainst
+        {
+            get { return superEffectiveAgainst; }
+            set
+            {
+                EnsureNotFrozen();
+                superEffectiveAgainst = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of armor types this attack skill is ineffective against
+        /// </summary>
+        public List<BasicSkill.ArmorTypes> IneffectiveAgainst
+        {
+            get { return ineffectiveAgainst; }
+            set
+            {
+                EnsureNotFrozen();
+                ineffectiveAgainst = value;
             }
         }
 
@@ -113,7 +144,29 @@ namespace Orion.Game.Simulation.Skills
                 range = range,
                 delay = delay,
                 splashRadius = splashRadius,
+                superEffectiveAgainst = superEffectiveAgainst,
+                ineffectiveAgainst = ineffectiveAgainst
             };
+        }
+
+        /// <summary>
+        /// Tests if this <see cref="Unit"/> is super effective against the specified unit type
+        /// </summary>
+        /// <param name="type">The type of armor to check against</param>
+        /// <returns>True if this unit is super effective against the specified type, else if not.</returns>
+        public bool IsSuperEffectiveAgainst(BasicSkill.ArmorTypes armorType)
+        {
+            return SuperEffectiveAgainst.Contains(armorType);
+        }
+
+        /// <summary>
+        /// Tests if this <see cref="Unit"/> is ineffective against the specified unit type
+        /// </summary>
+        /// <param name="type">The type of armor to check against</param>
+        /// <returns>True if this unit is ineffective against the specified type, else if not.</returns>
+        public bool IsIneffectiveAgainst(BasicSkill.ArmorTypes armorType)
+        {
+            return IneffectiveAgainst.Contains(armorType);
         }
 
         public override int GetStat(UnitStat stat)

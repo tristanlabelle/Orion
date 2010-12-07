@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Anthrax" VoicesTemplate="Grippe A(H1N1)" Width="2" Height="2" IsAirborne="True">
 	<Skills>
-		<Basic SightRange="9" MaxHealth="100" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
+		<Basic SightRange="9" MaxHealth="100" ArmorType="Light" Armor="2" FoodCost="2"/>
 		<Move Speed="15"/>
-		<Attack Power="5" Range="9" Delay="1"/>
+		<Attack Power="5" Range="9" Delay="1" EffectiveAgainst="Light" IneffectiveAgainst="Heavy"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>

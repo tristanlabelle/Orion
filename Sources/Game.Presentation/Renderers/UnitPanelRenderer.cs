@@ -26,7 +26,7 @@ namespace Orion.Game.Presentation.Renderers
         private static readonly UnitStat[] statsToDisplay = new[]
         {
             AttackSkill.PowerStat, AttackSkill.RangeStat,
-            BasicSkill.MeleeArmorStat, BasicSkill.RangedArmorStat,
+            BasicSkill.ArmorTypeStat, BasicSkill.ArmorStat,
             MoveSkill.SpeedStat, BasicSkill.SightRangeStat
         };
         private const float firstLineY = 180;
@@ -109,7 +109,12 @@ namespace Orion.Game.Presentation.Renderers
 
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;
-                    string message = "{0}: {1} ".FormatInvariant(stat.Description, value);
+
+                    string message = message = "{0}: {1} ".FormatInvariant(stat.Description, value);
+
+                    if(stat.Name == "ArmorType")
+                        message = "{0}: {1} ".FormatInvariant(stat.Description, ((BasicSkill.ArmorTypes)value).ToString());
+
                     context.Draw(message, new Vector2(150, y), Colors.Black);
                     y -= hp.Frame.Height;
                 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Gabraël Martien" Width="1" Height="1">
 	<Skills>
-		<Basic SightRange="5" MaxHealth="30" MeleeArmor="1" RangedArmor="1" AladdiumCost="30" FoodCost="1"/>
+		<Basic SightRange="5" MaxHealth="30" ArmorType="Surnatural" Armor="1" AladdiumCost="30" FoodCost="1"/>
 		<Move Speed="8"/>
-		<Attack Power="1" Range="0" Delay="1"/>
+		<Attack Power="1" Range="0" Delay="1" EffectiveAgainst="" IneffectiveAgainst="Light Heavy Surnatural"/>
 	</Skills>
 </UnitType>

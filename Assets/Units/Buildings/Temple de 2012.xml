@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Temple de 2012" Width="3" Height="3">
 	<Skills>
-		<Basic SightRange="8" MaxHealth="200" MeleeArmor="3" RangedArmor="3" AladdiumCost="150"/>
+		<Basic SightRange="8" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="150"/>
 		<Train Speed="10">
 			<Target>Pirate</Target>
 			<Target>Ninja</Target>

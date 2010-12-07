@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Tapis d'Aladdin" Width="2" Height="2" IsAirborne="True">
 	<Skills>
-		<Basic SightRange="8" MaxHealth="140" MeleeArmor="2" RangedArmor="2" FoodCost="2"/>
+		<Basic SightRange="8" MaxHealth="140" ArmorType="Light" Armor="2" FoodCost="2"/>
 		<Move Speed="15"/>
 	</Skills>
 	<Upgrades>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Grand schtroumpf" Width="1" Height="1">
 	<Skills>
-		<Basic SightRange="7" MaxHealth="60" MeleeArmor="1" RangedArmor="2" FoodCost="1"/>
+		<Basic SightRange="7" MaxHealth="60" ArmorType="Light" Armor="2" FoodCost="1"/>
 		<Move Speed="8"/>
-		<Attack Power="8" Range="0" Delay="4"/>
+		<Attack Power="8" Range="0" Delay="4" EffectiveAgainst="" IneffectiveAgainst=""/>
 		<Harvest Speed="5" MaxCarryingAmount="20"/>
 		<Build Speed="100">
 			<Target>Pyramide</Target>

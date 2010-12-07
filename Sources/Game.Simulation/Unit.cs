@@ -436,10 +436,19 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(target, "target");
 
             bool isMelee = GetStat(AttackSkill.RangeStat) == 0;
-            UnitStat armorStat = isMelee ? BasicSkill.MeleeArmorStat : BasicSkill.RangedArmorStat;
+            UnitStat armorStat = BasicSkill.ArmorStat;
+            UnitStat armorTypeStat = BasicSkill.ArmorTypeStat;
 
             int targetArmor = target.GetStat(armorStat);
+            BasicSkill.ArmorTypes targetArmorType = (BasicSkill.ArmorTypes)target.GetStat(BasicSkill.ArmorTypeStat);
+
             int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
+            
+            if(IsSuperEffectiveAgainst(targetArmorType))
+                damage *= 2;
+            else if(IsIneffectiveAgainst(targetArmorType))
+                damage /= 2;
+
             target.Health -= damage;
             OnHitting(target, damage);
 
@@ -466,6 +475,24 @@ namespace Orion.Game.Simulation
             }
 
             timeElapsedSinceLastHitInSeconds = 0;
+        }
+
+        public bool IsSuperEffectiveAgainst(BasicSkill.ArmorTypes type)
+        {
+            AttackSkill skill = Type.TryGetSkill<AttackSkill>();
+            if (skill == null)
+                return false;
+            else
+                return skill.IsSuperEffectiveAgainst(type);
+        }
+
+        public bool IsIneffectiveAgainst(BasicSkill.ArmorTypes type)
+        {
+            AttackSkill skill = Type.TryGetSkill<AttackSkill>();
+            if (skill != null)
+                return false;
+            else
+                return skill.IsIneffectiveAgainst(type);
         }
 
         private void OnHitting(Unit target, float damage)

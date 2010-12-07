@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Maison de Tristan" Width="3" Height="3">
 	<Skills>
-		<Basic SightRange="4" MaxHealth="200" MeleeArmor="3" RangedArmor="3" AladdiumCost="150" AlageneCost="50"/>
+		<Basic SightRange="4" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="150" AlageneCost="50"/>
 		<Research>
 			<Target>Schtroumpf véloce</Target>
 			<Target>Import Jean-Marc</Target>

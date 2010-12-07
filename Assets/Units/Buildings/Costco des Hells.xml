@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Costco des Hells" Width="2" Height="2">
 	<Skills>
-		<Basic SightRange="4" MaxHealth="100" MeleeArmor="2" RangedArmor="2" AladdiumCost="80"/>
+		<Basic SightRange="4" MaxHealth="100" ArmorType="Heavy" Armor="2" AladdiumCost="80"/>
 		<StoreResources/>
 	</Skills>
 </UnitType>

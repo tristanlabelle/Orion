@@ -4,5 +4,5 @@
   <Target>Grand schtroumpf</Target>
   <Effect Stat="Attack.Power" Change="1"/>
   <Effect Stat="MaxHealth" Change="25"/>
-  <Effect Stat="MeleeArmor" Change="1"/>
+  <Effect Stat="Armor" Change="1"/>
 </Technology>

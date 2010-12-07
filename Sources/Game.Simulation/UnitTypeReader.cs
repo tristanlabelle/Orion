@@ -127,23 +127,58 @@ namespace Orion.Game.Simulation
         {
             foreach (XmlAttribute statAttribute in skillElement.Attributes)
             {
-                UnitStat stat = UnitSkill.GetStat(skill, statAttribute.Name);
-                if (stat == null)
+                if (statAttribute.Name == "EffectiveAgainst")
                 {
-                    throw new InvalidDataException(
-                        "Invalid unit stat {0} for skill {1}."
-                        .FormatInvariant(statAttribute.Name, UnitSkill.GetTypeName(skill)));
+                    List<BasicSkill.ArmorTypes> effectiveTypes = new List<BasicSkill.ArmorTypes>();
+                    if (statAttribute.Value != "")
+                    {
+                        foreach (string effective in statAttribute.Value.Split(' '))
+                        {
+                            effectiveTypes.Add((BasicSkill.ArmorTypes)Enum.Parse(typeof(BasicSkill.ArmorTypes), effective, true));
+                        }
+                    }
+                    ((AttackSkill)skill).SuperEffectiveAgainst = effectiveTypes;
                 }
-
-                int value;
-                if (!int.TryParse(statAttribute.Value, NumberStyles.None, NumberFormatInfo.InvariantInfo, out value))
+                else if (statAttribute.Name == "IneffectiveAgainst")
                 {
-                    throw new InvalidDataException(
-                        "{0} stat value is not valid a positive integer."
-                        .FormatInvariant(statAttribute.Name));
+                    List<BasicSkill.ArmorTypes> ineffectiveTypes = new List<BasicSkill.ArmorTypes>();
+                    if (statAttribute.Value != "")
+                    {
+                        foreach (string ineffective in statAttribute.Value.Split(' '))
+                        {
+                            ineffectiveTypes.Add((BasicSkill.ArmorTypes)Enum.Parse(typeof(BasicSkill.ArmorTypes), ineffective, true));
+                        }
+                    }
+                    ((AttackSkill)skill).IneffectiveAgainst = ineffectiveTypes;
                 }
+                else
+                {
+                    UnitStat stat = UnitSkill.GetStat(skill, statAttribute.Name);
 
-                skill.SetStat(stat, value);
+                    if (stat == null)
+                    {
+                        throw new InvalidDataException(
+                            "Invalid unit stat {0} for skill {1}."
+                            .FormatInvariant(statAttribute.Name, UnitSkill.GetTypeName(skill)));
+                    }
+
+                    int value;
+                    if (!int.TryParse(statAttribute.Value, NumberStyles.None, NumberFormatInfo.InvariantInfo, out value))
+                    {
+                        if (statAttribute.Name == "ArmorType")
+                        {
+                            value = (int)Enum.Parse(typeof(BasicSkill.ArmorTypes), statAttribute.Value, true);
+                        }
+                        else
+                        {
+                            throw new InvalidDataException(
+                                "{0} stat value is not valid a positive integer."
+                                .FormatInvariant(statAttribute.Name));
+                        }
+                    }
+
+                    skill.SetStat(stat, value);
+                }
             }
         }
 

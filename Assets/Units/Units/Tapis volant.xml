@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Tapis volant" Width="2" Height="2" IsAirborne="True">
 	<Skills>
-		<Basic SightRange="8" MaxHealth="75" MeleeArmor="1" RangedArmor="1" AladdiumCost="25" AlageneCost="50" FoodCost="2"/>
+		<Basic SightRange="8" MaxHealth="75" ArmorType="Light" Armor="1" AladdiumCost="25" AlageneCost="50" FoodCost="2"/>
 		<Move Speed="6"/>
 		<Transport Capacity="6"/>
 	</Skills>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Ta mère" VoicesTemplate="Flying Spaghetti Monster" Width="3" Height="3" IsAirborne="True">
 	<Skills>
-		<Basic SightRange="10" MaxHealth="300" MeleeArmor="4" RangedArmor="5" FoodCost="3"/>
+		<Basic SightRange="10" MaxHealth="300" ArmorType="Heavy" Armor="5" FoodCost="3"/>
 		<Move Speed="3"/>
-		<Attack Power="50" Range="8" Delay="4" SplashRadius="6"/>
+		<Attack Power="50" Range="8" Delay="4" SplashRadius="6" EffectiveAgainst="Surnatural" IneffectiveAgainst=""/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>

@@ -12,21 +12,31 @@ namespace Orion.Game.Simulation.Skills
     [Serializable]
     public sealed class BasicSkill : UnitSkill
     {
+        #region enum
+        public enum ArmorTypes
+        {
+            LIGHT = 1,
+            HEAVY = 2,
+            SURNATURAL = 3,
+            DIVINE = 4
+        };
+        #endregion
+
         #region Fields
         public static readonly UnitStat AlageneCostStat = new UnitStat(typeof(BasicSkill), "AlageneCost", "Coût en alagène");
         public static readonly UnitStat AladdiumCostStat = new UnitStat(typeof(BasicSkill), "AladdiumCost", "Coût en aladdium");
         public static readonly UnitStat FoodCostStat = new UnitStat(typeof(BasicSkill), "FoodCost", "Coût en nourriture");
         public static readonly UnitStat MaxHealthStat = new UnitStat(typeof(BasicSkill), "MaxHealth", "Points de vie maximum");
-        public static readonly UnitStat MeleeArmorStat = new UnitStat(typeof(BasicSkill), "MeleeArmor", "Armure au corps-à-corps");
-        public static readonly UnitStat RangedArmorStat = new UnitStat(typeof(BasicSkill), "RangedArmor", "Armure à distance");
+        public static readonly UnitStat ArmorTypeStat = new UnitStat(typeof(BasicSkill), "ArmorType", "Type d'armure");
+        public static readonly UnitStat ArmorStat = new UnitStat(typeof(BasicSkill), "Armor", "Armure");
         public static readonly UnitStat SightRangeStat = new UnitStat(typeof(BasicSkill), "SightRange", "Portée de vision");
 
         private int alageneCost;
         private int aladdiumCost;
         private int foodCost;
         private int maxHealth = 1;
-        private int meleeArmor;
-        private int rangedArmor;
+        private ArmorTypes armorType;
+        private int armor;
         private int sightRange = 1;
         #endregion
 
@@ -88,30 +98,29 @@ namespace Orion.Game.Simulation.Skills
         }
 
         /// <summary>
-        /// Gets the amount of armor against melee attacks, in health points.
+        /// Gets the units type of armor.
         /// </summary>
-        public int MeleeArmor
+        public ArmorTypes ArmorType
         {
-            get { return maxHealth; }
+            get { return armorType; }
             set
             {
                 EnsureNotFrozen();
-                Argument.EnsurePositive(value, "MeleeArmor");
-                meleeArmor = value;
+                armorType = value;
             }
         }
 
         /// <summary>
-        /// Gets the amount of armor against ranged attacks, in health points.
+        /// Gets the amount of armor against attacks, in health points.
         /// </summary>
-        public int RangedArmor
+        public int Armor
         {
-            get { return rangedArmor; }
+            get { return armor; }
             set
             {
                 EnsureNotFrozen();
-                Argument.EnsurePositive(value, "RangedArmor");
-                rangedArmor = value;
+                Argument.EnsurePositive(value, "armor");
+                armor = value;
             }
         }
 
@@ -139,9 +148,9 @@ namespace Orion.Game.Simulation.Skills
                 alageneCost = alageneCost,
                 foodCost = foodCost,
                 maxHealth = maxHealth,
-                meleeArmor = meleeArmor,
-                rangedArmor = rangedArmor,
-                sightRange = sightRange
+                armor = armor,
+                sightRange = sightRange,
+                armorType = armorType
             };
         }
 
@@ -151,8 +160,8 @@ namespace Orion.Game.Simulation.Skills
             if (stat == AladdiumCostStat) return aladdiumCost;
             if (stat == FoodCostStat) return foodCost;
             if (stat == MaxHealthStat) return maxHealth;
-            if (stat == MeleeArmorStat) return meleeArmor;
-            if (stat == RangedArmorStat) return rangedArmor;
+            if (stat == ArmorTypeStat) return (int)armorType;
+            if (stat == ArmorStat) return armor;
             if (stat == SightRangeStat) return sightRange;
             return base.GetStat(stat);
         }
@@ -163,8 +172,8 @@ namespace Orion.Game.Simulation.Skills
             else if (stat == AladdiumCostStat) AladdiumCost = value;
             else if (stat == FoodCostStat) FoodCost = value;
             else if (stat == MaxHealthStat) MaxHealth = value;
-            else if (stat == MeleeArmorStat) MeleeArmor = value;
-            else if (stat == RangedArmorStat) RangedArmor = value;
+            else if (stat == ArmorTypeStat) ArmorType = (ArmorTypes)value;
+            else if (stat == ArmorStat) Armor = value;
             else if (stat == SightRangeStat) SightRange = value;
             else base.DoSetStat(stat, value);
         }

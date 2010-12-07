@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Carrefour Laval" Width="4" Height="4">
 	<Skills>
-		<Basic SightRange="10" MaxHealth="300" MeleeArmor="4" RangedArmor="4" AladdiumCost="140"/>
+		<Basic SightRange="10" MaxHealth="300" ArmorType="Heavy" Armor="4" AladdiumCost="140"/>
 		<Train Speed="10">
 			<Target>Gabraël Martien</Target>
 		</Train>

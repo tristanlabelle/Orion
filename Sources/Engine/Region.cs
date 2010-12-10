@@ -447,6 +447,11 @@ namespace Orion.Engine
         {
             return new Region(size);
         }
+
+        public static implicit operator Rectangle(Region region)
+        {
+            return new Rectangle(region.MinX, region.MinY, region.Width, region.Height);
+        }
         #endregion
         #endregion
     }

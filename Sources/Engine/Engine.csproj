@@ -141,6 +141,7 @@
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureManager.cs" />
     <Compile Include="Gui2\Alignment.cs" />
+    <Compile Include="Gui2\Button.cs" />
     <Compile Include="Gui2\Label.cs" />
     <Compile Include="Gui2\Panel.cs" />
     <Compile Include="Gui2\Borders.cs" />
@@ -149,7 +150,7 @@
     <Compile Include="Gui2\StackPanel.cs" />
     <Compile Include="Gui2\UIElement.cs" />
     <Compile Include="Gui2\Visibility.cs" />
-    <Compile Include="Gui2\UIManager.ChildCollection.cs" />
+    <Compile Include="Gui2\UIElement.SingleChildCollection.cs" />
     <Compile Include="Gui2\UIManager.cs" />
     <Compile Include="Gui\Button.cs" />
     <Compile Include="Gui\Checkbox.cs" />

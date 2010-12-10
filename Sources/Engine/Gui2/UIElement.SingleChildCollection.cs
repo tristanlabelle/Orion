@@ -5,27 +5,37 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
-    partial class UIManager
+    partial class UIElement
     {
-        private sealed class ChildCollection : ICollection<UIElement>
+        public sealed class SingleChildCollection : ICollection<UIElement>
         {
             #region Fields
-            private readonly UIManager uiManager;
+            private readonly Func<UIElement> getter;
+            private readonly Action<UIElement> setter;
+            private readonly UIElement[] iterationArray = new UIElement[1];
             #endregion
 
             #region Constructors
-            internal ChildCollection(UIManager uiManager)
+            public SingleChildCollection(Func<UIElement> getter, Action<UIElement> setter)
             {
-                Argument.EnsureNotNull(uiManager, "uiManager");
+                Argument.EnsureNotNull(getter, "getter");
+                Argument.EnsureNotNull(setter, "setter");
 
-                this.uiManager = uiManager;
+                this.getter = getter;
+                this.setter = setter;
             }
             #endregion
 
             #region Properties
             public int Count
             {
-                get { return uiManager.Root == null ? 0 : 1; }
+                get { return getter() == null ? 0 : 1; }
+            }
+
+            public UIElement Value
+            {
+                get { return getter(); }
+                set { setter(value); }
             }
             #endregion
 
@@ -34,35 +44,37 @@ namespace Orion.Engine.Gui2
             {
                 Argument.EnsureNotNull(item, "item");
 
-                if (uiManager.Root != null) throw new InvalidOperationException();
-                uiManager.Root = item;
+                setter(item);
             }
 
             public void Clear()
             {
-                uiManager.Root = null;
+                setter(null);
             }
 
             public bool Contains(UIElement item)
             {
-                return item != null && uiManager.Root == item;
+                return item != null && getter() == item;
             }
 
             public void CopyTo(UIElement[] array, int arrayIndex)
             {
-                if (uiManager.Root != null) array[arrayIndex] = uiManager.Root;
+                UIElement value = getter();
+                if (value != null) array[arrayIndex] = value;
             }
 
             public bool Remove(UIElement item)
             {
-                if (item == null || uiManager.Root != item) return false;
-                uiManager.Root = null;
+                if (item == null || getter() == null) return false;
+                setter(null);
                 return true;
             }
 
             public IEnumerator<UIElement> GetEnumerator()
             {
-                return Enumerable.Repeat(uiManager.Root, Count).GetEnumerator();
+                iterationArray[0] = getter();
+                var sequence = iterationArray[0] == null ? Enumerable.Empty<UIElement>() : iterationArray;
+                return sequence.GetEnumerator();
             }
             #endregion
 

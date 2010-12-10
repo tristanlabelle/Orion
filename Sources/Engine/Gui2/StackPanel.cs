@@ -75,17 +75,16 @@ namespace Orion.Engine.Gui2
                 }
             }
 
-            return new Size(width, height);
+            return new Size(width, height) + Padding;
         }
 
         protected override void ArrangeChildren()
         {
-            Region rectangle = Arrange();
+            Region? childrenAreaBounds = Arrange() - Margin - Padding;
+            if (!childrenAreaBounds.HasValue) return;
 
             if (orientation == Orientation.Vertical)
             {
-                int internalWidth = Math.Max(rectangle.Width - Margin.MinX - Margin.MaxX, 0);
-
                 int y = 0;
                 for (int i = 0; i < children.Count; ++i)
                 {
@@ -96,11 +95,11 @@ namespace Orion.Engine.Gui2
 
                     int x;
                     int width;
-                    DefaultArrange(internalWidth, child.HorizontalAlignment, childSize.Width, out x, out width);
+                    DefaultArrange(childrenAreaBounds.Value.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
 
                     Region childRectangle = new Region(
-                        rectangle.MinX + Margin.MinX + x,
-                        rectangle.MinY + Margin.MinY + y,
+                        childrenAreaBounds.Value.MinX + Margin.MinX + x,
+                        childrenAreaBounds.Value.MinY + Margin.MinY + y,
                         width, childSize.Height);
                     SetChildRectangle(child, childRectangle);
 

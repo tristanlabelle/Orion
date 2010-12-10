@@ -12,7 +12,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Base class of the UI hierarchy.
     /// </summary>
-    public abstract class UIElement
+    public abstract partial class UIElement
     {
         #region Fields
         private static readonly UIElement[] emptyArray = new UIElement[0];
@@ -20,6 +20,7 @@ namespace Orion.Engine.Gui2
         private UIManager manager;
         private UIElement parent;
         private Borders margin;
+        private Borders padding;
         private Visibility visibility;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
@@ -64,6 +65,19 @@ namespace Orion.Engine.Gui2
             set
             {
                 this.margin = value;
+                InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Accesses the padding inside this <see cref="UIElement"/>.
+        /// </summary>
+        public virtual Borders Padding
+        {
+            get { return padding; }
+            set
+            {
+                this.padding = value;
                 InvalidateMeasure();
             }
         }
@@ -240,13 +254,11 @@ namespace Orion.Engine.Gui2
 
         protected void DefaultArrangeChild(UIElement child)
         {
-            Region parentRectangle = Arrange();
+            Region? childrenBounds = Arrange() - margin - padding;
+            if (!childrenBounds.HasValue) return;
 
-            Region childRectangle = DefaultArrange(parentRectangle.Size, child);
-            childRectangle = new Region(
-                parentRectangle.MinX + childRectangle.MinX,
-                parentRectangle.MinY + childRectangle.MinY,
-                childRectangle.Width, childRectangle.Height);
+            Region childRectangle = DefaultArrange(childrenBounds.Value.Size, child);
+            childRectangle = new Region(childrenBounds.Value.Min + childRectangle.Min, childRectangle.Size);
 
             SetChildRectangle(child, childRectangle);
         }
@@ -313,7 +325,13 @@ namespace Orion.Engine.Gui2
 
         protected virtual void DoDraw(GraphicsContext graphicsContext)
         {
-            Region rectangle = Arrange();
+            DrawChildren(graphicsContext);
+        }
+
+        protected void DrawChildren(GraphicsContext graphicsContext)
+        {
+            Region? childrenAreaBounds = Arrange() - margin - padding;
+            if (!childrenAreaBounds.HasValue) return;
 
             DisposableHandle? scissorBoxHandle = null;
             foreach (UIElement child in Children)
@@ -321,8 +339,8 @@ namespace Orion.Engine.Gui2
                 if (!scissorBoxHandle.HasValue)
                 {
                     Region childRectangle = child.Arrange();
-                    if (!rectangle.Contains(childRectangle))
-                        scissorBoxHandle = graphicsContext.PushScissorRegion(rectangle);
+                    if (!childrenAreaBounds.Value.Contains(childRectangle))
+                        scissorBoxHandle = graphicsContext.PushScissorRegion(childrenAreaBounds.Value);
                 }
 
                 child.Draw(graphicsContext);

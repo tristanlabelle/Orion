@@ -84,6 +84,7 @@ namespace Orion.Game.Main
 
                 stackPanel.Children.Add(new Label { Text = "Foo" });
                 stackPanel.Children.Add(new Label { Text = "Bar" });
+                stackPanel.Children.Add(new Button("Frob") { Padding = new Borders(0, 0, 20, 0) });
                 uiManager.Root = stackPanel;
 
                 while (true)

@@ -14,7 +14,7 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private readonly GraphicsContext graphicsContext;
-        private readonly ChildCollection childCollection;
+        private readonly SingleChildCollection children;
         private UIElement root;
         private Size size;
         private Font defaultFont = new Font("Trebuchet MS", 10);
@@ -28,7 +28,7 @@ namespace Orion.Engine.Gui2
             
             this.graphicsContext = graphicsContext;
             this.size = graphicsContext.ViewportSize;
-            this.childCollection = new ChildCollection(this);
+            this.children = new SingleChildCollection(() => Root, value => Root = value);
         }
         #endregion
 
@@ -105,7 +105,7 @@ namespace Orion.Engine.Gui2
 
         protected override ICollection<UIElement> GetChildren()
         {
-            return childCollection;
+            return children;
         }
 
         protected override Size MeasureWithoutMargin()

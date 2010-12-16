@@ -26,6 +26,7 @@ namespace Orion.Game.Simulation
         private readonly Pathfinder pathfinder;
         private readonly Random random;
         private readonly int maxFoodAmount;
+        private SimulationStep lastSimulationStep;
         #endregion
 
         #region Constructors
@@ -100,6 +101,11 @@ namespace Orion.Game.Simulation
         public Terrain Terrain
         {
             get { return terrain; }
+        }
+
+        public SimulationStep LastSimulationStep
+        {
+            get { return lastSimulationStep; }
         }
 
         /// <summary>
@@ -294,6 +300,7 @@ namespace Orion.Game.Simulation
         /// <param name="step">Information on this simulation step.</param>
         public void Update(SimulationStep step)
         {
+            lastSimulationStep = step;
             entities.Update(step);
             Updated.Raise(this, step);
         }

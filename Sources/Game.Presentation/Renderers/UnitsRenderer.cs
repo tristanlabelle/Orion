@@ -47,6 +47,7 @@ namespace Orion.Game.Presentation.Renderers
         private readonly RuinsRenderer ruinsRenderer;
         private float simulationTimeInSeconds;
         private bool drawHealthBars;
+        private List<HitEventArgs> hitEvents;
         #endregion
 
         #region Constructors
@@ -60,8 +61,10 @@ namespace Orion.Game.Presentation.Renderers
             this.fireAnimation = new SpriteAnimation(gameGraphics, "Fire", fireSecondsPerFrame);
             this.buildingMemoryRenderer = new BuildingMemoryRenderer(faction, gameGraphics);
             this.ruinsRenderer = new RuinsRenderer(faction, gameGraphics);
+            this.hitEvents = new List<HitEventArgs>();
 
             World.Updated += OnWorldUpdated;
+            World.UnitHitting += OnUnitHitting;
         }
         #endregion
 
@@ -87,6 +90,15 @@ namespace Orion.Game.Presentation.Renderers
         private void OnWorldUpdated(World sender, SimulationStep args)
         {
             simulationTimeInSeconds = args.TimeInSeconds;
+        }
+
+        private void OnUnitHitting(World sender, HitEventArgs args)
+        {     
+            bool isRanged = args.Hitter.GetStat(AttackSkill.RangeStat) > 0;
+            if (!isRanged)
+                return;
+
+            hitEvents.Add(args);
         }
 
         public void Draw(GraphicsContext graphicsContext, Rectangle viewBounds)
@@ -230,43 +242,42 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawLasers(GraphicsContext graphics, Rectangle bounds, CollisionLayer layer)
         {
-            var attackTasks = World.Entities
-                .OfType<Unit>()
-                .Where(unit => unit.CollisionLayer == layer)
-                .Select(unit => unit.TaskQueue.Current as AttackTask)
-                .Where(task => task != null);
-
-            foreach (AttackTask attackTask in attackTasks)
+            for (int i = hitEvents.Count() - 1; i >= 0; i--)
             {
-                Unit attacker = attackTask.Unit;
-                bool isRanged = attacker.GetStat(AttackSkill.RangeStat) > 0;
-                if (!isRanged || attacker.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)
+                HitEventArgs hit = hitEvents[i];
+                if (hit.Hitter.CollisionLayer != layer)
                     continue;
 
-                Unit target = attackTask.Target;
-                if (!Rectangle.Intersects(attacker.BoundingRectangle, bounds)
-                    && !Rectangle.Intersects(target.BoundingRectangle, bounds))
+                if (hit.Hitter.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)
                     continue;
 
-                float laserProgress = attacker.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;
+                float laserProgress = (World.LastSimulationStep.TimeInSeconds - hit.TimeHitOccurred) / meleeHitSpinTimeInSeconds;
 
-                Vector2 delta = target.Center - attacker.Center;
-                if (delta.LengthSquared < 0.001f) continue;
+                Vector2 delta = hit.Target.Center - hit.Hitter.Center;
+                if (laserProgress > 1)
+                {
+                    hitEvents.RemoveAt(i);
+                    continue;
+                }
+
+                if (!Rectangle.Intersects(hit.Hitter.BoundingRectangle, bounds)
+                    && !Rectangle.Intersects(hit.Target.BoundingRectangle, bounds))
+                    continue;
 
                 Vector2 normalizedDelta = Vector2.Normalize(delta);
                 float distance = delta.LengthFast;
 
-                Vector2 laserCenter = attacker.Center + normalizedDelta * laserProgress * distance;
+                Vector2 laserCenter = hit.Hitter.Center + normalizedDelta * laserProgress * distance;
                 if (!faction.CanSee(new Region((int)laserCenter.X, (int)laserCenter.Y, 1, 1)))
                     continue;
 
-                Vector2 laserStart = attacker.Center + (normalizedDelta
+                Vector2 laserStart = hit.Hitter.Center + (normalizedDelta
                     * Math.Max(0, laserProgress * distance - laserLength * 0.5f));
-                Vector2 laserEnd = attacker.Center + (normalizedDelta
+                Vector2 laserEnd = hit.Hitter.Center + (normalizedDelta
                     * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
 
                 LineSegment lineSegment = new LineSegment(laserStart, laserEnd);
-                graphics.Stroke(lineSegment, attacker.Faction.Color);
+                graphics.Stroke(lineSegment, hit.Hitter.Faction.Color);
             }
         }
         #endregion

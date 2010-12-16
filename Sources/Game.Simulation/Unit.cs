@@ -497,7 +497,7 @@ namespace Orion.Game.Simulation
 
         private void OnHitting(Unit target, float damage)
         {
-            HitEventArgs args = new HitEventArgs(this, target, damage);
+            HitEventArgs args = new HitEventArgs(this, target, damage, World.LastSimulationStep.TimeInSeconds);
 
             Hitting.Raise(this, args);
 

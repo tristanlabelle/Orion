@@ -19,6 +19,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Engine.Gui2;
 using Application = System.Windows.Forms.Application;
 using Orion.Engine.Input;
+using Orion.Engine.Geometry;
 
 namespace Orion.Game.Main
 {
@@ -77,9 +78,21 @@ namespace Orion.Game.Main
 
             UIManager uiManager = new UIManager(graphicsContext);
 
+            Action draw = () =>
+            {
+                graphicsContext.Clear(Colors.Green);
+                graphicsContext.ProjectionBounds = new Rectangle(0, 0, uiManager.Size.Width, uiManager.Size.Height);
+                uiManager.Draw();
+                graphicsContext.Present();
+            };
+
             Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
             window.InputReceived += (sender, args) => inputEventQueue.Enqueue(args);
-            window.Resized += sender => uiManager.Size = window.ClientAreaSize;
+            window.Resized += sender =>
+            {
+                uiManager.Size = window.ClientAreaSize;
+                draw();
+            };
 
             StackPanel stackPanel = new StackPanel
             {
@@ -109,10 +122,7 @@ namespace Orion.Game.Main
                     }
                 }
 
-                graphicsContext.Clear(Colors.Green);
-                graphicsContext.ProjectionBounds = new Engine.Geometry.Rectangle(0, 0, uiManager.Size.Width, uiManager.Size.Height);
-                uiManager.Draw();
-                graphicsContext.Present();
+                draw();
             }
         }
         #endregion

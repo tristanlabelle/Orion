@@ -270,8 +270,11 @@ namespace Orion.Engine.Gui2
         /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
         public Size Measure()
         {
-        	if (layoutState == LayoutState.Invalidated)
+            if (layoutState == LayoutState.Invalidated)
+            {
                 cachedDesiredReservedSize = MeasureWithoutMargin() + margin;
+                layoutState = LayoutState.Measured;
+            }
 
             return cachedDesiredReservedSize;
         }
@@ -281,30 +284,34 @@ namespace Orion.Engine.Gui2
         /// </summary>
         protected void InvalidateMeasure()
         {
+            if (layoutState == LayoutState.Invalidated) return;
+
+            InvalidateArrange();
+
         	cachedDesiredReservedSize = Size.Zero;
-            cachedReservedRectangle = null;
         	layoutState = LayoutState.Invalidated;
+
             if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
 
         protected virtual void OnChildMeasureInvalidated(UIElement child)
         {
-        	if (layoutState != LayoutState.Invalidated)
-        		layoutState = LayoutState.Measured;
-        	
-        	if (parent != null) parent.OnChildMeasureInvalidated(this);
+            InvalidateMeasure();
         }
         #endregion
 
         #region Arrange
         public Region Arrange()
         {
-            if (!cachedReservedRectangle.HasValue)
+            if (layoutState != LayoutState.Arranged)
             {
                 if (parent == null)
                     cachedReservedRectangle = new Region(Measure());
                 else
                     parent.ArrangeChild(this);
+
+                layoutState = LayoutState.Arranged;
+                ArrangeChildren();
             }
 
             return cachedReservedRectangle.Value;
@@ -336,13 +343,21 @@ namespace Orion.Engine.Gui2
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
+            Debug.Assert(child.layoutState != LayoutState.Invalidated);
 
             child.cachedReservedRectangle = rectangle;
+            child.layoutState = LayoutState.Arranged;
         }
 
         protected void InvalidateArrange()
         {
+            if (layoutState != LayoutState.Arranged) return;
+
             cachedReservedRectangle = null;
+            layoutState = LayoutState.Measured;
+
+            foreach (UIElement child in Children)
+                child.InvalidateArrange();
         }
 
         public static void DefaultArrange(int availableSize, Alignment alignment, int desiredSize, out int min, out int actualSize)

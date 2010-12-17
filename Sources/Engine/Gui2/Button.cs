@@ -18,7 +18,6 @@ namespace Orion.Engine.Gui2
         public Button()
         {
             children = new SingleChildCollection(() => content, value => content = value);
-            Padding = new Borders(2);
         }
 
         public Button(string text)
@@ -26,7 +25,7 @@ namespace Orion.Engine.Gui2
         {
             Argument.EnsureNotNull(text, "text");
 
-            Content = new Label { Text = text };
+            Content = new Label { Text = text, Margin = new Borders(2) };
         }
         #endregion
 
@@ -61,12 +60,13 @@ namespace Orion.Engine.Gui2
 
         protected override Size MeasureWithoutMargin()
         {
-            return (content == null ? Size.Zero : content.Measure()) + Padding;
+            return (content == null ? Size.Zero : content.Measure());
         }
 
         protected override void DoDraw(GraphicsContext graphicsContext)
         {
-            graphicsContext.Fill((Rectangle)(Arrange() - Margin).Value, Colors.Gray);
+            bool hovered = IsAncestorOf(Manager.HoveredElement);
+            graphicsContext.Fill((Rectangle)(Arrange() - Margin).Value, hovered ? Colors.LightGray : Colors.Gray);
             DrawChildren(graphicsContext);
         }
         #endregion

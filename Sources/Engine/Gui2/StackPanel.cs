@@ -5,11 +5,12 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
-    public sealed partial class StackPanel : Panel
+    public sealed partial class StackPanel : UIElement
     {
         #region Fields
         private readonly ChildCollection children;
         private Orientation orientation = Orientation.Vertical;
+        private Borders padding;
         private int itemGap;
         #endregion
 
@@ -29,6 +30,12 @@ namespace Orion.Engine.Gui2
                 Argument.EnsureDefined(value, "Orientation");
                 orientation = value;
             }
+        }
+        
+        public Borders Padding
+        {
+        	get { return padding; }
+        	set { padding = value; }
         }
 
         public int ItemGap

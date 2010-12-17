@@ -18,6 +18,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Engine.Gui2;
 using Application = System.Windows.Forms.Application;
+using Orion.Engine.Input;
 
 namespace Orion.Game.Main
 {
@@ -71,80 +72,48 @@ namespace Orion.Game.Main
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            using (GameGraphics gameGraphics = new GameGraphics())
+            IGameWindow window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
+            GraphicsContext graphicsContext = window.GraphicsContext;
+
+            UIManager uiManager = new UIManager(graphicsContext);
+
+            Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
+            window.InputReceived += (sender, args) => inputEventQueue.Enqueue(args);
+            window.Resized += sender => uiManager.Size = window.ClientAreaSize;
+
+            StackPanel stackPanel = new StackPanel
             {
-                UIManager uiManager = new UIManager(gameGraphics.Context);
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+                ItemGap = 10
+            };
 
-                StackPanel stackPanel = new StackPanel
+            stackPanel.Children.Add(new Label { Text = "Foo" });
+            stackPanel.Children.Add(new Label { Text = "Bar" });
+            stackPanel.Children.Add(new Button("Frob"));
+            uiManager.Root = stackPanel;
+
+            while (!window.WasClosed)
+            {
+                window.Update();
+
+                while (inputEventQueue.Count > 0)
                 {
-                    HorizontalAlignment = Alignment.Center,
-                    VerticalAlignment = Alignment.Center,
-                    ItemGap = 10
-                };
-
-                stackPanel.Children.Add(new Label { Text = "Foo" });
-                stackPanel.Children.Add(new Label { Text = "Bar" });
-                stackPanel.Children.Add(new Button("Frob") { Padding = new Borders(0, 0, 20, 0) });
-                uiManager.Root = stackPanel;
-
-                while (true)
-                {
-                    gameGraphics.Window.Update();
-                    gameGraphics.Context.Clear(Colors.Green);
-                    gameGraphics.Context.ProjectionBounds = new Engine.Geometry.Rectangle(0, 0, uiManager.Size.Width, uiManager.Size.Height);
-                    uiManager.Draw();
-                    gameGraphics.Context.Present();
-                }
-
-                using (GameStateManager gameStateManager = new GameStateManager())
-                {
-                    gameStateManager.Push(new MainMenuGameState(gameStateManager, gameGraphics));
-
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    FrameRateCounter updateRateCounter = new FrameRateCounter();
-                    FrameRateCounter drawRateCounter = new FrameRateCounter();
-
-                    // This run loop uses a fixed time step for the updates and manages
-                    // situations where either the rendering or the updating is slow.
-                    // Source: http://gafferongames.com/game-physics/fix-your-timestep/
-                    float gameTime = 0.0f;
-
-                    float oldTime = (float)stopwatch.Elapsed.TotalSeconds;
-                    float timeAccumulator = 0.0f;
-
-                    while (!gameGraphics.Window.WasClosed && !gameStateManager.IsEmpty)
+                    InputEvent inputEvent = inputEventQueue.Dequeue();
+                    if (inputEvent.Type == InputEventType.Mouse)
                     {
-                        float newTime = (float)stopwatch.Elapsed.TotalSeconds;
-                        float actualTimeDelta = newTime - oldTime;
-                        if (actualTimeDelta > 0.2f) actualTimeDelta = 0.2f; // Helps when we break for a while during debugging
-                        timeAccumulator += actualTimeDelta * TimeSpeedMultiplier;
-                        oldTime = newTime;
-
-                        while (timeAccumulator >= TargetSecondsPerFrame)
-                        {
-                            gameStateManager.Update(TargetSecondsPerFrame);
-                            updateRateCounter.Update();
-
-                            gameTime += TargetSecondsPerFrame;
-                            timeAccumulator -= TargetSecondsPerFrame;
-                        }
-
-                        gameGraphics.Window.Update();
-                        if (gameStateManager.ActiveState == null) continue;
-
-                        gameGraphics.Context.Clear(Colors.Black);
-
-                        gameStateManager.Draw(gameGraphics);
-                        gameGraphics.Context.Present();
-
-                        drawRateCounter.Update();
+                        MouseEventType type;
+                        MouseEventArgs args;
+                        inputEvent.GetMouse(out type, out args);
+                        uiManager.SendMouseEvent(type, args);
                     }
                 }
-            }
 
-            Debug.Assert(Texture.AliveCount == 0,
-                "Congratulations! You've leaked {0} textures!"
-                .FormatInvariant(Texture.AliveCount));
+                graphicsContext.Clear(Colors.Green);
+                graphicsContext.ProjectionBounds = new Engine.Geometry.Rectangle(0, 0, uiManager.Size.Width, uiManager.Size.Height);
+                uiManager.Draw();
+                graphicsContext.Present();
+            }
         }
         #endregion
         #endregion

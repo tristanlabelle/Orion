@@ -143,7 +143,7 @@
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Button.cs" />
     <Compile Include="Gui2\Label.cs" />
-    <Compile Include="Gui2\Panel.cs" />
+    <Compile Include="Gui2\LayoutState.cs" />
     <Compile Include="Gui2\Borders.cs" />
     <Compile Include="Gui2\Orientation.cs" />
     <Compile Include="Gui2\StackPanel.ChildCollection.cs" />

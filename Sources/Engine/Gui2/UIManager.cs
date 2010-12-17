@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui2
 {
@@ -19,6 +20,7 @@ namespace Orion.Engine.Gui2
         private Size size;
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
+        private UIElement hoveredElement;
         #endregion
 
         #region Constructors
@@ -41,6 +43,7 @@ namespace Orion.Engine.Gui2
             get { return size; }
             set
             {
+                if (value == size) return;
                 size = value;
                 InvalidateMeasure();
             }
@@ -85,6 +88,14 @@ namespace Orion.Engine.Gui2
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the element containing the mouse cursor.
+        /// </summary>
+        public UIElement HoveredElement
+        {
+            get { return hoveredElement; }
+        }
         #endregion
 
         #region Methods
@@ -101,6 +112,46 @@ namespace Orion.Engine.Gui2
         public void Draw()
         {
             Draw(graphicsContext);
+        }
+        
+        /// <summary>
+        /// Injects a mouse event into the UI hierarchy.
+        /// </summary>
+        /// <param name="type">The type of the mouse event.</param>
+        /// <param name="args">A structure describing the mouse event.</param>
+        public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+        	UIElement target = GetDescendantAt((Point)args.Position);
+            if (target != hoveredElement)
+            {
+                UIElement commonAncestor = UIElement.FindCommonAncestor(target, hoveredElement);
+                if (hoveredElement != null) NotifyMouseExited(hoveredElement, commonAncestor);
+                if (target != null) NotifyMouseEntered(target, commonAncestor);
+            }
+
+            hoveredElement = target;
+        	if (target != null) target.PropagateMouseEvent(type, args);
+        }
+
+        private void NotifyMouseExited(UIElement target, UIElement firstExcludedAncestor)
+        {
+            while (target != firstExcludedAncestor)
+            {
+                target.OnMouseExited();
+                target = target.Parent;
+            }
+        }
+
+        private void NotifyMouseEntered(UIElement target, UIElement firstExcludedAncestor)
+        {
+            while (target != firstExcludedAncestor)
+            {
+                UIElement ancestor = target;
+                while (ancestor.Parent != firstExcludedAncestor)
+                    ancestor = ancestor.Parent;
+                ancestor.OnMouseEntered();
+                firstExcludedAncestor = ancestor;
+            }
         }
 
         protected override ICollection<UIElement> GetChildren()

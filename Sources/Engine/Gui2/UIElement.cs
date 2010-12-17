@@ -6,6 +6,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using System.Diagnostics;
 using System.ComponentModel;
+using Orion.Engine.Input;
 
 namespace Orion.Engine.Gui2
 {
@@ -20,12 +21,23 @@ namespace Orion.Engine.Gui2
         private UIManager manager;
         private UIElement parent;
         private Borders margin;
-        private Borders padding;
         private Visibility visibility;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
-        private Size? cachedMeasuredSize;
-        private Region? cachedArrangedRectangle;
+        
+        /// <summary>
+        /// A cached value of the optimal space for this <see cref="UIElement"/> based on the size of its contents.
+        /// This value is only meaningful if the layout state is not <see cref="LayoutState.Invalidated"/>.
+        /// </summary>
+        private Size cachedDesiredReservedSize;
+        
+        /// <summary>
+        /// A cached value of the client space rectangle reserved for this <see cref="UIElement"/>.
+        /// This value is only meaningful if the layout state is <see cref="LayoutState.Arranged"/>.
+        /// </summary>
+        private Region? cachedReservedRectangle;
+        
+        private LayoutState layoutState;
         #endregion
 
         #region Constructors
@@ -41,11 +53,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public UIManager Manager
         {
-            get
-            {
-                if (manager == null && parent != null) manager = parent.Manager;
-                return manager;
-            }
+            get { return manager; }
         }
 
         /// <summary>
@@ -65,19 +73,6 @@ namespace Orion.Engine.Gui2
             set
             {
                 this.margin = value;
-                InvalidateMeasure();
-            }
-        }
-
-        /// <summary>
-        /// Accesses the padding inside this <see cref="UIElement"/>.
-        /// </summary>
-        public virtual Borders Padding
-        {
-            get { return padding; }
-            set
-            {
-                this.padding = value;
                 InvalidateMeasure();
             }
         }
@@ -156,26 +151,73 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual UIElement GetChildAt(Point point)
         {
+        	if (manager == null) return null;
             if (!Arrange().Contains(point)) return null;
+            
             return Children.FirstOrDefault(child => child.Arrange().Contains(point));
+        }
+
+        /// <summary>
+        /// Tests if this <see cref="UIElement"/> is an ancestor of a given <see cref="UIElement"/>.
+        /// In other words, tests if a given <see cref="UIElement"/> is a descendant of this <see cref="UIElement"/>.
+        /// </summary>
+        /// <param name="descendant">The descendant to be tested.</param>
+        /// <returns>
+        /// <c>True</c> if this <see cref="UIElement"/> is an ancestor of <paramref name="descendant"/>,
+        /// <c>false</c> if not or if <paramref name="descendant"/> is null.
+        /// </returns>
+        public bool IsAncestorOf(UIElement descendant)
+        {
+            while (true)
+            {
+                if (descendant == null) return false;
+                if (descendant == this) return true;
+                descendant = descendant.Parent;
+            }
+        }
+        
+        /// <summary>
+        /// Gets the deepest descendant <see cref="UIElement"/> at a given location.
+        /// </summary>
+        /// <param name="point">The location where to find the descendant.</param>
+        /// <returns>The deepest descendant at that location.</returns>
+        public UIElement GetDescendantAt(Point point)
+        {
+        	if (manager == null) return null;
+            if (!Arrange().Contains(point)) return null;
+            
+        	UIElement current = this;
+        	while (true)
+        	{
+        		UIElement descendant = current.GetChildAt(point);
+        		if (descendant == null) break;
+        		current = descendant;
+        	}
+        	
+        	return current;
         }
 
         /// <summary>
         /// Changes the parent of this <see cref="UIElement"/> in the UI hierarchy.
         /// </summary>
         /// <param name="parent">The new parent of this <see cref="UIElement"/>.</param>
-        protected virtual void SetParent(UIElement parent)
+        private void SetParent(UIElement parent)
         {
             if (this is UIManager) throw new InvalidOperationException("The UI manager cannot be a child.");
+            if (this.parent != null && parent != null)
+            	throw new InvalidOperationException("Cannot set the parent when already parented.");
 
             this.parent = parent;
-            if (parent == null)
-            {
-                manager = null;
-                cachedMeasuredSize = null;
-            }
-
-            cachedArrangedRectangle = null;
+            UIManager newManager = parent == null ? null : parent.manager;
+            if (newManager != manager) SetManagerRecursively(newManager);
+            layoutState = LayoutState.Invalidated;
+        }
+        
+        private void SetManagerRecursively(UIManager manager)
+        {
+        	this.manager = manager;
+        	foreach (UIElement child in Children)
+        		child.SetManagerRecursively(manager);
         }
 
         protected void AdoptChild(UIElement child)
@@ -187,6 +229,31 @@ namespace Orion.Engine.Gui2
         {
             Debug.Assert(child.Parent == this);
             child.SetParent(null);
+        }
+
+        /// <summary>
+        /// Finds the common ancestor of two <see cref="UIElement"/>.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>
+        /// The common ancestor of those <see cref="UIElement"/>s,
+        /// or <c>null</c> if they have no common ancestor or one of them is <c>null</c>.
+        /// </returns>
+        public static UIElement FindCommonAncestor(UIElement a, UIElement b)
+        {
+            UIElement ancestorA = a;
+            while (ancestorA != null)
+            {
+                UIElement ancestorB = b;
+                while (ancestorB != null)
+                {
+                    if (ancestorB == ancestorA) return ancestorA;
+                    ancestorB = ancestorB.Parent;
+                }
+                ancestorA = ancestorA.Parent;
+            }
+            return null;
         }
         #endregion
 
@@ -203,15 +270,10 @@ namespace Orion.Engine.Gui2
         /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
         public Size Measure()
         {
-            if (!cachedMeasuredSize.HasValue)
-            {
-                Size sizeWithoutMargin = MeasureWithoutMargin();
-                cachedMeasuredSize = new Size(
-                    sizeWithoutMargin.Width + Margin.MinX + margin.MaxX,
-                    sizeWithoutMargin.Height + Margin.MinY + margin.MaxY);
-            }
+        	if (layoutState == LayoutState.Invalidated)
+                cachedDesiredReservedSize = MeasureWithoutMargin() + margin;
 
-            return cachedMeasuredSize.Value;
+            return cachedDesiredReservedSize;
         }
 
         /// <summary>
@@ -219,26 +281,33 @@ namespace Orion.Engine.Gui2
         /// </summary>
         protected void InvalidateMeasure()
         {
-            cachedMeasuredSize = null;
-            cachedArrangedRectangle = null;
+        	cachedDesiredReservedSize = Size.Zero;
+            cachedReservedRectangle = null;
+        	layoutState = LayoutState.Invalidated;
             if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
 
-        protected virtual void OnChildMeasureInvalidated(UIElement child) { }
+        protected virtual void OnChildMeasureInvalidated(UIElement child)
+        {
+        	if (layoutState != LayoutState.Invalidated)
+        		layoutState = LayoutState.Measured;
+        	
+        	if (parent != null) parent.OnChildMeasureInvalidated(this);
+        }
         #endregion
 
         #region Arrange
         public Region Arrange()
         {
-            if (!cachedArrangedRectangle.HasValue)
+            if (!cachedReservedRectangle.HasValue)
             {
                 if (parent == null)
-                    cachedArrangedRectangle = new Region(Measure());
+                    cachedReservedRectangle = new Region(Measure());
                 else
                     parent.ArrangeChild(this);
             }
 
-            return cachedArrangedRectangle.Value;
+            return cachedReservedRectangle.Value;
         }
 
         protected virtual void ArrangeChildren()
@@ -254,7 +323,7 @@ namespace Orion.Engine.Gui2
 
         protected void DefaultArrangeChild(UIElement child)
         {
-            Region? childrenBounds = Arrange() - margin - padding;
+            Region? childrenBounds = Arrange() - margin;
             if (!childrenBounds.HasValue) return;
 
             Region childRectangle = DefaultArrange(childrenBounds.Value.Size, child);
@@ -268,12 +337,12 @@ namespace Orion.Engine.Gui2
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
 
-            child.cachedArrangedRectangle = rectangle;
+            child.cachedReservedRectangle = rectangle;
         }
 
         protected void InvalidateArrange()
         {
-            cachedArrangedRectangle = null;
+            cachedReservedRectangle = null;
         }
 
         public static void DefaultArrange(int availableSize, Alignment alignment, int desiredSize, out int min, out int actualSize)
@@ -315,7 +384,45 @@ namespace Orion.Engine.Gui2
             return new Region(x, y, width, height);
         }
         #endregion
+        
+        #region Event Handling
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/> and its ancestors to handle a mouse event.
+        /// </summary>
+        /// <param name="type">The type of mouse event.</param>
+        /// <param name="args">The arguments describing the event.</param>
+        /// <returns>The <see cref="UIElement"/> which handled the event, or <c>null</c> if none did.</returns>
+        internal UIElement PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+        	UIElement handler = this;
+        	do
+        	{
+        		if (HandleMouseEvent(type, args)) break;
+        		handler = handler.parent;
+        	} while (handler != null);
+        	
+        	return handler;
+        }
+        
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/> to handle a mouse event.
+        /// </summary>
+        /// <param name="type">The type of mouse event.</param>
+        /// <param name="args">The arguments describing the event.</param>
+        /// <returns>
+        /// <c>True</c> if the mouse event was handled, <c>false</c> if not.
+        /// Returning <c>true</c> stops the propagation of the event through ancestors.
+        /// </returns>
+        protected virtual bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+        	return false;
+        }
 
+        protected internal virtual void OnMouseEntered() { }
+        protected internal virtual void OnMouseExited() { }
+        #endregion
+
+        #region Drawing
         protected void Draw(GraphicsContext graphicsContext)
         {
             if (visibility != Visibility.Visible || Arrange().Area == 0) return;
@@ -330,7 +437,7 @@ namespace Orion.Engine.Gui2
 
         protected void DrawChildren(GraphicsContext graphicsContext)
         {
-            Region? childrenAreaBounds = Arrange() - margin - padding;
+            Region? childrenAreaBounds = Arrange() - margin;
             if (!childrenAreaBounds.HasValue) return;
 
             DisposableHandle? scissorBoxHandle = null;
@@ -348,6 +455,7 @@ namespace Orion.Engine.Gui2
 
             if (scissorBoxHandle.HasValue) scissorBoxHandle.Value.Dispose();
         }
+        #endregion
         
         private void AssertUIManagerForMeasurement()
         {

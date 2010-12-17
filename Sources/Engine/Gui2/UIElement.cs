@@ -7,6 +7,7 @@ using Orion.Engine.Graphics;
 using System.Diagnostics;
 using System.ComponentModel;
 using Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui2
 {
@@ -24,6 +25,7 @@ namespace Orion.Engine.Gui2
         private Visibility visibility;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
+        private Size minimumSize;
         
         /// <summary>
         /// A cached value of the optimal space for this <see cref="UIElement"/> based on the size of its contents.
@@ -122,6 +124,72 @@ namespace Orion.Engine.Gui2
                 verticalAlignment = value;
                 InvalidateArrange();
             }
+        }
+
+        /// <summary>
+        /// Accesses the minimum size of this <see cref="UIElement"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// </summary>
+        public Size MinimumSize
+        {
+            get { return minimumSize; }
+            set
+            {
+                if (value == minimumSize) return;
+
+                minimumSize = value;
+                if (layoutState == LayoutState.Measured
+                    && (cachedDesiredReservedSize.Width < minimumSize.Width || cachedDesiredReservedSize.Height < minimumSize.Height))
+                {
+                    // The cached desired size being smaller than the new minimum size,
+                    // the element will have to be measured again so that it's desired size is bigger.
+                    InvalidateMeasure();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// </summary>
+        public int MinimumWidth
+        {
+            get { return minimumSize.Width; }
+            set
+            {
+                Argument.EnsurePositive(value, "MinimumWidth");
+                MinimumSize = new Size(value, minimumSize.Height);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// </summary>
+        public int MinimumHeight
+        {
+            get { return minimumSize.Height; }
+            set
+            {
+                Argument.EnsurePositive(value, "MinimumWHeight");
+                MinimumSize = new Size(minimumSize.Width, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="UIElement"/> can acquire the keyboard focus.
+        /// </summary>
+        public virtual bool IsFocusable
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="UIElement"/> currently has the keyboard focus.
+        /// </summary>
+        public bool HasFocus
+        {
+            get { return manager != null && manager.FocusedElement == this; }
         }
 
         /// <summary>
@@ -272,7 +340,13 @@ namespace Orion.Engine.Gui2
         {
             if (layoutState == LayoutState.Invalidated)
             {
-                cachedDesiredReservedSize = MeasureWithoutMargin() + margin;
+                Size desiredSize = MeasureWithoutMargin();
+                Size clampedDesiredSize = new Size(
+                    Math.Max(minimumSize.Width, desiredSize.Width),
+                    Math.Max(minimumSize.Height, desiredSize.Height));
+
+                cachedDesiredReservedSize = clampedDesiredSize + margin;
+
                 layoutState = LayoutState.Measured;
             }
 
@@ -425,7 +499,7 @@ namespace Orion.Engine.Gui2
         /// <param name="type">The type of mouse event.</param>
         /// <param name="args">The arguments describing the event.</param>
         /// <returns>
-        /// <c>True</c> if the mouse event was handled, <c>false</c> if not.
+        /// <c>True</c> if the event was handled, <c>false</c> if not.
         /// Returning <c>true</c> stops the propagation of the event through ancestors.
         /// </returns>
         protected virtual bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
@@ -433,8 +507,67 @@ namespace Orion.Engine.Gui2
         	return false;
         }
 
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/> and its ancestors to handle a key event.
+        /// </summary>
+        /// <param name="keyAndModifiers">
+        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
+        /// </param>
+        /// <param name="pressed">A value indicating if the key was pressed or released.</param>
+        /// <returns>The <see cref="UIElement"/> which handled the event, or <c>null</c> if none did.</returns>
+        internal UIElement PropagateKeyEvent(Keys keyAndModifiers, bool pressed)
+        {
+            UIElement handler = this;
+            do
+            {
+                if (HandleKeyEvent(keyAndModifiers, pressed)) break;
+                handler = handler.parent;
+            } while (handler != null);
+
+            return handler;
+        }
+
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/>to handle a key event.
+        /// </summary>
+        /// <param name="keyAndModifiers">
+        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
+        /// </param>
+        /// <param name="pressed">A value indicating if the key was pressed or released.</param>
+        /// <returns>
+        /// <c>True</c> if the event was handled, <c>false</c> if not.
+        /// Returning <c>true</c> stops the propagation of the event through ancestors.
+        /// </returns>
+        protected virtual bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/>to handle a character event.
+        /// </summary>
+        /// <param name="character">The character that was pressed.</param>
+        protected internal virtual void HandleCharacterEvent(char character) { }
+
+        /// <summary>
+        /// Invoked when the mouse cursor enters this <see cref="UIElement"/>.
+        /// </summary>
         protected internal virtual void OnMouseEntered() { }
+
+        /// <summary>
+        /// Invoked when the mouse cursor exits this <see cref="UIElement"/>.
+        /// </summary>
         protected internal virtual void OnMouseExited() { }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> acquires keyboard focus.
+        /// </summary>
+        protected internal virtual void OnFocusAcquired() { }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> loses keyboard focus.
+        /// </summary>
+        protected internal virtual void OnFocusLost() { }
         #endregion
 
         #region Drawing

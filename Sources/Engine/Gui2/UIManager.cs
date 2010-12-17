@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui2
 {
@@ -21,6 +22,7 @@ namespace Orion.Engine.Gui2
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
         private UIElement hoveredElement;
+        private UIElement focusedElement;
         #endregion
 
         #region Constructors
@@ -90,11 +92,29 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the element containing the mouse cursor.
+        /// Gets the <see cref="UIElement"/> containing the mouse cursor.
         /// </summary>
         public UIElement HoveredElement
         {
             get { return hoveredElement; }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="UIElement"/> which currently has the keyboard focus.
+        /// </summary>
+        public UIElement FocusedElement
+        {
+            get { return focusedElement; }
+            set
+            {
+                if (value == focusedElement) return;
+                if (value.Manager != this) throw new InvalidOperationException("Cannot set the focused element to an element from another manager.");
+
+                UIElement previouslyFocusedElement = focusedElement;
+                focusedElement = value;
+                if (previouslyFocusedElement != null) previouslyFocusedElement.OnFocusLost();
+                if (focusedElement != null) focusedElement.OnFocusAcquired();
+            }
         }
         #endregion
 
@@ -127,10 +147,35 @@ namespace Orion.Engine.Gui2
                 UIElement commonAncestor = UIElement.FindCommonAncestor(target, hoveredElement);
                 if (hoveredElement != null) NotifyMouseExited(hoveredElement, commonAncestor);
                 if (target != null) NotifyMouseEntered(target, commonAncestor);
+                hoveredElement = target;
             }
 
-            hoveredElement = target;
         	if (target != null) target.PropagateMouseEvent(type, args);
+        }
+
+        /// <summary>
+        /// Injects a keyboard event into the UI hierarchy.
+        /// </summary>
+        /// <param name="keyAndModifiers">
+        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
+        /// </param>
+        /// <param name="pressed">A value indicating if the key was pressed or released.</param>
+        public void SendKeyEvent(Keys keyAndModifiers, bool pressed)
+        {
+            if (focusedElement == null) return;
+
+            focusedElement.PropagateKeyEvent(keyAndModifiers, pressed);
+        }
+
+        /// <summary>
+        /// Injects a character event into the UI hierarchy.
+        /// </summary>
+        /// <param name="character">The character to be injected.</param>
+        public void SendCharacterEvent(char character)
+        {
+            if (focusedElement == null) return;
+
+            focusedElement.HandleCharacterEvent(character);
         }
 
         private void NotifyMouseExited(UIElement target, UIElement firstExcludedAncestor)

@@ -98,7 +98,8 @@ namespace Orion.Game.Main
             {
                 HorizontalAlignment = Alignment.Center,
                 VerticalAlignment = Alignment.Center,
-                ItemGap = 10
+                ItemGap = 10,
+                MinimumWidth = 200
             };
 
             stackPanel.Children.Add(new Label { Text = "Foo" });
@@ -119,6 +120,19 @@ namespace Orion.Game.Main
                         MouseEventArgs args;
                         inputEvent.GetMouse(out type, out args);
                         uiManager.SendMouseEvent(type, args);
+                    }
+                    else if (inputEvent.Type == InputEventType.Keyboard)
+                    {
+                        KeyboardEventType type;
+                        KeyboardEventArgs args;
+                        inputEvent.GetKeyboard(out type, out args);
+                        uiManager.SendKeyEvent(args.KeyAndModifiers, type == KeyboardEventType.ButtonPressed);
+                    }
+                    else if (inputEvent.Type == InputEventType.Character)
+                    {
+                        char character;
+                        inputEvent.GetCharacter(out character);
+                        uiManager.SendCharacterEvent(character);
                     }
                 }
 

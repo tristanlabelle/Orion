@@ -142,6 +142,7 @@
     <Compile Include="Graphics\TextureManager.cs" />
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Button.cs" />
+    <Compile Include="Gui2\DataBinding.cs" />
     <Compile Include="Gui2\Dock.cs" />
     <Compile Include="Gui2\DockedElement.cs" />
     <Compile Include="Gui2\DockPanel.ChildCollection.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="Gui\ViewContainer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IPropertyChangedEventSource.cs" />
     <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />

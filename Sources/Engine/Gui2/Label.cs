@@ -39,7 +39,10 @@ namespace Orion.Engine.Gui2
             set
             {
                 Argument.EnsureNotNull(value, "Text");
+                if (object.ReferenceEquals(value, text)) return;
+
                 this.text = value;
+                InvalidateMeasure();
             }
         }
 

@@ -51,7 +51,10 @@ namespace Orion.Engine.Gui2
             set
             {
                 Argument.EnsureNotNull(text, "text");
+                if (object.ReferenceEquals(value, text)) return;
+
                 text = value;
+                RaisePropertyChanged("Text");
             }
         }
 

@@ -102,9 +102,15 @@ namespace Orion.Game.Main
                 MinimumWidth = 200
             };
 
-            stackPanel.Children.Add(new Label("Foo"));
-            stackPanel.Children.Add(new TextField("Bar"));
+            Label label = new Label("Foo");
+            stackPanel.Children.Add(label);
+
+            TextField textField = new TextField("Bar");
+            stackPanel.Children.Add(textField);
+
             stackPanel.Children.Add(new Button("Frob"));
+
+            DataBinding.BindOneWay(() => textField.Text, () => label.Text, text => "You've typed: " + text);
 
             DockPanel dockPanel = new DockPanel { LastChildFill = true };
             dockPanel.Dock(new Button("+Y") { MinimumSize = new Size(80, 40) }, Dock.MaxY);

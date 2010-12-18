@@ -14,7 +14,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Base class of the UI hierarchy.
     /// </summary>
-    public abstract partial class UIElement
+    public abstract partial class UIElement : IPropertyChangedEventSource
     {
         #region Fields
         private static readonly UIElement[] emptyArray = new UIElement[0];
@@ -198,6 +198,21 @@ namespace Orion.Engine.Gui2
         public ICollection<UIElement> Children
         {
             get { return GetChildren(); }
+        }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the value of a property changes.
+        /// The parameter specifies the name of the property which value changed.
+        /// </summary>
+        public event Action<object, string> PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            Argument.EnsureNotNull(propertyName, "propertyName");
+
+            if (PropertyChanged != null) PropertyChanged(this, propertyName);
         }
         #endregion
 

@@ -14,13 +14,16 @@ namespace Orion.Engine.Gui2
     public sealed class Label : UIElement
     {
         #region Fields
-        private string text = string.Empty;
+        private string text;
         private ColorRgba? customColor;
         private Font customFont;
         #endregion
 
         #region Constructors
-        public Label() { }
+        public Label()
+        {
+            text = string.Empty;
+        }
 
         public Label(string text)
         {

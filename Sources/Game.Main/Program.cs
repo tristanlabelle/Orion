@@ -102,8 +102,8 @@ namespace Orion.Game.Main
                 MinimumWidth = 200
             };
 
-            stackPanel.Children.Add(new Label { Text = "Foo" });
-            stackPanel.Children.Add(new Label { Text = "Bar" });
+            stackPanel.Children.Add(new Label("Foo"));
+            stackPanel.Children.Add(new TextField("Bar"));
             stackPanel.Children.Add(new Button("Frob"));
 
             DockPanel dockPanel = new DockPanel { LastChildFill = true };

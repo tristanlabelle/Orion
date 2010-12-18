@@ -372,6 +372,11 @@ namespace Orion.Engine.Gui2
         {
             InvalidateMeasure();
         }
+
+        private void AssertUIManagerForMeasurement()
+        {
+            if (manager == null) throw new InvalidOperationException("Cannot get the measure a UI element without a UI manager.");
+        }
         #endregion
 
         #region Arrange
@@ -570,6 +575,24 @@ namespace Orion.Engine.Gui2
         protected internal virtual void OnFocusLost() { }
         #endregion
 
+        #region Focus
+        /// <summary>
+        /// Gives the keyboard focus to this <see cref="UIElement"/>.
+        /// </summary>
+        public void Focus()
+        {
+            if (manager != null) manager.FocusedElement = this;
+        }
+
+        /// <summary>
+        /// Removes the keyboard focus from this <see cref="UIElement"/>.
+        /// </summary>
+        public void LoseFocus()
+        {
+            if (HasFocus) manager.FocusedElement = null;
+        }
+        #endregion
+
         #region Drawing
         protected void Draw(GraphicsContext graphicsContext)
         {
@@ -604,11 +627,6 @@ namespace Orion.Engine.Gui2
             if (scissorBoxHandle.HasValue) scissorBoxHandle.Value.Dispose();
         }
         #endregion
-        
-        private void AssertUIManagerForMeasurement()
-        {
-            if (manager == null) throw new InvalidOperationException("Cannot get the measure a UI element without a UI manager.");
-        }
         #endregion
     }
 }

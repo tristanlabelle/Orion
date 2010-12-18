@@ -220,9 +220,9 @@ namespace Orion.Engine.Gui2
         public virtual UIElement GetChildAt(Point point)
         {
         	if (manager == null) return null;
-            if (!Arrange().Contains(point)) return null;
+            if (!GetReservedRectangle().Contains(point)) return null;
             
-            return Children.FirstOrDefault(child => child.Arrange().Contains(point));
+            return Children.FirstOrDefault(child => child.GetReservedRectangle().Contains(point));
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace Orion.Engine.Gui2
         public UIElement GetDescendantAt(Point point)
         {
         	if (manager == null) return null;
-            if (!Arrange().Contains(point)) return null;
+            if (!GetReservedRectangle().Contains(point)) return null;
             
         	UIElement current = this;
         	while (true)
@@ -375,7 +375,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Arrange
-        public Region Arrange()
+        protected Region GetReservedRectangle()
         {
             if (layoutState != LayoutState.Arranged)
             {
@@ -404,7 +404,7 @@ namespace Orion.Engine.Gui2
 
         protected void DefaultArrangeChild(UIElement child)
         {
-            Region? childrenBounds = Arrange() - margin;
+            Region? childrenBounds = GetReservedRectangle() - margin;
             if (!childrenBounds.HasValue) return;
 
             Region childRectangle = DefaultArrange(childrenBounds.Value.Size, child);
@@ -573,7 +573,7 @@ namespace Orion.Engine.Gui2
         #region Drawing
         protected void Draw(GraphicsContext graphicsContext)
         {
-            if (visibility != Visibility.Visible || Arrange().Area == 0) return;
+            if (visibility != Visibility.Visible || GetReservedRectangle().Area == 0) return;
 
             DoDraw(graphicsContext);
         }
@@ -585,7 +585,7 @@ namespace Orion.Engine.Gui2
 
         protected void DrawChildren(GraphicsContext graphicsContext)
         {
-            Region? childrenAreaBounds = Arrange() - margin;
+            Region? childrenAreaBounds = GetReservedRectangle() - margin;
             if (!childrenAreaBounds.HasValue) return;
 
             DisposableHandle? scissorBoxHandle = null;
@@ -593,7 +593,7 @@ namespace Orion.Engine.Gui2
             {
                 if (!scissorBoxHandle.HasValue)
                 {
-                    Region childRectangle = child.Arrange();
+                    Region childRectangle = child.GetReservedRectangle();
                     if (!childrenAreaBounds.Value.Contains(childRectangle))
                         scissorBoxHandle = graphicsContext.PushScissorRegion(childrenAreaBounds.Value);
                 }

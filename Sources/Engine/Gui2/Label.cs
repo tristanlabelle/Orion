@@ -20,6 +20,13 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
+        public Label() { }
+
+        public Label(string text)
+        {
+            Argument.EnsureNotNull(text, "text");
+            this.text = text;
+        }
         #endregion
 
         #region Properties
@@ -72,7 +79,7 @@ namespace Orion.Engine.Gui2
 
         protected override void DoDraw(GraphicsContext graphicsContext)
         {
-            Region rectangle = Arrange();
+            Region rectangle = GetReservedRectangle();
             graphicsContext.Draw(text, (Vector2)rectangle.Min, Color);
         }
         #endregion

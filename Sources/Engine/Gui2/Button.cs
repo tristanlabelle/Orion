@@ -25,7 +25,12 @@ namespace Orion.Engine.Gui2
         {
             Argument.EnsureNotNull(text, "text");
 
-            Content = new Label { Text = text, Margin = new Borders(2) };
+            Content = new Label(text)
+            {
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+                Margin = new Borders(2)
+            };
         }
         #endregion
 
@@ -66,7 +71,7 @@ namespace Orion.Engine.Gui2
         protected override void DoDraw(GraphicsContext graphicsContext)
         {
             bool hovered = IsAncestorOf(Manager.HoveredElement);
-            graphicsContext.Fill((Rectangle)(Arrange() - Margin).Value, hovered ? Colors.LightGray : Colors.Gray);
+            graphicsContext.Fill((Rectangle)(GetReservedRectangle() - Margin).Value, hovered ? Colors.LightGray : Colors.Gray);
             DrawChildren(graphicsContext);
         }
         #endregion

@@ -87,7 +87,7 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Region? childrenAreaBounds = Arrange() - Margin - Padding;
+            Region? childrenAreaBounds = GetReservedRectangle() - Margin - Padding;
             if (!childrenAreaBounds.HasValue) return;
 
             if (orientation == Orientation.Vertical)

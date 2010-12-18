@@ -105,8 +105,17 @@ namespace Orion.Game.Main
             stackPanel.Children.Add(new Label { Text = "Foo" });
             stackPanel.Children.Add(new Label { Text = "Bar" });
             stackPanel.Children.Add(new Button("Frob"));
+
+            DockPanel dockPanel = new DockPanel { LastChildFill = true };
+            dockPanel.Dock(new Button("+Y") { MinimumSize = new Size(80, 40) }, Dock.MaxY);
+            dockPanel.Dock(new Button("+X") { MinimumSize = new Size(40, 40), VerticalAlignment = Alignment.Center }, Dock.MaxX);
+            dockPanel.Dock(new Button("-Y") { MinimumSize = new Size(60, 60) }, Dock.MinY);
+            stackPanel.Children.Add(dockPanel);
+
             uiManager.Root = stackPanel;
 
+            Stopwatch stopwatch = new Stopwatch();
+            int frameCount = -1;
             while (!window.WasClosed)
             {
                 window.Update();
@@ -137,6 +146,10 @@ namespace Orion.Game.Main
                 }
 
                 draw();
+                ++frameCount;
+                stopwatch.Start();
+
+                if ((frameCount % 60) == 0) window.Title = "FPS: {0:F2}".FormatInvariant(frameCount / stopwatch.Elapsed.TotalSeconds);
             }
         }
         #endregion

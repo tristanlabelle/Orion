@@ -142,6 +142,10 @@
     <Compile Include="Graphics\TextureManager.cs" />
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Button.cs" />
+    <Compile Include="Gui2\Dock.cs" />
+    <Compile Include="Gui2\DockedElement.cs" />
+    <Compile Include="Gui2\DockPanel.ChildCollection.cs" />
+    <Compile Include="Gui2\DockPanel.cs" />
     <Compile Include="Gui2\Label.cs" />
     <Compile Include="Gui2\LayoutState.cs" />
     <Compile Include="Gui2\Borders.cs" />

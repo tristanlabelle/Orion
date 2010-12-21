@@ -90,6 +90,12 @@ namespace Orion.Game.Simulation
         /// Convenience aggregator of the <see cref="Faction.Defeated"/> event.
         /// </remarks>
         public event Action<World, Faction> FactionDefeated;
+
+        /// <summary>
+        /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s change diplomatic stance.
+        /// </summary>
+        /// <remarks>Convenience aggregator of the <see cref="Faction.DiplomaticStanceChanged"/> event.</remarks>
+        public event Action<Faction, Faction, DiplomaticStance> DiplomaticStanceChanged;
         #endregion
 
         #region Properties
@@ -224,6 +230,8 @@ namespace Orion.Game.Simulation
             Handle handle = new Handle((uint)factions.Count);
             Faction faction = new Faction(handle, this, name, color);
             factions.Add(faction);
+            faction.DiplomaticStanceChanged +=
+                (source, target, stance) => DiplomaticStanceChanged.Raise(source, target, stance);
             return faction;
         }
 

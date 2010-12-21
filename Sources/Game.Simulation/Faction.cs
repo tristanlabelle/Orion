@@ -96,6 +96,11 @@ namespace Orion.Game.Simulation
         /// </summary>
         public event Action<Faction, Technology> TechnologyResearched;
 
+        /// <summary>
+        /// Raised when the faction changes of diplomatic stance.
+        /// </summary>
+        public event Action<Faction, Faction, DiplomaticStance> DiplomaticStanceChanged;
+
         public event Action<Faction, string> Warning;
 
         public void RaiseWarning(string message, Faction source)
@@ -522,6 +527,7 @@ namespace Orion.Game.Simulation
             }
 
             diplomaticStances[target] = stance;
+            DiplomaticStanceChanged.Raise(this, target, stance);
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
 

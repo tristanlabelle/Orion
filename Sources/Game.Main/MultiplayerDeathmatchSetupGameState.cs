@@ -99,7 +99,8 @@ namespace Orion.Game.Main
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
-            Terrain terrain = Terrain.Generate(matchSettings.MapSize, random);
+            PerlinNoiseTerrainGenerator generator = new PerlinNoiseTerrainGenerator(random, matchSettings.MapSize);
+            Terrain terrain = generator.Generate();
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
             Match match = new Match(world, random);
@@ -136,7 +137,8 @@ namespace Orion.Game.Main
             }
             Debug.Assert(localCommander != null, "No local player slot.");
 
-            WorldGenerator.Generate(world, match.UnitTypes, random, !matchSettings.StartNomad);
+            WorldGenerator worldGenerator = new RandomWorldGenerator(random, !matchSettings.StartNomad);
+            worldGenerator.Generate(world, match.UnitTypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

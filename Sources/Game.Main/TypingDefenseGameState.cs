@@ -42,7 +42,8 @@ namespace Orion.Game.Main
             this.audio = manager.Audio;
 
             Random random = new MersenneTwister(Environment.TickCount);
-            Terrain terrain = Terrain.CreateFullyWalkable(new Size(60, 40));
+            TerrainGenerator generator = new TerrainGenerator.FullyWalkable(new Size(60, 40));
+            Terrain terrain = generator.Generate();
             World world = new World(terrain, random, 200);
             creepPath = CreepPath.Generate(world.Size, random);
             match = new Match(world, random, p => !creepPath.Contains(p));

@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PerlinNoiseTerrainGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
     <Compile Include="Skills\AttackSkill.cs" />
     <Compile Include="Skills\BasicSkill.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Skills\UnitSkill.cs" />
     <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
+    <Compile Include="TerrainGenerator.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />

@@ -22,7 +22,8 @@ namespace Orion.Engine.Gui2
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
         private UIElement hoveredElement;
-        private UIElement focusedElement;
+        private UIElement keyboardFocusedElement;
+        private UIElement mouseCapturedElement;
         #endregion
 
         #region Constructors
@@ -34,6 +35,18 @@ namespace Orion.Engine.Gui2
             this.size = graphicsContext.ViewportSize;
             this.children = new SingleChildCollection(() => Root, value => Root = value);
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the <see cref="UIElement"/> having the keyboard focus changes.
+        /// </summary>
+        public event Action<UIManager, UIElement> KeyboardFocusedElementChanged;
+
+        /// <summary>
+        /// Raised when the <see cref="UIElement"/> having captured the mouse changes.
+        /// </summary>
+        public event Action<UIManager, UIElement> MouseCapturedElementChanged;
         #endregion
 
         #region Properties
@@ -101,19 +114,43 @@ namespace Orion.Engine.Gui2
 
         /// <summary>
         /// Accesses the <see cref="UIElement"/> which currently has the keyboard focus.
+        /// This is the <see cref="UIElement"/> to which key and character events are routed.
         /// </summary>
-        public UIElement FocusedElement
+        public UIElement KeyboardFocusedElement
         {
-            get { return focusedElement; }
+            get { return keyboardFocusedElement; }
             set
             {
-                if (value == focusedElement) return;
-                if (value.Manager != this) throw new InvalidOperationException("Cannot set the focused element to an element from another manager.");
+                if (value == keyboardFocusedElement) return;
+                if (value.Manager != this) throw new InvalidOperationException("Cannot give the keyboard focus to an element from another manager.");
 
-                UIElement previouslyFocusedElement = focusedElement;
-                focusedElement = value;
-                if (previouslyFocusedElement != null) previouslyFocusedElement.OnFocusLost();
-                if (focusedElement != null) focusedElement.OnFocusAcquired();
+                UIElement previous = keyboardFocusedElement;
+                keyboardFocusedElement = value;
+                if (previous != null) previous.OnKeyboardFocusLost();
+                if (keyboardFocusedElement != null) keyboardFocusedElement.OnKeyboardFocusAcquired();
+
+                KeyboardFocusedElementChanged.Raise(this, keyboardFocusedElement);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="UIElement"/> which currently has captured the mouse.
+        /// This <see cref="UIElement"/> has a veto on mouse events, it gets a chance to process them before the normal hierarchy.
+        /// </summary>
+        public UIElement MouseCapturedElement
+        {
+            get { return mouseCapturedElement; }
+            set
+            {
+                if (value == mouseCapturedElement) return;
+                if (value.Manager != this) throw new InvalidOperationException("Cannot capture the mouse by an element from another manager.");
+
+                UIElement previous = mouseCapturedElement;
+                mouseCapturedElement = value;
+                if (previous != null) previous.OnMouseCaptureLost();
+                if (mouseCapturedElement != null) mouseCapturedElement.OnMouseCaptureAcquired();
+
+                MouseCapturedElementChanged.Raise(this, mouseCapturedElement);
             }
         }
         #endregion
@@ -141,6 +178,15 @@ namespace Orion.Engine.Gui2
         /// <param name="args">A structure describing the mouse event.</param>
         public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
         {
+            // If an element has captured the mouse, it gets a veto on mouse events,
+            // regardless of if they are in its client area.
+            if (mouseCapturedElement != null)
+            {
+                bool handled = mouseCapturedElement.HandleMouseEvent(type, args);
+                if (handled) return;
+            }
+
+            // Update the mouse position and generate mouse entered/exited events.
         	UIElement target = GetDescendantAt((Point)args.Position);
             if (target != hoveredElement)
             {
@@ -150,7 +196,18 @@ namespace Orion.Engine.Gui2
                 hoveredElement = target;
             }
 
-        	if (target != null) target.PropagateMouseEvent(type, args);
+            // Let the target or one of its descendant handle the event.
+            if (target != null)
+            {
+                UIElement handler = target;
+                do
+                {
+                    bool handled = handler.HandleMouseEvent(type, args);
+                    if (handled) break;
+
+                    handler = handler.Parent;
+                } while (handler != null);
+            }
         }
 
         /// <summary>
@@ -162,9 +219,14 @@ namespace Orion.Engine.Gui2
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
         public void SendKeyEvent(Keys keyAndModifiers, bool pressed)
         {
-            if (focusedElement == null) return;
+            if (keyboardFocusedElement == null) return;
 
-            focusedElement.PropagateKeyEvent(keyAndModifiers, pressed);
+            UIElement handler = keyboardFocusedElement;
+            do
+            {
+                if (handler.HandleKeyEvent(keyAndModifiers, pressed)) break;
+                handler = handler.Parent;
+            } while (handler != null);
         }
 
         /// <summary>
@@ -173,9 +235,9 @@ namespace Orion.Engine.Gui2
         /// <param name="character">The character to be injected.</param>
         public void SendCharacterEvent(char character)
         {
-            if (focusedElement == null) return;
+            if (keyboardFocusedElement == null) return;
 
-            focusedElement.HandleCharacterEvent(character);
+            keyboardFocusedElement.HandleCharacterEvent(character);
         }
 
         private void NotifyMouseExited(UIElement target, UIElement firstExcludedAncestor)

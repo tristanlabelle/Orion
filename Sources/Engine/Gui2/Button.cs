@@ -4,14 +4,21 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// A button <see cref="UIElement"/> that can be clicked by the user.
+    /// </summary>
     public sealed class Button : UIElement
     {
         #region Fields
         private readonly SingleChildCollection children;
         private UIElement content;
+        private bool isEnabled = true;
+        private bool isDown;
         #endregion
 
         #region Constructors
@@ -34,7 +41,18 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when this <see cref="Button"/> gets clicked,
+        /// either programatically, using the mouse or the keyboard.
+        /// </summary>
+        public event Action<Button> Clicked;
+        #endregion
+
         #region Properties
+        /// <summary>
+        /// Accesses the content <see cref="UIElement"/> of this <see cref="Button"/>.
+        /// </summary>
         public UIElement Content
         {
             get { return content; }
@@ -55,9 +73,32 @@ namespace Orion.Engine.Gui2
                 }
             }
         }
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Button"/> is enabled (can be clicked by the user).
+        /// </summary>
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set
+            {
+                if (value == isEnabled) return;
+
+                isEnabled = value;
+                if (!isEnabled) LoseKeyboardFocus();
+            }
+        }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Simulates a click from the user.
+        /// </summary>
+        public void Click()
+        {
+            if (Clicked != null) Clicked(this);
+        }
+
         protected override ICollection<UIElement> GetChildren()
         {
             return children;
@@ -68,9 +109,50 @@ namespace Orion.Engine.Gui2
             return (content == null ? Size.Zero : content.Measure());
         }
 
+        protected internal override bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        {
+            if (keyAndModifiers == Keys.Enter)
+            {
+                if (pressed) Click();
+                return true;
+            }
+
+            return false;
+        }
+
+        protected internal override bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        {
+            if (args.Button == MouseButton.Left)
+            {
+                if (type == MouseEventType.ButtonPressed)
+                {
+                    isDown = true;
+                    AcquireKeyboardFocus();
+                    AcquireMouseCapture();
+                }
+                else if (type == MouseEventType.ButtonReleased && isDown)
+                {
+                    LoseMouseCapture();
+                    isDown = false;
+
+                    bool isMouseOver = GetReservedRectangle().Contains((Point)args.Position);
+                    if (isMouseOver) Click();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        protected internal override void OnMouseExited()
+        {
+            isDown = false;
+        }
+
         protected override void DoDraw(GraphicsContext graphicsContext)
         {
-            bool hovered = IsAncestorOf(Manager.HoveredElement);
+            bool hovered = HasDescendant(Manager.HoveredElement);
             graphicsContext.Fill((Rectangle)(GetReservedRectangle() - Margin).Value, hovered ? Colors.LightGray : Colors.Gray);
             DrawChildren(graphicsContext);
         }

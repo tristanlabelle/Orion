@@ -116,13 +116,8 @@ namespace Orion.Engine.Gui2
                 if (value == isEditable) return;
 
                 isEditable = value;
-                if (!isEditable && HasFocus) Manager.FocusedElement = null;
+                if (!isEditable && HasKeyboardFocus) Manager.KeyboardFocusedElement = null;
             }
-        }
-
-        public override bool IsFocusable
-        {
-            get { return isEditable; }
         }
         #endregion
 
@@ -136,11 +131,11 @@ namespace Orion.Engine.Gui2
             relativeSelectionLength = -text.Length;
         }
 
-        protected override bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        protected internal override bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
         {
             if (type == MouseEventType.ButtonPressed && args.Button == MouseButton.Left && isEditable)
             {
-                Focus();
+                AcquireKeyboardFocus();
                 if ((args.ClickCount % 2) == 0) SelectAll();
                 return true;
             }
@@ -148,7 +143,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected override bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        protected internal override bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
         {
             switch (keyAndModifiers)
             {

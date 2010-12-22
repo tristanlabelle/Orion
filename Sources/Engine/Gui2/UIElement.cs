@@ -177,19 +177,19 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="UIElement"/> can acquire the keyboard focus.
+        /// Gets a value indicating if this <see cref="UIElement"/> currently has the keyboard focus.
         /// </summary>
-        public virtual bool IsFocusable
+        public bool HasKeyboardFocus
         {
-            get { return false; }
+            get { return manager != null && manager.KeyboardFocusedElement == this; }
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="UIElement"/> currently has the keyboard focus.
+        /// Gets a value indicating if this <see cref="UIElement"/> currently has captured the mouse.
         /// </summary>
-        public bool HasFocus
+        public bool HasMouseCapture
         {
-            get { return manager != null && manager.FocusedElement == this; }
+            get { return manager != null && manager.MouseCapturedElement == this; }
         }
 
         /// <summary>
@@ -240,16 +240,12 @@ namespace Orion.Engine.Gui2
             return Children.FirstOrDefault(child => child.GetReservedRectangle().Contains(point));
         }
 
-        /// <summary>
-        /// Tests if this <see cref="UIElement"/> is an ancestor of a given <see cref="UIElement"/>.
-        /// In other words, tests if a given <see cref="UIElement"/> is a descendant of this <see cref="UIElement"/>.
-        /// </summary>
-        /// <param name="descendant">The descendant to be tested.</param>
-        /// <returns>
-        /// <c>True</c> if this <see cref="UIElement"/> is an ancestor of <paramref name="descendant"/>,
-        /// <c>false</c> if not or if <paramref name="descendant"/> is null.
-        /// </returns>
-        public bool IsAncestorOf(UIElement descendant)
+       /// <summary>
+       /// Determines a given <see cref="UIElement"/> is a descendant of this <see cref="UIElement"/>.
+       /// </summary>
+       /// <param name="descendant">The <see cref="UIElement"/> to be tested.</param>
+       /// <returns><c>True</c> if it is this <see cref="UIElement"/> or one of its descendants, <c>false</c> if not.</returns>
+        public bool HasDescendant(UIElement descendant)
         {
             while (true)
             {
@@ -496,24 +492,6 @@ namespace Orion.Engine.Gui2
         
         #region Event Handling
         /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/> and its ancestors to handle a mouse event.
-        /// </summary>
-        /// <param name="type">The type of mouse event.</param>
-        /// <param name="args">The arguments describing the event.</param>
-        /// <returns>The <see cref="UIElement"/> which handled the event, or <c>null</c> if none did.</returns>
-        internal UIElement PropagateMouseEvent(MouseEventType type, MouseEventArgs args)
-        {
-        	UIElement handler = this;
-        	do
-        	{
-        		if (HandleMouseEvent(type, args)) break;
-        		handler = handler.parent;
-        	} while (handler != null);
-        	
-        	return handler;
-        }
-        
-        /// <summary>
         /// Gives a chance to this <see cref="UIElement"/> to handle a mouse event.
         /// </summary>
         /// <param name="type">The type of mouse event.</param>
@@ -522,29 +500,9 @@ namespace Orion.Engine.Gui2
         /// <c>True</c> if the event was handled, <c>false</c> if not.
         /// Returning <c>true</c> stops the propagation of the event through ancestors.
         /// </returns>
-        protected virtual bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        protected internal virtual bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
         {
         	return false;
-        }
-
-        /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/> and its ancestors to handle a key event.
-        /// </summary>
-        /// <param name="keyAndModifiers">
-        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
-        /// </param>
-        /// <param name="pressed">A value indicating if the key was pressed or released.</param>
-        /// <returns>The <see cref="UIElement"/> which handled the event, or <c>null</c> if none did.</returns>
-        internal UIElement PropagateKeyEvent(Keys keyAndModifiers, bool pressed)
-        {
-            UIElement handler = this;
-            do
-            {
-                if (HandleKeyEvent(keyAndModifiers, pressed)) break;
-                handler = handler.parent;
-            } while (handler != null);
-
-            return handler;
         }
 
         /// <summary>
@@ -558,7 +516,7 @@ namespace Orion.Engine.Gui2
         /// <c>True</c> if the event was handled, <c>false</c> if not.
         /// Returning <c>true</c> stops the propagation of the event through ancestors.
         /// </returns>
-        protected virtual bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        protected internal virtual bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
         {
             return false;
         }
@@ -578,34 +536,60 @@ namespace Orion.Engine.Gui2
         /// Invoked when the mouse cursor exits this <see cref="UIElement"/>.
         /// </summary>
         protected internal virtual void OnMouseExited() { }
-
-        /// <summary>
-        /// Invoked when this <see cref="UIElement"/> acquires keyboard focus.
-        /// </summary>
-        protected internal virtual void OnFocusAcquired() { }
-
-        /// <summary>
-        /// Invoked when this <see cref="UIElement"/> loses keyboard focus.
-        /// </summary>
-        protected internal virtual void OnFocusLost() { }
         #endregion
 
         #region Focus
         /// <summary>
         /// Gives the keyboard focus to this <see cref="UIElement"/>.
         /// </summary>
-        public void Focus()
+        public void AcquireKeyboardFocus()
         {
-            if (manager != null) manager.FocusedElement = this;
+            if (manager != null) manager.KeyboardFocusedElement = this;
         }
 
         /// <summary>
         /// Removes the keyboard focus from this <see cref="UIElement"/>.
         /// </summary>
-        public void LoseFocus()
+        public void LoseKeyboardFocus()
         {
-            if (HasFocus) manager.FocusedElement = null;
+            if (HasKeyboardFocus) manager.KeyboardFocusedElement = null;
         }
+
+        /// <summary>
+        /// Gives the mouse capture to this <see cref="UIElement"/>.
+        /// </summary>
+        public void AcquireMouseCapture()
+        {
+            if (manager != null) manager.MouseCapturedElement = this;
+        }
+
+        /// <summary>
+        /// Removes the mouse capture from this <see cref="UIElement"/>.
+        /// </summary>
+        public void LoseMouseCapture()
+        {
+            if (HasMouseCapture) manager.MouseCapturedElement = null;
+        }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> acquires keyboard focus.
+        /// </summary>
+        protected internal virtual void OnKeyboardFocusAcquired() { }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> loses keyboard focus.
+        /// </summary>
+        protected internal virtual void OnKeyboardFocusLost() { }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> acquires the mouse capture.
+        /// </summary>
+        protected internal virtual void OnMouseCaptureAcquired() { }
+
+        /// <summary>
+        /// Invoked when this <see cref="UIElement"/> loses the mouse capture.
+        /// </summary>
+        protected internal virtual void OnMouseCaptureLost() { }
         #endregion
 
         #region Drawing

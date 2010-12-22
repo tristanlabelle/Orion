@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Graphics;
 using OpenTK;
-using Keys = System.Windows.Forms.Keys;
+using Orion.Engine.Graphics;
 using Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {
@@ -131,21 +132,21 @@ namespace Orion.Engine.Gui2
             relativeSelectionLength = -text.Length;
         }
 
-        protected internal override bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
-            if (type == MouseEventType.ButtonPressed && args.Button == MouseButton.Left && isEditable)
+            if (button == MouseButtons.Left && pressCount > 0 && isEditable)
             {
                 AcquireKeyboardFocus();
-                if ((args.ClickCount % 2) == 0) SelectAll();
+                if (pressCount > 1) SelectAll();
                 return true;
             }
 
             return false;
         }
 
-        protected internal override bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        protected internal override bool HandleKey(Keys key, Keys modifiers, bool pressed)
         {
-            switch (keyAndModifiers)
+            switch (key | modifiers)
             {
                 case Keys.Left:
                     if (!pressed) return true;
@@ -213,7 +214,7 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        protected internal override void HandleCharacterEvent(char character)
+        protected internal override void HandleCharacter(char character)
         {
             if ("\b\r\t\n".Contains(character)) return;
 

@@ -6,6 +6,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {
@@ -109,9 +110,9 @@ namespace Orion.Engine.Gui2
             return (content == null ? Size.Zero : content.Measure());
         }
 
-        protected internal override bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        protected internal override bool HandleKey(Keys key, Keys modifiers, bool pressed)
         {
-            if (keyAndModifiers == Keys.Enter)
+            if (key == Keys.Enter && modifiers == Keys.None)
             {
                 if (pressed) Click();
                 return true;
@@ -120,22 +121,22 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
-            if (args.Button == MouseButton.Left)
+            if (button == MouseButtons.Left)
             {
-                if (type == MouseEventType.ButtonPressed)
+                if (pressCount > 0)
                 {
                     isDown = true;
                     AcquireKeyboardFocus();
                     AcquireMouseCapture();
                 }
-                else if (type == MouseEventType.ButtonReleased && isDown)
+                else if (isDown)
                 {
                     LoseMouseCapture();
                     isDown = false;
 
-                    bool isMouseOver = GetReservedRectangle().Contains((Point)args.Position);
+                    bool isMouseOver = GetReservedRectangle().Contains(state.Position);
                     if (isMouseOver) Click();
                 }
 

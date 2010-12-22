@@ -150,6 +150,7 @@
     <Compile Include="Gui2\Label.cs" />
     <Compile Include="Gui2\LayoutState.cs" />
     <Compile Include="Gui2\Borders.cs" />
+    <Compile Include="Gui2\MouseState.cs" />
     <Compile Include="Gui2\Orientation.cs" />
     <Compile Include="Gui2\StackPanel.ChildCollection.cs" />
     <Compile Include="Gui2\StackPanel.cs" />

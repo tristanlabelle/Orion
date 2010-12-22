@@ -20,6 +20,7 @@ using Orion.Engine.Gui2;
 using Application = System.Windows.Forms.Application;
 using Orion.Engine.Input;
 using Orion.Engine.Geometry;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Main
 {
@@ -134,20 +135,36 @@ namespace Orion.Game.Main
                         MouseEventType type;
                         MouseEventArgs args;
                         inputEvent.GetMouse(out type, out args);
-                        uiManager.SendMouseEvent(type, args);
+
+                        uiManager.InjectMouseMove((int)args.X, (int)args.Y);
+                        if (type == MouseEventType.WheelScrolled)
+                        {
+                            uiManager.InjectMouseWheel(args.WheelDelta);
+                        }
+                        else if (type == MouseEventType.ButtonPressed || type == MouseEventType.ButtonReleased)
+                        {
+                            MouseButtons buttons = MouseButtons.None;
+                            if (args.Button == MouseButton.Left) buttons = MouseButtons.Left;
+                            else if (args.Button == MouseButton.Middle) buttons = MouseButtons.Middle;
+                            else if (args.Button == MouseButton.Right) buttons = MouseButtons.Right;
+
+                            if (buttons != MouseButtons.None) uiManager.InjectMouseButton(buttons, args.ClickCount);
+                        }
                     }
                     else if (inputEvent.Type == InputEventType.Keyboard)
                     {
                         KeyboardEventType type;
                         KeyboardEventArgs args;
                         inputEvent.GetKeyboard(out type, out args);
-                        uiManager.SendKeyEvent(args.KeyAndModifiers, type == KeyboardEventType.ButtonPressed);
+
+                        uiManager.InjectKey(args.KeyAndModifiers, type == KeyboardEventType.ButtonPressed);
                     }
                     else if (inputEvent.Type == InputEventType.Character)
                     {
                         char character;
                         inputEvent.GetCharacter(out character);
-                        uiManager.SendCharacterEvent(character);
+
+                        uiManager.InjectCharacter(character);
                     }
                 }
 

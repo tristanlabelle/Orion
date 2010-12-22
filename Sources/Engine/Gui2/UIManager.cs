@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {
@@ -15,10 +17,18 @@ namespace Orion.Engine.Gui2
     public sealed partial class UIManager : UIElement
     {
         #region Fields
+        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseMoveCaller
+            = (sender, state, button, amount) => sender.HandleMouseMove(state);
+        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseButtonCaller
+            = (sender, state, button, amount) => sender.HandleMouseButton(state, button, (int)amount);
+        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseWheelCaller
+            = (sender, state, button, amount) => sender.HandleMouseWheel(state, amount);
+
         private readonly GraphicsContext graphicsContext;
         private readonly SingleChildCollection children;
         private UIElement root;
         private Size size;
+        private MouseState mouseState;
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
         private UIElement hoveredElement;
@@ -62,6 +72,14 @@ namespace Orion.Engine.Gui2
                 size = value;
                 InvalidateMeasure();
             }
+        }
+
+        /// <summary>
+        /// Gets the current state of the mouse.
+        /// </summary>
+        public MouseState MouseState
+        {
+            get { return mouseState; }
         }
         
         public Font DefaultFont
@@ -170,24 +188,71 @@ namespace Orion.Engine.Gui2
         {
             Draw(graphicsContext);
         }
-        
+
+        #region Input Event Injection
         /// <summary>
-        /// Injects a mouse event into the UI hierarchy.
+        /// Injects a mouse move event to be handled by the UI.
         /// </summary>
-        /// <param name="type">The type of the mouse event.</param>
-        /// <param name="args">A structure describing the mouse event.</param>
-        public void SendMouseEvent(MouseEventType type, MouseEventArgs args)
+        /// <param name="x">The new X coordinate of the mouse.</param>
+        /// <param name="y">The new Y coordinate of the mouse.</param>
+        public void InjectMouseMove(int x, int y)
+        {
+            if (x == mouseState.X && y == mouseState.Y) return;
+
+            mouseState = new MouseState(x, y, mouseState.Buttons);
+
+            InjectMouseEvent(MouseMoveCaller, MouseButtons.None, 0);
+        }
+
+        /// <summary>
+        /// Injects a mouse button event to be handled by the UI.
+        /// </summary>
+        /// <param name="button">The button that was pressed or released.</param>
+        /// <param name="pressCount">
+        /// The number of successive presses of the button, or <c>0</c> if the button was released.
+        /// </param>
+        public void InjectMouseButton(MouseButtons button, int pressCount)
+        {
+            if (button == MouseButtons.None) return;
+            EnsureValid(button);
+            Argument.EnsurePositive(pressCount, "pressCount");
+
+            MouseButtons buttons = mouseState.Buttons & ~button;
+            if (pressCount > 0) buttons &= button;
+
+            mouseState = new MouseState(mouseState.Position, buttons);
+
+            InjectMouseEvent(MouseButtonCaller, button, pressCount);
+        }
+
+        /// <summary>
+        /// Injects a mouse wheel event to be handled by the UI.
+        /// </summary>
+        /// <param name="amount">The number of notches the wheel was rolled, as a real number.</param>
+        public void InjectMouseWheel(float amount)
+        {
+            Argument.EnsureFinite(amount, "amount");
+
+            InjectMouseEvent(MouseWheelCaller, MouseButtons.None, amount);
+        }
+
+        private static void EnsureValid(MouseButtons button)
+        {
+            if (!PowerOfTwo.Is((uint)button)) throw new InvalidEnumArgumentException("button", (int)button, typeof(MouseButtons));
+        }
+
+        private void InjectMouseEvent(Func<UIElement, MouseState, MouseButtons, float, bool> caller, MouseButtons button, float amount)
         {
             // If an element has captured the mouse, it gets a veto on mouse events,
             // regardless of if they are in its client area.
             if (mouseCapturedElement != null)
             {
-                bool handled = mouseCapturedElement.HandleMouseEvent(type, args);
+                bool handled = caller(mouseCapturedElement, mouseState, button, amount);
                 if (handled) return;
             }
 
             // Update the mouse position and generate mouse entered/exited events.
-        	UIElement target = GetDescendantAt((Point)args.Position);
+            UIElement target = GetDescendantAt(mouseState.Position);
             if (target != hoveredElement)
             {
                 UIElement commonAncestor = UIElement.FindCommonAncestor(target, hoveredElement);
@@ -202,7 +267,7 @@ namespace Orion.Engine.Gui2
                 UIElement handler = target;
                 do
                 {
-                    bool handled = handler.HandleMouseEvent(type, args);
+                    bool handled = caller(handler, mouseState, button, amount);
                     if (handled) break;
 
                     handler = handler.Parent;
@@ -213,18 +278,19 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Injects a keyboard event into the UI hierarchy.
         /// </summary>
-        /// <param name="keyAndModifiers">
-        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
-        /// </param>
+        /// <param name="key">The key to be injected, with any active modifiers.</param>
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
-        public void SendKeyEvent(Keys keyAndModifiers, bool pressed)
+        public void InjectKey(Keys keyAndModifiers, bool pressed)
         {
             if (keyboardFocusedElement == null) return;
+
+            Keys key = keyAndModifiers & Keys.KeyCode;
+            if (key == Keys.None) return;
 
             UIElement handler = keyboardFocusedElement;
             do
             {
-                if (handler.HandleKeyEvent(keyAndModifiers, pressed)) break;
+                if (handler.HandleKey(key, keyAndModifiers & Keys.Modifiers, pressed)) break;
                 handler = handler.Parent;
             } while (handler != null);
         }
@@ -233,11 +299,11 @@ namespace Orion.Engine.Gui2
         /// Injects a character event into the UI hierarchy.
         /// </summary>
         /// <param name="character">The character to be injected.</param>
-        public void SendCharacterEvent(char character)
+        public void InjectCharacter(char character)
         {
             if (keyboardFocusedElement == null) return;
 
-            keyboardFocusedElement.HandleCharacterEvent(character);
+            keyboardFocusedElement.HandleCharacter(character);
         }
 
         private void NotifyMouseExited(UIElement target, UIElement firstExcludedAncestor)
@@ -260,6 +326,7 @@ namespace Orion.Engine.Gui2
                 firstExcludedAncestor = ancestor;
             }
         }
+        #endregion
 
         protected override ICollection<UIElement> GetChildren()
         {

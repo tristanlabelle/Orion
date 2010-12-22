@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {
@@ -489,34 +490,54 @@ namespace Orion.Engine.Gui2
             return new Region(x, y, width, height);
         }
         #endregion
-        
+
         #region Event Handling
         /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/> to handle a mouse event.
+        /// When overriden in a derived class, handles a mouse move event.
         /// </summary>
-        /// <param name="type">The type of mouse event.</param>
-        /// <param name="args">The arguments describing the event.</param>
-        /// <returns>
-        /// <c>True</c> if the event was handled, <c>false</c> if not.
-        /// Returning <c>true</c> stops the propagation of the event through ancestors.
-        /// </returns>
-        protected internal virtual bool HandleMouseEvent(MouseEventType type, MouseEventArgs args)
+        /// <param name="state">The current state of the mouse.</param>
+        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        protected internal virtual bool HandleMouseMove(MouseState state)
         {
-        	return false;
+            return false;
         }
 
         /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/>to handle a key event.
+        /// When overriden in a derived class, handles a mouse button event.
         /// </summary>
-        /// <param name="keyAndModifiers">
-        /// A <see cref="Keys"/> enumerant containing both the key pressed and the active modifiers.
+        /// <param name="state">The current state of the mouse.</param>
+        /// <param name="button">The involved button.</param>
+        /// <param name="pressCount">
+        /// The number of successive presses of the button, or <c>0</c> if the button was released.
         /// </param>
+        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        protected internal virtual bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// When overriden in a derived class, handles a mouse wheel event.
+        /// </summary>
+        /// <param name="state">The current state of the mouse.</param>
+        /// <param name="amount">The amount the mouse wheel was moved, in notches.</param>
+        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        protected internal virtual bool HandleMouseWheel(MouseState state, float amount)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Gives a chance to this <see cref="UIElement"/> to handle a key event.
+        /// </summary>
+        /// <param name="key">The key that was pressed or released.</param>
+        /// <param name="modifiers">The modifier keys which are currently pressed.</param>
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
         /// <returns>
         /// <c>True</c> if the event was handled, <c>false</c> if not.
         /// Returning <c>true</c> stops the propagation of the event through ancestors.
         /// </returns>
-        protected internal virtual bool HandleKeyEvent(Keys keyAndModifiers, bool pressed)
+        protected internal virtual bool HandleKey(Keys key, Keys modifiers, bool pressed)
         {
             return false;
         }
@@ -525,7 +546,7 @@ namespace Orion.Engine.Gui2
         /// Gives a chance to this <see cref="UIElement"/>to handle a character event.
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
-        protected internal virtual void HandleCharacterEvent(char character) { }
+        protected internal virtual void HandleCharacter(char character) { }
 
         /// <summary>
         /// Invoked when the mouse cursor enters this <see cref="UIElement"/>.

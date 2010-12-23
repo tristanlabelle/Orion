@@ -19,9 +19,9 @@ namespace Orion.Game.Simulation.Technologies
         #endregion
 
         #region Constructors
-        public TechnologyTree()
+        public TechnologyTree(AssetsDirectory assets)
         {
-            foreach (string filePath in Directory.GetFiles("../../../Assets/Technologies", "*.xml"))
+            foreach (string filePath in assets.EnumerateFiles("Technologies", "*.xml"))
             {
                 try
                 {

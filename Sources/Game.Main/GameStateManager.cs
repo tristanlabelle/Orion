@@ -17,6 +17,7 @@ namespace Orion.Game.Main
     public sealed class GameStateManager : IDisposable
     {
         #region Fields
+        private readonly AssetsDirectory assets;
         private readonly GameAudio audio;
         private readonly GameGraphics graphics;
         private readonly Stack<GameState> states = new Stack<GameState>();
@@ -28,13 +29,19 @@ namespace Orion.Game.Main
         public GameStateManager(string assetsPath)
         {
         	Argument.EnsureNotNull(assetsPath, "assetsPath");
-        	
-        	this.audio = new GameAudio(assetsPath + "/Sounds");
-        	this.graphics = new GameGraphics(assetsPath + "/Textures");
+
+            assets = new AssetsDirectory(assetsPath);
+        	this.audio = new GameAudio(assets);
+        	this.graphics = new GameGraphics(assets);
         }
         #endregion
 
         #region Properties
+        public AssetsDirectory AssetsDirectory
+        {
+            get { return assets; }
+        }
+
         public GameAudio Audio
         {
         	get { return audio; }

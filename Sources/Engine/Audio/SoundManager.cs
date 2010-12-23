@@ -24,15 +24,13 @@ namespace Orion.Engine.Audio
         #endregion
 
         #region Constructors
-        public SoundManager(ISoundContext soundContext, string directoryPath)
+        public SoundManager(ISoundContext soundContext, AssetsDirectory assets)
         {
             Argument.EnsureNotNull(soundContext, "soundContext");
-            Argument.EnsureNotNull(directoryPath, "directoryPath");
+            Argument.EnsureNotNull(assets, "assets");
 
             this.context = soundContext;
-            this.directory = new DirectoryInfo(directoryPath);
-
-            Debug.Assert(directory.Exists, "The sounds directory does not exist.");
+            this.directory = new DirectoryInfo(assets.GetDirectoryPath("Sounds"));
 
             if (directory.Exists)
             {
@@ -47,6 +45,10 @@ namespace Orion.Engine.Audio
 
                     if (soundContext.IsSoundLoadingThreadSafe) group.Preload();
                 }
+            }
+            else
+            {
+                Debug.Fail("The sounds directory does not exist.");
             }
         }
         #endregion

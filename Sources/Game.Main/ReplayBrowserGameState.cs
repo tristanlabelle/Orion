@@ -9,6 +9,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Simluation;
 
 namespace Orion.Game.Main
 {
@@ -88,11 +89,11 @@ namespace Orion.Game.Main
 
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
-            PerlinNoiseTerrainGenerator terrainGenerator = new PerlinNoiseTerrainGenerator(random, matchSettings.MapSize);
-            Terrain terrain = terrainGenerator.Generate();
+            WorldGenerator generator = new RandomWorldGenerator(random, !matchSettings.StartNomad);
+            Terrain terrain = generator.GenerateTerrain(matchSettings.MapSize);
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
-            Match match = new Match(world, random);
+            Match match = new Match(Manager.AssetsDirectory, world, random);
             match.AreRandomHeroesEnabled = matchSettings.AreRandomHeroesEnabled;
 
             Faction localFaction = world.CreateSpectatorFaction();
@@ -111,8 +112,7 @@ namespace Orion.Game.Main
                 if (matchSettings.RevealTopology) faction.LocalFogOfWar.Reveal();
             }
 
-            WorldGenerator worldGenerator = new RandomWorldGenerator(random, !matchSettings.StartNomad);
-            worldGenerator.Generate(world, match.UnitTypes);
+            generator.PrepareWorld(world, match.UnitTypes);
 
             CommandPipeline commandPipeline = new CommandPipeline(match);
             if (matchSettings.AreCheatsEnabled) commandPipeline.PushFilter(new CheatCodeExecutor(match));

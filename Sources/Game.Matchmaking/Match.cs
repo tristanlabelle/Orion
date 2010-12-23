@@ -24,25 +24,28 @@ namespace Orion.Game.Matchmaking
         private readonly World world;
         private readonly Random random;
         private readonly Func<Point, bool> canBuildPredicate;
-        private readonly UnitTypeRegistry unitTypes = new UnitTypeRegistry();
-        private readonly TechnologyTree technologyTree = new TechnologyTree();
+        private readonly UnitTypeRegistry unitTypes;
+        private readonly TechnologyTree technologyTree;
         private bool isRunning = true;
         private bool areRandomHeroesEnabled = true;
         #endregion
 
         #region Constructors
-        public Match(World world, Random random, Func<Point, bool> canBuildPredicate)
+        public Match(AssetsDirectory assets, World world, Random random, Func<Point, bool> canBuildPredicate)
         {
             Argument.EnsureNotNull(world, "world");
+            Argument.EnsureNotNull(assets, "assets");
             Argument.EnsureNotNull(random, "random");
 
+            this.unitTypes = new UnitTypeRegistry(assets);
+            this.technologyTree = new TechnologyTree(assets);
             this.world = world;
             this.random = random;
             this.canBuildPredicate = canBuildPredicate;
         }
 
-        public Match(World world, Random random)
-            : this(world, random, null) { }
+        public Match(AssetsDirectory assets, World world, Random random)
+            : this(assets, world, random, null) { }
         #endregion
 
         #region Events

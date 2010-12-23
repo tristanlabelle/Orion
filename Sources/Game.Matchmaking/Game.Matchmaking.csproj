@@ -159,7 +159,6 @@
     <Compile Include="PlayerBuilder.cs" />
     <Compile Include="PlayerSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="RemotePlayer.cs" />
     <Compile Include="ReplayEvent.cs" />
     <Compile Include="ReplayReader.cs" />
@@ -170,7 +169,6 @@
     <Compile Include="TowerDefense\CreepTask.cs" />
     <Compile Include="TowerDefense\CreepWaveCommander.cs" />
     <Compile Include="TowerDefense\TypingCreepCommander.cs" />
-    <Compile Include="WorldGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

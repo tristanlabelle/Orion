@@ -42,11 +42,12 @@ namespace Orion.Game.Main
             this.audio = manager.Audio;
 
             Random random = new MersenneTwister(Environment.TickCount);
-            TerrainGenerator generator = new TerrainGenerator.FullyWalkable(new Size(60, 40));
-            Terrain terrain = generator.Generate();
+            PlainWorldGenerator generator = new PlainWorldGenerator();
+            Terrain terrain = generator.GenerateTerrain(new Size(60, 40));
             World world = new World(terrain, random, 200);
             creepPath = CreepPath.Generate(world.Size, random);
-            match = new Match(world, random, p => !creepPath.Contains(p));
+
+            Match match = new Match(Manager.AssetsDirectory, world, random, p => !creepPath.Contains(p));
 
             Faction localFaction = world.CreateSpectatorFaction();
             localCommander = new SlaveCommander(match, localFaction);

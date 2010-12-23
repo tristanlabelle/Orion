@@ -27,9 +27,9 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Constructors
-        public GameGraphics(string assetsPath)
+        public GameGraphics(AssetsDirectory assets)
         {
-        	Argument.EnsureNotNull(assetsPath, "assetsPath");
+        	Argument.EnsureNotNull(assets, "assetsPath");
             this.window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
@@ -37,7 +37,7 @@ namespace Orion.Game.Presentation
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
             
-            this.textureManager = new TextureManager(window.GraphicsContext, assetsPath);
+            this.textureManager = new TextureManager(window.GraphicsContext, assets);
             this.textureManager.PreloadByExtension("png");
         }
         #endregion

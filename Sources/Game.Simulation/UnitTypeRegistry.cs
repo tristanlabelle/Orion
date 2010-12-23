@@ -19,9 +19,9 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
-        public UnitTypeRegistry()
+        public UnitTypeRegistry(AssetsDirectory assets)
         {
-            foreach (string filePath in Directory.GetFiles("../../../Assets/Units", "*.xml", SearchOption.AllDirectories))
+            foreach (string filePath in assets.EnumerateFiles("Units", "*.xml", SearchOption.AllDirectories))
             {
                 try
                 {

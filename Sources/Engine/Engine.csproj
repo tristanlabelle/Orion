@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Access.cs" />
     <Compile Include="Argument.cs" />
+    <Compile Include="AssetsDirectory.cs" />
     <Compile Include="Audio\ISound.cs" />
     <Compile Include="Audio\ISoundChannel.cs" />
     <Compile Include="Audio\ISoundContext.cs" />

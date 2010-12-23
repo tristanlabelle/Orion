@@ -32,9 +32,9 @@ namespace Orion.Game.Presentation.Audio
         #endregion
 
         #region Constructors
-        public GameAudio(string assetsPath)
+        public GameAudio(AssetsDirectory assets)
         {
-        	Argument.EnsureNotNull(assetsPath, "assetsPath");
+        	Argument.EnsureNotNull(assets, "assetsPath");
             try
             {
                 soundContext = new OpenALSoundContext();
@@ -49,7 +49,7 @@ namespace Orion.Game.Presentation.Audio
             uiChannel = soundContext.CreateChannel();
             uiChannel.Volume = 0.5f;
 
-            soundManager = new SoundManager(soundContext, assetsPath);
+            soundManager = new SoundManager(soundContext, assets);
         }
         #endregion
 

@@ -90,14 +90,14 @@ namespace Orion.Engine.Graphics
         /// Initializes a new <see cref="TextureManager"/> from a <see cref="GraphicsContext"/>.
         /// </summary>
         /// <param name="graphicsContext">The <see cref="GraphicsContext"/> to be used.</param>
-        /// <param name="rootPath">The path to the root directory from which to load textures.</param>
-        public TextureManager(GraphicsContext graphicsContext, string rootPath)
+        /// <param name="assets">The path to the root directory from which to load textures.</param>
+        public TextureManager(GraphicsContext graphicsContext, AssetsDirectory assets)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            Argument.EnsureNotNull(rootPath, "rootPath");
+            Argument.EnsureNotNull(assets, "rootPath");
 
             this.graphicsContext = graphicsContext;
-            this.directory = new DirectoryInfo(rootPath);
+            this.directory = new DirectoryInfo(assets.GetDirectoryPath("Textures"));
             Debug.Assert(this.directory.Exists, "Warning: The textures directory {0} does not exist.");
 
             this.defaultTexture = graphicsContext.CreateCheckerboardTexture(new Size(4, 4), Colors.Yellow, Colors.Pink);

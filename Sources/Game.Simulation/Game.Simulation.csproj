@@ -67,7 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PerlinNoiseTerrainGenerator.cs" />
+    <Compile Include="PlainWorldGenerator.cs" />
+    <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />
     <Compile Include="Skills\AttackSkill.cs" />
     <Compile Include="Skills\BasicSkill.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Skills\UnitSkill.cs" />
     <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
-    <Compile Include="TerrainGenerator.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />
@@ -145,6 +145,9 @@
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />
     <Compile Include="Utilities\WorldFoodSampler.cs" />
     <Compile Include="World.cs" />
+    <Compile Include="WorldGenerator.cs" />
+    <Compile Include="WorldLoader.cs" />
+    <Compile Include="WorldTileType.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

@@ -147,7 +147,6 @@
     <Compile Include="World.cs" />
     <Compile Include="WorldGenerator.cs" />
     <Compile Include="WorldLoader.cs" />
-    <Compile Include="WorldTileType.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

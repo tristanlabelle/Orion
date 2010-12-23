@@ -70,11 +70,6 @@
     <Compile Include="Commands\DisembarkCommand.cs" />
     <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
-    <Compile Include="FelixAI\FelixAI.cs" />
-    <Compile Include="FelixAI\FelixAIParameters.cs" />
-    <Compile Include="FelixAI\StrikeCommander.cs" />
-    <Compile Include="FelixAI\Subcommander.cs" />
-    <Compile Include="FelixAI\WorkersCommander.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="Networking\CompositeMatchAdvertiser.cs" />
     <Compile Include="Networking\IMatchAdvertizer.cs" />

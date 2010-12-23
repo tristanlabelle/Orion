@@ -15,7 +15,7 @@ namespace Orion.Game.Simulation
     public abstract class WorldGenerator
     {
         #region Methods
-        public abstract Terrain GenerateTerrain(Size size);
+        public abstract Terrain GenerateTerrain();
         public abstract void PrepareWorld(World world, UnitTypeRegistry unitTypes);
         #endregion
     }

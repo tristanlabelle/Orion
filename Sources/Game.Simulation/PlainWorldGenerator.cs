@@ -10,7 +10,19 @@ namespace Orion.Game.Simulation
 {
     public class PlainWorldGenerator : WorldGenerator
     {
-        public override Terrain GenerateTerrain(Size size)
+        #region Fields
+        private readonly Size size;
+        #endregion
+
+        #region Constructors
+        public PlainWorldGenerator(Size size)
+        {
+            this.size = size;
+        }
+        #endregion
+
+        #region Methods
+        public override Terrain GenerateTerrain()
         {
             return new Terrain(new BitArray2D(size, false));
         }
@@ -19,5 +31,6 @@ namespace Orion.Game.Simulation
         {
             // do nothing
         }
+        #endregion
     }
 }

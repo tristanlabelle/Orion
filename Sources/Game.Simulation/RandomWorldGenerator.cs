@@ -17,15 +17,17 @@ namespace Orion.Game.Simluation
         private readonly float initialMinimumDistanceBetweenCamps;
         private readonly Random random;
         private readonly bool createPyramids;
+        private readonly Size terrainSize;
         #endregion
 
         #region Constructors
-        public RandomWorldGenerator(Random random, bool createPyramids)
+        public RandomWorldGenerator(Random random, Size terrainSize, bool createPyramids)
         {
             resourcesDensity = 0.00518798828125;
             campSize = 15;
             initialMinimumDistanceBetweenCamps = 50;
             this.random = random;
+            this.terrainSize = terrainSize;
             this.createPyramids = createPyramids;
         }
         #endregion
@@ -40,17 +42,17 @@ namespace Orion.Game.Simluation
             GenerateResourceNodes(world, random);
         }
 
-        public override Terrain GenerateTerrain(Size size)
+        public override Terrain GenerateTerrain()
         {
             PerlinNoise noise = new PerlinNoise(random);
 
-            BitArray2D tiles = new BitArray2D(size);
-            double[] rawTerrain = new double[size.Area];
-            for (int y = 0; y < size.Height; y++)
+            BitArray2D tiles = new BitArray2D(terrainSize);
+            double[] rawTerrain = new double[terrainSize.Area];
+            for (int y = 0; y < terrainSize.Height; y++)
             {
-                for (int x = 0; x < size.Width; x++)
+                for (int x = 0; x < terrainSize.Width; x++)
                 {
-                    rawTerrain[y * size.Width + x] = noise[x, y];
+                    rawTerrain[y * terrainSize.Width + x] = noise[x, y];
                 }
             }
 
@@ -58,7 +60,7 @@ namespace Orion.Game.Simluation
             int k = 0;
             foreach (double noiseValue in rawTerrain.Select(d => d / max))
             {
-                tiles[k % size.Width, k / size.Width] = noiseValue >= 0.5;
+                tiles[k % terrainSize.Width, k / terrainSize.Width] = noiseValue >= 0.5;
                 k++;
             }
 

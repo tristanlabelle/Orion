@@ -100,8 +100,8 @@ namespace Orion.Game.Main
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
-            WorldGenerator generator = new RandomWorldGenerator(random, !matchSettings.StartNomad);
-            Terrain terrain = generator.GenerateTerrain(matchSettings.MapSize);
+            WorldGenerator generator = new RandomWorldGenerator(random, matchSettings.MapSize, !matchSettings.StartNomad);
+            Terrain terrain = generator.GenerateTerrain();
             World world = new World(terrain, random, matchSettings.FoodLimit);
 
             Match match = new Match(Manager.AssetsDirectory, world, random);

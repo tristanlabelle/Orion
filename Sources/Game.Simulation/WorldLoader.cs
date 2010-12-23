@@ -85,7 +85,7 @@ namespace Orion.Game.Simulation
 
                 for (int i = 0; i < size.Width; i++)
                     for (int j = 0; j < size.Height; j++)
-                        terrain[i, j] = rawTerrain[j * size.Width + i] == 1;
+                        terrain[i, j] = rawTerrain[j * size.Width + i] == 0;
 
                 // positioning of aladdium and alagene nodes
                 aladdiumNodes = new List<Point>();
@@ -127,9 +127,8 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        public override Terrain GenerateTerrain(Size size)
+        public override Terrain GenerateTerrain()
         {
-            // for now, ignore the Size argument, and find a more graceful way to eliminate it
             return new Terrain(terrain);
         }
 
@@ -149,13 +148,13 @@ namespace Orion.Game.Simulation
             IEnumerator<Faction> factionEnumerator = world.Factions.GetEnumerator();
             for (int i = 0; i < unitsByFaction.Count; i++)
             {
+                factionEnumerator.MoveNext();
                 Faction currentFaction = factionEnumerator.Current;
                 foreach (UnitInstance instance in unitsByFaction[i])
                 {
                     UnitType type = unitTypes.FromName(instance.UnitName);
                     currentFaction.CreateUnit(type, instance.Location);
                 }
-                factionEnumerator.MoveNext();
             }
         }
         #endregion

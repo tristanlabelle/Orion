@@ -37,10 +37,22 @@ namespace Orion.Engine.Gui2
 
             SetValue(sourceObject, sourceProperty, destinationObject, destinationProperty, converter);
 
-            IPropertyChangedEventSource propertyChangedEventSource = sourceObject as IPropertyChangedEventSource;
-            if (propertyChangedEventSource != null)
+            // Check for a corresponding strongly-typed changed event
+            PropertyChangedEventAttribute changedEventAttribute = (PropertyChangedEventAttribute)sourceProperty
+                .GetCustomAttributes(typeof(PropertyChangedEventAttribute), true)
+                .FirstOrDefault();
+            string changedEventName = changedEventAttribute == null ? sourceProperty.Name + "Changed" : changedEventAttribute.EventName;
+            EventInfo changedEventInfo = sourceProperty.ReflectedType.GetEvent(changedEventName);
+            if (changedEventInfo != null)
             {
-                propertyChangedEventSource.PropertyChanged += (sender, propertyName) =>
+                throw new NotImplementedException();
+            }
+
+            // Checked for IPropertyChangedNotifier implementation
+            IPropertyChangedNotifier propertyChangedNotifier = sourceObject as IPropertyChangedNotifier;
+            if (propertyChangedNotifier != null)
+            {
+                propertyChangedNotifier.PropertyChanged += (sender, propertyName) =>
                 {
                     if (propertyName != sourceProperty.Name) return;
                     SetValue(sourceObject, sourceProperty, destinationObject, destinationProperty, converter);
@@ -48,6 +60,7 @@ namespace Orion.Engine.Gui2
                 return;
             }
 
+            // Checked for INotifyPropertyChanged implementation
             INotifyPropertyChanged notifyPropertyChanged = sourceObject as INotifyPropertyChanged;
             if (notifyPropertyChanged != null)
             {

@@ -142,11 +142,15 @@
     <Compile Include="Graphics\TextureManager.cs" />
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Button.cs" />
+    <Compile Include="Gui2\CheckBox.ChildCollection.cs" />
+    <Compile Include="Gui2\CheckBox.cs" />
     <Compile Include="Gui2\DataBinding.cs" />
     <Compile Include="Gui2\Dock.cs" />
     <Compile Include="Gui2\DockedElement.cs" />
     <Compile Include="Gui2\DockPanel.ChildCollection.cs" />
     <Compile Include="Gui2\DockPanel.cs" />
+    <Compile Include="Gui2\IGuiRenderer.cs" />
+    <Compile Include="Gui2\ImageBox.cs" />
     <Compile Include="Gui2\Label.cs" />
     <Compile Include="Gui2\LayoutState.cs" />
     <Compile Include="Gui2\Borders.cs" />
@@ -205,7 +209,7 @@
     <Compile Include="Gui\ViewContainer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IPropertyChangedEventSource.cs" />
+    <Compile Include="IPropertyChangedNotifier.cs" />
     <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />
@@ -232,6 +236,7 @@
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Input\KeyboardEventArgs.cs" />
+    <Compile Include="PropertyChangedEventAttribute.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Size.cs" />

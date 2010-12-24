@@ -37,7 +37,7 @@ namespace Orion.Engine.Gui2
             {
                 HorizontalAlignment = Alignment.Center,
                 VerticalAlignment = Alignment.Center,
-                Margin = new Borders(2)
+                Margin = new Borders(5)
             };
         }
         #endregion
@@ -72,6 +72,8 @@ namespace Orion.Engine.Gui2
                     AdoptChild(value);
                     content = value;
                 }
+
+                InvalidateMeasure();
             }
         }
 
@@ -149,13 +151,6 @@ namespace Orion.Engine.Gui2
         protected internal override void OnMouseExited()
         {
             isDown = false;
-        }
-
-        protected override void DoDraw(GraphicsContext graphicsContext)
-        {
-            bool hovered = HasDescendant(Manager.HoveredElement);
-            graphicsContext.Fill((Rectangle)(GetReservedRectangle() - Margin).Value, hovered ? Colors.LightGray : Colors.Gray);
-            DrawChildren(graphicsContext);
         }
         #endregion
     }

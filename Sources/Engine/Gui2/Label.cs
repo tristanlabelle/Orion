@@ -80,13 +80,7 @@ namespace Orion.Engine.Gui2
         #region Methods
         protected override Size MeasureWithoutMargin()
         {
-            return Manager.MeasureString(text);
-        }
-
-        protected override void DoDraw(GraphicsContext graphicsContext)
-        {
-            Region rectangle = GetReservedRectangle();
-            graphicsContext.Draw(text, (Vector2)rectangle.Min, Color);
+            return Manager.Renderer.MeasureText(this, text);
         }
         #endregion
     }

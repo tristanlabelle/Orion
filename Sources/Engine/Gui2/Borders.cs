@@ -66,6 +66,11 @@ namespace Orion.Engine.Gui2
         #endregion
         
         #region Operators
+        public static implicit operator Borders(int value)
+        {
+            return new Borders(value);
+        }
+
         public static Region operator +(Region rectangle, Borders borders)
         {
             return new Region(

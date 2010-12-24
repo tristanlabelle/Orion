@@ -15,7 +15,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Base class of the UI hierarchy.
     /// </summary>
-    public abstract partial class UIElement : IPropertyChangedEventSource
+    public abstract partial class UIElement
     {
         #region Fields
         private static readonly UIElement[] emptyArray = new UIElement[0];
@@ -26,7 +26,7 @@ namespace Orion.Engine.Gui2
         private Visibility visibility;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
-        private Size minimumSize;
+        private Size minSize;
         
         /// <summary>
         /// A cached value of the optimal space for this <see cref="UIElement"/> based on the size of its contents.
@@ -131,16 +131,16 @@ namespace Orion.Engine.Gui2
         /// Accesses the minimum size of this <see cref="UIElement"/>, excluding the margins.
         /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
         /// </summary>
-        public Size MinimumSize
+        public Size MinSize
         {
-            get { return minimumSize; }
+            get { return minSize; }
             set
             {
-                if (value == minimumSize) return;
+                if (value == minSize) return;
 
-                minimumSize = value;
+                minSize = value;
                 if (layoutState == LayoutState.Measured
-                    && (cachedDesiredReservedSize.Width < minimumSize.Width || cachedDesiredReservedSize.Height < minimumSize.Height))
+                    && (cachedDesiredReservedSize.Width < minSize.Width || cachedDesiredReservedSize.Height < minSize.Height))
                 {
                     // The cached desired size being smaller than the new minimum size,
                     // the element will have to be measured again so that it's desired size is bigger.
@@ -153,13 +153,13 @@ namespace Orion.Engine.Gui2
         /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
         /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
         /// </summary>
-        public int MinimumWidth
+        public int MinWidth
         {
-            get { return minimumSize.Width; }
+            get { return minSize.Width; }
             set
             {
                 Argument.EnsurePositive(value, "MinimumWidth");
-                MinimumSize = new Size(value, minimumSize.Height);
+                MinSize = new Size(value, minSize.Height);
             }
         }
 
@@ -167,13 +167,13 @@ namespace Orion.Engine.Gui2
         /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
         /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
         /// </summary>
-        public int MinimumHeight
+        public int MinHeight
         {
-            get { return minimumSize.Height; }
+            get { return minSize.Height; }
             set
             {
                 Argument.EnsurePositive(value, "MinimumWHeight");
-                MinimumSize = new Size(minimumSize.Width, value);
+                MinSize = new Size(minSize.Width, value);
             }
         }
 
@@ -200,20 +200,14 @@ namespace Orion.Engine.Gui2
         {
             get { return GetChildren(); }
         }
-        #endregion
 
-        #region Events
         /// <summary>
-        /// Raised when the value of a property changes.
-        /// The parameter specifies the name of the property which value changed.
+        /// Convenience setter to assign initial children to this <see cref="UIElement"/>.
+        /// This operation may not be supported by the actual <see cref="UIElement"/> type.
         /// </summary>
-        public event Action<object, string> PropertyChanged;
-
-        protected void RaisePropertyChanged(string propertyName)
+        public IEnumerable<UIElement> InitChildren
         {
-            Argument.EnsureNotNull(propertyName, "propertyName");
-
-            if (PropertyChanged != null) PropertyChanged(this, propertyName);
+            set { AddChildren(value); }
         }
         #endregion
 
@@ -226,6 +220,43 @@ namespace Orion.Engine.Gui2
         protected virtual ICollection<UIElement> GetChildren()
         {
             return emptyArray;
+        }
+
+        /// <summary>
+        /// Adds a child to this <see cref="UIElement"/>.
+        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// </summary>
+        /// <param name="element">The <see cref="UIElement"/> to be added.</param>
+        public void AddChild(UIElement element)
+        {
+            Argument.EnsureNotNull(element, "element");
+            Children.Add(element);
+        }
+
+        /// <summary>
+        /// Adds children to this <see cref="UIElement"/>.
+        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// </summary>
+        /// <param name="elements">The <see cref="UIElement"/>s to be added.</param>
+        public void AddChildren(IEnumerable<UIElement> elements)
+        {
+            Argument.EnsureNotNull(elements, "elements");
+
+            foreach (UIElement element in elements)
+                Children.Add(element);
+        }
+
+        /// <summary>
+        /// Adds children to this <see cref="UIElement"/>.
+        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// </summary>
+        /// <param name="elements">The <see cref="UIElement"/>s to be added.</param>
+        public void AddChildren(params UIElement[] elements)
+        {
+            Argument.EnsureNotNull(elements, "elements");
+
+            foreach (UIElement element in elements)
+                Children.Add(element);
         }
 
         /// <summary>
@@ -354,8 +385,8 @@ namespace Orion.Engine.Gui2
             {
                 Size desiredSize = MeasureWithoutMargin();
                 Size clampedDesiredSize = new Size(
-                    Math.Max(minimumSize.Width, desiredSize.Width),
-                    Math.Max(minimumSize.Height, desiredSize.Height));
+                    Math.Max(minSize.Width, desiredSize.Width),
+                    Math.Max(minSize.Height, desiredSize.Height));
 
                 cachedDesiredReservedSize = clampedDesiredSize + margin;
 
@@ -392,7 +423,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Arrange
-        protected Region GetReservedRectangle()
+        protected internal Region GetReservedRectangle()
         {
             if (layoutState != LayoutState.Arranged)
             {
@@ -406,6 +437,21 @@ namespace Orion.Engine.Gui2
             }
 
             return cachedReservedRectangle.Value;
+        }
+
+        protected bool TryGetInternalRectangle(out Region rectangle)
+        {
+            Region? value = GetReservedRectangle() - Margin;
+            if (value.HasValue && value.Value.Area > 0)
+            {
+                rectangle = value.Value;
+                return true;
+            }
+            else
+            {
+                rectangle = default(Region);
+                return false;
+            }
         }
 
         protected virtual void ArrangeChildren()
@@ -434,7 +480,6 @@ namespace Orion.Engine.Gui2
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
-            Debug.Assert(child.layoutState != LayoutState.Invalidated);
 
             child.cachedReservedRectangle = rectangle;
             child.layoutState = LayoutState.Arranged;
@@ -611,41 +656,6 @@ namespace Orion.Engine.Gui2
         /// Invoked when this <see cref="UIElement"/> loses the mouse capture.
         /// </summary>
         protected internal virtual void OnMouseCaptureLost() { }
-        #endregion
-
-        #region Drawing
-        protected void Draw(GraphicsContext graphicsContext)
-        {
-            if (visibility != Visibility.Visible || GetReservedRectangle().Area == 0) return;
-
-            DoDraw(graphicsContext);
-        }
-
-        protected virtual void DoDraw(GraphicsContext graphicsContext)
-        {
-            DrawChildren(graphicsContext);
-        }
-
-        protected void DrawChildren(GraphicsContext graphicsContext)
-        {
-            Region? childrenAreaBounds = GetReservedRectangle() - margin;
-            if (!childrenAreaBounds.HasValue) return;
-
-            DisposableHandle? scissorBoxHandle = null;
-            foreach (UIElement child in Children)
-            {
-                if (!scissorBoxHandle.HasValue)
-                {
-                    Region childRectangle = child.GetReservedRectangle();
-                    if (!childrenAreaBounds.Value.Contains(childRectangle))
-                        scissorBoxHandle = graphicsContext.PushScissorRegion(childrenAreaBounds.Value);
-                }
-
-                child.Draw(graphicsContext);
-            }
-
-            if (scissorBoxHandle.HasValue) scissorBoxHandle.Value.Dispose();
-        }
         #endregion
         #endregion
     }

@@ -35,11 +35,18 @@ namespace Orion.Engine.Gui2
 
             this.text = text;
             caretIndex = text.Length;
-            MinimumSize = new Size(60, 20);
+            MinSize = new Size(60, 20);
         }
 
         public TextField()
             : this(string.Empty) { }
+        #endregion
+
+        #region Event
+        /// <summary>
+        /// Raised when the text within this <see cref="TextField"/> changes.
+        /// </summary>
+        public event Action<TextField> TextChanged;
         #endregion
 
         #region Properties
@@ -55,7 +62,7 @@ namespace Orion.Engine.Gui2
                 if (object.ReferenceEquals(value, text)) return;
 
                 text = value;
-                RaisePropertyChanged("Text");
+                TextChanged.Raise(this);
             }
         }
 
@@ -225,13 +232,6 @@ namespace Orion.Engine.Gui2
         protected override Size MeasureWithoutMargin()
         {
             return Size.Zero;
-        }
-
-        protected override void DoDraw(GraphicsContext graphicsContext)
-        {
-            Region rectangle = GetReservedRectangle();
-            graphicsContext.Fill(rectangle, IsEditable ? Colors.White : Colors.Gray);
-            graphicsContext.Draw(text, (Vector2)rectangle.Min, Colors.Black);
         }
         #endregion
     }

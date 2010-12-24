@@ -11,7 +11,8 @@ namespace Orion.Engine.Gui2
         private readonly ChildCollection children;
         private Orientation orientation = Orientation.Vertical;
         private Borders padding;
-        private int itemGap;
+        private int childGap;
+        private int minChildSize;
         #endregion
 
         #region Constructors
@@ -27,24 +28,49 @@ namespace Orion.Engine.Gui2
             get { return orientation; }
             set
             {
+                if (value == orientation) return;
                 Argument.EnsureDefined(value, "Orientation");
+
                 orientation = value;
+                InvalidateMeasure();
             }
         }
         
         public Borders Padding
         {
         	get { return padding; }
-        	set { padding = value; }
+        	set
+            {
+                //if (value == padding) return;
+
+                padding = value;
+                InvalidateMeasure();
+            }
         }
 
-        public int ItemGap
+        public int ChildGap
         {
-            get { return itemGap; }
+            get { return childGap; }
             set
             {
-                Argument.EnsurePositive(value, "ItemPadding");
-                itemGap = value;
+                if (value == childGap) return;
+                Argument.EnsurePositive(value, "ChildGap");
+
+                childGap = value;
+                InvalidateMeasure();
+            }
+        }
+
+        public int MinChildSize
+        {
+            get { return minChildSize; }
+            set
+            {
+                if (value == minChildSize) return;
+                Argument.EnsurePositive(value, "MinChildSize");
+
+                minChildSize = value;
+                InvalidateMeasure();
             }
         }
         #endregion
@@ -63,10 +89,10 @@ namespace Orion.Engine.Gui2
             {
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) height += itemGap;
+                    if (i > 0) height += childGap;
 
                     Size childSize = children[i].Measure();
-                    height += childSize.Height;
+                    height += Math.Max(minChildSize, childSize.Height);
                     if (childSize.Width > width) width = childSize.Width;
                 }
             }
@@ -74,10 +100,10 @@ namespace Orion.Engine.Gui2
             {
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) width += itemGap;
+                    if (i > 0) width += childGap;
 
                     Size childSize = children[i].Measure();
-                    width += childSize.Width;
+                    width += Math.Max(minChildSize, childSize.Width);
                     if (childSize.Height > height) height = childSize.Height;
                 }
             }
@@ -95,7 +121,7 @@ namespace Orion.Engine.Gui2
                 int y = 0;
                 for (int i = 0; i < children.Count; ++i)
                 {
-                    if (i > 0) y += itemGap;
+                    if (i > 0) y += childGap;
 
                     UIElement child = children[i];
                     Size childSize = child.Measure();
@@ -104,13 +130,14 @@ namespace Orion.Engine.Gui2
                     int width;
                     DefaultArrange(childrenAreaBounds.Value.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
 
+                    int height = Math.Max(minChildSize, childSize.Height);
                     Region childRectangle = new Region(
                         childrenAreaBounds.Value.MinX + Margin.MinX + x,
                         childrenAreaBounds.Value.MinY + Margin.MinY + y,
-                        width, childSize.Height);
+                        width, height);
                     SetChildRectangle(child, childRectangle);
 
-                    y += childSize.Height;
+                    y += height;
                 }
             }
             else

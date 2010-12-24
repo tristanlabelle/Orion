@@ -261,21 +261,23 @@ namespace Orion.Engine.Graphics
 
             scissorStack.Push(clippedRegion);
 
-            return new DisposableHandle(() =>
+            return new DisposableHandle(PopScissorRegion);
+        }
+
+        public void PopScissorRegion()
+        {
+            scissorStack.Pop();
+            if (scissorStack.Count == 0)
             {
-                scissorStack.Pop();
-                if (scissorStack.Count == 0)
-                {
-                    GL.Disable(EnableCap.ScissorTest);
-                }
-                else
-                {
-                    Region oldRegion = scissorStack.Peek();
-                    GL.Scissor(
-                        oldRegion.MinX, oldRegion.MinY,
-                        oldRegion.Width, oldRegion.Height);
-                }
-            });
+                GL.Disable(EnableCap.ScissorTest);
+            }
+            else
+            {
+                Region oldRegion = scissorStack.Peek();
+                GL.Scissor(
+                    oldRegion.MinX, oldRegion.MinY,
+                    oldRegion.Width, oldRegion.Height);
+            }
         }
         #endregion
 
@@ -541,6 +543,12 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Text
+        public Size Measure(string text, Font font)
+        {
+            Vector2 size = new Text(text, font ?? defaultFont).Frame.Size;
+            return new Size((int)size.X, (int)size.Y);
+        }
+
         public void Draw(string text, ColorRgba color)
         {
             Draw(text, new Vector2(0, 0), color);

@@ -56,6 +56,19 @@ namespace Orion.Engine.Gui2
         {
             get { return children; }
         }
+
+        /// <summary>
+        /// Convenience setter to assign initial children to this <see cref="UIElement"/>.
+        /// This operation may not be supported by the actual <see cref="UIElement"/> type.
+        /// </summary>
+        public new IEnumerable<DockedElement> InitChildren
+        {
+            set
+            {
+                foreach (DockedElement element in value)
+                    children.Add(element);
+            }
+        }
         #endregion
 
         #region Methods

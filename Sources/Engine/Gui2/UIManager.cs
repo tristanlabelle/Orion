@@ -24,10 +24,10 @@ namespace Orion.Engine.Gui2
         private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseWheelCaller
             = (sender, state, button, amount) => sender.HandleMouseWheel(state, amount);
 
-        private readonly GraphicsContext graphicsContext;
+        private readonly IGuiRenderer renderer;
         private readonly SingleChildCollection children;
         private UIElement root;
-        private Size size;
+        private Size size = new Size(800, 600);
         private MouseState mouseState;
         private Font defaultFont = new Font("Trebuchet MS", 10);
         private ColorRgba defaultTextColor = Colors.Black;
@@ -37,12 +37,11 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public UIManager(GraphicsContext graphicsContext)
+        public UIManager(IGuiRenderer renderer)
         {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            
-            this.graphicsContext = graphicsContext;
-            this.size = graphicsContext.ViewportSize;
+            Argument.EnsureNotNull(renderer, "renderer");
+
+            this.renderer = renderer;
             this.children = new SingleChildCollection(() => Root, value => Root = value);
         }
         #endregion
@@ -60,6 +59,14 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="IGuiRenderer"/> responsible of drawing this UI hierarchy.
+        /// </summary>
+        public IGuiRenderer Renderer
+        {
+            get { return renderer; }
+        }
+
         /// <summary>
         /// Gets the size of the client area where this <see cref="UIManager"/> can draw.
         /// </summary>
@@ -119,6 +126,8 @@ namespace Orion.Engine.Gui2
                     AdoptChild(value);
                     root = value;
                 }
+
+                InvalidateMeasure();
             }
         }
 
@@ -140,7 +149,7 @@ namespace Orion.Engine.Gui2
             set
             {
                 if (value == keyboardFocusedElement) return;
-                if (value.Manager != this) throw new InvalidOperationException("Cannot give the keyboard focus to an element from another manager.");
+                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot give the keyboard focus to an element from another manager.");
 
                 UIElement previous = keyboardFocusedElement;
                 keyboardFocusedElement = value;
@@ -161,7 +170,7 @@ namespace Orion.Engine.Gui2
             set
             {
                 if (value == mouseCapturedElement) return;
-                if (value.Manager != this) throw new InvalidOperationException("Cannot capture the mouse by an element from another manager.");
+                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot capture the mouse by an element from another manager.");
 
                 UIElement previous = mouseCapturedElement;
                 mouseCapturedElement = value;
@@ -174,19 +183,25 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        public Size MeasureString(string text)
-        {
-            Argument.EnsureNotNull(text, "text");
-            OpenTK.Vector2 size = new Text(text).Frame.Size;
-            return new Size((int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y));
-        }
-        
         /// <summary>
         /// Draws the UI hierarchy beneath this <see cref="UIManager"/>.
         /// </summary>
         public void Draw()
         {
-            Draw(graphicsContext);
+            Draw(this, renderer);
+        }
+
+        private static void Draw(UIElement element, IGuiRenderer renderer)
+        {
+            Region? rectangle = element.GetReservedRectangle() - element.Margin;
+            if (element.Visibility != Visibility.Visible || !rectangle.HasValue || rectangle.Value.Area == 0) return;
+
+            renderer.BeginDraw(element, rectangle.Value);
+
+            foreach (UIElement child in element.Children)
+                Draw(child, renderer);
+
+            renderer.EndDraw(element, rectangle.Value);
         }
 
         #region Input Event Injection

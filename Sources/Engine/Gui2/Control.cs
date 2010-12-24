@@ -15,13 +15,13 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Base class of the UI hierarchy.
     /// </summary>
-    public abstract partial class UIElement
+    public abstract partial class Control
     {
         #region Fields
-        private static readonly UIElement[] emptyArray = new UIElement[0];
+        private static readonly Control[] emptyArray = new Control[0];
 
         private UIManager manager;
-        private UIElement parent;
+        private Control parent;
         private Borders margin;
         private Visibility visibility;
         private Alignment horizontalAlignment;
@@ -29,13 +29,13 @@ namespace Orion.Engine.Gui2
         private Size minSize;
         
         /// <summary>
-        /// A cached value of the optimal space for this <see cref="UIElement"/> based on the size of its contents.
+        /// A cached value of the optimal space for this <see cref="Control"/> based on the size of its contents.
         /// This value is only meaningful if the layout state is not <see cref="LayoutState.Invalidated"/>.
         /// </summary>
         private Size cachedDesiredOuterSize;
         
         /// <summary>
-        /// A cached value of the client space rectangle reserved for this <see cref="UIElement"/>.
+        /// A cached value of the client space rectangle reserved for this <see cref="Control"/>.
         /// This value is only meaningful if the layout state is <see cref="LayoutState.Arranged"/>.
         /// </summary>
         private Region? cachedOuterRectangle;
@@ -44,7 +44,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        protected UIElement()
+        protected Control()
         {
             manager = this as UIManager;
         }
@@ -60,16 +60,16 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the <see cref="UIElement"/> which contains this element in the UI hierarchy.
+        /// Gets the <see cref="Control"/> which contains this <see cref="Control"/> in the UI hierarchy.
         /// </summary>
-        public UIElement Parent
+        public Control Parent
         {
             get { return parent; }
         }
 
         #region Margin
         /// <summary>
-        /// Accesses the margins around this <see cref="UIElement"/>.
+        /// Accesses the margins around this <see cref="Control"/>.
         /// </summary>
         public Borders Margin
         {
@@ -82,7 +82,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the margin of this <see cref="UIElement"/> on the minimum X-axis side.
+        /// Accesses the margin of this <see cref="Control"/> on the minimum X-axis side.
         /// </summary>
         public int MinXMargin
         {
@@ -91,7 +91,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the margin of this <see cref="UIElement"/> on the minimum Y-axis side.
+        /// Accesses the margin of this <see cref="Control"/> on the minimum Y-axis side.
         /// </summary>
         public int MinYMargin
         {
@@ -100,7 +100,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the margin of this <see cref="UIElement"/> on the maximum X-axis side.
+        /// Accesses the margin of this <see cref="Control"/> on the maximum X-axis side.
         /// </summary>
         public int MaxXMargin
         {
@@ -109,7 +109,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the margin of this <see cref="UIElement"/> on the maximum Y-axis side.
+        /// Accesses the margin of this <see cref="Control"/> on the maximum Y-axis side.
         /// </summary>
         public int MaxYMargin
         {
@@ -118,7 +118,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Sets the width of the margin on the left and right of the <see cref="UIElement"/>.
+        /// Sets the width of the margin on the left and right of the <see cref="Control"/>.
         /// </summary>
         public int XMargin
         {
@@ -126,7 +126,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Sets the height of the margin on the top and botton of the <see cref="UIElement"/>.
+        /// Sets the height of the margin on the top and botton of the <see cref="Control"/>.
         /// </summary>
         public int YMargin
         {
@@ -135,7 +135,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         /// <summary>
-        /// Accesses the current visibility of this <see cref="UIElement"/>.
+        /// Accesses the current visibility of this <see cref="Control"/>.
         /// </summary>
         public Visibility Visibility
         {
@@ -148,8 +148,8 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the horizontal alignment hint for this <see cref="UIElement"/>.
-        /// The parent element is charged of honoring or not this value.
+        /// Accesses the horizontal alignment hint for this <see cref="Control"/>.
+        /// The parent <see cref="Control"/> is charged of honoring or not this value.
         /// </summary>
         public Alignment HorizontalAlignment
         {
@@ -165,8 +165,8 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the vertical alignment hint for this <see cref="UIElement"/>.
-        /// The parent element is charged of honoring or not this value.
+        /// Accesses the vertical alignment hint for this <see cref="Control"/>.
+        /// The parent <see cref="Control"/> is charged of honoring or not this value.
         /// </summary>
         public Alignment VerticalAlignment
         {
@@ -182,8 +182,8 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the minimum size of this <see cref="UIElement"/>, excluding the margins.
-        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// Accesses the minimum size of this <see cref="Control"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="Control"/>.
         /// </summary>
         public Size MinSize
         {
@@ -197,15 +197,15 @@ namespace Orion.Engine.Gui2
                     && (cachedDesiredOuterSize.Width < minSize.Width || cachedDesiredOuterSize.Height < minSize.Height))
                 {
                     // The cached desired size being smaller than the new minimum size,
-                    // the element will have to be measured again so that it's desired size is bigger.
+                    // the control will have to be measured again so that it's desired size is bigger.
                     InvalidateMeasure();
                 }
             }
         }
 
         /// <summary>
-        /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
-        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// Accesses the minimum width of this <see cref="Control"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="Control"/>.
         /// </summary>
         public int MinWidth
         {
@@ -218,8 +218,8 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the minimum width of this <see cref="UIElement"/>, excluding the margins.
-        /// This is a hint which can or not be honored by the parent <see cref="UIElement"/>.
+        /// Accesses the minimum width of this <see cref="Control"/>, excluding the margins.
+        /// This is a hint which can or not be honored by the parent <see cref="Control"/>.
         /// </summary>
         public int MinHeight
         {
@@ -232,34 +232,34 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="UIElement"/> currently has the keyboard focus.
+        /// Gets a value indicating if this <see cref="Control"/> currently has the keyboard focus.
         /// </summary>
         public bool HasKeyboardFocus
         {
-            get { return manager != null && manager.KeyboardFocusedElement == this; }
+            get { return manager != null && manager.KeyboardFocusedControl == this; }
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="UIElement"/> currently has captured the mouse.
+        /// Gets a value indicating if this <see cref="Control"/> currently has captured the mouse.
         /// </summary>
         public bool HasMouseCapture
         {
-            get { return manager != null && manager.MouseCapturedElement == this; }
+            get { return manager != null && manager.MouseCapturedControl == this; }
         }
 
         /// <summary>
-        /// Gets the collection of children of this <see cref="UIElement"/>.
+        /// Gets the collection of children of this <see cref="Control"/>.
         /// </summary>
-        public ICollection<UIElement> Children
+        public ICollection<Control> Children
         {
             get { return GetChildren(); }
         }
 
         /// <summary>
-        /// Convenience setter to assign initial children to this <see cref="UIElement"/>.
-        /// This operation may not be supported by the actual <see cref="UIElement"/> type.
+        /// Convenience setter to assign initial children to this <see cref="Control"/>.
+        /// This operation may not be supported by the actual <see cref="Control"/> type.
         /// </summary>
-        public IEnumerable<UIElement> InitChildren
+        public IEnumerable<Control> InitChildren
         {
             set { AddChildren(value); }
         }
@@ -268,64 +268,64 @@ namespace Orion.Engine.Gui2
         #region Methods
         #region Hierarchy
         /// <summary>
-        /// Obtains the collection of children of this <see cref="UIElement"/>.
+        /// Obtains the collection of children of this <see cref="Control"/>.
         /// </summary>
-        /// <returns>The children collection of this <see cref="UIElement"/>.</returns>
-        protected virtual ICollection<UIElement> GetChildren()
+        /// <returns>The children collection of this <see cref="Control"/>.</returns>
+        protected virtual ICollection<Control> GetChildren()
         {
             return emptyArray;
         }
 
         /// <summary>
-        /// Adds a child to this <see cref="UIElement"/>.
-        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// Adds a child to this <see cref="Control"/>.
+        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to be added.</param>
-        public void AddChild(UIElement element)
+        /// <param name="control">The <see cref="Control"/> to be added.</param>
+        public void AddChild(Control control)
         {
-            Argument.EnsureNotNull(element, "element");
-            Children.Add(element);
+            Argument.EnsureNotNull(control, "control");
+            Children.Add(control);
         }
 
         /// <summary>
-        /// Adds children to this <see cref="UIElement"/>.
-        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// Adds children to this <see cref="Control"/>.
+        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
         /// </summary>
-        /// <param name="elements">The <see cref="UIElement"/>s to be added.</param>
-        public void AddChildren(IEnumerable<UIElement> elements)
+        /// <param name="controls">The <see cref="Control"/>s to be added.</param>
+        public void AddChildren(IEnumerable<Control> controls)
         {
-            Argument.EnsureNotNull(elements, "elements");
+            Argument.EnsureNotNull(controls, "controls");
 
-            foreach (UIElement element in elements)
-                Children.Add(element);
+            foreach (Control control in controls)
+                Children.Add(control);
         }
 
         /// <summary>
-        /// Adds children to this <see cref="UIElement"/>.
-        /// This is a convenience method, the actual type of this <see cref="UIElement"/> may not support this operation.
+        /// Adds children to this <see cref="Control"/>.
+        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
         /// </summary>
-        /// <param name="elements">The <see cref="UIElement"/>s to be added.</param>
-        public void AddChildren(params UIElement[] elements)
+        /// <param name="controls">The <see cref="Control"/>s to be added.</param>
+        public void AddChildren(params Control[] controls)
         {
-            Argument.EnsureNotNull(elements, "elements");
+            Argument.EnsureNotNull(controls, "controls");
 
-            foreach (UIElement element in elements)
-                Children.Add(element);
+            foreach (Control control in controls)
+                Children.Add(control);
         }
 
         /// <summary>
-        /// Finds a direct child of this <see cref="UIElement"/> from a point.
+        /// Finds a direct child of this <see cref="Control"/> from a point.
         /// </summary>
         /// <param name="point">A point where the child should be, in absolute coordinates.</param>
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
-        public virtual UIElement GetChildAt(Point point)
+        public virtual Control GetChildAt(Point point)
         {
         	if (manager == null) return null;
 
             Region rectangle;
             if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
 
-            foreach (UIElement child in Children)
+            foreach (Control child in Children)
             {
                 Region childRectangle;
                 if (child.TryGetRectangle(out childRectangle) && childRectangle.Contains(point))
@@ -336,52 +336,52 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Determines a given <see cref="UIElement"/> is an ancestor of this <see cref="UIElement"/>.
+        /// Determines a given <see cref="Control"/> is an ancestor of this <see cref="Control"/>.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to be tested.</param>
-        /// <returns><c>True</c> if it is this <see cref="UIElement"/> or one of its ancestors, <c>false</c> if not.</returns>
-        public bool HasAncestor(UIElement element)
+        /// <param name="control">The <see cref="Control"/> to be tested.</param>
+        /// <returns><c>True</c> if it is this <see cref="Control"/> or one of its ancestors, <c>false</c> if not.</returns>
+        public bool HasAncestor(Control control)
         {
-            if (element == null) return false;
+            if (control == null) return false;
 
-            UIElement ancestor = this;
+            Control ancestor = this;
             while (true)
             {
-                if (ancestor == element) return true;
+                if (ancestor == control) return true;
                 ancestor = ancestor.parent;
                 if (ancestor == null) return false;
             }
         }
 
        /// <summary>
-       /// Determines a given <see cref="UIElement"/> is a descendant of this <see cref="UIElement"/>.
+       /// Determines a given <see cref="Control"/> is a descendant of this <see cref="Control"/>.
        /// </summary>
-       /// <param name="descendant">The <see cref="UIElement"/> to be tested.</param>
-       /// <returns><c>True</c> if it is this <see cref="UIElement"/> or one of its descendants, <c>false</c> if not.</returns>
-        public bool HasDescendant(UIElement descendant)
+       /// <param name="control">The <see cref="Control"/> to be tested.</param>
+       /// <returns><c>True</c> if it is this <see cref="Control"/> or one of its descendants, <c>false</c> if not.</returns>
+        public bool HasDescendant(Control control)
         {
             while (true)
             {
-                if (descendant == null) return false;
-                if (descendant == this) return true;
-                descendant = descendant.Parent;
+                if (control == null) return false;
+                if (control == this) return true;
+                control = control.Parent;
             }
         }
         
         /// <summary>
-        /// Gets the deepest descendant <see cref="UIElement"/> at a given location.
+        /// Gets the deepest descendant <see cref="Control"/> at a given location.
         /// </summary>
         /// <param name="point">The location where to find the descendant.</param>
         /// <returns>The deepest descendant at that location.</returns>
-        public UIElement GetDescendantAt(Point point)
+        public Control GetDescendantAt(Point point)
         {
             Region rectangle;
             if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
             
-        	UIElement current = this;
+        	Control current = this;
         	while (true)
         	{
-        		UIElement descendant = current.GetChildAt(point);
+        		Control descendant = current.GetChildAt(point);
         		if (descendant == null) break;
         		current = descendant;
         	}
@@ -390,10 +390,10 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Changes the parent of this <see cref="UIElement"/> in the UI hierarchy.
+        /// Changes the parent of this <see cref="Control"/> in the UI hierarchy.
         /// </summary>
-        /// <param name="parent">The new parent of this <see cref="UIElement"/>.</param>
-        private void SetParent(UIElement parent)
+        /// <param name="parent">The new parent of this <see cref="Control"/>.</param>
+        private void SetParent(Control parent)
         {
             if (this is UIManager) throw new InvalidOperationException("The UI manager cannot be a child.");
             if (this.parent != null && parent != null)
@@ -408,36 +408,36 @@ namespace Orion.Engine.Gui2
         private void SetManagerRecursively(UIManager manager)
         {
         	this.manager = manager;
-        	foreach (UIElement child in Children)
+        	foreach (Control child in Children)
         		child.SetManagerRecursively(manager);
         }
 
-        protected void AdoptChild(UIElement child)
+        protected void AdoptChild(Control child)
         {
             child.SetParent(this);
         }
 
-        protected void AbandonChild(UIElement child)
+        protected void AbandonChild(Control child)
         {
             Debug.Assert(child.Parent == this);
             child.SetParent(null);
         }
 
         /// <summary>
-        /// Finds the common ancestor of two <see cref="UIElement"/>.
+        /// Finds the common ancestor of two <see cref="Control"/>.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns>
-        /// The common ancestor of those <see cref="UIElement"/>s,
+        /// The common ancestor of those <see cref="Control"/>s,
         /// or <c>null</c> if they have no common ancestor or one of them is <c>null</c>.
         /// </returns>
-        public static UIElement FindCommonAncestor(UIElement a, UIElement b)
+        public static Control FindCommonAncestor(Control a, Control b)
         {
-            UIElement ancestorA = a;
+            Control ancestorA = a;
             while (ancestorA != null)
             {
-                UIElement ancestorB = b;
+                Control ancestorB = b;
                 while (ancestorB != null)
                 {
                     if (ancestorB == ancestorA) return ancestorA;
@@ -451,15 +451,15 @@ namespace Orion.Engine.Gui2
 
         #region Measure
         /// <summary>
-        /// Measures the desired size of this <see cref="UIElement"/>, excluding its margin.
+        /// Measures the desired size of this <see cref="Control"/>, excluding its margin.
         /// </summary>
-        /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
+        /// <returns>The desired size of this <see cref="Control"/>.</returns>
         protected abstract Size MeasureWithoutMargin();
         
         /// <summary>
-        /// Measures the desired size of this <see cref="UIElement"/>.
+        /// Measures the desired size of this <see cref="Control"/>.
         /// </summary>
-        /// <returns>The desired size of this <see cref="UIElement"/>.</returns>
+        /// <returns>The desired size of this <see cref="Control"/>.</returns>
         public Size Measure()
         {
             if (layoutState == LayoutState.Invalidated)
@@ -478,7 +478,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Marks the desired size of this <see cref="UIElement"/> as dirty.
+        /// Marks the desired size of this <see cref="Control"/> as dirty.
         /// </summary>
         protected void InvalidateMeasure()
         {
@@ -492,24 +492,24 @@ namespace Orion.Engine.Gui2
             if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
 
-        protected virtual void OnChildMeasureInvalidated(UIElement child)
+        protected virtual void OnChildMeasureInvalidated(Control child)
         {
             InvalidateMeasure();
         }
 
         private void AssertUIManagerForMeasurement()
         {
-            if (manager == null) throw new InvalidOperationException("Cannot get the measure a UI element without a UI manager.");
+            if (manager == null) throw new InvalidOperationException("Cannot get the measure a control without a UI manager.");
         }
         #endregion
 
         #region Arrange
         /// <summary>
-        /// Attempts to retreive the outer rectangle of space reserved to this <see cref="UIElement"/>, this value includes the margins.
-        /// This operation can fail if this <see cref="UIElement"/> has no manager or if it is completely clipped.
+        /// Attempts to retreive the outer rectangle of space reserved to this <see cref="Control"/>, this value includes the margins.
+        /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
         /// </summary>
         /// <param name="rectangle">
-        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="UIElement"/>.
+        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="Control"/>.
         /// </param>
         /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
         public bool TryGetOuterRectangle(out Region rectangle)
@@ -529,11 +529,11 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Attempts to retreive the inner rectangle of space reserved to this <see cref="UIElement"/>, this value excludes the margins.
-        /// This operation can fail if this <see cref="UIElement"/> has no manager or if it is completely clipped.
+        /// Attempts to retreive the inner rectangle of space reserved to this <see cref="Control"/>, this value excludes the margins.
+        /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
         /// </summary>
         /// <param name="rectangle">
-        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="UIElement"/>.
+        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="Control"/>.
         /// </param>
         /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
         public bool TryGetRectangle(out Region rectangle)
@@ -550,16 +550,16 @@ namespace Orion.Engine.Gui2
 
         protected virtual void ArrangeChildren()
         {
-            foreach (UIElement child in Children)
+            foreach (Control child in Children)
                 DefaultArrangeChild(child);
         }
 
-        protected virtual void ArrangeChild(UIElement child)
+        protected virtual void ArrangeChild(Control child)
         {
             ArrangeChildren();
         }
 
-        protected void DefaultArrangeChild(UIElement child)
+        protected void DefaultArrangeChild(Control child)
         {
             Region rectangle;
             if (!TryGetRectangle(out rectangle))
@@ -574,7 +574,7 @@ namespace Orion.Engine.Gui2
             SetChildOuterRectangle(child, childRectangle);
         }
 
-        protected void SetChildOuterRectangle(UIElement child, Region? rectangle)
+        protected void SetChildOuterRectangle(Control child, Region? rectangle)
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
@@ -590,7 +590,7 @@ namespace Orion.Engine.Gui2
             cachedOuterRectangle = null;
             layoutState = LayoutState.Measured;
 
-            foreach (UIElement child in Children)
+            foreach (Control child in Children)
                 child.InvalidateArrange();
         }
 
@@ -623,13 +623,13 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        public static Region DefaultArrange(Size availableSpace, UIElement element)
+        public static Region DefaultArrange(Size availableSpace, Control control)
         {
-            Size desiredSize = element.Measure();
+            Size desiredSize = control.Measure();
 
             int x, y, width, height;
-            DefaultArrange(availableSpace.Width, element.HorizontalAlignment, desiredSize.Width, out x, out width);
-            DefaultArrange(availableSpace.Height, element.VerticalAlignment, desiredSize.Height, out y, out height);
+            DefaultArrange(availableSpace.Width, control.HorizontalAlignment, desiredSize.Width, out x, out width);
+            DefaultArrange(availableSpace.Height, control.VerticalAlignment, desiredSize.Height, out y, out height);
             return new Region(x, y, width, height);
         }
         #endregion
@@ -671,7 +671,7 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/> to handle a key event.
+        /// Gives a chance to this <see cref="Control"/> to handle a key event.
         /// </summary>
         /// <param name="key">The key that was pressed or released.</param>
         /// <param name="modifiers">The modifier keys which are currently pressed.</param>
@@ -686,72 +686,72 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gives a chance to this <see cref="UIElement"/>to handle a character event.
+        /// Gives a chance to this <see cref="Control"/>to handle a character event.
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
         protected internal virtual void HandleCharacter(char character) { }
 
         /// <summary>
-        /// Invoked when the mouse cursor enters this <see cref="UIElement"/>.
+        /// Invoked when the mouse cursor enters this <see cref="Control"/>.
         /// </summary>
         protected internal virtual void OnMouseEntered() { }
 
         /// <summary>
-        /// Invoked when the mouse cursor exits this <see cref="UIElement"/>.
+        /// Invoked when the mouse cursor exits this <see cref="Control"/>.
         /// </summary>
         protected internal virtual void OnMouseExited() { }
         #endregion
 
         #region Focus
         /// <summary>
-        /// Gives the keyboard focus to this <see cref="UIElement"/>.
+        /// Gives the keyboard focus to this <see cref="Control"/>.
         /// </summary>
         public void AcquireKeyboardFocus()
         {
-            if (manager != null) manager.KeyboardFocusedElement = this;
+            if (manager != null) manager.KeyboardFocusedControl = this;
         }
 
         /// <summary>
-        /// Removes the keyboard focus from this <see cref="UIElement"/>.
+        /// Removes the keyboard focus from this <see cref="Control"/>.
         /// </summary>
         public void ReleaseKeyboardFocus()
         {
-            if (HasKeyboardFocus) manager.KeyboardFocusedElement = null;
+            if (HasKeyboardFocus) manager.KeyboardFocusedControl = null;
         }
 
         /// <summary>
-        /// Gives the mouse capture to this <see cref="UIElement"/>.
+        /// Gives the mouse capture to this <see cref="Control"/>.
         /// </summary>
         public void AcquireMouseCapture()
         {
-            if (manager != null) manager.MouseCapturedElement = this;
+            if (manager != null) manager.MouseCapturedControl = this;
         }
 
         /// <summary>
-        /// Removes the mouse capture from this <see cref="UIElement"/>.
+        /// Removes the mouse capture from this <see cref="Control"/>.
         /// </summary>
         public void ReleaseMouseCapture()
         {
-            if (HasMouseCapture) manager.MouseCapturedElement = null;
+            if (HasMouseCapture) manager.MouseCapturedControl = null;
         }
 
         /// <summary>
-        /// Invoked when this <see cref="UIElement"/> acquires keyboard focus.
+        /// Invoked when this <see cref="Control"/> acquires keyboard focus.
         /// </summary>
         protected internal virtual void OnKeyboardFocusAcquired() { }
 
         /// <summary>
-        /// Invoked when this <see cref="UIElement"/> loses keyboard focus.
+        /// Invoked when this <see cref="Control"/> loses keyboard focus.
         /// </summary>
         protected internal virtual void OnKeyboardFocusLost() { }
 
         /// <summary>
-        /// Invoked when this <see cref="UIElement"/> acquires the mouse capture.
+        /// Invoked when this <see cref="Control"/> acquires the mouse capture.
         /// </summary>
         protected internal virtual void OnMouseCaptureAcquired() { }
 
         /// <summary>
-        /// Invoked when this <see cref="UIElement"/> loses the mouse capture.
+        /// Invoked when this <see cref="Control"/> loses the mouse capture.
         /// </summary>
         protected internal virtual void OnMouseCaptureLost() { }
         #endregion

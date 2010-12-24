@@ -14,18 +14,18 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Measures a given string.
         /// </summary>
-        /// <param name="element">The element displaying the text.</param>
+        /// <param name="control">The element displaying the text.</param>
         /// <param name="text">The string to be measured.</param>
         /// <returns>The size of the string, in pixels.</returns>
-        Size MeasureText(UIElement element, string text);
+        Size MeasureText(Control control, string text);
 
         /// <summary>
         /// Gets the size of an image.
         /// </summary>
-        /// <param name="element">The element displaying the image.</param>
+        /// <param name="control">The element displaying the image.</param>
         /// <param name="source">A value identifying an image.</param>
         /// <returns>The size of the image, in pixels.</returns>
-        Size GetImageSize(UIElement element, object source);
+        Size GetImageSize(Control control, object source);
 
         /// <summary>
         /// Gets the size of the button part of a <see cref="CheckBox"/>.
@@ -35,17 +35,17 @@ namespace Orion.Engine.Gui2
         Size GetCheckBoxSize(CheckBox checkBox);
 
         /// <summary>
-        /// Begins drawing a given <see cref="UIElement"/>.
+        /// Begins drawing a given <see cref="Control"/>.
         /// This is called before the children are drawn.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to be drawn.</param>
-        void BeginDraw(UIElement element);
+        /// <param name="control">The <see cref="Control"/> to be drawn.</param>
+        void BeginDraw(Control control);
 
         /// <summary>
-        /// Ends drawing a given <see cref="UIElement"/>.
+        /// Ends drawing a given <see cref="Control"/>.
         /// This is called after the children have been drawn.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to be drawn.</param>
-        void EndDraw(UIElement element);
+        /// <param name="control">The <see cref="Control"/> to be drawn.</param>
+        void EndDraw(Control control);
     }
 }

@@ -6,9 +6,9 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A <see cref="UIElement"/> which displays an image.
+    /// A <see cref="Control"/> which displays an image.
     /// </summary>
-    public sealed class ImageBox : UIElement
+    public sealed class ImageBox : Control
     {
         #region Fields
         private object source;

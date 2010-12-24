@@ -8,7 +8,7 @@ namespace Orion.Engine.Gui2
 {
     partial class CheckBox
     {
-        public sealed class ChildCollection : ICollection<UIElement>
+        public sealed class ChildCollection : ICollection<Control>
         {
             #region Fields
             private readonly CheckBox checkBox;
@@ -31,10 +31,10 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Methods
-            public void Add(UIElement item)
+            public void Add(Control item)
             {
                 Argument.EnsureNotNull(item, "item");
-                if (checkBox.content != null) throw new InvalidOperationException("Cannot add an element to a check box which already has some content.");
+                if (checkBox.content != null) throw new InvalidOperationException("Cannot add a control to a check box which already has some content.");
 
                 checkBox.Content = item;
             }
@@ -44,12 +44,12 @@ namespace Orion.Engine.Gui2
                 checkBox.Content = null;
             }
 
-            public bool Contains(UIElement item)
+            public bool Contains(Control item)
             {
                 return item != null && (item == checkBox.button || item == checkBox.content);
             }
 
-            public bool Remove(UIElement item)
+            public bool Remove(Control item)
             {
                 if (item == null) return false;
 
@@ -62,7 +62,7 @@ namespace Orion.Engine.Gui2
                 return false;
             }
 
-            public IEnumerator<UIElement> GetEnumerator()
+            public IEnumerator<Control> GetEnumerator()
             {
                 yield return checkBox.button;
                 if (checkBox.content != null) yield return checkBox.content;
@@ -70,13 +70,13 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Explicit Members
-            void ICollection<UIElement>.CopyTo(UIElement[] array, int arrayIndex)
+            void ICollection<Control>.CopyTo(Control[] array, int arrayIndex)
             {
                 array[arrayIndex] = checkBox.button;
                 if (checkBox.content != null) array[arrayIndex + 1] = checkBox.content;
             }
 
-            bool ICollection<UIElement>.IsReadOnly
+            bool ICollection<Control>.IsReadOnly
             {
                 get { return false; }
             }

@@ -6,22 +6,22 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// Wraps a <see cref="UIElement"/> and its <see cref="Dock"/> value.
+    /// Wraps a <see cref="Control"/> and its <see cref="Dock"/> value.
     /// </summary>
-    public struct DockedElement : IEquatable<DockedElement>
+    public struct DockedControl : IEquatable<DockedControl>
     {
         #region Fields
-        public readonly UIElement Element;
-        public readonly Dock Dock;
+        public readonly Control Control;
+        public readonly Direction Dock;
         #endregion
 
         #region Constructors
-        public DockedElement(UIElement element, Dock dock)
+        public DockedControl(Control control, Direction dock)
         {
-            Argument.EnsureNotNull(element, "element");
+            Argument.EnsureNotNull(control, "control");
             Argument.EnsureDefined(dock, "dock");
 
-            this.Element = element;
+            this.Control = control;
             this.Dock = dock;
         }
         #endregion
@@ -35,14 +35,14 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="other">The instance to be tested with.</param>
         /// <returns>True they are equal, false otherwise.</returns>
-        public bool Equals(DockedElement other)
+        public bool Equals(DockedControl other)
         {
-            return Element == other.Element && Dock == other.Dock;
+            return Control == other.Control && Dock == other.Dock;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is DockedElement && Equals((UIElement)obj);
+            return obj is DockedControl && Equals((Control)obj);
         }
 
         /// <summary>
@@ -51,19 +51,19 @@ namespace Orion.Engine.Gui2
         /// <param name="a">The first instance.</param>
         /// <param name="b">The second instance.</param>
         /// <returns>True they are equal, false otherwise.</returns>
-        public static bool Equals(DockedElement a, DockedElement b)
+        public static bool Equals(DockedControl a, DockedControl b)
         {
             return a.Equals(b);
         }
 
         public override int GetHashCode()
         {
-            return Element.GetHashCode() ^ Dock.GetHashCode();
+            return Control.GetHashCode() ^ Dock.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "{0} (Dock: {1})".FormatInvariant(Element, Dock);
+            return "{0} (Dock: {1})".FormatInvariant(Control, Dock);
         }
         #endregion
 
@@ -74,7 +74,7 @@ namespace Orion.Engine.Gui2
         /// <param name="a">The first instance.</param>
         /// <param name="b">The second instance.</param>
         /// <returns>True they are equal, false otherwise.</returns>
-        public static bool operator ==(DockedElement a, DockedElement b)
+        public static bool operator ==(DockedControl a, DockedControl b)
         {
             return Equals(a, b);
         }
@@ -85,7 +85,7 @@ namespace Orion.Engine.Gui2
         /// <param name="a">The first instance.</param>
         /// <param name="b">The second instance.</param>
         /// <returns>True they are different, false otherwise.</returns>
-        public static bool operator !=(DockedElement a, DockedElement b)
+        public static bool operator !=(DockedControl a, DockedControl b)
         {
             return !Equals(a, b);
         }

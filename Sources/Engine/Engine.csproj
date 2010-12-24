@@ -145,8 +145,8 @@
     <Compile Include="Gui2\CheckBox.ChildCollection.cs" />
     <Compile Include="Gui2\CheckBox.cs" />
     <Compile Include="Gui2\DataBinding.cs" />
-    <Compile Include="Gui2\Dock.cs" />
-    <Compile Include="Gui2\DockedElement.cs" />
+    <Compile Include="Gui2\Direction.cs" />
+    <Compile Include="Gui2\DockedControl.cs" />
     <Compile Include="Gui2\DockPanel.ChildCollection.cs" />
     <Compile Include="Gui2\DockPanel.cs" />
     <Compile Include="Gui2\IGuiRenderer.cs" />
@@ -160,9 +160,9 @@
     <Compile Include="Gui2\StackPanel.cs" />
     <Compile Include="Gui2\TextField.cs" />
     <Compile Include="Gui2\Thumb.cs" />
-    <Compile Include="Gui2\UIElement.cs" />
+    <Compile Include="Gui2\Control.cs" />
     <Compile Include="Gui2\Visibility.cs" />
-    <Compile Include="Gui2\UIElement.SingleChildCollection.cs" />
+    <Compile Include="Gui2\Control.SingleChildCollection.cs" />
     <Compile Include="Gui2\UIManager.cs" />
     <Compile Include="Gui\Button.cs" />
     <Compile Include="Gui\Checkbox.cs" />

@@ -12,26 +12,26 @@ using MouseButtons = System.Windows.Forms.MouseButtons;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// Root of the UI element hierarchy.
+    /// The root of the UI hierarchy. Manages the focus and allows the injection of events.
     /// </summary>
-    public sealed partial class UIManager : UIElement
+    public sealed partial class UIManager : Control
     {
         #region Fields
-        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseMoveCaller
+        private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseMoveCaller
             = (sender, state, button, amount) => sender.HandleMouseMove(state);
-        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseButtonCaller
+        private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseButtonCaller
             = (sender, state, button, amount) => sender.HandleMouseButton(state, button, (int)amount);
-        private static readonly Func<UIElement, MouseState, MouseButtons, float, bool> MouseWheelCaller
+        private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseWheelCaller
             = (sender, state, button, amount) => sender.HandleMouseWheel(state, amount);
 
         private readonly IGuiRenderer renderer;
         private readonly SingleChildCollection children;
-        private UIElement root;
+        private Control root;
         private Size size = new Size(800, 600);
         private MouseState mouseState;
-        private UIElement hoveredElement;
-        private UIElement keyboardFocusedElement;
-        private UIElement mouseCapturedElement;
+        private Control hoveredControl;
+        private Control keyboardFocusedControl;
+        private Control mouseCapturedControl;
         #endregion
 
         #region Constructors
@@ -46,14 +46,14 @@ namespace Orion.Engine.Gui2
 
         #region Events
         /// <summary>
-        /// Raised when the <see cref="UIElement"/> having the keyboard focus changes.
+        /// Raised when the <see cref="Control"/> having the keyboard focus changes.
         /// </summary>
-        public event Action<UIManager, UIElement> KeyboardFocusedElementChanged;
+        public event Action<UIManager, Control> KeyboardFocusedControlChanged;
 
         /// <summary>
-        /// Raised when the <see cref="UIElement"/> having captured the mouse changes.
+        /// Raised when the <see cref="Control"/> having captured the mouse changes.
         /// </summary>
-        public event Action<UIManager, UIElement> MouseCapturedElementChanged;
+        public event Action<UIManager, Control> MouseCapturedControlChanged;
         #endregion
 
         #region Properties
@@ -88,9 +88,9 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the root element of the UI hierarchy.
+        /// Accesses the root <see cref="Control"/> of the UI hierarchy.
         /// </summary>
-        public UIElement Root
+        public Control Root
         {
             get { return root; }
             set
@@ -114,52 +114,52 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the <see cref="UIElement"/> containing the mouse cursor.
+        /// Gets the <see cref="Control"/> containing the mouse cursor.
         /// </summary>
-        public UIElement HoveredElement
+        public Control HoveredControl
         {
-            get { return hoveredElement; }
+            get { return hoveredControl; }
         }
 
         /// <summary>
-        /// Accesses the <see cref="UIElement"/> which currently has the keyboard focus.
-        /// This is the <see cref="UIElement"/> to which key and character events are routed.
+        /// Accesses the <see cref="Control"/> which currently has the keyboard focus.
+        /// This is the <see cref="Control"/> to which key and character events are routed.
         /// </summary>
-        public UIElement KeyboardFocusedElement
+        public Control KeyboardFocusedControl
         {
-            get { return keyboardFocusedElement; }
+            get { return keyboardFocusedControl; }
             set
             {
-                if (value == keyboardFocusedElement) return;
-                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot give the keyboard focus to an element from another manager.");
+                if (value == keyboardFocusedControl) return;
+                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot give the keyboard focus to a control from another manager.");
 
-                UIElement previous = keyboardFocusedElement;
-                keyboardFocusedElement = value;
+                Control previous = keyboardFocusedControl;
+                keyboardFocusedControl = value;
                 if (previous != null) previous.OnKeyboardFocusLost();
-                if (keyboardFocusedElement != null) keyboardFocusedElement.OnKeyboardFocusAcquired();
+                if (keyboardFocusedControl != null) keyboardFocusedControl.OnKeyboardFocusAcquired();
 
-                KeyboardFocusedElementChanged.Raise(this, keyboardFocusedElement);
+                KeyboardFocusedControlChanged.Raise(this, keyboardFocusedControl);
             }
         }
 
         /// <summary>
-        /// Accesses the <see cref="UIElement"/> which currently has captured the mouse.
-        /// This <see cref="UIElement"/> has a veto on mouse events, it gets a chance to process them before the normal hierarchy.
+        /// Accesses the <see cref="Control"/> which currently has captured the mouse.
+        /// This <see cref="Control"/> has a veto on mouse events, it gets a chance to process them before the normal hierarchy.
         /// </summary>
-        public UIElement MouseCapturedElement
+        public Control MouseCapturedControl
         {
-            get { return mouseCapturedElement; }
+            get { return mouseCapturedControl; }
             set
             {
-                if (value == mouseCapturedElement) return;
-                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot capture the mouse by an element from another manager.");
+                if (value == mouseCapturedControl) return;
+                if (value != null && value.Manager != this) throw new InvalidOperationException("Cannot capture the mouse by a control from another manager.");
 
-                UIElement previous = mouseCapturedElement;
-                mouseCapturedElement = value;
+                Control previous = mouseCapturedControl;
+                mouseCapturedControl = value;
                 if (previous != null) previous.OnMouseCaptureLost();
-                if (mouseCapturedElement != null) mouseCapturedElement.OnMouseCaptureAcquired();
+                if (mouseCapturedControl != null) mouseCapturedControl.OnMouseCaptureAcquired();
 
-                MouseCapturedElementChanged.Raise(this, mouseCapturedElement);
+                MouseCapturedControlChanged.Raise(this, mouseCapturedControl);
             }
         }
         #endregion
@@ -173,18 +173,18 @@ namespace Orion.Engine.Gui2
             Draw(this, renderer);
         }
 
-        private static void Draw(UIElement element, IGuiRenderer renderer)
+        private static void Draw(Control control, IGuiRenderer renderer)
         {
             Region rectangle;
-            if (element.Visibility != Visibility.Visible || !element.TryGetRectangle(out rectangle) || rectangle.Area == 0)
+            if (control.Visibility != Visibility.Visible || !control.TryGetRectangle(out rectangle) || rectangle.Area == 0)
                 return;
 
-            renderer.BeginDraw(element);
+            renderer.BeginDraw(control);
 
-            foreach (UIElement child in element.Children)
+            foreach (Control child in control.Children)
                 Draw(child, renderer);
 
-            renderer.EndDraw(element);
+            renderer.EndDraw(control);
         }
 
         #region Input Event Injection
@@ -239,30 +239,30 @@ namespace Orion.Engine.Gui2
             if (!PowerOfTwo.Is((uint)button)) throw new InvalidEnumArgumentException("button", (int)button, typeof(MouseButtons));
         }
 
-        private void InjectMouseEvent(Func<UIElement, MouseState, MouseButtons, float, bool> caller, MouseButtons button, float amount)
+        private void InjectMouseEvent(Func<Control, MouseState, MouseButtons, float, bool> caller, MouseButtons button, float amount)
         {
-            // If an element has captured the mouse, it gets a veto on mouse events,
+            // If a control has captured the mouse, it gets a veto on mouse events,
             // regardless of if they are in its client area.
-            if (mouseCapturedElement != null)
+            if (mouseCapturedControl != null)
             {
-                bool handled = caller(mouseCapturedElement, mouseState, button, amount);
+                bool handled = caller(mouseCapturedControl, mouseState, button, amount);
                 if (handled) return;
             }
 
             // Update the mouse position and generate mouse entered/exited events.
-            UIElement target = GetDescendantAt(mouseState.Position);
-            if (target != hoveredElement)
+            Control target = GetDescendantAt(mouseState.Position);
+            if (target != hoveredControl)
             {
-                UIElement commonAncestor = UIElement.FindCommonAncestor(target, hoveredElement);
-                if (hoveredElement != null) NotifyMouseExited(hoveredElement, commonAncestor);
+                Control commonAncestor = Control.FindCommonAncestor(target, hoveredControl);
+                if (hoveredControl != null) NotifyMouseExited(hoveredControl, commonAncestor);
                 if (target != null) NotifyMouseEntered(target, commonAncestor);
-                hoveredElement = target;
+                hoveredControl = target;
             }
 
             // Let the target or one of its descendant handle the event.
             if (target != null)
             {
-                UIElement handler = target;
+                Control handler = target;
                 do
                 {
                     bool handled = caller(handler, mouseState, button, amount);
@@ -280,12 +280,12 @@ namespace Orion.Engine.Gui2
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
         public void InjectKey(Keys keyAndModifiers, bool pressed)
         {
-            if (keyboardFocusedElement == null) return;
+            if (keyboardFocusedControl == null) return;
 
             Keys key = keyAndModifiers & Keys.KeyCode;
             if (key == Keys.None) return;
 
-            UIElement handler = keyboardFocusedElement;
+            Control handler = keyboardFocusedControl;
             do
             {
                 if (handler.HandleKey(key, keyAndModifiers & Keys.Modifiers, pressed)) break;
@@ -299,12 +299,12 @@ namespace Orion.Engine.Gui2
         /// <param name="character">The character to be injected.</param>
         public void InjectCharacter(char character)
         {
-            if (keyboardFocusedElement == null) return;
+            if (keyboardFocusedControl == null) return;
 
-            keyboardFocusedElement.HandleCharacter(character);
+            keyboardFocusedControl.HandleCharacter(character);
         }
 
-        private void NotifyMouseExited(UIElement target, UIElement firstExcludedAncestor)
+        private void NotifyMouseExited(Control target, Control firstExcludedAncestor)
         {
             while (target != firstExcludedAncestor)
             {
@@ -313,11 +313,11 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        private void NotifyMouseEntered(UIElement target, UIElement firstExcludedAncestor)
+        private void NotifyMouseEntered(Control target, Control firstExcludedAncestor)
         {
             while (target != firstExcludedAncestor)
             {
-                UIElement ancestor = target;
+                Control ancestor = target;
                 while (ancestor.Parent != firstExcludedAncestor)
                     ancestor = ancestor.Parent;
                 ancestor.OnMouseEntered();
@@ -326,7 +326,7 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
-        protected override ICollection<UIElement> GetChildren()
+        protected override ICollection<Control> GetChildren()
         {
             return children;
         }

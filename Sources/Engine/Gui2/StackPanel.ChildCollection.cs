@@ -8,7 +8,7 @@ namespace Orion.Engine.Gui2
 {
     partial class StackPanel
     {
-        public sealed class ChildCollection : Collection<UIElement>
+        public sealed class ChildCollection : Collection<Control>
         {
             #region Fields
             private readonly StackPanel stackPanel;
@@ -25,7 +25,7 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Methods
-            protected override void InsertItem(int index, UIElement item)
+            protected override void InsertItem(int index, Control item)
             {
                 Argument.EnsureNotNull(item, "item");
 
@@ -39,7 +39,7 @@ namespace Orion.Engine.Gui2
                 base.RemoveItem(index);
             }
 
-            protected override void SetItem(int index, UIElement item)
+            protected override void SetItem(int index, Control item)
             {
                 RemoveItem(index);
                 InsertItem(index, item);

@@ -11,9 +11,9 @@ using MouseButtons = System.Windows.Forms.MouseButtons;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A UI elements which presents an editable box of text to the user.
+    /// A <see cref="Control"/> which presents an editable box of text to the user.
     /// </summary>
-    public sealed class TextField : UIElement
+    public sealed class TextField : Control
     {
         #region Fields
         private string text;
@@ -124,7 +124,7 @@ namespace Orion.Engine.Gui2
                 if (value == isEditable) return;
 
                 isEditable = value;
-                if (!isEditable && HasKeyboardFocus) Manager.KeyboardFocusedElement = null;
+                if (!isEditable && HasKeyboardFocus) Manager.KeyboardFocusedControl = null;
             }
         }
         #endregion

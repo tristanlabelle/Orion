@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 
 // Used to prevent naming clashes with the Dock method.
-using DockEnum = Orion.Engine.Gui2.Dock;
+using DockEnum = Orion.Engine.Gui2.Direction;
 
 namespace Orion.Engine.Gui2
 {
     /// <summary>
     /// A panel which arranges its children along its edges.
     /// </summary>
-    public sealed partial class DockPanel : UIElement
+    public sealed partial class DockPanel : Control
     {
         #region Fields
         private readonly ChildCollection children;
@@ -27,7 +27,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses a value indicating if the last child <see cref="UIElement"/> of this <see cref="DockPanel"/>
+        /// Accesses a value indicating if the last child <see cref="Control"/> of this <see cref="DockPanel"/>
         /// should be stretched to fill the remaining space, regardless of its <see cref="Dock"/> value.
         /// </summary>
         public bool LastChildFill
@@ -42,15 +42,15 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the <see cref="UIElement"/> which fills the remaining space.
+        /// Gets the <see cref="Control"/> which fills the remaining space.
         /// </summary>
-        public UIElement Filler
+        public Control Filler
         {
-            get { return lastChildFill && children.Count > 0 ? children[children.Count - 1].Element : null; }
+            get { return lastChildFill && children.Count > 0 ? children[children.Count - 1].Control : null; }
         }
 
         /// <summary>
-        /// Gets the collection of <see cref="UIElement"/> docked within this <see cref="DockPanel"/>.
+        /// Gets the collection of <see cref="Control"/> docked within this <see cref="DockPanel"/>.
         /// </summary>
         public new ChildCollection Children
         {
@@ -58,33 +58,33 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Convenience setter to assign initial children to this <see cref="UIElement"/>.
-        /// This operation may not be supported by the actual <see cref="UIElement"/> type.
+        /// Convenience setter to assign initial children to this <see cref="Control"/>.
+        /// This operation may not be supported by the actual <see cref="Control"/> type.
         /// </summary>
-        public new IEnumerable<DockedElement> InitChildren
+        public new IEnumerable<DockedControl> InitChildren
         {
             set
             {
-                foreach (DockedElement element in value)
-                    children.Add(element);
+                foreach (DockedControl control in value)
+                    children.Add(control);
             }
         }
         #endregion
 
         #region Methods
         /// <summary>
-        /// Adds a given <see cref="UIElement"/> to this <see cref="DockPanel"/> with the specified <see cref="Dock"/> mode.
+        /// Adds a given <see cref="Control"/> to this <see cref="DockPanel"/> with the specified <see cref="Dock"/> mode.
         /// </summary>
-        /// <param name="element">The <see cref="UIElement"/> to be added.</param>
-        /// <param name="dock">The <see cref="Dock"/> mode of that <see cref="UIElement"/>.</param>
-        public void Dock(UIElement element, Dock dock)
+        /// <param name="control">The <see cref="Control"/> to be added.</param>
+        /// <param name="dock">The <see cref="Dock"/> mode of that <see cref="Control"/>.</param>
+        public void Dock(Control control, Direction dock)
         {
-            children.Add(element, dock);
+            children.Add(control, dock);
         }
 
-        protected override ICollection<UIElement> GetChildren()
+        protected override ICollection<Control> GetChildren()
         {
-            return children.Elements;
+            return children.Controls;
         }
 
         protected override Size MeasureWithoutMargin()
@@ -96,8 +96,8 @@ namespace Orion.Engine.Gui2
 
             for (int i = 0; i < children.Count; ++i)
             {
-                DockedElement child = children[i];
-                Size childSize = child.Element.Measure();
+                DockedControl child = children[i];
+                Size childSize = child.Control.Measure();
 
                 if (LastChildFill && i == children.Count - 1)
                 {
@@ -155,8 +155,8 @@ namespace Orion.Engine.Gui2
 
             for (int i = 0; i < children.Count; ++i)
             {
-                DockedElement child = children[i];
-                Size childSize = child.Element.Measure();
+                DockedControl child = children[i];
+                Size childSize = child.Control.Measure();
 
                 int childRectangleMinX = remainingRectangleMinX;
                 int childRectangleMinY = remainingRectangleMinY;
@@ -195,16 +195,16 @@ namespace Orion.Engine.Gui2
 
                 if (childRectangleWidth <= 0 || childRectangleHeight <= 0)
                 {
-                    SetChildOuterRectangle(child.Element, null);
+                    SetChildOuterRectangle(child.Control, null);
                     continue;
                 }
 
-                Region relativeChildRectangle = DefaultArrange(new Size(childRectangleWidth, childRectangleHeight), child.Element);
+                Region relativeChildRectangle = DefaultArrange(new Size(childRectangleWidth, childRectangleHeight), child.Control);
                 Region childRectangle = new Region(
                     childRectangleMinX + relativeChildRectangle.MinX,
                     childRectangleMinY + relativeChildRectangle.MinY,
                     relativeChildRectangle.Width, relativeChildRectangle.Height);
-                SetChildOuterRectangle(child.Element, childRectangle);
+                SetChildOuterRectangle(child.Control, childRectangle);
             }
         }
         #endregion

@@ -9,9 +9,9 @@ using Orion.Engine.Graphics;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A <see cref="UIElement"/> which displays text.
+    /// A <see cref="Control"/> which displays text.
     /// </summary>
-    public sealed class Label : UIElement
+    public sealed class Label : Control
     {
         #region Fields
         private string text;

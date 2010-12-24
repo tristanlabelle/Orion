@@ -6,14 +6,14 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A checkbox <see cref="UIElement"/>.
+    /// A checkbox <see cref="Control"/>.
     /// </summary>
-    public sealed partial class CheckBox : UIElement
+    public sealed partial class CheckBox : Control
     {
         #region Fields
         private readonly ChildCollection children;
         private readonly Button button;
-        private UIElement content;
+        private Control content;
         private bool isChecked;
         private int buttonGap = 5;
         #endregion
@@ -46,9 +46,9 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses the element within this <see cref="CheckBox"/>.
+        /// Accesses the <see cref="Control"/> within this <see cref="CheckBox"/>.
         /// </summary>
-        public UIElement Content
+        public Control Content
         {
             get { return content; }
             set
@@ -105,7 +105,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        protected override ICollection<UIElement> GetChildren()
+        protected override ICollection<Control> GetChildren()
         {
             return children;
         }

@@ -96,12 +96,12 @@ namespace Orion.Game.Main
             #endregion
 
             #region Methods
-            public Size MeasureText(UIElement element, string text)
+            public Size MeasureText(Control element, string text)
             {
                 return graphicsContext.Measure(text, null);
             }
 
-            public Size GetImageSize(UIElement element, object source)
+            public Size GetImageSize(Control element, object source)
             {
                 if (source is Texture) return ((Texture)source).Size;
                 return Size.Zero;
@@ -112,7 +112,7 @@ namespace Orion.Game.Main
                 return checkBoxUncheckedTexture.Size;
             }
 
-            public void BeginDraw(UIElement element)
+            public void BeginDraw(Control element)
             {
                 Region rectangle;
                 if (!element.TryGetRectangle(out rectangle)) return;
@@ -127,12 +127,12 @@ namespace Orion.Game.Main
                 }
             }
 
-            public void EndDraw(UIElement element)
+            public void EndDraw(Control element)
             {
                 if (element.Children.Count > 0) graphicsContext.PopScissorRegion();
             }
 
-            private void Draw(UIElement element, Region rectangle) { }
+            private void Draw(Control element, Region rectangle) { }
 
             private void Draw(UIManager element, Region rectangle)
             {
@@ -159,7 +159,7 @@ namespace Orion.Game.Main
 
             private void Draw(TextField element, Region rectangle)
             {
-                Draw((UIElement)element, rectangle);
+                Draw((Control)element, rectangle);
                 graphicsContext.Draw(element.Text, rectangle.Min, Colors.Black);
             }
 
@@ -235,37 +235,37 @@ namespace Orion.Game.Main
                     LastChildFill = true,
                     InitChildren = new[]
                     {
-                        new DockedElement(new DockPanel()
+                        new DockedControl(new DockPanel()
                         {
                             MinHeight = 60,
                             InitChildren = new[]
                             {
-                                new DockedElement(new Button("Retour") { MinWidth = 200 }, Dock.MinX),
-                                new DockedElement(new Button("Commencer") { MinWidth = 200 }, Dock.MaxX)
+                                new DockedControl(new Button("Retour") { MinWidth = 200 }, Direction.MinX),
+                                new DockedControl(new Button("Commencer") { MinWidth = 200 }, Direction.MaxX)
                             }
-                        }, Dock.MinY),
+                        }, Direction.MinY),
 
-                        new DockedElement(new StackPanel()
+                        new DockedControl(new StackPanel()
                         {
                             Orientation = Orientation.Vertical,
                             VerticalAlignment = Alignment.Max,
                             MinXMargin = 5,
-                            InitChildren = new UIElement[]
+                            InitChildren = new Control[]
                             {
                                 new DockPanel()
                                 {
                                     LastChildFill = true,
                                     InitChildren = new[]
                                     {
-                                        new DockedElement(new TextField("200") { MinWidth = 100 }, Dock.MaxX),
-                                        new DockedElement(new Label("Aladdium initial: "), Dock.MinX)
+                                        new DockedControl(new TextField("200") { MinWidth = 100 }, Direction.MaxX),
+                                        new DockedControl(new Label("Aladdium initial: "), Direction.MinX)
                                     }
                                 },
                                 new CheckBox("Code de triche")
                             }
-                        }, Dock.MaxX),
+                        }, Direction.MaxX),
 
-                        new DockedElement(new StackPanel()
+                        new DockedControl(new StackPanel()
                         {
                             Orientation = Orientation.Vertical,
                             VerticalAlignment = Alignment.Max,
@@ -276,9 +276,9 @@ namespace Orion.Game.Main
                                     LastChildFill = true,
                                     InitChildren = new[]
                                     {
-                                        new DockedElement(new Label("Player 1 Name"), Dock.MinX),
-                                        new DockedElement(new Button("Kick"), Dock.MaxX),
-                                        new DockedElement(new Button("Future color combo box"), Dock.MaxX),
+                                        new DockedControl(new Label("Player 1 Name"), Direction.MinX),
+                                        new DockedControl(new Button("Kick"), Direction.MaxX),
+                                        new DockedControl(new Button("Future color combo box"), Direction.MaxX),
                                     }
                                 },
                                 new DockPanel()
@@ -286,13 +286,13 @@ namespace Orion.Game.Main
                                     LastChildFill = true,
                                     InitChildren = new[]
                                     {
-                                        new DockedElement(new Label("Player 2 Name"), Dock.MinX),
-                                        new DockedElement(new Button("Kick"), Dock.MaxX),
-                                        new DockedElement(new Button("Future color combo box"), Dock.MaxX),
+                                        new DockedControl(new Label("Player 2 Name"), Direction.MinX),
+                                        new DockedControl(new Button("Kick"), Direction.MaxX),
+                                        new DockedControl(new Button("Future color combo box"), Direction.MaxX),
                                     }
                                 }
                             }
-                        }, Dock.MinX)
+                        }, Direction.MinX)
                     }
                 }
                 //Root = new DockPanel()
@@ -314,7 +314,7 @@ namespace Orion.Game.Main
                 //            ChildGap = 10,
                 //            MinChildSize = 60,
                 //            MinWidth = 300,
-                //            InitChildren = new UIElement[]
+                //            InitChildren = new Control[]
                 //            {
                 //                new CheckBox("Checkboite"),
                 //                new Button("Crédits"),

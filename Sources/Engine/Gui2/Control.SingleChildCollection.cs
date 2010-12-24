@@ -5,18 +5,18 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
-    partial class UIElement
+    partial class Control
     {
-        public sealed class SingleChildCollection : ICollection<UIElement>
+        public sealed class SingleChildCollection : ICollection<Control>
         {
             #region Fields
-            private readonly Func<UIElement> getter;
-            private readonly Action<UIElement> setter;
-            private readonly UIElement[] iterationArray = new UIElement[1];
+            private readonly Func<Control> getter;
+            private readonly Action<Control> setter;
+            private readonly Control[] iterationArray = new Control[1];
             #endregion
 
             #region Constructors
-            public SingleChildCollection(Func<UIElement> getter, Action<UIElement> setter)
+            public SingleChildCollection(Func<Control> getter, Action<Control> setter)
             {
                 Argument.EnsureNotNull(getter, "getter");
                 Argument.EnsureNotNull(setter, "setter");
@@ -32,7 +32,7 @@ namespace Orion.Engine.Gui2
                 get { return getter() == null ? 0 : 1; }
             }
 
-            public UIElement Value
+            public Control Value
             {
                 get { return getter(); }
                 set { setter(value); }
@@ -40,7 +40,7 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Methods
-            public void Add(UIElement item)
+            public void Add(Control item)
             {
                 Argument.EnsureNotNull(item, "item");
 
@@ -52,34 +52,34 @@ namespace Orion.Engine.Gui2
                 setter(null);
             }
 
-            public bool Contains(UIElement item)
+            public bool Contains(Control item)
             {
                 return item != null && getter() == item;
             }
 
-            public void CopyTo(UIElement[] array, int arrayIndex)
+            public void CopyTo(Control[] array, int arrayIndex)
             {
-                UIElement value = getter();
+                Control value = getter();
                 if (value != null) array[arrayIndex] = value;
             }
 
-            public bool Remove(UIElement item)
+            public bool Remove(Control item)
             {
                 if (item == null || getter() == null) return false;
                 setter(null);
                 return true;
             }
 
-            public IEnumerator<UIElement> GetEnumerator()
+            public IEnumerator<Control> GetEnumerator()
             {
                 iterationArray[0] = getter();
-                var sequence = iterationArray[0] == null ? Enumerable.Empty<UIElement>() : iterationArray;
+                var sequence = iterationArray[0] == null ? Enumerable.Empty<Control>() : iterationArray;
                 return sequence.GetEnumerator();
             }
             #endregion
 
             #region IEnumerable Members
-            bool ICollection<UIElement>.IsReadOnly
+            bool ICollection<Control>.IsReadOnly
             {
                 get { return false; }
             }

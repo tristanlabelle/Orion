@@ -7,12 +7,12 @@ using MouseButtons = System.Windows.Forms.MouseButtons;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A <see cref="UIElement"/> which can be clicked and dragged by the user to adjust something.
+    /// A <see cref="Control"/> which can be clicked and dragged by the user to adjust something.
     /// </summary>
-    public sealed class Thumb : UIElement
+    public sealed class Thumb : Control
     {
         #region Fields
-        private static readonly UIElement[] children = new UIElement[0];
+        private static readonly Control[] children = new Control[0];
         private Point? dragStartPosition;
         #endregion
 
@@ -46,6 +46,16 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
+        protected override ICollection<Control> GetChildren()
+        {
+            return children;
+        }
+
+        protected override Size MeasureWithoutMargin()
+        {
+            return MinSize;
+        }
+
         protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
@@ -79,11 +89,6 @@ namespace Orion.Engine.Gui2
             }
 
             return false;
-        }
-
-        protected override ICollection<UIElement> GetChildren()
-        {
-            return children;
         }
         #endregion
     }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
-    public sealed partial class StackPanel : UIElement
+    public sealed partial class StackPanel : Control
     {
         #region Fields
         private readonly ChildCollection children;
@@ -76,7 +76,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        protected override ICollection<UIElement> GetChildren()
+        protected override ICollection<Control> GetChildren()
         {
             return children;
         }
@@ -125,7 +125,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (i > 0) y += childGap;
 
-                    UIElement child = children[i];
+                    Control child = children[i];
                     Size childSize = child.Measure();
 
                     int x;

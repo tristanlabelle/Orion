@@ -11,13 +11,13 @@ using MouseButtons = System.Windows.Forms.MouseButtons;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A button <see cref="UIElement"/> that can be clicked by the user.
+    /// A button <see cref="Control"/> that can be clicked by the user.
     /// </summary>
-    public sealed class Button : UIElement
+    public sealed class Button : Control
     {
         #region Fields
         private readonly SingleChildCollection children;
-        private UIElement content;
+        private Control content;
         private bool isEnabled = true;
         private bool isDown;
         #endregion
@@ -56,9 +56,9 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses the content <see cref="UIElement"/> of this <see cref="Button"/>.
+        /// Accesses the content <see cref="Control"/> of this <see cref="Button"/>.
         /// </summary>
-        public UIElement Content
+        public Control Content
         {
             get { return content; }
             set
@@ -106,7 +106,7 @@ namespace Orion.Engine.Gui2
             if (Clicked != null) Clicked(this);
         }
 
-        protected override ICollection<UIElement> GetChildren()
+        protected override ICollection<Control> GetChildren()
         {
             return children;
         }
@@ -142,7 +142,7 @@ namespace Orion.Engine.Gui2
                     ReleaseMouseCapture();
                     isDown = false;
 
-                    bool isMouseOver = HasAncestor(Manager.HoveredElement);
+                    bool isMouseOver = HasAncestor(Manager.HoveredControl);
                     if (isMouseOver) Click();
                 }
 

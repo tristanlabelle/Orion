@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Orion.Game.Simulation.IO
 {
-    public class WorldReader
+    public class WorldData
     {
         #region Static
         #region Fields
@@ -36,17 +36,41 @@ namespace Orion.Game.Simulation.IO
         #region Fields
         private readonly int numberOfFactions;
         private readonly Terrain terrain;
-        private readonly List<ResourceNodeTemplate> resourceNodes;
+        private readonly List<ResourceNodeTemplate> resourceNodes = new List<ResourceNodeTemplate>();
         private readonly List<List<UnitTemplate>> unitsByFaction = new List<List<UnitTemplate>>();
         #endregion
         #endregion
 
         #region Constructors
-        public WorldReader(BinaryReader reader)
+        public WorldData(World world)
+        {
+            numberOfFactions = world.Factions.Count();
+            terrain = world.Terrain;
+
+            IEnumerable<ResourceNode> concreteResourceNodes = world.Entities.OfType<ResourceNode>();
+            foreach (ResourceNode node in concreteResourceNodes)
+            {
+                ResourceNodeTemplate template = new ResourceNodeTemplate(node.Type, node.Position, node.AmountRemaining);
+                resourceNodes.Add(template);
+            }
+
+            foreach (Faction faction in world.Factions)
+            {
+                List<UnitTemplate> units = new List<UnitTemplate>();
+                foreach (Unit unit in faction.Units)
+                {
+                    UnitTemplate template = new UnitTemplate(Point.Truncate(unit.Position), unit.Type.Name);
+                    units.Add(template);
+                }
+                unitsByFaction.Add(units);
+            }
+        }
+
+        public WorldData(BinaryReader reader)
             : this(reader, true)
         { }
 
-        public WorldReader(BinaryReader reader, bool disposeOfReader)
+        public WorldData(BinaryReader reader, bool disposeOfReader)
         {
             try
             {
@@ -67,7 +91,6 @@ namespace Orion.Game.Simulation.IO
                         terrainBits[i, j] = rawTerrain[j * size.Width + i] == 0;
 
                 // resources
-                resourceNodes = new List<ResourceNodeTemplate>();
                 short aladdiumNodesCount = reader.ReadInt16();
                 short alageneNodesCount = reader.ReadInt16();
                 for (int i = 0; i < aladdiumNodesCount; i++)
@@ -92,17 +115,19 @@ namespace Orion.Game.Simulation.IO
                 for (int i = 0; i < numberOfFactions; i++)
                     unitsByFaction.Add(new List<UnitTemplate>());
 
-                short numberOfUnits = reader.ReadInt16();
-                for (int i = 0; i < numberOfUnits; i++)
+                for (int i = 0; i < numberOfFactions; i++)
                 {
-                    byte player = reader.ReadByte();
-                    short x = reader.ReadInt16();
-                    short y = reader.ReadInt16();
-                    int nameLength = reader.ReadInt16();
-                    string name = new string(reader.ReadChars(nameLength));
+                    short numberOfUnits = reader.ReadInt16();
+                    for (int j = 0; j < numberOfUnits; j++)
+                    {
+                        short x = reader.ReadInt16();
+                        short y = reader.ReadInt16();
+                        int nameLength = reader.ReadInt16();
+                        string name = new string(reader.ReadChars(nameLength));
 
-                    UnitTemplate template = new UnitTemplate(x, y, name);
-                    unitsByFaction[player].Add(template);
+                        UnitTemplate template = new UnitTemplate(x, y, name);
+                        unitsByFaction[i].Add(template);
+                    }
                 }
             }
             finally
@@ -146,6 +171,56 @@ namespace Orion.Game.Simulation.IO
         {
             Argument.EnsureLower(faction, unitsByFaction.Count, "faction");
             return unitsByFaction[faction];
+        }
+
+        public void Write(string filePath)
+        {
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                Write(stream);
+        }
+
+        public void Write(Stream stream)
+        {
+            // we have no right to close the underlying stream since it isn't ours
+            // so we won't dispose the Writer.
+            BinaryWriter writer = new BinaryWriter(stream);
+            writer.Write(mapFileMagic);
+            writer.Write((short)terrain.Width);
+            writer.Write((short)terrain.Height);
+            writer.Write((byte)unitsByFaction.Count);
+
+            for (int i = 0; i < terrain.Height; i++)
+                for (int j = 0; j < terrain.Width; j++)
+                    writer.Write(terrain.IsWalkable(new Point(j, i)));
+
+            writer.Write((short)AladdiumNodes.Count());
+            writer.Write((short)AlageneNodes.Count());
+
+            foreach (ResourceNodeTemplate node in AladdiumNodes)
+            {
+                writer.Write((short)node.Location.X);
+                writer.Write((short)node.Location.Y);
+                writer.Write(node.AmountRemaining);
+            }
+
+            foreach (ResourceNodeTemplate node in AlageneNodes)
+            {
+                writer.Write((short)node.Location.X);
+                writer.Write((short)node.Location.Y);
+                writer.Write(node.AmountRemaining);
+            }
+
+            foreach (List<UnitTemplate> units in unitsByFaction)
+            {
+                writer.Write(units.Count);
+                foreach (UnitTemplate unit in units)
+                {
+                    writer.Write((short)unit.Location.X);
+                    writer.Write((short)unit.Location.Y);
+                    writer.Write((int)unit.UnitTypeName.Length);
+                    writer.Write(unit.UnitTypeName);
+                }
+            }
         }
         #endregion
     }

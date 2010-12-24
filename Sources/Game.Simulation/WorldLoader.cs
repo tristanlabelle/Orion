@@ -14,7 +14,7 @@ namespace Orion.Game.Simulation
     public class WorldLoader : WorldGenerator
     {
         #region Fields
-        private readonly WorldReader worldData;
+        private readonly WorldData worldData;
         #endregion
 
         #region Constructors
@@ -22,7 +22,7 @@ namespace Orion.Game.Simulation
         {
             FileStream stream = new FileStream(filePath, FileMode.Open);
             BinaryReader binaryReader = new BinaryReader(stream);
-            worldData = new WorldReader(binaryReader);
+            worldData = new WorldData(binaryReader);
         }
         #endregion
 

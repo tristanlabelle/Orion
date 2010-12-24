@@ -19,7 +19,7 @@ namespace Orion.Game.Simulation.IO
         {
             this.type = type;
             this.location = location;
-            this.amountRemaining = amountRemaining
+            this.amountRemaining = amountRemaining;
         }
         #endregion
 

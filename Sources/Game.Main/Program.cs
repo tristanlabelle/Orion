@@ -70,6 +70,7 @@ namespace Orion.Game.Main
         {
             #region Fields
             private readonly GraphicsContext graphicsContext;
+            private readonly Texture menuBackgroundTexture;
             private readonly Texture buttonUpTexture;
             private readonly Texture buttonDownTexture;
             private readonly Texture checkBoxUncheckedTexture;
@@ -83,6 +84,7 @@ namespace Orion.Game.Main
                 Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
                 this.graphicsContext = graphicsContext;
+                menuBackgroundTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/MenuBackground.png");
                 buttonUpTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Up.png");
                 buttonDownTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Down.png");
                 checkBoxUncheckedTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/CheckBox_Unchecked.png");
@@ -131,6 +133,11 @@ namespace Orion.Game.Main
             }
 
             private void Draw(UIElement element, Region rectangle) { }
+
+            private void Draw(UIManager element, Region rectangle)
+            {
+                graphicsContext.Fill(rectangle, menuBackgroundTexture);
+            }
 
             private void Draw(Button element, Region rectangle)
             {

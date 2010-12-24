@@ -29,8 +29,6 @@ namespace Orion.Engine.Gui2
         private UIElement root;
         private Size size = new Size(800, 600);
         private MouseState mouseState;
-        private Font defaultFont = new Font("Trebuchet MS", 10);
-        private ColorRgba defaultTextColor = Colors.Black;
         private UIElement hoveredElement;
         private UIElement keyboardFocusedElement;
         private UIElement mouseCapturedElement;
@@ -87,22 +85,6 @@ namespace Orion.Engine.Gui2
         public MouseState MouseState
         {
             get { return mouseState; }
-        }
-        
-        public Font DefaultFont
-        {
-            get { return defaultFont; }
-            set
-            {
-                Argument.EnsureNotNull(value, "DefaultFont");
-                defaultFont = value;
-            }
-        }
-        
-        public ColorRgba DefaultTextColor
-        {
-            get { return defaultTextColor; }
-            set { defaultTextColor = value; }
         }
 
         /// <summary>

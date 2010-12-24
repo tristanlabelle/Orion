@@ -714,7 +714,7 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Removes the keyboard focus from this <see cref="UIElement"/>.
         /// </summary>
-        public void LoseKeyboardFocus()
+        public void ReleaseKeyboardFocus()
         {
             if (HasKeyboardFocus) manager.KeyboardFocusedElement = null;
         }
@@ -730,7 +730,7 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Removes the mouse capture from this <see cref="UIElement"/>.
         /// </summary>
-        public void LoseMouseCapture()
+        public void ReleaseMouseCapture()
         {
             if (HasMouseCapture) manager.MouseCapturedElement = null;
         }

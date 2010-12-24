@@ -92,7 +92,7 @@ namespace Orion.Engine.Gui2
                 if (value == isEnabled) return;
 
                 isEnabled = value;
-                if (!isEnabled) LoseKeyboardFocus();
+                if (!isEnabled) ReleaseKeyboardFocus();
             }
         }
         #endregion
@@ -139,7 +139,7 @@ namespace Orion.Engine.Gui2
                 }
                 else if (isDown)
                 {
-                    LoseMouseCapture();
+                    ReleaseMouseCapture();
                     isDown = false;
 
                     bool isMouseOver = HasAncestor(Manager.HoveredElement);

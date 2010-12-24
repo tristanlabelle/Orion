@@ -9,14 +9,14 @@ using Orion.Engine.Graphics;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A UIElement which displays text.
+    /// A <see cref="UIElement"/> which displays text.
     /// </summary>
     public sealed class Label : UIElement
     {
         #region Fields
         private string text;
-        private ColorRgba? customColor;
-        private Font customFont;
+        private ColorRgba? color;
+        private Font font;
         #endregion
 
         #region Constructors
@@ -32,7 +32,17 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when the text of this <see cref="Label"/> changes.
+        /// </summary>
+        public event Action<Label> TextChanged;
+        #endregion
+
         #region Properties
+        /// <summary>
+        /// Accesses the text displayed in this <see cref="Label"/>.
+        /// </summary>
         public string Text
         {
             get { return text; }
@@ -42,38 +52,29 @@ namespace Orion.Engine.Gui2
                 if (object.ReferenceEquals(value, text)) return;
 
                 this.text = value;
+                TextChanged.Raise(this);
                 InvalidateMeasure();
             }
         }
 
-        public ColorRgba? CustomColor
+        /// <summary>
+        /// Accesses the color of this <see cref="Label"/>.
+        /// A value of <c>null</c> indicates that the default color should be used.
+        /// </summary>
+        public ColorRgba? Color
         {
-            get { return customColor; }
-            set { customColor = value; }
+            get { return color; }
+            set { color = value; }
         }
-        
-        public ColorRgba Color
-        {
-            get
-            {
-                if (customColor.HasValue) return customColor.Value;
-                return Manager == null ? Colors.Black : Manager.DefaultTextColor;
-            }
-        }
-        
-        public Font CustomFont
-        {
-            get { return customFont; }
-            set { customFont = value; }
-        }
-        
+
+        /// <summary>
+        /// Accesses the font of this <see cref="Label"/>.
+        /// A value of <c>null</c> indicates that the default font should be used.
+        /// </summary>
         public Font Font
         {
-            get
-            {
-                if (customFont != null) return customFont;
-                return Manager == null ? null : Manager.DefaultFont;
-            }
+            get { return font; }
+            set { font = value; }
         }
         #endregion
 

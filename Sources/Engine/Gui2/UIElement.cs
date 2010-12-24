@@ -32,13 +32,13 @@ namespace Orion.Engine.Gui2
         /// A cached value of the optimal space for this <see cref="UIElement"/> based on the size of its contents.
         /// This value is only meaningful if the layout state is not <see cref="LayoutState.Invalidated"/>.
         /// </summary>
-        private Size cachedDesiredReservedSize;
+        private Size cachedDesiredOuterSize;
         
         /// <summary>
         /// A cached value of the client space rectangle reserved for this <see cref="UIElement"/>.
         /// This value is only meaningful if the layout state is <see cref="LayoutState.Arranged"/>.
         /// </summary>
-        private Region? cachedReservedRectangle;
+        private Region? cachedOuterRectangle;
         
         private LayoutState layoutState;
         #endregion
@@ -67,10 +67,11 @@ namespace Orion.Engine.Gui2
             get { return parent; }
         }
 
+        #region Margin
         /// <summary>
         /// Accesses the margins around this <see cref="UIElement"/>.
         /// </summary>
-        public virtual Borders Margin
+        public Borders Margin
         {
             get { return margin; }
             set
@@ -79,6 +80,59 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Accesses the margin of this <see cref="UIElement"/> on the minimum X-axis side.
+        /// </summary>
+        public int MinXMargin
+        {
+            get { return margin.MinX; }
+            set { Margin = new Borders(value, margin.MinY, margin.MaxX, margin.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the margin of this <see cref="UIElement"/> on the minimum Y-axis side.
+        /// </summary>
+        public int MinYMargin
+        {
+            get { return margin.MinY; }
+            set { Margin = new Borders(margin.MinX, value, margin.MaxX, margin.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the margin of this <see cref="UIElement"/> on the maximum X-axis side.
+        /// </summary>
+        public int MaxXMargin
+        {
+            get { return margin.MaxX; }
+            set { Margin = new Borders(margin.MinX, margin.MinY, value, margin.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the margin of this <see cref="UIElement"/> on the maximum Y-axis side.
+        /// </summary>
+        public int MaxYMargin
+        {
+            get { return margin.MaxY; }
+            set { Margin = new Borders(margin.MinX, margin.MinY, margin.MaxX, value); }
+        }
+
+        /// <summary>
+        /// Sets the width of the margin on the left and right of the <see cref="UIElement"/>.
+        /// </summary>
+        public int XMargin
+        {
+            set { Margin = new Borders(value, margin.MinY, value, margin.MaxY); }
+        }
+
+        /// <summary>
+        /// Sets the height of the margin on the top and botton of the <see cref="UIElement"/>.
+        /// </summary>
+        public int YMargin
+        {
+            set { Margin = new Borders(margin.MinX, value, margin.MaxX, value); }
+        }
+        #endregion
 
         /// <summary>
         /// Accesses the current visibility of this <see cref="UIElement"/>.
@@ -140,7 +194,7 @@ namespace Orion.Engine.Gui2
 
                 minSize = value;
                 if (layoutState == LayoutState.Measured
-                    && (cachedDesiredReservedSize.Width < minSize.Width || cachedDesiredReservedSize.Height < minSize.Height))
+                    && (cachedDesiredOuterSize.Width < minSize.Width || cachedDesiredOuterSize.Height < minSize.Height))
                 {
                     // The cached desired size being smaller than the new minimum size,
                     // the element will have to be measured again so that it's desired size is bigger.
@@ -267,9 +321,36 @@ namespace Orion.Engine.Gui2
         public virtual UIElement GetChildAt(Point point)
         {
         	if (manager == null) return null;
-            if (!GetReservedRectangle().Contains(point)) return null;
-            
-            return Children.FirstOrDefault(child => child.GetReservedRectangle().Contains(point));
+
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
+
+            foreach (UIElement child in Children)
+            {
+                Region childRectangle;
+                if (child.TryGetRectangle(out childRectangle) && childRectangle.Contains(point))
+                    return child;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Determines a given <see cref="UIElement"/> is an ancestor of this <see cref="UIElement"/>.
+        /// </summary>
+        /// <param name="element">The <see cref="UIElement"/> to be tested.</param>
+        /// <returns><c>True</c> if it is this <see cref="UIElement"/> or one of its ancestors, <c>false</c> if not.</returns>
+        public bool HasAncestor(UIElement element)
+        {
+            if (element == null) return false;
+
+            UIElement ancestor = this;
+            while (true)
+            {
+                if (ancestor == element) return true;
+                ancestor = ancestor.parent;
+                if (ancestor == null) return false;
+            }
         }
 
        /// <summary>
@@ -294,8 +375,8 @@ namespace Orion.Engine.Gui2
         /// <returns>The deepest descendant at that location.</returns>
         public UIElement GetDescendantAt(Point point)
         {
-        	if (manager == null) return null;
-            if (!GetReservedRectangle().Contains(point)) return null;
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
             
         	UIElement current = this;
         	while (true)
@@ -388,12 +469,12 @@ namespace Orion.Engine.Gui2
                     Math.Max(minSize.Width, desiredSize.Width),
                     Math.Max(minSize.Height, desiredSize.Height));
 
-                cachedDesiredReservedSize = clampedDesiredSize + margin;
+                cachedDesiredOuterSize = clampedDesiredSize + margin;
 
                 layoutState = LayoutState.Measured;
             }
 
-            return cachedDesiredReservedSize;
+            return cachedDesiredOuterSize;
         }
 
         /// <summary>
@@ -405,7 +486,7 @@ namespace Orion.Engine.Gui2
 
             InvalidateArrange();
 
-        	cachedDesiredReservedSize = Size.Zero;
+        	cachedDesiredOuterSize = Size.Zero;
         	layoutState = LayoutState.Invalidated;
 
             if (parent != null) parent.OnChildMeasureInvalidated(this);
@@ -423,12 +504,20 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Arrange
-        protected internal Region GetReservedRectangle()
+        /// <summary>
+        /// Attempts to retreive the outer rectangle of space reserved to this <see cref="UIElement"/>, this value includes the margins.
+        /// This operation can fail if this <see cref="UIElement"/> has no manager or if it is completely clipped.
+        /// </summary>
+        /// <param name="rectangle">
+        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="UIElement"/>.
+        /// </param>
+        /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
+        public bool TryGetOuterRectangle(out Region rectangle)
         {
-            if (layoutState != LayoutState.Arranged)
+            if (manager != null && layoutState != LayoutState.Arranged)
             {
                 if (parent == null)
-                    cachedReservedRectangle = new Region(Measure());
+                    cachedOuterRectangle = new Region(Measure());
                 else
                     parent.ArrangeChild(this);
 
@@ -436,22 +525,27 @@ namespace Orion.Engine.Gui2
                 ArrangeChildren();
             }
 
-            return cachedReservedRectangle.Value;
+            return cachedOuterRectangle.TryGetValue(out rectangle);
         }
 
-        protected bool TryGetInternalRectangle(out Region rectangle)
+        /// <summary>
+        /// Attempts to retreive the inner rectangle of space reserved to this <see cref="UIElement"/>, this value excludes the margins.
+        /// This operation can fail if this <see cref="UIElement"/> has no manager or if it is completely clipped.
+        /// </summary>
+        /// <param name="rectangle">
+        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="UIElement"/>.
+        /// </param>
+        /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
+        public bool TryGetRectangle(out Region rectangle)
         {
-            Region? value = GetReservedRectangle() - Margin;
-            if (value.HasValue && value.Value.Area > 0)
-            {
-                rectangle = value.Value;
-                return true;
-            }
-            else
+            Region outerRectangle;
+            if (!TryGetOuterRectangle(out outerRectangle))
             {
                 rectangle = default(Region);
                 return false;
             }
+
+            return Borders.TryShrink(outerRectangle, margin, out rectangle);
         }
 
         protected virtual void ArrangeChildren()
@@ -467,21 +561,25 @@ namespace Orion.Engine.Gui2
 
         protected void DefaultArrangeChild(UIElement child)
         {
-            Region? childrenBounds = GetReservedRectangle() - margin;
-            if (!childrenBounds.HasValue) return;
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle))
+            {
+                SetChildOuterRectangle(child, null);
+                return;
+            }
 
-            Region childRectangle = DefaultArrange(childrenBounds.Value.Size, child);
-            childRectangle = new Region(childrenBounds.Value.Min + childRectangle.Min, childRectangle.Size);
+            Region childRectangle = DefaultArrange(rectangle.Size, child);
+            childRectangle = new Region(rectangle.Min + childRectangle.Min, childRectangle.Size);
 
-            SetChildRectangle(child, childRectangle);
+            SetChildOuterRectangle(child, childRectangle);
         }
 
-        protected void SetChildRectangle(UIElement child, Region rectangle)
+        protected void SetChildOuterRectangle(UIElement child, Region? rectangle)
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
 
-            child.cachedReservedRectangle = rectangle;
+            child.cachedOuterRectangle = rectangle;
             child.layoutState = LayoutState.Arranged;
         }
 
@@ -489,7 +587,7 @@ namespace Orion.Engine.Gui2
         {
             if (layoutState != LayoutState.Arranged) return;
 
-            cachedReservedRectangle = null;
+            cachedOuterRectangle = null;
             layoutState = LayoutState.Measured;
 
             foreach (UIElement child in Children)

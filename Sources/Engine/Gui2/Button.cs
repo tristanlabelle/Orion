@@ -26,9 +26,10 @@ namespace Orion.Engine.Gui2
         public Button()
         {
             children = new SingleChildCollection(() => content, value => content = value);
+            MinSize = new Size(30, 10);
         }
 
-        public Button(string text)
+        public Button(string text, Borders padding)
             : this()
         {
             Argument.EnsureNotNull(text, "text");
@@ -37,9 +38,12 @@ namespace Orion.Engine.Gui2
             {
                 HorizontalAlignment = Alignment.Center,
                 VerticalAlignment = Alignment.Center,
-                Margin = new Borders(5)
+                Margin = padding
             };
         }
+
+        public Button(string text)
+            : this(text, new Borders(8)) { }
         #endregion
 
         #region Events
@@ -138,7 +142,7 @@ namespace Orion.Engine.Gui2
                     LoseMouseCapture();
                     isDown = false;
 
-                    bool isMouseOver = GetReservedRectangle().Contains(state.Position);
+                    bool isMouseOver = HasAncestor(Manager.HoveredElement);
                     if (isMouseOver) Click();
                 }
 

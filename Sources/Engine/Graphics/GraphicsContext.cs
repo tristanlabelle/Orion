@@ -545,8 +545,12 @@ namespace Orion.Engine.Graphics
         #region Text
         public Size Measure(string text, Font font)
         {
-            Vector2 size = new Text(text, font ?? defaultFont).Frame.Size;
-            return new Size((int)size.X, (int)size.Y);
+            var options = new TextRenderingOptions
+            {
+                Font = font ?? textRendererFont
+            };
+
+            return textRenderer.Measure(text, ref options);
         }
 
         public void Draw(string text, ColorRgba color)

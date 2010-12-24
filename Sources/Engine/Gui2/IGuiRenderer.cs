@@ -39,15 +39,13 @@ namespace Orion.Engine.Gui2
         /// This is called before the children are drawn.
         /// </summary>
         /// <param name="element">The <see cref="UIElement"/> to be drawn.</param>
-        /// <param name="rectangle">The rectangle occupied by the <see cref="UIElement"/>.</param>
-        void BeginDraw(UIElement element, Region rectangle);
+        void BeginDraw(UIElement element);
 
         /// <summary>
         /// Ends drawing a given <see cref="UIElement"/>.
         /// This is called after the children have been drawn.
         /// </summary>
         /// <param name="element">The <see cref="UIElement"/> to be drawn.</param>
-        /// <param name="rectangle">The rectangle occupied by the <see cref="UIElement"/>.</param>
-        void EndDraw(UIElement element, Region rectangle);
+        void EndDraw(UIElement element);
     }
 }

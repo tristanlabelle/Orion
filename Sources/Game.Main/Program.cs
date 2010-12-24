@@ -96,9 +96,7 @@ namespace Orion.Game.Main
             #region Methods
             public Size MeasureText(UIElement element, string text)
             {
-                System.Drawing.Font font = null;
-                if (element is Label) font = ((Label)element).Font;
-                return graphicsContext.Measure(text, font);
+                return graphicsContext.Measure(text, null);
             }
 
             public Size GetImageSize(UIElement element, object source)
@@ -112,16 +110,22 @@ namespace Orion.Game.Main
                 return checkBoxUncheckedTexture.Size;
             }
 
-            public void BeginDraw(UIElement element, Region rectangle)
+            public void BeginDraw(UIElement element)
             {
+                Region rectangle;
+                if (!element.TryGetRectangle(out rectangle)) return;
+
                 args[0] = element;
                 args[1] = rectangle;
                 GetType().InvokeMember("Draw", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null, this, args);
 
-                if (element.Children.Count > 0) graphicsContext.PushScissorRegion(rectangle);
+                if (element.Children.Count > 0)
+                {
+                    graphicsContext.PushScissorRegion(rectangle);
+                }
             }
 
-            public void EndDraw(UIElement element, Region rectangle)
+            public void EndDraw(UIElement element)
             {
                 if (element.Children.Count > 0) graphicsContext.PopScissorRegion();
             }
@@ -238,7 +242,7 @@ namespace Orion.Game.Main
                         {
                             Orientation = Orientation.Vertical,
                             VerticalAlignment = Alignment.Max,
-                            Margin = new Borders(30, 0, 0, 0),
+                            MinXMargin = 5,
                             InitChildren = new UIElement[]
                             {
                                 new DockPanel()

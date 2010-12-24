@@ -120,7 +120,7 @@ namespace Orion.Engine.Gui2
         protected override void ArrangeChildren()
         {
             Region internalRectangle;
-            if (!TryGetInternalRectangle(out internalRectangle)) return;
+            if (!TryGetRectangle(out internalRectangle)) return;
 
             Size checkBoxSize = Manager.Renderer.GetCheckBoxSize(this);
 
@@ -129,7 +129,7 @@ namespace Orion.Engine.Gui2
                 internalRectangle.MinY + internalRectangle.Height / 2 - checkBoxSize.Height / 2,
                 checkBoxSize.Width,
                 checkBoxSize.Height);
-            SetChildRectangle(button, buttonRectangle);
+            SetChildOuterRectangle(button, buttonRectangle);
 
             if (content != null)
             {
@@ -141,7 +141,7 @@ namespace Orion.Engine.Gui2
                     internalRectangle.MinY + internalRectangle.Height / 2 - contentHeight / 2,
                     Math.Max(0, internalRectangle.Width - checkBoxSize.Width - buttonGap),
                     contentHeight);
-                SetChildRectangle(content, contentRectangle);
+                SetChildOuterRectangle(content, contentRectangle);
             }
         }
         #endregion

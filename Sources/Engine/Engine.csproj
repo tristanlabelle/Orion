@@ -226,6 +226,7 @@
     <Compile Include="Networking\Protocol.cs" />
     <Compile Include="Networking\SafePacket.cs" />
     <Compile Include="Networking\SafeTransporter.cs" />
+    <Compile Include="NullableExtensions.cs" />
     <Compile Include="NumericExtensions.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Point16.cs" />

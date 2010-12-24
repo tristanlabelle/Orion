@@ -145,13 +145,13 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Region? childrenBounds = GetReservedRectangle() - Margin;
-            if (!childrenBounds.HasValue) return;
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle)) return;
 
-            int remainingRectangleMinX = childrenBounds.Value.MinX;
-            int remainingRectangleMinY = childrenBounds.Value.MinY;
-            int remainingRectangleWidth = childrenBounds.Value.Width;
-            int remainingRectangleHeight = childrenBounds.Value.Height;
+            int remainingRectangleMinX = rectangle.MinX;
+            int remainingRectangleMinY = rectangle.MinY;
+            int remainingRectangleWidth = rectangle.Width;
+            int remainingRectangleHeight = rectangle.Height;
 
             for (int i = 0; i < children.Count; ++i)
             {
@@ -193,12 +193,18 @@ namespace Orion.Engine.Gui2
                     }
                 }
 
+                if (childRectangleWidth <= 0 || childRectangleHeight <= 0)
+                {
+                    SetChildOuterRectangle(child.Element, null);
+                    continue;
+                }
+
                 Region relativeChildRectangle = DefaultArrange(new Size(childRectangleWidth, childRectangleHeight), child.Element);
                 Region childRectangle = new Region(
                     childRectangleMinX + relativeChildRectangle.MinX,
                     childRectangleMinY + relativeChildRectangle.MinY,
                     relativeChildRectangle.Width, relativeChildRectangle.Height);
-                SetChildRectangle(child.Element, childRectangle);
+                SetChildOuterRectangle(child.Element, childRectangle);
             }
         }
         #endregion

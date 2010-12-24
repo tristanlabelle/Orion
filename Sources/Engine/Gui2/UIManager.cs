@@ -193,15 +193,16 @@ namespace Orion.Engine.Gui2
 
         private static void Draw(UIElement element, IGuiRenderer renderer)
         {
-            Region? rectangle = element.GetReservedRectangle() - element.Margin;
-            if (element.Visibility != Visibility.Visible || !rectangle.HasValue || rectangle.Value.Area == 0) return;
+            Region rectangle;
+            if (element.Visibility != Visibility.Visible || !element.TryGetRectangle(out rectangle) || rectangle.Area == 0)
+                return;
 
-            renderer.BeginDraw(element, rectangle.Value);
+            renderer.BeginDraw(element);
 
             foreach (UIElement child in element.Children)
                 Draw(child, renderer);
 
-            renderer.EndDraw(element, rectangle.Value);
+            renderer.EndDraw(element);
         }
 
         #region Input Event Injection

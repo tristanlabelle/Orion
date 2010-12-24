@@ -45,47 +45,71 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Methods
-        public void Draw(IEnumerable<char> text, ref TextRenderingOptions options)
+        public Size Draw(IEnumerable<char> text, ref TextRenderingOptions options)
         {
             Argument.EnsureNotNull(text, "text");
 
             foreach (char character in text)
                 tempStringBuilder.Append(character);
 
-            Draw(ref options);
+            Size size = Draw(ref options);
 
             tempStringBuilder.Clear();
+
+            return size;
         }
 
 
-        public void Draw(string text, ref TextRenderingOptions options)
+        public Size Draw(string text, ref TextRenderingOptions options)
         {
             Argument.EnsureNotNull(text, "text");
 
             tempStringBuilder.Append(text);
-            Draw(ref options);
+            Size size = Draw(ref options);
             tempStringBuilder.Clear();
+
+            return size;
         }
 
-        private void Draw(ref TextRenderingOptions options)
+        public Size Measure(string text, ref TextRenderingOptions options)
+        {
+            Argument.EnsureNotNull(text, "text");
+
+            foreach (char character in text)
+                tempStringBuilder.Append(character);
+
+            Size size = Draw(ref options, false);
+
+            tempStringBuilder.Clear();
+
+            return size;
+        }
+
+        private Size Draw(ref TextRenderingOptions options, bool draw = true)
         {
             RenderedFont renderedFont = FindOrCreateRenderedFont(options.Font);
-            float size = renderedFont.Font.GetHeight();
+            float height = renderedFont.Font.GetHeight();
 
-            Vector2 position = options.Origin.ToVector();
+            int totalWidth = 0;
+            int totalHeight = (int)Math.Ceiling(height);
+
+            Vector2 origin = options.Origin.ToVector();
+            Vector2 position = origin;
             for (int i = 0; i < tempStringBuilder.Length; ++i)
             {
                 char character = tempStringBuilder[i];
                 if (char.IsWhiteSpace(character))
                 {
-                    position.X += renderedFont.SpaceWidth * size;
+                    position.X += renderedFont.SpaceWidth * height;
+                    if (position.X - origin.X > totalWidth)
+                        totalWidth = (int)Math.Ceiling(position.X - origin.X);
                 }
                 else
                 {
                     Glyph glyph = FindOrRenderGlyph(renderedFont, character);
                     Texture texture = renderedFont.Textures[glyph.TextureIndex];
                     Box textureRectangle = glyph.TextureRectangle;
-                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height / renderedFont.Font.Height * size);
+                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height / renderedFont.Font.Height * height);
 
                     if (box.MaxX > options.MaxWidthInPixels)
                     {
@@ -106,10 +130,15 @@ namespace Orion.Engine.Graphics
                         }
                     }
 
-                    graphicsContext.Fill(box, texture, textureRectangle, options.Color);
-                    position.X += glyph.TextureRectangle.Width * texture.Height / renderedFont.Font.Height * size;
+                    if (box.MaxX - origin.X > totalWidth) totalWidth = (int)Math.Ceiling(box.MaxX - origin.X);
+                    if (box.MaxY - origin.Y > totalHeight) totalHeight = (int)Math.Ceiling(box.MaxY - origin.Y);
+
+                    if (draw) graphicsContext.Fill(box, texture, textureRectangle, options.Color);
+                    position.X += glyph.TextureRectangle.Width * texture.Height / renderedFont.Font.Height * height;
                 }
             }
+
+            return new Size(totalWidth, totalHeight);
         }
 
         public void Dispose()

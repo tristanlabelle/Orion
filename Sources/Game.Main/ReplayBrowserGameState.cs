@@ -9,7 +9,6 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
-using Orion.Game.Simluation;
 
 namespace Orion.Game.Main
 {

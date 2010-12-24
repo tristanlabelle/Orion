@@ -7,7 +7,7 @@ using Orion.Engine.Collections;
 using Orion.Engine;
 using OpenTK;
 
-namespace Orion.Game.Simluation
+namespace Orion.Game.Simulation
 {
     public class RandomWorldGenerator : WorldGenerator
     {

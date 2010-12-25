@@ -615,6 +615,23 @@ namespace Orion.Engine
                 "Expected a finite value for argument '{0}' but got {1}.".FormatInvariant(name, value),
                 value);
         }
+
+        /// <summary>
+        /// Ensures that an argument has a value which is finite and not NaN.
+        /// </summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <param name="name">The name of the argument.</param>
+        /// <exception cref="NotFiniteNumberException">
+        /// Thrown if <paramref name="value"/> is infinite or NaN.
+        /// </exception>
+        public static void EnsureFinite(double value, string name)
+        {
+            if (!double.IsInfinity(value) && !double.IsNaN(value)) return;
+
+            throw new NotFiniteNumberException(
+                "Expected a finite value for argument '{0}' but got {1}.".FormatInvariant(name, value),
+                value);
+        }
         #endregion
 
         /// <summary>

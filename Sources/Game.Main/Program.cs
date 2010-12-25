@@ -75,6 +75,8 @@ namespace Orion.Game.Main
             private readonly Texture buttonDownTexture;
             private readonly Texture checkBoxUncheckedTexture;
             private readonly Texture checkBoxCheckedTexture;
+            private readonly Texture scrollBarArrowUpTexture;
+            private readonly Texture scrollBarThumbTexture;
             private readonly object[] args = new object[2];
             #endregion
 
@@ -89,6 +91,8 @@ namespace Orion.Game.Main
                 buttonDownTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Down.png");
                 checkBoxUncheckedTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/CheckBox_Unchecked.png");
                 checkBoxCheckedTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/CheckBox_Checked.png");
+                scrollBarArrowUpTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/ScrollBar_Arrow_Up.png");
+                scrollBarThumbTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/ScrollBar_Thumb.png");
             }
             #endregion
 
@@ -138,6 +142,21 @@ namespace Orion.Game.Main
             private void Draw(UIManager control, Region rectangle)
             {
                 graphicsContext.Fill(rectangle, menuBackgroundTexture);
+            }
+
+            private void Draw(RepeatButton control, Region rectangle)
+            {
+                ScrollBar parentScrollBar = control.Parent as ScrollBar;
+                if (parentScrollBar != null)
+                {
+                    graphicsContext.Fill(rectangle, scrollBarArrowUpTexture);
+                    return;
+                }
+            }
+
+            private void Draw(Thumb thumb, Region rectangle)
+            {
+                graphicsContext.Fill(rectangle, scrollBarThumbTexture);
             }
 
             private void Draw(Button control, Region rectangle)
@@ -266,6 +285,14 @@ namespace Orion.Game.Main
                             }
                         }, Direction.MaxX),
 
+                        new DockedControl(new ScrollBar()
+                        {
+                            Maximum = 100,
+                            Value = 20,
+                            Length = 20,
+                            SmallStep = 10
+                        }, Direction.MaxX),
+
                         new DockedControl(new StackPanel()
                         {
                             Orientation = Orientation.Vertical,
@@ -296,38 +323,6 @@ namespace Orion.Game.Main
                         }, Direction.MinX)
                     }
                 }
-                //Root = new DockPanel()
-                //{
-                //    LastChildFill = true,
-                //    InitChildren = new[]
-                //    {
-                //        new DockedElement(new Label()
-                //        {
-                //            Text = "Orion",
-                //            HorizontalAlignment = Alignment.Center,
-                //            CustomFont = new System.Drawing.Font("Trebuchet MS", 64) 
-                //        }, Dock.MaxY),
-
-                //        new DockedElement(new StackPanel()
-                //        {
-                //            HorizontalAlignment = Alignment.Center,
-                //            VerticalAlignment = Alignment.Center,
-                //            ChildGap = 10,
-                //            MinChildSize = 60,
-                //            MinWidth = 300,
-                //            InitChildren = new Control[]
-                //            {
-                //                new CheckBox("Checkboite"),
-                //                new Button("Crédits"),
-                //                new Button("Tower Defense"),
-                //                new Button("Typing Defense"),
-                //                new Button("Visionner une partie"),
-                //                new Button("Multijoueur"),
-                //                new Button("Monojoueur")
-                //            }
-                //        }, Dock.MinY)
-                //    }
-                //}
             };
 
             Action draw = () =>
@@ -394,11 +389,10 @@ namespace Orion.Game.Main
                     }
                 }
 
-                draw();
-                ++frameCount;
+                uiManager.Update(stopwatch.Elapsed);
+                stopwatch.Reset();
                 stopwatch.Start();
-
-                if ((frameCount % 60) == 0) window.Title = "FPS: {0:F2}".FormatInvariant(frameCount / stopwatch.Elapsed.TotalSeconds);
+                draw();
             }
         }
         #endregion

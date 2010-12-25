@@ -555,22 +555,22 @@ namespace Orion.Engine.Graphics
 
         public void Draw(string text, ColorRgba color)
         {
-            Draw(text, Point.Zero, color);
+            Draw(text, null, Point.Zero, color);
         }
 
         public void Draw(string text, Vector2 position, ColorRgba color)
         {
-            Draw(text, (Point)position, color);
+            Draw(text, null, (Point)position, color);
         }
 
         public void Draw(Text text, Rectangle clippingRect, ColorRgba color)
         {
-            Draw(text.Value, Point.Zero, color);
+            Draw(text.Value, null, Point.Zero, color);
         }
 
         public void Draw(Text text, Vector2 position, ColorRgba color)
         {
-            Draw(text.Value, (Point)position, color);
+            Draw(text.Value, null, (Point)position, color);
         }
 
         /// <summary>
@@ -582,14 +582,14 @@ namespace Orion.Engine.Graphics
         /// <param name="color">The color with which to draw the text.</param>
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            Draw(text.Value, (Point)origin, color);
+            Draw(text.Value, null, (Point)origin, color);
         }
 
-        public void Draw(string text, Point position, ColorRgba color)
+        public void Draw(string text, Font font, Point position, ColorRgba color)
         {
             var options = new TextRenderingOptions
             {
-                Font = textRendererFont,
+                Font = font ?? textRendererFont,
                 Origin = position,
                 Color = color
             };

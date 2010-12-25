@@ -15,10 +15,10 @@ namespace Orion.Game.Simulation.Skills
         #region enum
         public enum ArmorTypes
         {
-            LIGHT = 1,
-            HEAVY = 2,
-            SURNATURAL = 3,
-            DIVINE = 4
+            Light = 1,
+            Heavy = 2,
+            Surnatural = 3,
+            Divine = 4
         };
         #endregion
 

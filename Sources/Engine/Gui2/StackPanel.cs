@@ -5,12 +5,14 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// A panel which displays its items as a horizontal or vertical stack.
+    /// </summary>
     public sealed partial class StackPanel : Control
     {
         #region Fields
         private readonly ChildCollection children;
         private Orientation orientation = Orientation.Vertical;
-        private Borders padding;
         private int childGap;
         private int minChildSize;
         #endregion
@@ -23,6 +25,10 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Accesses the <see cref="Orientation"/> of this <see cref="StackPanel"/>,
+        /// which determines how child <see cref="Control"/>s are laid out.
+        /// </summary>
         public Orientation Orientation
         {
             get { return orientation; }
@@ -35,19 +41,10 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
-        
-        public Borders Padding
-        {
-        	get { return padding; }
-        	set
-            {
-                //if (value == padding) return;
 
-                padding = value;
-                InvalidateMeasure();
-            }
-        }
-
+        /// <summary>
+        /// Accesses the gap between successive child <see cref="Control"/>s, in pixels.
+        /// </summary>
         public int ChildGap
         {
             get { return childGap; }
@@ -61,6 +58,10 @@ namespace Orion.Engine.Gui2
             }
         }
 
+        /// <summary>
+        /// Accesses the minimum size of child <see cref="Control"/>s along the
+        /// current <see cref="Orientation"/>.
+        /// </summary>
         public int MinChildSize
         {
             get { return minChildSize; }
@@ -73,15 +74,40 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Gets the collection of child <see cref="Control"/>s within this <see cref="StackPanel"/>.
+        /// </summary>
+        public new ChildCollection Children
+        {
+            get { return children; }
+        }
+
+        /// <summary>
+        /// Utility property to add children to this <see cref="StackPanel"/>.
+        /// </summary>
+        /// <remarks>
+        /// This exists to leverage the object initializer feature of C# 3.
+        /// </remarks>
+        public IEnumerable<Control> InitChildren
+        {
+            set
+            {
+                Argument.EnsureNotNull(value, "InitChildren");
+
+                foreach (Control control in value)
+                    children.Add(control);
+            }
+        }
         #endregion
 
         #region Methods
-        protected override ICollection<Control> GetChildren()
+        protected override IEnumerable<Control> GetChildren()
         {
             return children;
         }
 
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             int width = 0;
             int height = 0;
@@ -91,7 +117,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (i > 0) height += childGap;
 
-                    Size childSize = children[i].Measure();
+                    Size childSize = children[i].MeasureOuterSize();
                     height += Math.Max(minChildSize, childSize.Height);
                     if (childSize.Width > width) width = childSize.Width;
                 }
@@ -102,20 +128,19 @@ namespace Orion.Engine.Gui2
                 {
                     if (i > 0) width += childGap;
 
-                    Size childSize = children[i].Measure();
+                    Size childSize = children[i].MeasureOuterSize();
                     width += Math.Max(minChildSize, childSize.Width);
                     if (childSize.Height > height) height = childSize.Height;
                 }
             }
 
-            return new Size(width, height) + Padding;
+            return new Size(width, height);
         }
 
         protected override void ArrangeChildren()
         {
             Region rectangle;
-            Region innerRectangle;
-            if (!TryGetRectangle(out rectangle) || !Borders.TryShrink(rectangle, padding, out innerRectangle))
+            if (!TryGetRectangle(out rectangle))
                 return;
 
             if (orientation == Orientation.Vertical)
@@ -126,16 +151,16 @@ namespace Orion.Engine.Gui2
                     if (i > 0) y += childGap;
 
                     Control child = children[i];
-                    Size childSize = child.Measure();
+                    Size childSize = child.MeasureOuterSize();
 
                     int x;
                     int width;
-                    DefaultArrange(innerRectangle.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
+                    DefaultArrange(rectangle.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
 
                     int height = Math.Max(minChildSize, childSize.Height);
                     Region childRectangle = new Region(
-                        innerRectangle.MinX + Margin.MinX + x,
-                        innerRectangle.MinY + Margin.MinY + y,
+                        rectangle.MinX + Margin.MinX + x,
+                        rectangle.MinY + Margin.MinY + y,
                         width, height);
                     SetChildOuterRectangle(child, childRectangle);
 

@@ -96,12 +96,12 @@ namespace Orion.Game.Main
             #endregion
 
             #region Methods
-            public Size MeasureText(Control element, string text)
+            public Size MeasureText(Control control, string text)
             {
                 return graphicsContext.Measure(text, null);
             }
 
-            public Size GetImageSize(Control element, object source)
+            public Size GetImageSize(Control control, object source)
             {
                 if (source is Texture) return ((Texture)source).Size;
                 return Size.Zero;
@@ -112,60 +112,61 @@ namespace Orion.Game.Main
                 return checkBoxUncheckedTexture.Size;
             }
 
-            public void BeginDraw(Control element)
+            public void BeginDraw(Control control)
             {
                 Region rectangle;
-                if (!element.TryGetRectangle(out rectangle)) return;
+                if (!control.TryGetRectangle(out rectangle))
+                {
+                    Debug.Fail("BeginDraw was called for a control without a rectangle.");
+                    return;
+                }
 
-                args[0] = element;
+                args[0] = control;
                 args[1] = rectangle;
                 GetType().InvokeMember("Draw", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null, this, args);
 
-                if (element.Children.Count > 0)
-                {
-                    graphicsContext.PushScissorRegion(rectangle);
-                }
+                graphicsContext.PushScissorRegion(rectangle);
             }
 
-            public void EndDraw(Control element)
+            public void EndDraw(Control control)
             {
-                if (element.Children.Count > 0) graphicsContext.PopScissorRegion();
+                graphicsContext.PopScissorRegion();
             }
 
-            private void Draw(Control element, Region rectangle) { }
+            private void Draw(Control control, Region rectangle) { }
 
-            private void Draw(UIManager element, Region rectangle)
+            private void Draw(UIManager control, Region rectangle)
             {
                 graphicsContext.Fill(rectangle, menuBackgroundTexture);
             }
 
-            private void Draw(Button element, Region rectangle)
+            private void Draw(Button control, Region rectangle)
             {
-                CheckBox parentCheckBox = element.Parent as CheckBox;
-                if (parentCheckBox != null && parentCheckBox.Content != element)
+                CheckBox parentCheckBox = control.Parent as CheckBox;
+                if (parentCheckBox != null && parentCheckBox.Content != control)
                 {
                     graphicsContext.Fill(rectangle, parentCheckBox.IsChecked ? checkBoxCheckedTexture : checkBoxUncheckedTexture);
                     return;
                 }
 
-                bool isMouseOver = rectangle.Contains(element.Manager.MouseState.Position);
+                bool isMouseOver = rectangle.Contains(control.Manager.MouseState.Position);
                 FillNinePart(rectangle, isMouseOver ? buttonDownTexture : buttonUpTexture);
             }
 
-            private void Draw(Label element, Region rectangle)
+            private void Draw(Label control, Region rectangle)
             {
-                graphicsContext.Draw(new Text(element.Text, element.Font), rectangle.Min, Colors.Black);
+                graphicsContext.Draw(new Text(control.Text, control.Font), rectangle.Min, Colors.Black);
             }
 
-            private void Draw(TextField element, Region rectangle)
+            private void Draw(TextField control, Region rectangle)
             {
-                Draw((Control)element, rectangle);
-                graphicsContext.Draw(element.Text, rectangle.Min, Colors.Black);
+                Draw((Control)control, rectangle);
+                graphicsContext.Draw(control.Text, rectangle.Min, Colors.Black);
             }
 
-            private void Draw(ImageBox element, Region rectangle)
+            private void Draw(ImageBox control, Region rectangle)
             {
-                Texture texture = element.Source as Texture;
+                Texture texture = control.Source as Texture;
 
                 if (texture != null) graphicsContext.Fill(rectangle, texture);
             }
@@ -230,7 +231,7 @@ namespace Orion.Game.Main
             UIManager uiManager = new UIManager(renderer)
             {
                 Size = window.ClientAreaSize,
-                Root = new DockPanel()
+                Content = new DockPanel()
                 {
                     LastChildFill = true,
                     InitChildren = new[]

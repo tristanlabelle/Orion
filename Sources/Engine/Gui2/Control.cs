@@ -18,8 +18,6 @@ namespace Orion.Engine.Gui2
     public abstract partial class Control
     {
         #region Fields
-        private static readonly Control[] emptyArray = new Control[0];
-
         private UIManager manager;
         private Control parent;
         private Borders margin;
@@ -248,69 +246,26 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the collection of children of this <see cref="Control"/>.
+        /// Enumerates the children of this <see cref="Control"/>.
         /// </summary>
-        public ICollection<Control> Children
+        /// <remarks>
+        /// This is implemented through <see cref="GetChildren"/> to allow overriding and shadowing simultaneously in a derived class.
+        /// </remarks>
+        public IEnumerable<Control> Children
         {
             get { return GetChildren(); }
-        }
-
-        /// <summary>
-        /// Convenience setter to assign initial children to this <see cref="Control"/>.
-        /// This operation may not be supported by the actual <see cref="Control"/> type.
-        /// </summary>
-        public IEnumerable<Control> InitChildren
-        {
-            set { AddChildren(value); }
         }
         #endregion
 
         #region Methods
         #region Hierarchy
         /// <summary>
-        /// Obtains the collection of children of this <see cref="Control"/>.
+        /// Obtains the sequence of children of this <see cref="Control"/>.
         /// </summary>
-        /// <returns>The children collection of this <see cref="Control"/>.</returns>
-        protected virtual ICollection<Control> GetChildren()
+        /// <returns>A sequence of the children of this <see cref="Control"/>.</returns>
+        protected virtual IEnumerable<Control> GetChildren()
         {
-            return emptyArray;
-        }
-
-        /// <summary>
-        /// Adds a child to this <see cref="Control"/>.
-        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
-        /// </summary>
-        /// <param name="control">The <see cref="Control"/> to be added.</param>
-        public void AddChild(Control control)
-        {
-            Argument.EnsureNotNull(control, "control");
-            Children.Add(control);
-        }
-
-        /// <summary>
-        /// Adds children to this <see cref="Control"/>.
-        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
-        /// </summary>
-        /// <param name="controls">The <see cref="Control"/>s to be added.</param>
-        public void AddChildren(IEnumerable<Control> controls)
-        {
-            Argument.EnsureNotNull(controls, "controls");
-
-            foreach (Control control in controls)
-                Children.Add(control);
-        }
-
-        /// <summary>
-        /// Adds children to this <see cref="Control"/>.
-        /// This is a convenience method, the actual type of this <see cref="Control"/> may not support this operation.
-        /// </summary>
-        /// <param name="controls">The <see cref="Control"/>s to be added.</param>
-        public void AddChildren(params Control[] controls)
-        {
-            Argument.EnsureNotNull(controls, "controls");
-
-            foreach (Control control in controls)
-                Children.Add(control);
+            return Enumerable.Empty<Control>();
         }
 
         /// <summary>
@@ -407,10 +362,15 @@ namespace Orion.Engine.Gui2
         
         private void SetManagerRecursively(UIManager manager)
         {
+            UIManager previousManager = this.manager;
         	this.manager = manager;
+            OnManagerChanged(previousManager);
+
         	foreach (Control child in Children)
         		child.SetManagerRecursively(manager);
         }
+
+        protected virtual void OnManagerChanged(UIManager previousManager) { }
 
         protected void AdoptChild(Control child)
         {
@@ -451,20 +411,16 @@ namespace Orion.Engine.Gui2
 
         #region Measure
         /// <summary>
-        /// Measures the desired size of this <see cref="Control"/>, excluding its margin.
+        /// Measures the desired size of this <see cref="Control"/>, including its margin.
         /// </summary>
         /// <returns>The desired size of this <see cref="Control"/>.</returns>
-        protected abstract Size MeasureWithoutMargin();
-        
-        /// <summary>
-        /// Measures the desired size of this <see cref="Control"/>.
-        /// </summary>
-        /// <returns>The desired size of this <see cref="Control"/>.</returns>
-        public Size Measure()
+        public Size MeasureOuterSize()
         {
+            if (manager == null) return Size.Zero;
+
             if (layoutState == LayoutState.Invalidated)
             {
-                Size desiredSize = MeasureWithoutMargin();
+                Size desiredSize = MeasureSize();
                 Size clampedDesiredSize = new Size(
                     Math.Max(minSize.Width, desiredSize.Width),
                     Math.Max(minSize.Height, desiredSize.Height));
@@ -476,6 +432,12 @@ namespace Orion.Engine.Gui2
 
             return cachedDesiredOuterSize;
         }
+
+        /// <summary>
+        /// Measures the desired size of this <see cref="Control"/>, excluding its margin.
+        /// </summary>
+        /// <returns>The desired size of this <see cref="Control"/>.</returns>
+        protected abstract Size MeasureSize();
 
         /// <summary>
         /// Marks the desired size of this <see cref="Control"/> as dirty.
@@ -508,16 +470,16 @@ namespace Orion.Engine.Gui2
         /// Attempts to retreive the outer rectangle of space reserved to this <see cref="Control"/>, this value includes the margins.
         /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
         /// </summary>
-        /// <param name="rectangle">
+        /// <param name="outerRectangle">
         /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="Control"/>.
         /// </param>
         /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
-        public bool TryGetOuterRectangle(out Region rectangle)
+        public bool TryGetOuterRectangle(out Region outerRectangle)
         {
             if (manager != null && layoutState != LayoutState.Arranged)
             {
                 if (parent == null)
-                    cachedOuterRectangle = new Region(Measure());
+                    cachedOuterRectangle = new Region(MeasureOuterSize());
                 else
                     parent.ArrangeChild(this);
 
@@ -525,11 +487,11 @@ namespace Orion.Engine.Gui2
                 ArrangeChildren();
             }
 
-            return cachedOuterRectangle.TryGetValue(out rectangle);
+            return cachedOuterRectangle.TryGetValue(out outerRectangle);
         }
 
         /// <summary>
-        /// Attempts to retreive the inner rectangle of space reserved to this <see cref="Control"/>, this value excludes the margins.
+        /// Attempts to retreive the rectangle of space reserved to this <see cref="Control"/>, this value excludes the margins.
         /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
         /// </summary>
         /// <param name="rectangle">
@@ -568,9 +530,7 @@ namespace Orion.Engine.Gui2
                 return;
             }
 
-            Region childRectangle = DefaultArrange(rectangle.Size, child);
-            childRectangle = new Region(rectangle.Min + childRectangle.Min, childRectangle.Size);
-
+            Region childRectangle = DefaultArrange(rectangle, child);
             SetChildOuterRectangle(child, childRectangle);
         }
 
@@ -625,12 +585,21 @@ namespace Orion.Engine.Gui2
 
         public static Region DefaultArrange(Size availableSpace, Control control)
         {
-            Size desiredSize = control.Measure();
+            Size desiredSize = control.MeasureOuterSize();
 
             int x, y, width, height;
             DefaultArrange(availableSpace.Width, control.HorizontalAlignment, desiredSize.Width, out x, out width);
             DefaultArrange(availableSpace.Height, control.VerticalAlignment, desiredSize.Height, out y, out height);
             return new Region(x, y, width, height);
+        }
+
+        public static Region DefaultArrange(Region availableSpace, Control control)
+        {
+            Region relativeRectangle = DefaultArrange(availableSpace.Size, control);
+            return new Region(
+                availableSpace.MinX + relativeRectangle.MinX,
+                availableSpace.MinY + relativeRectangle.MinY,
+                relativeRectangle.Width, relativeRectangle.Height);
         }
         #endregion
 
@@ -640,7 +609,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="state">The current state of the mouse.</param>
         /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
-        protected internal virtual bool HandleMouseMove(MouseState state)
+        protected internal virtual bool OnMouseMove(MouseState state)
         {
             return false;
         }
@@ -654,7 +623,7 @@ namespace Orion.Engine.Gui2
         /// The number of successive presses of the button, or <c>0</c> if the button was released.
         /// </param>
         /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
-        protected internal virtual bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected internal virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             return false;
         }
@@ -665,7 +634,7 @@ namespace Orion.Engine.Gui2
         /// <param name="state">The current state of the mouse.</param>
         /// <param name="amount">The amount the mouse wheel was moved, in notches.</param>
         /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
-        protected internal virtual bool HandleMouseWheel(MouseState state, float amount)
+        protected internal virtual bool OnMouseWheel(MouseState state, float amount)
         {
             return false;
         }
@@ -680,7 +649,7 @@ namespace Orion.Engine.Gui2
         /// <c>True</c> if the event was handled, <c>false</c> if not.
         /// Returning <c>true</c> stops the propagation of the event through ancestors.
         /// </returns>
-        protected internal virtual bool HandleKey(Keys key, Keys modifiers, bool pressed)
+        protected internal virtual bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
             return false;
         }
@@ -689,7 +658,7 @@ namespace Orion.Engine.Gui2
         /// Gives a chance to this <see cref="Control"/>to handle a character event.
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
-        protected internal virtual void HandleCharacter(char character) { }
+        protected internal virtual void OnCharacter(char character) { }
 
         /// <summary>
         /// Invoked when the mouse cursor enters this <see cref="Control"/>.

@@ -139,7 +139,7 @@ namespace Orion.Engine.Gui2
             relativeSelectionLength = -text.Length;
         }
 
-        protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left && pressCount > 0 && isEditable)
             {
@@ -151,7 +151,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool HandleKey(Keys key, Keys modifiers, bool pressed)
+        protected internal override bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
             switch (key | modifiers)
             {
@@ -221,7 +221,7 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        protected internal override void HandleCharacter(char character)
+        protected internal override void OnCharacter(char character)
         {
             if ("\b\r\t\n".Contains(character)) return;
 
@@ -229,7 +229,7 @@ namespace Orion.Engine.Gui2
             ++caretIndex;
         }
 
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             return Size.Zero;
         }

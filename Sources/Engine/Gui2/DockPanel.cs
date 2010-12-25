@@ -61,7 +61,7 @@ namespace Orion.Engine.Gui2
         /// Convenience setter to assign initial children to this <see cref="Control"/>.
         /// This operation may not be supported by the actual <see cref="Control"/> type.
         /// </summary>
-        public new IEnumerable<DockedControl> InitChildren
+        public IEnumerable<DockedControl> InitChildren
         {
             set
             {
@@ -82,12 +82,12 @@ namespace Orion.Engine.Gui2
             children.Add(control, dock);
         }
 
-        protected override ICollection<Control> GetChildren()
+        protected override IEnumerable<Control> GetChildren()
         {
             return children.Controls;
         }
 
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             int usedWidth = 0;
             int usedHeight = 0;
@@ -97,7 +97,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.Measure();
+                Size childSize = child.Control.MeasureOuterSize();
 
                 if (LastChildFill && i == children.Count - 1)
                 {
@@ -156,7 +156,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.Measure();
+                Size childSize = child.Control.MeasureOuterSize();
 
                 int childRectangleMinX = remainingRectangleMinX;
                 int childRectangleMinY = remainingRectangleMinY;

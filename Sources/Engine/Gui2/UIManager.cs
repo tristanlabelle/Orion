@@ -14,19 +14,18 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// The root of the UI hierarchy. Manages the focus and allows the injection of events.
     /// </summary>
-    public sealed partial class UIManager : Control
+    public sealed partial class UIManager : ContentControl
     {
         #region Fields
         private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseMoveCaller
-            = (sender, state, button, amount) => sender.HandleMouseMove(state);
+            = (sender, state, button, amount) => sender.OnMouseMove(state);
         private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseButtonCaller
-            = (sender, state, button, amount) => sender.HandleMouseButton(state, button, (int)amount);
+            = (sender, state, button, amount) => sender.OnMouseButton(state, button, (int)amount);
         private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseWheelCaller
-            = (sender, state, button, amount) => sender.HandleMouseWheel(state, amount);
+            = (sender, state, button, amount) => sender.OnMouseWheel(state, amount);
 
         private readonly IGuiRenderer renderer;
-        private readonly SingleChildCollection children;
-        private Control root;
+        private TimeSpan time;
         private Size size = new Size(800, 600);
         private MouseState mouseState;
         private Control hoveredControl;
@@ -40,11 +39,16 @@ namespace Orion.Engine.Gui2
             Argument.EnsureNotNull(renderer, "renderer");
 
             this.renderer = renderer;
-            this.children = new SingleChildCollection(() => Root, value => Root = value);
         }
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when the UI hierarchy gets updated.
+        /// The parameter specifies the time elapsed since the last update.
+        /// </summary>
+        public event Action<UIManager, TimeSpan> Updated;
+
         /// <summary>
         /// Raised when the <see cref="Control"/> having the keyboard focus changes.
         /// </summary>
@@ -63,6 +67,14 @@ namespace Orion.Engine.Gui2
         public IGuiRenderer Renderer
         {
             get { return renderer; }
+        }
+
+        /// <summary>
+        /// Gets the current time for this <see cref="UIManager"/>.
+        /// </summary>
+        public TimeSpan Time
+        {
+            get { return time; }
         }
 
         /// <summary>
@@ -85,32 +97,6 @@ namespace Orion.Engine.Gui2
         public MouseState MouseState
         {
             get { return mouseState; }
-        }
-
-        /// <summary>
-        /// Accesses the root <see cref="Control"/> of the UI hierarchy.
-        /// </summary>
-        public Control Root
-        {
-            get { return root; }
-            set
-            {
-                if (value == root) return;
-
-                if (root != null)
-                {
-                    AbandonChild(root);
-                    root = null;
-                }
-                
-                if (value != null)
-                {
-                    AdoptChild(value);
-                    root = value;
-                }
-
-                InvalidateMeasure();
-            }
         }
 
         /// <summary>
@@ -165,6 +151,18 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Updates this UI hierarchy.
+        /// </summary>
+        /// <param name="elapsedTime">The time elapsed since the last update.</param>
+        public void Update(TimeSpan elapsedTime)
+        {
+            if (elapsedTime < TimeSpan.Zero) throw new InvalidOperationException("The elapsed time should be positive.");
+
+            time += elapsedTime;
+            Updated.Raise(this, elapsedTime);
+        }
+
         /// <summary>
         /// Draws the UI hierarchy beneath this <see cref="UIManager"/>.
         /// </summary>
@@ -288,7 +286,7 @@ namespace Orion.Engine.Gui2
             Control handler = keyboardFocusedControl;
             do
             {
-                if (handler.HandleKey(key, keyAndModifiers & Keys.Modifiers, pressed)) break;
+                if (handler.OnKey(key, keyAndModifiers & Keys.Modifiers, pressed)) break;
                 handler = handler.Parent;
             } while (handler != null);
         }
@@ -301,7 +299,7 @@ namespace Orion.Engine.Gui2
         {
             if (keyboardFocusedControl == null) return;
 
-            keyboardFocusedControl.HandleCharacter(character);
+            keyboardFocusedControl.OnCharacter(character);
         }
 
         private void NotifyMouseExited(Control target, Control firstExcludedAncestor)
@@ -326,12 +324,7 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
-        protected override ICollection<Control> GetChildren()
-        {
-            return children;
-        }
-
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             return size;
         }

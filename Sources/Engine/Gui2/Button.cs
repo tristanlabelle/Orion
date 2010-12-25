@@ -13,11 +13,9 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A button <see cref="Control"/> that can be clicked by the user.
     /// </summary>
-    public sealed class Button : Control
+    public sealed class Button : ContentControl
     {
         #region Fields
-        private readonly SingleChildCollection children;
-        private Control content;
         private bool isEnabled = true;
         private bool isDown;
         #endregion
@@ -25,11 +23,11 @@ namespace Orion.Engine.Gui2
         #region Constructors
         public Button()
         {
-            children = new SingleChildCollection(() => content, value => content = value);
+            Padding = new Borders(10, 6);
             MinSize = new Size(30, 10);
         }
 
-        public Button(string text, Borders padding)
+        public Button(string text)
             : this()
         {
             Argument.EnsureNotNull(text, "text");
@@ -37,13 +35,9 @@ namespace Orion.Engine.Gui2
             Content = new Label(text)
             {
                 HorizontalAlignment = Alignment.Center,
-                VerticalAlignment = Alignment.Center,
-                Margin = padding
+                VerticalAlignment = Alignment.Center
             };
         }
-
-        public Button(string text)
-            : this(text, new Borders(8)) { }
         #endregion
 
         #region Events
@@ -55,32 +49,6 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Accesses the content <see cref="Control"/> of this <see cref="Button"/>.
-        /// </summary>
-        public Control Content
-        {
-            get { return content; }
-            set
-            {
-                if (value == content) return;
-
-                if (content != null)
-                {
-                    AbandonChild(content);
-                    content = null;
-                }
-
-                if (value != null)
-                {
-                    AdoptChild(value);
-                    content = value;
-                }
-
-                InvalidateMeasure();
-            }
-        }
-
         /// <summary>
         /// Accesses a value indicating if this <see cref="Button"/> is enabled (can be clicked by the user).
         /// </summary>
@@ -106,17 +74,7 @@ namespace Orion.Engine.Gui2
             if (Clicked != null) Clicked(this);
         }
 
-        protected override ICollection<Control> GetChildren()
-        {
-            return children;
-        }
-
-        protected override Size MeasureWithoutMargin()
-        {
-            return (content == null ? Size.Zero : content.Measure());
-        }
-
-        protected internal override bool HandleKey(Keys key, Keys modifiers, bool pressed)
+        protected internal override bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
             if (key == Keys.Enter && modifiers == Keys.None)
             {
@@ -127,7 +85,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
             {

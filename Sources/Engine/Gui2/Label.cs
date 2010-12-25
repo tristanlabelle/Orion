@@ -79,7 +79,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             return Manager.Renderer.MeasureText(this, text);
         }

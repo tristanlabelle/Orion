@@ -8,12 +8,10 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A checkbox <see cref="Control"/>.
     /// </summary>
-    public sealed partial class CheckBox : Control
+    public sealed partial class CheckBox : ContentControl
     {
         #region Fields
-        private readonly ChildCollection children;
         private readonly Button button;
-        private Control content;
         private bool isChecked;
         private int buttonGap = 5;
         #endregion
@@ -21,7 +19,6 @@ namespace Orion.Engine.Gui2
         #region Constructors
         public CheckBox()
         {
-            children = new ChildCollection(this);
             button = new Button();
             button.Clicked += sender => IsChecked = !IsChecked;
             AdoptChild(button);
@@ -32,8 +29,7 @@ namespace Orion.Engine.Gui2
         {
             Argument.EnsureNotNull(text, "text");
 
-            content = new Label(text);
-            AdoptChild(content);
+            Content = new Label(text);
         }
         #endregion
 
@@ -45,32 +41,6 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Accesses the <see cref="Control"/> within this <see cref="CheckBox"/>.
-        /// </summary>
-        public Control Content
-        {
-            get { return content; }
-            set
-            {
-                if (value == content) return;
-
-                if (content != null)
-                {
-                    AbandonChild(content);
-                    content = null;
-                }
-
-                if (value != null)
-                {
-                    AdoptChild(value);
-                    content = value;
-                }
-
-                InvalidateMeasure();
-            }
-        }
-
         /// <summary>
         /// Accesses a value indicating if this <see cref="CheckBox"/> is currently checked.
         /// </summary>
@@ -102,46 +72,54 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Gets the button used to tick the checkbox.
+        /// </summary>
+        public Button Button
+        {
+            get { return button; }
+        }
         #endregion
 
         #region Methods
-        protected override ICollection<Control> GetChildren()
+        protected override IEnumerable<Control> GetChildren()
         {
-            return children;
+            yield return button;
+            if (Content != null) yield return Content;
         }
 
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureInnerSize()
         {
             Size checkBoxSize = Manager.Renderer.GetCheckBoxSize(this);
-            Size contentSize = content == null ? Size.Zero : content.Measure();
+            Size contentSize = Content == null ? Size.Zero : Content.MeasureOuterSize();
             return new Size(checkBoxSize.Width + buttonGap + contentSize.Width, Math.Max(checkBoxSize.Height, contentSize.Height));
         }
 
         protected override void ArrangeChildren()
         {
-            Region internalRectangle;
-            if (!TryGetRectangle(out internalRectangle)) return;
+            Region innerRectangle;
+            if (!TryGetInnerRectangle(out innerRectangle)) return;
 
             Size checkBoxSize = Manager.Renderer.GetCheckBoxSize(this);
 
             Region buttonRectangle = new Region(
-                internalRectangle.MinX,
-                internalRectangle.MinY + internalRectangle.Height / 2 - checkBoxSize.Height / 2,
-                checkBoxSize.Width,
-                checkBoxSize.Height);
+                innerRectangle.MinX,
+                innerRectangle.MinY + innerRectangle.Height / 2 - checkBoxSize.Height / 2,
+                checkBoxSize.Width, checkBoxSize.Height);
             SetChildOuterRectangle(button, buttonRectangle);
 
-            if (content != null)
+            if (Content != null)
             {
-                Size contentSize = content.Measure();
-                int contentHeight = Math.Min(contentSize.Height, internalRectangle.Height);
+                Size contentSize = Content.MeasureOuterSize();
+                int contentHeight = Math.Min(contentSize.Height, innerRectangle.Height);
 
                 Region contentRectangle = new Region(
-                    internalRectangle.MinX + checkBoxSize.Width + buttonGap,
-                    internalRectangle.MinY + internalRectangle.Height / 2 - contentHeight / 2,
-                    Math.Max(0, internalRectangle.Width - checkBoxSize.Width - buttonGap),
+                    innerRectangle.MinX + checkBoxSize.Width + buttonGap,
+                    innerRectangle.MinY + innerRectangle.Height / 2 - contentHeight / 2,
+                    Math.Max(0, innerRectangle.Width - checkBoxSize.Width - buttonGap),
                     contentHeight);
-                SetChildOuterRectangle(content, contentRectangle);
+                SetChildOuterRectangle(Content, contentRectangle);
             }
         }
         #endregion

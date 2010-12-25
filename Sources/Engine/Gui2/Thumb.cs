@@ -12,7 +12,6 @@ namespace Orion.Engine.Gui2
     public sealed class Thumb : Control
     {
         #region Fields
-        private static readonly Control[] children = new Control[0];
         private Point? dragStartPosition;
         #endregion
 
@@ -46,17 +45,12 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        protected override ICollection<Control> GetChildren()
-        {
-            return children;
-        }
-
-        protected override Size MeasureWithoutMargin()
+        protected override Size MeasureSize()
         {
             return MinSize;
         }
 
-        protected internal override bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
             {
@@ -79,7 +73,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool HandleMouseMove(MouseState state)
+        protected internal override bool OnMouseMove(MouseState state)
         {
             if (IsDragged)
             {

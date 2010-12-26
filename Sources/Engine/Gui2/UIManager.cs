@@ -31,6 +31,7 @@ namespace Orion.Engine.Gui2
         private Control hoveredControl;
         private Control keyboardFocusedControl;
         private Control mouseCapturedControl;
+        private string cursorName;
         #endregion
 
         #region Constructors
@@ -148,6 +149,15 @@ namespace Orion.Engine.Gui2
                 MouseCapturedControlChanged.Raise(this, mouseCapturedControl);
             }
         }
+
+        /// <summary>
+        /// Accesses the name of the cursor currently in use.
+        /// </summary>
+        public string CursorName
+        {
+            get { return cursorName; }
+            set { cursorName = value; }
+        }
         #endregion
 
         #region Methods
@@ -169,6 +179,7 @@ namespace Orion.Engine.Gui2
         public void Draw()
         {
             Draw(this, renderer);
+            renderer.DrawCursor(mouseState.Position, cursorName);
         }
 
         private static void Draw(Control control, IGuiRenderer renderer)

@@ -12,7 +12,7 @@ namespace Orion.Engine.Gui2
     public sealed class Thumb : Control
     {
         #region Fields
-        private Point? dragStartPosition;
+        private Point? lastDragPosition;
         #endregion
 
         #region Events
@@ -40,7 +40,7 @@ namespace Orion.Engine.Gui2
         [PropertyChangedEvent("DragEnded")]
         public bool IsDragged
         {
-            get { return dragStartPosition.HasValue; }
+            get { return lastDragPosition.HasValue; }
         }
         #endregion
 
@@ -56,14 +56,14 @@ namespace Orion.Engine.Gui2
             {
                 if (pressCount > 0)
                 {
-                    dragStartPosition = state.Position;
+                    lastDragPosition = state.Position;
                     AcquireMouseCapture();
                     DragStarted.Raise(this);
                 }
                 else if (IsDragged)
                 {
                     ReleaseMouseCapture();
-                    dragStartPosition = null;
+                    lastDragPosition = null;
                     DragEnded.Raise(this);
                 }
 
@@ -77,7 +77,9 @@ namespace Orion.Engine.Gui2
         {
             if (IsDragged)
             {
-                Dragging.Raise(this, dragStartPosition.Value - state.Position);
+                Point delta = state.Position - lastDragPosition.Value;
+                lastDragPosition = state.Position;
+                Dragging.Raise(this, delta);
 
                 return true;
             }

@@ -36,6 +36,7 @@ namespace Orion.Engine.Gui2
             AdoptChild(maxButton);
 
             thumb = new Thumb();
+            thumb.Dragging += OnThumbDragging;
             AdoptChild(thumb);
 
             MinSize = new Size(16, 16);
@@ -174,14 +175,27 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        private void OnMinButtonClicked(RepeatButton arg1, int arg2)
+        private void OnMinButtonClicked(RepeatButton sender, int clickCount)
         {
             Value -= SmallStep;
         }
 
-        private void OnMaxButtonClicked(RepeatButton arg1, int arg2)
+        private void OnMaxButtonClicked(RepeatButton sender, int clickCount)
         {
             Value += SmallStep;
+        }
+
+        private void OnThumbDragging(Thumb sender, Point delta)
+        {
+            if (orientation == Orientation.Horizontal) throw new NotImplementedException();
+
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle)) return;
+            
+            int trackLength = rectangle.Height - rectangle.Width * 2;
+            if (trackLength <= 0) return;
+
+            Value += (delta.Y / (double)trackLength) * (maximum - minimum);
         }
         #endregion
     }

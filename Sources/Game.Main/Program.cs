@@ -70,6 +70,7 @@ namespace Orion.Game.Main
         {
             #region Fields
             private readonly GraphicsContext graphicsContext;
+            private readonly Texture defaultCursorTexture;
             private readonly Texture menuBackgroundTexture;
             private readonly Texture buttonUpTexture;
             private readonly Texture buttonDownTexture;
@@ -86,6 +87,7 @@ namespace Orion.Game.Main
                 Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
                 this.graphicsContext = graphicsContext;
+                defaultCursorTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Cursors/Default.png");
                 menuBackgroundTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/MenuBackground.png");
                 buttonUpTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Up.png");
                 buttonDownTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Down.png");
@@ -135,6 +137,14 @@ namespace Orion.Game.Main
             public void EndDraw(Control control)
             {
                 graphicsContext.PopScissorRegion();
+            }
+
+            public void DrawCursor(Point position, string cursorName)
+            {
+                Region rectangle = new Region(
+                    position.X, position.Y - defaultCursorTexture.Height,
+                    defaultCursorTexture.Width, defaultCursorTexture.Height);
+                graphicsContext.Fill(rectangle, defaultCursorTexture);
             }
 
             private void Draw(Control control, Region rectangle) { }
@@ -245,6 +255,7 @@ namespace Orion.Game.Main
 
             IGameWindow window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             GraphicsContext graphicsContext = window.GraphicsContext;
+            System.Windows.Forms.Cursor.Hide();
 
             IGuiRenderer renderer = new GuiRenderer(graphicsContext);
             UIManager uiManager = new UIManager(renderer)

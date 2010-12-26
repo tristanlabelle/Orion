@@ -47,5 +47,12 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be drawn.</param>
         void EndDraw(Control control);
+
+        /// <summary>
+        /// Draws a cursor.
+        /// </summary>
+        /// <param name="position">The location of the cursor.</param>
+        /// <param name="cursorName">The name of the cursor to be drawn.</param>
+        void DrawCursor(Point position, string cursorName);
     }
 }

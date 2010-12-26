@@ -91,9 +91,9 @@ namespace Orion.Engine.Gui2
 
         protected override Size MeasureInnerSize()
         {
-            Size checkBoxSize = Manager.Renderer.GetCheckBoxSize(this);
+            Size buttonSize = button.MeasureOuterSize();
             Size contentSize = Content == null ? Size.Zero : Content.MeasureOuterSize();
-            return new Size(checkBoxSize.Width + buttonGap + contentSize.Width, Math.Max(checkBoxSize.Height, contentSize.Height));
+            return new Size(buttonSize.Width + buttonGap + contentSize.Width, Math.Max(buttonSize.Height, contentSize.Height));
         }
 
         protected override void ArrangeChildren()
@@ -101,12 +101,12 @@ namespace Orion.Engine.Gui2
             Region innerRectangle;
             if (!TryGetInnerRectangle(out innerRectangle)) return;
 
-            Size checkBoxSize = Manager.Renderer.GetCheckBoxSize(this);
+            Size buttonSize = button.MeasureOuterSize();
 
             Region buttonRectangle = new Region(
                 innerRectangle.MinX,
-                innerRectangle.MinY + innerRectangle.Height / 2 - checkBoxSize.Height / 2,
-                checkBoxSize.Width, checkBoxSize.Height);
+                innerRectangle.MinY + innerRectangle.Height / 2 - buttonSize.Height / 2,
+                buttonSize.Width, buttonSize.Height);
             SetChildOuterRectangle(button, buttonRectangle);
 
             if (Content != null)
@@ -115,9 +115,9 @@ namespace Orion.Engine.Gui2
                 int contentHeight = Math.Min(contentSize.Height, innerRectangle.Height);
 
                 Region contentRectangle = new Region(
-                    innerRectangle.MinX + checkBoxSize.Width + buttonGap,
+                    innerRectangle.MinX + buttonSize.Width + buttonGap,
                     innerRectangle.MinY + innerRectangle.Height / 2 - contentHeight / 2,
-                    Math.Max(0, innerRectangle.Width - checkBoxSize.Width - buttonGap),
+                    Math.Max(0, innerRectangle.Width - buttonSize.Width - buttonGap),
                     contentHeight);
                 SetChildOuterRectangle(Content, contentRectangle);
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2
 {
@@ -11,29 +12,31 @@ namespace Orion.Engine.Gui2
     public sealed class ImageBox : Control
     {
         #region Fields
-        private object source;
+        private Texture texture;
         #endregion
 
         #region Constructors
         public ImageBox() { }
 
-        public ImageBox(object source)
+        public ImageBox(Texture texture)
         {
-            this.source = source;
+            this.texture = texture;
         }
         #endregion
 
         #region Properties
         /// <summary>
-        /// A <see cref="IGuiRenderer"/>-specific object providing the source of the image.
+        /// Accesses the <see cref="Texture"/> used by this <see cref="ImageBox"/>.
         /// </summary>
-        public object Source
+        public Texture Texture
         {
-            get { return source; }
+            get { return texture; }
             set
             {
-                if (value == source) return;
-                source = value;
+                if (value == texture) return;
+
+                texture = value;
+                InvalidateMeasure();
             }
         }
         #endregion
@@ -41,7 +44,15 @@ namespace Orion.Engine.Gui2
         #region Methods
         protected override Size MeasureSize()
         {
-            return Manager.Renderer.GetImageSize(this, source);
+            return texture == null ? Size.Zero : texture.Size;
+        }
+
+        protected internal override void Draw()
+        {
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle)) return;
+
+            Renderer.Fill(rectangle, texture, Colors.White);
         }
         #endregion
     }

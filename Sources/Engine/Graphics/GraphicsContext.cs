@@ -543,14 +543,14 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Text
-        public Size Measure(string text, Font font)
+        public Size Measure(string text, ref TextRenderingOptions options)
         {
-            var options = new TextRenderingOptions
-            {
-                Font = font ?? textRendererFont
-            };
-
             return textRenderer.Measure(text, ref options);
+        }
+
+        public Size Draw(string text, ref TextRenderingOptions options)
+        {
+            return textRenderer.Draw(text, ref options);
         }
 
         public void Draw(string text, ColorRgba color)

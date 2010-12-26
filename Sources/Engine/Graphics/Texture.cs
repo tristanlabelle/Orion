@@ -32,8 +32,6 @@ namespace Orion.Engine.Graphics
             Argument.EnsureStrictlyPositive(size.Area, "size.Area");
             Argument.EnsureDefined(pixelFormat, "pixelFormat");
 
-            Debug.Assert(PowerOfTwo.Is(size.Width) && PowerOfTwo.Is(size.Height));
-
             this.size = size;
             this.pixelFormat = pixelFormat;
             this.id = GL.GenTexture();

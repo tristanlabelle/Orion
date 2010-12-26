@@ -18,10 +18,12 @@ using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
+using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Application = System.Windows.Forms.Application;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using Orion.Engine.Gui2.Adornments;
 
 namespace Orion.Game.Main
 {
@@ -65,184 +67,6 @@ namespace Orion.Game.Main
         }
         #endregion
 
-
-        private sealed class GuiRenderer : IGuiRenderer
-        {
-            #region Fields
-            private readonly GraphicsContext graphicsContext;
-            private readonly Texture defaultCursorTexture;
-            private readonly Texture menuBackgroundTexture;
-            private readonly Texture buttonUpTexture;
-            private readonly Texture buttonDownTexture;
-            private readonly Texture checkBoxUncheckedTexture;
-            private readonly Texture checkBoxCheckedTexture;
-            private readonly Texture scrollBarArrowUpTexture;
-            private readonly Texture scrollBarThumbTexture;
-            private readonly object[] args = new object[2];
-            #endregion
-
-            #region Constructors
-            public GuiRenderer(GraphicsContext graphicsContext)
-            {
-                Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-
-                this.graphicsContext = graphicsContext;
-                defaultCursorTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Cursors/Default.png");
-                menuBackgroundTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/MenuBackground.png");
-                buttonUpTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Up.png");
-                buttonDownTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/Button_Down.png");
-                checkBoxUncheckedTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/CheckBox_Unchecked.png");
-                checkBoxCheckedTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/CheckBox_Checked.png");
-                scrollBarArrowUpTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/ScrollBar_Arrow_Up.png");
-                scrollBarThumbTexture = graphicsContext.CreateTextureFromFile("../../../Assets/Textures/Gui/ScrollBar_Thumb.png");
-            }
-            #endregion
-
-            #region Properties
-            #endregion
-
-            #region Methods
-            public Size MeasureText(Control control, string text)
-            {
-                return graphicsContext.Measure(text, null);
-            }
-
-            public Size GetImageSize(Control control, object source)
-            {
-                if (source is Texture) return ((Texture)source).Size;
-                return Size.Zero;
-            }
-
-            public Size GetCheckBoxSize(CheckBox checkBox)
-            {
-                return checkBoxUncheckedTexture.Size;
-            }
-
-            public void BeginDraw(Control control)
-            {
-                Region rectangle;
-                if (!control.TryGetRectangle(out rectangle))
-                {
-                    Debug.Fail("BeginDraw was called for a control without a rectangle.");
-                    return;
-                }
-
-                args[0] = control;
-                args[1] = rectangle;
-                GetType().InvokeMember("Draw", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null, this, args);
-
-                graphicsContext.PushScissorRegion(rectangle);
-            }
-
-            public void EndDraw(Control control)
-            {
-                graphicsContext.PopScissorRegion();
-            }
-
-            public void DrawCursor(Point position, string cursorName)
-            {
-                Region rectangle = new Region(
-                    position.X, position.Y - defaultCursorTexture.Height,
-                    defaultCursorTexture.Width, defaultCursorTexture.Height);
-                graphicsContext.Fill(rectangle, defaultCursorTexture);
-            }
-
-            private void Draw(Control control, Region rectangle) { }
-
-            private void Draw(UIManager control, Region rectangle)
-            {
-                graphicsContext.Fill(rectangle, menuBackgroundTexture);
-            }
-
-            private void Draw(RepeatButton control, Region rectangle)
-            {
-                ScrollBar parentScrollBar = control.Parent as ScrollBar;
-                if (parentScrollBar != null)
-                {
-                    graphicsContext.Fill(rectangle, scrollBarArrowUpTexture);
-                    return;
-                }
-            }
-
-            private void Draw(Thumb thumb, Region rectangle)
-            {
-                graphicsContext.Fill(rectangle, scrollBarThumbTexture);
-            }
-
-            private void Draw(Button control, Region rectangle)
-            {
-                CheckBox parentCheckBox = control.Parent as CheckBox;
-                if (parentCheckBox != null && parentCheckBox.Content != control)
-                {
-                    graphicsContext.Fill(rectangle, parentCheckBox.IsChecked ? checkBoxCheckedTexture : checkBoxUncheckedTexture);
-                    return;
-                }
-
-                bool isMouseOver = rectangle.Contains(control.Manager.MouseState.Position);
-                FillNinePart(rectangle, isMouseOver ? buttonDownTexture : buttonUpTexture);
-            }
-
-            private void Draw(Label control, Region rectangle)
-            {
-                graphicsContext.Draw(new Text(control.Text, control.Font), rectangle.Min, Colors.Black);
-            }
-
-            private void Draw(TextField control, Region rectangle)
-            {
-                Draw((Control)control, rectangle);
-                graphicsContext.Draw(control.Text, rectangle.Min, Colors.Black);
-            }
-
-            private void Draw(ImageBox control, Region rectangle)
-            {
-                Texture texture = control.Source as Texture;
-
-                if (texture != null) graphicsContext.Fill(rectangle, texture);
-            }
-
-            private void FillNinePart(Region rectangle, Texture texture)
-            {
-                int cornerSize = texture.Width / 2 - 1;
-                int middleWidth = rectangle.Width - cornerSize * 2;
-                int middleHeight = rectangle.Height - cornerSize * 2;
-                float cornerTextureSize = cornerSize / (float)texture.Width;
-                float middleTextureSize = 2.0f / (float)texture.Width;
-
-                // Min Row
-                DrawTexturePart(texture, rectangle.MinX, rectangle.MinY, cornerSize, cornerSize,
-                    0, 0, cornerTextureSize, cornerTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize, rectangle.MinY, middleWidth, cornerSize,
-                    cornerTextureSize, 0, middleTextureSize, cornerTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize + middleWidth, rectangle.MinY, cornerSize, cornerSize,
-                    cornerTextureSize + middleTextureSize, 0, cornerTextureSize, cornerTextureSize);
-
-                // Middle Row
-                DrawTexturePart(texture, rectangle.MinX, rectangle.MinY + cornerSize, cornerSize, middleHeight,
-                    0, cornerTextureSize, cornerTextureSize, middleTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize, rectangle.MinY + cornerSize, middleWidth, middleHeight,
-                    cornerTextureSize, cornerTextureSize, middleTextureSize, middleTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize + middleWidth, rectangle.MinY + cornerSize, cornerSize, middleHeight,
-                    cornerTextureSize + middleTextureSize, cornerTextureSize, cornerTextureSize, middleTextureSize);
-
-                // Max Row
-                DrawTexturePart(texture, rectangle.MinX, rectangle.MinY + cornerSize + middleHeight, cornerSize, cornerSize,
-                    0, cornerTextureSize + middleTextureSize, cornerTextureSize, cornerTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize, rectangle.MinY + cornerSize + middleHeight, middleWidth, cornerSize,
-                    cornerTextureSize, cornerTextureSize + middleTextureSize, middleTextureSize, cornerTextureSize);
-                DrawTexturePart(texture, rectangle.MinX + cornerSize + middleWidth, rectangle.MinY + cornerSize + middleHeight, cornerSize, cornerSize,
-                    cornerTextureSize + middleTextureSize, cornerTextureSize + middleTextureSize, cornerTextureSize, cornerTextureSize);
-            }
-
-            private void DrawTexturePart(Texture texture, int x, int y, int width, int height,
-                float textureX, float textureY, float textureWidth, float textureHeight)
-            {
-                Rectangle rectangle = new Rectangle(x, y, width, height);
-                Rectangle textureRectangle = new Rectangle(textureX, textureY, textureWidth, textureHeight);
-                graphicsContext.Fill(rectangle, texture, textureRectangle);
-            }
-            #endregion
-        }
-
         #region Main
         /// <summary>
         /// Main entry point for the program.
@@ -257,84 +81,33 @@ namespace Orion.Game.Main
             GraphicsContext graphicsContext = window.GraphicsContext;
             System.Windows.Forms.Cursor.Hide();
 
-            IGuiRenderer renderer = new GuiRenderer(graphicsContext);
-            UIManager uiManager = new UIManager(renderer)
-            {
-                Size = window.ClientAreaSize,
-                Content = new DockPanel()
-                {
-                    LastChildFill = true,
-                    InitChildren = new[]
-                    {
-                        new DockedControl(new DockPanel()
-                        {
-                            MinHeight = 60,
-                            InitChildren = new[]
-                            {
-                                new DockedControl(new Button("Retour") { MinWidth = 200 }, Direction.MinX),
-                                new DockedControl(new Button("Commencer") { MinWidth = 200 }, Direction.MaxX)
-                            }
-                        }, Direction.MinY),
+            GuiRenderer renderer = new OrionGuiRenderer(graphicsContext);
+            OrionGuiStyle style = new OrionGuiStyle(renderer);
 
-                        new DockedControl(new StackPanel()
-                        {
-                            Orientation = Orientation.Vertical,
-                            VerticalAlignment = Alignment.Max,
-                            MinXMargin = 5,
-                            InitChildren = new Control[]
-                            {
-                                new DockPanel()
-                                {
-                                    LastChildFill = true,
-                                    InitChildren = new[]
-                                    {
-                                        new DockedControl(new TextField("200") { MinWidth = 100 }, Direction.MaxX),
-                                        new DockedControl(new Label("Aladdium initial: "), Direction.MinX)
-                                    }
-                                },
-                                new CheckBox("Code de triche")
-                            }
-                        }, Direction.MaxX),
+            UIManager uiManager = style.CreateUIManager();
+            uiManager.Adornment = new TextureAdornment(renderer.TryGetTexture("MenuBackground"));
+            uiManager.Size = window.ClientAreaSize;
+            
+            DockPanel dockPanel = style.Create<DockPanel>();
+            dockPanel.LastChildFill = true;
+            uiManager.Content = dockPanel;
 
-                        new DockedControl(new ScrollBar()
-                        {
-                            Maximum = 100,
-                            Value = 20,
-                            Length = 20,
-                            SmallStep = 10
-                        }, Direction.MaxX),
+            ImageBox titleImageBox = style.Create<ImageBox>();
+            titleImageBox.HorizontalAlignment = Alignment.Center;
+            titleImageBox.Texture = renderer.TryGetTexture("Title");
+            dockPanel.Dock(titleImageBox, Direction.MaxY);
 
-                        new DockedControl(new StackPanel()
-                        {
-                            Orientation = Orientation.Vertical,
-                            VerticalAlignment = Alignment.Max,
-                            InitChildren = new[]
-                            {
-                                new DockPanel()
-                                {
-                                    LastChildFill = true,
-                                    InitChildren = new[]
-                                    {
-                                        new DockedControl(new Label("Player 1 Name"), Direction.MinX),
-                                        new DockedControl(new Button("Kick"), Direction.MaxX),
-                                        new DockedControl(new Button("Future color combo box"), Direction.MaxX),
-                                    }
-                                },
-                                new DockPanel()
-                                {
-                                    LastChildFill = true,
-                                    InitChildren = new[]
-                                    {
-                                        new DockedControl(new Label("Player 2 Name"), Direction.MinX),
-                                        new DockedControl(new Button("Kick"), Direction.MaxX),
-                                        new DockedControl(new Button("Future color combo box"), Direction.MaxX),
-                                    }
-                                }
-                            }
-                        }, Direction.MinX)
-                    }
-                }
-            };
+            StackPanel buttonsStackPanel = style.Create<StackPanel>();
+            buttonsStackPanel.HorizontalAlignment = Alignment.Center;
+            buttonsStackPanel.VerticalAlignment = Alignment.Center;
+            buttonsStackPanel.MinWidth = 300;
+            buttonsStackPanel.MinChildSize = 50;
+            buttonsStackPanel.ChildGap = 10;
+            dockPanel.Dock(buttonsStackPanel, Direction.MinX);
+
+            buttonsStackPanel.Stack(style.CreateTextButton("Monojoueur"));
+            buttonsStackPanel.Stack(style.CreateTextButton("Multijoueur"));
+            buttonsStackPanel.Stack(style.CreateTextButton("Crédits"));
 
             Action draw = () =>
             {
@@ -353,7 +126,6 @@ namespace Orion.Game.Main
             };
 
             Stopwatch stopwatch = new Stopwatch();
-            int frameCount = -1;
             while (!window.WasClosed)
             {
                 window.Update();

@@ -15,7 +15,7 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private string text;
-        private ColorRgba? color;
+        private ColorRgba color = Colors.Black;
         private Font font;
         #endregion
 
@@ -59,9 +59,8 @@ namespace Orion.Engine.Gui2
 
         /// <summary>
         /// Accesses the color of this <see cref="Label"/>.
-        /// A value of <c>null</c> indicates that the default color should be used.
         /// </summary>
-        public ColorRgba? Color
+        public ColorRgba Color
         {
             get { return color; }
             set { color = value; }
@@ -81,7 +80,27 @@ namespace Orion.Engine.Gui2
         #region Methods
         protected override Size MeasureSize()
         {
-            return Manager.Renderer.MeasureText(this, text);
+            var options = new TextRenderingOptions
+            {
+                Font = font
+            };
+
+            return Renderer.MeasureText(text, ref options);
+        }
+
+        protected internal override void Draw()
+        {
+            Region rectangle;
+            if (!TryGetRectangle(out rectangle)) return;
+
+            var options = new TextRenderingOptions
+            {
+                Origin = rectangle.Min,
+                Font = font,
+                Color = color
+            };
+
+            Renderer.DrawText(text, ref options);
         }
         #endregion
     }

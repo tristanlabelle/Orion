@@ -24,18 +24,18 @@ namespace Orion.Engine.Gui2
         private static readonly Func<Control, MouseState, MouseButtons, float, bool> MouseWheelCaller
             = (sender, state, button, amount) => sender.OnMouseWheel(state, amount);
 
-        private readonly IGuiRenderer renderer;
+        private readonly GuiRenderer renderer;
         private TimeSpan time;
         private Size size = new Size(800, 600);
         private MouseState mouseState;
         private Control hoveredControl;
         private Control keyboardFocusedControl;
         private Control mouseCapturedControl;
-        private string cursorName;
+        private Texture cursorTexture;
         #endregion
 
         #region Constructors
-        public UIManager(IGuiRenderer renderer)
+        public UIManager(GuiRenderer renderer)
         {
             Argument.EnsureNotNull(renderer, "renderer");
 
@@ -63,9 +63,9 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Gets the <see cref="IGuiRenderer"/> responsible of drawing this UI hierarchy.
+        /// Gets the <see cref="GuiRenderer"/> responsible of drawing this UI hierarchy.
         /// </summary>
-        public IGuiRenderer Renderer
+        public GuiRenderer Renderer
         {
             get { return renderer; }
         }
@@ -151,12 +151,12 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the name of the cursor currently in use.
+        /// Accesses the current cursor texture.
         /// </summary>
-        public string CursorName
+        public Texture CursorTexture
         {
-            get { return cursorName; }
-            set { cursorName = value; }
+            get { return cursorTexture; }
+            set { cursorTexture = value; }
         }
         #endregion
 
@@ -176,24 +176,39 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Draws the UI hierarchy beneath this <see cref="UIManager"/>.
         /// </summary>
-        public void Draw()
+        public new void Draw()
         {
-            Draw(this, renderer);
-            renderer.DrawCursor(mouseState.Position, cursorName);
+            Renderer.Begin();
+
+            Draw(this);
+            if (cursorTexture != null)
+            {
+                Region rectangle = new Region(mouseState.X, mouseState.Y - cursorTexture.Height, cursorTexture.Width, cursorTexture.Height);
+                renderer.Fill(rectangle, cursorTexture, Colors.White);
+            }
+
+            Renderer.End();
         }
 
-        private static void Draw(Control control, IGuiRenderer renderer)
+        private void Draw(Control control)
         {
             Region rectangle;
             if (control.Visibility != Visibility.Visible || !control.TryGetRectangle(out rectangle) || rectangle.Area == 0)
                 return;
 
-            renderer.BeginDraw(control);
+            if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
+
+            Region? previousClippingRectangle = Renderer.ClippingRectangle;
+            Renderer.ClippingRectangle = rectangle;
+
+            control.Draw();
 
             foreach (Control child in control.Children)
-                Draw(child, renderer);
+                Draw(child);
 
-            renderer.EndDraw(control);
+            renderer.ClippingRectangle = previousClippingRectangle;
+
+            if (control.Adornment != null) control.Adornment.DrawForeground(renderer, control);
         }
 
         #region Input Event Injection

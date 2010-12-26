@@ -34,11 +34,7 @@ namespace Orion.Engine.Graphics
         public Font Font
         {
             get { return font ?? SystemFonts.DefaultFont; }
-            set
-            {
-                Argument.EnsureNotNull(value, "Font");
-                font = value;
-            }
+            set { font = value ?? SystemFonts.DefaultFont; }
         }
 
         /// <summary>

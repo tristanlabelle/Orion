@@ -102,6 +102,15 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Stacks a <see cref="Control"/> within this <see cref="StackPanel"/>.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> to be stacked.</param>
+        public void Stack(Control control)
+        {
+            children.Add(control);
+        }
+
         protected override IEnumerable<Control> GetChildren()
         {
             return children;

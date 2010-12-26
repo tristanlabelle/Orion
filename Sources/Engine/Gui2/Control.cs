@@ -20,6 +20,7 @@ namespace Orion.Engine.Gui2
         #region Fields
         private UIManager manager;
         private Control parent;
+        private IControlAdornment adornment;
         private Borders margin;
         private Visibility visibility;
         private Alignment horizontalAlignment;
@@ -58,11 +59,28 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Gets the <see cref="GuiRenderer"/> which draws this <see cref="Control"/>.
+        /// </summary>
+        protected GuiRenderer Renderer
+        {
+            get { return manager.Renderer; }
+        }
+
+        /// <summary>
         /// Gets the <see cref="Control"/> which contains this <see cref="Control"/> in the UI hierarchy.
         /// </summary>
         public Control Parent
         {
             get { return parent; }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="IControlAdornment"/> which visually enhances this control.
+        /// </summary>
+        public IControlAdornment Adornment
+        {
+            get { return adornment; }
+            set { adornment = value; }
         }
 
         #region Margin
@@ -723,6 +741,10 @@ namespace Orion.Engine.Gui2
         /// Invoked when this <see cref="Control"/> loses the mouse capture.
         /// </summary>
         protected internal virtual void OnMouseCaptureLost() { }
+        #endregion
+
+        #region Drawing
+        protected internal virtual void Draw() { }
         #endregion
         #endregion
     }

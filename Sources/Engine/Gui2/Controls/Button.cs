@@ -63,6 +63,14 @@ namespace Orion.Engine.Gui2
                 if (!isEnabled) ReleaseKeyboardFocus();
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Button"/> is currently down.
+        /// </summary>
+        public bool IsDown
+        {
+            get { return isDown; }
+        }
         #endregion
 
         #region Methods
@@ -108,11 +116,6 @@ namespace Orion.Engine.Gui2
             }
 
             return false;
-        }
-
-        protected internal override void OnMouseExited()
-        {
-            isDown = false;
         }
         #endregion
     }

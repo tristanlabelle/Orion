@@ -99,6 +99,9 @@
     <Compile Include="Audio\GameAudio.cs" />
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="GameGraphics.cs" />
+    <Compile Include="Gui\OrionButtonAdornment.cs" />
+    <Compile Include="Gui\OrionGuiStyle.cs" />
+    <Compile Include="Gui\OrionGuiRenderer.cs" />
     <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\Scroller.cs" />

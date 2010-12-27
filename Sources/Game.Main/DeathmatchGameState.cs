@@ -99,7 +99,7 @@ namespace Orion.Game.Main
 
             commandPipeline.Update(lastSimulationStep);
 
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
             audioPresenter.SetViewBounds(ui.CameraBounds);
         }
 

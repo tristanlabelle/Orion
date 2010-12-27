@@ -108,7 +108,7 @@ namespace Orion.Engine.Gui2
                     ReleaseMouseCapture();
                     isDown = false;
 
-                    bool isMouseOver = HasAncestor(Manager.HoveredControl);
+                    bool isMouseOver = HasDescendant(Manager.HoveredControl);
                     if (isMouseOver) Click();
                 }
 

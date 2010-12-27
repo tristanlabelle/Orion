@@ -4,13 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui2;
+using Orion.Engine.Input;
+using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
-using Orion.Engine.Gui;
-using Orion.Engine.Geometry;
-using System.Windows.Forms;
-using Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
+using MouseButtons = System.Windows.Forms.MouseButtons;
+using RootView = Orion.Engine.Gui.RootView;
 
 namespace Orion.Game.Presentation
 {
@@ -22,6 +25,8 @@ namespace Orion.Game.Presentation
         #region Fields
         private readonly IGameWindow window;
         private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
+        private readonly OrionGuiStyle uiStyle;
+        private readonly UIManager uiManager;
         private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
@@ -35,6 +40,11 @@ namespace Orion.Game.Presentation
 
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
+
+            GuiRenderer guiRenderer = new OrionGuiRenderer(window.GraphicsContext);
+            uiStyle = new OrionGuiStyle(guiRenderer);
+            uiManager = new UIManager(guiRenderer);
+            uiManager.Size = window.ClientAreaSize;
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
         }
@@ -57,6 +67,16 @@ namespace Orion.Game.Presentation
         public TextureManager TextureManager
         {
             get { return textureManager; }
+        }
+
+        public UIManager UIManager
+        {
+            get { return uiManager; }
+        }
+
+        public OrionGuiStyle GuiStyle
+        {
+            get { return uiStyle; }
         }
 
         public RootView RootView
@@ -171,14 +191,21 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
+        public void DrawGui()
+        {
+            uiManager.Draw();
+            RootView.Draw(window.GraphicsContext);
+        }
+
         /// <summary>
         /// Updates the root view for a frame, allowing it to process queued input.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
-        public void UpdateRootView(float timeDeltaInSeconds)
+        public void UpdateGui(float timeDeltaInSeconds)
         {
             DispatchInputEvents();
-            RootView.Update(timeDeltaInSeconds);
+            rootView.Update(timeDeltaInSeconds);
+            uiManager.Update(TimeSpan.FromSeconds(timeDeltaInSeconds));
         }
 
         /// <summary>
@@ -196,6 +223,43 @@ namespace Orion.Game.Presentation
             {
                 InputEvent inputEvent = inputEventQueue.Dequeue();
                 rootView.SendInputEvent(inputEvent);
+                if (inputEvent.Type == InputEventType.Mouse)
+                {
+                    MouseEventType type;
+                    MouseEventArgs args;
+                    inputEvent.GetMouse(out type, out args);
+
+                    uiManager.InjectMouseMove((int)args.X, (int)args.Y);
+                    if (type == MouseEventType.WheelScrolled)
+                    {
+                        uiManager.InjectMouseWheel(args.WheelDelta);
+                    }
+                    else if (type == MouseEventType.ButtonPressed || type == MouseEventType.ButtonReleased)
+                    {
+                        MouseButtons buttons = MouseButtons.None;
+                        if (args.Button == MouseButton.Left) buttons = MouseButtons.Left;
+                        else if (args.Button == MouseButton.Middle) buttons = MouseButtons.Middle;
+                        else if (args.Button == MouseButton.Right) buttons = MouseButtons.Right;
+
+                        int pressCount = type == MouseEventType.ButtonReleased ? 0 : args.ClickCount;
+                        if (buttons != MouseButtons.None) uiManager.InjectMouseButton(buttons, pressCount);
+                    }
+                }
+                else if (inputEvent.Type == InputEventType.Keyboard)
+                {
+                    KeyboardEventType type;
+                    KeyboardEventArgs args;
+                    inputEvent.GetKeyboard(out type, out args);
+
+                    uiManager.InjectKey(args.KeyAndModifiers, type == KeyboardEventType.ButtonPressed);
+                }
+                else if (inputEvent.Type == InputEventType.Character)
+                {
+                    char character;
+                    inputEvent.GetCharacter(out character);
+
+                    uiManager.InjectCharacter(character);
+                }
             }
         }
 
@@ -207,7 +271,7 @@ namespace Orion.Game.Presentation
 
         private void OnWindowResized(IGameWindow sender)
         {
-            rootView.Frame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
+            uiManager.Size = window.ClientAreaSize;
         }
 
         private void HandleInput(InputEvent inputEvent)
@@ -227,7 +291,7 @@ namespace Orion.Game.Presentation
         {
             if (window.Mode == WindowMode.Windowed)
             {
-                try { window.SetFullscreen(new Size(1024, 768)); }
+                try { window.SetFullscreen(new Size(1280, 800)); }
                 catch (NotSupportedException) { }
             }
             else

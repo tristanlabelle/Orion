@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui;
+using Orion.Engine.Gui2;
+using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 
@@ -16,7 +17,7 @@ namespace Orion.Game.Main
     {
         #region Fields
         private readonly GameGraphics graphics;
-        private readonly MainMenuUI ui;
+        private readonly DockPanel rootDockPanel;
         #endregion
 
         #region Constructors
@@ -26,32 +27,45 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.ui = new MainMenuUI(graphics);
-            this.ui.SinglePlayerSelected += OnSinglePlayerSelected;
-            this.ui.MultiplayerSelected += OnMultiplayerSelected;
-            this.ui.TowerDefenseSelected += OnTowerDefenseSelected;
-            this.ui.TypingDefenseSelected += OnTypingDefenseSelected;
-            this.ui.ViewReplaySelected += OnViewReplaySelected;
-            this.ui.QuitGameSelected += OnQuitGameSelected;
-        }
-        #endregion
 
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
+            var renderer = graphics.UIManager.Renderer;
+            var style = graphics.GuiStyle;
+
+            rootDockPanel = style.Create<DockPanel>();
+            rootDockPanel.Adornment = new TextureAdornment(renderer.TryGetTexture("MenuBackground"));
+            rootDockPanel.LastChildFill = true;
+
+            ImageBox titleImageBox = style.Create<ImageBox>();
+            titleImageBox.HorizontalAlignment = Alignment.Center;
+            titleImageBox.Texture = renderer.TryGetTexture("Title");
+            rootDockPanel.Dock(titleImageBox, Direction.MaxY);
+
+            StackPanel buttonsStackPanel = style.Create<StackPanel>();
+            buttonsStackPanel.HorizontalAlignment = Alignment.Center;
+            buttonsStackPanel.VerticalAlignment = Alignment.Center;
+            buttonsStackPanel.MinWidth = 300;
+            buttonsStackPanel.MinChildSize = 50;
+            buttonsStackPanel.ChildGap = 10;
+            rootDockPanel.Dock(buttonsStackPanel, Direction.MinX);
+
+            StackButton(buttonsStackPanel, "Monojoueur", sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics)));
+            StackButton(buttonsStackPanel, "Multijoueur", sender => Manager.Push(new MultiplayerLobbyGameState(Manager, graphics)));
+            StackButton(buttonsStackPanel, "Tower Defense", sender => Manager.Push(new TowerDefenseGameState(Manager, graphics)));
+            StackButton(buttonsStackPanel, "Typing Defense", sender => Manager.Push(new TypingDefenseGameState(Manager, graphics)));
+            StackButton(buttonsStackPanel, "Visionner une partie", sender => Manager.Push(new ReplayBrowserGameState(Manager, graphics)));
+            StackButton(buttonsStackPanel, "Quitter", sender => Manager.Pop());
         }
         #endregion
 
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            graphics.UIManager.Content = rootDockPanel;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -61,47 +75,19 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
+            graphics.DrawGui();
         }
 
-        public override void Dispose()
+        private void StackButton(StackPanel stackPanel, string text, Action<Button> action)
         {
-            ui.Dispose();
-        }
-
-        private void OnSinglePlayerSelected(MainMenuUI sender)
-        {
-            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
-        }
-
-        private void OnMultiplayerSelected(MainMenuUI sender)
-        {
-            Manager.Push(new MultiplayerLobbyGameState(Manager, graphics));
-        }
-
-        private void OnTowerDefenseSelected(MainMenuUI sender)
-        {
-            Manager.Push(new TowerDefenseGameState(Manager, graphics));
-        }
-
-        private void OnTypingDefenseSelected(MainMenuUI sender)
-        {
-            Manager.Push(new TypingDefenseGameState(Manager, graphics));
-        }
-
-        private void OnViewReplaySelected(MainMenuUI sender)
-        {
-            Manager.Push(new ReplayBrowserGameState(Manager, graphics));
-        }
-
-        private void OnQuitGameSelected(MainMenuUI sender)
-        {
-            Manager.Pop();
+            Button button = graphics.GuiStyle.CreateTextButton(text);
+            button.Clicked += action;
+            stackPanel.Stack(button);
         }
         #endregion
     }

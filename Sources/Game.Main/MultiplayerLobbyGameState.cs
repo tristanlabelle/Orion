@@ -80,7 +80,7 @@ namespace Orion.Game.Main
         protected internal override void Update(float timeDeltaInSeconds)
         {
             lobby.Update();
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)

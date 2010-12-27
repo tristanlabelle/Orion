@@ -38,7 +38,8 @@ namespace Orion.Engine.Gui2
             set
             {
                 if (value == content) return;
-                if (value.Parent != null) throw new ArgumentException("Cannot add a parented control as the content of this control.");
+                if (value != null && value.Parent != null)
+                    throw new ArgumentException("Cannot add a parented control as the content of this control.");
 
                 if (content != null)
                 {

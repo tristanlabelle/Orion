@@ -122,7 +122,7 @@ namespace Orion.Game.Main
 
             commandPipeline.Update(lastSimulationStep);
 
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)

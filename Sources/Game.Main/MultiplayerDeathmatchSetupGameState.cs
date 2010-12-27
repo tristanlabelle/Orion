@@ -177,7 +177,7 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
             networking.Poll();
             if (IsHost)
             {

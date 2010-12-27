@@ -12,7 +12,7 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private readonly ChildCollection children;
-        private Orientation orientation = Orientation.Vertical;
+        private Direction direction = Direction.MinY;
         private int childGap;
         private int minChildSize;
         #endregion
@@ -26,18 +26,18 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses the <see cref="Orientation"/> of this <see cref="StackPanel"/>,
-        /// which determines how child <see cref="Control"/>s are laid out.
+        /// Accesses the <see cref="Direction"/> of this <see cref="StackPanel"/>,
+        /// which determines how child <see cref="Control"/>s are stacked.
         /// </summary>
-        public Orientation Orientation
+        public Direction Direction
         {
-            get { return orientation; }
+            get { return direction; }
             set
             {
-                if (value == orientation) return;
-                Argument.EnsureDefined(value, "Orientation");
+                if (value == direction) return;
+                Argument.EnsureDefined(value, "Direction");
 
-                orientation = value;
+                direction = value;
                 InvalidateMeasure();
             }
         }
@@ -120,7 +120,7 @@ namespace Orion.Engine.Gui2
         {
             int width = 0;
             int height = 0;
-            if (orientation == Orientation.Vertical)
+            if (direction == Direction.MinY || direction == Gui2.Direction.MaxY)
             {
                 for (int i = 0; i < children.Count; ++i)
                 {
@@ -152,7 +152,7 @@ namespace Orion.Engine.Gui2
             if (!TryGetRectangle(out rectangle))
                 return;
 
-            if (orientation == Orientation.Vertical)
+            if (direction == Direction.MinY || direction == Direction.MaxY)
             {
                 int y = 0;
                 for (int i = 0; i < children.Count; ++i)
@@ -167,10 +167,21 @@ namespace Orion.Engine.Gui2
                     DefaultArrange(rectangle.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
 
                     int height = Math.Max(minChildSize, childSize.Height);
-                    Region childRectangle = new Region(
-                        rectangle.MinX + Margin.MinX + x,
-                        rectangle.MinY + Margin.MinY + y,
-                        width, height);
+                    Region childRectangle;
+                    if (direction == Direction.MaxY)
+                    {
+                        childRectangle = new Region(
+                            rectangle.MinX + x,
+                            rectangle.MinY + y,
+                            width, height);
+                    }
+                    else
+                    {
+                        childRectangle = new Region(
+                            rectangle.MinX + x,
+                            rectangle.ExclusiveMaxY - y - height,
+                            width, height);
+                    }
                     SetChildOuterRectangle(child, childRectangle);
 
                     y += height;

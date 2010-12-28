@@ -25,7 +25,6 @@ namespace Orion.Game.Presentation
         #region Fields
         private readonly IGameWindow window;
         private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
-        private readonly OrionGuiStyle uiStyle;
         private readonly UIManager uiManager;
         private readonly RootView rootView;
         private readonly TextureManager textureManager;
@@ -41,9 +40,8 @@ namespace Orion.Game.Presentation
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
 
-            GuiRenderer guiRenderer = new OrionGuiRenderer(window.GraphicsContext);
-            uiStyle = new OrionGuiStyle(guiRenderer);
-            uiManager = new UIManager(guiRenderer);
+            OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext);
+            uiManager = style.CreateUIManager();
             uiManager.Size = window.ClientAreaSize;
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
@@ -76,7 +74,7 @@ namespace Orion.Game.Presentation
 
         public OrionGuiStyle GuiStyle
         {
-            get { return uiStyle; }
+            get { return (OrionGuiStyle)uiManager.Renderer; }
         }
 
         public RootView RootView

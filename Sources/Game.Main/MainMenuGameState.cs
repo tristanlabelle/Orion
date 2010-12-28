@@ -17,7 +17,7 @@ namespace Orion.Game.Main
     {
         #region Fields
         private readonly GameGraphics graphics;
-        private readonly DockPanel rootDockPanel;
+        private readonly MainMenuUI ui;
         #endregion
 
         #region Constructors
@@ -28,39 +28,21 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
 
-            var renderer = graphics.UIManager.Renderer;
-            var style = graphics.GuiStyle;
+            ui = new MainMenuUI(graphics.GuiStyle);
 
-            rootDockPanel = style.Create<DockPanel>();
-            rootDockPanel.Adornment = new TextureAdornment(renderer.TryGetTexture("MenuBackground"));
-            rootDockPanel.LastChildFill = true;
-
-            ImageBox titleImageBox = style.Create<ImageBox>();
-            titleImageBox.HorizontalAlignment = Alignment.Center;
-            titleImageBox.Texture = renderer.TryGetTexture("Title");
-            rootDockPanel.Dock(titleImageBox, Direction.MaxY);
-
-            StackPanel buttonsStackPanel = style.Create<StackPanel>();
-            buttonsStackPanel.HorizontalAlignment = Alignment.Center;
-            buttonsStackPanel.VerticalAlignment = Alignment.Center;
-            buttonsStackPanel.MinWidth = 300;
-            buttonsStackPanel.MinChildSize = 50;
-            buttonsStackPanel.ChildGap = 10;
-            rootDockPanel.Dock(buttonsStackPanel, Direction.MinX);
-
-            StackButton(buttonsStackPanel, "Monojoueur", sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics)));
-            StackButton(buttonsStackPanel, "Multijoueur", sender => Manager.Push(new MultiplayerLobbyGameState(Manager, graphics)));
-            StackButton(buttonsStackPanel, "Tower Defense", sender => Manager.Push(new TowerDefenseGameState(Manager, graphics)));
-            StackButton(buttonsStackPanel, "Typing Defense", sender => Manager.Push(new TypingDefenseGameState(Manager, graphics)));
-            StackButton(buttonsStackPanel, "Visionner une partie", sender => Manager.Push(new ReplayBrowserGameState(Manager, graphics)));
-            StackButton(buttonsStackPanel, "Quitter", sender => Manager.Pop());
+            ui.SinglePlayerClicked += sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
+            ui.MultiplayerClicked += sender => Manager.Push(new MultiplayerLobbyGameState(Manager, graphics));
+            ui.TowerDefenseClicked += sender => Manager.Push(new TowerDefenseGameState(Manager, graphics));
+            ui.TypingDefenseClicked += sender => Manager.Push(new TypingDefenseGameState(Manager, graphics));
+            ui.ReplayClicked += sender => Manager.Push(new ReplayBrowserGameState(Manager, graphics));
+            ui.QuitClicked += sender => Manager.Pop();
         }
         #endregion
 
         #region Methods
         protected internal override void OnEntered()
         {
-            graphics.UIManager.Content = rootDockPanel;
+            graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
@@ -81,13 +63,6 @@ namespace Orion.Game.Main
         protected internal override void Draw(GameGraphics graphics)
         {
             graphics.DrawGui();
-        }
-
-        private void StackButton(StackPanel stackPanel, string text, Action<Button> action)
-        {
-            Button button = graphics.GuiStyle.CreateTextButton(text);
-            button.Clicked += action;
-            stackPanel.Stack(button);
         }
         #endregion
     }

@@ -34,7 +34,8 @@ namespace Orion.Engine.Gui2.Adornments
             Region rectangle;
             if (!control.TryGetRectangle(out rectangle)) return;
 
-            renderer.Fill(rectangle, texture, Colors.White);
+            var sprite = new GuiSprite(rectangle, texture);
+            renderer.DrawSprite(ref sprite);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

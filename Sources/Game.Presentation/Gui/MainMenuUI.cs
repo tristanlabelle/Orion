@@ -3,46 +3,54 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Engine.Gui;
+using Orion.Engine.Gui2;
 using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
+using Orion.Engine.Gui2.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// The user interface for the main menu of the game.
     /// </summary>
-    public sealed class MainMenuUI : MaximizedPanel
+    public sealed class MainMenuUI : ContentControl
     {
         #region Fields
         private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
         private const string artistName = "Guillaume Lacasse";
-
-        private readonly Texture backgroundTexture;
         #endregion
 
         #region Constructors
-        public MainMenuUI(GameGraphics gameGraphics)
+        public MainMenuUI(OrionGuiStyle style)
         {
-            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
+            Argument.EnsureNotNull(style, "style");
 
-            this.backgroundTexture = gameGraphics.GetMiscTexture("MenuBackground");
+            DockPanel dockPanel = style.Create<DockPanel>();
+            dockPanel.Adornment = new TextureAdornment(style.TryGetTexture("MenuBackground"));
+            dockPanel.LastChildFill = true;
+            Content = dockPanel;
 
-            Font titleFont = new Font("Impact", 48);
-            AddCenteredLabel("Orion", titleFont, Colors.White, 700);
+            ImageBox titleImageBox = style.Create<ImageBox>();
+            titleImageBox.HorizontalAlignment = Alignment.Center;
+            titleImageBox.Texture = style.TryGetTexture("Title");
+            dockPanel.Dock(titleImageBox, Direction.MaxY);
 
-            CreateButton(0.52f, "Monojoueur", () => SinglePlayerSelected);
-            CreateButton(0.45f, "Multijoueur", () => MultiplayerSelected);
-            CreateButton(0.38f, "Tower Defense", () => TowerDefenseSelected);
-            CreateButton(0.31f, "Typing Defense", () => TypingDefenseSelected);
-            CreateButton(0.24f, "Visionner une partie", () => ViewReplaySelected);
-            CreateButton(0.17f, "Quitter", () => QuitGameSelected);
+            StackPanel buttonsStackPanel = style.Create<StackPanel>();
+            buttonsStackPanel.HorizontalAlignment = Alignment.Center;
+            buttonsStackPanel.VerticalAlignment = Alignment.Center;
+            buttonsStackPanel.MinWidth = 300;
+            buttonsStackPanel.MinChildSize = 50;
+            buttonsStackPanel.ChildGap = 10;
+            dockPanel.Dock(buttonsStackPanel, Direction.MinX);
 
-            Font creditsFont = new Font("Trebuchet MS", 11);
-            AddCenteredLabel("Programmeurs ", creditsFont, Colors.Orange, 90);
-            AddCenteredLabel(programmerNames, creditsFont, Colors.Yellow, 70);
-            AddCenteredLabel("Artiste audio-vidéo  ", creditsFont, Colors.Orange, 40);
-            AddCenteredLabel(artistName, creditsFont, Colors.Yellow, 20);
+            StackButton(buttonsStackPanel, style, "Monojoueur", () => SinglePlayerClicked);
+            StackButton(buttonsStackPanel, style, "Multijoueur", () => MultiplayerClicked);
+            StackButton(buttonsStackPanel, style, "Tower Defense", () => TowerDefenseClicked);
+            StackButton(buttonsStackPanel, style, "Typing Defense", () => TypingDefenseClicked);
+            StackButton(buttonsStackPanel, style, "Visionner une partie", () => ReplayClicked);
+            StackButton(buttonsStackPanel, style, "Options", () => OptionsClicked);
+            StackButton(buttonsStackPanel, style, "Crédits", () => CreditsClicked);
+            StackButton(buttonsStackPanel, style, "Quitter", () => QuitClicked);
         }
         #endregion
 
@@ -50,69 +58,50 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the user has chosen to launch a single-player game.
         /// </summary>
-        public event Action<MainMenuUI> SinglePlayerSelected;
+        public event Action<MainMenuUI> SinglePlayerClicked;
 
         /// <summary>
         /// Raised when the user has chosen to launch a multiplayer game.
         /// </summary>
-        public event Action<MainMenuUI> MultiplayerSelected;
+        public event Action<MainMenuUI> MultiplayerClicked;
 
         /// <summary>
         /// Raised when the user has chosen to launch a tower defense game.
         /// </summary>
-        public event Action<MainMenuUI> TowerDefenseSelected;
+        public event Action<MainMenuUI> TowerDefenseClicked;
 
         /// <summary>
         /// Raised when the user has chosen to launch a typing defense game.
         /// </summary>
-        public event Action<MainMenuUI> TypingDefenseSelected;
+        public event Action<MainMenuUI> TypingDefenseClicked;
 
         /// <summary>
         /// Raised when the user has chosen to view a replay.
         /// </summary>
-        public event Action<MainMenuUI> ViewReplaySelected;
+        public event Action<MainMenuUI> ReplayClicked;
+
+        /// <summary>
+        /// Raised when the user has chosen to view the credits.
+        /// </summary>
+        public event Action<MainMenuUI> CreditsClicked;
+
+        /// <summary>
+        /// Raised when the user has chosen to view the options.
+        /// </summary>
+        public event Action<MainMenuUI> OptionsClicked;
 
         /// <summary>
         /// Raised when the user has chosen to quit the game.
         /// </summary>
-        public event Action<MainMenuUI> QuitGameSelected;
+        public event Action<MainMenuUI> QuitClicked;
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Creates a menu button.
-        /// </summary>
-        /// <param name="y">The y position of the button.</param>
-        /// <param name="caption">The caption text on the button.</param>
-        /// <param name="eventGetter">
-        /// A delegate to a method which retrieves the event to be raised when the button is clicked.
-        /// </param>
-        private void CreateButton(float y, string caption, Func<Action<MainMenuUI>> eventGetter)
+        private void StackButton(StackPanel stackPanel, OrionGuiStyle style, string text, Func<Action<MainMenuUI>> eventGetter)
         {
-            Rectangle rectangle = Instant.CreateComponentRectangle(Bounds, Rectangle.FromCenterSize(0.5f, y, 0.25f, 0.06f));
-            Button button = new Button(rectangle, caption);
-
-            if (eventGetter != null)
-                button.Triggered += sender => eventGetter().Raise(this);
-
-            Children.Add(button);
-        }
-
-        private void AddCenteredLabel(string @string, Font font, ColorRgb color, float y)
-        {
-            Text text = new Text(@string, font);
-            Label label = new Label(text);
-            label.Color = color;
-            float x = (Bounds.Width - label.Frame.Width) / 2;
-            label.Frame = label.Frame.TranslatedTo(x, y);
-            Children.Add(label);
-        }
-
-        protected override void Render(GraphicsContext graphicsContext)
-        {
-            graphicsContext.Fill(Bounds, backgroundTexture);
-
-            base.Render(graphicsContext);
+            Button button = style.CreateTextButton(text);
+            button.Clicked += sender => eventGetter().Raise(this);
+            stackPanel.Stack(button);
         }
         #endregion
     }

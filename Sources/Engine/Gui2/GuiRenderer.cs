@@ -53,20 +53,12 @@ namespace Orion.Engine.Gui2
         public abstract void DrawText(string text, ref TextRenderingOptions options);
 
         /// <summary>
-        /// Draws a filled rectangle, optionnally mapping it with a texture.
+        /// Draws a sprite.
         /// </summary>
-        /// <param name="rectangle">The screen rectangle to be drawn.</param>
-        /// <param name="texture">The texture to be mapped on the rectangle, can be <c>null</c>.</param>
-        /// <param name="textureRectangle">The texture coordinates, in pixels, to which the rectangle maps.</param>
-        /// <param name="tint">The tint to apply to the rectangle and, optionnally, its texture.</param>
-        public abstract void Fill(Region rectangle, Texture texture, Region textureRectangle, ColorRgba tint);
+        /// <param name="sprite">The sprite to be drawn.</param>
+        public abstract void DrawSprite(ref GuiSprite sprite);
 
-        public void Fill(Region rectangle, Texture texture, ColorRgba tint)
-        {
-            Fill(rectangle, texture, new Region(0, 0, texture.Width, texture.Height), tint);
-        }
-
-        public void FillNinePart(Region rectangle, Texture texture, ColorRgba tint)
+        public void FillNinePart(Region rectangle, Texture texture, ColorRgba color)
         {
             int middleTextureSize = 2;
             int cornerWidth = texture.Width / 2 - 1;
@@ -75,37 +67,43 @@ namespace Orion.Engine.Gui2
             int middleHeight = rectangle.Height - cornerHeight * 2;
 
             // Min Row
-            FillPart(texture, tint, rectangle.MinX, rectangle.MinY, cornerWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX, rectangle.MinY, cornerWidth, cornerHeight,
                 0, 0, cornerWidth, cornerHeight);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth, rectangle.MinY, middleWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth, rectangle.MinY, middleWidth, cornerHeight,
                 cornerWidth, 0, middleTextureSize, cornerHeight);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY, cornerWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY, cornerWidth, cornerHeight,
                 cornerWidth + middleTextureSize, 0, cornerWidth, cornerHeight);
 
             // Middle Row
-            FillPart(texture, tint, rectangle.MinX, rectangle.MinY + cornerHeight, cornerWidth, middleHeight,
+            FillPart(texture, color, rectangle.MinX, rectangle.MinY + cornerHeight, cornerWidth, middleHeight,
                 0, cornerHeight, cornerWidth, middleTextureSize);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth, rectangle.MinY + cornerHeight, middleWidth, middleHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth, rectangle.MinY + cornerHeight, middleWidth, middleHeight,
                 cornerWidth, cornerHeight, middleTextureSize, middleTextureSize);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY + cornerHeight, cornerWidth, middleHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY + cornerHeight, cornerWidth, middleHeight,
                 cornerWidth + middleTextureSize, cornerHeight, cornerWidth, middleTextureSize);
 
             // Max Row
-            FillPart(texture, tint, rectangle.MinX, rectangle.MinY + cornerHeight + middleHeight, cornerWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX, rectangle.MinY + cornerHeight + middleHeight, cornerWidth, cornerHeight,
                 0, cornerHeight + middleTextureSize, cornerWidth, cornerHeight);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth, rectangle.MinY + cornerHeight + middleHeight, middleWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth, rectangle.MinY + cornerHeight + middleHeight, middleWidth, cornerHeight,
                 cornerWidth, cornerHeight + middleTextureSize, middleTextureSize, cornerHeight);
-            FillPart(texture, tint, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY + cornerHeight + middleHeight, cornerWidth, cornerHeight,
+            FillPart(texture, color, rectangle.MinX + cornerWidth + middleWidth, rectangle.MinY + cornerHeight + middleHeight, cornerWidth, cornerHeight,
                 cornerWidth + middleTextureSize, cornerHeight + middleTextureSize, cornerWidth, cornerHeight);
         }
 
-        private void FillPart(Texture texture, ColorRgba tint,
+        private void FillPart(Texture texture, ColorRgba color,
             int minX, int minY, int width, int height,
             int minTexX, int minTexY, int texWidth, int texHeight)
         {
-            Region rectangle = new Region(minX, minY, width, height);
-            Region textureRectangle = new Region(minTexX, minTexY, texWidth, texHeight);
-            Fill(rectangle, texture, textureRectangle, tint);
+            var sprite = new GuiSprite()
+            {
+                Rectangle = new Region(minX, minY, width, height),
+                Texture = texture,
+                PixelRectangle = new Region(minTexX, minTexY, texWidth, texHeight),
+                Color = color
+            };
+
+            DrawSprite(ref sprite);
         }
         #endregion
     }

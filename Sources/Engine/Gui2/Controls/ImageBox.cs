@@ -52,7 +52,8 @@ namespace Orion.Engine.Gui2
             Region rectangle;
             if (!TryGetRectangle(out rectangle)) return;
 
-            Renderer.Fill(rectangle, texture, Colors.White);
+            var sprite = new GuiSprite(rectangle, texture);
+            Renderer.DrawSprite(ref sprite);
         }
         #endregion
     }

@@ -58,6 +58,25 @@ namespace Orion.Engine.Gui2
             }
         }
 
+
+        /// <summary>
+        /// Gets the content rectangle of this <see cref="Control"/> which resulted from the last arrange pass.
+        /// This value excludes the margins and the padding and is valid only if <see cref="IsArranged"/> is true.
+        /// </summary>
+        public Region InnerRectangle
+        {
+            get
+            {
+                Region rectangle = Rectangle;
+                return new Region(
+                    rectangle.MinX + padding.MinX,
+                    rectangle.MinY + padding.MinY,
+                    Math.Max(0, rectangle.Width - padding.TotalX),
+                    Math.Max(0, rectangle.Height - padding.TotalY));
+            }
+        }
+
+        #region Padding
         /// <summary>
         /// Accesses the padding between the borders of this <see cref="ContentControl"/> and its contents.
         /// </summary>
@@ -72,29 +91,62 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Accesses the padding of this <see cref="Control"/> on the minimum X-axis side.
+        /// </summary>
+        public int MinXPadding
+        {
+            get { return padding.MinX; }
+            set { Padding = new Borders(value, padding.MinY, padding.MaxX, padding.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the padding of this <see cref="Control"/> on the minimum Y-axis side.
+        /// </summary>
+        public int MinYPadding
+        {
+            get { return padding.MinY; }
+            set { Padding = new Borders(padding.MinX, value, padding.MaxX, padding.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the padding of this <see cref="Control"/> on the maximum X-axis side.
+        /// </summary>
+        public int MaxXPadding
+        {
+            get { return padding.MaxX; }
+            set { Padding = new Borders(padding.MinX, padding.MinY, value, padding.MaxY); }
+        }
+
+        /// <summary>
+        /// Accesses the padding of this <see cref="Control"/> on the maximum Y-axis side.
+        /// </summary>
+        public int MaxYPadding
+        {
+            get { return padding.MaxY; }
+            set { Padding = new Borders(padding.MinX, padding.MinY, padding.MaxX, value); }
+        }
+
+        /// <summary>
+        /// Sets the width of the padding on the left and right of the <see cref="Control"/>.
+        /// </summary>
+        public int XPadding
+        {
+            set { Padding = new Borders(value, padding.MinY, value, padding.MaxY); }
+        }
+
+        /// <summary>
+        /// Sets the height of the padding on the top and botton of the <see cref="Control"/>.
+        /// </summary>
+        public int YPadding
+        {
+            set { Padding = new Borders(padding.MinX, value, padding.MaxX, value); }
+        }
+        #endregion
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Attempts to retreive the inner rectangle of space reserved to this <see cref="Control"/>, this value excludes the margins and the padding.
-        /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
-        /// </summary>
-        /// <param name="innerRectangle">
-        /// If the operation succeeds, outputs the rectangle of space within the padding of this <see cref="Control"/>.
-        /// </param>
-        /// <returns><c>True</c> if the rectangle could be retreived, <c>false</c> if not.</returns>
-        public bool TryGetInnerRectangle(out Region innerRectangle)
-        {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle))
-            {
-                innerRectangle = default(Region);
-                return false;
-            }
-
-            return Borders.TryShrink(rectangle, padding, out innerRectangle);
-        }
-
         protected override IEnumerable<Control> GetChildren()
         {
             if (content != null) yield return content;
@@ -107,14 +159,15 @@ namespace Orion.Engine.Gui2
 
         protected virtual Size MeasureInnerSize()
         {
-            return content == null ? Size.Zero : content.MeasureOuterSize();
+            if (content == null) return Size.Zero;
+
+            content.Measure();
+            return content.DesiredOuterSize;
         }
 
         protected override void ArrangeChildren()
         {
-            if (content == null) return;
-
-            DefaultArrangeChild(content);
+            if (content != null) DefaultArrangeChild(content, InnerRectangle);
         }
         #endregion
     }

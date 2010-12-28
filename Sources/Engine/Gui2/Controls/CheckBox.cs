@@ -91,27 +91,32 @@ namespace Orion.Engine.Gui2
 
         protected override Size MeasureInnerSize()
         {
-            Size buttonSize = button.MeasureOuterSize();
-            Size contentSize = Content == null ? Size.Zero : Content.MeasureOuterSize();
+            button.Measure();
+            Size buttonSize = button.DesiredOuterSize;
+            if (Content == null) return buttonSize;
+
+            Content.Measure();
+            Size contentSize = Content.DesiredOuterSize;
             return new Size(buttonSize.Width + buttonGap + contentSize.Width, Math.Max(buttonSize.Height, contentSize.Height));
         }
 
         protected override void ArrangeChildren()
         {
-            Region innerRectangle;
-            if (!TryGetInnerRectangle(out innerRectangle)) return;
+            Region innerRectangle = InnerRectangle;
 
-            Size buttonSize = button.MeasureOuterSize();
+            button.Measure();
+            Size buttonSize = button.DesiredOuterSize;
 
             Region buttonRectangle = new Region(
                 innerRectangle.MinX,
                 innerRectangle.MinY + innerRectangle.Height / 2 - buttonSize.Height / 2,
                 buttonSize.Width, buttonSize.Height);
-            SetChildOuterRectangle(button, buttonRectangle);
+            ArrangeChild(button, buttonRectangle);
 
             if (Content != null)
             {
-                Size contentSize = Content.MeasureOuterSize();
+                Content.Measure();
+                Size contentSize = Content.DesiredOuterSize;
                 int contentHeight = Math.Min(contentSize.Height, innerRectangle.Height);
 
                 Region contentRectangle = new Region(
@@ -119,7 +124,7 @@ namespace Orion.Engine.Gui2
                     innerRectangle.MinY + innerRectangle.Height / 2 - contentHeight / 2,
                     Math.Max(0, innerRectangle.Width - buttonSize.Width - buttonGap),
                     contentHeight);
-                SetChildOuterRectangle(Content, contentRectangle);
+                ArrangeChild(Content, contentRectangle);
             }
         }
         #endregion

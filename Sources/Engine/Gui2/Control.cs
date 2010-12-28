@@ -26,20 +26,23 @@ namespace Orion.Engine.Gui2
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
         private Size minSize;
+        private int? width;
+        private int? height;
         
         /// <summary>
         /// A cached value of the optimal space for this <see cref="Control"/> based on the size of its contents.
-        /// This value is only meaningful if the layout state is not <see cref="LayoutState.Invalidated"/>.
+        /// This value is only meaningful if the control has been measured.
         /// </summary>
         private Size cachedDesiredOuterSize;
         
         /// <summary>
         /// A cached value of the client space rectangle reserved for this <see cref="Control"/>.
-        /// This value is only meaningful if the layout state is <see cref="LayoutState.Arranged"/>.
+        /// This value is only meaningful if the control has been arranged.
         /// </summary>
-        private Region? cachedOuterRectangle;
-        
-        private LayoutState layoutState;
+        private Region cachedOuterRectangle;
+
+        private bool isMeasured;
+        private bool isArranged;
         #endregion
 
         #region Constructors
@@ -163,6 +166,7 @@ namespace Orion.Engine.Gui2
             }
         }
 
+        #region Alignment
         /// <summary>
         /// Accesses the horizontal alignment hint for this <see cref="Control"/>.
         /// The parent <see cref="Control"/> is charged of honoring or not this value.
@@ -196,7 +200,9 @@ namespace Orion.Engine.Gui2
                 InvalidateArrange();
             }
         }
+        #endregion
 
+        #region Size
         /// <summary>
         /// Accesses the minimum size of this <see cref="Control"/>, excluding the margins.
         /// This is a hint which can or not be honored by the parent <see cref="Control"/>.
@@ -209,8 +215,7 @@ namespace Orion.Engine.Gui2
                 if (value == minSize) return;
 
                 minSize = value;
-                if (layoutState == LayoutState.Measured
-                    && (cachedDesiredOuterSize.Width < minSize.Width || cachedDesiredOuterSize.Height < minSize.Height))
+                if (isMeasured && (cachedDesiredOuterSize.Width < minSize.Width || cachedDesiredOuterSize.Height < minSize.Height))
                 {
                     // The cached desired size being smaller than the new minimum size,
                     // the control will have to be measured again so that it's desired size is bigger.
@@ -248,6 +253,137 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Accesses the target width for this <see cref="Control"/>, this excludes the margins.
+        /// A value of <c>null</c> indicates that the <see cref="Control"/> should use default sizing behavior.
+        /// <see cref="MinHeight"/> takes precedence on this value.
+        /// </summary>
+        public int? Width
+        {
+            get { return width; }
+            set
+            {
+                if (value == width) return;
+                if (value.HasValue) Argument.EnsurePositive(value.Value, "Width");
+
+                this.width = value;
+                InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Accesses the target height for this <see cref="Control"/>, this excludes the margins.
+        /// A value of <c>null</c> indicates that the <see cref="Control"/> should use default sizing behavior.
+        /// <see cref="MinHeight"/> takes precedence on this value.
+        /// </summary>
+        public int? Height
+        {
+            get { return height; }
+            set
+            {
+                if (value == height) return;
+                if (value.HasValue) Argument.EnsurePositive(value.Value, "Height");
+
+                this.height = value;
+                InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Gets the desired outer size of this <see cref="Control"/> which resulted from the last measure pass.
+        /// This value includes the margins and is valid only if <see cref="IsMeasured"/> is true.
+        /// </summary>
+        public Size DesiredOuterSize
+        {
+            get
+            {
+                Debug.Assert(isMeasured, "DesiredOuterSize should not be read when not measured.");
+                return cachedDesiredOuterSize;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the desired size of this <see cref="Control"/> which resulted from the last measure pass.
+        /// This value excludes the margins and is valid only if <see cref="IsMeasured"/> is true.
+        /// </summary>
+        public Size DesiredSize
+        {
+            get
+            {
+                Debug.Assert(isMeasured, "DesiredSize should not be read when not measured.");
+                return new Size(
+                    Math.Max(0, cachedDesiredOuterSize.Width - margin.TotalX),
+                    Math.Max(0, cachedDesiredOuterSize.Height - margin.TotalY));
+            }
+        }
+
+        /// <summary>
+        /// Gets the actual size of this <see cref="Control"/> which resulted from the last arrange pass.
+        /// This value excludes the margins and is valid only if <see cref="IsArranged"/> is true.
+        /// </summary>
+        public Size ActualSize
+        {
+            get
+            {
+                Debug.Assert(isArranged, "Actual should not be read when not arranged.");
+                return Rectangle.Size;
+            }
+        }
+        #endregion
+
+        #region Rectangle
+        /// <summary>
+        /// Gets the outer rectangle bounding this <see cref="Control"/> which resulted from the last arrange pass.
+        /// This value includes the margins and is valid only if <see cref="IsArranged"/> is true.
+        /// </summary>
+        public Region OuterRectangle
+        {
+            get
+            {
+                Debug.Assert(isArranged, "OuterRectangle should not be read when not arranged.");
+                return cachedOuterRectangle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the rectangle bounding this <see cref="Control"/> which resulted from the last arrange pass.
+        /// This value excludes the margins and is valid only if <see cref="IsArranged"/> is true.
+        /// </summary>
+        public Region Rectangle
+        {
+            get
+            {
+                Debug.Assert(isArranged, "Rectangle should not be read when not arranged.");
+                return new Region(
+                    cachedOuterRectangle.MinX + margin.MinX,
+                    cachedOuterRectangle.MinY + margin.MinY,
+                    Math.Max(0, cachedOuterRectangle.Width - margin.TotalX),
+                    Math.Max(0, cachedOuterRectangle.Height - margin.TotalY));
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> has been measured.
+        /// If this is <c>true</c>, the value of <see cref="DesiredOuterSize"/> is valid.
+        /// </summary>
+        public bool IsMeasured
+        {
+            get { return isMeasured; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> has been arranged.
+        /// If this is <c>true</c>, the values of <see cref="OuterRectangle"/>,
+        /// <see cref="Rectangle"/> and <see cref="ActualSize"/> are valid.
+        /// </summary>
+        public bool IsArranged
+        {
+            get { return isArranged; }
+        }
+
+        #region Focus
+        /// <summary>
         /// Gets a value indicating if this <see cref="Control"/> currently has the keyboard focus.
         /// </summary>
         public bool HasKeyboardFocus
@@ -262,6 +398,7 @@ namespace Orion.Engine.Gui2
         {
             get { return manager != null && manager.MouseCapturedControl == this; }
         }
+        #endregion
 
         /// <summary>
         /// Enumerates the children of this <see cref="Control"/>.
@@ -293,19 +430,31 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual Control GetChildAt(Point point)
         {
-        	if (manager == null) return null;
-
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
+        	if (!isArranged || !Rectangle.Contains(point)) return null;
 
             foreach (Control child in Children)
-            {
-                Region childRectangle;
-                if (child.TryGetRectangle(out childRectangle) && childRectangle.Contains(point))
+                if (child.IsArranged && child.Rectangle.Contains(point))
                     return child;
+           
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the deepest descendant <see cref="Control"/> at a given location.
+        /// </summary>
+        /// <param name="point">The location where to find the descendant.</param>
+        /// <returns>The deepest descendant at that location.</returns>
+        public Control GetDescendantAt(Point point)
+        {
+            Control current = this;
+            while (true)
+            {
+                Control descendant = current.GetChildAt(point);
+                if (descendant == null) break;
+                current = descendant;
             }
 
-            return null;
+            return current;
         }
 
         /// <summary>
@@ -340,27 +489,6 @@ namespace Orion.Engine.Gui2
                 control = control.Parent;
             }
         }
-        
-        /// <summary>
-        /// Gets the deepest descendant <see cref="Control"/> at a given location.
-        /// </summary>
-        /// <param name="point">The location where to find the descendant.</param>
-        /// <returns>The deepest descendant at that location.</returns>
-        public Control GetDescendantAt(Point point)
-        {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle) || !rectangle.Contains(point)) return null;
-            
-        	Control current = this;
-        	while (true)
-        	{
-        		Control descendant = current.GetChildAt(point);
-        		if (descendant == null) break;
-        		current = descendant;
-        	}
-        	
-        	return current;
-        }
 
         /// <summary>
         /// Changes the parent of this <see cref="Control"/> in the UI hierarchy.
@@ -372,10 +500,11 @@ namespace Orion.Engine.Gui2
             if (this.parent != null && parent != null)
             	throw new InvalidOperationException("Cannot set the parent when already parented.");
 
+            isMeasured = false;
+            isArranged = false;
             this.parent = parent;
             UIManager newManager = parent == null ? null : parent.manager;
             if (newManager != manager) SetManagerRecursively(newManager);
-            layoutState = LayoutState.Invalidated;
         }
         
         private void SetManagerRecursively(UIManager manager)
@@ -429,25 +558,30 @@ namespace Orion.Engine.Gui2
 
         #region Measure
         /// <summary>
-        /// Measures the desired size of this <see cref="Control"/>, including its margin.
+        /// Sets the size of this <see cref="Control"/>.
         /// </summary>
-        /// <returns>The desired size of this <see cref="Control"/>.</returns>
-        public Size MeasureOuterSize()
+        /// <param name="size">The size to be set.</param>
+        public void SetSize(Size size)
         {
-            if (manager == null) return Size.Zero;
+            Width = size.Width;
+            Height = size.Height;
+        }
 
-            if (layoutState == LayoutState.Invalidated)
-            {
-                Size desiredSize = MeasureSize();
-                Size clampedDesiredSize = new Size(
-                    Math.Max(minSize.Width, desiredSize.Width),
-                    Math.Max(minSize.Height, desiredSize.Height));
+        /// <summary>
+        /// Measures this <see cref="Control"/> to determine its desired size.
+        /// </summary>
+        /// <returns>The desired outer size (margins included) of the <see cref="Control"/>.</returns>
+        public Size Measure()
+        {
+            if (isMeasured) return cachedDesiredOuterSize;
+            if (manager == null) throw new InvalidOperationException("Cannot measure a control without a manager.");
 
-                cachedDesiredOuterSize = clampedDesiredSize + margin;
+            Size desiredSize = MeasureSize();
+            cachedDesiredOuterSize = new Size(
+                Math.Max(minSize.Width, width.GetValueOrDefault(desiredSize.Width)) + margin.TotalX,
+                Math.Max(minSize.Height, height.GetValueOrDefault(desiredSize.Height)) + margin.TotalY);
 
-                layoutState = LayoutState.Measured;
-            }
-
+            isMeasured = true;
             return cachedDesiredOuterSize;
         }
 
@@ -462,126 +596,71 @@ namespace Orion.Engine.Gui2
         /// </summary>
         protected void InvalidateMeasure()
         {
-            if (layoutState == LayoutState.Invalidated) return;
+            if (!isMeasured) return;
 
-            InvalidateArrange();
-
-        	cachedDesiredOuterSize = Size.Zero;
-        	layoutState = LayoutState.Invalidated;
-
+            isMeasured = false;
             if (parent != null) parent.OnChildMeasureInvalidated(this);
         }
 
         protected virtual void OnChildMeasureInvalidated(Control child)
         {
             InvalidateMeasure();
-        }
-
-        private void AssertUIManagerForMeasurement()
-        {
-            if (manager == null) throw new InvalidOperationException("Cannot get the measure a control without a UI manager.");
+            child.InvalidateArrange();
         }
         #endregion
 
         #region Arrange
-        /// <summary>
-        /// Attempts to retreive the outer rectangle of space reserved to this <see cref="Control"/>, this value includes the margins.
-        /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
-        /// </summary>
-        /// <param name="outerRectangle">
-        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="Control"/>.
-        /// </param>
-        /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
-        public bool TryGetOuterRectangle(out Region outerRectangle)
+        internal void Arrange(Region outerRectangle)
         {
-            if (manager != null && layoutState != LayoutState.Arranged)
-            {
-                if (parent == null)
-                    cachedOuterRectangle = new Region(MeasureOuterSize());
-                else
-                    parent.ArrangeChild(this);
-
-                layoutState = LayoutState.Arranged;
-                ArrangeChildren();
-            }
-
-            return cachedOuterRectangle.TryGetValue(out outerRectangle);
+            cachedOuterRectangle = outerRectangle;
+            isArranged = true;
         }
 
-        /// <summary>
-        /// Attempts to retreive the rectangle of space reserved to this <see cref="Control"/>, this value excludes the margins.
-        /// This operation can fail if this <see cref="Control"/> has no manager or if it is completely clipped.
-        /// </summary>
-        /// <param name="rectangle">
-        /// If the operation succeeds, outputs the rectangle of space reserved to this <see cref="Control"/>.
-        /// </param>
-        /// <returns><c>True</c> if the reserved rectangle could be retreived, <c>false</c> if not.</returns>
-        public bool TryGetRectangle(out Region rectangle)
-        {
-            Region outerRectangle;
-            if (!TryGetOuterRectangle(out outerRectangle))
-            {
-                rectangle = default(Region);
-                return false;
-            }
+        protected abstract void ArrangeChildren();
 
-            return Borders.TryShrink(outerRectangle, margin, out rectangle);
+        protected void DefaultArrangeChild(Control child, Region availableRectangle)
+        {
+            Region childRectangle = DefaultArrange(availableRectangle, child);
+            ArrangeChild(child, childRectangle);
         }
 
-        protected virtual void ArrangeChildren()
-        {
-            foreach (Control child in Children)
-                DefaultArrangeChild(child);
-        }
-
-        protected virtual void ArrangeChild(Control child)
-        {
-            ArrangeChildren();
-        }
-
-        protected void DefaultArrangeChild(Control child)
-        {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle))
-            {
-                SetChildOuterRectangle(child, null);
-                return;
-            }
-
-            Region childRectangle = DefaultArrange(rectangle, child);
-            SetChildOuterRectangle(child, childRectangle);
-        }
-
-        protected void SetChildOuterRectangle(Control child, Region? rectangle)
+        protected void ArrangeChild(Control child, Region outerRectangle)
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
 
-            child.cachedOuterRectangle = rectangle;
-            child.layoutState = LayoutState.Arranged;
+            child.cachedOuterRectangle = outerRectangle;
+            child.isArranged = true;
+            child.ArrangeChildren();
         }
 
         protected void InvalidateArrange()
         {
-            if (layoutState != LayoutState.Arranged) return;
+            if (!isArranged) return;
 
-            cachedOuterRectangle = null;
-            layoutState = LayoutState.Measured;
+            isArranged = false;
 
             foreach (Control child in Children)
                 child.InvalidateArrange();
         }
 
-        public static void DefaultArrange(int availableSize, Alignment alignment, int desiredSize, out int min, out int actualSize)
+        public static void DefaultArrange(int availableSize, Alignment alignment, int desiredOuterSize, int maxOuterSize,
+            out int min, out int actualOuterSize)
         {
-            if (alignment == Alignment.Stretch || desiredSize >= availableSize)
+            if (alignment == Alignment.Stretch || desiredOuterSize >= availableSize)
             {
-                min = 0;
-                actualSize = availableSize;
-                return;
+                if (maxOuterSize > availableSize)
+                {
+                    min = 0;
+                    actualOuterSize = availableSize;
+                    return;
+                }
+
+                desiredOuterSize = maxOuterSize;
+                alignment = Alignment.Center;
             }
 
-            actualSize = Math.Min(availableSize, desiredSize);
+            actualOuterSize = Math.Min(availableSize, desiredOuterSize);
 
             switch (alignment)
             {
@@ -590,11 +669,11 @@ namespace Orion.Engine.Gui2
                     break;
 
                 case Alignment.Center:
-                    min = availableSize / 2 - desiredSize / 2;
+                    min = availableSize / 2 - desiredOuterSize / 2;
                     break;
 
                 case Alignment.Max:
-                    min = availableSize - actualSize;
+                    min = availableSize - actualOuterSize;
                     break;
 
                 default: throw new InvalidEnumArgumentException("alignment", (int)alignment, typeof(Alignment));
@@ -603,11 +682,14 @@ namespace Orion.Engine.Gui2
 
         public static Region DefaultArrange(Size availableSpace, Control control)
         {
-            Size desiredSize = control.MeasureOuterSize();
+            control.Measure();
+            Size desiredOuterSize = control.DesiredOuterSize;
+            int maxWidth = control.Width.HasValue ? control.Width.Value + control.Margin.TotalX : availableSpace.Width;
+            int maxHeight = control.Height.HasValue ? control.Height.Value + control.Margin.TotalY : availableSpace.Height;
 
             int x, y, width, height;
-            DefaultArrange(availableSpace.Width, control.HorizontalAlignment, desiredSize.Width, out x, out width);
-            DefaultArrange(availableSpace.Height, control.VerticalAlignment, desiredSize.Height, out y, out height);
+            DefaultArrange(availableSpace.Width, control.HorizontalAlignment, desiredOuterSize.Width, maxWidth, out x, out width);
+            DefaultArrange(availableSpace.Height, control.VerticalAlignment, desiredOuterSize.Height, maxHeight, out y, out height);
             return new Region(x, y, width, height);
         }
 

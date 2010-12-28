@@ -156,22 +156,21 @@ namespace Orion.Engine.Gui2
         {
             if (orientation == Orientation.Horizontal) throw new NotImplementedException();
 
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle)) return;
+            Region rectangle = base.Rectangle;
 
-            SetChildOuterRectangle(minButton, new Region(rectangle.MinX, rectangle.MinY, rectangle.Width, rectangle.Width));
-            SetChildOuterRectangle(maxButton, new Region(rectangle.MinX, rectangle.ExclusiveMaxY - rectangle.Width, rectangle.Width, rectangle.Width));
+            ArrangeChild(minButton, new Region(rectangle.MinX, rectangle.MinY, rectangle.Width, rectangle.Width));
+            ArrangeChild(maxButton, new Region(rectangle.MinX, rectangle.ExclusiveMaxY - rectangle.Width, rectangle.Width, rectangle.Width));
 
             int trackLength = rectangle.Height - rectangle.Width * 2;
             if (trackLength <= 0)
             {
-                SetChildOuterRectangle(thumb, null);
+                ArrangeChild(thumb, new Region(rectangle.MinX, rectangle.MinY + rectangle.Width, rectangle.Width, 0));
             }
             else
             {
                 int minY = rectangle.MinY + rectangle.Width + (int)(trackLength * (value - minimum) / (maximum - minimum));
                 int height = Math.Min(trackLength, (int)(trackLength * length / Math.Abs(maximum - minimum)));
-                SetChildOuterRectangle(thumb, new Region(rectangle.MinX, minY, rectangle.Width, height));
+                ArrangeChild(thumb, new Region(rectangle.MinX, minY, rectangle.Width, height));
             }
         }
 
@@ -189,8 +188,7 @@ namespace Orion.Engine.Gui2
         {
             if (orientation == Orientation.Horizontal) throw new NotImplementedException();
 
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle)) return;
+            Region rectangle = base.Rectangle;
             
             int trackLength = rectangle.Height - rectangle.Width * 2;
             if (trackLength <= 0) return;

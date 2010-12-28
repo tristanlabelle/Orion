@@ -37,9 +37,7 @@ namespace Orion.Engine.Gui2.Controls
             for (int i = children.Count - 1; i >= 0; --i)
             {
                 Control child = children[i];
-
-                Region rectangle;
-                if (child.TryGetRectangle(out rectangle) && rectangle.Contains(point))
+                if (child.IsArranged && child.Rectangle.Contains(point))
                     return child;
             }
 
@@ -57,7 +55,8 @@ namespace Orion.Engine.Gui2.Controls
             int height = 0;
             foreach (Control child in children)
             {
-                Size childSize = child.MeasureOuterSize();
+                child.Measure();
+                Size childSize = child.DesiredOuterSize;
                 if (childSize.Width > width) width = childSize.Width;
                 if (childSize.Height > height) height = childSize.Height;
             }
@@ -67,18 +66,10 @@ namespace Orion.Engine.Gui2.Controls
 
         protected override void ArrangeChildren()
         {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle))
-            {
-                foreach (Control child in children)
-                    SetChildOuterRectangle(child, null);
-                return;
-            }
-
             foreach (Control child in children)
             {
-                Region childRectangle = DefaultArrange(rectangle, child);
-                SetChildOuterRectangle(child, childRectangle);
+                Region childRectangle = DefaultArrange(Rectangle, child);
+                ArrangeChild(child, childRectangle);
             }
         }
         #endregion

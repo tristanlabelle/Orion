@@ -157,7 +157,6 @@
     <Compile Include="Gui2\GuiRenderer.cs" />
     <Compile Include="Gui2\Controls\ImageBox.cs" />
     <Compile Include="Gui2\Controls\Label.cs" />
-    <Compile Include="Gui2\LayoutState.cs" />
     <Compile Include="Gui2\Borders.cs" />
     <Compile Include="Gui2\MouseState.cs" />
     <Compile Include="Gui2\Adornments\NinePartTextureAdornment.cs" />

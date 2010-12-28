@@ -51,16 +51,13 @@ namespace Orion.Game.Presentation.Gui
         {
             Debug.Assert(control == button);
 
-            Region rectangle;
-            if (!button.TryGetRectangle(out rectangle)) return;
-
             Texture texture;
             if (button.HasDescendant(button.Manager.HoveredControl))
                 texture = button.IsDown ? downTexture : overTexture;
             else
                 texture = upTexture;
 
-            renderer.FillNinePart(rectangle, texture, Colors.White);
+            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control)

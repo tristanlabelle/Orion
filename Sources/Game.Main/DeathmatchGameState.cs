@@ -27,7 +27,7 @@ namespace Orion.Game.Main
         private readonly Match match;
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
-        private readonly MatchUI ui;
+        private readonly MatchUI2 ui;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         #endregion
@@ -50,32 +50,25 @@ namespace Orion.Game.Main
 
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
-            this.ui = new MatchUI(graphics, userInputManager, matchRenderer);
+            this.ui = new MatchUI2(graphics, userInputManager, matchRenderer);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
-            this.ui.QuitPressed += OnQuitPressed;
+            //this.ui.QuitPressed += OnQuitPressed;
             this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
-        }
-        #endregion
-
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
         }
         #endregion
 
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -100,18 +93,18 @@ namespace Orion.Game.Main
             commandPipeline.Update(lastSimulationStep);
 
             graphics.UpdateGui(timeDeltaInSeconds);
-            audioPresenter.SetViewBounds(ui.CameraBounds);
+            //audioPresenter.SetViewBounds(ui.CameraBounds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
+            graphics.DrawGui();
         }
 
         public override void Dispose()
         {
             audioPresenter.Dispose();
-            ui.Dispose();
+            //ui.Dispose();
             commandPipeline.Dispose();
             audio.Dispose();
         }
@@ -142,7 +135,7 @@ namespace Orion.Game.Main
             if (faction == localCommander.Faction)
             {
                 audioPresenter.PlayDefeatSound();
-                ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
+                //ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
                 return;
             }
 
@@ -152,7 +145,7 @@ namespace Orion.Game.Main
             if (!allEnemyFactionsDefeated) return;
 
             audioPresenter.PlayVictorySound();
-            ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
+            //ui.DisplayVictoryMessage(() => Manager.PopTo<MainMenuGameState>());
         }
         #endregion
     }

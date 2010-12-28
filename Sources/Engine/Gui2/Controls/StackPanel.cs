@@ -126,7 +126,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (i > 0) height += childGap;
 
-                    Size childSize = children[i].MeasureOuterSize();
+                    Size childSize = children[i].Measure();
                     height += Math.Max(minChildSize, childSize.Height);
                     if (childSize.Width > width) width = childSize.Width;
                 }
@@ -137,7 +137,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (i > 0) width += childGap;
 
-                    Size childSize = children[i].MeasureOuterSize();
+                    Size childSize = children[i].Measure();
                     width += Math.Max(minChildSize, childSize.Width);
                     if (childSize.Height > height) height = childSize.Height;
                 }
@@ -148,9 +148,7 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle))
-                return;
+            Region rectangle = base.Rectangle;
 
             if (direction == Direction.MinY || direction == Direction.MaxY)
             {
@@ -160,29 +158,16 @@ namespace Orion.Engine.Gui2
                     if (i > 0) y += childGap;
 
                     Control child = children[i];
-                    Size childSize = child.MeasureOuterSize();
-
-                    int x;
-                    int width;
-                    DefaultArrange(rectangle.Width, child.HorizontalAlignment, childSize.Width, out x, out width);
+                    Size childSize = child.Measure();
 
                     int height = Math.Max(minChildSize, childSize.Height);
-                    Region childRectangle;
-                    if (direction == Direction.MaxY)
-                    {
-                        childRectangle = new Region(
-                            rectangle.MinX + x,
-                            rectangle.MinY + y,
-                            width, height);
-                    }
-                    else
-                    {
-                        childRectangle = new Region(
-                            rectangle.MinX + x,
-                            rectangle.ExclusiveMaxY - y - height,
-                            width, height);
-                    }
-                    SetChildOuterRectangle(child, childRectangle);
+                    Region availableSpace = new Region(
+                        rectangle.MinX,
+                        direction == Direction.MaxX ? rectangle.MinY + y : rectangle.ExclusiveMaxY - height - y,
+                        rectangle.Width, height);
+
+                    Region childRectangle = DefaultArrange(availableSpace, child);
+                    ArrangeChild(child, childRectangle);
 
                     y += height;
                 }

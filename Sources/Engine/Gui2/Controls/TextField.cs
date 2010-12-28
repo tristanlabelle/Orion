@@ -139,6 +139,13 @@ namespace Orion.Engine.Gui2
             relativeSelectionLength = -text.Length;
         }
 
+        protected override Size MeasureSize()
+        {
+            return Size.Zero;
+        }
+
+        protected override void ArrangeChildren() { }
+
         protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left && pressCount > 0 && isEditable)
@@ -227,11 +234,6 @@ namespace Orion.Engine.Gui2
 
             Text = text.Insert(caretIndex, character);
             ++caretIndex;
-        }
-
-        protected override Size MeasureSize()
-        {
-            return Size.Zero;
         }
         #endregion
     }

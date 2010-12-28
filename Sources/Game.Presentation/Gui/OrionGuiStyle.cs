@@ -24,12 +24,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public OrionGuiStyle(GraphicsContext graphicsContext)
+        public OrionGuiStyle(GraphicsContext graphicsContext, TextureManager textureManager)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
+            Argument.EnsureNotNull(textureManager, "textureManager");
 
             this.graphicsContext = graphicsContext;
-            this.textureManager = new TextureManager(graphicsContext, "../../../Assets/Textures/Gui");
+            this.textureManager = textureManager;
         }
         #endregion
 
@@ -62,7 +63,7 @@ namespace Orion.Game.Presentation.Gui
 
         public override Texture TryGetTexture(string name)
         {
-            return textureManager.Get(name);
+            return textureManager.Get("Gui/" + name);
         }
 
         public override Size MeasureText(string text, ref TextRenderingOptions options)
@@ -115,6 +116,13 @@ namespace Orion.Game.Presentation.Gui
             return uiManager;
         }
 
+        public Label CreateLabel(string text)
+        {
+            Label label = new Label(text);
+            ApplySpecificStyle(label);
+            return label;
+        }
+
         /// <summary>
         /// Creates a button containing text and styles it.
         /// </summary>
@@ -122,10 +130,9 @@ namespace Orion.Game.Presentation.Gui
         /// <returns>The button that was created.</returns>
         public Button CreateTextButton(string text)
         {
-            Label label = new Label(text);
+            Label label = CreateLabel(text);
             label.HorizontalAlignment = Alignment.Center;
             label.VerticalAlignment = Alignment.Center;
-            ApplySpecificStyle(label);
 
             Button button = new Button();
             ApplySpecificStyle(button);
@@ -147,7 +154,7 @@ namespace Orion.Game.Presentation.Gui
             GetType().InvokeMember("ApplySpecificStyle", bindingFlags, null, this, new[] { control });
         }
 
-        private Texture GetTexture(string name)
+        private Texture GetGuiTexture(string name)
         {
             return textureManager.Get("Gui/" + name);
         }
@@ -156,7 +163,7 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(UIManager uiManager)
         {
-            uiManager.CursorTexture = GetTexture("Cursors/Default");
+            uiManager.CursorTexture = GetGuiTexture("Cursors/Default");
         }
 
         private void ApplySpecificStyle(Label label)
@@ -167,7 +174,7 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(Button button)
         {
-            Texture upTexture = GetTexture("Button_Up");
+            Texture upTexture = GetGuiTexture("Button_Up");
 
             var adornment = new OrionButtonAdornment(button, this);
             button.Adornment = adornment;
@@ -177,7 +184,7 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(CheckBox checkBox)
         {
-            Texture uncheckedTexture = GetTexture("CheckBox_Unchecked");
+            Texture uncheckedTexture = GetGuiTexture("CheckBox_Unchecked");
 
             checkBox.Adornment = new TextureAdornment(uncheckedTexture);
             checkBox.MinSize = uncheckedTexture.Size;

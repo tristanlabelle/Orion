@@ -50,6 +50,8 @@ namespace Orion.Engine.Gui2
             return MinSize;
         }
 
+        protected override void ArrangeChildren() { }
+
         protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)

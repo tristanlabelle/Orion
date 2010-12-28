@@ -88,14 +88,13 @@ namespace Orion.Engine.Gui2
             return Renderer.MeasureText(text, ref options);
         }
 
+        protected override void ArrangeChildren() { }
+
         protected internal override void Draw()
         {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle)) return;
-
             var options = new TextRenderingOptions
             {
-                Origin = rectangle.Min,
+                Origin = Rectangle.Min,
                 Font = font,
                 Color = color
             };

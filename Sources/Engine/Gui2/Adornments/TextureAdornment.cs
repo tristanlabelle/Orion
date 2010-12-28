@@ -31,10 +31,7 @@ namespace Orion.Engine.Gui2.Adornments
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            Region rectangle;
-            if (!control.TryGetRectangle(out rectangle)) return;
-
-            var sprite = new GuiSprite(rectangle, texture);
+            var sprite = new GuiSprite(control.Rectangle, texture);
             renderer.DrawSprite(ref sprite);
         }
 

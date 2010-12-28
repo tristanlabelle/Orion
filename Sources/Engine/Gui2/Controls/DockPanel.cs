@@ -97,7 +97,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.MeasureOuterSize();
+                Size childSize = child.Control.Measure();
 
                 if (LastChildFill && i == children.Count - 1)
                 {
@@ -145,8 +145,7 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle)) return;
+            Region rectangle = base.Rectangle;
 
             int remainingRectangleMinX = rectangle.MinX;
             int remainingRectangleMinY = rectangle.MinY;
@@ -156,7 +155,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.MeasureOuterSize();
+                Size childSize = child.Control.Measure();
 
                 int childRectangleMinX = remainingRectangleMinX;
                 int childRectangleMinY = remainingRectangleMinY;
@@ -165,7 +164,7 @@ namespace Orion.Engine.Gui2
 
                 if (!LastChildFill || i != children.Count - 1)
                 {
-                    switch(child.Dock)
+                    switch (child.Dock)
                     {
                         case DockEnum.MinX:
                             childRectangleWidth = childSize.Width;
@@ -195,7 +194,7 @@ namespace Orion.Engine.Gui2
 
                 if (childRectangleWidth <= 0 || childRectangleHeight <= 0)
                 {
-                    SetChildOuterRectangle(child.Control, null);
+                    ArrangeChild(child.Control, new Region(childRectangleMinX, childRectangleMinY, 0, 0));
                     continue;
                 }
 
@@ -204,7 +203,7 @@ namespace Orion.Engine.Gui2
                     childRectangleMinX + relativeChildRectangle.MinX,
                     childRectangleMinY + relativeChildRectangle.MinY,
                     relativeChildRectangle.Width, relativeChildRectangle.Height);
-                SetChildOuterRectangle(child.Control, childRectangle);
+                ArrangeChild(child.Control, childRectangle);
             }
         }
         #endregion

@@ -37,14 +37,14 @@ namespace Orion.Game.Presentation
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
 
+            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
+
             Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
 
-            OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext);
+            OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext, textureManager);
             uiManager = style.CreateUIManager();
-            uiManager.Size = window.ClientAreaSize;
-
-            this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
+            uiManager.SetSize(window.ClientAreaSize);
         }
         #endregion
 
@@ -191,6 +191,7 @@ namespace Orion.Game.Presentation
 
         public void DrawGui()
         {
+            window.GraphicsContext.ProjectionBounds = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             uiManager.Draw();
             RootView.Draw(window.GraphicsContext);
         }
@@ -269,7 +270,7 @@ namespace Orion.Game.Presentation
 
         private void OnWindowResized(IGameWindow sender)
         {
-            uiManager.Size = window.ClientAreaSize;
+            uiManager.SetSize(window.ClientAreaSize);
         }
 
         private void HandleInput(InputEvent inputEvent)

@@ -8,6 +8,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using System.Diagnostics;
 
 namespace Orion.Engine.Gui2
 {
@@ -26,7 +27,6 @@ namespace Orion.Engine.Gui2
 
         private readonly GuiRenderer renderer;
         private TimeSpan time;
-        private Size size = new Size(800, 600);
         private MouseState mouseState;
         private Control hoveredControl;
         private Control keyboardFocusedControl;
@@ -65,7 +65,7 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Gets the <see cref="GuiRenderer"/> responsible of drawing this UI hierarchy.
         /// </summary>
-        public GuiRenderer Renderer
+        public new GuiRenderer Renderer
         {
             get { return renderer; }
         }
@@ -76,20 +76,6 @@ namespace Orion.Engine.Gui2
         public TimeSpan Time
         {
             get { return time; }
-        }
-
-        /// <summary>
-        /// Gets the size of the client area where this <see cref="UIManager"/> can draw.
-        /// </summary>
-        public Size Size
-        {
-            get { return size; }
-            set
-            {
-                if (value == size) return;
-                size = value;
-                InvalidateMeasure();
-            }
         }
 
         /// <summary>
@@ -162,12 +148,28 @@ namespace Orion.Engine.Gui2
 
         #region Methods
         /// <summary>
+        /// Arranges this UI hierarchy.
+        /// </summary>
+        public void Arrange()
+        {
+            if (IsArranged && IsMeasured) return;
+
+            Measure();
+            Arrange(new Region(DesiredSize));
+            ArrangeChildren();
+
+            return;
+        }
+
+        /// <summary>
         /// Updates this UI hierarchy.
         /// </summary>
         /// <param name="elapsedTime">The time elapsed since the last update.</param>
         public void Update(TimeSpan elapsedTime)
         {
             if (elapsedTime < TimeSpan.Zero) throw new InvalidOperationException("The elapsed time should be positive.");
+
+            Arrange();
 
             time += elapsedTime;
             Updated.Raise(this, elapsedTime);
@@ -178,6 +180,8 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public new void Draw()
         {
+            Arrange();
+
             Renderer.Begin();
 
             Draw(this);
@@ -196,14 +200,19 @@ namespace Orion.Engine.Gui2
 
         private void Draw(Control control)
         {
-            Region rectangle;
-            if (control.Visibility != Visibility.Visible || !control.TryGetRectangle(out rectangle) || rectangle.Area == 0)
+            if (!control.IsArranged)
+            {
+                Debug.Fail("Attempted to draw a control that is not arranged.");
+                return;
+            }
+
+            if (control.Visibility != Visibility.Visible || control.Rectangle.Area == 0)
                 return;
 
             if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
 
             Region? previousClippingRectangle = Renderer.ClippingRectangle;
-            Renderer.ClippingRectangle = rectangle;
+            Renderer.ClippingRectangle = control.Rectangle;
 
             control.Draw();
 
@@ -225,6 +234,8 @@ namespace Orion.Engine.Gui2
         {
             if (x == mouseState.X && y == mouseState.Y) return;
 
+            Arrange();
+
             mouseState = new MouseState(x, y, mouseState.Buttons);
 
             InjectMouseEvent(MouseMoveCaller, MouseButtons.None, 0);
@@ -243,6 +254,8 @@ namespace Orion.Engine.Gui2
             EnsureValid(button);
             Argument.EnsurePositive(pressCount, "pressCount");
 
+            Arrange();
+
             MouseButtons buttons = mouseState.Buttons & ~button;
             if (pressCount > 0) buttons &= button;
 
@@ -258,6 +271,8 @@ namespace Orion.Engine.Gui2
         public void InjectMouseWheel(float amount)
         {
             Argument.EnsureFinite(amount, "amount");
+
+            Arrange();
 
             InjectMouseEvent(MouseWheelCaller, MouseButtons.None, amount);
         }
@@ -310,6 +325,8 @@ namespace Orion.Engine.Gui2
         {
             if (keyboardFocusedControl == null) return;
 
+            Arrange();
+
             Keys key = keyAndModifiers & Keys.KeyCode;
             if (key == Keys.None) return;
 
@@ -328,6 +345,8 @@ namespace Orion.Engine.Gui2
         public void InjectCharacter(char character)
         {
             if (keyboardFocusedControl == null) return;
+
+            Arrange();
 
             keyboardFocusedControl.OnCharacter(character);
         }
@@ -353,11 +372,6 @@ namespace Orion.Engine.Gui2
             }
         }
         #endregion
-
-        protected override Size MeasureSize()
-        {
-            return size;
-        }
         #endregion
     }
 }

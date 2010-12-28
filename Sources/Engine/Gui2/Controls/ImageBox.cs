@@ -44,15 +44,14 @@ namespace Orion.Engine.Gui2
         #region Methods
         protected override Size MeasureSize()
         {
-            return texture == null ? Size.Zero : texture.Size;
+            return texture == null ? Size.Zero : new Size(texture.Width, texture.Height);
         }
+
+        protected override void ArrangeChildren() { }
 
         protected internal override void Draw()
         {
-            Region rectangle;
-            if (!TryGetRectangle(out rectangle)) return;
-
-            var sprite = new GuiSprite(rectangle, texture);
+            var sprite = new GuiSprite(Rectangle, texture);
             Renderer.DrawSprite(ref sprite);
         }
         #endregion

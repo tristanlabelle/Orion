@@ -26,15 +26,17 @@ namespace Orion.Engine.Gui2.Adornments
         {
             get { return texture; }
         }
+
+        public Borders SuggestedPadding
+        {
+            get { return new Borders(texture.Width / 2 - 1, texture.Height / 2 - 1); }
+        }
         #endregion
 
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            Region rectangle;
-            if (!control.TryGetRectangle(out rectangle)) return;
-
-            renderer.FillNinePart(rectangle, texture, Colors.White);
+            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

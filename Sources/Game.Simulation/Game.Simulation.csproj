@@ -67,6 +67,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\ResourceNodeTemplate.cs" />
+    <Compile Include="IO\UnitTemplate.cs" />
+    <Compile Include="IO\WorldData.cs" />
     <Compile Include="PlainWorldGenerator.cs" />
     <Compile Include="RandomWorldGenerator.cs" />
     <Compile Include="ResourceAmount.cs" />

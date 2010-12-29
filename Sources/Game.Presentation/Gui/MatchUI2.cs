@@ -16,15 +16,22 @@ namespace Orion.Game.Presentation.Gui
     public sealed class MatchUI2 : ContentControl
     {
         #region Fields
+        private readonly Action<UIManager, TimeSpan> updatedEventHandler;
+
         private Label aladdiumAmountLabel;
         private Label alageneAmountLabel;
+        private Control bottomBar;
         private ContentControl selectionInfoPanel;
+
+        private Point scrollDirection;
         #endregion
 
         #region Constructors
         public MatchUI2(OrionGuiStyle style)
         {
             Argument.EnsureNotNull(style, "style");
+
+            updatedEventHandler = OnGuiUpdated;
 
             DockPanel mainDockPanel = style.Create<DockPanel>();
             mainDockPanel.Dock(CreateTopBar(style), Direction.MaxY);
@@ -59,9 +66,54 @@ namespace Orion.Game.Presentation.Gui
             get { return int.Parse(alageneAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
             set { alageneAmountLabel.Text = value.ToStringInvariant(); }
         }
+
+        /// <summary>
+        /// Gets the screen-space rectangle in which the game can be seen.
+        /// </summary>
+        public Region ViewportRectangle
+        {
+            get
+            {
+                Region rectangle = Rectangle;
+                int bottomBarHeight = bottomBar.ActualSize.Height;
+                return new Region(
+                    rectangle.MinX, rectangle.MinY + bottomBarHeight,
+                    rectangle.Width, Math.Max(0, rectangle.Height - bottomBarHeight));
+            }
+        }
+
+        /// <summary>
+        /// Gets a point which indicates the direction the camera should be scrolling.
+        /// </summary>
+        public Point ScrollDirection
+        {
+            get { return scrollDirection; }
+        }
         #endregion
 
         #region Methods
+        protected override void OnManagerChanged(UIManager previousManager)
+        {
+            if (previousManager != null) previousManager.Updated -= updatedEventHandler;
+            if (Manager != null) Manager.Updated += updatedEventHandler;
+        }
+
+        private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
+        {
+            Region rectangle = Rectangle;
+            Point mousePosition = sender.MouseState.Position;
+
+            int scrollX = 0;
+            if (mousePosition.X == 0) scrollX = -1;
+            else if (mousePosition.X == rectangle.ExclusiveMaxX - 1) scrollX = 1;
+
+            int scrollY = 0;
+            if (mousePosition.Y == 0) scrollY = -1;
+            else if (mousePosition.Y == rectangle.ExclusiveMaxY - 1) scrollY = 1;
+
+            scrollDirection = new Point(scrollX, scrollY);
+        }
+
         private Control CreateTopBar(OrionGuiStyle style)
         {
             ContentControl container = new ContentControl();
@@ -115,6 +167,7 @@ namespace Orion.Game.Presentation.Gui
         private Control CreateBottomBar(OrionGuiStyle style)
         {
             ContentControl container = new ContentControl();
+            bottomBar = container;
             container.IsMouseEventSink = true;
             container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
 

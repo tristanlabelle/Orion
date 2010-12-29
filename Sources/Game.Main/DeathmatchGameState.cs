@@ -29,6 +29,7 @@ namespace Orion.Game.Main
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
         private readonly MatchUI2 ui;
+        private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
@@ -51,9 +52,10 @@ namespace Orion.Game.Main
             this.localCommander = localCommander;
 
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
-            matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.ui = new MatchUI2(graphics.GuiStyle);
             this.ui.MinimapRendering += OnMinimapRendering;
+            this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
+            this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
@@ -103,18 +105,29 @@ namespace Orion.Game.Main
             commandPipeline.Update(lastSimulationStep);
 
             graphics.UpdateGui(timeDeltaInSeconds);
-            //audioPresenter.SetViewBounds(ui.CameraBounds);
+            camera.ViewportSize = ui.ViewportRectangle.Size;
+            camera.ScrollDirection = ui.ScrollDirection;
+            camera.Update(timeDeltaInSeconds);
+            audioPresenter.SetViewBounds(camera.ViewBounds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
         {
+            graphics.UIManager.Arrange();
             Size clientSize = graphics.Window.ClientAreaSize;
-            float aspectRatio = clientSize.Height / (float)clientSize.Width;
-            float widthInTiles = clientSize.Width / 32f;
-            graphics.Context.ProjectionBounds = new Rectangle(30, 50, widthInTiles, widthInTiles * aspectRatio);
-            matchRenderer.Draw(graphics.Context.ProjectionBounds);
+            Region viewportRectangle = ui.ViewportRectangle;
+            if (viewportRectangle.Area > 0)
+            {
+                Rectangle worldViewBounds = camera.ViewBounds;
+                graphics.Context.ProjectionBounds = new Rectangle(
+                    worldViewBounds.MinX - worldViewBounds.Width * viewportRectangle.MinX / viewportRectangle.Width,
+                    worldViewBounds.MinY - worldViewBounds.Height * viewportRectangle.MinY / viewportRectangle.Height,
+                    worldViewBounds.Width * clientSize.Width / viewportRectangle.Width,
+                    worldViewBounds.Height * clientSize.Height / viewportRectangle.Height);
+                matchRenderer.Draw(worldViewBounds);
+            }
 
-            graphics.Context.ProjectionBounds = new Rectangle(graphics.Window.ClientAreaSize.Width, graphics.Window.ClientAreaSize.Height);
+            graphics.Context.ProjectionBounds = new Rectangle(clientSize.Width, clientSize.Height);
             graphics.DrawGui();
         }
 
@@ -125,20 +138,23 @@ namespace Orion.Game.Main
             Rectangle previousProjectionBounds = graphics.Context.ProjectionBounds;
 
             Size clientSize = graphics.Window.ClientAreaSize;
+
             graphics.Context.ProjectionBounds = new Rectangle(
-                rectangle.MinX * rectangle.Width / clientSize.Width,
-                rectangle.MinY * rectangle.Height / clientSize.Height,
+                -World.Bounds.Width * rectangle.MinX / rectangle.Width,
+                -World.Bounds.Height * rectangle.MinY / rectangle.Height,
                 World.Bounds.Width * clientSize.Width / rectangle.Width,
                 World.Bounds.Height * clientSize.Height / rectangle.Height);
             matchRenderer.DrawMinimap();
+
+            graphics.Context.Stroke(camera.ViewBounds, Colors.Red);
 
             graphics.Context.ProjectionBounds = previousProjectionBounds;
         }
 
         public override void Dispose()
         {
+            matchRenderer.Dispose();
             audioPresenter.Dispose();
-            //ui.Dispose();
             commandPipeline.Dispose();
             audio.Dispose();
         }

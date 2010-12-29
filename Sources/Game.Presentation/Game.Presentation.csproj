@@ -98,6 +98,7 @@
     <Compile Include="Actions\UnitActionProvider.cs" />
     <Compile Include="Audio\GameAudio.cs" />
     <Compile Include="Audio\MatchAudioPresenter.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />

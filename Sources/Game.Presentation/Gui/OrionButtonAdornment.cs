@@ -52,7 +52,7 @@ namespace Orion.Game.Presentation.Gui
             Debug.Assert(control == button);
 
             Texture texture;
-            if (button.HasDescendant(button.Manager.HoveredControl))
+            if (button.IsUnderMouse)
                 texture = button.IsDown ? downTexture : overTexture;
             else
                 texture = upTexture;

@@ -13,6 +13,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using InputMouseEventType = Orion.Engine.Input.MouseEventType;
 using RootView = Orion.Engine.Gui.RootView;
 
 namespace Orion.Game.Presentation
@@ -222,49 +223,13 @@ namespace Orion.Game.Presentation
             {
                 InputEvent inputEvent = inputEventQueue.Dequeue();
                 rootView.SendInputEvent(inputEvent);
-                if (inputEvent.Type == InputEventType.Mouse)
-                {
-                    MouseEventType type;
-                    MouseEventArgs args;
-                    inputEvent.GetMouse(out type, out args);
-
-                    uiManager.InjectMouseMove((int)args.X, (int)args.Y);
-                    if (type == MouseEventType.WheelScrolled)
-                    {
-                        uiManager.InjectMouseWheel(args.WheelDelta);
-                    }
-                    else if (type == MouseEventType.ButtonPressed || type == MouseEventType.ButtonReleased)
-                    {
-                        MouseButtons buttons = MouseButtons.None;
-                        if (args.Button == MouseButton.Left) buttons = MouseButtons.Left;
-                        else if (args.Button == MouseButton.Middle) buttons = MouseButtons.Middle;
-                        else if (args.Button == MouseButton.Right) buttons = MouseButtons.Right;
-
-                        int pressCount = type == MouseEventType.ButtonReleased ? 0 : args.ClickCount;
-                        if (buttons != MouseButtons.None) uiManager.InjectMouseButton(buttons, pressCount);
-                    }
-                }
-                else if (inputEvent.Type == InputEventType.Keyboard)
-                {
-                    KeyboardEventType type;
-                    KeyboardEventArgs args;
-                    inputEvent.GetKeyboard(out type, out args);
-
-                    uiManager.InjectKey(args.KeyAndModifiers, type == KeyboardEventType.ButtonPressed);
-                }
-                else if (inputEvent.Type == InputEventType.Character)
-                {
-                    char character;
-                    inputEvent.GetCharacter(out character);
-
-                    uiManager.InjectCharacter(character);
-                }
+                uiManager.InjectInputEvent(inputEvent);
             }
         }
 
         private void OnInputReceived(IGameWindow sender, InputEvent inputEvent)
         {
-            HandleInput(inputEvent);
+            if (HandleInput(inputEvent)) return;
             inputEventQueue.Enqueue(inputEvent);
         }
 
@@ -273,7 +238,7 @@ namespace Orion.Game.Presentation
             uiManager.SetSize(window.ClientAreaSize);
         }
 
-        private void HandleInput(InputEvent inputEvent)
+        private bool HandleInput(InputEvent inputEvent)
         {
             if (inputEvent.Type == InputEventType.Keyboard)
             {
@@ -282,15 +247,21 @@ namespace Orion.Game.Presentation
                 inputEvent.GetKeyboard(out type, out args);
 
                 if (type == KeyboardEventType.ButtonPressed && args.IsAltModifierDown && args.Key == Keys.Enter)
+                {
                     ToggleFullscreen();
+                    return true;
+                }
             }
+
+            return false;
         }
 
         private void ToggleFullscreen()
         {
             if (window.Mode == WindowMode.Windowed)
             {
-                try { window.SetFullscreen(new Size(1280, 800)); }
+                var bounds = System.Windows.Forms.Screen.PrimaryScreen.Bounds;
+                try { window.SetFullscreen(new Size(bounds.Width, bounds.Height)); }
                 catch (NotSupportedException) { }
             }
             else

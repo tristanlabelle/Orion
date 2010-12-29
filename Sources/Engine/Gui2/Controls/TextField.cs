@@ -228,12 +228,15 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        protected internal override void OnCharacter(char character)
+        protected internal override bool OnCharacter(char character)
         {
-            if ("\b\r\t\n".Contains(character)) return;
+            if (!"\b\r\t\n".Contains(character))
+            {
+                Text = text.Insert(caretIndex, character);
+                ++caretIndex;
+            }
 
-            Text = text.Insert(caretIndex, character);
-            ++caretIndex;
+            return true;
         }
         #endregion
     }

@@ -43,6 +43,8 @@ namespace Orion.Engine.Gui2
 
         private bool isMeasured;
         private bool isArranged;
+
+        private bool isMouseEventSink;
         #endregion
 
         #region Constructors
@@ -382,7 +384,23 @@ namespace Orion.Engine.Gui2
             get { return isArranged; }
         }
 
-        #region Focus
+        #region Input & Focus
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> or one of its descendants are under the mouse cursor.
+        /// </summary>
+        public bool IsUnderMouse
+        {
+            get { return manager != null && HasDescendant(manager.ControlUnderMouse); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> is directly under the mouse cursor.
+        /// </summary>
+        public bool IsDirectlyUnderMouse
+        {
+            get { return manager != null && manager.ControlUnderMouse == this; }
+        }
+
         /// <summary>
         /// Gets a value indicating if this <see cref="Control"/> currently has the keyboard focus.
         /// </summary>
@@ -397,6 +415,16 @@ namespace Orion.Engine.Gui2
         public bool HasMouseCapture
         {
             get { return manager != null && manager.MouseCapturedControl == this; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> always indicates
+        /// mouse events as being handled.
+        /// </summary>
+        public bool IsMouseEventSink
+        {
+            get { return isMouseEventSink; }
+            set { isMouseEventSink = value; }
         }
         #endregion
 
@@ -715,11 +743,44 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Event Handling
+        protected virtual bool PropagateMouseEvent(
+            MouseEventType type, MouseState state, MouseButtons button, float value)
+        {
+            foreach (Control child in Children)
+            {
+                if (child.Rectangle.Contains(state.Position))
+                {
+                    bool handled = child.PropagateMouseEvent(type, state, button, value);
+                    if (handled) return true;
+                    break;
+                }
+            }
+
+            return OnMouseEvent(type, state, button, value);
+        }
+
+        protected bool PropagateMouseEventToChild(Control child,
+            MouseEventType type, MouseState state, MouseButtons button, float value)
+        {
+            return child.PropagateMouseEvent(type, state, button, value);
+        }
+
+        internal bool OnMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
+        {
+            switch (type)
+            {
+                case MouseEventType.Move: return OnMouseMove(state) || IsMouseEventSink;
+                case MouseEventType.Button: return OnMouseButton(state, button, (int)value) || IsMouseEventSink;
+                case MouseEventType.Wheel: return OnMouseWheel(state, value) || IsMouseEventSink;
+                default: throw new InvalidEnumArgumentException("type", (int)type, typeof(MouseEventType));
+            }
+        }
+
         /// <summary>
         /// When overriden in a derived class, handles a mouse move event.
         /// </summary>
         /// <param name="state">The current state of the mouse.</param>
-        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseMove(MouseState state)
         {
             return false;
@@ -733,7 +794,7 @@ namespace Orion.Engine.Gui2
         /// <param name="pressCount">
         /// The number of successive presses of the button, or <c>0</c> if the button was released.
         /// </param>
-        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             return false;
@@ -744,7 +805,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="state">The current state of the mouse.</param>
         /// <param name="amount">The amount the mouse wheel was moved, in notches.</param>
-        /// <returns><c>True</c> if the event was handled, this stops event propagation. <c>False</c> to let the event propagate.</returns>
+        /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseWheel(MouseState state, float amount)
         {
             return false;
@@ -756,10 +817,7 @@ namespace Orion.Engine.Gui2
         /// <param name="key">The key that was pressed or released.</param>
         /// <param name="modifiers">The modifier keys which are currently pressed.</param>
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
-        /// <returns>
-        /// <c>True</c> if the event was handled, <c>false</c> if not.
-        /// Returning <c>true</c> stops the propagation of the event through ancestors.
-        /// </returns>
+        /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
             return false;
@@ -769,7 +827,8 @@ namespace Orion.Engine.Gui2
         /// Gives a chance to this <see cref="Control"/>to handle a character event.
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
-        protected internal virtual void OnCharacter(char character) { }
+        /// <returns>A value indicating if the event was handled.</returns>
+        protected internal virtual bool OnCharacter(char character) { return false; }
 
         /// <summary>
         /// Invoked when the mouse cursor enters this <see cref="Control"/>.

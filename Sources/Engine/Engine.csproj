@@ -160,6 +160,7 @@
     <Compile Include="Gui2\Controls\ImageBox.cs" />
     <Compile Include="Gui2\Controls\Label.cs" />
     <Compile Include="Gui2\Borders.cs" />
+    <Compile Include="Gui2\MouseEventType.cs" />
     <Compile Include="Gui2\MouseState.cs" />
     <Compile Include="Gui2\Adornments\BorderTextureAdornment.cs" />
     <Compile Include="Gui2\Orientation.cs" />

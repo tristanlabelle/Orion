@@ -65,6 +65,7 @@ namespace Orion.Game.Presentation.Gui
         private Control CreateTopBar(OrionGuiStyle style)
         {
             ContentControl container = new ContentControl();
+            container.IsMouseEventSink = true;
             container.HorizontalAlignment = Alignment.Center;
             container.Width = 500;
             BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
@@ -114,6 +115,7 @@ namespace Orion.Game.Presentation.Gui
         private Control CreateBottomBar(OrionGuiStyle style)
         {
             ContentControl container = new ContentControl();
+            container.IsMouseEventSink = true;
             container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
 
             DockPanel dockPanel = new DockPanel();
@@ -135,7 +137,12 @@ namespace Orion.Game.Presentation.Gui
 
             selectionInfoPanel = new ContentControl();
             dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
-            selectionInfoPanel.Content = style.CreateLabel("Placeholder");
+            selectionInfoPanel.Content = new ImageBox
+            {
+                Texture = style.GetTexture("Gui/Carving"),
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+            };
 
             return container;
         }

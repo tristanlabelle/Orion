@@ -8,7 +8,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// Interface for classes which can visually enhance a control.
     /// </summary>
-    public interface IControlAdornment
+    public interface IAdornment
     {
         /// <summary>
         /// Draws the background of a given <see cref="Control"/>.

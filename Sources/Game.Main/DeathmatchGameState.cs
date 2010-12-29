@@ -12,6 +12,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Presentation.Audio;
+using Orion.Engine.Geometry;
 
 namespace Orion.Game.Main
 {
@@ -28,6 +29,7 @@ namespace Orion.Game.Main
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
         private readonly MatchUI2 ui;
+        private readonly IMatchRenderer matchRenderer;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         #endregion
@@ -49,14 +51,22 @@ namespace Orion.Game.Main
             this.localCommander = localCommander;
 
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
-            var matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
-            this.ui = new MatchUI2(graphics, userInputManager, matchRenderer);
+            matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
+            this.ui = new MatchUI2(graphics.GuiStyle);
+            this.ui.MinimapRendering += OnMinimapRendering;
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             //this.ui.QuitPressed += OnQuitPressed;
             this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
+        }
+        #endregion
+
+        #region Properties
+        private World World
+        {
+            get { return match.World; }
         }
         #endregion
 
@@ -98,7 +108,31 @@ namespace Orion.Game.Main
 
         protected internal override void Draw(GameGraphics graphics)
         {
+            Size clientSize = graphics.Window.ClientAreaSize;
+            float aspectRatio = clientSize.Height / (float)clientSize.Width;
+            float widthInTiles = clientSize.Width / 32f;
+            graphics.Context.ProjectionBounds = new Rectangle(30, 50, widthInTiles, widthInTiles * aspectRatio);
+            matchRenderer.Draw(graphics.Context.ProjectionBounds);
+
+            graphics.Context.ProjectionBounds = new Rectangle(graphics.Window.ClientAreaSize.Width, graphics.Window.ClientAreaSize.Height);
             graphics.DrawGui();
+        }
+
+        private void OnMinimapRendering(MatchUI2 sender, Region rectangle)
+        {
+            if (rectangle.Area == 0) return;
+
+            Rectangle previousProjectionBounds = graphics.Context.ProjectionBounds;
+
+            Size clientSize = graphics.Window.ClientAreaSize;
+            graphics.Context.ProjectionBounds = new Rectangle(
+                rectangle.MinX * rectangle.Width / clientSize.Width,
+                rectangle.MinY * rectangle.Height / clientSize.Height,
+                World.Bounds.Width * clientSize.Width / rectangle.Width,
+                World.Bounds.Height * clientSize.Height / rectangle.Height);
+            matchRenderer.DrawMinimap();
+
+            graphics.Context.ProjectionBounds = previousProjectionBounds;
         }
 
         public override void Dispose()

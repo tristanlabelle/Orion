@@ -20,7 +20,7 @@ namespace Orion.Engine.Gui2
         #region Fields
         private UIManager manager;
         private Control parent;
-        private IControlAdornment adornment;
+        private IAdornment adornment;
         private Borders margin;
         private Visibility visibility;
         private Alignment horizontalAlignment;
@@ -78,9 +78,9 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the <see cref="IControlAdornment"/> which visually enhances this control.
+        /// Accesses the <see cref="IAdornment"/> which visually enhances this control.
         /// </summary>
-        public IControlAdornment Adornment
+        public IAdornment Adornment
         {
             get { return adornment; }
             set { adornment = value; }
@@ -565,6 +565,17 @@ namespace Orion.Engine.Gui2
         {
             Width = size.Width;
             Height = size.Height;
+        }
+
+        /// <summary>
+        /// Sets the size of this <see cref="Control"/>.
+        /// </summary>
+        /// <param name="width">The new width.</param>
+        /// <param name="height">The new height.</param>
+        public void SetSize(int width, int height)
+        {
+            Width = width;
+            Height = height;
         }
 
         /// <summary>

@@ -61,9 +61,9 @@ namespace Orion.Game.Presentation.Gui
             graphicsContext.PopScissorRegion();
         }
 
-        public override Texture TryGetTexture(string name)
+        public override Texture GetTexture(string name)
         {
-            return textureManager.Get("Gui/" + name);
+            return textureManager.Get(name);
         }
 
         public override Size MeasureText(string text, ref TextRenderingOptions options)

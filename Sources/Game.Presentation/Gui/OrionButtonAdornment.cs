@@ -12,7 +12,7 @@ namespace Orion.Game.Presentation.Gui
     /// <summary>
     /// An adornment for Orion buttons.
     /// </summary>
-    public sealed class OrionButtonAdornment : IControlAdornment
+    public sealed class OrionButtonAdornment : IAdornment
     {
         #region Fields
         private readonly Button button;
@@ -28,9 +28,9 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(renderer, "renderer");
 
             this.button = button;
-            upTexture = renderer.TryGetTexture("Button_Up");
-            overTexture = renderer.TryGetTexture("Button_Over");
-            downTexture = renderer.TryGetTexture("Button_Down");
+            upTexture = renderer.GetTexture("Gui/Button_Up");
+            overTexture = renderer.GetTexture("Gui/Button_Over");
+            downTexture = renderer.GetTexture("Gui/Button_Down");
         }
         #endregion
 

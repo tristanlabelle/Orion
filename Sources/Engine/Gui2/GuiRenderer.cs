@@ -34,8 +34,8 @@ namespace Orion.Engine.Gui2
         /// Attempts to retrieve a texture by its name.
         /// </summary>
         /// <param name="name">The name of the texture to be retrieve.</param>
-        /// <returns>The texture identified by that name, or <c>null</c> if no such texture was found.</returns>
-        public abstract Texture TryGetTexture(string name);
+        /// <returns>The texture identified by that name, or a dummy texture if no such texture was found.</returns>
+        public abstract Texture GetTexture(string name);
 
         /// <summary>
         /// Measures the space occupied by a string of text.

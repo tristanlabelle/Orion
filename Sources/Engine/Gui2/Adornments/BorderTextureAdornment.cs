@@ -6,14 +6,17 @@ using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2.Adornments
 {
-    public sealed class TextureAdornment : IAdornment
+    /// <summary>
+    /// A control adornment which draws a border based on a texture.
+    /// </summary>
+    public sealed class BorderTextureAdornment : IAdornment
     {
         #region Fields
         private readonly Texture texture;
         #endregion
 
         #region Constructors
-        public TextureAdornment(Texture texture)
+        public BorderTextureAdornment(Texture texture)
         {
             Argument.EnsureNotNull(texture, "texture");
 
@@ -26,13 +29,17 @@ namespace Orion.Engine.Gui2.Adornments
         {
             get { return texture; }
         }
+
+        public Borders SuggestedPadding
+        {
+            get { return new Borders(texture.Width / 2 - 1, texture.Height / 2 - 1); }
+        }
         #endregion
 
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            var sprite = new GuiSprite(control.Rectangle, texture);
-            renderer.DrawSprite(ref sprite);
+            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

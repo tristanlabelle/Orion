@@ -6,14 +6,17 @@ using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2.Adornments
 {
-    public sealed class NinePartTextureAdornment : IControlAdornment
+    /// <summary>
+    /// A control adornment which tiles a texture under the control.
+    /// </summary>
+    public sealed class TilingTextureAdornment : IAdornment
     {
         #region Fields
         private readonly Texture texture;
         #endregion
 
         #region Constructors
-        public NinePartTextureAdornment(Texture texture)
+        public TilingTextureAdornment(Texture texture)
         {
             Argument.EnsureNotNull(texture, "texture");
 
@@ -36,7 +39,13 @@ namespace Orion.Engine.Gui2.Adornments
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
+            var sprite = new GuiSprite
+            {
+                Rectangle = control.Rectangle,
+                Texture = texture,
+                PixelRectangle = control.Rectangle
+            };
+            renderer.DrawSprite(ref sprite);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

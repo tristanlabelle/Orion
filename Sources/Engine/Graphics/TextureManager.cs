@@ -87,7 +87,7 @@ namespace Orion.Engine.Graphics
                 texture = graphicsContext.CreateTextureFromFile(filePath);
 
                 texture.SetSmooth(true);
-                texture.SetRepeat(false);
+                texture.SetRepeat(true);
 
                 textures.Add(name, texture);
                 return texture;

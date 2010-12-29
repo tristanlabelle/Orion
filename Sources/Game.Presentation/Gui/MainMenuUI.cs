@@ -26,13 +26,13 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(style, "style");
 
             DockPanel dockPanel = style.Create<DockPanel>();
-            dockPanel.Adornment = new TextureAdornment(style.TryGetTexture("MenuBackground"));
+            dockPanel.Adornment = new TextureAdornment(style.GetTexture("Gui/MenuBackground"));
             dockPanel.LastChildFill = true;
             Content = dockPanel;
 
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
-            titleImageBox.Texture = style.TryGetTexture("Title");
+            titleImageBox.Texture = style.GetTexture("Gui/Title");
             dockPanel.Dock(titleImageBox, Direction.MaxY);
 
             StackPanel buttonsStackPanel = style.Create<StackPanel>();

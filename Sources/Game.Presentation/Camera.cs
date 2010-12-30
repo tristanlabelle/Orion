@@ -77,6 +77,19 @@ namespace Orion.Game.Presentation
             target += new Vector2(scrollDirection.X, scrollDirection.Y) * timeDeltaInSeconds * scrollSpeed;
             target = new Rectangle(worldSize.Width, worldSize.Height).Clamp(target);
         }
+
+        /// <summary>
+        /// Transforms a point in viewport coordinates to world coordinates.
+        /// </summary>
+        /// <param name="point">The viewport coordinates point to be transformed.</param>
+        /// <returns>The resulting world coordinates point.</returns>
+        public Vector2 ViewportToWorld(Point point)
+        {
+            Rectangle viewBounds = ViewBounds;
+            return new Vector2(
+                viewBounds.MinX + point.X / (float)viewportSize.Width * viewBounds.Width,
+                viewBounds.MinY + point.Y / (float)viewportSize.Height * viewBounds.Height);
+        }
         #endregion
     }
 }

@@ -13,6 +13,10 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Presentation.Audio;
 using Orion.Engine.Geometry;
+using OpenTK;
+using Orion.Engine.Gui2;
+using Input = Orion.Engine.Input;
+using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Main
 {
@@ -28,6 +32,7 @@ namespace Orion.Game.Main
         private readonly Match match;
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
+        private readonly UserInputManager userInputManager;
         private readonly MatchUI2 ui;
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
@@ -51,9 +56,12 @@ namespace Orion.Game.Main
             this.commandPipeline = commandPipeline;
             this.localCommander = localCommander;
 
-            UserInputManager userInputManager = new UserInputManager(match, localCommander);
+            this.userInputManager = new UserInputManager(match, localCommander);
             this.ui = new MatchUI2(graphics.GuiStyle);
+            this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
             this.ui.MinimapRendering += OnMinimapRendering;
+            this.ui.MouseMoved += OnViewportMouseMoved;
+            this.ui.MouseButton += OnViewportMouseButton;
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
@@ -131,6 +139,11 @@ namespace Orion.Game.Main
             graphics.DrawGui();
         }
 
+        private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)
+        {
+            camera.Target = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
+        }
+
         private void OnMinimapRendering(MatchUI2 sender, Region rectangle)
         {
             if (rectangle.Area == 0) return;
@@ -149,6 +162,32 @@ namespace Orion.Game.Main
             graphics.Context.Stroke(camera.ViewBounds, Colors.Red);
 
             graphics.Context.ProjectionBounds = previousProjectionBounds;
+        }
+
+        private bool OnViewportMouseMoved(Control sender, MouseState mouseState)
+        {
+            Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
+            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.None, 0, 0);
+            userInputManager.HandleMouseMove(args);
+            return true;
+        }
+
+        private bool OnViewportMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)
+        {
+            Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
+
+            Input.MouseButton inputButton;
+            if (button == MouseButtons.Left) inputButton = Input.MouseButton.Left;
+            else if (button == MouseButtons.Middle) inputButton = Input.MouseButton.Middle;
+            else if (button == MouseButtons.Right) inputButton = Input.MouseButton.Right;
+            else return false;
+
+            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, inputButton, pressCount, 0);
+
+            if (pressCount == 0) userInputManager.HandleMouseUp(args);
+            else userInputManager.HandleMouseDown(args);
+
+            return true;
         }
 
         public override void Dispose()

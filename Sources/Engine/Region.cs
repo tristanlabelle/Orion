@@ -269,6 +269,17 @@ namespace Orion.Engine
         }
 
         /// <summary>
+        /// Gets the coordinates of a point in this rectangle's coordinate system,
+        /// where (0,0) is the minimum corner and (1,1) is the maximum corner.
+        /// </summary>
+        /// <param name="point">The point to be normalized.</param>
+        /// <returns>The resulting normalized point.</returns>
+        public Vector2 Normalize(Point point)
+        {
+            return new Vector2((point.X - MinX) / (float)Width, (point.Y - MinY) / (float)Height);
+        }
+
+        /// <summary>
         /// Tests for equality with another instance.
         /// </summary>
         /// <param name="other">The instance to be tested with.</param>

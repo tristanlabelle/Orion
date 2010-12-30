@@ -7,6 +7,9 @@ using Orion.Game.Presentation.Renderers;
 using Orion.Engine;
 using Orion.Engine.Gui2.Adornments;
 using System.Globalization;
+using OpenTK;
+using MouseButtons = System.Windows.Forms.MouseButtons;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -24,6 +27,7 @@ namespace Orion.Game.Presentation.Gui
         private ContentControl selectionInfoPanel;
 
         private Point scrollDirection;
+        private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
         #endregion
 
         #region Constructors
@@ -42,6 +46,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when the view gets moved using the minimap.
+        /// The parameter specifies the new world position of the camera,
+        /// normalized between (0,0) and (1,1).
+        /// </summary>
+        public event Action<MatchUI2, Vector2> MinimapCameraMoved;
+
         /// <summary>
         /// Raised when the minimap should be rendered.
         /// </summary>
@@ -95,21 +106,42 @@ namespace Orion.Game.Presentation.Gui
         protected override void OnManagerChanged(UIManager previousManager)
         {
             if (previousManager != null) previousManager.Updated -= updatedEventHandler;
-            if (Manager != null) Manager.Updated += updatedEventHandler;
+            if (Manager != null)
+            {
+                Manager.Updated += updatedEventHandler;
+                AcquireKeyboardFocus();
+            }
+        }
+
+        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        {
+            if (key == Keys.Left) isLeftPressed = pressed;
+            if (key == Keys.Right) isRightPressed = pressed;
+            if (key == Keys.Up) isUpPressed = pressed;
+            if (key == Keys.Down) isDownPressed = pressed;
+
+            UpdateScrollDirection();
+
+            return true;
         }
 
         private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
+            UpdateScrollDirection();
+        }
+
+        private void UpdateScrollDirection()
+        {
             Region rectangle = Rectangle;
-            Point mousePosition = sender.MouseState.Position;
+            Point mousePosition = Manager.MouseState.Position;
 
             int scrollX = 0;
-            if (mousePosition.X == 0) scrollX = -1;
-            else if (mousePosition.X == rectangle.ExclusiveMaxX - 1) scrollX = 1;
+            if (mousePosition.X == 0 || isLeftPressed) scrollX += -1;
+            if (mousePosition.X == rectangle.ExclusiveMaxX - 1 || isRightPressed) scrollX += 1;
 
             int scrollY = 0;
-            if (mousePosition.Y == 0) scrollY = -1;
-            else if (mousePosition.Y == rectangle.ExclusiveMaxY - 1) scrollY = 1;
+            if (mousePosition.Y == 0 || isDownPressed) scrollY += -1;
+            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isUpPressed) scrollY += 1;
 
             scrollDirection = new Point(scrollX, scrollY);
         }
@@ -200,8 +232,48 @@ namespace Orion.Game.Presentation.Gui
         private Control CreateMinimapViewport()
         {
             ViewportBox minimapBox = new ViewportBox();
+            minimapBox.MouseButton += OnMinimapMouseButton;
+            minimapBox.MouseMoved += OnMinimapMouseMoved;
             minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
+
             return minimapBox;
+        }
+
+        private bool OnMinimapMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)
+        {
+            if (button == MouseButtons.Left)
+            {
+                if (pressCount > 0)
+                {
+                    sender.AcquireMouseCapture();
+                    MoveMinimapCamera(sender.Rectangle, mouseState.Position);
+                }
+                else
+                {
+                    sender.ReleaseMouseCapture();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool OnMinimapMouseMoved(Control sender, MouseState mouseState)
+        {
+            if (sender.HasMouseCapture)
+            {
+                MoveMinimapCamera(sender.Rectangle, mouseState.Position);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void MoveMinimapCamera(Region rectangle, Point position)
+        {
+            Vector2 normalizedPosition = rectangle.Normalize(rectangle.Clamp(position));
+            MinimapCameraMoved.Raise(this, normalizedPosition);
         }
         #endregion
     }

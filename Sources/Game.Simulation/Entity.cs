@@ -6,6 +6,8 @@ using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -20,6 +22,8 @@ namespace Orion.Game.Simulation
         private readonly World world;
         private readonly Handle handle;
         private bool isDead;
+
+        private readonly List<Component> components = new List<Component>();
         #endregion
 
         #region Constructors
@@ -155,6 +159,47 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
+        #region Components
+        public bool HasComponent<T>() where T : Component
+        {
+            return components.OfType<T>().Count() > 0;
+        }
+
+        public T GetComponent<T>() where T : Component
+        {
+            return components.OfType<T>().First();
+        }
+
+        public T GetComponentOrNull<T>() where T : Component
+        {
+            return components.OfType<T>().FirstOrDefault();
+        }
+
+        public IEnumerable<Component> GetComponents()
+        {
+            return components;
+        }
+
+        public void AddComponent(Component component)
+        {
+            Type componentType = component.GetType();
+            if (components.Count(c => c.GetType() == componentType) > 0)
+                throw new ArgumentException("component");
+            components.Add(component);
+        }
+
+        public void RemoveComponent<T>() where T : Component
+        {
+            Component instance = GetComponent<T>();
+            components.Remove(instance);
+        }
+
+        public float GetStat(EntityStat stat)
+        {
+            return components.Sum(c => c.GetStatBonus(stat));
+        }
+        #endregion
+
         public sealed override int GetHashCode()
         {
             return handle.GetHashCode();
@@ -165,7 +210,7 @@ namespace Orion.Game.Simulation
             return "Entity {0}".FormatInvariant(handle);
         }
 
-        protected void Die()
+        public void Die()
         {
             if (isDead)
             {

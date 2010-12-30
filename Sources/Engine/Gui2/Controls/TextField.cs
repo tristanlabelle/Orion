@@ -228,7 +228,7 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        protected internal override bool OnCharacter(char character)
+        protected internal override bool OnCharacterTyped(char character)
         {
             if (!"\b\r\t\n".Contains(character))
             {

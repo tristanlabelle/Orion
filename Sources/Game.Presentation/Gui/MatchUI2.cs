@@ -179,10 +179,7 @@ namespace Orion.Game.Presentation.Gui
             dockPanel.Dock(minimapBoxContainer, Direction.MinX);
             minimapBoxContainer.SetSize(200, 200);
             minimapBoxContainer.Padding = new Borders(6);
-
-            ViewportBox minimapBox = new ViewportBox();
-            minimapBoxContainer.Content = minimapBox;
-            minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
+            minimapBoxContainer.Content = CreateMinimapViewport();
 
             Control actionPanel = style.CreateLabel("Placeholder");
             dockPanel.Dock(actionPanel, Direction.MaxX);
@@ -198,6 +195,13 @@ namespace Orion.Game.Presentation.Gui
             };
 
             return container;
+        }
+
+        private Control CreateMinimapViewport()
+        {
+            ViewportBox minimapBox = new ViewportBox();
+            minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
+            return minimapBox;
         }
         #endregion
     }

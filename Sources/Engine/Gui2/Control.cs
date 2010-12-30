@@ -54,6 +54,43 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Events
+        private HandleableEvent<Func<Control, MouseState, bool>> mouseMovedEvent;
+        public event Func<Control, MouseState, bool> MouseMoved
+        {
+            add { mouseMovedEvent.AddHandler(value); }
+            remove { mouseMovedEvent.RemoveHandler(value); }
+        }
+
+        private HandleableEvent<Func<Control, MouseState, MouseButtons, int, bool>> mouseButtonEvent;
+        public event Func<Control, MouseState, MouseButtons, int, bool> MouseButton
+        {
+            add { mouseButtonEvent.AddHandler(value); }
+            remove { mouseButtonEvent.RemoveHandler(value); }
+        }
+
+        private HandleableEvent<Func<Control, MouseState, float, bool>> mouseWheelEvent;
+        public event Func<Control, MouseState, float, bool> MouseWheel
+        {
+            add { mouseWheelEvent.AddHandler(value); }
+            remove { mouseWheelEvent.RemoveHandler(value); }
+        }
+
+        private HandleableEvent<Func<Control, Keys, bool, bool>> keyEvent;
+        public event Func<Control, Keys, bool, bool> Key
+        {
+            add { keyEvent.AddHandler(value); }
+            remove { keyEvent.RemoveHandler(value); }
+        }
+
+        private HandleableEvent<Func<Control, char, bool>> characterTypedEvent;
+        public event Func<Control, char, bool> CharacterTyped
+        {
+            add { characterTypedEvent.AddHandler(value); }
+            remove { characterTypedEvent.RemoveHandler(value); }
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the <see cref="UIManager"/> at the root of this UI hierarchy.
@@ -742,7 +779,7 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
-        #region Event Handling
+        #region Input Events
         protected virtual bool PropagateMouseEvent(
             MouseEventType type, MouseState state, MouseButtons button, float value)
         {
@@ -765,7 +802,7 @@ namespace Orion.Engine.Gui2
             return child.PropagateMouseEvent(type, state, button, value);
         }
 
-        internal bool OnMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
+        protected internal bool OnMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
         {
             switch (type)
             {
@@ -783,7 +820,7 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseMove(MouseState state)
         {
-            return false;
+            return mouseMovedEvent.Raise(this, state);
         }
 
         /// <summary>
@@ -797,7 +834,7 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
-            return false;
+            return mouseButtonEvent.Raise(this, state, button, pressCount);
         }
 
         /// <summary>
@@ -808,7 +845,7 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnMouseWheel(MouseState state, float amount)
         {
-            return false;
+            return mouseWheelEvent.Raise(this, state, amount);
         }
 
         /// <summary>
@@ -820,7 +857,7 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         protected internal virtual bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
-            return false;
+            return keyEvent.Raise(this, key | modifiers, pressed);
         }
 
         /// <summary>
@@ -828,7 +865,10 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnCharacter(char character) { return false; }
+        protected internal virtual bool OnCharacterTyped(char character)
+        {
+            return characterTypedEvent.Raise(this, character);
+        }
 
         /// <summary>
         /// Invoked when the mouse cursor enters this <see cref="Control"/>.

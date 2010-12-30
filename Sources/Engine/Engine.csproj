@@ -143,6 +143,7 @@
     <Compile Include="Gui2\Adornments\TextureAdornment.cs" />
     <Compile Include="Gui2\Adornments\TilingTextureAdornment.cs" />
     <Compile Include="Gui2\Alignment.cs" />
+    <Compile Include="Gui2\HandleableEvent.cs" />
     <Compile Include="Gui2\Controls\Button.cs" />
     <Compile Include="Gui2\Controls\CheckBox.cs" />
     <Compile Include="Gui2\ContentControl.cs" />

@@ -354,7 +354,7 @@ namespace Orion.Engine.Gui2
 
             Arrange();
 
-            return keyboardFocusedControl.OnCharacter(character);
+            return keyboardFocusedControl.OnCharacterTyped(character);
         }
 
         public bool InjectInputEvent(Input.InputEvent @event)

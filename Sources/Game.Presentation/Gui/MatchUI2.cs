@@ -25,6 +25,7 @@ namespace Orion.Game.Presentation.Gui
         private Label alageneAmountLabel;
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
+        private TextField chatTextField;
 
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
@@ -38,8 +39,10 @@ namespace Orion.Game.Presentation.Gui
             updatedEventHandler = OnGuiUpdated;
 
             DockPanel mainDockPanel = style.Create<DockPanel>();
+            mainDockPanel.LastChildFill = true;
             mainDockPanel.Dock(CreateTopBar(style), Direction.MaxY);
             mainDockPanel.Dock(CreateBottomBar(style), Direction.MinY);
+            mainDockPanel.Dock(CreateChatOverlays(style), Direction.MinY);
 
             Content = mainDockPanel;
         }
@@ -57,6 +60,11 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the minimap should be rendered.
         /// </summary>
         public event Action<MatchUI2, Region> MinimapRendering;
+
+        /// <summary>
+        /// Raised when the user has submitted text using the chat.
+        /// </summary>
+        public event Action<MatchUI2, string> Chatted;
         #endregion
 
         #region Properties
@@ -100,6 +108,12 @@ namespace Orion.Game.Presentation.Gui
         {
             get { return scrollDirection; }
         }
+
+        public int InactiveWorkerCount
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
         #endregion
 
         #region Methods
@@ -115,6 +129,13 @@ namespace Orion.Game.Presentation.Gui
 
         protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
+            if (key == Keys.Enter && pressed)
+            {
+                chatTextField.Visibility = Visibility.Visible;
+                chatTextField.AcquireKeyboardFocus();
+                return true;
+            }
+
             if (key == Keys.Left) isLeftPressed = pressed;
             if (key == Keys.Right) isRightPressed = pressed;
             if (key == Keys.Up) isUpPressed = pressed;
@@ -237,6 +258,40 @@ namespace Orion.Game.Presentation.Gui
             minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
 
             return minimapBox;
+        }
+
+        private Control CreateChatOverlays(OrionGuiStyle style)
+        {
+            DockPanel dockPanel = new DockPanel();
+
+            chatTextField = style.Create<TextField>();
+            dockPanel.Dock(chatTextField, Direction.MinY);
+            chatTextField.TextColor = Colors.White;
+            chatTextField.HorizontalAlignment = Alignment.Min;
+            chatTextField.Width = 500;
+            chatTextField.Visibility = Visibility.Hidden;
+            chatTextField.Key += OnChatTextFieldKey;
+
+            return dockPanel;
+        }
+
+        private bool OnChatTextFieldKey(Control sender, Keys key, bool pressed)
+        {
+            if ((key == Keys.Enter || key == Keys.Escape) && pressed)
+            {
+                string chattedText = chatTextField.Text;
+
+                AcquireKeyboardFocus();
+                chatTextField.Text = string.Empty;
+                chatTextField.Visibility = Visibility.Hidden;
+
+                if (key == Keys.Enter && !string.IsNullOrEmpty(chattedText))
+                    Chatted.Raise(this, chattedText);
+
+                return true;
+            }
+
+            return false;
         }
 
         private bool OnMinimapMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)

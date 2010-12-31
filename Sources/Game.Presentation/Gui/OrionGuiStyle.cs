@@ -172,6 +172,12 @@ namespace Orion.Game.Presentation.Gui
             label.MinHeight = (int)font.GetHeight();
         }
 
+        private void ApplySpecificStyle(TextField textField)
+        {
+            textField.Font = font;
+            textField.MinHeight = (int)font.GetHeight();
+        }
+
         private void ApplySpecificStyle(Button button)
         {
             Texture upTexture = GetGuiTexture("Button_Up");

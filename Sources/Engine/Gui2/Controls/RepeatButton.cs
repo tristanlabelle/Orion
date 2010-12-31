@@ -63,7 +63,7 @@ namespace Orion.Engine.Gui2
             Clicked.Raise(this, 1);
         }
 
-        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
             {

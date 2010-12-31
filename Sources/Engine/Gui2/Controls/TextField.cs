@@ -7,6 +7,7 @@ using Orion.Engine.Graphics;
 using Orion.Engine.Input;
 using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using System.Drawing;
 
 namespace Orion.Engine.Gui2
 {
@@ -26,6 +27,10 @@ namespace Orion.Engine.Gui2
         /// </summary>
         private int relativeSelectionLength;
         private bool isEditable = true;
+        private Font font;
+        private ColorRgba textColor = Colors.Black;
+        private ColorRgba caretColor = Colors.Black;
+        private int caretWidth = System.Windows.Forms.SystemInformation.CaretWidth;
         #endregion
 
         #region Constructors
@@ -127,6 +132,24 @@ namespace Orion.Engine.Gui2
                 if (!isEditable && HasKeyboardFocus) Manager.KeyboardFocusedControl = null;
             }
         }
+
+        /// <summary>
+        /// Accesses the font of the text in this <see cref="TextField"/>.
+        /// </summary>
+        public Font Font
+        {
+            get { return font; }
+            set { font = value; }
+        }
+
+        /// <summary>
+        /// Accesses the color of the (unselected) text in this <see cref="TextField"/>.
+        /// </summary>
+        public ColorRgba TextColor
+        {
+            get { return textColor; }
+            set { textColor = value; }
+        }
         #endregion
 
         #region Methods
@@ -144,9 +167,20 @@ namespace Orion.Engine.Gui2
             return Size.Zero;
         }
 
+        protected internal override void Draw()
+        {
+            var options = new TextRenderingOptions
+            {
+                Font = font,
+                Color = textColor,
+                Origin = Rectangle.Min
+            };
+            Renderer.DrawText(text, ref options);
+        }
+
         protected override void ArrangeChildren() { }
 
-        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left && pressCount > 0 && isEditable)
             {
@@ -158,44 +192,42 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
-            switch (key | modifiers)
+            if (!pressed) return true;
+
+            Keys modifiedKey = key | modifiers;
+            switch (modifiedKey)
             {
                 case Keys.Left:
-                    if (!pressed) return true;
                     if (HasSelection)
                     {
                         caretIndex = SelectionStartIndex;
                         relativeSelectionLength = 0;
                     }
                     else if (caretIndex > 0) --caretIndex;
-                    return true;
+                    break;
 
                 case Keys.Right:
-                    if (!pressed) return true;
                     if (HasSelection)
                     {
                         caretIndex = SelectionEndIndex;
                         relativeSelectionLength = 0;
                     }
                     else if (caretIndex < text.Length) ++caretIndex;
-                    return true;
+                    break;
 
                 case Keys.Home:
-                    if (!pressed) return true;
                     caretIndex = 0;
                     relativeSelectionLength = 0;
-                    return true;
+                    break;
 
                 case Keys.End:
-                    if (!pressed) return true;
                     caretIndex = text.Length;
                     relativeSelectionLength = 0;
-                    return true;
+                    break;
 
                 case Keys.Back:
-                    if (!pressed) return true;
                     if (HasSelection)
                     {
                         Text = text.Substring(0, SelectionStartIndex) + text.Substring(SelectionEndIndex);
@@ -207,10 +239,9 @@ namespace Orion.Engine.Gui2
                         Text = text.Substring(0, caretIndex - 1) + text.Substring(caretIndex);
                         --caretIndex;
                     }
-                    return true;
+                    break;
 
                 case Keys.Delete:
-                    if (!pressed) return true;
                     if (HasSelection)
                     {
                         Text = text.Substring(0, SelectionStartIndex) + text.Substring(SelectionEndIndex);
@@ -221,14 +252,13 @@ namespace Orion.Engine.Gui2
                     {
                         Text = text.Substring(0, caretIndex) + text.Substring(caretIndex + 1);
                     }
-                    return true;
-
-                default:
-                    return false;
+                    break;
             }
+
+            return true;
         }
 
-        protected internal override bool OnCharacterTyped(char character)
+        protected override bool OnCharacterTyped(char character)
         {
             if (!"\b\r\t\n".Contains(character))
             {

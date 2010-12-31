@@ -793,7 +793,7 @@ namespace Orion.Engine.Gui2
                 }
             }
 
-            return OnMouseEvent(type, state, button, value);
+            return HandleMouseEvent(type, state, button, value);
         }
 
         protected bool PropagateMouseEventToChild(Control child,
@@ -802,15 +802,48 @@ namespace Orion.Engine.Gui2
             return child.PropagateMouseEvent(type, state, button, value);
         }
 
-        protected internal bool OnMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
+        protected internal bool HandleMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
         {
             switch (type)
             {
-                case MouseEventType.Move: return OnMouseMove(state) || IsMouseEventSink;
-                case MouseEventType.Button: return OnMouseButton(state, button, (int)value) || IsMouseEventSink;
-                case MouseEventType.Wheel: return OnMouseWheel(state, value) || IsMouseEventSink;
+                case MouseEventType.Move: return HandleMouseMoved(state);
+                case MouseEventType.Button: return HandleMouseButton(state, button, (int)value);
+                case MouseEventType.Wheel: return HandleMouseWheel(state, value);
                 default: throw new InvalidEnumArgumentException("type", (int)type, typeof(MouseEventType));
             }
+        }
+
+        protected internal bool HandleMouseMoved(MouseState state)
+        {
+            return OnMouseMoved(state)
+                | mouseMovedEvent.Raise(this, state)
+                | IsMouseEventSink;
+        }
+
+        protected internal bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        {
+            return OnMouseButton(state, button, pressCount)
+                | mouseButtonEvent.Raise(this, state, button, pressCount)
+                | IsMouseEventSink;
+        }
+
+        protected internal bool HandleMouseWheel(MouseState state, float amount)
+        {
+            return OnMouseWheel(state, amount)
+                | mouseWheelEvent.Raise(this, state, amount)
+                | IsMouseEventSink;
+        }
+
+        protected internal bool HandleKey(Keys key, Keys modifiers, bool pressed)
+        {
+            return OnKey(key, modifiers, pressed)
+                | keyEvent.Raise(this, key | modifiers, pressed);
+        }
+
+        protected internal bool HandleCharacterTyped(char character)
+        {
+            return OnCharacterTyped(character)
+                | characterTypedEvent.Raise(this, character);
         }
 
         /// <summary>
@@ -818,10 +851,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="state">The current state of the mouse.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnMouseMove(MouseState state)
-        {
-            return mouseMovedEvent.Raise(this, state);
-        }
+        protected virtual bool OnMouseMoved(MouseState state) { return false; }
 
         /// <summary>
         /// When overriden in a derived class, handles a mouse button event.
@@ -832,10 +862,7 @@ namespace Orion.Engine.Gui2
         /// The number of successive presses of the button, or <c>0</c> if the button was released.
         /// </param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
-        {
-            return mouseButtonEvent.Raise(this, state, button, pressCount);
-        }
+        protected virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount) { return false; }
 
         /// <summary>
         /// When overriden in a derived class, handles a mouse wheel event.
@@ -843,10 +870,7 @@ namespace Orion.Engine.Gui2
         /// <param name="state">The current state of the mouse.</param>
         /// <param name="amount">The amount the mouse wheel was moved, in notches.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnMouseWheel(MouseState state, float amount)
-        {
-            return mouseWheelEvent.Raise(this, state, amount);
-        }
+        protected virtual bool OnMouseWheel(MouseState state, float amount) { return false; }
 
         /// <summary>
         /// Gives a chance to this <see cref="Control"/> to handle a key event.
@@ -855,20 +879,14 @@ namespace Orion.Engine.Gui2
         /// <param name="modifiers">The modifier keys which are currently pressed.</param>
         /// <param name="pressed">A value indicating if the key was pressed or released.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnKey(Keys key, Keys modifiers, bool pressed)
-        {
-            return keyEvent.Raise(this, key | modifiers, pressed);
-        }
+        protected virtual bool OnKey(Keys key, Keys modifiers, bool pressed) { return false; }
 
         /// <summary>
         /// Gives a chance to this <see cref="Control"/>to handle a character event.
         /// </summary>
         /// <param name="character">The character that was pressed.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected internal virtual bool OnCharacterTyped(char character)
-        {
-            return characterTypedEvent.Raise(this, character);
-        }
+        protected virtual bool OnCharacterTyped(char character) { return false; }
 
         /// <summary>
         /// Invoked when the mouse cursor enters this <see cref="Control"/>.

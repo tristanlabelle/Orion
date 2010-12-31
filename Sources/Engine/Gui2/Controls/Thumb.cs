@@ -52,7 +52,7 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren() { }
 
-        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
             {
@@ -75,7 +75,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool OnMouseMove(MouseState state)
+        protected override bool OnMouseMoved(MouseState state)
         {
             if (IsDragged)
             {

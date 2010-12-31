@@ -62,6 +62,7 @@ namespace Orion.Game.Main
             this.ui.MinimapRendering += OnMinimapRendering;
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
+            this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);

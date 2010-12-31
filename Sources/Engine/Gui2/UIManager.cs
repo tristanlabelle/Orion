@@ -300,7 +300,7 @@ namespace Orion.Engine.Gui2
             // regardless of if they are in its client area.
             if (mouseCapturedControl != null)
             {
-                bool handled = mouseCapturedControl.OnMouseEvent(type, mouseState, button, amount);
+                bool handled = mouseCapturedControl.HandleMouseEvent(type, mouseState, button, amount);
                 if (handled) return true;
             }
 
@@ -335,7 +335,7 @@ namespace Orion.Engine.Gui2
             Control handler = keyboardFocusedControl;
             do
             {
-                if (handler.OnKey(key, keyAndModifiers & Keys.Modifiers, pressed))
+                if (handler.HandleKey(key, keyAndModifiers & Keys.Modifiers, pressed))
                     return true;
                 handler = handler.Parent;
             } while (handler != null);
@@ -354,7 +354,7 @@ namespace Orion.Engine.Gui2
 
             Arrange();
 
-            return keyboardFocusedControl.OnCharacterTyped(character);
+            return keyboardFocusedControl.HandleCharacterTyped(character);
         }
 
         public bool InjectInputEvent(Input.InputEvent @event)

@@ -82,7 +82,7 @@ namespace Orion.Engine.Gui2
             if (Clicked != null) Clicked(this);
         }
 
-        protected internal override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
         {
             if (key == Keys.Enter && modifiers == Keys.None)
             {
@@ -93,7 +93,7 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected internal override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
             if (button == MouseButtons.Left)
             {

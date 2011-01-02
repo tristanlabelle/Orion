@@ -10,6 +10,7 @@ using System.Globalization;
 using OpenTK;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using Keys = System.Windows.Forms.Keys;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -28,6 +29,7 @@ namespace Orion.Game.Presentation.Gui
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
+        private UniformGridPanel actionButtonGrid;
 
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
@@ -74,6 +76,12 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the user has submitted text using the chat.
         /// </summary>
         public event Action<MatchUI2, string> Chatted;
+
+        /// <summary>
+        /// Raised when one of the action buttons gets clicked.
+        /// The parameters specify the row and column indices of the button.
+        /// </summary>
+        public event Action<MatchUI2, int, int> ActionButtonClicked;
         #endregion
 
         #region Properties
@@ -93,6 +101,33 @@ namespace Orion.Game.Presentation.Gui
         {
             get { return int.Parse(alageneAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
             set { alageneAmountLabel.Text = value.ToStringInvariant(); }
+        }
+
+        /// <summary>
+        /// Accesses the displayed amount of used food.
+        /// </summary>
+        public int UsedFoodAmount
+        {
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
+            set { foodAmountLabel.Text = value + "/" + FoodLimit; }
+        }
+
+        /// <summary>
+        /// Accesses the displayed food limit.
+        /// </summary>
+        public int FoodLimit
+        {
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[1]); }
+            set { foodAmountLabel.Text = UsedFoodAmount + "/" + value; }
+        }
+
+        /// <summary>
+        /// Accesses the displayed number of inactive workers.
+        /// </summary>
+        public int InactiveWorkerCount
+        {
+            get { return int.Parse(inactiveWorkerCountLabel.Text); }
+            set { inactiveWorkerCountLabel.Text = value.ToStringInvariant(); }
         }
 
         /// <summary>
@@ -116,24 +151,6 @@ namespace Orion.Game.Presentation.Gui
         public Point ScrollDirection
         {
             get { return scrollDirection; }
-        }
-
-        public int UsedFoodAmount
-        {
-            get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
-            set { foodAmountLabel.Text = value + "/" + FoodLimit; }
-        }
-
-        public int FoodLimit
-        {
-            get { return int.Parse(foodAmountLabel.Text.Split('/')[1]); }
-            set { foodAmountLabel.Text = UsedFoodAmount + "/" + value; }
-        }
-
-        public int InactiveWorkerCount
-        {
-            get { return int.Parse(inactiveWorkerCountLabel.Text); }
-            set { inactiveWorkerCountLabel.Text = value.ToStringInvariant(); }
         }
         #endregion
 
@@ -266,9 +283,9 @@ namespace Orion.Game.Presentation.Gui
             minimapBoxContainer.Padding = new Borders(6);
             minimapBoxContainer.Content = CreateMinimapViewport();
 
-            Control actionPanel = style.CreateLabel("Placeholder");
-            dockPanel.Dock(actionPanel, Direction.MaxX);
-            actionPanel.SetSize(200, 200);
+            actionButtonGrid = CreateActionButtons(style);
+            dockPanel.Dock(actionButtonGrid, Direction.MaxX);
+            actionButtonGrid.SetSize(200, 200);
 
             selectionInfoPanel = new ContentControl();
             dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
@@ -280,6 +297,26 @@ namespace Orion.Game.Presentation.Gui
             };
 
             return container;
+        }
+
+        private UniformGridPanel CreateActionButtons(OrionGuiStyle style)
+        {
+            UniformGridPanel grid = new UniformGridPanel(3, 3);
+            grid.CellGap = 3;
+
+            for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
+            {
+                for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
+                {
+                    Button actionButton = style.Create<Button>();
+                    grid.Children[rowIndex, columnIndex] = actionButton;
+                    actionButton.Visibility = Visibility.Hidden;
+                    actionButton.Content = new ImageBox();
+                    actionButton.Clicked += OnActionButtonClicked;
+                }
+            }
+
+            return grid;
         }
 
         private Control CreateMinimapViewport()
@@ -372,6 +409,18 @@ namespace Orion.Game.Presentation.Gui
         {
             Vector2 normalizedPosition = rectangle.Normalize(rectangle.Clamp(position));
             MinimapCameraMoved.Raise(this, normalizedPosition);
+        }
+
+        private void OnActionButtonClicked(Button sender)
+        {
+            int rowIndex, columnIndex;
+            if (!actionButtonGrid.Children.Find(sender, out rowIndex, out columnIndex))
+            {
+                Debug.Fail("An action button that wasn't a child of the action button grid was clicked.");
+                return;
+            }
+
+            ActionButtonClicked.Raise(this, rowIndex, columnIndex);
         }
         #endregion
     }

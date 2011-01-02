@@ -17,6 +17,7 @@ using OpenTK;
 using Orion.Engine.Gui2;
 using Input = Orion.Engine.Input;
 using MouseButtons = System.Windows.Forms.MouseButtons;
+using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Main
 {
@@ -34,6 +35,7 @@ namespace Orion.Game.Main
         private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
         private readonly MatchUI2 ui;
+        private readonly WorkerActivityMonitor workerActivityMonitor;
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
         private readonly MatchAudioPresenter audioPresenter;
@@ -66,8 +68,13 @@ namespace Orion.Game.Main
             this.ui.MouseWheel += OnViewportMouseWheel;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
 
+            this.workerActivityMonitor = new WorkerActivityMonitor(localCommander.Faction);
+
             PropertyBinding.BindOneWay(() => localCommander.Faction.AladdiumAmount, () => ui.AladdiumAmount);
             PropertyBinding.BindOneWay(() => localCommander.Faction.AlageneAmount, () => ui.AlageneAmount);
+            PropertyBinding.BindOneWay(() => localCommander.Faction.UsedFoodAmount, () => ui.UsedFoodAmount);
+            PropertyBinding.BindOneWay(() => localCommander.Faction.MaxFoodAmount, () => ui.FoodLimit);
+            PropertyBinding.BindOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.InactiveWorkerCount);
 
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
@@ -197,6 +204,12 @@ namespace Orion.Game.Main
 
         private bool OnViewportMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)
         {
+            if (button == MouseButtons.Left)
+            {
+                if (pressCount > 0) sender.AcquireMouseCapture();
+                else sender.ReleaseMouseCapture();
+            }
+
             Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
 
             Input.MouseButton inputButton;

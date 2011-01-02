@@ -6,6 +6,9 @@ using System.Linq.Expressions;
 
 namespace Orion.Engine.Gui2
 {
+    /// <summary>
+    /// Provides helper methods to bind properties so that their values are kept synchronized.
+    /// </summary>
     public static class PropertyBinding
     {
         public static void BindOneWay<T, U>(Expression<Func<T>> sourcePropertyExpression, Expression<Func<U>> destinationPropertyExpression, Func<T, U> converter = null)
@@ -18,12 +21,8 @@ namespace Orion.Engine.Gui2
 
             if (converter == null) converter = value => (U)Convert.ChangeType(value, typeof(U));
 
-            destination.Set(converter(source.Get()));
-
-            if (source.Bind())
-            {
-                source.ValueChanged += sender => destination.Set(converter(source.Get()));
-            }
+            destination.Value = converter(source.Value);
+            if (source.Bind()) source.ValueChanged += sender => destination.Value = converter(source.Value);
         }
     }
 }

@@ -23,6 +23,8 @@ namespace Orion.Game.Presentation.Gui
 
         private Label aladdiumAmountLabel;
         private Label alageneAmountLabel;
+        private Label foodAmountLabel;
+        private Label inactiveWorkerCountLabel;
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
@@ -116,10 +118,22 @@ namespace Orion.Game.Presentation.Gui
             get { return scrollDirection; }
         }
 
+        public int UsedFoodAmount
+        {
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
+            set { foodAmountLabel.Text = value + "/" + FoodLimit; }
+        }
+
+        public int FoodLimit
+        {
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[1]); }
+            set { foodAmountLabel.Text = UsedFoodAmount + "/" + value; }
+        }
+
         public int InactiveWorkerCount
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return int.Parse(inactiveWorkerCountLabel.Text); }
+            set { inactiveWorkerCountLabel.Text = value.ToStringInvariant(); }
         }
         #endregion
 
@@ -179,7 +193,6 @@ namespace Orion.Game.Presentation.Gui
             ContentControl container = new ContentControl();
             container.IsMouseEventSink = true;
             container.HorizontalAlignment = Alignment.Center;
-            container.Width = 500;
             BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
             container.Adornment = adornment;
             container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
@@ -187,30 +200,22 @@ namespace Orion.Game.Presentation.Gui
             DockPanel dockPanel = style.Create<DockPanel>();
             container.Content = dockPanel;
 
-            ImageBox aladdiumImageBox = new ImageBox();
-            dockPanel.Dock(aladdiumImageBox, Direction.MinX);
-            aladdiumImageBox.Texture = style.GetTexture("Aladdium");
-            aladdiumImageBox.VerticalAlignment = Alignment.Center;
-            aladdiumImageBox.SetSize(30, 30);
-
-            aladdiumAmountLabel = style.CreateLabel("0");
+            dockPanel.Dock(CreateResourceImageBox(style, "Aladdium"), Direction.MinX);
+            aladdiumAmountLabel = CreateResourceLabel(style);
             dockPanel.Dock(aladdiumAmountLabel, Direction.MinX);
-            aladdiumAmountLabel.VerticalAlignment = Alignment.Center;
-            aladdiumAmountLabel.MinXMargin = 5;
-            aladdiumAmountLabel.Color = Colors.White;
 
-            ImageBox alageneImageBox = new ImageBox();
-            dockPanel.Dock(alageneImageBox, Direction.MinX);
-            alageneImageBox.Texture = style.GetTexture("Alagene");
-            alageneImageBox.VerticalAlignment = Alignment.Center;
-            alageneImageBox.SetSize(30, 30);
-            alageneImageBox.MinXMargin = 20;
-
-            alageneAmountLabel = style.CreateLabel("0");
+            dockPanel.Dock(CreateResourceImageBox(style, "Alagene"), Direction.MinX);
+            alageneAmountLabel = CreateResourceLabel(style);
             dockPanel.Dock(alageneAmountLabel, Direction.MinX);
-            alageneAmountLabel.VerticalAlignment = Alignment.Center;
-            alageneAmountLabel.MinXMargin = 5;
-            alageneAmountLabel.Color = Colors.White;
+
+            dockPanel.Dock(CreateResourceImageBox(style, "Gui/Food"), Direction.MinX);
+            foodAmountLabel = CreateResourceLabel(style);
+            dockPanel.Dock(foodAmountLabel, Direction.MinX);
+            foodAmountLabel.Text = "0/0";
+
+            dockPanel.Dock(CreateResourceImageBox(style, "Units/Schtroumpf"), Direction.MinX);
+            inactiveWorkerCountLabel = CreateResourceLabel(style);
+            dockPanel.Dock(inactiveWorkerCountLabel, Direction.MinX);
 
             Button pauseButton = style.CreateTextButton("Pause");
             dockPanel.Dock(pauseButton, Direction.MaxX);
@@ -222,6 +227,26 @@ namespace Orion.Game.Presentation.Gui
             diplomacyButton.MaxXMargin = 10;
 
             return container;
+        }
+
+        private static ImageBox CreateResourceImageBox(OrionGuiStyle style, string textureName)
+        {
+            ImageBox imageBox = new ImageBox();
+            imageBox.Texture = style.GetTexture(textureName);
+            imageBox.VerticalAlignment = Alignment.Center;
+            imageBox.SetSize(30, 30);
+            return imageBox;
+        }
+
+        private static Label CreateResourceLabel(OrionGuiStyle style)
+        {
+            Label label = style.CreateLabel("0");
+            label.VerticalAlignment = Alignment.Center;
+            label.MinXMargin = 5;
+            label.MinWidth = 30;
+            label.Color = Colors.White;
+            label.MaxXMargin = 10;
+            return label;
         }
 
         private Control CreateBottomBar(OrionGuiStyle style)

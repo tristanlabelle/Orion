@@ -80,12 +80,6 @@ namespace Orion.Game.Simulation.Components
             if (currentDamage >= Entity.GetStat(MaxHealthStat))
                 Entity.Die();
         }
-
-        public override void Update(SimulationStep step)
-        {
-            currentDamage -= regenerationRate * step.TimeDeltaInSeconds;
-            if (currentDamage < 0) currentDamage = 0;
-        }
         #endregion
     }
 }

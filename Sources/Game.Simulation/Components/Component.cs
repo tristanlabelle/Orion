@@ -29,9 +29,6 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public virtual void Update(SimulationStep step)
-        { }
-
         public virtual float GetStatBonus(EntityStat stat)
         {
             Type type = GetType();

@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private CollisionLayer collisionLayer;
         private Size size;
-        private Vector2 position;
+        private Vector2 location;
         private float angle;
         private float sightRange;
         #endregion
@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Components
             this.sightRange = sightRange;
             this.collisionLayer = layer;
             this.size = size;
-            this.position = position;
+            this.location = position;
         }
         #endregion
 
@@ -74,9 +74,9 @@ namespace Orion.Game.Simulation.Components
             get { return size.Height; }
         }
 
-        public Vector2 Position
+        public Vector2 Location
         {
-            get { return position; }
+            get { return location; }
             set
             {
                 World world = Entity.World;
@@ -85,9 +85,9 @@ namespace Orion.Game.Simulation.Components
                     Debug.Fail("Position out of bounds.");
                     value = world.Bounds.Clamp(value);
                 }
-                var oldPosition = position;
-                position = value;
-                Moved.Raise(this, oldPosition, position);
+                var oldPosition = location;
+                location = value;
+                Moved.Raise(this, oldPosition, location);
             }
         }
 
@@ -95,13 +95,13 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                return new Vector2(Position.X + Size.Width * 0.5f, Position.Y + Size.Height * 0.5f);
+                return new Vector2(Location.X + Size.Width * 0.5f, Location.Y + Size.Height * 0.5f);
             }
         }
 
         public Rectangle BoundingRectangle
         {
-            get { return new Rectangle(Position.X, Position.Y, Size.Width, Size.Height); }
+            get { return new Rectangle(Location.X, Location.Y, Size.Width, Size.Height); }
         }
 
         public Rectangle CollisionRectangle
@@ -118,7 +118,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
+                Point min = new Point((int)Math.Round(location.X), (int)Math.Round(location.Y));
                 return new Region(min, size);
             }
         }

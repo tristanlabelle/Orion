@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
+using FactionComponent = Orion.Game.Simulation.Components.FactionMembership;
 
 namespace Orion.Game.Simulation
 {
@@ -199,6 +200,15 @@ namespace Orion.Game.Simulation
             return components.Sum(c => c.GetStatBonus(stat));
         }
         #endregion
+
+        internal void RaiseWarning(string warning)
+        {
+            FactionMembership factionComponent = GetComponentOrNull<FactionComponent>();
+            if (factionComponent == null)
+                Debug.WriteLine(warning);
+            else
+                factionComponent.Faction.RaiseWarning(warning);
+        }
 
         public sealed override int GetHashCode()
         {

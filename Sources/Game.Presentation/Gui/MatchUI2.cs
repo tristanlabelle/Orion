@@ -57,6 +57,13 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchUI2, Vector2> MinimapCameraMoved;
 
         /// <summary>
+        /// Raised when the minimap receives a right click.
+        /// The parameter specifies the world position of the click,
+        /// normalized between (0,0) and (1,1).
+        /// </summary>
+        public event Action<MatchUI2, Vector2> MinimapRightClicked;
+
+        /// <summary>
         /// Raised when the minimap should be rendered.
         /// </summary>
         public event Action<MatchUI2, Region> MinimapRendering;
@@ -266,7 +273,8 @@ namespace Orion.Game.Presentation.Gui
 
             chatTextField = style.Create<TextField>();
             dockPanel.Dock(chatTextField, Direction.MinY);
-            chatTextField.TextColor = Colors.White;
+            chatTextField.MinXMargin = 5;
+            chatTextField.MinYMargin = 5;
             chatTextField.HorizontalAlignment = Alignment.Min;
             chatTextField.Width = 500;
             chatTextField.Visibility = Visibility.Hidden;
@@ -306,6 +314,16 @@ namespace Orion.Game.Presentation.Gui
                 else
                 {
                     sender.ReleaseMouseCapture();
+                }
+
+                return true;
+            }
+            else if (button == MouseButtons.Right)
+            {
+                if (pressCount > 0 && sender.IsUnderMouse)
+                {
+                    Vector2 normalizedPosition = sender.Rectangle.Normalize(sender.Rectangle.Clamp(mouseState.Position));
+                    MinimapRightClicked.Raise(this, normalizedPosition);
                 }
 
                 return true;

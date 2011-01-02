@@ -59,9 +59,11 @@ namespace Orion.Game.Main
             this.userInputManager = new UserInputManager(match, localCommander);
             this.ui = new MatchUI2(graphics.GuiStyle);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
+            this.ui.MinimapRightClicked += OnMinimapRightClicked;
             this.ui.MinimapRendering += OnMinimapRendering;
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
+            this.ui.MouseWheel += OnViewportMouseWheel;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
@@ -145,6 +147,15 @@ namespace Orion.Game.Main
             camera.Target = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
         }
 
+        private void OnMinimapRightClicked(MatchUI2 sender, Vector2 normalizedPosition)
+        {
+            Vector2 worldPosition = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
+            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.Right, 1, 0);
+            userInputManager.HandleMouseDown(args);
+            args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.Right, 0, 0);
+            userInputManager.HandleMouseUp(args);
+        }
+
         private void OnMinimapRendering(MatchUI2 sender, Region rectangle)
         {
             if (rectangle.Area == 0) return;
@@ -170,6 +181,13 @@ namespace Orion.Game.Main
             Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
             Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.None, 0, 0);
             userInputManager.HandleMouseMove(args);
+            return true;
+        }
+
+        private bool OnViewportMouseWheel(Control sender, MouseState mouseState, float amount)
+        {
+            if (amount >= 1) camera.ZoomIn();
+            if (amount <= -1) camera.ZoomOut();
             return true;
         }
 

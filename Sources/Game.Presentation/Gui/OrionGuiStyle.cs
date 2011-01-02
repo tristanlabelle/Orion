@@ -78,17 +78,19 @@ namespace Orion.Game.Presentation.Gui
 
         public override void DrawSprite(ref GuiSprite sprite)
         {
-            Rectangle normalizedTextureRectangle = Rectangle.Empty;
-            if (sprite.Texture != null)
+            if (sprite.Texture == null)
             {
-                normalizedTextureRectangle = new Rectangle(
+                graphicsContext.Fill(sprite.Rectangle, sprite.Color);
+            }
+            else
+            {
+                Rectangle normalizedTextureRectangle = new Rectangle(
                     sprite.PixelRectangle.MinX / (float)sprite.Texture.Width,
                     sprite.PixelRectangle.MinY / (float)sprite.Texture.Height,
                     sprite.PixelRectangle.Width / (float)sprite.Texture.Width,
                     sprite.PixelRectangle.Height / (float)sprite.Texture.Height);
+                graphicsContext.Fill(sprite.Rectangle, sprite.Texture, normalizedTextureRectangle, sprite.Color);
             }
-
-            graphicsContext.Fill(sprite.Rectangle, sprite.Texture, normalizedTextureRectangle, sprite.Color);
         }
         #endregion
 
@@ -169,20 +171,22 @@ namespace Orion.Game.Presentation.Gui
         private void ApplySpecificStyle(Label label)
         {
             label.Font = font;
-            label.MinHeight = (int)font.GetHeight();
         }
 
         private void ApplySpecificStyle(TextField textField)
         {
+            OrionTextFieldAdornment adornment = OrionTextFieldAdornment.Instance;
+            textField.Adornment = adornment;
+            textField.Padding = adornment.Padding;
             textField.Font = font;
-            textField.MinHeight = (int)font.GetHeight();
+            textField.TextColor = Colors.Black;
         }
 
         private void ApplySpecificStyle(Button button)
         {
             Texture upTexture = GetGuiTexture("Button_Up");
 
-            var adornment = new OrionButtonAdornment(button, this);
+            var adornment = new OrionButtonAdornment(this);
             button.Adornment = adornment;
             button.Padding = adornment.Padding;
             button.MinSize = adornment.MinSize;

@@ -58,6 +58,21 @@ namespace Orion.Engine.Gui2
         /// <param name="sprite">The sprite to be drawn.</param>
         public abstract void DrawSprite(ref GuiSprite sprite);
 
+        /// <summary>
+        /// Draws a uniformly colored filled rectangle.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to be filled.</param>
+        /// <param name="color">The color to fill the rectangle with.</param>
+        public void DrawRectangle(Region rectangle, ColorRgba color)
+        {
+            var sprite = new GuiSprite
+            {
+                Rectangle = rectangle,
+                Color = color
+            };
+            DrawSprite(ref sprite);
+        }
+
         public void FillNinePart(Region rectangle, Texture texture, ColorRgba color)
         {
             int middleTextureSize = 2;

@@ -14,12 +14,15 @@ namespace Orion.Game.Presentation
     public sealed class Camera
     {
         #region Fields
-        private const float scrollSpeed = 40;
+        private const float defaultTileSizeInPixels = 32;
+        private const float defaultScrollSpeed = 40;
+        private const int maximumZoomLevel = 4;
 
         private Size worldSize;
         private Size viewportSize;
         private Vector2 target;
         private Point scrollDirection;
+        private int zoomLevel;
         #endregion
 
         #region Constructors
@@ -63,18 +66,48 @@ namespace Orion.Game.Presentation
         /// </summary>
         public Rectangle ViewBounds
         {
-            get { return Rectangle.FromCenterSize(target.X, target.Y, viewportSize.Width / 32f, viewportSize.Height / 32f); }
+            get { return Rectangle.FromCenterSize(target.X, target.Y, viewportSize.Width / TileSizeInPixels, viewportSize.Height / TileSizeInPixels); }
+        }
+
+        private int MinimumZoomLevel
+        {
+            get { return (int)Math.Floor(Math.Log(defaultTileSizeInPixels / Math.Min(worldSize.Width, worldSize.Height), 2) * 2); }
+        }
+
+        private float ZoomScale
+        {
+            get { return (float)Math.Pow(2, zoomLevel / 2.0); }
+        }
+
+        private float TileSizeInPixels
+        {
+            get { return ZoomScale * defaultTileSizeInPixels; }
+        }
+
+        private float ScrollSpeed
+        {
+            get { return defaultScrollSpeed / ZoomScale; }
         }
         #endregion
 
         #region Methods
+        public void ZoomIn()
+        {
+            if (zoomLevel < maximumZoomLevel) zoomLevel++;
+        }
+
+        public void ZoomOut()
+        {
+            if (zoomLevel > MinimumZoomLevel) zoomLevel--;
+        }
+
         /// <summary>
         /// Updates this <see cref="Camera"/> for a frame.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the last frame, in seconds.</param>
         public void Update(float timeDeltaInSeconds)
         {
-            target += new Vector2(scrollDirection.X, scrollDirection.Y) * timeDeltaInSeconds * scrollSpeed;
+            target += new Vector2(scrollDirection.X, scrollDirection.Y) * timeDeltaInSeconds * ScrollSpeed;
             target = new Rectangle(worldSize.Width, worldSize.Height).Clamp(target);
         }
 

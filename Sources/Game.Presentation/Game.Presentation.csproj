@@ -105,6 +105,7 @@
     <Compile Include="Gui\OrionGuiStyle.cs" />
     <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />
+    <Compile Include="Gui\OrionTextFieldAdornment.cs" />
     <Compile Include="Gui\Scroller.cs" />
     <Compile Include="ProfanityFilter.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />

@@ -15,19 +15,16 @@ namespace Orion.Game.Presentation.Gui
     public sealed class OrionButtonAdornment : IAdornment
     {
         #region Fields
-        private readonly Button button;
         private readonly Texture upTexture;
         private readonly Texture overTexture;
         private readonly Texture downTexture;
         #endregion
 
         #region Constructors
-        public OrionButtonAdornment(Button button, GuiRenderer renderer)
+        public OrionButtonAdornment(GuiRenderer renderer)
         {
-            Argument.EnsureNotNull(button, "button");
             Argument.EnsureNotNull(renderer, "renderer");
 
-            this.button = button;
             upTexture = renderer.GetTexture("Gui/Button_Up");
             overTexture = renderer.GetTexture("Gui/Button_Over");
             downTexture = renderer.GetTexture("Gui/Button_Down");
@@ -49,7 +46,8 @@ namespace Orion.Game.Presentation.Gui
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            Debug.Assert(control == button);
+            Button button = control as Button;
+            if (button == null) return;
 
             Texture texture;
             if (button.IsUnderMouse)
@@ -60,10 +58,7 @@ namespace Orion.Game.Presentation.Gui
             renderer.FillNinePart(control.Rectangle, texture, Colors.White);
         }
 
-        public void DrawForeground(GuiRenderer renderer, Control control)
-        {
-            Debug.Assert(control == button);
-        }
+        public void DrawForeground(GuiRenderer renderer, Control control) { }
         #endregion
     }
 }

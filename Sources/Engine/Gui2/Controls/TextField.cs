@@ -31,6 +31,7 @@ namespace Orion.Engine.Gui2
         private ColorRgba textColor = Colors.Black;
         private ColorRgba caretColor = Colors.Black;
         private int caretWidth = System.Windows.Forms.SystemInformation.CaretWidth;
+        private Borders padding;
         #endregion
 
         #region Constructors
@@ -67,6 +68,12 @@ namespace Orion.Engine.Gui2
                 if (object.ReferenceEquals(value, text)) return;
 
                 text = value;
+                if (SelectionEndIndex > text.Length)
+                {
+                    caretIndex = text.Length;
+                    relativeSelectionLength = 0;
+                }
+
                 TextChanged.Raise(this);
             }
         }
@@ -139,7 +146,11 @@ namespace Orion.Engine.Gui2
         public Font Font
         {
             get { return font; }
-            set { font = value; }
+            set
+            {
+                font = value;
+                InvalidateMeasure();
+            }
         }
 
         /// <summary>
@@ -149,6 +160,21 @@ namespace Orion.Engine.Gui2
         {
             get { return textColor; }
             set { textColor = value; }
+        }
+
+        /// <summary>
+        /// Accesses the padding between the borders of the <see cref="TextField"/>.
+        /// </summary>
+        public Borders Padding
+        {
+            get { return padding; }
+            set
+            {
+                if (value == padding) return;
+
+                padding = value;
+                InvalidateMeasure();
+            }
         }
         #endregion
 
@@ -164,16 +190,20 @@ namespace Orion.Engine.Gui2
 
         protected override Size MeasureSize()
         {
-            return Size.Zero;
+            int height = font == null ? 0 : (int)Math.Ceiling(font.GetHeight());
+            return new Size(padding.TotalX, padding.TotalY + height);
         }
 
         protected internal override void Draw()
         {
+            Region rectangle = Rectangle;
+            if (rectangle.Width < padding.TotalX || rectangle.Height < padding.TotalY) return;
+
             var options = new TextRenderingOptions
             {
                 Font = font,
                 Color = textColor,
-                Origin = Rectangle.Min
+                Origin = new Point(rectangle.MinX + padding.MinX, rectangle.MinY + padding.MinY)
             };
             Renderer.DrawText(text, ref options);
         }

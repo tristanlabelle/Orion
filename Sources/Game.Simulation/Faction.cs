@@ -21,7 +21,7 @@ namespace Orion.Game.Simulation
     public sealed class Faction
     {
         #region Fields
-        private const int minimumPopulationLimit = 10;
+        private const int minimumFoodAmount = 10;
 
         private readonly Handle handle;
         private readonly World world;
@@ -86,6 +86,9 @@ namespace Orion.Game.Simulation
         /// Raised when a new <see cref="Technology"/> has been researched.
         /// </summary>
         public event Action<Faction, Technology> TechnologyResearched;
+
+        public event Action<Faction> AladdiumAmountChanged;
+        public event Action<Faction> AlageneAmountChanged;
 
         public event Action<Faction, string> Warning;
 
@@ -191,8 +194,10 @@ namespace Orion.Game.Simulation
             get { return aladdiumAmount; }
             set
             {
+                if (value == aladdiumAmount) return;
                 Argument.EnsurePositive(value, "AladdiumAmount");
                 aladdiumAmount = value;
+                AladdiumAmountChanged.Raise(this);
             }
         }
 
@@ -204,14 +209,16 @@ namespace Orion.Game.Simulation
             get { return alageneAmount; }
             set
             {
+                if (value == alageneAmount) return;
                 Argument.EnsurePositive(value, "AlageneAmount");
                 alageneAmount = value;
+                AlageneAmountChanged.Raise(this);
             }
         }
 
         public int MaxFoodAmount
         {
-            get { return Math.Max(Math.Min(world.MaximumFoodAmount, totalFoodAmount), minimumPopulationLimit); }
+            get { return Math.Max(Math.Min(world.MaximumFoodAmount, totalFoodAmount), minimumFoodAmount); }
         }
 
         public int RemainingFoodAmount
@@ -222,7 +229,11 @@ namespace Orion.Game.Simulation
         public int UsedFoodAmount
         {
             get { return usedFoodAmount; }
-            set { usedFoodAmount = value; }
+            set
+            {
+                if (value == usedFoodAmount) return;
+                usedFoodAmount = value;
+            }
         }
         #endregion
         #endregion

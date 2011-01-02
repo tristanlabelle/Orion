@@ -65,6 +65,10 @@ namespace Orion.Game.Main
             this.ui.MouseButton += OnViewportMouseButton;
             this.ui.MouseWheel += OnViewportMouseWheel;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
+
+            PropertyBinding.BindOneWay(() => localCommander.Faction.AladdiumAmount, () => ui.AladdiumAmount);
+            PropertyBinding.BindOneWay(() => localCommander.Faction.AlageneAmount, () => ui.AlageneAmount);
+
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);

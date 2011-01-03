@@ -109,8 +109,8 @@ namespace Orion.Engine.Gui2
 
             int totalRowHeights;
             if (RowCount == 0) totalRowHeights = 0;
-            else if (AreRowsUniformSized) totalRowHeights = desiredColumnWidths.Max() * RowCount;
-            else totalRowHeights = desiredColumnWidths.Sum();
+            else if (AreRowsUniformSized) totalRowHeights = desiredRowHeights.Max() * RowCount;
+            else totalRowHeights = desiredRowHeights.Sum();
 
             int totalColumnWidth;
             if (ColumnCount == 0) totalColumnWidth = 0;

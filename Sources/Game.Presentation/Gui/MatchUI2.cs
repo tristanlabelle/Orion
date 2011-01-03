@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
-using Orion.Game.Presentation.Renderers;
-using Orion.Engine;
-using Orion.Engine.Gui2.Adornments;
-using System.Globalization;
 using OpenTK;
-using MouseButtons = System.Windows.Forms.MouseButtons;
+using Orion.Engine;
+using Orion.Engine.Gui2;
+using Orion.Engine.Gui2.Adornments;
+using Orion.Game.Presentation.Renderers;
 using Keys = System.Windows.Forms.Keys;
-using System.Diagnostics;
+using MouseButtons = System.Windows.Forms.MouseButtons;
+using Orion.Engine.Graphics;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -20,6 +21,7 @@ namespace Orion.Game.Presentation.Gui
     public sealed class MatchUI2 : ContentControl
     {
         #region Fields
+        private readonly OrionGuiStyle style;
         private readonly Action<UIManager, TimeSpan> updatedEventHandler;
 
         private Label aladdiumAmountLabel;
@@ -29,7 +31,8 @@ namespace Orion.Game.Presentation.Gui
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
-        private UniformGridPanel actionButtonGrid;
+        private StackPanel messagesStackPanel;
+        private GridPanel actionButtonGrid;
 
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
@@ -40,15 +43,15 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(style, "style");
 
+            this.style = style;
             updatedEventHandler = OnGuiUpdated;
 
             DockPanel mainDockPanel = style.Create<DockPanel>();
-            mainDockPanel.LastChildFill = true;
-            mainDockPanel.Dock(CreateTopBar(style), Direction.MaxY);
-            mainDockPanel.Dock(CreateBottomBar(style), Direction.MinY);
-            mainDockPanel.Dock(CreateChatOverlays(style), Direction.MinY);
-
             Content = mainDockPanel;
+            mainDockPanel.LastChildFill = true;
+            mainDockPanel.Dock(CreateTopBar(), Direction.MaxY);
+            mainDockPanel.Dock(CreateBottomBar(), Direction.MinY);
+            mainDockPanel.Dock(CreateChatOverlays(), Direction.MinY);
         }
         #endregion
 
@@ -152,9 +155,197 @@ namespace Orion.Game.Presentation.Gui
         {
             get { return scrollDirection; }
         }
+
+        /// <summary>
+        /// Accesses the control which displays information about the selection.
+        /// </summary>
+        public Control SelectionInfoControl
+        {
+            get { return selectionInfoPanel.Content; }
+            set { selectionInfoPanel.Content = value; }
+        }
         #endregion
 
         #region Methods
+        public void AddMessage(string text, ColorRgb color)
+        {
+            Label label = style.CreateLabel(text);
+            label.Color = color;
+            messagesStackPanel.Stack(label);
+        }
+
+        public void SetActionButton(int rowIndex, int columnIndex, Texture texture)
+        {
+            Button button = (Button)actionButtonGrid.Children[rowIndex, columnIndex];
+            button.Visibility = Visibility.Visible;
+            ImageBox imageBox = (ImageBox)button.Content;
+            imageBox.Texture = texture;
+        }
+
+        private void UpdateScrollDirection()
+        {
+            Region rectangle = Rectangle;
+            Point mousePosition = Manager.MouseState.Position;
+
+            int scrollX = 0;
+            if (mousePosition.X == 0 || isLeftPressed) scrollX += -1;
+            if (mousePosition.X == rectangle.ExclusiveMaxX - 1 || isRightPressed) scrollX += 1;
+
+            int scrollY = 0;
+            if (mousePosition.Y == 0 || isDownPressed) scrollY += -1;
+            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isUpPressed) scrollY += 1;
+
+            scrollDirection = new Point(scrollX, scrollY);
+        }
+
+        #region Initialization
+        private Control CreateTopBar()
+        {
+            ContentControl container = new ContentControl();
+            container.IsMouseEventSink = true;
+            container.HorizontalAlignment = Alignment.Center;
+            BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
+            container.Adornment = adornment;
+            container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
+
+            DockPanel dockPanel = style.Create<DockPanel>();
+            container.Content = dockPanel;
+
+            dockPanel.Dock(CreateResourceImageBox("Aladdium"), Direction.MinX);
+            aladdiumAmountLabel = CreateResourceLabel();
+            dockPanel.Dock(aladdiumAmountLabel, Direction.MinX);
+
+            dockPanel.Dock(CreateResourceImageBox("Alagene"), Direction.MinX);
+            alageneAmountLabel = CreateResourceLabel();
+            dockPanel.Dock(alageneAmountLabel, Direction.MinX);
+
+            dockPanel.Dock(CreateResourceImageBox("Gui/Food"), Direction.MinX);
+            foodAmountLabel = CreateResourceLabel();
+            dockPanel.Dock(foodAmountLabel, Direction.MinX);
+            foodAmountLabel.Text = "0/0";
+
+            dockPanel.Dock(CreateResourceImageBox("Units/Schtroumpf"), Direction.MinX);
+            inactiveWorkerCountLabel = CreateResourceLabel();
+            dockPanel.Dock(inactiveWorkerCountLabel, Direction.MinX);
+
+            Button pauseButton = style.CreateTextButton("Pause");
+            dockPanel.Dock(pauseButton, Direction.MaxX);
+            pauseButton.VerticalAlignment = Alignment.Center;
+
+            Button diplomacyButton = style.CreateTextButton("Diplomatie");
+            dockPanel.Dock(diplomacyButton, Direction.MaxX);
+            diplomacyButton.VerticalAlignment = Alignment.Center;
+            diplomacyButton.MaxXMargin = 10;
+
+            return container;
+        }
+
+        private ImageBox CreateResourceImageBox(string textureName)
+        {
+            ImageBox imageBox = new ImageBox();
+            imageBox.Texture = style.GetTexture(textureName);
+            imageBox.VerticalAlignment = Alignment.Center;
+            imageBox.SetSize(30, 30);
+            return imageBox;
+        }
+
+        private Label CreateResourceLabel()
+        {
+            Label label = style.CreateLabel("0");
+            label.VerticalAlignment = Alignment.Center;
+            label.MinXMargin = 5;
+            label.MinWidth = 30;
+            label.Color = Colors.White;
+            label.MaxXMargin = 10;
+            return label;
+        }
+
+        private Control CreateBottomBar()
+        {
+            ContentControl container = new ContentControl();
+            bottomBar = container;
+            container.IsMouseEventSink = true;
+            container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
+
+            DockPanel dockPanel = new DockPanel();
+            container.Content = dockPanel;
+            dockPanel.LastChildFill = true;
+
+            ContentControl minimapBoxContainer = new ContentControl();
+            dockPanel.Dock(minimapBoxContainer, Direction.MinX);
+            minimapBoxContainer.SetSize(200, 200);
+            minimapBoxContainer.Padding = new Borders(6);
+            minimapBoxContainer.Content = CreateMinimapViewport();
+
+            actionButtonGrid = CreateActionButtons();
+            dockPanel.Dock(actionButtonGrid, Direction.MaxX);
+            actionButtonGrid.SetSize(200, 200);
+
+            selectionInfoPanel = new ContentControl();
+            dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
+            selectionInfoPanel.Content = new ImageBox
+            {
+                Texture = style.GetTexture("Gui/Carving"),
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+            };
+
+            return container;
+        }
+
+        private GridPanel CreateActionButtons()
+        {
+            GridPanel grid = new GridPanel(3, 3);
+            grid.AreColumnsUniformSized = true;
+            grid.AreRowsUniformSized = true;
+            grid.CellGap = 3;
+
+            for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
+            {
+                for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
+                {
+                    Button actionButton = style.Create<Button>();
+                    grid.Children[rowIndex, columnIndex] = actionButton;
+                    actionButton.Visibility = Visibility.Hidden;
+                    actionButton.Content = new ImageBox();
+                    actionButton.Clicked += OnActionButtonClicked;
+                }
+            }
+
+            return grid;
+        }
+
+        private Control CreateMinimapViewport()
+        {
+            ViewportBox minimapBox = new ViewportBox();
+            minimapBox.MouseButton += OnMinimapMouseButton;
+            minimapBox.MouseMoved += OnMinimapMouseMoved;
+            minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
+
+            return minimapBox;
+        }
+
+        private Control CreateChatOverlays()
+        {
+            DockPanel dockPanel = new DockPanel();
+
+            chatTextField = style.Create<TextField>();
+            dockPanel.Dock(chatTextField, Direction.MinY);
+            chatTextField.MinXMargin = 5;
+            chatTextField.MinYMargin = 5;
+            chatTextField.HorizontalAlignment = Alignment.Min;
+            chatTextField.Width = 500;
+            chatTextField.Visibility = Visibility.Hidden;
+            chatTextField.Key += OnChatTextFieldKey;
+
+            messagesStackPanel = new StackPanel();
+            dockPanel.Dock(messagesStackPanel, Direction.MinY);
+
+            return dockPanel;
+        }
+        #endregion
+
+        #region Event Handling
         protected override void OnManagerChanged(UIManager previousManager)
         {
             if (previousManager != null) previousManager.Updated -= updatedEventHandler;
@@ -187,162 +378,6 @@ namespace Orion.Game.Presentation.Gui
         private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
             UpdateScrollDirection();
-        }
-
-        private void UpdateScrollDirection()
-        {
-            Region rectangle = Rectangle;
-            Point mousePosition = Manager.MouseState.Position;
-
-            int scrollX = 0;
-            if (mousePosition.X == 0 || isLeftPressed) scrollX += -1;
-            if (mousePosition.X == rectangle.ExclusiveMaxX - 1 || isRightPressed) scrollX += 1;
-
-            int scrollY = 0;
-            if (mousePosition.Y == 0 || isDownPressed) scrollY += -1;
-            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isUpPressed) scrollY += 1;
-
-            scrollDirection = new Point(scrollX, scrollY);
-        }
-
-        private Control CreateTopBar(OrionGuiStyle style)
-        {
-            ContentControl container = new ContentControl();
-            container.IsMouseEventSink = true;
-            container.HorizontalAlignment = Alignment.Center;
-            BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
-            container.Adornment = adornment;
-            container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
-
-            DockPanel dockPanel = style.Create<DockPanel>();
-            container.Content = dockPanel;
-
-            dockPanel.Dock(CreateResourceImageBox(style, "Aladdium"), Direction.MinX);
-            aladdiumAmountLabel = CreateResourceLabel(style);
-            dockPanel.Dock(aladdiumAmountLabel, Direction.MinX);
-
-            dockPanel.Dock(CreateResourceImageBox(style, "Alagene"), Direction.MinX);
-            alageneAmountLabel = CreateResourceLabel(style);
-            dockPanel.Dock(alageneAmountLabel, Direction.MinX);
-
-            dockPanel.Dock(CreateResourceImageBox(style, "Gui/Food"), Direction.MinX);
-            foodAmountLabel = CreateResourceLabel(style);
-            dockPanel.Dock(foodAmountLabel, Direction.MinX);
-            foodAmountLabel.Text = "0/0";
-
-            dockPanel.Dock(CreateResourceImageBox(style, "Units/Schtroumpf"), Direction.MinX);
-            inactiveWorkerCountLabel = CreateResourceLabel(style);
-            dockPanel.Dock(inactiveWorkerCountLabel, Direction.MinX);
-
-            Button pauseButton = style.CreateTextButton("Pause");
-            dockPanel.Dock(pauseButton, Direction.MaxX);
-            pauseButton.VerticalAlignment = Alignment.Center;
-
-            Button diplomacyButton = style.CreateTextButton("Diplomatie");
-            dockPanel.Dock(diplomacyButton, Direction.MaxX);
-            diplomacyButton.VerticalAlignment = Alignment.Center;
-            diplomacyButton.MaxXMargin = 10;
-
-            return container;
-        }
-
-        private static ImageBox CreateResourceImageBox(OrionGuiStyle style, string textureName)
-        {
-            ImageBox imageBox = new ImageBox();
-            imageBox.Texture = style.GetTexture(textureName);
-            imageBox.VerticalAlignment = Alignment.Center;
-            imageBox.SetSize(30, 30);
-            return imageBox;
-        }
-
-        private static Label CreateResourceLabel(OrionGuiStyle style)
-        {
-            Label label = style.CreateLabel("0");
-            label.VerticalAlignment = Alignment.Center;
-            label.MinXMargin = 5;
-            label.MinWidth = 30;
-            label.Color = Colors.White;
-            label.MaxXMargin = 10;
-            return label;
-        }
-
-        private Control CreateBottomBar(OrionGuiStyle style)
-        {
-            ContentControl container = new ContentControl();
-            bottomBar = container;
-            container.IsMouseEventSink = true;
-            container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
-
-            DockPanel dockPanel = new DockPanel();
-            container.Content = dockPanel;
-            dockPanel.LastChildFill = true;
-
-            ContentControl minimapBoxContainer = new ContentControl();
-            dockPanel.Dock(minimapBoxContainer, Direction.MinX);
-            minimapBoxContainer.SetSize(200, 200);
-            minimapBoxContainer.Padding = new Borders(6);
-            minimapBoxContainer.Content = CreateMinimapViewport();
-
-            actionButtonGrid = CreateActionButtons(style);
-            dockPanel.Dock(actionButtonGrid, Direction.MaxX);
-            actionButtonGrid.SetSize(200, 200);
-
-            selectionInfoPanel = new ContentControl();
-            dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
-            selectionInfoPanel.Content = new ImageBox
-            {
-                Texture = style.GetTexture("Gui/Carving"),
-                HorizontalAlignment = Alignment.Center,
-                VerticalAlignment = Alignment.Center,
-            };
-
-            return container;
-        }
-
-        private UniformGridPanel CreateActionButtons(OrionGuiStyle style)
-        {
-            UniformGridPanel grid = new UniformGridPanel(3, 3);
-            grid.CellGap = 3;
-
-            for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
-            {
-                for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
-                {
-                    Button actionButton = style.Create<Button>();
-                    grid.Children[rowIndex, columnIndex] = actionButton;
-                    actionButton.Visibility = Visibility.Hidden;
-                    actionButton.Content = new ImageBox();
-                    actionButton.Clicked += OnActionButtonClicked;
-                }
-            }
-
-            return grid;
-        }
-
-        private Control CreateMinimapViewport()
-        {
-            ViewportBox minimapBox = new ViewportBox();
-            minimapBox.MouseButton += OnMinimapMouseButton;
-            minimapBox.MouseMoved += OnMinimapMouseMoved;
-            minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
-
-            return minimapBox;
-        }
-
-        private Control CreateChatOverlays(OrionGuiStyle style)
-        {
-            DockPanel dockPanel = new DockPanel();
-
-            chatTextField = style.Create<TextField>();
-            dockPanel.Dock(chatTextField, Direction.MinY);
-            chatTextField.MinXMargin = 5;
-            chatTextField.MinYMargin = 5;
-            chatTextField.HorizontalAlignment = Alignment.Min;
-            chatTextField.Width = 500;
-            chatTextField.Visibility = Visibility.Hidden;
-            chatTextField.Key += OnChatTextFieldKey;
-
-            return dockPanel;
         }
 
         private bool OnChatTextFieldKey(Control sender, Keys key, bool pressed)
@@ -410,8 +445,8 @@ namespace Orion.Game.Presentation.Gui
             Vector2 normalizedPosition = rectangle.Normalize(rectangle.Clamp(position));
             MinimapCameraMoved.Raise(this, normalizedPosition);
         }
-
-        private void OnActionButtonClicked(Button sender)
+        
+        private void OnActionButtonClicked(Button sender, MouseButtons mouseButton)
         {
             int rowIndex, columnIndex;
             if (!actionButtonGrid.Children.Find(sender, out rowIndex, out columnIndex))
@@ -422,6 +457,7 @@ namespace Orion.Game.Presentation.Gui
 
             ActionButtonClicked.Raise(this, rowIndex, columnIndex);
         }
+        #endregion
         #endregion
     }
 }

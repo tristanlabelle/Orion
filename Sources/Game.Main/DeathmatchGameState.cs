@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
+using Orion.Engine.Gui2;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Audio;
 using Orion.Game.Presentation.Gui;
+using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
-using Orion.Game.Presentation.Renderers;
-using Orion.Game.Presentation.Audio;
-using Orion.Engine.Geometry;
-using OpenTK;
-using Orion.Engine.Gui2;
+using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
 using MouseButtons = System.Windows.Forms.MouseButtons;
-using Orion.Game.Simulation.Utilities;
 
 namespace Orion.Game.Main
 {

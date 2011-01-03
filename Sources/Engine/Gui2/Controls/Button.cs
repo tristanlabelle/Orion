@@ -17,7 +17,12 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private bool isEnabled = true;
-        private bool isDown;
+
+        /// <summary>
+        /// The mouse button that is pressing this button, if any.
+        /// </summary>
+        private MouseButtons pressingButton;
+        private MouseButtons clickingButtons = MouseButtons.Left;
         #endregion
 
         #region Constructors
@@ -44,8 +49,9 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Raised when this <see cref="Button"/> gets clicked,
         /// either programatically, using the mouse or the keyboard.
+        /// The argument specifies the mouse button used to click the button.
         /// </summary>
-        public event Action<Button> Clicked;
+        public event Action<Button, MouseButtons> Clicked;
         #endregion
 
         #region Properties
@@ -69,7 +75,16 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public bool IsDown
         {
-            get { return isDown; }
+            get { return pressingButton != MouseButtons.None; }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating which mouse buttons can be used to click the button, as flags.
+        /// </summary>
+        public MouseButtons ClickingButtons
+        {
+            get { return clickingButtons; }
+            set { clickingButtons = value; }
         }
         #endregion
 
@@ -79,7 +94,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public void Click()
         {
-            if (Clicked != null) Clicked(this);
+            if (Clicked != null) Clicked(this, MouseButtons.None);
         }
 
         protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
@@ -95,20 +110,20 @@ namespace Orion.Engine.Gui2
 
         protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
         {
-            if (button == MouseButtons.Left)
+            if ((ClickingButtons & button) != 0)
             {
                 if (pressCount > 0)
                 {
-                    isDown = true;
+                    pressingButton = button;
                     AcquireKeyboardFocus();
                     AcquireMouseCapture();
                 }
-                else if (isDown)
+                else if (pressingButton != MouseButtons.None)
                 {
                     ReleaseMouseCapture();
-                    isDown = false;
+                    pressingButton = MouseButtons.None;
 
-                    if (IsUnderMouse) Click();
+                    if (IsUnderMouse) Clicked.Raise(this, button);
                 }
 
                 return true;

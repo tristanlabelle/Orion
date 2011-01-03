@@ -6,18 +6,20 @@ using System.Diagnostics;
 
 namespace Orion.Engine.Gui2
 {
-    partial class UniformGridPanel
+    partial class GridPanel
     {
         public sealed class ChildCollection : ICollection<Control>
         {
             #region Fields
-            private readonly UniformGridPanel panel;
-            private readonly Control[,] children;
+            private readonly GridPanel panel;
+            private Control[,] children;
+            private int rowCount;
+            private int columnCount;
             private int count;
             #endregion
 
             #region Constructors
-            internal ChildCollection(UniformGridPanel panel, int rowCount, int columnCount)
+            internal ChildCollection(GridPanel panel, int rowCount, int columnCount)
             {
                 Argument.EnsureNotNull(panel, "panel");
                 Argument.EnsurePositive(rowCount, "rowCount");
@@ -25,18 +27,22 @@ namespace Orion.Engine.Gui2
 
                 this.panel = panel;
                 this.children = new Control[rowCount, columnCount];
+                this.rowCount = rowCount;
+                this.columnCount = columnCount;
             }
             #endregion
 
             #region Properties
             public int RowCount
             {
-                get { return children.GetLength(0); }
+                get { return rowCount; }
+                set { Resize(value, columnCount); }
             }
 
             public int ColumnCount
             {
-                get { return children.GetLength(1); }
+                get { return columnCount; }
+                set { Resize(rowCount, value); }
             }
 
             public int CellCount
@@ -64,6 +70,36 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Methods
+            public void Resize(int newRowCount, int newColumnCount)
+            {
+                Argument.EnsurePositive(newRowCount, "newRowCount");
+                Argument.EnsurePositive(newColumnCount, "newColumnCount");
+
+                if (newRowCount < RowCount || newColumnCount < ColumnCount)
+                {
+                    for (int rowIndex = 0; rowIndex < RowCount; ++rowIndex)
+                        for (int columnIndex = 0; columnIndex < ColumnCount; ++columnIndex)
+                            if (rowIndex >= newRowCount || columnIndex >= newColumnCount)
+                                RemoveAt(rowIndex, columnIndex);
+                }
+
+                if (newRowCount > children.GetLength(0) || newColumnCount > children.GetLength(1))
+                {
+                    Control[,] newChildren = new Control[
+                        Math.Max(children.GetLength(0), newRowCount),
+                        Math.Max(children.GetLength(1), newColumnCount)];
+
+                    for (int rowIndex = 0; rowIndex < newRowCount; ++rowIndex)
+                        for (int columnIndex = 0; columnIndex < newColumnCount; ++columnIndex)
+                            newChildren[rowIndex, columnIndex] = children[rowIndex, columnIndex];
+
+                    children = newChildren;
+                }
+
+                this.rowCount = newRowCount;
+                this.columnCount = newColumnCount;
+            }
+
             public void Add(Control item)
             {
                 Argument.EnsureNotNull(item, "item");

@@ -100,7 +100,7 @@ namespace Orion.Game.Presentation.Gui
         private void StackButton(StackPanel stackPanel, OrionGuiStyle style, string text, Func<Action<MainMenuUI>> eventGetter)
         {
             Button button = style.CreateTextButton(text);
-            button.Clicked += sender => eventGetter().Raise(this);
+            button.Clicked += (sender, mouseButton) => eventGetter().Raise(this);
             stackPanel.Stack(button);
         }
         #endregion

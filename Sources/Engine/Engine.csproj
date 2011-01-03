@@ -175,6 +175,7 @@
     <Compile Include="Gui2\Controls\Thumb.cs" />
     <Compile Include="Gui2\Control.cs" />
     <Compile Include="Gui2\PropertyBinding.cs" />
+    <Compile Include="Gui2\Stretch.cs" />
     <Compile Include="Gui2\Visibility.cs" />
     <Compile Include="Gui2\UIManager.cs" />
     <Compile Include="Gui\Button.cs" />

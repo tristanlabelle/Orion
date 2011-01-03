@@ -156,24 +156,16 @@ namespace Orion.Engine.Graphics
             if (bitmap == null) bitmap = new Bitmap(image);
             try
             {
-                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                BitmapData bitmapData = bitmap.LockBits(
+                    new Rectangle(0, 0, image.Width, image.Height),
+                    ImageLockMode.ReadOnly, bitmap.PixelFormat);
                 try
                 {
-                    BitmapData bitmapData = bitmap.LockBits(
-                        new Rectangle(0, 0, image.Width, image.Height),
-                        ImageLockMode.ReadOnly, bitmap.PixelFormat);
-                    try
-                    {
-                        return FromBitmapData(bitmapData);
-                    }
-                    finally
-                    {
-                        bitmap.UnlockBits(bitmapData);
-                    }
+                    return FromBitmapData(bitmapData);
                 }
                 finally
                 {
-                    bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    bitmap.UnlockBits(bitmapData);
                 }
             }
             finally

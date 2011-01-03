@@ -182,7 +182,7 @@ namespace Orion.Engine.Gui2
             {
                 var cursorSprite = new GuiSprite(cursorTexture)
                 {
-                    Rectangle = new Region(mouseState.X, mouseState.Y - cursorTexture.Height, cursorTexture.Width, cursorTexture.Height)
+                    Rectangle = new Region(mouseState.X, mouseState.Y, cursorTexture.Width, cursorTexture.Height)
                 };
 
                 renderer.DrawSprite(ref cursorSprite);

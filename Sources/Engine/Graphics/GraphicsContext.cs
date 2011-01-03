@@ -93,7 +93,7 @@ namespace Orion.Engine.Graphics
                 GL.MatrixMode(MatrixMode.Projection);
                 GL.LoadIdentity();
                 GL.Ortho(projectionBounds.MinX, projectionBounds.MaxX,
-                    projectionBounds.MinY, projectionBounds.MaxY, -1, 1);
+                    projectionBounds.MaxY, projectionBounds.MinY, -1, 1);
                 GL.MatrixMode(MatrixMode.Modelview);
             }
         }
@@ -256,7 +256,7 @@ namespace Orion.Engine.Graphics
 
             GL.Enable(EnableCap.ScissorTest);
             GL.Scissor(
-                clippedRegion.MinX, clippedRegion.MinY,
+                clippedRegion.MinX, ViewportSize.Height - clippedRegion.ExclusiveMaxY,
                 clippedRegion.Width, clippedRegion.Height);
 
             scissorStack.Push(clippedRegion);
@@ -330,7 +330,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Drawing
-        #region Ellipses (and implicitly converted circles)
+        #region Ellipses
         /// <summary>
         /// Fills a given <see cref="Ellipse"/>.
         /// </summary>
@@ -399,9 +399,9 @@ namespace Orion.Engine.Graphics
         private void DrawVertices(Rectangle rectangle)
         {
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             DrawVertex(rectangle.MinX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
         }
         #endregion
 
@@ -671,12 +671,12 @@ namespace Orion.Engine.Graphics
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
             DrawVertex(rectangle.MinX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
             GL.End();
         }
 

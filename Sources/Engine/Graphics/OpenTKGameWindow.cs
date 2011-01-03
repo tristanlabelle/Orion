@@ -248,7 +248,7 @@ namespace Orion.Engine.Graphics
             Orion.Engine.Input.MouseButton button, int clickCount, float wheelDelta)
         {
             Orion.Engine.Input.MouseEventArgs args = new Orion.Engine.Input.MouseEventArgs(
-                new Vector2(clientPoint.X, ClientAreaSize.Height - clientPoint.Y - 1), button, clickCount, wheelDelta);
+                new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, args);
             InputReceived.Raise(this, inputEvent);
         }

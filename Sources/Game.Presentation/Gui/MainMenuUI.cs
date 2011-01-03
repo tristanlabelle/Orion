@@ -33,15 +33,16 @@ namespace Orion.Game.Presentation.Gui
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
             titleImageBox.Texture = style.GetTexture("Gui/Title");
-            dockPanel.Dock(titleImageBox, Direction.MaxY);
+            dockPanel.Dock(titleImageBox, Direction.MinY);
 
             StackPanel buttonsStackPanel = style.Create<StackPanel>();
+            dockPanel.Dock(buttonsStackPanel, Direction.MaxX);
+            buttonsStackPanel.Direction = Direction.MaxY;
             buttonsStackPanel.HorizontalAlignment = Alignment.Center;
             buttonsStackPanel.VerticalAlignment = Alignment.Center;
             buttonsStackPanel.MinWidth = 300;
             buttonsStackPanel.MinChildSize = 50;
             buttonsStackPanel.ChildGap = 10;
-            dockPanel.Dock(buttonsStackPanel, Direction.MinX);
 
             StackButton(buttonsStackPanel, style, "Monojoueur", () => SinglePlayerClicked);
             StackButton(buttonsStackPanel, style, "Multijoueur", () => MultiplayerClicked);

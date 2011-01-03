@@ -49,9 +49,9 @@ namespace Orion.Game.Presentation.Gui
             DockPanel mainDockPanel = style.Create<DockPanel>();
             Content = mainDockPanel;
             mainDockPanel.LastChildFill = true;
-            mainDockPanel.Dock(CreateTopBar(), Direction.MaxY);
-            mainDockPanel.Dock(CreateBottomBar(), Direction.MinY);
-            mainDockPanel.Dock(CreateChatOverlays(), Direction.MinY);
+            mainDockPanel.Dock(CreateTopBar(), Direction.MinY);
+            mainDockPanel.Dock(CreateBottomBar(), Direction.MaxY);
+            mainDockPanel.Dock(CreateChatOverlays(), Direction.MaxY);
         }
         #endregion
 
@@ -143,7 +143,7 @@ namespace Orion.Game.Presentation.Gui
                 Region rectangle = Rectangle;
                 int bottomBarHeight = bottomBar.ActualSize.Height;
                 return new Region(
-                    rectangle.MinX, rectangle.MinY + bottomBarHeight,
+                    rectangle.MinX, rectangle.MinY,
                     rectangle.Width, Math.Max(0, rectangle.Height - bottomBarHeight));
             }
         }
@@ -188,12 +188,12 @@ namespace Orion.Game.Presentation.Gui
             Point mousePosition = Manager.MouseState.Position;
 
             int scrollX = 0;
-            if (mousePosition.X == 0 || isLeftPressed) scrollX += -1;
+            if (mousePosition.X == 0 || isLeftPressed) scrollX -= 1;
             if (mousePosition.X == rectangle.ExclusiveMaxX - 1 || isRightPressed) scrollX += 1;
 
             int scrollY = 0;
-            if (mousePosition.Y == 0 || isDownPressed) scrollY += -1;
-            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isUpPressed) scrollY += 1;
+            if (mousePosition.Y == 0 || isUpPressed) scrollY -= 1;
+            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isDownPressed) scrollY += 1;
 
             scrollDirection = new Point(scrollX, scrollY);
         }
@@ -264,6 +264,7 @@ namespace Orion.Game.Presentation.Gui
         {
             ContentControl container = new ContentControl();
             bottomBar = container;
+            container.Padding = new Borders(6);
             container.IsMouseEventSink = true;
             container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
 
@@ -274,12 +275,10 @@ namespace Orion.Game.Presentation.Gui
             ContentControl minimapBoxContainer = new ContentControl();
             dockPanel.Dock(minimapBoxContainer, Direction.MinX);
             minimapBoxContainer.SetSize(200, 200);
-            minimapBoxContainer.Padding = new Borders(6);
             minimapBoxContainer.Content = CreateMinimapViewport();
 
             actionButtonGrid = CreateActionButtons();
             dockPanel.Dock(actionButtonGrid, Direction.MaxX);
-            actionButtonGrid.SetSize(200, 200);
 
             selectionInfoPanel = new ContentControl();
             dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
@@ -295,10 +294,11 @@ namespace Orion.Game.Presentation.Gui
 
         private GridPanel CreateActionButtons()
         {
-            GridPanel grid = new GridPanel(3, 3);
+            GridPanel grid = new GridPanel(3, 5);
             grid.AreColumnsUniformSized = true;
             grid.AreRowsUniformSized = true;
             grid.CellGap = 3;
+            grid.SetSize(300, 200);
 
             for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
             {
@@ -306,7 +306,7 @@ namespace Orion.Game.Presentation.Gui
                 {
                     Button actionButton = style.Create<Button>();
                     grid.Children[rowIndex, columnIndex] = actionButton;
-                    actionButton.Visibility = Visibility.Hidden;
+                    //actionButton.Visibility = Visibility.Hidden;
                     actionButton.Content = new ImageBox();
                     actionButton.Clicked += OnActionButtonClicked;
                 }

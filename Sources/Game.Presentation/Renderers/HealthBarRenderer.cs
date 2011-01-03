@@ -27,7 +27,7 @@ namespace Orion.Game.Presentation.Renderers
         {
             float healthbarWidth = (float)Math.Log(unit.MaxHealth);
             Rectangle unitBoundingRectangle = unit.BoundingRectangle;
-            float y = unitBoundingRectangle.CenterY + unitBoundingRectangle.Height * 0.75f;
+            float y = unitBoundingRectangle.CenterY - unitBoundingRectangle.Height * 0.75f;
             float x = unitBoundingRectangle.CenterX - healthbarWidth / 2f;
             Draw(context, unit, new Vector2(x, y));
         }

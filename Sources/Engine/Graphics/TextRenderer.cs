@@ -256,7 +256,7 @@ namespace Orion.Engine.Graphics
                         {
                             for (int x = 0; x < renderedBounds.Width; ++x)
                             {
-                                byte* sourcePixelPointer = sourcePointer + bitmapData.Stride * (renderedBounds.Height - y - 1) + x * 4;
+                                byte* sourcePixelPointer = sourcePointer + bitmapData.Stride * y + x * 4;
                                 byte* destinationPixelPointer = destinationPointer + surface.Stride * y + x * 4;
 
                                 // Force to white + alpha

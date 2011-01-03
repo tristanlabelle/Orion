@@ -652,13 +652,23 @@ namespace Orion.Engine.Gui2
             if (isMeasured) return cachedDesiredOuterSize;
             if (manager == null) throw new InvalidOperationException("Cannot measure a control without a manager.");
 
-            Size desiredSize = MeasureSize();
-            cachedDesiredOuterSize = new Size(
-                Math.Max(minSize.Width, width.GetValueOrDefault(desiredSize.Width)) + margin.TotalX,
-                Math.Max(minSize.Height, height.GetValueOrDefault(desiredSize.Height)) + margin.TotalY);
+            cachedDesiredOuterSize = MeasureOuterSize();
 
             isMeasured = true;
             return cachedDesiredOuterSize;
+        }
+
+        /// <summary>
+        /// Measures the desired outer size of this <see cref="Control"/>.
+        /// This takes the margin, desired size and minimum size into account.
+        /// </summary>
+        /// <returns>The desired outer size of this <see cref="Control"/>.</returns>
+        protected Size MeasureOuterSize()
+        {
+            Size desiredSize = MeasureSize();
+            return new Size(
+                Math.Max(minSize.Width, width.GetValueOrDefault(desiredSize.Width)) + margin.TotalX,
+                Math.Max(minSize.Height, height.GetValueOrDefault(desiredSize.Height)) + margin.TotalY);
         }
 
         /// <summary>

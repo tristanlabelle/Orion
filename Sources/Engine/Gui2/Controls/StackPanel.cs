@@ -12,7 +12,7 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private readonly ChildCollection children;
-        private Direction direction = Direction.MinY;
+        private Direction direction = Direction.MaxY;
         private int childGap;
         private int minChildSize;
         #endregion
@@ -163,7 +163,7 @@ namespace Orion.Engine.Gui2
                     int height = Math.Max(minChildSize, childSize.Height);
                     Region availableSpace = new Region(
                         rectangle.MinX,
-                        direction == Direction.MaxX ? rectangle.MinY + y : rectangle.ExclusiveMaxY - height - y,
+                        direction == Direction.MaxY ? rectangle.MinY + y : rectangle.ExclusiveMaxY - height - y,
                         rectangle.Width, height);
 
                     Region childRectangle = DefaultArrange(availableSpace, child);

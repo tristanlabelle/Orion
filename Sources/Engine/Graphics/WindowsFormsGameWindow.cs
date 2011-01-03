@@ -205,7 +205,7 @@ namespace Orion.Engine.Graphics
         private void RaiseMouseEvent(MouseEventType type, float x, float y,
             MouseButton button, int clickCount, float wheelDelta)
         {
-            Vector2 position = new Vector2(x, (form.GLControl.Height - 1) - y);
+            Vector2 position = new Vector2(x, y);
             var eventArgs = new Orion.Engine.Input.MouseEventArgs(position, button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, eventArgs);
             InputReceived.Raise(this, inputEvent);

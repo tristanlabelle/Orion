@@ -163,8 +163,12 @@
     <Compile Include="Gui2\Controls\ImageBox.cs" />
     <Compile Include="Gui2\Controls\Label.cs" />
     <Compile Include="Gui2\Borders.cs" />
+    <Compile Include="Gui2\KeyEvent.cs" />
+    <Compile Include="Gui2\KeyEventType.cs" />
+    <Compile Include="Gui2\ModifierKeys.cs" />
+    <Compile Include="Gui2\MouseButtons.cs" />
+    <Compile Include="Gui2\MouseEvent.cs" />
     <Compile Include="Gui2\MouseEventType.cs" />
-    <Compile Include="Gui2\MouseState.cs" />
     <Compile Include="Gui2\Adornments\BorderTextureAdornment.cs" />
     <Compile Include="Gui2\Orientation.cs" />
     <Compile Include="Gui2\Controls\RepeatButton.cs" />
@@ -199,6 +203,7 @@
     <Compile Include="Input\KeyboardEventType.cs" />
     <Compile Include="Gui\Label.cs" />
     <Compile Include="Gui\ListPanel.cs" />
+    <Compile Include="Input\InputEnums.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Input\MouseEventType.cs" />

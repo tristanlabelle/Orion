@@ -6,7 +6,7 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// Identifies a type of mouse event.
+    /// Describes the type of a mouse event.
     /// </summary>
     public enum MouseEventType
     {
@@ -23,6 +23,11 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Specifies that the event is a mouse wheel move.
         /// </summary>
-        Wheel
+        Wheel,
+
+        /// <summary>
+        /// Specifies that the event is a click (a mouse down followed by a mouse up within some time and space constraints).
+        /// </summary>
+        Click
     }
 }

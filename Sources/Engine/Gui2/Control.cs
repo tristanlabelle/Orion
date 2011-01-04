@@ -55,35 +55,67 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Events
-        private HandleableEvent<Func<Control, MouseState, bool>> mouseMovedEvent;
-        public event Func<Control, MouseState, bool> MouseMoved
+        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseMovedEvent;
+        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseButtonEvent;
+        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseWheelEvent;
+        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseClickEvent;
+        private HandleableEvent<Func<Control, KeyEvent, bool>> keyEvent;
+        private HandleableEvent<Func<Control, char, bool>> characterTypedEvent;
+
+        /// <summary>
+        /// Raised when the mouse moves over this control or when this control has the mouse capture.
+        /// The return value specifies if the event was handled.
+        /// </summary>
+        public event Func<Control, MouseEvent, bool> MouseMoved
         {
             add { mouseMovedEvent.AddHandler(value); }
             remove { mouseMovedEvent.RemoveHandler(value); }
         }
 
-        private HandleableEvent<Func<Control, MouseState, MouseButtons, int, bool>> mouseButtonEvent;
-        public event Func<Control, MouseState, MouseButtons, int, bool> MouseButton
+        /// <summary>
+        /// Raised when a mouse button is pressed or released over this control or when this control has the mouse capture.
+        /// The return value specifies if the event was handled.
+        /// </summary>
+        public event Func<Control, MouseEvent, bool> MouseButton
         {
             add { mouseButtonEvent.AddHandler(value); }
             remove { mouseButtonEvent.RemoveHandler(value); }
         }
 
-        private HandleableEvent<Func<Control, MouseState, float, bool>> mouseWheelEvent;
-        public event Func<Control, MouseState, float, bool> MouseWheel
+        /// <summary>
+        /// Raised when the mouse wheel is moved over this control or when this control has the mouse capture.
+        /// The return value specifies if the event was handled.
+        /// </summary>
+        public event Func<Control, MouseEvent, bool> MouseWheel
         {
             add { mouseWheelEvent.AddHandler(value); }
             remove { mouseWheelEvent.RemoveHandler(value); }
         }
 
-        private HandleableEvent<Func<Control, Keys, bool, bool>> keyEvent;
-        public event Func<Control, Keys, bool, bool> Key
+        /// <summary>
+        /// Raised when the mouse is clicked over this control or when this control has the mouse capture.
+        /// The return value specifies if the event was handled.
+        /// </summary>
+        public event Func<Control, MouseEvent, bool> MouseClick
+        {
+            add { mouseClickEvent.AddHandler(value); }
+            remove { mouseClickEvent.RemoveHandler(value); }
+        }
+
+        /// <summary>
+        /// Raised when a key event occurs while this control has the keyboard focus.
+        /// The return value specifies if the event was handled.
+        /// </summary>
+        public event Func<Control, KeyEvent, bool> KeyEvent
         {
             add { keyEvent.AddHandler(value); }
             remove { keyEvent.RemoveHandler(value); }
         }
 
-        private HandleableEvent<Func<Control, char, bool>> characterTypedEvent;
+        /// <summary>
+        /// Raised when a character is typed while this control has the keyboard focus.
+        /// The return value specifies if the event was handled.
+        /// </summary>
         public event Func<Control, char, bool> CharacterTyped
         {
             add { characterTypedEvent.AddHandler(value); }
@@ -790,67 +822,73 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Input Events
-        protected virtual bool PropagateMouseEvent(
-            MouseEventType type, MouseState state, MouseButtons button, float value)
+        protected virtual bool PropagateMouseEvent(MouseEvent @event)
         {
             foreach (Control child in Children)
             {
-                if (child.Rectangle.Contains(state.Position))
+                if (child.Rectangle.Contains(@event.Position))
                 {
-                    bool handled = child.PropagateMouseEvent(type, state, button, value);
+                    bool handled = child.PropagateMouseEvent(@event);
                     if (handled) return true;
                     break;
                 }
             }
 
-            return HandleMouseEvent(type, state, button, value);
+            return HandleMouseEvent(@event);
         }
 
-        protected bool PropagateMouseEventToChild(Control child,
-            MouseEventType type, MouseState state, MouseButtons button, float value)
+        protected bool PropagateMouseEventToChild(Control child, MouseEvent @event)
         {
-            return child.PropagateMouseEvent(type, state, button, value);
+            return child.PropagateMouseEvent(@event);
         }
 
-        protected internal bool HandleMouseEvent(MouseEventType type, MouseState state, MouseButtons button, float value)
+        protected internal bool HandleMouseEvent(MouseEvent @event)
         {
-            switch (type)
+            switch (@event.Type)
             {
-                case MouseEventType.Move: return HandleMouseMoved(state);
-                case MouseEventType.Button: return HandleMouseButton(state, button, (int)value);
-                case MouseEventType.Wheel: return HandleMouseWheel(state, value);
-                default: throw new InvalidEnumArgumentException("type", (int)type, typeof(MouseEventType));
+                case MouseEventType.Move: return HandleMouseMoved(@event);
+                case MouseEventType.Button: return HandleMouseButton(@event);
+                case MouseEventType.Wheel: return HandleMouseWheel(@event);
+                case MouseEventType.Click: return HandleMouseClick(@event);
+                default: throw new InvalidEnumArgumentException("type", (int)@event.Type, typeof(MouseEventType));
             }
         }
 
-        protected internal bool HandleMouseMoved(MouseState state)
+        private bool HandleMouseMoved(MouseEvent @event)
         {
-            return OnMouseMoved(state)
-                | mouseMovedEvent.Raise(this, state)
+            return OnMouseMoved(@event)
+                | mouseMovedEvent.Raise(this, @event)
                 | IsMouseEventSink;
         }
 
-        protected internal bool HandleMouseButton(MouseState state, MouseButtons button, int pressCount)
+        private bool HandleMouseButton(MouseEvent @event)
         {
-            return OnMouseButton(state, button, pressCount)
-                | mouseButtonEvent.Raise(this, state, button, pressCount)
+            return OnMouseButton(@event)
+                | mouseButtonEvent.Raise(this, @event)
                 | IsMouseEventSink;
         }
 
-        protected internal bool HandleMouseWheel(MouseState state, float amount)
+        private bool HandleMouseWheel(MouseEvent @event)
         {
-            return OnMouseWheel(state, amount)
-                | mouseWheelEvent.Raise(this, state, amount)
+            return OnMouseWheel(@event)
+                | mouseWheelEvent.Raise(this, @event)
                 | IsMouseEventSink;
         }
 
-        protected internal bool HandleKey(Keys key, Keys modifiers, bool pressed)
+        private bool HandleMouseClick(MouseEvent @event)
         {
-            return OnKey(key, modifiers, pressed)
-                | keyEvent.Raise(this, key | modifiers, pressed);
+            return OnMouseClick(@event)
+                | mouseClickEvent.Raise(this, @event)
+                | IsMouseEventSink;
         }
 
-        protected internal bool HandleCharacterTyped(char character)
+        internal bool HandleKeyEvent(KeyEvent @event)
+        {
+            return OnKeyEvent(@event)
+                | keyEvent.Raise(this, @event);
+        }
+
+        internal bool HandleCharacterTyped(char character)
         {
             return OnCharacterTyped(character)
                 | characterTypedEvent.Raise(this, character);
@@ -859,42 +897,42 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// When overriden in a derived class, handles a mouse move event.
         /// </summary>
-        /// <param name="state">The current state of the mouse.</param>
+        /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected virtual bool OnMouseMoved(MouseState state) { return false; }
+        protected virtual bool OnMouseMoved(MouseEvent @event) { return false; }
 
         /// <summary>
         /// When overriden in a derived class, handles a mouse button event.
         /// </summary>
-        /// <param name="state">The current state of the mouse.</param>
-        /// <param name="button">The involved button.</param>
-        /// <param name="pressCount">
-        /// The number of successive presses of the button, or <c>0</c> if the button was released.
-        /// </param>
+        /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected virtual bool OnMouseButton(MouseState state, MouseButtons button, int pressCount) { return false; }
+        protected virtual bool OnMouseButton(MouseEvent @event) { return false; }
 
         /// <summary>
         /// When overriden in a derived class, handles a mouse wheel event.
         /// </summary>
-        /// <param name="state">The current state of the mouse.</param>
-        /// <param name="amount">The amount the mouse wheel was moved, in notches.</param>
+        /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected virtual bool OnMouseWheel(MouseState state, float amount) { return false; }
+        protected virtual bool OnMouseWheel(MouseEvent @event) { return false; }
+
+        /// <summary>
+        /// When overriden in a derived class, handles a mouse click event.
+        /// </summary>
+        /// <param name="event">The event object.</param>
+        /// <returns>A value indicating if the event was handled.</returns>
+        protected virtual bool OnMouseClick(MouseEvent @event) { return false; }
 
         /// <summary>
         /// Gives a chance to this <see cref="Control"/> to handle a key event.
         /// </summary>
-        /// <param name="key">The key that was pressed or released.</param>
-        /// <param name="modifiers">The modifier keys which are currently pressed.</param>
-        /// <param name="pressed">A value indicating if the key was pressed or released.</param>
+        /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        protected virtual bool OnKey(Keys key, Keys modifiers, bool pressed) { return false; }
+        protected virtual bool OnKeyEvent(KeyEvent @event) { return false; }
 
         /// <summary>
         /// Gives a chance to this <see cref="Control"/>to handle a character event.
         /// </summary>
-        /// <param name="character">The character that was pressed.</param>
+        /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
         protected virtual bool OnCharacterTyped(char character) { return false; }
 

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using OpenTK;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
-using System.Drawing;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Engine.Gui2
 {
@@ -210,26 +209,32 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren() { }
 
-        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseEvent @event)
         {
-            if (button == MouseButtons.Left && pressCount > 0 && isEditable)
+            if (@event.Button == MouseButtons.Left && @event.IsPressed && isEditable)
             {
                 AcquireKeyboardFocus();
-                if (pressCount > 1) SelectAll();
                 return true;
             }
 
             return false;
         }
 
-        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        protected override bool OnMouseClick(MouseEvent @event)
         {
-            if (!pressed) return true;
+            AcquireKeyboardFocus();
+            if (@event.ClickCount > 1) SelectAll();
 
-            Keys modifiedKey = key | modifiers;
-            switch (modifiedKey)
+            return true;
+        }
+
+        protected override bool OnKeyEvent(KeyEvent @event)
+        {
+            if (!@event.IsDown || @event.ModifierKeys != ModifierKeys.None) return true;
+
+            switch (@event.Key)
             {
-                case Keys.Left:
+                case Key.Left:
                     if (HasSelection)
                     {
                         caretIndex = SelectionStartIndex;
@@ -238,7 +243,7 @@ namespace Orion.Engine.Gui2
                     else if (caretIndex > 0) --caretIndex;
                     break;
 
-                case Keys.Right:
+                case Key.Right:
                     if (HasSelection)
                     {
                         caretIndex = SelectionEndIndex;
@@ -247,17 +252,17 @@ namespace Orion.Engine.Gui2
                     else if (caretIndex < text.Length) ++caretIndex;
                     break;
 
-                case Keys.Home:
+                case Key.Home:
                     caretIndex = 0;
                     relativeSelectionLength = 0;
                     break;
 
-                case Keys.End:
+                case Key.End:
                     caretIndex = text.Length;
                     relativeSelectionLength = 0;
                     break;
 
-                case Keys.Back:
+                case Key.Back:
                     if (HasSelection)
                     {
                         Text = text.Substring(0, SelectionStartIndex) + text.Substring(SelectionEndIndex);
@@ -271,7 +276,7 @@ namespace Orion.Engine.Gui2
                     }
                     break;
 
-                case Keys.Delete:
+                case Key.Delete:
                     if (HasSelection)
                     {
                         Text = text.Substring(0, SelectionStartIndex) + text.Substring(SelectionEndIndex);

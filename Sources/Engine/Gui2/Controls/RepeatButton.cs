@@ -63,11 +63,11 @@ namespace Orion.Engine.Gui2
             Clicked.Raise(this, 1);
         }
 
-        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseEvent @event)
         {
-            if (button == MouseButtons.Left)
+            if (@event.Button == MouseButtons.Left)
             {
-                if (pressCount > 0)
+                if (@event.IsPressed)
                 {
                     AcquireMouseCapture();
                     clickCount = 1;

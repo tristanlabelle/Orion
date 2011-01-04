@@ -9,9 +9,8 @@ using Orion.Engine;
 using Orion.Engine.Gui2;
 using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation.Renderers;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
 using Orion.Engine.Graphics;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -27,12 +26,15 @@ namespace Orion.Game.Presentation.Gui
         private Label aladdiumAmountLabel;
         private Label alageneAmountLabel;
         private Label foodAmountLabel;
+        private ImageBox inactiveWorkerCountImageBox;
         private Label inactiveWorkerCountLabel;
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
         private StackPanel messagesStackPanel;
         private GridPanel actionButtonGrid;
+        private TimeSpan time;
+        private TimeSpan lastInactiveWorkerCountChangedTime;
 
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
@@ -85,6 +87,11 @@ namespace Orion.Game.Presentation.Gui
         /// The parameters specify the row and column indices of the button.
         /// </summary>
         public event Action<MatchUI2, int, int> ActionButtonClicked;
+
+        /// <summary>
+        /// Raised when the button showing the number of inactive workers gets pressed.
+        /// </summary>
+        public event Action<MatchUI2> InactiveWorkersButtonPressed;
         #endregion
 
         #region Properties
@@ -94,7 +101,11 @@ namespace Orion.Game.Presentation.Gui
         public int AladdiumAmount
         {
             get { return int.Parse(aladdiumAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
-            set { aladdiumAmountLabel.Text = value.ToStringInvariant(); }
+            set
+            {
+                Argument.EnsurePositive(value, "AladdiumAmount");
+                aladdiumAmountLabel.Text = value.ToStringInvariant();
+            }
         }
 
         /// <summary>
@@ -103,7 +114,11 @@ namespace Orion.Game.Presentation.Gui
         public int AlageneAmount
         {
             get { return int.Parse(alageneAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
-            set { alageneAmountLabel.Text = value.ToStringInvariant(); }
+            set
+            {
+                Argument.EnsurePositive(value, "AlageneAmount");
+                alageneAmountLabel.Text = value.ToStringInvariant();
+            }
         }
 
         /// <summary>
@@ -112,7 +127,11 @@ namespace Orion.Game.Presentation.Gui
         public int UsedFoodAmount
         {
             get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
-            set { foodAmountLabel.Text = value + "/" + FoodLimit; }
+            set
+            {
+                Argument.EnsurePositive(value, "UsedFoodAmount");
+                foodAmountLabel.Text = value + "/" + FoodLimit;
+            }
         }
 
         /// <summary>
@@ -121,7 +140,11 @@ namespace Orion.Game.Presentation.Gui
         public int FoodLimit
         {
             get { return int.Parse(foodAmountLabel.Text.Split('/')[1]); }
-            set { foodAmountLabel.Text = UsedFoodAmount + "/" + value; }
+            set
+            {
+                Argument.EnsurePositive(value, "FoodLimit");
+                foodAmountLabel.Text = UsedFoodAmount + "/" + value;
+            }
         }
 
         /// <summary>
@@ -130,7 +153,14 @@ namespace Orion.Game.Presentation.Gui
         public int InactiveWorkerCount
         {
             get { return int.Parse(inactiveWorkerCountLabel.Text); }
-            set { inactiveWorkerCountLabel.Text = value.ToStringInvariant(); }
+            set
+            {
+                if (value == InactiveWorkerCount) return;
+                Argument.EnsurePositive(value, "InactiveWorkerCount");
+
+                inactiveWorkerCountLabel.Text = value.ToStringInvariant();
+                lastInactiveWorkerCountChangedTime = time;
+            }
         }
 
         /// <summary>
@@ -185,7 +215,7 @@ namespace Orion.Game.Presentation.Gui
         private void UpdateScrollDirection()
         {
             Region rectangle = Rectangle;
-            Point mousePosition = Manager.MouseState.Position;
+            Point mousePosition = Manager.MousePosition;
 
             int scrollX = 0;
             if (mousePosition.X == 0 || isLeftPressed) scrollX -= 1;
@@ -198,6 +228,20 @@ namespace Orion.Game.Presentation.Gui
             scrollDirection = new Point(scrollX, scrollY);
         }
 
+        private void UpdateInactiveWorkerButton()
+        {
+            if (inactiveWorkerCountLabel.Text == "0")
+            {
+                inactiveWorkerCountImageBox.Color = Colors.White;
+                return;
+            }
+
+            double timeElapsedInSeconds = time.TotalSeconds - lastInactiveWorkerCountChangedTime.TotalSeconds;
+            float intensity = (float)((0.2 + Math.Cos(timeElapsedInSeconds * 5) + 1) / 2 * 0.8);
+
+            inactiveWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
+        }
+
         #region Initialization
         private Control CreateTopBar()
         {
@@ -208,25 +252,25 @@ namespace Orion.Game.Presentation.Gui
             container.Adornment = adornment;
             container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
 
-            DockPanel dockPanel = style.Create<DockPanel>();
+            DockPanel dockPanel = new DockPanel();
             container.Content = dockPanel;
 
-            dockPanel.Dock(CreateResourceImageBox("Aladdium"), Direction.MinX);
-            aladdiumAmountLabel = CreateResourceLabel();
-            dockPanel.Dock(aladdiumAmountLabel, Direction.MinX);
+            StackPanel resourcesStackPanel = new StackPanel();
+            dockPanel.Dock(resourcesStackPanel, Direction.MinX);
+            resourcesStackPanel.Direction = Direction.MaxX;
+            resourcesStackPanel.ChildGap = 10;
+            resourcesStackPanel.MaxXMargin = 15;
 
-            dockPanel.Dock(CreateResourceImageBox("Alagene"), Direction.MinX);
-            alageneAmountLabel = CreateResourceLabel();
-            dockPanel.Dock(alageneAmountLabel, Direction.MinX);
-
-            dockPanel.Dock(CreateResourceImageBox("Gui/Food"), Direction.MinX);
-            foodAmountLabel = CreateResourceLabel();
-            dockPanel.Dock(foodAmountLabel, Direction.MinX);
+            ImageBox dummyImageBox;
+            resourcesStackPanel.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
+            resourcesStackPanel.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
+            resourcesStackPanel.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";
 
-            dockPanel.Dock(CreateResourceImageBox("Units/Schtroumpf"), Direction.MinX);
-            inactiveWorkerCountLabel = CreateResourceLabel();
-            dockPanel.Dock(inactiveWorkerCountLabel, Direction.MinX);
+            Button inactiveWorkersButton = new Button();
+            dockPanel.Dock(inactiveWorkersButton, Direction.MinX);
+            inactiveWorkersButton.Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel);
+            inactiveWorkersButton.Clicked += (sender, mouseButton) => InactiveWorkersButtonPressed.Raise(this);
 
             Button pauseButton = style.CreateTextButton("Pause");
             dockPanel.Dock(pauseButton, Direction.MaxX);
@@ -240,24 +284,25 @@ namespace Orion.Game.Presentation.Gui
             return container;
         }
 
-        private ImageBox CreateResourceImageBox(string textureName)
+        private StackPanel CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
         {
-            ImageBox imageBox = new ImageBox();
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Direction = Direction.MaxX;
+
+            imageBox = new ImageBox();
+            stackPanel.Stack(imageBox);
             imageBox.Texture = style.GetTexture(textureName);
             imageBox.VerticalAlignment = Alignment.Center;
             imageBox.SetSize(30, 30);
-            return imageBox;
-        }
 
-        private Label CreateResourceLabel()
-        {
-            Label label = style.CreateLabel("0");
+            label = style.CreateLabel("0");
+            stackPanel.Stack(label);
             label.VerticalAlignment = Alignment.Center;
             label.MinXMargin = 5;
             label.MinWidth = 30;
             label.Color = Colors.White;
-            label.MaxXMargin = 10;
-            return label;
+
+            return stackPanel;
         }
 
         private Control CreateBottomBar()
@@ -337,7 +382,7 @@ namespace Orion.Game.Presentation.Gui
             chatTextField.HorizontalAlignment = Alignment.Min;
             chatTextField.Width = 500;
             chatTextField.Visibility = Visibility.Hidden;
-            chatTextField.Key += OnChatTextFieldKey;
+            chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
 
             messagesStackPanel = new StackPanel();
             dockPanel.Dock(messagesStackPanel, Direction.MinY);
@@ -357,33 +402,35 @@ namespace Orion.Game.Presentation.Gui
             }
         }
 
-        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
-            if (key == Keys.Enter && pressed)
+            time += elapsedTime;
+            UpdateScrollDirection();
+            UpdateInactiveWorkerButton();
+        }
+
+        protected override bool OnKeyEvent(KeyEvent @event)
+        {
+            if (@event.Key == Key.Enter && @event.IsDown)
             {
                 chatTextField.Visibility = Visibility.Visible;
                 chatTextField.AcquireKeyboardFocus();
                 return true;
             }
 
-            if (key == Keys.Left) isLeftPressed = pressed;
-            if (key == Keys.Right) isRightPressed = pressed;
-            if (key == Keys.Up) isUpPressed = pressed;
-            if (key == Keys.Down) isDownPressed = pressed;
+            if (@event.Key == Key.Left) isLeftPressed = @event.IsDown;
+            if (@event.Key == Key.Right) isRightPressed = @event.IsDown;
+            if (@event.Key == Key.Up) isUpPressed = @event.IsDown;
+            if (@event.Key == Key.Down) isDownPressed = @event.IsDown;
 
             UpdateScrollDirection();
 
             return true;
         }
 
-        private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
+        private bool OnChatTextFieldKeyEvent(Control sender, KeyEvent @event)
         {
-            UpdateScrollDirection();
-        }
-
-        private bool OnChatTextFieldKey(Control sender, Keys key, bool pressed)
-        {
-            if ((key == Keys.Enter || key == Keys.Escape) && pressed)
+            if ((@event.Key == Key.Enter || @event.Key == Key.Escape) && @event.IsDown)
             {
                 string chattedText = chatTextField.Text;
 
@@ -391,7 +438,7 @@ namespace Orion.Game.Presentation.Gui
                 chatTextField.Text = string.Empty;
                 chatTextField.Visibility = Visibility.Hidden;
 
-                if (key == Keys.Enter && !string.IsNullOrEmpty(chattedText))
+                if (@event.Key == Key.Enter && !string.IsNullOrEmpty(chattedText))
                     Chatted.Raise(this, chattedText);
 
                 return true;
@@ -400,14 +447,14 @@ namespace Orion.Game.Presentation.Gui
             return false;
         }
 
-        private bool OnMinimapMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)
+        private bool OnMinimapMouseButton(Control sender, MouseEvent @event)
         {
-            if (button == MouseButtons.Left)
+            if (@event.Button == MouseButtons.Left)
             {
-                if (pressCount > 0)
+                if (@event.IsPressed)
                 {
                     sender.AcquireMouseCapture();
-                    MoveMinimapCamera(sender.Rectangle, mouseState.Position);
+                    MoveMinimapCamera(sender.Rectangle, @event.Position);
                 }
                 else
                 {
@@ -416,11 +463,11 @@ namespace Orion.Game.Presentation.Gui
 
                 return true;
             }
-            else if (button == MouseButtons.Right)
+            else if (@event.Button == MouseButtons.Right)
             {
-                if (pressCount > 0 && sender.IsUnderMouse)
+                if (@event.IsPressed && sender.IsUnderMouse)
                 {
-                    Vector2 normalizedPosition = sender.Rectangle.Normalize(sender.Rectangle.Clamp(mouseState.Position));
+                    Vector2 normalizedPosition = sender.Rectangle.Normalize(sender.Rectangle.Clamp(@event.Position));
                     MinimapRightClicked.Raise(this, normalizedPosition);
                 }
 
@@ -430,11 +477,11 @@ namespace Orion.Game.Presentation.Gui
             return false;
         }
 
-        private bool OnMinimapMouseMoved(Control sender, MouseState mouseState)
+        private bool OnMinimapMouseMoved(Control sender, MouseEvent @event)
         {
             if (sender.HasMouseCapture)
             {
-                MoveMinimapCamera(sender.Rectangle, mouseState.Position);
+                MoveMinimapCamera(sender.Rectangle, @event.Position);
                 return true;
             }
 

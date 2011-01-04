@@ -52,13 +52,13 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren() { }
 
-        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseEvent @event)
         {
-            if (button == MouseButtons.Left)
+            if (@event.Button == MouseButtons.Left)
             {
-                if (pressCount > 0)
+                if (@event.IsPressed)
                 {
-                    lastDragPosition = state.Position;
+                    lastDragPosition = @event.Position;
                     AcquireMouseCapture();
                     DragStarted.Raise(this);
                 }
@@ -75,12 +75,12 @@ namespace Orion.Engine.Gui2
             return false;
         }
 
-        protected override bool OnMouseMoved(MouseState state)
+        protected override bool OnMouseMoved(MouseEvent @event)
         {
             if (IsDragged)
             {
-                Point delta = state.Position - lastDragPosition.Value;
-                lastDragPosition = state.Position;
+                Point delta = @event.Position - lastDragPosition.Value;
+                lastDragPosition = @event.Position;
                 Dragging.Raise(this, delta);
 
                 return true;

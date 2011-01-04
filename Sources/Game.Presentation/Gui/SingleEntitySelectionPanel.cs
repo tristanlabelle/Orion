@@ -18,6 +18,7 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly GameGraphics graphics;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
+        private readonly Action<Unit> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
         private readonly Action<ResourceNode> remainingAmountChangedEventHandler;
 
@@ -35,6 +36,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
+            this.damageChangedEventHandler = UpdateHealth;
             this.taskQueueChangedEventHandler = UpdateTodoList;
             this.remainingAmountChangedEventHandler = UpdateAmount;
 
@@ -79,6 +81,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 Unit unit = (Unit)entity;
 
+                unit.DamageChanged -= damageChangedEventHandler;
                 unit.TaskQueue.Changed -= taskQueueChangedEventHandler;
             }
             else if (entity is ResourceNode)
@@ -97,9 +100,10 @@ namespace Orion.Game.Presentation.Gui
 
                 nameLabel.Text = unit.Type.Name;
                 imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
-                healthLabel.Text = (int)Math.Ceiling(unit.Health) + "/" + unit.MaxHealth;
+                UpdateHealth(unit);
                 UpdateTodoList(unit.TaskQueue);
 
+                unit.DamageChanged += damageChangedEventHandler;
                 unit.TaskQueue.Changed += taskQueueChangedEventHandler;
             }
             else if (entity is ResourceNode)
@@ -120,6 +124,11 @@ namespace Orion.Game.Presentation.Gui
                 unusedTodoButtons.Add(todoButton);
 
             todoStackPanel.Children.Clear();
+        }
+
+        private void UpdateHealth(Unit unit)
+        {
+            healthLabel.Text = (int)Math.Ceiling(unit.Health) + "/" + unit.MaxHealth;
         }
 
         private void UpdateTodoList(TaskQueue taskQueue)

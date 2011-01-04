@@ -5,8 +5,7 @@ using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 using Orion.Engine.Input;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Engine.Gui2
 {
@@ -97,24 +96,24 @@ namespace Orion.Engine.Gui2
             if (Clicked != null) Clicked(this, MouseButtons.None);
         }
 
-        protected override bool OnKey(Keys key, Keys modifiers, bool pressed)
+        protected override bool OnKeyEvent(KeyEvent @event)
         {
-            if (key == Keys.Enter && modifiers == Keys.None)
+            if (@event.Key == Key.Enter && @event.ModifierKeys == ModifierKeys.None)
             {
-                if (pressed) Click();
+                if (@event.IsDown) Click();
                 return true;
             }
 
             return false;
         }
 
-        protected override bool OnMouseButton(MouseState state, MouseButtons button, int pressCount)
+        protected override bool OnMouseButton(MouseEvent @event)
         {
-            if ((ClickingButtons & button) != 0)
+            if ((ClickingButtons & @event.Button) != 0)
             {
-                if (pressCount > 0)
+                if (@event.IsPressed)
                 {
-                    pressingButton = button;
+                    pressingButton = @event.Button;
                     AcquireKeyboardFocus();
                     AcquireMouseCapture();
                 }
@@ -123,7 +122,7 @@ namespace Orion.Engine.Gui2
                     ReleaseMouseCapture();
                     pressingButton = MouseButtons.None;
 
-                    if (IsUnderMouse) Clicked.Raise(this, button);
+                    if (IsUnderMouse) Clicked.Raise(this, @event.Button);
                 }
 
                 return true;

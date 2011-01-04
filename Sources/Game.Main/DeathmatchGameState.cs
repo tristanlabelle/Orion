@@ -18,8 +18,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Main
 {
@@ -71,7 +70,7 @@ namespace Orion.Game.Main
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
             this.ui.MouseWheel += OnViewportMouseWheel;
-            this.ui.Key += OnViewportKey;
+            this.ui.KeyEvent += OnViewportKeyEvent;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
@@ -209,49 +208,53 @@ namespace Orion.Game.Main
             graphics.Context.ProjectionBounds = previousProjectionBounds;
         }
 
-        private bool OnViewportMouseMoved(Control sender, MouseState mouseState)
+        private bool OnViewportMouseMoved(Control sender, MouseEvent @event)
         {
-            Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
+            Vector2 worldPosition = camera.ViewportToWorld(@event.Position - ui.ViewportRectangle.Min);
             Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.None, 0, 0);
             userInputManager.HandleMouseMove(args);
             return true;
         }
 
-        private bool OnViewportMouseWheel(Control sender, MouseState mouseState, float amount)
+        private bool OnViewportMouseWheel(Control sender, MouseEvent @event)
         {
-            if (amount >= 1) camera.ZoomIn();
-            if (amount <= -1) camera.ZoomOut();
+            if (@event.WheelDelta >= 1) camera.ZoomIn();
+            if (@event.WheelDelta <= -1) camera.ZoomOut();
             return true;
         }
 
-        private bool OnViewportMouseButton(Control sender, MouseState mouseState, MouseButtons button, int pressCount)
+        private bool OnViewportMouseButton(Control sender, MouseEvent @event)
         {
-            if (button == MouseButtons.Left)
+            if (@event.Button == MouseButtons.Left)
             {
-                if (pressCount > 0) sender.AcquireMouseCapture();
+                if (@event.IsPressed) sender.AcquireMouseCapture();
                 else sender.ReleaseMouseCapture();
             }
 
-            Vector2 worldPosition = camera.ViewportToWorld(mouseState.Position - ui.ViewportRectangle.Min);
+            Vector2 worldPosition = camera.ViewportToWorld(@event.Position - ui.ViewportRectangle.Min);
 
             Input.MouseButton inputButton;
-            if (button == MouseButtons.Left) inputButton = Input.MouseButton.Left;
-            else if (button == MouseButtons.Middle) inputButton = Input.MouseButton.Middle;
-            else if (button == MouseButtons.Right) inputButton = Input.MouseButton.Right;
+            if (@event.Button == MouseButtons.Left) inputButton = Input.MouseButton.Left;
+            else if (@event.Button == MouseButtons.Middle) inputButton = Input.MouseButton.Middle;
+            else if (@event.Button == MouseButtons.Right) inputButton = Input.MouseButton.Right;
             else return false;
 
-            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, inputButton, pressCount, 0);
+            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, inputButton, @event.IsPressed ? 1 : 0, 0);
 
-            if (pressCount == 0) userInputManager.HandleMouseUp(args);
-            else userInputManager.HandleMouseDown(args);
+            if (@event.IsPressed) userInputManager.HandleMouseDown(args);
+            else userInputManager.HandleMouseUp(args);
 
             return true;
         }
 
-        private bool OnViewportKey(Control sender, Keys keyAndModifiers, bool pressed)
+        private bool OnViewportKeyEvent(Control sender, KeyEvent @event)
         {
-            Input.KeyboardEventArgs args = new Input.KeyboardEventArgs(keyAndModifiers);
-            if (pressed) userInputManager.HandleKeyDown(args);
+            var keys = Input.InputEnums.GetFormsKeys(@event.Key);
+            var modifierKeys = Input.InputEnums.GetFormsModifierKeys(@event.ModifierKeys);
+
+            Input.KeyboardEventArgs args = new Input.KeyboardEventArgs(keys | modifierKeys);
+
+            if (@event.IsDown) userInputManager.HandleKeyDown(args);
             else userInputManager.HandleKeyUp(args);
 
             return true;

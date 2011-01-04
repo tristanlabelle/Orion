@@ -15,8 +15,10 @@ using Orion.Game.Presentation.Gui;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
+using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Main
@@ -35,6 +37,7 @@ namespace Orion.Game.Main
         private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
         private readonly MatchUI2 ui;
+        private readonly SingleEntitySelectionPanel singleEntitySelectionPanel;
         private readonly WorkerActivityMonitor workerActivityMonitor;
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
@@ -59,6 +62,8 @@ namespace Orion.Game.Main
             this.localCommander = localCommander;
 
             this.userInputManager = new UserInputManager(match, localCommander);
+            this.userInputManager.Selection.Changed += OnSelectionChanged;
+
             this.ui = new MatchUI2(graphics.GuiStyle);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
             this.ui.MinimapRightClicked += OnMinimapRightClicked;
@@ -66,7 +71,10 @@ namespace Orion.Game.Main
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
             this.ui.MouseWheel += OnViewportMouseWheel;
+            this.ui.Key += OnViewportKey;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
+
+            this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
 
             this.workerActivityMonitor = new WorkerActivityMonitor(localCommander.Faction);
 
@@ -153,6 +161,20 @@ namespace Orion.Game.Main
             graphics.DrawGui();
         }
 
+        private void OnSelectionChanged(Selection selection)
+        {
+            if (selection.Count == 1)
+            {
+                singleEntitySelectionPanel.Entity = selection.FirstOrDefault();
+                ui.SelectionInfoControl = singleEntitySelectionPanel;
+            }
+            else
+            {
+                ui.SelectionInfoControl = null;
+                singleEntitySelectionPanel.Entity = null;
+            }
+        }
+
         private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)
         {
             camera.Target = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
@@ -222,6 +244,15 @@ namespace Orion.Game.Main
 
             if (pressCount == 0) userInputManager.HandleMouseUp(args);
             else userInputManager.HandleMouseDown(args);
+
+            return true;
+        }
+
+        private bool OnViewportKey(Control sender, Keys keyAndModifiers, bool pressed)
+        {
+            Input.KeyboardEventArgs args = new Input.KeyboardEventArgs(keyAndModifiers);
+            if (pressed) userInputManager.HandleKeyDown(args);
+            else userInputManager.HandleKeyUp(args);
 
             return true;
         }

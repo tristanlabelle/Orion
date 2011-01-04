@@ -107,7 +107,8 @@
     <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
     <Compile Include="Gui\Scroller.cs" />
-    <Compile Include="Gui\SingleUnitSelectionPanel.cs" />
+    <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
+    <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
     <Compile Include="Renderers\CreepMoneyRenderer.cs" />

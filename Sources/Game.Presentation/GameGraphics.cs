@@ -15,6 +15,7 @@ using Keys = System.Windows.Forms.Keys;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using InputMouseEventType = Orion.Engine.Input.MouseEventType;
 using RootView = Orion.Engine.Gui.RootView;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation
 {
@@ -165,8 +166,20 @@ namespace Orion.Game.Presentation
         /// <returns>The texture for that action.</returns>
         public Texture GetActionTexture(string actionName)
         {
-            string fullName = Path.Combine("Actions", actionName);
+            string fullName = Path.Combine(Path.Combine("Gui", "Actions"), actionName);
             return GetTexture(fullName);
+        }
+
+        /// <summary>
+        /// Gets a texture representing an action in the UI.
+        /// </summary>
+        /// <param name="task">A task based on the action.</param>
+        /// <returns>The texture for that action.</returns>
+        public Texture GetActionTexture(Task task)
+        {
+            string taskName = task.GetType().Name;
+            string actionName = taskName.EndsWith("Task") ? taskName.Substring(0, taskName.Length - "Task".Length) : taskName;
+            return GetActionTexture(actionName);
         }
 
         /// <summary>

@@ -30,12 +30,14 @@ namespace Orion.Engine.Gui2
                 Argument.EnsureNotNull(item, "item");
 
                 stackPanel.AdoptChild(item);
+                stackPanel.InvalidateMeasure();
                 base.InsertItem(index, item);
             }
 
             protected override void RemoveItem(int index)
             {
                 stackPanel.AbandonChild(Items[index]);
+                stackPanel.InvalidateMeasure();
                 base.RemoveItem(index);
             }
 

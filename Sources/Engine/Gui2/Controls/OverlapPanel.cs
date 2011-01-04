@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Engine.Gui2.Controls
+namespace Orion.Engine.Gui2
 {
     /// <summary>
     /// A panel control which arranges its children so that each appears above the previous.

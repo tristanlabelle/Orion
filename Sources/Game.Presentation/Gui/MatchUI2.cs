@@ -275,6 +275,7 @@ namespace Orion.Game.Presentation.Gui
             ContentControl minimapBoxContainer = new ContentControl();
             dockPanel.Dock(minimapBoxContainer, Direction.MinX);
             minimapBoxContainer.SetSize(200, 200);
+            minimapBoxContainer.MaxXMargin = 6;
             minimapBoxContainer.Content = CreateMinimapViewport();
 
             actionButtonGrid = CreateActionButtons();

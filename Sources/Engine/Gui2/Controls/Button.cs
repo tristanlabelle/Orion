@@ -13,7 +13,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A button <see cref="Control"/> that can be clicked by the user.
     /// </summary>
-    public sealed class Button : ContentControl
+    public class Button : ContentControl
     {
         #region Fields
         private bool isEnabled = true;

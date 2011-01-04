@@ -174,7 +174,25 @@ namespace Orion.Engine.Gui2
             }
             else
             {
-                throw new NotImplementedException();
+                int x = 0;
+                for (int i = 0; i < children.Count; ++i)
+                {
+                    if (i > 0) x += childGap;
+
+                    Control child = children[i];
+                    Size childSize = child.Measure();
+
+                    int width = Math.Max(minChildSize, childSize.Width);
+                    Region availableSpace = new Region(
+                        direction == Direction.MaxX ? rectangle.MinX + x : rectangle.ExclusiveMaxX - width - x,
+                        rectangle.MinY,
+                        width, rectangle.Height);
+
+                    Region childRectangle = DefaultArrange(availableSpace, child);
+                    ArrangeChild(child, childRectangle);
+
+                    x += width;
+                }
             }
         }
         #endregion

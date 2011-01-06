@@ -232,7 +232,11 @@ namespace Orion.Game.Presentation
             switch (args.Key)
             {
                 case Keys.Escape: mouseCommand = null; break;
-                case Keys.ShiftKey: shiftKeyPressed = true; break;
+                case Keys.ShiftKey:
+                case Keys.LShiftKey:
+                case Keys.RShiftKey:
+                    shiftKeyPressed = true;
+                    break;
                 case Keys.Delete: LaunchSuicide(); break;
             }
 
@@ -248,7 +252,7 @@ namespace Orion.Game.Presentation
 
         public void HandleKeyUp(KeyboardEventArgs args)
         {
-            if (args.Key == Keys.ShiftKey)
+            if (args.Key == Keys.ShiftKey || args.Key == Keys.LShiftKey || args.Key == Keys.RShiftKey)
             {
                 shiftKeyPressed = false;
                 if (launchedCommandsWithShift)

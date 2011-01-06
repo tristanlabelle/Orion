@@ -23,6 +23,9 @@ namespace Orion.Game.Presentation.Gui
         private readonly OrionGuiStyle style;
         private readonly Action<UIManager, TimeSpan> updatedEventHandler;
 
+        private readonly InterpolatedCounter aladdiumAmountCounter = new InterpolatedCounter(0);
+        private readonly InterpolatedCounter alageneAmountCounter = new InterpolatedCounter(0);
+
         private Label aladdiumAmountLabel;
         private Label alageneAmountLabel;
         private Label foodAmountLabel;
@@ -100,11 +103,11 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public int AladdiumAmount
         {
-            get { return int.Parse(aladdiumAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
+            get { return aladdiumAmountCounter.TargetValue; }
             set
             {
                 Argument.EnsurePositive(value, "AladdiumAmount");
-                aladdiumAmountLabel.Text = value.ToStringInvariant();
+                aladdiumAmountCounter.TargetValue = value;
             }
         }
 
@@ -113,11 +116,11 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public int AlageneAmount
         {
-            get { return int.Parse(alageneAmountLabel.Text, NumberFormatInfo.InvariantInfo); }
+            get { return alageneAmountCounter.TargetValue; }
             set
             {
                 Argument.EnsurePositive(value, "AlageneAmount");
-                alageneAmountLabel.Text = value.ToStringInvariant();
+                alageneAmountCounter.TargetValue = value;
             }
         }
 
@@ -263,7 +266,11 @@ namespace Orion.Game.Presentation.Gui
 
             ImageBox dummyImageBox;
             resourcesStackPanel.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
+            PropertyBinding.BindOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
+
             resourcesStackPanel.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
+            PropertyBinding.BindOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
+
             resourcesStackPanel.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";
 
@@ -405,6 +412,10 @@ namespace Orion.Game.Presentation.Gui
         private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
             time += elapsedTime;
+
+            aladdiumAmountCounter.Update(elapsedTime);
+            alageneAmountCounter.Update(elapsedTime);
+
             UpdateScrollDirection();
             UpdateInactiveWorkerButton();
         }

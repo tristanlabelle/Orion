@@ -365,11 +365,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Size DesiredOuterSize
         {
-            get
-            {
-                Debug.Assert(isMeasured, "DesiredOuterSize should not be read when not measured.");
-                return cachedDesiredOuterSize;
-            }
+            get { return cachedDesiredOuterSize; }
         }
 
 
@@ -381,7 +377,6 @@ namespace Orion.Engine.Gui2
         {
             get
             {
-                Debug.Assert(isMeasured, "DesiredSize should not be read when not measured.");
                 return new Size(
                     Math.Max(0, cachedDesiredOuterSize.Width - margin.TotalX),
                     Math.Max(0, cachedDesiredOuterSize.Height - margin.TotalY));
@@ -394,11 +389,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Size ActualSize
         {
-            get
-            {
-                Debug.Assert(isArranged, "Actual should not be read when not arranged.");
-                return Rectangle.Size;
-            }
+            get { return Rectangle.Size; }
         }
         #endregion
 
@@ -409,11 +400,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Region OuterRectangle
         {
-            get
-            {
-                Debug.Assert(isArranged, "OuterRectangle should not be read when not arranged.");
-                return cachedOuterRectangle;
-            }
+            get { return cachedOuterRectangle; }
         }
 
         /// <summary>
@@ -424,7 +411,6 @@ namespace Orion.Engine.Gui2
         {
             get
             {
-                Debug.Assert(isArranged, "Rectangle should not be read when not arranged.");
                 return new Region(
                     cachedOuterRectangle.MinX + margin.MinX,
                     cachedOuterRectangle.MinY + margin.MinY,

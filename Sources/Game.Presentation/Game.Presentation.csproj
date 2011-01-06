@@ -100,6 +100,7 @@
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="GameGraphics.cs" />
+    <Compile Include="Gui\InterpolatedCounter.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
     <Compile Include="Gui\OrionGuiStyle.cs" />

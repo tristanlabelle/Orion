@@ -7,10 +7,10 @@ using System.ComponentModel;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// Represents an entry in a <see cref="FormPanel"/>, with a header and a content control.
+    /// Represents an entry in a <see cref="FormLayout"/>, with a header and a content control.
     /// </summary>
     [ImmutableObject(true)]
-    public struct FormPanelEntry
+    public struct FormLayoutEntry
     {
         #region Fields
         private readonly Control header;
@@ -18,7 +18,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public FormPanelEntry(Control header, Control content)
+        public FormLayoutEntry(Control header, Control content)
         {
             this.header = header;
             this.content = content;

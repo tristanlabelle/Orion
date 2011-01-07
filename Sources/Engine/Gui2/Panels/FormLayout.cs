@@ -9,7 +9,7 @@ namespace Orion.Engine.Gui2
     /// A layout <see cref="Control"/> which arranges its children as a form,
     /// with headers (typically text) next to fields.
     /// </summary>
-    public sealed partial class FormPanel : Control
+    public sealed partial class FormLayout : Control
     {
         #region Fields
         private readonly EntryCollection entries;
@@ -20,7 +20,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public FormPanel()
+        public FormLayout()
         {
             entries = new EntryCollection(this);
         }
@@ -28,7 +28,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Gets the collection of entries in this <see cref="FormPanel"/>.
+        /// Gets the collection of entries in this <see cref="FormLayout"/>.
         /// </summary>
         public EntryCollection Entries
         {
@@ -86,7 +86,7 @@ namespace Orion.Engine.Gui2
 
         #region Methods
         /// <summary>
-        /// Adds an entry with a header and a content control to this <see cref="FormPanel"/>.
+        /// Adds an entry with a header and a content control to this <see cref="FormLayout"/>.
         /// </summary>
         /// <param name="header">The header control of the entry.</param>
         /// <param name="content">The content control of the entry.</param>
@@ -97,7 +97,7 @@ namespace Orion.Engine.Gui2
 
         protected override IEnumerable<Control> GetChildren()
         {
-            foreach (FormPanelEntry entry in entries)
+            foreach (FormLayoutEntry entry in entries)
             {
                 if (entry.Header != null) yield return entry.Header;
                 if (entry.Content != null) yield return entry.Content;
@@ -114,7 +114,7 @@ namespace Orion.Engine.Gui2
             {
                 if (i > 0) height += entryGap;
 
-                FormPanelEntry entry = entries[i];
+                FormLayoutEntry entry = entries[i];
                 int entryHeight = 0;
 
                 if (entry.Header != null)
@@ -146,7 +146,7 @@ namespace Orion.Engine.Gui2
             {
                 if (i > 0) y += entryGap;
 
-                FormPanelEntry entry = entries[i];
+                FormLayoutEntry entry = entries[i];
                 int entryHeight = minEntrySize;
 
                 if (entry.Header != null)

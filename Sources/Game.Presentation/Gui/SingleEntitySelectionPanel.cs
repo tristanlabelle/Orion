@@ -34,8 +34,8 @@ namespace Orion.Game.Presentation.Gui
         private Label nameLabel;
         private Label healthLabel;
         private ImageBox imageBox;
-        private FormPanel infoFormPanel;
-        private StackPanel todoStackPanel;
+        private FormLayout statsForm;
+        private StackLayout todoButtonStack;
         private Entity entity;
         #endregion
 
@@ -49,12 +49,12 @@ namespace Orion.Game.Presentation.Gui
             this.taskQueueChangedEventHandler = UpdateTodoList;
             this.remainingAmountChangedEventHandler = UpdateAmount;
 
-            DockPanel mainDockPanel = new DockPanel();
-            Content = mainDockPanel;
-            mainDockPanel.LastChildFill = true;
+            DockLayout dock = new DockLayout();
+            Content = dock;
+            dock.LastChildFill = true;
 
-            mainDockPanel.Dock(CreatePhoto(), Direction.MinX);
-            mainDockPanel.Dock(CreateInfoForm(), Direction.MaxX);
+            dock.Dock(CreatePhoto(), Direction.MinX);
+            dock.Dock(CreateInfoForm(), Direction.MaxX);
         }
         #endregion
 
@@ -103,7 +103,7 @@ namespace Orion.Game.Presentation.Gui
 
         private void SetEntity()
         {
-            infoFormPanel.Entries.Clear();
+            statsForm.Entries.Clear();
 
             if (entity is Unit)
             {
@@ -113,7 +113,7 @@ namespace Orion.Game.Presentation.Gui
                 imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
                 UpdateHealth(unit);
                 UpdateTodoList(unit.TaskQueue);
-                infoFormPanel.Visibility = Visibility.Visible;
+                statsForm.Visibility = Visibility.Visible;
                 foreach (UnitStat stat in statsToDisplay)
                 {
                     if (!unit.Type.HasSkill(stat.SkillType)) continue;
@@ -124,7 +124,7 @@ namespace Orion.Game.Presentation.Gui
                     Label headerLabel = Style.CreateLabel(stat.Description + ":");
                     Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
 
-                    infoFormPanel.Entries.Add(headerLabel, valueLabel);
+                    statsForm.Entries.Add(headerLabel, valueLabel);
                 }
 
                 unit.DamageChanged += damageChangedEventHandler;
@@ -137,7 +137,7 @@ namespace Orion.Game.Presentation.Gui
                 nameLabel.Text = resourceNode.Type.ToStringInvariant();
                 imageBox.Texture = graphics.GetResourceTexture(resourceNode);
                 UpdateAmount(resourceNode);
-                infoFormPanel.Visibility = Visibility.Hidden;
+                statsForm.Visibility = Visibility.Hidden;
 
                 resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
             }
@@ -145,10 +145,10 @@ namespace Orion.Game.Presentation.Gui
 
         private void ClearTodoList()
         {
-            foreach (TodoButton todoButton in todoStackPanel.Children)
+            foreach (TodoButton todoButton in todoButtonStack.Children)
                 unusedTodoButtons.Add(todoButton);
 
-            todoStackPanel.Children.Clear();
+            todoButtonStack.Children.Clear();
         }
 
         private void UpdateHealth(Unit unit)
@@ -164,7 +164,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 TodoButton button = GetTodoButton();
                 button.Texture = graphics.GetActionTexture(task);
-                todoStackPanel.Stack(button);
+                todoButtonStack.Stack(button);
             }
         }
 
@@ -187,7 +187,7 @@ namespace Orion.Game.Presentation.Gui
 
         private Control CreatePhoto()
         {
-            DockPanel photoDockPanel = new DockPanel();
+            DockLayout photoDockPanel = new DockLayout();
             photoDockPanel.LastChildFill = true;
             photoDockPanel.MaxXMargin = 10;
             photoDockPanel.VerticalAlignment = Alignment.Center;
@@ -210,37 +210,37 @@ namespace Orion.Game.Presentation.Gui
 
         private Control CreateInfoForm()
         {
-            DockPanel dockPanel = new DockPanel();
-            dockPanel.LastChildFill = true;
+            DockLayout dock = new DockLayout();
+            dock.LastChildFill = true;
 
-            StackPanel topStackPanel = new StackPanel();
-            topStackPanel.Direction = Direction.MaxX;
-            topStackPanel.MinHeight = 32;
-            topStackPanel.MaxYMargin = 6;
+            StackLayout topStack = new StackLayout();
+            topStack.Direction = Direction.MaxX;
+            topStack.MinHeight = 32;
+            topStack.MaxYMargin = 6;
 
             Label todoLabel = Style.CreateLabel("Todo:");
             todoLabel.VerticalAlignment = Alignment.Center;
             todoLabel.MaxXMargin = 6;
-            topStackPanel.Stack(todoLabel);
+            topStack.Stack(todoLabel);
 
-            todoStackPanel = new StackPanel()
+            todoButtonStack = new StackLayout()
             {
                 Direction = Direction.MaxX,
                 VerticalAlignment = Alignment.Center,
                 ChildGap = 3
             };
-            topStackPanel.Stack(todoStackPanel);
+            topStack.Stack(todoButtonStack);
 
-            dockPanel.Dock(topStackPanel, Direction.MinY);
+            dock.Dock(topStack, Direction.MinY);
 
-            infoFormPanel = new FormPanel();
-            infoFormPanel.VerticalAlignment = Alignment.Min;
-            infoFormPanel.HeaderContentGap = 5;
-            infoFormPanel.EntryGap = 6;
+            statsForm = new FormLayout();
+            statsForm.VerticalAlignment = Alignment.Min;
+            statsForm.HeaderContentGap = 5;
+            statsForm.EntryGap = 6;
 
-            dockPanel.Dock(infoFormPanel, Direction.MaxY);
+            dock.Dock(statsForm, Direction.MaxY);
 
-            return dockPanel;
+            return dock;
         }
         #endregion
     }

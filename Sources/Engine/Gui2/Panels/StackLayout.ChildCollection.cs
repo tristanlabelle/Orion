@@ -6,18 +6,21 @@ using System.Text;
 
 namespace Orion.Engine.Gui2
 {
-    partial class StackPanel
+    partial class StackLayout
     {
+        /// <summary>
+        /// A collection of a <see cref="StackLayout"/>'s child <see cref="Control"/>s.
+        /// </summary>
         public sealed class ChildCollection : Collection<Control>
         {
             #region Fields
-            private readonly StackPanel stackPanel;
+            private readonly StackLayout stack;
             #endregion
 
             #region Constructors
-            internal ChildCollection(StackPanel stackPanel)
+            internal ChildCollection(StackLayout stack)
             {
-                this.stackPanel = stackPanel;
+                this.stack = stack;
             }
             #endregion
 
@@ -29,15 +32,15 @@ namespace Orion.Engine.Gui2
             {
                 Argument.EnsureNotNull(item, "item");
 
-                stackPanel.AdoptChild(item);
-                stackPanel.InvalidateMeasure();
+                stack.AdoptChild(item);
+                stack.InvalidateMeasure();
                 base.InsertItem(index, item);
             }
 
             protected override void RemoveItem(int index)
             {
-                stackPanel.AbandonChild(Items[index]);
-                stackPanel.InvalidateMeasure();
+                stack.AbandonChild(Items[index]);
+                stack.InvalidateMeasure();
                 base.RemoveItem(index);
             }
 

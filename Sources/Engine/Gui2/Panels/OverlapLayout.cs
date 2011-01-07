@@ -6,16 +6,16 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A panel control which arranges its children so that each appears above the previous.
+    /// A layout <see cref="Control"/> which arranges its children so that each appears above the previous.
     /// </summary>
-    public sealed partial class OverlapPanel : Control
+    public sealed partial class OverlapLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;
         #endregion
 
         #region Constructors
-        public OverlapPanel()
+        public OverlapLayout()
         {
             children = new ChildCollection(this);
         }
@@ -23,7 +23,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Gets the children of this <see cref="OverlapPanel"/>. The last child is the topmost one.
+        /// Gets the children of this <see cref="OverlapLayout"/>. The last child is the topmost one.
         /// </summary>
         public new ChildCollection Children
         {

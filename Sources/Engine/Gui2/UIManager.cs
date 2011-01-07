@@ -214,19 +214,30 @@ namespace Orion.Engine.Gui2
             if (control.Visibility != Visibility.Visible || control.Rectangle.Area == 0)
                 return;
 
-            if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
 
             Region? previousClippingRectangle = Renderer.ClippingRectangle;
-            Renderer.ClippingRectangle = control.Rectangle;
+            if (previousClippingRectangle.HasValue)
+            {
+                Region? intersection = Region.Intersection(previousClippingRectangle.Value, control.Rectangle);
+                if (!intersection.HasValue) return;
+
+                Renderer.ClippingRectangle = intersection.Value;
+            }
+            else
+            {
+                Renderer.ClippingRectangle = control.Rectangle;
+            }
+
+            if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
 
             control.Draw();
 
             foreach (Control child in control.Children)
                 DrawControlAndDescendants(child);
 
-            renderer.ClippingRectangle = previousClippingRectangle;
-
             if (control.Adornment != null) control.Adornment.DrawForeground(renderer, control);
+
+            renderer.ClippingRectangle = previousClippingRectangle;
         }
 
         private void DrawCursor()

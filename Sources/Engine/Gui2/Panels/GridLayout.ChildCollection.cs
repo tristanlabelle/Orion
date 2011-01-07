@@ -6,12 +6,12 @@ using System.Diagnostics;
 
 namespace Orion.Engine.Gui2
 {
-    partial class GridPanel
+    partial class GridLayout
     {
         public sealed class ChildCollection : ICollection<Control>
         {
             #region Fields
-            private readonly GridPanel panel;
+            private readonly GridLayout grid;
             private Control[,] children;
             private int rowCount;
             private int columnCount;
@@ -19,13 +19,13 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Constructors
-            internal ChildCollection(GridPanel panel, int rowCount, int columnCount)
+            internal ChildCollection(GridLayout grid, int rowCount, int columnCount)
             {
-                Argument.EnsureNotNull(panel, "panel");
+                Argument.EnsureNotNull(grid, "grid");
                 Argument.EnsurePositive(rowCount, "rowCount");
                 Argument.EnsurePositive(columnCount, "columnCount");
 
-                this.panel = panel;
+                this.grid = grid;
                 this.children = new Control[rowCount, columnCount];
                 this.rowCount = rowCount;
                 this.columnCount = columnCount;
@@ -63,7 +63,7 @@ namespace Orion.Engine.Gui2
                 set
                 {
                     RemoveAt(rowIndex, columnIndex);
-                    panel.AdoptChild(value);
+                    grid.AdoptChild(value);
                     children[rowIndex, columnIndex] = value;
                 }
             }
@@ -103,9 +103,9 @@ namespace Orion.Engine.Gui2
             public void Add(Control item)
             {
                 Argument.EnsureNotNull(item, "item");
-                if (Count == CellCount) throw new InvalidOperationException("Cannot add a child to a full UniformGridPanel");
+                if (Count == CellCount) throw new InvalidOperationException("Cannot add a child to a full grid.");
 
-                panel.AdoptChild(item);
+                grid.AdoptChild(item);
                 for (int rowIndex = 0; rowIndex < RowCount; ++rowIndex)
                 {
                     for (int columnIndex = 0; columnIndex < ColumnCount; ++columnIndex)
@@ -173,7 +173,7 @@ namespace Orion.Engine.Gui2
                 if (child == null) return false;
 
                 children[rowIndex, columnIndex] = null;
-                panel.AbandonChild(child);
+                grid.AbandonChild(child);
                 return true;
             }
 

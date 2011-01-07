@@ -6,19 +6,19 @@ using System.Collections.ObjectModel;
 
 namespace Orion.Engine.Gui2
 {
-    partial class FormPanel
+    partial class FormLayout
     {
         /// <summary>
-        /// The collection of entries in the <see cref="FormPanel."/>
+        /// The collection of entries in the <see cref="FormLayout."/>
         /// </summary>
-        public sealed class EntryCollection : Collection<FormPanelEntry>
+        public sealed class EntryCollection : Collection<FormLayoutEntry>
         {
             #region Fields
-            private readonly FormPanel form;
+            private readonly FormLayout form;
             #endregion
 
             #region Constructors
-            internal EntryCollection(FormPanel form)
+            internal EntryCollection(FormLayout form)
             {
                 this.form = form;
             }
@@ -32,10 +32,10 @@ namespace Orion.Engine.Gui2
             /// <param name="content">The content of this entry, or <c>null</c> if no content is desired.</param>
             public void Add(Control header, Control content)
             {
-                Add(new FormPanelEntry(header, content));
+                Add(new FormLayoutEntry(header, content));
             }
 
-            protected override void SetItem(int index, FormPanelEntry item)
+            protected override void SetItem(int index, FormLayoutEntry item)
             {
                 RemoveItem(index);
                 InsertItem(index, item);
@@ -43,7 +43,7 @@ namespace Orion.Engine.Gui2
 
             protected override void RemoveItem(int index)
             {
-                FormPanelEntry entry = this[index];
+                FormLayoutEntry entry = this[index];
                 base.RemoveItem(index);
 
                 if (entry.Header != null) form.AbandonChild(entry.Header);
@@ -51,7 +51,7 @@ namespace Orion.Engine.Gui2
                 form.InvalidateMeasure();
             }
 
-            protected override void InsertItem(int index, FormPanelEntry item)
+            protected override void InsertItem(int index, FormLayoutEntry item)
             {
                 if (item.Header != null) form.AdoptChild(item.Header);
                 if (item.Content != null) form.AdoptChild(item.Content);

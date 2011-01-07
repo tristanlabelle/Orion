@@ -6,9 +6,9 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A panel which displays its items as a horizontal or vertical stack.
+    /// A layout <see cref="Control"/> which displays its items as a horizontal or vertical stack.
     /// </summary>
-    public sealed partial class StackPanel : Control
+    public sealed partial class StackLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;
@@ -18,7 +18,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public StackPanel()
+        public StackLayout()
         {
             children = new ChildCollection(this);
         }
@@ -26,7 +26,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses the <see cref="Direction"/> of this <see cref="StackPanel"/>,
+        /// Accesses the <see cref="Direction"/> of this <see cref="StackLayout"/>,
         /// which determines how child <see cref="Control"/>s are stacked.
         /// </summary>
         public Direction Direction
@@ -76,34 +76,17 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the collection of child <see cref="Control"/>s within this <see cref="StackPanel"/>.
+        /// Gets the collection of child <see cref="Control"/>s within this <see cref="StackLayout"/>.
         /// </summary>
         public new ChildCollection Children
         {
             get { return children; }
         }
-
-        /// <summary>
-        /// Utility property to add children to this <see cref="StackPanel"/>.
-        /// </summary>
-        /// <remarks>
-        /// This exists to leverage the object initializer feature of C# 3.
-        /// </remarks>
-        public IEnumerable<Control> InitChildren
-        {
-            set
-            {
-                Argument.EnsureNotNull(value, "InitChildren");
-
-                foreach (Control control in value)
-                    children.Add(control);
-            }
-        }
         #endregion
 
         #region Methods
         /// <summary>
-        /// Stacks a <see cref="Control"/> within this <see cref="StackPanel"/>.
+        /// Stacks a <see cref="Control"/> within this <see cref="StackLayout"/>.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be stacked.</param>
         public void Stack(Control control)

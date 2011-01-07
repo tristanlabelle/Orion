@@ -25,33 +25,33 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(style, "style");
 
-            DockPanel dockPanel = style.Create<DockPanel>();
-            dockPanel.Adornment = new TextureAdornment(style.GetTexture("Gui/MenuBackground"));
-            dockPanel.LastChildFill = true;
-            Content = dockPanel;
+            DockLayout dock = style.Create<DockLayout>();
+            dock.Adornment = new TextureAdornment(style.GetTexture("Gui/MenuBackground"));
+            dock.LastChildFill = true;
+            Content = dock;
 
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
             titleImageBox.Texture = style.GetTexture("Gui/Title");
-            dockPanel.Dock(titleImageBox, Direction.MinY);
+            dock.Dock(titleImageBox, Direction.MinY);
 
-            StackPanel buttonsStackPanel = style.Create<StackPanel>();
-            dockPanel.Dock(buttonsStackPanel, Direction.MaxX);
-            buttonsStackPanel.Direction = Direction.MaxY;
-            buttonsStackPanel.HorizontalAlignment = Alignment.Center;
-            buttonsStackPanel.VerticalAlignment = Alignment.Center;
-            buttonsStackPanel.MinWidth = 300;
-            buttonsStackPanel.MinChildSize = 50;
-            buttonsStackPanel.ChildGap = 10;
+            StackLayout buttonsStack = style.Create<StackLayout>();
+            dock.Dock(buttonsStack, Direction.MaxX);
+            buttonsStack.Direction = Direction.MaxY;
+            buttonsStack.HorizontalAlignment = Alignment.Center;
+            buttonsStack.VerticalAlignment = Alignment.Center;
+            buttonsStack.MinWidth = 300;
+            buttonsStack.MinChildSize = 50;
+            buttonsStack.ChildGap = 10;
 
-            StackButton(buttonsStackPanel, style, "Monojoueur", () => SinglePlayerClicked);
-            StackButton(buttonsStackPanel, style, "Multijoueur", () => MultiplayerClicked);
-            StackButton(buttonsStackPanel, style, "Tower Defense", () => TowerDefenseClicked);
-            StackButton(buttonsStackPanel, style, "Typing Defense", () => TypingDefenseClicked);
-            StackButton(buttonsStackPanel, style, "Visionner une partie", () => ReplayClicked);
-            StackButton(buttonsStackPanel, style, "Options", () => OptionsClicked);
-            StackButton(buttonsStackPanel, style, "Crédits", () => CreditsClicked);
-            StackButton(buttonsStackPanel, style, "Quitter", () => QuitClicked);
+            StackButton(buttonsStack, style, "Monojoueur", () => SinglePlayerClicked);
+            StackButton(buttonsStack, style, "Multijoueur", () => MultiplayerClicked);
+            StackButton(buttonsStack, style, "Tower Defense", () => TowerDefenseClicked);
+            StackButton(buttonsStack, style, "Typing Defense", () => TypingDefenseClicked);
+            StackButton(buttonsStack, style, "Visionner une partie", () => ReplayClicked);
+            StackButton(buttonsStack, style, "Options", () => OptionsClicked);
+            StackButton(buttonsStack, style, "Crédits", () => CreditsClicked);
+            StackButton(buttonsStack, style, "Quitter", () => QuitClicked);
         }
         #endregion
 
@@ -98,11 +98,11 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
-        private void StackButton(StackPanel stackPanel, OrionGuiStyle style, string text, Func<Action<MainMenuUI>> eventGetter)
+        private void StackButton(StackLayout stack, OrionGuiStyle style, string text, Func<Action<MainMenuUI>> eventGetter)
         {
             Button button = style.CreateTextButton(text);
             button.Clicked += (sender, mouseButton) => eventGetter().Raise(this);
-            stackPanel.Stack(button);
+            stack.Stack(button);
         }
         #endregion
     }

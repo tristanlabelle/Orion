@@ -9,9 +9,9 @@ using DockEnum = Orion.Engine.Gui2.Direction;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A panel which arranges its children along its edges.
+    /// A layout <see cref="Control"/> which arranges its children along its edges.
     /// </summary>
-    public sealed partial class DockPanel : Control
+    public sealed partial class DockLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;
@@ -19,7 +19,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public DockPanel()
+        public DockLayout()
         {
             this.children = new ChildCollection(this);
         }
@@ -27,7 +27,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses a value indicating if the last child <see cref="Control"/> of this <see cref="DockPanel"/>
+        /// Accesses a value indicating if the last child <see cref="Control"/> of this <see cref="DockLayout"/>
         /// should be stretched to fill the remaining space, regardless of its <see cref="Dock"/> value.
         /// </summary>
         public bool LastChildFill
@@ -50,30 +50,17 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the collection of <see cref="Control"/> docked within this <see cref="DockPanel"/>.
+        /// Gets the collection of <see cref="Control"/> docked within this <see cref="DockLayout"/>.
         /// </summary>
         public new ChildCollection Children
         {
             get { return children; }
         }
-
-        /// <summary>
-        /// Convenience setter to assign initial children to this <see cref="Control"/>.
-        /// This operation may not be supported by the actual <see cref="Control"/> type.
-        /// </summary>
-        public IEnumerable<DockedControl> InitChildren
-        {
-            set
-            {
-                foreach (DockedControl control in value)
-                    children.Add(control);
-            }
-        }
         #endregion
 
         #region Methods
         /// <summary>
-        /// Adds a given <see cref="Control"/> to this <see cref="DockPanel"/> with the specified <see cref="Dock"/> mode.
+        /// Adds a given <see cref="Control"/> to this <see cref="DockLayout"/> with the specified <see cref="Dock"/> mode.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be added.</param>
         /// <param name="dock">The <see cref="Dock"/> mode of that <see cref="Control"/>.</param>
@@ -84,7 +71,7 @@ namespace Orion.Engine.Gui2
 
         protected override IEnumerable<Control> GetChildren()
         {
-            return children.Controls;
+            return children.Select(dockedChild => dockedChild.Control);
         }
 
         protected override Size MeasureSize()

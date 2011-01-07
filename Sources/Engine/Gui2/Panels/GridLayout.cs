@@ -6,9 +6,9 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A panel which arranges its child <see cref="Control"/>s within a grid cells.
+    /// A layout <see cref="Control"/> which arranges its children within grid cells.
     /// </summary>
-    public sealed partial class GridPanel : Control
+    public sealed partial class GridLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;
@@ -20,14 +20,14 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public GridPanel(int rowCount, int columnCount)
+        public GridLayout(int rowCount, int columnCount)
         {
             this.children = new ChildCollection(this, rowCount, columnCount);
             this.desiredRowHeights = new int[rowCount];
             this.desiredColumnWidths = new int[columnCount];
         }
 
-        public GridPanel() : this(0, 0) { }
+        public GridLayout() : this(0, 0) { }
         #endregion
 
         #region Properties

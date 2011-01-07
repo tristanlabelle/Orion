@@ -7,102 +7,23 @@ using System.Collections;
 
 namespace Orion.Engine.Gui2
 {
-    partial class DockPanel
+    partial class DockLayout
     {
         /// <summary>
-        /// Holds the children of a <see cref="DockPanel"/>.
+        /// Holds the children of a <see cref="DockLayout"/>.
         /// </summary>
         public sealed class ChildCollection : Collection<DockedControl>
         {
-            public sealed class ControlCollection : ICollection<Control>
-            {
-                #region Fields
-                private readonly ChildCollection collection;
-                #endregion
-
-                #region Constructors
-                internal ControlCollection(ChildCollection collection)
-                {
-                    Argument.EnsureNotNull(collection, "collection");
-                    this.collection = collection;
-                }
-                #endregion
-
-                #region Properties
-                public int Count
-                {
-                    get { return collection.Count; }
-                }
-                #endregion
-
-                #region Methods
-                public void Clear()
-                {
-                    collection.Clear();
-                }
-
-                public bool Contains(Control item)
-                {
-                    return collection.Contains(item);
-                }
-
-                public void CopyTo(Control[] array, int arrayIndex)
-                {
-                    for (int i = 0; i < collection.Count; ++i)
-                        array[arrayIndex + i] = collection[i].Control;
-                }
-
-                public bool Remove(Control item)
-                {
-                    return collection.Remove(item);
-                }
-
-                public IEnumerator<Control> GetEnumerator()
-                {
-                    return collection.Select(item => item.Control).GetEnumerator();
-                }
-                #endregion
-
-                #region Explicit Members
-                void ICollection<Control>.Add(Control item)
-                {
-                    throw new NotSupportedException();
-                }
-
-                bool ICollection<Control>.IsReadOnly
-                {
-                    get { return false; }
-                }
-
-                IEnumerator IEnumerable.GetEnumerator()
-                {
-                    return GetEnumerator();
-                }
-                #endregion
-            }
-
             #region Fields
-            private readonly DockPanel panel;
-            private readonly ControlCollection controls;
+            private readonly DockLayout dock;
             #endregion
 
             #region Constructors
-            internal ChildCollection(DockPanel panel)
+            internal ChildCollection(DockLayout dock)
             {
-                Argument.EnsureNotNull(panel, "panel");
+                Argument.EnsureNotNull(dock, "dock");
 
-                this.panel = panel;
-                this.controls = new ControlCollection(this);
-            }
-            #endregion
-
-            #region Properties
-            /// <summary>
-            /// Gets the collection of <see cref="Control"/>s within this collection.
-            /// </summary>
-            public ControlCollection Controls
-            {
-                get { return controls; }
+                this.dock = dock;
             }
             #endregion
 
@@ -176,9 +97,9 @@ namespace Orion.Engine.Gui2
             {
                 EnsureAddable(item);
 
-                panel.AdoptChild(item.Control);
+                dock.AdoptChild(item.Control);
                 base.InsertItem(index, item);
-                panel.InvalidateMeasure();
+                dock.InvalidateMeasure();
             }
 
             protected override void RemoveItem(int index)
@@ -186,8 +107,8 @@ namespace Orion.Engine.Gui2
                 Control removedItem = this[index].Control;
                 base.RemoveItem(index);
 
-                panel.AbandonChild(removedItem);
-                panel.InvalidateMeasure();
+                dock.AbandonChild(removedItem);
+                dock.InvalidateMeasure();
             }
 
             protected override void SetItem(int index, DockedControl item)

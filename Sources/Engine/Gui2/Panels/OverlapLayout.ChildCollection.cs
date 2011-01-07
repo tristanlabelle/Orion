@@ -6,20 +6,23 @@ using System.Collections.ObjectModel;
 
 namespace Orion.Engine.Gui2
 {
-    partial class OverlapPanel
+    partial class OverlapLayout
     {
+        /// <summary>
+        /// A collection of <see cref="OverlapLayout"/> child <see cref="Control"/>s.
+        /// </summary>
         public sealed class ChildCollection : Collection<Control>
         {
             #region Fields
-            private readonly OverlapPanel panel;
+            private readonly OverlapLayout layout;
             #endregion
 
             #region Constructors
-            internal ChildCollection(OverlapPanel panel)
+            internal ChildCollection(OverlapLayout layout)
             {
-                Argument.EnsureNotNull(panel, "panel");
+                Argument.EnsureNotNull(layout, "layout");
 
-                this.panel = panel;
+                this.layout = layout;
             }
             #endregion
 
@@ -33,15 +36,15 @@ namespace Orion.Engine.Gui2
             {
                 Control item = Items[index];
                 Items.RemoveAt(index);
-                panel.AbandonChild(item);
-                panel.InvalidateMeasure();
+                layout.AbandonChild(item);
+                layout.InvalidateMeasure();
             }
 
             protected override void InsertItem(int index, Control item)
             {
-                panel.AdoptChild(item);
+                layout.AdoptChild(item);
                 Items.Insert(index, item);
-                panel.InvalidateMeasure();
+                layout.InvalidateMeasure();
             }
 
             protected override void SetItem(int index, Control item)

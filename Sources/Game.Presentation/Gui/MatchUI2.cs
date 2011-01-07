@@ -34,8 +34,8 @@ namespace Orion.Game.Presentation.Gui
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
-        private StackPanel messagesStackPanel;
-        private GridPanel actionButtonGrid;
+        private StackLayout messageStack;
+        private GridLayout actionButtonGrid;
         private TimeSpan time;
         private TimeSpan lastInactiveWorkerCountChangedTime;
 
@@ -51,12 +51,12 @@ namespace Orion.Game.Presentation.Gui
             this.style = style;
             updatedEventHandler = OnGuiUpdated;
 
-            DockPanel mainDockPanel = style.Create<DockPanel>();
-            Content = mainDockPanel;
-            mainDockPanel.LastChildFill = true;
-            mainDockPanel.Dock(CreateTopBar(), Direction.MinY);
-            mainDockPanel.Dock(CreateBottomBar(), Direction.MaxY);
-            mainDockPanel.Dock(CreateChatOverlays(), Direction.MaxY);
+            DockLayout mainDock = style.Create<DockLayout>();
+            Content = mainDock;
+            mainDock.LastChildFill = true;
+            mainDock.Dock(CreateTopBar(), Direction.MinY);
+            mainDock.Dock(CreateBottomBar(), Direction.MaxY);
+            mainDock.Dock(CreateChatOverlays(), Direction.MaxY);
         }
         #endregion
 
@@ -204,7 +204,7 @@ namespace Orion.Game.Presentation.Gui
         {
             Label label = style.CreateLabel(text);
             label.Color = color;
-            messagesStackPanel.Stack(label);
+            messageStack.Stack(label);
         }
 
         public void SetActionButton(int rowIndex, int columnIndex, Texture texture)
@@ -255,61 +255,61 @@ namespace Orion.Game.Presentation.Gui
             container.Adornment = adornment;
             container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
 
-            DockPanel dockPanel = new DockPanel();
-            container.Content = dockPanel;
+            DockLayout dock = new DockLayout();
+            container.Content = dock;
 
-            StackPanel resourcesStackPanel = new StackPanel();
-            dockPanel.Dock(resourcesStackPanel, Direction.MinX);
-            resourcesStackPanel.Direction = Direction.MaxX;
-            resourcesStackPanel.ChildGap = 10;
-            resourcesStackPanel.MaxXMargin = 15;
+            StackLayout resourcesStack = new StackLayout();
+            dock.Dock(resourcesStack, Direction.MinX);
+            resourcesStack.Direction = Direction.MaxX;
+            resourcesStack.ChildGap = 10;
+            resourcesStack.MaxXMargin = 15;
 
             ImageBox dummyImageBox;
-            resourcesStackPanel.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
             PropertyBinding.BindOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
 
-            resourcesStackPanel.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
             PropertyBinding.BindOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
 
-            resourcesStackPanel.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";
 
             Button inactiveWorkersButton = new Button();
-            dockPanel.Dock(inactiveWorkersButton, Direction.MinX);
+            dock.Dock(inactiveWorkersButton, Direction.MinX);
             inactiveWorkersButton.Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel);
             inactiveWorkersButton.Clicked += (sender, mouseButton) => InactiveWorkersButtonPressed.Raise(this);
 
             Button pauseButton = style.CreateTextButton("Pause");
-            dockPanel.Dock(pauseButton, Direction.MaxX);
+            dock.Dock(pauseButton, Direction.MaxX);
             pauseButton.VerticalAlignment = Alignment.Center;
 
             Button diplomacyButton = style.CreateTextButton("Diplomatie");
-            dockPanel.Dock(diplomacyButton, Direction.MaxX);
+            dock.Dock(diplomacyButton, Direction.MaxX);
             diplomacyButton.VerticalAlignment = Alignment.Center;
             diplomacyButton.MaxXMargin = 10;
 
             return container;
         }
 
-        private StackPanel CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
+        private StackLayout CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
         {
-            StackPanel stackPanel = new StackPanel();
-            stackPanel.Direction = Direction.MaxX;
+            StackLayout stack = new StackLayout();
+            stack.Direction = Direction.MaxX;
 
             imageBox = new ImageBox();
-            stackPanel.Stack(imageBox);
+            stack.Stack(imageBox);
             imageBox.Texture = style.GetTexture(textureName);
             imageBox.VerticalAlignment = Alignment.Center;
             imageBox.SetSize(30, 30);
 
             label = style.CreateLabel("0");
-            stackPanel.Stack(label);
+            stack.Stack(label);
             label.VerticalAlignment = Alignment.Center;
             label.MinXMargin = 5;
             label.MinWidth = 30;
             label.Color = Colors.White;
 
-            return stackPanel;
+            return stack;
         }
 
         private Control CreateBottomBar()
@@ -320,21 +320,21 @@ namespace Orion.Game.Presentation.Gui
             container.IsMouseEventSink = true;
             container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
 
-            DockPanel dockPanel = new DockPanel();
-            container.Content = dockPanel;
-            dockPanel.LastChildFill = true;
+            DockLayout dock = new DockLayout();
+            container.Content = dock;
+            dock.LastChildFill = true;
 
             ContentControl minimapBoxContainer = new ContentControl();
-            dockPanel.Dock(minimapBoxContainer, Direction.MinX);
+            dock.Dock(minimapBoxContainer, Direction.MinX);
             minimapBoxContainer.SetSize(200, 200);
             minimapBoxContainer.MaxXMargin = 6;
             minimapBoxContainer.Content = CreateMinimapViewport();
 
             actionButtonGrid = CreateActionButtons();
-            dockPanel.Dock(actionButtonGrid, Direction.MaxX);
+            dock.Dock(actionButtonGrid, Direction.MaxX);
 
             selectionInfoPanel = new ContentControl();
-            dockPanel.Dock(selectionInfoPanel, Direction.MaxX);
+            dock.Dock(selectionInfoPanel, Direction.MaxX);
             selectionInfoPanel.Content = new ImageBox
             {
                 Texture = style.GetTexture("Gui/Carving"),
@@ -345,9 +345,9 @@ namespace Orion.Game.Presentation.Gui
             return container;
         }
 
-        private GridPanel CreateActionButtons()
+        private GridLayout CreateActionButtons()
         {
-            GridPanel grid = new GridPanel(3, 5);
+            GridLayout grid = new GridLayout(3, 5);
             grid.AreColumnsUniformSized = true;
             grid.AreRowsUniformSized = true;
             grid.CellGap = 3;
@@ -380,10 +380,10 @@ namespace Orion.Game.Presentation.Gui
 
         private Control CreateChatOverlays()
         {
-            DockPanel dockPanel = new DockPanel();
+            DockLayout dock = new DockLayout();
 
             chatTextField = style.Create<TextField>();
-            dockPanel.Dock(chatTextField, Direction.MinY);
+            dock.Dock(chatTextField, Direction.MinY);
             chatTextField.MinXMargin = 5;
             chatTextField.MinYMargin = 5;
             chatTextField.HorizontalAlignment = Alignment.Min;
@@ -391,10 +391,10 @@ namespace Orion.Game.Presentation.Gui
             chatTextField.Visibility = Visibility.Hidden;
             chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
 
-            messagesStackPanel = new StackPanel();
-            dockPanel.Dock(messagesStackPanel, Direction.MinY);
+            messageStack = new StackLayout();
+            dock.Dock(messageStack, Direction.MinY);
 
-            return dockPanel;
+            return dock;
         }
         #endregion
 

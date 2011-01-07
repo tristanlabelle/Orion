@@ -604,6 +604,10 @@ namespace Orion.Engine.Gui2
 
         protected void AdoptChild(Control child)
         {
+            Argument.EnsureNotNull(child, "child");
+            if (child.parent == this) return;
+            if (child.parent != null) throw new ArgumentException("Cannot add a child which already has another parent.");
+
             child.SetParent(this);
         }
 

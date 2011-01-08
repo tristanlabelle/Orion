@@ -17,27 +17,21 @@ namespace Orion.Engine.Gui2
 
         #region Events
         /// <summary>
-        /// Raised when this <see cref="Thumb"/> starts being dragged by the user.
+        /// Raised when this <see cref="Thumb"/> starts or stops being dragged by the user.
         /// </summary>
-        public event Action<Thumb> DragStarted;
+        public event Action<Thumb> DragStateChanged;
 
         /// <summary>
         /// Raised when this <see cref="Thumb"/> is dragged by the user.
         /// </summary>
         public event Action<Thumb, Point> Dragging;
-
-        /// <summary>
-        /// Raised when this <see cref="Thumb"/> stops being dragged by the user.
-        /// </summary>
-        public event Action<Thumb> DragEnded;
         #endregion
 
         #region Properties
         /// <summary>
         /// Gets a value indicating if this <see cref="Thumb"/> is currently being dragged.
         /// </summary>
-        [PropertyChangedEvent("DragStarted")]
-        [PropertyChangedEvent("DragEnded")]
+        [PropertyChangedEvent("DragStateChanged")]
         public bool IsDragged
         {
             get { return lastDragPosition.HasValue; }
@@ -60,13 +54,13 @@ namespace Orion.Engine.Gui2
                 {
                     lastDragPosition = @event.Position;
                     AcquireMouseCapture();
-                    DragStarted.Raise(this);
+                    DragStateChanged.Raise(this);
                 }
                 else if (IsDragged)
                 {
                     ReleaseMouseCapture();
                     lastDragPosition = null;
-                    DragEnded.Raise(this);
+                    DragStateChanged.Raise(this);
                 }
 
                 return true;

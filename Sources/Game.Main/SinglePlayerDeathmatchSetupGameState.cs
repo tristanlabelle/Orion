@@ -23,8 +23,7 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
-        private readonly PlayerSettings playerSettings;
-        private readonly MatchConfigurationUI ui;
+        private readonly MatchConfigurationUI2 ui;
         #endregion
 
         #region Constructors
@@ -37,26 +36,20 @@ namespace Orion.Game.Main
             this.matchSettings = new MatchSettings();
             this.matchSettings.AreCheatsEnabled = true;
 
-            this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
+            this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
+            {
+                NeedsReadying = false,
+            };
 
-            List<PlayerBuilder> builders = new List<PlayerBuilder>();
-            builders.Add(new PlayerBuilder("Harvesting Computer", (name, color) => new AIPlayer(name, color)));
+            this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
+            this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
+            this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
 
-            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
-            this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
-            
-            this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
-            this.ui.StartGamePressed += OnStartGamePressed;
-            this.ui.PlayerColorChanged += OnPlayerColorChanged;
-            this.ui.ExitPressed += OnExitPressed;
-        }
-        #endregion
-
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
+            //this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
+            //this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
+            //this.ui.PlayerColorChanged += OnPlayerColorChanged;
+            this.ui.MatchStarted += OnStartGamePressed;
+            this.ui.Exited += OnExitPressed;
         }
         #endregion
 
@@ -64,12 +57,12 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -84,16 +77,11 @@ namespace Orion.Game.Main
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
-        }
-
-        public override void Dispose()
-        {
-            ui.Dispose();
+            graphics.DrawGui();
         }
         #endregion
 
-        private void OnStartGamePressed(MatchConfigurationUI sender)
+        private void OnStartGamePressed(MatchConfigurationUI2 sender)
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -105,6 +93,9 @@ namespace Orion.Game.Main
 
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
+
+            PlayerSettings playerSettings = new PlayerSettings();
+            playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
             foreach (Player player in playerSettings.Players)
             {
                 Faction faction = world.CreateFaction(Colors.GetName(player.Color), player.Color);
@@ -150,7 +141,7 @@ namespace Orion.Game.Main
             player.Color = color;
         }
 
-        private void OnExitPressed(MatchConfigurationUI sender)
+        private void OnExitPressed(MatchConfigurationUI2 sender)
         {
             Manager.Pop();
         }

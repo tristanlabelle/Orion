@@ -104,8 +104,7 @@ namespace Orion.Engine.Gui2
         {
             Region innerRectangle = InnerRectangle;
 
-            button.Measure();
-            Size buttonSize = button.DesiredOuterSize;
+            Size buttonSize = button.Measure();
 
             Region buttonRectangle = new Region(
                 innerRectangle.MinX,

@@ -25,14 +25,9 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
-        public Button()
-        {
-            Padding = new Borders(10, 6);
-            MinSize = new Size(30, 10);
-        }
+        public Button() { }
 
         public Button(string text)
-            : this()
         {
             Argument.EnsureNotNull(text, "text");
 

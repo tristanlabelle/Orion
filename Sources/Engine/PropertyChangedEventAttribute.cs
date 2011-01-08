@@ -11,7 +11,7 @@ namespace Orion.Engine
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public sealed class PropertyChangedEventAttribute : Attribute
     {
         #region Fields

@@ -145,6 +145,19 @@ namespace Orion.Game.Presentation.Gui
         }
 
         /// <summary>
+        /// Creates a <see cref="CheckBox"/> whose content is a text label.
+        /// </summary>
+        /// <param name="text">The check box label text.</param>
+        /// <returns>The newly created <see cref="CheckBox"/>.</returns>
+        public CheckBox CreateTextCheckBox(string text)
+        {
+            CheckBox checkBox = new CheckBox();
+            checkBox.Content = CreateLabel(text);
+            ApplySpecificStyle(checkBox);
+            return checkBox;
+        }
+
+        /// <summary>
         /// Applies the Orion style to a given <see cref="Control"/>.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be styled.</param>
@@ -194,10 +207,8 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(CheckBox checkBox)
         {
-            Texture uncheckedTexture = GetGuiTexture("CheckBox_Unchecked");
-
-            checkBox.Adornment = new TextureAdornment(uncheckedTexture);
-            checkBox.MinSize = uncheckedTexture.Size;
+            checkBox.Button.Adornment = new OrionCheckBoxButtonAdornment(this);
+            checkBox.Button.SetSize(20, 20);
         }
         #endregion
         #endregion

@@ -11,6 +11,7 @@ using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation.Renderers;
 using Orion.Engine.Graphics;
 using Key = OpenTK.Input.Key;
+using Orion.Engine.Data;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -266,10 +267,10 @@ namespace Orion.Game.Presentation.Gui
 
             ImageBox dummyImageBox;
             resourcesStack.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
-            PropertyBinding.BindOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
+            Binding.CreateOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
 
             resourcesStack.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
-            PropertyBinding.BindOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
+            Binding.CreateOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
 
             resourcesStack.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";

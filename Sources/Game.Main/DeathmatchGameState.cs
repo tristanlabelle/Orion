@@ -19,6 +19,7 @@ using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
 using Key = OpenTK.Input.Key;
+using Orion.Engine.Data;
 
 namespace Orion.Game.Main
 {
@@ -77,11 +78,11 @@ namespace Orion.Game.Main
 
             this.workerActivityMonitor = new WorkerActivityMonitor(localCommander.Faction);
 
-            PropertyBinding.BindOneWay(() => localCommander.Faction.AladdiumAmount, () => ui.AladdiumAmount);
-            PropertyBinding.BindOneWay(() => localCommander.Faction.AlageneAmount, () => ui.AlageneAmount);
-            PropertyBinding.BindOneWay(() => localCommander.Faction.UsedFoodAmount, () => ui.UsedFoodAmount);
-            PropertyBinding.BindOneWay(() => localCommander.Faction.MaxFoodAmount, () => ui.FoodLimit);
-            PropertyBinding.BindOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.InactiveWorkerCount);
+            Binding.CreateOneWay(() => localCommander.Faction.AladdiumAmount, () => ui.AladdiumAmount);
+            Binding.CreateOneWay(() => localCommander.Faction.AlageneAmount, () => ui.AlageneAmount);
+            Binding.CreateOneWay(() => localCommander.Faction.UsedFoodAmount, () => ui.UsedFoodAmount);
+            Binding.CreateOneWay(() => localCommander.Faction.MaxFoodAmount, () => ui.FoodLimit);
+            Binding.CreateOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.InactiveWorkerCount);
 
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);

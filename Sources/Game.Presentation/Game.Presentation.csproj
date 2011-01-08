@@ -101,8 +101,10 @@
     <Compile Include="Camera.cs" />
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
+    <Compile Include="Gui\MatchConfigurationUI2.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
+    <Compile Include="Gui\OrionCheckBoxButtonAdornment.cs" />
     <Compile Include="Gui\OrionGuiStyle.cs" />
     <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />

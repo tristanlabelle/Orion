@@ -15,8 +15,6 @@ namespace Orion.Engine.Gui2
     public class Button : ContentControl
     {
         #region Fields
-        private bool isEnabled = true;
-
         /// <summary>
         /// The mouse button that is pressing this button, if any.
         /// </summary>
@@ -49,21 +47,6 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Accesses a value indicating if this <see cref="Button"/> is enabled (can be clicked by the user).
-        /// </summary>
-        public bool IsEnabled
-        {
-            get { return isEnabled; }
-            set
-            {
-                if (value == isEnabled) return;
-
-                isEnabled = value;
-                if (!isEnabled) ReleaseKeyboardFocus();
-            }
-        }
-
         /// <summary>
         /// Gets a value indicating if this <see cref="Button"/> is currently down.
         /// </summary>

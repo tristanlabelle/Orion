@@ -45,6 +45,7 @@ namespace Orion.Engine.Gui2
         private bool isArranged;
 
         private bool isMouseEventSink;
+        private bool hasEnabledFlag = true;
         #endregion
 
         #region Constructors
@@ -482,6 +483,35 @@ namespace Orion.Engine.Gui2
             set { isMouseEventSink = value; }
         }
         #endregion
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Control"/> has the enabled flag.
+        /// If <c>false</c>, this <see cref="Control"/> and its descendants will be disabled.
+        /// </summary>
+        public bool HasEnabledFlag
+        {
+            get { return hasEnabledFlag; }
+            set { hasEnabledFlag = value; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> is enabled,
+        /// taking into account this <see cref="Control"/> and its ancestors' enabled flag.
+        /// </summary>
+        public bool IsEnabled
+        {
+            get
+            {
+                Control ancestor = this;
+                do
+                {
+                    if (!hasEnabledFlag) return false;
+                    ancestor = ancestor.parent;
+                } while (ancestor != null);
+
+                return true;
+            }
+        }
 
         /// <summary>
         /// Enumerates the children of this <see cref="Control"/>.

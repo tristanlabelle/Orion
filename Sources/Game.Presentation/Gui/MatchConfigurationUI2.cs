@@ -87,8 +87,8 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public bool CanStart
         {
-            get { return startButton.IsEnabled; }
-            set { startButton.IsEnabled = value; }
+            get { return startButton.HasEnabledFlag; }
+            set { startButton.HasEnabledFlag = value; }
         }
 
         /// <summary>
@@ -96,8 +96,8 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public bool CanChangeSettings
         {
-            get { return canChangeSettings; }
-            set { canChangeSettings = value; }
+            get { return settingsForm.HasEnabledFlag; }
+            set { settingsForm.HasEnabledFlag = value; }
         }
 
         /// <summary>
@@ -142,6 +142,7 @@ namespace Orion.Game.Presentation.Gui
             bottomDock.Dock(startButton, Direction.MaxX);
 
             readyCheckBox = style.CreateTextCheckBox("Je suis prêt");
+            readyCheckBox.StateChanged += sender => ReadinessChanged.Raise(this);
             bottomDock.Dock(readyCheckBox, Direction.MaxX);
             return bottomDock;
         }

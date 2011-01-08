@@ -12,25 +12,25 @@ namespace Orion.Game.Simulation.Components
     public class Position : Component
     {
         #region Static
-        public static readonly EntityStat SightRangeStat = new EntityStat(typeof(Position), "SightRange", "Portée de vision");
+        public static readonly EntityStat<float> SightRangeStat = new EntityStat<float>(typeof(Position), "SightRange", "Portée de vision");
         #endregion
 
         #region Fields
         private CollisionLayer collisionLayer;
         private Size size;
+        private float sightRange;
+
         private Vector2 location;
         private float angle;
-        private float sightRange;
         #endregion
 
         #region Constructors
-        public Position(Entity entity, float sightRange, CollisionLayer layer, Size size, Vector2 position)
+        public Position(Entity entity, float sightRange, CollisionLayer layer, Size size)
             : base(entity)
         {
             this.sightRange = sightRange;
             this.collisionLayer = layer;
             this.size = size;
-            this.location = position;
         }
         #endregion
 
@@ -42,6 +42,7 @@ namespace Orion.Game.Simulation.Components
         public float Angle
         {
             get { return angle; }
+            set { angle = value; }
         }
 
         public float SightRange

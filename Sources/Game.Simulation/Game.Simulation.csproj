@@ -78,6 +78,7 @@
     <Compile Include="Components\InvalidComponentStatException.cs" />
     <Compile Include="Components\Move.cs" />
     <Compile Include="Components\Position.cs" />
+    <Compile Include="Components\Sellable.cs" />
     <Compile Include="Components\Transport.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />

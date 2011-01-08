@@ -14,14 +14,16 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private Faction faction;
         private int foodRequirement;
+        private int foodProvided;
         #endregion
 
         #region Constructors
-        public FactionMembership(Entity entity, Faction faction, int foodRequirement)
+        public FactionMembership(Entity entity, Faction faction, int foodRequirement, int foodProvided)
             : base(entity)
         {
             this.faction = faction;
             this.foodRequirement = foodRequirement;
+            this.foodProvided = foodProvided;
         }
         #endregion
 
@@ -34,6 +36,11 @@ namespace Orion.Game.Simulation.Components
         public int FoodRequirement
         {
             get { return foodRequirement; }
+        }
+
+        public int FoodProvided
+        {
+            get { return foodProvided; }
         }
         #endregion
     }

@@ -15,11 +15,11 @@ namespace Orion.Game.Simulation.Components
     {
         #region Fields
         private readonly Type skillType;
-        private readonly EntityStat stat;
+        private readonly object stat;
         #endregion
 
         #region Constructors
-        public InvalidComponentStatException(Type skillType, EntityStat stat)
+        public InvalidComponentStatException(Type skillType, object stat)
         {
             Argument.EnsureNotNull(skillType, "skillType");
             Argument.EnsureNotNull(stat, "stat");
@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation.Components
             get { return skillType; }
         }
 
-        public EntityStat Stat
+        public object Stat
         {
             get { return stat; }
         }

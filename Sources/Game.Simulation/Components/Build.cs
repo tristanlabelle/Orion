@@ -8,7 +8,7 @@ namespace Orion.Game.Simulation.Components
     public class Build : Component
     {
         #region Fields
-        public static readonly EntityStat BuildSpeedStat = new EntityStat(typeof(Build), "BuildSpeed", "Vitesse de construction");
+        public static readonly EntityStat<float> BuildSpeedStat = new EntityStat<float>(typeof(Build), "BuildSpeed", "Vitesse de construction");
 
         private readonly IEnumerable<UnitType> buildableTypes;
         private float buildSpeed;

@@ -10,11 +10,11 @@ namespace Orion.Game.Simulation.Components
     public class Health : Component
     {
         #region Static
-        public static readonly EntityStat MaxHealthStat = new EntityStat(typeof(Health), "MaxHealth", "Points de vie maximum");
-        public static readonly EntityStat RegenerationRateStat = new EntityStat(typeof(Health), "RegenerationRate", "Regénération");
-        public static readonly EntityStat DamageReductionStat = new EntityStat(typeof(Health), "DamageReduction", "Réduction de dégâts");
-        public static readonly EntityStat CurrentHealthStat = new EntityStat(typeof(Health), "CurrentHealth", "Points de vie");
-        public static readonly EntityStat ArmorStat = new EntityStat(typeof(Health), "Armor", "Armure");
+        public static readonly EntityStat<int> MaxHealthStat = new EntityStat<int>(typeof(Health), "MaxHealth", "Points de vie maximum");
+        public static readonly EntityStat<float> RegenerationRateStat = new EntityStat<float>(typeof(Health), "RegenerationRate", "Regénération");
+        public static readonly EntityStat<int> DamageReductionStat = new EntityStat<int>(typeof(Health), "DamageReduction", "Réduction de dégâts");
+        public static readonly EntityStat<int> CurrentHealthStat = new EntityStat<int>(typeof(Health), "CurrentHealth", "Points de vie");
+        public static readonly EntityStat<float> ArmorStat = new EntityStat<float>(typeof(Health), "Armor", "Armure");
         #endregion
 
         #region Fields

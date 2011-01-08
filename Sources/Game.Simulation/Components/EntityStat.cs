@@ -14,7 +14,7 @@ namespace Orion.Game.Simulation.Components
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
-    public sealed class EntityStat
+    public sealed class EntityStat<TNumericType>
     {
         #region Fields
         private readonly Type componentType;

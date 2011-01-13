@@ -48,26 +48,15 @@ namespace Orion.Game.Presentation.Actions.Enablers
                     }
                 }
 
-                buttonsArray[x, y] = CreateButton(technology);
+                Technology technologyForClosure = technology;
+                buttonsArray[x, y] = new ActionButton()
+	            {
+	            	Name = technology.Name,
+	            	Description = "Aladdium: {1} Alagene: {2}".FormatInvariant(technology.AladdiumCost, technology.AlageneCost),
+	            	Texture = graphics.GetTechnologyTexture(technology),
+	            	Action = () => userInputManager.LaunchResearch(technologyForClosure)
+	            };
             }
-        }
-
-        private ActionButton CreateButton(Technology technology)
-        {
-            ActionButton button = new ActionButton(actionPanel, userInputManager, string.Empty, Keys.None, graphics);
-
-            button.Name = "{0}\nAladdium: {1} Alagene: {2}"
-                .FormatInvariant(technology.Name, technology.AladdiumCost, technology.AlageneCost);
-
-            Texture texture = graphics.GetTechnologyTexture(technology);
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
-            {
-                userInputManager.LaunchResearch(technology);
-            };
-
-            return button;
         }
         #endregion
     }

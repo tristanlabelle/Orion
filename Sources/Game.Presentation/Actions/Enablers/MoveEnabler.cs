@@ -30,18 +30,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Move", Keys.M, graphics);
-
-            Texture texture = graphics.GetActionTexture("Move");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            buttonsArray[0, 3] = new ActionButton()
             {
-                userInputManager.SelectedCommand = userCommand;
-                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+            	Name = "Déplacer",
+            	Texture = graphics.GetActionTexture("Move"),
+            	HotKey = Keys.M,
+            	Action = () =>
+	            {
+	                userInputManager.SelectedCommand = userCommand;
+	                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+	            }
             };
-
-            buttonsArray[0, 3] = button;
         }
         #endregion
     }

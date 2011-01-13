@@ -348,11 +348,11 @@ namespace Orion.Game.Presentation.Gui
 
         private GridLayout CreateActionButtons()
         {
-            GridLayout grid = new GridLayout(3, 5);
+            GridLayout grid = new GridLayout(4, 4);
             grid.AreColumnsUniformSized = true;
             grid.AreRowsUniformSized = true;
             grid.CellGap = 3;
-            grid.SetSize(300, 200);
+            grid.SetSize(200, 200);
 
             for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
             {

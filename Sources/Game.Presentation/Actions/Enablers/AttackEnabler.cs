@@ -30,20 +30,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Attack", Keys.A, graphics);
-
-            Texture texture = graphics.GetActionTexture("Attack");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += OnButtonPressed;
-
-            buttonsArray[2, 3] = button;
-        }
-
-        private void OnButtonPressed(Button button)
-        {
-            userInputManager.SelectedCommand = userCommand;
-            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+            buttonsArray[2, 3] = new ActionButton()
+            {
+            	Name = "Attaquer",
+            	Texture = graphics.GetActionTexture("Attack"),
+            	HotKey = Keys.A,
+            	Action = () =>
+	            {
+		            userInputManager.SelectedCommand = userCommand;
+		            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+	            }
+            };
         }
         #endregion
     }

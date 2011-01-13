@@ -37,12 +37,9 @@ namespace Orion.Game.Presentation.Actions
             return (point.X == 3 && point.Y == 0) ? button : null;
         }
 
-        public void Dispose()
-        {
-            button.Dispose();
-        }
-
         void IActionProvider.Refresh() {}
+        
+        void IDisposable.Dispose() {}
         #endregion
     }
 }

@@ -269,7 +269,7 @@ namespace Orion.Game.Main
             audio.Dispose();
         }
 
-        private void OnQuitPressed(MatchUI sender)
+        private void OnQuitPressed(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
         }

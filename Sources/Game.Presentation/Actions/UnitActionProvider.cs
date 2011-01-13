@@ -39,13 +39,13 @@ namespace Orion.Game.Presentation.Actions
 
         public void Refresh()
         {
-            DisposeButtons();
+            ClearButtons();
             CreateButtons();
         }
 
         public void Dispose()
         {
-            DisposeButtons();
+            ClearButtons();
         }
 
         private void CreateButtons()
@@ -54,19 +54,11 @@ namespace Orion.Game.Presentation.Actions
                 enabler.LetFill(unitType, buttons);
         }
 
-        private void DisposeButtons()
+        private void ClearButtons()
         {
             for (int y = 0; y < buttons.GetLength(1); ++y)
-            {
                 for (int x = 0; x < buttons.GetLength(0); ++x)
-                {
-                    if (buttons[x, y] != null)
-                    {
-                        buttons[x, y].Dispose();
                         buttons[x, y] = null;
-                    }
-                }
-            }
         }
         #endregion
     }

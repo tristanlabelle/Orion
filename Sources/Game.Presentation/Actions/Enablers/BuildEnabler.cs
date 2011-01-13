@@ -30,39 +30,25 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!unitType.HasSkill<BuildSkill>()) return;
             
-            buttonsArray[0, 0] = CreateBuildButton(unitType);
-            buttonsArray[1, 0] = CreateRepairButton();
-        }
-
-        private ActionButton CreateBuildButton(UnitType unitType)
-        {
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Build", Keys.B, graphics);
-
-            Texture texture = graphics.GetActionTexture("Build");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            buttonsArray[0, 0] = new ActionButton()
             {
-                actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType));
+            	Name = "Construire",
+            	Texture = graphics.GetActionTexture("Build"),
+            	HotKey = Keys.B,
+            	Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
             };
-
-            return button;
-        }
-
-        private ActionButton CreateRepairButton()
-        {
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Repair", Keys.R, graphics);
-
-            Texture texture = graphics.GetActionTexture("Repair");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            
+            buttonsArray[1, 0] = new ActionButton()
             {
-                userInputManager.SelectedCommand = repairUserCommand;
-                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+            	Name = "Réparer",
+            	Texture = graphics.GetActionTexture("Repair"),
+            	HotKey = Keys.R,
+            	Action = () =>
+	            {
+	                userInputManager.SelectedCommand = repairUserCommand;
+	                actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+	            }
             };
-
-            return button;
         }
         #endregion
     }

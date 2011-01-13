@@ -24,22 +24,12 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (unitType.Upgrades.All(u => u.IsFree)) return;
 
-            buttonsArray[2, 0] = CreateUpgradeButton(unitType);
-        }
-
-        private ActionButton CreateUpgradeButton(UnitType unitType)
-        {
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Upgrade", Keys.None, graphics);
-
-            Texture texture = graphics.GetActionTexture("Upgrade");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            buttonsArray[2, 0] = new ActionButton()
             {
-                actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType));
+            	Name = "Améliorer",
+            	Texture = graphics.GetActionTexture("Upgrade"),
+            	Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType))
             };
-
-            return button;
         }
         #endregion
     }

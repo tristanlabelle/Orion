@@ -30,20 +30,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<HealSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Heal", Keys.H, graphics);
-
-            Texture texture = graphics.GetActionTexture("Heal");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += OnButtonPressed;
-
-            buttonsArray[3, 2] = button;
-        }
-
-        private void OnButtonPressed(Button button)
-        {
-            userInputManager.SelectedCommand = userCommand;
-            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+            buttonsArray[3, 2] = new ActionButton()
+            {
+            	Name = "Soigner",
+            	Texture = graphics.GetActionTexture("Heal"),
+            	HotKey = Keys.H,
+            	Action = () =>
+		        {
+		            userInputManager.SelectedCommand = userCommand;
+		            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+		        }
+            };
         }
         #endregion
     }

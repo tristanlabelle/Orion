@@ -94,20 +94,20 @@ namespace Orion.Game.Presentation.Actions
 
         private ActionButton CreateButton(UnitType buildingType)
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, buildingType.Name, Keys.None, graphics);
-
-            Texture texture = graphics.GetUnitTexture(buildingType);
-            button.Renderer = new TexturedRenderer(texture);
-
-            Faction faction = inputManager.LocalFaction;
-            int aladdium = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-            int alagene = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
-            button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
-
-            button.Triggered += delegate(Button sender)
+        	Faction faction = inputManager.LocalFaction;
+            int aladdiumCost = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
+            int alageneCost = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
+        	
+            ActionButton button = new ActionButton()
             {
-                inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
-                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
+            	Name = buildingType.Name,
+            	Description = "Aladdium: {1} / Alagene: {2}".FormatInvariant(aladdiumCost, alageneCost),
+            	Texture = graphics.GetUnitTexture(buildingType),
+            	Action = () =>
+	            {
+	                inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
+	                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
+	            }
             };
 
             return button;
@@ -116,16 +116,8 @@ namespace Orion.Game.Presentation.Actions
         private void DisposeButtons()
         {
             for (int y = 0; y < buttons.GetLength(1); ++y)
-            {
                 for (int x = 0; x < buttons.GetLength(0); ++x)
-                {
-                    if (buttons[x, y] != null)
-                    {
-                        buttons[x, y].Dispose();
-                        buttons[x, y] = null;
-                    }
-                }
-            }
+                    buttons[x, y] = null;
         }
         #endregion
     }

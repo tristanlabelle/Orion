@@ -55,13 +55,13 @@ namespace Orion.Game.Presentation.Actions
 
         public void Refresh()
         {
-            DisposeButtons();
+            ClearButtons();
             CreateButtons();
         }
 
         public void Dispose()
         {
-            DisposeButtons();
+            ClearButtons();
         }
 
         private void CreateButtons()
@@ -74,7 +74,13 @@ namespace Orion.Game.Presentation.Actions
                 UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
                 if (targetType == null) continue;
 
-                buttons[x, y] = CreateButton(upgrade, targetType);
+                buttons[x, y] = new ActionButton()
+	            {
+	            	Name = upgrade.Target,
+	            	Description = "Aladdium: {1} / Alagene: {2}".FormatInvariant(upgrade.AladdiumCost, upgrade.AlageneCost),
+	            	Texture = graphics.GetUnitTexture(targetType),
+	            	Action = () => inputManager.LaunchUpgrade(targetType)
+	            };
 
                 x++;
                 if (x == 4)
@@ -87,37 +93,12 @@ namespace Orion.Game.Presentation.Actions
             buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(UnitTypeUpgrade upgrade, UnitType targetType)
-        {
-            ActionButton button = new ActionButton(actionPanel, inputManager, targetType.Name, Keys.None, graphics);
-
-            Texture texture = graphics.GetUnitTexture(targetType);
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Name = "{0}\nAladdium: {1} / Alagene: {2}"
-                .FormatInvariant(upgrade.Target, upgrade.AladdiumCost, upgrade.AlageneCost);
-
-            button.Triggered += delegate(Button sender)
-            {
-                inputManager.LaunchUpgrade(targetType);
-            };
-
-            return button;
-        }
-
-        private void DisposeButtons()
+        private void ClearButtons()
         {
             for (int y = 0; y < buttons.GetLength(1); ++y)
-            {
                 for (int x = 0; x < buttons.GetLength(0); ++x)
-                {
                     if (buttons[x, y] != null)
-                    {
-                        buttons[x, y].Dispose();
                         buttons[x, y] = null;
-                    }
-                }
-            }
         }
         #endregion
     }

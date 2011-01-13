@@ -23,17 +23,13 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<TransportSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Débarquer", Keys.D, graphics);
-
-            Texture texture = graphics.GetActionTexture("Disembark");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            buttonsArray[3, 0] = new ActionButton()
             {
-                userInputManager.LaunchDisembark();
+            	Name = "Débarquer",
+            	Texture = graphics.GetActionTexture("Disembark"),
+            	HotKey = Keys.D,
+            	Action = () => userInputManager.LaunchDisembark()
             };
-
-            buttonsArray[3, 0] = button;
         }
         #endregion
     }

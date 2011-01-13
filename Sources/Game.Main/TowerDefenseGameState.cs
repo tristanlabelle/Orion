@@ -31,7 +31,6 @@ namespace Orion.Game.Main
         private readonly SlaveCommander localCommander;
         private readonly CreepWaveCommander creepCommander;
         private readonly CommandPipeline commandPipeline;
-        private readonly MatchUI ui;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         private int lifeCount = 10;
@@ -69,12 +68,9 @@ namespace Orion.Game.Main
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new TowerDefenseMatchRenderer(userInputManager, graphics, creepPath);
 
-            ui = new MatchUI(graphics, userInputManager, matchRenderer);
-            ui.SetResourcesLabelTextGetter(GetResourcesLabelText);
             audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
             world.EntityRemoved += OnEntityRemoved;
-            ui.QuitPressed += OnQuitPressed;
         }
         #endregion
 
@@ -98,12 +94,10 @@ namespace Orion.Game.Main
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()
@@ -138,7 +132,6 @@ namespace Orion.Game.Main
         public override void Dispose()
         {
             audioPresenter.Dispose();
-            ui.Dispose();
             audio.Dispose();
             commandPipeline.Dispose();
         }
@@ -148,7 +141,6 @@ namespace Orion.Game.Main
             if (lifeCount == 0) return;
 
             --lifeCount;
-            if (lifeCount == 0) ui.DisplayDefeatMessage(() => Manager.Pop());
         }
 
         private string GetResourcesLabelText()
@@ -166,7 +158,7 @@ namespace Orion.Game.Main
             return text;
         }
 
-        private void OnQuitPressed(MatchUI sender)
+        private void OnQuitPressed(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
         }

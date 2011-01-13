@@ -1,48 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
-using Orion.Engine.Input;
-using Orion.Game.Presentation;
-using Orion.Game.Matchmaking;
-using Orion.Game.Presentation.Actions.Enablers;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {
-    public class ActionButton : Button
+	/// <summary>
+	/// Describes a button which appears in the action panel of the match UI.
+	/// </summary>
+    public sealed class ActionButton
     {
         #region Fields
-        protected readonly ActionPanel actionPanel;
-        protected readonly UserInputManager inputManager;
-        protected readonly GameGraphics gameGraphics;
         private string name;
         private string description;
+        private Texture texture;
+        private Keys hotKey;
+        private Action action;
         #endregion
-
-        #region Constructors
-        public ActionButton(ActionPanel actionPanel, UserInputManager inputManager,
-            string name, Keys hotkey, GameGraphics gameGraphics)
-            : base(new Rectangle(1,1), string.Empty)
-        {
-            Argument.EnsureNotNull(actionPanel, "actionPanel");
-            Argument.EnsureNotNull(inputManager, "inputManager");
-            Argument.EnsureNotNull(name, "name");
-            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
-
-            base.HotKey = hotkey;
-            this.actionPanel = actionPanel;
-            this.inputManager = inputManager;
-            this.gameGraphics = gameGraphics;
-            this.name = name;
-        }
-        #endregion
-
+        
         #region Properties
+        /// <summary>
+        /// Accesses the name of the action represented by this button.
+        /// </summary>
         public string Name
         {
             get { return name; }
@@ -52,17 +32,46 @@ namespace Orion.Game.Presentation.Actions
                 name = value;
             }
         }
-
+        
+        /// <summary>
+        /// Accesses the description of the action represented by this button.
+        /// </summary>
         public string Description
         {
             get { return description; }
-            set
-            {
-                Argument.EnsureNotNull(value, "Name");
-                description = value;
-            }
+            set { description = value; }
         }
-
+        
+        /// <summary>
+        /// Accesses the texture displayed on the button.
+        /// </summary>
+        public Texture Texture
+        {
+        	get { return texture; }
+        	set { texture = value; }
+        }
+        
+        /// <summary>
+        /// Accesses the hot key which clicks this button.
+        /// </summary>
+        public Keys HotKey
+        {
+        	get { return hotKey; }
+        	set { hotKey = value; }
+        }
+        
+        /// <summary>
+        /// Accesses the action resulting the clicking of this button.
+        /// </summary>
+        public Action Action
+        {
+        	get { return action; }
+        	set { action = value; }
+        }
+        
+        /// <summary>
+        /// Gets the tool tip text which appears for this button.
+        /// </summary>
         public string TooltipText
         {
             get
@@ -78,7 +87,6 @@ namespace Orion.Game.Presentation.Actions
                     stringBuilder.Append(')');
                 }
 
-                string description = Description;
                 if (description != null)
                 {
                     stringBuilder.Append('\n');
@@ -87,26 +95,6 @@ namespace Orion.Game.Presentation.Actions
 
                 return stringBuilder.ToString();
             }
-        }
-
-        protected GameGraphics GameGraphics
-        {
-            get { return gameGraphics; }
-        }
-        #endregion
-
-        #region Methods
-        protected override bool OnMouseEntered(MouseEventArgs args)
-        {
-            actionPanel.TooltipPanel.SetDescription(TooltipText);
-            actionPanel.ShowTooltip();
-            return base.OnMouseEntered(args);
-        }
-
-        protected override bool OnMouseExited(MouseEventArgs args)
-        {
-            actionPanel.HideTooltip();
-            return base.OnMouseExited(args);
         }
         #endregion
     }

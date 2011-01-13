@@ -43,15 +43,16 @@ namespace Orion.Game.Presentation.Actions
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            ActionButton button = new ActionButton(this, inputManager, "Cancel", Keys.Escape, gameGraphics);
-
-            Texture texture = gameGraphics.GetActionTexture("Cancel");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            ActionButton button = new ActionButton()
             {
-                inputManager.SelectedCommand = null;
-                this.Restore();
+            	Name = "Annuler",
+            	Texture = gameGraphics.GetActionTexture("Cancel"),
+            	HotKey = Keys.Escape,
+            	Action = () =>
+	            {
+	                inputManager.SelectedCommand = null;
+	                this.Restore();
+	            }
             };
 
             return button;

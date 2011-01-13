@@ -85,7 +85,12 @@ namespace Orion.Engine.Graphics
             return size;
         }
 
-        private Size Draw(ref TextRenderingOptions options, bool draw = true)
+        private Size Draw(ref TextRenderingOptions options)
+        {
+        	return Draw(ref options, true);
+        }
+        
+        private Size Draw(ref TextRenderingOptions options, bool draw)
         {
             RenderedFont renderedFont = FindOrCreateRenderedFont(options.Font);
             float height = renderedFont.Font.GetHeight();

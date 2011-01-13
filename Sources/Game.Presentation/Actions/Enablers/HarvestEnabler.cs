@@ -30,20 +30,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<HarvestSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Harvest", Keys.H, graphics);
-
-            Texture texture = graphics.GetActionTexture("Harvest");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += OnButtonPressed;
-
-            buttonsArray[1, 2] = button;
-        }
-
-        private void OnButtonPressed(Button button)
-        {
-            userInputManager.SelectedCommand = userCommand;
-            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+            buttonsArray[1, 2] = new ActionButton()
+            {
+            	Name = "Ramasser",
+            	Texture = graphics.GetActionTexture("Harvest"),
+            	HotKey = Keys.H,
+            	Action = () =>
+	            {
+		            userInputManager.SelectedCommand = userCommand;
+		            actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+	            }
+            };
         }
         #endregion
     }

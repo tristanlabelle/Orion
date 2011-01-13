@@ -22,18 +22,13 @@ namespace Orion.Game.Presentation.Actions.Enablers
         public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
         {
             if (!type.HasSkill<SellableSkill>()) return;
-
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Sell", Keys.None, graphics);
-
-            Texture texture = graphics.GetActionTexture("Sell");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            
+            buttonsArray[3, 0] = new ActionButton()
             {
-                userInputManager.LaunchSell();
+            	Name = "Vendre",
+            	Texture = graphics.GetActionTexture("Sell"),
+            	Action = () => userInputManager.LaunchSell()
             };
-
-            buttonsArray[3, 0] = button;
         }
         #endregion
     }

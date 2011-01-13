@@ -47,17 +47,17 @@ namespace Orion.Game.Presentation.Actions.Enablers
                     }
                 }
 
-                ActionButton button = new ActionButton(actionPanel, userInputManager, traineeType.Name, Keys.None, graphics);
-
-                Texture texture = graphics.GetUnitTexture(traineeType);
-                button.Renderer = new TexturedRenderer(texture);
-
-                UnitType traineeTypeForClosure = traineeType;
-                button.Triggered += delegate(Button sender) { userInputManager.LaunchTrain(traineeTypeForClosure); };
-
                 int aladdium = LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
                 int alagene = LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
-                button.Name = "{0}\nAladdium: {1} Alagene: {2}".FormatInvariant(traineeType.Name, aladdium, alagene);
+                
+                UnitType traineeTypeForClosure = traineeType;
+                ActionButton button = new ActionButton()
+                {
+                	Name = traineeType.Name,
+                	Description = "Aladdium: {1} Alagene: {2}".FormatInvariant(aladdium, alagene),
+                	Texture = graphics.GetUnitTexture(traineeType),
+                	Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
+                };
 
                 buttonsArray[x, y] = button;
             }

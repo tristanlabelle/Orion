@@ -27,7 +27,6 @@ namespace Orion.Game.Main
         private readonly SlaveCommander localCommander;
         private readonly TypingCreepCommander creepCommander;
         private readonly CommandPipeline commandPipeline;
-        private readonly MatchUI ui;
         private readonly MatchAudioPresenter audioPresenter;
         private SimulationStep lastSimulationStep;
         private Unit focusedCreep;
@@ -63,8 +62,6 @@ namespace Orion.Game.Main
             UserInputManager userInputManager = new UserInputManager(match, localCommander);
             var matchRenderer = new TypingDefenseMatchRenderer(userInputManager, graphics, creepCommander);
 
-            ui = new MatchUI(graphics, userInputManager, matchRenderer);
-            ui.SetResourcesLabelTextGetter(GetResourcesLabelText);
             audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
             ui.CharacterTyped += OnCharacterTyped;
@@ -152,7 +149,7 @@ namespace Orion.Game.Main
                 .FormatInvariant(LocalFaction.AladdiumAmount, lifeCount);
         }
 
-        private void OnQuitPressed(MatchUI sender)
+        private void OnQuitPressed(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
         }

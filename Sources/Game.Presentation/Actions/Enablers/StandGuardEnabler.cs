@@ -24,17 +24,13 @@ namespace Orion.Game.Presentation.Actions.Enablers
         {
             if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 
-            ActionButton button = new ActionButton(actionPanel, userInputManager, "Stand Guard", Keys.G, graphics);
-
-            Texture texture = graphics.GetActionTexture("Stand Guard");
-            button.Renderer = new TexturedRenderer(texture);
-
-            button.Triggered += delegate(Button sender)
+            buttonsArray[3, 3] = new ActionButton()
             {
-                userInputManager.LaunchStandGuard();
+            	Name = "Guarder",
+            	Texture = graphics.GetActionTexture("Stand Guard"),
+            	HotKey = Keys.G,
+            	Action = () => userInputManager.LaunchStandGuard()
             };
-
-            buttonsArray[3, 3] = button;
         }
         #endregion
     }

@@ -173,7 +173,7 @@ namespace Orion.Game.Main
                 if (unit.Type.Name == "Créateur")
                 {
                     LocalFaction.MarkAsDefeated();
-                    ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
+                    //ui.DisplayDefeatMessage(() => Manager.PopTo<MainMenuGameState>());
                 }
             }
             else

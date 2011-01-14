@@ -64,9 +64,9 @@ namespace Orion.Game.Main
 
             audioPresenter = new MatchAudioPresenter(audio, userInputManager);
 
-            ui.CharacterTyped += OnCharacterTyped;
+            //ui.CharacterTyped += OnCharacterTyped;
             world.EntityRemoved += OnEntityRemoved;
-            ui.QuitPressed += OnQuitPressed;
+            //ui.QuitPressed += OnQuitPressed;
         }
         #endregion
 
@@ -90,12 +90,12 @@ namespace Orion.Game.Main
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            //RootView.Children.Add(ui);
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            //RootView.Children.Remove(ui);
         }
 
         protected internal override void OnUnshadowed()
@@ -130,7 +130,7 @@ namespace Orion.Game.Main
         public override void Dispose()
         {
             audioPresenter.Dispose();
-            ui.Dispose();
+            //ui.Dispose();
             audio.Dispose();
             commandPipeline.Dispose();
         }
@@ -139,8 +139,8 @@ namespace Orion.Game.Main
         {
             if (lifeCount == 0) return;
 
-            --lifeCount;
-            if (lifeCount == 0) ui.DisplayDefeatMessage(() => Manager.Pop());
+            //--lifeCount;
+            //if (lifeCount == 0) ui.DisplayDefeatMessage(() => Manager.Pop());
         }
 
         private string GetResourcesLabelText()

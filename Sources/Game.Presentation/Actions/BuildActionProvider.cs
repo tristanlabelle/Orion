@@ -6,13 +6,13 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Matchmaking;
+using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
-using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {

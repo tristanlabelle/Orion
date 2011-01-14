@@ -98,7 +98,7 @@ namespace Orion.Game.Presentation.Actions
                     	continue;
                     }
                     
-                    ui.SetActionButton(3 - y, x, button.Texture);
+                    ui.SetActionButton(3 - y, x, button);
                 }
             }
         }

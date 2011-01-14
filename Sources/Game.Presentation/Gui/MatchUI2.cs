@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Data;
+using Orion.Engine.Graphics;
 using Orion.Engine.Gui2;
 using Orion.Engine.Gui2.Adornments;
+using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Renderers;
-using Orion.Engine.Graphics;
-using Orion.Engine.Data;
 using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
@@ -208,12 +210,25 @@ namespace Orion.Game.Presentation.Gui
             messageStack.Stack(label);
         }
 
-        public void SetActionButton(int rowIndex, int columnIndex, Texture texture)
+        public void SetActionButton(int rowIndex, int columnIndex, ActionButton actionButton)
         {
             Button button = (Button)actionButtonGrid.Children[rowIndex, columnIndex];
+            if (actionButton == null)
+            {
+            	button.Visibility = Visibility.Hidden;
+            	return;
+            }
+            
             button.Visibility = Visibility.Visible;
-            ImageBox imageBox = (ImageBox)button.Content;
-            imageBox.Texture = texture;
+            
+            if (actionButton.Texture != null)
+            {
+            	ImageBox imageBox = (ImageBox)button.Content;
+            	imageBox.Texture = actionButton.Texture;
+            }
+            
+            if (actionButton.Action != null)
+            	button.Clicked += (sender, mouseButton) => actionButton.Action();
         }
 
         private void UpdateScrollDirection()

@@ -101,7 +101,7 @@ namespace Orion.Game.Presentation.Actions
             ActionButton button = new ActionButton()
             {
             	Name = buildingType.Name,
-            	Description = "Aladdium: {1} / Alagene: {2}".FormatInvariant(aladdiumCost, alageneCost),
+            	Description = "Aladdium: {0} / Alagene: {1}".FormatInvariant(aladdiumCost, alageneCost),
             	Texture = graphics.GetUnitTexture(buildingType),
             	Action = () =>
 	            {

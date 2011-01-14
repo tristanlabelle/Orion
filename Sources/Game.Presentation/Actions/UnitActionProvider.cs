@@ -207,7 +207,7 @@ namespace Orion.Game.Presentation.Actions
                 buttons[point.X, point.Y] = new ActionButton()
                 {
                     Name = traineeType.Name,
-                    Description = "Aladdium: {1} Alagene: {2}".FormatInvariant(aladdium, alagene),
+                    Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(aladdium, alagene),
                     Texture = graphics.GetUnitTexture(traineeType),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
                 };
@@ -229,7 +229,7 @@ namespace Orion.Game.Presentation.Actions
                 buttons[point.X, point.Y] = new ActionButton()
                 {
                     Name = technology.Name,
-                    Description = "Aladdium: {1} Alagene: {2}".FormatInvariant(technology.AladdiumCost, technology.AlageneCost),
+                    Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(technology.AladdiumCost, technology.AlageneCost),
                     Texture = graphics.GetTechnologyTexture(technology),
                     Action = () => userInputManager.LaunchResearch(technologyForClosure)
                 };

@@ -20,7 +20,7 @@ namespace Orion.Game.Presentation.Gui
     /// <summary>
     /// Provides the in-match user interface.
     /// </summary>
-    public sealed class MatchUI2 : ContentControl
+    public sealed partial class MatchUI2 : ContentControl
     {
         #region Fields
         private readonly OrionGuiStyle style;
@@ -87,12 +87,6 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the user has submitted text using the chat.
         /// </summary>
         public event Action<MatchUI2, string> Chatted;
-
-        /// <summary>
-        /// Raised when one of the action buttons gets clicked.
-        /// The parameters specify the row and column indices of the button.
-        /// </summary>
-        public event Action<MatchUI2, int, int> ActionButtonClicked;
 
         /// <summary>
         /// Raised when the button showing the number of inactive workers gets pressed.
@@ -210,25 +204,25 @@ namespace Orion.Game.Presentation.Gui
             messageStack.Stack(label);
         }
 
-        public void SetActionButton(int rowIndex, int columnIndex, ActionButton actionButton)
+        public void ClearActionButtons()
         {
-            Button button = (Button)actionButtonGrid.Children[rowIndex, columnIndex];
-            if (actionButton == null)
+            foreach (ActionButton button in actionButtonGrid.Children)
+                button.Visibility = Visibility.Hidden;
+        }
+
+        public void SetActionButton(int rowIndex, int columnIndex, ActionDescriptor descriptor)
+        {
+            ActionButton button = (ActionButton)actionButtonGrid.Children[rowIndex, columnIndex];
+            if (descriptor == null)
             {
             	button.Visibility = Visibility.Hidden;
             	return;
             }
             
             button.Visibility = Visibility.Visible;
-            
-            if (actionButton.Texture != null)
-            {
-            	ImageBox imageBox = (ImageBox)button.Content;
-            	imageBox.Texture = actionButton.Texture;
-            }
-            
-            if (actionButton.Action != null)
-            	button.Clicked += (sender, mouseButton) => actionButton.Action();
+
+            button.Texture = descriptor.Texture;
+            button.Action = descriptor.Action;
         }
 
         private void UpdateScrollDirection()
@@ -296,13 +290,15 @@ namespace Orion.Game.Presentation.Gui
             inactiveWorkersButton.Clicked += (sender, mouseButton) => InactiveWorkersButtonPressed.Raise(this);
 
             Button pauseButton = style.CreateTextButton("Pause");
-            dock.Dock(pauseButton, Direction.MaxX);
+            pauseButton.AcquireKeyboardFocusWhenPressed = false;
             pauseButton.VerticalAlignment = Alignment.Center;
+            dock.Dock(pauseButton, Direction.MaxX);
 
             Button diplomacyButton = style.CreateTextButton("Diplomatie");
-            dock.Dock(diplomacyButton, Direction.MaxX);
+            diplomacyButton.AcquireKeyboardFocusWhenPressed = false;
             diplomacyButton.VerticalAlignment = Alignment.Center;
             diplomacyButton.MaxXMargin = 10;
+            dock.Dock(diplomacyButton, Direction.MaxX);
 
             return container;
         }
@@ -373,11 +369,9 @@ namespace Orion.Game.Presentation.Gui
             {
                 for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
                 {
-                    Button actionButton = style.Create<Button>();
+                    ActionButton actionButton = style.Create<ActionButton>();
+                    actionButton.Visibility = Visibility.Hidden;
                     grid.Children[rowIndex, columnIndex] = actionButton;
-                    //actionButton.Visibility = Visibility.Hidden;
-                    actionButton.Content = new ImageBox();
-                    actionButton.Clicked += OnActionButtonClicked;
                 }
             }
 
@@ -399,9 +393,9 @@ namespace Orion.Game.Presentation.Gui
             DockLayout dock = new DockLayout();
 
             chatTextField = style.Create<TextField>();
-            dock.Dock(chatTextField, Direction.MinY);
+            dock.Dock(chatTextField, Direction.MaxY);
             chatTextField.MinXMargin = 5;
-            chatTextField.MinYMargin = 5;
+            chatTextField.MaxYMargin = 5;
             chatTextField.HorizontalAlignment = Alignment.Min;
             chatTextField.Width = 500;
             chatTextField.Visibility = Visibility.Hidden;
@@ -519,18 +513,6 @@ namespace Orion.Game.Presentation.Gui
         {
             Vector2 normalizedPosition = rectangle.Normalize(rectangle.Clamp(position));
             MinimapCameraMoved.Raise(this, normalizedPosition);
-        }
-        
-        private void OnActionButtonClicked(Button sender, MouseButtons mouseButton)
-        {
-            int rowIndex, columnIndex;
-            if (!actionButtonGrid.Children.Find(sender, out rowIndex, out columnIndex))
-            {
-                Debug.Fail("An action button that wasn't a child of the action button grid was clicked.");
-                return;
-            }
-
-            ActionButtonClicked.Raise(this, rowIndex, columnIndex);
         }
         #endregion
         #endregion

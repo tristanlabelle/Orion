@@ -9,7 +9,7 @@ namespace Orion.Game.Presentation.Actions
 	/// <summary>
 	/// Describes a button which appears in the action panel of the match UI.
 	/// </summary>
-    public sealed class ActionButton
+    public sealed class ActionDescriptor
     {
         #region Fields
         private string name;

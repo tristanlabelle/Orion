@@ -26,7 +26,7 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
         private readonly UnitType unitType;
-        private readonly ActionButton[,] buttons = new ActionButton[4, 4];
+        private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
@@ -48,9 +48,9 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return buttons[point.X, point.Y];
+            return actions[point.X, point.Y];
         }
 
         public void Refresh()
@@ -79,7 +79,7 @@ namespace Orion.Game.Presentation.Actions
 
             foreach (UnitType buildingType in buildingTypes)
             {
-                buttons[x, y] = CreateButton(buildingType);
+                actions[x, y] = CreateButton(buildingType);
 
                 x++;
                 if (x == 4)
@@ -89,16 +89,16 @@ namespace Orion.Game.Presentation.Actions
                 }
             }
 
-            buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
+            actions[3, 0] = actionPanel.CreateCancelAction(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(UnitType buildingType)
+        private ActionDescriptor CreateButton(UnitType buildingType)
         {
         	Faction faction = inputManager.LocalFaction;
             int aladdiumCost = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
             int alageneCost = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
         	
-            ActionButton button = new ActionButton()
+            return new ActionDescriptor()
             {
             	Name = buildingType.Name,
             	Description = "Aladdium: {0} / Alagene: {1}".FormatInvariant(aladdiumCost, alageneCost),
@@ -109,15 +109,13 @@ namespace Orion.Game.Presentation.Actions
 	                actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
 	            }
             };
-
-            return button;
         }
 
         private void DisposeButtons()
         {
-            for (int y = 0; y < buttons.GetLength(1); ++y)
-                for (int x = 0; x < buttons.GetLength(0); ++x)
-                    buttons[x, y] = null;
+            for (int y = 0; y < actions.GetLength(1); ++y)
+                for (int x = 0; x < actions.GetLength(0); ++x)
+                    actions[x, y] = null;
         }
         #endregion
     }

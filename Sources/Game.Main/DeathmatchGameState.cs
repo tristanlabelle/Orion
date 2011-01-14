@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Data;
 using Orion.Engine.Geometry;
-using Orion.Engine.Gui;
 using Orion.Engine.Gui2;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
@@ -16,11 +13,8 @@ using Orion.Game.Presentation.Audio;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
-using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Main
 {
@@ -168,6 +162,7 @@ namespace Orion.Game.Main
         private void OnSelectionChanged(Selection selection)
         {
             actionPanel.Clear();
+            ui.ClearActionButtons();
             
             if (selection.Count == 1)
             {

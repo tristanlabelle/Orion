@@ -26,7 +26,7 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
         private readonly UnitType unitType;
-        private readonly ActionButton[,] buttons = new ActionButton[4, 4];
+        private readonly ActionDescriptor[,] buttons = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
@@ -48,7 +48,7 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
             return buttons[point.X, point.Y];
         }
@@ -74,7 +74,7 @@ namespace Orion.Game.Presentation.Actions
                 UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
                 if (targetType == null) continue;
 
-                buttons[x, y] = new ActionButton()
+                buttons[x, y] = new ActionDescriptor()
 	            {
 	            	Name = upgrade.Target,
 	            	Description = "Aladdium: {1} / Alagene: {2}".FormatInvariant(upgrade.AladdiumCost, upgrade.AlageneCost),
@@ -90,7 +90,7 @@ namespace Orion.Game.Presentation.Actions
                 }
             }
 
-            buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
+            buttons[3, 0] = actionPanel.CreateCancelAction(inputManager, graphics);
         }
 
         private void ClearButtons()

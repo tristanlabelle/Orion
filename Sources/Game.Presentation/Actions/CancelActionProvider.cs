@@ -17,7 +17,7 @@ namespace Orion.Game.Presentation.Actions
     public sealed class CancelActionProvider : IActionProvider
     {
         #region Fields
-        private readonly ActionButton button;
+        private readonly ActionDescriptor action;
         #endregion
 
         #region Constructor
@@ -27,14 +27,14 @@ namespace Orion.Game.Presentation.Actions
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            button = actionPanel.CreateCancelButton(inputManager, gameGraphics);
+            action = actionPanel.CreateCancelAction(inputManager, gameGraphics);
         }
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return (point.X == 3 && point.Y == 0) ? button : null;
+            return (point.X == 3 && point.Y == 0) ? action : null;
         }
 
         void IActionProvider.Refresh() {}

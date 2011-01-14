@@ -19,6 +19,7 @@ namespace Orion.Engine.Gui2
         /// The mouse button that is pressing this button, if any.
         /// </summary>
         private MouseButtons pressingButton;
+        private bool acquireKeyboardFocusWhenPressed = true;
         private MouseButtons clickingButtons = MouseButtons.Left;
         #endregion
 
@@ -48,20 +49,30 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Gets a value indicating if this <see cref="Button"/> is currently down.
-        /// </summary>
-        public bool IsDown
-        {
-            get { return pressingButton != MouseButtons.None; }
-        }
-
-        /// <summary>
         /// Accesses a value indicating which mouse buttons can be used to click the button, as flags.
         /// </summary>
         public MouseButtons ClickingButtons
         {
             get { return clickingButtons; }
             set { clickingButtons = value; }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Button"/>
+        /// should acquire the keyboard focus when a mouse button presses it.
+        /// </summary>
+        public bool AcquireKeyboardFocusWhenPressed
+        {
+            get { return acquireKeyboardFocusWhenPressed; }
+            set { acquireKeyboardFocusWhenPressed = true; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Button"/> is currently down.
+        /// </summary>
+        public bool IsDown
+        {
+            get { return pressingButton != MouseButtons.None; }
         }
         #endregion
 
@@ -71,7 +82,12 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public void Click()
         {
-            if (Clicked != null) Clicked(this, MouseButtons.None);
+            OnClicked(MouseButtons.None);
+        }
+
+        protected virtual void OnClicked(MouseButtons button)
+        {
+            Clicked.Raise(this, button);
         }
 
         protected override bool OnKeyEvent(KeyEvent @event)
@@ -92,7 +108,7 @@ namespace Orion.Engine.Gui2
                 if (@event.IsPressed)
                 {
                     pressingButton = @event.Button;
-                    AcquireKeyboardFocus();
+                    if (acquireKeyboardFocusWhenPressed) AcquireKeyboardFocus();
                     AcquireMouseCapture();
                 }
                 else if (pressingButton != MouseButtons.None)
@@ -100,7 +116,7 @@ namespace Orion.Engine.Gui2
                     ReleaseMouseCapture();
                     pressingButton = MouseButtons.None;
 
-                    if (IsUnderMouse) Clicked.Raise(this, @event.Button);
+                    if (IsUnderMouse) OnClicked(@event.Button);
                 }
 
                 return true;

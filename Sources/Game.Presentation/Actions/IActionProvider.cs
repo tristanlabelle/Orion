@@ -12,17 +12,17 @@ namespace Orion.Game.Presentation.Actions
     public interface IActionProvider : IDisposable
     {
         /// <summary>
-        /// Gets an <see cref="ActionButton"/> at a given position.
+        /// Gets an <see cref="ActionDescriptor"/> at a given position.
         /// </summary>
-        /// <param name="point">The position of the <see cref="ActionButton"/> to be returned.</param>
-        /// <returns>The <see cref="ActionButton"/> at that position.</returns>
+        /// <param name="point">The position of the <see cref="ActionDescriptor"/> to be returned.</param>
+        /// <returns>The <see cref="ActionDescriptor"/> at that position.</returns>
         /// <remarks>
-        /// This <see cref="IActionProvider"/> still owns the returned <see cref="ActionButton"/>.
+        /// This <see cref="IActionProvider"/> still owns the returned <see cref="ActionDescriptor"/>.
         /// </remarks>
-        ActionButton GetButtonAt(Point point);
+        ActionDescriptor GetActionAt(Point point);
 
         /// <summary>
-        /// Recreates the <see cref="ActionButton"/>s as to reflect some new context.
+        /// Recreates the <see cref="ActionDescriptor"/>s as to reflect some new context.
         /// </summary>
         void Refresh();
     }

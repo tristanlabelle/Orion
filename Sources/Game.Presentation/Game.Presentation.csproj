@@ -69,7 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ActionButton.cs" />
+    <Compile Include="Actions\ActionDescriptor.cs" />
     <Compile Include="Actions\ActionPanel.cs" />
     <Compile Include="Actions\BuildActionProvider.cs" />
     <Compile Include="Actions\CancelActionProvider.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.cs" />
+    <Compile Include="Gui\MatchUI2.ActionButton.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
     <Compile Include="Gui\OrionCheckBoxButtonAdornment.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
-    <Compile Include="Gui\Scroller.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />

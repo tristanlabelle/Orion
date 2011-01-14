@@ -24,12 +24,12 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton CreateCancelButton(UserInputManager inputManager, GameGraphics gameGraphics)
+        public ActionDescriptor CreateCancelAction(UserInputManager inputManager, GameGraphics gameGraphics)
         {
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            return new ActionButton()
+            return new ActionDescriptor()
             {
             	Name = "Annuler",
             	Texture = gameGraphics.GetActionTexture("Cancel"),
@@ -90,15 +90,7 @@ namespace Orion.Game.Presentation.Actions
                 for (int x = 0; x < 4; x++)
                 {
                     Point point = new Point(x, y);
-                    ActionButton button = provider.GetButtonAt(point);
-                    
-                    if (button == null)
-                    {
-                    	ui.SetActionButton(3 - y, x, null);
-                    	continue;
-                    }
-                    
-                    ui.SetActionButton(3 - y, x, button);
+                    ui.SetActionButton(3 - y, x, provider.GetActionAt(point));
                 }
             }
         }

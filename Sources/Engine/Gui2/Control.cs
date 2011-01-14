@@ -233,7 +233,16 @@ namespace Orion.Engine.Gui2
             get { return visibility; }
             set
             {
+                if (value == visibility) return;
+
                 visibility = value;
+
+                if (visibility != Visibility.Visible)
+                {
+                    ReleaseKeyboardFocus();
+                    ReleaseMouseCapture();
+                }
+
                 InvalidateMeasure();
             }
         }

@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager userInputManager;
         private readonly GameGraphics graphics;
         private readonly UnitType unitType;
-        private readonly ActionButton[,] buttons = new ActionButton[4, 4];
+        private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
@@ -40,9 +40,9 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return buttons[point.X, point.Y];
+            return actions[point.X, point.Y];
         }
 
         public void Refresh()
@@ -60,7 +60,7 @@ namespace Orion.Game.Presentation.Actions
         {
             if (unitType.HasSkill<AttackSkill>())
             {
-                buttons[2, 3] = new ActionButton()
+                actions[2, 3] = new ActionDescriptor()
                 {
                     Name = "Attaquer",
                     Texture = graphics.GetActionTexture("Attack"),
@@ -75,7 +75,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<BuildSkill>())
             {
-                buttons[0, 0] = new ActionButton()
+                actions[0, 0] = new ActionDescriptor()
                 {
                     Name = "Construire",
                     Texture = graphics.GetActionTexture("Build"),
@@ -83,7 +83,7 @@ namespace Orion.Game.Presentation.Actions
                     Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
                 };
 
-                buttons[1, 0] = new ActionButton()
+                actions[1, 0] = new ActionDescriptor()
                 {
                     Name = "Réparer",
                     Texture = graphics.GetActionTexture("Repair"),
@@ -98,7 +98,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<TransportSkill>())
             {
-                buttons[3, 0] = new ActionButton()
+                actions[3, 0] = new ActionDescriptor()
                 {
                     Name = "Débarquer",
                     Texture = graphics.GetActionTexture("Disembark"),
@@ -109,7 +109,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<HarvestSkill>())
             {
-                buttons[1, 2] = new ActionButton()
+                actions[1, 2] = new ActionDescriptor()
                 {
                     Name = "Ramasser",
                     Texture = graphics.GetActionTexture("Harvest"),
@@ -124,7 +124,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<HealSkill>())
             {
-                buttons[3, 2] = new ActionButton()
+                actions[3, 2] = new ActionDescriptor()
                 {
                     Name = "Soigner",
                     Texture = graphics.GetActionTexture("Heal"),
@@ -139,7 +139,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<MoveSkill>())
             {
-                buttons[0, 3] = new ActionButton()
+                actions[0, 3] = new ActionDescriptor()
                 {
                     Name = "Déplacer",
                     Texture = graphics.GetActionTexture("Move"),
@@ -154,7 +154,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<SellableSkill>())
             {
-                buttons[3, 0] = new ActionButton()
+                actions[3, 0] = new ActionDescriptor()
                 {
                     Name = "Vendre",
                     Texture = graphics.GetActionTexture("Sell"),
@@ -164,7 +164,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<AttackSkill>() && !unitType.HasSkill<MoveSkill>())
             {
-                buttons[3, 3] = new ActionButton()
+                actions[3, 3] = new ActionDescriptor()
                 {
                     Name = "Guarder",
                     Texture = graphics.GetActionTexture("Stand Guard"),
@@ -175,7 +175,7 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.Upgrades.Any(u => !u.IsFree))
             {
-                buttons[2, 0] = new ActionButton()
+                actions[2, 0] = new ActionDescriptor()
                 {
                     Name = "Améliorer",
                     Texture = graphics.GetActionTexture("Upgrade"),
@@ -204,7 +204,7 @@ namespace Orion.Game.Presentation.Actions
                 int alagene = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
 
                 UnitType traineeTypeForClosure = traineeType;
-                buttons[point.X, point.Y] = new ActionButton()
+                actions[point.X, point.Y] = new ActionDescriptor()
                 {
                     Name = traineeType.Name,
                     Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(aladdium, alagene),
@@ -226,7 +226,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 Point point = FindUnusedButton();
                 Technology technologyForClosure = technology;
-                buttons[point.X, point.Y] = new ActionButton()
+                actions[point.X, point.Y] = new ActionDescriptor()
                 {
                     Name = technology.Name,
                     Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(technology.AladdiumCost, technology.AlageneCost),
@@ -240,7 +240,7 @@ namespace Orion.Game.Presentation.Actions
         {
             int x = 0;
             int y = 3;
-            while (buttons[x, y] != null)
+            while (actions[x, y] != null)
             {
                 x++;
                 if (x == 4)
@@ -255,9 +255,9 @@ namespace Orion.Game.Presentation.Actions
 
         private void ClearButtons()
         {
-            for (int y = 0; y < buttons.GetLength(1); ++y)
-                for (int x = 0; x < buttons.GetLength(0); ++x)
-                        buttons[x, y] = null;
+            for (int y = 0; y < actions.GetLength(1); ++y)
+                for (int x = 0; x < actions.GetLength(0); ++x)
+                        actions[x, y] = null;
         }
         #endregion
     }

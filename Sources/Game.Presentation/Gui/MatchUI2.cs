@@ -10,8 +10,8 @@ using Orion.Engine.Gui2;
 using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation.Renderers;
 using Orion.Engine.Graphics;
-using Key = OpenTK.Input.Key;
 using Orion.Engine.Data;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
 {

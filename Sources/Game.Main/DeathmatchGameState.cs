@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Data;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui;
 using Orion.Engine.Gui2;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Audio;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Presentation.Renderers;
@@ -19,7 +21,6 @@ using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Utilities;
 using Input = Orion.Engine.Input;
 using Key = OpenTK.Input.Key;
-using Orion.Engine.Data;
 
 namespace Orion.Game.Main
 {
@@ -38,6 +39,7 @@ namespace Orion.Game.Main
         private readonly UserInputManager userInputManager;
         private readonly MatchUI2 ui;
         private readonly SingleEntitySelectionPanel singleEntitySelectionPanel;
+        private readonly ActionPanel actionPanel;
         private readonly WorkerActivityMonitor workerActivityMonitor;
         private readonly Camera camera;
         private readonly IMatchRenderer matchRenderer;
@@ -76,6 +78,8 @@ namespace Orion.Game.Main
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
 
+            this.actionPanel = new ActionPanel(ui);
+            
             this.workerActivityMonitor = new WorkerActivityMonitor(localCommander.Faction);
 
             Binding.CreateOneWay(() => localCommander.Faction.AladdiumAmount, () => ui.AladdiumAmount);
@@ -163,10 +167,19 @@ namespace Orion.Game.Main
 
         private void OnSelectionChanged(Selection selection)
         {
+            actionPanel.Clear();
+            
             if (selection.Count == 1)
             {
-                singleEntitySelectionPanel.Entity = selection.FirstOrDefault();
+            	Entity entity = selection.Single();
+                singleEntitySelectionPanel.Entity = entity;
                 ui.SelectionInfoControl = singleEntitySelectionPanel;
+                
+                Unit unit = entity as Unit;
+                if (unit != null)
+                {
+                	actionPanel.Push(new UnitActionProvider(actionPanel, userInputManager, graphics, unit.Type));
+                }
             }
             else
             {

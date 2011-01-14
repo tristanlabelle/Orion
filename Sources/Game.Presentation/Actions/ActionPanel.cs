@@ -1,39 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
-using Orion.Engine.Gui;
-using Orion.Engine.Input;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
-using Orion.Game.Matchmaking;
+using Orion.Game.Presentation.Gui;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {
-    public class ActionPanel : Panel
+    public sealed class ActionPanel
     {
         #region Fields
+        private readonly MatchUI2 ui;
         private readonly Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
-        private readonly TooltipPanel tooltipPanel;
         #endregion
-
+        
         #region Constructors
-        public ActionPanel(Rectangle frame)
-            : base(frame)
+        public ActionPanel(MatchUI2 ui)
         {
-            tooltipPanel = new TooltipPanel(new Vector2(0, Bounds.MaxY), Bounds.Width);
-        }
-        #endregion
-
-        #region Properties
-        internal TooltipPanel TooltipPanel
-        {
-            get { return tooltipPanel; }
+        	Argument.EnsureNotNull(ui, "ui");
+        	this.ui = ui;
         }
         #endregion
 
@@ -43,7 +29,7 @@ namespace Orion.Game.Presentation.Actions
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            ActionButton button = new ActionButton()
+            return new ActionButton()
             {
             	Name = "Annuler",
             	Texture = gameGraphics.GetActionTexture("Cancel"),
@@ -54,8 +40,6 @@ namespace Orion.Game.Presentation.Actions
 	                this.Restore();
 	            }
             };
-
-            return button;
         }
 
         public void Pop()
@@ -94,55 +78,29 @@ namespace Orion.Game.Presentation.Actions
             previousActionProvider.Dispose();
         }
 
-        internal void ShowTooltip()
-        {
-            if (!Children.Contains(tooltipPanel))
-                Children.Add(tooltipPanel);
-        }
-
-        internal void HideTooltip()
-        {
-            Children.Remove(tooltipPanel);
-        }
-
         public void Refresh()
         {
-            Children.Clear();
             if (actionProviders.Count == 0) return;
             
             IActionProvider provider = actionProviders.Peek();
             provider.Refresh();
 
-            Rectangle templateSize = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(0.2f, 0.2f));
-            Vector2 padding = new Vector2(Bounds.Width * 0.0375f, Bounds.Height * 0.0375f);
-
             for (int y = 3; y >= 0; y--)
             {
-                Vector2 origin = new Vector2(padding.X, padding.Y + (templateSize.Height + padding.Y) * y);
                 for (int x = 0; x < 4; x++)
                 {
                     Point point = new Point(x, y);
                     ActionButton button = provider.GetButtonAt(point);
-                    if (button != null)
+                    
+                    if (button == null)
                     {
-                        button.Frame = templateSize.TranslatedBy(origin);
-                        Children.Add(button);
+                    	ui.SetActionButton(3 - y, x, null);
+                    	continue;
                     }
-                    origin.X += padding.X + templateSize.Width;
+                    
+                    ui.SetActionButton(3 - y, x, button.Texture);
                 }
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // We don't actually own our children buttons so clear them
-                // so the base Dispose does not do so
-                Children.Clear();
-            }
-
-            base.Dispose(disposing);
         }
         #endregion
     }

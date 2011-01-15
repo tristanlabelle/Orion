@@ -508,6 +508,16 @@ namespace Orion.Game.Presentation.Gui
 
             UpdateScrollDirection();
 
+            foreach (ActionButton actionButton in actionButtonGrid.Children)
+            {
+                ActionDescriptor descriptor = actionButton.Descriptor;
+                if (descriptor != null && descriptor.HotKey == @event.Key)
+                {
+                    if (descriptor.Action != null) descriptor.Action();
+                    return true;
+                }
+            }
+
             return true;
         }
 

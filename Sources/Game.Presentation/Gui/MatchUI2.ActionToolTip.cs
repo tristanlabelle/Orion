@@ -6,6 +6,7 @@ using Orion.Engine.Gui2;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation.Actions;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -14,7 +15,7 @@ namespace Orion.Game.Presentation.Gui
         private sealed class ActionToolTip : ContentControl
         {
             #region Fields
-            private readonly Label nameLabel;
+            private readonly Label headerLabel;
             private readonly ImageBox aladdiumImageBox;
             private readonly Label aladdiumCostLabel;
             private readonly ImageBox alageneImageBox;
@@ -35,8 +36,8 @@ namespace Orion.Game.Presentation.Gui
 
                 DockLayout dock = new DockLayout();
 
-                nameLabel = style.Create<Label>();
-                dock.Dock(nameLabel, Direction.MinY);
+                headerLabel = style.Create<Label>();
+                dock.Dock(headerLabel, Direction.MinY);
 
                 StackLayout costsStack = new StackLayout()
                 {
@@ -76,7 +77,12 @@ namespace Orion.Game.Presentation.Gui
                     }
 
                     VisibilityFlag = Visibility.Visible;
-                    nameLabel.Text = descriptor.Name ?? string.Empty;
+
+                    string headerText = descriptor.Name ?? string.Empty;
+                    if (descriptor.HotKey != Key.Unknown)
+                        headerText += " (" + descriptor.HotKey.ToStringInvariant() + ")";
+
+                    headerLabel.Text = headerText;
                     UpdateResource(descriptor.Cost.Aladdium, aladdiumImageBox, aladdiumCostLabel);
                     UpdateResource(descriptor.Cost.Alagene, alageneImageBox, alageneCostLabel);
                     UpdateResource(descriptor.Cost.Food, foodImageBox, foodCostLabel);

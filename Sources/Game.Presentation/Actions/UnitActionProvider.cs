@@ -8,7 +8,7 @@ using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
-using Keys = System.Windows.Forms.Keys;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -64,7 +64,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Attaquer",
                     Texture = graphics.GetActionTexture("Attack"),
-                    HotKey = Keys.A,
+                    HotKey = Key.A,
                     Action = () =>
                     {
                         userInputManager.SelectedCommand = new AttackUserCommand(userInputManager, graphics);
@@ -79,7 +79,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Construire",
                     Texture = graphics.GetActionTexture("Build"),
-                    HotKey = Keys.B,
+                    HotKey = Key.B,
                     Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
                 };
 
@@ -87,7 +87,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Réparer",
                     Texture = graphics.GetActionTexture("Repair"),
-                    HotKey = Keys.R,
+                    HotKey = Key.R,
                     Action = () =>
                     {
                         userInputManager.SelectedCommand = new RepairUserCommand(userInputManager);
@@ -102,7 +102,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Débarquer",
                     Texture = graphics.GetActionTexture("Disembark"),
-                    HotKey = Keys.D,
+                    HotKey = Key.D,
                     Action = () => userInputManager.LaunchDisembark()
                 };
             }
@@ -113,7 +113,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Ramasser",
                     Texture = graphics.GetActionTexture("Harvest"),
-                    HotKey = Keys.H,
+                    HotKey = Key.H,
                     Action = () =>
                     {
                         userInputManager.SelectedCommand = new HarvestUserCommand(userInputManager);
@@ -128,7 +128,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Soigner",
                     Texture = graphics.GetActionTexture("Heal"),
-                    HotKey = Keys.H,
+                    HotKey = Key.H,
                     Action = () =>
                     {
                         userInputManager.SelectedCommand = new HealUserCommand(userInputManager);
@@ -143,7 +143,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Déplacer",
                     Texture = graphics.GetActionTexture("Move"),
-                    HotKey = Keys.M,
+                    HotKey = Key.M,
                     Action = () =>
                     {
                         userInputManager.SelectedCommand = new MoveUserCommand(userInputManager);
@@ -168,7 +168,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = "Guarder",
                     Texture = graphics.GetActionTexture("Stand Guard"),
-                    HotKey = Keys.G,
+                    HotKey = Key.G,
                     Action = () => userInputManager.LaunchStandGuard()
                 };
             }

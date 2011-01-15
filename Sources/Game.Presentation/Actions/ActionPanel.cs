@@ -4,7 +4,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Presentation.Gui;
-using Keys = System.Windows.Forms.Keys;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -33,7 +33,7 @@ namespace Orion.Game.Presentation.Actions
             {
             	Name = "Annuler",
             	Texture = gameGraphics.GetActionTexture("Cancel"),
-            	HotKey = Keys.Escape,
+            	HotKey = Key.Escape,
             	Action = () =>
 	            {
 	                inputManager.SelectedCommand = null;

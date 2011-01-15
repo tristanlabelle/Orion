@@ -3,7 +3,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
-using Keys = System.Windows.Forms.Keys;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -16,7 +16,7 @@ namespace Orion.Game.Presentation.Actions
         private string name;
         private ResourceAmount cost;
         private Texture texture;
-        private Keys hotKey;
+        private Key hotKey;
         private Action action;
         #endregion
         
@@ -55,7 +55,7 @@ namespace Orion.Game.Presentation.Actions
         /// <summary>
         /// Accesses the hot key which clicks this button.
         /// </summary>
-        public Keys HotKey
+        public Key HotKey
         {
         	get { return hotKey; }
         	set { hotKey = value; }

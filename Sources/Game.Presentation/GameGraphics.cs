@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
@@ -10,12 +8,10 @@ using Orion.Engine.Gui2;
 using Orion.Engine.Input;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
-using InputMouseEventType = Orion.Engine.Input.MouseEventType;
 using RootView = Orion.Engine.Gui.RootView;
-using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation
 {
@@ -38,6 +34,8 @@ namespace Orion.Game.Presentation
             this.window = new OpenTKGameWindow("Orion", WindowMode.Windowed, new Size(1024, 768));
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
+
+            System.Windows.Forms.Cursor.Hide();
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
 

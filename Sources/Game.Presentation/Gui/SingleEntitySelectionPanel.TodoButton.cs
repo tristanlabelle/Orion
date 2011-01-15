@@ -23,11 +23,15 @@ namespace Orion.Game.Presentation.Gui
                 panel.Style.ApplyStyle(this);
                 SetSize(32, 32);
 
+                AcquireKeyboardFocusWhenPressed = false;
                 Content = imageBox = new ImageBox();
             }
             #endregion
 
             #region Properties
+            /// <summary>
+            /// Accesses the <see cref="Texture"/> that appears on this button.
+            /// </summary>
             public Texture Texture
             {
                 get { return imageBox.Texture; }

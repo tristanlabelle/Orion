@@ -64,7 +64,7 @@ namespace Orion.Engine.Gui2
         public bool AcquireKeyboardFocusWhenPressed
         {
             get { return acquireKeyboardFocusWhenPressed; }
-            set { acquireKeyboardFocusWhenPressed = true; }
+            set { acquireKeyboardFocusWhenPressed = value; }
         }
 
         /// <summary>

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Data;
@@ -284,10 +283,14 @@ namespace Orion.Game.Presentation.Gui
             resourcesStack.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";
 
-            Button inactiveWorkersButton = new Button();
-            dock.Dock(inactiveWorkersButton, Direction.MinX);
-            inactiveWorkersButton.Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel);
+            Button inactiveWorkersButton = new Button()
+            {
+                AcquireKeyboardFocusWhenPressed = false,
+                Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel)
+            };
+
             inactiveWorkersButton.Clicked += (sender, mouseButton) => InactiveWorkersButtonPressed.Raise(this);
+            dock.Dock(inactiveWorkersButton, Direction.MinX);
 
             Button pauseButton = style.CreateTextButton("Pause");
             pauseButton.AcquireKeyboardFocusWhenPressed = false;

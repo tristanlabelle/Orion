@@ -200,14 +200,15 @@ namespace Orion.Game.Presentation.Actions
             {
                 Point point = FindUnusedButton();
 
-                int aladdium = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
-                int alagene = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
+                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
+                int alageneCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
+                int foodCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.FoodCostStat);
 
                 UnitType traineeTypeForClosure = traineeType;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
                     Name = traineeType.Name,
-                    Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(aladdium, alagene),
+                    Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
                     Texture = graphics.GetUnitTexture(traineeType),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
                 };
@@ -229,7 +230,7 @@ namespace Orion.Game.Presentation.Actions
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
                     Name = technology.Name,
-                    Description = "Aladdium: {0} Alagene: {1}".FormatInvariant(technology.AladdiumCost, technology.AlageneCost),
+                    Cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost),
                     Texture = graphics.GetTechnologyTexture(technology),
                     Action = () => userInputManager.LaunchResearch(technologyForClosure)
                 };

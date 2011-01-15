@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {

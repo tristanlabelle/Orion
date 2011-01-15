@@ -2,6 +2,7 @@
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
+using Orion.Game.Simulation;
 using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
@@ -13,7 +14,7 @@ namespace Orion.Game.Presentation.Actions
     {
         #region Fields
         private string name;
-        private string description;
+        private ResourceAmount cost;
         private Texture texture;
         private Keys hotKey;
         private Action action;
@@ -34,12 +35,12 @@ namespace Orion.Game.Presentation.Actions
         }
         
         /// <summary>
-        /// Accesses the description of the action represented by this button.
+        /// Accesses the cost of the action represented by this button.
         /// </summary>
-        public string Description
+        public ResourceAmount Cost
         {
-            get { return description; }
-            set { description = value; }
+            get { return cost; }
+            set { cost = value; }
         }
         
         /// <summary>
@@ -68,33 +69,12 @@ namespace Orion.Game.Presentation.Actions
         	get { return action; }
         	set { action = value; }
         }
-        
-        /// <summary>
-        /// Gets the tool tip text which appears for this button.
-        /// </summary>
-        public string TooltipText
+        #endregion
+
+        #region Methods
+        public override string ToString()
         {
-            get
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-
-                stringBuilder.Append(name);
-
-                if (HotKey != Keys.None)
-                {
-                    stringBuilder.Append(" (");
-                    stringBuilder.Append(HotKey.ToStringInvariant());
-                    stringBuilder.Append(')');
-                }
-
-                if (description != null)
-                {
-                    stringBuilder.Append('\n');
-                    stringBuilder.Append(description);
-                }
-
-                return stringBuilder.ToString();
-            }
+            return name;
         }
         #endregion
     }

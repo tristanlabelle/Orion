@@ -103,6 +103,7 @@ namespace Orion.Engine.Gui2
         public Control ControlUnderMouse
         {
             get { return controlUnderMouse; }
+            internal set { controlUnderMouse = value; }
         }
 
         /// <summary>

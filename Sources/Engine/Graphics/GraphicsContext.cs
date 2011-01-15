@@ -27,6 +27,16 @@ namespace Orion.Engine.Graphics
         private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
         private readonly TextRenderer textRenderer;
+
+        /// <summary>
+        /// The size of the OpenGL viewport.
+        /// </summary>
+        /// <remarks>
+        /// This value corresponds to glGetInteger(GL_VIEWPORT), but is cached
+        /// because that function seems to have a monstrous impact on performance.
+        /// </remarks>
+        private Size viewportSize;
+
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
         private Font font = defaultFont;
         #endregion
@@ -46,6 +56,10 @@ namespace Orion.Engine.Graphics
             GL.Ortho(-1, 1, -1, 1, -1, 1);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
+            
+            int[] viewportCoordinates = new int[4];
+            GL.GetInteger(GetPName.Viewport, viewportCoordinates);
+            viewportSize = new Size(viewportCoordinates[2], viewportCoordinates[3]);
         }
         #endregion
 
@@ -55,16 +69,12 @@ namespace Orion.Engine.Graphics
         /// </summary>
         public Size ViewportSize
         {
-            get
-            {
-                int[] viewportCoordinates = new int[4];
-                GL.GetInteger(GetPName.Viewport, viewportCoordinates);
-
-                return new Size(viewportCoordinates[2], viewportCoordinates[3]);
-            }
+            get { return viewportSize; }
             internal set
             {
+                if (value == viewportSize) return;
                 GL.Viewport(0, 0, value.Width, value.Height);
+                viewportSize = value;
             }
         }
 

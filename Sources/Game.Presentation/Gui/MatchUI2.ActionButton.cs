@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Gui2;
 using Orion.Engine.Graphics;
+using Orion.Game.Presentation.Actions;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -15,7 +16,7 @@ namespace Orion.Game.Presentation.Gui
         private sealed class ActionButton : Button
         {
             #region Fields
-            private Action action;
+            private ActionDescriptor descriptor;
             #endregion
 
             #region Constructors
@@ -28,33 +29,30 @@ namespace Orion.Game.Presentation.Gui
 
             #region Properties
             /// <summary>
-            /// Accesses the texture displayed on this <see cref="ActionButton"/>.
+            /// Accesses the <see cref="ActionDescriptor"/> of this button's action.
             /// </summary>
-            public Texture Texture
+            public ActionDescriptor Descriptor
             {
-                get { return ImageBox.Texture; }
-                set { ImageBox.Texture = value; }
-            }
+                get { return descriptor; }
+                set
+                {
+                    descriptor = value;
+                    if (descriptor == null)
+                    {
+                        VisibilityFlag = Visibility.Hidden;
+                        return;
+                    }
 
-            /// <summary>
-            /// Accesses the callback that is invoked when this button is pressed.
-            /// </summary>
-            public Action Action
-            {
-                get { return action; }
-                set { action = value; }
-            }
-
-            private ImageBox ImageBox
-            {
-                get { return (ImageBox)Content; }
+                    VisibilityFlag = Visibility.Visible;
+                    ((ImageBox)Content).Texture = descriptor.Texture;
+                }
             }
             #endregion
 
             #region Methods
             protected override void OnClicked(MouseButtons button)
             {
-                if (action != null) action();
+                if (descriptor != null && descriptor.Action != null) descriptor.Action();
             }
             #endregion
         }

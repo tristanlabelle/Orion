@@ -66,7 +66,7 @@ namespace Orion.Game.Main
             this.ui.MinimapRendering += OnMinimapRendering;
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
-            this.ui.MouseWheel += OnViewportMouseWheel;
+            this.ui.ViewportZoomed += OnViewportZoomed;
             this.ui.KeyEvent += OnViewportKeyEvent;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
 
@@ -226,11 +226,10 @@ namespace Orion.Game.Main
             return true;
         }
 
-        private bool OnViewportMouseWheel(Control sender, MouseEvent @event)
+        private void OnViewportZoomed(MatchUI2 sender, float delta)
         {
-            if (@event.WheelDelta >= 1) camera.ZoomIn();
-            if (@event.WheelDelta <= -1) camera.ZoomOut();
-            return true;
+            if (delta >= 1) camera.ZoomIn();
+            if (delta <= -1) camera.ZoomOut();
         }
 
         private bool OnViewportMouseButton(Control sender, MouseEvent @event)

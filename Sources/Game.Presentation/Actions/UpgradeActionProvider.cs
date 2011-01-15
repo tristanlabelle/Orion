@@ -76,8 +76,8 @@ namespace Orion.Game.Presentation.Actions
 
                 buttons[x, y] = new ActionDescriptor()
 	            {
-	            	Name = upgrade.Target,
-	            	Description = "Aladdium: {1} / Alagene: {2}".FormatInvariant(upgrade.AladdiumCost, upgrade.AlageneCost),
+                    Name = upgrade.Target,
+                    Cost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost),
 	            	Texture = graphics.GetUnitTexture(targetType),
 	            	Action = () => inputManager.LaunchUpgrade(targetType)
 	            };

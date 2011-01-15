@@ -38,9 +38,11 @@ namespace Orion.Game.Presentation.Gui
         private TextField chatTextField;
         private MessageConsole messageConsole;
         private GridLayout actionButtonGrid;
+        private ActionToolTip actionToolTip;
         private TimeSpan time;
         private TimeSpan lastInactiveWorkerCountChangedTime;
 
+        private ActionButton lastActionButtonUnderMouse;
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
         #endregion
@@ -58,7 +60,7 @@ namespace Orion.Game.Presentation.Gui
             mainDock.LastChildFill = true;
             mainDock.Dock(CreateTopBar(), Direction.MinY);
             mainDock.Dock(CreateBottomBar(), Direction.MaxY);
-            mainDock.Dock(CreateChatOverlays(), Direction.MaxY);
+            mainDock.Dock(CreateOverlays(), Direction.MaxY);
         }
         #endregion
 
@@ -81,6 +83,11 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the minimap should be rendered.
         /// </summary>
         public event Action<MatchUI2, Region> MinimapRendering;
+
+        /// <summary>
+        /// Raised when the game gets zoomed in or out. The parameter specifies the zoom amount.
+        /// </summary>
+        public event Action<MatchUI2, float> ViewportZoomed;
 
         /// <summary>
         /// Raised when the user has submitted text using the chat.
@@ -193,6 +200,24 @@ namespace Orion.Game.Presentation.Gui
             get { return selectionInfoPanel.Content; }
             set { selectionInfoPanel.Content = value; }
         }
+
+        private ActionButton ActionButtonUnderMouse
+        {
+            get
+            {
+                if (Manager == null) return null;
+
+                Control controlUnderMouse = Manager.ControlUnderMouse;
+                while (controlUnderMouse != null)
+                {
+                    ActionButton actionButtonUnderMouse = controlUnderMouse as ActionButton;
+                    if (actionButtonUnderMouse != null) return actionButtonUnderMouse;
+                    controlUnderMouse = controlUnderMouse.Parent;
+                }
+
+                return null;
+            }
+        }
         #endregion
 
         #region Methods
@@ -227,16 +252,7 @@ namespace Orion.Game.Presentation.Gui
         public void SetActionButton(int rowIndex, int columnIndex, ActionDescriptor descriptor)
         {
             ActionButton button = (ActionButton)actionButtonGrid.Children[rowIndex, columnIndex];
-            if (descriptor == null)
-            {
-                button.VisibilityFlag = Visibility.Hidden;
-            	return;
-            }
-
-            button.VisibilityFlag = Visibility.Visible;
-
-            button.Texture = descriptor.Texture;
-            button.Action = descriptor.Action;
+            button.Descriptor = descriptor;
         }
 
         private void UpdateScrollDirection()
@@ -401,14 +417,24 @@ namespace Orion.Game.Presentation.Gui
             ViewportBox minimapBox = new ViewportBox();
             minimapBox.MouseButton += OnMinimapMouseButton;
             minimapBox.MouseMoved += OnMinimapMouseMoved;
+            minimapBox.MouseWheel += OnMinimapMouseWheel;
             minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
 
             return minimapBox;
         }
 
-        private Control CreateChatOverlays()
+        private Control CreateOverlays()
         {
             DockLayout dock = new DockLayout();
+
+            actionToolTip = new ActionToolTip(style)
+            {
+                Adornment = new ColoredBackgroundAdornment(Colors.Gray),
+                VerticalAlignment = Alignment.Max,
+                IsMouseEventSink = true,
+                VisibilityFlag = Visibility.Hidden
+            };
+            dock.Dock(actionToolTip, Direction.MaxX);
 
             chatTextField = style.Create<TextField>();
             dock.Dock(chatTextField, Direction.MaxY);
@@ -419,10 +445,12 @@ namespace Orion.Game.Presentation.Gui
             chatTextField.VisibilityFlag = Visibility.Hidden;
             chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
 
-            messageConsole = new MessageConsole(style);
-            messageConsole.Direction = Direction.MinY;
-            messageConsole.MinXMargin = 5;
-            messageConsole.MaxYMargin = 5;
+            messageConsole = new MessageConsole(style)
+            {
+                Direction = Direction.MinX,
+                MinXMargin = 5,
+                MaxXMargin = 5
+            };
             dock.Dock(messageConsole, Direction.MaxY);
 
             return dock;
@@ -449,6 +477,19 @@ namespace Orion.Game.Presentation.Gui
 
             UpdateScrollDirection();
             UpdateInactiveWorkerButton();
+
+            ActionButton actionButtonUnderMouse = ActionButtonUnderMouse;
+            if (actionButtonUnderMouse != lastActionButtonUnderMouse)
+            {
+                lastActionButtonUnderMouse = actionButtonUnderMouse;
+                actionToolTip.Descriptor = actionButtonUnderMouse == null ? null : actionButtonUnderMouse.Descriptor;
+            }
+        }
+
+        protected override bool OnMouseWheel(MouseEvent @event)
+        {
+            ViewportZoomed.Raise(this, @event.WheelDelta);
+            return true;
         }
 
         protected override bool OnKeyEvent(KeyEvent @event)
@@ -528,6 +569,12 @@ namespace Orion.Game.Presentation.Gui
             }
 
             return false;
+        }
+
+        private bool OnMinimapMouseWheel(Control sender, MouseEvent @event)
+        {
+            ViewportZoomed.Raise(this, @event.WheelDelta);
+            return true;
         }
 
         private void MoveMinimapCamera(Region rectangle, Point position)

@@ -101,7 +101,7 @@ namespace Orion.Game.Presentation.Actions
             return new ActionDescriptor()
             {
             	Name = buildingType.Name,
-            	Description = "Aladdium: {0} / Alagene: {1}".FormatInvariant(aladdiumCost, alageneCost),
+                Cost = new ResourceAmount(aladdiumCost, alageneCost),
             	Texture = graphics.GetUnitTexture(buildingType),
             	Action = () =>
 	            {

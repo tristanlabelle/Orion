@@ -91,6 +91,7 @@
     <Compile Include="Gui\InterpolatedCounter.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.cs" />
     <Compile Include="Gui\MatchUI2.ActionButton.cs" />
+    <Compile Include="Gui\MatchUI2.ActionToolTip.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
     <Compile Include="Gui\OrionCheckBoxButtonAdornment.cs" />
@@ -128,7 +129,6 @@
     <Compile Include="Gui\MaximizedPanel.cs" />
     <Compile Include="Gui\MultiplayerLobbyUI.cs" />
     <Compile Include="Gui\MainMenuUI.cs" />
-    <Compile Include="Gui\MatchConsole.cs" />
     <Compile Include="Gui\ReplayBrowserUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInputCommand.cs" />

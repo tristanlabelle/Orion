@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
-using System.Diagnostics;
-using System.ComponentModel;
 using Orion.Engine.Input;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Engine.Gui2
 {
@@ -56,12 +54,12 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Events
-        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseMovedEvent;
-        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseButtonEvent;
-        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseWheelEvent;
-        private HandleableEvent<Func<Control, MouseEvent, bool>> mouseClickEvent;
-        private HandleableEvent<Func<Control, KeyEvent, bool>> keyEvent;
-        private HandleableEvent<Func<Control, char, bool>> characterTypedEvent;
+        private HandleableEvent<Control, MouseEvent> mouseMovedEvent;
+        private HandleableEvent<Control, MouseEvent> mouseButtonEvent;
+        private HandleableEvent<Control, MouseEvent> mouseWheelEvent;
+        private HandleableEvent<Control, MouseEvent> mouseClickEvent;
+        private HandleableEvent<Control, KeyEvent> keyEvent;
+        private HandleableEvent<Control, char> characterTypedEvent;
 
         /// <summary>
         /// Raised when the mouse moves over this control or when this control has the mouse capture.
@@ -125,6 +123,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
+        #region Hierarchy
         /// <summary>
         /// Gets the <see cref="UIManager"/> at the root of this UI hierarchy.
         /// </summary>
@@ -134,20 +133,40 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the <see cref="GuiRenderer"/> which draws this <see cref="Control"/>.
-        /// </summary>
-        protected GuiRenderer Renderer
-        {
-            get { return manager.Renderer; }
-        }
-
-        /// <summary>
         /// Gets the <see cref="Control"/> which contains this <see cref="Control"/> in the UI hierarchy.
         /// </summary>
         public Control Parent
         {
             get { return parent; }
         }
+
+        /// <summary>
+        /// Enumerates the ancestors of this <see cref="Control"/>.
+        /// </summary>
+        public IEnumerable<Control> Ancestors
+        {
+            get
+            {
+                Control ancestor = parent;
+                while (ancestor != null)
+                {
+                    yield return ancestor;
+                    ancestor = ancestor.parent;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the children of this <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is implemented through <see cref="GetChildren"/> to allow overriding and shadowing simultaneously in a derived class.
+        /// </remarks>
+        public IEnumerable<Control> Children
+        {
+            get { return GetChildren(); }
+        }
+        #endregion
 
         /// <summary>
         /// Accesses the <see cref="IAdornment"/> which visually enhances this control.
@@ -237,15 +256,20 @@ namespace Orion.Engine.Gui2
             {
                 if (value == visibilityFlag) return;
 
+                Visibility previousVisibilityFlag = visibilityFlag;
                 visibilityFlag = value;
 
                 if (visibilityFlag != Visibility.Visible)
                 {
+                    if (manager != null && HasDescendant(manager.ControlUnderMouse))
+                        manager.ControlUnderMouse = Parent;
+
                     ReleaseKeyboardFocus();
                     ReleaseMouseCapture();
                 }
 
-                InvalidateMeasure();
+                if (visibilityFlag == Visibility.Collapsed || previousVisibilityFlag == Visibility.Collapsed)
+                    InvalidateMeasure();
             }
         }
 
@@ -325,12 +349,7 @@ namespace Orion.Engine.Gui2
                 if (value == minSize) return;
 
                 minSize = value;
-                if (isMeasured && (cachedDesiredOuterSize.Width < minSize.Width || cachedDesiredOuterSize.Height < minSize.Height))
-                {
-                    // The cached desired size being smaller than the new minimum size,
-                    // the control will have to be measured again so that it's desired size is bigger.
-                    InvalidateMeasure();
-                }
+                InvalidateMeasure();
             }
         }
 
@@ -554,14 +573,11 @@ namespace Orion.Engine.Gui2
         #endregion
 
         /// <summary>
-        /// Enumerates the children of this <see cref="Control"/>.
+        /// Gets the <see cref="GuiRenderer"/> which draws this <see cref="Control"/>.
         /// </summary>
-        /// <remarks>
-        /// This is implemented through <see cref="GetChildren"/> to allow overriding and shadowing simultaneously in a derived class.
-        /// </remarks>
-        public IEnumerable<Control> Children
+        protected GuiRenderer Renderer
         {
-            get { return GetChildren(); }
+            get { return manager.Renderer; }
         }
         #endregion
 
@@ -757,6 +773,8 @@ namespace Orion.Engine.Gui2
         /// <returns>The desired outer size of this <see cref="Control"/>.</returns>
         protected Size MeasureOuterSize()
         {
+            if (visibilityFlag == Visibility.Collapsed) return Size.Zero;
+
             Size desiredSize = MeasureSize();
             return new Size(
                 Math.Max(minSize.Width, width.GetValueOrDefault(desiredSize.Width)) + margin.TotalX,

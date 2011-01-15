@@ -93,10 +93,9 @@ namespace Orion.Engine.Graphics
         private Size Draw(ref TextRenderingOptions options, bool draw)
         {
             RenderedFont renderedFont = FindOrCreateRenderedFont(options.Font);
-            float height = renderedFont.Font.GetHeight();
 
             int totalWidth = 0;
-            int totalHeight = (int)Math.Ceiling(height);
+            int totalHeight = (int)Math.Ceiling(renderedFont.Height);
 
             Vector2 origin = options.Origin.ToVector();
             Vector2 position = origin;
@@ -105,7 +104,7 @@ namespace Orion.Engine.Graphics
                 char character = tempStringBuilder[i];
                 if (char.IsWhiteSpace(character))
                 {
-                    position.X += renderedFont.SpaceWidth * height;
+                    position.X += renderedFont.SpaceWidth * renderedFont.Height;
                     if (position.X - origin.X > totalWidth)
                         totalWidth = (int)Math.Ceiling(position.X - origin.X);
                 }
@@ -114,7 +113,7 @@ namespace Orion.Engine.Graphics
                     Glyph glyph = FindOrRenderGlyph(renderedFont, character);
                     Texture texture = renderedFont.Textures[glyph.TextureIndex];
                     Box textureRectangle = glyph.TextureRectangle;
-                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height / renderedFont.Font.Height * height);
+                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height);
 
                     if (box.MaxX > options.MaxWidthInPixels)
                     {
@@ -130,7 +129,7 @@ namespace Orion.Engine.Graphics
                         else if (options.HorizontalOverflowPolicy == TextOverflowPolicy.Wrap)
                         {
                             position.X = options.Origin.X;
-                            position.Y -= renderedFont.LineSpacing;
+                            position.Y -= renderedFont.Height;
                             box = new Box(position.X, position.Y, box.Width, box.Height);
                         }
                     }
@@ -139,7 +138,7 @@ namespace Orion.Engine.Graphics
                     if (box.MaxY - origin.Y > totalHeight) totalHeight = (int)Math.Ceiling(box.MaxY - origin.Y);
 
                     if (draw) graphicsContext.Fill(box, texture, textureRectangle, options.Color);
-                    position.X += glyph.TextureRectangle.Width * texture.Height / renderedFont.Font.Height * height;
+                    position.X += glyph.TextureRectangle.Width * texture.Height;
                 }
             }
 
@@ -165,7 +164,9 @@ namespace Orion.Engine.Graphics
             if (renderedFonts.TryGetValue(font, out renderedFont))
                 return renderedFont;
 
-            if (fontRenderTarget == null || fontRenderTarget.Height < font.Height * 2)
+            // Cached for performance
+            int fontHeight = font.Height;
+            if (fontRenderTarget == null || fontRenderTarget.Height < fontHeight * 2)
             {
                 if (fontRenderer != null)
                 {
@@ -173,7 +174,7 @@ namespace Orion.Engine.Graphics
                     fontRenderTarget.Dispose();
                 }
 
-                fontRenderTarget = new Bitmap(font.Height * 2, font.Height * 2, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                fontRenderTarget = new Bitmap(fontHeight * 2, fontHeight * 2, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 fontRenderer = Graphics.FromImage(fontRenderTarget);
             }
 
@@ -182,7 +183,7 @@ namespace Orion.Engine.Graphics
 
             // use the width of an 'i' for the size of a space.
             Glyph iGlyph = FindOrRenderGlyph(renderedFont, 'i');
-            renderedFont.SpaceWidth = iGlyph.TextureRectangle.Width * renderedFont.Textures[iGlyph.TextureIndex].Height / font.Height;
+            renderedFont.SpaceWidth = iGlyph.TextureRectangle.Width * renderedFont.Textures[iGlyph.TextureIndex].Height / fontHeight;
 
             return renderedFont;
         }
@@ -283,7 +284,7 @@ namespace Orion.Engine.Graphics
 
         private Rectangle GetRenderedBounds(RenderedFont renderedFont, string characterString)
         {
-            RectangleF layoutRect = new RectangleF(0, 0, renderedFont.Font.Height * 2, renderedFont.Font.Height * 2);
+            RectangleF layoutRect = new RectangleF(0, 0, renderedFont.Height * 2, renderedFont.Height * 2);
             using (var characterRegion = fontRenderer.MeasureCharacterRanges(characterString, renderedFont.Font, layoutRect, stringFormat)[0])
             {
                 RectangleF characterBounds = characterRegion.GetBounds(fontRenderer);

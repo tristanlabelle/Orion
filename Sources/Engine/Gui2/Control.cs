@@ -22,7 +22,7 @@ namespace Orion.Engine.Gui2
         private Control parent;
         private IAdornment adornment;
         private Borders margin;
-        private Visibility visibility;
+        private Visibility visibilityFlag;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
         private Size minSize;
@@ -225,19 +225,21 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Visibility
         /// <summary>
-        /// Accesses the current visibility of this <see cref="Control"/>.
+        /// Accesses the current visibility flag of this <see cref="Control"/>.
+        /// The actual visibility depends on the flags of this <see cref="Control"/> and its ancestors
         /// </summary>
-        public Visibility Visibility
+        public Visibility VisibilityFlag
         {
-            get { return visibility; }
+            get { return visibilityFlag; }
             set
             {
-                if (value == visibility) return;
+                if (value == visibilityFlag) return;
 
-                visibility = value;
+                visibilityFlag = value;
 
-                if (visibility != Visibility.Visible)
+                if (visibilityFlag != Visibility.Visible)
                 {
                     ReleaseKeyboardFocus();
                     ReleaseMouseCapture();
@@ -246,6 +248,33 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Gets the actual visibility of this <see cref="Control"/>,
+        /// based on this <see cref="Control"/>'s and its parent's <see cref="VisibilityFlag"/>.
+        /// </summary>
+        public Visibility Visibility
+        {
+            get
+            {
+                Visibility visibility = Visibility.Visible;
+
+                Control ancestor = this;
+                do
+                {
+                    if (ancestor.VisibilityFlag < visibility)
+                    {
+                        visibility = ancestor.VisibilityFlag;
+                        if (visibility == Visibility.Collapsed) break;
+                    }
+
+                    ancestor = ancestor.Parent;
+                } while (ancestor != null);
+
+                return visibility;
+            }
+        }
+        #endregion
 
         #region Alignment
         /// <summary>
@@ -493,6 +522,7 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Enabled
         /// <summary>
         /// Accesses a value indicating if this <see cref="Control"/> has the enabled flag.
         /// If <c>false</c>, this <see cref="Control"/> and its descendants will be disabled.
@@ -521,6 +551,7 @@ namespace Orion.Engine.Gui2
                 return true;
             }
         }
+        #endregion
 
         /// <summary>
         /// Enumerates the children of this <see cref="Control"/>.
@@ -851,6 +882,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Input Events
+        #region Propagation Plumbing
         protected virtual bool PropagateMouseEvent(MouseEvent @event)
         {
             foreach (Control child in Children)
@@ -873,6 +905,8 @@ namespace Orion.Engine.Gui2
 
         protected internal bool HandleMouseEvent(MouseEvent @event)
         {
+            if (Visibility < Visibility.Visible) return false;
+
             switch (@event.Type)
             {
                 case MouseEventType.Move: return HandleMouseMoved(@event);
@@ -913,16 +947,22 @@ namespace Orion.Engine.Gui2
 
         internal bool HandleKeyEvent(KeyEvent @event)
         {
+            if (Visibility < Visibility.Visible) return false;
+
             return OnKeyEvent(@event)
                 | keyEvent.Raise(this, @event);
         }
 
         internal bool HandleCharacterTyped(char character)
         {
+            if (Visibility < Visibility.Visible) return false;
+
             return OnCharacterTyped(character)
                 | characterTypedEvent.Raise(this, character);
         }
+        #endregion
 
+        #region Overridables
         /// <summary>
         /// When overriden in a derived class, handles a mouse move event.
         /// </summary>
@@ -974,6 +1014,7 @@ namespace Orion.Engine.Gui2
         /// Invoked when the mouse cursor exits this <see cref="Control"/>.
         /// </summary>
         protected internal virtual void OnMouseExited() { }
+        #endregion
         #endregion
 
         #region Focus

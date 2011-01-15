@@ -88,6 +88,7 @@ namespace Orion.Game.Main
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
             //this.ui.QuitPressed += OnQuitPressed;
+            this.match.FactionMessageReceived += OnFactionMessageReceived;
             this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
         }
@@ -280,6 +281,11 @@ namespace Orion.Game.Main
         private void OnQuitPressed(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
+        }
+
+        private void OnFactionMessageReceived(Match match, FactionMessage message)
+        {
+            ui.AddMessage(message.Text, message.Sender.Color);
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

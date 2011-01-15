@@ -68,8 +68,8 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public bool NeedsReadying
         {
-            get { return readyCheckBox.Visibility == Visibility.Visible; }
-            set { readyCheckBox.Visibility = value ? Visibility.Visible : Visibility.Hidden; }
+            get { return readyCheckBox.VisibilityFlag == Visibility.Visible; }
+            set { readyCheckBox.VisibilityFlag = value ? Visibility.Visible : Visibility.Hidden; }
         }
 
         /// <summary>

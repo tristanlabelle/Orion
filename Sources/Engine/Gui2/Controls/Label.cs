@@ -11,7 +11,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A <see cref="Control"/> which displays text.
     /// </summary>
-    public sealed class Label : Control
+    public class Label : Control
     {
         #region Fields
         private string text;

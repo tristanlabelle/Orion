@@ -113,7 +113,7 @@ namespace Orion.Game.Presentation.Gui
                 imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
                 UpdateHealth(unit);
                 UpdateTodoList(unit.TaskQueue);
-                statsForm.Visibility = Visibility.Visible;
+                statsForm.VisibilityFlag = Visibility.Visible;
                 foreach (UnitStat stat in statsToDisplay)
                 {
                     if (!unit.Type.HasSkill(stat.SkillType)) continue;
@@ -137,7 +137,7 @@ namespace Orion.Game.Presentation.Gui
                 nameLabel.Text = resourceNode.Type.ToStringInvariant();
                 imageBox.Texture = graphics.GetResourceTexture(resourceNode);
                 UpdateAmount(resourceNode);
-                statsForm.Visibility = Visibility.Hidden;
+                statsForm.VisibilityFlag = Visibility.Hidden;
 
                 resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
             }

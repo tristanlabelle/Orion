@@ -36,7 +36,7 @@ namespace Orion.Game.Presentation.Gui
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
-        private StackLayout messageStack;
+        private MessageConsole messageConsole;
         private GridLayout actionButtonGrid;
         private TimeSpan time;
         private TimeSpan lastInactiveWorkerCountChangedTime;
@@ -196,29 +196,44 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Adds a message to this <see cref="MatchUI2"/>'s message console.
+        /// </summary>
+        /// <param name="text">The text of the message.</param>
+        /// <param name="color">The color of the message.</param>
         public void AddMessage(string text, ColorRgb color)
         {
-            Label label = style.CreateLabel(text);
-            label.Color = color;
-            messageStack.Stack(label);
+            messageConsole.AddMessage(text, color);
         }
 
+        /// <summary>
+        /// Hides all action buttons.
+        /// </summary>
         public void ClearActionButtons()
         {
             foreach (ActionButton button in actionButtonGrid.Children)
-                button.Visibility = Visibility.Hidden;
+                button.VisibilityFlag = Visibility.Hidden;
         }
 
+        /// <summary>
+        /// Resets an action button from a descriptor.
+        /// </summary>
+        /// <param name="rowIndex">The index of the row of the button.</param>
+        /// <param name="columnIndex">The index of the column of the button.</param>
+        /// <param name="descriptor">
+        /// The action descriptor to be applied to the button.
+        /// Can be <c>null</c> if the button should not be available.
+        /// </param>
         public void SetActionButton(int rowIndex, int columnIndex, ActionDescriptor descriptor)
         {
             ActionButton button = (ActionButton)actionButtonGrid.Children[rowIndex, columnIndex];
             if (descriptor == null)
             {
-            	button.Visibility = Visibility.Hidden;
+                button.VisibilityFlag = Visibility.Hidden;
             	return;
             }
-            
-            button.Visibility = Visibility.Visible;
+
+            button.VisibilityFlag = Visibility.Visible;
 
             button.Texture = descriptor.Texture;
             button.Action = descriptor.Action;
@@ -373,7 +388,7 @@ namespace Orion.Game.Presentation.Gui
                 for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
                 {
                     ActionButton actionButton = style.Create<ActionButton>();
-                    actionButton.Visibility = Visibility.Hidden;
+                    actionButton.VisibilityFlag = Visibility.Hidden;
                     grid.Children[rowIndex, columnIndex] = actionButton;
                 }
             }
@@ -401,11 +416,14 @@ namespace Orion.Game.Presentation.Gui
             chatTextField.MaxYMargin = 5;
             chatTextField.HorizontalAlignment = Alignment.Min;
             chatTextField.Width = 500;
-            chatTextField.Visibility = Visibility.Hidden;
+            chatTextField.VisibilityFlag = Visibility.Hidden;
             chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
 
-            messageStack = new StackLayout();
-            dock.Dock(messageStack, Direction.MinY);
+            messageConsole = new MessageConsole(style);
+            messageConsole.Direction = Direction.MinY;
+            messageConsole.MinXMargin = 5;
+            messageConsole.MaxYMargin = 5;
+            dock.Dock(messageConsole, Direction.MaxY);
 
             return dock;
         }
@@ -437,7 +455,7 @@ namespace Orion.Game.Presentation.Gui
         {
             if (@event.Key == Key.Enter && @event.IsDown)
             {
-                chatTextField.Visibility = Visibility.Visible;
+                chatTextField.VisibilityFlag = Visibility.Visible;
                 chatTextField.AcquireKeyboardFocus();
                 return true;
             }
@@ -460,7 +478,7 @@ namespace Orion.Game.Presentation.Gui
 
                 AcquireKeyboardFocus();
                 chatTextField.Text = string.Empty;
-                chatTextField.Visibility = Visibility.Hidden;
+                chatTextField.VisibilityFlag = Visibility.Hidden;
 
                 if (@event.Key == Key.Enter && !string.IsNullOrEmpty(chattedText))
                     Chatted.Raise(this, chattedText);

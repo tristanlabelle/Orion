@@ -211,8 +211,7 @@ namespace Orion.Engine.Gui2
                 return;
             }
 
-            if (control.Visibility != Visibility.Visible || control.Rectangle.Area == 0)
-                return;
+            if (control.VisibilityFlag < Visibility.Visible || control.Rectangle.Area == 0) return;
 
 
             Region? previousClippingRectangle = Renderer.ClippingRectangle;

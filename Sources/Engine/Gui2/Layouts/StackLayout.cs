@@ -8,7 +8,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A layout <see cref="Control"/> which displays its items as a horizontal or vertical stack.
     /// </summary>
-    public sealed partial class StackLayout : Control
+    public partial class StackLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;

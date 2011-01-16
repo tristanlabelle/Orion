@@ -340,6 +340,8 @@ namespace Orion.Game.Main
 
         private void OnFactionMessageReceived(Match match, FactionMessage message)
         {
+            if (!message.IsRecipient(userInputManager.LocalFaction)) return;
+
             string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
             ui.AddMessage(text, message.Sender.Color);
         }

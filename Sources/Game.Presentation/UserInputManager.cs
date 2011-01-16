@@ -543,14 +543,15 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(text, "text");
 
-            commander.SendMessage(text);
-        }
+            text = text.Trim();
+            if (text.Length == 0) return;
 
-        public void LaunchAllyChatMessage(string text)
-        {
-            Argument.EnsureNotNull(text, "text");
+            text = ProfanityFilter.Filter(text);
 
-            commander.SendAllyMessage(text);
+            if (text[0] == '#')
+                commander.SendAllyMessage(text.Substring(1));
+            else
+                commander.SendMessage(text);
         }
 
         public void LaunchUpgrade(UnitType targetType)

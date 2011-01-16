@@ -82,7 +82,7 @@ namespace Orion.Game.Main
             Binding.CreateOneWay(() => localCommander.Faction.AlageneAmount, () => ui.AlageneAmount);
             Binding.CreateOneWay(() => localCommander.Faction.UsedFoodAmount, () => ui.UsedFoodAmount);
             Binding.CreateOneWay(() => localCommander.Faction.MaxFoodAmount, () => ui.FoodLimit);
-            Binding.CreateOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.InactiveWorkerCount);
+            Binding.CreateOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.IdleWorkerCount);
 
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
@@ -141,10 +141,27 @@ namespace Orion.Game.Main
             commandPipeline.Update(lastSimulationStep);
 
             graphics.UpdateGui(timeDeltaInSeconds);
-            camera.ViewportSize = ui.ViewportRectangle.Size;
-            camera.ScrollDirection = ui.ScrollDirection;
-            camera.Update(timeDeltaInSeconds);
+
+            UpdateCamera(timeDeltaInSeconds);
             audioPresenter.SetViewBounds(camera.ViewBounds);
+        }
+
+        private void UpdateCamera(float timeDeltaInSeconds)
+        {
+            camera.ViewportSize = ui.ViewportRectangle.Size;
+
+            Entity firstSelectedEntity = Selection.FirstOrDefault();
+            if (ui.IsFollowingSelection && firstSelectedEntity != null)
+            {
+                camera.ScrollDirection = Point.Zero;
+                camera.Target = firstSelectedEntity.Position;
+            }
+            else
+            {
+                camera.ScrollDirection = ui.ScrollDirection;
+            }
+
+            camera.Update(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
@@ -176,7 +193,7 @@ namespace Orion.Game.Main
             {
             	Entity entity = selection.Single();
                 singleEntitySelectionPanel.Entity = entity;
-                ui.SelectionInfoControl = singleEntitySelectionPanel;
+                ui.SelectionInfoPanel = singleEntitySelectionPanel;
                 
                 Unit unit = entity as Unit;
                 if (unit != null)
@@ -186,7 +203,7 @@ namespace Orion.Game.Main
             }
             else
             {
-                ui.SelectionInfoControl = null;
+                ui.SelectionInfoPanel = null;
                 singleEntitySelectionPanel.Entity = null;
             }
         }

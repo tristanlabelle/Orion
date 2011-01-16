@@ -31,8 +31,8 @@ namespace Orion.Game.Presentation.Gui
         private Label aladdiumAmountLabel;
         private Label alageneAmountLabel;
         private Label foodAmountLabel;
-        private ImageBox inactiveWorkerCountImageBox;
-        private Label inactiveWorkerCountLabel;
+        private ImageBox idleWorkerCountImageBox;
+        private Label idleWorkerCountLabel;
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
@@ -46,6 +46,7 @@ namespace Orion.Game.Presentation.Gui
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
         private bool isSelectingAllIdleWorkers;
+        private bool isFollowingSelection;
         #endregion
 
         #region Constructors
@@ -157,17 +158,17 @@ namespace Orion.Game.Presentation.Gui
         }
 
         /// <summary>
-        /// Accesses the displayed number of inactive workers.
+        /// Accesses the displayed number of idle workers.
         /// </summary>
-        public int InactiveWorkerCount
+        public int IdleWorkerCount
         {
-            get { return int.Parse(inactiveWorkerCountLabel.Text); }
+            get { return int.Parse(idleWorkerCountLabel.Text); }
             set
             {
-                if (value == InactiveWorkerCount) return;
+                if (value == IdleWorkerCount) return;
                 Argument.EnsurePositive(value, "InactiveWorkerCount");
 
-                inactiveWorkerCountLabel.Text = value.ToStringInvariant();
+                idleWorkerCountLabel.Text = value.ToStringInvariant();
                 lastIdleWorkerCountChangedTime = time;
             }
         }
@@ -198,10 +199,18 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Accesses the control which displays information about the selection.
         /// </summary>
-        public Control SelectionInfoControl
+        public Control SelectionInfoPanel
         {
             get { return selectionInfoPanel.Content; }
             set { selectionInfoPanel.Content = value; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating that the camera should follow the current selection.
+        /// </summary>
+        public bool IsFollowingSelection
+        {
+            get { return isFollowingSelection; }
         }
 
         private ActionButton ActionButtonUnderMouse
@@ -276,16 +285,16 @@ namespace Orion.Game.Presentation.Gui
 
         private void UpdateInactiveWorkerButton()
         {
-            if (inactiveWorkerCountLabel.Text == "0")
+            if (idleWorkerCountLabel.Text == "0")
             {
-                inactiveWorkerCountImageBox.Color = Colors.White;
+                idleWorkerCountImageBox.Color = Colors.White;
                 return;
             }
 
             double timeElapsedInSeconds = time.TotalSeconds - lastIdleWorkerCountChangedTime.TotalSeconds;
             float intensity = (float)((0.2 + Math.Cos(timeElapsedInSeconds * 5) + 1) / 2 * 0.8);
 
-            inactiveWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
+            idleWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
         }
 
         #region Initialization
@@ -320,7 +329,7 @@ namespace Orion.Game.Presentation.Gui
             Button inactiveWorkersButton = new Button()
             {
                 AcquireKeyboardFocusWhenPressed = false,
-                Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel)
+                Content = CreateResourcePanel("Units/Schtroumpf", out idleWorkerCountImageBox, out idleWorkerCountLabel)
             };
 
             // Hack to detect if button is pressed while shift is down.
@@ -457,7 +466,7 @@ namespace Orion.Game.Presentation.Gui
 
             messageConsole = new MessageConsole(style)
             {
-                Direction = Direction.MinX,
+                Direction = Direction.MinY,
                 MinXMargin = 5,
                 MaxXMargin = 5
             };
@@ -508,6 +517,12 @@ namespace Orion.Game.Presentation.Gui
             {
                 chatTextField.VisibilityFlag = Visibility.Visible;
                 chatTextField.AcquireKeyboardFocus();
+                return true;
+            }
+
+            if (@event.Key == Key.Space)
+            {
+                isFollowingSelection = @event.IsDown;
                 return true;
             }
 

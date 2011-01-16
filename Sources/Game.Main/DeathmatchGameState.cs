@@ -60,6 +60,7 @@ namespace Orion.Game.Main
 
             this.userInputManager = new UserInputManager(match, localCommander);
             this.userInputManager.Selection.Changed += OnSelectionChanged;
+            this.userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
 
             this.ui = new MatchUI2(graphics.GuiStyle);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
@@ -102,9 +103,19 @@ namespace Orion.Game.Main
             get { return match.World; }
         }
 
+        private Faction LocalFaction
+        {
+            get { return userInputManager.LocalFaction; }
+        }
+
         private Selection Selection
         {
             get { return userInputManager.Selection; }
+        }
+
+        private SelectionManager SelectionManager
+        {
+            get { return userInputManager.SelectionManager; }
         }
         #endregion
 
@@ -186,28 +197,38 @@ namespace Orion.Game.Main
             graphics.DrawGui();
         }
 
-        private void OnSelectionChanged(Selection selection)
+        private void UpdateActionPanel()
         {
             actionPanel.Clear();
             ui.ClearActionButtons();
+
+            bool allSelectedUnitsAllied = Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl));
+            if (SelectionManager.FocusedUnitType == null || !allSelectedUnitsAllied) return;
             
-            if (selection.Count == 1)
+            actionPanel.Push(new UnitActionProvider(actionPanel, userInputManager, graphics, SelectionManager.FocusedUnitType));
+        }
+
+        private void OnSelectionChanged(Selection selection)
+        {
+            ui.SelectionInfoPanel = null;
+            singleEntitySelectionPanel.Entity = null;
+
+            if (selection.Count == 0)
+            {
+                actionPanel.Clear();
+                ui.ClearActionButtons();
+            }
+            else if (selection.Count == 1)
             {
             	Entity entity = selection.Single();
                 singleEntitySelectionPanel.Entity = entity;
                 ui.SelectionInfoPanel = singleEntitySelectionPanel;
-                
-                Unit unit = entity as Unit;
-                if (unit != null)
-                {
-                	actionPanel.Push(new UnitActionProvider(actionPanel, userInputManager, graphics, unit.Type));
-                }
             }
-            else
-            {
-                ui.SelectionInfoPanel = null;
-                singleEntitySelectionPanel.Entity = null;
-            }
+        }
+
+        private void OnFocusedUnitTypeChanged(SelectionManager sender)
+        {
+            UpdateActionPanel();
         }
 
         private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)

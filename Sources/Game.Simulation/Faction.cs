@@ -363,7 +363,7 @@ namespace Orion.Game.Simulation
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
-            usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
+            UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 
             return unit;
         }
@@ -389,7 +389,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
 
-            usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
+            UsedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
         }
 
         /// <remarks>Invoked by Unit.</remarks>

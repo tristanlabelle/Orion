@@ -74,7 +74,7 @@ namespace Orion.Engine.Gui2
             return children.Select(dockedChild => dockedChild.Control);
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             int usedWidth = 0;
             int usedHeight = 0;
@@ -84,7 +84,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.Measure();
+                Size childSize = child.Control.Measure(Size.MaxValue);
 
                 if (LastChildFill && i == children.Count - 1)
                 {
@@ -142,7 +142,7 @@ namespace Orion.Engine.Gui2
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.Measure();
+                Size childSize = child.Control.DesiredOuterSize;
 
                 int childRectangleMinX = remainingRectangleMinX;
                 int childRectangleMinY = remainingRectangleMinY;

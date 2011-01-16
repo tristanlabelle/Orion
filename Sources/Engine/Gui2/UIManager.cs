@@ -168,7 +168,7 @@ namespace Orion.Engine.Gui2
         {
             if (IsArranged && IsMeasured) return;
             
-            Measure();
+            Measure(new Size(Width.GetValueOrDefault(int.MaxValue), Height.GetValueOrDefault(int.MaxValue)));
             Arrange(new Region(DesiredSize));
             ArrangeChildren();
 

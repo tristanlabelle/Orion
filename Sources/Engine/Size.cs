@@ -43,9 +43,9 @@ namespace Orion.Engine
         /// <summary>
         /// Gets the area of this size.
         /// </summary>
-        public int Area
+        public long Area
         {
-            get { return Width * Height; }
+            get { return (long)Width * (long)Height; }
         }
         #endregion
 
@@ -108,11 +108,27 @@ namespace Orion.Engine
         /// </summary>
         public static readonly Size Zero = new Size(0, 0);
 
+        /// <summary>
+        /// A size with the maximum possible width and height.
+        /// </summary>
+        public static readonly Size MaxValue = new Size(int.MaxValue, int.MaxValue);
+
         private static readonly Regex parsingRegex
             = new Regex(@"\A\s*([0-9]+)x([0-9]+)\s*\Z", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Creates a size clamped to a positive value.
+        /// </summary>
+        /// <param name="width">The width of the size.</param>
+        /// <param name="height">The height of the size.</param>
+        /// <returns>The resulting clamped size.</returns>
+        public static Size CreateClamped(int width, int height)
+        {
+            return new Size(Math.Max(0, width), Math.Max(0, height));
+        }
+
         /// <summary>
         /// Tests two instances for equality.
         /// </summary>

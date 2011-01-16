@@ -187,7 +187,7 @@ namespace Orion.Engine.Gui2
             relativeSelectionLength = -text.Length;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             int height = font == null ? 0 : (int)Math.Ceiling(font.GetHeight());
             return new Size(padding.TotalX, padding.TotalY + height);

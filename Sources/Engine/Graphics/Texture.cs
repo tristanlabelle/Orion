@@ -212,7 +212,7 @@ namespace Orion.Engine.Graphics
                 throw new ArgumentException("Invalid pixel region.");
             Argument.EnsureNotNull(pixelData, "data");
 
-            ValidatePixelBufferSize(pixelData, region.Area, pixelFormat);
+            ValidatePixelBufferSize(pixelData, (int)region.Area, pixelFormat);
 
             int lastID;
             GL.GetInteger(GetPName.Texture2D, out lastID);

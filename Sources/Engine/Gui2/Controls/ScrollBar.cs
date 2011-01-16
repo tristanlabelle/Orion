@@ -145,7 +145,7 @@ namespace Orion.Engine.Gui2
             yield return maxButton;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             if (orientation == Orientation.Horizontal) throw new NotImplementedException();
 

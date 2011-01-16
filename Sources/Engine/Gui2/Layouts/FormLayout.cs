@@ -104,7 +104,7 @@ namespace Orion.Engine.Gui2
             }
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             cachedHeaderColumnWidth = 0;
             int contentColumnWidth = 0;
@@ -119,14 +119,14 @@ namespace Orion.Engine.Gui2
 
                 if (entry.Header != null)
                 {
-                    Size headerSize = entry.Header.Measure();
+                    Size headerSize = entry.Header.Measure(Size.MaxValue);
                     entryHeight = headerSize.Height;
                     if (headerSize.Width > cachedHeaderColumnWidth) cachedHeaderColumnWidth = headerSize.Width;
                 }
 
                 if (entry.Content != null)
                 {
-                    Size contentSize = entry.Header.Measure();
+                    Size contentSize = entry.Content.Measure(Size.MaxValue);
                     if (entryHeight < contentSize.Height) entryHeight = contentSize.Height;
                     if (contentSize.Width > contentColumnWidth) contentColumnWidth = contentSize.Width;
                 }
@@ -151,13 +151,13 @@ namespace Orion.Engine.Gui2
 
                 if (entry.Header != null)
                 {
-                    Size headerSize = entry.Header.Measure();
+                    Size headerSize = entry.Header.DesiredOuterSize;
                     if (headerSize.Height > entryHeight) entryHeight = headerSize.Height;
                 }
 
                 if (entry.Content != null)
                 {
-                    Size contentSize = entry.Content.Measure();
+                    Size contentSize = entry.Content.DesiredOuterSize;
                     if (contentSize.Height > entryHeight) entryHeight = contentSize.Height;
                 }
 

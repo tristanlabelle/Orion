@@ -152,17 +152,19 @@ namespace Orion.Engine.Gui2
             if (content != null) yield return content;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
-            return MeasureInnerSize() + padding;
+            Size availableInnerSize = Size.CreateClamped(
+                availableSize.Width - padding.TotalX,
+                availableSize.Height - padding.TotalY);
+            return MeasureInnerSize(availableInnerSize) + padding;
         }
 
-        protected virtual Size MeasureInnerSize()
+        protected virtual Size MeasureInnerSize(Size availableSize)
         {
             if (content == null) return Size.Zero;
 
-            content.Measure();
-            return content.DesiredOuterSize;
+            return content.Measure(availableSize);
         }
 
         protected override void ArrangeChildren()

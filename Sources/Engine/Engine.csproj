@@ -44,6 +44,7 @@
     <Optimize>false</Optimize>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>..\bin\release\</OutputPath>
@@ -185,6 +186,7 @@
     <Compile Include="Gui2\Controls\Thumb.cs" />
     <Compile Include="Gui2\Control.cs" />
     <Compile Include="Data\Binding.cs" />
+    <Compile Include="Gui2\OrientationStrategy.cs" />
     <Compile Include="Gui2\Stretch.cs" />
     <Compile Include="Gui2\Visibility.cs" />
     <Compile Include="Gui2\UIManager.cs" />

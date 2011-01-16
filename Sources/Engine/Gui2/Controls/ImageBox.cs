@@ -72,7 +72,7 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             return texture == null ? Size.Zero : new Size(texture.Width, texture.Height);
         }

@@ -139,7 +139,10 @@ namespace Orion.Engine
         }
         #endregion
 
-        public int Area
+        /// <summary>
+        /// Gets the area of this region.
+        /// </summary>
+        public long Area
         {
             get { return size.Area; }
         }

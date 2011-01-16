@@ -99,31 +99,25 @@ namespace Orion.Engine.Gui2
             return children;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
+            var strategy = OrientationStrategy.FromDirection(direction);
+
             int width = 0;
             int height = 0;
-            if (direction == Direction.MinY || direction == Gui2.Direction.MaxY)
-            {
-                for (int i = 0; i < children.Count; ++i)
-                {
-                    if (i > 0) height += childGap;
 
-                    Size childSize = children[i].Measure();
-                    height += Math.Max(minChildSize, childSize.Height);
-                    if (childSize.Width > width) width = childSize.Width;
-                }
-            }
-            else
+            for (int i = 0; i < children.Count; ++i)
             {
-                for (int i = 0; i < children.Count; ++i)
-                {
-                    if (i > 0) width += childGap;
+                if (i > 0) strategy.IncrementPrimary(ref width, ref height, childGap);
 
-                    Size childSize = children[i].Measure();
-                    width += Math.Max(minChildSize, childSize.Width);
-                    if (childSize.Height > height) height = childSize.Height;
-                }
+                Size childSize = children[i].Measure(Size.MaxValue);
+
+                int childLength = Math.Max(minChildSize, strategy.GetPrimary(childSize));
+                strategy.IncrementPrimary(ref width, ref height, childLength);
+
+                int childSecondarySizeComponent = strategy.GetSecondary(childSize);
+                if (childSecondarySizeComponent > strategy.GetSecondary(width, height))
+                    strategy.SetSecondary(ref width, ref height, childSecondarySizeComponent);
             }
 
             return new Size(width, height);
@@ -132,50 +126,38 @@ namespace Orion.Engine.Gui2
         protected override void ArrangeChildren()
         {
             Region rectangle = base.Rectangle;
+            var strategy = OrientationStrategy.FromDirection(direction);
 
-            if (direction == Direction.MinY || direction == Direction.MaxY)
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < children.Count; ++i)
             {
-                int y = 0;
-                for (int i = 0; i < children.Count; ++i)
+                if (i > 0) strategy.IncrementPrimary(ref x, ref y, childGap);
+
+                Control child = children[i];
+                Size childSize = child.DesiredOuterSize;
+
+                int childLength = Math.Max(minChildSize, strategy.GetPrimary(childSize));
+                Region availableSpace;
+                if (strategy.Orientation == Orientation.Horizontal)
                 {
-                    if (i > 0) y += childGap;
-
-                    Control child = children[i];
-                    Size childSize = child.Measure();
-
-                    int height = Math.Max(minChildSize, childSize.Height);
-                    Region availableSpace = new Region(
-                        rectangle.MinX,
-                        direction == Direction.MaxY ? rectangle.MinY + y : rectangle.ExclusiveMaxY - height - y,
-                        rectangle.Width, height);
-
-                    Region childRectangle = DefaultArrange(availableSpace, child);
-                    ArrangeChild(child, childRectangle);
-
-                    y += height;
-                }
-            }
-            else
-            {
-                int x = 0;
-                for (int i = 0; i < children.Count; ++i)
-                {
-                    if (i > 0) x += childGap;
-
-                    Control child = children[i];
-                    Size childSize = child.Measure();
-
-                    int width = Math.Max(minChildSize, childSize.Width);
-                    Region availableSpace = new Region(
-                        direction == Direction.MaxX ? rectangle.MinX + x : rectangle.ExclusiveMaxX - width - x,
+                    availableSpace = new Region(
+                        direction == Direction.MaxX ? rectangle.MinX + x : rectangle.ExclusiveMaxX - childLength - x,
                         rectangle.MinY,
-                        width, rectangle.Height);
-
-                    Region childRectangle = DefaultArrange(availableSpace, child);
-                    ArrangeChild(child, childRectangle);
-
-                    x += width;
+                        childLength, rectangle.Height);
                 }
+                else
+                {
+                    availableSpace = new Region(
+                        rectangle.MinX,
+                        direction == Direction.MaxY ? rectangle.MinY + y : rectangle.ExclusiveMaxY - childLength - y,
+                        rectangle.Width, childLength);
+                }
+
+                Region childRectangle = DefaultArrange(availableSpace, child);
+                ArrangeChild(child, childRectangle);
+
+                strategy.IncrementPrimary(ref x, ref y, childLength);
             }
         }
         #endregion

@@ -89,7 +89,7 @@ namespace Orion.Engine.Gui2
             return children;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             Array.Clear(desiredRowHeights, 0, desiredRowHeights.Length);
             Array.Clear(desiredColumnWidths, 0, desiredColumnWidths.Length);
@@ -100,7 +100,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (children[rowIndex, columnIndex] != null)
                     {
-                        Size size = children[rowIndex, columnIndex].Measure();
+                        Size size = children[rowIndex, columnIndex].Measure(Size.MaxValue);
                         if (size.Height > desiredRowHeights[rowIndex]) desiredRowHeights[rowIndex] = size.Height;
                         if (size.Width > desiredColumnWidths[columnIndex]) desiredColumnWidths[columnIndex] = size.Width;
                     }
@@ -124,8 +124,6 @@ namespace Orion.Engine.Gui2
 
         protected override void ArrangeChildren()
         {
-            Measure();
-
             Region rectangle = Rectangle;
 
             int rowHeight = Math.Max(0, (rectangle.Height - Math.Max(0, RowCount - 1) * cellGap) / RowCount);

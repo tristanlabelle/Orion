@@ -89,14 +89,12 @@ namespace Orion.Engine.Gui2
             if (Content != null) yield return Content;
         }
 
-        protected override Size MeasureInnerSize()
+        protected override Size MeasureInnerSize(Size availableSize)
         {
-            button.Measure();
-            Size buttonSize = button.DesiredOuterSize;
+            Size buttonSize = button.Measure(Size.MaxValue);
             if (Content == null) return buttonSize;
 
-            Content.Measure();
-            Size contentSize = Content.DesiredOuterSize;
+            Size contentSize = Content.Measure(Size.MaxValue);
             return new Size(buttonSize.Width + buttonGap + contentSize.Width, Math.Max(buttonSize.Height, contentSize.Height));
         }
 
@@ -104,7 +102,7 @@ namespace Orion.Engine.Gui2
         {
             Region innerRectangle = InnerRectangle;
 
-            Size buttonSize = button.Measure();
+            Size buttonSize = button.DesiredOuterSize;
 
             Region buttonRectangle = new Region(
                 innerRectangle.MinX,
@@ -114,7 +112,6 @@ namespace Orion.Engine.Gui2
 
             if (Content != null)
             {
-                Content.Measure();
                 Size contentSize = Content.DesiredOuterSize;
                 int contentHeight = Math.Min(contentSize.Height, innerRectangle.Height);
 

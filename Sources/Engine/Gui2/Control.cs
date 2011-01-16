@@ -732,6 +732,7 @@ namespace Orion.Engine.Gui2
         #region Measure
         /// <summary>
         /// Sets the size of this <see cref="Control"/>.
+        /// The parent may or not honor this value.
         /// </summary>
         /// <param name="size">The size to be set.</param>
         public void SetSize(Size size)
@@ -742,6 +743,7 @@ namespace Orion.Engine.Gui2
 
         /// <summary>
         /// Sets the size of this <see cref="Control"/>.
+        /// The parent may or not honor this value.
         /// </summary>
         /// <param name="width">The new width.</param>
         /// <param name="height">The new height.</param>
@@ -754,13 +756,14 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Measures this <see cref="Control"/> to determine its desired size.
         /// </summary>
+        /// <param name="availableSize">The size available for measurement.</param>
         /// <returns>The desired outer size (margins included) of the <see cref="Control"/>.</returns>
-        public Size Measure()
+        public Size Measure(Size availableSize)
         {
             if (isMeasured) return cachedDesiredOuterSize;
             if (manager == null) throw new InvalidOperationException("Cannot measure a control without a manager.");
 
-            cachedDesiredOuterSize = MeasureOuterSize();
+            cachedDesiredOuterSize = MeasureOuterSize(availableSize);
 
             isMeasured = true;
             return cachedDesiredOuterSize;
@@ -770,12 +773,26 @@ namespace Orion.Engine.Gui2
         /// Measures the desired outer size of this <see cref="Control"/>.
         /// This takes the margin, desired size and minimum size into account.
         /// </summary>
+        /// <param name="availableSize">The size available for measurement.</param>
         /// <returns>The desired outer size of this <see cref="Control"/>.</returns>
-        protected Size MeasureOuterSize()
+        protected Size MeasureOuterSize(Size availableSize)
         {
-            if (visibilityFlag == Visibility.Collapsed) return Size.Zero;
+            if (visibilityFlag == Visibility.Collapsed)
+            {
+                MeasureSize(Size.Zero);
+                return Size.Zero;
+            }
 
-            Size desiredSize = MeasureSize();
+            int availableWidthWithoutMargins = Math.Max(0, availableSize.Width - margin.TotalX);
+            if (width.HasValue && width.Value < availableWidthWithoutMargins)
+                availableWidthWithoutMargins = width.Value;
+
+            int availableHeightWithoutMargins = Math.Max(0, availableSize.Height - margin.TotalY);
+            if (height.HasValue && height.Value < availableHeightWithoutMargins)
+                availableHeightWithoutMargins = height.Value;
+
+            Size desiredSize = MeasureSize(new Size(availableWidthWithoutMargins, availableHeightWithoutMargins));
+
             return new Size(
                 Math.Max(minSize.Width, width.GetValueOrDefault(desiredSize.Width)) + margin.TotalX,
                 Math.Max(minSize.Height, height.GetValueOrDefault(desiredSize.Height)) + margin.TotalY);
@@ -784,8 +801,9 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Measures the desired size of this <see cref="Control"/>, excluding its margin.
         /// </summary>
+        /// <param name="availableSize">The size available for measurement.</param>
         /// <returns>The desired size of this <see cref="Control"/>.</returns>
-        protected abstract Size MeasureSize();
+        protected abstract Size MeasureSize(Size availableSize);
 
         /// <summary>
         /// Marks the desired size of this <see cref="Control"/> as dirty.
@@ -878,7 +896,6 @@ namespace Orion.Engine.Gui2
 
         public static Region DefaultArrange(Size availableSpace, Control control)
         {
-            control.Measure();
             Size desiredOuterSize = control.DesiredOuterSize;
             int maxWidth = control.Width.HasValue ? control.Width.Value + control.Margin.TotalX : availableSpace.Width;
             int maxHeight = control.Height.HasValue ? control.Height.Value + control.Margin.TotalY : availableSpace.Height;

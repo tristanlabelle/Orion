@@ -49,14 +49,13 @@ namespace Orion.Engine.Gui2
             return children;
         }
 
-        protected override Size MeasureSize()
+        protected override Size MeasureSize(Size availableSize)
         {
             int width = 0;
             int height = 0;
             foreach (Control child in children)
             {
-                child.Measure();
-                Size childSize = child.DesiredOuterSize;
+                Size childSize = child.Measure(availableSize);
                 if (childSize.Width > width) width = childSize.Width;
                 if (childSize.Height > height) height = childSize.Height;
             }

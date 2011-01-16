@@ -37,20 +37,20 @@ namespace Orion.Game.Presentation.Gui
                 DockLayout dock = new DockLayout();
 
                 headerLabel = style.Create<Label>();
-                dock.Dock(headerLabel, Direction.MinY);
+                dock.Dock(headerLabel, Direction.NegativeY);
 
                 StackLayout costsStack = new StackLayout()
                 {
                     ChildGap = 5,
                     MinYMargin = 5,
-                    Direction = Direction.MaxX
+                    Direction = Direction.PositiveX
                 };
 
                 StackResource(style, costsStack, "Aladdium", out aladdiumImageBox, out aladdiumCostLabel);
                 StackResource(style, costsStack, "Alagene", out alageneImageBox, out alageneCostLabel);
                 StackResource(style, costsStack, "Gui/Food", out foodImageBox, out foodCostLabel);
 
-                dock.Dock(costsStack, Direction.MaxY);
+                dock.Dock(costsStack, Direction.PositiveY);
 
                 Content = dock;
 

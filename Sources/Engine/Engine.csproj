@@ -172,6 +172,8 @@
     <Compile Include="Gui2\Borders.cs" />
     <Compile Include="Gui2\KeyEvent.cs" />
     <Compile Include="Gui2\KeyEventType.cs" />
+    <Compile Include="Gui2\Layouts\WrapLayout.ChildCollection.cs" />
+    <Compile Include="Gui2\Layouts\WrapLayout.cs" />
     <Compile Include="Gui2\ModifierKeys.cs" />
     <Compile Include="Gui2\MouseButtons.cs" />
     <Compile Include="Gui2\MouseEvent.cs" />

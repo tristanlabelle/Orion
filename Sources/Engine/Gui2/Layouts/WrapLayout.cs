@@ -6,18 +6,19 @@ using System.Text;
 namespace Orion.Engine.Gui2
 {
     /// <summary>
-    /// A layout <see cref="Control"/> which displays its items as a horizontal or vertical stack.
+    /// A layout <see cref="Control"/> which displays its items as a horizontal or vertical stack which wraps.
     /// </summary>
-    public partial class StackLayout : Control
+    public partial class WrapLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;
         private Direction direction = Direction.PositiveY;
         private int childGap;
+        private int seriesGap;
         #endregion
 
         #region Constructors
-        public StackLayout()
+        public WrapLayout()
         {
             children = new ChildCollection(this);
         }
@@ -25,7 +26,7 @@ namespace Orion.Engine.Gui2
 
         #region Properties
         /// <summary>
-        /// Accesses the <see cref="Direction"/> of this <see cref="StackLayout"/>,
+        /// Accesses the <see cref="Direction"/> of this <see cref="WrapLayout"/>,
         /// which determines how child <see cref="Control"/>s are stacked.
         /// </summary>
         public Direction Direction
@@ -58,7 +59,23 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the collection of child <see cref="Control"/>s within this <see cref="StackLayout"/>.
+        /// Accesses the gap between successive rows or columns of children, in pixels.
+        /// </summary>
+        public int SeriesGap
+        {
+            get { return seriesGap; }
+            set
+            {
+                if (value == seriesGap) return;
+                Argument.EnsurePositive(value, "SeriesGap");
+
+                seriesGap = value;
+                InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Gets the collection of child <see cref="Control"/>s within this <see cref="WrapLayout"/>.
         /// </summary>
         public new ChildCollection Children
         {
@@ -68,7 +85,7 @@ namespace Orion.Engine.Gui2
 
         #region Methods
         /// <summary>
-        /// Stacks a <see cref="Control"/> within this <see cref="StackLayout"/>.
+        /// Stacks a <see cref="Control"/> within this <see cref="WrapLayout"/>.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be stacked.</param>
         public void Stack(Control control)
@@ -97,6 +114,7 @@ namespace Orion.Engine.Gui2
 
             int x = 0;
             int y = 0;
+            int firstChildInSeriesIndex = 0;
             int seriesSize = 0;
             int width = 0;
             int height = 0;
@@ -120,37 +138,78 @@ namespace Orion.Engine.Gui2
 
                 if (direction.IsHorizontal())
                 {
+                    if (i != 0 && childSize.Width > availableChildSize.Width)
+                    {
+                        if (arrange) ArrangeSeries(firstChildInSeriesIndex, i, y, seriesSize);
+                        x = 0;
+                        y += seriesGap + seriesSize;
+                        seriesSize = 0;
+                        firstChildInSeriesIndex = i;
+                    }
+
                     if (childSize.Height > seriesSize) seriesSize = childSize.Height;
 
                     width = Math.Max(width, x + childGap + childSize.Width);
                     height = Math.Max(height, y + childSize.Height);
 
-                    if (arrange)
-                    {
-                        Region childRectangle = new Region(rectangle.MinX + x, rectangle.MinY + y, childSize.Width, availableChildSize.Height);
-                        DefaultArrangeChild(child, childRectangle);
-                    }
-
                     x += childSize.Width + childGap;
                 }
                 else
                 {
+                    if (i != 0 && childSize.Height > availableChildSize.Height)
+                    {
+                        if (arrange) ArrangeSeries(firstChildInSeriesIndex, i, x, seriesSize);
+                        y = 0;
+                        x += seriesGap + seriesSize;
+                        seriesSize = 0;
+                        firstChildInSeriesIndex = i;
+                    }
+
                     if (childSize.Width > seriesSize) seriesSize = childSize.Width;
 
                     height = Math.Max(height, y + childGap + childSize.Height);
                     width = Math.Max(width, x + childSize.Width);
 
-                    if (arrange)
-                    {
-                        Region childRectangle = new Region(rectangle.MinX + x, rectangle.MinY + y, availableChildSize.Width, childSize.Height);
-                        DefaultArrangeChild(child, childRectangle);
-                    }
-
                     y += childSize.Height + childGap;
                 }
             }
 
+            if (arrange && children.Count > 0)
+            {
+                ArrangeSeries(firstChildInSeriesIndex, children.Count, direction.IsHorizontal() ? y : x, seriesSize);
+            }
+
             return new Size(width, height);
+        }
+
+        private void ArrangeSeries(int firstIndex, int endIndex, int offset, int size)
+        {
+            Region rectangle = base.Rectangle;
+
+            if (direction.IsHorizontal())
+            {
+                int x = 0;
+                for (int i = firstIndex; i < endIndex; ++i)
+                {
+                    Control child = children[i];
+                    Size childSize = child.DesiredOuterSize;
+                    Region childRectangle = new Region(rectangle.MinX + x, rectangle.MinY + offset, childSize.Width, size);
+                    DefaultArrangeChild(child, childRectangle);
+                    x += childSize.Width + childGap;
+                }
+            }
+            else
+            {
+                int y = 0;
+                for (int i = firstIndex; i < endIndex; ++i)
+                {
+                    Control child = children[i];
+                    Size childSize = child.DesiredOuterSize;
+                    Region childRectangle = new Region(rectangle.MinX + offset, rectangle.MinY + y, size, childSize.Height);
+                    DefaultArrangeChild(child, childRectangle);
+                    y += childSize.Height + childGap;
+                }
+            }
         }
         #endregion
     }

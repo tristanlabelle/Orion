@@ -61,9 +61,9 @@ namespace Orion.Game.Presentation.Gui
             DockLayout mainDock = style.Create<DockLayout>();
             Content = mainDock;
             mainDock.LastChildFill = true;
-            mainDock.Dock(CreateTopBar(), Direction.MinY);
-            mainDock.Dock(CreateBottomBar(), Direction.MaxY);
-            mainDock.Dock(CreateOverlays(), Direction.MaxY);
+            mainDock.Dock(CreateTopBar(), Direction.NegativeY);
+            mainDock.Dock(CreateBottomBar(), Direction.PositiveY);
+            mainDock.Dock(CreateOverlays(), Direction.PositiveY);
         }
         #endregion
 
@@ -320,8 +320,8 @@ namespace Orion.Game.Presentation.Gui
             container.Content = dock;
 
             StackLayout resourcesStack = new StackLayout();
-            dock.Dock(resourcesStack, Direction.MinX);
-            resourcesStack.Direction = Direction.MaxX;
+            dock.Dock(resourcesStack, Direction.NegativeX);
+            resourcesStack.Direction = Direction.PositiveX;
             resourcesStack.ChildGap = 10;
             resourcesStack.MaxXMargin = 15;
 
@@ -349,18 +349,18 @@ namespace Orion.Game.Presentation.Gui
             };
 
             inactiveWorkersButton.Clicked += (sender, mouseButton) => SelectingIdleWorkers.Raise(this, isSelectingAllIdleWorkers);
-            dock.Dock(inactiveWorkersButton, Direction.MinX);
+            dock.Dock(inactiveWorkersButton, Direction.NegativeX);
 
             Button pauseButton = style.CreateTextButton("Pause");
             pauseButton.AcquireKeyboardFocusWhenPressed = false;
             pauseButton.VerticalAlignment = Alignment.Center;
-            dock.Dock(pauseButton, Direction.MaxX);
+            dock.Dock(pauseButton, Direction.PositiveX);
 
             Button diplomacyButton = style.CreateTextButton("Diplomatie");
             diplomacyButton.AcquireKeyboardFocusWhenPressed = false;
             diplomacyButton.VerticalAlignment = Alignment.Center;
             diplomacyButton.MaxXMargin = 10;
-            dock.Dock(diplomacyButton, Direction.MaxX);
+            dock.Dock(diplomacyButton, Direction.PositiveX);
 
             return container;
         }
@@ -368,7 +368,7 @@ namespace Orion.Game.Presentation.Gui
         private StackLayout CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
         {
             StackLayout stack = new StackLayout();
-            stack.Direction = Direction.MaxX;
+            stack.Direction = Direction.PositiveX;
 
             imageBox = new ImageBox();
             stack.Stack(imageBox);
@@ -399,16 +399,16 @@ namespace Orion.Game.Presentation.Gui
             dock.LastChildFill = true;
 
             ContentControl minimapBoxContainer = new ContentControl();
-            dock.Dock(minimapBoxContainer, Direction.MinX);
+            dock.Dock(minimapBoxContainer, Direction.NegativeX);
             minimapBoxContainer.SetSize(200, 200);
             minimapBoxContainer.MaxXMargin = 6;
             minimapBoxContainer.Content = CreateMinimapViewport();
 
             actionButtonGrid = CreateActionButtons();
-            dock.Dock(actionButtonGrid, Direction.MaxX);
+            dock.Dock(actionButtonGrid, Direction.PositiveX);
 
             selectionInfoPanel = new ContentControl();
-            dock.Dock(selectionInfoPanel, Direction.MaxX);
+            dock.Dock(selectionInfoPanel, Direction.PositiveX);
             selectionInfoPanel.Content = new ImageBox
             {
                 Texture = style.GetTexture("Gui/Carving"),
@@ -462,10 +462,10 @@ namespace Orion.Game.Presentation.Gui
                 IsMouseEventSink = true,
                 VisibilityFlag = Visibility.Hidden
             };
-            dock.Dock(actionToolTip, Direction.MaxX);
+            dock.Dock(actionToolTip, Direction.PositiveX);
 
             chatTextField = style.Create<TextField>();
-            dock.Dock(chatTextField, Direction.MaxY);
+            dock.Dock(chatTextField, Direction.PositiveY);
             chatTextField.MinXMargin = 5;
             chatTextField.MaxYMargin = 5;
             chatTextField.HorizontalAlignment = Alignment.Min;
@@ -475,11 +475,11 @@ namespace Orion.Game.Presentation.Gui
 
             messageConsole = new MessageConsole(style)
             {
-                Direction = Direction.MinY,
+                Direction = Direction.NegativeY,
                 MinXMargin = 5,
                 MaxXMargin = 5
             };
-            dock.Dock(messageConsole, Direction.MaxY);
+            dock.Dock(messageConsole, Direction.PositiveY);
 
             return dock;
         }

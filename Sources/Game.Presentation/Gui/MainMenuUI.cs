@@ -1,12 +1,12 @@
 ﻿using System;
 using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
+using Orion.Engine.Graphics;
 using Orion.Engine.Gui2;
+using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
-using Orion.Engine.Gui2.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -33,16 +33,17 @@ namespace Orion.Game.Presentation.Gui
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
             titleImageBox.Texture = style.GetTexture("Gui/Title");
-            dock.Dock(titleImageBox, Direction.MinY);
+            dock.Dock(titleImageBox, Direction.NegativeY);
 
-            StackLayout buttonsStack = style.Create<StackLayout>();
-            dock.Dock(buttonsStack, Direction.MaxX);
-            buttonsStack.Direction = Direction.MaxY;
-            buttonsStack.HorizontalAlignment = Alignment.Center;
-            buttonsStack.VerticalAlignment = Alignment.Center;
-            buttonsStack.MinWidth = 300;
-            buttonsStack.MinChildSize = 50;
-            buttonsStack.ChildGap = 10;
+            StackLayout buttonsStack = new StackLayout()
+            {
+                Direction = Direction.PositiveY,
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+                MinWidth = 300,
+                ChildGap = 10
+            };
+            dock.Dock(buttonsStack, Direction.PositiveX);
 
             StackButton(buttonsStack, style, "Monojoueur", () => SinglePlayerClicked);
             StackButton(buttonsStack, style, "Multijoueur", () => MultiplayerClicked);
@@ -101,6 +102,7 @@ namespace Orion.Game.Presentation.Gui
         private void StackButton(StackLayout stack, OrionGuiStyle style, string text, Func<Action<MainMenuUI>> eventGetter)
         {
             Button button = style.CreateTextButton(text);
+            button.MinHeight = 50;
             button.Clicked += (sender, mouseButton) => eventGetter().Raise(this);
             stack.Stack(button);
         }

@@ -13,22 +13,22 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Specifies the negative X axis side.
         /// </summary>
-        MinX,
+        NegativeX,
 
         /// <summary>
         /// Specifies the negative Y axis side.
         /// </summary>
-        MinY,
+        NegativeY,
 
         /// <summary>
         /// Specifies the positive X axis side.
         /// </summary>
-        MaxX,
+        PositiveX,
 
         /// <summary>
         /// Specifies the positive Y axis side.
         /// </summary>
-        MaxY
+        PositiveY
     }
 
     /// <summary>
@@ -55,40 +55,40 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.MinX"/> or <see cref="Direction.MaxX"/>.
+        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.NegativeX"/> or <see cref="Direction.PositiveX"/>.
         /// </summary>
         /// <param name="direction">The <see cref="Direction"/>.</param>
-        /// <returns><c>True</c> if it is <see cref="Direction.MinX"/> or <see cref="Direction.MaxX"/>, <c>false</c> if not.</returns>
+        /// <returns><c>True</c> if it is <see cref="Direction.NegativeX"/> or <see cref="Direction.PositiveX"/>, <c>false</c> if not.</returns>
         public static bool IsHorizontal(this Direction direction)
         {
             return GetOrientation(direction) == Orientation.Horizontal;
         }
 
         /// <summary>
-        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.MinY"/> or <see cref="Direction.MaxY"/>.
+        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.NegativeY"/> or <see cref="Direction.PositiveY"/>.
         /// </summary>
         /// <param name="direction">The <see cref="Direction"/>.</param>
-        /// <returns><c>True</c> if it is <see cref="Direction.MinY"/> or <see cref="Direction.MaxY"/>, <c>false</c> if not.</returns>
+        /// <returns><c>True</c> if it is <see cref="Direction.NegativeY"/> or <see cref="Direction.PositiveY"/>, <c>false</c> if not.</returns>
         public static bool IsVertical(this Direction direction)
         {
             return GetOrientation(direction) == Orientation.Vertical;
         }
 
         /// <summary>
-        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.MinX"/> or <see cref="Direction.MinY"/>.
+        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.NegativeX"/> or <see cref="Direction.NegativeY"/>.
         /// </summary>
         /// <param name="direction">The <see cref="Direction"/>.</param>
-        /// <returns><c>True</c> if it is <see cref="Direction.MinX"/> or <see cref="Direction.MinY"/>, <c>false</c> if not.</returns>
+        /// <returns><c>True</c> if it is <see cref="Direction.NegativeX"/> or <see cref="Direction.NegativeY"/>, <c>false</c> if not.</returns>
         public static bool IsMin(this Direction direction)
         {
             return (int)direction < 2;
         }
 
         /// <summary>
-        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.MaxX"/> or <see cref="Direction.MaxY"/>.
+        /// Gets a value indicating if a given <see cref="Direction"/> is either <see cref="Direction.PositiveX"/> or <see cref="Direction.PositiveY"/>.
         /// </summary>
         /// <param name="direction">The <see cref="Direction"/>.</param>
-        /// <returns><c>True</c> if it is <see cref="Direction.MaxX"/> or <see cref="Direction.MaxY"/>, <c>false</c> if not.</returns>
+        /// <returns><c>True</c> if it is <see cref="Direction.PositiveX"/> or <see cref="Direction.PositiveY"/>, <c>false</c> if not.</returns>
         public static bool IsMax(this Direction direction)
         {
             return (int)direction > 1;

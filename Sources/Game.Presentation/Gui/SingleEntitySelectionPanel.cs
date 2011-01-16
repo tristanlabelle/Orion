@@ -54,8 +54,8 @@ namespace Orion.Game.Presentation.Gui
             Content = dock;
             dock.LastChildFill = true;
 
-            dock.Dock(CreatePhoto(), Direction.MinX);
-            dock.Dock(CreateInfoForm(), Direction.MaxX);
+            dock.Dock(CreatePhoto(), Direction.NegativeX);
+            dock.Dock(CreateInfoForm(), Direction.PositiveX);
         }
         #endregion
 
@@ -208,15 +208,15 @@ namespace Orion.Game.Presentation.Gui
             photoDockPanel.SetSize(120, 120);
 
             nameLabel = Style.Create<Label>();
-            photoDockPanel.Dock(nameLabel, Direction.MinY);
+            photoDockPanel.Dock(nameLabel, Direction.NegativeY);
             nameLabel.HorizontalAlignment = Alignment.Center;
 
             healthLabel = Style.Create<Label>();
-            photoDockPanel.Dock(healthLabel, Direction.MaxY);
+            photoDockPanel.Dock(healthLabel, Direction.PositiveY);
             healthLabel.HorizontalAlignment = Alignment.Center;
 
             imageBox = new ImageBox();
-            photoDockPanel.Dock(imageBox, Direction.MinY);
+            photoDockPanel.Dock(imageBox, Direction.NegativeY);
             imageBox.HorizontalAlignment = Alignment.Center;
 
             return photoDockPanel;
@@ -228,7 +228,7 @@ namespace Orion.Game.Presentation.Gui
             dock.LastChildFill = true;
 
             StackLayout topStack = new StackLayout();
-            topStack.Direction = Direction.MaxX;
+            topStack.Direction = Direction.PositiveX;
             topStack.MinHeight = 32;
             topStack.MaxYMargin = 6;
 
@@ -239,20 +239,20 @@ namespace Orion.Game.Presentation.Gui
 
             todoButtonStack = new StackLayout()
             {
-                Direction = Direction.MaxX,
+                Direction = Direction.PositiveX,
                 VerticalAlignment = Alignment.Center,
                 ChildGap = 3
             };
             topStack.Stack(todoButtonStack);
 
-            dock.Dock(topStack, Direction.MinY);
+            dock.Dock(topStack, Direction.NegativeY);
 
             statsForm = new FormLayout();
             statsForm.VerticalAlignment = Alignment.Min;
             statsForm.HeaderContentGap = 5;
             statsForm.EntryGap = 6;
 
-            dock.Dock(statsForm, Direction.MaxY);
+            dock.Dock(statsForm, Direction.PositiveY);
 
             return dock;
         }

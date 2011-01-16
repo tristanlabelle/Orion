@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-// Used to prevent naming clashes with the Dock method.
-using DockEnum = Orion.Engine.Gui2.Direction;
-
 namespace Orion.Engine.Gui2
 {
     /// <summary>
@@ -78,56 +75,31 @@ namespace Orion.Engine.Gui2
         {
             int usedWidth = 0;
             int usedHeight = 0;
-            int freeWidth = 0;
-            int freeHeight = 0;
+            int minWidth = 0;
+            int minHeight = 0;
 
             for (int i = 0; i < children.Count; ++i)
             {
                 DockedControl child = children[i];
-                Size childSize = child.Control.Measure(Size.MaxValue);
 
-                if (LastChildFill && i == children.Count - 1)
+                Size availableChildSize = Size.CreateClamped(availableSize.Width - usedWidth, availableSize.Height - usedHeight);
+                Size childSize = child.Control.Measure(availableChildSize);
+
+                if (child.Dock.IsHorizontal())
                 {
-                    if (childSize.Width > freeWidth) usedWidth += childSize.Width - freeWidth;
-                    if (childSize.Height > freeHeight) usedHeight += childSize.Height - freeHeight;
-                    break;
-                }
-
-                if (child.Dock == DockEnum.MinX || child.Dock == DockEnum.MaxX)
-                {
-                    if (childSize.Width > freeWidth)
-                    {
-                        usedWidth += childSize.Width - freeWidth;
-                        freeWidth = 0;
-                    }
-                    else freeWidth -= childSize.Width;
-
-                    if (childSize.Height > freeHeight)
-                    {
-                        int heightDelta = childSize.Height - freeHeight;
-                        usedHeight += heightDelta;
-                        freeHeight += heightDelta;
-                    }
+                    usedWidth += childSize.Width;
+                    minHeight = Math.Max(minHeight, usedHeight + childSize.Height);
                 }
                 else
                 {
-                    if (childSize.Height > freeHeight)
-                    {
-                        usedHeight += childSize.Height - freeHeight;
-                        freeHeight = 0;
-                    }
-                    else freeHeight -= childSize.Height;
-
-                    if (childSize.Width > freeWidth)
-                    {
-                        int widthDelta = childSize.Width - freeWidth;
-                        usedWidth += widthDelta;
-                        freeWidth += widthDelta;
-                    }
+                    usedHeight += childSize.Height;
+                    minWidth = Math.Max(minWidth, usedWidth + childSize.Width);
                 }
             }
 
-            return new Size(usedWidth, usedHeight);
+            return new Size(
+                Math.Max(usedWidth, minWidth),
+                Math.Max(usedHeight, minHeight));
         }
 
         protected override void ArrangeChildren()
@@ -153,25 +125,25 @@ namespace Orion.Engine.Gui2
                 {
                     switch (child.Dock)
                     {
-                        case DockEnum.MinX:
+                        case Direction.NegativeX:
                             childRectangleWidth = childSize.Width;
                             remainingRectangleMinX += childSize.Width;
                             remainingRectangleWidth -= childSize.Width;
                             break;
 
-                        case DockEnum.MinY:
+                        case Direction.NegativeY:
                             childRectangleHeight = childSize.Height;
                             remainingRectangleMinY += childSize.Height;
                             remainingRectangleHeight -= childSize.Height;
                             break;
 
-                        case DockEnum.MaxX:
+                        case Direction.PositiveX:
                             childRectangleMinX = remainingRectangleMinX + remainingRectangleWidth - childSize.Width;
                             childRectangleWidth = childSize.Width;
                             remainingRectangleWidth -= childSize.Width;
                             break;
 
-                        case DockEnum.MaxY:
+                        case Direction.PositiveY:
                             childRectangleMinY = remainingRectangleMinY + remainingRectangleHeight - childSize.Height;
                             childRectangleHeight = childSize.Height;
                             remainingRectangleHeight -= childSize.Height;

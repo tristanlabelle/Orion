@@ -38,8 +38,8 @@ namespace Orion.Game.Presentation.Gui
                 LastChildFill = true
             };
 
-            mainDock.Dock(CreateBottomDock(), Direction.MaxY);
-            mainDock.Dock(CreateContentDock(), Direction.MinX);
+            mainDock.Dock(CreateBottomDock(), Direction.PositiveY);
+            mainDock.Dock(CreateContentDock(), Direction.NegativeX);
 
             Content = mainDock;
         }
@@ -134,16 +134,16 @@ namespace Orion.Game.Presentation.Gui
 
             Button backButton = style.CreateTextButton("Retour");
             backButton.Clicked += (sender, mouseButton) => Exited.Raise(this);
-            bottomDock.Dock(backButton, Direction.MinX);
+            bottomDock.Dock(backButton, Direction.NegativeX);
 
             startButton = style.CreateTextButton("Commencer");
             startButton.Clicked += (sender, mouseButton) => MatchStarted.Raise(this);
             startButton.MinXMargin = 20;
-            bottomDock.Dock(startButton, Direction.MaxX);
+            bottomDock.Dock(startButton, Direction.PositiveX);
 
             readyCheckBox = style.CreateTextCheckBox("Je suis prêt");
             readyCheckBox.StateChanged += sender => ReadinessChanged.Raise(this);
-            bottomDock.Dock(readyCheckBox, Direction.MaxX);
+            bottomDock.Dock(readyCheckBox, Direction.PositiveX);
             return bottomDock;
         }
 
@@ -160,7 +160,7 @@ namespace Orion.Game.Presentation.Gui
                 HeaderContentGap = 6
             };
 
-            contentDock.Dock(settingsForm, Direction.MaxX);
+            contentDock.Dock(settingsForm, Direction.PositiveX);
             return contentDock;
         }
         #endregion

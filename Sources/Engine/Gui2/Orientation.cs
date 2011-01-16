@@ -26,8 +26,8 @@ namespace Orion.Engine.Gui2
     /// </summary>
     public static class OrientationExtensions
     {
-        private static readonly Direction[] minDirections = new[] { Direction.MinX, Direction.MinY };
-        private static readonly Direction[] maxDirections = new[] { Direction.MaxX, Direction.MaxY };
+        private static readonly Direction[] negativeDirections = new[] { Direction.NegativeX, Direction.NegativeY };
+        private static readonly Direction[] positiveDirections = new[] { Direction.PositiveX, Direction.PositiveY };
 
         /// <summary>
         /// Gets the other <see cref="Orientation"/>.
@@ -43,20 +43,20 @@ namespace Orion.Engine.Gui2
         /// Gets the <see cref="Direction"/> which goes towards the negative side of an <see cref="Orientation"/>'s axis.
         /// </summary>
         /// <param name="orientation">The <see cref="Orientation"/>.</param>
-        /// <returns>The corresponding minimum <see cref="Direction"/>.</returns>
-        public static Direction GetMinDirection(this Orientation orientation)
+        /// <returns>The corresponding negative <see cref="Direction"/>.</returns>
+        public static Direction GetNegativeDirection(this Orientation orientation)
         {
-            return minDirections[(int)orientation];
+            return negativeDirections[(int)orientation];
         }
 
         /// <summary>
         /// Gets the <see cref="Direction"/> which goes towards the positive side of an <see cref="Orientation"/>'s axis.
         /// </summary>
         /// <param name="orientation">The <see cref="Orientation"/>.</param>
-        /// <returns>The corresponding maximum <see cref="Direction"/>.</returns>
-        public static Direction GetMaxDirection(this Orientation orientation)
+        /// <returns>The corresponding positive <see cref="Direction"/>.</returns>
+        public static Direction GetPositiveDirection(this Orientation orientation)
         {
-            return maxDirections[(int)orientation];
+            return positiveDirections[(int)orientation];
         }
     }
 }

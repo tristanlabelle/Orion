@@ -37,8 +37,7 @@ namespace Orion.Engine.Gui2
             for (int i = children.Count - 1; i >= 0; --i)
             {
                 Control child = children[i];
-                if (child.IsArranged && child.Rectangle.Contains(point))
-                    return child;
+                if (child.Rectangle.Contains(point)) return child;
             }
 
             return null;

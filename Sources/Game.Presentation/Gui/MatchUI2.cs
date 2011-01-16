@@ -58,12 +58,14 @@ namespace Orion.Game.Presentation.Gui
             this.style = style;
             updatedEventHandler = OnGuiUpdated;
 
-            DockLayout mainDock = style.Create<DockLayout>();
-            Content = mainDock;
-            mainDock.LastChildFill = true;
+            DockLayout mainDock = new DockLayout()
+            {
+                LastChildFill = true
+            };
             mainDock.Dock(CreateTopBar(), Direction.NegativeY);
             mainDock.Dock(CreateBottomBar(), Direction.PositiveY);
             mainDock.Dock(CreateOverlays(), Direction.PositiveY);
+            Content = mainDock;
         }
         #endregion
 
@@ -370,11 +372,14 @@ namespace Orion.Game.Presentation.Gui
             StackLayout stack = new StackLayout();
             stack.Direction = Direction.PositiveX;
 
-            imageBox = new ImageBox();
+            imageBox = new ImageBox()
+            {
+                Texture = style.GetTexture(textureName),
+                VerticalAlignment = Alignment.Center,
+                Width = 30,
+                Height = 30
+            };
             stack.Stack(imageBox);
-            imageBox.Texture = style.GetTexture(textureName);
-            imageBox.VerticalAlignment = Alignment.Center;
-            imageBox.SetSize(30, 30);
 
             label = style.CreateLabel("0");
             stack.Stack(label);
@@ -388,44 +393,57 @@ namespace Orion.Game.Presentation.Gui
 
         private Control CreateBottomBar()
         {
-            ContentControl container = new ContentControl();
+            ContentControl container = new ContentControl()
+            {
+                Padding = new Borders(6),
+                IsMouseEventSink = true,
+                Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"))
+            };
             bottomBar = container;
-            container.Padding = new Borders(6);
-            container.IsMouseEventSink = true;
-            container.Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"));
 
-            DockLayout dock = new DockLayout();
-            container.Content = dock;
-            dock.LastChildFill = true;
+            OverlapLayout overlap = new OverlapLayout();
+            container.Content = overlap;
 
-            ContentControl minimapBoxContainer = new ContentControl();
+            ImageBox carvingImageBox = new ImageBox
+            {
+                Texture = style.GetTexture("Gui/Carving"),
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+            };
+            overlap.Children.Add(carvingImageBox);
+
+            DockLayout dock = new DockLayout() { LastChildFill = true };
+            overlap.Children.Add(dock);
+
+            ContentControl minimapBoxContainer = new ContentControl()
+            {
+                Width = 200,
+                Height = 200,
+                MaxXMargin = 6,
+                Content = CreateMinimapViewport()
+            };
             dock.Dock(minimapBoxContainer, Direction.NegativeX);
-            minimapBoxContainer.SetSize(200, 200);
-            minimapBoxContainer.MaxXMargin = 6;
-            minimapBoxContainer.Content = CreateMinimapViewport();
 
             actionButtonGrid = CreateActionButtons();
             dock.Dock(actionButtonGrid, Direction.PositiveX);
 
             selectionInfoPanel = new ContentControl();
             dock.Dock(selectionInfoPanel, Direction.PositiveX);
-            selectionInfoPanel.Content = new ImageBox
-            {
-                Texture = style.GetTexture("Gui/Carving"),
-                HorizontalAlignment = Alignment.Center,
-                VerticalAlignment = Alignment.Center,
-            };
 
             return container;
         }
 
         private GridLayout CreateActionButtons()
         {
-            GridLayout grid = new GridLayout(4, 4);
-            grid.AreColumnsUniformSized = true;
-            grid.AreRowsUniformSized = true;
-            grid.CellGap = 3;
-            grid.SetSize(200, 200);
+            GridLayout grid = new GridLayout(4, 4)
+            {
+                AreColumnsUniformSized = true,
+                AreRowsUniformSized = true,
+                CellGap = 3,
+                Width = 200,
+                Height = 200,
+                Adornment = new ColoredBackgroundAdornment(new ColorRgba(Colors.Black, 0.2f))
+            };
 
             for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
             {

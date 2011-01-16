@@ -599,10 +599,10 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual Control GetChildAt(Point point)
         {
-        	if (!isArranged || !Rectangle.Contains(point)) return null;
+        	if (!Rectangle.Contains(point)) return null;
 
             foreach (Control child in Children)
-                if (child.IsArranged && child.Rectangle.Contains(point))
+                if (child.Rectangle.Contains(point))
                     return child;
            
             return null;
@@ -920,14 +920,11 @@ namespace Orion.Engine.Gui2
         #region Propagation Plumbing
         protected virtual bool PropagateMouseEvent(MouseEvent @event)
         {
-            foreach (Control child in Children)
+            Control child = GetChildAt(@event.Position);
+            if (child != null)
             {
-                if (child.Rectangle.Contains(@event.Position))
-                {
-                    bool handled = child.PropagateMouseEvent(@event);
-                    if (handled) return true;
-                    break;
-                }
+                bool handled = child.PropagateMouseEvent(@event);
+                if (handled) return true;
             }
 
             return HandleMouseEvent(@event);

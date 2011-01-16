@@ -34,6 +34,7 @@ namespace Orion.Game.Main
         private readonly UserInputManager userInputManager;
         private readonly MatchUI2 ui;
         private readonly SingleEntitySelectionPanel singleEntitySelectionPanel;
+        private readonly MultipleUnitSelectionPanel multipleUnitSelectionPanel;
         private readonly ActionPanel actionPanel;
         private readonly WorkerActivityMonitor workerActivityMonitor;
         private readonly Camera camera;
@@ -74,6 +75,8 @@ namespace Orion.Game.Main
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
+            this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(graphics);
+            this.multipleUnitSelectionPanel.UnitClicked += OnSelectionPanelUnitClicked;
 
             this.actionPanel = new ActionPanel(ui);
             
@@ -212,6 +215,7 @@ namespace Orion.Game.Main
         {
             ui.SelectionInfoPanel = null;
             singleEntitySelectionPanel.Entity = null;
+            multipleUnitSelectionPanel.ClearUnits();
 
             if (selection.Count == 0)
             {
@@ -220,15 +224,25 @@ namespace Orion.Game.Main
             }
             else if (selection.Count == 1)
             {
-            	Entity entity = selection.Single();
+                Entity entity = selection.Single();
                 singleEntitySelectionPanel.Entity = entity;
                 ui.SelectionInfoPanel = singleEntitySelectionPanel;
+            }
+            else
+            {
+                multipleUnitSelectionPanel.SetUnits(Selection.OfType<Unit>());
+                ui.SelectionInfoPanel = multipleUnitSelectionPanel;
             }
         }
 
         private void OnFocusedUnitTypeChanged(SelectionManager sender)
         {
             UpdateActionPanel();
+        }
+
+        private void OnSelectionPanelUnitClicked(MultipleUnitSelectionPanel sender, Unit unit)
+        {
+            Selection.Set(unit);
         }
 
         private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)

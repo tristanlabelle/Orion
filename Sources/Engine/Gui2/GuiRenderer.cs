@@ -35,6 +35,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         /// <param name="name">The name of the texture to be retrieve.</param>
         /// <returns>The texture identified by that name, or a dummy texture if no such texture was found.</returns>
+        [Obsolete("Use GameGraphics texture getters.")]
         public abstract Texture GetTexture(string name);
 
         /// <summary>

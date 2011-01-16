@@ -93,6 +93,8 @@
     <Compile Include="Gui\MatchUI2.ActionButton.cs" />
     <Compile Include="Gui\MatchUI2.ActionToolTip.cs" />
     <Compile Include="Gui\MatchUI2.cs" />
+    <Compile Include="Gui\MultipleUnitSelectionPanel.cs" />
+    <Compile Include="Gui\MultipleUnitSelectionPanel.UnitButton.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
     <Compile Include="Gui\OrionCheckBoxButtonAdornment.cs" />
     <Compile Include="Gui\OrionGuiStyle.cs" />

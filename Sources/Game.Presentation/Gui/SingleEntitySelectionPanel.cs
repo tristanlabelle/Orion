@@ -35,6 +35,7 @@ namespace Orion.Game.Presentation.Gui
         private Label healthLabel;
         private ImageBox imageBox;
         private FormLayout statsForm;
+        private Label todoLabel;
         private StackLayout todoButtonStack;
         private Entity entity;
         #endregion
@@ -59,6 +60,9 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Accesses the entity for which information is being displayed.
+        /// </summary>
         public Entity Entity
         {
             get { return entity; }
@@ -104,6 +108,7 @@ namespace Orion.Game.Presentation.Gui
         private void SetEntity()
         {
             statsForm.Entries.Clear();
+            ClearTodoList();
 
             if (entity is Unit)
             {
@@ -137,6 +142,7 @@ namespace Orion.Game.Presentation.Gui
                 nameLabel.Text = resourceNode.Type.ToStringInvariant();
                 imageBox.Texture = graphics.GetResourceTexture(resourceNode);
                 UpdateAmount(resourceNode);
+                todoLabel.VisibilityFlag = Visibility.Hidden;
                 statsForm.VisibilityFlag = Visibility.Hidden;
 
                 resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
@@ -159,6 +165,14 @@ namespace Orion.Game.Presentation.Gui
         private void UpdateTodoList(TaskQueue taskQueue)
         {
             ClearTodoList();
+
+            if (taskQueue.Count == 0)
+            {
+                todoLabel.VisibilityFlag = Visibility.Hidden;
+                return;
+            }
+
+            todoLabel.VisibilityFlag = Visibility.Visible;
 
             foreach (Task task in taskQueue)
             {
@@ -218,7 +232,7 @@ namespace Orion.Game.Presentation.Gui
             topStack.MinHeight = 32;
             topStack.MaxYMargin = 6;
 
-            Label todoLabel = Style.CreateLabel("Todo:");
+            todoLabel = Style.CreateLabel("Todo:");
             todoLabel.VerticalAlignment = Alignment.Center;
             todoLabel.MaxXMargin = 6;
             topStack.Stack(todoLabel);

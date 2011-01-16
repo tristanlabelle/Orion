@@ -47,6 +47,7 @@ namespace Orion.Game.Presentation.Gui
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
         private bool isSelectingAllIdleWorkers;
         private bool isFollowingSelection;
+        private bool isDisplayingHealthBars;
         #endregion
 
         #region Constructors
@@ -211,6 +212,14 @@ namespace Orion.Game.Presentation.Gui
         public bool IsFollowingSelection
         {
             get { return isFollowingSelection; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if all health bars should be displayed.
+        /// </summary>
+        public bool IsDisplayingHealthBars
+        {
+            get { return isDisplayingHealthBars; }
         }
 
         private ActionButton ActionButtonUnderMouse
@@ -513,6 +522,8 @@ namespace Orion.Game.Presentation.Gui
 
         protected override bool OnKeyEvent(KeyEvent @event)
         {
+            isDisplayingHealthBars = @event.IsAltDown;
+
             if (@event.Key == Key.Enter && @event.IsDown)
             {
                 chatTextField.VisibilityFlag = Visibility.Visible;

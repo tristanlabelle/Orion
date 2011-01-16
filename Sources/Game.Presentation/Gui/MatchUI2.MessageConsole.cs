@@ -38,7 +38,7 @@ namespace Orion.Game.Presentation.Gui
         private sealed class MessageConsole : StackLayout
         {
             #region Fields
-            private static readonly TimeSpan messageLifeSpan = new TimeSpan(0, 0, 10);
+            private static readonly TimeSpan messageLifeSpan = new TimeSpan(0, 0, 8);
             private static readonly TimeSpan messageFadeOutDuration = new TimeSpan(0, 0, 2);
             private const int maxMessageCount = 15;
 

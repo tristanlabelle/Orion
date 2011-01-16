@@ -167,6 +167,7 @@ namespace Orion.Game.Main
         protected internal override void Draw(GameGraphics graphics)
         {
             graphics.UIManager.Arrange();
+
             Size clientSize = graphics.Window.ClientAreaSize;
             Region viewportRectangle = ui.ViewportRectangle;
             if (viewportRectangle.Area > 0)
@@ -177,6 +178,7 @@ namespace Orion.Game.Main
                     worldViewBounds.MinY - worldViewBounds.Height * viewportRectangle.MinY / viewportRectangle.Height,
                     worldViewBounds.Width * clientSize.Width / viewportRectangle.Width,
                     worldViewBounds.Height * clientSize.Height / viewportRectangle.Height);
+                matchRenderer.WorldRenderer.DrawHealthBars = ui.IsDisplayingHealthBars;
                 matchRenderer.Draw(worldViewBounds);
             }
 
@@ -338,7 +340,8 @@ namespace Orion.Game.Main
 
         private void OnFactionMessageReceived(Match match, FactionMessage message)
         {
-            ui.AddMessage(message.Text, message.Sender.Color);
+            string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
+            ui.AddMessage(text, message.Sender.Color);
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

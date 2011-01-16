@@ -141,6 +141,7 @@ namespace Orion.Engine.Graphics
 
             window.Width = resolution.Width;
             window.Height = resolution.Height;
+            graphicsContext.ViewportSize = resolution;
 
             if (window.WindowState != WindowState.Fullscreen)
                 window.WindowState = WindowState.Fullscreen;

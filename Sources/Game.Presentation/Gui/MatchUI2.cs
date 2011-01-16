@@ -39,12 +39,13 @@ namespace Orion.Game.Presentation.Gui
         private MessageConsole messageConsole;
         private GridLayout actionButtonGrid;
         private ActionToolTip actionToolTip;
-        private TimeSpan time;
-        private TimeSpan lastInactiveWorkerCountChangedTime;
 
+        private TimeSpan time;
+        private TimeSpan lastIdleWorkerCountChangedTime;
         private ActionButton lastActionButtonUnderMouse;
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
+        private bool isSelectingAllIdleWorkers;
         #endregion
 
         #region Constructors
@@ -95,9 +96,10 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchUI2, string> Chatted;
 
         /// <summary>
-        /// Raised when the button showing the number of inactive workers gets pressed.
+        /// Raised when the user selects idle workers.
+        /// The parameter is <c>true</c> if all idle workers should be selected and <c>false</c> if only the next one should.
         /// </summary>
-        public event Action<MatchUI2> InactiveWorkersButtonPressed;
+        public event Action<MatchUI2, bool> SelectingIdleWorkers;
         #endregion
 
         #region Properties
@@ -135,7 +137,8 @@ namespace Orion.Game.Presentation.Gui
             get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
             set
             {
-                Argument.EnsurePositive(value, "UsedFoodAmount");
+                // The used food amount can actually be negative because of the twelvehungrymen cheat
+                // Argument.EnsurePositive(value, "UsedFoodAmount");
                 foodAmountLabel.Text = value + "/" + FoodLimit;
             }
         }
@@ -165,7 +168,7 @@ namespace Orion.Game.Presentation.Gui
                 Argument.EnsurePositive(value, "InactiveWorkerCount");
 
                 inactiveWorkerCountLabel.Text = value.ToStringInvariant();
-                lastInactiveWorkerCountChangedTime = time;
+                lastIdleWorkerCountChangedTime = time;
             }
         }
 
@@ -279,7 +282,7 @@ namespace Orion.Game.Presentation.Gui
                 return;
             }
 
-            double timeElapsedInSeconds = time.TotalSeconds - lastInactiveWorkerCountChangedTime.TotalSeconds;
+            double timeElapsedInSeconds = time.TotalSeconds - lastIdleWorkerCountChangedTime.TotalSeconds;
             float intensity = (float)((0.2 + Math.Cos(timeElapsedInSeconds * 5) + 1) / 2 * 0.8);
 
             inactiveWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
@@ -320,7 +323,14 @@ namespace Orion.Game.Presentation.Gui
                 Content = CreateResourcePanel("Units/Schtroumpf", out inactiveWorkerCountImageBox, out inactiveWorkerCountLabel)
             };
 
-            inactiveWorkersButton.Clicked += (sender, mouseButton) => InactiveWorkersButtonPressed.Raise(this);
+            // Hack to detect if button is pressed while shift is down.
+            inactiveWorkersButton.MouseMoved += (sender, @event) =>
+            {
+                isSelectingAllIdleWorkers = @event.IsShiftDown;
+                return false;
+            };
+
+            inactiveWorkersButton.Clicked += (sender, mouseButton) => SelectingIdleWorkers.Raise(this, isSelectingAllIdleWorkers);
             dock.Dock(inactiveWorkersButton, Direction.MinX);
 
             Button pauseButton = style.CreateTextButton("Pause");

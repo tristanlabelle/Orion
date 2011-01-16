@@ -2,6 +2,7 @@
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Data;
 using Orion.Engine.Geometry;
 using Orion.Engine.Gui2;
@@ -66,6 +67,7 @@ namespace Orion.Game.Main
             this.ui.MinimapRendering += OnMinimapRendering;
             this.ui.MouseMoved += OnViewportMouseMoved;
             this.ui.MouseButton += OnViewportMouseButton;
+            this.ui.SelectingIdleWorkers += OnSelectingIdleWorkers;
             this.ui.ViewportZoomed += OnViewportZoomed;
             this.ui.KeyEvent += OnViewportKeyEvent;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
@@ -98,6 +100,11 @@ namespace Orion.Game.Main
         private World World
         {
             get { return match.World; }
+        }
+
+        private Selection Selection
+        {
+            get { return userInputManager.Selection; }
         }
         #endregion
 
@@ -216,6 +223,36 @@ namespace Orion.Game.Main
             graphics.Context.Stroke(camera.ViewBounds, Colors.Red);
 
             graphics.Context.ProjectionBounds = previousProjectionBounds;
+        }
+
+        private void OnSelectingIdleWorkers(MatchUI2 sender, bool all)
+        {
+            if (workerActivityMonitor.InactiveWorkerCount == 0) return;
+
+            var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
+
+            if (all)
+            {
+                Selection.Set(inactiveWorkers);
+                camera.Target = inactiveWorkers.First().Position;
+            }
+            else
+            {
+                Unit unitToSelect;
+                if (Selection.Type == SelectionType.Units && Selection.Count == 1)
+                {
+                    Unit selectedUnit = Selection.Units.First();
+                    int index = (inactiveWorkers.IndexOf(selectedUnit) + 1) % workerActivityMonitor.InactiveWorkerCount;
+                    unitToSelect = inactiveWorkers.ElementAt(index);
+                }
+                else
+                {
+                    unitToSelect = inactiveWorkers.First();
+                }
+
+                Selection.Set(unitToSelect);
+                camera.Target = unitToSelect.Position;
+            }
         }
 
         private bool OnViewportMouseMoved(Control sender, MouseEvent @event)

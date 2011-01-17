@@ -19,6 +19,8 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private readonly GuiRenderer renderer;
+        private readonly PopupCollection popups;
+        
         private TimeSpan time;
         private Point mousePosition;
         private MouseButtons mouseButtonStates;
@@ -30,11 +32,16 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new <see cref="UIManager"/> from the <see cref="GuiRenderer"/> which draws it.
+        /// </summary>
+        /// <param name="renderer">The <see cref="GuiRenderer"/> which draws this UI.</param>
         public UIManager(GuiRenderer renderer)
         {
             Argument.EnsureNotNull(renderer, "renderer");
 
             this.renderer = renderer;
+            this.popups = new PopupCollection(this);
         }
         #endregion
 
@@ -63,6 +70,14 @@ namespace Orion.Engine.Gui2
         public new GuiRenderer Renderer
         {
             get { return renderer; }
+        }
+        
+        /// <summary>
+        /// Gets the collection of <see cref="Popups"/> currently displayed.
+        /// </summary>
+        public PopupCollection Popups
+        {
+        	get { return popups; }
         }
 
         /// <summary>
@@ -174,6 +189,31 @@ namespace Orion.Engine.Gui2
 
             return;
         }
+        
+		protected override void ArrangeChildren()
+		{
+			base.ArrangeChildren();
+			foreach (Popup popup in popups)
+				DefaultArrangeChild(popup, popup.GetDesiredRectangle());
+		}
+		
+		public override Control GetChildAt(Point point)
+		{
+			for (int i = popups.Count - 1; i >= 0; --i)
+			{
+				Popup popup = popups[i];
+				if (popup.Rectangle.Contains(point)) return popup;
+				if (popup.IsModal) return false;
+			}
+			
+			return Content != null && Content.Rectangle.Contains(point) ? Content : null;
+		}
+        
+		protected override IEnumerable<Control> GetChildren()
+		{
+			if (Content != null) yield return Content;
+			foreach (Popup popup in popups) yield return popup;
+		}
 
         /// <summary>
         /// Updates this UI hierarchy.
@@ -189,6 +229,7 @@ namespace Orion.Engine.Gui2
             Updated.Raise(this, elapsedTime);
         }
 
+        #region Drawing
         /// <summary>
         /// Draws the UI hierarchy beneath this <see cref="UIManager"/>.
         /// </summary>
@@ -199,6 +240,10 @@ namespace Orion.Engine.Gui2
             Renderer.Begin();
 
             DrawControlAndDescendants(this);
+            
+            foreach (Popup popup in popups)
+            	DrawControlAndDescendants(popup);
+            
             DrawCursor();
 
             Renderer.End();
@@ -252,6 +297,7 @@ namespace Orion.Engine.Gui2
                 renderer.DrawSprite(ref cursorSprite);
             }
         }
+        #endregion
 
         #region Input Event Injection
         /// <summary>
@@ -262,8 +308,6 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         public bool InjectMouseMove(int x, int y)
         {
-            Arrange();
-
             MouseEvent @event = MouseEvent.CreateMove(new Point(x, y), mouseButtonStates, modifierKeys);
             return InjectMouseEvent(@event);
         }
@@ -278,8 +322,6 @@ namespace Orion.Engine.Gui2
         {
             EnsureValid(button);
 
-            Arrange();
-
             MouseEvent @event = MouseEvent.CreateButton(mousePosition, mouseButtonStates, modifierKeys, button, pressed);
             return InjectMouseEvent(@event);
         }
@@ -292,8 +334,6 @@ namespace Orion.Engine.Gui2
         public bool InjectMouseWheel(float delta)
         {
             Argument.EnsureFinite(delta, "amount");
-
-            Arrange();
 
             MouseEvent @event = MouseEvent.CreateWheel(mousePosition, mouseButtonStates, modifierKeys, delta);
             return InjectMouseEvent(@event);
@@ -310,8 +350,6 @@ namespace Orion.Engine.Gui2
             Argument.EnsureStrictlyPositive(count, "count");
             EnsureValid(button);
 
-            Arrange();
-
             MouseEvent @event = MouseEvent.CreateClick(mousePosition, mouseButtonStates, modifierKeys, button, count);
             return InjectMouseEvent(@event);
         }
@@ -323,6 +361,8 @@ namespace Orion.Engine.Gui2
         /// <returns>A value indicating if the event was handled.</returns>
         public bool InjectMouseEvent(MouseEvent @event)
         {
+            Arrange();
+            
             mousePosition = @event.Position;
             mouseButtonStates = @event.ButtonStates;
             modifierKeys = @event.ModifierKeys;
@@ -344,9 +384,33 @@ namespace Orion.Engine.Gui2
                 if (newControlUnderMouse != null) NotifyMouseEntered(newControlUnderMouse, commonAncestor);
                 controlUnderMouse = newControlUnderMouse;
             }
-
+            
             return PropagateMouseEvent(@event);
         }
+        
+		protected override bool PropagateMouseEvent(MouseEvent @event)
+		{
+			// Give popups a chance to handle the event.
+			for (int i = popups.Count - 1; i >= 0; --i)
+			{
+				Popup popup = popups[i];
+				if (popup.Rectangle.Contains(@event.Position))
+				{
+					bool handled = PropagateMouseEventToChild(popup, @event);
+					if (handled) return true;
+				}
+				
+				if (popup.IsModal) return false;
+			}
+			
+			if (Content != null && Content.Rectangle.Contains(@event.Position))
+			{
+				bool handled = PropagateMouseEventToChild(Content, @event);
+				if (handled) return true;
+			}
+			
+			return HandleMouseEvent(@event);
+		}
 
         public bool InjectMouseEvent(Input.MouseEventType type, Input.MouseEventArgs args)
         {

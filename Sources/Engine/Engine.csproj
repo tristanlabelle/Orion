@@ -149,6 +149,8 @@
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Controls\ButtonClickEvent.cs" />
     <Compile Include="Gui2\Controls\ButtonClickType.cs" />
+    <Compile Include="Gui2\Controls\ModalDialog.cs" />
+    <Compile Include="Gui2\Controls\Popup.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.EntryCollection.cs" />
     <Compile Include="Gui2\Layouts\FormLayoutEntry.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.cs" />
@@ -192,6 +194,7 @@
     <Compile Include="Data\Binding.cs" />
     <Compile Include="Gui2\OrientationStrategy.cs" />
     <Compile Include="Gui2\Stretch.cs" />
+    <Compile Include="Gui2\UIManager.PopupCollection.cs" />
     <Compile Include="Gui2\Visibility.cs" />
     <Compile Include="Gui2\UIManager.cs" />
     <Compile Include="Gui\Button.cs" />

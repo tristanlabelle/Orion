@@ -20,7 +20,7 @@ namespace Orion.Engine.Gui2
         public CheckBox()
         {
             button = new Button();
-            button.Clicked += (sender, mouseButton) => IsChecked = !IsChecked;
+            button.Clicked += (sender, @event) => IsChecked = !IsChecked;
             AdoptChild(button);
         }
 

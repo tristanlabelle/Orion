@@ -133,11 +133,11 @@ namespace Orion.Game.Presentation.Gui
             DockLayout bottomDock = new DockLayout();
 
             Button backButton = style.CreateTextButton("Retour");
-            backButton.Clicked += (sender, mouseButton) => Exited.Raise(this);
+            backButton.Clicked += (sender, @event) => Exited.Raise(this);
             bottomDock.Dock(backButton, Direction.NegativeX);
 
             startButton = style.CreateTextButton("Commencer");
-            startButton.Clicked += (sender, mouseButton) => MatchStarted.Raise(this);
+            startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
             startButton.MinXMargin = 20;
             bottomDock.Dock(startButton, Direction.PositiveX);
 

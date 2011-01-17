@@ -42,9 +42,8 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Raised when this <see cref="Button"/> gets clicked,
         /// either programatically, using the mouse or the keyboard.
-        /// The argument specifies the mouse button used to click the button.
         /// </summary>
-        public event Action<Button, MouseButtons> Clicked;
+        public event Action<Button, ButtonClickEvent> Clicked;
         #endregion
 
         #region Properties
@@ -78,16 +77,25 @@ namespace Orion.Engine.Gui2
 
         #region Methods
         /// <summary>
-        /// Simulates a click from the user.
+        /// Simulates a click.
+        /// </summary>
+        /// <param name="event">The <see cref="ButtonClickEvent"/> describing the event.</param>
+        public void Click(ButtonClickEvent @event)
+        {
+            OnClicked(@event);
+        }
+
+        /// <summary>
+        /// Simulates a programmatic click.
         /// </summary>
         public void Click()
         {
-            OnClicked(MouseButtons.None);
+            OnClicked(ButtonClickEvent.Programmatic);
         }
 
-        protected virtual void OnClicked(MouseButtons button)
+        protected virtual void OnClicked(ButtonClickEvent @event)
         {
-            Clicked.Raise(this, button);
+            Clicked.Raise(this, @event);
         }
 
         protected override bool OnKeyEvent(KeyEvent @event)
@@ -116,7 +124,7 @@ namespace Orion.Engine.Gui2
                     ReleaseMouseCapture();
                     pressingButton = MouseButtons.None;
 
-                    if (IsUnderMouse) OnClicked(@event.Button);
+                    if (IsUnderMouse) OnClicked(ButtonClickEvent.CreateMouse(@event));
                 }
 
                 return true;

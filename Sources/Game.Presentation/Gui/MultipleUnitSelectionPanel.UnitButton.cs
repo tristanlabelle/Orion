@@ -6,6 +6,7 @@ using Orion.Game.Simulation;
 using Orion.Engine.Gui2;
 using Orion.Engine;
 using System.Diagnostics;
+using Orion.Game.Presentation.Renderers;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -48,15 +49,35 @@ namespace Orion.Game.Presentation.Gui
                 {
                     unit = value;
                     imageBox.Texture = unit == null ? null : panel.graphics.GetUnitTexture(unit);
+                    UpdateImageTint();
                 }
             }
             #endregion
 
             #region Methods
-            protected override void OnClicked(MouseButtons button)
+            /// <summary>
+            /// Updates the tint of the unit image to reflect its health.
+            /// </summary>
+            public void UpdateImageTint()
+            {
+                float healthFraction = unit == null ? 1 : unit.Health / unit.MaxHealth;
+                imageBox.Tint = HealthBarRenderer.GetColor(healthFraction);
+            }
+
+            protected override void Draw()
+            {
+                UpdateImageTint();
+                base.Draw();
+            }
+
+            protected override void OnClicked(ButtonClickEvent @event)
             {
                 Debug.Assert(unit != null);
-                panel.UnitClicked(panel, unit);
+
+                if (@event.Type == ButtonClickType.Mouse && @event.MouseEvent.IsShiftDown)
+                    panel.UnitDeselected.Raise(panel, unit);
+                else
+                    panel.UnitSelected.Raise(panel, unit);
             }
             #endregion
         }

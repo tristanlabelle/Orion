@@ -16,9 +16,9 @@ namespace Orion.Game.Presentation.Renderers
     public static class HealthBarRenderer
     {
         #region Fields
-        private static readonly ColorRgb lowLifeColor = Colors.Red;
-        private static readonly ColorRgb middleLifeColor = Colors.Yellow;
-        private static readonly ColorRgb fullLifeColor = Colors.ForestGreen;
+        private static readonly ColorRgb noHealthColor = Colors.Red;
+        private static readonly ColorRgb middleHealthColor = Colors.Yellow;
+        private static readonly ColorRgb fullHealthColor = Colors.ForestGreen;
         private static readonly ColorRgb borderColor = Colors.DarkGray;
         #endregion
 
@@ -45,11 +45,11 @@ namespace Orion.Game.Presentation.Renderers
             float leftHealthWidth = into.Width * (unit.Health / unit.MaxHealth);
             Vector2 origin = into.Min;
 
-            float lifeFraction = unit.Health / unit.MaxHealth;
-            ColorRgb lifeColor = Interpolate(lowLifeColor, middleLifeColor, fullLifeColor, lifeFraction);
+            float healthFraction = unit.Health / unit.MaxHealth;
+            ColorRgb healthColor = GetColor(healthFraction);
 
             Rectangle lifeRect = new Rectangle(origin.X, origin.Y, leftHealthWidth, into.Height);
-            context.Fill(lifeRect, lifeColor);
+            context.Fill(lifeRect, healthColor);
             Rectangle damageRect = new Rectangle(
                 origin.X + leftHealthWidth, origin.Y,
                 into.Width - leftHealthWidth, into.Height);
@@ -57,17 +57,17 @@ namespace Orion.Game.Presentation.Renderers
             context.Fill(damageRect, borderColor);
         }
 
-        private static ColorRgb Interpolate(ColorRgb first, ColorRgb second, ColorRgb third, float progress)
+        public static ColorRgb GetColor(float healthFraction)
         {
-            if (progress >= 0.5f)
+            if (healthFraction >= 0.5f)
             {
-                float subprogress = (progress - 0.5f) * 2;
-                return ColorRgb.Lerp(second, third, subprogress);
+                float subprogress = (healthFraction - 0.5f) * 2;
+                return ColorRgb.Lerp(middleHealthColor, fullHealthColor, subprogress);
             }
             else
             {
-                float subprogress = progress * 2;
-                return ColorRgb.Lerp(first, second, subprogress);
+                float subprogress = healthFraction * 2;
+                return ColorRgb.Lerp(noHealthColor, middleHealthColor, subprogress);
             }
         }
         #endregion

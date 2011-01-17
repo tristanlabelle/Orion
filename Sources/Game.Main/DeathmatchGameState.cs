@@ -76,7 +76,8 @@ namespace Orion.Game.Main
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(graphics);
-            this.multipleUnitSelectionPanel.UnitClicked += OnSelectionPanelUnitClicked;
+            this.multipleUnitSelectionPanel.UnitSelected += OnMultipleSelectionPanelUnitSelected;
+            this.multipleUnitSelectionPanel.UnitDeselected += OnMultipleSelectionPanelUnitDeselected;
 
             this.actionPanel = new ActionPanel(ui);
             
@@ -240,9 +241,14 @@ namespace Orion.Game.Main
             UpdateActionPanel();
         }
 
-        private void OnSelectionPanelUnitClicked(MultipleUnitSelectionPanel sender, Unit unit)
+        private void OnMultipleSelectionPanelUnitSelected(MultipleUnitSelectionPanel sender, Unit unit)
         {
             Selection.Set(unit);
+        }
+
+        private void OnMultipleSelectionPanelUnitDeselected(MultipleUnitSelectionPanel sender, Unit unit)
+        {
+            Selection.Remove(unit);
         }
 
         private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)

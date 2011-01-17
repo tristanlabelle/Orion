@@ -50,7 +50,7 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Methods
-            protected override void OnClicked(MouseButtons button)
+            protected override void OnClicked(ButtonClickEvent @event)
             {
                 if (descriptor != null && descriptor.Action != null) descriptor.Action();
             }

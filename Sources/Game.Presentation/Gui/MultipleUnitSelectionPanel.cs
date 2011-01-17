@@ -8,6 +8,9 @@ using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Gui
 {
+    /// <summary>
+    /// Provides a display of the selected units for selection of multiple units.
+    /// </summary>
     public sealed partial class MultipleUnitSelectionPanel : ContentControl
     {
         #region Fields
@@ -34,9 +37,14 @@ namespace Orion.Game.Presentation.Gui
 
         #region Events
         /// <summary>
-        /// Raised when a unit gets clicked.
+        /// Raised when the selection should change to a specific unit.
         /// </summary>
-        public event Action<MultipleUnitSelectionPanel, Unit> UnitClicked;
+        public event Action<MultipleUnitSelectionPanel, Unit> UnitSelected;
+
+        /// <summary>
+        /// Raised when a unit should be removed from the selection.
+        /// </summary>
+        public event Action<MultipleUnitSelectionPanel, Unit> UnitDeselected;
         #endregion
 
         #region Methods

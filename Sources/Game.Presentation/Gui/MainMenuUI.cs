@@ -103,7 +103,7 @@ namespace Orion.Game.Presentation.Gui
         {
             Button button = style.CreateTextButton(text);
             button.MinHeight = 50;
-            button.Clicked += (sender, mouseButton) => eventGetter().Raise(this);
+            button.Clicked += (sender, @event) => eventGetter().Raise(this);
             stack.Stack(button);
         }
         #endregion

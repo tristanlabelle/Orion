@@ -45,7 +45,6 @@ namespace Orion.Game.Presentation.Gui
         private ActionButton lastActionButtonUnderMouse;
         private Point scrollDirection;
         private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
-        private bool isSelectingAllIdleWorkers;
         private bool isFollowingSelection;
         private bool isDisplayingHealthBars;
         #endregion
@@ -344,13 +343,8 @@ namespace Orion.Game.Presentation.Gui
             };
 
             // Hack to detect if button is pressed while shift is down.
-            inactiveWorkersButton.MouseMoved += (sender, @event) =>
-            {
-                isSelectingAllIdleWorkers = @event.IsShiftDown;
-                return false;
-            };
 
-            inactiveWorkersButton.Clicked += (sender, mouseButton) => SelectingIdleWorkers.Raise(this, isSelectingAllIdleWorkers);
+            inactiveWorkersButton.Clicked += (sender, @event) => SelectingIdleWorkers.Raise(this, @event.MouseEvent.IsShiftDown);
             dock.Dock(inactiveWorkersButton, Direction.NegativeX);
 
             Button pauseButton = style.CreateTextButton("Pause");

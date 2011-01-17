@@ -147,6 +147,8 @@
     <Compile Include="Gui2\Adornments\TextureAdornment.cs" />
     <Compile Include="Gui2\Adornments\TilingTextureAdornment.cs" />
     <Compile Include="Gui2\Alignment.cs" />
+    <Compile Include="Gui2\Controls\ButtonClickEvent.cs" />
+    <Compile Include="Gui2\Controls\ButtonClickType.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.EntryCollection.cs" />
     <Compile Include="Gui2\Layouts\FormLayoutEntry.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.cs" />

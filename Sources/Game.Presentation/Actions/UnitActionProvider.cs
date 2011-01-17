@@ -162,7 +162,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<AttackSkill>() && !unitType.HasSkill<MoveSkill>())
+            if (unitType.HasSkill<AttackSkill>() && unitType.HasSkill<MoveSkill>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {

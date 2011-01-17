@@ -16,7 +16,7 @@ namespace Orion.Game.Presentation
     public sealed class SelectionManager
     {
         #region Fields
-        public static readonly int SelectionLimit = 24;
+        public static readonly int SelectionLimit = int.MaxValue;
         public static readonly int GroupCount = 10;
 
         private readonly Faction faction;

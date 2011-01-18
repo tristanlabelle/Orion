@@ -24,7 +24,6 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly OrionGuiStyle style;
         private readonly Action<UIManager, TimeSpan> updatedEventHandler;
-
         private readonly InterpolatedCounter aladdiumAmountCounter = new InterpolatedCounter(0);
         private readonly InterpolatedCounter alageneAmountCounter = new InterpolatedCounter(0);
 
@@ -33,6 +32,9 @@ namespace Orion.Game.Presentation.Gui
         private Label foodAmountLabel;
         private ImageBox idleWorkerCountImageBox;
         private Label idleWorkerCountLabel;
+        private ModalDialog pausePanelDialog;
+        private PausePanel pausePanel;
+
         private Control bottomBar;
         private ContentControl selectionInfoPanel;
         private TextField chatTextField;
@@ -50,12 +52,12 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI2(OrionGuiStyle style)
+        public MatchUI2(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            this.style = style;
-            updatedEventHandler = OnGuiUpdated;
+            this.style = graphics.GuiStyle;
+            this.updatedEventHandler = OnGuiUpdated;
 
             DockLayout mainDock = new DockLayout()
             {
@@ -103,6 +105,21 @@ namespace Orion.Game.Presentation.Gui
         /// The parameter is <c>true</c> if all idle workers should be selected and <c>false</c> if only the next one should.
         /// </summary>
         public event Action<MatchUI2, bool> SelectingIdleWorkers;
+
+        /// <summary>
+        /// Raised when the user pauses the game.
+        /// </summary>
+        public event Action<MatchUI2> Paused;
+
+        /// <summary>
+        /// Raised when the user resumes the game after its been paused.
+        /// </summary>
+        public event Action<MatchUI2> Resumed;
+
+        /// <summary>
+        /// Raised when the user quits the game.
+        /// </summary>
+        public event Action<MatchUI2> Exited;
         #endregion
 
         #region Properties
@@ -195,7 +212,7 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public Point ScrollDirection
         {
-            get { return scrollDirection; }
+            get { return Manager != null && Manager.ModalPopup != null ? Point.Zero : scrollDirection; }
         }
 
         /// <summary>
@@ -221,6 +238,14 @@ namespace Orion.Game.Presentation.Gui
         public bool IsDisplayingHealthBars
         {
             get { return isDisplayingHealthBars; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the match is currently paused.
+        /// </summary>
+        public bool IsPaused
+        {
+            get { return Manager != null && Manager.Popups.Contains(pausePanelDialog); }
         }
 
         private ActionButton ActionButtonUnderMouse
@@ -347,10 +372,7 @@ namespace Orion.Game.Presentation.Gui
             inactiveWorkersButton.Clicked += (sender, @event) => SelectingIdleWorkers.Raise(this, @event.MouseEvent.IsShiftDown);
             dock.Dock(inactiveWorkersButton, Direction.NegativeX);
 
-            Button pauseButton = style.CreateTextButton("Pause");
-            pauseButton.AcquireKeyboardFocusWhenPressed = false;
-            pauseButton.VerticalAlignment = Alignment.Center;
-            dock.Dock(pauseButton, Direction.PositiveX);
+            dock.Dock(CreatePauseButton(), Direction.PositiveX);
 
             Button diplomacyButton = style.CreateTextButton("Diplomatie");
             diplomacyButton.AcquireKeyboardFocusWhenPressed = false;
@@ -359,6 +381,36 @@ namespace Orion.Game.Presentation.Gui
             dock.Dock(diplomacyButton, Direction.PositiveX);
 
             return container;
+        }
+
+        private Button CreatePauseButton()
+        {
+            Button button = style.CreateTextButton("Pause");
+            button.AcquireKeyboardFocusWhenPressed = false;
+            button.VerticalAlignment = Alignment.Center;
+
+            pausePanelDialog = new ModalDialog();
+            pausePanel = new PausePanel(style);
+            pausePanelDialog.Content = pausePanel;
+
+            button.Clicked += (sender, @event) =>
+            {
+                Manager.Popups.Add(pausePanelDialog);
+                Paused.Raise(this);
+            };
+            pausePanel.Resumed += sender =>
+            {
+                Manager.Popups.Remove(pausePanelDialog);
+                AcquireKeyboardFocus();
+                Resumed.Raise(this);
+            };
+            pausePanel.Exited += sender =>
+            {
+                Manager.Popups.Remove(pausePanelDialog);
+                Exited.Raise(this);
+            };
+
+            return button;
         }
 
         private StackLayout CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
@@ -510,6 +562,8 @@ namespace Orion.Game.Presentation.Gui
 
         private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
+            if (Manager.ModalPopup != null) return;
+
             time += elapsedTime;
 
             aladdiumAmountCounter.Update(elapsedTime);

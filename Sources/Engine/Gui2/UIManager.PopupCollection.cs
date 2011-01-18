@@ -28,7 +28,9 @@ namespace Orion.Engine.Gui2
 			{
 				manager.AdoptChild(item);
 				base.InsertItem(index, item);
-				
+
+                manager.InvalidateMeasure();
+
 				if (item.IsModal)
 				{
 					manager.KeyboardFocusedControl = null;
@@ -40,13 +42,14 @@ namespace Orion.Engine.Gui2
 			{
 				Popup popup = Items[index];
 				base.RemoveItem(index);
-				manager.AbandonChild(popup);
+                manager.AbandonChild(popup);
+                manager.InvalidateMeasure();
 			}
 			
 			protected override void SetItem(int index, Popup item)
 			{
 				RemoveItem(index);
-				InsertItem(item);
+				InsertItem(index, item);
 			}
 			
 			protected override void ClearItems()

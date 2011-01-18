@@ -101,6 +101,7 @@
     <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
+    <Compile Include="Gui\PausePanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />

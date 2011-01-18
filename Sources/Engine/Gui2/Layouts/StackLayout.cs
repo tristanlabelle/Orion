@@ -110,11 +110,11 @@ namespace Orion.Engine.Gui2
                 if (arrange)
                 {
                     childSize = child.DesiredOuterSize;
-                    availableChildSize = new Size(rectangle.Width - x, rectangle.Height - y);
+                    availableChildSize = Size.CreateClamped(rectangle.Width - x, rectangle.Height - y);
                 }
                 else
                 {
-                    availableChildSize = new Size(availableSize.Width - x, availableSize.Height - y);
+                    availableChildSize = Size.CreateClamped(availableSize.Width - x, availableSize.Height - y);
                     childSize = child.Measure(availableChildSize);
                 }
 
@@ -122,7 +122,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (childSize.Height > seriesSize) seriesSize = childSize.Height;
 
-                    width = Math.Max(width, x + childGap + childSize.Width);
+                    width = Math.Max(width, x + childSize.Width);
                     height = Math.Max(height, y + childSize.Height);
 
                     if (arrange)
@@ -137,7 +137,7 @@ namespace Orion.Engine.Gui2
                 {
                     if (childSize.Width > seriesSize) seriesSize = childSize.Width;
 
-                    height = Math.Max(height, y + childGap + childSize.Height);
+                    height = Math.Max(height, y + childSize.Height);
                     width = Math.Max(width, x + childSize.Width);
 
                     if (arrange)

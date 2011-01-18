@@ -21,6 +21,11 @@ namespace Orion.Engine.Gui2
 		/// </summary>
 		/// <returns>The rectangle to arrange this <see cref="Popup"/> in.</returns>
 		public abstract Region GetDesiredRectangle();
+
+        protected internal override void Draw()
+        {
+            if (IsModal) Renderer.DrawRectangle(Manager.Rectangle, new ColorRgba(Colors.Black, 0.2f));
+        }
 		#endregion
 	}
 }

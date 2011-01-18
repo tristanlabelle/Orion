@@ -63,7 +63,7 @@ namespace Orion.Game.Main
             this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
 
-            this.ui = new MatchUI2(graphics.GuiStyle);
+            this.ui = new MatchUI2(graphics);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
             this.ui.MinimapRightClicked += OnMinimapRightClicked;
             this.ui.MinimapRendering += OnMinimapRendering;
@@ -73,6 +73,7 @@ namespace Orion.Game.Main
             this.ui.ViewportZoomed += OnViewportZoomed;
             this.ui.KeyEvent += OnViewportKeyEvent;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
+            this.ui.Exited += OnUserExited;
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(graphics);
@@ -374,7 +375,7 @@ namespace Orion.Game.Main
             audio.Dispose();
         }
 
-        private void OnQuitPressed(MatchUI2 sender)
+        private void OnUserExited(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
         }

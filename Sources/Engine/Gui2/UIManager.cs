@@ -166,6 +166,22 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Gets the topmost modal <see cref="Popup"/> currently visible.
+        /// </summary>
+        public Popup ModalPopup
+        {
+            get
+            {
+                for (int i = popups.Count - 1; i >= 0; --i)
+                {
+                    Popup popup = popups[i];
+                    if (popup.IsModal) return popup;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Accesses the current cursor texture.
         /// </summary>
         public Texture CursorTexture
@@ -189,6 +205,12 @@ namespace Orion.Engine.Gui2
 
             return;
         }
+
+        protected override Size MeasureSize(Size availableSize)
+        {
+            foreach (Popup popup in popups) popup.Measure(availableSize);
+            return base.MeasureSize(availableSize);
+        }
         
 		protected override void ArrangeChildren()
 		{
@@ -203,7 +225,7 @@ namespace Orion.Engine.Gui2
 			{
 				Popup popup = popups[i];
 				if (popup.Rectangle.Contains(point)) return popup;
-				if (popup.IsModal) return false;
+				if (popup.IsModal) return null;
 			}
 			
 			return Content != null && Content.Rectangle.Contains(point) ? Content : null;
@@ -240,9 +262,6 @@ namespace Orion.Engine.Gui2
             Renderer.Begin();
 
             DrawControlAndDescendants(this);
-            
-            foreach (Popup popup in popups)
-            	DrawControlAndDescendants(popup);
             
             DrawCursor();
 

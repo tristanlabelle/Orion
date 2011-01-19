@@ -206,15 +206,17 @@ namespace Orion.Engine.Gui2
                 case Key.Back:
                     if (caretIndex > 0)
                     {
-                        Text = text.Substring(0, caretIndex - 1) + text.Substring(caretIndex);
+                        text = text.Substring(0, caretIndex - 1) + text.Substring(caretIndex);
                         --caretIndex;
+                        TextChanged.Raise(this);
                     }
                     break;
 
                 case Key.Delete:
                     if (caretIndex < text.Length)
                     {
-                        Text = text.Substring(0, caretIndex) + text.Substring(caretIndex + 1);
+                        text = text.Substring(0, caretIndex) + text.Substring(caretIndex + 1);
+                        TextChanged.Raise(this);
                     }
                     break;
             }
@@ -226,8 +228,9 @@ namespace Orion.Engine.Gui2
         {
             if (!"\b\r\t\n".Contains(character))
             {
-                Text = text.Insert(caretIndex, character);
+                text = text.Insert(caretIndex, character);
                 ++caretIndex;
+                TextChanged.Raise(this);
             }
 
             return true;

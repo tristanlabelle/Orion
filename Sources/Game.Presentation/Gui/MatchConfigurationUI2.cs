@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui2;
 using Orion.Engine.Data;
-using System.Linq.Expressions;
+using Orion.Engine.Gui2;
 using Orion.Engine.Gui2.Adornments;
+using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// Provides the user interface to edit the settings of a match.
     /// </summary>
-    public sealed class MatchConfigurationUI2 : ContentControl
+    public sealed partial class MatchConfigurationUI2 : ContentControl
     {
         #region Fields
         private readonly OrionGuiStyle style;
+        private readonly PlayerCollection players;
+        private StackLayout playerStack;
         private CheckBox readyCheckBox;
         private Button startButton;
         private FormLayout settingsForm;
         private bool canChangeSettings = true;
-        private bool canKickPlayers = true;
         #endregion
 
         #region Constructors
@@ -30,8 +32,9 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(style, "style");
 
             this.style = style;
+            this.players = new PlayerCollection(this);
 
-            Adornment = new ColoredBackgroundAdornment(Colors.Gray);
+            Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true };
 
             DockLayout mainDock = new DockLayout()
             {
@@ -46,6 +49,11 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when a player gets kicked.
+        /// </summary>
+        public event Action<MatchConfigurationUI2, Player> PlayerKicked;
+
         /// <summary>
         /// Raised when the state of readiness of the player changes.
         /// </summary>
@@ -63,6 +71,14 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the collection of players in this match.
+        /// </summary>
+        public PlayerCollection Players
+        {
+            get { return players; }
+        }
+
         /// <summary>
         /// Accesses a value indicating if the user needs to mark himself as ready before the game can start.
         /// </summary>
@@ -99,15 +115,6 @@ namespace Orion.Game.Presentation.Gui
             get { return settingsForm.HasEnabledFlag; }
             set { settingsForm.HasEnabledFlag = value; }
         }
-
-        /// <summary>
-        /// Accesses a value indicating if the user can kick other players from the game.
-        /// </summary>
-        public bool CanKickPlayers
-        {
-            get { return canKickPlayers; }
-            set { canKickPlayers = value; }
-        }
         #endregion
 
         #region Methods
@@ -133,12 +140,16 @@ namespace Orion.Game.Presentation.Gui
             DockLayout bottomDock = new DockLayout();
 
             Button backButton = style.CreateTextButton("Retour");
+            backButton.MinSize = new Size(150, 40);
+            backButton.Margin = 5;
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             bottomDock.Dock(backButton, Direction.NegativeX);
 
             startButton = style.CreateTextButton("Commencer");
-            startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
+            startButton.MinSize = new Size(150, 40);
+            startButton.Margin = 5;
             startButton.MinXMargin = 20;
+            startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
             bottomDock.Dock(startButton, Direction.PositiveX);
 
             readyCheckBox = style.CreateTextCheckBox("Je suis prêt");
@@ -156,11 +167,25 @@ namespace Orion.Game.Presentation.Gui
 
             settingsForm = new FormLayout()
             {
+                MinWidth = 250,
+                Margin = 5,
                 MinEntrySize = 32,
-                HeaderContentGap = 6
+                HeaderContentGap = 10
             };
-
             contentDock.Dock(settingsForm, Direction.PositiveX);
+
+            Label playersLabel = style.CreateLabel("Joueurs:");
+            playersLabel.Margin = 5;
+            contentDock.Dock(playersLabel, Direction.NegativeY);
+
+            playerStack = new StackLayout()
+            {
+                Direction = Direction.PositiveY,
+                Margin = 5,
+                ChildGap = 5
+            };
+            contentDock.Dock(playerStack, Direction.PositiveX);
+
             return contentDock;
         }
         #endregion

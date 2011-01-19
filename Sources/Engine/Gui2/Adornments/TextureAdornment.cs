@@ -6,10 +6,14 @@ using Orion.Engine.Graphics;
 
 namespace Orion.Engine.Gui2.Adornments
 {
+    /// <summary>
+    /// An adornment which draws a texture in the background of a control.
+    /// </summary>
     public sealed class TextureAdornment : IAdornment
     {
         #region Fields
         private Texture texture;
+        private bool isTiling;
         #endregion
 
         #region Constructors
@@ -28,13 +32,24 @@ namespace Orion.Engine.Gui2.Adornments
             get { return texture; }
             set { texture = value; }
         }
+
+        /// <summary>
+        /// Accesses a value indicating if the texture should tile accross the surface of the control.
+        /// </summary>
+        public bool IsTiling
+        {
+            get { return isTiling; }
+            set { isTiling = value; }
+        }
         #endregion
 
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
             if (texture == null) return;
+
             var sprite = new GuiSprite(control.Rectangle, texture);
+            if (isTiling) sprite.PixelRectangle = (Region)control.ActualSize;
             renderer.DrawSprite(ref sprite);
         }
 

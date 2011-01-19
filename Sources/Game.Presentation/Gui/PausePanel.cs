@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(style, "style");
 
             MinWidth = 200;
-            Adornment = new ColoredBackgroundAdornment(Colors.Gray);
+            Adornment = new ColorAdornment(Colors.Gray);
             Padding = 5;
 
             StackLayout stack = new StackLayout()

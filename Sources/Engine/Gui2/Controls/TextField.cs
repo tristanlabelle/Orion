@@ -63,7 +63,7 @@ namespace Orion.Engine.Gui2
                 if (object.ReferenceEquals(value, text)) return;
 
                 text = value;
-                caretIndex = text.Length;
+                if (caretIndex > text.Length) caretIndex = text.Length;
 
                 TextChanged.Raise(this);
             }

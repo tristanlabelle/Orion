@@ -443,7 +443,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 Padding = new Borders(6),
                 IsMouseEventSink = true,
-                Adornment = new TilingTextureAdornment(style.GetTexture("Gui/Granite"))
+                Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true }
             };
             bottomBar = container;
 
@@ -488,7 +488,7 @@ namespace Orion.Game.Presentation.Gui
                 CellGap = 3,
                 Width = 200,
                 Height = 200,
-                Adornment = new ColoredBackgroundAdornment(new ColorRgba(Colors.Black, 0.2f))
+                Adornment = new ColorAdornment(new ColorRgba(Colors.Black, 0.2f))
             };
 
             for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
@@ -521,7 +521,7 @@ namespace Orion.Game.Presentation.Gui
 
             actionToolTip = new ActionToolTip(style)
             {
-                Adornment = new ColoredBackgroundAdornment(Colors.Gray),
+                Adornment = new ColorAdornment(Colors.Gray),
                 VerticalAlignment = Alignment.Max,
                 IsMouseEventSink = true,
                 VisibilityFlag = Visibility.Hidden

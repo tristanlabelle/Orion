@@ -143,9 +143,8 @@
     <Compile Include="Graphics\Text.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureManager.cs" />
-    <Compile Include="Gui2\Adornments\ColoredBackgroundAdornment.cs" />
+    <Compile Include="Gui2\Adornments\ColorAdornment.cs" />
     <Compile Include="Gui2\Adornments\TextureAdornment.cs" />
-    <Compile Include="Gui2\Adornments\TilingTextureAdornment.cs" />
     <Compile Include="Gui2\Alignment.cs" />
     <Compile Include="Gui2\Controls\ButtonClickEvent.cs" />
     <Compile Include="Gui2\Controls\ButtonClickType.cs" />

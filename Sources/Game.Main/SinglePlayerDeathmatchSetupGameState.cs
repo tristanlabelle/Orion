@@ -23,6 +23,7 @@ namespace Orion.Game.Main
         #region Fields
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
+        private readonly PlayerSettings playerSettings;
         private readonly MatchConfigurationUI2 ui;
         #endregion
 
@@ -36,12 +37,17 @@ namespace Orion.Game.Main
             this.matchSettings = new MatchSettings();
             this.matchSettings.AreCheatsEnabled = true;
 
+            this.playerSettings = new PlayerSettings();
+            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
+
             this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
             {
                 NeedsReadying = false,
             };
 
+            this.ui.Players.Add(playerSettings.Players.First());
             this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
+            this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
             this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
             this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
 
@@ -94,8 +100,6 @@ namespace Orion.Game.Main
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
 
-            PlayerSettings playerSettings = new PlayerSettings();
-            playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
             foreach (Player player in playerSettings.Players)
             {
                 Faction faction = world.CreateFaction(Colors.GetName(player.Color), player.Color);

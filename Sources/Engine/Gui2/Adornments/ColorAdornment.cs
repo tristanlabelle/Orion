@@ -8,14 +8,14 @@ namespace Orion.Engine.Gui2.Adornments
     /// <summary>
     /// A control adornment which fills the background of the control with a color.
     /// </summary>
-    public sealed class ColoredBackgroundAdornment : IAdornment
+    public sealed class ColorAdornment : IAdornment
     {
         #region Fields
         private readonly ColorRgba color;
         #endregion
 
         #region Constructors
-        public ColoredBackgroundAdornment(ColorRgba color)
+        public ColorAdornment(ColorRgba color)
         {
             this.color = color;
         }

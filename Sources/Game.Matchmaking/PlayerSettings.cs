@@ -11,7 +11,7 @@ namespace Orion.Game.Matchmaking
     public class PlayerSettings
     {
         #region Fields
-        private static ColorRgb[] colors = new ColorRgb[]
+        public static readonly ColorRgb[] FactionColors = new ColorRgb[]
         {
             ColorPalette.Red, ColorPalette.Cyan, ColorPalette.Magenta, ColorPalette.Orange,
             ColorPalette.Green, ColorPalette.Yellow, ColorPalette.Gray, ColorPalette.Blue,
@@ -20,7 +20,7 @@ namespace Orion.Game.Matchmaking
 
         private Action<Player> onColorChanged;
         private List<Player> players = new List<Player>();
-        private int maxPlayers = colors.Length;
+        private int maxPlayers = FactionColors.Length;
         #endregion
 
         #region Constructors
@@ -53,7 +53,7 @@ namespace Orion.Game.Matchmaking
 
         public IEnumerable<ColorRgb> AvailableColors
         {
-            get { return colors.Except(players.Select(p => p.Color)); }
+            get { return FactionColors.Except(players.Select(p => p.Color)); }
         }
 
         public int PlayerCount

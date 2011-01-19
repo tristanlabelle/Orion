@@ -90,6 +90,8 @@
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.cs" />
+    <Compile Include="Gui\MatchConfigurationUI2.PlayerCollection.cs" />
+    <Compile Include="Gui\MatchConfigurationUI2.PlayerRow.cs" />
     <Compile Include="Gui\MatchUI2.ActionButton.cs" />
     <Compile Include="Gui\MatchUI2.ActionToolTip.cs" />
     <Compile Include="Gui\MatchUI2.cs" />

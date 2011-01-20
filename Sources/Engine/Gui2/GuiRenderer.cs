@@ -12,23 +12,100 @@ namespace Orion.Engine.Gui2
     /// </summary>
     public abstract class GuiRenderer
     {
-        #region Properties
-        /// <summary>
-        /// Accesses the current clipping rectangle, if any.
-        /// </summary>
-        public abstract Region? ClippingRectangle { get; set; }
-        #endregion
-
         #region Methods
+        #region Begin/End
         /// <summary>
         /// Invoked when the rendering of the GUI begins.
         /// </summary>
-        public virtual void Begin() { }
+        /// <returns>A disposable object to enable using C# using statements to automatically invoke <see cref="M:End"/>.</returns>
+        public DisposableHandle Begin()
+        {
+            BeginImpl();
+            return new DisposableHandle(End);
+        }
 
         /// <summary>
         /// Invoked when the rendering of the GUI ends.
         /// </summary>
-        public virtual void End() { }
+        public void End()
+        {
+            EndImpl();
+        }
+
+        /// <summary>
+        /// Setups the renderer to begin drawing operations for a frame.
+        /// </summary>
+        protected virtual void BeginImpl() { }
+
+        /// <summary>
+        /// Cleans up the renderer after the last drawing operations of a frame.
+        /// </summary>
+        protected virtual void EndImpl() { }
+        #endregion
+
+        #region Transformations
+        /// <summary>
+        /// Adds a new transformation to the transformation stack.
+        /// </summary>
+        /// <param name="transform">The transformation to be pushed.</param>
+        /// <returns>A disposable object enabling the use of C# using statements to invoke <see cref="PopTransform"/>.</returns>
+        public DisposableHandle PushTransform(Transform transform)
+        {
+            PushTransformImpl(transform);
+            return new DisposableHandle(PopTransform);
+        }
+
+        /// <summary>
+        /// Reverts the transformation to its value before the last <see cref="PushTransform"/> call.
+        /// </summary>
+        public void PopTransform()
+        {
+            PopTransformImpl();
+        }
+
+        /// <summary>
+        /// Adds a new transformation to the transformation stack.
+        /// </summary>
+        /// <param name="transform">The transformation to be pushed.</param>
+        protected abstract void PushTransformImpl(Transform transform);
+
+        /// <summary>
+        /// Reverts the transformation to its value before the last <see cref="PushTransformImpl"/> call.
+        /// </summary>
+        protected abstract void PopTransformImpl();
+        #endregion
+
+        #region Clipping
+        /// <summary>
+        /// Changes the clipping rectangle by pushing a new value on the clipping rectangle stack.
+        /// </summary>
+        /// <param name="rectangle">The clipping rectangle to be pushed.</param>
+        /// <returns>A disposable object to be used in a C# using expression.</returns>
+        public DisposableHandle PushClippingRectangle(Region rectangle)
+        {
+            PushClippingRectangleImpl(rectangle);
+            return new DisposableHandle(PopClippingRectangle);
+        }
+
+        /// <summary>
+        /// Reverts to the clipping rectangle in place before the last <see cref="M:PushClippingRectangle(Region)"/> call.
+        /// </summary>
+        public void PopClippingRectangle()
+        {
+            PopClippingRectangleImpl();
+        }
+
+        /// <summary>
+        /// Changes the clipping rectangle by pushing a new value on the clipping rectangle stack.
+        /// </summary>
+        /// <param name="rectangle">The clipping rectangle to be pushed.</param>
+        protected abstract void PushClippingRectangleImpl(Region rectangle);
+
+        /// <summary>
+        /// Reverts to the clipping rectangle in place before the last <see cref="M:PushClippingRectangleImpl(Region)"/> call.
+        /// </summary>
+        protected abstract void PopClippingRectangleImpl();
+        #endregion
 
         /// <summary>
         /// Attempts to retrieve a texture by its name.

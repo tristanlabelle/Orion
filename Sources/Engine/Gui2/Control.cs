@@ -20,7 +20,7 @@ namespace Orion.Engine.Gui2
         private Control parent;
         private IAdornment adornment;
         private Borders margin;
-        private Visibility visibilityFlag;
+        private Visibility visibilityFlag = Visibility.Visible;
         private Alignment horizontalAlignment;
         private Alignment verticalAlignment;
         private Size minSize;
@@ -599,10 +599,10 @@ namespace Orion.Engine.Gui2
         /// <returns>The child at that point, or <c>null</c> if no child can be found at that point.</returns>
         public virtual Control GetChildAt(Point point)
         {
-        	if (!Rectangle.Contains(point)) return null;
+        	if (!Rectangle.Contains(point) || Visibility < Visibility.Visible) return null;
 
             foreach (Control child in Children)
-                if (child.Rectangle.Contains(point))
+                if (child.VisibilityFlag == Gui2.Visibility.Visible && child.Rectangle.Contains(point))
                     return child;
            
             return null;
@@ -918,23 +918,6 @@ namespace Orion.Engine.Gui2
 
         #region Input Events
         #region Propagation Plumbing
-        protected virtual bool PropagateMouseEvent(MouseEvent @event)
-        {
-            Control child = GetChildAt(@event.Position);
-            if (child != null)
-            {
-                bool handled = child.PropagateMouseEvent(@event);
-                if (handled) return true;
-            }
-
-            return HandleMouseEvent(@event);
-        }
-
-        protected bool PropagateMouseEventToChild(Control child, MouseEvent @event)
-        {
-            return child.PropagateMouseEvent(@event);
-        }
-
         protected internal bool HandleMouseEvent(MouseEvent @event)
         {
             if (Visibility < Visibility.Visible) return false;

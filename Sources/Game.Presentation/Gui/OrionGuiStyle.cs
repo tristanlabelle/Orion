@@ -34,29 +34,24 @@ namespace Orion.Game.Presentation.Gui
         }
         #endregion
 
-        #region Properties
-        public override Region? ClippingRectangle
-        {
-            get
-            {
-                return graphicsContext.ScissorRegion;
-            }
-            set
-            {
-                graphicsContext.PopScissorRegion();
-                graphicsContext.PushScissorRegion(value ?? graphicsContext.ScissorRegion);
-            }
-        }
-        #endregion
-
         #region Methods
         #region GuiRenderer Implementation
-        public override void Begin()
+        protected override void PushTransformImpl(Transform transform)
         {
-            graphicsContext.PushScissorRegion(graphicsContext.ScissorRegion);
+            graphicsContext.PushTransform(transform);
         }
 
-        public override void End()
+        protected override void PopTransformImpl()
+        {
+            graphicsContext.PopTransform();
+        }
+
+        protected override void PushClippingRectangleImpl(Region rectangle)
+        {
+            graphicsContext.PushScissorRegion(rectangle);
+        }
+
+        protected override void PopClippingRectangleImpl()
         {
             graphicsContext.PopScissorRegion();
         }
@@ -209,6 +204,20 @@ namespace Orion.Game.Presentation.Gui
         {
             checkBox.Button.Adornment = new OrionCheckBoxButtonAdornment(this);
             checkBox.Button.SetSize(20, 20);
+        }
+
+        private void ApplySpecificStyle(ComboBox comboBox)
+        {
+            var adornment = new BorderTextureAdornment(GetGuiTexture("Dropdown_Border"));
+            comboBox.MinSize = new Size(64, 24);
+            comboBox.Button.Adornment = adornment;
+            comboBox.Button.MinWidth = 20;
+            comboBox.SelectedItemViewport.Adornment = adornment;
+            comboBox.SelectedItemViewport.MinSize = new Size(32, 16);
+            comboBox.DropDown.HighlightColor = new ColorRgba(Colors.LightBlue, 0.5f);
+            comboBox.DropDown.Adornment = adornment;
+            comboBox.DropDown.ItemGap = 4;
+            comboBox.DropDown.Padding = 4;
         }
         #endregion
         #endregion

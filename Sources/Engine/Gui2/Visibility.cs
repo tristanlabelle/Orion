@@ -16,16 +16,16 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Specifies that the <see cref="Control"/> is not visible and does not occupy physical space.
         /// </summary>
-        Collapsed = -2,
+        Collapsed = -1,
 
         /// <summary>
         /// Specifies that the <see cref="Control"/> is not visible but still occupies physical space.
         /// </summary>
-        Hidden = -1,
+        Hidden = 0,
 
         /// <summary>
         /// Specifies that the <see cref="Control"/> is fully visible and occupies physical space.
         /// </summary>
-        Visible = 0
+        Visible = 1
     }
 }

@@ -16,6 +16,7 @@ namespace Orion.Engine.Gui2
         private Texture texture;
         private Stretch stretch = Stretch.Uniform;
         private ColorRgba color = Colors.White;
+        private bool drawIfNoTexture;
         #endregion
 
         #region Constructors
@@ -69,6 +70,15 @@ namespace Orion.Engine.Gui2
             get { return color.Rgb; }
             set { color = new ColorRgba(value, color.A); }
         }
+
+        /// <summary>
+        /// Accesses a value which indicates if a colored rectangle should be drawn if <see cref="P:Texture"/> is null.
+        /// </summary>
+        public bool DrawIfNoTexture
+        {
+            get { return drawIfNoTexture; }
+            set { drawIfNoTexture = value; }
+        }
         #endregion
 
         #region Methods
@@ -81,7 +91,11 @@ namespace Orion.Engine.Gui2
 
         protected internal override void Draw()
         {
-            if (texture == null) return;
+            if (texture == null)
+            {
+                if (drawIfNoTexture) Renderer.DrawRectangle(Rectangle, Color);
+                return;
+            }
 
             var rectangle = Rectangle;
             var sprite = new GuiSprite

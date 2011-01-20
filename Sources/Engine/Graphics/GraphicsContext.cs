@@ -274,6 +274,9 @@ namespace Orion.Engine.Graphics
             return new DisposableHandle(PopScissorRegion);
         }
 
+        /// <summary>
+        /// Reverts the scissor rectangle to its value prior to the last <see cref="PushScissorRegion"/> call.
+        /// </summary>
         public void PopScissorRegion()
         {
             scissorStack.Pop();
@@ -314,7 +317,15 @@ namespace Orion.Engine.Graphics
 
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
 
-            return new DisposableHandle(GL.PopMatrix);
+            return new DisposableHandle(PopTransform);
+        }
+
+        /// <summary>
+        /// Undoes the last <see cref="PushTransform"/> call.
+        /// </summary>
+        public void PopTransform()
+        {
+            GL.PopMatrix();
         }
 
         public DisposableHandle PushTransform(Vector2 translation, float rotation, Vector2 scaling)

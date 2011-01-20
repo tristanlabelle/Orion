@@ -19,6 +19,7 @@ namespace Orion.Game.Presentation.Gui
             #region Fields
             private readonly Player player;
             private readonly Button kickButton;
+            private readonly ComboBox colorComboBox;
             #endregion
 
             #region Constructors
@@ -40,11 +41,22 @@ namespace Orion.Game.Presentation.Gui
 
                 kickButton = ui.style.CreateTextButton("Kick");
                 kickButton.VerticalAlignment = Alignment.Center;
-                kickButton.MinXMargin = 10;
+                kickButton.MinXMargin = 5;
                 kickButton.MaxXMargin = 5;
                 kickButton.VisibilityFlag = Visibility.Hidden;
                 kickButton.Clicked += (sender, @event) => ui.PlayerKicked.Raise(ui, player);
                 dock.Dock(kickButton, Direction.PositiveX);
+
+                colorComboBox = ui.style.Create<ComboBox>();
+                colorComboBox.Button.Width = 24;
+                colorComboBox.SelectedItemViewport.Width = 100 - 24;
+                colorComboBox.DropDown.Width = 100 - 24;
+                colorComboBox.VerticalAlignment = Alignment.Center;
+                colorComboBox.Items.Add(ui.style.CreateLabel("Foo"));
+                colorComboBox.Items.Add(ui.style.CreateLabel("Bar"));
+                colorComboBox.Items.Add(ui.style.CreateLabel("Frob"));
+                colorComboBox.Items.Add(ui.style.CreateLabel("Nicate"));
+                dock.Dock(colorComboBox, Direction.PositiveX);
 
                 this.player = player;
                 player.NameChanged += sender => nameLabel.Text = player.Name;

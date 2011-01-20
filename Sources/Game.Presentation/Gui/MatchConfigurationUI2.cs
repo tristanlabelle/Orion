@@ -23,7 +23,6 @@ namespace Orion.Game.Presentation.Gui
         private CheckBox readyCheckBox;
         private Button startButton;
         private FormLayout settingsForm;
-        private bool canChangeSettings = true;
         #endregion
 
         #region Constructors

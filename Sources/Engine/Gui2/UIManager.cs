@@ -224,11 +224,14 @@ namespace Orion.Engine.Gui2
 			for (int i = popups.Count - 1; i >= 0; --i)
 			{
 				Popup popup = popups[i];
+                if (popup.Visibility < Visibility.Visible) continue;
 				if (popup.Rectangle.Contains(point)) return popup;
 				if (popup.IsModal) return null;
 			}
 			
-			return Content != null && Content.Rectangle.Contains(point) ? Content : null;
+			return Content != null
+                && Content.Visibility == Visibility.Visible
+                && Content.Rectangle.Contains(point) ? Content : null;
 		}
         
 		protected override IEnumerable<Control> GetChildren()
@@ -278,30 +281,17 @@ namespace Orion.Engine.Gui2
 
             if (control.VisibilityFlag < Visibility.Visible || control.Rectangle.Area == 0) return;
 
-
-            Region? previousClippingRectangle = Renderer.ClippingRectangle;
-            if (previousClippingRectangle.HasValue)
+            using (Renderer.PushClippingRectangle(control.Rectangle))
             {
-                Region? intersection = Region.Intersection(previousClippingRectangle.Value, control.Rectangle);
-                if (!intersection.HasValue) return;
+                if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
 
-                Renderer.ClippingRectangle = intersection.Value;
+                control.Draw();
+
+                foreach (Control child in control.Children)
+                    DrawControlAndDescendants(child);
+
+                if (control.Adornment != null) control.Adornment.DrawForeground(renderer, control);
             }
-            else
-            {
-                Renderer.ClippingRectangle = control.Rectangle;
-            }
-
-            if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
-
-            control.Draw();
-
-            foreach (Control child in control.Children)
-                DrawControlAndDescendants(child);
-
-            if (control.Adornment != null) control.Adornment.DrawForeground(renderer, control);
-
-            renderer.ClippingRectangle = previousClippingRectangle;
         }
 
         private void DrawCursor()
@@ -386,50 +376,40 @@ namespace Orion.Engine.Gui2
             mouseButtonStates = @event.ButtonStates;
             modifierKeys = @event.ModifierKeys;
 
-            // If a control has captured the mouse, it gets a veto on mouse events,
-            // regardless of if they are in its client area.
-            if (mouseCapturedControl != null)
+            // If a control has captured the mouse, it gets a veto on mouse events which are outside of its client area.
+            Control targetControl = GetDescendantAt(@event.Position);
+            if (mouseCapturedControl != null && (!mouseCapturedControl.HasDescendant(targetControl) || targetControl == null))
             {
                 bool handled = mouseCapturedControl.HandleMouseEvent(@event);
                 if (handled) return true;
             }
-
-            // Update the mouse position and generate mouse entered/exited events.
-            Control newControlUnderMouse = GetDescendantAt(@event.Position);
-            if (newControlUnderMouse != controlUnderMouse)
-            {
-                Control commonAncestor = Control.FindCommonAncestor(newControlUnderMouse, controlUnderMouse);
-                if (controlUnderMouse != null) NotifyMouseExited(controlUnderMouse, commonAncestor);
-                if (newControlUnderMouse != null) NotifyMouseEntered(newControlUnderMouse, commonAncestor);
-                controlUnderMouse = newControlUnderMouse;
-            }
             
-            return PropagateMouseEvent(@event);
+            if (controlUnderMouse != targetControl)
+            {
+                // Generate mouse entered/exited events.
+                if (targetControl == null)
+                {
+                    NotifyMouseExited(controlUnderMouse, null);
+                    controlUnderMouse = null;
+                }
+                else
+                {
+                    Control commonAncestor = Control.FindCommonAncestor(targetControl, controlUnderMouse);
+                    if (controlUnderMouse != null) NotifyMouseExited(controlUnderMouse, commonAncestor);
+                    if (targetControl != null) NotifyMouseEntered(targetControl, commonAncestor);
+                    controlUnderMouse = targetControl;
+                }
+            }
+
+            while (targetControl != null)
+            {
+                bool handled = targetControl.HandleMouseEvent(@event);
+                if (handled) return true;
+                targetControl = targetControl.Parent;
+            }
+
+            return false;
         }
-        
-		protected override bool PropagateMouseEvent(MouseEvent @event)
-		{
-			// Give popups a chance to handle the event.
-			for (int i = popups.Count - 1; i >= 0; --i)
-			{
-				Popup popup = popups[i];
-				if (popup.Rectangle.Contains(@event.Position))
-				{
-					bool handled = PropagateMouseEventToChild(popup, @event);
-					if (handled) return true;
-				}
-				
-				if (popup.IsModal) return false;
-			}
-			
-			if (Content != null && Content.Rectangle.Contains(@event.Position))
-			{
-				bool handled = PropagateMouseEventToChild(Content, @event);
-				if (handled) return true;
-			}
-			
-			return HandleMouseEvent(@event);
-		}
 
         public bool InjectMouseEvent(Input.MouseEventType type, Input.MouseEventArgs args)
         {

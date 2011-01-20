@@ -208,16 +208,36 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(ComboBox comboBox)
         {
-            var adornment = new BorderTextureAdornment(GetGuiTexture("Dropdown_Border"));
+            var adornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
+
             comboBox.MinSize = new Size(64, 24);
+
             comboBox.Button.Adornment = adornment;
             comboBox.Button.MinWidth = 20;
+
+            ImageBox buttonImageBox = new ImageBox()
+            {
+                Stretch = Stretch.None,
+                Texture = GetGuiTexture("Down_Arrow")
+            };
+            comboBox.Button.Content = buttonImageBox;
+            comboBox.Button.PreDrawing += OnComboBoxButtonPreDrawing;
+
             comboBox.SelectedItemViewport.Adornment = adornment;
+            comboBox.SelectedItemViewport.Padding = 4;
             comboBox.SelectedItemViewport.MinSize = new Size(32, 16);
+
             comboBox.DropDown.HighlightColor = new ColorRgba(Colors.LightBlue, 0.5f);
             comboBox.DropDown.Adornment = adornment;
             comboBox.DropDown.ItemGap = 4;
             comboBox.DropDown.Padding = 4;
+        }
+
+        private void OnComboBoxButtonPreDrawing(Control control, GuiRenderer renderer)
+        {
+            Button button = (Button)control;
+            ImageBox imageBox = (ImageBox)button.Content;
+            imageBox.Tint = button.IsUnderMouse ? Colors.Red : Colors.White;
         }
         #endregion
         #endregion

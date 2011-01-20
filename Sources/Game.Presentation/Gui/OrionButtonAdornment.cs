@@ -55,7 +55,7 @@ namespace Orion.Game.Presentation.Gui
             else
                 texture = upTexture;
 
-            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
+            renderer.DrawNinePart(control.Rectangle, texture, Colors.White);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

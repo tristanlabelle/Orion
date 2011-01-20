@@ -283,6 +283,8 @@ namespace Orion.Engine.Gui2
 
             using (Renderer.PushClippingRectangle(control.Rectangle))
             {
+                control.RaisePreDrawing();
+
                 if (control.Adornment != null) control.Adornment.DrawBackground(renderer, control);
 
                 control.Draw();

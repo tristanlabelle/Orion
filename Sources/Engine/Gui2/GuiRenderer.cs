@@ -151,7 +151,7 @@ namespace Orion.Engine.Gui2
             DrawSprite(ref sprite);
         }
 
-        public void FillNinePart(Region rectangle, Texture texture, ColorRgba color)
+        public void DrawNinePart(Region rectangle, Texture texture, ColorRgba color)
         {
             int middleTextureSize = 2;
             int cornerWidth = texture.Width / 2 - 1;

@@ -120,6 +120,16 @@ namespace Orion.Engine.Gui2
             add { characterTypedEvent.AddHandler(value); }
             remove { characterTypedEvent.RemoveHandler(value); }
         }
+
+        /// <summary>
+        /// Raised right before this <see cref="Control"/> draws itself.
+        /// </summary>
+        public event Action<Control, GuiRenderer> PreDrawing;
+
+        internal void RaisePreDrawing()
+        {
+            PreDrawing.Raise(this, Renderer);
+        }
         #endregion
 
         #region Properties

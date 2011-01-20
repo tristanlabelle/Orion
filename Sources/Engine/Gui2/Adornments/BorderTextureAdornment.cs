@@ -39,7 +39,7 @@ namespace Orion.Engine.Gui2.Adornments
         #region Methods
         public void DrawBackground(GuiRenderer renderer, Control control)
         {
-            renderer.FillNinePart(control.Rectangle, texture, Colors.White);
+            renderer.DrawNinePart(control.Rectangle, texture, Colors.White);
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

@@ -74,6 +74,8 @@ namespace Orion.Game.Main
             this.ui.KeyEvent += OnViewportKeyEvent;
             this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
             this.ui.Exited += OnUserExited;
+            this.ui.Paused += sender => match.Pause();
+            this.ui.Resumed += sender => match.Resume();
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(graphics);
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(graphics);

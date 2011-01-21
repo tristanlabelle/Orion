@@ -130,6 +130,16 @@ namespace Orion.Engine.Gui2
         {
             PreDrawing.Raise(this, Renderer);
         }
+
+        /// <summary>
+        /// Raised right after this <see cref="Control"/> draws itself.
+        /// </summary>
+        public event Action<Control, GuiRenderer> PostDrawing;
+
+        internal void RaisePostDrawing()
+        {
+            PostDrawing.Raise(this, Renderer);
+        }
         #endregion
 
         #region Properties

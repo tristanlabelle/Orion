@@ -53,8 +53,8 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return traineeType; }
         }
-
-        public float Progress
+        
+        public override float Progress
         {
             get
             {

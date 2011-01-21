@@ -177,22 +177,7 @@ namespace Orion.Game.Presentation.Gui
             foreach (Task task in taskQueue)
             {
                 TodoButton button = GetTodoButton();
-                if (task is TrainTask)
-                {
-                    button.Texture = graphics.GetUnitTexture(((TrainTask)task).TraineeType);
-                }
-                else if (task is RepairTask)
-                {
-                    button.Texture = graphics.GetUnitTexture(((RepairTask)task).Target);
-                }
-                else if (task is ResearchTask)
-                {
-                    button.Texture = graphics.GetTechnologyTexture(((ResearchTask)task).Technology);
-                }
-                else
-                {
-                    button.Texture = graphics.GetActionTexture(task);
-                }
+                button.Task = task;
                 todoButtonStack.Stack(button);
             }
         }
@@ -216,11 +201,14 @@ namespace Orion.Game.Presentation.Gui
 
         private Control CreatePhoto()
         {
-            DockLayout photoDockPanel = new DockLayout();
-            photoDockPanel.LastChildFill = true;
-            photoDockPanel.MaxXMargin = 10;
-            photoDockPanel.VerticalAlignment = Alignment.Center;
-            photoDockPanel.SetSize(120, 120);
+            DockLayout photoDockPanel = new DockLayout()
+            {
+                MaxXMargin = 10,
+                VerticalAlignment = Alignment.Center,
+                Height = 120,
+                Width = 140,
+                LastChildFill = true
+            };
 
             nameLabel = Style.Create<Label>();
             photoDockPanel.Dock(nameLabel, Direction.NegativeY);

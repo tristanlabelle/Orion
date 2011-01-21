@@ -293,6 +293,8 @@ namespace Orion.Engine.Gui2
                     DrawControlAndDescendants(child);
 
                 if (control.Adornment != null) control.Adornment.DrawForeground(renderer, control);
+
+                control.RaisePostDrawing();
             }
         }
 

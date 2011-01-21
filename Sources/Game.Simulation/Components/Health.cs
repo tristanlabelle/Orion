@@ -10,11 +10,11 @@ namespace Orion.Game.Simulation.Components
     public class Health : Component
     {
         #region Static
-        public static readonly EntityStat<int> MaxHealthStat = new EntityStat<int>(typeof(Health), "MaxHealth", "Points de vie maximum");
-        public static readonly EntityStat<float> RegenerationRateStat = new EntityStat<float>(typeof(Health), "RegenerationRate", "Regénération");
-        public static readonly EntityStat<int> DamageReductionStat = new EntityStat<int>(typeof(Health), "DamageReduction", "Réduction de dégâts");
-        public static readonly EntityStat<int> CurrentHealthStat = new EntityStat<int>(typeof(Health), "CurrentHealth", "Points de vie");
-        public static readonly EntityStat<float> ArmorStat = new EntityStat<float>(typeof(Health), "Armor", "Armure");
+        public static readonly EntityStat MaxHealthStat = new EntityStat(typeof(Health), StatType.Integer, "MaxHealth", "Points de vie maximum");
+        public static readonly EntityStat RegenerationRateStat = new EntityStat(typeof(Health), StatType.Real, "RegenerationRate", "Regénération");
+        public static readonly EntityStat DamageReductionStat = new EntityStat(typeof(Health), StatType.Integer, "DamageReduction", "Réduction de dégâts");
+        public static readonly EntityStat CurrentHealthStat = new EntityStat(typeof(Health), StatType.Integer, "CurrentHealth", "Points de vie");
+        public static readonly EntityStat ArmorStat = new EntityStat(typeof(Health), StatType.Real, "Armor", "Armure");
         #endregion
 
         #region Fields
@@ -77,7 +77,7 @@ namespace Orion.Game.Simulation.Components
             if (actualDamage < 0) actualDamage = 0;
             currentDamage += actualDamage;
 
-            if (currentDamage >= Entity.GetStat(MaxHealthStat))
+            if (currentDamage >= Entity.GetStat(MaxHealthStat).IntegerValue)
                 Entity.Die();
         }
         #endregion

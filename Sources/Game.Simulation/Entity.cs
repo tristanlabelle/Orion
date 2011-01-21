@@ -195,14 +195,12 @@ namespace Orion.Game.Simulation
             components.Remove(instance);
         }
 
-        public float GetStat(EntityStat<float> stat)
+        public Stat GetStat(EntityStat stat)
         {
-            return components.Sum(c => c.GetStatBonus(stat));
-        }
-
-        public float GetStat(EntityStat<int> stat)
-        {
-            return components.Sum(c => c.GetStatBonus(stat));
+            if (stat.NumericType == StatType.Integer)
+                return new Stat(components.Sum(c => c.GetStatBonus(stat).IntegerValue));
+            else
+                return new Stat(components.Sum(c => c.GetStatBonus(stat).RealValue));
         }
         #endregion
 

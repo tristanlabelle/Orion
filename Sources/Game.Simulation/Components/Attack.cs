@@ -10,10 +10,10 @@ namespace Orion.Game.Simulation.Components
     {
         #region Static
         #region Fields
-        public static readonly EntityStat<float> PowerStat = new EntityStat<float>(typeof(Attack), "Power", "Puissance");
-        public static readonly EntityStat<float> RangeStat = new EntityStat<float>(typeof(Attack), "Range", "Portée");
-        public static readonly EntityStat<float> DelayStat = new EntityStat<float>(typeof(Attack), "Delay", "Délai");
-        public static readonly EntityStat<float> SplashRadiusStat = new EntityStat<float>(typeof(Attack), "SplashRadius", "Rayon de dégâts");
+        public static readonly EntityStat PowerStat = new EntityStat(typeof(Attack), StatType.Real, "Power", "Puissance");
+        public static readonly EntityStat RangeStat = new EntityStat(typeof(Attack), StatType.Real, "Range", "Portée");
+        public static readonly EntityStat DelayStat = new EntityStat(typeof(Attack), StatType.Real, "Delay", "Délai");
+        public static readonly EntityStat SplashRadiusStat = new EntityStat(typeof(Attack), StatType.Real, "SplashRadius", "Rayon de dégâts");
         #endregion
 
         #region Methods

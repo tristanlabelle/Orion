@@ -14,10 +14,11 @@ namespace Orion.Game.Simulation.Components
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
-    public sealed class EntityStat<TNumericType>
+    public sealed class EntityStat
     {
         #region Fields
         private readonly Type componentType;
+        private readonly StatType numericType;
         private readonly string componentName;
         private readonly string name;
         private readonly string fullName;
@@ -25,12 +26,13 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Constructors
-        internal EntityStat(Type componentType, string name, string description)
+        internal EntityStat(Type componentType, StatType type, string name, string description)
         {
             Argument.EnsureNotNull(componentType, "skillType");
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(description, "description");
 
+            this.numericType = type;
             this.componentType = componentType;
             this.componentName = UnitSkill.GetTypeName(componentType);
             this.name = name;
@@ -46,6 +48,14 @@ namespace Orion.Game.Simulation.Components
         public Type ComponentType
         {
             get { return componentType; }
+        }
+
+        /// <summary>
+        /// Gets the numeric type in which are the values of this stat represented.
+        /// </summary>
+        public StatType NumericType
+        {
+            get { return numericType; }
         }
 
         /// <summary>

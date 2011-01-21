@@ -8,8 +8,8 @@ namespace Orion.Game.Simulation.Components
     public class Sellable : Component
     {
         #region Fields
-        public static readonly EntityStat<int> AlageneValueStat = new EntityStat<int>(typeof(Sellable), "AlageneValue", "Valeur d'alagène");
-        public static readonly EntityStat<int> AladdiumValueStat = new EntityStat<int>(typeof(Sellable), "AladdiumValue", "Valeur d'aladdium");
+        public static readonly EntityStat AlageneValueStat = new EntityStat(typeof(Sellable), StatType.Integer, "AlageneValue", "Valeur d'alagène");
+        public static readonly EntityStat AladdiumValueStat = new EntityStat(typeof(Sellable), StatType.Integer, "AladdiumValue", "Valeur d'aladdium");
 
         private float alageneValue;
         private float aladdiumValue;

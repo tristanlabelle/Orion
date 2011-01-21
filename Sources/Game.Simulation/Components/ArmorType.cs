@@ -4,7 +4,7 @@
     {
         Light,
         Heavy,
-        Surnatural,
+        Supernatural,
         Divine
     }
 }

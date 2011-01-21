@@ -29,17 +29,20 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public virtual TNumericType GetStatBonus<TNumericType>(EntityStat<TNumericType> stat)
+        public virtual Stat GetStatBonus(EntityStat stat)
         {
             Type type = GetType();
             if (type != stat.ComponentType)
-                return default(TNumericType);
+                return new Stat();
 
             PropertyInfo property = type.GetProperty(stat.Name, BindingFlags.Public);
             if (property == null)
                 throw new InvalidComponentStatException(type, stat);
 
-            return (TNumericType)property.GetValue(this, null);
+            if (stat.NumericType == StatType.Integer)
+                return new Stat((int)property.GetValue(this, null));
+            else
+                return new Stat((float)property.GetValue(this, null));
         }
         #endregion
     }

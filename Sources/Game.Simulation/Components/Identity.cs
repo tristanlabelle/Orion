@@ -20,5 +20,12 @@ namespace Orion.Game.Simulation.Components
             this.type = type;
         }
         #endregion
+
+        #region Properties
+        public UnitType Type
+        {
+            get { return type; }
+        }
+        #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace Orion.Game.Simulation.Components
     public class Position : Component
     {
         #region Static
-        public static readonly EntityStat<float> SightRangeStat = new EntityStat<float>(typeof(Position), "SightRange", "Portée de vision");
+        public static readonly EntityStat SightRangeStat = new EntityStat(typeof(Position), StatType.Real, "SightRange", "Portée de vision");
         #endregion
 
         #region Fields
@@ -52,7 +52,7 @@ namespace Orion.Game.Simulation.Components
 
         public Circle LineOfSight
         {
-            get { return new Circle(Center, Entity.GetStat(SightRangeStat)); }
+            get { return new Circle(Center, Entity.GetStat(SightRangeStat).RealValue); }
         }
 
         public CollisionLayer CollisionLayer

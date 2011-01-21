@@ -9,8 +9,8 @@ namespace Orion.Game.Simulation.Components
     public class Kamikaze : Component
     {
         #region Fields
-        public static readonly EntityStat<float> RadiusStat = new EntityStat<float>(typeof(Kamikaze), "Radius", "Rayon d'explosion");
-        public static readonly EntityStat<int> DamageStat = new EntityStat<int>(typeof(Kamikaze), "Damage", "Dégâts");
+        public static readonly EntityStat RadiusStat = new EntityStat(typeof(Kamikaze), StatType.Real, "Radius", "Rayon d'explosion");
+        public static readonly EntityStat DamageStat = new EntityStat(typeof(Kamikaze), StatType.Integer, "Damage", "Dégâts");
 
         private Func<bool> shouldExplode;
         private float radius;

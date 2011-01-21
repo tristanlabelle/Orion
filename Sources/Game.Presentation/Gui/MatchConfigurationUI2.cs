@@ -19,10 +19,13 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly OrionGuiStyle style;
         private readonly PlayerCollection players;
+        private readonly Dictionary<Label, Action> playerBuilders = new Dictionary<Label, Action>();
         private StackLayout playerStack;
+        private FormLayout settingsForm;
+        private StackLayout aiCreationStack;
+        private ComboBox aiBuilderComboBox;
         private CheckBox readyCheckBox;
         private Button startButton;
-        private FormLayout settingsForm;
         #endregion
 
         #region Constructors
@@ -33,6 +36,7 @@ namespace Orion.Game.Presentation.Gui
             this.style = style;
             this.players = new PlayerCollection(this);
 
+            Padding = 5;
             Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true };
 
             DockLayout mainDock = new DockLayout()
@@ -122,6 +126,17 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
+        public void AddPlayerBuilder(string name, Action action)
+        {
+            Argument.EnsureNotNull(name, "name");
+            Argument.EnsureNotNull(action, "action");
+
+            Label text = style.CreateLabel(name);
+            aiBuilderComboBox.Items.Add(text);
+            aiCreationStack.VisibilityFlag = Visibility.Visible;
+            playerBuilders.Add(text, action);
+        }
+        
         public void AddBooleanSetting(string text, Expression<Func<bool>> bindingSourcePropertyExpression)
         {
             CheckBox checkBox = style.Create<CheckBox>();
@@ -141,17 +156,18 @@ namespace Orion.Game.Presentation.Gui
 
         private DockLayout CreateBottomDock()
         {
-            DockLayout bottomDock = new DockLayout();
+            DockLayout bottomDock = new DockLayout()
+            {
+                MinYMargin = 5
+            };
 
             Button backButton = style.CreateTextButton("Retour");
             backButton.MinSize = new Size(150, 40);
-            backButton.Margin = 5;
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             bottomDock.Dock(backButton, Direction.NegativeX);
 
             startButton = style.CreateTextButton("Commencer");
             startButton.MinSize = new Size(150, 40);
-            startButton.Margin = 5;
             startButton.MinXMargin = 20;
             startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
             bottomDock.Dock(startButton, Direction.PositiveX);
@@ -172,7 +188,7 @@ namespace Orion.Game.Presentation.Gui
             settingsForm = new FormLayout()
             {
                 MinWidth = 250,
-                Margin = 5,
+                MinXMargin = 5,
                 MinEntrySize = 32,
                 HeaderContentGap = 10
             };
@@ -182,15 +198,41 @@ namespace Orion.Game.Presentation.Gui
             playersLabel.Margin = 5;
             contentDock.Dock(playersLabel, Direction.NegativeY);
 
+            aiCreationStack = CreateAICreationStack();
+            contentDock.Dock(aiCreationStack, Direction.PositiveY);
+
             playerStack = new StackLayout()
             {
                 Direction = Direction.PositiveY,
-                Margin = 5,
                 ChildGap = 5
             };
             contentDock.Dock(playerStack, Direction.PositiveX);
 
             return contentDock;
+        }
+
+        private StackLayout CreateAICreationStack()
+        {
+            StackLayout stack = new StackLayout()
+            {
+                Direction = Direction.PositiveX,
+                ChildGap = 10,
+                VisibilityFlag = Visibility.Hidden
+            };
+
+            Label label = style.CreateLabel("Intelligence artificielle:");
+            label.VerticalAlignment = Alignment.Center;
+            stack.Stack(label);
+
+            aiBuilderComboBox = style.Create<ComboBox>();
+            aiBuilderComboBox.VerticalAlignment = Alignment.Center;
+            stack.Stack(aiBuilderComboBox);
+
+            Button createAIButton = style.CreateTextButton("Créer");
+            createAIButton.Clicked += (sender, @args) => playerBuilders[(Label)aiBuilderComboBox.SelectedItem]();
+            stack.Stack(createAIButton);
+
+            return stack;
         }
         #endregion
     }

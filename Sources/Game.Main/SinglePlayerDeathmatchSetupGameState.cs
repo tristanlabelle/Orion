@@ -46,14 +46,32 @@ namespace Orion.Game.Main
             };
 
             this.ui.Players.Add(playerSettings.Players.First());
+
             this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
             this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
             this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
             this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
-            this.ui.PlayerColorChanged += (sender, player, newColor) => player.Color = newColor;
 
-            //this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
-            //this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
+            this.ui.AddPlayerBuilder("Ramasseur", () =>
+            {
+                if (!playerSettings.AvailableColors.Any()) return;
+                AIPlayer player = new AIPlayer("Ramasseur", playerSettings.AvailableColors.First());
+                playerSettings.AddPlayer(player);
+                ui.Players.Add(player, true);
+            });
+
+            this.ui.PlayerKicked += (sender, player) =>
+            {
+                playerSettings.RemovePlayer(player);
+                ui.Players.Remove(player);
+            };
+
+            this.ui.PlayerColorChanged += (sender, player, newColor) =>
+            {
+                if (!playerSettings.AvailableColors.Contains(newColor)) return;
+                player.Color = newColor;
+            };
+
             this.ui.MatchStarted += OnStartGamePressed;
             this.ui.Exited += OnExitPressed;
         }

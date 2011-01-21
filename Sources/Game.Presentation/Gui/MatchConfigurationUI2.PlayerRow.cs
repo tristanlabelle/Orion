@@ -51,11 +51,6 @@ namespace Orion.Game.Presentation.Gui
                 colorComboBox.SelectedItemViewport.Width = 60;
                 colorComboBox.DropDown.Width = 60;
                 colorComboBox.VerticalAlignment = Alignment.Center;
-                colorComboBox.SelectedItemChanged += sender =>
-                {
-                    ColorRgb newColor = ((ImageBox)colorComboBox.SelectedItem).Tint;
-                    ui.PlayerColorChanged.Raise(ui, player, newColor);
-                };
 
                 foreach (ColorRgb color in PlayerSettings.FactionColors)
                 {
@@ -70,6 +65,14 @@ namespace Orion.Game.Presentation.Gui
                     colorComboBox.Items.Add(colorBox);
                     if (player.Color == color) colorComboBox.SelectedItem = colorBox;
                 }
+
+                // This is done after adding the items because the first item added triggers a selection change
+                colorComboBox.SelectedItemChanged += sender =>
+                {
+                    ColorRgb newColor = ((ImageBox)colorComboBox.SelectedItem).Tint;
+                    colorComboBox.SelectedItem = colorComboBox.Items.First(item => ((ImageBox)item).Color == player.Color);
+                    ui.PlayerColorChanged.Raise(ui, player, newColor);
+                };
 
                 dock.Dock(colorComboBox, Direction.PositiveX);
 

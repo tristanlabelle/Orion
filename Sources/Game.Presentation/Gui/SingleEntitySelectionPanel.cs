@@ -177,7 +177,22 @@ namespace Orion.Game.Presentation.Gui
             foreach (Task task in taskQueue)
             {
                 TodoButton button = GetTodoButton();
-                button.Texture = graphics.GetActionTexture(task);
+                if (task is TrainTask)
+                {
+                    button.Texture = graphics.GetUnitTexture(((TrainTask)task).TraineeType);
+                }
+                else if (task is RepairTask)
+                {
+                    button.Texture = graphics.GetUnitTexture(((RepairTask)task).Target);
+                }
+                else if (task is ResearchTask)
+                {
+                    button.Texture = graphics.GetTechnologyTexture(((ResearchTask)task).Technology);
+                }
+                else
+                {
+                    button.Texture = graphics.GetActionTexture(task);
+                }
                 todoButtonStack.Stack(button);
             }
         }

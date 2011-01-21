@@ -15,6 +15,7 @@ namespace Orion.Engine.Gui2
         private readonly Button button;
         private readonly ControlViewport selectedItemViewport;
         private readonly DropDownList dropDownList;
+        private readonly ItemCollection items;
         #endregion
 
         #region Constructors
@@ -32,6 +33,8 @@ namespace Orion.Engine.Gui2
 
             dropDownList = new DropDownList(this);
             dropDownList.VisibilityFlag = Visibility.Hidden;
+
+            items = new ItemCollection(this); // Must be created after the DropDownList
         }
         #endregion
 
@@ -70,9 +73,9 @@ namespace Orion.Engine.Gui2
         /// <summary>
         /// Gets the collection of items that are displayed by this <see cref="ComboBox"/>.
         /// </summary>
-        public IList<Control> Items
+        public ItemCollection Items
         {
-            get { return dropDownList.Items; }
+            get { return items; }
         }
 
         /// <summary>

@@ -56,10 +56,10 @@ namespace Orion.Game.Presentation.Actions.UserCommands
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
-            Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
-            Rectangle rectangle = new Rectangle(cursorPosition - size, size);
-            graphicsContext.Fill(rectangle, texture);
+            //float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
+            //Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
+            //Rectangle rectangle = new Rectangle(cursorPosition - size, size);
+            //graphicsContext.Fill(rectangle, texture);
         }
         #endregion
     }

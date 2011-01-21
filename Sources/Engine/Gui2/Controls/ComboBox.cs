@@ -35,6 +35,13 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when the item that is currently selected changes.
+        /// </summary>
+        public event Action<ComboBox> SelectedItemChanged;
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the <see cref="Button"/> which opens this <see cref="ComboBox"/>.
@@ -74,7 +81,22 @@ namespace Orion.Engine.Gui2
         public Control SelectedItem
         {
             get { return selectedItemViewport.ViewedControl; }
-            set { selectedItemViewport.ViewedControl = value; }
+            set
+            {
+                if (value == SelectedItem) return;
+
+                selectedItemViewport.ViewedControl = value;
+                SelectedItemChanged.Raise(this);
+            }
+        }
+
+        /// <summary>
+        /// Accesses the index of the currently selected item.
+        /// </summary>
+        public int SelectedItemIndex
+        {
+            get { return Items.IndexOf(SelectedItem); }
+            set { SelectedItem = value < 0 ? null : Items[value]; }
         }
 
         /// <summary>

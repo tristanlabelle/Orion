@@ -34,7 +34,6 @@ namespace Orion.Game.Presentation.Gui
                 Content = dock;
 
                 Label nameLabel = ui.style.CreateLabel(player.Name);
-                nameLabel.Color = player.Color;
                 nameLabel.VerticalAlignment = Alignment.Center;
                 nameLabel.MinXMargin = 5;
                 dock.Dock(nameLabel, Direction.NegativeX);
@@ -49,18 +48,35 @@ namespace Orion.Game.Presentation.Gui
 
                 colorComboBox = ui.style.Create<ComboBox>();
                 colorComboBox.Button.Width = 24;
-                colorComboBox.SelectedItemViewport.Width = 100 - 24;
-                colorComboBox.DropDown.Width = 100 - 24;
+                colorComboBox.SelectedItemViewport.Width = 60;
+                colorComboBox.DropDown.Width = 60;
                 colorComboBox.VerticalAlignment = Alignment.Center;
-                colorComboBox.Items.Add(ui.style.CreateLabel("Foo"));
-                colorComboBox.Items.Add(ui.style.CreateLabel("Bar"));
-                colorComboBox.Items.Add(ui.style.CreateLabel("Frob"));
-                colorComboBox.Items.Add(ui.style.CreateLabel("Nicate"));
+                colorComboBox.SelectedItemChanged += sender =>
+                {
+                    ColorRgb newColor = ((ImageBox)colorComboBox.SelectedItem).Tint;
+                    ui.PlayerColorChanged.Raise(ui, player, newColor);
+                };
+
+                foreach (ColorRgb color in PlayerSettings.FactionColors)
+                {
+                    ImageBox colorBox = new ImageBox()
+                    {
+                        Width = 20,
+                        Height = 20,
+                        Tint = color,
+                        DrawIfNoTexture = true
+                    };
+
+                    colorComboBox.Items.Add(colorBox);
+                    if (player.Color == color) colorComboBox.SelectedItem = colorBox;
+                }
+
                 dock.Dock(colorComboBox, Direction.PositiveX);
 
                 this.player = player;
                 player.NameChanged += sender => nameLabel.Text = player.Name;
-                player.ColorChanged += sender => nameLabel.Color = player.Color;
+                player.ColorChanged += sender =>
+                    colorComboBox.SelectedItem = colorComboBox.Items.First(item => ((ImageBox)item).Color == player.Color);
             }
             #endregion
 

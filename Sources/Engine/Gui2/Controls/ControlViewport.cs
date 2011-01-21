@@ -93,7 +93,8 @@ namespace Orion.Engine.Gui2
             Region viewedControlRectangle = viewedControl.Rectangle;
             if (viewedControlRectangle.Area == 0) return;
 
-            Vector2 translation = (Vector2)innerRectangle.Min - (Vector2)viewedControlRectangle.Min;
+            Vector2 translation = (Vector2)innerRectangle.Min + (Vector2)innerRectangle.Size * 0.5f - (Vector2)viewedControlRectangle.Size * 0.5f
+                - (Vector2)viewedControlRectangle.Min;
 
             using (Renderer.PushClippingRectangle(innerRectangle))
             using (Renderer.PushTransform(new Transform(translation, 0, Vector2.One)))

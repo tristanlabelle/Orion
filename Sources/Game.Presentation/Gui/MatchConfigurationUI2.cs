@@ -54,6 +54,11 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MatchConfigurationUI2, Player> PlayerKicked;
 
         /// <summary>
+        /// Raised when the player changes its color.
+        /// </summary>
+        public event Action<MatchConfigurationUI2, Player, ColorRgb> PlayerColorChanged;
+
+        /// <summary>
         /// Raised when the state of readiness of the player changes.
         /// </summary>
         public event Action<MatchConfigurationUI2> ReadinessChanged;

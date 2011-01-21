@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK;
 
 namespace Orion.Engine.Gui2
 {
@@ -12,7 +13,7 @@ namespace Orion.Engine.Gui2
             #region Fields
             private readonly ComboBox comboBox;
             private readonly StackLayout itemStack;
-            private Control highlightedItem;
+            private int highlightedItemIndex = -1;
             private ColorRgba highlightColor = Colors.TransparentBlack;
             #endregion
 
@@ -60,6 +61,11 @@ namespace Orion.Engine.Gui2
                 get { return itemStack.ChildGap; }
                 set { itemStack.ChildGap = value; }
             }
+
+            private Control HighlightedItem
+            {
+                get { return highlightedItemIndex == -1 ? null : Items[highlightedItemIndex]; }
+            }
             #endregion
 
             #region Methods
@@ -75,14 +81,22 @@ namespace Orion.Engine.Gui2
 
             protected override bool OnMouseMoved(MouseEvent @event)
             {
-                if (!Rectangle.Contains(@event.Position)) return true;
-
-                foreach (Control control in itemStack.Children)
+                if (!Rectangle.Contains(@event.Position))
                 {
-                    if (control.OuterRectangle.Contains(@event.Position))
+                    highlightedItemIndex = -1;
+                    return true;
+                }
+
+                // Highlight the item that is the closest to the cursor, the cheap way.
+                float closestSquaredDistance = float.PositiveInfinity;
+                for (int i = 0; i < itemStack.Children.Count; ++i)
+                {
+                    Control item = itemStack.Children[i];
+                    float squaredDistance = ((Vector2)(@event.Position - item.Rectangle.Clamp(@event.Position))).LengthSquared;
+                    if (squaredDistance < closestSquaredDistance)
                     {
-                        highlightedItem = control;
-                        break;
+                        highlightedItemIndex = i;
+                        closestSquaredDistance = squaredDistance;
                     }
                 }
 
@@ -93,12 +107,12 @@ namespace Orion.Engine.Gui2
             {
                 if (!Rectangle.Contains(@event.Position))
                 {
-                    highlightedItem = null;
+                    highlightedItemIndex = -1;
                 }
-                else if (highlightedItem != null)
+                else if (highlightedItemIndex != -1)
                 {
-                    comboBox.SelectedItem = highlightedItem;
-                    highlightedItem = null;
+                    comboBox.SelectedItemIndex = highlightedItemIndex;
+                    highlightedItemIndex = -1;
                 }
 
                 VisibilityFlag = Visibility.Hidden;
@@ -108,9 +122,16 @@ namespace Orion.Engine.Gui2
 
             protected internal override void Draw()
             {
-                if (highlightedItem != null)
+                if (highlightedItemIndex != -1)
                 {
-                    Renderer.DrawRectangle(highlightedItem.OuterRectangle, highlightColor);
+                    Region innerRectangle = InnerRectangle;
+                    Region itemOuterRectangle = HighlightedItem.OuterRectangle;
+
+                    Region highlightRectangle = new Region(
+                        innerRectangle.MinX, itemOuterRectangle.MinY,
+                        innerRectangle.Width, itemOuterRectangle.Height);
+
+                    Renderer.DrawRectangle(highlightRectangle, highlightColor);
                 }
             }
             #endregion

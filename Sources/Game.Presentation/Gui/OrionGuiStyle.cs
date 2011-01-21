@@ -210,10 +210,9 @@ namespace Orion.Game.Presentation.Gui
         {
             var adornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
 
-            comboBox.MinSize = new Size(64, 24);
-
             comboBox.Button.Adornment = adornment;
             comboBox.Button.MinWidth = 20;
+            comboBox.Button.MinHeight = 20;
 
             ImageBox buttonImageBox = new ImageBox()
             {
@@ -225,7 +224,7 @@ namespace Orion.Game.Presentation.Gui
 
             comboBox.SelectedItemViewport.Adornment = adornment;
             comboBox.SelectedItemViewport.Padding = 4;
-            comboBox.SelectedItemViewport.MinSize = new Size(32, 16);
+            comboBox.SelectedItemViewport.MinWidth = 20;
 
             comboBox.DropDown.HighlightColor = new ColorRgba(Colors.LightBlue, 0.5f);
             comboBox.DropDown.Adornment = adornment;

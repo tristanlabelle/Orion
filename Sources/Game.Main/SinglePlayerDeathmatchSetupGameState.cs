@@ -50,10 +50,10 @@ namespace Orion.Game.Main
             this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
             this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
             this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
+            this.ui.PlayerColorChanged += (sender, player, newColor) => player.Color = newColor;
 
             //this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
             //this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
-            //this.ui.PlayerColorChanged += OnPlayerColorChanged;
             this.ui.MatchStarted += OnStartGamePressed;
             this.ui.Exited += OnExitPressed;
         }

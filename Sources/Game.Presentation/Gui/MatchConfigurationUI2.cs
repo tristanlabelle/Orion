@@ -188,7 +188,7 @@ namespace Orion.Game.Presentation.Gui
             settingsForm = new FormLayout()
             {
                 MinWidth = 250,
-                MinXMargin = 5,
+                MinXMargin = 10,
                 MinEntrySize = 32,
                 HeaderContentGap = 10
             };

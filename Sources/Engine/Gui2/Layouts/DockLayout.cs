@@ -8,7 +8,7 @@ namespace Orion.Engine.Gui2
     /// <summary>
     /// A layout <see cref="Control"/> which arranges its children along its edges.
     /// </summary>
-    public sealed partial class DockLayout : Control
+    public partial class DockLayout : Control
     {
         #region Fields
         private readonly ChildCollection children;

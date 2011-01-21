@@ -11,8 +11,18 @@ namespace Orion.Engine.Gui2
 		/// <summary>
 		/// Gets a value indicating if this <see cref="Popup"/> captures all input,
 		/// prohibiting the user from using the underneath UI until it has been dealth with.
+        /// This property takes visibility into account. Hidden popups cannot be modal.
 		/// </summary>
-		public abstract bool IsModal { get; }
+		public bool IsModal
+        {
+            get { return IsModalImpl && Visibility == Visibility.Visible; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Popup"/> captures all input,
+        /// prohibiting the user from using the underneath UI until it has been dealth with.
+        /// </summary>
+        protected abstract bool IsModalImpl { get; }
 		#endregion
 		
 		#region Methods

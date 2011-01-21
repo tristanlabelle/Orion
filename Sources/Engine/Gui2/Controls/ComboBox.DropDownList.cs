@@ -31,7 +31,7 @@ namespace Orion.Engine.Gui2
             #endregion
 
             #region Properties
-            public override bool IsModal
+            protected override bool IsModalImpl
             {
                 get { return false; }
             }

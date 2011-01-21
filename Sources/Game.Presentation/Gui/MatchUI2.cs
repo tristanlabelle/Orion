@@ -13,6 +13,7 @@ using Orion.Engine.Gui2.Adornments;
 using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Renderers;
 using Key = OpenTK.Input.Key;
+using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -32,7 +33,8 @@ namespace Orion.Game.Presentation.Gui
         private Label foodAmountLabel;
         private ImageBox idleWorkerCountImageBox;
         private Label idleWorkerCountLabel;
-        private ModalDialog pausePanelDialog;
+        private ModalDialog modalDialog;
+        private DiplomacyPanel2 diplomacyPanel;
         private PausePanel pausePanel;
 
         private Control bottomBar;
@@ -52,18 +54,24 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI2(GameGraphics graphics)
+        public MatchUI2(GameGraphics graphics, Faction localFaction)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localFaction, "localFaction");
 
             this.style = graphics.GuiStyle;
             this.updatedEventHandler = OnGuiUpdated;
+
+            this.modalDialog = new ModalDialog()
+            {
+                VisibilityFlag = Visibility.Hidden
+            };
 
             DockLayout mainDock = new DockLayout()
             {
                 LastChildFill = true
             };
-            mainDock.Dock(CreateTopBar(), Direction.NegativeY);
+            mainDock.Dock(CreateTopBar(localFaction), Direction.NegativeY);
             mainDock.Dock(CreateBottomBar(), Direction.PositiveY);
             mainDock.Dock(CreateOverlays(), Direction.PositiveY);
             Content = mainDock;
@@ -105,6 +113,11 @@ namespace Orion.Game.Presentation.Gui
         /// The parameter is <c>true</c> if all idle workers should be selected and <c>false</c> if only the next one should.
         /// </summary>
         public event Action<MatchUI2, bool> SelectingIdleWorkers;
+
+        /// <summary>
+        /// Raised when the diplomatic stance of the local faction with regard to another faction changes.
+        /// </summary>
+        public event Action<MatchUI2, Faction, DiplomaticStance> DiplomaticStanceChanged;
 
         /// <summary>
         /// Raised when the user pauses the game.
@@ -245,7 +258,7 @@ namespace Orion.Game.Presentation.Gui
         /// </summary>
         public bool IsPaused
         {
-            get { return Manager != null && Manager.Popups.Contains(pausePanelDialog); }
+            get { return Manager != null && Manager.Popups.Contains(modalDialog); }
         }
 
         private ActionButton ActionButtonUnderMouse
@@ -333,7 +346,7 @@ namespace Orion.Game.Presentation.Gui
         }
 
         #region Initialization
-        private Control CreateTopBar()
+        private Control CreateTopBar(Faction localFaction)
         {
             ContentControl container = new ContentControl();
             container.IsMouseEventSink = true;
@@ -374,11 +387,7 @@ namespace Orion.Game.Presentation.Gui
 
             dock.Dock(CreatePauseButton(), Direction.PositiveX);
 
-            Button diplomacyButton = style.CreateTextButton("Diplomatie");
-            diplomacyButton.AcquireKeyboardFocusWhenPressed = false;
-            diplomacyButton.VerticalAlignment = Alignment.Center;
-            diplomacyButton.MaxXMargin = 10;
-            dock.Dock(diplomacyButton, Direction.PositiveX);
+            dock.Dock(CreateDiplomacyButton(localFaction), Direction.PositiveX);
 
             return container;
         }
@@ -389,25 +398,52 @@ namespace Orion.Game.Presentation.Gui
             button.AcquireKeyboardFocusWhenPressed = false;
             button.VerticalAlignment = Alignment.Center;
 
-            pausePanelDialog = new ModalDialog();
             pausePanel = new PausePanel(style);
-            pausePanelDialog.Content = pausePanel;
 
             button.Clicked += (sender, @event) =>
             {
-                Manager.Popups.Add(pausePanelDialog);
+                modalDialog.Content = pausePanel;
+                modalDialog.VisibilityFlag = Visibility.Visible;
                 Paused.Raise(this);
             };
+
             pausePanel.Resumed += sender =>
             {
-                Manager.Popups.Remove(pausePanelDialog);
+                modalDialog.VisibilityFlag = Visibility.Hidden;
                 AcquireKeyboardFocus();
                 Resumed.Raise(this);
             };
+
             pausePanel.Exited += sender =>
             {
-                Manager.Popups.Remove(pausePanelDialog);
+                modalDialog.VisibilityFlag = Visibility.Hidden;
                 Exited.Raise(this);
+            };
+
+            return button;
+        }
+
+        private Button CreateDiplomacyButton(Faction localFaction)
+        {
+            Button button = style.CreateTextButton("Diplomatie");
+            button.AcquireKeyboardFocusWhenPressed = false;
+            button.VerticalAlignment = Alignment.Center;
+            button.MaxXMargin = 10;
+
+            diplomacyPanel = new DiplomacyPanel2(style, localFaction);
+
+            button.Clicked += (sender, @event) =>
+            {
+                modalDialog.Content = diplomacyPanel;
+                modalDialog.VisibilityFlag = Visibility.Visible;
+            };
+
+            diplomacyPanel.StanceChanged += (sender, otherFaction, newStance) => DiplomaticStanceChanged.Raise(this, otherFaction, newStance);
+
+            diplomacyPanel.Closed += sender =>
+            {
+                modalDialog.VisibilityFlag = Visibility.Hidden;
+                AcquireKeyboardFocus();
             };
 
             return button;
@@ -552,10 +588,16 @@ namespace Orion.Game.Presentation.Gui
         #region Event Handling
         protected override void OnManagerChanged(UIManager previousManager)
         {
-            if (previousManager != null) previousManager.Updated -= updatedEventHandler;
+            if (previousManager != null)
+            {
+                previousManager.Updated -= updatedEventHandler;
+                previousManager.Popups.Remove(modalDialog);
+            }
+
             if (Manager != null)
             {
                 Manager.Updated += updatedEventHandler;
+                Manager.Popups.Add(modalDialog);
                 AcquireKeyboardFocus();
             }
         }

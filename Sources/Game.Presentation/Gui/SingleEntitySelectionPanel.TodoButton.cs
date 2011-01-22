@@ -14,7 +14,8 @@ namespace Orion.Game.Presentation.Gui
         private sealed class TodoButton : Button
         {
             #region Fields
-            private const int progressBarHeight = 5;
+            private const int progressBarHeight = 4;
+            private const int progressBarMargin = 4;
 
             private readonly SingleEntitySelectionPanel panel;
             private readonly ImageBox imageBox;
@@ -47,7 +48,7 @@ namespace Orion.Game.Presentation.Gui
 
                     if (task == null)
                         imageBox.Texture = null;
-                    if (task is TrainTask)
+                    else if (task is TrainTask)
                         imageBox.Texture = panel.graphics.GetUnitTexture(((TrainTask)task).TraineeType);
                     else if (task is RepairTask)
                         imageBox.Texture = panel.graphics.GetUnitTexture(((RepairTask)task).Target);
@@ -73,8 +74,8 @@ namespace Orion.Game.Presentation.Gui
 
                 Region buttonRectangle = button.Rectangle;
                 Region progressBarRectangle = new Region(
-                    buttonRectangle.MinX, buttonRectangle.ExclusiveMaxY - progressBarHeight,
-                    (int)(buttonRectangle.Width * progress), progressBarHeight);
+                    buttonRectangle.MinX + progressBarMargin, buttonRectangle.ExclusiveMaxY - progressBarHeight - progressBarMargin,
+                    (int)((buttonRectangle.Width - progressBarMargin * 2) * progress), progressBarHeight);
                 if (progressBarRectangle.Area == 0) return;
 
                 renderer.DrawRectangle(progressBarRectangle, Colors.Green);

@@ -288,7 +288,7 @@ namespace Orion.Engine.Graphics
             {
                 Region oldRegion = scissorStack.Peek();
                 GL.Scissor(
-                    oldRegion.MinX, oldRegion.MinY,
+                    oldRegion.MinX, ViewportSize.Height - oldRegion.ExclusiveMaxY,
                     oldRegion.Width, oldRegion.Height);
             }
         }

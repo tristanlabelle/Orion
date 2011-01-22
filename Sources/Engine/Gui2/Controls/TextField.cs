@@ -7,6 +7,7 @@ using OpenTK;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
 using Key = OpenTK.Input.Key;
+using SystemInformation = System.Windows.Forms.SystemInformation;
 
 namespace Orion.Engine.Gui2
 {
@@ -19,13 +20,13 @@ namespace Orion.Engine.Gui2
         private string text = string.Empty;
         private int caretIndex;
         private bool isEditable = true;
-
+        private Func<char, bool> characterPredicate;
         private Font font;
         private int cachedFontHeight;
-
         private ColorRgba textColor = Colors.Black;
         private ColorRgba caretColor = Colors.Black;
-        private int caretWidth = System.Windows.Forms.SystemInformation.CaretWidth;
+        private int caretWidth = SystemInformation.CaretWidth;
+        private TimeSpan caretBlinkDuration = TimeSpan.FromMilliseconds(SystemInformation.CaretBlinkTime);
         private Borders padding;
         #endregion
 
@@ -100,6 +101,15 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Accesses a delegate to a method which filters out entered characters.
+        /// </summary>
+        public Func<char, bool> CharacterPredicate
+        {
+            get { return characterPredicate; }
+            set { characterPredicate = value; }
+        }
+
+        /// <summary>
         /// Accesses the font of the text in this <see cref="TextField"/>.
         /// </summary>
         public Font Font
@@ -126,6 +136,41 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Accesses the color of the caret.
+        /// </summary>
+        public ColorRgba CaretColor
+        {
+            get { return caretColor; }
+            set { caretColor = value; }
+        }
+
+        /// <summary>
+        /// Accesses the width of the caret, in pixels.
+        /// </summary>
+        public int CaretWidth
+        {
+            get { return caretWidth; }
+            set
+            {
+                Argument.EnsurePositive(value, "CaretWidth");
+                caretWidth = value;
+            }
+        }
+
+        /// <summary>
+        /// Accesses the duration of a caret blink cycle.
+        /// </summary>
+        public TimeSpan CaretBlinkDuration
+        {
+            get { return caretBlinkDuration; }
+            set
+            {
+                if (value <= TimeSpan.Zero) throw new ArgumentOutOfRangeException("CaretBlinkDuration");
+                caretBlinkDuration = value;
+            }
+        }
+
+        /// <summary>
         /// Accesses the padding between the borders of the <see cref="TextField"/>.
         /// </summary>
         public Borders Padding
@@ -139,9 +184,41 @@ namespace Orion.Engine.Gui2
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Gets the rectangle in which the text is drawn.
+        /// </summary>
+        public Region InnerRectangle
+        {
+            get { return Borders.ShrinkClamped(Rectangle, padding); }
+        }
+
+        private bool ShouldCaretBeDrawn
+        {
+            get
+            {
+                return Manager != null
+                    && HasKeyboardFocus
+                    && caretWidth > 0
+                    && caretColor.A > 0
+                    && Manager.Time.Ticks % (caretBlinkDuration.Ticks * 2) < caretBlinkDuration.Ticks;
+            }
+        }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Gets a value indicating if a given character can be typed in this <see cref="TextField"/>.
+        /// </summary>
+        /// <param name="character">The character to be tested.</param>
+        /// <returns><c>True</c> if the character is allowed, <c>false</c> if not.</returns>
+        public bool IsAllowedCharacter(char character)
+        {
+            return !"\b\r\t\n".Contains(character)
+                && !char.IsControl(character)
+                && (characterPredicate == null || characterPredicate(character));
+        }
+
         protected override Size MeasureSize(Size availableSize)
         {
             return new Size(padding.TotalX, padding.TotalY + cachedFontHeight);
@@ -149,16 +226,25 @@ namespace Orion.Engine.Gui2
 
         protected internal override void Draw()
         {
-            Region rectangle = Rectangle;
-            if (rectangle.Width < padding.TotalX || rectangle.Height < padding.TotalY) return;
+            Region innerRectangle = InnerRectangle;
+            if (innerRectangle.Area == 0) return;
 
             var options = new TextRenderingOptions
             {
                 Font = font,
                 Color = textColor,
-                Origin = new Point(rectangle.MinX + padding.MinX, rectangle.MinY + padding.MinY)
+                Origin = new Point(innerRectangle.MinX, innerRectangle.MinY)
             };
             Renderer.DrawText(text, ref options);
+
+            if (ShouldCaretBeDrawn)
+            {
+                Size sizeBeforeCaret = Renderer.MeasureText(new Substring(text, 0, caretIndex), ref options);
+                Region caretRectangle = new Region(
+                    innerRectangle.MinX + sizeBeforeCaret.Width,
+                    innerRectangle.MinY, caretWidth, innerRectangle.Height);
+                Renderer.DrawRectangle(caretRectangle, caretColor);
+            }
         }
 
         protected override void ArrangeChildren() { }
@@ -226,7 +312,7 @@ namespace Orion.Engine.Gui2
 
         protected override bool OnCharacterTyped(char character)
         {
-            if (!"\b\r\t\n".Contains(character))
+            if (IsAllowedCharacter(character))
             {
                 text = text.Insert(caretIndex, character);
                 ++caretIndex;

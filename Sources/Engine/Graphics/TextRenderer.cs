@@ -59,27 +59,19 @@ namespace Orion.Engine.Graphics
             return size;
         }
 
-
-        public Size Draw(string text, ref TextRenderingOptions options)
+        public Size Draw(Substring text, ref TextRenderingOptions options)
         {
-            Argument.EnsureNotNull(text, "text");
-
-            tempStringBuilder.Append(text);
+            tempStringBuilder.Append(text.BaseString, text.StartIndex, text.Length);
             Size size = Draw(ref options);
             tempStringBuilder.Clear();
 
             return size;
         }
 
-        public Size Measure(string text, ref TextRenderingOptions options)
+        public Size Measure(Substring text, ref TextRenderingOptions options)
         {
-            Argument.EnsureNotNull(text, "text");
-
-            foreach (char character in text)
-                tempStringBuilder.Append(character);
-
+            tempStringBuilder.Append(text.BaseString, text.StartIndex, text.Length);
             Size size = Draw(ref options, false);
-
             tempStringBuilder.Clear();
 
             return size;

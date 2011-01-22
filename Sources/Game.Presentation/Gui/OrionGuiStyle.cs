@@ -61,12 +61,12 @@ namespace Orion.Game.Presentation.Gui
             return textureManager.Get(name);
         }
 
-        public override Size MeasureText(string text, ref TextRenderingOptions options)
+        public override Size MeasureText(Substring text, ref TextRenderingOptions options)
         {
             return graphicsContext.Measure(text, ref options);
         }
 
-        public override void DrawText(string text, ref TextRenderingOptions options)
+        public override void DrawText(Substring text, ref TextRenderingOptions options)
         {
             graphicsContext.Draw(text, ref options);
         }

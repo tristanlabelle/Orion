@@ -115,20 +115,22 @@ namespace Orion.Engine.Gui2
         [Obsolete("Use GameGraphics texture getters.")]
         public abstract Texture GetTexture(string name);
 
+        #region Text
         /// <summary>
         /// Measures the space occupied by a string of text.
         /// </summary>
         /// <param name="text">The text to be measured.</param>
         /// <param name="options">Options determining how the text should be measured.</param>
         /// <returns>The size occupied by the text, in pixels.</returns>
-        public abstract Size MeasureText(string text, ref TextRenderingOptions options);
+        public abstract Size MeasureText(Substring text, ref TextRenderingOptions options);
 
         /// <summary>
         /// Draws a string of text.
         /// </summary>
         /// <param name="text">The text to be drawn.</param>
         /// <param name="options">Options determining how the text should be drawn.</param>
-        public abstract void DrawText(string text, ref TextRenderingOptions options);
+        public abstract void DrawText(Substring text, ref TextRenderingOptions options);
+        #endregion
 
         /// <summary>
         /// Draws a sprite.

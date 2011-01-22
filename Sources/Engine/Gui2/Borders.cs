@@ -58,11 +58,17 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the width of both sides along the X axis.
+        /// </summary>
         public int TotalX
         {
             get { return MinX + MaxX; }
         }
 
+        /// <summary>
+        /// Gets the width of both sides along the Y axis.
+        /// </summary>
         public int TotalY
         {
             get { return MinY + MaxY; }
@@ -117,6 +123,12 @@ namespace Orion.Engine.Gui2
             return a.Equals(b);
         }
 
+        /// <summary>
+        /// Makes a rectangle bigger by removing borders.
+        /// </summary>
+        /// <param name="rectangle">The initial rectangle.</param>
+        /// <param name="borders">The amount to grow by along the edges.</param>
+        /// <returns>The resulting rectangle.</returns>
         public static Region Grow(Region rectangle, Borders borders)
         {
             return new Region(
@@ -124,10 +136,41 @@ namespace Orion.Engine.Gui2
                 rectangle.Width + borders.TotalX, rectangle.Height + borders.TotalY);
         }
 
-        public static Region? Shrink(Region? rectangle, Borders borders)
+        /// <summary>
+        /// Increases a size based on given borders.
+        /// </summary>
+        /// <param name="size">The initial size.</param>
+        /// <param name="borders">The amount to grow by.</param>
+        /// <returns>The resulting size.</returns>
+        public static Size Grow(Size size, Borders borders)
         {
-            Region result;
-            return rectangle.HasValue && TryShrink(rectangle.Value, borders, out result) ? result : (Region?)null;
+            return new Size(size.Width + borders.TotalX, size.Height + borders.TotalY);
+        }
+
+        /// <summary>
+        /// Computes a smaller rectangle by removing borders.
+        /// The final rectangle size is clamped to zero if negative.
+        /// </summary>
+        /// <param name="rectangle">The initial rectangle.</param>
+        /// <param name="borders">The sizes to remove along borders.</param>
+        /// <returns>The resulting rectangle.</returns>
+        public static Region ShrinkClamped(Region rectangle, Borders borders)
+        {
+            return new Region(
+                rectangle.MinX + borders.MinX, rectangle.MinY + borders.MinY,
+                Math.Max(0, rectangle.Width - borders.TotalX), Math.Max(0, rectangle.Height - borders.TotalY));
+        }
+
+        /// <summary>
+        /// Computes a smaller size by removing borders.
+        /// The final size is clamped to zero if negative.
+        /// </summary>
+        /// <param name="size">The initial size.</param>
+        /// <param name="borders">The sizes to remove along borders.</param>
+        /// <returns>The resulting size.</returns>
+        public static Size ShrinkClamped(Size size, Borders borders)
+        {
+            return Size.CreateClamped(size.Width - borders.TotalX, size.Height - borders.TotalY);
         }
 
         public static bool TryShrink(Region rectangle, Borders borders, out Region result)
@@ -183,24 +226,9 @@ namespace Orion.Engine.Gui2
             return Grow(rectangle, borders);
         }
 
-        public static Region? operator -(Region? rectangle, Borders borders)
-        {
-            return Shrink(rectangle, borders);
-        }
-
         public static Size operator +(Size size, Borders borders)
         {
-            return new Size(size.Width + borders.TotalX, size.Height + borders.TotalY);
-        }
-
-        public static Size? operator -(Size? size, Borders borders)
-        {
-            if (!size.HasValue) return null;
-
-            Size sizeValue = size.Value;
-            if (borders.TotalX > sizeValue.Width || borders.TotalY > sizeValue.Height) return null;
-
-            return new Size(sizeValue.Width - borders.TotalX, sizeValue.Height - borders.TotalY);
+            return Grow(size, borders);
         }
         #endregion
         #endregion

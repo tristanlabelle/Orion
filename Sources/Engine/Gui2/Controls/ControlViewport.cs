@@ -65,14 +65,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Region InnerRectangle
         {
-            get
-            {
-                Region rectangle = Rectangle;
-                return new Region(
-                    rectangle.MinX + padding.MinX, rectangle.MinY + padding.MinY,
-                    Math.Max(0, rectangle.Width - padding.TotalX),
-                    Math.Max(0, rectangle.Height - padding.TotalY));
-            }
+            get { return Borders.ShrinkClamped(Rectangle, padding); }
         }
         #endregion
 

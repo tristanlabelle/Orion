@@ -280,6 +280,7 @@
     <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="Substring.cs" />
     <Compile Include="Transform.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />

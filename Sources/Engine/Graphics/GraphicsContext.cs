@@ -564,34 +564,20 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Text
-        public Size Measure(string text, ref TextRenderingOptions options)
+        public Size Measure(Substring text, ref TextRenderingOptions options)
         {
             return textRenderer.Measure(text, ref options);
         }
 
-        public Size Draw(string text, ref TextRenderingOptions options)
+        public Size Draw(Substring text, ref TextRenderingOptions options)
         {
             return textRenderer.Draw(text, ref options);
         }
 
-        public void Draw(string text, ColorRgba color)
-        {
-            Draw(text, null, Point.Zero, color);
-        }
-
-        public void Draw(string text, Vector2 position, ColorRgba color)
-        {
-            Draw(text, null, (Point)position, color);
-        }
-
+        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
         public void Draw(Text text, Rectangle clippingRect, ColorRgba color)
         {
-            Draw(text.Value, null, Point.Zero, color);
-        }
-
-        public void Draw(Text text, Vector2 position, ColorRgba color)
-        {
-            Draw(text.Value, null, (Point)position, color);
+            Draw(text, Vector2.Zero, clippingRect, color);
         }
 
         /// <summary>
@@ -601,21 +587,17 @@ namespace Orion.Engine.Graphics
         /// <param name="text">The <see cref="Text"/> object to draw</param>
         /// <param name="clippingRect">The rectangle clipping the text</param>
         /// <param name="color">The color with which to draw the text.</param>
+        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
-        {
-            Draw(text.Value, null, (Point)origin, color);
-        }
-
-        public void Draw(string text, Font font, Point position, ColorRgba color)
         {
             var options = new TextRenderingOptions
             {
-                Font = font ?? textRendererFont,
-                Origin = position,
+                Font = text.Font ?? font ?? textRendererFont,
+                Origin = (Point)origin,
                 Color = color
             };
 
-            textRenderer.Draw(text, ref options);
+            textRenderer.Draw((Substring)text.Value, ref options);
         }
         #endregion
 

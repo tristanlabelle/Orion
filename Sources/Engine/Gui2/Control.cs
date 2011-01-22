@@ -453,12 +453,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Size DesiredSize
         {
-            get
-            {
-                return new Size(
-                    Math.Max(0, cachedDesiredOuterSize.Width - margin.TotalX),
-                    Math.Max(0, cachedDesiredOuterSize.Height - margin.TotalY));
-            }
+            get { return Borders.ShrinkClamped(cachedDesiredOuterSize, margin); }
         }
 
         /// <summary>
@@ -487,14 +482,7 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Region Rectangle
         {
-            get
-            {
-                return new Region(
-                    cachedOuterRectangle.MinX + margin.MinX,
-                    cachedOuterRectangle.MinY + margin.MinY,
-                    Math.Max(0, cachedOuterRectangle.Width - margin.TotalX),
-                    Math.Max(0, cachedOuterRectangle.Height - margin.TotalY));
-            }
+            get { return Borders.ShrinkClamped(cachedOuterRectangle, margin); }
         }
         #endregion
 

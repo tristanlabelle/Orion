@@ -90,6 +90,7 @@
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\DiplomacyPanel2.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
+    <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.PlayerCollection.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.PlayerRow.cs" />
@@ -101,16 +102,12 @@
     <Compile Include="Gui\OrionButtonAdornment.cs" />
     <Compile Include="Gui\OrionCheckBoxButtonAdornment.cs" />
     <Compile Include="Gui\OrionGuiStyle.cs" />
-    <Compile Include="Gui\DiplomacyPanel.cs" />
-    <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
     <Compile Include="Gui\PausePanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />
     <Compile Include="Renderers\BuildingMemoryRenderer.cs" />
-    <Compile Include="Renderers\CreepMoneyRenderer.cs" />
-    <Compile Include="Renderers\CreepPathRenderer.cs" />
     <Compile Include="Renderers\ExplosionRenderer.cs" />
     <Compile Include="Renderers\FogOfWarRenderer.cs" />
     <Compile Include="Renderers\HealthBarRenderer.cs" />
@@ -121,11 +118,7 @@
     <Compile Include="Renderers\RuinsRenderer.cs" />
     <Compile Include="Renderers\SelectionRenderer.cs" />
     <Compile Include="Renderers\TerrainRenderer.cs" />
-    <Compile Include="Renderers\TowerDefenseMatchRenderer.cs" />
-    <Compile Include="Renderers\TypingDefenseMatchRenderer.cs" />
     <Compile Include="Renderers\UnderAttackWarningRenderer.cs" />
-    <Compile Include="Renderers\UnitButtonRenderer.cs" />
-    <Compile Include="Renderers\UnitPanelRenderer.cs" />
     <Compile Include="Renderers\UnitsRenderer.cs" />
     <Compile Include="Renderers\WorldRenderer.cs" />
     <Compile Include="Selection.cs" />

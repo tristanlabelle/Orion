@@ -32,8 +32,6 @@ namespace Orion.Game.Main
 
             ui.SinglePlayerClicked += sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager, graphics));
             ui.MultiplayerClicked += sender => Manager.Push(new MultiplayerLobbyGameState(Manager, graphics));
-            ui.TowerDefenseClicked += sender => Manager.Push(new TowerDefenseGameState(Manager, graphics));
-            ui.TypingDefenseClicked += sender => Manager.Push(new TypingDefenseGameState(Manager, graphics));
             ui.ReplayClicked += sender => Manager.Push(new ReplayBrowserGameState(Manager, graphics));
             ui.QuitClicked += sender => Manager.Pop();
         }

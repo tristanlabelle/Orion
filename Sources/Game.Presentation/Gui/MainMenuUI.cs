@@ -47,10 +47,7 @@ namespace Orion.Game.Presentation.Gui
 
             StackButton(buttonsStack, style, "Monojoueur", () => SinglePlayerClicked);
             StackButton(buttonsStack, style, "Multijoueur", () => MultiplayerClicked);
-            StackButton(buttonsStack, style, "Tower Defense", () => TowerDefenseClicked);
-            StackButton(buttonsStack, style, "Typing Defense", () => TypingDefenseClicked);
             StackButton(buttonsStack, style, "Visionner une partie", () => ReplayClicked);
-            StackButton(buttonsStack, style, "Options", () => OptionsClicked);
             StackButton(buttonsStack, style, "Crédits", () => CreditsClicked);
             StackButton(buttonsStack, style, "Quitter", () => QuitClicked);
         }
@@ -68,16 +65,6 @@ namespace Orion.Game.Presentation.Gui
         public event Action<MainMenuUI> MultiplayerClicked;
 
         /// <summary>
-        /// Raised when the user has chosen to launch a tower defense game.
-        /// </summary>
-        public event Action<MainMenuUI> TowerDefenseClicked;
-
-        /// <summary>
-        /// Raised when the user has chosen to launch a typing defense game.
-        /// </summary>
-        public event Action<MainMenuUI> TypingDefenseClicked;
-
-        /// <summary>
         /// Raised when the user has chosen to view a replay.
         /// </summary>
         public event Action<MainMenuUI> ReplayClicked;
@@ -86,11 +73,6 @@ namespace Orion.Game.Presentation.Gui
         /// Raised when the user has chosen to view the credits.
         /// </summary>
         public event Action<MainMenuUI> CreditsClicked;
-
-        /// <summary>
-        /// Raised when the user has chosen to view the options.
-        /// </summary>
-        public event Action<MainMenuUI> OptionsClicked;
 
         /// <summary>
         /// Raised when the user has chosen to quit the game.

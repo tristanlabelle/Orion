@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B45D29E4-B452-4850-8C4E-FB0564E071AB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -183,6 +183,10 @@
     <Compile Include="Gui\ViewContainer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Localization\Definition.cs" />
+    <Compile Include="Localization\Genders.cs" />
+    <Compile Include="Localization\Localizer.cs" />
+    <Compile Include="Localization\Translation.cs" />
     <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />

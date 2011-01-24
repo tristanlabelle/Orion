@@ -187,9 +187,9 @@ namespace Orion.Game.Presentation.Renderers
 
             float drawingAngle = GetUnitDrawingAngle(unit);
             float oscillation = GetOscillation(unit);
-            float distance = shadowDistance + oscillation * 0.1f;
-            Vector2 center = unit.Center - new Vector2(distance, distance);
-            float scaling = shadowScaling + oscillation * -0.1f;
+            float distance = shadowDistance - oscillation * 0.1f;
+            Vector2 center = unit.Center + new Vector2(-distance, distance);
+            float scaling = shadowScaling + oscillation * 0.1f;
             using (graphicsContext.PushTransform(center, drawingAngle, scaling))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);

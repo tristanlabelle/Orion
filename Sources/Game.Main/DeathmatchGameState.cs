@@ -57,7 +57,9 @@ namespace Orion.Game.Main
             this.audio = new GameAudio();
             this.match = match;
             this.commandPipeline = commandPipeline;
+
             this.localCommander = localCommander;
+            this.localCommander.Faction.Warning += OnLocalFactionWarning;
 
             this.userInputManager = new UserInputManager(match, localCommander);
             this.userInputManager.Selection.Changed += OnSelectionChanged;
@@ -98,7 +100,6 @@ namespace Orion.Game.Main
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
 
-            //this.ui.QuitPressed += OnQuitPressed;
             this.match.FactionMessageReceived += OnFactionMessageReceived;
             this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
@@ -381,6 +382,11 @@ namespace Orion.Game.Main
         private void OnUserExited(MatchUI2 sender)
         {
             Manager.PopTo<MainMenuGameState>();
+        }
+
+        private void OnLocalFactionWarning(Faction sender, string text)
+        {
+            ui.AddMessage(text, LocalFaction.Color);
         }
 
         private void OnFactionMessageReceived(Match match, FactionMessage message)

@@ -49,6 +49,9 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the object representing the operating system window to which the game is drawn.
+        /// </summary>
         public IGameWindow Window
         {
             get { return window; }
@@ -62,26 +65,39 @@ namespace Orion.Game.Presentation
             get { return window.GraphicsContext; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="TextureManager"/> which provides services to load and cache textures.
+        /// </summary>
         public TextureManager TextureManager
         {
             get { return textureManager; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="UIManager"/> that is the root of the UI hierarchy.
+        /// </summary>
         public UIManager UIManager
         {
             get { return uiManager; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="OrionGuiStyle"/> object which allows stylizing UI controls.
+        /// </summary>
         public OrionGuiStyle GuiStyle
         {
             get { return (OrionGuiStyle)uiManager.Renderer; }
         }
 
+        [Obsolete("Old UI system that will be killed, use UIManager.")]
         public RootView RootView
         {
             get { return rootView; }
         }
 
+        /// <summary>
+        /// Gets the default texture that is returned when the queried texture is not found.
+        /// </summary>
         public Texture DefaultTexture
         {
             get { return textureManager.Get("Default"); }

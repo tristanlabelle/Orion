@@ -645,13 +645,25 @@ namespace Orion.Game.Presentation.Gui
                 return true;
             }
 
+            if (@event.Key == Key.F1 && @event.IsDown)
+            {
+                SelectingIdleWorkers.Raise(this, @event.IsShiftDown);
+                return true;
+            }
+
             if (@event.Key == Key.Left) isLeftPressed = @event.IsDown;
             if (@event.Key == Key.Right) isRightPressed = @event.IsDown;
             if (@event.Key == Key.Up) isUpPressed = @event.IsDown;
             if (@event.Key == Key.Down) isDownPressed = @event.IsDown;
 
             UpdateScrollDirection();
+            HandleActionHotKey(@event);
 
+            return true;
+        }
+
+        private bool HandleActionHotKey(KeyEvent @event)
+        {
             foreach (ActionButton actionButton in actionButtonGrid.Children)
             {
                 ActionDescriptor descriptor = actionButton.Descriptor;
@@ -662,7 +674,7 @@ namespace Orion.Game.Presentation.Gui
                 }
             }
 
-            return true;
+            return false;
         }
 
         private bool OnChatTextFieldKeyEvent(Control sender, KeyEvent @event)

@@ -69,6 +69,21 @@ namespace Orion.Game.Presentation
             get { return Rectangle.FromCenterSize(target.X, target.Y, viewportSize.Width / TileSizeInPixels, viewportSize.Height / TileSizeInPixels); }
         }
 
+        /// <summary>
+        /// Accesses the current zoom level. Zero is the default level,
+        /// a positive value zooms in while a negative value zooms out.
+        /// </summary>
+        public int ZoomLevel
+        {
+            get { return zoomLevel; }
+            set
+            {
+                if (value < MinimumZoomLevel) value = MinimumZoomLevel;
+                if (value > maximumZoomLevel) value = maximumZoomLevel;
+                zoomLevel = value;
+            }
+        }
+
         private int MinimumZoomLevel
         {
             get { return (int)Math.Floor(Math.Log(defaultTileSizeInPixels / Math.Min(worldSize.Width, worldSize.Height), 2) * 2); }
@@ -91,11 +106,17 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Zooms in of a single zoom level.
+        /// </summary>
         public void ZoomIn()
         {
             if (zoomLevel < maximumZoomLevel) zoomLevel++;
         }
 
+        /// <summary>
+        /// Zooms out of a single zoom level.
+        /// </summary>
         public void ZoomOut()
         {
             if (zoomLevel > MinimumZoomLevel) zoomLevel--;

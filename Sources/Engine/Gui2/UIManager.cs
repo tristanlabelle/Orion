@@ -202,8 +202,6 @@ namespace Orion.Engine.Gui2
             Measure(new Size(Width.GetValueOrDefault(int.MaxValue), Height.GetValueOrDefault(int.MaxValue)));
             Arrange(new Region(DesiredSize));
             ArrangeChildren();
-
-            return;
         }
 
         protected override Size MeasureSize(Size availableSize)

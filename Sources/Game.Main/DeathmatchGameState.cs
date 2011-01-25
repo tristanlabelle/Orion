@@ -55,7 +55,12 @@ namespace Orion.Game.Main
 
             this.graphics = graphics;
             this.audio = new GameAudio();
+
             this.match = match;
+            this.match.FactionMessageReceived += OnFactionMessageReceived;
+            this.match.World.EntityRemoved += OnEntityRemoved;
+            this.match.World.FactionDefeated += OnFactionDefeated;
+
             this.commandPipeline = commandPipeline;
 
             this.localCommander = localCommander;
@@ -96,13 +101,15 @@ namespace Orion.Game.Main
             Binding.CreateOneWay(() => workerActivityMonitor.InactiveWorkerCount, () => ui.IdleWorkerCount);
 
             this.camera = new Camera(match.World.Size, graphics.Window.ClientAreaSize);
+
+            // Center the camera on the player's largest unit, favoring buildings
+            Unit cameraTargetUnit = localCommander.Faction.Units
+                .WithMaxOrDefault(unit => (unit.IsBuilding ? 1000 : 0) + unit.Size.Area);
+            if (cameraTargetUnit != null) this.camera.Target = cameraTargetUnit.Position;
+
             this.matchRenderer = new DeathmatchRenderer(userInputManager, graphics);
             this.audioPresenter = new MatchAudioPresenter(audio, userInputManager);
             this.lastSimulationStep = new SimulationStep(-1, 0, 0);
-
-            this.match.FactionMessageReceived += OnFactionMessageReceived;
-            this.match.World.EntityRemoved += OnEntityRemoved;
-            this.match.World.FactionDefeated += OnFactionDefeated;
         }
         #endregion
 
@@ -167,9 +174,7 @@ namespace Orion.Game.Main
         }
 
         private void UpdateCamera(float timeDeltaInSeconds)
-        {
-            camera.ViewportSize = ui.ViewportRectangle.Size;
-
+       { 
             Entity firstSelectedEntity = Selection.FirstOrDefault();
             if (ui.IsFollowingSelection && firstSelectedEntity != null)
             {
@@ -192,7 +197,9 @@ namespace Orion.Game.Main
             Region viewportRectangle = ui.ViewportRectangle;
             if (viewportRectangle.Area > 0)
             {
+                camera.ViewportSize = ui.ViewportRectangle.Size;
                 Rectangle worldViewBounds = camera.ViewBounds;
+
                 graphics.Context.ProjectionBounds = new Rectangle(
                     worldViewBounds.MinX - worldViewBounds.Width * viewportRectangle.MinX / viewportRectangle.Width,
                     worldViewBounds.MinY - worldViewBounds.Height * viewportRectangle.MinY / viewportRectangle.Height,

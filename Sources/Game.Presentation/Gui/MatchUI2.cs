@@ -64,7 +64,8 @@ namespace Orion.Game.Presentation.Gui
 
             this.modalDialog = new ModalDialog()
             {
-                VisibilityFlag = Visibility.Hidden
+                VisibilityFlag = Visibility.Hidden,
+                IsKeyEventSink = true
             };
 
             DockLayout mainDock = new DockLayout()
@@ -345,6 +346,19 @@ namespace Orion.Game.Presentation.Gui
             idleWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
         }
 
+        private void ShowPauseDialog()
+        {
+            modalDialog.Content = pausePanel;
+            modalDialog.VisibilityFlag = Visibility.Visible;
+            Paused.Raise(this);
+        }
+
+        private void ShowDiplomacyDialog()
+        {
+            modalDialog.Content = diplomacyPanel;
+            modalDialog.VisibilityFlag = Visibility.Visible;
+        }
+
         #region Initialization
         private Control CreateTopBar(Faction localFaction)
         {
@@ -400,12 +414,7 @@ namespace Orion.Game.Presentation.Gui
 
             pausePanel = new PausePanel(style);
 
-            button.Clicked += (sender, @event) =>
-            {
-                modalDialog.Content = pausePanel;
-                modalDialog.VisibilityFlag = Visibility.Visible;
-                Paused.Raise(this);
-            };
+            button.Clicked += (sender, @event) => ShowPauseDialog();
 
             pausePanel.Resumed += sender =>
             {
@@ -432,11 +441,7 @@ namespace Orion.Game.Presentation.Gui
 
             diplomacyPanel = new DiplomacyPanel2(style, localFaction);
 
-            button.Clicked += (sender, @event) =>
-            {
-                modalDialog.Content = diplomacyPanel;
-                modalDialog.VisibilityFlag = Visibility.Visible;
-            };
+            button.Clicked += (sender, @event) => ShowDiplomacyDialog();
 
             diplomacyPanel.StanceChanged += (sender, otherFaction, newStance) => DiplomaticStanceChanged.Raise(this, otherFaction, newStance);
 
@@ -632,6 +637,12 @@ namespace Orion.Game.Presentation.Gui
         {
             isDisplayingHealthBars = @event.IsAltDown;
 
+            if (@event.Key == Key.Space)
+            {
+                isFollowingSelection = @event.IsDown;
+                return true;
+            }
+
             if (@event.Key == Key.Enter && @event.IsDown)
             {
                 chatTextField.VisibilityFlag = Visibility.Visible;
@@ -639,15 +650,21 @@ namespace Orion.Game.Presentation.Gui
                 return true;
             }
 
-            if (@event.Key == Key.Space)
-            {
-                isFollowingSelection = @event.IsDown;
-                return true;
-            }
-
             if (@event.Key == Key.F1 && @event.IsDown)
             {
                 SelectingIdleWorkers.Raise(this, @event.IsShiftDown);
+                return true;
+            }
+
+            if (@event.Key == Key.F9 && @event.IsDown)
+            {
+                ShowPauseDialog();
+                return true;
+            }
+
+            if (@event.Key == Key.F10 && @event.IsDown)
+            {
+                ShowDiplomacyDialog();
                 return true;
             }
 

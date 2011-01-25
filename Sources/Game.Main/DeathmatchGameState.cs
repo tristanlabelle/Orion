@@ -227,7 +227,7 @@ namespace Orion.Game.Main
         private void OnSelectionChanged(Selection selection)
         {
             ui.SelectionInfoPanel = null;
-            singleEntitySelectionPanel.Entity = null;
+            singleEntitySelectionPanel.Clear();
             multipleUnitSelectionPanel.ClearUnits();
 
             if (selection.Count == 0)
@@ -238,8 +238,21 @@ namespace Orion.Game.Main
             else if (selection.Count == 1)
             {
                 Entity entity = selection.Single();
-                singleEntitySelectionPanel.Entity = entity;
-                ui.SelectionInfoPanel = singleEntitySelectionPanel;
+
+                Unit unit = entity as Unit;
+                if (unit != null)
+                {
+                    bool isAllied = (LocalFaction.GetDiplomaticStance(unit.Faction) & DiplomaticStance.SharedVision) != 0;
+                    singleEntitySelectionPanel.ShowUnit(unit, showTasks: isAllied);
+                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
+                }
+
+                ResourceNode resourceNode = entity as ResourceNode;
+                if (resourceNode != null)
+                {
+                    singleEntitySelectionPanel.ShowResourceNode(resourceNode);
+                    ui.SelectionInfoPanel = singleEntitySelectionPanel;
+                }
             }
             else
             {

@@ -451,6 +451,12 @@ namespace Orion.Engine.Gui2
             Arrange();
 
             Control handler = keyboardFocusedControl;
+            
+            // Modal popup veto
+            Popup modalPopup = ModalPopup;
+            if (modalPopup != null && !modalPopup.HasDescendant(handler))
+                handler = modalPopup;
+
             do
             {
                 if (handler.HandleKeyEvent(@event)) return true;
@@ -490,6 +496,11 @@ namespace Orion.Engine.Gui2
             if (keyboardFocusedControl == null) return false;
 
             Arrange();
+
+            // Modal popup veto
+            Popup modalPopup = ModalPopup;
+            if (modalPopup != null && !modalPopup.HasDescendant(keyboardFocusedControl))
+                return false;
 
             return keyboardFocusedControl.HandleCharacterTyped(character);
         }

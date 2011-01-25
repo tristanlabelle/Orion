@@ -66,14 +66,6 @@ namespace Orion.Game.Presentation.Gui
         public Entity Entity
         {
             get { return entity; }
-            set
-            {
-                if (value == entity) return;
-
-                if (entity != null) ClearEntity();
-                entity = value;
-                if (entity != null) SetEntity();
-            }
         }
 
         private OrionGuiStyle Style
@@ -83,12 +75,78 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
-        private void ClearEntity()
+        /// <summary>
+        /// Show information on a given unit.
+        /// </summary>
+        /// <param name="unit">The <see cref="Unit"/> for which information is to be shown.</param>
+        /// <param name="showTasks">
+        /// A value indicating if the <see cref="Task"/>s of the <see cref="Unit"/> are to be shown.
+        /// </param>
+        public void ShowUnit(Unit unit, bool showTasks)
+        {
+            Argument.EnsureNotNull(unit, "unit");
+            if (unit == entity) return;
+            Clear();
+
+            nameLabel.Text = unit.Type.Name;
+            imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
+
+            UpdateHealth(unit);
+            unit.DamageChanged += damageChangedEventHandler;
+
+            if (showTasks)
+            {
+                todoLabel.VisibilityFlag = Visibility.Visible;
+                UpdateTodoList(unit.TaskQueue);
+                unit.TaskQueue.Changed += taskQueueChangedEventHandler;
+            }
+
+            statsForm.VisibilityFlag = Visibility.Visible;
+            foreach (UnitStat stat in statsToDisplay)
+            {
+                if (!unit.Type.HasSkill(stat.SkillType)) continue;
+
+                int value = unit.GetStat(stat);
+                if (value == 0) continue;
+
+                Label headerLabel = Style.CreateLabel(stat.Description + ":");
+                Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
+
+                statsForm.Entries.Add(headerLabel, valueLabel);
+            }
+        }
+
+        /// <summary>
+        /// Shows information on a given <see cref="ResourceNode"/>.
+        /// </summary>
+        /// <param name="resourceNode">The <see cref="ResourceNode"/> for which information is to be shown.</param>
+        public void ShowResourceNode(ResourceNode resourceNode)
+        {
+            Argument.EnsureNotNull(resourceNode, "node");
+            if (resourceNode == entity) return;
+            Clear();
+
+            nameLabel.Text = resourceNode.Type.ToStringInvariant();
+            imageBox.Texture = graphics.GetResourceTexture(resourceNode);
+            UpdateAmount(resourceNode);
+
+            resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
+        }
+
+        /// <summary>
+        /// Resets this panel by removing all entity-specific info.
+        /// </summary>
+        public void Clear()
         {
             nameLabel.Text = string.Empty;
             imageBox.Texture = null;
             healthLabel.Text = string.Empty;
+
             ClearTodoList();
+            todoLabel.VisibilityFlag = Visibility.Hidden;
+
+            statsForm.Entries.Clear();
+            statsForm.VisibilityFlag = Visibility.Hidden;
 
             if (entity is Unit)
             {
@@ -103,50 +161,8 @@ namespace Orion.Game.Presentation.Gui
 
                 resourceNode.RemainingAmountChanged -= remainingAmountChangedEventHandler;
             }
-        }
 
-        private void SetEntity()
-        {
-            statsForm.Entries.Clear();
-            ClearTodoList();
-
-            if (entity is Unit)
-            {
-                Unit unit = (Unit)entity;
-
-                nameLabel.Text = unit.Type.Name;
-                imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
-                UpdateHealth(unit);
-                UpdateTodoList(unit.TaskQueue);
-                statsForm.VisibilityFlag = Visibility.Visible;
-                foreach (UnitStat stat in statsToDisplay)
-                {
-                    if (!unit.Type.HasSkill(stat.SkillType)) continue;
-
-                    int value = unit.GetStat(stat);
-                    if (value == 0) continue;
-                    
-                    Label headerLabel = Style.CreateLabel(stat.Description + ":");
-                    Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
-
-                    statsForm.Entries.Add(headerLabel, valueLabel);
-                }
-
-                unit.DamageChanged += damageChangedEventHandler;
-                unit.TaskQueue.Changed += taskQueueChangedEventHandler;
-            }
-            else if (entity is ResourceNode)
-            {
-                ResourceNode resourceNode = (ResourceNode)entity;
-
-                nameLabel.Text = resourceNode.Type.ToStringInvariant();
-                imageBox.Texture = graphics.GetResourceTexture(resourceNode);
-                UpdateAmount(resourceNode);
-                todoLabel.VisibilityFlag = Visibility.Hidden;
-                statsForm.VisibilityFlag = Visibility.Hidden;
-
-                resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
-            }
+            entity = null;
         }
 
         private void ClearTodoList()

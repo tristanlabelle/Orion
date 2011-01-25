@@ -43,6 +43,7 @@ namespace Orion.Engine.Gui2
         private bool isArranged;
 
         private bool isMouseEventSink;
+        private bool isKeyEventSink;
         private bool hasEnabledFlag = true;
         #endregion
 
@@ -547,6 +548,16 @@ namespace Orion.Engine.Gui2
             get { return isMouseEventSink; }
             set { isMouseEventSink = value; }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Control"/> always indicates
+        /// keyboard events as being handled.
+        /// </summary>
+        public bool IsKeyEventSink
+        {
+            get { return isKeyEventSink; }
+            set { isKeyEventSink = value; }
+        }
         #endregion
 
         #region Enabled
@@ -928,7 +939,7 @@ namespace Orion.Engine.Gui2
         #region Propagation Plumbing
         protected internal bool HandleMouseEvent(MouseEvent @event)
         {
-            if (Visibility < Visibility.Visible) return false;
+            Debug.Assert(Visibility == Visibility.Visible);
 
             switch (@event.Type)
             {
@@ -963,6 +974,8 @@ namespace Orion.Engine.Gui2
 
         private bool HandleMouseClick(MouseEvent @event)
         {
+            Debug.Assert(Visibility == Visibility.Visible);
+
             return OnMouseClick(@event)
                 | mouseClickEvent.Raise(this, @event)
                 | IsMouseEventSink;
@@ -970,15 +983,16 @@ namespace Orion.Engine.Gui2
 
         internal bool HandleKeyEvent(KeyEvent @event)
         {
-            if (Visibility < Visibility.Visible) return false;
+            Debug.Assert(Visibility == Visibility.Visible);
 
             return OnKeyEvent(@event)
-                | keyEvent.Raise(this, @event);
+                | keyEvent.Raise(this, @event)
+                | IsKeyEventSink;
         }
 
         internal bool HandleCharacterTyped(char character)
         {
-            if (Visibility < Visibility.Visible) return false;
+            Debug.Assert(Visibility == Visibility.Visible);
 
             return OnCharacterTyped(character)
                 | characterTypedEvent.Raise(this, character);

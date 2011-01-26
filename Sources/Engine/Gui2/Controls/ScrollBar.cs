@@ -43,6 +43,13 @@ namespace Orion.Engine.Gui2
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when this <see cref="ScrollBar"/> gets scrolled.
+        /// </summary>
+        public event Action<ScrollBar> Scrolled;
+        #endregion
+
         #region Properties
         /// <summary>
         /// Accesses the orientation of this <see cref="ScrollBar"/>.
@@ -117,6 +124,7 @@ namespace Orion.Engine.Gui2
                 if (value == this.value) return;
 
                 this.value = value;
+                Scrolled.Raise(this);
                 InvalidateArrange();
             }
         }

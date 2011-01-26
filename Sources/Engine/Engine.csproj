@@ -154,6 +154,7 @@
     <Compile Include="Gui2\Controls\ControlViewport.cs" />
     <Compile Include="Gui2\Controls\ModalDialog.cs" />
     <Compile Include="Gui2\Controls\Popup.cs" />
+    <Compile Include="Gui2\Controls\ScrollPanel.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.EntryCollection.cs" />
     <Compile Include="Gui2\Layouts\FormLayoutEntry.cs" />
     <Compile Include="Gui2\Layouts\FormLayout.cs" />

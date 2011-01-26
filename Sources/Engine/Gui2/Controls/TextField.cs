@@ -253,6 +253,7 @@ namespace Orion.Engine.Gui2
         {
             if (@event.Button == MouseButtons.Left && @event.IsPressed && isEditable)
             {
+                PositionCaret(@event.Position);
                 AcquireKeyboardFocus();
                 return true;
             }
@@ -320,6 +321,44 @@ namespace Orion.Engine.Gui2
             }
 
             return true;
+        }
+
+        private void PositionCaret(Point point)
+        {
+            Region innerRectangle = InnerRectangle;
+            if (innerRectangle.Width == 0 || text.Length == 0)
+            {
+                caretIndex = text.Length;
+                return;
+            }
+
+            int x = point.X - innerRectangle.MinX;
+
+            var options = new TextRenderingOptions { Font = font };
+
+            int minCharacterIndex = 0;
+            int minCharacterX = 0;
+            int exclusiveMaxCharacterIndex = text.Length;
+            int exclusiveMaxCharacterX = Renderer.MeasureText(text, ref options).Width;
+            while (exclusiveMaxCharacterIndex - minCharacterIndex > 1)
+            {
+                int index = (minCharacterIndex + exclusiveMaxCharacterIndex) / 2;
+                int textWidth = Renderer.MeasureText(new Substring(text, 0, index), ref options).Width;
+
+                if (x < textWidth)
+                {
+                    exclusiveMaxCharacterIndex = index;
+                    exclusiveMaxCharacterX = textWidth;
+                }
+                else
+                {
+                    minCharacterIndex = index;
+                    minCharacterX = textWidth;
+                }
+            }
+
+            caretIndex = x - minCharacterX < exclusiveMaxCharacterX - x
+                ? minCharacterIndex : exclusiveMaxCharacterIndex;
         }
         #endregion
     }

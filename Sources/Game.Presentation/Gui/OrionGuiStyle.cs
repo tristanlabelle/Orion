@@ -210,26 +210,32 @@ namespace Orion.Game.Presentation.Gui
         {
             var adornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
 
-            comboBox.Button.Adornment = adornment;
-            comboBox.Button.MinWidth = 20;
-            comboBox.Button.MinHeight = 20;
-
-            ImageBox buttonImageBox = new ImageBox()
+            Button button = comboBox.Button;
+            button.Adornment = adornment;
+            button.MinWidth = 20;
+            button.MinHeight = 20;
+            button.Content = new ImageBox()
             {
                 Stretch = Stretch.None,
                 Texture = GetGuiTexture("Down_Arrow")
             };
-            comboBox.Button.Content = buttonImageBox;
-            comboBox.Button.PreDrawing += OnComboBoxButtonPreDrawing;
+            button.PreDrawing += OnComboBoxButtonPreDrawing;
 
-            comboBox.SelectedItemViewport.Adornment = adornment;
-            comboBox.SelectedItemViewport.Padding = 4;
-            comboBox.SelectedItemViewport.MinWidth = 20;
+            ControlViewport selectedItemViewport = comboBox.SelectedItemViewport;
+            selectedItemViewport.Adornment = adornment;
+            selectedItemViewport.Padding = 4;
+            selectedItemViewport.MinWidth = 20;
 
-            comboBox.DropDown.HighlightColor = new ColorRgba(Colors.LightBlue, 0.5f);
             comboBox.DropDown.Adornment = adornment;
-            comboBox.DropDown.ItemGap = 4;
             comboBox.DropDown.Padding = 4;
+            comboBox.ListBox.HighlightColor = new ColorRgba(Colors.LightBlue, 0.3f);
+            comboBox.ListBox.SelectionColor = new ColorRgba(Colors.LightBlue, 0.6f);
+            comboBox.ListBox.ItemGap = 4;
+        }
+
+        private void ApplySpecificStyle(ScrollPanel scrollPanel)
+        {
+            ApplySpecificStyle(scrollPanel.VerticalScrollBar);
         }
 
         private void OnComboBoxButtonPreDrawing(Control control, GuiRenderer renderer)

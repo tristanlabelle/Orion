@@ -14,8 +14,7 @@ namespace Orion.Engine.Gui2
         private readonly DockLayout dock;
         private readonly Button button;
         private readonly ControlViewport selectedItemViewport;
-        private readonly DropDownList dropDownList;
-        private readonly ItemCollection items;
+        private readonly DropDownPopup dropDown;
         #endregion
 
         #region Constructors
@@ -31,10 +30,9 @@ namespace Orion.Engine.Gui2
             selectedItemViewport = new ControlViewport();
             dock.Dock(selectedItemViewport, Direction.NegativeX);
 
-            dropDownList = new DropDownList(this);
-            dropDownList.VisibilityFlag = Visibility.Hidden;
-
-            items = new ItemCollection(this); // Must be created after the DropDownList
+            dropDown = new DropDownPopup(this);
+            dropDown.VisibilityFlag = Visibility.Hidden;
+            dropDown.ListBox.SelectionChanged += OnSelectionChanged;
         }
         #endregion
 
@@ -63,19 +61,27 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Gets the <see cref="DropDownList"/> displayed when this <see cref="ComboBox"/> is open.
+        /// Gets the <see cref="DropDownPopup"/> displayed when this <see cref="ComboBox"/> is open.
         /// </summary>
-        public DropDownList DropDown
+        public DropDownPopup DropDown
         {
-            get { return dropDownList; }
+            get { return dropDown; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ListBox"/> within the drop-down popup.
+        /// </summary>
+        public ListBox ListBox
+        {
+            get { return dropDown.ListBox; }
         }
 
         /// <summary>
         /// Gets the collection of items that are displayed by this <see cref="ComboBox"/>.
         /// </summary>
-        public ItemCollection Items
+        public IList<Control> Items
         {
-            get { return items; }
+            get { return ListBox.Items; }
         }
 
         /// <summary>
@@ -83,14 +89,8 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public Control SelectedItem
         {
-            get { return selectedItemViewport.ViewedControl; }
-            set
-            {
-                if (value == SelectedItem) return;
-
-                selectedItemViewport.ViewedControl = value;
-                SelectedItemChanged.Raise(this);
-            }
+            get { return ListBox.SelectedItem; }
+            set { ListBox.SelectedItem = value; }
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public int SelectedItemIndex
         {
-            get { return Items.IndexOf(SelectedItem); }
-            set { SelectedItem = value < 0 ? null : Items[value]; }
+            get { return ListBox.SelectedItemIndex; }
+            set { ListBox.SelectedItemIndex = value; }
         }
 
         /// <summary>
@@ -107,16 +107,16 @@ namespace Orion.Engine.Gui2
         /// </summary>
         public bool IsOpen
         {
-            get { return dropDownList.VisibilityFlag == Visibility.Visible; }
-            set { dropDownList.VisibilityFlag = value ? Visibility.Visible : Visibility.Hidden; }
+            get { return dropDown.VisibilityFlag == Visibility.Visible; }
+            set { dropDown.VisibilityFlag = value ? Visibility.Visible : Visibility.Hidden; }
         }
         #endregion
 
         #region Methods
         protected override void OnManagerChanged(UIManager previousManager)
         {
-            if (previousManager != null) previousManager.Popups.Remove(dropDownList);
-            if (Manager != null) Manager.Popups.Add(dropDownList);
+            if (previousManager != null) previousManager.Popups.Remove(dropDown);
+            if (Manager != null) Manager.Popups.Add(dropDown);
         }
 
         protected override IEnumerable<Control> GetChildren()
@@ -134,11 +134,17 @@ namespace Orion.Engine.Gui2
             DefaultArrangeChild(dock, Rectangle);
         }
 
+        private void OnSelectionChanged(ListBox sender)
+        {
+            selectedItemViewport.ViewedControl = sender.SelectedItem;
+            dropDown.VisibilityFlag = Visibility.Hidden;
+        }
+
         private void OnButtonClicked(Button sender, ButtonClickEvent @event)
         {
-            dropDownList.VisibilityFlag = Visibility.Visible;
-            dropDownList.AcquireMouseCapture();
-            dropDownList.AcquireKeyboardFocus();
+            dropDown.VisibilityFlag = Visibility.Visible;
+            dropDown.AcquireMouseCapture();
+            dropDown.AcquireKeyboardFocus();
         }
         #endregion
     }

@@ -104,6 +104,7 @@
     <Compile Include="Gui\OrionGuiStyle.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
     <Compile Include="Gui\PausePanel.cs" />
+    <Compile Include="Gui\ReplayBrowser2.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />

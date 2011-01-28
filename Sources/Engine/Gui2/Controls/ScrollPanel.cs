@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Engine.Gui2.Controls
+namespace Orion.Engine.Gui2
 {
     /// <summary>
     /// A <see cref="ContentControl"/> which enables scrolling its it contents.

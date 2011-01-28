@@ -149,9 +149,10 @@
     <Compile Include="Gui2\Controls\ButtonClickEvent.cs" />
     <Compile Include="Gui2\Controls\ButtonClickType.cs" />
     <Compile Include="Gui2\Controls\ComboBox.cs" />
-    <Compile Include="Gui2\Controls\ComboBox.DropDownList.cs" />
-    <Compile Include="Gui2\Controls\ComboBox.ItemCollection.cs" />
+    <Compile Include="Gui2\Controls\ComboBox.DropDown.cs" />
     <Compile Include="Gui2\Controls\ControlViewport.cs" />
+    <Compile Include="Gui2\Controls\ListBox.cs" />
+    <Compile Include="Gui2\Controls\ListBox.ItemCollection.cs" />
     <Compile Include="Gui2\Controls\ModalDialog.cs" />
     <Compile Include="Gui2\Controls\Popup.cs" />
     <Compile Include="Gui2\Controls\ScrollPanel.cs" />

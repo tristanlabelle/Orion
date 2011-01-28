@@ -234,8 +234,8 @@ namespace Orion.Engine.Gui2
 
         private void DrawHighlight(int index, ColorRgba color)
         {
-            Region rectangle = Rectangle;
-            Region itemOuterRectangle = HighlightedItem.OuterRectangle;
+            Region rectangle = itemStack.Rectangle;
+            Region itemOuterRectangle = items[index].OuterRectangle;
 
             Region highlightRectangle = new Region(
                 rectangle.MinX, itemOuterRectangle.MinY,

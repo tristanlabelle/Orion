@@ -128,6 +128,19 @@ namespace Orion.Game.Presentation
             string fullName = Path.Combine("Units", unitTypeName);
             return GetTexture(fullName);
         }
+        
+        /// <summary>
+        /// Gets a texture for a GUI element
+        /// </summary>
+        /// <param name="name">The name of the gui texture.</param>
+        /// <returns>The GUI texture with that name.</returns>
+        public Texture GetGuiTexture(string name)
+        {
+            Argument.EnsureNotNull(name, "name");
+
+            string fullName = Path.Combine("Gui", name);
+            return GetTexture(fullName);
+        }
 
         /// <summary>
         /// Gets a texture representing a unit.

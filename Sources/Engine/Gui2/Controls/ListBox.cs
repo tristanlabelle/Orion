@@ -160,6 +160,15 @@ namespace Orion.Engine.Gui2
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Adds an item to this <see cref="ListBox"/>.
+        /// </summary>
+        /// <param name="control">The control to be added.</param>
+        public void AddItem(Control control)
+        {
+        	items.Add(control);
+        }
+        
         protected override IEnumerable<Control> GetChildren()
         {
             yield return itemStack;

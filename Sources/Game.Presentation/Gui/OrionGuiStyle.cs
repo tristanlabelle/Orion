@@ -205,6 +205,13 @@ namespace Orion.Game.Presentation.Gui
             checkBox.Button.Adornment = new OrionCheckBoxButtonAdornment(this);
             checkBox.Button.SetSize(20, 20);
         }
+        
+        private void ApplySpecificStyle(ListBox listBox)
+        {
+            listBox.HighlightColor = new ColorRgba(Colors.LightBlue, 0.3f);
+            listBox.SelectionColor = new ColorRgba(Colors.LightBlue, 0.6f);
+            listBox.ItemGap = 4;
+        }
 
         private void ApplySpecificStyle(ComboBox comboBox)
         {
@@ -228,9 +235,7 @@ namespace Orion.Game.Presentation.Gui
 
             comboBox.DropDown.Adornment = adornment;
             comboBox.DropDown.Padding = 4;
-            comboBox.ListBox.HighlightColor = new ColorRgba(Colors.LightBlue, 0.3f);
-            comboBox.ListBox.SelectionColor = new ColorRgba(Colors.LightBlue, 0.6f);
-            comboBox.ListBox.ItemGap = 4;
+            ApplySpecificStyle(comboBox.ListBox);
         }
 
         private void ApplySpecificStyle(ScrollPanel scrollPanel)

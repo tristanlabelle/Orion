@@ -243,7 +243,7 @@ namespace Orion.Game.Main
                 if (unit != null)
                 {
                     bool isAllied = (LocalFaction.GetDiplomaticStance(unit.Faction) & DiplomaticStance.SharedVision) != 0;
-                    singleEntitySelectionPanel.ShowUnit(unit, showTasks: isAllied);
+                    singleEntitySelectionPanel.ShowUnit(unit, isAllied);
                     ui.SelectionInfoPanel = singleEntitySelectionPanel;
                 }
 

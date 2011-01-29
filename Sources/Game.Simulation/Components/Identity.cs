@@ -9,22 +9,18 @@ namespace Orion.Game.Simulation.Components
     public class Identity : Component
     {
         #region Fields
-        private readonly UnitType type;
+        private UnitType type;
         #endregion
 
         #region Constructors
-        public Identity(Entity entity, UnitType type)
-            : base(entity)
-        {
-            Argument.EnsureNotNull(type, "type");
-            this.type = type;
-        }
+        public Identity(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
         public UnitType Type
         {
             get { return type; }
+            set { type = value; }
         }
         #endregion
     }

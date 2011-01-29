@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Game.Simulation.Skills;
 using Orion.Engine;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -18,55 +19,58 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        private int maxHealth;
+        [Mandatory] private int maxHealth;
+        [Mandatory] private ArmorType armorType;
+        [Persistent] private float regenerationRate;
+        [Persistent] private float damageReduction;
+        [Persistent] private float armor;
         private float currentDamage;
-        private float regenerationRate;
-        private float damageReduction;
-        private ArmorType armorType;
-        private float armor;
         #endregion
 
         #region Constructors
-        public Health(Entity entity, int maxHealth, ArmorType armorType, float armor, float regenerationRate, float damageReduction)
-            : base(entity)
-        {
-            this.maxHealth = maxHealth;
-            this.armor = armor;
-            this.armorType = armorType;
-            this.regenerationRate = regenerationRate;
-            this.damageReduction = damageReduction;
-        }
+        public Health(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
+        [Mandatory]
         public int MaxHealth
         {
             get { return maxHealth; }
+            set { maxHealth = value; }
         }
 
+        [Mandatory]
         public ArmorType ArmorType
         {
             get { return armorType; }
+            set { armorType = value; }
         }
 
+        [Mandatory]
         public float Armor
         {
             get { return armor; }
+            set { armor = value; }
         }
 
         public float CurrentHealth
         {
             get { return maxHealth - currentDamage; }
+            set { currentDamage = maxHealth - value; }
         }
 
+        [Persistent]
         public float RegenerationRate
         {
             get { return regenerationRate; }
+            set { regenerationRate = value; }
         }
 
+        [Persistent]
         public float DamageReduction
         {
             get { return damageReduction; }
+            set { damageReduction = value; }
         }
         #endregion
 

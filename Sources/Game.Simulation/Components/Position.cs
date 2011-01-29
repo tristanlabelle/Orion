@@ -6,6 +6,7 @@ using Orion.Engine;
 using OpenTK;
 using Orion.Engine.Geometry;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -16,22 +17,16 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        private CollisionLayer collisionLayer;
-        private Size size;
-        private float sightRange;
+        [Mandatory] private CollisionLayer collisionLayer;
+        [Mandatory] private Size size;
+        [Mandatory] private float sightRange;
 
         private Vector2 location;
         private float angle;
         #endregion
 
         #region Constructors
-        public Position(Entity entity, float sightRange, CollisionLayer layer, Size size)
-            : base(entity)
-        {
-            this.sightRange = sightRange;
-            this.collisionLayer = layer;
-            this.size = size;
-        }
+        public Position(Entity entity) : base(entity) { }
         #endregion
 
         #region Events
@@ -48,6 +43,7 @@ namespace Orion.Game.Simulation.Components
         public float SightRange
         {
             get { return sightRange; }
+            set { sightRange = value; }
         }
 
         public Circle LineOfSight
@@ -63,16 +59,19 @@ namespace Orion.Game.Simulation.Components
         public Size Size
         {
             get { return size; }
+            set { size = value; }
         }
 
         public int Width
         {
             get { return size.Width; }
+            set { size = new Size(value, size.Height); }
         }
 
         public int Height
         {
             get { return size.Height; }
+            set { size = new Size(size.Width, value); }
         }
 
         public Vector2 Location

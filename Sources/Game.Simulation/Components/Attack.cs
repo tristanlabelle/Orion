@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -15,23 +16,6 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat DelayStat = new EntityStat(typeof(Attack), StatType.Real, "Delay", "Délai");
         public static readonly EntityStat SplashRadiusStat = new EntityStat(typeof(Attack), StatType.Real, "SplashRadius", "Rayon de dégâts");
         #endregion
-
-        #region Methods
-        public static DamageFilter CreateArmorTypeDamageFilter(ArmorType armorType, float additionalDamage)
-        {
-            Argument.EnsureNotEqual(additionalDamage, 0, "additionalDamage");
-
-            Func<Entity, float> filter = delegate(Entity e)
-            {
-                Health healthComponent = e.GetComponent<Health>();
-                return healthComponent.ArmorType == armorType ? additionalDamage : 0;
-            };
-
-            char sign = additionalDamage > 0 ? '+' : '-';
-            string description = "{0}{1} contre {2}".FormatInvariant(sign, additionalDamage, armorType);
-            return new DamageFilter(filter, description);
-        }
-        #endregion
         #endregion
 
         #region Fields
@@ -39,58 +23,58 @@ namespace Orion.Game.Simulation.Components
         private float range;
         private float delay;
         private float splashRadius;
-        private readonly List<DamageFilter> damageFilters;
+        private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
         #region Constructors
-        public Attack(Entity entity, float power, float range, float delay, float splashRadius)
-            : base(entity)
-        {
-            this.power = power;
-            this.range = range;
-            this.delay = delay;
-            this.splashRadius = splashRadius;
-        }
+        public Attack(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
+        [Mandatory]
         public float Power
         {
             get { return power; }
+            set { power = value; }
         }
 
+        [Persistent]
         public float Range
         {
             get { return range; }
+            set { range = value; }
         }
 
+        [Mandatory]
         public float Delay
         {
             get { return delay; }
+            set { delay = value; }
         }
 
+        [Persistent]
         public float SplashRadius
         {
             get { return splashRadius; }
+            set { splashRadius = value; }
+        }
+
+        [Persistent]
+        public ICollection<DamageFilter> DamageFilters
+        {
+            get { return damageFilters; }
         }
         #endregion
 
         #region Methods
-        public void AddDamageFilter(DamageFilter filter)
-        {
-            damageFilters.Add(filter);
-        }
-
-        public void RemoveDamageFilter(DamageFilter filter)
-        {
-            damageFilters.Remove(filter);
-        }
-
         public float ApplyDamageFilters(float initalDamage, Entity target)
         {
             float finalDamage = initalDamage;
             foreach (DamageFilter filter in damageFilters)
-                finalDamage += filter.Apply(target);
+            {
+                if (filter.Applies(target))
+                    finalDamage += filter.AdditionalDamage;
+            }
             return finalDamage;
         }
         #endregion

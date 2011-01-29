@@ -16,7 +16,7 @@ namespace Orion.Game.Simulation
     /// Abstract base class for game objects present in the game world.
     /// </summary>
     [Serializable]
-    public abstract class Entity
+    public class Entity
     {
         #region Instance
         #region Fields
@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
-        protected Entity(World world, Handle handle)
+        public Entity(World world, Handle handle)
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
@@ -72,7 +72,11 @@ namespace Orion.Game.Simulation
         /// Gets the size of this <see cref="Entity"/>, in tiles.
         /// This value is garanteed to remain constant.
         /// </summary>
-        public abstract Size Size { get; }
+#warning Temporary hack until components take over
+        public virtual Size Size
+        {
+            get { return GetComponent<Position>().Size; }
+        }
 
         /// <summary>
         /// Gets the width of this <see cref="Entity"/>, in tiles.
@@ -138,7 +142,11 @@ namespace Orion.Game.Simulation
         /// <see cref="Entity"/> lies. This should never change
         /// in the lifetime of the <see cref="Entity"/>.
         /// </summary>
-        public abstract CollisionLayer CollisionLayer { get; }
+#warning Temporary hack until components take over
+        public virtual CollisionLayer CollisionLayer
+        {
+            get { return GetComponent<Position>().CollisionLayer; }
+        }
 
         /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> is alive.
@@ -164,6 +172,11 @@ namespace Orion.Game.Simulation
         public bool HasComponent<T>() where T : Component
         {
             return components.OfType<T>().Count() > 0;
+        }
+
+        public bool HasComponent(Type componentType)
+        {
+            return components.Count(c => c.GetType() == componentType) > 0;
         }
 
         public T GetComponent<T>() where T : Component
@@ -273,7 +286,11 @@ namespace Orion.Game.Simulation
             DoUpdate(step);
         }
 
-        protected abstract Vector2 GetPosition();
+#warning Temporary hack until components take over
+        protected virtual Vector2 GetPosition()
+        {
+            return GetComponent<Position>().Location;
+        }
 
         protected virtual void DoUpdate(SimulationStep step) { }
         #endregion

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -11,28 +12,25 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat AlageneValueStat = new EntityStat(typeof(Sellable), StatType.Integer, "AlageneValue", "Valeur d'alagène");
         public static readonly EntityStat AladdiumValueStat = new EntityStat(typeof(Sellable), StatType.Integer, "AladdiumValue", "Valeur d'aladdium");
 
-        private float alageneValue;
-        private float aladdiumValue;
+        [Mandatory] private float alageneValue;
+        [Mandatory] private float aladdiumValue;
         #endregion
 
         #region Constructors
-        public Sellable(Entity entity, float alageneValue, float aladdiumValue)
-            : base(entity)
-        {
-            this.aladdiumValue = aladdiumValue;
-            this.alageneValue = alageneValue;
-        }
+        public Sellable(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
         public float AlageneValue
         {
             get { return alageneValue; }
+            set { alageneValue = value; }
         }
 
         public float AladdiumValue
         {
             get { return aladdiumValue; }
+            set { aladdiumValue = value; }
         }
         #endregion
     }

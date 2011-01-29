@@ -5,32 +5,37 @@ using System.Text;
 
 namespace Orion.Game.Simulation.Components
 {
-    public sealed class DamageFilter
+    public class DamageFilter
     {
         #region Fields
-        private readonly Func<Entity, float> filter;
-        private readonly string description;
+        private Func<Entity, bool> applies;
+        private int additionalDamage;
+        private string description;
         #endregion
 
         #region Constructors
-        public DamageFilter(Func<Entity, float> function, string description)
+        public DamageFilter(Func<Entity, bool> applies, int additionalDamage, string description)
         {
-            this.filter = function;
+            this.additionalDamage = additionalDamage;
+            this.applies = applies;
             this.description = description;
         }
         #endregion
 
         #region Properties
-        public Func<Entity, float> Apply
+        public Func<Entity, bool> Applies
         {
-            get { return filter; }
+            get { return applies; }
         }
-        #endregion
 
-        #region Methods
-        public override string ToString()
+        public int AdditionalDamage
         {
-            return description;
+            get { return additionalDamage; }
+        }
+
+        public string Description
+        {
+            get { return description; }
         }
         #endregion
     }

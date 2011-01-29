@@ -13,6 +13,7 @@ namespace Orion.Game.Simulation.Components
         private string name;
         private int aladdiumCost;
         private int alageneCost;
+        private int threatLevel;
         private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
         #endregion
 
@@ -26,6 +27,13 @@ namespace Orion.Game.Simulation.Components
         {
             get { return name; }
             set { name = value; }
+        }
+
+        [Mandatory]
+        public int ThreatLevel
+        {
+            get { return threatLevel; }
+            set { threatLevel = value; }
         }
 
         [Persistent]

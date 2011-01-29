@@ -19,11 +19,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        [Mandatory] private int maxHealth;
-        [Mandatory] private ArmorType armorType;
-        [Persistent] private float regenerationRate;
-        [Persistent] private float damageReduction;
-        [Persistent] private float armor;
+        private int maxHealth;
+        private ArmorType armorType;
+        private float regenerationRate;
+        private float damageReduction;
+        private float armor;
         private float currentDamage;
         #endregion
 
@@ -53,6 +53,7 @@ namespace Orion.Game.Simulation.Components
             set { armor = value; }
         }
 
+        [Transient]
         public float CurrentHealth
         {
             get { return maxHealth - currentDamage; }

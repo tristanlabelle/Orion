@@ -12,7 +12,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat SpeedMultiplierStat = new EntityStat(typeof(Train), StatType.Real, "Speed Multiplier", "Multiplicateur de vitesse");
 
         [Mandatory] private float speedMultiplier;
-        [Mandatory] private HashSet<UnitType> trainableTypes = new HashSet<UnitType>();
+        [Mandatory] private HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
         #region Constructors
@@ -26,16 +26,16 @@ namespace Orion.Game.Simulation.Components
             set { speedMultiplier = value; }
         }
 
-        public IEnumerable<UnitType> TrainableTypes
+        public ICollection<string> TrainableTypes
         {
             get { return trainableTypes; }
         }
         #endregion
 
         #region Methods
-        public void AddTrainableType(UnitType type)
+        public bool Supports(Entity type)
         {
-            trainableTypes.Add(type);
+            return trainableTypes.Contains(type.GetComponent<Identity>().Name);
         }
         #endregion
     }

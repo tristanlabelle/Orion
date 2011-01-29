@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
     public class Identity : Component
     {
         #region Fields
-        private UnitType type;
+        private string name;
+        private int aladdiumCost;
+        private int alageneCost;
+        private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
         #endregion
 
         #region Constructors
@@ -17,10 +21,31 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        public UnitType Type
+        [Mandatory]
+        public string Name
         {
-            get { return type; }
-            set { type = value; }
+            get { return name; }
+            set { name = value; }
+        }
+
+        [Persistent]
+        public int AladdiumCost
+        {
+            get { return aladdiumCost; }
+            set { aladdiumCost = value; }
+        }
+
+        [Persistent]
+        public int AlageneCost
+        {
+            get { return alageneCost; }
+            set { alageneCost = value; }
+        }
+
+        [Persistent]
+        public ICollection<UnitTypeUpgrade> Upgrades
+        {
+            get { return upgrades; }
         }
         #endregion
     }

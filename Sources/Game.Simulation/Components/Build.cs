@@ -11,7 +11,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         public static readonly EntityStat BuildSpeedStat = new EntityStat(typeof(Build), StatType.Real, "BuildSpeed", "Vitesse de construction");
 
-        private readonly HashSet<UnitType> buildableTypes = new HashSet<UnitType>();
+        private readonly HashSet<string> buildableTypes = new HashSet<string>();
         private float speed;
         #endregion
 
@@ -28,21 +28,16 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Persistent]
-        public ICollection<UnitType> BuildableTypes
+        public ICollection<string> BuildableTypes
         {
             get { return buildableTypes; }
         }
         #endregion
 
         #region Methods
-        public bool Supports(UnitType type)
+        public bool Supports(Entity type)
         {
-            return buildableTypes.Contains(type);
-        }
-
-        public void AddBuildableType(UnitType type)
-        {
-            buildableTypes.Add(type);
+            return buildableTypes.Contains(type.GetComponent<Identity>().Name);
         }
         #endregion
     }

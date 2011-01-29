@@ -6,6 +6,7 @@ using System.Xml;
 using System.Diagnostics;
 using System.Reflection;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using System.Collections;
 
 namespace Orion.Game.Simulation.Components.Serialization
@@ -74,8 +75,22 @@ namespace Orion.Game.Simulation.Components.Serialization
 
                 ConstructorInfo constructor = componentType.GetConstructor(componentConstructorTypeArguments);
                 Component component = (Component)constructor.Invoke(constructorArguments);
-                foreach (XmlElement fieldElement in componentElement.ChildNodes.OfType<XmlElement>())
-                    DeserializeField(component, fieldElement, persistentOnly);
+                HashSet<PropertyInfo> mandatoryProperties = new HashSet<PropertyInfo>(componentClass
+                    .GetProperties()
+                    .Where(p => p.GetCustomAttributes(typeof(MandatoryAttribute), true).Length == 1));
+                foreach (XmlElement propertyElement in componentElement.ChildNodes.OfType<XmlElement>())
+                {
+                    PropertyInfo property = componentClass.GetProperty(propertyElement.Name);
+                    if (property == null)
+                        throw new InvalidOperationException("Couldn't find a field associated to the {0} tag".FormatInvariant(propertyElement.Name));
+
+                    DeserializeField(component, property, propertyElement, persistentOnly);
+                    mandatoryProperties.Remove(property);
+                }
+                
+                if (mandatoryProperties.Count != 0)
+                    throw new InvalidOperationException("Not all mandatory properties were assigned during deserialization");
+
                 entity.AddComponent(component);
             }
             return entity;
@@ -85,36 +100,37 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// Deserializes a field of a certain component based on XML data.
         /// </summary>
         /// <param name="component">The component for which the field should be deserialized</param>
-        /// <param name="fieldElement">The XML element for the field</param>
+        /// <param name="propertyElement">The XML element for the field</param>
         /// <returns>An Entity object with the specs from the XML file</returns>
-        private void DeserializeField(Component component, XmlElement fieldElement, bool persistentOnly)
+        private void DeserializeField(Component component, PropertyInfo property, XmlElement propertyElement, bool persistentOnly)
         {
-            string fieldName = fieldElement.Name;
-            FieldInfo field = component.GetType().GetField(fieldName, fieldLookupFlags);
-            if (field == null)
-                throw new InvalidOperationException("Couldn't find a field associated to the {0} tag".FormatInvariant(fieldName));
+            Argument.EnsureNotNull(component, "component");
+            Argument.EnsureNotNull(property, "property");
+            Argument.EnsureNotNull(propertyElement, "fieldElement");
 
-            object[] attributes = field.GetCustomAttributes(typeof(PersistentAttribute), false);
+            string fieldName = propertyElement.Name;
+
+            object[] attributes = property.GetCustomAttributes(typeof(PersistentAttribute), false);
             if (persistentOnly && attributes.Length != 1)
                 throw new InvalidOperationException("Trying to deserialize a transient field in a persistent-only deserialization");
 
-            Type fieldType = field.FieldType;
-            if (typeof(ICollection).IsAssignableFrom(fieldType))
+            Type propertyType = property.PropertyType;
+            if (typeof(ICollection).IsAssignableFrom(propertyType))
             {
                 // The non-generic ICollection interface doesn't have an Add method; therefore, we need a method that
                 // can use a generic version of ICollection. Because of that, it will need to be generic itself;
                 // and we need to populate the type arguments with Type objects we won't know until runtime.
                 // Therefore, we must use reflection.
                 MethodInfo nongenericDeserializeCollection = typeof(XmlDeserializer).GetMethod("DeserializeCollection");
-                MethodInfo deserializeCollection = nongenericDeserializeCollection.MakeGenericMethod(fieldType);
-                deserializeCollection.Invoke(this, new object[] { component, field, fieldElement });
+                MethodInfo deserializeCollection = nongenericDeserializeCollection.MakeGenericMethod(propertyType);
+                deserializeCollection.Invoke(this, new object[] { component, property, propertyElement });
             }
             else
             {
                 try
                 {
-                    object value = DeserializeObject(field.FieldType, fieldElement);
-                    field.SetValue(component, value);
+                    object value = DeserializeObject(propertyType, propertyElement);
+                    property.SetValue(component, value, null);
                 }
                 catch (TypeMismatchException e)
                 {
@@ -129,16 +145,16 @@ namespace Orion.Game.Simulation.Components.Serialization
         /// </summary>
         /// <typeparam name="T">The collection's item type</typeparam>
         /// <param name="component">The component for which the field should be deserialized</param>
-        /// <param name="field">The field representing the ICollection object</param>
+        /// <param name="property">The field representing the ICollection object</param>
         /// <param name="fieldElement">The XML collection description</param>
-        private void DeserializeCollection<T>(Component component, FieldInfo field, XmlElement fieldElement)
+        private void DeserializeCollection<T>(Component component, PropertyInfo property, XmlElement fieldElement)
         {
             IEnumerable<XmlElement> childItems = fieldElement
                 .ChildNodes
                 .OfType<XmlElement>()
                 .Where(x => x.Name.Equals("Item", StringComparison.InvariantCultureIgnoreCase));
 
-            ICollection<T> collection = (ICollection<T>)field.GetValue(component);
+            ICollection<T> collection = (ICollection<T>)property.GetValue(component, null);
             foreach (XmlElement item in childItems)
                 collection.Add((T)DeserializeObject(typeof(T), item));
         }
@@ -208,9 +224,6 @@ namespace Orion.Game.Simulation.Components.Serialization
                 return method.Invoke(this, new object[] { target, objectElement });
             }
 
-            // special Orion types (like references to unit types)
-            // (no such type now)
-
             // complex types
             // those are harder because the XML serializer uses structural typing
             return DeserializeComplexType(type, objectElement);
@@ -230,30 +243,57 @@ namespace Orion.Game.Simulation.Components.Serialization
         private object DeserializeComplexType(Type type, XmlElement objectElement)
         {
             XmlElement[] children = objectElement.ChildNodes.OfType<XmlElement>().ToArray();
-            ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public)
-                .Where(c => c.GetParameters().Length == children.Length)
-                .ToArray();
-
-            // find the first matching constructor
-            foreach (ConstructorInfo constructor in constructors)
+            if (children.Length == 0)
             {
-                ParameterInfo[] parameters = constructor.GetParameters();
-                bool argumentNamesMatch = parameters
-                    .Select(p => p.Name)
-                    .SequenceEqual(children.Select(c => c.Name), StringComparer.InvariantCultureIgnoreCase);
-                if (!argumentNamesMatch) continue;
-
-                object[] arguments;
-                try
-                {
-                    arguments = Enumerable
-                    .Range(0, parameters.Length)
-                    .Select(i => DeserializeObject(parameters[i].ParameterType, children[i]))
+                // just text inside the tag: find constructors with just one argument
+                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public)
+                    .Where(c => c.GetParameters().Length == 1)
                     .ToArray();
-                }
-                catch (TypeMismatchException) { break; }
 
-                return constructor.Invoke(arguments);
+                foreach (ConstructorInfo constructor in constructors)
+                {
+                    ParameterInfo parameter = constructor.GetParameters()[0];
+                    try
+                    {
+                        object[] arguments = new object[]
+                        {
+                            DeserializeObject(parameter.ParameterType, objectElement)
+                        };
+                        return constructor.Invoke(arguments);
+                    }
+                    catch (TypeMismatchException)
+                    {
+                        continue;
+                    }
+                }
+            }
+            else
+            {
+                ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public)
+                    .Where(c => c.GetParameters().Length == children.Length)
+                    .ToArray();
+
+                // find the first matching constructor
+                foreach (ConstructorInfo constructor in constructors)
+                {
+                    ParameterInfo[] parameters = constructor.GetParameters();
+                    bool argumentNamesMatch = parameters
+                        .Select(p => p.Name)
+                        .SequenceEqual(children.Select(c => c.Name), StringComparer.InvariantCultureIgnoreCase);
+                    if (!argumentNamesMatch) continue;
+
+                    object[] arguments;
+                    try
+                    {
+                        arguments = Enumerable
+                            .Range(0, parameters.Length)
+                            .Select(i => DeserializeObject(parameters[i].ParameterType, children[i]))
+                            .ToArray();
+                    }
+                    catch (TypeMismatchException) { break; }
+
+                    return constructor.Invoke(arguments);
+                }
             }
 
             throw new TypeMismatchException(type, objectElement.OuterXml);

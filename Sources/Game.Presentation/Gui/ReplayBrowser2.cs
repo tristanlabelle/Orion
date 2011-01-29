@@ -33,15 +33,19 @@ namespace Orion.Game.Presentation.Gui
                 LastChildFill = true
             };
 
+            dock.Dock(graphics.GuiStyle.CreateLabel("Parties enregistrées:"), Direction.NegativeY);
+
             DockLayout buttonDock = new DockLayout();
             
             Button backButton = graphics.GuiStyle.CreateTextButton("Retour");
+            backButton.MinSize = new Size(150, 40);
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             buttonDock.Dock(backButton, Direction.NegativeX);
 
             Button viewButton = graphics.GuiStyle.CreateTextButton("Visionner");
+            viewButton.MinSize = new Size(150, 40);
             viewButton.HasEnabledFlag = false;
-            viewButton.Clicked += (sender, @event) => Started.Raise(this, ((Label)replayListBox.SelectedItem).Text);
+            viewButton.Clicked += (sender, @event) => TryStartSelectedReplay();
             buttonDock.Dock(viewButton, Direction.PositiveX);
 
             dock.Dock(buttonDock, Direction.PositiveY);
@@ -51,6 +55,7 @@ namespace Orion.Game.Presentation.Gui
             replayListBox.MaxYMargin = 10;
             replayListBox.Padding = 5;
             replayListBox.SelectionChanged += sender => viewButton.HasEnabledFlag = sender.SelectedItem != null;
+            replayListBox.MouseClick += OnReplayListBoxDoubleClicked;
             dock.Dock(replayListBox, Direction.NegativeY);
 
             Content = dock;
@@ -80,6 +85,23 @@ namespace Orion.Game.Presentation.Gui
         	
         	Label label = graphics.GuiStyle.CreateLabel(name);
         	replayListBox.AddItem(label);
+        }
+
+        private bool OnReplayListBoxDoubleClicked(Control sender, MouseEvent @event)
+        {
+            if (@event.ClickCount > 1)
+            {
+                TryStartSelectedReplay();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void TryStartSelectedReplay()
+        {
+            Label selectedReplayLabel = (Label)replayListBox.SelectedItem;
+            if (selectedReplayLabel != null) Started.Raise(this, selectedReplayLabel.Text);
         }
         #endregion
     }

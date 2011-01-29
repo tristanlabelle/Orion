@@ -473,7 +473,7 @@ namespace Orion.Game.Presentation.Gui
             label.VerticalAlignment = Alignment.Center;
             label.MinXMargin = 5;
             label.MinWidth = 30;
-            label.Color = Colors.White;
+            label.TextColor = Colors.White;
 
             return stack;
         }
@@ -563,7 +563,7 @@ namespace Orion.Game.Presentation.Gui
             actionToolTip = new ActionToolTip(style)
             {
                 Adornment = new ColorAdornment(Colors.Gray),
-                VerticalAlignment = Alignment.Max,
+                VerticalAlignment = Alignment.Positive,
                 IsMouseEventSink = true,
                 VisibilityFlag = Visibility.Hidden
             };
@@ -573,7 +573,7 @@ namespace Orion.Game.Presentation.Gui
             dock.Dock(chatTextField, Direction.PositiveY);
             chatTextField.MinXMargin = 5;
             chatTextField.MaxYMargin = 5;
-            chatTextField.HorizontalAlignment = Alignment.Min;
+            chatTextField.HorizontalAlignment = Alignment.Negative;
             chatTextField.Width = 500;
             chatTextField.VisibilityFlag = Visibility.Hidden;
             chatTextField.KeyEvent += OnChatTextFieldKeyEvent;

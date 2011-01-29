@@ -15,7 +15,8 @@ namespace Orion.Engine.Gui2
     {
         #region Fields
         private string text;
-        private ColorRgba color = Colors.Black;
+        private ColorRgba textColor = Colors.Black;
+        private ColorRgba disabledTextColor = Colors.Black;
         private Font font;
         #endregion
 
@@ -58,12 +59,21 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
-        /// Accesses the color of this <see cref="Label"/>.
+        /// Accesses the color of the text of this <see cref="Label"/>.
         /// </summary>
-        public ColorRgba Color
+        public ColorRgba TextColor
         {
-            get { return color; }
-            set { color = value; }
+            get { return textColor; }
+            set { textColor = value; }
+        }
+
+        /// <summary>
+        /// Accesses the color of the text of this <see cref="Label"/> when it is disabled.
+        /// </summary>
+        public ColorRgba DisabledTextColor
+        {
+            get { return disabledTextColor; }
+            set { disabledTextColor = value; }
         }
 
         /// <summary>
@@ -96,7 +106,7 @@ namespace Orion.Engine.Gui2
             {
                 Origin = Rectangle.Min,
                 Font = font,
-                Color = color
+                Color = IsEnabled ? textColor : disabledTextColor
             };
 
             Renderer.DrawText(text, ref options);

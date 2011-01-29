@@ -267,7 +267,7 @@ namespace Orion.Game.Presentation.Gui
             dock.Dock(topStack, Direction.NegativeY);
 
             statsForm = new FormLayout();
-            statsForm.VerticalAlignment = Alignment.Min;
+            statsForm.VerticalAlignment = Alignment.Negative;
             statsForm.HeaderContentGap = 5;
             statsForm.EntryGap = 6;
 

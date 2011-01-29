@@ -31,7 +31,6 @@ namespace Orion.Engine.Gui2
             protected override void InsertItem(int index, Control item)
             {
                 base.InsertItem(index, item);
-                if (Count == 1) listBox.SelectedItemIndex = index;
             }
 
             protected override void RemoveItem(int index)

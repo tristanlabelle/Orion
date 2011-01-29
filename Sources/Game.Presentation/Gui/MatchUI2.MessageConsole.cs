@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation.Gui
             public MessageLabel(string text, ColorRgb color, TimeSpan expirationTime)
             {
                 Text = text;
-                Color = color;
+                TextColor = color;
                 this.expirationTime = expirationTime;
             }
             #endregion
@@ -97,7 +97,7 @@ namespace Orion.Game.Presentation.Gui
                     if (remainingLifeSpan < messageFadeOutDuration)
                     {
                         float alpha = (float)(remainingLifeSpan.TotalSeconds / messageFadeOutDuration.TotalSeconds);
-                        label.Color = new ColorRgba(label.Color.Rgb, alpha);
+                        label.TextColor = new ColorRgba(label.TextColor.Rgb, alpha);
                     }
                 }
             }

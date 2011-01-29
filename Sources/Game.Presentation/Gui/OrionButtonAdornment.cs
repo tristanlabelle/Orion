@@ -18,6 +18,7 @@ namespace Orion.Game.Presentation.Gui
         private readonly Texture upTexture;
         private readonly Texture overTexture;
         private readonly Texture downTexture;
+        private readonly Texture disabledTexture;
         #endregion
 
         #region Constructors
@@ -28,6 +29,7 @@ namespace Orion.Game.Presentation.Gui
             upTexture = renderer.GetTexture("Gui/Button_Up");
             overTexture = renderer.GetTexture("Gui/Button_Over");
             downTexture = renderer.GetTexture("Gui/Button_Down");
+            disabledTexture = renderer.GetTexture("Gui/Button_Disabled");
         }
         #endregion
 
@@ -50,10 +52,17 @@ namespace Orion.Game.Presentation.Gui
             if (button == null) return;
 
             Texture texture;
-            if (button.IsUnderMouse)
-                texture = button.IsDown ? downTexture : overTexture;
+            if (button.IsEnabled)
+            {
+                if (button.IsUnderMouse)
+                    texture = button.IsDown ? downTexture : overTexture;
+                else
+                    texture = upTexture;
+            }
             else
-                texture = upTexture;
+            {
+                texture = disabledTexture;
+            }
 
             renderer.DrawNinePart(control.Rectangle, texture, Colors.White);
         }

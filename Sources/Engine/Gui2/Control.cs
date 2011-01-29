@@ -45,6 +45,8 @@ namespace Orion.Engine.Gui2
         private bool isMouseEventSink;
         private bool isKeyEventSink;
         private bool hasEnabledFlag = true;
+
+        private object tag;
         #endregion
 
         #region Constructors
@@ -582,7 +584,7 @@ namespace Orion.Engine.Gui2
                 Control ancestor = this;
                 do
                 {
-                    if (!hasEnabledFlag) return false;
+                    if (!ancestor.HasEnabledFlag) return false;
                     ancestor = ancestor.parent;
                 } while (ancestor != null);
 
@@ -590,6 +592,15 @@ namespace Orion.Engine.Gui2
             }
         }
         #endregion
+
+        /// <summary>
+        /// Accesses the tag of this <see cref="Control"/>, which is a user data object associated with it.
+        /// </summary>
+        public object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
+        }
 
         /// <summary>
         /// Gets the <see cref="GuiRenderer"/> which draws this <see cref="Control"/>.
@@ -897,7 +908,7 @@ namespace Orion.Engine.Gui2
 
             switch (alignment)
             {
-                case Alignment.Min:
+                case Alignment.Negative:
                     min = 0;
                     break;
 
@@ -905,7 +916,7 @@ namespace Orion.Engine.Gui2
                     min = availableSize / 2 - desiredOuterSize / 2;
                     break;
 
-                case Alignment.Max:
+                case Alignment.Positive:
                     min = availableSize - actualOuterSize;
                     break;
 

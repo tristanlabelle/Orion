@@ -168,6 +168,41 @@ namespace Orion.Engine.Gui2
         {
         	items.Add(control);
         }
+
+        /// <summary>
+        /// Gets the index of the item of this <see cref="ListBox"/> closest to a given point.
+        /// </summary>
+        /// <param name="point">The point for which the closest item is to be found.</param>
+        /// <returns>The index of the item closest to that point, or <c>-1</c> if there's none.</returns>
+        public int GetClosestItemIndex(Point point)
+        {
+            // Highlight the item that is the closest to the cursor, the cheap way.
+            float closestSquaredDistance = float.PositiveInfinity;
+            int closestItemIndex = -1;
+            for (int i = 0; i < items.Count; ++i)
+            {
+                Control item = items[i];
+                float squaredDistance = ((Vector2)(point - item.OuterRectangle.Clamp(point))).LengthSquared;
+                if (squaredDistance < closestSquaredDistance)
+                {
+                    closestItemIndex = i;
+                    closestSquaredDistance = squaredDistance;
+                }
+            }
+
+            return closestItemIndex;
+        }
+
+        /// <summary>
+        /// Gets the item of this <see cref="ListBox"/> closest to a given point.
+        /// </summary>
+        /// <param name="point">The point for which the closest item is to be found.</param>
+        /// <returns>The item closest to that point, or <c>null</c> if there's none.</returns>
+        public Control GetClosestItem(Point point)
+        {
+            int index = GetClosestItemIndex(point);
+            return index == -1 ? null : items[index];
+        }
         
         protected override IEnumerable<Control> GetChildren()
         {
@@ -186,33 +221,20 @@ namespace Orion.Engine.Gui2
 
         protected override bool OnMouseMoved(MouseEvent @event)
         {
-            if (!Rectangle.Contains(@event.Position))
-            {
-                highlightedItemIndex = -1;
-                return true;
-            }
-
-            // Highlight the item that is the closest to the cursor, the cheap way.
-            float closestSquaredDistance = float.PositiveInfinity;
-            for (int i = 0; i < itemStack.Children.Count; ++i)
-            {
-                Control item = itemStack.Children[i];
-                float squaredDistance = ((Vector2)(@event.Position - item.Rectangle.Clamp(@event.Position))).LengthSquared;
-                if (squaredDistance < closestSquaredDistance)
-                {
-                    highlightedItemIndex = i;
-                    closestSquaredDistance = squaredDistance;
-                }
-            }
-
+            highlightedItemIndex = GetClosestItemIndex(@event.Position);
             return true;
         }
 
         protected override bool OnMouseButton(MouseEvent @event)
         {
-            if (highlightedItemIndex != -1)
+            if (@event.IsPressed && highlightedItemIndex != -1)
                 SelectedItemIndex = highlightedItemIndex;
 
+            return true;
+        }
+
+        protected override bool OnMouseClick(MouseEvent @event)
+        {
             return true;
         }
 

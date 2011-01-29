@@ -179,6 +179,8 @@ namespace Orion.Game.Presentation.Gui
         private void ApplySpecificStyle(Label label)
         {
             label.Font = font;
+            label.TextColor = Colors.Black;
+            label.DisabledTextColor = Colors.Gray;
         }
 
         private void ApplySpecificStyle(TextField textField)

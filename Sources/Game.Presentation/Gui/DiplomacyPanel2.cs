@@ -84,7 +84,7 @@ namespace Orion.Game.Presentation.Gui
             }
 
             Button closeButton = style.CreateTextButton("Accepter");
-            closeButton.HorizontalAlignment = Alignment.Max;
+            closeButton.HorizontalAlignment = Alignment.Positive;
             closeButton.Clicked += (sender, @event) => Closed.Raise(this);
             stack.Stack(closeButton);
 

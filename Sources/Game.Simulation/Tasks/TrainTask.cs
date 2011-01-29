@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -158,10 +159,10 @@ namespace Orion.Game.Simulation.Tasks
             // Check to see if we can harvest automatically
             if (unit.HasSkill<HarvestSkill>())
             {
-                ResourceNode resourceNode = World.Entities
+                Entity resourceNode = World.Entities
                     .Intersecting(Unit.RallyPoint)
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault();
+                    .Where(e => e.HasComponent<Harvestable>())
+                    .FirstOrDefault(e => !e.GetComponent<Harvestable>().IsEmpty);
 
                 if (resourceNode != null && unit.Faction.CanHarvest(resourceNode))
                     rallyPointTask = new HarvestTask(unit, resourceNode);

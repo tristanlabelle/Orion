@@ -5,6 +5,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -24,7 +25,7 @@ namespace Orion.Game.Simulation.Tasks
         private const float harvestDuration = 5;
         private const float depositingDuration = 0;
 
-        private readonly ResourceNode node;
+        private readonly Entity node;
         private int amountCarrying;
         private float amountAccumulator;
         private float secondsGivingResource;
@@ -34,7 +35,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public HarvestTask(Unit harvester, ResourceNode node)
+        public HarvestTask(Unit harvester, Entity node)
             : base(harvester)
         {
             if (!harvester.HasSkill<HarvestSkill>())
@@ -47,14 +48,14 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Properties
-        public ResourceNode ResourceNode
+        public Entity ResourceNode
         {
             get { return node; }
         }
 
         public override string Description
         {
-            get { return "harvesting " + node.Type; }
+            get { return "harvesting " + node.GetComponent<Harvestable>().Type; }
         }
         #endregion
 
@@ -101,17 +102,18 @@ namespace Orion.Game.Simulation.Tasks
             int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
+                Harvestable harvest = node.GetComponent<Harvestable>();
                 if (!node.IsAliveInWorld)
                 {
-                    Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(node.Type));
+                    Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvest.Type));
                     move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
                     mode = Mode.Delivering;
                     return;
                 }
 
-                if (node.AmountRemaining > 0)
+                if (!harvest.IsEmpty)
                 {
-                    node.Harvest(1);
+                    harvest.Harvest(1);
                     --amountAccumulator;
                     ++amountCarrying;
                 }
@@ -156,9 +158,10 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             
             //adds the resources to the unit's faction
-            if (node.Type == ResourceType.Aladdium)
+            Harvestable harvest = node.GetComponent<Harvestable>();
+            if (harvest.Type == ResourceType.Aladdium)
                 Unit.Faction.AladdiumAmount += amountCarrying;
-            else if (node.Type == ResourceType.Alagene)
+            else if (harvest.Type == ResourceType.Alagene)
                 Unit.Faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 

@@ -81,6 +81,7 @@
     <Compile Include="Components\Kamikaze.cs" />
     <Compile Include="Components\Move.cs" />
     <Compile Include="Components\Position.cs" />
+    <Compile Include="Components\Harvestable.cs" />
     <Compile Include="Components\Sellable.cs" />
     <Compile Include="Components\Serialization\MandatoryAttribute.cs" />
     <Compile Include="Components\Serialization\PersistentAttribute.cs" />
@@ -142,7 +143,6 @@
     <Compile Include="Pathfinding\PathNode.cs" />
     <Compile Include="Pathfinding\PathNodeQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceNode.cs" />
     <Compile Include="ResourceType.cs" />
     <Compile Include="Tasks\HealTask.cs" />
     <Compile Include="Tasks\MoveTask.cs">

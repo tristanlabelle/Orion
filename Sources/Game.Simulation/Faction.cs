@@ -11,6 +11,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using ColorPalette = Orion.Engine.Colors;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -460,13 +461,14 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="node">The resource node to be tested.</param>
         /// <returns><c>True</c> if the resource node can be harvested, <c>false</c> otherwise.</returns>
-        public bool CanHarvest(ResourceNode node)
+        public bool CanHarvest(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
 
-            if (node.Type == ResourceType.Aladdium) return true;
+            if (node.GetComponent<Harvestable>().Type == ResourceType.Aladdium) return true;
 
-            Unit extractor = world.Entities.GetGroundEntityAt(node.Position) as Unit;
+            Vector2 location = node.GetComponent<Position>().Location;
+            Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()
                 && !extractor.IsUnderConstruction

@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation
 {
@@ -105,9 +106,9 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets the resource node in this selection, if any.
         /// </summary>
-        public ResourceNode ResourceNode
+        public Entity ResourceNode
         {
-            get { return entities.FirstOrDefault() as ResourceNode; }
+            get { return entities.FirstOrDefault(e => e.HasComponent<Harvestable>()); }
         }
 
         /// <summary>
@@ -253,7 +254,7 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            if (entity is ResourceNode)
+            if (entity.HasComponent<Harvestable>())
             {
                 Set(entity);
                 return;
@@ -345,7 +346,7 @@ namespace Orion.Game.Presentation
                 && !Contains(entity)
                 && entity.IsAliveInWorld
                 && (localFaction == null || localFaction.CanSee(entity))
-                && !(Type == SelectionType.Units && entity is ResourceNode);
+                && !(Type == SelectionType.Units && entity.HasComponent<Harvestable>());
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

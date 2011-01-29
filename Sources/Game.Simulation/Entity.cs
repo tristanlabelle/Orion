@@ -75,7 +75,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual Size Size
         {
-            get { return GetComponent<Position>().Size; }
+            get { return GetComponent<Identity>().Size; }
         }
 
         /// <summary>

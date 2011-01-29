@@ -17,9 +17,8 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        [Mandatory] private CollisionLayer collisionLayer;
-        [Mandatory] private Size size;
-        [Mandatory] private float sightRange;
+        private CollisionLayer collisionLayer;
+        private float sightRange;
 
         private Vector2 location;
         private float angle;
@@ -40,38 +39,24 @@ namespace Orion.Game.Simulation.Components
             set { angle = value; }
         }
 
+        [Mandatory]
         public float SightRange
         {
             get { return sightRange; }
             set { sightRange = value; }
         }
 
+        [Transient]
         public Circle LineOfSight
         {
             get { return new Circle(Center, Entity.GetStat(SightRangeStat).RealValue); }
         }
 
+        [Mandatory]
         public CollisionLayer CollisionLayer
         {
             get { return collisionLayer; }
-        }
-
-        public Size Size
-        {
-            get { return size; }
-            set { size = value; }
-        }
-
-        public int Width
-        {
-            get { return size.Width; }
-            set { size = new Size(value, size.Height); }
-        }
-
-        public int Height
-        {
-            get { return size.Height; }
-            set { size = new Size(size.Width, value); }
+            set { collisionLayer = value; }
         }
 
         public Vector2 Location
@@ -91,19 +76,27 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
+        [Transient]
         public Vector2 Center
         {
             get
             {
-                return new Vector2(Location.X + Size.Width * 0.5f, Location.Y + Size.Height * 0.5f);
+                Size size = Entity.GetComponent<Identity>().Size;
+                return new Vector2(Location.X + size.Width * 0.5f, Location.Y + size.Height * 0.5f);
             }
         }
 
+        [Transient]
         public Rectangle BoundingRectangle
         {
-            get { return new Rectangle(Location.X, Location.Y, Size.Width, Size.Height); }
+            get
+            {
+                Size size = Entity.GetComponent<Identity>().Size;
+                return new Rectangle(Location.X, Location.Y, size.Width, size.Height);
+            }
         }
 
+        [Transient]
         public Rectangle CollisionRectangle
         {
             get
@@ -114,10 +107,12 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
+        [Transient]
         public Region GridRegion
         {
             get
             {
+                Size size = Entity.GetComponent<Identity>().Size;
                 Point min = new Point((int)Math.Round(location.X), (int)Math.Round(location.Y));
                 return new Region(min, size);
             }

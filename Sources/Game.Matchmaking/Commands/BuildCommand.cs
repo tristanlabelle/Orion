@@ -10,6 +10,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -79,10 +80,12 @@ namespace Orion.Game.Matchmaking.Commands
 
             if (buildingType.HasSkill<ExtractAlageneSkill>())
             {
-                ResourceNode node = match.World.Entities
-                    .OfType<ResourceNode>()
-                    .FirstOrDefault(n => n.BoundingRectangle.ContainsPoint(location) && n.Type == ResourceType.Alagene);
-                Debug.Assert(node != null, "Extractors can only be built on resource node  of Alagene.");
+                Harvestable harvestingInfo = match.World.Entities
+                    .Where(e => e.HasComponent<Harvestable>())
+                    .Select(e => e.GetComponent<Harvestable>())
+                    .Where(h => h.Type == ResourceType.Alagene)
+                    .FirstOrDefault(h => !h.IsEmpty);
+                Debug.Assert(harvestingInfo != null, "Extractors can only be built on resource node of Alagene.");
             }
 
             BuildingPlan plan = new BuildingPlan(faction, buildingType, location);

@@ -15,9 +15,9 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat EmbarkSpeedStat = new EntityStat(typeof(Transport), StatType.Real, "EmbarkSpeed", "Vitesse d'embarquement");
         public static readonly EntityStat DisembarkSpeedStat = new EntityStat(typeof(Transport), StatType.Real, "DisembarkSpeed", "Vitesse de débarquement");
 
-        [Mandatory] private int capacity;
-        [Mandatory] private float loadSpeed;
-        [Mandatory] private float unloadSpeed;
+        private int capacity;
+        private float loadSpeed;
+        private float unloadSpeed;
 
         private float lastLoadTime;
         private float lastUnloadTime;
@@ -30,18 +30,21 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        [Mandatory]
         public int Capacity
         {
             get { return capacity; }
             set { capacity = value; }
         }
 
+        [Mandatory]
         public float LoadSpeed
         {
             get { return loadSpeed; }
             set { loadSpeed = value; }
         }
 
+        [Mandatory]
         public float UnloadSpeed
         {
             get { return unloadSpeed; }
@@ -60,6 +63,7 @@ namespace Orion.Game.Simulation.Components
             set { lastUnloadTime = value; }
         }
 
+        [Transient]
         public int LoadSize
         {
             get
@@ -70,11 +74,13 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
+        [Transient]
         public int RemainingSpace
         {
             get { return capacity - LoadSize; }
         }
 
+        [Transient]
         public IEnumerable<Entity> LoadedEntities
         {
             get { return loadedUnits; }

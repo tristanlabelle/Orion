@@ -10,6 +10,8 @@ using Orion.Game.Presentation;
 using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
+using System.Collections.Generic;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -59,10 +61,18 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
                 // Special case for alagene extractors:
                 // They can only be build on alagene nodes.
-                return World.Entities
+                IEnumerable<Entity> alageneResourceNodes = World.Entities
                     .Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One))
-                    .OfType<ResourceNode>()
-                    .Any(node => node.Type == ResourceType.Alagene && (Point)node.Position == minLocation.Value);
+                    .Where(e => e.HasComponent<Harvestable>())
+                    .Where(e => e.GetComponent<Harvestable>().Type == ResourceType.Alagene);
+
+                foreach (Entity entity in alageneResourceNodes)
+                {
+                    Position position = entity.GetComponent<Position>();
+                    if (position.Location == minLocation.Value)
+                        return true;
+                }
+                return false;
             }
         }
         #endregion

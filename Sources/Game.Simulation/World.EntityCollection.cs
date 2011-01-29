@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -135,12 +136,23 @@ namespace Orion.Game.Simulation
                 return unit;
             }
 
-            public ResourceNode CreateResourceNode(ResourceType type, Point point)
+            public Entity CreateResourceNode(ResourceType type, Point point)
             {
-                Handle handle = handleGenerator();
-                ResourceNode node = new ResourceNode(world, handle, type, ResourceNode.DefaultTotalAmount, point);
-                Add(node);
+                Entity node = new Entity(world, handleGenerator());
+                Identity identity = new Identity(node);
+                identity.Size = new Size(2, 2);
+                node.AddComponent(identity);
 
+                Harvestable harvestableComponent = new Harvestable(node);
+                harvestableComponent.AmountRemaining = World.DefaultResourceAmount;
+                harvestableComponent.Type = type;
+                node.AddComponent(harvestableComponent);
+                
+                Position positionComponent = new Position(node);
+                positionComponent.Location = point;
+                node.AddComponent(positionComponent);
+                
+                Add(node);
                 return node;
             }
             #endregion

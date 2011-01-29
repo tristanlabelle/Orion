@@ -3,6 +3,7 @@ using OpenTK;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Engine;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
@@ -18,9 +19,9 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Visible)
             {
-                ResourceNode resourceNode = World.Entities
+                Entity resourceNode = World.Entities
                     .Intersecting(location)
-                    .OfType<ResourceNode>()
+                    .Where(e => e.HasComponent<Harvestable>())
                     .FirstOrDefault(node => LocalFaction.CanHarvest(node));
                 if (resourceNode == null) return;
 

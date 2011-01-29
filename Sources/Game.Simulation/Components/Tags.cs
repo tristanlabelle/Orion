@@ -10,7 +10,6 @@ namespace Orion.Game.Simulation.Components
     public class Tags : Component
     {
         #region Fields
-        [Persistent]
         private readonly HashSet<string> tags = new HashSet<string>();
         #endregion
 
@@ -18,23 +17,11 @@ namespace Orion.Game.Simulation.Components
         public Tags(Entity entity) : base(entity) { }
         #endregion
 
-        #region Methods
-        public bool HasTag(string tag)
+        #region Properties
+        [Persistent]
+        public ICollection<string> List
         {
-            Argument.EnsureNotNull(tag, "tag");
-            return tags.Contains(tag);
-        }
-
-        public void AddTag(string tag)
-        {
-            Argument.EnsureNotNull(tag, "tag");
-            tags.Add(tag);
-        }
-
-        public void RemoveTag(string tag)
-        {
-            Argument.EnsureNotNull(tag, "tag");
-            tags.Remove(tag);
+            get { return tags; }
         }
         #endregion
     }

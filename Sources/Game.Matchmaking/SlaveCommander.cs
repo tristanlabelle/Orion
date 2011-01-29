@@ -60,7 +60,7 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
         }
 
-        public void LaunchHarvest(IEnumerable<Unit> units, ResourceNode node)
+        public void LaunchHarvest(IEnumerable<Unit> units, Entity node)
         {
             if (units.Count() > 0)
                 IssueCommand(new HarvestCommand(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));

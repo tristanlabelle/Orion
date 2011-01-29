@@ -18,10 +18,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
-        public UnitTypeUpgrade(string target)
-            : this(target, 0, 0)
-        { }
-
         public UnitTypeUpgrade(string target, int aladdiumCost, int alageneCost)
         {
             Argument.EnsureNotNull(target, "target");
@@ -32,6 +28,10 @@ namespace Orion.Game.Simulation
             this.aladdiumCost = aladdiumCost;
             this.alageneCost = alageneCost;
         }
+
+        public UnitTypeUpgrade(string target)
+            : this(target, 0, 0)
+        { }
         #endregion
 
         #region Properties

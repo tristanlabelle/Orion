@@ -3,6 +3,7 @@ using System.Linq;
 using System.Diagnostics;
 using Orion.Engine;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -94,9 +95,10 @@ namespace Orion.Game.Simulation.Tasks
                 if (Unit.HasSkill<HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
                 {
                     // Smells like a hack!
-                    ResourceNode node = Unit.World.Entities
+                    Entity node = Unit.World.Entities
                         .Intersecting(target.BoundingRectangle)
-                        .OfType<ResourceNode>()
+                        .Where(e => e.HasComponent<Harvestable>())
+                        .Where(e => !e.GetComponent<Harvestable>().IsEmpty)
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
 
                     if (Unit.TaskQueue.Count == 1)

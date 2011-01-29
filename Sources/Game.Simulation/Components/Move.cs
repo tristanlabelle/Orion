@@ -12,8 +12,8 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat SpeedStat = new EntityStat(typeof(Move), StatType.Real, "Speed", "Vitesse");
         public static readonly EntityStat AccelerationStat = new EntityStat(typeof(Move), StatType.Real, "Acceleration", "Accélération");
 
-        [Mandatory] private float speed;
-        [Mandatory] private float acceleration;
+        private float speed;
+        private float acceleration;
         #endregion
 
         #region Constructors
@@ -21,12 +21,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        [Mandatory]
         public float Speed
         {
             get { return speed; }
             set { speed = value; }
         }
 
+        [Mandatory]
         public float Acceleration
         {
             get { return acceleration; }

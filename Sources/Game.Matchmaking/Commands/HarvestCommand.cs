@@ -65,7 +65,7 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            ResourceNode resourceNode = (ResourceNode)match.World.Entities.FromHandle(resourceNodeHandle);
+            Entity resourceNode = match.World.Entities.FromHandle(resourceNodeHandle);
             foreach (Handle harvesterHandle in harvesterHandles)
             {
                 Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);

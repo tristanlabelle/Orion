@@ -7,6 +7,8 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -53,35 +55,37 @@ namespace Orion.Game.Presentation.Renderers
         }
 
         private void DrawClipped(GraphicsContext graphicsContext, Rectangle viewBounds,
-            Action<GraphicsContext, ResourceNode> drawDelegate)
+            Action<GraphicsContext, Entity> drawDelegate)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
             Rectangle clippingBounds = viewBounds;
-            foreach (Entity entity in World.Entities)
+            foreach (Entity entity in World.Entities.Where(e => e.HasComponent<Harvestable>()))
             {
-                ResourceNode resourceNode = entity as ResourceNode;
-                if (resourceNode == null) continue;
-
+                Position positionComponent = entity.GetComponent<Position>();
                 Rectangle boundingRectangle = entity.BoundingRectangle;
                 if (!Rectangle.Intersects(clippingBounds, boundingRectangle)
-                    || !faction.HasPartiallySeen(resourceNode.GridRegion))
+                    || !faction.HasPartiallySeen(positionComponent.GridRegion))
                     continue;
 
-                drawDelegate(graphicsContext, resourceNode);
+                drawDelegate(graphicsContext, entity);
             }
         }
 
-        private void DrawUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
+        private void DrawUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            string resourceTypeName = resourceNode.Type.ToStringInvariant();
+            Debug.Assert(resourceNode.HasComponent<Harvestable>(), "Entity is not a resource node!");
+            Harvestable harvestData = resourceNode.GetComponent<Harvestable>();
+            string resourceTypeName = harvestData.Type.ToStringInvariant();
             Texture texture = gameGraphics.GetMiscTexture(resourceTypeName);
             graphicsContext.Fill(resourceNode.BoundingRectangle, texture);
         }
 
-        private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, ResourceNode resourceNode)
+        private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            ColorRgb color = GetResourceColor(resourceNode.Type);
+            Debug.Assert(resourceNode.HasComponent<Harvestable>(), "Entity is not a resource node!");
+            Harvestable harvestData = resourceNode.GetComponent<Harvestable>();
+            ColorRgb color = GetResourceColor(harvestData.Type);
             graphicsContext.Fill(resourceNode.BoundingRectangle, color);
         }
 

@@ -13,8 +13,8 @@ namespace Orion.Game.Simulation.Components
         public static readonly EntityStat SpeedStat = new EntityStat(typeof(Harvest), StatType.Real, "Speed", "Vitesse de récolte");
         public static readonly EntityStat MaxCarryingAmountStat = new EntityStat(typeof(Harvest), StatType.Integer, "MaxCarryingAmount", "Quantité maximum");
 
-        [Mandatory] private float speed;
-        [Mandatory] private int maxCarryingAmount;
+        private float speed;
+        private int maxCarryingAmount;
 
         private ResourceAmount resourceAmount;
         #endregion
@@ -24,12 +24,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        [Mandatory]
         public float Speed
         {
             get { return speed; }
             set { speed = value; }
         }
 
+        [Mandatory]
         public int MaxCarryingAmount
         {
             get { return maxCarryingAmount; }

@@ -14,6 +14,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation
 {
@@ -304,13 +305,13 @@ namespace Orion.Game.Presentation
             {
                 LaunchDefaultCommand((Unit)targetEntity);
             }
-            else if (targetEntity is ResourceNode)
+            else if (targetEntity.HasComponent<Harvestable>())
             {
-                ResourceNode targetResourceNode = (ResourceNode)targetEntity;
+                Position position = targetEntity.GetComponent<Position>();
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
-                    LaunchChangeRallyPoint(targetResourceNode.Center);
+                    LaunchChangeRallyPoint(position.Center);
                 else
-                    LaunchDefaultCommand(targetResourceNode);
+                    LaunchDefaultCommand(targetEntity);
             }
             else
             {
@@ -340,9 +341,9 @@ namespace Orion.Game.Presentation
                     return;
                 }
 
-                ResourceNode alageneNode = World.Entities
+                Entity alageneNode = World.Entities
                     .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
-                    .OfType<ResourceNode>()
+                    .Where(e => e.HasComponent<Harvestable>())
                     .FirstOrDefault(node => node.Position == target.Position);
                 if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
                 {
@@ -366,8 +367,9 @@ namespace Orion.Game.Presentation
             LaunchMove(target.Position);
         }
 
-        private void LaunchDefaultCommand(ResourceNode target)
+        private void LaunchDefaultCommand(Entity target)
         {
+            Debug.Assert(target.HasComponent<Harvestable>(), "Target is not harvestable!");
             if (LocalFaction.CanHarvest(target))
                 LaunchHarvest(target);
             else
@@ -419,8 +421,9 @@ namespace Orion.Game.Presentation
             commander.LaunchMove(movableUnits.Where(unit => !unit.HasSkill<AttackSkill>()), destination);
         }
 
-        public void LaunchHarvest(ResourceNode node)
+        public void LaunchHarvest(Entity node)
         {
+            Debug.Assert(node.HasComponent<Harvestable>(), "Node is not a resource node!");
             IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position

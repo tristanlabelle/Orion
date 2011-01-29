@@ -11,6 +11,8 @@ using Orion.Engine.Gui;
 using Orion.Engine.Geometry;
 using System.Windows.Forms;
 using Orion.Engine.Input;
+using Orion.Game.Simulation.Components;
+using System.Diagnostics;
 
 namespace Orion.Game.Presentation
 {
@@ -135,10 +137,11 @@ namespace Orion.Game.Presentation
         /// </summary>
         /// <param name="node">The resource node for which to retrieve a texture.</param>
         /// <returns>The texture for that resource node.</returns>
-        public Texture GetResourceTexture(ResourceNode node)
+        public Texture GetResourceTexture(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
-            return GetResourceTexture(node.Type);
+            Debug.Assert(node.HasComponent<Harvestable>(), "Entity is not a resource node!");
+            return GetResourceTexture(node.GetComponent<Harvestable>().Type);
         }
 
         /// <summary>

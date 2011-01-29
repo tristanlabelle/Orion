@@ -11,9 +11,8 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         public static readonly EntityStat HarvestRateStat = new EntityStat(typeof(Harvestable), StatType.Real, "HarvestRate", "Vitesse de récolte");
 
-        private int aladdiumLeft;
-        private int alageneLeft;
-        private float harvestRate;
+        private int resourceAmount;
+        private ResourceType type;
         #endregion
 
         #region Constructors
@@ -23,25 +22,31 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        [Persistent]
-        public int AladdiumLeft
+        [Mandatory]
+        public int AmountRemaining
         {
-            get { return aladdiumLeft; }
-            set { aladdiumLeft = value; }
-        }
-
-        [Persistent]
-        public int AlageneLeft
-        {
-            get { return alageneLeft; }
-            set { alageneLeft = value; }
+            get { return resourceAmount; }
+            set { resourceAmount = value; }
         }
 
         [Mandatory]
-        public float HarvestRate
+        public ResourceType Type
         {
-            get { return harvestRate; }
-            set { harvestRate = value; }
+            get { return type; }
+            set { type = value; }
+        }
+
+        [Transient]
+        public bool IsEmpty
+        {
+            get { return resourceAmount == 0; }
+        }
+        #endregion
+
+        #region Methods
+        public void Harvest(int amount)
+        {
+            resourceAmount -= amount;
         }
         #endregion
     }

@@ -11,8 +11,8 @@ namespace Orion.Game.Simulation.Components
         #region Properties
         public static readonly EntityStat SpeedMultiplierStat = new EntityStat(typeof(Train), StatType.Real, "Speed Multiplier", "Multiplicateur de vitesse");
 
-        [Mandatory] private float speedMultiplier;
-        [Mandatory] private HashSet<string> trainableTypes = new HashSet<string>();
+        private float speedMultiplier;
+        private HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
         #region Constructors
@@ -20,12 +20,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        [Mandatory]
         public float SpeedMultiplier
         {
             get { return speedMultiplier; }
             set { speedMultiplier = value; }
         }
 
+        [Mandatory]
         public ICollection<string> TrainableTypes
         {
             get { return trainableTypes; }

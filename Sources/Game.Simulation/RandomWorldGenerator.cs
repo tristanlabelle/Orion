@@ -88,9 +88,9 @@ namespace Orion.Game.Simulation
         {
             for (int i = 0; i < aladdiumNodeCount + alageneNodeCount; i++)
             {
-                Point location = GetRandomFreeLocation(world, ResourceNode.DefaultSize, random);
+                Point location = GetRandomFreeLocation(world, World.DefaultResourceNodeSize, random);
                 ResourceType resourceType = i < aladdiumNodeCount ? ResourceType.Aladdium : ResourceType.Alagene;
-                ResourceNode node = world.Entities.CreateResourceNode(resourceType, location);
+                world.Entities.CreateResourceNode(resourceType, location);
             }
         }
 

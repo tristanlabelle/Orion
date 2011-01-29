@@ -8,6 +8,7 @@ using OpenTK;
 using System.IO;
 using System.Diagnostics;
 using Orion.Game.Simulation.IO;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -38,8 +39,8 @@ namespace Orion.Game.Simulation
             foreach (ResourceNodeTemplate node in worldData.AladdiumNodes)
             {
                 Point nodeLocation = node.Location;
-                ResourceNode concreteNode = world.Entities.CreateResourceNode(node.ResourceType, nodeLocation);
-                concreteNode.AmountRemaining = node.AmountRemaining;
+                Entity concreteNode = world.Entities.CreateResourceNode(node.ResourceType, nodeLocation);
+                concreteNode.GetComponent<Harvestable>().AmountRemaining = node.AmountRemaining;
             }
 
             // place units

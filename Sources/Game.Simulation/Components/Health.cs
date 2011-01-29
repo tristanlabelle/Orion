@@ -21,6 +21,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private int maxHealth;
         private ArmorType armorType;
+        private int threatLevel;
         private float regenerationRate;
         private float damageReduction;
         private float armor;
@@ -51,6 +52,13 @@ namespace Orion.Game.Simulation.Components
         {
             get { return armor; }
             set { armor = value; }
+        }
+
+        [Mandatory]
+        public int ThreatLevel
+        {
+            get { return threatLevel; }
+            set { threatLevel = value; }
         }
 
         [Transient]

@@ -10,6 +10,8 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
+using System.Diagnostics;
 
 namespace Orion.Game.Matchmaking
 {
@@ -22,12 +24,12 @@ namespace Orion.Game.Matchmaking
         #region ResourceNodeData
         private sealed class ResourceNodeData
         {
-            public readonly ResourceNode Node;
+            public readonly Entity Node;
             public int HarvesterCount;
             public Unit NearbyDepot;
             public Unit Extractor;
 
-            public ResourceNodeData(ResourceNode node)
+            public ResourceNodeData(Entity node)
             {
                 Argument.EnsureNotNull(node, "node");
                 this.Node = node;
@@ -68,8 +70,8 @@ namespace Orion.Game.Matchmaking
         private readonly List<PlaceToExplore> placesToExplore = new List<PlaceToExplore>();
         private readonly HashSet<UnitType> createdUnitTypes = new HashSet<UnitType>();
         private readonly HashSet<Unit> buildings = new HashSet<Unit>();
-        private readonly Dictionary<ResourceNode, ResourceNodeData> resourceNodesData
-            = new Dictionary<ResourceNode, ResourceNodeData>();
+        private readonly Dictionary<Entity, ResourceNodeData> resourceNodesData
+            = new Dictionary<Entity, ResourceNodeData>();
 
         /// <summary>
         /// A set of units which have been assigned tasks within the update.
@@ -115,15 +117,15 @@ namespace Orion.Game.Matchmaking
             get { return Match.Random; }
         }
 
-        private IEnumerable<ResourceNode> VisibleResourceNodes
+        private IEnumerable<Entity> VisibleResourceNodes
         {
             get
             {
                 foreach (Entity entity in World.Entities)
                 {
-                    ResourceNode node = entity as ResourceNode;
-                    if (node == null || !Faction.CanSee(node)) continue;
-                    yield return node;
+                    if (!entity.HasComponent<Harvestable>()) continue;
+                    if (!Faction.CanSee(entity)) continue;
+                    yield return entity;
                 }
             }
         }
@@ -239,8 +241,8 @@ namespace Orion.Game.Matchmaking
                 ++nodeData.HarvesterCount;
             }
 
-            var resourceNodes = World.Entities.OfType<ResourceNode>();
-            foreach (ResourceNode node in resourceNodes)
+            var resourceNodes = World.Entities.Where(e => e.HasComponent<Harvestable>());
+            foreach (Entity node in resourceNodes)
             {
                 ResourceNodeData nodeData;
                 if (!resourceNodesData.TryGetValue(node, out nodeData))
@@ -251,7 +253,8 @@ namespace Orion.Game.Matchmaking
                     resourceNodesData.Add(node, nodeData);
                 }
 
-                if (nodeData.Node.Type == ResourceType.Alagene
+
+                if (nodeData.Node.GetComponent<Harvestable>().Type == ResourceType.Alagene
                     && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
                     && World.IsFree(node.GridRegion, CollisionLayer.Ground))
                 {
@@ -261,7 +264,7 @@ namespace Orion.Game.Matchmaking
                         Unit builder = GetNearbyUnit(u => u.Type.CanBuild(alageneExtractorUnitType), node.Center);
                         if (builder != null)
                         {
-                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorUnitType.Handle, node.Position);
+                            var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorUnitType.Handle, Point.Truncate(node.Position));
                             IssueCommand(command);
                             assignedUnits.Add(builder);
                         }
@@ -463,9 +466,8 @@ namespace Orion.Game.Matchmaking
                 buildings.Add(unit);
                 if (unit.Type == alageneExtractorUnitType)
                 {
-                    ResourceNode node = World.Entities.Intersecting(unit.Center)
-                        .OfType<ResourceNode>()
-                        .First();
+                    Entity node = World.Entities.Intersecting(unit.Center)
+                        .First(e => e.HasComponent<Harvestable>());
 
                     var nodeData = resourceNodesData[node];
                     nodeData.Extractor = unit;
@@ -475,10 +477,10 @@ namespace Orion.Game.Matchmaking
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            ResourceNode node = entity as ResourceNode;
-            if (node != null)
+            Debug.Assert(entity.HasComponent<Harvestable>(), "Entity is not a resource node!");
+            if (entity != null)
             {
-                resourceNodesData.Remove(node);
+                resourceNodesData.Remove(entity);
                 return;
             }
 

@@ -1,6 +1,6 @@
 ﻿namespace Orion.Egine.Localization
 {
-    internal enum Genders
+    public enum Genders
     {
         M,
         F,

@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Diagnostics;
 using System.Xml;
@@ -18,8 +19,8 @@ namespace Orion.Egine.Localization
         #region Fields
         private CultureInfo cultureInfo;
         private bool isLoaded = false;
-        private Hashtable nouns;
-        private Hashtable sentences;
+        private Dictionary<string, Definition> nouns;
+        private Dictionary<string, Definition> sentences;
 
         #region XmlConst
         private const string NOUN_DEFINITIONS = "NounDefinitions";
@@ -42,8 +43,8 @@ namespace Orion.Egine.Localization
         /// <param name="path">The path to the XML file where the definitions are stored.</param>
         public Localizer(string path)
         {
-            nouns = new Hashtable();
-            sentences = new Hashtable();
+            nouns = new Dictionary<string, Definition>();
+            sentences = new Dictionary<string, Definition>();
 
             cultureInfo = new CultureInfo(1033); //English-United States
 
@@ -72,11 +73,11 @@ namespace Orion.Egine.Localization
         /// </summary>
         /// <param name="key">The unique key used to find the noun.</param>
         /// <returns>The localized string for the noun.</returns>
-        public string GetString(string key)
+        public string GetNoun(string key)
         {
             Debug.Assert(isLoaded);
 
-            Definition matchingDefinition = (Definition)nouns[key];
+            Definition matchingDefinition = nouns[key];
 
             return matchingDefinition.GetTranslation(cultureInfo).TranslatedString;
         }
@@ -86,19 +87,64 @@ namespace Orion.Egine.Localization
         /// The definitions must be loaded before they can be accessed.
         /// </summary>
         /// <param name="key">The unique key used to find the sentence.</param>
-        /// <param name="values">Parameters to be passed to the sentence. (%0 = value[0])</param>
+        /// <param name="values">Parameters to be passed to the sentence. (%n0 = value[0])</param>
         /// <returns>The localized and formatted string for the sentence.</returns>
-        public string GetString(string key, params string[] values)
+        public string GetSentence(string key, params string[] values)
         {
             Debug.Assert(isLoaded);
             
-            //TODO:
             Definition matchingDefinition = (Definition)nouns[key];
 
-            //- Replace all %nX by their matching values[X]
-            //- Parse {} - 2 choices ~ OR > for the moment
+            string input = matchingDefinition.GetTranslation(this.cultureInfo).TranslatedString;
+            StringBuilder output = new StringBuilder(input);
 
-            throw new NotImplementedException("COMING SOON!");
+            //- Replace all %nX by their matching values[X]
+            Regex objArgPattern = new Regex("%n[0-9]");
+
+            foreach (Match match in objArgPattern.Matches(input))
+            {
+                int argIndex = int.Parse(match.Value.Substring(2, 1)); //Position of the arg number
+                output = output.Replace(match.Value, values[argIndex].ToString());
+            }
+
+            //- Replace all {n0~F?xxx:yyy} by the value before or after the ":" using the gender after the "~"
+            Regex objGenderPattern = new Regex("\\{n[0-9]~(M|F|N)\\?.*?:?.*?\\}");
+
+            foreach (Match match in objGenderPattern.Matches(input))
+            {
+                int argIndex = int.Parse(match.Value.Substring(2, 1)); //Position of the arg number
+                Translation argTranslation = nouns[values[argIndex]].GetTranslation(cultureInfo);
+                Debug.Assert(argTranslation != null);
+
+                Genders gender;
+                switch (match.Value.Substring(4, 1))
+                {
+                    case "M": gender = Genders.M; break;
+                    case "F": gender = Genders.F; break;
+                    default: gender = Genders.Na; break;
+                }
+
+                bool genderMatches = argTranslation.Gender == gender;
+                bool expContainsColon = match.Value.Contains(":");
+
+                Regex subReplaceValuesPattern = new Regex(".*\\?(.*?:?.*?)\\}.*");
+                string[] replaceValues = subReplaceValuesPattern.Replace(match.Value, "$1").Split(':');
+
+                if (genderMatches)
+                {
+                    output = output.Replace(match.Value, replaceValues[0]);
+                }
+                else if (!genderMatches && expContainsColon)
+                {
+                    output = output.Replace(match.Value, replaceValues[1]);
+                }
+                else if (!genderMatches && !expContainsColon) //NAND
+                {
+                    output = output.Replace(match.Value, string.Empty);
+                }
+            }
+
+            return output.ToString();
         }
 
         /// <summary>

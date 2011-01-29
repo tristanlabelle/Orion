@@ -7,7 +7,7 @@ namespace Orion.Egine.Localization
     /// <summary>
     /// Represents a translation of a definition.
     /// </summary>
-    internal class Translation
+    public class Translation
     {
         #region Fields
         private string translatedString;
@@ -58,6 +58,14 @@ namespace Orion.Egine.Localization
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Returns the non-formatted translated string of the translation.
+        /// </summary>
+        /// <returns>The string</returns>
+        public override string ToString()
+        {
+            return translatedString;
+        }
         #endregion
     }
 }

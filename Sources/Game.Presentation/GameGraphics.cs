@@ -11,7 +11,6 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
 using Keys = System.Windows.Forms.Keys;
-using RootView = Orion.Engine.Gui.RootView;
 
 namespace Orion.Game.Presentation
 {
@@ -24,7 +23,6 @@ namespace Orion.Game.Presentation
         private readonly IGameWindow window;
         private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
         private readonly UIManager uiManager;
-        private readonly RootView rootView;
         private readonly TextureManager textureManager;
         #endregion
 
@@ -38,9 +36,6 @@ namespace Orion.Game.Presentation
             System.Windows.Forms.Cursor.Hide();
 
             this.textureManager = new TextureManager(window.GraphicsContext, "../../../Assets/Textures");
-
-            Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
-            this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
 
             OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext, textureManager);
             uiManager = style.CreateUIManager();
@@ -87,12 +82,6 @@ namespace Orion.Game.Presentation
         public OrionGuiStyle GuiStyle
         {
             get { return (OrionGuiStyle)uiManager.Renderer; }
-        }
-
-        [Obsolete("Old UI system that will be killed, use UIManager.")]
-        public RootView RootView
-        {
-            get { return rootView; }
         }
 
         /// <summary>
@@ -230,21 +219,22 @@ namespace Orion.Game.Presentation
         }
         #endregion
 
+        /// <summary>
+        /// Draws the user interface.
+        /// </summary>
         public void DrawGui()
         {
             window.GraphicsContext.ProjectionBounds = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
             uiManager.Draw();
-            RootView.Draw(window.GraphicsContext);
         }
 
         /// <summary>
-        /// Updates the root view for a frame, allowing it to process queued input.
+        /// Updates the user interface for a frame, allowing it to process queued input.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
         public void UpdateGui(float timeDeltaInSeconds)
         {
             DispatchInputEvents();
-            rootView.Update(timeDeltaInSeconds);
             uiManager.Update(TimeSpan.FromSeconds(timeDeltaInSeconds));
         }
 
@@ -262,7 +252,6 @@ namespace Orion.Game.Presentation
             while (inputEventQueue.Count > 0)
             {
                 InputEvent inputEvent = inputEventQueue.Dequeue();
-                rootView.SendInputEvent(inputEvent);
                 uiManager.InjectInputEvent(inputEvent);
             }
         }

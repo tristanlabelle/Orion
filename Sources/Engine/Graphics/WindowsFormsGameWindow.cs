@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using OpenTK.Graphics;
 using OpenTK;
+using OpenTK.Graphics;
 using Orion.Engine.Collections;
-using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using WinForms = System.Windows.Forms;
 

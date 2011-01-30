@@ -468,12 +468,17 @@ namespace Orion.Game.Presentation.Gui
             };
             stack.Stack(imageBox);
 
-            label = style.CreateLabel("0");
+            // style.CreateLabel is not used because the text must be white and inheriting the "disabled" style is not desired
+            label = new Label()
+            {
+                Text = "0",
+                Font = style.Font,
+                TextColor = Colors.White,
+                VerticalAlignment = Alignment.Center,
+                MinXMargin = 5,
+                MinWidth = 30,
+            };
             stack.Stack(label);
-            label.VerticalAlignment = Alignment.Center;
-            label.MinXMargin = 5;
-            label.MinWidth = 30;
-            label.TextColor = Colors.White;
 
             return stack;
         }

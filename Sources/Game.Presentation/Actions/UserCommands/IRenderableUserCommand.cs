@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Orion.Engine.Graphics;
 using Orion.Engine.Geometry;
 
-namespace Orion.Engine.Gui
+namespace Orion.Game.Presentation.Actions.UserCommands
 {
     /// <summary>
-    /// Allows to render the content of a view.
+    /// Provides the interface that allows a <see cref="UserCommand"/> to draw visual cues on-screen.
     /// </summary>
-    public interface IViewRenderer
+    public interface IRenderableUserCommand
     {
         /// <summary>
         /// Draws the content of a view.

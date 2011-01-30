@@ -124,7 +124,6 @@
     <Compile Include="Graphics\GameWindowForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Graphics\NormalizedZoneChartRenderer.cs" />
     <Compile Include="Graphics\OpenTKGameWindow.cs" />
     <Compile Include="Graphics\TextOverflowPolicy.cs" />
     <Compile Include="Graphics\TextRenderer.cs" />
@@ -202,53 +201,16 @@
     <Compile Include="Gui2\UIManager.PopupCollection.cs" />
     <Compile Include="Gui2\Visibility.cs" />
     <Compile Include="Gui2\UIManager.cs" />
-    <Compile Include="Gui\Button.cs" />
-    <Compile Include="Gui\Checkbox.cs" />
-    <Compile Include="Gui\CheckboxRenderer.cs" />
-    <Compile Include="Gui\ClippedView.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Graphics\CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gui\DelegatedRenderer.cs" />
-    <Compile Include="Gui\DropdownList.cs" />
-    <Compile Include="Gui\FilledRenderer.cs" />
-    <Compile Include="Data\ChartModel.cs" />
     <Compile Include="Input\InputEvent.cs" />
     <Compile Include="Input\InputEventType.cs" />
-    <Compile Include="Gui\Panel.cs" />
-    <Compile Include="Gui\Instant.cs" />
-    <Compile Include="Gui\IViewRenderer.cs" />
     <Compile Include="Input\KeyboardEventType.cs" />
-    <Compile Include="Gui\Label.cs" />
-    <Compile Include="Gui\ListPanel.cs" />
     <Compile Include="Input\InputEnums.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Input\MouseEventType.cs" />
-    <Compile Include="Gui\RenderedView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\Responder.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\RootView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\RoundedRectangleRenderer.cs" />
-    <Compile Include="Gui\Scrollbar.cs" />
-    <Compile Include="Gui\TextField.cs" />
-    <Compile Include="Gui\TexturedRenderer.cs" />
-    <Compile Include="Gui\View.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\ViewChildrenCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\ViewContainer.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />

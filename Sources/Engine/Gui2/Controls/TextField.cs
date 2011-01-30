@@ -251,6 +251,13 @@ namespace Orion.Engine.Gui2
 
         protected override bool OnMouseButton(MouseEvent @event)
         {
+            if (!Rectangle.Contains(@event.Position))
+            {
+                ReleaseMouseCapture();
+                ReleaseKeyboardFocus();
+                return false;
+            }
+
             if (@event.Button == MouseButtons.Left && @event.IsPressed && isEditable)
             {
                 PositionCaret(@event.Position);
@@ -263,7 +270,14 @@ namespace Orion.Engine.Gui2
 
         protected override bool OnMouseClick(MouseEvent @event)
         {
-            if (IsEditable) AcquireKeyboardFocus();
+            if (!Rectangle.Contains(@event.Position))
+            {
+                ReleaseMouseCapture();
+                ReleaseKeyboardFocus();
+                return false;
+            }
+
+            if (@event.Button == MouseButtons.Left && IsEditable) AcquireKeyboardFocus();
 
             return true;
         }

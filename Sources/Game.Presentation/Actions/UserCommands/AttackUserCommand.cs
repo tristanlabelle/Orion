@@ -3,15 +3,11 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
 using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
-using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
-    public sealed class AttackUserCommand : UserInputCommand, IViewRenderer
+    public sealed class AttackUserCommand : UserInputCommand, IRenderableUserCommand
     {
         #region Fields
         private readonly Texture texture;

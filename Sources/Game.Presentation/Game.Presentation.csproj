@@ -73,12 +73,12 @@
     <Compile Include="Actions\ActionPanel.cs" />
     <Compile Include="Actions\BuildActionProvider.cs" />
     <Compile Include="Actions\CancelActionProvider.cs" />
-    <Compile Include="Actions\TooltipPanel.cs" />
     <Compile Include="Actions\UpgradeActionProvider.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
     <Compile Include="Actions\UserCommands\EmbarkUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HealUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HarvestUserCommand.cs" />
+    <Compile Include="Actions\UserCommands\IRenderableUserCommand.cs" />
     <Compile Include="Actions\UserCommands\MoveUserCommand.cs" />
     <Compile Include="Actions\UserCommands\RepairUserCommand.cs" />
     <Compile Include="Actions\UserCommands\AttackUserCommand.cs" />
@@ -90,7 +90,6 @@
     <Compile Include="GameGraphics.cs" />
     <Compile Include="Gui\DiplomacyPanel2.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
-    <Compile Include="Gui\MatchConfigurationUI.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.PlayerCollection.cs" />
     <Compile Include="Gui\MatchConfigurationUI2.PlayerRow.cs" />
@@ -127,8 +126,6 @@
     <Compile Include="SelectionManager.cs" />
     <Compile Include="SelectionType.cs" />
     <Compile Include="SpriteAnimation.cs" />
-    <Compile Include="Gui\MaximizedPanel.cs" />
-    <Compile Include="Gui\MultiplayerLobbyUI.cs" />
     <Compile Include="Gui\MainMenuUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInputCommand.cs" />

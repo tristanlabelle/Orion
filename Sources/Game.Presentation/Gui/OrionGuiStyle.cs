@@ -37,6 +37,16 @@ namespace Orion.Game.Presentation.Gui
         }
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Gets the font used for in-game text.
+        /// </summary>
+        public Font Font
+        {
+            get { return font; }
+        }
+        #endregion
+
         #region Methods
         #region GuiRenderer Implementation
         protected override void PushTransformImpl(Transform transform)

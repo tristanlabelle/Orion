@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using Orion.Engine;
-using Orion.Engine.Gui;
 using Orion.Engine.Networking;
 using Orion.Game.Matchmaking.Networking;
-using Orion.Game.Matchmaking.Networking.Packets;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 

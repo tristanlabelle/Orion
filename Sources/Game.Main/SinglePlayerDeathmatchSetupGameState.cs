@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
@@ -72,8 +69,8 @@ namespace Orion.Game.Main
                 player.Color = newColor;
             };
 
-            this.ui.MatchStarted += OnStartGamePressed;
-            this.ui.Exited += OnExitPressed;
+            this.ui.MatchStarted += sender => StartGame();
+            this.ui.Exited += sender => Manager.Pop();
         }
         #endregion
 
@@ -105,7 +102,7 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        private void OnStartGamePressed(MatchConfigurationUI2 sender)
+        private void StartGame()
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -156,16 +153,6 @@ namespace Orion.Game.Main
             GameState targetGameState = new DeathmatchGameState(
                 Manager, graphics, match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
-        }
-
-        private void OnPlayerColorChanged(MatchConfigurationUI ui, Player player, ColorRgb color)
-        {
-            player.Color = color;
-        }
-
-        private void OnExitPressed(MatchConfigurationUI2 sender)
-        {
-            Manager.Pop();
         }
         #endregion
     }

@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Viking" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="70" ArmorType="Heavy" Armor="2" AladdiumCost="100" AlageneCost="25" FoodCost="3"/>
-		<Move Speed="6"/>
-		<Attack Power="13" Range="0" Delay="4" EffectiveAgainst="Heavy" IneffectiveAgainst="Surnatural"/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Thor" AladdiumCost="0" AlageneCost="0"/>
-		<Upgrade Target="Obélix" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Viking</Name>
+		<AladdiumCost>100</AladdiumCost>
+		<Upgrades>
+			<Item>Thor</Item>
+			<Item>Obélix</Item>
+		</Upgrades>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>3</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>13</Power>
+		<Range>0</Range>
+		<Delay>4</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>70</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	<Move>
+		<Speed>6</Speed>
+		<Acceleration>6</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

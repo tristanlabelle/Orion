@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Extracteur d'alagène" Width="2" Height="2">
-	<Skills>
-		<Basic SightRange="4" MaxHealth="75" ArmorType="Heavy" Armor="1" AladdiumCost="75"/>
-		<ExtractAlagene/>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Extracteur d'alagène</Name>
+		<AladdiumCost>75</AladdiumCost>
+	</Identity>
+	<ExtractAlagene/>
+	<Health>
+		<MaxHealth>75</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+		<SightRange>4</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

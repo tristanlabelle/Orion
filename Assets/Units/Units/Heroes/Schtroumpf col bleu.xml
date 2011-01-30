@@ -1,20 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Schtroumpf col bleu" VoicesTemplate="Schtroumpf" Width="1" Height="1" IsSuicidable="False">
-	<Skills>
-		<Basic SightRange="3" MaxHealth="50" ArmorType="Light" Armor="0" FoodCost="5"/>
-		<Move Speed="2"/>
-		<Attack Power="1" Range="0" Delay="10" EffectiveAgainst="" IneffectiveAgainst=""/>
-		<Build Speed="2">
-			<Target>Pyramide</Target>
-			<Target>Temple de 2012</Target>
-			<Target>Portail démoniaque</Target>
-			<Target>Centre de propagande</Target>
-			<Target>Maison de Tristan</Target>
-			<Target>Jean-Marc</Target>
-			<Target>Oeil de Sauron</Target>
-			<Target>Extracteur d'alagène</Target>
-			<Target>Réserve</Target>
-			<Target>Costco des Hells</Target>
-		</Build>
-	</Skills>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Schtroumpf col bleu</Name>
+		<AladdiumCost>50</AladdiumCost>
+		<VoicesTemplate>Schtroumpf</VoicesTemplate>
+	</Identity>
+	
+	<FactionMembership>
+		<FoodRequirement>5</FoodRequirement>
+	</FactionMembership>
+	
+	<Unsuicidable/>
+	
+	<Attack>
+		<Power>1</Power>
+		<Range>0</Range>
+		<Delay>10</Delay>
+	</Attack>
+	
+	<Build>
+		<Speed>2</Speed>
+		<BuildableTypes>
+			<Item>Pyramide</Item>
+			<Item>Temple de 2012</Item>
+			<Item>Portail démoniaque</Item>
+			<Item>Centre de propagande</Item>
+			<Item>Maison de Tristan</Item>
+			<Item>Jean-Marc</Item>
+			<Item>Œil de Sauron</Item>
+			<Item>Extracteur d'Alagène</Item>
+			<Item>Réserve</Item>
+			<Item>Costco des Hells</Item>
+			<Item>Carrefour Laval</Item>
+		</BuildableTypes>
+	</Build>
+	
+	<Health>
+		<MaxHealth>50</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>0</Armor>
+	</Health>
+	
+	<Move>
+		<Speed>2</Speed>
+		<Acceleration>2</Acceleration>
+	</Move>
+	
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>3</SightRange>
+	</Position>
+	
+	<Tags>
+		<Tags>
+			<Item>worker</Item>
+		</Tags>
+	</Tags>
+</Entity>

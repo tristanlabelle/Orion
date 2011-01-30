@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Barbe bleue" VoicesTemplate="Pirate" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="120" ArmorType="Light" Armor="2" FoodCost="1"/>
-		<Move Speed="8"/>
-		<Attack Power="16" Range="0" Delay="3" EffectiveAgainst="Heavy" IneffectiveAgainst=""/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Barbe bleue</Name>
+		<Upgrades>
+			<Item>Chuck Norris</Item>
+		</Upgrades>
+		<VoicesTemplate>Pirate</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>16</Power>
+		<Range>0</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>120</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>2</Armor>
+	</Health>
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

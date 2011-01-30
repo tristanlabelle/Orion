@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Pirate" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="40" ArmorType="Light" Armor="1" AladdiumCost="50" FoodCost="1"/>
-		<Move Speed="8"/>
-		<Attack Power="5" Range="0" Delay="3" EffectiveAgainst="Heavy" IneffectiveAgainst=""/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Barbe bleue" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Pirate</Name>
+		<AladdiumCost>50</AladdiumCost>
+		<Upgrades>
+			<Item>Barbe bleue</Item>
+		</Upgrades>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>1</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>5</Power>
+		<Range>0</Range>
+		<Delay>3</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Heavy</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Heavy armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>40</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Move>
+		<Speed>8</Speed>
+		<Acceleration>8</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

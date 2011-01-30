@@ -1,11 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Léonardo" VoicesTemplate="Ninja" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="120" ArmorType="Light" Armor="4" FoodCost="2"/>
-		<Move Speed="10"/>
-		<Attack Power="10" Range="5" Delay="2" EffectiveAgainst="Light Surnatural" IneffectiveAgainst="Heavy"/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Léonardo</Name>
+		<Upgrades>
+			<Item>Chuck Norris</Item>
+		</Upgrades>
+		<VoicesTemplate>Ninja</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>2</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>10</Power>
+		<Range>5</Range>
+		<Delay>2</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Supernatural</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Supernatural armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>120</MaxHealth>
+		<ArmorType>Light</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	<Move>
+		<Speed>10</Speed>
+		<Acceleration>10</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

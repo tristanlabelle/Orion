@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Thor" VoicesTemplate="Viking" Width="1" Height="1">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="200" ArmorType="Heavy" Armor="3" FoodCost="3"/>
-		<Move Speed="6"/>
-		<Attack Power="50" Range="0" Delay="4" EffectiveAgainst="Light" IneffectiveAgainst="Surnatural"/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Thor</Name>
+		<Upgrades>
+			<Item>Chuck Norris</Item>
+		</Upgrades>
+		<VoicesTemplate>Viking</VoicesTemplate>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>3</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>50</Power>
+		<Range>0</Range>
+		<Delay>4</Delay>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Light</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Light armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>200</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>3</Armor>
+	</Health>
+	<Move>
+		<Speed>6</Speed>
+		<Acceleration>6</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Ground</CollisionLayer>
+		<Size>
+			<Width>1</Width>
+			<Height>1</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

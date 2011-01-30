@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Jésus" Width="2" Height="2" IsAirborne="True">
-	<Skills>
-		<Basic SightRange="8" MaxHealth="80" ArmorType="Surnatural" Armor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
-		<Move Speed="12"/>
-		<Heal Speed="2" Range="4"/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Jésus-raptor" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Jésus</Name>
+		<AladdiumCost>80</AladdiumCost>
+		<AlageneCost>40</AlageneCost>
+		<Upgrades>
+			<Item>Jésus-raptor</Item>
+		</Upgrades>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>2</FoodRequirement>
+	</FactionMembership>
+	<Heal>
+		<Speed>2</Speed>
+		<Range>3</Range>
+	</Heal>
+	<Health>
+		<MaxHealth>80</MaxHealth>
+		<ArmorType>Supernatural</ArmorType>
+		<Armor>1</Armor>
+	</Health>
+	<Move>
+		<Speed>12</Speed>
+		<Acceleration>12</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>2</Width>
+			<Height>2</Height>
+		</Size>
+		<SightRange>8</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UnitType Name="Flying Spaghetti Monster" Width="3" Height="3" IsAirborne="True">
-	<Skills>
-		<Basic SightRange="10" MaxHealth="150" ArmorType="Heavy" Armor="4" AladdiumCost="250" AlageneCost="175" FoodCost="3"/>
-		<Move Speed="2"/>
-		<Attack Power="24" Range="6" Delay="5" SplashRadius="3" EffectiveAgainst="Surnatural" IneffectiveAgainst=""/>
-	</Skills>
-	<Upgrades>
-		<Upgrade Target="Ta mère" AladdiumCost="0" AlageneCost="0"/>
-	</Upgrades>
-</UnitType>
+<Entity>
+	<Identity>
+		<Name>Flying Spaghetti Monster</Name>
+		<AladdiumCost>250</AladdiumCost>
+		<AlageneCost>175</AlageneCost>
+		<Upgrades>
+			<Item>Ta mère</Item>
+		</Upgrades>
+	</Identity>
+	<FactionMembership>
+		<FoodRequirement>3</FoodRequirement>
+	</FactionMembership>
+	<Attack>
+		<Power>24</Power>
+		<Range>6</Range>
+		<Delay>5</Delay>
+		<SplashRadius>3</SplashRadius>
+		<DamageFilters>
+			<Item>
+				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
+					<ArmorType>Supernatural</ArmorType>
+				</Applies>
+				<AdditionalDamage>1</AdditionalDamage>
+				<Description>Supernatural armor</Description>
+			</Item>
+		</DamageFilters>
+	</Attack>
+	<Health>
+		<MaxHealth>150</MaxHealth>
+		<ArmorType>Heavy</ArmorType>
+		<Armor>4</Armor>
+	</Health>
+	<Move>
+		<Speed>2</Speed>
+		<Acceleration>2</Acceleration>
+	</Move>
+	<Position>
+		<CollisionLayer>Air</CollisionLayer>
+		<Size>
+			<Width>3</Width>
+			<Height>3</Height>
+		</Size>
+		<SightRange>10</SightRange>
+	</Position>
+	<Tags/>
+</Entity>

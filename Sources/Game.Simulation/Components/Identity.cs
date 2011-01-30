@@ -13,7 +13,9 @@ namespace Orion.Game.Simulation.Components
         private string name;
         private int aladdiumCost;
         private int alageneCost;
+        private TrainType trainType;
         private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
+        private Entity templateEntity;
         #endregion
 
         #region Constructors
@@ -26,6 +28,13 @@ namespace Orion.Game.Simulation.Components
         {
             get { return name; }
             set { name = value; }
+        }
+
+        [Persistent]
+        public TrainType TrainType
+        {
+            get { return trainType; }
+            set { trainType = value; }
         }
 
         [Persistent]
@@ -46,6 +55,12 @@ namespace Orion.Game.Simulation.Components
         public ICollection<UnitTypeUpgrade> Upgrades
         {
             get { return upgrades; }
+        }
+
+        public Entity TemplateEntity
+        {
+            get { return templateEntity; }
+            set { templateEntity = value; }
         }
         #endregion
     }

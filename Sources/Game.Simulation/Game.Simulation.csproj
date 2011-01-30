@@ -80,7 +80,7 @@
     <Compile Include="Components\InvalidComponentStatException.cs" />
     <Compile Include="Components\Kamikaze.cs" />
     <Compile Include="Components\Move.cs" />
-    <Compile Include="Components\Position.cs" />
+    <Compile Include="Components\Spatial.cs" />
     <Compile Include="Components\Harvestable.cs" />
     <Compile Include="Components\Sellable.cs" />
     <Compile Include="Components\Serialization\MandatoryAttribute.cs" />
@@ -93,6 +93,8 @@
     <Compile Include="Components\StatType.cs" />
     <Compile Include="Components\Tags.cs" />
     <Compile Include="Components\Train.cs" />
+    <Compile Include="Components\TrainProgress.cs" />
+    <Compile Include="Components\TrainProgressType.cs" />
     <Compile Include="Components\Transport.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Skills\UnitSkill.cs" />
     <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
+    <Compile Include="TrainType.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />

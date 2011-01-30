@@ -147,7 +147,7 @@ namespace Orion.Game.Simulation
                 harvestableComponent.Type = type;
                 node.AddComponent(harvestableComponent);
 
-                Position positionComponent = new Position(node);
+                Spatial positionComponent = new Spatial(node);
                 positionComponent.Size = new Size(2, 2);
                 positionComponent.Location = point;
                 node.AddComponent(positionComponent);

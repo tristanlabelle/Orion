@@ -307,7 +307,7 @@ namespace Orion.Game.Presentation
             }
             else if (targetEntity.HasComponent<Harvestable>())
             {
-                Position position = targetEntity.GetComponent<Position>();
+                Spatial position = targetEntity.GetComponent<Spatial>();
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(position.Center);
                 else

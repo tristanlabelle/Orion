@@ -22,7 +22,7 @@ namespace Orion.Game.Simulation.Components
         private float lastLoadTime;
         private float lastUnloadTime;
         private List<Entity> loadedUnits = new List<Entity>();
-        private List<Position> positionComponents = new List<Position>();
+        private List<Spatial> positionComponents = new List<Spatial>();
         #endregion
 
         #region Constructors
@@ -93,7 +93,7 @@ namespace Orion.Game.Simulation.Components
             Move mobility = entity.GetComponentOrNull<Move>();
             if (mobility == null) return false;
 
-            Position embarkeePosition = entity.GetComponentOrNull<Position>();
+            Spatial embarkeePosition = entity.GetComponentOrNull<Spatial>();
             if (embarkeePosition == null) return false;
 
             FactionMembership embarkeeMembership = entity.GetComponentOrNull<FactionMembership>();
@@ -113,8 +113,8 @@ namespace Orion.Game.Simulation.Components
             if (!CanEmbark(entity))
                 throw new ArgumentException("entity");
 
-            Position embarkeePosition = entity.GetComponent<Position>();
-            entity.RemoveComponent<Position>();
+            Spatial embarkeePosition = entity.GetComponent<Spatial>();
+            entity.RemoveComponent<Spatial>();
 
             positionComponents.Add(embarkeePosition);
             loadedUnits.Add(entity);
@@ -125,8 +125,8 @@ namespace Orion.Game.Simulation.Components
             if (!loadedUnits.Contains(entity))
                 throw new ArgumentException("entity");
 
-            Position embarkerPosition = Entity.GetComponent<Position>();
-            Position embarkeePosition = entity.GetComponent<Position>();
+            Spatial embarkerPosition = Entity.GetComponent<Spatial>();
+            Spatial embarkeePosition = entity.GetComponent<Spatial>();
             Point? location = embarkerPosition
                 .GridRegion.Points
                 .Concat(embarkerPosition.GridRegion.GetAdjacentPoints())
@@ -139,7 +139,7 @@ namespace Orion.Game.Simulation.Components
             }
 
             int embarkeeIndex = loadedUnits.IndexOf(entity);
-            Position position = positionComponents[embarkeeIndex];
+            Spatial position = positionComponents[embarkeeIndex];
             loadedUnits.RemoveAt(embarkeeIndex);
             positionComponents.RemoveAt(embarkeeIndex);
 

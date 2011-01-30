@@ -86,7 +86,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual Size Size
         {
-            get { return GetComponent<Position>().Size; }
+            get { return GetComponent<Spatial>().Size; }
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual CollisionLayer CollisionLayer
         {
-            get { return GetComponent<Position>().CollisionLayer; }
+            get { return GetComponent<Spatial>().CollisionLayer; }
         }
 
         /// <summary>
@@ -190,9 +190,19 @@ namespace Orion.Game.Simulation
             return components.Count(c => c.GetType() == componentType) > 0;
         }
 
+        public Component GetComponent(Type type)
+        {
+            return components.First(c => c.GetType() == type);
+        }
+
         public T GetComponent<T>() where T : Component
         {
             return components.OfType<T>().First();
+        }
+
+        public Component GetComponentOrNull(Type type)
+        {
+            return components.FirstOrDefault(c => c.GetType() == type);
         }
 
         public T GetComponentOrNull<T>() where T : Component
@@ -217,6 +227,17 @@ namespace Orion.Game.Simulation
         {
             Component instance = GetComponent<T>();
             components.Remove(instance);
+        }
+
+        public void RemoveComponent(Type componentType)
+        {
+            Component instance = GetComponent(componentType);
+            components.Remove(instance);
+        }
+
+        public void RemoveComponent(Component component)
+        {
+            components.Remove(component);
         }
 
         public Stat GetStat(EntityStat stat)
@@ -311,7 +332,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         protected virtual Vector2 GetPosition()
         {
-            return GetComponent<Position>().Location;
+            return GetComponent<Spatial>().Location;
         }
 
         protected virtual void DoUpdate(SimulationStep step) { }

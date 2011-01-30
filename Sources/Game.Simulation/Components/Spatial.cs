@@ -10,10 +10,10 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Position : Component
+    public class Spatial : Component
     {
         #region Static
-        public static readonly EntityStat SightRangeStat = new EntityStat(typeof(Position), StatType.Real, "SightRange", "Portée de vision");
+        public static readonly EntityStat SightRangeStat = new EntityStat(typeof(Spatial), StatType.Real, "SightRange", "Portée de vision");
         #endregion
 
         #region Fields
@@ -26,11 +26,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Constructors
-        public Position(Entity entity) : base(entity) { }
+        public Spatial(Entity entity) : base(entity) { }
         #endregion
 
         #region Events
-        public event Action<Position, Vector2, Vector2> Moved;
+        public event Action<Spatial, Vector2, Vector2> Moved;
         #endregion
 
         #region Properties

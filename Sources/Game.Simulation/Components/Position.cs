@@ -19,6 +19,7 @@ namespace Orion.Game.Simulation.Components
         #region Fields
         private CollisionLayer collisionLayer;
         private float sightRange;
+        private Size size;
 
         private Vector2 location;
         private float angle;
@@ -76,12 +77,32 @@ namespace Orion.Game.Simulation.Components
             }
         }
 
+        [Mandatory]
+        public Size Size
+        {
+            get { return size; }
+            set { size = value; }
+        }
+
+        [Transient]
+        public int Width
+        {
+            get { return size.Width; }
+            set { size = new Size(value, size.Height); }
+        }
+
+        [Transient]
+        public int Height
+        {
+            get { return size.Height; }
+            set { size = new Size(size.Width, value); }
+        }
+
         [Transient]
         public Vector2 Center
         {
             get
             {
-                Size size = Entity.GetComponent<Identity>().Size;
                 return new Vector2(Location.X + size.Width * 0.5f, Location.Y + size.Height * 0.5f);
             }
         }
@@ -91,7 +112,6 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                Size size = Entity.GetComponent<Identity>().Size;
                 return new Rectangle(Location.X, Location.Y, size.Width, size.Height);
             }
         }
@@ -112,7 +132,6 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                Size size = Entity.GetComponent<Identity>().Size;
                 Point min = new Point((int)Math.Round(location.X), (int)Math.Round(location.Y));
                 return new Region(min, size);
             }

@@ -28,6 +28,17 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Constructs a prototype entity.
+        /// </summary>
+        /// <remarks>
+        /// Prototype entities don't belong to the world and all have the handle '0'. They exist only to be cloned into existence.
+        /// </remarks>
+        public Entity()
+        {
+            handle = new Handle(0);
+        }
+
         public Entity(World world, Handle handle)
         {
             Argument.EnsureNotNull(world, "world");
@@ -75,7 +86,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual Size Size
         {
-            get { return GetComponent<Identity>().Size; }
+            get { return GetComponent<Position>().Size; }
         }
 
         /// <summary>
@@ -214,6 +225,17 @@ namespace Orion.Game.Simulation
                 return new Stat(components.Sum(c => c.GetStatBonus(stat).IntegerValue));
             else
                 return new Stat(components.Sum(c => c.GetStatBonus(stat).RealValue));
+        }
+
+        public Entity CloneIntoExistence(World world, Handle handle)
+        {
+            Entity clone = new Entity(world, handle);
+            foreach (Component component in components)
+            {
+                Component componentCopy = component.Clone(clone);
+                clone.AddComponent(componentCopy);
+            }
+            return clone;
         }
         #endregion
 

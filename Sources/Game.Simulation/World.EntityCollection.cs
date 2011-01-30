@@ -140,15 +140,15 @@ namespace Orion.Game.Simulation
             {
                 Entity node = new Entity(world, handleGenerator());
                 Identity identity = new Identity(node);
-                identity.Size = new Size(2, 2);
                 node.AddComponent(identity);
 
                 Harvestable harvestableComponent = new Harvestable(node);
                 harvestableComponent.AmountRemaining = World.DefaultResourceAmount;
                 harvestableComponent.Type = type;
                 node.AddComponent(harvestableComponent);
-                
+
                 Position positionComponent = new Position(node);
+                positionComponent.Size = new Size(2, 2);
                 positionComponent.Location = point;
                 node.AddComponent(positionComponent);
                 

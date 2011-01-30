@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui2;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Engine.Gui2.Adornments
+namespace Orion.Engine.Gui.Adornments
 {
     /// <summary>
     /// A control adornment which fills the background of the control with a color.

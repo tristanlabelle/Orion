@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Provides a read-only view of another <see cref="Control"/>.

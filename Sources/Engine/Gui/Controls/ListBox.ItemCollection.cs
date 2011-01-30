@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     partial class ListBox
     {

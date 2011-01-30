@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Stores a thickness value along four edges.

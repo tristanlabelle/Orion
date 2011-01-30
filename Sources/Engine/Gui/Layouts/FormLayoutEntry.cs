@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Represents an entry in a <see cref="FormLayout"/>, with a header and a content control.

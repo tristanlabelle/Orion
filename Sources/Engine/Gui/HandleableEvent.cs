@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// An aggregation of event handling delegates with a boolean return type that indicates if the event was handled.

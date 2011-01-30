@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Parameter class which wraps all necessary data to draw a sprite.

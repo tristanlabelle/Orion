@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     partial class StackLayout
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Presentation.Actions;
@@ -10,7 +10,7 @@ using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
 {
-    partial class MatchUI2
+    partial class MatchUI
     {
         private sealed class ActionToolTip : ContentControl
         {

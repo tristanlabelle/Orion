@@ -11,12 +11,12 @@ namespace Orion.Game.Presentation.Actions
     public sealed class ActionPanel
     {
         #region Fields
-        private readonly MatchUI2 ui;
+        private readonly MatchUI ui;
         private readonly Stack<IActionProvider> actionProviders = new Stack<IActionProvider>();
         #endregion
         
         #region Constructors
-        public ActionPanel(MatchUI2 ui)
+        public ActionPanel(MatchUI ui)
         {
         	Argument.EnsureNotNull(ui, "ui");
         	this.ui = ui;

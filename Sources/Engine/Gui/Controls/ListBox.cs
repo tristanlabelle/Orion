@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A control which provides a list of items from which the user can make a selection.

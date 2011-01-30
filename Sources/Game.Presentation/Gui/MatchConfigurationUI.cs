@@ -5,8 +5,8 @@ using System.Linq.Expressions;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Data;
-using Orion.Engine.Gui2;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
@@ -14,7 +14,7 @@ namespace Orion.Game.Presentation.Gui
     /// <summary>
     /// Provides the user interface to edit the settings of a match.
     /// </summary>
-    public sealed partial class MatchConfigurationUI2 : ContentControl
+    public sealed partial class MatchConfigurationUI : ContentControl
     {
         #region Fields
         private readonly OrionGuiStyle style;
@@ -28,7 +28,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI2(OrionGuiStyle style)
+        public MatchConfigurationUI(OrionGuiStyle style)
         {
             Argument.EnsureNotNull(style, "style");
 
@@ -54,27 +54,27 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when a player gets kicked.
         /// </summary>
-        public event Action<MatchConfigurationUI2, Player> PlayerKicked;
+        public event Action<MatchConfigurationUI, Player> PlayerKicked;
 
         /// <summary>
         /// Raised when the player changes its color.
         /// </summary>
-        public event Action<MatchConfigurationUI2, Player, ColorRgb> PlayerColorChanged;
+        public event Action<MatchConfigurationUI, Player, ColorRgb> PlayerColorChanged;
 
         /// <summary>
         /// Raised when the state of readiness of the player changes.
         /// </summary>
-        public event Action<MatchConfigurationUI2> ReadinessChanged;
+        public event Action<MatchConfigurationUI> ReadinessChanged;
 
         /// <summary>
         /// Raised when the user clicks the button to start the match.
         /// </summary>
-        public event Action<MatchConfigurationUI2> MatchStarted;
+        public event Action<MatchConfigurationUI> MatchStarted;
 
         /// <summary>
         /// Raised when the user exits the screen.
         /// </summary>
-        public event Action<MatchConfigurationUI2> Exited;
+        public event Action<MatchConfigurationUI> Exited;
         #endregion
 
         #region Properties

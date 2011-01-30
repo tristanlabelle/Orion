@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Game.Simulation;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
     /// A control which allows the user to change his diplomatic state with regard to other factions.
     /// </summary>
-    public sealed class DiplomacyPanel2 : ContentControl
+    public sealed class DiplomacyPanel : ContentControl
     {
         private sealed class FactionRow : DockLayout
         {
@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Constructors
-            public FactionRow(DiplomacyPanel2 panel, OrionGuiStyle style, Faction localFaction, Faction otherFaction)
+            public FactionRow(DiplomacyPanel panel, OrionGuiStyle style, Faction localFaction, Faction otherFaction)
             {
                 Dock(new ImageBox()
                     {
@@ -64,7 +64,7 @@ namespace Orion.Game.Presentation.Gui
         }
 
         #region Constructors
-        public DiplomacyPanel2(OrionGuiStyle style, Faction faction)
+        public DiplomacyPanel(OrionGuiStyle style, Faction faction)
         {
             Argument.EnsureNotNull(style, "style");
             Argument.EnsureNotNull(faction, "faction");
@@ -104,12 +104,12 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the diplomatic stance of this faction with regard to other factions changes.
         /// </summary>
-        public event Action<DiplomacyPanel2, Faction, DiplomaticStance> StanceChanged;
+        public event Action<DiplomacyPanel, Faction, DiplomaticStance> StanceChanged;
 
         /// <summary>
         /// Raised when the diplomacy panel gets closed by the user.
         /// </summary>
-        public event Action<DiplomacyPanel2> Closed;
+        public event Action<DiplomacyPanel> Closed;
         #endregion
     }
 }

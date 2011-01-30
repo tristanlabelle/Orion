@@ -21,7 +21,7 @@ namespace Orion.Game.Main
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
         private readonly PlayerSettings playerSettings;
-        private readonly MatchConfigurationUI2 ui;
+        private readonly MatchConfigurationUI ui;
         #endregion
 
         #region Constructors
@@ -37,7 +37,7 @@ namespace Orion.Game.Main
             this.playerSettings = new PlayerSettings();
             this.playerSettings.AddPlayer(new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First()));
 
-            this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
+            this.ui = new MatchConfigurationUI(graphics.GuiStyle)
             {
                 NeedsReadying = false,
             };

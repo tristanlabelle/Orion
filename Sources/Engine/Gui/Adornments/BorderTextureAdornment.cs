@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
 
-namespace Orion.Engine.Gui2.Adornments
+namespace Orion.Engine.Gui.Adornments
 {
     /// <summary>
     /// A control adornment which draws a border based on a texture.

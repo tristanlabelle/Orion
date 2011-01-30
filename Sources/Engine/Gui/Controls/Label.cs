@@ -6,7 +6,7 @@ using System.Text;
 using OpenTK;
 using Orion.Engine.Graphics;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A <see cref="Control"/> which displays text.

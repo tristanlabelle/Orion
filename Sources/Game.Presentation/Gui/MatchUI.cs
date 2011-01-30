@@ -8,8 +8,8 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Data;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui2;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Renderers;
 using Key = OpenTK.Input.Key;
@@ -20,7 +20,7 @@ namespace Orion.Game.Presentation.Gui
     /// <summary>
     /// Provides the in-match user interface.
     /// </summary>
-    public sealed partial class MatchUI2 : ContentControl
+    public sealed partial class MatchUI : ContentControl
     {
         #region Fields
         private readonly OrionGuiStyle style;
@@ -34,7 +34,7 @@ namespace Orion.Game.Presentation.Gui
         private ImageBox idleWorkerCountImageBox;
         private Label idleWorkerCountLabel;
         private ModalDialog modalDialog;
-        private DiplomacyPanel2 diplomacyPanel;
+        private DiplomacyPanel diplomacyPanel;
         private PausePanel pausePanel;
 
         private Control bottomBar;
@@ -54,7 +54,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI2(GameGraphics graphics, Faction localFaction)
+        public MatchUI(GameGraphics graphics, Faction localFaction)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localFaction, "localFaction");
@@ -85,55 +85,55 @@ namespace Orion.Game.Presentation.Gui
         /// The parameter specifies the new world position of the camera,
         /// normalized between (0,0) and (1,1).
         /// </summary>
-        public event Action<MatchUI2, Vector2> MinimapCameraMoved;
+        public event Action<MatchUI, Vector2> MinimapCameraMoved;
 
         /// <summary>
         /// Raised when the minimap receives a right click.
         /// The parameter specifies the world position of the click,
         /// normalized between (0,0) and (1,1).
         /// </summary>
-        public event Action<MatchUI2, Vector2> MinimapRightClicked;
+        public event Action<MatchUI, Vector2> MinimapRightClicked;
 
         /// <summary>
         /// Raised when the minimap should be rendered.
         /// </summary>
-        public event Action<MatchUI2, Region> MinimapRendering;
+        public event Action<MatchUI, Region> MinimapRendering;
 
         /// <summary>
         /// Raised when the game gets zoomed in or out. The parameter specifies the zoom amount.
         /// </summary>
-        public event Action<MatchUI2, float> ViewportZoomed;
+        public event Action<MatchUI, float> ViewportZoomed;
 
         /// <summary>
         /// Raised when the user has submitted text using the chat.
         /// </summary>
-        public event Action<MatchUI2, string> Chatted;
+        public event Action<MatchUI, string> Chatted;
 
         /// <summary>
         /// Raised when the user selects idle workers.
         /// The parameter is <c>true</c> if all idle workers should be selected and <c>false</c> if only the next one should.
         /// </summary>
-        public event Action<MatchUI2, bool> SelectingIdleWorkers;
+        public event Action<MatchUI, bool> SelectingIdleWorkers;
 
         /// <summary>
         /// Raised when the diplomatic stance of the local faction with regard to another faction changes.
         /// </summary>
-        public event Action<MatchUI2, Faction, DiplomaticStance> DiplomaticStanceChanged;
+        public event Action<MatchUI, Faction, DiplomaticStance> DiplomaticStanceChanged;
 
         /// <summary>
         /// Raised when the user pauses the game.
         /// </summary>
-        public event Action<MatchUI2> Paused;
+        public event Action<MatchUI> Paused;
 
         /// <summary>
         /// Raised when the user resumes the game after its been paused.
         /// </summary>
-        public event Action<MatchUI2> Resumed;
+        public event Action<MatchUI> Resumed;
 
         /// <summary>
         /// Raised when the user quits the game.
         /// </summary>
-        public event Action<MatchUI2> Exited;
+        public event Action<MatchUI> Exited;
         #endregion
 
         #region Properties
@@ -283,7 +283,7 @@ namespace Orion.Game.Presentation.Gui
 
         #region Methods
         /// <summary>
-        /// Adds a message to this <see cref="MatchUI2"/>'s message console.
+        /// Adds a message to this <see cref="MatchUI"/>'s message console.
         /// </summary>
         /// <param name="text">The text of the message.</param>
         /// <param name="color">The color of the message.</param>
@@ -439,7 +439,7 @@ namespace Orion.Game.Presentation.Gui
             button.VerticalAlignment = Alignment.Center;
             button.MaxXMargin = 10;
 
-            diplomacyPanel = new DiplomacyPanel2(style, localFaction);
+            diplomacyPanel = new DiplomacyPanel(style, localFaction);
 
             button.Clicked += (sender, @event) => ShowDiplomacyDialog();
 

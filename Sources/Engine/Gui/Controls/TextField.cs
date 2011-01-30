@@ -9,7 +9,7 @@ using Orion.Engine.Input;
 using Key = OpenTK.Input.Key;
 using SystemInformation = System.Windows.Forms.SystemInformation;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A <see cref="Control"/> which presents an editable box of text to the user.

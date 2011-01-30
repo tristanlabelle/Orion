@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
 
 namespace Orion.Game.Presentation.Gui
 {
-	partial class MatchUI2
+	partial class MatchUI
 	{
         private sealed class MessageLabel : Label
         {

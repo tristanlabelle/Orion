@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
 	partial class UIManager
 	{

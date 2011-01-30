@@ -10,7 +10,7 @@ using Key = OpenTK.Input.Key;
 using Keys = System.Windows.Forms.Keys;
 using Input = Orion.Engine.Input;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// The root of the UI hierarchy. Manages the focus and allows the injection of events.

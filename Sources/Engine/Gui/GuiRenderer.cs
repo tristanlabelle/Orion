@@ -5,7 +5,7 @@ using System.Text;
 using Orion.Engine.Graphics;
 using OpenTK;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Base class providing the drawing facility for GUIs.

@@ -19,7 +19,7 @@ namespace Orion.Game.Main
         private readonly GameGraphics graphics;
         private readonly GameNetworking networking;
         private readonly MultiplayerLobby lobby;
-        private readonly MultiplayerLobbyUI2 ui;
+        private readonly MultiplayerLobbyUI ui;
         #endregion
 
         #region Constructors
@@ -31,7 +31,7 @@ namespace Orion.Game.Main
             this.graphics = graphics;
             this.networking = new GameNetworking();
             this.lobby = new MultiplayerLobby(this.networking);
-            this.ui = new MultiplayerLobbyUI2(graphics);
+            this.ui = new MultiplayerLobbyUI(graphics);
             this.ui.PlayerName = Dns.GetHostName();
 
             this.lobby.Disable();

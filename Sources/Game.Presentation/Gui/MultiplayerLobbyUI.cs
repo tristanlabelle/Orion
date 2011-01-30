@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui.Adornments;
 using Orion.Engine.Networking;
 using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public sealed class MultiplayerLobbyUI2 : ContentControl
+    public sealed class MultiplayerLobbyUI : ContentControl
     {
         #region Fields
         private readonly GameGraphics graphics;
@@ -22,7 +22,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyUI2(GameGraphics graphics)
+        public MultiplayerLobbyUI(GameGraphics graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
@@ -65,27 +65,27 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the user exits the screen.
         /// </summary>
-        public event Action<MultiplayerLobbyUI2> Exited;
+        public event Action<MultiplayerLobbyUI> Exited;
 
         /// <summary>
         /// Raised when the user joins an advertized match.
         /// </summary>
-        public event Action<MultiplayerLobbyUI2, AdvertizedMatch> Joined;
+        public event Action<MultiplayerLobbyUI, AdvertizedMatch> Joined;
 
         /// <summary>
         /// Raised when the user chooses to host a game.
         /// </summary>
-        public event Action<MultiplayerLobbyUI2, string> Hosted;
+        public event Action<MultiplayerLobbyUI, string> Hosted;
 
         /// <summary>
         /// Raised when the user joins a game at a specific IP end point.
         /// </summary>
-        public event Action<MultiplayerLobbyUI2, IPv4EndPoint> JoinedByIP;
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinedByIP;
 
         /// <summary>
         /// Raised when the user pings a specific IP end point.
         /// </summary>
-        public event Action<MultiplayerLobbyUI2, IPv4EndPoint> PingedIP;
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> PingedIP;
         #endregion
 
         #region Properties

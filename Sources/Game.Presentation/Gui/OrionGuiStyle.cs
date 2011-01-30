@@ -5,15 +5,15 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Font = System.Drawing.Font;
 using System.Reflection;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
     /// <summary>
-    /// An implementation of the <see cref="Orion.Engine.Gui2.GuiRenderer"/> class for Orion's GUI.
+    /// An implementation of the <see cref="Orion.Engine.Gui.GuiRenderer"/> class for Orion's GUI.
     /// </summary>
     public sealed class OrionGuiStyle : GuiRenderer
     {

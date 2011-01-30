@@ -24,7 +24,7 @@ namespace Orion.Game.Main
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
         private readonly PlayerSettings playerSettings;
-        private readonly MatchConfigurationUI2 ui;
+        private readonly MatchConfigurationUI ui;
         private readonly GameNetworking networking;
         private readonly IMatchAdvertizer advertizer;
 
@@ -58,7 +58,7 @@ namespace Orion.Game.Main
             this.matchName = matchName;
             this.playerName = playerName;
 
-            this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
+            this.ui = new MatchConfigurationUI(graphics.GuiStyle)
             {
                 CanChangeSettings = IsHost,
                 CanStart = IsHost,

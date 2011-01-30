@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui2;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui;
+using Orion.Engine.Gui.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
 	/// <summary>
 	/// Provides a user interface which enables the user to select a replay to watch.
 	/// </summary>
-    public sealed class ReplayBrowser2 : ContentControl
+    public sealed class ReplayBrowser : ContentControl
     {
         #region Fields
         private readonly GameGraphics graphics;
@@ -19,7 +19,7 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public ReplayBrowser2(GameGraphics graphics)
+        public ReplayBrowser(GameGraphics graphics)
         {
             Argument.EnsureNotNull(graphics, "graphics");
 
@@ -66,12 +66,12 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the user exits the screen.
         /// </summary>
-        public event Action<ReplayBrowser2> Exited;
+        public event Action<ReplayBrowser> Exited;
         
         /// <summary>
         /// Raised when the user starts a replay.
         /// </summary>
-        public event Action<ReplayBrowser2, string> Started;
+        public event Action<ReplayBrowser, string> Started;
         #endregion
 
         #region Methods

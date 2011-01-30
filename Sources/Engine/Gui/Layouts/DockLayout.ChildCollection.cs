@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     partial class DockLayout
     {

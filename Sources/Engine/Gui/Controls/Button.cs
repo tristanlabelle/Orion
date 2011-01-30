@@ -7,7 +7,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Input;
 using Key = OpenTK.Input.Key;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A button <see cref="Control"/> that can be clicked by the user.

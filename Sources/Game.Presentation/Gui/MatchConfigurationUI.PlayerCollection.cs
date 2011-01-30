@@ -8,16 +8,16 @@ using Orion.Engine;
 
 namespace Orion.Game.Presentation.Gui
 {
-    partial class MatchConfigurationUI2
+    partial class MatchConfigurationUI
     {
         public sealed class PlayerCollection : Collection<Player>
         {
             #region Fields
-            private readonly MatchConfigurationUI2 ui;
+            private readonly MatchConfigurationUI ui;
             #endregion
 
             #region Constructors
-            internal PlayerCollection(MatchConfigurationUI2 ui)
+            internal PlayerCollection(MatchConfigurationUI ui)
             {
                 Argument.EnsureNotNull(ui, "ui");
 

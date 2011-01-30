@@ -5,7 +5,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Data;
 using Orion.Engine.Geometry;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Presentation;
@@ -32,7 +32,7 @@ namespace Orion.Game.Main
         private readonly CommandPipeline commandPipeline;
         private readonly SlaveCommander localCommander;
         private readonly UserInputManager userInputManager;
-        private readonly MatchUI2 ui;
+        private readonly MatchUI ui;
         private readonly SingleEntitySelectionPanel singleEntitySelectionPanel;
         private readonly MultipleUnitSelectionPanel multipleUnitSelectionPanel;
         private readonly ActionPanel actionPanel;
@@ -70,7 +70,7 @@ namespace Orion.Game.Main
             this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
 
-            this.ui = new MatchUI2(graphics, userInputManager.LocalFaction);
+            this.ui = new MatchUI(graphics, userInputManager.LocalFaction);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
             this.ui.MinimapRightClicked += OnMinimapRightClicked;
             this.ui.MinimapRendering += OnMinimapRendering;
@@ -276,12 +276,12 @@ namespace Orion.Game.Main
             Selection.Remove(unit);
         }
 
-        private void OnMinimapCameraMoved(MatchUI2 sender, Vector2 normalizedPosition)
+        private void OnMinimapCameraMoved(MatchUI sender, Vector2 normalizedPosition)
         {
             camera.Target = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
         }
 
-        private void OnMinimapRightClicked(MatchUI2 sender, Vector2 normalizedPosition)
+        private void OnMinimapRightClicked(MatchUI sender, Vector2 normalizedPosition)
         {
             Vector2 worldPosition = new Vector2(normalizedPosition.X * World.Width, normalizedPosition.Y * World.Height);
             Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, Input.MouseButton.Right, 1, 0);
@@ -290,7 +290,7 @@ namespace Orion.Game.Main
             userInputManager.HandleMouseUp(args);
         }
 
-        private void OnMinimapRendering(MatchUI2 sender, Region rectangle)
+        private void OnMinimapRendering(MatchUI sender, Region rectangle)
         {
             if (rectangle.Area == 0) return;
 
@@ -310,7 +310,7 @@ namespace Orion.Game.Main
             graphics.Context.ProjectionBounds = previousProjectionBounds;
         }
 
-        private void OnSelectingIdleWorkers(MatchUI2 sender, bool all)
+        private void OnSelectingIdleWorkers(MatchUI sender, bool all)
         {
             if (workerActivityMonitor.InactiveWorkerCount == 0) return;
 
@@ -348,7 +348,7 @@ namespace Orion.Game.Main
             return true;
         }
 
-        private void OnViewportZoomed(MatchUI2 sender, float delta)
+        private void OnViewportZoomed(MatchUI sender, float delta)
         {
             if (delta >= 1) camera.ZoomIn();
             if (delta <= -1) camera.ZoomOut();
@@ -399,7 +399,7 @@ namespace Orion.Game.Main
             audio.Dispose();
         }
 
-        private void OnUserExited(MatchUI2 sender)
+        private void OnUserExited(MatchUI sender)
         {
             Manager.PopTo<MainMenuGameState>();
         }

@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
-using Orion.Engine.Gui2.Adornments;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
 {
-    partial class MatchConfigurationUI2
+    partial class MatchConfigurationUI
     {
         /// <summary>
         /// Provides a representation of a player in the player list of the match configuration.
@@ -23,7 +23,7 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Constructors
-            public PlayerRow(MatchConfigurationUI2 ui, Player player)
+            public PlayerRow(MatchConfigurationUI ui, Player player)
             {
                 Argument.EnsureNotNull(ui, "ui");
                 Argument.EnsureNotNull(player, "player");

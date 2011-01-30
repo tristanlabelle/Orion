@@ -22,7 +22,7 @@ namespace Orion.Game.Main
         private static readonly string replayExtension = "replay";
         
         private readonly GameGraphics graphics;
-        private readonly ReplayBrowser2 ui;
+        private readonly ReplayBrowser ui;
         #endregion
 
         #region Constructors
@@ -32,7 +32,7 @@ namespace Orion.Game.Main
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.ui = new ReplayBrowser2(graphics);
+            this.ui = new ReplayBrowser(graphics);
 
             this.ui.Exited += OnExited;
             this.ui.Started += OnStarted;
@@ -83,12 +83,12 @@ namespace Orion.Game.Main
         }
         #endregion
 
-        private void OnExited(ReplayBrowser2 sender)
+        private void OnExited(ReplayBrowser sender)
         {
             Manager.Pop();
         }
 
-        private void OnStarted(ReplayBrowser2 sender, string replayName)
+        private void OnStarted(ReplayBrowser sender, string replayName)
         {
         	string replayFilePath = Path.Combine(replayFolderName, replayName + "." + replayExtension);
         	

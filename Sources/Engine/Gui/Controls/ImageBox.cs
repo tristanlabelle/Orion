@@ -5,7 +5,7 @@ using System.Text;
 using Orion.Engine.Graphics;
 using System.Diagnostics;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A <see cref="Control"/> which displays an image.

@@ -4,7 +4,7 @@ using System.IO;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;

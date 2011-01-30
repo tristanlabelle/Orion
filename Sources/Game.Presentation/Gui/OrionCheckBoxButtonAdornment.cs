@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui2;
+using Orion.Engine.Gui;
 using Orion.Engine;
 
 namespace Orion.Game.Presentation.Gui

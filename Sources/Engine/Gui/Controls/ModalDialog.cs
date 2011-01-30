@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
 	/// <summary>
 	/// A popup which displays a modal dialog.

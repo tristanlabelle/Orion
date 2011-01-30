@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
 	/// <summary>
 	/// Represent a control which appear above the UI such as menus, tool tips and drop-down lists.

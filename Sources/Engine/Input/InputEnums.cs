@@ -6,7 +6,7 @@ using TKKey = OpenTK.Input.Key;
 using TKMouseButton = OpenTK.Input.MouseButton;
 using FormsKeys = System.Windows.Forms.Keys;
 using FormsMouseButtons = System.Windows.Forms.MouseButtons;
-using OrionModifierKeys = Orion.Engine.Gui2.ModifierKeys;
+using OrionModifierKeys = Orion.Engine.Gui.ModifierKeys;
 
 namespace Orion.Engine.Input
 {

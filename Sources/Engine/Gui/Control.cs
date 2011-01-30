@@ -8,7 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
 using Orion.Engine.Input;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// Base class of the UI hierarchy.
@@ -632,7 +632,7 @@ namespace Orion.Engine.Gui2
         	if (!Rectangle.Contains(point) || Visibility < Visibility.Visible) return null;
 
             foreach (Control child in Children)
-                if (child.VisibilityFlag == Gui2.Visibility.Visible && child.Rectangle.Contains(point))
+                if (child.VisibilityFlag == Gui.Visibility.Visible && child.Rectangle.Contains(point))
                     return child;
            
             return null;

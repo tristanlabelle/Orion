@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using SystemInformation = System.Windows.Forms.SystemInformation;
 
-namespace Orion.Engine.Gui2
+namespace Orion.Engine.Gui
 {
     /// <summary>
     /// A <see cref="Control"/> which looks like a button but generates events

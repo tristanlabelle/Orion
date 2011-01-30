@@ -193,7 +193,7 @@ namespace Orion.Game.Presentation.Gui
         {
             label.Font = font;
             label.TextColor = Colors.Black;
-            label.PreDrawing += OnLabelPreDrawing;
+            label.DisabledTextColor = Colors.Gray;
         }
 
         private void ApplySpecificStyle(TextField textField)
@@ -203,7 +203,7 @@ namespace Orion.Game.Presentation.Gui
             textField.Padding = adornment.Padding;
             textField.Font = font;
             textField.TextColor = Colors.Black;
-            textField.PreDrawing += OnTextFieldPreDrawing;
+            textField.DisabledTextColor = Colors.Gray;
         }
 
         private void ApplySpecificStyle(Button button)
@@ -257,18 +257,6 @@ namespace Orion.Game.Presentation.Gui
         private void ApplySpecificStyle(ScrollPanel scrollPanel)
         {
             ApplySpecificStyle(scrollPanel.VerticalScrollBar);
-        }
-
-        private void OnLabelPreDrawing(Control sender, GuiRenderer renderer)
-        {
-            Label label = (Label)sender;
-            label.TextColor = label.IsEnabled ? enabledTextColor : disabledTextColor;
-        }
-
-        private void OnTextFieldPreDrawing(Control sender, GuiRenderer renderer)
-        {
-            TextField textField = (TextField)sender;
-            textField.TextColor = textField.IsEnabled ? enabledTextColor : disabledTextColor;
         }
 
         private void OnComboBoxButtonPreDrawing(Control control, GuiRenderer renderer)

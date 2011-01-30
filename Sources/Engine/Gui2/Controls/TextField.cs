@@ -24,6 +24,7 @@ namespace Orion.Engine.Gui2
         private Font font;
         private int cachedFontHeight;
         private ColorRgba textColor = Colors.Black;
+        private ColorRgba disabledTextColor = Colors.Gray;
         private ColorRgba caretColor = Colors.Black;
         private int caretWidth = SystemInformation.CaretWidth;
         private TimeSpan caretBlinkDuration = TimeSpan.FromMilliseconds(SystemInformation.CaretBlinkTime);
@@ -136,6 +137,15 @@ namespace Orion.Engine.Gui2
         }
 
         /// <summary>
+        /// Accesses the color of the text when this <see cref="TextField"/> is disabled.
+        /// </summary>
+        public ColorRgba DisabledTextColor
+        {
+            get { return disabledTextColor; }
+            set { disabledTextColor = value; }
+        }
+
+        /// <summary>
         /// Accesses the color of the caret.
         /// </summary>
         public ColorRgba CaretColor
@@ -232,7 +242,7 @@ namespace Orion.Engine.Gui2
             var options = new TextRenderingOptions
             {
                 Font = font,
-                Color = textColor,
+                Color = IsEnabled ? textColor : disabledTextColor,
                 Origin = new Point(innerRectangle.MinX, innerRectangle.MinY)
             };
             Renderer.DrawText(text, ref options);

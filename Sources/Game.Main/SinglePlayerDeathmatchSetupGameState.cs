@@ -38,7 +38,7 @@ namespace Orion.Game.Main
             this.matchSettings.AreCheatsEnabled = true;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
+            this.playerSettings.AddPlayer(new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First()));
 
             this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
             {

@@ -19,7 +19,6 @@ namespace Orion.Game.Presentation.Gui
         #region Fields
         private readonly OrionGuiStyle style;
         private readonly PlayerCollection players;
-        private readonly Dictionary<Label, Action> playerBuilders = new Dictionary<Label, Action>();
         private StackLayout playerStack;
         private FormLayout settingsForm;
         private StackLayout aiCreationStack;
@@ -132,9 +131,12 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(action, "action");
 
             Label text = style.CreateLabel(name);
+            text.Tag = action;
             aiBuilderComboBox.Items.Add(text);
+            if (aiBuilderComboBox.SelectedItemIndex == -1)
+                aiBuilderComboBox.SelectedItemIndex = 0;
+
             aiCreationStack.VisibilityFlag = Visibility.Visible;
-            playerBuilders.Add(text, action);
         }
         
         public void AddBooleanSetting(string text, Expression<Func<bool>> bindingSourcePropertyExpression)
@@ -229,7 +231,12 @@ namespace Orion.Game.Presentation.Gui
             stack.Stack(aiBuilderComboBox);
 
             Button createAIButton = style.CreateTextButton("Créer");
-            createAIButton.Clicked += (sender, @args) => playerBuilders[(Label)aiBuilderComboBox.SelectedItem]();
+            createAIButton.Clicked += (sender, @args) => 
+            {
+                Label aiBuilderLabel = (Label)aiBuilderComboBox.SelectedItem;
+                Action aiBuildingAction = (Action)aiBuilderLabel.Tag;
+                aiBuildingAction();
+            };
             stack.Stack(createAIButton);
 
             return stack;

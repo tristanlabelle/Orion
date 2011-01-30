@@ -24,10 +24,6 @@ namespace Orion.Game.Matchmaking
         {
             this.endPoint = endPoint;
         }
-
-        public RemotePlayer(IPv4EndPoint endPoint, ColorRgb color)
-            : this(endPoint, Dns.GetHostEntry(endPoint.Address).HostName, color)
-        { }
         #endregion
 
         #region Properties

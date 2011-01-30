@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Engine.Networking;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Gui;
 using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Matchmaking.Networking.Packets;
-using System.Diagnostics;
-using System.Net;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Gui;
 
 namespace Orion.Game.Main
 {
@@ -41,7 +41,7 @@ namespace Orion.Game.Main
             this.lobby.Disable();
 
             this.lobby.MatchesChanged += sender => RefreshMatches();
-            this.lobby.JoinResponseReceived += (sender, response) => HangleJoinResponse(response);
+            this.lobby.JoinResponseReceived += (sender, response) => HandleJoinResponse(response);
 
             this.ui.Exited += sender => Manager.Pop();
             this.ui.Joined += (sender, match) => Join(match.EndPoint);
@@ -94,25 +94,24 @@ namespace Orion.Game.Main
                 ui.AddMatch(match);
         }
 
-        private void HangleJoinResponse(JoinResponseEventArgs args)
+        private void HandleJoinResponse(JoinResponseEventArgs args)
         {
             if (args.WasAccepted)
             {
                 var gameState = MultiplayerDeathmatchSetupGameState.CreateAsClient(
-                    Manager, graphics, networking, args.HostEndPoint);
+                    Manager, graphics, networking, ui.PlayerName, args.HostEndPoint);
                 Manager.Push(gameState);
             }
             else
             {
                 Debug.Fail("Failed to join " + args.HostEndPoint);
-                //Instant.DisplayAlert(ui, "Impossible de rejointer {0}.".FormatInvariant(args.HostEndPoint),
-                //    () => ui.IsEnabled = true);
+                ui.HasEnabledFlag = true;
             }
         }
 
         private void Host(string matchName)
         {
-            var gameState = MultiplayerDeathmatchSetupGameState.CreateAsHost(Manager, graphics, networking, matchName);
+            var gameState = MultiplayerDeathmatchSetupGameState.CreateAsHost(Manager, graphics, networking, matchName, ui.PlayerName);
             Manager.Push(gameState);
         }
 
@@ -126,7 +125,7 @@ namespace Orion.Game.Main
         {
             if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
             ui.HasEnabledFlag = false;
-            lobby.BeginJoining(endPoint);
+            lobby.BeginJoining(endPoint, ui.PlayerName);
         }
         #endregion
     }

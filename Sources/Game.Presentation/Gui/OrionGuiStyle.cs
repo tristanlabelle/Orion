@@ -19,6 +19,9 @@ namespace Orion.Game.Presentation.Gui
     {
         #region Fields
         private static readonly Font font = new Font("Trebuchet MS", 16, System.Drawing.GraphicsUnit.Pixel);
+        private static readonly ColorRgb enabledTextColor = Colors.Black;
+        private static readonly ColorRgb disabledTextColor = Colors.Gray;
+
         private readonly GraphicsContext graphicsContext;
         private readonly TextureManager textureManager;
         #endregion
@@ -180,7 +183,7 @@ namespace Orion.Game.Presentation.Gui
         {
             label.Font = font;
             label.TextColor = Colors.Black;
-            label.DisabledTextColor = Colors.Gray;
+            label.PreDrawing += OnLabelPreDrawing;
         }
 
         private void ApplySpecificStyle(TextField textField)
@@ -190,6 +193,7 @@ namespace Orion.Game.Presentation.Gui
             textField.Padding = adornment.Padding;
             textField.Font = font;
             textField.TextColor = Colors.Black;
+            textField.PreDrawing += OnTextFieldPreDrawing;
         }
 
         private void ApplySpecificStyle(Button button)
@@ -243,6 +247,18 @@ namespace Orion.Game.Presentation.Gui
         private void ApplySpecificStyle(ScrollPanel scrollPanel)
         {
             ApplySpecificStyle(scrollPanel.VerticalScrollBar);
+        }
+
+        private void OnLabelPreDrawing(Control sender, GuiRenderer renderer)
+        {
+            Label label = (Label)sender;
+            label.TextColor = label.IsEnabled ? enabledTextColor : disabledTextColor;
+        }
+
+        private void OnTextFieldPreDrawing(Control sender, GuiRenderer renderer)
+        {
+            TextField textField = (TextField)sender;
+            textField.TextColor = textField.IsEnabled ? enabledTextColor : disabledTextColor;
         }
 
         private void OnComboBoxButtonPreDrawing(Control control, GuiRenderer renderer)

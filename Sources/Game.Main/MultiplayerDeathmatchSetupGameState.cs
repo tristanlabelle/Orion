@@ -16,6 +16,9 @@ using Orion.Game.Simulation;
 
 namespace Orion.Game.Main
 {
+    /// <summar>y
+    /// A game state in which the user can tweak settings before starting a multiplayer game.
+    /// </summary>
     public sealed class MultiplayerDeathmatchSetupGameState : GameState
     {
         #region Instance
@@ -23,7 +26,7 @@ namespace Orion.Game.Main
         private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
         private readonly PlayerSettings playerSettings;
-        private readonly MatchConfigurationUI ui;
+        private readonly MatchConfigurationUI2 ui;
         private readonly GameNetworking networking;
         private readonly IMatchAdvertizer advertizer;
 
@@ -33,18 +36,21 @@ namespace Orion.Game.Main
         /// <remarks>Defined only for the host.</remarks>
         private readonly string matchName;
 
-        private float elapsedSecondsSinceLastAdvertize;
+        private readonly string playerName;
+
+        private TimeSpan elapsedTimeSinceLastAdvertize;
         #endregion
 
         #region Constructors
         private MultiplayerDeathmatchSetupGameState(GameStateManager manager, GameGraphics graphics,
-            GameNetworking networking, IMatchAdvertizer advertizer, string matchName, IPv4EndPoint? hostEndPoint)
+            GameNetworking networking, IMatchAdvertizer advertizer, string matchName, string playerName, IPv4EndPoint? hostEndPoint)
             : base(manager)
         {
             Argument.EnsureNotNull(manager, "manager");
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(networking, "networking");
             Argument.EnsureNotNull(advertizer, "advertizer");
+            Argument.EnsureNotNull(playerName, "playerName");
 
             this.networking = networking;
             this.graphics = graphics;
@@ -52,41 +58,56 @@ namespace Orion.Game.Main
             this.matchSettings = new MatchSettings();
             this.hostEndPoint = hostEndPoint;
             this.matchName = matchName;
+            this.playerName = playerName;
+
+            this.ui = new MatchConfigurationUI2(graphics.GuiStyle)
+            {
+                CanChangeSettings = IsHost,
+                CanStart = IsHost,
+                NeedsReadying = false
+            };
+            this.ui.Exited += sender => Exit();
+
+            this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
+            this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
+            this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
+            this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
 
             this.playerSettings = new PlayerSettings();
-
-            List<PlayerBuilder> builders = new List<PlayerBuilder>();
-            builders.Add(new PlayerBuilder("Harvesting Computer", (name, color) => new AIPlayer(name, color)));
-
-            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders, IsHost);
-            this.ui.PlayerColorChanged += OnColorChanged;
-            this.ui.ExitPressed += OnExitPressed;
+            this.playerSettings.PlayerJoined += (sender, player) => this.ui.Players.Add(player);
+            this.playerSettings.PlayerLeft += (sender, player, index) => this.ui.Players.Remove(player);
 
             if (IsHost)
             {
-                this.playerSettings.PlayerJoined += OnPlayerAdded;
-                this.playerSettings.PlayerLeft += OnPlayerRemoved;
-                this.playerSettings.PlayerChanged += OnColorChanged;
-                this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
-                this.matchSettings.Changed += OnMatchSettingsChanged;
-                this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
-                this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
-                this.ui.StartGamePressed += OnStartGamePressed;
+                this.playerSettings.AddPlayer(new LocalPlayer(playerName, playerSettings.AvailableColors.First()));
+
+                this.playerSettings.PlayerJoined += (sender, player) => SendAddPlayer(player);
+                this.playerSettings.PlayerLeft += (sender, player, index) => SendPlayerRemoved(player, index);
+                this.playerSettings.PlayerChanged += (sender, player, index) => SendPlayerColorChange(player, index);
+
+                this.matchSettings.Changed += sender => SendMatchSettings();
+
+                this.ui.AddPlayerBuilder("Ramasseur", () =>
+                {
+                    if (!playerSettings.AvailableColors.Any()) return;
+                    playerSettings.AddPlayer(new AIPlayer("Ramasseur", playerSettings.AvailableColors.First()));
+                });
+                this.ui.PlayerColorChanged += (sender, player, color) => ChangePlayerColor(player, color);
+                this.ui.PlayerKicked += (sender, player) => playerSettings.RemovePlayer(player);
+                this.ui.MatchStarted += sender => DelistAndStartMatch();
             }
 
-            this.networking.PacketReceived += OnPacketReceived;
+            this.networking.PacketReceived += (sender, packet) => HandlePacket(packet);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets a value indicating if the host of the game is the local player.
+        /// </summary>
         public bool IsHost
         {
             get { return !hostEndPoint.HasValue; }
-        }
-
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
         }
 
         private IEnumerable<IPv4EndPoint> Clients
@@ -162,12 +183,12 @@ namespace Orion.Game.Main
             if (IsHost) AdvertizeMatch();
             else networking.Send(MatchSettingsRequestPacket.Instance, hostEndPoint.Value);
 
-            RootView.Children.Add(ui);
+            graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -181,10 +202,10 @@ namespace Orion.Game.Main
             networking.Poll();
             if (IsHost)
             {
-                elapsedSecondsSinceLastAdvertize += timeDeltaInSeconds;
-                if (elapsedSecondsSinceLastAdvertize > advertizeFrequency)
+                elapsedTimeSinceLastAdvertize += TimeSpan.FromSeconds(timeDeltaInSeconds);
+                if (elapsedTimeSinceLastAdvertize > advertizePeriod)
                 {
-                    elapsedSecondsSinceLastAdvertize %= advertizeFrequency;
+                    elapsedTimeSinceLastAdvertize = TimeSpan.Zero;
                     AdvertizeMatch();
                 }
             }
@@ -192,22 +213,17 @@ namespace Orion.Game.Main
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
-        }
-
-        public override void Dispose()
-        {
-            ui.Dispose();
+            graphics.DrawGui();
         }
         #endregion
 
         #region Events Handling
-        private void OnMatchSettingsChanged(MatchSettings settings)
+        private void SendMatchSettings()
         {
-            networking.Send(new MatchSettingsPacket(settings), Clients);
+            networking.Send(new MatchSettingsPacket(matchSettings), Clients);
         }
 
-        private void OnPacketReceived(GameNetworking networking, GamePacketEventArgs args)
+        private void HandlePacket(GamePacketEventArgs args)
         {
             if (IsHost)
                 HandleFromHostPerspective(args.Packet, args.SenderEndPoint);
@@ -216,7 +232,7 @@ namespace Orion.Game.Main
         }
 
         #region UI Events
-        private void OnColorChanged(MatchConfigurationUI ui, Player player, ColorRgb newColor)
+        private void ChangePlayerColor(Player player, ColorRgb newColor)
         {
             if (IsHost)
             {
@@ -224,10 +240,12 @@ namespace Orion.Game.Main
                 networking.Send(new ColorChangePacket(IndexOfPlayer(player), newColor), Clients);
             }
             else if (player is LocalPlayer)
+            {
                 networking.Send(new ColorChangeRequestPacket(newColor), hostEndPoint.Value);
+            }
         }
 
-        private void OnExitPressed(MatchConfigurationUI ui)
+        private void Exit()
         {
             if (IsHost)
             {
@@ -242,7 +260,7 @@ namespace Orion.Game.Main
             Manager.Pop();
         }
 
-        private void OnStartGamePressed(MatchConfigurationUI ui)
+        private void DelistAndStartMatch()
         {
             networking.Broadcast(DelistMatchPacket.Instance);
             networking.Send(StartingMatchPacket.Instance, Clients);
@@ -251,28 +269,28 @@ namespace Orion.Game.Main
         #endregion
 
         #region Player Settings
-        private void OnColorChanged(PlayerSettings settings, Player changingPlayer, int index)
+        private void SendPlayerColorChange(Player player, int index)
         {
-            networking.Send(new ColorChangePacket(index, changingPlayer.Color), Clients);
+            networking.Send(new ColorChangePacket(index, player.Color), Clients);
         }
 
-        private void OnPlayerRemoved(PlayerSettings settings, Player leavingPlayer, int index)
+        private void SendPlayerRemoved(Player player, int index)
         {
             RemovePlayerPacket removePlayer = new RemovePlayerPacket(index);
             networking.Send(removePlayer, Clients);
-            if (leavingPlayer is RemotePlayer)
+            if (player is RemotePlayer)
             {
-                RemotePlayer remote = (RemotePlayer)leavingPlayer;
+                RemotePlayer remote = (RemotePlayer)player;
                 networking.Send(removePlayer, remote.EndPoint);
             }
         }
 
-        private void OnPlayerAdded(PlayerSettings sender, Player newPlayer)
+        private void SendAddPlayer(Player player)
         {
-            AddPlayerPacket addPlayer = new AddPlayerPacket(newPlayer);
-            if (newPlayer is RemotePlayer)
+            AddPlayerPacket addPlayer = new AddPlayerPacket(player);
+            if (player is RemotePlayer)
             {
-                RemotePlayer remote = (RemotePlayer)newPlayer;
+                RemotePlayer remote = (RemotePlayer)player;
                 foreach(IPv4EndPoint endPoint in Clients)
                     if(endPoint != remote.EndPoint)
                         networking.Send(addPlayer, endPoint);
@@ -300,8 +318,8 @@ namespace Orion.Game.Main
 
                 int indexOfSelf = settingsPacket.RecipientIndex;
                 Player[] allPlayers = newSettings.Players.ToArray();
-                allPlayers[0] = new RemotePlayer(hostEndPoint.Value, allPlayers[0].Color);
-                allPlayers[indexOfSelf] = new LocalPlayer(allPlayers[indexOfSelf].Color);
+                allPlayers[0] = new RemotePlayer(hostEndPoint.Value, allPlayers[0].Name, allPlayers[0].Color);
+                allPlayers[indexOfSelf] = new LocalPlayer(playerName, allPlayers[indexOfSelf].Color);
 
                 foreach (Player player in playerSettings.Players.ToArray())
                     playerSettings.RemovePlayer(player);
@@ -314,7 +332,9 @@ namespace Orion.Game.Main
             
             if (packet is CancelMatchPacket)
             {
-                Instant.DisplayAlert(ui, "Le match a été annulé.", () => Manager.Pop());
+                // TODO: Display a proper message box
+                Debug.Fail("The match was canceled");
+                Manager.Pop();
             	return;
             }
 
@@ -324,7 +344,9 @@ namespace Orion.Game.Main
                 Player target = playerSettings.Players.ElementAt(remove.PlayerIndex);
                 if (target is LocalPlayer)
                 {
-                    Instant.DisplayAlert(ui, "Vous avez été déconnecté.", () => Manager.Pop());
+                    // TODO: Display a proper message box
+                    Debug.Fail("You've been disconnected");
+                    Manager.Pop();
                     return;
                 }
                 playerSettings.RemovePlayer(target);
@@ -366,7 +388,8 @@ namespace Orion.Game.Main
                 {
                     if (playerSettings.PlayerCount < playerSettings.MaximumNumberOfPlayers)
                     {
-                        RemotePlayer player = new RemotePlayer(client, playerSettings.AvailableColors.First());
+                        string playerName = ((JoinRequestPacket)packet).PlayerName;
+                        RemotePlayer player = new RemotePlayer(client, playerName, playerSettings.AvailableColors.First());
                         playerSettings.AddPlayer(player);
                         networking.Send(JoinResponsePacket.Accepted, client);
                         AdvertizeMatch();
@@ -445,28 +468,35 @@ namespace Orion.Game.Main
 
         #region Static
         #region Fields
-        private const float advertizeFrequency = 5;
+        /// <summary>
+        /// The time to wait before re-advertizing games.
+        /// </summary>
+        private static readonly TimeSpan advertizePeriod = TimeSpan.FromSeconds(5);
         #endregion
 
         #region Methods
         public static MultiplayerDeathmatchSetupGameState CreateAsHost(
             GameStateManager manager, GameGraphics graphics,
-            GameNetworking networking, string matchName)
+            GameNetworking networking, string matchName, string playerName)
         {
+            Argument.EnsureNotNull(matchName, "matchName");
+            Argument.EnsureNotNull(playerName, "playerName");
+
             CompositeMatchAdvertizer advertizer = new CompositeMatchAdvertizer();
             advertizer.AddAdvertiser(new LocalNetworkAdvertizer(networking));
             advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
-            Argument.EnsureNotNull(matchName, "matchName");
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, advertizer, matchName, null);
+                networking, advertizer, matchName, playerName, null);
         }
 
         public static MultiplayerDeathmatchSetupGameState CreateAsClient(
             GameStateManager manager, GameGraphics graphics,
-            GameNetworking networking, IPv4EndPoint hostEndPoint)
+            GameNetworking networking, string playerName, IPv4EndPoint hostEndPoint)
         {
+            Argument.EnsureNotNull(playerName, "playerName");
+
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
-                networking, new NullMatchAdvertizer(), null, hostEndPoint);
+                networking, NullMatchAdvertizer.Instance, null, playerName, hostEndPoint);
         }
         #endregion
         #endregion

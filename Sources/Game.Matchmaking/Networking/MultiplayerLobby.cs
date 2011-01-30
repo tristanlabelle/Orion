@@ -78,12 +78,18 @@ namespace Orion.Game.Matchmaking.Networking
             if (matchesChanged) MatchesChanged.Raise(this);
         }
 
-        public void BeginJoining(IPv4EndPoint endPoint)
+        /// <summary>
+        /// Starts the process of joining a networked match.
+        /// </summary>
+        /// <param name="endPoint">The end point of the machine hosting the match.</param>
+        /// <param name="playerName">The player name to join as.</param>
+        public void BeginJoining(IPv4EndPoint endPoint, string playerName)
         {
             if (IsJoining) throw new InvalidOperationException("Cannot join when already in the process of joining.");
 
             joiningEndPoint = endPoint;
-            networking.Send(JoinRequestPacket.Instance, endPoint);
+            GamePacket packet = new JoinRequestPacket(playerName);
+            networking.Send(packet, endPoint);
         }
 
         public void Dispose()

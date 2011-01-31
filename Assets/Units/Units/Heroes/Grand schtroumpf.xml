@@ -1,66 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Grand schtroumpf</Name>
-		<Upgrades>
-			<Item>Chuck Norris</Item>
-		</Upgrades>
-		<VoicesTemplate>Schtroumpf</VoicesTemplate>
-	</Identity>
-	<FactionMembership>
-		<FoodRequirement>1</FoodRequirement>
-	</FactionMembership>
-	<Attack>
-		<Power>8</Power>
-		<Range>0</Range>
-		<Delay>4</Delay>
-	</Attack>
-	
-	<Build>
-		<Speed>100</Speed>
-		<BuildableTypes>
-			<Item>Pyramide</Item>
-			<Item>Temple de 2012</Item>
-			<Item>Portail démoniaque</Item>
-			<Item>Centre de propagande</Item>
-			<Item>Maison de Tristan</Item>
-			<Item>Jean-Marc</Item>
-			<Item>Œil de Sauron</Item>
-			<Item>Extracteur d'Alagène</Item>
-			<Item>Réserve</Item>
-			<Item>Costco des Hells</Item>
-			<Item>Carrefour Laval</Item>
-		</BuildableTypes>
-	</Build>
-	
-	<Health>
-		<MaxHealth>60</MaxHealth>
-		<ArmorType>Light</ArmorType>
-		<Armor>2</Armor>
-	</Health>
-	
-	<Harvest>
-		<Speed>5</Speed>
-		<MaxCarryingAmount>20</MaxCarryingAmount>
-	</Harvest>
-	
-	<Move>
-		<Speed>8</Speed>
-		<Acceleration>8</Acceleration>
-	</Move>
-	
-	<Position>
-		<CollisionLayer>Ground</CollisionLayer>
-		<Size>
-			<Width>1</Width>
-			<Height>1</Height>
-		</Size>
-		<SightRange>7</SightRange>
-	</Position>
-	
-	<Tags>
-		<Tags>
-			<Item>worker</Item>
-		</Tags>
-	</Tags>
-</Entity>
+<UnitType Name="Grand schtroumpf" Width="1" Height="1">
+	<Skills>
+		<Basic SightRange="7" MaxHealth="60" ArmorType="Light" Armor="2" FoodCost="1"/>
+		<Move Speed="8"/>
+		<Attack Power="8" Range="0" Delay="4" EffectiveAgainst="" IneffectiveAgainst=""/>
+		<Harvest Speed="5" MaxCarryingAmount="20"/>
+		<Build Speed="100">
+			<Target>Pyramide</Target>
+			<Target>Temple de 2012</Target>
+			<Target>Portail démoniaque</Target>
+			<Target>Centre de propagande</Target>
+			<Target>Maison de Tristan</Target>
+			<Target>Jean-Marc</Target>
+			<Target>Oeil de Sauron</Target>
+			<Target>Extracteur d'alagène</Target>
+			<Target>Réserve</Target>
+			<Target>Costco des Hells</Target>
+		</Build>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

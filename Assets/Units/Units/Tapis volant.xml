@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Tapis volant</Name>
-		<AladdiumCost>25</AladdiumCost>
-		<AlageneCost>50</AlageneCost>
-		<Upgrades>
-			<Item>Tapis d'Aladdin</Item>
-		</Upgrades>
-	</Identity>
-	<FactionMembership>
-		<FoodRequirement>2</FoodRequirement>
-	</FactionMembership>
-	<Transport>
-		<Capacity>6</Capacity>
-		<LoadSpeed>1</LoadSpeed>
-		<UnloadSpeed>1</UnloadSpeed>
-	</Transport>
-	<Health>
-		<MaxHealth>75</MaxHealth>
-		<ArmorType>Light</ArmorType>
-		<Armor>1</Armor>
-	</Health>
-	<Move>
-		<Speed>6</Speed>
-		<Acceleration>6</Acceleration>
-	</Move>
-	<Position>
-		<CollisionLayer>Air</CollisionLayer>
-		<Size>
-			<Width>2</Width>
-			<Height>2</Height>
-		</Size>
-		<SightRange>8</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Tapis volant" Width="2" Height="2" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="75" ArmorType="Light" Armor="1" AladdiumCost="25" AlageneCost="50" FoodCost="2"/>
+		<Move Speed="6"/>
+		<Transport Capacity="6"/>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="Tapis d'Aladdin" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

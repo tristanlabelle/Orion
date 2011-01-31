@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Maison de Tristan</Name>
-		<AladdiumCost>150</AladdiumCost>
-		<AlageneCost>50</AlageneCost>
-	</Identity>
-	<Research>
-		<ResearchableTypes>
-			<Item>Schtroumpf véloce</Item>
-			<Item>Import Jean-Marc</Item>
-			<Item>Sainte Trinité</Item>
-			<Item>Schtroumpf costaud</Item>
-			<Item>Spaghetti Alfredo</Item>
-			<Item>Force islamique</Item>
-			<Item>Pandémie</Item>
-		</ResearchableTypes>
-	</Train>
-	<Health>
-		<MaxHealth>200</MaxHealth>
-		<ArmorType>Heavy</ArmorType>
-		<Armor>3</Armor>
-	</Health>
-	<Position>
-		<CollisionLayer>Ground</CollisionLayer>
-		<Size>
-			<Width>3</Width>
-			<Height>3</Height>
-		</Size>
-		<SightRange>4</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Maison de Tristan" Width="3" Height="3">
+	<Skills>
+		<Basic SightRange="4" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="150" AlageneCost="50"/>
+		<Research>
+			<Target>Schtroumpf véloce</Target>
+			<Target>Import Jean-Marc</Target>
+			<Target>Sainte Trinité</Target>
+			<Target>Schtroumpf costaud</Target>
+			<Target>Spaghetti Alfredo</Target>
+			<Target>Force islamique</Target>
+			<Target>Pandémie</Target>
+		</Research>
+		<Train Speed="10">
+			<Target>Mentos</Target>
+			<Target>Coke diète</Target>
+		</Train>
+	</Skills>
+</UnitType>

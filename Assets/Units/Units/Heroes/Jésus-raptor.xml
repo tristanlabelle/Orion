@@ -1,40 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Jésus-raptor</Name>
-		<Upgrades>
-			<Item>Chuck Norris</Item>
-		</Upgrades>
-		<VoicesTemplate>Jésus</VoicesTemplate>
-	</Identity>
-	<FactionMembership>
-		<FoodRequirement>2</FoodRequirement>
-	</FactionMembership>
-	<Attack>
-		<Power>14</Power>
-		<Range>0</Range>
-		<Delay>3</Delay>
-	</Attack>
-	<Heal>
-		<Speed>6</Speed>
-		<Range>6</Range>
-	</Heal>
-	<Health>
-		<MaxHealth>160</MaxHealth>
-		<ArmorType>Supernatural</ArmorType>
-		<Armor>2</Armor>
-	</Health>
-	<Move>
-		<Speed>14</Speed>
-		<Acceleration>14</Acceleration>
-	</Move>
-	<Position>
-		<CollisionLayer>Air</CollisionLayer>
-		<Size>
-			<Width>2</Width>
-			<Height>2</Height>
-		</Size>
-		<SightRange>8</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Jésus-raptor" Width="2" Height="2" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="160" ArmorType="Surnatural" Armor="2" FoodCost="2"/>
+		<Move Speed="14"/>
+		<Heal Speed="6" Range="6"/>
+		<Attack Power="14" Range="0" Delay="3" EffectiveAgainst="" IneffectiveAgainst=""/>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

@@ -1,22 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Costco des Hells</Name>
-		<AladdiumCost>80</AladdiumCost>
-	</Identity>
-	<StoreResources/>
-	<Health>
-		<MaxHealth>100</MaxHealth>
-		<ArmorType>Heavy</ArmorType>
-		<Armor>2</Armor>
-	</Health>
-	<Position>
-		<CollisionLayer>Ground</CollisionLayer>
-		<Size>
-			<Width>2</Width>
-			<Height>2</Height>
-		</Size>
-		<SightRange>4</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Costco des Hells" Width="2" Height="2">
+	<Skills>
+		<Basic SightRange="4" MaxHealth="100" ArmorType="Heavy" Armor="2" AladdiumCost="80"/>
+		<StoreResources/>
+	</Skills>
+</UnitType>

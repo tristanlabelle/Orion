@@ -1,33 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Tapis d'Aladdin</Name>
-		<Upgrades>
-			<Item>Chuck Norris</Item>
-		</Upgrades>
-	</Identity>
-	<FactionMembership>
-		<FoodRequirement>2</FoodRequirement>
-	</FactionMembership>
-	<Transport>
-		<Capacity>10</Capacity>
-	</Transport>
-	<Health>
-		<MaxHealth>140</MaxHealth>
-		<ArmorType>Light</ArmorType>
-		<Armor>2</Armor>
-	</Health>
-	<Move>
-		<Speed>15</Speed>
-		<Acceleration>15</Acceleration>
-	</Move>
-	<Position>
-		<CollisionLayer>Air</CollisionLayer>
-		<Size>
-			<Width>2</Width>
-			<Height>2</Height>
-		</Size>
-		<SightRange>8</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Tapis d'Aladdin" Width="2" Height="2" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="140" ArmorType="Light" Armor="2" FoodCost="2"/>
+		<Move Speed="15"/>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

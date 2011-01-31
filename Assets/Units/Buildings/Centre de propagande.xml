@@ -1,31 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Centre de propagande</Name>
-		<AladdiumCost>125</AladdiumCost>
-		<AlageneCost>200</AlageneCost>
-	</Identity>
-	<Train>
-		<Speed>10</Speed>
-		<TrainableTypes>
-			<Item>Jedihad</Item>
-			<Item>Jésus</Item>
-			<Item>Flying Spaghetti Monster</Item>
-			<Item>Hélicoptère TVA</Item>
-		</TrainableTypes>
-	</Train>
-	<Health>
-		<MaxHealth>200</MaxHealth>
-		<ArmorType>Heavy</ArmorType>
-		<Armor>3</Armor>
-	</Health>
-	<Position>
-		<CollisionLayer>Ground</CollisionLayer>
-		<Size>
-			<Width>3</Width>
-			<Height>3</Height>
-		</Size>
-		<SightRange>8</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Centre de propagande" Width="3" Height="3">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="200" ArmorType="Heavy" Armor="3" AladdiumCost="125" AlageneCost="200"/>
+		<Train Speed="10">
+			<Target>Jedihad</Target>
+			<Target>Jésus</Target>
+			<Target>Flying Spaghetti Monster</Target>
+			<Target>Hélicoptère TVA</Target>
+		</Train>
+	</Skills>
+</UnitType>

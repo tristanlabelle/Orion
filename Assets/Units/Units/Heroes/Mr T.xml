@@ -1,56 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Don't mess with Mr T.xml fool! -->
-<Entity>
-	<Identity>
-		<Name>Mr T</Name>
-	</Identity>
-	<FactionMembership>
-		<FoodRequirement>10</FoodRequirement>
-	</FactionMembership>
-	<Attack>
-		<Power>50</Power>
-		<Range>20</Range>
-		<Delay>1</Delay>
-		<DamageFilters>
-			<Item>
-				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
-					<ArmorType>Light</ArmorType>
-				</Applies>
-				<AdditionalDamage>1</AdditionalDamage>
-				<Description>Light armor</Description>
-			</Item>
-			<Item>
-				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
-					<ArmorType>Heavy</ArmorType>
-				</Applies>
-				<AdditionalDamage>1</AdditionalDamage>
-				<Description>Heavy armor</Description>
-			</Item>
-			<Item>
-				<Applies CallTarget="Orion.Game.Simulation.Components.DamageFilter.ForArmorType">
-					<ArmorType>Supernatural</ArmorType>
-				</Applies>
-				<AdditionalDamage>1</AdditionalDamage>
-				<Description>Supernatural armor</Description>
-			</Item>
-		</DamageFilters>
-	</Attack>
-	<Health>
-		<MaxHealth>1000</MaxHealth>
-		<ArmorType>Divine</ArmorType>
-		<Armor>10</Armor>
-	</Health>
-	<Move>
-		<Speed>15</Speed>
-		<Acceleration>15</Acceleration>
-	</Move>
-	<Position>
-		<CollisionLayer>Air</CollisionLayer>
-		<Size>
-			<Width>4</Width>
-			<Height>4</Height>
-		</Size>
-		<SightRange>20</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Mr T" Width="4" Height="4" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="20" MaxHealth="1000" ArmorType="Divine" Armor="10" FoodCost="10"/>
+		<Move Speed="15"/>
+		<Attack Power="50" Range="20" Delay="1" EffectiveAgainst="Light Heavy Surnatural" IneffectiveAgainst=""/>
+	</Skills>
+</UnitType>

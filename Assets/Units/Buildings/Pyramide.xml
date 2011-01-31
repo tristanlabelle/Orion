@@ -1,31 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Entity>
-	<Identity>
-		<Name>Pyramide</Name>
-		<AladdiumCost>250</AladdiumCost>
-	</Identity>
-	<FactionMembership>
-		<ProvideFood>10</ProvideFood>
-	</FactionMembership>
-	<Train>
-		<Speed>10</Speed>
-		<TrainableTypes>
-			<Item>Schtroumpf</Item>
-		</TrainableTypes>
-	</Train>
-	<StoreResources/>
-	<Health>
-		<MaxHealth>400</MaxHealth>
-		<ArmorType>Heavy</ArmorType>
-		<Armor>4</Armor>
-	</Health>
-	<Position>
-		<CollisionLayer>Ground</CollisionLayer>
-		<Size>
-			<Width>3</Width>
-			<Height>3</Height>
-		</Size>
-		<SightRange>8</SightRange>
-	</Position>
-	<Tags/>
-</Entity>
+<UnitType Name="Pyramide" Width="3" Height="3">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="400" ArmorType="Heavy" Armor="4" AladdiumCost="250"/>
+		<ProvideFood Amount="10"/>
+		<StoreResources/>
+		<Train Speed="10">
+			<Target>Schtroumpf</Target>
+		</Train>
+	</Skills>
+</UnitType>

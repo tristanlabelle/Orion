@@ -69,7 +69,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 foreach (Entity entity in alageneResourceNodes)
                 {
                     Spatial position = entity.GetComponent<Spatial>();
-                    if (position.Location == minLocation.Value)
+                    if (position.Position == minLocation.Value)
                         return true;
                 }
                 return false;

@@ -33,7 +33,7 @@ namespace Orion.Game.Simulation.Tasks
             if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an building under construction");
 
-            if (!trainer.Type.HasSkill<TrainSkill>())
+            if (!trainer.HasSkill<TrainSkill>())
                 throw new ArgumentException("Cannot train without the train skill.", "trainer");
 
             // Normally we'd check if the train skill supports the trainee type, but as the trainee type

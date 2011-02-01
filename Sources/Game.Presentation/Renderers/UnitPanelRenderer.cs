@@ -105,7 +105,7 @@ namespace Orion.Game.Presentation.Renderers
             {
                 foreach (UnitStat stat in statsToDisplay)
                 {
-                    if (!unit.Type.HasSkill(stat.SkillType)) continue;
+                    if (!unit.HasSkill(stat.SkillType)) continue;
 
                     int value = unit.GetStat(stat);
                     if (value == 0) continue;

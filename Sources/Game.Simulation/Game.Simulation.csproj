@@ -122,6 +122,8 @@
     <Compile Include="Tasks\EmbarkTask.cs" />
     <Compile Include="Technologies\TechnologyReader.cs" />
     <Compile Include="TrainType.cs" />
+    <Compile Include="Unit.Position.cs" />
+    <Compile Include="Unit.Transport.cs" />
     <Compile Include="UnitTypeReader.cs" />
     <Compile Include="UnitTypeUpgrade.cs" />
     <Compile Include="Utilities\FogOfWarMemory.cs" />

@@ -179,14 +179,6 @@ namespace Orion.Game.Simulation
         #endregion
         
         #region Can*** Testing
-        public bool CanTransport(UnitType unitType)
-        {
-            Argument.EnsureNotNull(unitType, "unitType");
-            return HasSkill<TransportSkill>()
-            	&& unitType.HasSkill<MoveSkill>()
-            	&& !unitType.IsAirborne
-            	&& !unitType.HasSkill<TransportSkill>();
-        }
 
         public bool CanBuild(UnitType buildingType)
         {

@@ -574,7 +574,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(transporter, "transporter");
 
             var embarkers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
+                .Where(unit => unit.Faction == LocalFaction && transporter.CanTransport(unit));
             OverrideIfNecessary();
             commander.LaunchEmbark(embarkers, transporter);
         }

@@ -332,7 +332,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         protected virtual Vector2 GetPosition()
         {
-            return GetComponent<Spatial>().Location;
+            return GetComponent<Spatial>().Position;
         }
 
         protected virtual void DoUpdate(SimulationStep step) { }

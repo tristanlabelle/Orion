@@ -1,5 +1,6 @@
 ﻿using System;
 using Orion.Engine;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Skills
 {

@@ -8,6 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -16,7 +17,7 @@ namespace Orion.Game.Simulation
     /// depending on its <see cref="UnitType"/>.
     /// </summary>
     [Serializable]
-    public sealed class Unit : Entity
+    public sealed partial class Unit : Entity
     {
         #region Fields
         /// <summary>
@@ -71,6 +72,9 @@ namespace Orion.Game.Simulation
                 Health = 1;
                 healthBuilt = 1;
             }
+
+            // Transport
+            if (type.HasSkill<TransportSkill>()) InitTransport();
         }
         #endregion
 
@@ -157,40 +161,6 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Physical
-        public override Size Size
-        {
-            get { return type.Size; }
-        }
-
-        public new Vector2 Position
-        {
-            get { return position; }
-            set
-            {
-                if (value == position) return;
-                if (!World.Bounds.ContainsPoint(value))
-                {
-                    Debug.Fail("Position out of bounds.");
-                    value = World.Bounds.Clamp(value);
-                }
-
-                Vector2 oldPosition = position;
-                position = value;
-                OnMoved(oldPosition, position);
-            }
-        }
-
-        /// <summary>
-        /// Gets the angle this <see cref="Unit"/> is facing.
-        /// </summary>
-        public float Angle
-        {
-            get { return angle; }
-            set { angle = value; }
-        }
-        #endregion
-
         /// <summary>
         /// Gets a circle representing the area of the world that is within
         /// the line of sight of this <see cref="Unit"/>.
@@ -199,28 +169,6 @@ namespace Orion.Game.Simulation
         {
             get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
         }
-
-        #region Transport
-        /// <summary>
-        /// Gets a value indicating if this unit is embarked in another unit.
-        /// </summary>
-        public bool IsEmbarked
-        {
-            get { return transporter != null; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this transporter unit is at full capacity.
-        /// </summary>
-        public bool IsTransportFull
-        {
-            get
-            {
-                Debug.Assert(HasSkill<TransportSkill>());
-                return transportedUnits != null && transportedUnits.Count == GetStat(TransportSkill.CapacityStat);
-            }
-        }
-        #endregion
 
         #region Health
         /// <summary>
@@ -338,6 +286,21 @@ namespace Orion.Game.Simulation
         public bool HasSkill<TSkill>() where TSkill : UnitSkill
         {
             return type.HasSkill<TSkill>();
+        }
+
+        /// <summary>
+        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
+        /// </summary>
+        /// <param name="TSkill">The type of skill to be found.</param>
+        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
+        public bool HasSkill(Type skillType)
+        {
+            return type.HasSkill(skillType);
+        }
+
+        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
+        {
+            return type.TryGetSkill<TSkill>();
         }
 
         /// <summary>

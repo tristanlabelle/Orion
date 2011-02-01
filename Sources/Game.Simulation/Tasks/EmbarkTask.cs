@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(transporter, "transporter");
-            if (!transporter.Type.CanTransport(unit.Type))
+            if (!transporter.CanTransport(unit))
                 throw new ArgumentException("A {0} cannot transport a {1}.".FormatInvariant(transporter, unit));
 
             this.transporter = transporter;

@@ -145,6 +145,10 @@
     <Compile Include="Gui\Adornments\ColorAdornment.cs" />
     <Compile Include="Gui\Adornments\TextureAdornment.cs" />
     <Compile Include="Gui\Alignment.cs" />
+    <Compile Include="Gui\Control.Hierarchy.cs" />
+    <Compile Include="Gui\Control.Input.cs" />
+    <Compile Include="Gui\Control.Layout.cs" />
+    <Compile Include="Gui\Control.Visual.cs" />
     <Compile Include="Gui\Controls\ButtonClickEvent.cs" />
     <Compile Include="Gui\Controls\ButtonClickType.cs" />
     <Compile Include="Gui\Controls\ComboBox.cs" />

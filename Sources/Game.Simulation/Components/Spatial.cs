@@ -66,7 +66,7 @@ namespace Orion.Game.Simulation.Components
             set
             {
                 World world = Entity.World;
-                if (!world.Bounds.ContainsPoint(value))
+                if (world != null && !world.Bounds.ContainsPoint(value))
                 {
                     Debug.Fail("Position out of bounds.");
                     value = world.Bounds.Clamp(value);

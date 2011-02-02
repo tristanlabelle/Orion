@@ -305,7 +305,7 @@ namespace Orion.Game.Presentation
             {
                 LaunchDefaultCommand((Unit)targetEntity);
             }
-            else if (targetEntity.HasComponent<Harvestable>())
+            else if (targetEntity != null && targetEntity.HasComponent<Harvestable>())
             {
                 Spatial position = targetEntity.GetComponent<Spatial>();
                 if (Selection.Units.All(unit => unit.IsBuilding))

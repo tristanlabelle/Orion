@@ -68,6 +68,10 @@ namespace Orion.Game.Simulation
             this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
             this.upgrades = builder.Upgrades.ToList().AsReadOnly();
 
+            // Initialize components
+            InitPosition(new Vector2(0,0), builder.Size, builder.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground);
+            if (type.HasSkill<TransportSkill>()) InitTransport();
+
             Debug.Assert(!HasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
@@ -91,6 +95,11 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(faction, "faction");
 
             this.type = type;
+
+            // Initialize components
+            InitPosition(position, type.Size, type.CollisionLayer);
+            if (type.HasSkill<TransportSkill>()) InitTransport();
+
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
             this.rallyPoint = Center;
@@ -100,10 +109,6 @@ namespace Orion.Game.Simulation
                 Health = 1;
                 healthBuilt = 1;
             }
-
-            // Initialize components
-            InitPosition(position, type.Size, type.CollisionLayer);
-            if (type.HasSkill<TransportSkill>()) InitTransport();
         }
         #endregion
 
@@ -182,11 +187,6 @@ namespace Orion.Game.Simulation
         public bool IsAirborne
         {
             get { return type.IsAirborne; }
-        }
-
-        public override CollisionLayer CollisionLayer
-        {
-            get { return type.CollisionLayer; }
         }
 
         public ReadOnlyCollection<UnitTypeUpgrade> Upgrades

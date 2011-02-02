@@ -112,7 +112,7 @@ namespace Orion.Game.Presentation.Audio
             Unit unit = entity as Unit;
             if (unit == null) return;
             
-            if (unit.Type.Name == "Chuck Norris")
+            if (unit.Name == "Chuck Norris")
             {
                 audio.PlayUISound("Chuck Norris.Spawn");
                 return;

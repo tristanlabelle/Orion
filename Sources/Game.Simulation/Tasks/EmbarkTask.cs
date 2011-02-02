@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Properties
         public override string Description
         {
-            get { return "Embarking into {0}".FormatInvariant(transporter.Type.Name); }
+            get { return "Embarking into {0}".FormatInvariant(transporter.Name); }
         }
         #endregion
 

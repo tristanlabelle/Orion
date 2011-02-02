@@ -11,7 +11,7 @@ namespace Orion.Game.Simulation
     /// <summary>
     /// Contains the attempt at basing transport on components.
     /// </summary>
-    public sealed partial class Unit : Entity
+    public partial class Unit : Entity
     {
         private void InitTransport()
         {

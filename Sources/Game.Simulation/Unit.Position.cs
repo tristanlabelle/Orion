@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation
 {
-    public sealed partial class Unit : Entity
+    public partial class Unit : Entity
     {
         private void InitPosition(Vector2 position, Size size, CollisionLayer layer)
         {

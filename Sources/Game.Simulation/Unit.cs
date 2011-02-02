@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation
     /// depending on its <see cref="UnitType"/>.
     /// </summary>
     [Serializable]
-    public sealed partial class Unit : Entity
+    public partial class Unit : Entity
     {
         #region Fields
         /// <summary>
@@ -29,8 +29,6 @@ namespace Orion.Game.Simulation
         private readonly Faction faction;
         private readonly TaskQueue taskQueue;
         private UnitType type;
-        private Vector2 position;
-        private float angle;
         private float damage;
         private Vector2 rallyPoint;
         /// <summary>
@@ -43,7 +41,19 @@ namespace Orion.Game.Simulation
         private Unit transporter;
         #endregion
 
+        #region UnitType Fields
+        private string name;
+        #endregion
+
         #region Constructors
+        /// <summary>
+        /// UnitType base construtor.
+        /// </summary>
+        internal Unit(string name)
+        {
+            this.name = name;
+        }
+
         /// <summary>
         /// Initializes a new <see cref="Unit"/> from its identifier,
         /// <see cref="UnitType"/> and <see cref="World"/>.
@@ -64,7 +74,6 @@ namespace Orion.Game.Simulation
             this.type = type;
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
-            this.position = position;
             this.rallyPoint = Center;
 
             if (type.IsBuilding)
@@ -73,7 +82,8 @@ namespace Orion.Game.Simulation
                 healthBuilt = 1;
             }
 
-            // Transport
+            // Initialize components
+            InitPosition(position, type.Size, type.CollisionLayer);
             if (type.HasSkill<TransportSkill>()) InitTransport();
         }
         #endregion
@@ -122,6 +132,11 @@ namespace Orion.Game.Simulation
                 type = value;
                 OnTypeChanged(oldType, value);
             }
+        }
+
+        public string Name
+        {
+            get { return type.Name; }
         }
 
         /// <summary>
@@ -179,7 +194,7 @@ namespace Orion.Game.Simulation
             get { return damage; }
             set
             {
-                if (float.IsNaN(value)) throw new ArgumentException("The damage cannot be set to NaN.", "Damage");
+                Argument.EnsureNotNaN(value, "value");
                 if (value < 0) value = 0;
                 else if (value > MaxHealth) value = MaxHealth;
                 else if (value == damage) return;
@@ -554,7 +569,7 @@ namespace Orion.Game.Simulation
                 transportedUnits.Pop();
                 // The position field is changed directly instead of using the property
                 // because we don't want to raise the Moved event.
-                transportedUnit.position = location.Value;
+                transportedUnit.Position = location.Value;
                 transportedUnit.transporter = null;
                 World.Entities.Add(transportedUnit);
             }
@@ -681,7 +696,7 @@ namespace Orion.Game.Simulation
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
-                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared
+                .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared
                     + (unit.HasSkill<AttackSkill>() ? 0 : 100));
 
             if (unitToAttack == null) return false;
@@ -701,7 +716,7 @@ namespace Orion.Game.Simulation
                    && !unit.IsBuilding
                    && Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                    && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
 
             if (unitToHeal == null) return false;
 
@@ -720,7 +735,7 @@ namespace Orion.Game.Simulation
                    && unit.IsUnderConstruction
                    && unit.Faction == faction
                    && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
+               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
 
             if (unitToRepair == null) return false;
 

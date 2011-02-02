@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");
-            if (target.Type.IsBuilding)
+            if (target.IsBuilding)
                 throw new ArgumentException("Cannot heal buildings.", "target");
 
             this.target = target;

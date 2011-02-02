@@ -95,7 +95,7 @@ namespace Orion.Game.Presentation.Renderers
 
             context.Font = statsFont;
 
-            context.Draw(unit.Type.Name, new Vector2(150, firstLineY), Colors.Black);
+            context.Draw(unit.Name, new Vector2(150, firstLineY), Colors.Black);
 
             Text hp = new Text("HP: {0}/{1}".FormatInvariant((int)unit.Health, unit.MaxHealth), statsFont);
             context.Draw(hp, new Vector2(150, firstLineY - hp.Frame.Height), Colors.Black);

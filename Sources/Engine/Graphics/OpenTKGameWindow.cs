@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using OpenTK.Platform;
-using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using TKMouseButton = OpenTK.Input.MouseButton;
 
@@ -257,7 +251,7 @@ namespace Orion.Engine.Graphics
 
         private void OnWindowResized(object sender, EventArgs e)
         {
-            GL.Viewport(0, 0, ClientAreaSize.Width, ClientAreaSize.Height);
+            graphicsContext.ViewportSize = new Size(ClientAreaSize.Width, ClientAreaSize.Height);
             Resized.Raise(this);
         }
 

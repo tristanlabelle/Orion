@@ -202,6 +202,8 @@ namespace Orion.Game.Presentation.Gui
         private void LaunchSelectedMatch()
         {
             Label selectedMatchLabel = (Label)matchListBox.SelectedItem;
+            if (selectedMatchLabel == null) return;
+
             AdvertizedMatch match = (AdvertizedMatch)selectedMatchLabel.Tag;
             Joined.Raise(this, match);
         }

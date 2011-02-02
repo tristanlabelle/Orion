@@ -9,6 +9,8 @@ using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Components;
+using System.Collections.ObjectModel;
+using Orion.Game.Simulation.Technologies;
 
 namespace Orion.Game.Simulation
 {
@@ -43,15 +45,32 @@ namespace Orion.Game.Simulation
 
         #region UnitType Fields
         private string name;
+        private string graphicsTemplate;
+        private string voicesTemplate;
+        private readonly Dictionary<Type, UnitSkill> skills; // nouveau field
+        private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades; // nouveau field
         #endregion
 
         #region Constructors
         /// <summary>
         /// UnitType base construtor.
         /// </summary>
-        internal Unit(string name)
+        internal Unit(Handle handle, UnitTypeBuilder builder)
+            : base(null, handle)
         {
-            this.name = name;
+            this.name = builder.Name;
+            this.graphicsTemplate = builder.GraphicsTemplate ?? builder.Name;
+            this.voicesTemplate = builder.VoicesTemplate ?? builder.Name;
+
+            this.skills = builder.Skills
+                .Select(skill => skill.CreateFrozenClone())
+                .ToDictionary(skill => skill.GetType());
+            this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
+            this.upgrades = builder.Upgrades.ToList().AsReadOnly();
+
+            Debug.Assert(!HasSkill<AttackSkill>()
+                || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
         }
 
         /// <summary>
@@ -139,6 +158,16 @@ namespace Orion.Game.Simulation
             get { return type.Name; }
         }
 
+        public string GraphicsTemplate
+        {
+            get { return graphicsTemplate; }
+        }
+
+        public string VoicesTemplate
+        {
+            get { return voicesTemplate; }
+        }
+
         /// <summary>
         /// Gets a value indicating if this <see cref="Unit"/> is a building.
         /// </summary>
@@ -158,6 +187,21 @@ namespace Orion.Game.Simulation
         public override CollisionLayer CollisionLayer
         {
             get { return type.CollisionLayer; }
+        }
+
+        public ReadOnlyCollection<UnitTypeUpgrade> Upgrades
+        {
+            get { return upgrades; }
+        }
+
+        public bool KeepsFactionAlive
+        {
+            get
+            {
+                return IsBuilding && HasSkill<TrainSkill>()
+                    || HasSkill<BuildSkill>()
+                    || HasSkill<AttackSkill>();
+            }
         }
         #endregion
 
@@ -328,6 +372,21 @@ namespace Orion.Game.Simulation
             return faction.GetStat(type, stat);
         }
 
+        public int GetBaseStat(UnitStat stat)
+        {
+            Argument.EnsureNotNull(stat, "stat");
+
+            UnitSkill skill;
+            if (!skills.TryGetValue(stat.SkillType, out skill))
+            {
+                throw new ArgumentException(
+                    "Cannot get base stat {0} without skill {1}."
+                    .FormatInvariant(stat, stat.SkillName));
+            }
+
+            return skill.GetStat(stat);
+        }
+
         /// <summary>
         /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
         /// </summary>
@@ -372,6 +431,34 @@ namespace Orion.Game.Simulation
                 TypeChanged(this, oldType, newType);
             Faction.OnUnitTypeChanged(this, oldType, newType);
         }
+
+        #region Can* Testing
+        public bool CanBuild(UnitType buildingType)
+        {
+            Argument.EnsureNotNull(buildingType, "buildingType");
+            BuildSkill skill = TryGetSkill<BuildSkill>();
+            return buildingType.IsBuilding
+                && skill != null
+                && skill.Supports(buildingType);
+        }
+
+        public bool CanTrain(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            TrainSkill skill = TryGetSkill<TrainSkill>();
+            return !unitType.IsBuilding
+                && skill != null
+                && skill.Supports(unitType);
+        }
+
+        public bool CanResearch(Technology technology)
+        {
+            Argument.EnsureNotNull(technology, "technology");
+            ResearchSkill skill = TryGetSkill<ResearchSkill>();
+            return skill != null
+                && skill.Supports(technology);
+        }
+        #endregion
         #endregion
 
         #region Position/Angle

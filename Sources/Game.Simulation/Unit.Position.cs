@@ -21,6 +21,12 @@ namespace Orion.Game.Simulation
             AddComponent(spatial);
         }
 
+        public CollisionLayer CollisionLayer
+        {
+            get { return GetComponent<Spatial>().CollisionLayer; }
+            set { GetComponent<Spatial>().CollisionLayer = value; }
+        }
+
         public new Vector2 Position
         {
             get { return GetComponent<Spatial>().Position; }
@@ -30,6 +36,16 @@ namespace Orion.Game.Simulation
         public override Size Size
         {
             get { return GetComponent<Spatial>().Size; }
+        }
+
+        public int Width
+        {
+            get { return Size.Width; }
+        }
+
+        public int Height
+        {
+            get { return Size.Height; }
         }
 
         public float Angle

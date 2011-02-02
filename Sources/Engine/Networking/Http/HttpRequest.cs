@@ -33,7 +33,7 @@ namespace Orion.Engine.Networking.Http
         public HttpRequest(string hostNameOrAddress, ushort port)
         {
             IPAddress[] addresses = Dns.GetHostAddresses(hostNameOrAddress);
-            if (addresses.Length == 0) throw new ArgumentException("Could not resolve hostname " + hostNameOrAddress);
+            if (addresses.Length == 0) throw new SocketException((int)SocketError.HostNotFound);
 
             hostEndPoint = new IPv4EndPoint((IPv4Address)addresses[0], port);
             socket.Connect(hostEndPoint);
@@ -161,23 +161,19 @@ namespace Orion.Engine.Networking.Http
 
         public void ExecuteAsync(HttpRequestMethod method, string path, Action<HttpResponse> onReceive)
         {
-            Thread requestThread = new Thread(() => onReceive(Execute(method, path)));
-            requestThread.Name = "HTTP Request Thread";
-            requestThread.Start();
+            ThreadPool.QueueUserWorkItem(obj => onReceive(Execute(method, path)));
         }
 
-        public void ExecuteAsync(HttpRequestMethod method, string path, IDictionary<string, string> fields)
+        public void ExecuteAsync(HttpRequestMethod method, string path,
+            IDictionary<string, string> fields)
         {
-            Thread requestThread = new Thread(() => Execute(method, path, fields));
-            requestThread.Name = "HTTP Request Thread";
-            requestThread.Start();
+            ThreadPool.QueueUserWorkItem(obj => Execute(method, path, fields));
         }
 
-        public void ExecuteAsync(HttpRequestMethod method, string path, IDictionary<string, string> fields, Action<HttpResponse> onReceive)
+        public void ExecuteAsync(HttpRequestMethod method, string path,
+            IDictionary<string, string> fields, Action<HttpResponse> onReceive)
         {
-            Thread requestThread = new Thread(() => onReceive(Execute(method, path, fields)));
-            requestThread.Name = "HTTP Request Thread";
-            requestThread.Start();
+            ThreadPool.QueueUserWorkItem(obj => onReceive(Execute(method, path, fields)));
         }
         #endregion
     }

@@ -480,6 +480,7 @@ namespace Orion.Game.Main
             CompositeMatchAdvertizer advertizer = new CompositeMatchAdvertizer();
             advertizer.AddAdvertiser(new LocalNetworkAdvertizer(networking));
             advertizer.AddAdvertiser(new MasterServerAdvertizer("http://www.laissemoichercherca.com/ets/orion.php"));
+
             return new MultiplayerDeathmatchSetupGameState(manager, graphics,
                 networking, advertizer, matchName, playerName, null);
         }

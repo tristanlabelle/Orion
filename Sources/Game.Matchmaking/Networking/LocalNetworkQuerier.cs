@@ -8,7 +8,10 @@ using Orion.Game.Matchmaking.Networking.Packets;
 
 namespace Orion.Game.Matchmaking.Networking
 {
-    public class LocalNetworkQuerier : IMatchQuerier
+    /// <summary>
+    /// A match provider which detects match broadcasted on the local network.
+    /// </summary>
+    public sealed class LocalNetworkQuerier : IMatchQuerier
     {
         #region Fields
         private readonly TimeSpan timeBeforeReExploring;
@@ -44,7 +47,7 @@ namespace Orion.Game.Matchmaking.Networking
         #region Properties
         public string Tag { get { return "LAN"; } }
 
-        public ReadOnlyCollection<AdvertizedMatch> Matches
+        public ICollection<AdvertizedMatch> Matches
         {
             get { return readOnlyMatches; }
         }

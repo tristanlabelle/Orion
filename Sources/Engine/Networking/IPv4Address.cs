@@ -157,13 +157,12 @@ namespace Orion.Engine.Networking
 
         public override bool Equals(object obj)
         {
-            if (!(obj is IPv4Address)) return false;
-            return Equals((IPv4Address)obj);
+            return obj is IPv4Address && Equals((IPv4Address)obj);
         }
 
         public override int GetHashCode()
         {
-            return (int)value;
+            return unchecked((int)value);
         }
 
         public override string ToString()

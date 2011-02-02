@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Orion.Egine.Localization
+namespace Orion.Engine.Localization
 {
     /// <summary>
     /// Represents a translation of a definition.

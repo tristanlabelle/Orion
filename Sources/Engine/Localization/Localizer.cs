@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Diagnostics;
 using System.Xml;
 
-namespace Orion.Egine.Localization
+namespace Orion.Engine.Localization
 {
     /// <summary>
     /// This class allows to load and access definitions 

@@ -1,4 +1,4 @@
-﻿namespace Orion.Egine.Localization
+﻿namespace Orion.Engine.Localization
 {
     public enum Genders
     {

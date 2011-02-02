@@ -4,7 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Orion.Egine.Localization
+namespace Orion.Engine.Localization
 {
     /// <summary>
     /// Represents a definition of a noun (Unit in Orion) or a sentence.

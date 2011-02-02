@@ -75,7 +75,7 @@ namespace Orion.Game.Matchmaking.Commands
                 {
                     throw new InvalidOperationException(
                         "Unit {0} cannot upgrade to {1}."
-                        .FormatInvariant(unit.Name, upgrade.Target));
+                        .FormatInvariant(unit.Type.Name, upgrade.Target));
                 }
 
                 int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);

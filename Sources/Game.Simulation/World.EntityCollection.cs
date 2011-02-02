@@ -149,7 +149,7 @@ namespace Orion.Game.Simulation
 
                 Spatial positionComponent = new Spatial(node);
                 positionComponent.Size = new Size(2, 2);
-                positionComponent.Position = point;
+                positionComponent.Location = point;
                 node.AddComponent(positionComponent);
                 
                 Add(node);

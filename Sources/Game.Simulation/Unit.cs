@@ -8,9 +8,6 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Components;
-using System.Collections.ObjectModel;
-using Orion.Game.Simulation.Technologies;
 
 namespace Orion.Game.Simulation
 {
@@ -19,7 +16,7 @@ namespace Orion.Game.Simulation
     /// depending on its <see cref="UnitType"/>.
     /// </summary>
     [Serializable]
-    public partial class Unit : Entity
+    public sealed class Unit : Entity
     {
         #region Fields
         /// <summary>
@@ -31,6 +28,8 @@ namespace Orion.Game.Simulation
         private readonly Faction faction;
         private readonly TaskQueue taskQueue;
         private UnitType type;
+        private Vector2 position;
+        private float angle;
         private float damage;
         private Vector2 rallyPoint;
         /// <summary>
@@ -43,40 +42,7 @@ namespace Orion.Game.Simulation
         private Unit transporter;
         #endregion
 
-        #region UnitType Fields
-        private string name;
-        private string graphicsTemplate;
-        private string voicesTemplate;
-        private readonly Dictionary<Type, UnitSkill> skills; // nouveau field
-        private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades; // nouveau field
-        #endregion
-
         #region Constructors
-        /// <summary>
-        /// UnitType base construtor.
-        /// </summary>
-        internal Unit(Handle handle, UnitTypeBuilder builder)
-            : base(null, handle)
-        {
-            this.name = builder.Name;
-            this.graphicsTemplate = builder.GraphicsTemplate ?? builder.Name;
-            this.voicesTemplate = builder.VoicesTemplate ?? builder.Name;
-
-            this.skills = builder.Skills
-                .Select(skill => skill.CreateFrozenClone())
-                .ToDictionary(skill => skill.GetType());
-            this.skills.Add(typeof(BasicSkill), builder.BasicSkill.CreateFrozenClone());
-            this.upgrades = builder.Upgrades.ToList().AsReadOnly();
-
-            // Initialize components
-            InitPosition(new Vector2(0,0), builder.Size, builder.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground);
-            if (type.HasSkill<TransportSkill>()) InitTransport();
-
-            Debug.Assert(!HasSkill<AttackSkill>()
-                || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
-        }
-
         /// <summary>
         /// Initializes a new <see cref="Unit"/> from its identifier,
         /// <see cref="UnitType"/> and <see cref="World"/>.
@@ -95,13 +61,9 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(faction, "faction");
 
             this.type = type;
-
-            // Initialize components
-            InitPosition(position, type.Size, type.CollisionLayer);
-            if (type.HasSkill<TransportSkill>()) InitTransport();
-
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
+            this.position = position;
             this.rallyPoint = Center;
 
             if (type.IsBuilding)
@@ -158,21 +120,6 @@ namespace Orion.Game.Simulation
             }
         }
 
-        public string Name
-        {
-            get { return type.Name; }
-        }
-
-        public string GraphicsTemplate
-        {
-            get { return graphicsTemplate; }
-        }
-
-        public string VoicesTemplate
-        {
-            get { return voicesTemplate; }
-        }
-
         /// <summary>
         /// Gets a value indicating if this <see cref="Unit"/> is a building.
         /// </summary>
@@ -189,19 +136,9 @@ namespace Orion.Game.Simulation
             get { return type.IsAirborne; }
         }
 
-        public ReadOnlyCollection<UnitTypeUpgrade> Upgrades
+        public override CollisionLayer CollisionLayer
         {
-            get { return upgrades; }
-        }
-
-        public bool KeepsFactionAlive
-        {
-            get
-            {
-                return IsBuilding && HasSkill<TrainSkill>()
-                    || HasSkill<BuildSkill>()
-                    || HasSkill<AttackSkill>();
-            }
+            get { return type.CollisionLayer; }
         }
         #endregion
 
@@ -220,6 +157,40 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
+        #region Physical
+        public override Size Size
+        {
+            get { return type.Size; }
+        }
+
+        public new Vector2 Position
+        {
+            get { return position; }
+            set
+            {
+                if (value == position) return;
+                if (!World.Bounds.ContainsPoint(value))
+                {
+                    Debug.Fail("Position out of bounds.");
+                    value = World.Bounds.Clamp(value);
+                }
+
+                Vector2 oldPosition = position;
+                position = value;
+                OnMoved(oldPosition, position);
+            }
+        }
+
+        /// <summary>
+        /// Gets the angle this <see cref="Unit"/> is facing.
+        /// </summary>
+        public float Angle
+        {
+            get { return angle; }
+            set { angle = value; }
+        }
+        #endregion
+
         /// <summary>
         /// Gets a circle representing the area of the world that is within
         /// the line of sight of this <see cref="Unit"/>.
@@ -228,6 +199,28 @@ namespace Orion.Game.Simulation
         {
             get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
         }
+
+        #region Transport
+        /// <summary>
+        /// Gets a value indicating if this unit is embarked in another unit.
+        /// </summary>
+        public bool IsEmbarked
+        {
+            get { return transporter != null; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this transporter unit is at full capacity.
+        /// </summary>
+        public bool IsTransportFull
+        {
+            get
+            {
+                Debug.Assert(HasSkill<TransportSkill>());
+                return transportedUnits != null && transportedUnits.Count == GetStat(TransportSkill.CapacityStat);
+            }
+        }
+        #endregion
 
         #region Health
         /// <summary>
@@ -238,7 +231,7 @@ namespace Orion.Game.Simulation
             get { return damage; }
             set
             {
-                Argument.EnsureNotNaN(value, "value");
+                if (float.IsNaN(value)) throw new ArgumentException("The damage cannot be set to NaN.", "Damage");
                 if (value < 0) value = 0;
                 else if (value > MaxHealth) value = MaxHealth;
                 else if (value == damage) return;
@@ -348,21 +341,6 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
-        /// </summary>
-        /// <param name="TSkill">The type of skill to be found.</param>
-        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
-        public bool HasSkill(Type skillType)
-        {
-            return type.HasSkill(skillType);
-        }
-
-        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
-        {
-            return type.TryGetSkill<TSkill>();
-        }
-
-        /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
         /// </summary>
         /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
@@ -370,21 +348,6 @@ namespace Orion.Game.Simulation
         public int GetStat(UnitStat stat)
         {
             return faction.GetStat(type, stat);
-        }
-
-        public int GetBaseStat(UnitStat stat)
-        {
-            Argument.EnsureNotNull(stat, "stat");
-
-            UnitSkill skill;
-            if (!skills.TryGetValue(stat.SkillType, out skill))
-            {
-                throw new ArgumentException(
-                    "Cannot get base stat {0} without skill {1}."
-                    .FormatInvariant(stat, stat.SkillName));
-            }
-
-            return skill.GetStat(stat);
         }
 
         /// <summary>
@@ -431,34 +394,6 @@ namespace Orion.Game.Simulation
                 TypeChanged(this, oldType, newType);
             Faction.OnUnitTypeChanged(this, oldType, newType);
         }
-
-        #region Can* Testing
-        public bool CanBuild(UnitType buildingType)
-        {
-            Argument.EnsureNotNull(buildingType, "buildingType");
-            BuildSkill skill = TryGetSkill<BuildSkill>();
-            return buildingType.IsBuilding
-                && skill != null
-                && skill.Supports(buildingType);
-        }
-
-        public bool CanTrain(UnitType unitType)
-        {
-            Argument.EnsureNotNull(unitType, "unitType");
-            TrainSkill skill = TryGetSkill<TrainSkill>();
-            return !unitType.IsBuilding
-                && skill != null
-                && skill.Supports(unitType);
-        }
-
-        public bool CanResearch(Technology technology)
-        {
-            Argument.EnsureNotNull(technology, "technology");
-            ResearchSkill skill = TryGetSkill<ResearchSkill>();
-            return skill != null
-                && skill.Supports(technology);
-        }
-        #endregion
         #endregion
 
         #region Position/Angle
@@ -656,7 +591,7 @@ namespace Orion.Game.Simulation
                 transportedUnits.Pop();
                 // The position field is changed directly instead of using the property
                 // because we don't want to raise the Moved event.
-                transportedUnit.Position = location.Value;
+                transportedUnit.position = location.Value;
                 transportedUnit.transporter = null;
                 World.Entities.Add(transportedUnit);
             }
@@ -783,7 +718,7 @@ namespace Orion.Game.Simulation
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
-                .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared
+                .WithMinOrDefault(unit => (unit.Position - position).LengthSquared
                     + (unit.HasSkill<AttackSkill>() ? 0 : 100));
 
             if (unitToAttack == null) return false;
@@ -803,7 +738,7 @@ namespace Orion.Game.Simulation
                    && !unit.IsBuilding
                    && Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                    && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
+               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToHeal == null) return false;
 
@@ -822,7 +757,7 @@ namespace Orion.Game.Simulation
                    && unit.IsUnderConstruction
                    && unit.Faction == faction
                    && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
+               .WithMinOrDefault(unit => (unit.Position - position).LengthSquared);
 
             if (unitToRepair == null) return false;
 

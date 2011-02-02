@@ -21,17 +21,17 @@ namespace Orion.Game.Simulation
     public sealed class UnitType
     {
         #region Fields
-        private readonly Handle handle; // dans Entity
-        private readonly string name; // nouveau field
-        private readonly string graphicsTemplate; // nouveau field
-        private readonly string voicesTemplate; // nouveau field
+        private readonly Handle handle;
+        private readonly string name;
+        private readonly string graphicsTemplate;
+        private readonly string voicesTemplate;
 
-        private readonly Size size; // dans Spatial
-        private readonly bool isAirborne; // par Spatial
-        private readonly bool isSuicidable; // n'existe plus
-        private readonly bool isBuilding; // par Move (!HasComponent)
-        private readonly Dictionary<Type, UnitSkill> skills; // nouveau field
-        private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades; // nouveau field
+        private readonly Size size;
+        private readonly bool isAirborne;
+        private readonly bool isSuicidable;
+        private readonly bool isBuilding;
+        private readonly Dictionary<Type, UnitSkill> skills;
+        private readonly ReadOnlyCollection<UnitTypeUpgrade> upgrades;
         #endregion
 
         #region Constructors
@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation
             this.graphicsTemplate = builder.GraphicsTemplate ?? builder.Name;
             this.voicesTemplate = builder.VoicesTemplate ?? builder.Name;
 
-            this.size = builder.Size; // Spatial
+            this.size = builder.Size;
             this.isAirborne = builder.IsAirborne;
             this.isSuicidable = builder.IsSuicidable;
             this.isBuilding = !builder.Skills.OfType<MoveSkill>().Any();
@@ -179,6 +179,14 @@ namespace Orion.Game.Simulation
         #endregion
         
         #region Can*** Testing
+        public bool CanTransport(UnitType unitType)
+        {
+            Argument.EnsureNotNull(unitType, "unitType");
+            return HasSkill<TransportSkill>()
+            	&& unitType.HasSkill<MoveSkill>()
+            	&& !unitType.IsAirborne
+            	&& !unitType.HasSkill<TransportSkill>();
+        }
 
         public bool CanBuild(UnitType buildingType)
         {

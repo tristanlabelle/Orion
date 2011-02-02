@@ -128,7 +128,7 @@ namespace Orion.Game.Presentation.Renderers
             Unit unit = entity as Unit;
             if (unit == null) return;
 
-            if (unit.Name == "Chuck Norris")
+            if (unit.Type.Name == "Chuck Norris")
                 shakingSecondsLeft = shakingDuration;
         }
 

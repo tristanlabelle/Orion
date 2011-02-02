@@ -5,7 +5,6 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Components.Serialization;
-using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -24,19 +23,10 @@ namespace Orion.Game.Simulation.Components
         private float lastUnloadTime;
         private List<Entity> loadedUnits = new List<Entity>();
         private List<Spatial> positionComponents = new List<Spatial>();
-        private Func<Entity, bool> canTransport;
         #endregion
 
         #region Constructors
-        public Transport(Entity entity)
-            : base(entity)
-        {
-            canTransport = delegate(Entity e)
-            {
-                Debug.Assert(e.HasComponent<Spatial>(), "Entity has no spatial component!");
-                return e.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground;
-            };
-        }
+        public Transport(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
@@ -59,13 +49,6 @@ namespace Orion.Game.Simulation.Components
         {
             get { return unloadSpeed; }
             set { unloadSpeed = value; }
-        }
-
-        [Persistent]
-        public Func<Entity, bool> CanTransport
-        {
-            get { return canTransport; }
-            set { canTransport = value; }
         }
 
         public float LastLoadTime
@@ -160,7 +143,7 @@ namespace Orion.Game.Simulation.Components
             loadedUnits.RemoveAt(embarkeeIndex);
             positionComponents.RemoveAt(embarkeeIndex);
 
-            position.Position = location.Value;
+            position.Location = location.Value;
             entity.AddComponent(position);
         }
         #endregion

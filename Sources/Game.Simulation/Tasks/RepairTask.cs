@@ -39,7 +39,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot repair without the build skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
-            if (!target.IsBuilding)
+            if (!target.Type.IsBuilding)
                 throw new ArgumentException("Can only repair buildings.", "target");
 
             this.target = target;
@@ -153,7 +153,7 @@ namespace Orion.Game.Simulation.Tasks
             if ((needsAladdiumCredit && Faction.AladdiumAmount == 0)
                 || (needsAlageneCredit && Faction.AlageneAmount == 0))
             {
-                string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Name);
+                string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Type.Name);
                 Faction.RaiseWarning(warning);
                 return false;
             }

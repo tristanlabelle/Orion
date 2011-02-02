@@ -293,7 +293,7 @@ namespace Orion.Game.Presentation
             
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
             {
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -308,7 +308,7 @@ namespace Orion.Game.Presentation
             else if (targetEntity != null && targetEntity.HasComponent<Harvestable>())
             {
                 Spatial position = targetEntity.GetComponent<Spatial>();
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(position.Center);
                 else
                     LaunchDefaultCommand(targetEntity);
@@ -316,7 +316,7 @@ namespace Orion.Game.Presentation
             else
             {
                 Debug.Assert(targetEntity == null);
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -335,7 +335,7 @@ namespace Orion.Game.Presentation
 
             if (target.HasSkill<ExtractAlageneSkill>())
             {
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Type.IsBuilding))
                 {
                     LaunchChangeRallyPoint(target.Center);
                     return;
@@ -388,7 +388,7 @@ namespace Orion.Game.Presentation
             if (!shiftKeyPressed)
             {
                 IEnumerable<Unit> units = Selection.Units
-                    .Where(unit => IsUnitControllable(unit) && !unit.IsBuilding);
+                    .Where(unit => IsUnitControllable(unit) && !unit.Type.IsBuilding);
                 commander.LaunchCancel(units);
             }
         }
@@ -465,7 +465,7 @@ namespace Orion.Game.Presentation
         public void LaunchHeal(Unit target)
         {
             Argument.EnsureNotNull(target, "target");
-            if (target.IsBuilding) return;
+            if (target.Type.IsBuilding) return;
 
             IEnumerable<Unit> healers = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<HealSkill>());
@@ -574,7 +574,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(transporter, "transporter");
 
             var embarkers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && transporter.CanTransport(unit));
+                .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
             OverrideIfNecessary();
             commander.LaunchEmbark(embarkers, transporter);
         }

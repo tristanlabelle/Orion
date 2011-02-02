@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(transporter, "transporter");
-            if (!transporter.CanTransport(unit))
+            if (!transporter.Type.CanTransport(unit.Type))
                 throw new ArgumentException("A {0} cannot transport a {1}.".FormatInvariant(transporter, unit));
 
             this.transporter = transporter;
@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Properties
         public override string Description
         {
-            get { return "Embarking into {0}".FormatInvariant(transporter.Name); }
+            get { return "Embarking into {0}".FormatInvariant(transporter.Type.Name); }
         }
         #endregion
 

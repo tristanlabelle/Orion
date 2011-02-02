@@ -428,7 +428,7 @@ namespace Orion.Game.Simulation
             }
             else
             {
-                if (unit.HasSkill<ProvideFoodSkill>())
+                if (unit.Type.HasSkill<ProvideFoodSkill>())
                     totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
@@ -467,7 +467,7 @@ namespace Orion.Game.Simulation
 
             if (node.GetComponent<Harvestable>().Type == ResourceType.Aladdium) return true;
 
-            Vector2 location = node.GetComponent<Spatial>().Position;
+            Vector2 location = node.GetComponent<Spatial>().Location;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()

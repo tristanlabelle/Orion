@@ -25,7 +25,7 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(builder, "builder");
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
 
-            BuildSkill buildSkill = builder.TryGetSkill<BuildSkill>();
+            BuildSkill buildSkill = builder.Type.TryGetSkill<BuildSkill>();
             if (buildSkill == null)
                 throw new ArgumentException("Cannot build without the build skill.", "builder");
             if (!buildSkill.Supports(buildingPlan.BuildingType))

@@ -125,7 +125,12 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Methods
-        public void AddPlayerBuilder(string name, Action action)
+        /// <summary>
+        /// Adds a new kind of AI that can be added to the match.
+        /// </summary>
+        /// <param name="name">The name of the AI.</param>
+        /// <param name="action">A callback to be invoked when the user adds one of such AIs to the match.</param>
+        public void AddAIBuilder(string name, Action action)
         {
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(action, "action");
@@ -138,7 +143,49 @@ namespace Orion.Game.Presentation.Gui
 
             aiCreationStack.VisibilityFlag = Visibility.Visible;
         }
+
+        public void AddSettings(MatchSettings settings)
+        {
+            AddIntegerSetting("Largeur de la carte", () => settings.MapWidth, MatchSettings.SuggestedMinimumMapSize.Width);
+            AddIntegerSetting("Hauteur de la carte", () => settings.MapHeight, MatchSettings.SuggestedMinimumMapSize.Height);
+            AddIntegerSetting("Aladdium initial", () => settings.InitialAladdiumAmount, MatchSettings.SuggestedMinimumAladdium);
+            AddIntegerSetting("Alagène initial", () => settings.InitialAlageneAmount, MatchSettings.SuggestedMinimumAlagene);
+            AddIntegerSetting("Limite de nourriture", () => settings.FoodLimit, MatchSettings.SuggestedMinimumPopulation);
+
+            AddIntegerSetting("Germe de génération", () => settings.RandomSeed, int.MinValue);
+            AddBooleanSetting("Codes de triche", () => settings.AreCheatsEnabled);
+            AddBooleanSetting("Début nomade", () => settings.StartNomad);
+            AddBooleanSetting("Héros aléatoires", () => settings.AreRandomHeroesEnabled);
+            AddBooleanSetting("Topologie révélée", () => settings.RevealTopology);
+        }
         
+        public void AddIntegerSetting(string text, Expression<Func<int>> bindingSourcePropertyExpression, int minimumValue)
+        {
+            Argument.EnsureNotNull(text, "text");
+            Argument.EnsureNotNull(bindingSourcePropertyExpression, "bindingSourcePropertyExpression");
+
+            TextField textField = style.Create<TextField>();
+
+            Bindable bindable = BindableProperty.FromExpression(bindingSourcePropertyExpression);
+            textField.Text = bindable.Value.ToString();
+            bindable.ValueChanged += sender => textField.Text = bindable.Value.ToString();
+
+            textField.TextChanged += sender =>
+            {
+                int value;
+                bool isValid = int.TryParse(textField.Text, out value) && value >= minimumValue;
+                textField.TextColor = isValid ? Colors.Black : Colors.Red;
+            };
+            textField.KeyboardFocusStateChanged += sender =>
+            {
+                int value;
+                if (int.TryParse(textField.Text, out value) && value >= minimumValue)
+                    bindable.Value = value;
+            };
+
+            AddSetting(text, textField);
+        }
+
         public void AddBooleanSetting(string text, Expression<Func<bool>> bindingSourcePropertyExpression)
         {
             CheckBox checkBox = style.Create<CheckBox>();
@@ -189,7 +236,7 @@ namespace Orion.Game.Presentation.Gui
 
             settingsForm = new FormLayout()
             {
-                MinWidth = 250,
+                MinWidth = 300,
                 MinXMargin = 10,
                 MinEntrySize = 32,
                 HeaderContentGap = 10

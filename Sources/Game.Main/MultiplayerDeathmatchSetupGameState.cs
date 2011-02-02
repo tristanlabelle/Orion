@@ -66,10 +66,7 @@ namespace Orion.Game.Main
             };
             this.ui.Exited += sender => Exit();
 
-            this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
-            this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
-            this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
-            this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
+            this.ui.AddSettings(matchSettings);
 
             this.playerSettings = new PlayerSettings();
             this.playerSettings.PlayerJoined += (sender, player) => this.ui.Players.Add(player);
@@ -85,7 +82,7 @@ namespace Orion.Game.Main
 
                 this.matchSettings.Changed += sender => SendMatchSettings();
 
-                this.ui.AddPlayerBuilder("Ramasseur", () =>
+                this.ui.AddAIBuilder("Ramasseur", () =>
                 {
                     if (!playerSettings.AvailableColors.Any()) return;
                     playerSettings.AddPlayer(new AIPlayer("Ramasseur", playerSettings.AvailableColors.First()));

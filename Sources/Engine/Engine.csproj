@@ -145,6 +145,7 @@
     <Compile Include="Gui\Adornments\ColorAdornment.cs" />
     <Compile Include="Gui\Adornments\TextureAdornment.cs" />
     <Compile Include="Gui\Alignment.cs" />
+    <Compile Include="Gui\Control.Focus.cs" />
     <Compile Include="Gui\Control.Hierarchy.cs" />
     <Compile Include="Gui\Control.Input.cs" />
     <Compile Include="Gui\Control.Layout.cs" />

@@ -43,13 +43,9 @@ namespace Orion.Game.Main
             };
 
             this.ui.Players.Add(playerSettings.Players.First());
+            this.ui.AddSettings(matchSettings);
 
-            this.ui.AddBooleanSetting("Codes de triche", () => matchSettings.AreCheatsEnabled);
-            this.ui.AddBooleanSetting("Début nomade", () => matchSettings.StartNomad);
-            this.ui.AddBooleanSetting("Héros aléatoires", () => matchSettings.AreRandomHeroesEnabled);
-            this.ui.AddBooleanSetting("Topologie révélée", () => matchSettings.RevealTopology);
-
-            this.ui.AddPlayerBuilder("Ramasseur", () =>
+            this.ui.AddAIBuilder("Ramasseur", () =>
             {
                 if (!playerSettings.AvailableColors.Any()) return;
                 AIPlayer player = new AIPlayer("Ramasseur", playerSettings.AvailableColors.First());

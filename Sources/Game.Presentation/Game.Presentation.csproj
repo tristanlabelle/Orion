@@ -55,6 +55,12 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>..\References\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
+      <HintPath>..\References\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\OpenTK.dll</HintPath>
@@ -88,15 +94,15 @@
     <Compile Include="Audio\MatchAudioPresenter.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="GameGraphics.cs" />
-    <Compile Include="Gui\DiplomacyPanel2.cs" />
+    <Compile Include="Gui\DiplomacyPanel.cs" />
     <Compile Include="Gui\InterpolatedCounter.cs" />
-    <Compile Include="Gui\MatchConfigurationUI2.cs" />
-    <Compile Include="Gui\MatchConfigurationUI2.PlayerCollection.cs" />
-    <Compile Include="Gui\MatchConfigurationUI2.PlayerRow.cs" />
-    <Compile Include="Gui\MatchUI2.ActionButton.cs" />
-    <Compile Include="Gui\MatchUI2.ActionToolTip.cs" />
-    <Compile Include="Gui\MatchUI2.cs" />
-    <Compile Include="Gui\MultiplayerLobbyUI2.cs" />
+    <Compile Include="Gui\MatchConfigurationUI.cs" />
+    <Compile Include="Gui\MatchConfigurationUI.PlayerCollection.cs" />
+    <Compile Include="Gui\MatchConfigurationUI.PlayerRow.cs" />
+    <Compile Include="Gui\MatchUI.ActionButton.cs" />
+    <Compile Include="Gui\MatchUI.ActionToolTip.cs" />
+    <Compile Include="Gui\MatchUI.cs" />
+    <Compile Include="Gui\MultiplayerLobbyUI.cs" />
     <Compile Include="Gui\MultipleUnitSelectionPanel.cs" />
     <Compile Include="Gui\MultipleUnitSelectionPanel.UnitButton.cs" />
     <Compile Include="Gui\OrionButtonAdornment.cs" />
@@ -104,7 +110,7 @@
     <Compile Include="Gui\OrionGuiStyle.cs" />
     <Compile Include="Gui\OrionTextFieldAdornment.cs" />
     <Compile Include="Gui\PausePanel.cs" />
-    <Compile Include="Gui\ReplayBrowser2.cs" />
+    <Compile Include="Gui\ReplayBrowser.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.cs" />
     <Compile Include="Gui\SingleEntitySelectionPanel.TodoButton.cs" />
     <Compile Include="ProfanityFilter.cs" />
@@ -163,7 +169,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gui\MatchUI2.MessageConsole.cs" />
+    <Compile Include="Gui\MatchUI.MessageConsole.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

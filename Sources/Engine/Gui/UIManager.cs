@@ -136,8 +136,8 @@ namespace Orion.Engine.Gui
 
                 Control previous = keyboardFocusedControl;
                 keyboardFocusedControl = value;
-                if (previous != null) previous.OnKeyboardFocusLost();
-                if (keyboardFocusedControl != null) keyboardFocusedControl.OnKeyboardFocusAcquired();
+                if (previous != null) previous.HandleKeyboardFocusLoss();
+                if (keyboardFocusedControl != null) keyboardFocusedControl.HandleKeyboardFocusAcquisition();
 
                 KeyboardFocusChanged.Raise(this, keyboardFocusedControl);
             }
@@ -158,8 +158,8 @@ namespace Orion.Engine.Gui
 
                 Control previous = mouseCapturedControl;
                 mouseCapturedControl = value;
-                if (previous != null) previous.OnMouseCaptureLost();
-                if (mouseCapturedControl != null) mouseCapturedControl.OnMouseCaptureAcquired();
+                if (previous != null) previous.HandleMouseCaptureLoss();
+                if (mouseCapturedControl != null) mouseCapturedControl.HandleMouseCaptureAcquisition();
 
                 MouseCaptureChanged.Raise(this, mouseCapturedControl);
             }

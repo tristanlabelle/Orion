@@ -30,7 +30,7 @@ namespace Orion.Engine.Localization
         /// Constructor of the translation.
         /// </summary>
         /// <param name="translatedString">The translated string.</param>
-        /// <param name="language">The language of the string.</param>
+        /// <param name="language">The language of the string (2 letters ISO en/fr).</param>
         /// <param name="gender">The gender of the string (for noun definitions)</param>
         public Translation(string translatedString, string language, Genders gender)
         {

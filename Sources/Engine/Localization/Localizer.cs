@@ -18,7 +18,16 @@ namespace Orion.Engine.Localization
     {
         #region Fields
         private CultureInfo cultureInfo;
-        private bool isLoaded = false;
+
+        private static readonly Regex objArgPattern
+            = new Regex(@"%n[0-9]", RegexOptions.Compiled);
+
+        private static readonly Regex objGenderPattern 
+            = new Regex(@"\{n[0-9]~(M|F|N)\?.*?:?.*?\}", RegexOptions.Compiled);
+
+        private static readonly Regex subReplaceValuesPattern 
+            = new Regex(@".*\?(.*?:?.*?)\}.*", RegexOptions.Compiled);
+
         private Dictionary<string, Definition> nouns;
         private Dictionary<string, Definition> sentences;
 
@@ -41,14 +50,12 @@ namespace Orion.Engine.Localization
         /// Also sets the CultureInfo to English-UnitedStates by default (LCID=1033)
         /// </summary>
         /// <param name="path">The path to the XML file where the definitions are stored.</param>
-        public Localizer(string path)
+        public Localizer()
         {
             nouns = new Dictionary<string, Definition>();
             sentences = new Dictionary<string, Definition>();
 
             cultureInfo = new CultureInfo(1033); //English-United States
-
-            LoadDictionary(path);
         }
         #endregion
 
@@ -64,6 +71,22 @@ namespace Orion.Engine.Localization
             set { cultureInfo = value; }
         }
 
+        /// <summary>
+        /// Gets the dictionary that contains the noun definitions.
+        /// </summary>
+        public Dictionary<string, Definition> Nouns
+        {
+            get { return nouns; }
+        }
+
+        /// <summary>
+        /// Gets the dictionary that contains the sentence definitions.
+        /// </summary>
+        public Dictionary<string, Definition> Sentences
+        {
+            get { return sentences; }
+        }
+
         #endregion
 
         #region Methods
@@ -75,8 +98,6 @@ namespace Orion.Engine.Localization
         /// <returns>The localized string for the noun.</returns>
         public string GetNoun(string key)
         {
-            Debug.Assert(isLoaded);
-
             Definition matchingDefinition = nouns[key];
 
             return matchingDefinition.GetTranslation(cultureInfo).TranslatedString;
@@ -90,16 +111,14 @@ namespace Orion.Engine.Localization
         /// <param name="values">Parameters to be passed to the sentence. (%n0 = value[0])</param>
         /// <returns>The localized and formatted string for the sentence.</returns>
         public string GetSentence(string key, params string[] values)
-        {
-            Debug.Assert(isLoaded);
-            
+        {   
             Definition matchingDefinition = (Definition)nouns[key];
 
             string input = matchingDefinition.GetTranslation(this.cultureInfo).TranslatedString;
             StringBuilder output = new StringBuilder(input);
 
+            //Noun Parsing
             //- Replace all %nX by their matching values[X]
-            Regex objArgPattern = new Regex("%n[0-9]");
 
             foreach (Match match in objArgPattern.Matches(input))
             {
@@ -107,8 +126,8 @@ namespace Orion.Engine.Localization
                 output = output.Replace(match.Value, values[argIndex].ToString());
             }
 
+            //Gender Parsing
             //- Replace all {n0~F?xxx:yyy} by the value before or after the ":" using the gender after the "~"
-            Regex objGenderPattern = new Regex("\\{n[0-9]~(M|F|N)\\?.*?:?.*?\\}");
 
             foreach (Match match in objGenderPattern.Matches(input))
             {
@@ -127,7 +146,6 @@ namespace Orion.Engine.Localization
                 bool genderMatches = argTranslation.Gender == gender;
                 bool expContainsColon = match.Value.Contains(":");
 
-                Regex subReplaceValuesPattern = new Regex(".*\\?(.*?:?.*?)\\}.*");
                 string[] replaceValues = subReplaceValuesPattern.Replace(match.Value, "$1").Split(':');
 
                 if (genderMatches)
@@ -214,7 +232,6 @@ namespace Orion.Engine.Localization
                 }
             }//End Document Reading
 
-            isLoaded = true;
             xr.Close();
         }
 
@@ -225,7 +242,24 @@ namespace Orion.Engine.Localization
         {
             nouns.Clear();
             sentences.Clear();
-            isLoaded = false;
+        }
+
+        /// <summary>
+        /// Adds a noun to the dictionary.
+        /// </summary>
+        /// <param name="nounDefinition">The noun definition to be added.</param>
+        public void AddNoun(Definition nounDefinition)
+        {
+            nouns.Add(nounDefinition.Key, nounDefinition);
+        }
+
+        /// <summary>
+        /// Adds a sentence to the dictionary.
+        /// </summary>
+        /// <param name="sentenceDefinition">The sentence to be added.</param>
+        public void AddSentence(Definition sentenceDefinition)
+        {
+            sentences.Add(sentenceDefinition.Key,sentenceDefinition);
         }
         #endregion
     }

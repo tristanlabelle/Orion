@@ -9,7 +9,7 @@ namespace Orion.Engine.Localization
     /// <summary>
     /// Represents a definition of a noun (Unit in Orion) or a sentence.
     /// </summary>
-    internal class Definition
+    public class Definition
     {
         #region Fields
         private string key;
@@ -17,6 +17,9 @@ namespace Orion.Engine.Localization
         #endregion
 
         #region Propreties
+        /// <summary>
+        /// Gets the unique key of the definition.
+        /// </summary>
         public string Key { get { return key; } }
         #endregion
 

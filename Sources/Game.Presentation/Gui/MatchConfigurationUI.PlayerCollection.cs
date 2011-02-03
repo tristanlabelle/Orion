@@ -26,12 +26,13 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Methods
-            public void Add(Player player, bool isKickable)
+            public void Add(Player player, bool canChangeColor, bool isKickable)
             {
                 Add(player);
 
                 var row = (PlayerRow)ui.playerStack.Children[ui.playerStack.Children.Count - 1];
-                row.IsKickable = true;
+                row.CanChangeColor = canChangeColor;
+                row.IsKickable = isKickable;
             }
 
             protected override void InsertItem(int index, Player item)

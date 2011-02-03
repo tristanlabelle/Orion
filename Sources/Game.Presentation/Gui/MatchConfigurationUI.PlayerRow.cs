@@ -42,7 +42,6 @@ namespace Orion.Game.Presentation.Gui
                 kickButton.VerticalAlignment = Alignment.Center;
                 kickButton.MinXMargin = 5;
                 kickButton.MaxXMargin = 5;
-                kickButton.VisibilityFlag = Visibility.Hidden;
                 kickButton.Clicked += (sender, @event) => ui.PlayerKicked.Raise(ui, player);
                 dock.Dock(kickButton, Direction.PositiveX);
 
@@ -99,6 +98,15 @@ namespace Orion.Game.Presentation.Gui
             {
                 get { return kickButton.VisibilityFlag == Visibility.Visible; }
                 set { kickButton.VisibilityFlag = value ? Visibility.Visible : Visibility.Hidden; }
+            }
+
+            /// <summary>
+            /// Accesses a value indicating if this player's color can be changed.
+            /// </summary>
+            public bool CanChangeColor
+            {
+                get { return colorComboBox.HasEnabledFlag; }
+                set { colorComboBox.HasEnabledFlag = value; }
             }
             #endregion
         }

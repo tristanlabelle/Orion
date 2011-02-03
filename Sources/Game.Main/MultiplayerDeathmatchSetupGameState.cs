@@ -69,7 +69,7 @@ namespace Orion.Game.Main
             this.ui.AddSettings(matchSettings);
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.PlayerJoined += (sender, player) => this.ui.Players.Add(player);
+            this.playerSettings.PlayerJoined += (sender, player) => this.ui.Players.Add(player, IsHost, IsHost && !(player is LocalPlayer));
             this.playerSettings.PlayerLeft += (sender, player, index) => this.ui.Players.Remove(player);
 
             if (IsHost)

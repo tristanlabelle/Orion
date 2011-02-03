@@ -35,14 +35,15 @@ namespace Orion.Game.Main
             this.matchSettings.AreCheatsEnabled = true;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First()));
+            LocalPlayer localPlayer = new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First());
+            this.playerSettings.AddPlayer(localPlayer);
 
             this.ui = new MatchConfigurationUI(graphics.GuiStyle)
             {
                 NeedsReadying = false,
             };
 
-            this.ui.Players.Add(playerSettings.Players.First());
+            this.ui.Players.Add(localPlayer, true, false);
             this.ui.AddSettings(matchSettings);
 
             this.ui.AddAIBuilder("Ramasseur", () =>
@@ -50,7 +51,7 @@ namespace Orion.Game.Main
                 if (!playerSettings.AvailableColors.Any()) return;
                 AIPlayer player = new AIPlayer("Ramasseur", playerSettings.AvailableColors.First());
                 playerSettings.AddPlayer(player);
-                ui.Players.Add(player, true);
+                ui.Players.Add(player, true, true);
             });
 
             this.ui.PlayerKicked += (sender, player) =>

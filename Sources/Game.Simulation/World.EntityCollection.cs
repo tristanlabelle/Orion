@@ -150,6 +150,8 @@ namespace Orion.Game.Simulation
                 Spatial positionComponent = new Spatial(node);
                 positionComponent.Size = new Size(2, 2);
                 positionComponent.Location = point;
+                if (type == ResourceType.Aladdium)
+                    positionComponent.CollisionLayer = CollisionLayer.Ground;
                 node.AddComponent(positionComponent);
                 
                 Add(node);

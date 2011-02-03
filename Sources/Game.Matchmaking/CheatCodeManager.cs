@@ -109,7 +109,7 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnChuckNorris(Match match, Faction faction)
         {
-            UnitType unitType = match.UnitTypes.FromName("Chuck Norris");
+            Unit unitType = match.UnitTypes.FromName("Chuck Norris");
             if (unitType == null)
             {
                 Debug.Fail("Failed to find hero unit type.");
@@ -150,7 +150,7 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnMisterT(Match match, Faction faction)
         {
-            UnitType heroUnitType = match.UnitTypes.FromName("Mr T");
+            Unit heroUnitType = match.UnitTypes.FromName("Mr T");
             faction.CreateUnit(heroUnitType, (Point)match.World.Bounds.Center);
         }
 

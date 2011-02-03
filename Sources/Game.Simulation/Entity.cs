@@ -34,9 +34,9 @@ namespace Orion.Game.Simulation
         /// <remarks>
         /// Prototype entities don't belong to the world and all have the handle '0'. They exist only to be cloned into existence.
         /// </remarks>
-        public Entity()
+        public Entity(Handle handle)
         {
-            handle = new Handle(0);
+            this.handle = handle;
         }
 
         public Entity(World world, Handle handle)
@@ -332,7 +332,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         protected virtual Vector2 GetPosition()
         {
-            return GetComponent<Spatial>().Location;
+            return GetComponent<Spatial>().Position;
         }
 
         protected virtual void DoUpdate(SimulationStep step) { }

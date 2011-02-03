@@ -182,7 +182,7 @@ namespace Orion.Game.Presentation.Audio
                 .GroupBy(unit => unit.Type)
                 .WithMaxOrDefault(group => group.Count());
 
-            UnitType unitType = unitTypeGroup == null ? null : unitTypeGroup.Key;
+            Unit unitType = unitTypeGroup == null ? null : unitTypeGroup.Key;
 
             previousSelection.Clear();
             previousSelection.UnionWith(sender);
@@ -197,7 +197,7 @@ namespace Orion.Game.Presentation.Audio
         {
             Debug.Assert(args != null);
 
-            UnitType unitType = userInputManager.SelectionManager.FocusedUnitType;
+            Unit unitType = userInputManager.SelectionManager.FocusedUnitType;
             if (unitType == null) return;
 
             string commandName = args.GetType().Name.Replace("Command", string.Empty);

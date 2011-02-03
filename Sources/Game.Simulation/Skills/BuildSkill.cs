@@ -8,7 +8,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="UnitType"/> to erect buildings.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to erect buildings.
     /// </summary>
     [Serializable]
     public sealed class BuildSkill : UnitSkill
@@ -60,7 +60,7 @@ namespace Orion.Game.Simulation.Skills
             };
         }
 
-        public bool Supports(UnitType unitType)
+        public bool Supports(Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             return unitType.IsBuilding && targets.Contains(unitType.Name);

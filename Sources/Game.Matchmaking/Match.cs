@@ -139,7 +139,7 @@ namespace Orion.Game.Matchmaking
         /// </summary>
         /// <param name="unitType">The original unit type.</param>
         /// <returns>One of the heroes of the original unit type, or that unit type itself.</returns>
-        public UnitType RandomizeHero(UnitType unitType)
+        public Unit RandomizeHero(Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             if (!areRandomHeroesEnabled) return unitType;
@@ -156,7 +156,7 @@ namespace Orion.Game.Matchmaking
                 int upgradeIndex = random.Next(upgradeCount);
                 UnitTypeUpgrade upgrade = heroUpgrades.ElementAt(upgradeIndex);
 
-                UnitType heroUnitType = UnitTypes.FromName(upgrade.Target);
+                Unit heroUnitType = UnitTypes.FromName(upgrade.Target);
                 if (heroUnitType == null)
                 {
 #if DEBUG

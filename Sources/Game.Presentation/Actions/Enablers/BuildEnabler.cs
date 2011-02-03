@@ -26,7 +26,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Methods
-        public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
+        public override void LetFill(Unit unitType, ActionButton[,] buttonsArray)
         {
             if (!unitType.HasSkill<BuildSkill>()) return;
             
@@ -34,7 +34,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
             buttonsArray[1, 0] = CreateRepairButton();
         }
 
-        private ActionButton CreateBuildButton(UnitType unitType)
+        private ActionButton CreateBuildButton(Unit unitType)
         {
             ActionButton button = new ActionButton(actionPanel, userInputManager, "Build", Keys.B, graphics);
 

@@ -76,7 +76,7 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
 
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            UnitType buildingType = match.UnitTypes.FromHandle(buildingTypeHandle);
+            Unit buildingType = match.UnitTypes.FromHandle(buildingTypeHandle);
 
             if (buildingType.HasSkill<ExtractAlageneSkill>())
             {

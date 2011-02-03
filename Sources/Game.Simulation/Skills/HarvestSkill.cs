@@ -4,7 +4,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="UnitType"/> to collect resources.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to collect resources.
     /// </summary>
     [Serializable]
     [SkillDependency(typeof(MoveSkill))]

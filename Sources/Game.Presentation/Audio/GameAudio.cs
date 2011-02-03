@@ -81,7 +81,7 @@ namespace Orion.Game.Presentation.Audio
         #endregion
 
         #region Methods
-        public string GetUnitSoundName(UnitType unitType, string eventName)
+        public string GetUnitSoundName(Unit unitType, string eventName)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(eventName, "eventName");

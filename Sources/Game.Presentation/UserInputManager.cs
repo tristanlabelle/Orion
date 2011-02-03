@@ -393,7 +393,7 @@ namespace Orion.Game.Presentation
             }
         }
 
-        public void LaunchBuild(Point location, UnitType buildingType)
+        public void LaunchBuild(Point location, Unit buildingType)
         {
             IEnumerable<Unit> builders = Selection.Units
                 .Where(unit => IsUnitControllable(unit) && unit.Type.CanBuild(buildingType));
@@ -474,7 +474,7 @@ namespace Orion.Game.Presentation
             commander.LaunchHeal(healers, target);
         }
 
-        public void LaunchTrain(UnitType unitType)
+        public void LaunchTrain(Unit unitType)
         {
             IEnumerable<Unit> trainers = Selection.Units
                 .Where(unit => IsUnitControllable(unit)
@@ -552,7 +552,7 @@ namespace Orion.Game.Presentation
             commander.SendAllyMessage(text);
         }
 
-        public void LaunchUpgrade(UnitType targetType)
+        public void LaunchUpgrade(Unit targetType)
         {
             Argument.EnsureNotNull(targetType, "targetType");
 

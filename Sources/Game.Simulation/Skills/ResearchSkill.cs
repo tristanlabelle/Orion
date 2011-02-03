@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Technologies;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="UnitType"/> to research
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to research
     /// new <see cref="Technology">technologies</see>.
     /// </summary>
     [Serializable]

@@ -17,13 +17,13 @@ namespace Orion.Game.Simulation.Utilities
     {
         #region Fields
         private readonly Faction faction;
-        private readonly UnitType unitType;
+        private readonly Unit unitType;
         private readonly Vector2 center;
         private float remainingTimeToLive;
         #endregion
 
         #region Constructors
-        internal Ruin(Faction faction, UnitType unitType, Vector2 center, float lifeSpan)
+        internal Ruin(Faction faction, Unit unitType, Vector2 center, float lifeSpan)
         {
             Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(unitType, "unitType");

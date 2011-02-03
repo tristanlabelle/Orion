@@ -62,10 +62,7 @@ namespace Orion.Game.Simulation
 
             foreach (Point point in region.Points)
             {
-#if DEBUG
-                if (this[point] != null)
-                    Debug.Fail("Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
-#endif
+                Debug.Assert(this[point] == null, "Cell {0} is occupied by {1}.".FormatInvariant(point, this[point]));
                 this[point] = entity;
             }
         }

@@ -17,7 +17,7 @@ using Keys = System.Windows.Forms.Keys;
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
-    /// Provides the buttons to build each <see cref="UnitType"/> that is supported by a builder unit.
+    /// Provides the buttons to build each <see cref="Unit"/> that is supported by a builder unit.
     /// </summary>
     public sealed class UpgradeActionProvider : IActionProvider
     {
@@ -25,13 +25,13 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
-        private readonly UnitType unitType;
+        private readonly Unit unitType;
         private readonly ActionButton[,] buttons = new ActionButton[4, 4];
         #endregion
 
         #region Constructors
         public UpgradeActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics, UnitType unitType)
+            GameGraphics graphics, Unit unitType)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
@@ -71,7 +71,7 @@ namespace Orion.Game.Presentation.Actions
 
             foreach (UnitTypeUpgrade upgrade in unitType.Upgrades.Where(u => !u.IsFree))
             {
-                UnitType targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
+                Unit targetType = inputManager.Match.UnitTypes.FromName(upgrade.Target);
                 if (targetType == null) continue;
 
                 buttons[x, y] = CreateButton(upgrade, targetType);
@@ -87,7 +87,7 @@ namespace Orion.Game.Presentation.Actions
             buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(UnitTypeUpgrade upgrade, UnitType targetType)
+        private ActionButton CreateButton(UnitTypeUpgrade upgrade, Unit targetType)
         {
             ActionButton button = new ActionButton(actionPanel, inputManager, targetType.Name, Keys.None, graphics);
 

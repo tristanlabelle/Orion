@@ -246,12 +246,12 @@ namespace Orion.Game.Simulation
         #region Stats & Technologies
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
-        /// for a unit of this <see cref="Faction"/> by its <see cref="UnitType"/>.
+        /// for a unit of this <see cref="Faction"/> by its <see cref="Unit"/>.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the unit for which the stat is to be retrieved.</param>
+        /// <param name="type">The <see cref="Unit"/> of the unit for which the stat is to be retrieved.</param>
         /// <param name="stat">The <see cref="UnitStat"/> to be retrieved.</param>
-        /// <returns>The value of that stat for the specified <see cref="UnitType"/>.</returns>
-        public int GetStat(UnitType type, UnitStat stat)
+        /// <returns>The value of that stat for the specified <see cref="UnitTypeUpgrade"/>.</returns>
+        public int GetStat(Unit type, UnitStat stat)
         {
             Argument.EnsureNotNull(type, "type");
             return type.GetBaseStat(stat) + GetTechnologyBonuses(type, stat);
@@ -262,7 +262,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="stat">The stat type.</param>
         /// <returns>The sum of the bonuses offered by technologies</returns>
-        public int GetTechnologyBonuses(UnitType type, UnitStat stat)
+        public int GetTechnologyBonuses(Unit type, UnitStat stat)
         {
             int total = 0;
             foreach (Technology technology in technologies)
@@ -332,10 +332,10 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
         /// </summary>
-        /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
+        /// <param name="type">The <see cref="Unit"/> of the <see cref="Unit"/> to be created.</param>
         /// <param name="point">The initial position of the <see cref="Unit"/>.</param>
         /// <returns>The newly created <see cref="Unit"/>.</returns>
-        public Unit CreateUnit(UnitType type, Point point)
+        public Unit CreateUnit(Unit type, Point point)
         {
             Argument.EnsureNotNull(type, "type");
 
@@ -371,7 +371,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitTypeChanged(Unit unit, UnitType oldType, UnitType newType)
+        internal void OnUnitTypeChanged(Unit unit, Unit oldType, Unit newType)
         {
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
@@ -467,7 +467,7 @@ namespace Orion.Game.Simulation
 
             if (node.GetComponent<Harvestable>().Type == ResourceType.Aladdium) return true;
 
-            Vector2 location = node.GetComponent<Spatial>().Location;
+            Vector2 location = node.GetComponent<Spatial>().Position;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()

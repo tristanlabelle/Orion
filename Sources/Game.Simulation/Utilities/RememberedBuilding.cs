@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation.Utilities
         #region Instance
         #region Fields
         private readonly Point location;
-        private readonly UnitType type;
+        private readonly Unit type;
         private readonly Faction faction;
         #endregion
 
@@ -45,7 +45,7 @@ namespace Orion.Game.Simulation.Utilities
             get { return Entity.GetGridRegion(location, type.Size); }
         }
 
-        public UnitType Type
+        public Unit Type
         {
             get { return type; }
         }

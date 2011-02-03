@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Methods
-        public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
+        public override void LetFill(Unit unitType, ActionButton[,] buttonsArray)
         {
             TrainSkill trainSkill = unitType.TryGetSkill<TrainSkill>();
             if (trainSkill == null) return;
@@ -34,7 +34,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
                 .Where(traineeType => trainSkill.Supports(traineeType))
                 .OrderBy(traineeType => traineeType.GetBaseStat(BasicSkill.AladdiumCostStat) + traineeType.GetBaseStat(BasicSkill.AlageneCostStat));
 
-            foreach (UnitType traineeType in traineeTypes)
+            foreach (Unit traineeType in traineeTypes)
             {
                 // find an empty slot
                 while (buttonsArray[x, y] != null)
@@ -52,7 +52,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
                 Texture texture = graphics.GetUnitTexture(traineeType);
                 button.Renderer = new TexturedRenderer(texture);
 
-                UnitType traineeTypeForClosure = traineeType;
+                Unit traineeTypeForClosure = traineeType;
                 button.Triggered += delegate(Button sender) { userInputManager.LaunchTrain(traineeTypeForClosure); };
 
                 int aladdium = LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);

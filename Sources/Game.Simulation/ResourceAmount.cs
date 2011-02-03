@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation
         /// <param name="unitType">The type of the unit.</param>
         /// <param name="faction">The faction to which the unit belongs.</param>
         /// <returns>A new instance based on the cost of that unit.</returns>
-        public static ResourceAmount FromUnitCost(UnitType unitType, Faction faction)
+        public static ResourceAmount FromUnitCost(Unit unitType, Faction faction)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(faction, "faction");

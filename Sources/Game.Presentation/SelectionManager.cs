@@ -22,7 +22,7 @@ namespace Orion.Game.Presentation
         private readonly Faction faction;
         private readonly Selection selection;
         private readonly HashSet<Unit>[] groups;
-        private UnitType focusedUnitType;
+        private Unit focusedUnitType;
         #endregion
 
         #region Constructors
@@ -74,7 +74,7 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets the type of unit which currently has the focus.
         /// </summary>
-        public UnitType FocusedUnitType
+        public Unit FocusedUnitType
         {
             get { return focusedUnitType; }
             set
@@ -120,7 +120,7 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void ResetFocusedUnitType()
         {
-            UnitType newSelectedUnitType = selection.Units
+            Unit newSelectedUnitType = selection.Units
                 .Select(unit => unit.Type)
                 .FirstOrDefault();
             if (newSelectedUnitType == focusedUnitType) return;

@@ -111,7 +111,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
         private bool TrySpawnCreep()
         {
             string creepTypeName = WaveCreepTypeNames[waveIndex % WaveCreepTypeNames.Length];
-            UnitType creepType = Match.UnitTypes.FromName(creepTypeName);
+            Unit creepType = Match.UnitTypes.FromName(creepTypeName);
 
             Point spawnPoint = path.Points[0];
             Region spawnRegion = new Region(spawnPoint, creepType.Size);

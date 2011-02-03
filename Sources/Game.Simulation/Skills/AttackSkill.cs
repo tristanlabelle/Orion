@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="UnitType"/> to attack.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to attack.
     /// </summary>
     [Serializable]
     public sealed class AttackSkill : UnitSkill

@@ -20,7 +20,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Methods
-        public override void LetFill(UnitType type, ActionButton[,] buttonsArray)
+        public override void LetFill(Unit type, ActionButton[,] buttonsArray)
         {
             if (!type.HasSkill<AttackSkill>() || !type.HasSkill<MoveSkill>()) return;
 

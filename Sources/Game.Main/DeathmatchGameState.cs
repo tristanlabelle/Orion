@@ -128,7 +128,7 @@ namespace Orion.Game.Main
             Faction faction = unit.Faction;
             if (faction.Status == FactionStatus.Defeated) return;
 
-            bool hasKeepAliveUnit = faction.Units.Any(u => u.IsAlive && u.Type.KeepsFactionAlive);
+            bool hasKeepAliveUnit = faction.Units.Any(u => u.IsAlive && u.KeepsFactionAlive);
             if (hasKeepAliveUnit) return;
             
             faction.MarkAsDefeated();

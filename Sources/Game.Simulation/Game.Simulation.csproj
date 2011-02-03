@@ -171,7 +171,6 @@
     <Compile Include="Unit.cs" />
     <Compile Include="World.EntityCollection.cs" />
     <Compile Include="Skills\UnitStat.cs" />
-    <Compile Include="UnitType.cs" />
     <Compile Include="UnitTypeBuilder.cs" />
     <Compile Include="UnitTypeRegistry.cs" />
     <Compile Include="Utilities\WorkerActivityMonitor.cs" />

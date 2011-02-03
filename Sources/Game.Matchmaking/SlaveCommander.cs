@@ -54,7 +54,7 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new AttackCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
         }
 
-        public void LaunchBuild(IEnumerable<Unit> units, UnitType buildingType, Point point)
+        public void LaunchBuild(IEnumerable<Unit> units, Unit buildingType, Point point)
         {
             if (units.Count() > 0)
                 IssueCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
@@ -92,7 +92,7 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new RepairCommand(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
         }
 
-        public void LaunchTrain(IEnumerable<Unit> buildings, UnitType trainedType)
+        public void LaunchTrain(IEnumerable<Unit> buildings, Unit trainedType)
         {
             if (buildings.Count() > 0)
                 IssueCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
@@ -130,7 +130,7 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
-        public void LaunchUpgrade(IEnumerable<Unit> units, UnitType targetType)
+        public void LaunchUpgrade(IEnumerable<Unit> units, Unit targetType)
         {
             if (units.Count() > 0)
                 IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetType.Handle));

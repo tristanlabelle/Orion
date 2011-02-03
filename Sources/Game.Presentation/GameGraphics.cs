@@ -102,23 +102,12 @@ namespace Orion.Game.Presentation
         /// <summary>
         /// Gets a texture representing a unit.
         /// </summary>
-        /// <param name="unitType">The type of a unit.</param>
-        /// <returns>The texture for that unit type.</returns>
-        public Texture GetUnitTexture(UnitType unitType)
-        {
-            Argument.EnsureNotNull(unitType, "unitType");
-            return GetUnitTexture(unitType.GraphicsTemplate);
-        }
-
-        /// <summary>
-        /// Gets a texture representing a unit.
-        /// </summary>
         /// <param name="unit">The unit.</param>
         /// <returns>The texture for that unit.</returns>
         public Texture GetUnitTexture(Unit unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            return GetUnitTexture(unit.Type);
+            return GetUnitTexture(unit.GraphicsTemplate);
         }
 
         /// <summary>

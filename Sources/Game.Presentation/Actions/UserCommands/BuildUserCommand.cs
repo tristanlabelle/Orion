@@ -18,14 +18,14 @@ namespace Orion.Game.Presentation.Actions.UserCommands
     public sealed class BuildUserCommand : UserInputCommand, IViewRenderer
     {
         #region Fields
-        private readonly UnitType buildingType;
+        private readonly Unit buildingType;
         private readonly Texture texture;
         private Point? minLocation;
         #endregion
 
         #region Constructors
         public BuildUserCommand(UserInputManager inputManager, GameGraphics gameGraphics,
-            UnitType buildingType)
+            Unit buildingType)
             : base(inputManager)
         {
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
@@ -69,7 +69,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 foreach (Entity entity in alageneResourceNodes)
                 {
                     Spatial position = entity.GetComponent<Spatial>();
-                    if (position.Location == minLocation.Value)
+                    if (position.Position == minLocation.Value)
                         return true;
                 }
                 return false;

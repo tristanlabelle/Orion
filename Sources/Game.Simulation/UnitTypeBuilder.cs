@@ -10,7 +10,7 @@ using Orion.Engine.Collections;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Provides a mutable representation of a <see cref="UnitType"/>
+    /// Provides a mutable representation of a <see cref="Unit"/>
     /// as a way to create instances.
     /// </summary>
     [Serializable]
@@ -149,10 +149,10 @@ namespace Orion.Game.Simulation
             }
         }
 
-        public UnitType Build(Handle handle)
+        public Unit Build(Handle handle)
         {
             Validate();
-            return new UnitType(handle, this);
+            return new Unit(handle, this);
         }
         #endregion
     }

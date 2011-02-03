@@ -54,7 +54,7 @@ namespace Orion.Game.Simulation
                 Faction currentFaction = factionEnumerator.Current;
                 foreach (UnitTemplate unit in worldData.GetUnitsForFaction(i))
                 {
-                    UnitType type = unitTypes.FromName(unit.UnitTypeName);
+                    Unit type = unitTypes.FromName(unit.UnitTypeName);
                     currentFaction.CreateUnit(type, unit.Location);
                 }
             }

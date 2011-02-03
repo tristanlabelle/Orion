@@ -143,7 +143,7 @@ namespace Orion.Game.Simulation.Components
             loadedUnits.RemoveAt(embarkeeIndex);
             positionComponents.RemoveAt(embarkeeIndex);
 
-            position.Location = location.Value;
+            position.Position = location.Value;
             entity.AddComponent(position);
         }
         #endregion

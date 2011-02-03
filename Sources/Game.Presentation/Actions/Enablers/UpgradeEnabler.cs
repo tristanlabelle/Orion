@@ -20,14 +20,14 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Methods
-        public override void LetFill(UnitType unitType, ActionButton[,] buttonsArray)
+        public override void LetFill(Unit unitType, ActionButton[,] buttonsArray)
         {
             if (unitType.Upgrades.All(u => u.IsFree)) return;
 
             buttonsArray[2, 0] = CreateUpgradeButton(unitType);
         }
 
-        private ActionButton CreateUpgradeButton(UnitType unitType)
+        private ActionButton CreateUpgradeButton(Unit unitType)
         {
             ActionButton button = new ActionButton(actionPanel, userInputManager, "Upgrade", Keys.None, graphics);
 

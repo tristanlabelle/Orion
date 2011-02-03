@@ -59,16 +59,16 @@ namespace Orion.Game.Matchmaking
         private const float minimumTimeBetweenSuccessiveExplorations = 10;
         private const int maximumExplorationCount = 6;
 
-        private readonly UnitType workerUnitType;
-        private readonly UnitType foodSupplyUnitType;
-        private readonly UnitType resourceDepotUnitType;
-        private readonly UnitType alageneExtractorUnitType;
-        private readonly UnitType pyramidUnitType;
-        private readonly UnitType defenseTowerUnitType;
-        private readonly UnitType laboratoryUnitType;
+        private readonly Unit workerUnitType;
+        private readonly Unit foodSupplyUnitType;
+        private readonly Unit resourceDepotUnitType;
+        private readonly Unit alageneExtractorUnitType;
+        private readonly Unit pyramidUnitType;
+        private readonly Unit defenseTowerUnitType;
+        private readonly Unit laboratoryUnitType;
 
         private readonly List<PlaceToExplore> placesToExplore = new List<PlaceToExplore>();
-        private readonly HashSet<UnitType> createdUnitTypes = new HashSet<UnitType>();
+        private readonly HashSet<Unit> createdUnitTypes = new HashSet<Unit>();
         private readonly HashSet<Unit> buildings = new HashSet<Unit>();
         private readonly Dictionary<Entity, ResourceNodeData> resourceNodesData
             = new Dictionary<Entity, ResourceNodeData>();
@@ -285,7 +285,7 @@ namespace Orion.Game.Matchmaking
                 if (nodeData.NearbyDepot != null) continue;
                 
                 // Build a nearby depot or pyramid
-                UnitType buildingType = resourceDepotUnitType;
+                Unit buildingType = resourceDepotUnitType;
 
                 Unit nearestPyramid = buildings
                     .Where(building => building.Type == pyramidUnitType)
@@ -401,7 +401,7 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Helpers
-        private ResourceAmount GetCost(UnitType unitType)
+        private ResourceAmount GetCost(Unit unitType)
         {
             return ResourceAmount.FromUnitCost(unitType, Faction);
         }
@@ -429,7 +429,7 @@ namespace Orion.Game.Matchmaking
             return 2;
         }
 
-        private bool TryBuildNear(Unit builder, UnitType buildingType, Vector2 location)
+        private bool TryBuildNear(Unit builder, Unit buildingType, Vector2 location)
         {
             Point buildingLocation = new Point(
                             (int)location.X + Random.Next(-8, 9),

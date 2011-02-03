@@ -21,7 +21,7 @@ namespace Orion.Game.Simulation.Components
         private float sightRange;
         private Size size;
 
-        private Vector2 location;
+        private Vector2 position;
         private float angle;
         #endregion
 
@@ -60,20 +60,20 @@ namespace Orion.Game.Simulation.Components
             set { collisionLayer = value; }
         }
 
-        public Vector2 Location
+        public Vector2 Position
         {
-            get { return location; }
+            get { return position; }
             set
             {
                 World world = Entity.World;
-                if (!world.Bounds.ContainsPoint(value))
+                if (world != null && !world.Bounds.ContainsPoint(value))
                 {
                     Debug.Fail("Position out of bounds.");
                     value = world.Bounds.Clamp(value);
                 }
-                var oldPosition = location;
-                location = value;
-                Moved.Raise(this, oldPosition, location);
+                var oldPosition = position;
+                position = value;
+                Moved.Raise(this, oldPosition, position);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                return new Vector2(Location.X + size.Width * 0.5f, Location.Y + size.Height * 0.5f);
+                return new Vector2(Position.X + size.Width * 0.5f, Position.Y + size.Height * 0.5f);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                return new Rectangle(Location.X, Location.Y, size.Width, size.Height);
+                return new Rectangle(Position.X, Position.Y, size.Width, size.Height);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                Point min = new Point((int)Math.Round(location.X), (int)Math.Round(location.Y));
+                Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
                 return new Region(min, size);
             }
         }

@@ -9,13 +9,13 @@ using Orion.Engine;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Keeps the collection of registered <see cref="UnitType"/>s.
+    /// Keeps the collection of registered <see cref="Unit"/>s.
     /// </summary>
     [Serializable]
-    public sealed class UnitTypeRegistry : IEnumerable<UnitType>
+    public sealed class UnitTypeRegistry : IEnumerable<Unit>
     {
         #region Fields
-        private readonly Dictionary<string, UnitType> types = new Dictionary<string, UnitType>();
+        private readonly Dictionary<string, Unit> types = new Dictionary<string, Unit>();
         #endregion
 
         #region Constructors
@@ -39,27 +39,27 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        public UnitType Register(UnitTypeBuilder builder)
+        public Unit Register(UnitTypeBuilder builder)
         {
             Argument.EnsureNotNull(builder, "builder");
-            UnitType unitType = builder.Build(new Handle((uint)types.Count));
+            Unit unitType = builder.Build(new Handle((uint)types.Count));
             types.Add(unitType.Name, unitType);
             return unitType;
         }
 
-        public UnitType FromHandle(Handle handle)
+        public Unit FromHandle(Handle handle)
         {
             return types.Values.FirstOrDefault(unitType => unitType.Handle == handle);
         }
 
-        public UnitType FromName(string name)
+        public Unit FromName(string name)
         {
-            UnitType type;
+            Unit type;
             types.TryGetValue(name, out type);
             return type;
         }
 
-        public IEnumerator<UnitType> GetEnumerator()
+        public IEnumerator<Unit> GetEnumerator()
         {
             return types.Values.GetEnumerator();
         }

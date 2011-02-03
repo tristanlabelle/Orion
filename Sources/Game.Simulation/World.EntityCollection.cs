@@ -121,13 +121,13 @@ namespace Orion.Game.Simulation
             #region Entity Creation
             /// <summary>
             /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
-            /// from its <see cref="UnitType"/> and <see cref="Faction"/>.
+            /// from its <see cref="Unit"/> and <see cref="Faction"/>.
             /// </summary>
-            /// <param name="type">The <see cref="UnitType"/> of the <see cref="Unit"/> to be created.</param>
+            /// <param name="type">The <see cref="Unit"/> of the <see cref="Unit"/> to be created.</param>
             /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
             /// <param name="point">The initial position of the <see cref="Unit"/> to be created.</param>
             /// <returns>The newly created <see cref="Entity"/>.</returns>
-            internal Unit CreateUnit(UnitType type, Faction faction, Point point)
+            internal Unit CreateUnit(Unit type, Faction faction, Point point)
             {
                 Handle handle = handleGenerator();
                 Unit unit = new Unit(handle, type, faction, point);
@@ -149,7 +149,7 @@ namespace Orion.Game.Simulation
 
                 Spatial positionComponent = new Spatial(node);
                 positionComponent.Size = new Size(2, 2);
-                positionComponent.Location = point;
+                positionComponent.Position = point;
                 if (type == ResourceType.Aladdium)
                     positionComponent.CollisionLayer = CollisionLayer.Ground;
                 node.AddComponent(positionComponent);

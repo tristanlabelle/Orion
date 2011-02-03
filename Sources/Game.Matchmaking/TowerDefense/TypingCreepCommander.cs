@@ -69,7 +69,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
             float progress = (float)minPhraseLength / longestPhraseLength;
             int creepTypeIndex = Math.Min((int)(progress * CreepWaveCommander.WaveCreepTypeNames.Length), CreepWaveCommander.WaveCreepTypeNames.Length - 1);
             string creepTypeName = CreepWaveCommander.WaveCreepTypeNames[creepTypeIndex];
-            UnitType creepType = Match.UnitTypes.FromName(creepTypeName);
+            Unit creepType = Match.UnitTypes.FromName(creepTypeName);
             Unit creep = Faction.CreateUnit(creepType, creepPath.Points[0]);
             var task = new CreepTask(creep, creepPath);
             task.Leaked += OnCreepLeaked;

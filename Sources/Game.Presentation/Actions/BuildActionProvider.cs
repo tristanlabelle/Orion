@@ -17,7 +17,7 @@ using Orion.Game.Simulation.Skills;
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
-    /// Provides the buttons to build each <see cref="UnitType"/> that is supported by a builder unit.
+    /// Provides the buttons to build each <see cref="Unit"/> that is supported by a builder unit.
     /// </summary>
     public sealed class BuildActionProvider : IActionProvider
     {
@@ -25,13 +25,13 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
-        private readonly UnitType unitType;
+        private readonly Unit unitType;
         private readonly ActionButton[,] buttons = new ActionButton[4, 4];
         #endregion
 
         #region Constructors
         public BuildActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics, UnitType unitType)
+            GameGraphics graphics, Unit unitType)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
@@ -77,7 +77,7 @@ namespace Orion.Game.Presentation.Actions
                 .OrderByDescending(buildingType => buildingType.HasSkill<TrainSkill>())
                 .ThenBy(buildingType => buildingType.GetBaseStat(BasicSkill.AladdiumCostStat) + buildingType.GetBaseStat(BasicSkill.AlageneCostStat));
 
-            foreach (UnitType buildingType in buildingTypes)
+            foreach (Unit buildingType in buildingTypes)
             {
                 buttons[x, y] = CreateButton(buildingType);
 
@@ -92,7 +92,7 @@ namespace Orion.Game.Presentation.Actions
             buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(UnitType buildingType)
+        private ActionButton CreateButton(Unit buildingType)
         {
             ActionButton button = new ActionButton(actionPanel, inputManager, buildingType.Name, Keys.None, graphics);
 

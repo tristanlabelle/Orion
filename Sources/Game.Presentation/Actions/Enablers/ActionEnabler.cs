@@ -50,7 +50,7 @@ namespace Orion.Game.Presentation.Actions.Enablers
         #endregion
 
         #region Methods
-        public abstract void LetFill(UnitType type, ActionButton[,] buttonsArray);
+        public abstract void LetFill(Unit type, ActionButton[,] buttonsArray);
         #endregion
     }
 }

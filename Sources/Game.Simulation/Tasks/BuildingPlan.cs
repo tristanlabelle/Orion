@@ -14,13 +14,13 @@ namespace Orion.Game.Simulation.Tasks
     {
         #region Fields
         private readonly Faction faction;
-        private readonly UnitType buildingType;
+        private readonly Unit buildingType;
         private readonly Point location;
         private Unit building;
         #endregion
 
         #region Constructors
-        public BuildingPlan(Faction faction, UnitType buildingType, Point location)
+        public BuildingPlan(Faction faction, Unit buildingType, Point location)
         {
             Argument.EnsureNotNull(faction, "faction");
             Argument.EnsureNotNull(buildingType, "buildingType");
@@ -32,7 +32,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Proprieties
-        public UnitType BuildingType
+        public Unit BuildingType
         {
             get { return buildingType; }
         }

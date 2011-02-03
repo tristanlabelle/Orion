@@ -17,14 +17,14 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class TrainTask : Task
     {
         #region Fields
-        private readonly UnitType traineeType;
+        private readonly Unit traineeType;
         private float healthPointsTrained;
         private bool attemptingToPlaceUnit;
         private bool waitingForEnoughFood;
         #endregion
 
         #region Constructors
-        public TrainTask(Unit trainer, UnitType traineeType)
+        public TrainTask(Unit trainer, Unit traineeType)
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
@@ -50,7 +50,7 @@ namespace Orion.Game.Simulation.Tasks
             get { return "Training"; }
         }
 
-        public UnitType TraineeType
+        public Unit TraineeType
         {
             get { return traineeType; }
         }
@@ -106,7 +106,7 @@ namespace Orion.Game.Simulation.Tasks
             MarkAsEnded();
         }
 
-        private Point? TryGetFreeSurroundingSpawnPoint(UnitType spawneeType)
+        private Point? TryGetFreeSurroundingSpawnPoint(Unit spawneeType)
         {
             Argument.EnsureNotNull(spawneeType, "spawneeType");
 
@@ -137,7 +137,7 @@ namespace Orion.Game.Simulation.Tasks
             }
         }
 
-        private Unit TrySpawn(UnitType spawneeType)
+        private Unit TrySpawn(Unit spawneeType)
         {
             Argument.EnsureNotNull(spawneeType, "spawneeType");
 

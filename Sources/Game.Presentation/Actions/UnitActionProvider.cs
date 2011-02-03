@@ -13,12 +13,12 @@ namespace Orion.Game.Presentation.Actions
     {
         #region Fields
         private readonly List<ActionEnabler> enablers;
-        private readonly UnitType unitType;
+        private readonly Unit unitType;
         private readonly ActionButton[,] buttons = new ActionButton[4, 4];
         #endregion
 
         #region Constructors
-        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType unitType)
+        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, Unit unitType)
         {
             Argument.EnsureNotNull(actionEnablers, "actionEnablers");
             Argument.EnsureNotNull(unitType, "unitType");

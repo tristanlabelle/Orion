@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Represents a technology that, when researched, has an effect
-    /// on one or more stats of a <see cref="UnitType"/>.
+    /// on one or more stats of a <see cref="Unit"/>.
     /// </summary>
     /// <remarks>
     /// Possible requirements:
@@ -83,13 +83,13 @@ namespace Orion.Game.Simulation.Technologies
         #endregion
 
         #region Methods
-        public bool AppliesTo(UnitType unitType)
+        public bool AppliesTo(Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             return targets.Contains(unitType.Name);
         }
 
-        public int GetEffect(UnitType unitType, UnitStat stat)
+        public int GetEffect(Unit unitType, UnitStat stat)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             if (!AppliesTo(unitType)) return 0;

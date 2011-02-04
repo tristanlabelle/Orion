@@ -57,7 +57,7 @@ namespace Orion.Game.Simulation.Utilities
         /// </summary>
         public Rectangle Rectangle
         {
-            get { return Rectangle.FromCenterSize(center.X, center.Y, unitType.Width, unitType.Height); }
+            get { return Rectangle.FromCenterSize(center.X, center.Y, unitType.Size.Width, unitType.Size.Height); }
         }
 
         /// <summary>

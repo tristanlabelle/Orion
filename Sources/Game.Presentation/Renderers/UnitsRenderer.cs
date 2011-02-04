@@ -172,7 +172,7 @@ namespace Orion.Game.Presentation.Renderers
             float drawingAngle = GetUnitDrawingAngle(unit);
             using (graphics.PushTransform(center, drawingAngle))
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
                 graphics.Fill(localRectangle, texture, unit.Faction.Color);
             }
 
@@ -206,7 +206,7 @@ namespace Orion.Game.Presentation.Renderers
             float scaling = shadowScaling + oscillation * -0.1f;
             using (graphicsContext.PushTransform(center, drawingAngle, scaling))
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Width, unit.Height);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
                 graphicsContext.Fill(localRectangle, texture, tint);
             }
         }

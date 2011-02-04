@@ -93,18 +93,18 @@ namespace Orion.Game.Presentation.Actions.UserCommands
 
         private Point GetMinLocation(Vector2 location)
         {
-            int minX = (int)Math.Round(location.X - buildingType.Width * 0.5f);
-            int minY = (int)Math.Round(location.Y - buildingType.Height * 0.5f);
+            int minX = (int)Math.Round(location.X - buildingType.Size.Width * 0.5f);
+            int minY = (int)Math.Round(location.Y - buildingType.Size.Height * 0.5f);
 
             if (minX < 0)
                 minX = 0;
-            else if (minX >= World.Width - buildingType.Width)
-                minX = World.Width - buildingType.Width;
+            else if (minX >= World.Width - buildingType.Size.Width)
+                minX = World.Width - buildingType.Size.Width;
 
             if (minY < 0)
                 minY = 0;
-            else if (minY >= World.Height - buildingType.Height)
-                minY = World.Height - buildingType.Height;
+            else if (minY >= World.Height - buildingType.Size.Height)
+                minY = World.Height - buildingType.Size.Height;
 
             return new Point(minX, minY);
         }
@@ -116,7 +116,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             ColorRgb tint = IsLocationValid ? Colors.LightBlue : Colors.Red;
             Rectangle rectangle = new Rectangle(
                 minLocation.Value.X, minLocation.Value.Y,
-                buildingType.Width, buildingType.Height);
+                buildingType.Size.Width, buildingType.Size.Height);
             context.Fill(rectangle, tint.ToRgba(0.4f));
             context.Fill(rectangle, texture, tint);
         }

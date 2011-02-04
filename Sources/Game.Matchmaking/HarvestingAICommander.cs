@@ -435,8 +435,8 @@ namespace Orion.Game.Matchmaking
                             (int)location.X + Random.Next(-8, 9),
                             (int)location.Y + Random.Next(-8, 9));
             buildingLocation = new Region(
-                World.Width - foodSupplyUnitType.Width,
-                World.Height - foodSupplyUnitType.Height)
+                World.Width - foodSupplyUnitType.Size.Width,
+                World.Height - foodSupplyUnitType.Size.Height)
                 .Clamp(buildingLocation);
 
             Region buildingRegion = new Region(buildingLocation, buildingType.Size);

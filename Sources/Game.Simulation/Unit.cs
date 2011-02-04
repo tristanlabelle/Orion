@@ -191,16 +191,6 @@ namespace Orion.Game.Simulation
             get { return GetComponent<Spatial>().Size; }
         }
 
-        public int Width
-        {
-            get { return Size.Width; }
-        }
-
-        public int Height
-        {
-            get { return Size.Height; }
-        }
-
         public new Vector2 Position
         {
             get { return GetComponent<Spatial>().Position; }

@@ -6,7 +6,6 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
@@ -232,7 +231,11 @@ namespace Orion.Game.Presentation
             switch (args.Key)
             {
                 case Keys.Escape: mouseCommand = null; break;
-                case Keys.ShiftKey: shiftKeyPressed = true; break;
+                case Keys.ShiftKey:
+                case Keys.LShiftKey:
+                case Keys.RShiftKey:
+                    shiftKeyPressed = true;
+                    break;
                 case Keys.Delete: LaunchSuicide(); break;
             }
 
@@ -248,7 +251,7 @@ namespace Orion.Game.Presentation
 
         public void HandleKeyUp(KeyboardEventArgs args)
         {
-            if (args.Key == Keys.ShiftKey)
+            if (args.Key == Keys.ShiftKey || args.Key == Keys.LShiftKey || args.Key == Keys.RShiftKey)
             {
                 shiftKeyPressed = false;
                 if (launchedCommandsWithShift)
@@ -539,14 +542,15 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(text, "text");
 
-            commander.SendMessage(text);
-        }
+            text = text.Trim();
+            if (text.Length == 0) return;
 
-        public void LaunchAllyChatMessage(string text)
-        {
-            Argument.EnsureNotNull(text, "text");
+            text = ProfanityFilter.Filter(text);
 
-            commander.SendAllyMessage(text);
+            if (text[0] == '#')
+                commander.SendAllyMessage(text.Substring(1));
+            else
+                commander.SendMessage(text);
         }
 
         public void LaunchUpgrade(UnitType targetType)

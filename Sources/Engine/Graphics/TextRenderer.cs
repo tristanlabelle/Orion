@@ -14,22 +14,8 @@ namespace Orion.Engine.Graphics
     /// <summary>
     /// Provides means to render text on the screen.
     /// </summary>
-    public sealed class TextRenderer : IDisposable
+    public sealed partial class TextRenderer : IDisposable
     {
-        #region Glyph structure
-        private struct Glyph
-        {
-            public readonly int TextureIndex;
-            public readonly Box TextureRectangle;
-
-            public Glyph(int textureIndex, Box textureRectangle)
-            {
-                this.TextureIndex = textureIndex;
-                this.TextureRectangle = textureRectangle;
-            }
-        }
-        #endregion
-
         #region Fields
         private const int TextureSize = 512;
         private const int GlyphPaddingSize = 1;
@@ -37,31 +23,18 @@ namespace Orion.Engine.Graphics
         private static readonly StringFormat stringFormat;
 
         private readonly GraphicsContext graphicsContext;
-        private readonly Font font;
-        private readonly Bitmap fontRenderTarget;
-        private readonly Graphics fontRenderer;
-        private readonly List<Texture> textures = new List<Texture>();
-        private readonly Dictionary<char, Glyph> glyphs = new Dictionary<char, Glyph>();
-        private readonly float spaceWidth;
-        private int nextGlyphX;
-        private int nextGlyphY;
-        private int maxGlyphHeight;
+        private readonly Dictionary<Font, RenderedFont> renderedFonts = new Dictionary<Font, RenderedFont>();
+        private StringBuilder tempStringBuilder = new StringBuilder();
+        private Bitmap fontRenderTarget;
+        private Graphics fontRenderer;
         #endregion
 
         #region Constructors
-        public TextRenderer(GraphicsContext graphicsContext, Font font)
+        public TextRenderer(GraphicsContext graphicsContext)
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            Argument.EnsureNotNull(font, "font");
 
             this.graphicsContext = graphicsContext;
-            this.font = font;
-            fontRenderTarget = new Bitmap(font.Height * 2, font.Height * 2, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            fontRenderer = Graphics.FromImage(fontRenderTarget);
-
-            // use the width of an 'i' for the size of a space.
-            Glyph iGlyph = FindOrRenderGlyph('i');
-            spaceWidth = iGlyph.TextureRectangle.Width * textures[iGlyph.TextureIndex].Height / font.Height;
         }
 
         static TextRenderer()
@@ -71,106 +44,201 @@ namespace Orion.Engine.Graphics
         }
         #endregion
 
-        #region Properties
-        private Texture TopmostTexture
-        {
-            get { return textures[textures.Count - 1]; }
-        }
-        #endregion
-
         #region Methods
-        public void Draw(IEnumerable<char> text, float size, Vector2 origin, ColorRgba tint, float maxWidth)
+        public Size Draw(IEnumerable<char> text, ref TextRenderingOptions options)
         {
             Argument.EnsureNotNull(text, "text");
-            Argument.EnsureStrictlyPositive(size, "size");
-            Argument.EnsureStrictlyPositive(maxWidth, "maxWidth");
 
-            Vector2 position = origin;
             foreach (char character in text)
+                tempStringBuilder.Append(character);
+
+            Size size = Draw(ref options);
+
+            tempStringBuilder.Clear();
+
+            return size;
+        }
+
+        public Size Draw(Substring text, ref TextRenderingOptions options)
+        {
+            tempStringBuilder.Append(text.BaseString, text.StartIndex, text.Length);
+            Size size = Draw(ref options);
+            tempStringBuilder.Clear();
+
+            return size;
+        }
+
+        public Size Measure(Substring text, ref TextRenderingOptions options)
+        {
+            tempStringBuilder.Append(text.BaseString, text.StartIndex, text.Length);
+            Size size = Draw(ref options, false);
+            tempStringBuilder.Clear();
+
+            return size;
+        }
+
+        private Size Draw(ref TextRenderingOptions options)
+        {
+        	return Draw(ref options, true);
+        }
+        
+        private Size Draw(ref TextRenderingOptions options, bool draw)
+        {
+            RenderedFont renderedFont = FindOrCreateRenderedFont(options.Font);
+
+            int totalWidth = 0;
+            int totalHeight = (int)Math.Ceiling(renderedFont.Height);
+
+            Vector2 origin = options.Origin.ToVector();
+            Vector2 position = origin;
+            for (int i = 0; i < tempStringBuilder.Length; ++i)
             {
+                char character = tempStringBuilder[i];
                 if (char.IsWhiteSpace(character))
                 {
-                    position.X += spaceWidth * size;
+                    position.X += renderedFont.SpaceWidth * renderedFont.Height;
+                    if (position.X - origin.X > totalWidth)
+                        totalWidth = (int)Math.Ceiling(position.X - origin.X);
                 }
                 else
                 {
-                    Glyph glyph = FindOrRenderGlyph(character);
-                    Texture texture = textures[glyph.TextureIndex];
-                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height / font.Height * size);
-                    graphicsContext.Fill(box, texture, glyph.TextureRectangle, tint);
-                    position.X += glyph.TextureRectangle.Width * texture.Height / font.Height * size;
+                    Glyph glyph = FindOrRenderGlyph(renderedFont, character);
+                    Texture texture = renderedFont.Textures[glyph.TextureIndex];
+                    Box textureRectangle = glyph.TextureRectangle;
+                    Box box = new Box(position, glyph.TextureRectangle.Size * texture.Height);
+
+                    if (box.MaxX > options.MaxWidthInPixels)
+                    {
+                        if (options.HorizontalOverflowPolicy == TextOverflowPolicy.Clip)
+                        {
+                            float amount = (options.MaxWidthInPixels.Value - box.MinX) / box.Width;
+                            box = new Box(box.MinX, box.MinY, box.Width * amount, box.Height);
+                            textureRectangle = new Box(textureRectangle.MinX, textureRectangle.MinY, textureRectangle.Width * amount, textureRectangle.Height);
+
+                            // Prevent other characters from being drawn
+                            i = tempStringBuilder.Length;
+                        }
+                        else if (options.HorizontalOverflowPolicy == TextOverflowPolicy.Wrap)
+                        {
+                            position.X = options.Origin.X;
+                            position.Y -= renderedFont.Height;
+                            box = new Box(position.X, position.Y, box.Width, box.Height);
+                        }
+                    }
+
+                    if (box.MaxX - origin.X > totalWidth) totalWidth = (int)Math.Ceiling(box.MaxX - origin.X);
+                    if (box.MaxY - origin.Y > totalHeight) totalHeight = (int)Math.Ceiling(box.MaxY - origin.Y);
+
+                    if (draw) graphicsContext.Fill(box, texture, textureRectangle, options.Color);
+                    position.X += glyph.TextureRectangle.Width * texture.Height;
                 }
             }
+
+            return new Size(totalWidth, totalHeight);
         }
 
         public void Dispose()
         {
-            foreach (Texture texture in textures)
-                texture.Dispose();
-            textures.Clear();
-            glyphs.Clear();
-            fontRenderer.Dispose();
-            fontRenderTarget.Dispose();
+            foreach (RenderedFont renderedFont in renderedFonts.Values)
+                renderedFont.Dispose();
+            renderedFonts.Clear();
+
+            if (fontRenderer != null)
+            {
+                fontRenderer.Dispose();
+                fontRenderTarget.Dispose();
+            }
         }
 
-        private Glyph FindOrRenderGlyph(char character)
+        private RenderedFont FindOrCreateRenderedFont(Font font)
+        {
+            RenderedFont renderedFont;
+            if (renderedFonts.TryGetValue(font, out renderedFont))
+                return renderedFont;
+
+            // Cached for performance
+            int fontHeight = font.Height;
+            if (fontRenderTarget == null || fontRenderTarget.Height < fontHeight * 2)
+            {
+                if (fontRenderer != null)
+                {
+                    fontRenderer.Dispose();
+                    fontRenderTarget.Dispose();
+                }
+
+                fontRenderTarget = new Bitmap(fontHeight * 2, fontHeight * 2, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                fontRenderer = Graphics.FromImage(fontRenderTarget);
+            }
+
+            renderedFont = new RenderedFont(font);
+            renderedFonts.Add(font, renderedFont);
+
+            // use the width of an 'i' for the size of a space.
+            Glyph iGlyph = FindOrRenderGlyph(renderedFont, 'i');
+            renderedFont.SpaceWidth = iGlyph.TextureRectangle.Width * renderedFont.Textures[iGlyph.TextureIndex].Height / fontHeight;
+
+            return renderedFont;
+        }
+
+        private Glyph FindOrRenderGlyph(RenderedFont renderedFont, char character)
         {
             Glyph glyph;
-            if (glyphs.TryGetValue(character, out glyph)) return glyph;
+            if (renderedFont.Glyphs.TryGetValue(character, out glyph)) return glyph;
 
-            glyph = RenderGlyph(character);
-            glyphs.Add(character, glyph);
+            glyph = RenderGlyph(renderedFont, character);
+            renderedFont.Glyphs.Add(character, glyph);
             return glyph;
         }
 
-        private Glyph RenderGlyph(char character)
+        private Glyph RenderGlyph(RenderedFont renderedFont, char character)
         {
             string characterString = character.ToString();
 
             fontRenderer.Clear(Color.FromArgb(0, 255, 255, 255));
-            fontRenderer.DrawString(characterString, font, Brushes.White, new PointF(0, 0));
-            Rectangle renderedBounds = GetRenderedBounds(characterString);
+            fontRenderer.DrawString(characterString, renderedFont.Font, Brushes.White, new PointF(0, 0));
+            Rectangle renderedBounds = GetRenderedBounds(renderedFont, characterString);
 
-            if (textures.Count == 0)
+            if (renderedFont.Textures.Count == 0)
             {
-                CreateTexture();
+                CreateTexture(renderedFont);
             }
             else
             {
-                if (nextGlyphX + renderedBounds.Width > TopmostTexture.Width)
+                if (renderedFont.NextGlyphX + renderedBounds.Width > renderedFont.TopmostTexture.Width)
                 {
-                    nextGlyphX = 0;
-                    nextGlyphY += maxGlyphHeight + GlyphPaddingSize;
-                    maxGlyphHeight = 0;
+                    renderedFont.NextGlyphX = 0;
+                    renderedFont.NextGlyphY += renderedFont.MaxLineGlyphHeight + GlyphPaddingSize;
+                    renderedFont.MaxLineGlyphHeight = 0;
                 }
 
-                if (nextGlyphY + renderedBounds.Height > TopmostTexture.Height)
+                if (renderedFont.NextGlyphY + renderedBounds.Height > renderedFont.TopmostTexture.Height)
                 {
-                    CreateTexture();
-                    nextGlyphX = 0;
-                    nextGlyphY = 0;
-                    maxGlyphHeight = 0;
+                    CreateTexture(renderedFont);
+                    renderedFont.NextGlyphX = 0;
+                    renderedFont.NextGlyphY = 0;
+                    renderedFont.MaxLineGlyphHeight = 0;
                 }
             }
 
-            Texture texture = TopmostTexture;
+            Texture texture = renderedFont.TopmostTexture;
 
             if (renderedBounds.Width * renderedBounds.Height > 0)
-                BlitToTexture(renderedBounds, texture);
+                BlitToTexture(renderedBounds, texture, new Point(renderedFont.NextGlyphX, renderedFont.NextGlyphY));
 
             Box textureRectangle = new Box(
-                nextGlyphX / (float)texture.Width,
-                nextGlyphY / (float)texture.Height,
+                renderedFont.NextGlyphX / (float)texture.Width,
+                renderedFont.NextGlyphY / (float)texture.Height,
                 renderedBounds.Width / (float)texture.Width,
                 renderedBounds.Height / (float)texture.Height);
 
-            nextGlyphX += renderedBounds.Width + GlyphPaddingSize;
-            if (maxGlyphHeight < renderedBounds.Height) maxGlyphHeight = renderedBounds.Height;
+            renderedFont.NextGlyphX += renderedBounds.Width + GlyphPaddingSize;
+            if (renderedFont.MaxLineGlyphHeight < renderedBounds.Height)
+                renderedFont.MaxLineGlyphHeight = renderedBounds.Height;
 
-            return new Glyph(textures.Count - 1, textureRectangle);
+            return new Glyph(renderedFont.Textures.Count - 1, textureRectangle);
         }
 
-        private void BlitToTexture(Rectangle renderedBounds, Texture texture)
+        private void BlitToTexture(Rectangle renderedBounds, Texture texture, Point texturePoint)
         {
             BitmapData bitmapData = fontRenderTarget.LockBits(renderedBounds,
                 ImageLockMode.ReadOnly, fontRenderTarget.PixelFormat);
@@ -179,14 +247,14 @@ namespace Orion.Engine.Graphics
                 unsafe
                 {
                     byte* sourcePointer = (byte*)bitmapData.Scan0;
-                    texture.LockToOverwrite(new Region(nextGlyphX, nextGlyphY, renderedBounds.Width, renderedBounds.Height), surface =>
+                    texture.LockToOverwrite(new Region(texturePoint.X, texturePoint.Y, renderedBounds.Width, renderedBounds.Height), surface =>
                     {
                         byte* destinationPointer = (byte*)surface.DataPointer;
                         for (int y = 0; y < renderedBounds.Height; ++y)
                         {
                             for (int x = 0; x < renderedBounds.Width; ++x)
                             {
-                                byte* sourcePixelPointer = sourcePointer + bitmapData.Stride * (renderedBounds.Height - y - 1) + x * 4;
+                                byte* sourcePixelPointer = sourcePointer + bitmapData.Stride * y + x * 4;
                                 byte* destinationPixelPointer = destinationPointer + surface.Stride * y + x * 4;
 
                                 // Force to white + alpha
@@ -206,10 +274,10 @@ namespace Orion.Engine.Graphics
             }
         }
 
-        private Rectangle GetRenderedBounds(string characterString)
+        private Rectangle GetRenderedBounds(RenderedFont renderedFont, string characterString)
         {
-            RectangleF layoutRect = new RectangleF(0, 0, font.Height * 2, font.Height * 2);
-            using (var characterRegion = fontRenderer.MeasureCharacterRanges(characterString, font, layoutRect, stringFormat)[0])
+            RectangleF layoutRect = new RectangleF(0, 0, renderedFont.Height * 2, renderedFont.Height * 2);
+            using (var characterRegion = fontRenderer.MeasureCharacterRanges(characterString, renderedFont.Font, layoutRect, stringFormat)[0])
             {
                 RectangleF characterBounds = characterRegion.GetBounds(fontRenderer);
                 return Rectangle.FromLTRB(
@@ -220,11 +288,11 @@ namespace Orion.Engine.Graphics
             }
         }
 
-        private Texture CreateTexture()
+        private Texture CreateTexture(RenderedFont renderedFont)
         {
             Texture texture = graphicsContext.CreateBlankTexture(new Size(TextureSize, TextureSize), PixelFormat.Rgba);
             texture.SetSmooth(true);
-            textures.Add(texture);
+            renderedFont.Textures.Add(texture);
             return texture;
         }
         #endregion

@@ -46,6 +46,15 @@ namespace Orion.Game.Simulation.Tasks
         /// </summary>
         public abstract string Description { get; }
 
+        /// <summary>
+        /// Gets a value indicating the progress of this <see cref="Task"/>.
+        /// This value is in the interval [0, 1], or <see cref="float.NaN"/> if the progress cannot be determined.
+        /// </summary>
+        public virtual float Progress
+        {
+            get { return float.NaN; }
+        }
+
         protected Faction Faction
         {
             get { return unit.Faction; }

@@ -61,6 +61,7 @@ namespace Orion.Game.Simulation.Utilities
             get { return activeWorkers; }
         }
 
+        [PropertyChangedEvent("WorkerActivityStateChanged")]
         public int ActiveWorkerCount
         {
             get { return activeWorkers.Count; }
@@ -71,6 +72,7 @@ namespace Orion.Game.Simulation.Utilities
             get { return inactiveWorkers; }
         }
 
+        [PropertyChangedEvent("WorkerActivityStateChanged")]
         public int InactiveWorkerCount
         {
             get { return inactiveWorkers.Count; }

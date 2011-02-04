@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Game.Presentation;
+using Orion.Game.Presentation.Audio;
 
 namespace Orion.Game.Main
 {
@@ -26,17 +27,33 @@ namespace Orion.Game.Main
         #endregion
 
         #region Properties
-        protected GameStateManager Manager
-        {
-            get { return manager; }
-        }
-
         /// <summary>
         /// Gets a value indicating if this game state is the currently active one.
         /// </summary>
         public bool IsActive
         {
             get { return manager.ActiveState == this; }
+        }
+
+        protected GameStateManager Manager
+        {
+            get { return manager; }
+        }
+
+        /// <summary>
+        /// Gets the graphics context which provides a visual representation of the game.
+        /// </summary>
+        protected GameGraphics Graphics
+        {
+            get { return manager.Graphics; }
+        }
+
+        /// <summary>
+        /// Gets the audio context which provides audible representation of game events.
+        /// </summary>
+        protected GameAudio Audio
+        {
+            get { return manager.Audio; }
         }
         #endregion
 

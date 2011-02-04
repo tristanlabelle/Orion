@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using Orion.Engine.Networking.Http;
-using System.Diagnostics;
 
 namespace Orion.Game.Matchmaking.Networking
 {
-    public class MasterServerAdvertizer : IMatchAdvertizer
+    /// <summary>
+    /// A match advertizer which register matches to a central server.
+    /// </summary>
+    public sealed class MasterServerAdvertizer : IMatchAdvertizer
     {
         #region Fields
         private const string nameField = "name";
@@ -18,7 +22,6 @@ namespace Orion.Game.Matchmaking.Networking
 
         private readonly HttpRequest masterServerRequest;
         private readonly Uri masterServerUri;
-        private readonly Dictionary<string, string> fields = new Dictionary<string, string>();
         #endregion
 
         #region Constructors
@@ -29,14 +32,24 @@ namespace Orion.Game.Matchmaking.Networking
         public MasterServerAdvertizer(Uri masterServerUri)
         {
             this.masterServerUri = masterServerUri;
-            masterServerRequest = new HttpRequest(masterServerUri.DnsSafeHost);
+
+            try
+            {
+                masterServerRequest = new HttpRequest(masterServerUri.DnsSafeHost);
+            }
+            catch (SocketException)
+            {
+                // The server is not reacheable, this object will act as a null object.
+            }
         }
         #endregion
 
         #region Methods
         public void Advertize(string name, int openSlotsCount)
         {
-            fields.Clear();
+            if (masterServerRequest == null) return;
+
+            Dictionary<string, string> fields = new Dictionary<string, string>();
             fields[nameField] = name;
             fields[openSlotsField] = openSlotsCount.ToString();
             fields[timeToLiveField] = defaultTimeToLive.ToString();
@@ -45,6 +58,9 @@ namespace Orion.Game.Matchmaking.Networking
 
         public void Delist(string name)
         {
+            if (masterServerRequest == null) return;
+
+            Dictionary<string, string> fields = new Dictionary<string, string>();
             fields[nameField] = name;
             fields[cancelMatch] = "true";
             masterServerRequest.ExecuteAsync(HttpRequestMethod.Post, masterServerUri.AbsolutePath, fields);

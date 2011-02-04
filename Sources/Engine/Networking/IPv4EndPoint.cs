@@ -206,18 +206,59 @@ namespace Orion.Engine.Networking
         {
             Argument.EnsureNotNull(str, "str");
 
-            int colonIndex = str.IndexOf(':');
-            if (colonIndex == -1) throw new FormatException("Invalid IPV4 EndPoint format, expected a colon");
+            string addressString;
+            string portString;
 
-            string addressString = str.Substring(0, colonIndex);
+            int colonIndex = str.IndexOf(':');
+            if (colonIndex == -1)
+            {
+                addressString = str;
+                portString = "0";
+            }
+            else
+            {
+                addressString = str.Substring(0, colonIndex);
+                portString = str.Substring(colonIndex + 1);
+            }
+
             IPv4Address address = IPv4Address.Parse(addressString);
 
-            string portString = str.Substring(colonIndex + 1);
             ushort port;
             if (!ushort.TryParse(portString, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out port))
                 throw new FormatException("Invalid IPV4 EndPoint format, a port number between 0 and 65535.");
 
             return new IPv4EndPoint(address, port);
+        }
+
+        /// <summary>
+        /// Attempts to parse an <see cref="IPv4EndPoint"/> from a string representation.
+        /// </summary>
+        /// <param name="str">The string to be parsed.</param>
+        /// <param name="endPoint">The resulting end point.</param>
+        /// <returns><c>True</c> if the string was in a valid format and the operation succeeded, <c>false</c> otherwise.</returns>
+        public static bool TryParse(string str, out IPv4EndPoint endPoint)
+        {
+            try
+            {
+                endPoint = Parse(str);
+                return true;
+            }
+            catch (FormatException)
+            {
+                endPoint = default(IPv4EndPoint);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to parse an <see cref="IPv4EndPoint"/> from a string representation.
+        /// </summary>
+        /// <param name="str">The string to be parsed.</param>
+        /// <returns>The resulting end point, or <c>null</c> if the string was in an invalid format.</returns>
+        public static IPv4EndPoint? TryParse(string str)
+        {
+            try { return Parse(str); }
+            catch (FormatException) { return null; }
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation
     	
     	#region Instance
         #region Fields
-        private const int minimumPopulationLimit = 10;
+        private const int minimumFoodAmount = 10;
 
         private readonly Handle handle;
         private readonly World world;
@@ -47,6 +47,11 @@ namespace Orion.Game.Simulation
 
         private int aladdiumAmount;
         private int alageneAmount;
+
+        /// <summary>
+        /// The amount of food provided by all food-storing units.
+        /// The actual food limit is clamped within a range such as [10, 200].
+        /// </summary>
         private int totalFoodAmount;
         private int usedFoodAmount;
         private FactionStatus status = FactionStatus.Undefeated;
@@ -100,6 +105,11 @@ namespace Orion.Game.Simulation
         /// Raised when the faction changes of diplomatic stance.
         /// </summary>
         public event Action<Faction, Faction, DiplomaticStance> DiplomaticStanceChanged;
+
+        public event Action<Faction> AladdiumAmountChanged;
+        public event Action<Faction> AlageneAmountChanged;
+        public event Action<Faction> UsedFoodAmountChanged;
+        public event Action<Faction> MaxFoodAmountChanged;
 
         public event Action<Faction, string> Warning;
 
@@ -205,8 +215,10 @@ namespace Orion.Game.Simulation
             get { return aladdiumAmount; }
             set
             {
+                if (value == aladdiumAmount) return;
                 Argument.EnsurePositive(value, "AladdiumAmount");
                 aladdiumAmount = value;
+                AladdiumAmountChanged.Raise(this);
             }
         }
 
@@ -218,25 +230,50 @@ namespace Orion.Game.Simulation
             get { return alageneAmount; }
             set
             {
+                if (value == alageneAmount) return;
                 Argument.EnsurePositive(value, "AlageneAmount");
                 alageneAmount = value;
+                AlageneAmountChanged.Raise(this);
             }
         }
 
         public int MaxFoodAmount
         {
-            get { return Math.Max(Math.Min(world.MaximumFoodAmount, totalFoodAmount), minimumPopulationLimit); }
+            get { return Math.Max(Math.Min(world.MaximumFoodAmount, totalFoodAmount), minimumFoodAmount); }
         }
 
+        private int TotalFoodAmount
+        {
+            get { return totalFoodAmount; }
+            set
+            {
+                int previousMaxFoodAmount = MaxFoodAmount;
+                totalFoodAmount = value;
+                if (MaxFoodAmount != previousMaxFoodAmount)
+                    MaxFoodAmountChanged.Raise(this);
+            }
+        }
+
+        /// <summary>
+        /// Gets the amount of food this <see cref="Faction"/> has not used.
+        /// </summary>
         public int RemainingFoodAmount
         {
             get { return MaxFoodAmount - usedFoodAmount; }
         }
 
+        /// <summary>
+        /// Accesses the amount of food currently used by this <see cref="Faction"/>'s units.
+        /// </summary>
         public int UsedFoodAmount
         {
             get { return usedFoodAmount; }
-            set { usedFoodAmount = value; }
+            set
+            {
+                if (value == usedFoodAmount) return;
+                usedFoodAmount = value;
+                UsedFoodAmountChanged.Raise(this);
+            }
         }
         #endregion
         #endregion
@@ -340,7 +377,7 @@ namespace Orion.Game.Simulation
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
 
-            usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
+            UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 
             return unit;
         }
@@ -366,7 +403,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
 
-            usedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
+            UsedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
         }
 
         /// <remarks>Invoked by Unit.</remarks>
@@ -412,7 +449,7 @@ namespace Orion.Game.Simulation
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
             if (unit.HasSkill<ProvideFoodSkill>())
-                totalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
+                TotalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
         }
         #endregion
 
@@ -428,7 +465,7 @@ namespace Orion.Game.Simulation
             else
             {
                 if (unit.Type.HasSkill<ProvideFoodSkill>())
-                    totalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
+                    TotalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }

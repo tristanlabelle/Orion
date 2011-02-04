@@ -3,28 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
-using Orion.Game.Simulation;
 using Orion.Game.Presentation;
-using Orion.Game.Presentation.Actions.Enablers;
+using Orion.Game.Presentation.Actions.UserCommands;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Technologies;
+using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Actions
 {
     public sealed class UnitActionProvider : IActionProvider
     {
         #region Fields
-        private readonly List<ActionEnabler> enablers;
+        private readonly ActionPanel actionPanel;
+        private readonly UserInputManager userInputManager;
+        private readonly GameGraphics graphics;
         private readonly UnitType unitType;
-        private readonly ActionButton[,] buttons = new ActionButton[4, 4];
+        private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
-        public UnitActionProvider(IEnumerable<ActionEnabler> actionEnablers, UnitType unitType)
+        public UnitActionProvider(ActionPanel actionPanel, UserInputManager userInputManager, GameGraphics graphics, UnitType unitType)
         {
-            Argument.EnsureNotNull(actionEnablers, "actionEnablers");
             Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(actionPanel, "actionPanel");
+            Argument.EnsureNotNull(userInputManager, "userInputManager");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            this.enablers = actionEnablers.ToList();
-            Argument.EnsureNoneNull(this.enablers, "actionEnablers");
+            this.actionPanel = actionPanel;
+            this.userInputManager = userInputManager;
+            this.graphics = graphics;
             this.unitType = unitType;
 
             CreateButtons();
@@ -32,41 +40,225 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return buttons[point.X, point.Y];
+            return actions[point.X, point.Y];
         }
 
         public void Refresh()
         {
-            DisposeButtons();
+            ClearButtons();
             CreateButtons();
         }
 
         public void Dispose()
         {
-            DisposeButtons();
+            ClearButtons();
         }
 
         private void CreateButtons()
         {
-            foreach (ActionEnabler enabler in enablers)
-                enabler.LetFill(unitType, buttons);
+            if (unitType.HasSkill<AttackSkill>())
+            {
+                actions[2, 3] = new ActionDescriptor()
+                {
+                    Name = "Attaquer",
+                    Texture = graphics.GetActionTexture("Attack"),
+                    HotKey = Key.A,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new AttackUserCommand(userInputManager, graphics);
+                        actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+                    }
+                };
+            }
+
+            if (unitType.HasSkill<BuildSkill>())
+            {
+                actions[0, 0] = new ActionDescriptor()
+                {
+                    Name = "Construire",
+                    Texture = graphics.GetActionTexture("Build"),
+                    HotKey = Key.B,
+                    Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
+                };
+
+                actions[1, 0] = new ActionDescriptor()
+                {
+                    Name = "Réparer",
+                    Texture = graphics.GetActionTexture("Repair"),
+                    HotKey = Key.R,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new RepairUserCommand(userInputManager);
+                        actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+                    }
+                };
+            }
+
+            if (unitType.HasSkill<TransportSkill>())
+            {
+                actions[3, 0] = new ActionDescriptor()
+                {
+                    Name = "Débarquer",
+                    Texture = graphics.GetActionTexture("Disembark"),
+                    HotKey = Key.D,
+                    Action = () => userInputManager.LaunchDisembark()
+                };
+            }
+
+            if (unitType.HasSkill<HarvestSkill>())
+            {
+                actions[1, 2] = new ActionDescriptor()
+                {
+                    Name = "Ramasser",
+                    Texture = graphics.GetActionTexture("Harvest"),
+                    HotKey = Key.H,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new HarvestUserCommand(userInputManager);
+                        actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+                    }
+                };
+            }
+
+            if (unitType.HasSkill<HealSkill>())
+            {
+                actions[3, 2] = new ActionDescriptor()
+                {
+                    Name = "Soigner",
+                    Texture = graphics.GetActionTexture("Heal"),
+                    HotKey = Key.H,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new HealUserCommand(userInputManager);
+                        actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+                    }
+                };
+            }
+
+            if (unitType.HasSkill<MoveSkill>())
+            {
+                actions[0, 3] = new ActionDescriptor()
+                {
+                    Name = "Déplacer",
+                    Texture = graphics.GetActionTexture("Move"),
+                    HotKey = Key.M,
+                    Action = () =>
+                    {
+                        userInputManager.SelectedCommand = new MoveUserCommand(userInputManager);
+                        actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
+                    }
+                };
+            }
+
+            if (unitType.HasSkill<SellableSkill>())
+            {
+                actions[3, 0] = new ActionDescriptor()
+                {
+                    Name = "Vendre",
+                    Texture = graphics.GetActionTexture("Sell"),
+                    Action = () => userInputManager.LaunchSell()
+                };
+            }
+
+            if (unitType.HasSkill<AttackSkill>() && unitType.HasSkill<MoveSkill>())
+            {
+                actions[3, 3] = new ActionDescriptor()
+                {
+                    Name = "Guarder",
+                    Texture = graphics.GetActionTexture("Stand Guard"),
+                    HotKey = Key.G,
+                    Action = () => userInputManager.LaunchStandGuard()
+                };
+            }
+
+            if (unitType.Upgrades.Any(u => !u.IsFree))
+            {
+                actions[2, 0] = new ActionDescriptor()
+                {
+                    Name = "Améliorer",
+                    Texture = graphics.GetActionTexture("Upgrade"),
+                    Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType))
+                };
+            }
+
+            CreateTrainButtons();
+            CreateResearchButtons();
         }
 
-        private void DisposeButtons()
+        private void CreateTrainButtons()
         {
-            for (int y = 0; y < buttons.GetLength(1); ++y)
+            TrainSkill trainSkill = unitType.TryGetSkill<TrainSkill>();
+            if (trainSkill == null) return;
+
+            var traineeTypes = userInputManager.Match.UnitTypes
+                .Where(traineeType => trainSkill.Supports(traineeType))
+                .OrderBy(traineeType => traineeType.GetBaseStat(BasicSkill.AladdiumCostStat) + traineeType.GetBaseStat(BasicSkill.AlageneCostStat));
+
+            foreach (UnitType traineeType in traineeTypes)
             {
-                for (int x = 0; x < buttons.GetLength(0); ++x)
+                Point point = FindUnusedButton();
+
+                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
+                int alageneCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
+                int foodCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.FoodCostStat);
+
+                UnitType traineeTypeForClosure = traineeType;
+                actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    if (buttons[x, y] != null)
-                    {
-                        buttons[x, y].Dispose();
-                        buttons[x, y] = null;
-                    }
+                    Name = traineeType.Name,
+                    Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
+                    Texture = graphics.GetUnitTexture(traineeType),
+                    Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
+                };
+            }
+        }
+
+        private void CreateResearchButtons()
+        {
+            ResearchSkill researchSkill = unitType.TryGetSkill<ResearchSkill>();
+            if (researchSkill == null) return;
+
+            var technologies = userInputManager.Match.TechnologyTree.Technologies
+                .Where(tech => userInputManager.LocalFaction.IsResearchable(tech) && researchSkill.Supports(tech));
+
+            foreach (Technology technology in technologies)
+            {
+                Point point = FindUnusedButton();
+                Technology technologyForClosure = technology;
+                actions[point.X, point.Y] = new ActionDescriptor()
+                {
+                    Name = technology.Name,
+                    Cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost),
+                    Texture = graphics.GetTechnologyTexture(technology),
+                    Action = () => userInputManager.LaunchResearch(technologyForClosure)
+                };
+            }
+        }
+
+        private Point FindUnusedButton()
+        {
+            int x = 0;
+            int y = 3;
+            while (actions[x, y] != null)
+            {
+                x++;
+                if (x == 4)
+                {
+                    x = 0;
+                    y--;
                 }
             }
+
+            return new Point(x, y);
+        }
+
+        private void ClearButtons()
+        {
+            for (int y = 0; y < actions.GetLength(1); ++y)
+                for (int x = 0; x < actions.GetLength(0); ++x)
+                        actions[x, y] = null;
         }
         #endregion
     }

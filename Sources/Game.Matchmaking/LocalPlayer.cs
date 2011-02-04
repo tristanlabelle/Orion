@@ -15,9 +15,6 @@ namespace Orion.Game.Matchmaking
         #region Constructors
         public LocalPlayer(string name, ColorRgb color)
             : base(name, color) { }
-
-        public LocalPlayer(ColorRgb color)
-            : this(Environment.MachineName, color) { }
         #endregion
 
         #region Serialization

@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.Networking;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 using Orion.Game.Simulation;
@@ -21,7 +18,6 @@ namespace Orion.Game.Main
     public sealed class SinglePlayerDeathmatchSetupGameState : GameState
     {
         #region Fields
-        private readonly GameGraphics graphics;
         private readonly MatchSettings matchSettings;
         private readonly PlayerSettings playerSettings;
         private readonly MatchConfigurationUI ui;
@@ -31,30 +27,43 @@ namespace Orion.Game.Main
         public SinglePlayerDeathmatchSetupGameState(GameStateManager manager)
             : base(manager)
         {
-            this.graphics = manager.Graphics;
             this.matchSettings = new MatchSettings();
             this.matchSettings.AreCheatsEnabled = true;
 
             this.playerSettings = new PlayerSettings();
-            this.playerSettings.AddPlayer(new LocalPlayer(playerSettings.AvailableColors.First()));
+            LocalPlayer localPlayer = new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First());
+            this.playerSettings.AddPlayer(localPlayer);
 
-            List<PlayerBuilder> builders = new List<PlayerBuilder>();
-            builders.Add(new PlayerBuilder("Harvesting Computer", (name, color) => new AIPlayer(name, color)));
+            this.ui = new MatchConfigurationUI(Graphics.GuiStyle)
+            {
+                NeedsReadying = false,
+            };
 
-            this.ui = new MatchConfigurationUI(matchSettings, playerSettings, builders);
-            this.ui.AddPlayerPressed += (sender, player) => playerSettings.AddPlayer(player);
-            
-            this.ui.KickPlayerPressed += (sender, player) => playerSettings.RemovePlayer(player);
-            this.ui.StartGamePressed += OnStartGamePressed;
-            this.ui.PlayerColorChanged += OnPlayerColorChanged;
-            this.ui.ExitPressed += OnExitPressed;
-        }
-        #endregion
+            this.ui.Players.Add(localPlayer, true, false);
+            this.ui.AddSettings(matchSettings);
 
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
+            this.ui.AddAIBuilder("Ramasseur", () =>
+            {
+                if (!playerSettings.AvailableColors.Any()) return;
+                AIPlayer player = new AIPlayer("Ramasseur", playerSettings.AvailableColors.First());
+                playerSettings.AddPlayer(player);
+                ui.Players.Add(player, true, true);
+            });
+
+            this.ui.PlayerKicked += (sender, player) =>
+            {
+                playerSettings.RemovePlayer(player);
+                ui.Players.Remove(player);
+            };
+
+            this.ui.PlayerColorChanged += (sender, player, newColor) =>
+            {
+                if (!playerSettings.AvailableColors.Contains(newColor)) return;
+                player.Color = newColor;
+            };
+
+            this.ui.MatchStarted += sender => StartGame();
+            this.ui.Exited += sender => Manager.Pop();
         }
         #endregion
 
@@ -62,12 +71,12 @@ namespace Orion.Game.Main
         #region Overrides
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            Graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            Graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -77,21 +86,16 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDeltaInSeconds);
         }
 
-        protected internal override void Draw(GameGraphics graphics)
+        protected internal override void Draw(GameGraphics Graphics)
         {
-            RootView.Draw(graphics.Context);
-        }
-
-        public override void Dispose()
-        {
-            ui.Dispose();
+            Graphics.DrawGui();
         }
         #endregion
 
-        private void OnStartGamePressed(MatchConfigurationUI sender)
+        private void StartGame()
         {
             Random random = new MersenneTwister(matchSettings.RandomSeed);
 
@@ -105,6 +109,7 @@ namespace Orion.Game.Main
 
             SlaveCommander localCommander = null;
             List<Commander> aiCommanders = new List<Commander>();
+
             foreach (Player player in playerSettings.Players)
             {
                 Faction faction = world.CreateFaction(Colors.GetName(player.Color), player.Color);
@@ -141,18 +146,8 @@ namespace Orion.Game.Main
             commandPipeline.AddCommander(localCommander);
 
             GameState targetGameState = new DeathmatchGameState(
-                Manager, graphics, match, commandPipeline, localCommander);
+                Manager, match, commandPipeline, localCommander);
             Manager.Push(targetGameState);
-        }
-
-        private void OnPlayerColorChanged(MatchConfigurationUI ui, Player player, ColorRgb color)
-        {
-            player.Color = color;
-        }
-
-        private void OnExitPressed(MatchConfigurationUI sender)
-        {
-            Manager.Pop();
         }
         #endregion
     }

@@ -36,7 +36,7 @@ namespace Orion.Engine
 {
     /// <summary>
     /// The Mersenne Twister is a portable random number generator with a high period and decent performances (or at least we'll hope so,
-    /// since we can't use vector instructions with the .net framework). Its prototype is slightly similar to the System.Random class.
+    /// since we can't use vector instructions with the .net framework).
     /// </summary>
     public sealed class MersenneTwister : Random
     {
@@ -153,13 +153,16 @@ namespace Orion.Engine
             /// <returns>The shifted vector</returns>
             public static Vector128 operator <<(Vector128 vec, int shift)
             {
-                long high = vec.a << 32 | vec.b;
-                long low = vec.c << 32 | vec.d;
-                high <<= shift;
-                high |= low >> (sizeof(long) * 8 - shift);
-                low <<= shift;
+                unchecked
+                {
+                    long high = vec.a << 32 | vec.b;
+                    long low = vec.c << 32 | vec.d;
+                    high <<= shift;
+                    high |= low >> (sizeof(long) * 8 - shift);
+                    low <<= shift;
 
-                return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                    return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                }
             }
 
             /// <summary>
@@ -170,13 +173,16 @@ namespace Orion.Engine
             /// <returns>The shifted vector</returns>
             public static Vector128 operator >>(Vector128 vec, int shift)
             {
-                long high = vec.a << 32 | vec.b;
-                long low = vec.c << 32 | vec.d;
-                low >>= shift;
-                low |= high << (sizeof(long) * 8 - shift);
-                high >>= shift;
+                unchecked
+                {
+                    long high = vec.a << 32 | vec.b;
+                    long low = vec.c << 32 | vec.d;
+                    low >>= shift;
+                    low |= high << (sizeof(long) * 8 - shift);
+                    high >>= shift;
 
-                return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                    return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                }
             }
         }
         #endregion
@@ -251,7 +257,7 @@ namespace Orion.Engine
             {
                 int prevIndex = i - 1;
                 uint prev = state[prevIndex / 4][prevIndex % 4];
-                state[i / 4][i % 4] = 1812433253 * (prev ^ (prev >> 30)) + 1;
+                state[i / 4][i % 4] = unchecked(1812433253 * (prev ^ (prev >> 30)) + 1);
             }
             vectorIndex = ArraySize32;
             CertifyPeriod();

@@ -50,7 +50,7 @@ namespace Orion.Game.Simulation.IO
             IEnumerable<ResourceNode> concreteResourceNodes = world.Entities.OfType<ResourceNode>();
             foreach (ResourceNode node in concreteResourceNodes)
             {
-                ResourceNodeTemplate template = new ResourceNodeTemplate(node.Type, node.Position, node.AmountRemaining);
+                ResourceNodeTemplate template = new ResourceNodeTemplate(node.Type, node.Position, node.RemainingAmount);
                 resourceNodes.Add(template);
             }
 
@@ -200,14 +200,14 @@ namespace Orion.Game.Simulation.IO
             {
                 writer.Write((short)node.Location.X);
                 writer.Write((short)node.Location.Y);
-                writer.Write(node.AmountRemaining);
+                writer.Write(node.RemainingAmount);
             }
 
             foreach (ResourceNodeTemplate node in AlageneNodes)
             {
                 writer.Write((short)node.Location.X);
                 writer.Write((short)node.Location.Y);
-                writer.Write(node.AmountRemaining);
+                writer.Write(node.RemainingAmount);
             }
 
             foreach (List<UnitTemplate> units in unitsByFaction)

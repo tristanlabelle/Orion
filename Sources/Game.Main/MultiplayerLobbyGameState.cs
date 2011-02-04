@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Linq;
-using System.Net.Sockets;
-using Orion.Engine;
-using Orion.Engine.Gui;
-using Orion.Engine.Networking;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Gui;
-using Orion.Game.Matchmaking.Networking;
-using Orion.Game.Matchmaking.Networking.Packets;
 using System.Diagnostics;
 using System.Net;
+using Orion.Engine;
+using Orion.Engine.Networking;
+using Orion.Game.Matchmaking.Networking;
+using Orion.Game.Presentation;
+using Orion.Game.Presentation.Gui;
 
 namespace Orion.Game.Main
 {
@@ -33,25 +29,19 @@ namespace Orion.Game.Main
             this.graphics = manager.Graphics;
             this.networking = new GameNetworking();
             this.lobby = new MultiplayerLobby(this.networking);
-            this.ui = new MultiplayerLobbyUI(Dns.GetHostName());
+            this.ui = new MultiplayerLobbyUI(graphics);
+            this.ui.PlayerName = Dns.GetHostName();
 
             this.lobby.Disable();
 
-            this.lobby.MatchesChanged += OnLobbyMatchesChanged;
-            this.lobby.JoinResponseReceived += OnJoinResponseReceived;
+            this.lobby.MatchesChanged += sender => RefreshMatches();
+            this.lobby.JoinResponseReceived += (sender, response) => HandleJoinResponse(response);
 
-            this.ui.BackPressed += OnBackPressed;
-            this.ui.HostPressed += OnHostPressed;
-            this.ui.JoinPressed += OnJoinPressed;
-            this.ui.JoinByIpPressed += OnJoinByIPPressed;
-            this.ui.PingPressed += OnPingPressed;
-        }
-        #endregion
-
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
+            this.ui.Exited += sender => Manager.Pop();
+            this.ui.Joined += (sender, match) => Join(match.EndPoint);
+            this.ui.Hosted += (sender, name) => Host(name);
+            this.ui.JoinedByIP += (sender, endPoint) => Join(endPoint);
+            this.ui.PingedIP += (sender, endPoint) => Ping(endPoint);
         }
         #endregion
 
@@ -65,79 +55,62 @@ namespace Orion.Game.Main
         {
             lobby.Disable();
             ui.ClearMatches();
-            RootView.Children.Remove(ui);
+            graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
         {
-            RootView.Children.Add(ui);
-            ui.IsEnabled = true;
+            graphics.UIManager.Content = ui;
             lobby.Enable();
         }
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
             lobby.Update();
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            graphics.UpdateGui(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
+            graphics.DrawGui();
         }
 
         public override void Dispose()
         {
             OnShadowed();
-            ui.Dispose();
             networking.Dispose();
         }
 
-        private void OnLobbyMatchesChanged(MultiplayerLobby sender)
+        private void RefreshMatches()
         {
             ui.ClearMatches();
             foreach (AdvertizedMatch match in lobby.Matches)
                 ui.AddMatch(match);
         }
 
-        private void OnJoinResponseReceived(MultiplayerLobby sender, JoinResponseEventArgs args)
+        private void HandleJoinResponse(JoinResponseEventArgs args)
         {
             if (args.WasAccepted)
             {
                 var gameState = MultiplayerDeathmatchSetupGameState.CreateAsClient(
-                    Manager, graphics, networking, args.HostEndPoint);
+                    Manager, networking, ui.PlayerName, args.HostEndPoint);
                 Manager.Push(gameState);
             }
             else
             {
-                Instant.DisplayAlert(ui, "Impossible de rejointer {0}.".FormatInvariant(args.HostEndPoint),
-                    () => ui.IsEnabled = true);
+                Debug.Fail("Failed to join " + args.HostEndPoint);
+                ui.HasEnabledFlag = true;
             }
         }
 
-        private void OnBackPressed(MultiplayerLobbyUI sender)
+        private void Host(string matchName)
         {
-            Manager.Pop();
-        }
-
-        private void OnHostPressed(MultiplayerLobbyUI sender, string matchName)
-        {
-            var gameState = MultiplayerDeathmatchSetupGameState.CreateAsHost(Manager, graphics, networking, matchName);
+            var gameState = MultiplayerDeathmatchSetupGameState.CreateAsHost(
+                Manager, networking, matchName, ui.PlayerName);
             Manager.Push(gameState);
         }
 
-        private void OnJoinPressed(MultiplayerLobbyUI sender, AdvertizedMatch match)
-        {
-            Join(match.EndPoint);
-        }
-
-        private void OnJoinByIPPressed(MultiplayerLobbyUI sender, IPv4EndPoint endPoint)
-        {
-            if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
-            Join(endPoint);
-        }
-
-        private void OnPingPressed(MultiplayerLobbyUI sender, IPv4EndPoint endPoint)
+        private void Ping(IPv4EndPoint endPoint)
         {
             if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
             networking.Ping(endPoint);
@@ -145,8 +118,9 @@ namespace Orion.Game.Main
 
         private void Join(IPv4EndPoint endPoint)
         {
-            ui.IsEnabled = false;
-            lobby.BeginJoining(endPoint);
+            if (endPoint.Port == 0) endPoint = new IPv4EndPoint(endPoint.Address, networking.PortNumber);
+            ui.HasEnabledFlag = false;
+            lobby.BeginJoining(endPoint, ui.PlayerName);
         }
         #endregion
     }

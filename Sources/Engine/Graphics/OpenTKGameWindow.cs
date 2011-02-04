@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using OpenTK.Platform;
-using Orion.Engine.Gui;
 using Orion.Engine.Input;
 using TKMouseButton = OpenTK.Input.MouseButton;
 
@@ -141,6 +135,7 @@ namespace Orion.Engine.Graphics
 
             window.Width = resolution.Width;
             window.Height = resolution.Height;
+            graphicsContext.ViewportSize = resolution;
 
             if (window.WindowState != WindowState.Fullscreen)
                 window.WindowState = WindowState.Fullscreen;
@@ -172,8 +167,8 @@ namespace Orion.Engine.Graphics
 
         private void RaiseKeyboardEvent(KeyboardEventType type, Key key)
         {
-            Keys keys;
-            if (!keyToKeys.TryGetValue(key, out keys))
+            Keys keys = Input.InputEnums.GetFormsKeys(key);
+            if (keys == Keys.None)
             {
                 string message = "OpenTK.Input.Key {0} has no mapping to a System.Windows.Forms.Keys value, key ignored."
                     .FormatInvariant(key);
@@ -248,7 +243,7 @@ namespace Orion.Engine.Graphics
             Orion.Engine.Input.MouseButton button, int clickCount, float wheelDelta)
         {
             Orion.Engine.Input.MouseEventArgs args = new Orion.Engine.Input.MouseEventArgs(
-                new Vector2(clientPoint.X, ClientAreaSize.Height - clientPoint.Y), button, clickCount, wheelDelta);
+                new Vector2(clientPoint.X, clientPoint.Y), button, clickCount, wheelDelta);
             InputEvent inputEvent = InputEvent.CreateMouse(type, args);
             InputReceived.Raise(this, inputEvent);
         }
@@ -256,7 +251,7 @@ namespace Orion.Engine.Graphics
 
         private void OnWindowResized(object sender, EventArgs e)
         {
-            GL.Viewport(0, 0, ClientAreaSize.Width, ClientAreaSize.Height);
+            graphicsContext.ViewportSize = new Size(ClientAreaSize.Width, ClientAreaSize.Height);
             Resized.Raise(this);
         }
 
@@ -267,96 +262,6 @@ namespace Orion.Engine.Graphics
             Closing.Raise(this);
         }
         #endregion
-        #endregion
-
-        #region Key->Keys Conversion
-        private static readonly Dictionary<Key, Keys> keyToKeys;
-
-        static OpenTKGameWindow()
-        {
-            keyToKeys = new Dictionary<Key, Keys>();
-
-            // The following is taken from OpenTK's source (and reversed)
-            keyToKeys.Add(Key.Escape, Keys.Escape);
-
-            // Function keys
-            for (int i = 0; i < 24; i++)
-            {
-                keyToKeys.Add(Key.F1 + i, (Keys)((int)Keys.F1 + i));
-            }
-
-            // Number keys (0-9)
-            for (int i = 0; i <= 9; i++)
-            {
-                keyToKeys.Add(Key.Number0 + i, (Keys)(0x30 + i));
-            }
-
-            // Letters (A-Z)
-            for (int i = 0; i < 26; i++)
-            {
-                keyToKeys.Add(Key.A + i, (Keys)(0x41 + i));
-            }
-
-            keyToKeys.Add(Key.Tab, Keys.Tab);
-            keyToKeys.Add(Key.CapsLock, Keys.Capital);
-            keyToKeys.Add(Key.ControlLeft, Keys.ControlKey);
-            keyToKeys.Add(Key.ShiftLeft, Keys.ShiftKey);
-            keyToKeys.Add(Key.WinLeft, Keys.LWin);
-            keyToKeys.Add(Key.AltLeft, Keys.Menu);
-            keyToKeys.Add(Key.Space, Keys.Space);
-            keyToKeys.Add(Key.AltRight, Keys.Menu);
-            keyToKeys.Add(Key.WinRight, Keys.RWin);
-            keyToKeys.Add(Key.Menu, Keys.Apps);
-            keyToKeys.Add(Key.ControlRight, Keys.ControlKey);
-            keyToKeys.Add(Key.ShiftRight, Keys.ShiftKey);
-            keyToKeys.Add(Key.Enter, Keys.Return);
-            keyToKeys.Add(Key.BackSpace, Keys.Back);
-
-            keyToKeys.Add(Key.Semicolon, Keys.Oem1);      // Varies by keyboard, ;: on Win2K/US
-            keyToKeys.Add(Key.Slash, Keys.Oem2);          // Varies by keyboard, /? on Win2K/US
-            keyToKeys.Add(Key.Tilde, Keys.Oem3);          // Varies by keyboard, `~ on Win2K/US
-            keyToKeys.Add(Key.BracketLeft, Keys.Oem4);    // Varies by keyboard, [{ on Win2K/US
-            keyToKeys.Add(Key.BackSlash, Keys.Oem5);      // Varies by keyboard, \| on Win2K/US
-            keyToKeys.Add(Key.BracketRight, Keys.Oem6);   // Varies by keyboard, ]} on Win2K/US
-            keyToKeys.Add(Key.Quote, Keys.Oem7);          // Varies by keyboard, '" on Win2K/US
-            keyToKeys.Add(Key.Plus, Keys.Oemplus);        // Invariant: +
-            keyToKeys.Add(Key.Comma, Keys.Oemcomma);      // Invariant: ,
-            keyToKeys.Add(Key.Minus, Keys.OemMinus);      // Invariant: -
-            keyToKeys.Add(Key.Period, Keys.OemPeriod);    // Invariant: .
-
-            keyToKeys.Add(Key.Home, Keys.Home);
-            keyToKeys.Add(Key.End, Keys.End);
-            keyToKeys.Add(Key.Delete, Keys.Delete);
-            keyToKeys.Add(Key.PageUp, Keys.Prior);
-            keyToKeys.Add(Key.PageDown, Keys.Next);
-            keyToKeys.Add(Key.PrintScreen, Keys.Print);
-            keyToKeys.Add(Key.Pause, Keys.Pause);
-            keyToKeys.Add(Key.NumLock, Keys.NumLock);
-
-            keyToKeys.Add(Key.ScrollLock, Keys.Scroll);
-            keyToKeys.Add(Key.Clear, Keys.Clear);
-            keyToKeys.Add(Key.Insert, Keys.Insert);
-
-            keyToKeys.Add(Key.Sleep, Keys.Sleep);
-
-            // Keypad
-            for (int i = 0; i <= 9; i++)
-            {
-                keyToKeys.Add(Key.Keypad0 + i, (Keys)((int)Keys.NumPad0 + i));
-            }
-
-            keyToKeys.Add(Key.KeypadDecimal, Keys.Decimal);
-            keyToKeys.Add(Key.KeypadAdd, Keys.Add);
-            keyToKeys.Add(Key.KeypadSubtract, Keys.Subtract);
-            keyToKeys.Add(Key.KeypadDivide, Keys.Divide);
-            keyToKeys.Add(Key.KeypadMultiply, Keys.Multiply);
-
-            // Navigation
-            keyToKeys.Add(Key.Up, Keys.Up);
-            keyToKeys.Add(Key.Down, Keys.Down);
-            keyToKeys.Add(Key.Left, Keys.Left);
-            keyToKeys.Add(Key.Right, Keys.Right);
-        }
         #endregion
     }
 }

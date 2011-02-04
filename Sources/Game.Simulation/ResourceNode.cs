@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation
         private readonly ResourceType type;
         private readonly int totalAmount;
         private readonly Point position;
-        private int amountRemaining;
+        private int remainingAmount;
         #endregion
 
         #region Constructors
@@ -30,9 +30,16 @@ namespace Orion.Game.Simulation
 
             this.type = type;
             this.totalAmount = amount;
-            this.amountRemaining = amount;
+            this.remainingAmount = amount;
             this.position = position;
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the amount remaining in the node changes.
+        /// </summary>
+        public event Action<ResourceNode> RemainingAmountChanged;
         #endregion
 
         #region Properties
@@ -46,10 +53,23 @@ namespace Orion.Game.Simulation
             get { return totalAmount; }
         }
 
-        public int AmountRemaining
+        /// <summary>
+        /// Accesses the amount of resource which remains in this node.
+        /// </summary>
+        public int RemainingAmount
         {
-            get { return amountRemaining; }
-            set { amountRemaining = value; }
+            get { return remainingAmount; }
+            set
+            {
+                if (value == remainingAmount) return;
+
+                Argument.EnsurePositive(value, "RemainingAmount");
+
+                remainingAmount = value;
+                RemainingAmountChanged.Raise(this);
+
+                if (remainingAmount == 0) Die();
+            }
         }
 
         public override Size Size
@@ -71,19 +91,7 @@ namespace Orion.Game.Simulation
         #region Methods
         public void Harvest(int amount)
         {
-            if (amount > amountRemaining)
-            {
-                throw new ArgumentException(
-                    "Cannot harvest {0} points when only {1} remain."
-                    .FormatInvariant(amount, amountRemaining), "amount");
-            }
-
-            amountRemaining -= amount;
-            if (amountRemaining <= 0)
-            {
-                amountRemaining = 0;
-                Die();
-            }
+            RemainingAmount -= amount;
         }
 
         public override string ToString()

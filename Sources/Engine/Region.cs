@@ -139,7 +139,10 @@ namespace Orion.Engine
         }
         #endregion
 
-        public int Area
+        /// <summary>
+        /// Gets the area of this region.
+        /// </summary>
+        public long Area
         {
             get { return size.Area; }
         }
@@ -266,6 +269,17 @@ namespace Orion.Engine
         {
             return (point.X == MinX - 1 || point.X == ExclusiveMaxX)
                 && (point.Y == MinY - 1 || point.Y == ExclusiveMaxY);
+        }
+
+        /// <summary>
+        /// Gets the coordinates of a point in this rectangle's coordinate system,
+        /// where (0,0) is the minimum corner and (1,1) is the maximum corner.
+        /// </summary>
+        /// <param name="point">The point to be normalized.</param>
+        /// <returns>The resulting normalized point.</returns>
+        public Vector2 Normalize(Point point)
+        {
+            return new Vector2((point.X - MinX) / (float)Width, (point.Y - MinY) / (float)Height);
         }
 
         /// <summary>
@@ -446,6 +460,11 @@ namespace Orion.Engine
         public static explicit operator Region(Size size)
         {
             return new Region(size);
+        }
+
+        public static implicit operator Rectangle(Region region)
+        {
+            return new Rectangle(region.MinX, region.MinY, region.Width, region.Height);
         }
         #endregion
         #endregion

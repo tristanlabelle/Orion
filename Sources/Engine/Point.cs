@@ -91,6 +91,16 @@ namespace Orion.Engine
             return new Point((int)vector.X, (int)vector.Y);
         }
 
+        public static Point Add(Point a, Point b)
+        {
+            return new Point(a.X + b.X, a.Y + b.Y);
+        }
+
+        public static Point Subtract(Point a, Point b)
+        {
+            return new Point(a.X - b.X, a.Y - b.Y);
+        }
+
         public static bool Equals(Point a, Point b)
         {
             return a.Equals(b);
@@ -106,6 +116,16 @@ namespace Orion.Engine
         public static bool operator !=(Point a, Point b)
         {
             return !Equals(a, b);
+        }
+
+        public static Point operator +(Point a, Point b)
+        {
+            return Add(a, b);
+        }
+
+        public static Point operator -(Point a, Point b)
+        {
+            return Subtract(a, b);
         }
 
         public static explicit operator Point(Vector2 vector)

@@ -39,7 +39,7 @@ namespace Orion.Game.Simulation
             {
                 Point nodeLocation = node.Location;
                 ResourceNode concreteNode = world.Entities.CreateResourceNode(node.ResourceType, nodeLocation);
-                concreteNode.AmountRemaining = node.AmountRemaining;
+                concreteNode.RemainingAmount = node.RemainingAmount;
             }
 
             // place units

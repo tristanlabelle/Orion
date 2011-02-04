@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Gui;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Gui;
 
@@ -15,7 +16,6 @@ namespace Orion.Game.Main
     public sealed class MainMenuGameState : GameState
     {
         #region Fields
-        private readonly GameGraphics graphics;
         private readonly MainMenuUI ui;
         #endregion
 
@@ -23,33 +23,24 @@ namespace Orion.Game.Main
         public MainMenuGameState(GameStateManager manager)
             : base(manager)
         {
-            this.graphics = manager.Graphics;
-            this.ui = new MainMenuUI(graphics);
-            this.ui.SinglePlayerSelected += OnSinglePlayerSelected;
-            this.ui.MultiplayerSelected += OnMultiplayerSelected;
-            this.ui.TowerDefenseSelected += OnTowerDefenseSelected;
-            this.ui.TypingDefenseSelected += OnTypingDefenseSelected;
-            this.ui.ViewReplaySelected += OnViewReplaySelected;
-            this.ui.QuitGameSelected += OnQuitGameSelected;
-        }
-        #endregion
+            ui = new MainMenuUI(Graphics.GuiStyle);
 
-        #region Properties
-        public RootView RootView
-        {
-            get { return graphics.RootView; }
+            ui.SinglePlayerClicked += sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager));
+            ui.MultiplayerClicked += sender => Manager.Push(new MultiplayerLobbyGameState(Manager));
+            ui.ReplayClicked += sender => Manager.Push(new ReplayBrowserGameState(Manager));
+            ui.QuitClicked += sender => Manager.Pop();
         }
         #endregion
 
         #region Methods
         protected internal override void OnEntered()
         {
-            RootView.Children.Add(ui);
+            Graphics.UIManager.Content = ui;
         }
 
         protected internal override void OnShadowed()
         {
-            RootView.Children.Remove(ui);
+            Graphics.UIManager.Content = null;
         }
 
         protected internal override void OnUnshadowed()
@@ -59,47 +50,12 @@ namespace Orion.Game.Main
 
         protected internal override void Update(float timeDeltaInSeconds)
         {
-            graphics.UpdateRootView(timeDeltaInSeconds);
+            Graphics.UpdateGui(timeDeltaInSeconds);
         }
 
         protected internal override void Draw(GameGraphics graphics)
         {
-            RootView.Draw(graphics.Context);
-        }
-
-        public override void Dispose()
-        {
-            ui.Dispose();
-        }
-
-        private void OnSinglePlayerSelected(MainMenuUI sender)
-        {
-            Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager));
-        }
-
-        private void OnMultiplayerSelected(MainMenuUI sender)
-        {
-            Manager.Push(new MultiplayerLobbyGameState(Manager));
-        }
-
-        private void OnTowerDefenseSelected(MainMenuUI sender)
-        {
-            Manager.Push(new TowerDefenseGameState(Manager));
-        }
-
-        private void OnTypingDefenseSelected(MainMenuUI sender)
-        {
-            Manager.Push(new TypingDefenseGameState(Manager));
-        }
-
-        private void OnViewReplaySelected(MainMenuUI sender)
-        {
-            Manager.Push(new ReplayBrowserGameState(Manager));
-        }
-
-        private void OnQuitGameSelected(MainMenuUI sender)
-        {
-            Manager.Pop();
+            graphics.DrawGui();
         }
         #endregion
     }

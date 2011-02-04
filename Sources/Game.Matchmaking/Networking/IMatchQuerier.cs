@@ -7,16 +7,19 @@ using System.Collections.ObjectModel;
 
 namespace Orion.Game.Matchmaking.Networking
 {
+    /// <summary>
+    /// Interface for objects which can provide matches.
+    /// </summary>
     public interface IMatchQuerier : IDisposable
     {
         #region Properties
         /// <summary>
-        /// Gets the read-only list of matches offered by this IMatchFinder.
+        /// Gets the read-only list of matches offered by this <see cref="IMatchQuerier"/>.
         /// </summary>
-        ReadOnlyCollection<AdvertizedMatch> Matches { get; }
+        ICollection<AdvertizedMatch> Matches { get; }
 
         /// <summary>
-        /// Gets or sets the activity state of this IMatchFinder.
+        /// Gets or sets the activity state of this <see cref="IMatchQuerier"/>.
         /// </summary>
         /// <remarks>
         /// A disabled IMatchFinder does nothing to find matches, and throws an
@@ -25,7 +28,7 @@ namespace Orion.Game.Matchmaking.Networking
         bool IsEnabled { get; set; }
 
         /// <summary>
-        /// Gets the tag of this IMatchFinder.
+        /// Gets the tag of this <see cref="IMatchQuerier"/>.
         /// </summary>
         /// <remarks>
         /// The tag is indented to differentiate the source of matches. It can be displayed
@@ -37,7 +40,7 @@ namespace Orion.Game.Matchmaking.Networking
 
         #region Methods
         /// <summary>
-        /// Updates this IMatchFinder so it refreshes its internal list of matches, or at
+        /// Updates this <see cref="IMatchQuerier"/> so it refreshes its internal list of matches, or at
         /// least tries to do so.
         /// </summary>
         /// <returns></returns>

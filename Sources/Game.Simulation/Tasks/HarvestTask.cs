@@ -109,7 +109,7 @@ namespace Orion.Game.Simulation.Tasks
                     return;
                 }
 
-                if (node.AmountRemaining > 0)
+                if (node.RemainingAmount > 0)
                 {
                     node.Harvest(1);
                     --amountAccumulator;

@@ -340,6 +340,9 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
+            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no Spatial component!");
+            Spatial spatialComponent = unit.GetComponent<Spatial>();
+            spatialComponent.Moved += (s, oldPos, newPos) => OnUnitMoved(unit, oldPos, newPos);
 
             usedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
 

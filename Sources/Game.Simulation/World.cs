@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;
 using Orion.Game.Simulation.Technologies;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -322,6 +323,10 @@ namespace Orion.Game.Simulation
         /// <remarks>Invoked by World.EntityCollection.</remarks>
         private void OnEntityAdded(Entity entity)
         {
+            Debug.Assert(entity.HasComponent<Spatial>(), "Entity has no Spatial component!");
+            Spatial spatial = entity.GetComponent<Spatial>();
+            spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
+
             EntityAdded.Raise(this, entity);
         }
 

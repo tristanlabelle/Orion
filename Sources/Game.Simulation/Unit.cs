@@ -108,8 +108,6 @@ namespace Orion.Game.Simulation
             // components stuff
             Spatial spatial = (Spatial)meta.GetComponent<Spatial>().Clone(this);
             spatial.Position = position;
-#warning Transitional kludge
-            spatial.Moved += (s, oldPos, newPos) => OnMoved(oldPos, newPos);
             AddComponent(spatial);
 
             this.faction = faction;
@@ -126,19 +124,9 @@ namespace Orion.Game.Simulation
 
         #region Events
         /// <summary>
-        /// Raised when this <see cref="Unit"/> gets damaged or healed.
-        /// </summary>
-        public event Action<Unit> DamageChanged;
-
-        /// <summary>
         /// Raised when the construction of this <see cref="Unit"/> is completed.
         /// </summary>
         public event Action<Unit> ConstructionCompleted;
-
-        /// <summary>
-        /// Raised when this <see cref="Unit"/> hits another <see cref="Unit"/>.
-        /// </summary>
-        public event Action<Unit, HitEventArgs> Hitting;
         #endregion
 
         #region Properties
@@ -312,7 +300,6 @@ namespace Orion.Game.Simulation
 
                 damage = value;
 
-                DamageChanged.Raise(this);
                 if (damage == MaxHealth) Die();
             }
         }
@@ -542,12 +529,6 @@ namespace Orion.Game.Simulation
         {
             return Position;
         }
-
-        protected override void OnMoved(Vector2 oldPosition, Vector2 newPosition)
-        {
-            faction.OnUnitMoved(this, oldPosition, newPosition);
-            base.OnMoved(oldPosition, newPosition);
-        }
         #endregion
 
         #region Hitting
@@ -628,8 +609,6 @@ namespace Orion.Game.Simulation
         private void OnHitting(Unit target, float damage)
         {
             HitEventArgs args = new HitEventArgs(this, target, damage, World.LastSimulationStep.TimeInSeconds);
-
-            Hitting.Raise(this, args);
 
             World.OnUnitHitting(args);
         }

@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation
         private readonly Handle handle;
         private bool isDead;
 
-        private readonly List<Component> components = new List<Component>();
+        private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
         #endregion
 
         #region Constructors
@@ -182,76 +182,77 @@ namespace Orion.Game.Simulation
         #region Components
         public bool HasComponent<T>() where T : Component
         {
-            return components.OfType<T>().Count() > 0;
+            return HasComponent(typeof(T));
         }
 
         public bool HasComponent(Type componentType)
         {
-            return components.Count(c => c.GetType() == componentType) > 0;
+            return components.ContainsKey(componentType);
         }
 
         public Component GetComponent(Type type)
         {
-            return components.First(c => c.GetType() == type);
+            return components[type];
         }
 
         public T GetComponent<T>() where T : Component
         {
-            return components.OfType<T>().First();
+            return (T)components[typeof(T)];
         }
 
         public Component GetComponentOrNull(Type type)
         {
-            return components.FirstOrDefault(c => c.GetType() == type);
+            Component result;
+            if (!components.TryGetValue(type, out result))
+                return null;
+            return result;
         }
 
         public T GetComponentOrNull<T>() where T : Component
         {
-            return components.OfType<T>().FirstOrDefault();
+            return (T)GetComponentOrNull(typeof(T));
         }
 
         public IEnumerable<Component> GetComponents()
         {
-            return components;
+            return components.Values;
         }
 
         public void AddComponent(Component component)
         {
             Type componentType = component.GetType();
-            if (components.Count(c => c.GetType() == componentType) > 0)
+            if (components.ContainsKey(componentType))
                 throw new ArgumentException("component");
-            components.Add(component);
+            components.Add(componentType, component);
         }
 
         public void RemoveComponent<T>() where T : Component
         {
-            Component instance = GetComponent<T>();
-            components.Remove(instance);
+            RemoveComponent(typeof(T));
         }
 
         public void RemoveComponent(Type componentType)
         {
-            Component instance = GetComponent(componentType);
-            components.Remove(instance);
+            components.Remove(componentType);
         }
 
         public void RemoveComponent(Component component)
         {
-            components.Remove(component);
+            components.Remove(component.GetType());
         }
 
         public Stat GetStat(EntityStat stat)
         {
             if (stat.NumericType == StatType.Integer)
-                return new Stat(components.Sum(c => c.GetStatBonus(stat).IntegerValue));
+                return new Stat(GetComponents().Sum(c => c.GetStatBonus(stat).IntegerValue));
             else
-                return new Stat(components.Sum(c => c.GetStatBonus(stat).RealValue));
+                return new Stat(GetComponents().Sum(c => c.GetStatBonus(stat).RealValue));
         }
 
         public Entity CloneIntoExistence(World world, Handle handle)
         {
             Entity clone = new Entity(world, handle);
-            foreach (Component component in components)
+            foreach (Component component in GetComponents())
             {
                 Component componentCopy = component.Clone(clone);
                 clone.AddComponent(componentCopy);

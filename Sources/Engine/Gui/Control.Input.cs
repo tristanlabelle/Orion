@@ -160,6 +160,15 @@ namespace Orion.Engine.Gui
                 return true;
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating if this control
+        /// can handle events even when it is disabled.
+        /// </summary>
+        protected virtual bool HandlesEventsWhenDisabled
+        {
+            get { return false; }
+        }
         #endregion
         #endregion
 
@@ -168,6 +177,8 @@ namespace Orion.Engine.Gui
         protected internal bool HandleMouseEvent(MouseEvent @event)
         {
             Debug.Assert(Visibility == Visibility.Visible);
+
+            if (!HandlesEventsWhenDisabled && !IsEnabled) return false;
 
             switch (@event.Type)
             {
@@ -213,6 +224,8 @@ namespace Orion.Engine.Gui
         {
             Debug.Assert(Visibility == Visibility.Visible);
 
+            if (!HandlesEventsWhenDisabled && !IsEnabled) return false;
+
             return OnKeyEvent(@event)
                 | keyEvent.Raise(this, @event)
                 | IsKeyEventSink;
@@ -221,6 +234,8 @@ namespace Orion.Engine.Gui
         internal bool HandleCharacterTyped(char character)
         {
             Debug.Assert(Visibility == Visibility.Visible);
+
+            if (!HandlesEventsWhenDisabled && !IsEnabled) return false;
 
             return OnCharacterTyped(character)
                 | characterTypedEvent.Raise(this, character);

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Font = System.Drawing.Font;
-using System.Reflection;
 using Orion.Engine.Gui.Adornments;
+using Font = System.Drawing.Font;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -24,6 +24,9 @@ namespace Orion.Game.Presentation.Gui
 
         private readonly GraphicsContext graphicsContext;
         private readonly TextureManager textureManager;
+        private readonly OrionButtonAdornment buttonAdornment;
+        private readonly OrionCheckBoxButtonAdornment checkBoxButtonAdornment;
+        private readonly BorderTextureAdornment comboBoxAdornment;
         #endregion
 
         #region Constructors
@@ -34,6 +37,9 @@ namespace Orion.Game.Presentation.Gui
 
             this.graphicsContext = graphicsContext;
             this.textureManager = textureManager;
+            this.buttonAdornment = new OrionButtonAdornment(this);
+            this.checkBoxButtonAdornment = new OrionCheckBoxButtonAdornment(this);
+            this.comboBoxAdornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
         }
         #endregion
 
@@ -198,9 +204,8 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(TextField textField)
         {
-            OrionTextFieldAdornment adornment = OrionTextFieldAdornment.Instance;
-            textField.Adornment = adornment;
-            textField.Padding = adornment.Padding;
+            textField.Adornment = OrionTextFieldAdornment.Instance;
+            textField.Padding = OrionTextFieldAdornment.Instance.Padding;
             textField.Font = font;
             textField.TextColor = Colors.Black;
             textField.DisabledTextColor = Colors.Gray;
@@ -208,17 +213,14 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(Button button)
         {
-            Texture upTexture = GetGuiTexture("Button_Up");
-
-            var adornment = new OrionButtonAdornment(this);
-            button.Adornment = adornment;
-            button.Padding = adornment.Padding;
-            button.MinSize = adornment.MinSize;
+            button.Adornment = buttonAdornment;
+            button.Padding = buttonAdornment.Padding;
+            button.MinSize = buttonAdornment.MinSize;
         }
 
         private void ApplySpecificStyle(CheckBox checkBox)
         {
-            checkBox.Button.Adornment = new OrionCheckBoxButtonAdornment(this);
+            checkBox.Button.Adornment = checkBoxButtonAdornment;
             checkBox.Button.SetSize(20, 20);
         }
         
@@ -231,10 +233,8 @@ namespace Orion.Game.Presentation.Gui
 
         private void ApplySpecificStyle(ComboBox comboBox)
         {
-            var adornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
-
             Button button = comboBox.Button;
-            button.Adornment = adornment;
+            button.Adornment = comboBoxAdornment;
             button.MinWidth = 20;
             button.MinHeight = 20;
             button.Content = new ImageBox()
@@ -245,11 +245,11 @@ namespace Orion.Game.Presentation.Gui
             button.PreDrawing += OnComboBoxButtonPreDrawing;
 
             ControlViewport selectedItemViewport = comboBox.SelectedItemViewport;
-            selectedItemViewport.Adornment = adornment;
+            selectedItemViewport.Adornment = comboBoxAdornment;
             selectedItemViewport.Padding = 4;
             selectedItemViewport.MinWidth = 20;
 
-            comboBox.DropDown.Adornment = adornment;
+            comboBox.DropDown.Adornment = comboBoxAdornment;
             comboBox.DropDown.Padding = 4;
             ApplySpecificStyle(comboBox.ListBox);
         }

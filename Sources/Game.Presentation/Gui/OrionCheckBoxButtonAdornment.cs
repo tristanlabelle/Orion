@@ -14,9 +14,9 @@ namespace Orion.Game.Presentation.Gui
     public sealed class OrionCheckBoxButtonAdornment : IAdornment
     {
         #region Fields
-        private readonly Texture uncheckedTexture;
-        private readonly Texture checkedTexture;
-        private readonly Texture disabledTexture;
+        private readonly Texture buttonTexture;
+        private readonly Texture checkTexture;
+        private readonly Texture disabledCheckTexture;
         #endregion
 
         #region Constructors
@@ -24,9 +24,9 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(renderer, "renderer");
 
-            uncheckedTexture = renderer.GetTexture("Gui/CheckBox_Unchecked");
-            checkedTexture = renderer.GetTexture("Gui/CheckBox_Checked");
-            disabledTexture = renderer.GetTexture("Gui/CheckBox_Disabled");
+            buttonTexture = renderer.GetTexture("Gui/CheckBox_Button");
+            checkTexture = renderer.GetTexture("Gui/CheckBox_Check");
+            disabledCheckTexture = renderer.GetTexture("Gui/CheckBox_Check_Disabled");
         }
         #endregion
 
@@ -39,9 +39,14 @@ namespace Orion.Game.Presentation.Gui
             CheckBox checkBox = button.Parent as CheckBox;
             if (checkBox == null) return;
 
-            Texture texture = checkBox.IsChecked ? checkedTexture : uncheckedTexture;
-            var sprite = new GuiSprite(button.Rectangle, texture);
+            var sprite = new GuiSprite(button.Rectangle, buttonTexture);
             renderer.DrawSprite(ref sprite);
+
+            if (checkBox.IsChecked)
+            {
+                sprite = new GuiSprite(button.Rectangle, button.IsEnabled ? checkTexture : disabledCheckTexture);
+                renderer.DrawSprite(ref sprite);
+            }
         }
 
         public void DrawForeground(GuiRenderer renderer, Control control) { }

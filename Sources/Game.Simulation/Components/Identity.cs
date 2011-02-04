@@ -11,6 +11,7 @@ namespace Orion.Game.Simulation.Components
     {
         #region Fields
         private string name;
+        private bool isSelectable = true;
         private int aladdiumCost;
         private int alageneCost;
         private TrainType trainType;
@@ -55,6 +56,13 @@ namespace Orion.Game.Simulation.Components
         public ICollection<UnitTypeUpgrade> Upgrades
         {
             get { return upgrades; }
+        }
+
+        [Persistent]
+        public bool IsSelectable
+        {
+            get { return isSelectable; }
+            set { isSelectable = false; }
         }
 
         public Entity TemplateEntity

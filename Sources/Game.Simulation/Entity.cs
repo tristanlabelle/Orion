@@ -315,7 +315,10 @@ namespace Orion.Game.Simulation
                 Debug.Fail("{0} was updated when it wasn't alive and in the world.".FormatInvariant(this));
                 return;
             }
-                
+
+            foreach (Component component in GetComponents())
+                component.Update(step);
+
             DoUpdate(step);
         }
 

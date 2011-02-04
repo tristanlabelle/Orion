@@ -21,7 +21,6 @@ namespace Orion.Engine.Gui
         private HandleableEvent<Control, MouseEvent> mouseMovedEvent;
         private HandleableEvent<Control, MouseEvent> mouseButtonEvent;
         private HandleableEvent<Control, MouseEvent> mouseWheelEvent;
-        private HandleableEvent<Control, MouseEvent> mouseClickEvent;
 
         /// <summary>
         /// Raised when the mouse moves over this control or when this control has the mouse capture.
@@ -51,16 +50,6 @@ namespace Orion.Engine.Gui
         {
             add { mouseWheelEvent.AddHandler(value); }
             remove { mouseWheelEvent.RemoveHandler(value); }
-        }
-
-        /// <summary>
-        /// Raised when the mouse is clicked over this control or when this control has the mouse capture.
-        /// The return value specifies if the event was handled.
-        /// </summary>
-        public event Func<Control, MouseEvent, bool> MouseClick
-        {
-            add { mouseClickEvent.AddHandler(value); }
-            remove { mouseClickEvent.RemoveHandler(value); }
         }
         #endregion
 
@@ -185,7 +174,6 @@ namespace Orion.Engine.Gui
                 case MouseEventType.Move: return HandleMouseMoved(@event);
                 case MouseEventType.Button: return HandleMouseButton(@event);
                 case MouseEventType.Wheel: return HandleMouseWheel(@event);
-                case MouseEventType.Click: return HandleMouseClick(@event);
                 default: throw new InvalidEnumArgumentException("type", (int)@event.Type, typeof(MouseEventType));
             }
         }
@@ -208,15 +196,6 @@ namespace Orion.Engine.Gui
         {
             return OnMouseWheel(@event)
                 | mouseWheelEvent.Raise(this, @event)
-                | IsMouseEventSink;
-        }
-
-        private bool HandleMouseClick(MouseEvent @event)
-        {
-            Debug.Assert(Visibility == Visibility.Visible);
-
-            return OnMouseClick(@event)
-                | mouseClickEvent.Raise(this, @event)
                 | IsMouseEventSink;
         }
 
@@ -263,13 +242,6 @@ namespace Orion.Engine.Gui
         /// <param name="event">The event object.</param>
         /// <returns>A value indicating if the event was handled.</returns>
         protected virtual bool OnMouseWheel(MouseEvent @event) { return false; }
-
-        /// <summary>
-        /// When overriden in a derived class, handles a mouse click event.
-        /// </summary>
-        /// <param name="event">The event object.</param>
-        /// <returns>A value indicating if the event was handled.</returns>
-        protected virtual bool OnMouseClick(MouseEvent @event) { return false; }
 
         /// <summary>
         /// Gives a chance to this <see cref="Control"/> to handle a key event.

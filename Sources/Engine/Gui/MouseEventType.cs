@@ -23,11 +23,6 @@ namespace Orion.Engine.Gui
         /// <summary>
         /// Specifies that the event is a mouse wheel move.
         /// </summary>
-        Wheel,
-
-        /// <summary>
-        /// Specifies that the event is a click (a mouse down followed by a mouse up within some time and space constraints).
-        /// </summary>
-        Click
+        Wheel
     }
 }

@@ -55,7 +55,7 @@ namespace Orion.Game.Presentation.Gui
             replayListBox.MaxYMargin = 10;
             replayListBox.Padding = 5;
             replayListBox.SelectionChanged += sender => viewButton.HasEnabledFlag = sender.SelectedItem != null;
-            replayListBox.MouseClick += OnReplayListBoxDoubleClicked;
+            replayListBox.MouseButton += OnReplayListBoxMouseButton;
             dock.Dock(replayListBox, Direction.NegativeY);
 
             Content = dock;
@@ -87,9 +87,9 @@ namespace Orion.Game.Presentation.Gui
         	replayListBox.AddItem(label);
         }
 
-        private bool OnReplayListBoxDoubleClicked(Control sender, MouseEvent @event)
+        private bool OnReplayListBoxMouseButton(Control sender, MouseEvent @event)
         {
-            if (@event.ClickCount > 1)
+            if (@event.IsPressed && @event.ClickCount > 1)
             {
                 TryStartSelectedReplay();
                 return true;

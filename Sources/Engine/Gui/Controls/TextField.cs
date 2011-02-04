@@ -278,20 +278,6 @@ namespace Orion.Engine.Gui
             return false;
         }
 
-        protected override bool OnMouseClick(MouseEvent @event)
-        {
-            if (!Rectangle.Contains(@event.Position))
-            {
-                ReleaseMouseCapture();
-                ReleaseKeyboardFocus();
-                return false;
-            }
-
-            if (@event.Button == MouseButtons.Left && IsEditable) AcquireKeyboardFocus();
-
-            return true;
-        }
-
         protected override bool OnKeyEvent(KeyEvent @event)
         {
             if (!@event.IsDown || @event.ModifierKeys != ModifierKeys.None) return true;

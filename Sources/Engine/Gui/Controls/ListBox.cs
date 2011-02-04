@@ -233,11 +233,6 @@ namespace Orion.Engine.Gui
             return true;
         }
 
-        protected override bool OnMouseClick(MouseEvent @event)
-        {
-            return true;
-        }
-
         protected internal override void Draw()
         {
             if (highlightedItemIndex == -1)

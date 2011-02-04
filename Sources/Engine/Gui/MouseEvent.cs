@@ -24,7 +24,8 @@ namespace Orion.Engine.Gui
         #endregion
 
         #region Constructors
-        public MouseEvent(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys, MouseButtons button, float wheelDelta, int clickCount)
+        public MouseEvent(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys,
+            MouseButtons button, int clickCount, float wheelDelta)
         {
             if (button != MouseButtons.None && !PowerOfTwo.Is((int)button))
                 throw new ArgumentException("A single button should be specified.", "button");
@@ -50,7 +51,7 @@ namespace Orion.Engine.Gui
             {
                 if (wheelDelta != 0) return MouseEventType.Wheel;
                 if (Button == MouseButtons.None) return MouseEventType.Move;
-                return clickCount == 0 ? MouseEventType.Button : MouseEventType.Click;
+                return MouseEventType.Button;
             }
         }
 
@@ -167,7 +168,7 @@ namespace Orion.Engine.Gui
         }
 
         /// <summary>
-        /// Gets the number of successive clicks, for click events.
+        /// Gets the number of successive clicks, for button events.
         /// </summary>
         public int ClickCount
         {
@@ -191,7 +192,6 @@ namespace Orion.Engine.Gui
                 case MouseEventType.Move: return "Moved to " + Position;
                 case MouseEventType.Button: return "{0} button {1} at {2}".FormatInvariant(Button, IsPressed ? "pressed" : "released", Position);
                 case MouseEventType.Wheel: return "Wheel rolled by {0} at {1}".FormatInvariant(WheelDelta, Position);
-                case MouseEventType.Click: return "Click #{0} at {1}".FormatInvariant(ClickCount, Position);
                 default:
                     Debug.Fail("Unexpected mouse event type.");
                     return base.ToString();
@@ -200,24 +200,19 @@ namespace Orion.Engine.Gui
 
         public static MouseEvent CreateMove(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys)
         {
-            return new MouseEvent(position, buttonStates, modifierKeys, MouseButtons.None, 0f, 0);
+            return new MouseEvent(position, buttonStates, modifierKeys, MouseButtons.None, 0, 0f);
         }
 
-        public static MouseEvent CreateButton(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys, MouseButtons button, bool pressed)
+        public static MouseEvent CreateButton(Point position, MouseButtons buttonStates,
+            ModifierKeys modifierKeys, MouseButtons button, bool pressed, int clickCount)
         {
             Argument.EnsureNotEqual(button, MouseButtons.None, "button");
+            Argument.EnsureStrictlyPositive(clickCount, "clickCount");
 
             buttonStates &= ~button;
             if (pressed) buttonStates |= button;
 
-            return new MouseEvent(position, buttonStates, modifierKeys, button, 0f, 0);
-        }
-
-        public static MouseEvent CreateClick(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys, MouseButtons button, int count)
-        {
-            Argument.EnsureNotEqual(button, MouseButtons.None, "button");
-            Argument.EnsureStrictlyPositive(count, "count");
-            return new MouseEvent(position, buttonStates, modifierKeys, button, 0f, count);
+            return new MouseEvent(position, buttonStates, modifierKeys, button, clickCount, 0f);
         }
 
         public static MouseEvent CreateWheel(Point position, MouseButtons buttonStates, ModifierKeys modifierKeys, float wheelDelta)
@@ -225,7 +220,7 @@ namespace Orion.Engine.Gui
             Argument.EnsureFinite(wheelDelta, "wheelDelta");
             Argument.EnsureNotEqual(wheelDelta, 0, "wheelDelta");
 
-            return new MouseEvent(position, buttonStates, modifierKeys, MouseButtons.None, wheelDelta, 0);
+            return new MouseEvent(position, buttonStates, modifierKeys, MouseButtons.None, 0, wheelDelta);
         }
         #endregion
     }

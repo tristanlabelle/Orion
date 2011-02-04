@@ -328,12 +328,13 @@ namespace Orion.Engine.Gui
         /// </summary>
         /// <param name="button">The button that was pressed or released.</param>
         /// <param name="pressed"><c>True</c> if the button was pressed, <c>false</c> if it was released.</param>
+        /// <param name="clickCount">The number of successive click to which this button event belongs.</param>
         /// <returns>A value indicating if the event was handled.</returns>
-        public bool InjectMouseButton(MouseButtons button, bool pressed)
+        public bool InjectMouseButton(MouseButtons button, bool pressed, int clickCount)
         {
             EnsureValid(button);
 
-            MouseEvent @event = MouseEvent.CreateButton(mousePosition, mouseButtonStates, modifierKeys, button, pressed);
+            MouseEvent @event = MouseEvent.CreateButton(mousePosition, mouseButtonStates, modifierKeys, button, pressed, clickCount);
             return InjectMouseEvent(@event);
         }
 
@@ -347,21 +348,6 @@ namespace Orion.Engine.Gui
             Argument.EnsureFinite(delta, "amount");
 
             MouseEvent @event = MouseEvent.CreateWheel(mousePosition, mouseButtonStates, modifierKeys, delta);
-            return InjectMouseEvent(@event);
-        }
-
-        /// <summary>
-        /// Injects a mouse click event to be handled by the UI.
-        /// </summary>
-        /// <param name="button">The button that was clicked.</param>
-        /// <param name="count">The number of successive clicks.</param>
-        /// <returns>A value indicating if the event was handled.</returns>
-        public bool InjectMouseClick(MouseButtons button, int count)
-        {
-            Argument.EnsureStrictlyPositive(count, "count");
-            EnsureValid(button);
-
-            MouseEvent @event = MouseEvent.CreateClick(mousePosition, mouseButtonStates, modifierKeys, button, count);
             return InjectMouseEvent(@event);
         }
 
@@ -427,7 +413,7 @@ namespace Orion.Engine.Gui
                 else if (args.Button == Input.MouseButton.Middle) buttons = MouseButtons.Middle;
                 else if (args.Button == Input.MouseButton.Right) buttons = MouseButtons.Right;
 
-                return InjectMouseButton(buttons, type == Input.MouseEventType.ButtonPressed);
+                return InjectMouseButton(buttons, type == Input.MouseEventType.ButtonPressed, args.ClickCount);
             }
 
             return handled;

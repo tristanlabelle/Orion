@@ -196,15 +196,6 @@ namespace Orion.Game.Simulation
             get { return GetComponent<Spatial>().Position; }
             set { GetComponent<Spatial>().Position = value; }
         }
-
-        /// <summary>
-        /// Gets the angle this <see cref="Unit"/> is facing.
-        /// </summary>
-        public float Angle
-        {
-            get { return GetComponent<Spatial>().Angle; }
-            set { GetComponent<Spatial>().Angle = value; }
-        }
         #endregion
 
         /// <summary>
@@ -506,7 +497,9 @@ namespace Orion.Game.Simulation
         {
             Vector2 delta = target - Center;
             if (delta.LengthSquared < 0.01f) return;
-            Angle = (float)Math.Atan2(delta.Y, delta.X);
+
+            Debug.Assert(HasComponent<Spatial>(), "Unit has no Spatial component!");
+            GetComponent<Spatial>().Angle = (float)Math.Atan2(delta.Y, delta.X);
         }
 
         protected override Vector2 GetPosition()

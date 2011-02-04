@@ -231,7 +231,9 @@ namespace Orion.Game.Presentation.Renderers
             // and building textures are not supposed to be rotated.
             if (unit.IsBuilding) return 0;
 
-            float baseAngle = unit.Angle - (float)Math.PI * 0.5f;
+            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+            float angle = unit.GetComponent<Spatial>().Angle;
+            float baseAngle = angle - (float)Math.PI * 0.5f;
 
             bool isMelee = unit.HasSkill<AttackSkill>() && unit.GetStat(AttackSkill.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)

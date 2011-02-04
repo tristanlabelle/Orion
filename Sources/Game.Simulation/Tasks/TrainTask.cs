@@ -147,7 +147,7 @@ namespace Orion.Game.Simulation.Tasks
 
             Unit spawnee = Unit.Faction.CreateUnit(spawneeType, point.Value);
             Vector2 traineeDelta = spawnee.Center - Unit.Center;
-            spawnee.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+            spawnee.GetComponent<Spatial>().Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 
             return spawnee;
         }

@@ -154,14 +154,6 @@ namespace Orion.Game.Simulation
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating if this <see cref="Unit"/> moves in the air.
-        /// </summary>
-        public bool IsAirborne
-        {
-            get { return CollisionLayer == CollisionLayer.Air; }
-        }
-
         public override CollisionLayer CollisionLayer
         {
             get { return GetComponent<Spatial>().CollisionLayer; }
@@ -459,7 +451,11 @@ namespace Orion.Game.Simulation
             int range = GetStat(AttackSkill.RangeStat);
             if (range == 0)
             {
-                if (!IsAirborne && other.IsAirborne) return false;
+                Debug.Assert(HasComponent<Spatial>(), "Unit has no spatial component!");
+                Debug.Assert(other.HasComponent<Spatial>(), "Enemy unit has no spatial component!");
+                bool selfIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
+                bool otherIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
+                if (selfIsAirborne && otherIsAirborne) return false;
                 return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             }
 
@@ -476,13 +472,16 @@ namespace Orion.Game.Simulation
         }
 
         #region Can*** Testing
-        public bool CanTransport(Unit unitType)
+        public bool CanTransport(Unit unit)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
+            Argument.EnsureNotNull(unit, "unitType");
+
+            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+            bool isGroundUnit = unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground;
             return HasSkill<TransportSkill>()
-                && unitType.HasSkill<MoveSkill>()
-                && !unitType.IsAirborne
-                && !unitType.HasSkill<TransportSkill>();
+                && unit.HasSkill<MoveSkill>()
+                && isGroundUnit
+                && !unit.HasSkill<TransportSkill>();
         }
 
         public bool CanBuild(Unit buildingType)
@@ -822,8 +821,9 @@ namespace Orion.Game.Simulation
                 .Where(unit => !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                     && IsInLineOfSight(unit));
 
-            if (!IsAirborne && GetStat(AttackSkill.RangeStat) == 0)
-                attackableUnits = attackableUnits.Where(u => !u.IsAirborne);
+            bool isGroundUnit = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground;
+            if (!isGroundUnit && GetStat(AttackSkill.RangeStat) == 0)
+                attackableUnits = attackableUnits.Where(u => u.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground);
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits

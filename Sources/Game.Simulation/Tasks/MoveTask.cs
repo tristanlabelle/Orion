@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Pathfinding;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -47,7 +48,8 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
-            Debug.Assert(unit.IsAirborne || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
+            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+            Debug.Assert(unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
         }
@@ -133,7 +135,10 @@ namespace Orion.Game.Simulation.Tasks
         {
             foreach (Point point in targetRegion.Points)
             {
-                if (!Unit.IsAirborne && !World.Terrain.IsWalkable(point)) return false;
+                Debug.Assert(Unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+                if (Unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground
+                    && !World.Terrain.IsWalkable(point)) return false;
+
                 Entity entity = World.Entities.GetEntityAt(point, Unit.CollisionLayer);
                 if (entity != null && entity != Unit) return false;
             }
@@ -204,7 +209,10 @@ namespace Orion.Game.Simulation.Tasks
             Region grownRegion = Region.Grow(region, 1);
             Func<Point, float> destinationDistanceEvaluator = point =>
             {
-                if (region.Contains(point)) return unit.IsAirborne ? 0 : 1;
+                Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+                if (region.Contains(point))
+                    return unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air ? 0 : 1;
+
                 return ((Vector2)point - (Vector2)grownRegion.Clamp(point)).LengthFast;
             };
 

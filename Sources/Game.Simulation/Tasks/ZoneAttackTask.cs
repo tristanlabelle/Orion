@@ -4,6 +4,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -75,7 +76,7 @@ namespace Orion.Game.Simulation.Tasks
                     .Intersecting(Unit.LineOfSight)
                     .OfType<Unit>()
                     .FirstOrDefault(other => Unit.IsInLineOfSight(other)
-                        && (isRanged || !other.IsAirborne)
+                        && (isRanged || other.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground)
                         && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
 
                 if (target != null) attack = new AttackTask(Unit, target);

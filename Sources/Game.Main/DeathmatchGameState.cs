@@ -370,7 +370,7 @@ namespace Orion.Game.Main
             else if (@event.Button == MouseButtons.Right) inputButton = Input.MouseButton.Right;
             else return false;
 
-            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, inputButton, @event.ClickCount, 0);
+            Input.MouseEventArgs args = new Input.MouseEventArgs(worldPosition, inputButton, @event.ClickCount, 0f);
 
             if (@event.IsPressed) userInputManager.HandleMouseDown(args);
             else userInputManager.HandleMouseUp(args);

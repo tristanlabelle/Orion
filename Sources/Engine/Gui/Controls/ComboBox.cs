@@ -138,6 +138,7 @@ namespace Orion.Engine.Gui
         {
             selectedItemViewport.ViewedControl = sender.SelectedItem;
             dropDown.VisibilityFlag = Visibility.Hidden;
+            SelectedItemChanged.Raise(this);
         }
 
         private void OnButtonClicked(Button sender, ButtonClickEvent @event)

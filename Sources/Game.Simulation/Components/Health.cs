@@ -84,6 +84,13 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public override void Update(SimulationStep step)
+        {
+            currentDamage -= regenerationRate * step.TimeDeltaInSeconds;
+            if (currentDamage < 0)
+                currentDamage = 0;
+        }
+
         public void Damage(float damage)
         {
             float actualDamage = damage - damageReduction;

@@ -139,7 +139,7 @@ namespace Orion.Game.Simulation.Tasks
                 if (Unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground
                     && !World.Terrain.IsWalkable(point)) return false;
 
-                Entity entity = World.Entities.GetEntityAt(point, Unit.CollisionLayer);
+                Entity entity = World.Entities.GetEntityAt(point, Unit.GetComponent<Spatial>().CollisionLayer);
                 if (entity != null && entity != Unit) return false;
             }
 
@@ -166,8 +166,9 @@ namespace Orion.Game.Simulation.Tasks
 
         private Func<Point, bool> GetWalkabilityTester()
         {
-            if (Unit.CollisionLayer == CollisionLayer.Ground) return IsGroundPathable;
-            if (Unit.CollisionLayer == CollisionLayer.Air) return IsAirPathable;
+            CollisionLayer layer = Unit.GetComponent<Spatial>().CollisionLayer;
+            if (layer == CollisionLayer.Ground) return IsGroundPathable;
+            if (layer == CollisionLayer.Air) return IsAirPathable;
             throw new InvalidOperationException(
                 "Cannot pathfind for a unit on collision layer {0}.".FormatInvariant(Unit));
         }

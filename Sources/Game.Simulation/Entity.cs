@@ -149,17 +149,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         /// <summary>
-        /// Gets the <see cref="CollisionLayer"/> on which this
-        /// <see cref="Entity"/> lies. This should never change
-        /// in the lifetime of the <see cref="Entity"/>.
-        /// </summary>
-#warning Temporary hack until components take over
-        public virtual CollisionLayer CollisionLayer
-        {
-            get { return GetComponent<Spatial>().CollisionLayer; }
-        }
-
-        /// <summary>
         /// Gets a value indicating if this <see cref="Entity"/> is alive.
         /// </summary>
         public bool IsAlive

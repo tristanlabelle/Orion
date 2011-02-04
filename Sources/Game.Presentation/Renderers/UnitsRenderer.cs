@@ -248,7 +248,9 @@ namespace Orion.Game.Presentation.Renderers
             for (int i = hitEvents.Count() - 1; i >= 0; i--)
             {
                 HitEventArgs hit = hitEvents[i];
-                if (hit.Hitter.CollisionLayer != layer)
+                Entity hitter = hit.Hitter;
+                Debug.Assert(hitter.HasComponent<Spatial>(), "Hitter has no Spatial component!");
+                if (hitter.GetComponent<Spatial>().CollisionLayer != layer)
                     continue;
 
                 if (hit.Hitter.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)

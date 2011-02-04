@@ -42,7 +42,7 @@ namespace Orion.Game.Simulation
         private Unit transporter;
         #endregion
 
-        #region Unit fields
+        #region UnitType fields
         private string name;
         private string graphicsTemplate;
         private string voicesTemplate;
@@ -152,11 +152,6 @@ namespace Orion.Game.Simulation
                     || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                     "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
             }
-        }
-
-        public override CollisionLayer CollisionLayer
-        {
-            get { return GetComponent<Spatial>().CollisionLayer; }
         }
 
         public string Name
@@ -686,10 +681,11 @@ namespace Orion.Game.Simulation
             while (transportedUnits.Count > 0)
             {
                 Unit transportedUnit = transportedUnits.Peek();
+                Debug.Assert(transportedUnit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground);
 
                 Point? location = GridRegion.Points
                     .Concat(GridRegion.GetAdjacentPoints())
-                    .FirstOrNull(point => World.IsFree(point, transportedUnit.CollisionLayer));
+                    .FirstOrNull(point => World.IsFree(point, CollisionLayer.Ground));
                 if (!location.HasValue)
                 {
                     faction.RaiseWarning("Pas de place pour le débarquement d'unités");

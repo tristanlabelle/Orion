@@ -170,7 +170,7 @@ namespace Orion.Game.Presentation
         {
             Point point = (Point)position;
             Entity clickedEntity = World.IsWithinBounds(point)
-                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.CollisionLayer)
+                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.GetComponent<Spatial>().CollisionLayer)
                 : null;
 
             if (clickedEntity == null)

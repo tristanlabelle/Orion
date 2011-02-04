@@ -121,8 +121,9 @@ namespace Orion.Game.Simulation.Tasks
                 .Where(point =>
                 {
                     Region region = new Region(point, spawneeType.Size);
+                    CollisionLayer layer = spawneeType.GetComponent<Spatial>().CollisionLayer;
                     return new Region(World.Size).Contains(region)
-                        && World.IsFree(new Region(point, spawneeType.Size), spawneeType.CollisionLayer);
+                        && World.IsFree(new Region(point, spawneeType.Size), layer);
                 });
 
             if (Unit.HasRallyPoint)

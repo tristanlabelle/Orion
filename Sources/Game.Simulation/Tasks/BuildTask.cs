@@ -4,6 +4,7 @@ using System.Diagnostics;
 using OpenTK;
 using Orion.Engine;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -75,7 +76,8 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            if (!Unit.World.IsFree(buildingPlan.GridRegion, buildingPlan.BuildingType.CollisionLayer))
+            CollisionLayer layer = buildingPlan.BuildingType.GetComponent<Spatial>().CollisionLayer;
+            if (!Unit.World.IsFree(buildingPlan.GridRegion, layer))
             {
                 string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
                 Faction.RaiseWarning(warning);

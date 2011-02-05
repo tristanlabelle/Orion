@@ -9,6 +9,7 @@ using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Utilities;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -24,7 +25,6 @@ namespace Orion.Game.Presentation.Renderers
         private readonly Faction faction;
         private readonly Texture buildingRuinTexture;
         private readonly Texture skeletonTexture;
-        private readonly RuinsMonitor monitor;
         #endregion
 
         #region Constructors
@@ -36,7 +36,6 @@ namespace Orion.Game.Presentation.Renderers
             this.faction = faction;
             this.buildingRuinTexture = gameGraphics.GetUnitTexture("Ruins");
             this.skeletonTexture = gameGraphics.GetUnitTexture("Skeleton");
-            this.monitor = new RuinsMonitor(faction.World);
         }
         #endregion
 
@@ -52,25 +51,29 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            foreach (Ruin ruin in monitor.Ruins)
+            foreach (Entity ruin in faction.World.Entities.Where(e => e.HasComponent<TimedExistence>()))
             {
-                Rectangle rectangle = ruin.Rectangle;
+                Region gridRegion = ruin.GetComponent<Spatial>().GridRegion;
+                Rectangle rectangle = gridRegion.ToRectangle();
                 if (!Rectangle.Intersects(rectangle, viewBounds))
                     continue;
 
-                Region gridRegion = new Region(
-                    (int)rectangle.MinX, (int)rectangle.MinY,
-                    (int)rectangle.Width, (int)rectangle.Height);
-
                 if (!faction.CanSee(gridRegion)) continue;
 
-                float alpha = ruin.RemainingTimeToLive / ruinFadeDurationInSeconds;
+                TimedExistence timeout = ruin.GetComponent<TimedExistence>();
+                Identity identity = ruin.GetComponent<Identity>();
+
+                ColorRgb factionColor = ruin.HasComponent<FactionMembership>()
+                    ? ruin.GetComponent<FactionMembership>().Faction.Color
+                    : Colors.White;
+
+                float alpha = timeout.TimeLeft / ruinFadeDurationInSeconds;
                 if (alpha < 0) alpha = 0;
                 if (alpha > maxRuinAlpha) alpha = maxRuinAlpha;
 
-                Texture texture = ruin.WasBuilding ? buildingRuinTexture : skeletonTexture;
+                Texture texture = identity.TrainType == TrainType.OnSite ? buildingRuinTexture : skeletonTexture;
 
-                ColorRgba color = new ColorRgba(ruin.FactionColor, alpha);
+                ColorRgba color = new ColorRgba(factionColor, alpha);
                 graphicsContext.Fill(rectangle, texture, color);
             }
         }

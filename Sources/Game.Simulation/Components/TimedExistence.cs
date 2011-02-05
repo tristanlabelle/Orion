@@ -35,6 +35,18 @@ namespace Orion.Game.Simulation.Components
             get { return elapsedTime; }
             set { elapsedTime = value; }
         }
+
+        [Transient]
+        public float TimeLeft
+        {
+            get { return lifeSpan - elapsedTime; }
+            set
+            {
+                Argument.EnsurePositive(value, "value");
+                Argument.EnsureLowerOrEqual(value, lifeSpan, "value");
+                elapsedTime = lifeSpan - value;
+            }
+        }
         #endregion
 
         #region Methods

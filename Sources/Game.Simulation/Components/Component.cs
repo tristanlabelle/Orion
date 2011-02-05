@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Game.Simulation.Skills;
 using System.Reflection;
 using Orion.Game.Simulation.Components.Serialization;
+using System.Collections;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -62,10 +63,32 @@ namespace Orion.Game.Simulation.Components
             {
                 if (property.GetCustomAttributes(typeof(PersistentAttribute), true).Length == 0)
                     continue;
+
                 object currentValue = property.GetValue(this, null);
-                property.SetValue(newInstance, currentValue, null);
+                Type propertyType = currentValue.GetType();
+
+                if (typeof(ICollection).IsAssignableFrom(propertyType))
+                {
+                    // if it's a collection, copy the contents
+                    object newCollection = property.GetValue(newInstance, null);
+                    Type typeArgument = propertyType.GetGenericArguments()[0];
+                    MethodInfo copyCollection = typeof(Component)
+                        .GetMethod("CopyCollection", BindingFlags.NonPublic | BindingFlags.Static)
+                        .MakeGenericMethod(typeArgument);
+                    copyCollection.Invoke(null, new object[] { currentValue, newCollection });
+                }
+                else
+                {
+                    // otherwise, set the value
+                    property.SetValue(newInstance, currentValue, null);
+                }
             }
             return newInstance;
+        }
+
+        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
+        {
+            foreach (T item in from) to.Add(item);
         }
         #endregion
     }

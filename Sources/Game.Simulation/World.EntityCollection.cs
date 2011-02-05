@@ -136,10 +136,16 @@ namespace Orion.Game.Simulation
                 return unit;
             }
 
+            internal Entity CreateEntity()
+            {
+                return new Entity(world, handleGenerator());
+            }
+
             public Entity CreateResourceNode(ResourceType type, Point point)
             {
                 Entity node = new Entity(world, handleGenerator());
                 Identity identity = new Identity(node);
+                identity.LeavesRemains = false;
                 node.AddComponent(identity);
 
                 Harvestable harvestableComponent = new Harvestable(node);

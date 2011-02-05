@@ -11,7 +11,10 @@ namespace Orion.Game.Simulation.Components
     {
         #region Fields
         private string name;
+        private string visualIdentity;
+        private string soundIdentity;
         private bool isSelectable = true;
+        private bool leavesRemains = true;
         private int aladdiumCost;
         private int alageneCost;
         private TrainType trainType;
@@ -29,6 +32,20 @@ namespace Orion.Game.Simulation.Components
         {
             get { return name; }
             set { name = value; }
+        }
+
+        [Persistent]
+        public string VisualIdentity
+        {
+            get { return visualIdentity ?? name; }
+            set { visualIdentity = value; }
+        }
+
+        [Persistent]
+        public string SoundIdentity
+        {
+            get { return soundIdentity ?? name; }
+            set { soundIdentity = value; }
         }
 
         [Persistent]
@@ -63,6 +80,13 @@ namespace Orion.Game.Simulation.Components
         {
             get { return isSelectable; }
             set { isSelectable = false; }
+        }
+
+        [Persistent]
+        public bool LeavesRemains
+        {
+            get { return leavesRemains; }
+            set { leavesRemains = value; }
         }
 
         public Entity TemplateEntity

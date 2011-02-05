@@ -75,6 +75,22 @@ namespace Orion.Game.Simulation
             spatial.SightRange = builder.BasicSkill.SightRange;
             spatial.Size = builder.Size;
             AddComponent(spatial);
+
+            Identity identity = new Identity(this);
+            identity.Name = name;
+            identity.VisualIdentity = graphicsTemplate;
+            identity.SoundIdentity = voicesTemplate;
+            identity.LeavesRemains = true;
+            identity.IsSelectable = true;
+            identity.TemplateEntity = this;
+            foreach (UnitTypeUpgrade upgrade in upgrades)
+                identity.Upgrades.Add(upgrade);
+            identity.TrainType = HasSkill<MoveSkill>()
+                ? TrainType.Immaterial
+                : TrainType.OnSite;
+            identity.AladdiumCost = builder.BasicSkill.AladdiumCost;
+            identity.AlageneCost = builder.BasicSkill.AlageneCost;
+            AddComponent(identity);
         }
 
         /// <summary>
@@ -109,6 +125,7 @@ namespace Orion.Game.Simulation
             Spatial spatial = (Spatial)meta.GetComponent<Spatial>().Clone(this);
             spatial.Position = position;
             AddComponent(spatial);
+            AddComponent(meta.GetComponent<Identity>().Clone(this));
 
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
@@ -431,7 +448,7 @@ namespace Orion.Game.Simulation
                 Debug.Assert(other.HasComponent<Spatial>(), "Enemy unit has no spatial component!");
                 bool selfIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
                 bool otherIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
-                if (selfIsAirborne && otherIsAirborne) return false;
+                if (!selfIsAirborne && otherIsAirborne) return false;
                 return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             }
 

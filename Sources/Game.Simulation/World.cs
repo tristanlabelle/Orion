@@ -349,6 +349,41 @@ namespace Orion.Game.Simulation
 
             bool isEmbarkedUnit = entity is Unit && ((Unit)entity).IsEmbarked;
             if (!isEmbarkedUnit) entities.Remove(entity);
+
+            Identity identity = entity.GetComponent<Identity>();
+            if (identity.LeavesRemains)
+            {
+                CreateRuinsForEntity(entity);
+            }
+        }
+
+        private void CreateRuinsForEntity(Entity entity)
+        {
+            Entity ruins = entities.CreateEntity();
+            Identity identity = new Identity(ruins);
+            identity.LeavesRemains = false;
+            identity.IsSelectable = false;
+            identity.Name = "Ruins";
+            identity.TrainType = entity.GetComponent<Identity>().TrainType;
+            ruins.AddComponent(identity);
+
+            TimedExistence timeout = new TimedExistence(ruins);
+            timeout.LifeSpan = entity.HasComponent<Move>() ? 30 : 120;
+            ruins.AddComponent(timeout);
+
+            Spatial spatial = new Spatial(ruins);
+            spatial.Position = entity.Position;
+            spatial.CollisionLayer = CollisionLayer.None;
+            spatial.Size = entity.GetComponent<Spatial>().Size;
+            ruins.AddComponent(spatial);
+
+            if (entity.HasComponent<FactionMembership>())
+            {
+                FactionMembership membership = new FactionMembership(ruins);
+                membership.Faction = entity.GetComponent<FactionMembership>().Faction;
+                ruins.AddComponent(membership);
+            }
+            entities.Add(ruins);
         }
 
         /// <remarks>Invoked by Unit.</remarks>

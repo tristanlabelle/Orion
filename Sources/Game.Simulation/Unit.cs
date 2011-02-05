@@ -28,26 +28,18 @@ namespace Orion.Game.Simulation
         /// </summary>
         private const int nearbyEnemyCheckPeriod = 8;
 
-        private readonly Faction faction;
-        private readonly TaskQueue taskQueue;
-        private float damage;
-        private Vector2 rallyPoint;
         /// <summary>
         /// The amount of health that has been built.
         /// A value of <see cref="float.NaN"/> indicates that the construction has completed.
         /// </summary>
         private float healthBuilt = float.NaN;
+
+        private readonly TaskQueue taskQueue;
+        private Vector2 rallyPoint;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Stack<Unit> transportedUnits;
         private Unit transporter;
-        #endregion
-
-        #region UnitType fields
-        private string name;
-        private string graphicsTemplate;
-        private string voicesTemplate;
         private Dictionary<Type, UnitSkill> skills;
-        private ReadOnlyCollection<UnitTypeUpgrade> upgrades;
         #endregion
 
         #region Constructors
@@ -55,19 +47,15 @@ namespace Orion.Game.Simulation
             : base(handle)
         {
             Argument.EnsureNotNull(builder, "builder");
-            name = builder.Name;
-            graphicsTemplate = builder.GraphicsTemplate ?? builder.Name;
-            voicesTemplate = builder.VoicesTemplate ?? builder.Name;
 
             skills = builder.Skills
                 .Select(skill => skill.CreateFrozenClone())
                 .ToDictionary(skill => skill.GetType());
             skills.Add(typeof(BasicSkill), builder.BasicSkill);
-            upgrades = builder.Upgrades.ToList().AsReadOnly();
 
             Debug.Assert(!HasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(builder.Name));
 
             // components stuff
             Spatial spatial = new Spatial(this);
@@ -77,13 +65,13 @@ namespace Orion.Game.Simulation
             AddComponent(spatial);
 
             Identity identity = new Identity(this);
-            identity.Name = name;
-            identity.VisualIdentity = graphicsTemplate;
-            identity.SoundIdentity = voicesTemplate;
+            identity.Name = builder.Name;
+            identity.VisualIdentity = builder.GraphicsTemplate ?? builder.Name; ;
+            identity.SoundIdentity = builder.VoicesTemplate ?? builder.Name;
             identity.LeavesRemains = true;
             identity.IsSelectable = true;
             identity.TemplateEntity = this;
-            foreach (UnitTypeUpgrade upgrade in upgrades)
+            foreach (UnitTypeUpgrade upgrade in builder.Upgrades)
                 identity.Upgrades.Add(upgrade);
             identity.TrainType = HasSkill<MoveSkill>()
                 ? TrainType.Immaterial
@@ -97,6 +85,12 @@ namespace Orion.Game.Simulation
             health.ArmorType = builder.BasicSkill.ArmorType;
             health.MaxHealth = builder.BasicSkill.MaxHealth;
             AddComponent(health);
+
+            FactionMembership membership = new FactionMembership(this);
+            membership.FoodRequirement = builder.BasicSkill.FoodCost;
+            if (HasSkill<ProvideFoodSkill>())
+                membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
+            AddComponent(membership);
         }
 
         /// <summary>
@@ -116,25 +110,22 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(meta, "meta");
             Argument.EnsureNotNull(faction, "faction");
 
-            name = meta.Name;
-            graphicsTemplate = meta.GraphicsTemplate;
-            voicesTemplate = meta.VoicesTemplate;
-
             skills = meta.skills;
-            upgrades = meta.upgrades;
 
             Debug.Assert(!HasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(meta.Name));
 
             // components stuff
-            Spatial spatial = (Spatial)meta.GetComponent<Spatial>().Clone(this);
+            Spatial spatial = Component.Clone(meta.GetComponent<Spatial>(), this);
             spatial.Position = position;
             AddComponent(spatial);
-            AddComponent(meta.GetComponent<Identity>().Clone(this));
-            AddComponent(meta.GetComponent<Health>().Clone(this));
+            FactionMembership membership = Component.Clone(meta.GetComponent<FactionMembership>(), this);
+            membership.Faction = faction;
+            AddComponent(membership);
+            AddComponent(Component.Clone(meta.GetComponent<Identity>(), this));
+            AddComponent(Component.Clone(meta.GetComponent<Health>(), this));
 
-            this.faction = faction;
             this.taskQueue = new TaskQueue(this);
             this.rallyPoint = Center;
 
@@ -165,32 +156,35 @@ namespace Orion.Game.Simulation
             {
                 Argument.EnsureNotNull(value, "Type");
 
-                name = value.Name;
-                graphicsTemplate = value.GraphicsTemplate;
-                voicesTemplate = value.VoicesTemplate;
+                Name = value.Name;
+                GraphicsTemplate = value.GraphicsTemplate;
+                VoicesTemplate = value.VoicesTemplate;
 
                 skills = value.skills;
-                upgrades = value.upgrades;
+                Upgrades = value.Upgrades;
 
                 Debug.Assert(!HasSkill<AttackSkill>()
                     || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                    "{0} has an attack range bigger than its line of sight.".FormatInvariant(name));
+                    "{0} has an attack range bigger than its line of sight.".FormatInvariant(Name));
             }
         }
 
         public string Name
         {
-            get { return name; }
+            get { return GetComponent<Identity>().Name; }
+            private set { GetComponent<Identity>().Name = value; }
         }
 
         public string GraphicsTemplate
         {
-            get { return graphicsTemplate; }
+            get { return GetComponent<Identity>().VisualIdentity; }
+            set { GetComponent<Identity>().VisualIdentity = value; }
         }
 
         public string VoicesTemplate
         {
-            get { return voicesTemplate; }
+            get { return GetComponent<Identity>().SoundIdentity; }
+            set { GetComponent<Identity>().SoundIdentity = value; }
         }
 
         public bool IsBuilding
@@ -203,14 +197,21 @@ namespace Orion.Game.Simulation
             get { return false; }
         }
 
-        public ReadOnlyCollection<UnitTypeUpgrade> Upgrades
+        public ICollection<UnitTypeUpgrade> Upgrades
         {
-            get { return upgrades; }
+            get { return GetComponent<Identity>().Upgrades; }
+            private set
+            {
+                Identity identity = GetComponent<Identity>();
+                identity.Upgrades.Clear();
+                foreach (UnitTypeUpgrade upgrade in value)
+                    identity.Upgrades.Add(upgrade);
+            }
         }
         #endregion
 
         #region Spatial Component
-        public Size Size
+        public override Size Size
         {
             get { return GetComponent<Spatial>().Size; }
         }
@@ -248,7 +249,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Faction Faction
         {
-            get { return faction; }
+            get { return GetComponent<FactionMembership>().Faction; }
         }
         #endregion
 
@@ -417,7 +418,7 @@ namespace Orion.Game.Simulation
         /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
         public int GetStat(UnitStat stat)
         {
-            return faction.GetStat(Type, stat);
+            return Faction.GetStat(Type, stat);
         }
 
         /// <summary>
@@ -638,7 +639,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(IsUnderConstruction);
             healthBuilt = float.NaN;
             ConstructionCompleted.Raise(this);
-            faction.OnBuildingConstructionCompleted(this);
+            Faction.OnBuildingConstructionCompleted(this);
         }
         #endregion
 
@@ -650,7 +651,7 @@ namespace Orion.Game.Simulation
         internal void Embark(Unit unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            Argument.EnsureEqual(unit.Faction, faction, "unit.Faction");
+            Argument.EnsureEqual(unit.Faction, Faction, "unit.Faction");
             Debug.Assert(HasSkill<TransportSkill>());
 
             if (transportedUnits == null) transportedUnits = new Stack<Unit>();
@@ -685,7 +686,7 @@ namespace Orion.Game.Simulation
                     .FirstOrNull(point => World.IsFree(point, CollisionLayer.Ground));
                 if (!location.HasValue)
                 {
-                    faction.RaiseWarning("Pas de place pour le débarquement d'unités");
+                    Faction.RaiseWarning("Pas de place pour le débarquement d'unités");
                     break;
                 }
 
@@ -857,7 +858,7 @@ namespace Orion.Game.Simulation
                .Where(unit => unit != this
                    && unit.IsBuilding
                    && unit.IsUnderConstruction
-                   && unit.Faction == faction
+                   && unit.Faction == Faction
                    && IsInLineOfSight(unit))
                .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
 
@@ -871,7 +872,7 @@ namespace Orion.Game.Simulation
 
         public override string ToString()
         {
-            return "{0} {2} {1}".FormatInvariant(Handle, name, faction);
+            return "{0} {2} {1}".FormatInvariant(Handle, Name, Faction);
         }
         #endregion
     }

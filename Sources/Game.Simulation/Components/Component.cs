@@ -12,6 +12,20 @@ namespace Orion.Game.Simulation.Components
 {
     public abstract class Component
     {
+        #region Static
+        #region Methods
+        public static T Clone<T>(T component, Entity entity) where T : Component
+        {
+            return (T)component.Clone(entity);
+        }
+
+        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
+        {
+            foreach (T item in from) to.Add(item);
+        }
+        #endregion
+        #endregion
+
         #region Fields
         private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
         private Entity entity;
@@ -84,11 +98,6 @@ namespace Orion.Game.Simulation.Components
                 }
             }
             return newInstance;
-        }
-
-        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
-        {
-            foreach (T item in from) to.Add(item);
         }
         #endregion
     }

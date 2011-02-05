@@ -1,6 +1,7 @@
 ﻿using System;
 using Orion.Engine;
 using System.Collections.Generic;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Skills
 {
@@ -22,8 +23,8 @@ namespace Orion.Game.Simulation.Skills
         private int range;
         private int delay = 1;
         private int splashRadius;
-        private List<BasicSkill.ArmorTypes> superEffectiveAgainst = new List<BasicSkill.ArmorTypes>();
-        private List<BasicSkill.ArmorTypes> ineffectiveAgainst = new List<BasicSkill.ArmorTypes>();
+        private List<ArmorType> superEffectiveAgainst = new List<ArmorType>();
+        private List<ArmorType> ineffectiveAgainst = new List<ArmorType>();
         #endregion
 
         #region Properties
@@ -44,7 +45,7 @@ namespace Orion.Game.Simulation.Skills
         /// <summary>
         /// Returns the list of armor types this attack skill is very effective against
         /// </summary>
-        public List<BasicSkill.ArmorTypes> SuperEffectiveAgainst
+        public List<ArmorType> SuperEffectiveAgainst
         {
             get { return superEffectiveAgainst; }
             set
@@ -57,7 +58,7 @@ namespace Orion.Game.Simulation.Skills
         /// <summary>
         /// Returns the list of armor types this attack skill is ineffective against
         /// </summary>
-        public List<BasicSkill.ArmorTypes> IneffectiveAgainst
+        public List<ArmorType> IneffectiveAgainst
         {
             get { return ineffectiveAgainst; }
             set
@@ -154,7 +155,7 @@ namespace Orion.Game.Simulation.Skills
         /// </summary>
         /// <param name="type">The type of armor to check against</param>
         /// <returns>True if this unit is super effective against the specified type, else if not.</returns>
-        public bool IsSuperEffectiveAgainst(BasicSkill.ArmorTypes armorType)
+        public bool IsSuperEffectiveAgainst(ArmorType armorType)
         {
             return SuperEffectiveAgainst.Contains(armorType);
         }
@@ -164,7 +165,7 @@ namespace Orion.Game.Simulation.Skills
         /// </summary>
         /// <param name="type">The type of armor to check against</param>
         /// <returns>True if this unit is ineffective against the specified type, else if not.</returns>
-        public bool IsIneffectiveAgainst(BasicSkill.ArmorTypes armorType)
+        public bool IsIneffectiveAgainst(ArmorType armorType)
         {
             return IneffectiveAgainst.Contains(armorType);
         }

@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
     /// Responsible for drawing the resource nodes on-screen.
     /// </summary>
-    public sealed class ResourcesRenderer : IViewRenderer
+    public sealed class ResourcesRenderer
     {
         #region Fields
         private static readonly ColorRgb miniatureAladdiumColor = Colors.Green;

@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
-using Orion.Game.Presentation;
-using Orion.Game.Matchmaking;
-using Keys = System.Windows.Forms.Keys;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -17,7 +9,7 @@ namespace Orion.Game.Presentation.Actions
     public sealed class CancelActionProvider : IActionProvider
     {
         #region Fields
-        private readonly ActionButton button;
+        private readonly ActionDescriptor action;
         #endregion
 
         #region Constructor
@@ -27,22 +19,19 @@ namespace Orion.Game.Presentation.Actions
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(gameGraphics, "gameGraphics");
 
-            button = actionPanel.CreateCancelButton(inputManager, gameGraphics);
+            action = actionPanel.CreateCancelAction(inputManager, gameGraphics);
         }
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return (point.X == 3 && point.Y == 0) ? button : null;
-        }
-
-        public void Dispose()
-        {
-            button.Dispose();
+            return (point.X == 3 && point.Y == 0) ? action : null;
         }
 
         void IActionProvider.Refresh() {}
+        
+        void IDisposable.Dispose() {}
         #endregion
     }
 }

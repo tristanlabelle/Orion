@@ -2,195 +2,114 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine;
-using Orion.Engine.Collections;
 using Orion.Engine.Gui;
-using Orion.Engine.Geometry;
+using Orion.Engine;
 using Orion.Game.Simulation;
-using OpenTK;
+using Orion.Engine.Gui.Adornments;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public sealed class DiplomacyPanel : Panel
+    /// <summary>
+    /// A control which allows the user to change his diplomatic state with regard to other factions.
+    /// </summary>
+    public sealed class DiplomacyPanel : ContentControl
     {
-        #region Nested Types
-        private sealed class FactionPanel : Panel
+        private sealed class FactionRow : DockLayout
         {
             #region Fields
-            private readonly Faction faction;
-            private readonly Checkbox alliedVictoryCheckbox;
-            private readonly Checkbox sharedVisionCheckbox;
-            private readonly Checkbox sharedControlCheckbox;
+            private readonly Faction otherFaction;
             #endregion
 
             #region Constructors
-            public FactionPanel(Rectangle frame, Faction localFaction, Faction otherFaction)
-                : base(frame, otherFaction.Color)
+            public FactionRow(DiplomacyPanel panel, OrionGuiStyle style, Faction localFaction, Faction otherFaction)
             {
-                Argument.EnsureNotNull(otherFaction, "faction");
-
-                this.faction = otherFaction;
-
-                Children.Add(new Label(otherFaction.Name));
-
-                DiplomaticStance stance = localFaction.GetDiplomaticStance(otherFaction);
-
-                Rectangle alliedVictoryCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.6f, 0, 0.05f, 1));
-                Rectangle sharedVisionCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.75f, 0, 0.05f, 1));
-                Rectangle sharedControlCheckboxFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.90f, 0, 0.05f, 1));
-
-                alliedVictoryCheckbox = new Checkbox(alliedVictoryCheckboxFrame, stance.HasFlag(DiplomaticStance.AlliedVictory));
-                sharedVisionCheckbox = new Checkbox(sharedVisionCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedVision));
-                sharedControlCheckbox = new Checkbox(sharedControlCheckboxFrame, stance.HasFlag(DiplomaticStance.SharedControl));
-
-                if (stance.HasFlag(DiplomaticStance.SharedControl))
-                {
-                    alliedVictoryCheckbox.IsEnabled = false;
-                    sharedVisionCheckbox.IsEnabled = false;
-                    sharedControlCheckbox.IsEnabled = false;
-                }
-                else
-                {
-                    sharedControlCheckbox.StateChanged += (checkbox, state) =>
+                Dock(new ImageBox()
                     {
-                        alliedVictoryCheckbox.IsChecked = state;
-                        sharedVisionCheckbox.IsChecked = state;
-                    };
-                }
+                        Width = 32,
+                        Height = 32,
+                        VerticalAlignment = Alignment.Center,
+                        MaxXMargin = 5,
+                        Tint = otherFaction.Color,
+                        DrawIfNoTexture = true
+                    }, Direction.NegativeX);
 
-                Children.Add(alliedVictoryCheckbox);
-                Children.Add(sharedVisionCheckbox);
-                Children.Add(sharedControlCheckbox);
+                Label nameLabel = style.CreateLabel(otherFaction.Name);
+                nameLabel.VerticalAlignment = Alignment.Center;
+                Dock(nameLabel, Direction.NegativeX);
+
+                CheckBox alliedCheckBox = style.Create<CheckBox>();
+                alliedCheckBox.VerticalAlignment = Alignment.Center;
+                alliedCheckBox.Content = style.CreateLabel("Allié");
+                alliedCheckBox.IsChecked = (localFaction.GetDiplomaticStance(otherFaction) & DiplomaticStance.SharedVision) != 0;
+                alliedCheckBox.StateChanged += sender =>
+                {
+                    DiplomaticStance diplomaticStance = alliedCheckBox.IsChecked
+                        ? DiplomaticStance.SharedVision | DiplomaticStance.AlliedVictory
+                        : DiplomaticStance.Enemy;
+                    panel.StanceChanged.Raise(panel, otherFaction, diplomaticStance);
+                };
+
+                Dock(alliedCheckBox, Direction.PositiveX);
+
+                this.otherFaction = otherFaction;
             }
             #endregion
 
             #region Properties
             public Faction Faction
             {
-                get { return faction; }
-            }
-
-            public bool IsAlliedVictoryChecked
-            {
-                get { return alliedVictoryCheckbox.IsChecked; }
-            }
-
-            public bool IsSharedVisionChecked
-            {
-                get { return sharedVisionCheckbox.IsChecked; }
-            }
-
-            public bool IsSharedControlChecked
-            {
-                get { return sharedControlCheckbox.IsChecked; }
+                get { return otherFaction; }
             }
             #endregion
         }
-        #endregion
-
-        #region Fields
-        private readonly UserInputManager userInputManager;
-        private readonly ListPanel factionListPanel;
-        private bool isDirty;
-        #endregion
 
         #region Constructors
-        public DiplomacyPanel(Rectangle frame, UserInputManager userInputManager)
-            : base(frame)
+        public DiplomacyPanel(OrionGuiStyle style, Faction faction)
         {
-            Argument.EnsureNotNull(userInputManager, "userInputManager");
+            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(faction, "faction");
 
-            this.userInputManager = userInputManager;
+            StackLayout stack = new StackLayout()
+            {
+                Direction = Direction.PositiveY,
+                ChildGap = 10,
+            };
 
-            Rectangle listPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0, 0.1f, 1, 0.9f));
-            this.factionListPanel = new ListPanel(listPanelFrame, Vector2.Zero);
-            this.Children.Add(factionListPanel);
+            stack.Stack(style.CreateLabel("Autres factions:"));
 
-            CreateTitle();
-            CreateFactionPanels();
+            foreach (Faction otherFaction in faction.World.Factions)
+            {
+                if (otherFaction == faction) continue;
+                stack.Stack(new FactionRow(this, style, faction, otherFaction));
+            }
 
-            Rectangle buttonFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.4f, 0.01f, 0.2f, 0.08f));
-            Button acceptButton = new Button(buttonFrame, "Accepter");
-            acceptButton.Triggered += OnAcceptPressed;
-            this.Children.Add(acceptButton);
+            Button closeButton = style.CreateTextButton("Accepter");
+            closeButton.HorizontalAlignment = Alignment.Positive;
+            closeButton.Clicked += (sender, @event) => Closed.Raise(this);
+            stack.Stack(closeButton);
 
-            LocalFaction.World.FactionDefeated += OnFactionDefeated;
+            faction.World.FactionDefeated += (sender, defeatedFaction) =>
+            {
+                stack.Children.Remove(stack.Children.First(child => ((FactionRow)child).Faction == defeatedFaction));
+            };
+
+            Adornment = new ColorAdornment(Colors.Gray);
+            MinWidth = 300;
+            Padding = 10;
+            Content = stack;
         }
         #endregion
 
         #region Events
-        public event Action<DiplomacyPanel> Accepted;
-        #endregion
+        /// <summary>
+        /// Raised when the diplomatic stance of this faction with regard to other factions changes.
+        /// </summary>
+        public event Action<DiplomacyPanel, Faction, DiplomaticStance> StanceChanged;
 
-        #region Properties
-        public Faction LocalFaction
-        {
-            get { return userInputManager.LocalFaction; }
-        }
-        #endregion
-
-        #region Methods
-        private void OnFactionDefeated(World world, Faction faction)
-        {
-            FactionPanel factionPanel = factionListPanel.Children
-                .OfType<FactionPanel>()
-                .FirstOrDefault(p => p.Faction == faction);
-
-            if (factionPanel != null) factionListPanel.Children.Remove(factionPanel);
-        }
-
-        private void CreateTitle()
-        {
-            Rectangle headerFrame = Instant.CreateComponentRectangle(factionListPanel.Bounds, new Rectangle(1, 0.07f));
-            Panel header = new Panel(headerFrame);
-
-            Rectangle alliedVictoryFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.45f, 0, 0.6f, 1));
-            Rectangle sharedVisionFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.65f, 0, 0.80f, 1));
-            Rectangle sharedControlFrame = Instant.CreateComponentRectangle(headerFrame, new Rectangle(0.85f, 0, 1, 1));
-            Label alliedVictoryLabel = new Label(alliedVictoryFrame, "Victoire alliée");
-            Label sharedVisionLabel = new Label(sharedVisionFrame, "Vision partagée");
-            Label sharedControlLabel = new Label(sharedControlFrame, "Contrôle partagé");
-
-            header.Children.Add(alliedVictoryLabel);
-            header.Children.Add(sharedVisionLabel);
-            header.Children.Add(sharedControlLabel);
-            factionListPanel.Children.Add(header);
-        }
-
-        private void CreateFactionPanels()
-        {
-            var otherFactions = LocalFaction.World.Factions
-                .Except(LocalFaction)
-                .Where(faction => faction.Status == FactionStatus.Undefeated);
-
-            Rectangle factionPanelFrame = Instant.CreateComponentRectangle(factionListPanel.Bounds, new Rectangle(1, 0.07f));
-            foreach (Faction faction in otherFactions)
-            {
-                FactionPanel factionPanel = new FactionPanel(factionPanelFrame, LocalFaction, faction);
-                factionListPanel.Children.Add(factionPanel);
-            }
-        }
-        
-        private void OnAcceptPressed(Button obj)
-        {
-            Commit();
-            Accepted.Raise(this);
-        }
-
-        private void Commit()
-        {
-            foreach (FactionPanel factionPanel in factionListPanel.Children.OfType<FactionPanel>())
-            {
-                DiplomaticStance newStance = DiplomaticStance.Enemy;
-                if (factionPanel.IsSharedControlChecked) newStance |= DiplomaticStance.SharedControl;
-                if (factionPanel.IsSharedControlChecked || factionPanel.IsAlliedVictoryChecked)
-                    newStance |= DiplomaticStance.AlliedVictory;
-                if (factionPanel.IsSharedControlChecked || factionPanel.IsSharedVisionChecked)
-                    newStance |= DiplomaticStance.SharedVision;
-
-                userInputManager.LaunchChangeDiplomacy(factionPanel.Faction, newStance);
-            }
-        }
+        /// <summary>
+        /// Raised when the diplomacy panel gets closed by the user.
+        /// </summary>
+        public event Action<DiplomacyPanel> Closed;
         #endregion
     }
 }

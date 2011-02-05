@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Skills
 {
@@ -12,16 +13,6 @@ namespace Orion.Game.Simulation.Skills
     [Serializable]
     public sealed class BasicSkill : UnitSkill
     {
-        #region enum
-        public enum ArmorTypes
-        {
-            Light = 1,
-            Heavy = 2,
-            Surnatural = 3,
-            Divine = 4
-        };
-        #endregion
-
         #region Fields
         public static readonly UnitStat AlageneCostStat = new UnitStat(typeof(BasicSkill), "AlageneCost", "Coût en alagène");
         public static readonly UnitStat AladdiumCostStat = new UnitStat(typeof(BasicSkill), "AladdiumCost", "Coût en aladdium");
@@ -35,7 +26,7 @@ namespace Orion.Game.Simulation.Skills
         private int aladdiumCost;
         private int foodCost;
         private int maxHealth = 1;
-        private ArmorTypes armorType;
+        private ArmorType armorType;
         private int armor;
         private int sightRange = 1;
         #endregion
@@ -100,7 +91,7 @@ namespace Orion.Game.Simulation.Skills
         /// <summary>
         /// Gets the units type of armor.
         /// </summary>
-        public ArmorTypes ArmorType
+        public ArmorType ArmorType
         {
             get { return armorType; }
             set
@@ -172,7 +163,7 @@ namespace Orion.Game.Simulation.Skills
             else if (stat == AladdiumCostStat) AladdiumCost = value;
             else if (stat == FoodCostStat) FoodCost = value;
             else if (stat == MaxHealthStat) MaxHealth = value;
-            else if (stat == ArmorTypeStat) ArmorType = (ArmorTypes)value;
+            else if (stat == ArmorTypeStat) ArmorType = (ArmorType)value;
             else if (stat == ArmorStat) Armor = value;
             else if (stat == SightRangeStat) SightRange = value;
             else base.DoSetStat(stat, value);

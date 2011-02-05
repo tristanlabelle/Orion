@@ -153,6 +153,19 @@ namespace Orion.Engine.Collections
         #endregion
         #endregion
 
+        #region RemoveLast
+        /// <summary>
+        /// Removes the last item from a given list.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the list.</typeparam>
+        /// <param name="list">The list from which the last item is to be removed.</param>
+        public static void RemoveLast<T>(this IList<T> list)
+        {
+            Argument.EnsureNotNull(list, "list");
+            list.RemoveAt(list.Count - 1);
+        }
+        #endregion
+
         #region Indices
         #region IndexOf
         /// <summary>

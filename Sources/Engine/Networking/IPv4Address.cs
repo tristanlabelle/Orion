@@ -84,7 +84,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public byte W
         {
-            get { return (byte)(value >> 24); }
+            get { return unchecked((byte)(value >> 24)); }
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public byte X
         {
-            get { return (byte)(value >> 16); }
+            get { return unchecked((byte)(value >> 16)); }
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public byte Y
         {
-            get { return (byte)(value >> 8); }
+            get { return unchecked((byte)(value >> 8)); }
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Orion.Engine.Networking
         /// </summary>
         public byte Z
         {
-            get { return (byte)(value >> 0); }
+            get { return unchecked((byte)(value >> 0)); }
         }
         #endregion
         #endregion
@@ -157,13 +157,12 @@ namespace Orion.Engine.Networking
 
         public override bool Equals(object obj)
         {
-            if (!(obj is IPv4Address)) return false;
-            return Equals((IPv4Address)obj);
+            return obj is IPv4Address && Equals((IPv4Address)obj);
         }
 
         public override int GetHashCode()
         {
-            return (int)value;
+            return unchecked((int)value);
         }
 
         public override string ToString()

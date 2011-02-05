@@ -16,7 +16,7 @@ namespace Orion.Game.Presentation.Renderers
         #region Fields
         private static readonly float GrassTextureSizeInTiles = 4;
         private static readonly float SandTextureSizeInTiles = 12;
-        private static readonly float ObstacleTextureSizeInTiles = 4;
+        private static readonly float ObstacleTextureSizeInTiles = 6;
         private static readonly ColorRgb MiniatureWalkableColor = ColorRgb.FromBytes(232, 207, 144);
         private static readonly ColorRgb MiniatureObstacleColor = ColorRgb.FromBytes(100, 78, 60);
 

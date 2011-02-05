@@ -4,10 +4,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
 using Orion.Game.Matchmaking;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
@@ -15,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
-    public sealed class BuildUserCommand : UserInputCommand, IViewRenderer
+    public sealed class BuildUserCommand : UserInputCommand, IRenderableUserCommand
     {
         #region Fields
         private readonly Unit buildingType;

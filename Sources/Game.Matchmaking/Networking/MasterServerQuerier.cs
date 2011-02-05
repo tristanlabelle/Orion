@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orion.Game.Matchmaking;
-using Orion.Game.Matchmaking.Networking;
 using System.Collections.ObjectModel;
 using System.IO;
-using Orion.Engine.Networking;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
+using Orion.Engine.Networking;
 using Orion.Engine.Networking.Http;
+using Orion.Game.Matchmaking;
+using Orion.Game.Matchmaking.Networking;
 
 namespace Orion.Game.Matchmaking.Networking
 {
-    public class MasterServerQuerier : IMatchQuerier
+    /// <summary>
+    /// Provides matches by checking those advertized on a master server.
+    /// </summary>
+    public sealed class MasterServerQuerier : IMatchQuerier
     {
         #region Fields
         private static readonly Regex returnLineRegex = new Regex(@"^(\d+)\s+(\d+)\s+(.+)$", RegexOptions.Compiled);
@@ -34,7 +38,15 @@ namespace Orion.Game.Matchmaking.Networking
             this.timeBeforeReExploring = timeBeforeReExploring;
             this.serverUri = serverUri;
             this.readOnlyMatches = matches.AsReadOnly();
+
+            try
+            {
             httpClient = new HttpRequest(serverUri.DnsSafeHost);
+        }
+            catch (SocketException)
+            {
+                // The master server was not found, this object will act as a null object.
+            }
         }
 
         public MasterServerQuerier(string serverUri, TimeSpan timeBeforeReExploring)
@@ -45,7 +57,7 @@ namespace Orion.Game.Matchmaking.Networking
         #region Properties
         public string Tag { get { return "WAN"; } }
 
-        public ReadOnlyCollection<AdvertizedMatch> Matches
+        public ICollection<AdvertizedMatch> Matches
         {
             get { return readOnlyMatches; }
         }
@@ -65,6 +77,8 @@ namespace Orion.Game.Matchmaking.Networking
         #region Methods
         public bool Update()
         {
+            if (httpClient == null || !isEnabled) return false;
+
             DateTime now = DateTime.Now;
             bool updated = false;
 
@@ -80,11 +94,11 @@ namespace Orion.Game.Matchmaking.Networking
                 lastPoll = now;
                 httpClient.ExecuteAsync(HttpRequestMethod.Get, serverUri.AbsolutePath, OnReadCompleted);
             }
+
             return updated;
         }
 
-        public void Dispose()
-        { }
+        public void Dispose() { }
 
         private void OnReadCompleted(HttpResponse response)
         {

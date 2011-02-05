@@ -3,6 +3,6 @@
 	<Skills>
 		<Basic SightRange="20" MaxHealth="1000" ArmorType="Divine" Armor="10" FoodCost="10"/>
 		<Move Speed="15"/>
-		<Attack Power="50" Range="20" Delay="1" EffectiveAgainst="Light Heavy Surnatural" IneffectiveAgainst=""/>
+		<Attack Power="50" Range="20" Delay="1" EffectiveAgainst="Light Heavy Supernatural" IneffectiveAgainst=""/>
 	</Skills>
 </UnitType>

@@ -43,40 +43,40 @@ namespace Orion.Game.Matchmaking
 
         public void LaunchCancel(IEnumerable<Unit> units)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new CancelCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchAttack(IEnumerable<Unit> units, Unit target)
         {
             units = units.Except(target);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new AttackCommand(Faction.Handle, units.Select(unit => unit.Handle), target.Handle));
         }
 
         public void LaunchBuild(IEnumerable<Unit> units, Unit buildingType, Point point)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new BuildCommand(Faction.Handle, units.Select(unit => unit.Handle), buildingType.Handle, point));
         }
 
         public void LaunchHarvest(IEnumerable<Unit> units, Entity node)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new HarvestCommand(Faction.Handle, units.Select(unit => unit.Handle), node.Handle));
         }
 
         public void LaunchMove(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = World.Clamp(destination);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new MoveCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void LaunchChangeRallyPoint(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = World.Clamp(destination);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new ChangeRallyPointCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
@@ -88,13 +88,13 @@ namespace Orion.Game.Matchmaking
         public void LaunchRepair(IEnumerable<Unit> units, Unit repairedUnit)
         {
             units = units.Except(repairedUnit);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new RepairCommand(Faction.Handle, units.Select(unit => unit.Handle), repairedUnit.Handle));
         }
 
         public void LaunchTrain(IEnumerable<Unit> buildings, Unit trainedType)
         {
-            if (buildings.Count() > 0)
+            if (buildings.Any())
                 IssueCommand(new TrainCommand(Faction.Handle, buildings.Select(unit => unit.Handle), trainedType.Handle));
         }
 
@@ -106,45 +106,45 @@ namespace Orion.Game.Matchmaking
 
         public void LaunchSuicide(IEnumerable<Unit> units)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new SuicideCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchZoneAttack(IEnumerable<Unit> units, Vector2 destination)
         {
             destination = World.Clamp(destination);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new ZoneAttackCommand(Faction.Handle, units.Select(unit => unit.Handle), destination));
         }
 
         public void LaunchHeal(IEnumerable<Unit> units, Unit hurtUnit)
         {
             units = units.Except(hurtUnit);
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new HealCommand(Faction.Handle, units.Select(unit => unit.Handle), hurtUnit.Handle));
         }
 
         public void LaunchStandGuard(IEnumerable<Unit> units)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
         public void LaunchUpgrade(IEnumerable<Unit> units, Unit targetType)
         {
-            if (units.Count() > 0)
+            if (units.Any())
                 IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetType.Handle));
         }
 
         public void LaunchEmbark(IEnumerable<Unit> embarkers, Unit transporter)
         {
-            if (embarkers.Count() > 0)
+            if (embarkers.Any())
                 IssueCommand(new EmbarkCommand(Faction.Handle, embarkers.Select(u => u.Handle), transporter.Handle));
         }
 
         public void LaunchDisembark(IEnumerable<Unit> transporters)
         {
-            if (transporters.Count() > 0)
+            if (transporters.Any())
                 IssueCommand(new DisembarkCommand(Faction.Handle, transporters.Select(u => u.Handle)));
         }
         #endregion

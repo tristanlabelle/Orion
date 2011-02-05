@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
-using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
+using Orion.Game.Presentation.Actions.UserCommands;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -101,7 +99,7 @@ namespace Orion.Game.Presentation.Renderers
                 worldRenderer.DrawFogOfWar(context, visibleBounds);
                 selectionRenderer.DrawRallyPointMarkers(context);
 
-                IViewRenderer selectedCommandRenderer = inputManager.SelectedCommand as IViewRenderer;
+                IRenderableUserCommand selectedCommandRenderer = inputManager.SelectedCommand as IRenderableUserCommand;
                 if (selectedCommandRenderer != null)
                     selectedCommandRenderer.Draw(context, visibleBounds);
             }

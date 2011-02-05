@@ -156,9 +156,6 @@ namespace Orion.Engine.Graphics
             if (bitmap == null) bitmap = new Bitmap(image);
             try
             {
-                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                try
-                {
                     BitmapData bitmapData = bitmap.LockBits(
                         new Rectangle(0, 0, image.Width, image.Height),
                         ImageLockMode.ReadOnly, bitmap.PixelFormat);
@@ -173,11 +170,6 @@ namespace Orion.Engine.Graphics
                 }
                 finally
                 {
-                    bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                }
-            }
-            finally
-            {
                 if (bitmap != image)
                     bitmap.Dispose();
             }
@@ -262,21 +254,26 @@ namespace Orion.Engine.Graphics
         private static BufferedPixelSurface FromBgrBitmapData(BitmapData bitmapData)
         {
             BufferedPixelSurface image = new BufferedPixelSurface(new Size(bitmapData.Width, bitmapData.Height), PixelFormat.Rgb);
-            
+
+            // Caching those instead of using image.Data.Xxx in the following code makes a big performance difference.
+            byte[] imageData = image.Data.Array;
+            int imageDataOffset = image.Data.Offset;
+            int imageDataLength = image.Data.Count;
+
             int bytesPerPixel = image.PixelFormat.GetBytesPerPixel();
             int rowLength = image.Size.Width * bytesPerPixel;
             for (int rowIndex = 0; rowIndex < bitmapData.Height; ++rowIndex)
             {
                 long rowPointer = (long)bitmapData.Scan0 + rowIndex * bitmapData.Stride;
-                Marshal.Copy((IntPtr)rowPointer, image.Data.Array, image.Data.Offset + rowIndex * rowLength, rowLength);
+                Marshal.Copy((IntPtr)rowPointer, imageData, imageDataOffset + rowIndex * rowLength, rowLength);
             }
 
             // BGR -> RGB
-            for (int i = image.Data.Offset; i < image.Data.Count; i += bytesPerPixel)
+            for (int i = imageDataOffset; i < imageDataLength; i += bytesPerPixel)
             {
-                byte blue = image.Data.Array[i];
-                image.Data.Array[i] = image.Data.Array[i + 2];
-                image.Data.Array[i + 2] = blue;
+                byte blue = imageData[i];
+                imageData[i] = imageData[i + 2];
+                imageData[i + 2] = blue;
             }
 
             return image;

@@ -1,15 +1,15 @@
 using System;
-using System.Diagnostics;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
-using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 
 namespace Orion.Game.Presentation.Renderers
 {
-    public sealed class MinimapRenderer : IViewRenderer
+    /// <summary>
+    /// A renderer which draws the world as seen through the minimap, as well as overlays.
+    /// </summary>
+    public sealed class MinimapRenderer
     {
         #region Fields
         private static readonly ColorRgb ViewRectangleColor = Colors.Orange;

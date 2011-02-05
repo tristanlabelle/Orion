@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
-using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
-using Orion.Game.Matchmaking;
 using Orion.Game.Presentation.Actions.UserCommands;
-using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Presentation.Actions
@@ -26,7 +18,7 @@ namespace Orion.Game.Presentation.Actions
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
         private readonly Unit unitType;
-        private readonly ActionButton[,] buttons = new ActionButton[4, 4];
+        private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
@@ -48,9 +40,9 @@ namespace Orion.Game.Presentation.Actions
         #endregion
 
         #region Methods
-        public ActionButton GetButtonAt(Point point)
+        public ActionDescriptor GetActionAt(Point point)
         {
-            return buttons[point.X, point.Y];
+            return actions[point.X, point.Y];
         }
 
         public void Refresh()
@@ -79,7 +71,7 @@ namespace Orion.Game.Presentation.Actions
 
             foreach (Unit buildingType in buildingTypes)
             {
-                buttons[x, y] = CreateButton(buildingType);
+                actions[x, y] = CreateButton(buildingType);
 
                 x++;
                 if (x == 4)
@@ -89,44 +81,34 @@ namespace Orion.Game.Presentation.Actions
                 }
             }
 
-            buttons[3, 0] = actionPanel.CreateCancelButton(inputManager, graphics);
+            actions[3, 0] = actionPanel.CreateCancelAction(inputManager, graphics);
         }
 
-        private ActionButton CreateButton(Unit buildingType)
+        private ActionDescriptor CreateButton(Unit buildingType)
         {
-            ActionButton button = new ActionButton(actionPanel, inputManager, buildingType.Name, Keys.None, graphics);
-
-            Texture texture = graphics.GetUnitTexture(buildingType);
-            button.Renderer = new TexturedRenderer(texture);
-
             Faction faction = inputManager.LocalFaction;
-            int aladdium = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
-            int alagene = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
-            button.Name = "{0}\nAladdium: {1} / Alagene: {2}".FormatInvariant(buildingType.Name, aladdium, alagene);
-
-            button.Triggered += delegate(Button sender)
+            int aladdiumCost = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
+            int alageneCost = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
+        	
+            return new ActionDescriptor()
             {
+            	Name = buildingType.Name,
+                Cost = new ResourceAmount(aladdiumCost, alageneCost),
+            	Texture = graphics.GetUnitTexture(buildingType),
+            	Action = () =>
+	            {
                 inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
                 actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
+	            }
             };
-
-            return button;
         }
 
         private void DisposeButtons()
         {
-            for (int y = 0; y < buttons.GetLength(1); ++y)
-            {
-                for (int x = 0; x < buttons.GetLength(0); ++x)
-                {
-                    if (buttons[x, y] != null)
-                    {
-                        buttons[x, y].Dispose();
-                        buttons[x, y] = null;
+            for (int y = 0; y < actions.GetLength(1); ++y)
+                for (int x = 0; x < actions.GetLength(0); ++x)
+                    actions[x, y] = null;
                     }
-                }
-            }
-        }
         #endregion
     }
 }

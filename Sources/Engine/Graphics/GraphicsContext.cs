@@ -22,10 +22,21 @@ namespace Orion.Engine.Graphics
         #region Instance
         #region Fields
         private static readonly Font defaultFont = new Font("Trebuchet MS", 14);
+        private static readonly Font textRendererFont = new Font("Trebuchet MS", 18, System.Drawing.GraphicsUnit.Pixel);
 
         private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
         private readonly TextRenderer textRenderer;
+
+        /// <summary>
+        /// The size of the OpenGL viewport.
+        /// </summary>
+        /// <remarks>
+        /// This value corresponds to glGetInteger(GL_VIEWPORT), but is cached
+        /// because that function seems to have a monstrous impact on performance.
+        /// </remarks>
+        private Size viewportSize;
+
         private Rectangle projectionBounds = Rectangle.FromCenterExtent(0, 0, 1, 1);
         private Font font = defaultFont;
         #endregion
@@ -36,7 +47,7 @@ namespace Orion.Engine.Graphics
             Argument.EnsureNotNull(backbufferSwapper, "backbufferSwapper");
 
             this.backbufferSwapper = backbufferSwapper;
-            this.textRenderer = new TextRenderer(this, new Font("Trebuchet MS", 24, System.Drawing.GraphicsUnit.Pixel));
+            this.textRenderer = new TextRenderer(this);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
@@ -45,6 +56,10 @@ namespace Orion.Engine.Graphics
             GL.Ortho(-1, 1, -1, 1, -1, 1);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
+            
+            int[] viewportCoordinates = new int[4];
+            GL.GetInteger(GetPName.Viewport, viewportCoordinates);
+            viewportSize = new Size(viewportCoordinates[2], viewportCoordinates[3]);
         }
         #endregion
 
@@ -54,16 +69,12 @@ namespace Orion.Engine.Graphics
         /// </summary>
         public Size ViewportSize
         {
-            get
-            {
-                int[] viewportCoordinates = new int[4];
-                GL.GetInteger(GetPName.Viewport, viewportCoordinates);
-
-                return new Size(viewportCoordinates[2], viewportCoordinates[3]);
-            }
+            get { return viewportSize; }
             internal set
             {
+                if (value == viewportSize) return;
                 GL.Viewport(0, 0, value.Width, value.Height);
+                viewportSize = value;
             }
         }
 
@@ -92,7 +103,7 @@ namespace Orion.Engine.Graphics
                 GL.MatrixMode(MatrixMode.Projection);
                 GL.LoadIdentity();
                 GL.Ortho(projectionBounds.MinX, projectionBounds.MaxX,
-                    projectionBounds.MinY, projectionBounds.MaxY, -1, 1);
+                    projectionBounds.MaxY, projectionBounds.MinY, -1, 1);
                 GL.MatrixMode(MatrixMode.Modelview);
             }
         }
@@ -255,12 +266,18 @@ namespace Orion.Engine.Graphics
 
             GL.Enable(EnableCap.ScissorTest);
             GL.Scissor(
-                clippedRegion.MinX, clippedRegion.MinY,
+                clippedRegion.MinX, ViewportSize.Height - clippedRegion.ExclusiveMaxY,
                 clippedRegion.Width, clippedRegion.Height);
 
             scissorStack.Push(clippedRegion);
 
-            return new DisposableHandle(() =>
+            return new DisposableHandle(PopScissorRegion);
+        }
+
+        /// <summary>
+        /// Reverts the scissor rectangle to its value prior to the last <see cref="PushScissorRegion"/> call.
+        /// </summary>
+        public void PopScissorRegion()
             {
                 scissorStack.Pop();
                 if (scissorStack.Count == 0)
@@ -271,10 +288,9 @@ namespace Orion.Engine.Graphics
                 {
                     Region oldRegion = scissorStack.Peek();
                     GL.Scissor(
-                        oldRegion.MinX, oldRegion.MinY,
+                    oldRegion.MinX, ViewportSize.Height - oldRegion.ExclusiveMaxY,
                         oldRegion.Width, oldRegion.Height);
                 }
-            });
         }
         #endregion
 
@@ -301,7 +317,15 @@ namespace Orion.Engine.Graphics
 
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
 
-            return new DisposableHandle(GL.PopMatrix);
+            return new DisposableHandle(PopTransform);
+        }
+
+        /// <summary>
+        /// Undoes the last <see cref="PushTransform"/> call.
+        /// </summary>
+        public void PopTransform()
+        {
+            GL.PopMatrix();
         }
 
         public DisposableHandle PushTransform(Vector2 translation, float rotation, Vector2 scaling)
@@ -327,7 +351,7 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Drawing
-        #region Ellipses (and implicitly converted circles)
+        #region Ellipses
         /// <summary>
         /// Fills a given <see cref="Ellipse"/>.
         /// </summary>
@@ -396,9 +420,9 @@ namespace Orion.Engine.Graphics
         private void DrawVertices(Rectangle rectangle)
         {
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             DrawVertex(rectangle.MinX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
         }
         #endregion
 
@@ -502,11 +526,11 @@ namespace Orion.Engine.Graphics
             try
             {
                 IntPtr pointer = pinningHandle.AddrOfPinnedObject();
-                GL.EnableClientState(EnableCap.VertexArray);
+                GL.EnableClientState(ArrayCap.VertexArray);
                 GL.VertexPointer(2, VertexPointerType.Float, 0, pointer);
                 GL.DrawArrays(BeginMode.TriangleStrip, 0, vertices.Length);
                 GL.VertexPointer(2, VertexPointerType.Float, 0, IntPtr.Zero);
-                GL.DisableClientState(EnableCap.VertexArray);
+                GL.DisableClientState(ArrayCap.VertexArray);
             }
             finally
             {
@@ -540,30 +564,20 @@ namespace Orion.Engine.Graphics
         #endregion
 
         #region Text
-        public void Draw(string text, ColorRgba color)
+        public Size Measure(Substring text, ref TextRenderingOptions options)
         {
-            Draw(text, new Vector2(0, 0), color);
+            return textRenderer.Measure(text, ref options);
         }
 
-        public void Draw(string text, Vector2 position, ColorRgba color)
+        public Size Draw(Substring text, ref TextRenderingOptions options)
         {
-            Text textObject = new Text(text, font);
-            Draw(textObject, position, color);
+            return textRenderer.Draw(text, ref options);
         }
 
-        public void Draw(Text text, ColorRgba color)
-        {
-            Draw(text, Vector2.Zero, color);
-        }
-
+        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
         public void Draw(Text text, Rectangle clippingRect, ColorRgba color)
         {
             Draw(text, Vector2.Zero, clippingRect, color);
-        }
-
-        public void Draw(Text text, Vector2 position, ColorRgba color)
-        {
-            Draw(text, position, text.Frame, color);
         }
 
         /// <summary>
@@ -573,9 +587,17 @@ namespace Orion.Engine.Graphics
         /// <param name="text">The <see cref="Text"/> object to draw</param>
         /// <param name="clippingRect">The rectangle clipping the text</param>
         /// <param name="color">The color with which to draw the text.</param>
+        [Obsolete("Superseded by Measure(Substring, TextRenderingOptions&)")]
         public void Draw(Text text, Vector2 origin, Rectangle clippingRect, ColorRgba color)
         {
-            textRenderer.Draw(text.Value, text.Font.GetHeight(), origin, color, float.PositiveInfinity);
+            var options = new TextRenderingOptions
+            {
+                Font = text.Font ?? font ?? textRendererFont,
+                Origin = (Point)origin,
+                Color = color
+            };
+
+            textRenderer.Draw((Substring)text.Value, ref options);
         }
         #endregion
 
@@ -652,12 +674,12 @@ namespace Orion.Engine.Graphics
             GL.Begin(BeginMode.Quads);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MinY);
             DrawVertex(rectangle.MinX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
-            DrawVertex(rectangle.MaxX, rectangle.MinY);
-            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
-            DrawVertex(rectangle.MaxX, rectangle.MaxY);
             GL.TexCoord2(textureRectangle.MinX, textureRectangle.MaxY);
             DrawVertex(rectangle.MinX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MaxY);
+            DrawVertex(rectangle.MaxX, rectangle.MaxY);
+            GL.TexCoord2(textureRectangle.MaxX, textureRectangle.MinY);
+            DrawVertex(rectangle.MaxX, rectangle.MinY);
             GL.End();
         }
 

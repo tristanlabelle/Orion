@@ -1,696 +1,769 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using OpenTK;
 using Orion.Engine;
-using Orion.Engine.Collections;
-using Orion.Engine.Geometry;
+using Orion.Engine.Data;
 using Orion.Engine.Graphics;
 using Orion.Engine.Gui;
-using Orion.Engine.Input;
-using Orion.Game.Matchmaking;
-using Orion.Game.Matchmaking.Commands;
+using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation.Actions;
-using Orion.Game.Presentation.Actions.Enablers;
 using Orion.Game.Presentation.Renderers;
+using Key = OpenTK.Input.Key;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Utilities;
-using Control = System.Windows.Forms.Control;
-using Keys = System.Windows.Forms.Keys;
-using MouseButtons = System.Windows.Forms.MouseButtons;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public sealed class MatchUI : MaximizedPanel
+    /// <summary>
+    /// Provides the in-match user interface.
+    /// </summary>
+    public sealed partial class MatchUI : ContentControl
     {
         #region Fields
-        #region Chat
-        private readonly TextField chatInput;
-        private readonly MatchConsole console;
-        #endregion
+        private readonly OrionGuiStyle style;
+        private readonly Action<UIManager, TimeSpan> updatedEventHandler;
+        private readonly InterpolatedCounter aladdiumAmountCounter = new InterpolatedCounter(0);
+        private readonly InterpolatedCounter alageneAmountCounter = new InterpolatedCounter(0);
 
-        #region General UI
-        private readonly IMatchRenderer matchRenderer;
-        private readonly ClippedView worldView;
-        private readonly Panel hudPanel;
-        private readonly Panel selectionPanel;
-        #endregion
+        private Label aladdiumAmountLabel;
+        private Label alageneAmountLabel;
+        private Label foodAmountLabel;
+        private ImageBox idleWorkerCountImageBox;
+        private Label idleWorkerCountLabel;
+        private ModalDialog modalDialog;
+        private DiplomacyPanel diplomacyPanel;
+        private PausePanel pausePanel;
 
-        #region Top bar
-        private readonly Label resourcesLabel;
-        private readonly Panel pausePanel;
-        private DiplomacyPanel diplomacyPanel; // Lazy initialized
-        private Func<string> resourcesLabelTextGetter;
-        #endregion
+        private Control bottomBar;
+        private ContentControl selectionInfoPanel;
+        private TextField chatTextField;
+        private MessageConsole messageConsole;
+        private GridLayout actionButtonGrid;
+        private ActionToolTip actionToolTip;
 
-        #region Minimap
-        private readonly MinimapRenderer minimapRenderer;
-        private readonly Panel minimapPanel;
-        private bool mouseDownOnMinimap;
-        #endregion
-
-        #region Idle Workers
-        private readonly WorkerActivityMonitor workerActivityMonitor;
-        private readonly Button idleWorkerButton;
-        #endregion
-
-        private readonly GameGraphics gameGraphics;
-        private readonly UserInputManager userInputManager;
-        private readonly List<ActionEnabler> enablers = new List<ActionEnabler>();
-        private readonly ActionPanel actionPanel;
-        private bool isSpaceDown;
-        private bool isShiftDown;
+        private TimeSpan time;
+        private TimeSpan lastIdleWorkerCountChangedTime;
+        private ActionButton lastActionButtonUnderMouse;
+        private Point scrollDirection;
+        private bool isLeftPressed, isRightPressed, isUpPressed, isDownPressed;
+        private bool isFollowingSelection;
+        private bool isDisplayingHealthBars;
         #endregion
 
         #region Constructors
-        public MatchUI(GameGraphics gameGraphics, UserInputManager userInputManager,
-            IMatchRenderer matchRenderer)
+        public MatchUI(GameGraphics graphics, Faction localFaction)
         {
-            Argument.EnsureNotNull(gameGraphics, "gameGraphics");
-            Argument.EnsureNotNull(userInputManager, "userInputManager");
-            Argument.EnsureNotNull(matchRenderer, "matchRenderer");
+            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localFaction, "localFaction");
 
-            this.gameGraphics = gameGraphics;
-            this.userInputManager = userInputManager;
+            this.style = graphics.GuiStyle;
+            this.updatedEventHandler = OnGuiUpdated;
 
-            Match.FactionMessageReceived += OnFactionMessageReceived;
+            this.modalDialog = new ModalDialog()
+            {
+                VisibilityFlag = Visibility.Hidden,
+                IsKeyEventSink = true
+            };
 
-            World world = Match.World;
-            world.FactionDefeated += OnFactionDefeated;
-
-            this.matchRenderer = matchRenderer;
-
-            Rectangle worldFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0.29f), new Vector2(1, 1));
-            worldView = new ClippedView(worldFrame, world.Bounds, null);
-            worldView.Renderer = new DelegatedRenderer((c, bounds) => matchRenderer.Draw(bounds));
-            worldView.Bounds = new Rectangle(40, 20);
-            worldView.MinimumVisibleBoundsSize = new Vector2(8, 4);
-            worldView.BoundsChanged += OnWorldViewBoundsChanged;
-            Children.Add(worldView);
-
-            Rectangle topBarFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0, 0.96f, 1, 0.04f));
-            Panel topBarPanel = new Panel(topBarFrame);
-            Children.Add(topBarPanel);
-
-            this.resourcesLabel = new Label(topBarPanel.Bounds);
-            topBarPanel.Children.Add(resourcesLabel);
-            this.resourcesLabelTextGetter = GetDefaultResourcesLabelText;
-
-            Rectangle pauseButtonFrame = Instant.CreateComponentRectangle(topBarPanel.Bounds, new Rectangle(0.69f, 0, 0.15f, 1));
-            Button pauseButton = new Button(pauseButtonFrame, "Pause");
-            pauseButton.Triggered += b => DisplayPausePanel();
-            topBarPanel.Children.Add(pauseButton);
-
-            Rectangle diplomacyButtonFrame = Instant.CreateComponentRectangle(topBarPanel.Bounds, new Rectangle(0.85f, 0, 0.15f, 1));
-            Button diplomacyButton = new Button(diplomacyButtonFrame, "Diplomatie");
-            diplomacyButton.Triggered += b => DisplayDiplomacy();
-            topBarPanel.Children.Add(diplomacyButton);
-
-            Rectangle hudPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(1, 0.29f));
-            hudPanel = new Panel(hudPanelFrame);
-            Children.Add(hudPanel);
-
-            Rectangle selectionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Rectangle(0.25f, 0, 0.5f, 1));
-            selectionPanel = new Panel(selectionPanelFrame, Colors.DarkGray);
-            hudPanel.Children.Add(selectionPanel);
-
-            Rectangle actionPanelFrame = Instant.CreateComponentRectangle(hudPanel.Bounds, new Rectangle(0.75f, 0, 0.25f, 1));
-            actionPanel = new ActionPanel(actionPanelFrame);
-            hudPanel.Children.Add(actionPanel);
-
-            Vector2 maxMinimapRectangleSize = new Vector2(0.23f, 0.9f);
-            Vector2 minimapRectangleSize = maxMinimapRectangleSize;
-            if (Match.World.Width > Match.World.Height)
-                minimapRectangleSize.Y *= Match.World.Height / (float)Match.World.Width;
-            else
-                minimapRectangleSize.X *= Match.World.Width / (float)Match.World.Height;
-
-            Vector2 minimapRectangleOrigin = new Vector2(
-                0.01f + (maxMinimapRectangleSize.X - minimapRectangleSize.X) * 0.5f,
-                0.05f + (maxMinimapRectangleSize.Y - minimapRectangleSize.Y) * 0.5f);
-
-            Rectangle minimapFrame = Instant.CreateComponentRectangle(hudPanel.Bounds,
-                minimapRectangleOrigin, minimapRectangleOrigin + minimapRectangleSize);
-            minimapRenderer = new MinimapRenderer(() => worldView.Bounds, LocalFaction, matchRenderer);
-            minimapPanel = new Panel(minimapFrame, minimapRenderer);
-            minimapPanel.Bounds = world.Bounds;
-            hudPanel.Children.Add(minimapPanel);
-
-            CreateScrollers();
-
-            Rectangle chatInputFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.04f, 0.3f), new Vector2(0.915f, 0.34f));
-            chatInput = new TextField(chatInputFrame);
-            chatInput.Triggered += OnChatInputTriggered;
-            chatInput.KeyboardButtonPressed += OnChatInputKeyboardButtonPressed;
-
-            Rectangle consoleFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.35f), new Vector2(0.5f, 0.9f));
-            console = new MatchConsole(consoleFrame);
-            Children.Add(console);
-
-            Rectangle pausePanelFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0.33f, 0.33f), new Vector2(0.66f, 0.66f));
-            pausePanel = new Panel(pausePanelFrame);
-
-            Rectangle quitGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.56f), new Vector2(0.75f, 0.86f));
-            Button quitGameButton = new Button(quitGameButtonFrame, "Quitter");
-            quitGameButton.Triggered += button => QuitPressed.Raise(this);
-
-            Rectangle resumeGameButtonFrame = Instant.CreateComponentRectangle(pausePanel.Bounds, new Vector2(0.25f, 0.14f), new Vector2(0.75f, 0.42f));
-            Button resumeGameButton = new Button(resumeGameButtonFrame, "Retour");
-            resumeGameButton.Triggered += button => HidePausePanel();
-
-            pausePanel.Children.Add(quitGameButton);
-            pausePanel.Children.Add(resumeGameButton);
-
-            KeyboardButtonPressed += (sender, args) => userInputManager.HandleKeyDown(args);
-            KeyboardButtonReleased += (sender, args) => userInputManager.HandleKeyUp(args);
-
-            userInputManager.Selection.Changed += OnSelectionChanged;
-            userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
-            LocalCommander.CommandIssued += OnCommanderGeneratedCommand;
-            minimapPanel.MouseButtonPressed += MinimapMouseDown;
-            minimapPanel.MouseMoved += MinimapMouseMove;
-
-            enablers.Add(new MoveEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new AttackEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new StandGuardEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new BuildEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new DisembarkEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new UpgradeEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new SellEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new HarvestEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new TrainEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new HealEnabler(userInputManager, actionPanel, gameGraphics));
-            enablers.Add(new ResearchEnabler(userInputManager, actionPanel, gameGraphics));
-
-            workerActivityMonitor = new WorkerActivityMonitor(LocalFaction);
-            workerActivityMonitor.WorkerActivityStateChanged += OnWorkerActivityStateChanged;
-            Rectangle inactiveWorkerRectangle = Instant.CreateComponentRectangle(Bounds, new Vector2(0.005f, 0.3f), new Vector2(0.035f, 0.34f));
-            Texture workerTexture = gameGraphics.GetUnitTexture("Schtroumpf");
-            TexturedRenderer workerButtonRenderer = new TexturedRenderer(workerTexture, Colors.White, Colors.Gray, Colors.LightGray);
-            this.idleWorkerButton = new Button(inactiveWorkerRectangle, string.Empty, workerButtonRenderer);
-            this.idleWorkerButton.CaptionUpColor = Colors.Red;
-            this.idleWorkerButton.Triggered += OnIdleWorkerButtonTriggered;
-            UpdateWorkerActivityButton();
-
-            LocalFaction.Warning += OnLocalFactionWarning;
-
-            Unit viewTarget = LocalFaction.Units.FirstOrDefault(unit => unit.HasSkill<TrainSkill>())
-                ?? LocalFaction.Units.FirstOrDefault();
-            if (viewTarget != null) CenterOn(viewTarget.Center);
+            DockLayout mainDock = new DockLayout()
+            {
+                LastChildFill = true
+            };
+            mainDock.Dock(CreateTopBar(localFaction), Direction.NegativeY);
+            mainDock.Dock(CreateBottomBar(), Direction.PositiveY);
+            mainDock.Dock(CreateOverlays(), Direction.PositiveY);
+            Content = mainDock;
         }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when the user has quitted the Match through the UI.
+        /// Raised when the view gets moved using the minimap.
+        /// The parameter specifies the new world position of the camera,
+        /// normalized between (0,0) and (1,1).
         /// </summary>
-        public event Action<MatchUI> QuitPressed;
+        public event Action<MatchUI, Vector2> MinimapCameraMoved;
+
+        /// <summary>
+        /// Raised when the minimap receives a right click.
+        /// The parameter specifies the world position of the click,
+        /// normalized between (0,0) and (1,1).
+        /// </summary>
+        public event Action<MatchUI, Vector2> MinimapRightClicked;
+
+        /// <summary>
+        /// Raised when the minimap should be rendered.
+        /// </summary>
+        public event Action<MatchUI, Region> MinimapRendering;
+
+        /// <summary>
+        /// Raised when the game gets zoomed in or out. The parameter specifies the zoom amount.
+        /// </summary>
+        public event Action<MatchUI, float> ViewportZoomed;
+
+        /// <summary>
+        /// Raised when the user has submitted text using the chat.
+        /// </summary>
+        public event Action<MatchUI, string> Chatted;
+
+        /// <summary>
+        /// Raised when the user selects idle workers.
+        /// The parameter is <c>true</c> if all idle workers should be selected and <c>false</c> if only the next one should.
+        /// </summary>
+        public event Action<MatchUI, bool> SelectingIdleWorkers;
+
+        /// <summary>
+        /// Raised when the diplomatic stance of the local faction with regard to another faction changes.
+        /// </summary>
+        public event Action<MatchUI, Faction, DiplomaticStance> DiplomaticStanceChanged;
+
+        /// <summary>
+        /// Raised when the user pauses the game.
+        /// </summary>
+        public event Action<MatchUI> Paused;
+
+        /// <summary>
+        /// Raised when the user resumes the game after its been paused.
+        /// </summary>
+        public event Action<MatchUI> Resumed;
+
+        /// <summary>
+        /// Raised when the user quits the game.
+        /// </summary>
+        public event Action<MatchUI> Exited;
         #endregion
 
         #region Properties
-        public Rectangle CameraBounds
+        /// <summary>
+        /// Accesses the displayed aladdium amount.
+        /// </summary>
+        public int AladdiumAmount
         {
-            get { return worldView.Bounds; }
+            get { return aladdiumAmountCounter.TargetValue; }
+            set
+            {
+                Argument.EnsurePositive(value, "AladdiumAmount");
+                aladdiumAmountCounter.TargetValue = value;
+            }
         }
 
-        private SelectionManager SelectionManager
+        /// <summary>
+        /// Accesses the displayed alagene amount.
+        /// </summary>
+        public int AlageneAmount
         {
-            get { return userInputManager.SelectionManager; }
+            get { return alageneAmountCounter.TargetValue; }
+            set
+            {
+                Argument.EnsurePositive(value, "AlageneAmount");
+                alageneAmountCounter.TargetValue = value;
+            }
         }
 
-        private Selection Selection
+        /// <summary>
+        /// Accesses the displayed amount of used food.
+        /// </summary>
+        public int UsedFoodAmount
         {
-            get { return userInputManager.Selection; }
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[0]); }
+            set
+            {
+                // The used food amount can actually be negative because of the twelvehungrymen cheat
+                // Argument.EnsurePositive(value, "UsedFoodAmount");
+                foodAmountLabel.Text = value + "/" + FoodLimit;
+            }
         }
 
-        private Commander LocalCommander
+        /// <summary>
+        /// Accesses the displayed food limit.
+        /// </summary>
+        public int FoodLimit
         {
-            get { return userInputManager.LocalCommander; }
+            get { return int.Parse(foodAmountLabel.Text.Split('/')[1]); }
+            set
+            {
+                Argument.EnsurePositive(value, "FoodLimit");
+                foodAmountLabel.Text = UsedFoodAmount + "/" + value;
+            }
         }
 
-        private Faction LocalFaction
+        /// <summary>
+        /// Accesses the displayed number of idle workers.
+        /// </summary>
+        public int IdleWorkerCount
         {
-            get { return userInputManager.LocalFaction; }
+            get { return int.Parse(idleWorkerCountLabel.Text); }
+            set
+            {
+                if (value == IdleWorkerCount) return;
+                Argument.EnsurePositive(value, "InactiveWorkerCount");
+
+                idleWorkerCountLabel.Text = value.ToStringInvariant();
+                lastIdleWorkerCountChangedTime = time;
+            }
         }
 
-        private World World
+        /// <summary>
+        /// Gets the screen-space rectangle in which the game can be seen.
+        /// </summary>
+        public Region ViewportRectangle
         {
-            get { return LocalFaction.World; }
+            get
+            {
+                Region rectangle = Rectangle;
+                int bottomBarHeight = bottomBar.ActualSize.Height;
+                return new Region(
+                    rectangle.MinX, rectangle.MinY,
+                    rectangle.Width, Math.Max(0, rectangle.Height - bottomBarHeight));
+            }
         }
 
-        private Match Match
+        /// <summary>
+        /// Gets a point which indicates the direction the camera should be scrolling.
+        /// </summary>
+        public Point ScrollDirection
         {
-            get { return userInputManager.Match; }
+            get { return Manager != null && Manager.ModalPopup != null ? Point.Zero : scrollDirection; }
+        }
+
+        /// <summary>
+        /// Accesses the control which displays information about the selection.
+        /// </summary>
+        public Control SelectionInfoPanel
+        {
+            get { return selectionInfoPanel.Content; }
+            set { selectionInfoPanel.Content = value; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating that the camera should follow the current selection.
+        /// </summary>
+        public bool IsFollowingSelection
+        {
+            get { return isFollowingSelection; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if all health bars should be displayed.
+        /// </summary>
+        public bool IsDisplayingHealthBars
+        {
+            get { return isDisplayingHealthBars; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if the match is currently paused.
+        /// </summary>
+        public bool IsPaused
+        {
+            get { return Manager != null && Manager.Popups.Contains(modalDialog); }
+        }
+
+        private ActionButton ActionButtonUnderMouse
+        {
+            get
+            {
+                if (Manager == null) return null;
+
+                Control controlUnderMouse = Manager.ControlUnderMouse;
+                while (controlUnderMouse != null)
+                {
+                    ActionButton actionButtonUnderMouse = controlUnderMouse as ActionButton;
+                    if (actionButtonUnderMouse != null) return actionButtonUnderMouse;
+                    controlUnderMouse = controlUnderMouse.Parent;
+                }
+
+                return null;
+            }
         }
         #endregion
 
         #region Methods
-        #region Initialization
-        private void CreateScrollers()
+        /// <summary>
+        /// Adds a message to this <see cref="MatchUI"/>'s message console.
+        /// </summary>
+        /// <param name="text">The text of the message.</param>
+        /// <param name="color">The color of the message.</param>
+        public void AddMessage(string text, ColorRgb color)
         {
-            const float sliderSize = 0.005f;
+            messageConsole.AddMessage(text, color);
+        }
 
-            Rectangle northFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 1 - sliderSize), new Vector2(1, 1));
-            Rectangle southFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(1, sliderSize));
-            Rectangle eastFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(1 - sliderSize, 0), new Vector2(1, 1));
-            Rectangle westFrame = Instant.CreateComponentRectangle(Bounds, new Vector2(0, 0), new Vector2(sliderSize, 1));
-            Scroller northScroller = new Scroller(worldView, northFrame, new Vector2(0, 0.05f), Keys.Up);
-            Scroller southScroller = new Scroller(worldView, southFrame, new Vector2(0, -0.05f), Keys.Down);
-            Scroller eastScroller = new Scroller(worldView, eastFrame, new Vector2(0.025f, 0), Keys.Right);
-            Scroller westScroller = new Scroller(worldView, westFrame, new Vector2(-0.025f, 0), Keys.Left);
+        /// <summary>
+        /// Hides all action buttons.
+        /// </summary>
+        public void ClearActionButtons()
+        {
+            foreach (ActionButton button in actionButtonGrid.Children)
+                button.VisibilityFlag = Visibility.Hidden;
+        }
 
-            Children.Add(northScroller);
-            Children.Add(southScroller);
-            Children.Add(eastScroller);
-            Children.Add(westScroller);
+        /// <summary>
+        /// Resets an action button from a descriptor.
+        /// </summary>
+        /// <param name="rowIndex">The index of the row of the button.</param>
+        /// <param name="columnIndex">The index of the column of the button.</param>
+        /// <param name="descriptor">
+        /// The action descriptor to be applied to the button.
+        /// Can be <c>null</c> if the button should not be available.
+        /// </param>
+        public void SetActionButton(int rowIndex, int columnIndex, ActionDescriptor descriptor)
+        {
+            ActionButton button = (ActionButton)actionButtonGrid.Children[rowIndex, columnIndex];
+            button.Descriptor = descriptor;
+        }
+
+        private void UpdateScrollDirection()
+        {
+            Region rectangle = Rectangle;
+            Point mousePosition = Manager.MousePosition;
+
+            int scrollX = 0;
+            if (mousePosition.X == 0 || isLeftPressed) scrollX -= 1;
+            if (mousePosition.X == rectangle.ExclusiveMaxX - 1 || isRightPressed) scrollX += 1;
+
+            int scrollY = 0;
+            if (mousePosition.Y == 0 || isUpPressed) scrollY -= 1;
+            if (mousePosition.Y == rectangle.ExclusiveMaxY - 1 || isDownPressed) scrollY += 1;
+
+            scrollDirection = new Point(scrollX, scrollY);
+        }
+
+        private void UpdateInactiveWorkerButton()
+        {
+            if (idleWorkerCountLabel.Text == "0")
+            {
+                idleWorkerCountImageBox.Color = Colors.White;
+                return;
+            }
+
+            double timeElapsedInSeconds = time.TotalSeconds - lastIdleWorkerCountChangedTime.TotalSeconds;
+            float intensity = (float)((0.2 + Math.Cos(timeElapsedInSeconds * 5) + 1) / 2 * 0.8);
+
+            idleWorkerCountImageBox.Color = new ColorRgb(1, intensity, intensity);
+        }
+
+        private void ShowPauseDialog()
+        {
+            modalDialog.Content = pausePanel;
+            modalDialog.VisibilityFlag = Visibility.Visible;
+            Paused.Raise(this);
+        }
+
+        private void ShowDiplomacyDialog()
+        {
+            modalDialog.Content = diplomacyPanel;
+            modalDialog.VisibilityFlag = Visibility.Visible;
+        }
+
+        #region Initialization
+        private Control CreateTopBar(Faction localFaction)
+        {
+            ContentControl container = new ContentControl();
+            container.IsMouseEventSink = true;
+            container.HorizontalAlignment = Alignment.Center;
+            BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
+            container.Adornment = adornment;
+            container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
+
+            DockLayout dock = new DockLayout();
+            container.Content = dock;
+
+            StackLayout resourcesStack = new StackLayout();
+            dock.Dock(resourcesStack, Direction.NegativeX);
+            resourcesStack.Direction = Direction.PositiveX;
+            resourcesStack.ChildGap = 10;
+            resourcesStack.MaxXMargin = 15;
+
+            ImageBox dummyImageBox;
+            resourcesStack.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
+            Binding.CreateOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
+
+            resourcesStack.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
+            Binding.CreateOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
+
+            resourcesStack.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
+            foodAmountLabel.Text = "0/0";
+
+            Button inactiveWorkersButton = new Button()
+            {
+                AcquireKeyboardFocusWhenPressed = false,
+                Content = CreateResourcePanel("Units/Schtroumpf", out idleWorkerCountImageBox, out idleWorkerCountLabel)
+            };
+
+            // Hack to detect if button is pressed while shift is down.
+
+            inactiveWorkersButton.Clicked += (sender, @event) => SelectingIdleWorkers.Raise(this, @event.MouseEvent.IsShiftDown);
+            dock.Dock(inactiveWorkersButton, Direction.NegativeX);
+
+            dock.Dock(CreatePauseButton(), Direction.PositiveX);
+
+            dock.Dock(CreateDiplomacyButton(localFaction), Direction.PositiveX);
+
+            return container;
+        }
+
+        private Button CreatePauseButton()
+        {
+            Button button = style.CreateTextButton("Pause");
+            button.AcquireKeyboardFocusWhenPressed = false;
+            button.VerticalAlignment = Alignment.Center;
+
+            pausePanel = new PausePanel(style);
+
+            button.Clicked += (sender, @event) => ShowPauseDialog();
+
+            pausePanel.Resumed += sender =>
+            {
+                modalDialog.VisibilityFlag = Visibility.Hidden;
+                AcquireKeyboardFocus();
+                Resumed.Raise(this);
+            };
+
+            pausePanel.Exited += sender =>
+            {
+                modalDialog.VisibilityFlag = Visibility.Hidden;
+                Exited.Raise(this);
+            };
+
+            return button;
+        }
+
+        private Button CreateDiplomacyButton(Faction localFaction)
+        {
+            Button button = style.CreateTextButton("Diplomatie");
+            button.AcquireKeyboardFocusWhenPressed = false;
+            button.VerticalAlignment = Alignment.Center;
+            button.MaxXMargin = 10;
+
+            diplomacyPanel = new DiplomacyPanel(style, localFaction);
+
+            button.Clicked += (sender, @event) => ShowDiplomacyDialog();
+
+            diplomacyPanel.StanceChanged += (sender, otherFaction, newStance) => DiplomaticStanceChanged.Raise(this, otherFaction, newStance);
+
+            diplomacyPanel.Closed += sender =>
+            {
+                modalDialog.VisibilityFlag = Visibility.Hidden;
+                AcquireKeyboardFocus();
+            };
+
+            return button;
+        }
+
+        private StackLayout CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
+        {
+            StackLayout stack = new StackLayout();
+            stack.Direction = Direction.PositiveX;
+
+            imageBox = new ImageBox()
+            {
+                Texture = style.GetTexture(textureName),
+                VerticalAlignment = Alignment.Center,
+                Width = 30,
+                Height = 30
+            };
+            stack.Stack(imageBox);
+
+            label = style.CreateLabel("0");
+            label.TextColor = Colors.White;
+            label.VerticalAlignment = Alignment.Center;
+            label.MinXMargin = 5;
+            label.MinWidth = 30;
+            stack.Stack(label);
+
+            return stack;
+        }
+
+        private Control CreateBottomBar()
+        {
+            ContentControl container = new ContentControl()
+            {
+                Padding = new Borders(6),
+                IsMouseEventSink = true,
+                Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true }
+            };
+            bottomBar = container;
+
+            OverlapLayout overlap = new OverlapLayout();
+            container.Content = overlap;
+
+            ImageBox carvingImageBox = new ImageBox
+            {
+                Texture = style.GetTexture("Gui/Carving"),
+                HorizontalAlignment = Alignment.Center,
+                VerticalAlignment = Alignment.Center,
+            };
+            overlap.Children.Add(carvingImageBox);
+
+            DockLayout dock = new DockLayout() { LastChildFill = true };
+            overlap.Children.Add(dock);
+
+            ContentControl minimapBoxContainer = new ContentControl()
+            {
+                Width = 200,
+                Height = 200,
+                MaxXMargin = 6,
+                Content = CreateMinimapViewport()
+            };
+            dock.Dock(minimapBoxContainer, Direction.NegativeX);
+
+            actionButtonGrid = CreateActionButtons();
+            dock.Dock(actionButtonGrid, Direction.PositiveX);
+
+            selectionInfoPanel = new ContentControl();
+            dock.Dock(selectionInfoPanel, Direction.PositiveX);
+
+            return container;
+        }
+
+        private GridLayout CreateActionButtons()
+        {
+            GridLayout grid = new GridLayout(4, 4)
+            {
+                AreColumnsUniformSized = true,
+                AreRowsUniformSized = true,
+                CellGap = 3,
+                Width = 200,
+                Height = 200,
+                Adornment = new ColorAdornment(new ColorRgba(Colors.Black, 0.2f))
+            };
+
+            for (int rowIndex = 0; rowIndex < grid.RowCount; ++rowIndex)
+            {
+                for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
+                {
+                    ActionButton actionButton = style.Create<ActionButton>();
+                    actionButton.VisibilityFlag = Visibility.Hidden;
+                    grid.Children[rowIndex, columnIndex] = actionButton;
+                }
+            }
+
+            return grid;
+        }
+
+        private Control CreateMinimapViewport()
+        {
+            ViewportBox minimapBox = new ViewportBox();
+            minimapBox.MouseButton += OnMinimapMouseButton;
+            minimapBox.MouseMoved += OnMinimapMouseMoved;
+            minimapBox.MouseWheel += OnMinimapMouseWheel;
+            minimapBox.Rendering += sender => MinimapRendering.Raise(this, sender.Rectangle);
+
+            return minimapBox;
+        }
+
+        private Control CreateOverlays()
+        {
+            DockLayout dock = new DockLayout();
+
+            actionToolTip = new ActionToolTip(style)
+            {
+                Adornment = new ColorAdornment(Colors.Gray),
+                VerticalAlignment = Alignment.Positive,
+                IsMouseEventSink = true,
+                VisibilityFlag = Visibility.Hidden
+            };
+            dock.Dock(actionToolTip, Direction.PositiveX);
+
+            chatTextField = style.Create<TextField>();
+            dock.Dock(chatTextField, Direction.PositiveY);
+            chatTextField.MinXMargin = 5;
+            chatTextField.MaxYMargin = 5;
+            chatTextField.HorizontalAlignment = Alignment.Negative;
+            chatTextField.Width = 500;
+            chatTextField.VisibilityFlag = Visibility.Hidden;
+            chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
+
+            messageConsole = new MessageConsole(style)
+            {
+                Direction = Direction.NegativeY,
+                MinXMargin = 5,
+                MaxXMargin = 5
+            };
+            dock.Dock(messageConsole, Direction.PositiveY);
+
+            return dock;
         }
         #endregion
 
         #region Event Handling
-        private void OnFactionDefeated(World sender, Faction faction)
+        protected override void OnManagerChanged(UIManager previousManager)
         {
-            string text = "{0} a été vaincu.".FormatInvariant(faction.Name);
-            console.AddMessage(text, faction.Color);
-        }
-
-        private void OnFactionMessageReceived(Match sender, FactionMessage message)
-        {
-            Argument.EnsureNotNull(message, "message");
-
-            if (!message.IsRecipient(LocalFaction)) return;
-
-            string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
-            console.AddMessage(text, message.Sender.Color);
-        }
-
-        private void OnWorkerActivityStateChanged(WorkerActivityMonitor sender, Unit worker)
-        {
-            UpdateWorkerActivityButton();
-        }
-
-        private void UpdateWorkerActivityButton()
-        {
-            if (workerActivityMonitor.InactiveWorkerCount == 0)
-                Children.Remove(idleWorkerButton);
-            else
+            if (previousManager != null)
             {
-                idleWorkerButton.Caption = workerActivityMonitor.InactiveWorkerCount.ToStringInvariant();
-                if (idleWorkerButton.Parent == null)
-                    Children.Add(idleWorkerButton);
+                previousManager.Updated -= updatedEventHandler;
+                previousManager.Popups.Remove(modalDialog);
+            }
+
+            if (Manager != null)
+            {
+                Manager.Updated += updatedEventHandler;
+                Manager.Popups.Add(modalDialog);
+                AcquireKeyboardFocus();
             }
         }
 
-        private void OnIdleWorkerButtonTriggered(Button sender)
+        private void OnGuiUpdated(UIManager sender, TimeSpan elapsedTime)
         {
-            var inactiveWorkers = workerActivityMonitor.InactiveWorkers;
-            if (isShiftDown)
+            if (Manager.ModalPopup != null) return;
+
+            time += elapsedTime;
+
+            aladdiumAmountCounter.Update(elapsedTime);
+            alageneAmountCounter.Update(elapsedTime);
+
+            UpdateScrollDirection();
+            UpdateInactiveWorkerButton();
+
+            ActionButton actionButtonUnderMouse = ActionButtonUnderMouse;
+            if (actionButtonUnderMouse != lastActionButtonUnderMouse)
             {
-                Selection.Set(inactiveWorkers);
+                lastActionButtonUnderMouse = actionButtonUnderMouse;
+                actionToolTip.Descriptor = actionButtonUnderMouse == null ? null : actionButtonUnderMouse.Descriptor;
             }
-            else
+        }
+
+        protected override bool OnMouseWheel(MouseEvent @event)
+        {
+            ViewportZoomed.Raise(this, @event.WheelDelta);
+            return true;
+        }
+
+        protected override bool OnKeyEvent(KeyEvent @event)
+        {
+            isDisplayingHealthBars = @event.IsAltDown;
+
+            if (@event.Key == Key.Space)
             {
-                if (Selection.Type == SelectionType.Units && Selection.Count == 1)
+                isFollowingSelection = @event.IsDown;
+                return true;
+            }
+
+            if (@event.Key == Key.Enter && @event.IsDown)
+            {
+                chatTextField.VisibilityFlag = Visibility.Visible;
+                chatTextField.AcquireKeyboardFocus();
+                return true;
+            }
+
+            if (@event.Key == Key.F1 && @event.IsDown)
+            {
+                SelectingIdleWorkers.Raise(this, @event.IsShiftDown);
+                return true;
+            }
+
+            if (@event.Key == Key.F9 && @event.IsDown)
+            {
+                ShowPauseDialog();
+                return true;
+            }
+
+            if (@event.Key == Key.F10 && @event.IsDown)
+            {
+                ShowDiplomacyDialog();
+                return true;
+            }
+
+            if (@event.Key == Key.Left) isLeftPressed = @event.IsDown;
+            if (@event.Key == Key.Right) isRightPressed = @event.IsDown;
+            if (@event.Key == Key.Up) isUpPressed = @event.IsDown;
+            if (@event.Key == Key.Down) isDownPressed = @event.IsDown;
+
+            UpdateScrollDirection();
+            HandleActionHotKey(@event);
+
+            return true;
+        }
+
+        private bool HandleActionHotKey(KeyEvent @event)
+        {
+            foreach (ActionButton actionButton in actionButtonGrid.Children)
+            {
+                ActionDescriptor descriptor = actionButton.Descriptor;
+                if (descriptor != null && descriptor.HotKey == @event.Key)
                 {
-                    Unit selectedUnit = Selection.Units.First();
-                    if (inactiveWorkers.Contains(selectedUnit))
-                    {
-                        int nextIndex = (inactiveWorkers.IndexOf(selectedUnit) + 1) % inactiveWorkers.Count();
-                        Selection.Set(inactiveWorkers.ElementAt(nextIndex));
-                        CenterOnSelection();
-                        return;
-                    }
+                    if (descriptor.Action != null) descriptor.Action();
+                    return true;
                 }
-
-                Selection.Set(inactiveWorkers.First());
-                CenterOnSelection();
-            }
-        }
-
-        protected override bool OnMouseWheelScrolled(MouseEventArgs args)
-        {
-            float scale = 1 - args.WheelDelta / 5;
-            worldView.Zoom(scale);
-            return base.OnMouseWheelScrolled(args);
-        }
-
-        protected override bool OnMouseButtonPressed(MouseEventArgs args)
-        {
-            if (worldView.Frame.ContainsPoint(args.Position))
-            {
-                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseDown(args.CloneWithNewPosition(newPosition));
             }
 
-            return base.OnMouseButtonPressed(args);
+            return false;
         }
 
-        protected override bool OnMouseMoved(MouseEventArgs args)
+        private bool OnChatTextFieldKeyEvent(Control sender, KeyEvent @event)
         {
-            if (worldView.Frame.ContainsPoint(args.Position) || (Control.MouseButtons & MouseButtons.Left) != 0)
+            if ((@event.Key == Key.Enter || @event.Key == Key.Escape) && @event.IsDown)
             {
-                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-                userInputManager.HandleMouseMove(args.CloneWithNewPosition(newPosition));
-            }
-            else
-            {
-                userInputManager.HoveredUnit = null;
+                string chattedText = chatTextField.Text;
+
+                AcquireKeyboardFocus();
+                chatTextField.Text = string.Empty;
+                chatTextField.VisibilityFlag = Visibility.Hidden;
+
+                if (@event.Key == Key.Enter && !string.IsNullOrEmpty(chattedText))
+                    Chatted.Raise(this, chattedText);
+
+                return true;
             }
 
-            return base.OnMouseMoved(args);
+            return false;
         }
 
-        protected override bool OnMouseButtonReleased(MouseEventArgs args)
+        private bool OnMinimapMouseButton(Control sender, MouseEvent @event)
         {
-            Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, args.Position);
-            userInputManager.HandleMouseUp(args.CloneWithNewPosition(newPosition));
-            mouseDownOnMinimap = false;
-            return base.OnMouseButtonReleased(args);
-        }
-
-        private void OnChatInputKeyboardButtonPressed(Responder sender, KeyboardEventArgs args)
-        {
-            if (args.Key == Keys.Escape)
+            if (@event.Button == MouseButtons.Left)
             {
-                chatInput.Clear();
-                Children.Remove(chatInput);
-            }
-        }
-
-        private void OnChatInputTriggered(TextField chatInput)
-        {
-            string text = chatInput.Contents.Trim();
-            if (text.Any(character => !char.IsWhiteSpace(character)))
-            {
-                text = ProfanityFilter.Filter(text);
-
-                if (text[0] == '#')
-                    userInputManager.LaunchAllyChatMessage(text.Substring(1));
-                else
-                    userInputManager.LaunchChatMessage(text);
-            }
-
-            chatInput.Clear();
-            Children.Remove(chatInput);
-        }
-
-        protected override bool OnKeyboardButtonPressed(KeyboardEventArgs args)
-        {
-            isShiftDown = args.IsShiftModifierDown;
-            matchRenderer.WorldRenderer.DrawHealthBars = args.IsAltModifierDown;
-            isSpaceDown = args.Key == Keys.Space;
-
-            if (args.Key == Keys.Escape)
-            {
-                chatInput.Clear();
-                Children.Remove(chatInput);
-                return false;
-            }
-            else if (args.Key == Keys.Enter)
-            {
-                chatInput.Clear();
-                Children.Add(chatInput);
-                return false;
-            }
-            else if (args.Key == Keys.F9)
-            {
-                DisplayPausePanel();
-                return false;
-            }
-            else if (args.Key == Keys.F10)
-            {
-                DisplayDiplomacy();
-                return false;
-            }
-
-            return base.OnKeyboardButtonPressed(args);
-        }
-
-        protected override bool OnKeyboardButtonReleased(KeyboardEventArgs args)
-        {
-            isShiftDown = args.IsShiftModifierDown;
-            matchRenderer.WorldRenderer.DrawHealthBars = args.IsAltModifierDown;
-            isSpaceDown = (args.Key != Keys.Space && isSpaceDown);
-            return base.OnKeyboardButtonReleased(args);
-        }
-
-        protected override void Update(float timeDeltaInSeconds)
-        {
-            if (isSpaceDown && !Selection.IsEmpty)
-                CenterOnSelection();
-
-            resourcesLabel.Text = resourcesLabelTextGetter();
-
-            base.Update(timeDeltaInSeconds);
-        }
-
-        private void OnWorldViewBoundsChanged(View sender, Rectangle oldBounds)
-        {
-            Rectangle newBounds = sender.Bounds;
-            worldView.FullBounds = World.Bounds
-                .TranslatedBy(-newBounds.Extent)
-                .ResizedBy(newBounds.Width, newBounds.Height);
-
-            if (worldView.IsMouseOver)
-            {
-                Vector2 newPosition = Rectangle.ConvertPoint(worldView.Frame, worldView.Bounds, worldView.MousePosition.Value);
-                userInputManager.HandleMouseMove(new MouseEventArgs(newPosition, MouseButton.None, 0, 0));
-            }
-        }
-
-        private void MinimapMouseDown(Responder source, MouseEventArgs args)
-        {
-            if (args.Button == MouseButton.Left)
-            {
-                if (userInputManager.SelectedCommand != null)
+                if (@event.IsPressed)
                 {
-                    userInputManager.LaunchMouseCommand(args.Position);
+                    sender.AcquireMouseCapture();
+                    MoveMinimapCamera(sender.Rectangle, @event.Position);
                 }
                 else
                 {
-                    MoveWorldView(args.Position);
-                    mouseDownOnMinimap = true;
+                    sender.ReleaseMouseCapture();
                 }
+
+                return true;
             }
-            else if (args.Button == MouseButton.Right)
+            else if (@event.Button == MouseButtons.Right)
             {
-                userInputManager.LaunchDefaultCommand(args.Position);
-            }
-        }
-
-        private void MinimapMouseMove(Responder source, MouseEventArgs args)
-        {
-            if (mouseDownOnMinimap) MoveWorldView(args.Position);
-        }
-
-        private void OnSelectionChanged(Selection selection)
-        {
-            while (selectionPanel.Children.Count > 0) selectionPanel.Children[0].Dispose();
-            selectionPanel.Children.Clear();
-            selectionPanel.Renderer = null;
-
-            if (selection.Type == SelectionType.Units)
-            {
-                if (selection.Count == 1)
-                    CreateSingleUnitSelectionPanel();
-                else
-                    CreateMultipleUnitsSelectionPanel();
-            }
-        }
-
-        private void OnFocusedUnitTypeChanged(SelectionManager selectionManager)
-        {
-            UpdateSkillsPanel();
-        }
-
-        private void OnCommanderGeneratedCommand(Commander commander, Command command)
-        {
-            actionPanel.Restore();
-        }
-
-        private void OnLocalFactionWarning(Faction sender, string args)
-        {
-            console.AddMessage(args, sender.Color);
-        }
-        #endregion
-
-        #region Methods
-        public void SetResourcesLabelTextGetter(Func<string> getter)
-        {
-            Argument.EnsureNotNull(getter, "getter");
-            this.resourcesLabelTextGetter = getter;
-        }
-
-        private string GetDefaultResourcesLabelText()
-        {
-            return "Aladdium: {0}    Alagene: {1}    Population: {2}/{3}"
-                .FormatInvariant(LocalFaction.AladdiumAmount, LocalFaction.AlageneAmount,
-                LocalFaction.UsedFoodAmount, LocalFaction.MaxFoodAmount);
-        }
-
-        public void DisplayDefeatMessage(Action callback)
-        {
-            Argument.EnsureNotNull(callback, "callback");
-            Instant.DisplayAlert(this, "Vous avez perdu le match.", callback);
-        }
-
-        public void DisplayVictoryMessage(Action callback)
-        {
-            Argument.EnsureNotNull(callback, "callback");
-            Instant.DisplayAlert(this, "VICTOIRE !", callback);
-        }
-
-        public void CenterOn(Vector2 position)
-        {
-            Vector2 worldBoundsExtent = worldView.Bounds.Extent;
-            worldView.Bounds = worldView.Bounds.TranslatedTo(position - worldBoundsExtent);
-        }
-
-        private void CenterOnSelection()
-        {
-            CenterOn(SelectionManager.FocusedUnit.Center);
-        }
-
-        private void CreateSingleUnitSelectionPanel()
-        {
-            Unit unit = Selection.Units.First();
-            selectionPanel.Renderer = new UnitPanelRenderer(userInputManager.LocalFaction, unit, gameGraphics);
-            UnitButtonRenderer buttonRenderer = new UnitButtonRenderer(unit, gameGraphics);
-            Button unitButton = new Button(new Rectangle(10, 10, 130, 200), string.Empty, buttonRenderer);
-            float aspectRatio = Bounds.Width / Bounds.Height;
-            unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
-
-            unitButton.Triggered += OnUnitButtonPressed;
-            selectionPanel.Children.Add(unitButton);
-        }
-
-        private void CreateMultipleUnitsSelectionPanel()
-        {
-            List<Unit> orderedSelectedUnits = userInputManager.Selection.Units.ToList();
-
-            var selectedUnitTypes = orderedSelectedUnits
-                .GroupBy(unit => unit.Type)
-                .OrderByDescending(group => group.Count())
-                .Select(group => group.Key)
-                .ToList();
-
-            orderedSelectedUnits.Sort((a, b) =>
-            {
-                int comparison = selectedUnitTypes.IndexOf(a.Type)
-                    .CompareTo(selectedUnitTypes.IndexOf(b.Type));
-                if (comparison == 0) comparison = a.Handle.Value.CompareTo(b.Handle.Value);
-                return comparison;
-            });
-
-            selectionPanel.Renderer = new FilledRenderer(Colors.DarkGray, Colors.Gray);
-            const float paddingX = 5;
-            const float paddingY = 15;
-            Rectangle frame = new Rectangle(selectionPanel.Bounds.Width / 11 - paddingX * 2,
-                selectionPanel.Bounds.Height / 2.2f - paddingY * 2);
-            float currentX = paddingX + selectionPanel.Bounds.MinX;
-            float currentY = selectionPanel.Bounds.Height - paddingY - frame.Height;
-            foreach (Unit unit in orderedSelectedUnits)
-            {
-                UnitButtonRenderer renderer = new UnitButtonRenderer(unit, gameGraphics);
-                renderer.HasFocus = (unit.Type == SelectionManager.FocusedUnitType);
-                Button unitButton = new Button(frame.TranslatedTo(currentX, currentY), string.Empty, renderer);
-                float aspectRatio = Bounds.Width / Bounds.Height;
-                unitButton.Bounds = new Rectangle(3f, 3f * aspectRatio);
-                unitButton.Triggered += OnUnitButtonPressed;
-                currentX += frame.Width + paddingX;
-                if (currentX + frame.Width > selectionPanel.Bounds.MaxX)
+                if (@event.IsPressed && sender.IsUnderMouse)
                 {
-                    currentY -= frame.Height + paddingY;
-                    currentX = paddingX + selectionPanel.Bounds.MinX;
+                    Vector2 normalizedPosition = sender.Rectangle.Normalize(sender.Rectangle.Clamp(@event.Position));
+                    MinimapRightClicked.Raise(this, normalizedPosition);
                 }
-                selectionPanel.Children.Add(unitButton);
+
+                return true;
             }
+
+            return false;
         }
 
-        private void OnUnitButtonPressed(Button button)
+        private bool OnMinimapMouseMoved(Control sender, MouseEvent @event)
         {
-            Unit unit = ((UnitButtonRenderer)button.Renderer).Unit;
-            if (unit.Type == SelectionManager.FocusedUnitType || SelectionManager.Selection.Count == 1)
+            if (sender.HasMouseCapture)
             {
-                SelectionManager.Selection.Set(unit);
-                MoveWorldView(unit.Center);
-            }
-            else
-            {
-                SelectionManager.FocusedUnitType = unit.Type;
-                foreach (Button unitButton in selectionPanel.Children)
-                {
-                    UnitButtonRenderer renderer = (UnitButtonRenderer)unitButton.Renderer;
-                    renderer.HasFocus = renderer.Unit.Type == SelectionManager.FocusedUnitType;
-                }
-            }
-        }
-
-        private void UpdateSkillsPanel()
-        {
-            actionPanel.Clear();
-            if (Selection.Type != SelectionType.Units) return;
-            
-            if (Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl)))
-                actionPanel.Push(new UnitActionProvider(enablers, SelectionManager.FocusedUnitType));
-        }
-
-        private void MoveWorldView(Vector2 center)
-        {
-            Vector2 difference = worldView.Bounds.Min - worldView.Bounds.Center;
-            Rectangle newBounds = worldView.Bounds.TranslatedTo(center + difference);
-            float xDiff = worldView.FullBounds.MaxX - newBounds.MaxX;
-            float yDiff = worldView.FullBounds.MaxY - newBounds.MaxY;
-            if (xDiff < 0) newBounds = newBounds.TranslatedXBy(xDiff);
-            if (yDiff < 0) newBounds = newBounds.TranslatedYBy(yDiff);
-            if (newBounds.MinX < -newBounds.Width / 2) newBounds = newBounds.TranslatedTo(-newBounds.Width / 2, newBounds.Min.Y);
-            if (newBounds.MinY < -newBounds.Height / 2) newBounds = newBounds.TranslatedTo(newBounds.Min.X, -newBounds.Height / 2);
-            worldView.Bounds = newBounds;
-        }
-
-        private void DisplayPausePanel()
-        {
-            if (Children.Contains(pausePanel)) return;
-
-            Match.Pause();
-            if (!Match.IsRunning)
-            {
-                foreach (Scroller scroller in Children.OfType<Scroller>())
-                    scroller.IsEnabled = false;
+                MoveMinimapCamera(sender.Rectangle, @event.Position);
+                return true;
             }
 
-            Children.Add(pausePanel);
+            return false;
         }
 
-        private void HidePausePanel()
+        private bool OnMinimapMouseWheel(Control sender, MouseEvent @event)
         {
-            foreach (Scroller scroller in Children.OfType<Scroller>())
-                scroller.IsEnabled = true;
-
-            Children.Remove(pausePanel);
-            Match.Resume();
+            ViewportZoomed.Raise(this, @event.WheelDelta);
+            return true;
         }
 
-        private void DisplayDiplomacy()
+        private void MoveMinimapCamera(Region rectangle, Point position)
         {
-            if (diplomacyPanel != null && Children.Contains(diplomacyPanel))
-                Children.Remove(diplomacyPanel);
-
-            Rectangle diplomacyPanelFrame = Instant.CreateComponentRectangle(Bounds, new Rectangle(0.2f, 0.3f, 0.6f, 0.6f));
-            diplomacyPanel = new DiplomacyPanel(diplomacyPanelFrame, userInputManager);
-            diplomacyPanel.Accepted += (sender) => Children.Remove(diplomacyPanel);
-
-            Children.Add(diplomacyPanel);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                matchRenderer.Dispose();
-            }
-
-            base.Dispose(disposing);
+            Vector2 normalizedPosition = rectangle.Normalize(rectangle.Clamp(position));
+            MinimapCameraMoved.Raise(this, normalizedPosition);
         }
         #endregion
         #endregion

@@ -32,8 +32,6 @@ namespace Orion.Engine.Graphics
             Argument.EnsureStrictlyPositive(size.Area, "size.Area");
             Argument.EnsureDefined(pixelFormat, "pixelFormat");
 
-            Debug.Assert(PowerOfTwo.Is(size.Width) && PowerOfTwo.Is(size.Height));
-
             this.size = size;
             this.pixelFormat = pixelFormat;
             this.id = GL.GenTexture();
@@ -214,7 +212,7 @@ namespace Orion.Engine.Graphics
                 throw new ArgumentException("Invalid pixel region.");
             Argument.EnsureNotNull(pixelData, "data");
 
-            ValidatePixelBufferSize(pixelData, region.Area, pixelFormat);
+            ValidatePixelBufferSize(pixelData, (int)region.Area, pixelFormat);
 
             int lastID;
             GL.GetInteger(GetPName.Texture2D, out lastID);

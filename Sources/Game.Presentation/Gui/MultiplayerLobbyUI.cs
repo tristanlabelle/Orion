@@ -1,204 +1,230 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
-using OpenTK;
-using Orion.Engine;
-using Orion.Engine.Geometry;
-using Orion.Engine.Networking;
 using Orion.Engine.Gui;
+using Orion.Engine;
+using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Networking;
 using Orion.Game.Matchmaking.Networking;
-using System.Globalization;
 
 namespace Orion.Game.Presentation.Gui
 {
-    public sealed class MultiplayerLobbyUI : MaximizedPanel
+    public sealed class MultiplayerLobbyUI : ContentControl
     {
         #region Fields
-        private readonly ListPanel matchListPanel;
-        private readonly Rectangle matchButtonFrame;
-        private readonly string defaultGameName;
+        private readonly GameGraphics graphics;
+        private TextField playerNameTextField;
+        private ListBox matchListBox;
+        private TextField ipEndPointTextField;
+        private Button joinIPButton, pingIPButton;
+        private TextField createdGameNameTextField;
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyUI(string defaultGameName)
+        public MultiplayerLobbyUI(GameGraphics graphics)
         {
-            this.defaultGameName = defaultGameName;
-            Rectangle matchListFrame = Bounds.TranslatedBy(10, 10).ResizedBy(-230, -20);
-            matchButtonFrame = new Rectangle(matchListFrame.Width - 20, 30);
-            matchListPanel = new ListPanel(matchListFrame, new Vector2(10, 10));
-            Children.Add(matchListPanel);
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            Rectangle hostFrame = new Rectangle(matchListFrame.MaxX + 10, matchListFrame.MaxY, 200, -50);
-            Button hostButton = new Button(hostFrame, "Héberger");
-            hostButton.Triggered += OnHostButtonPressed;
-            Children.Add(hostButton);
+            this.graphics = graphics;
 
-            Rectangle joinRemoteFrame = hostFrame.TranslatedBy(0, -hostFrame.Height - 10);
-            Button joinRemoteButton = new Button(joinRemoteFrame, "Jointer par IP");
-            joinRemoteButton.Triggered += OnJoinByIPPressed;
-            Children.Add(joinRemoteButton);
+            Adornment = new TextureAdornment(graphics.GetGuiTexture("Granite")) { IsTiling = true };
+            Padding = 5;
 
-            Rectangle backButtonFrame = joinRemoteFrame.TranslatedTo(joinRemoteFrame.MinX, 10);
-            Button backButton = new Button(backButtonFrame, "Retour");
-            backButton.Triggered += (sender) => BackPressed.Raise(this);
-            Children.Add(backButton);
+            DockLayout dock = new DockLayout()
+            {
+                LastChildFill = true
+            };
 
-            Rectangle pingButtonFrame = joinRemoteFrame.TranslatedBy(0, -joinRemoteFrame.Height - 10);
-            Button pingButton = new Button(pingButtonFrame, "Ping");
-            pingButton.Triggered += OnPingButtonPressed;
-            Children.Add(pingButton);
+            dock.Dock(CreatePlayerNameControls(), Direction.NegativeY);
+
+            Label matchesLabel = graphics.GuiStyle.CreateLabel("Parties:");
+            matchesLabel.MaxYMargin = 5;
+            dock.Dock(matchesLabel, Direction.NegativeY);
+
+            Button backButton = graphics.GuiStyle.CreateTextButton("Retour");
+            backButton.HorizontalAlignment = Alignment.Negative;
+            backButton.MinSize = new Size(150, 40);
+            backButton.MinYMargin = 5;
+            backButton.Clicked += (sender, @event) => Exited.Raise(this);
+            dock.Dock(backButton, Direction.PositiveY);
+
+            dock.Dock(CreateHostControls(), Direction.PositiveY);
+            dock.Dock(CreateIPControls(), Direction.PositiveY);
+
+            matchListBox = graphics.GuiStyle.Create<ListBox>();
+            matchListBox.Adornment = new ColorAdornment(Colors.Black.ToRgba(0.2f));
+            matchListBox.SelectionChanged += sender => LaunchSelectedMatch();
+            dock.Dock(matchListBox, Direction.NegativeY);
+
+            Content = dock;
         }
         #endregion
 
         #region Events
         /// <summary>
-        /// Raised when the user decided to go back through the UI.
+        /// Raised when the user exits the screen.
         /// </summary>
-        public event Action<MultiplayerLobbyUI> BackPressed;
+        public event Action<MultiplayerLobbyUI> Exited;
 
         /// <summary>
-        /// Raised when the user decided to host a game through the UI.
+        /// Raised when the user joins an advertized match.
         /// </summary>
-        public event Action<MultiplayerLobbyUI, string> HostPressed;
+        public event Action<MultiplayerLobbyUI, AdvertizedMatch> Joined;
 
         /// <summary>
-        /// Raised when the user decided to join a game through the UI.
+        /// Raised when the user chooses to host a game.
         /// </summary>
-        public event Action<MultiplayerLobbyUI, AdvertizedMatch> JoinPressed;
+        public event Action<MultiplayerLobbyUI, string> Hosted;
 
         /// <summary>
-        /// Raised when the user decided to join a game by entering its IP end point.
+        /// Raised when the user joins a game at a specific IP end point.
         /// </summary>
-        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinByIpPressed;
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> JoinedByIP;
 
         /// <summary>
-        /// Raised when the user has entered an address to be pinged.
+        /// Raised when the user pings a specific IP end point.
         /// </summary>
-        public event Action<MultiplayerLobbyUI, IPv4EndPoint> PingPressed;
+        public event Action<MultiplayerLobbyUI, IPv4EndPoint> PingedIP;
         #endregion
 
         #region Properties
-        public bool IsEnabled
+        /// <summary>
+        /// Accesses the name the user has chosen for his player.
+        /// </summary>
+        public string PlayerName
         {
-            get { return Children.OfType<Button>().First().IsEnabled; }
-            set
-            {
-                if (value == IsEnabled) return;
-
-                foreach (Button button in Children.OfType<Button>())
-                    button.IsEnabled = value;
-                foreach (Button button in matchListPanel.Children.OfType<Button>())
-                    button.IsEnabled = value;
-            }
+            get { return playerNameTextField.Text; }
+            set { playerNameTextField.Text = value; }
         }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Clears all displayed matches.
+        /// </summary>
         public void ClearMatches()
         {
-            matchListPanel.DisposeAllChildren();
+            matchListBox.Items.Clear();
         }
 
+        /// <summary>
+        /// Adds an advertized match to the list of displayed matches.
+        /// </summary>
+        /// <param name="match">The match to be added.</param>
         public void AddMatch(AdvertizedMatch match)
         {
             Argument.EnsureNotNull(match, "match");
 
-            string caption = "[{2}] {0} ({1} places libres)".FormatInvariant(match.Name, match.OpenSlotCount, match.Source.Tag);
-            Button button = new Button(matchButtonFrame, caption);
-            button.Triggered += b => JoinPressed.Raise(this, match);
-            button.IsEnabled = IsEnabled;
-            matchListPanel.Children.Add(button);
+            string text = "[{0}] {1} ({2} places libres)".FormatInvariant(match.Source.Tag, match.Name, match.OpenSlotCount);
+            Label label = graphics.GuiStyle.CreateLabel(text);
+            label.Tag = match;
+            matchListBox.Items.Add(label);
         }
 
-        private void OnHostButtonPressed(Button sender)
+        private Control CreatePlayerNameControls()
         {
-            Instant.Prompt(this, "Entrez le nom de la partie à créer.", defaultGameName, str => HostPressed.Raise(this, str));
-        }
-
-        private void OnJoinByIPPressed(Button sender)
-        {
-            Instant.Prompt(this, "Quelle adresse voulez-vous jointer?", JoinAddress);
-        }
-
-        private void JoinAddress(string endPointString)
-        {
-            IPv4EndPoint? endPoint = ParseEndPointWithAlerts(endPointString);
-            if (!endPoint.HasValue) return;
-
-            JoinByIpPressed.Raise(this, endPoint.Value);
-        }
-
-        private IPv4EndPoint? ParseEndPointWithAlerts(string endPointString)
-        {
-            string[] parts = endPointString.Split(':');
-            if (parts.Length > 2)
+            StackLayout stack = new StackLayout()
             {
-                Instant.DisplayAlert(this, "Adresse invalide, trop de ':'.");
-                return null;
-            }
+                Direction = Direction.PositiveX,
+                ChildGap = 5,
+                MaxYMargin = 5
+            };
 
-            IPv4Address address;
-            if (!IPv4Address.TryParse(parts[0], out address))
-            {
-                // Attempt to resolve as a host name
-                try
-                {
-                    IPAddress resolvedAddress = Dns.GetHostAddresses(parts[0])
-                        .FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    if (resolvedAddress == null)
-                    {
-                        Instant.DisplayAlert(this, "L'hôte {0} n'a pas d'addresse IPv4.".FormatInvariant(parts[0]));
-                        return null;
-                    }
+            Label label = graphics.GuiStyle.CreateLabel("Nom de joueur:");
+            label.VerticalAlignment = Alignment.Center;
+            stack.Stack(label);
 
-                    address = (IPv4Address)resolvedAddress;
-                }
-                catch (SocketException)
-                {
-                    Instant.DisplayAlert(this, "Impossible de résoudre le nom d'hôte {0}.".FormatInvariant(parts[0]));
-                    return null;
-                }
-            }
+            playerNameTextField = graphics.GuiStyle.Create<TextField>();
+            playerNameTextField.Width = 300;
+            stack.Stack(playerNameTextField);
 
-            ushort port = 0;
-            if (parts.Length == 2 && !ushort.TryParse(parts[1], NumberStyles.None, NumberFormatInfo.InvariantInfo, out port))
-            {
-                Instant.DisplayAlert(this, "Format de port invalide.".FormatInvariant(address));
-                return null;
-            }
-
-            return new IPv4EndPoint(address, port);
+            return stack;
         }
 
-        private void OnPingButtonPressed(Button sender)
+        private Control CreateHostControls()
         {
-            Instant.Prompt(this, "Entrez l'adresse IP à pinger:", Ping);
-        }
-
-        private void Ping(string endPointString)
-        {
-            IPv4EndPoint? endPoint = ParseEndPointWithAlerts(endPointString);
-            if (!endPoint.HasValue) return;
-
-            PingPressed.Raise(this, endPoint.Value);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
+            StackLayout stack = new StackLayout()
             {
-                BackPressed = null;
-                HostPressed = null;
-                JoinPressed = null;
-                JoinByIpPressed = null;
-                PingPressed = null;
-            }
+                Direction = Direction.PositiveX,
+                ChildGap = 5,
+                MinYMargin = 5
+            };
 
-            base.Dispose(disposing);
+            Label label = graphics.GuiStyle.CreateLabel("Héberger une partie nommée:");
+            label.VerticalAlignment = Alignment.Center;
+            stack.Stack(label);
+
+            createdGameNameTextField = graphics.GuiStyle.Create<TextField>();
+            createdGameNameTextField.Width = 300;
+            createdGameNameTextField.VerticalAlignment = Alignment.Center;
+            stack.Stack(createdGameNameTextField);
+
+            Button createGameButton = graphics.GuiStyle.CreateTextButton("Créer");
+            createGameButton.Clicked += (sender, @event) => Hosted.Raise(this, createdGameNameTextField.Text);
+            stack.Stack(createGameButton);
+
+            return stack;
+        }
+
+        private Control CreateIPControls()
+        {
+            StackLayout stack = new StackLayout()
+            {
+                Direction = Direction.PositiveX,
+                ChildGap = 5,
+                MinYMargin = 5
+            };
+
+            Label label = graphics.GuiStyle.CreateLabel("Jointer par IP:");
+            label.VerticalAlignment = Alignment.Center;
+            stack.Stack(label);
+
+            ipEndPointTextField = graphics.GuiStyle.Create<TextField>();
+            ipEndPointTextField.Width = 200;
+            ipEndPointTextField.VerticalAlignment = Alignment.Center;
+            ipEndPointTextField.TextChanged += OnIPEndPointTextChanged;
+            stack.Stack(ipEndPointTextField);
+
+            joinIPButton = graphics.GuiStyle.CreateTextButton("Jointer");
+            joinIPButton.HasEnabledFlag = false;
+            joinIPButton.Clicked += (sender, @event) => JoinByIP();
+            stack.Stack(joinIPButton);
+
+            pingIPButton = graphics.GuiStyle.CreateTextButton("Pinger");
+            pingIPButton.HasEnabledFlag = false;
+            pingIPButton.Clicked += (sender, @event) => JoinByIP();
+            stack.Stack(pingIPButton);
+
+            return stack;
+        }
+
+        private void LaunchSelectedMatch()
+        {
+            Label selectedMatchLabel = (Label)matchListBox.SelectedItem;
+            if (selectedMatchLabel == null) return;
+
+            AdvertizedMatch match = (AdvertizedMatch)selectedMatchLabel.Tag;
+            Joined.Raise(this, match);
+        }
+
+        private void OnIPEndPointTextChanged(TextField sender)
+        {
+            bool isValidFormat = IPv4EndPoint.TryParse(sender.Text).HasValue;
+            joinIPButton.HasEnabledFlag = isValidFormat;
+            pingIPButton.HasEnabledFlag = isValidFormat;
+        }
+
+        private void JoinByIP()
+        {
+            IPv4EndPoint endPoint = IPv4EndPoint.Parse(ipEndPointTextField.Text);
+            JoinedByIP.Raise(this, endPoint);
+        }
+
+        private void PingIP()
+        {
+            IPv4EndPoint endPoint = IPv4EndPoint.Parse(ipEndPointTextField.Text);
+            PingedIP.Raise(this, endPoint);
         }
         #endregion
     }

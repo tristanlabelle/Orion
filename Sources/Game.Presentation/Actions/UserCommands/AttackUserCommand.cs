@@ -3,15 +3,11 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
-using Orion.Engine.Gui;
 using Orion.Game.Simulation;
-using Orion.Game.Presentation;
-using Orion.Game.Presentation.Renderers;
-using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Actions.UserCommands
 {
-    public sealed class AttackUserCommand : UserInputCommand, IViewRenderer
+    public sealed class AttackUserCommand : UserInputCommand, IRenderableUserCommand
     {
         #region Fields
         private readonly Texture texture;
@@ -56,10 +52,10 @@ namespace Orion.Game.Presentation.Actions.UserCommands
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
-            Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
-            Rectangle rectangle = new Rectangle(cursorPosition - size, size);
-            graphicsContext.Fill(rectangle, texture);
+            //float minBoundsSize = Math.Min(bounds.Width, bounds.Height);
+            //Vector2 size = new Vector2(minBoundsSize / texture.Width, minBoundsSize / texture.Height) * 4;
+            //Rectangle rectangle = new Rectangle(cursorPosition - size, size);
+            //graphicsContext.Fill(rectangle, texture);
         }
         #endregion
     }

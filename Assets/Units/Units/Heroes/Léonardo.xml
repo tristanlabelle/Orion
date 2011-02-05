@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="8" MaxHealth="120" ArmorType="Light" Armor="4" FoodCost="2"/>
 		<Move Speed="10"/>
-		<Attack Power="10" Range="5" Delay="2" EffectiveAgainst="Light Surnatural" IneffectiveAgainst="Heavy"/>
+		<Attack Power="10" Range="5" Delay="2" EffectiveAgainst="Light Supernatural" IneffectiveAgainst="Heavy"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>

@@ -14,25 +14,25 @@ namespace Orion.Game.Simulation.Components
     public sealed class InvalidComponentStatException : ArgumentException
     {
         #region Fields
-        private readonly Type skillType;
+        private readonly Type componentType;
         private readonly object stat;
         #endregion
 
         #region Constructors
-        public InvalidComponentStatException(Type skillType, object stat)
+        public InvalidComponentStatException(Type componentType, object stat)
         {
-            Argument.EnsureNotNull(skillType, "skillType");
+            Argument.EnsureNotNull(componentType, "skillType");
             Argument.EnsureNotNull(stat, "stat");
 
-            this.skillType = skillType;
+            this.componentType = componentType;
             this.stat = stat;
         }
         #endregion
 
         #region Properties
-        public Type SkillType
+        public Type ComponentType
         {
-            get { return skillType; }
+            get { return componentType; }
         }
 
         public object Stat
@@ -47,7 +47,7 @@ namespace Orion.Game.Simulation.Components
 
         public override string Message
         {
-            get { return "Invalid stat {0} for {1}.".FormatInvariant(stat, skillType.Name); }
+            get { return "Invalid stat {0} for {1}.".FormatInvariant(stat, componentType.Name); }
         }
         #endregion
 

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Orion.Engine;
-using Orion.Engine.Graphics;
-using Orion.Game.Simulation;
-using Orion.Game.Simulation.Technologies;
-using Orion.Engine.Gui;
 using Orion.Engine.Geometry;
-using System.Windows.Forms;
+using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Engine.Input;
+using Orion.Game.Presentation.Gui;
+using Orion.Game.Simulation;
+using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Technologies;
+using Keys = System.Windows.Forms.Keys;
 using Orion.Game.Simulation.Components;
 using System.Diagnostics;
 
@@ -24,7 +24,7 @@ namespace Orion.Game.Presentation
         #region Fields
         private readonly IGameWindow window;
         private readonly Queue<InputEvent> inputEventQueue = new Queue<InputEvent>();
-        private readonly RootView rootView;
+        private readonly UIManager uiManager;
         private readonly TextureManager textureManager;
         #endregion
 
@@ -36,15 +36,21 @@ namespace Orion.Game.Presentation
             this.window.InputReceived += OnInputReceived;
             this.window.Resized += OnWindowResized;
 
-            Rectangle rootViewFrame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
-            this.rootView = new RootView(rootViewFrame, RootView.ContentsBounds);
+            System.Windows.Forms.Cursor.Hide();
             
             this.textureManager = new TextureManager(window.GraphicsContext, assets);
             this.textureManager.PreloadByExtension("png");
+
+            OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext, textureManager);
+            uiManager = style.CreateUIManager();
+            uiManager.SetSize(window.ClientAreaSize);
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the object representing the operating system window to which the game is drawn.
+        /// </summary>
         public IGameWindow Window
         {
             get { return window; }
@@ -58,16 +64,33 @@ namespace Orion.Game.Presentation
             get { return window.GraphicsContext; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="TextureManager"/> which provides services to load and cache textures.
+        /// </summary>
         public TextureManager TextureManager
         {
             get { return textureManager; }
         }
 
-        public RootView RootView
+        /// <summary>
+        /// Gets the <see cref="UIManager"/> that is the root of the UI hierarchy.
+        /// </summary>
+        public UIManager UIManager
         {
-            get { return rootView; }
+            get { return uiManager; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="OrionGuiStyle"/> object which allows stylizing UI controls.
+        /// </summary>
+        public OrionGuiStyle GuiStyle
+        {
+            get { return (OrionGuiStyle)uiManager.Renderer; }
+        }
+
+        /// <summary>
+        /// Gets the default texture that is returned when the queried texture is not found.
+        /// </summary>
         public Texture DefaultTexture
         {
             get { return textureManager.Get("Default"); }
@@ -96,6 +119,19 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(unitTypeName, "unitTypeName");
 
             string fullName = Path.Combine("Units", unitTypeName);
+            return GetTexture(fullName);
+        }
+        
+        /// <summary>
+        /// Gets a texture for a GUI element
+        /// </summary>
+        /// <param name="name">The name of the gui texture.</param>
+        /// <returns>The GUI texture with that name.</returns>
+        public Texture GetGuiTexture(string name)
+        {
+            Argument.EnsureNotNull(name, "name");
+
+            string fullName = Path.Combine("Gui", name);
             return GetTexture(fullName);
         }
 
@@ -140,8 +176,20 @@ namespace Orion.Game.Presentation
         /// <returns>The texture for that action.</returns>
         public Texture GetActionTexture(string actionName)
         {
-            string fullName = Path.Combine("Actions", actionName);
+            string fullName = Path.Combine(Path.Combine("Gui", "Actions"), actionName);
             return GetTexture(fullName);
+        }
+
+        /// <summary>
+        /// Gets a texture representing an action in the UI.
+        /// </summary>
+        /// <param name="task">A task based on the action.</param>
+        /// <returns>The texture for that action.</returns>
+        public Texture GetActionTexture(Task task)
+        {
+            string taskName = task.GetType().Name;
+            string actionName = taskName.EndsWith("Task") ? taskName.Substring(0, taskName.Length - "Task".Length) : taskName;
+            return GetActionTexture(actionName);
         }
 
         /// <summary>
@@ -166,13 +214,22 @@ namespace Orion.Game.Presentation
         #endregion
 
         /// <summary>
-        /// Updates the root view for a frame, allowing it to process queued input.
+        /// Draws the user interface.
+        /// </summary>
+        public void DrawGui()
+        {
+            window.GraphicsContext.ProjectionBounds = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
+            uiManager.Draw();
+        }
+
+        /// <summary>
+        /// Updates the user interface for a frame, allowing it to process queued input.
         /// </summary>
         /// <param name="timeDeltaInSeconds">The time elapsed since the previous frame, in seconds.</param>
-        public void UpdateRootView(float timeDeltaInSeconds)
+        public void UpdateGui(float timeDeltaInSeconds)
         {
             DispatchInputEvents();
-            RootView.Update(timeDeltaInSeconds);
+            uiManager.Update(TimeSpan.FromSeconds(timeDeltaInSeconds));
         }
 
         /// <summary>
@@ -189,22 +246,22 @@ namespace Orion.Game.Presentation
             while (inputEventQueue.Count > 0)
             {
                 InputEvent inputEvent = inputEventQueue.Dequeue();
-                rootView.SendInputEvent(inputEvent);
+                uiManager.InjectInputEvent(inputEvent);
             }
         }
 
         private void OnInputReceived(IGameWindow sender, InputEvent inputEvent)
         {
-            HandleInput(inputEvent);
+            if (HandleInput(inputEvent)) return;
             inputEventQueue.Enqueue(inputEvent);
         }
 
         private void OnWindowResized(IGameWindow sender)
         {
-            rootView.Frame = new Rectangle(window.ClientAreaSize.Width, window.ClientAreaSize.Height);
+            uiManager.SetSize(window.ClientAreaSize);
         }
 
-        private void HandleInput(InputEvent inputEvent)
+        private bool HandleInput(InputEvent inputEvent)
         {
             if (inputEvent.Type == InputEventType.Keyboard)
             {
@@ -213,15 +270,21 @@ namespace Orion.Game.Presentation
                 inputEvent.GetKeyboard(out type, out args);
 
                 if (type == KeyboardEventType.ButtonPressed && args.IsAltModifierDown && args.Key == Keys.Enter)
+                {
                     ToggleFullscreen();
+                    return true;
             }
+        }
+
+            return false;
         }
 
         private void ToggleFullscreen()
         {
             if (window.Mode == WindowMode.Windowed)
             {
-                try { window.SetFullscreen(new Size(1024, 768)); }
+                var bounds = System.Windows.Forms.Screen.PrimaryScreen.Bounds;
+                try { window.SetFullscreen(new Size(bounds.Width, bounds.Height)); }
                 catch (NotSupportedException) { }
             }
             else

@@ -202,14 +202,14 @@ namespace Orion.Game.Simulation.IO
             {
                 writer.Write((short)node.Location.X);
                 writer.Write((short)node.Location.Y);
-                writer.Write(node.AmountRemaining);
+                writer.Write(node.RemainingAmount);
             }
 
             foreach (ResourceNodeTemplate node in AlageneNodes)
             {
                 writer.Write((short)node.Location.X);
                 writer.Write((short)node.Location.Y);
-                writer.Write(node.AmountRemaining);
+                writer.Write(node.RemainingAmount);
             }
 
             foreach (List<UnitTemplate> units in unitsByFaction)

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Presentation", "Game.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Main", "Game.Main\Game.Main.csproj", "{7C578DB5-788D-426E-B011-D4FD40875846}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -43,13 +45,17 @@ Global
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Debug|x86.Build.0 = Debug|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.ActiveCfg = Release|x86
 		{7C578DB5-788D-426E-B011-D4FD40875846}.Release|x86.Build.0 = Release|x86
+		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Debug|x86.ActiveCfg = Debug|x86
+		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Debug|x86.Build.0 = Debug|x86
+		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Release|x86.ActiveCfg = Release|x86
+		{E0412ED7-FE01-4CEB-86DA-9E90B36F84AF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Game.Main\Game.Main.csproj

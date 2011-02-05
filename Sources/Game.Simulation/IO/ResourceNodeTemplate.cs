@@ -11,15 +11,15 @@ namespace Orion.Game.Simulation.IO
         #region Fields
         private readonly ResourceType type;
         private readonly Point location;
-        private readonly int amountRemaining;
+        private readonly int remainingAmount;
         #endregion
 
         #region Constructors
-        public ResourceNodeTemplate(ResourceType type, Point location, int amountRemaining)
+        public ResourceNodeTemplate(ResourceType type, Point location, int remainingAmount)
         {
             this.type = type;
             this.location = location;
-            this.amountRemaining = amountRemaining;
+            this.remainingAmount = remainingAmount;
         }
         #endregion
 
@@ -34,9 +34,9 @@ namespace Orion.Game.Simulation.IO
             get { return location; }
         }
 
-        public int AmountRemaining
+        public int RemainingAmount
         {
-            get { return amountRemaining; }
+            get { return remainingAmount; }
         }
         #endregion
     }

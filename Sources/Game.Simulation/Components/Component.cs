@@ -41,7 +41,7 @@ namespace Orion.Game.Simulation.Components
             if (type != stat.ComponentType)
                 return new Stat();
 
-            PropertyInfo property = type.GetProperty(stat.Name, BindingFlags.Public);
+            PropertyInfo property = type.GetProperty(stat.Name);
             if (property == null)
                 throw new InvalidComponentStatException(type, stat);
 

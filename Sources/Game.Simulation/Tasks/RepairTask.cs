@@ -58,6 +58,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "repairing {0}".FormatInvariant(target); }
         }
+
+        public override float Progress
+        {
+            get { return target.IsAliveInWorld ? target.Health / target.MaxHealth : float.NaN; }
+        }
         #endregion
 
         #region Methods

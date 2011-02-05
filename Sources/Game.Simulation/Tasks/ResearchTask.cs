@@ -39,6 +39,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             get { return "Researching " + technology.Name; }
         }
+
+        public override float Progress
+        {
+            get { return Math.Min(timeElapsed / researchTimeInSeconds, 1); }
+        }
         #endregion
 
         #region Methods

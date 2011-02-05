@@ -10,6 +10,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation.Skills;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -129,24 +130,24 @@ namespace Orion.Game.Simulation
             {
                 if (statAttribute.Name == "EffectiveAgainst")
                 {
-                    List<BasicSkill.ArmorTypes> effectiveTypes = new List<BasicSkill.ArmorTypes>();
+                    List<ArmorType> effectiveTypes = new List<ArmorType>();
                     if (statAttribute.Value != "")
                     {
                         foreach (string effective in statAttribute.Value.Split(' '))
                         {
-                            effectiveTypes.Add((BasicSkill.ArmorTypes)Enum.Parse(typeof(BasicSkill.ArmorTypes), effective, true));
+                            effectiveTypes.Add((ArmorType)Enum.Parse(typeof(ArmorType), effective, true));
                         }
                     }
                     ((AttackSkill)skill).SuperEffectiveAgainst = effectiveTypes;
                 }
                 else if (statAttribute.Name == "IneffectiveAgainst")
                 {
-                    List<BasicSkill.ArmorTypes> ineffectiveTypes = new List<BasicSkill.ArmorTypes>();
+                    List<ArmorType> ineffectiveTypes = new List<ArmorType>();
                     if (statAttribute.Value != "")
                     {
                         foreach (string ineffective in statAttribute.Value.Split(' '))
                         {
-                            ineffectiveTypes.Add((BasicSkill.ArmorTypes)Enum.Parse(typeof(BasicSkill.ArmorTypes), ineffective, true));
+                            ineffectiveTypes.Add((ArmorType)Enum.Parse(typeof(ArmorType), ineffective, true));
                         }
                     }
                     ((AttackSkill)skill).IneffectiveAgainst = ineffectiveTypes;
@@ -167,7 +168,7 @@ namespace Orion.Game.Simulation
                     {
                         if (statAttribute.Name == "ArmorType")
                         {
-                            value = (int)Enum.Parse(typeof(BasicSkill.ArmorTypes), statAttribute.Value, true);
+                            value = (int)Enum.Parse(typeof(ArmorType), statAttribute.Value, true);
                         }
                         else
                         {

@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Skills;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Stores information on an amount of aladdium, alagene and food.
+    /// Stores amounts of aladdium, alagene and food, and vector-like arithmetic on those values.
     /// </summary>
     [Serializable]
     [ImmutableObject(true)]
@@ -96,6 +96,13 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Static
+        #region Fields
+        /// <summary>
+        /// A <see cref="ResourceAmount"/> which corresponds to zero aladdium, alagene and food.
+        /// </summary>
+        public static readonly ResourceAmount Zero = new ResourceAmount(0, 0, 0);
+        #endregion
+
         #region Methods
         /// <summary>
         /// Creates a new instance from the cost of a unit.

@@ -166,7 +166,7 @@ namespace Orion.Engine.Graphics
                 Texture texture = graphicsContext.CreateTextureFromFile(filePath);
 
                 texture.SetSmooth(true);
-                texture.SetRepeat(false);
+                texture.SetRepeat(true);
 
                 textures.Add(name, new Item(graphicsContext, texture));
 

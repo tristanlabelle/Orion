@@ -10,7 +10,7 @@ namespace Orion.Game.Matchmaking.Networking
     /// <summary>
     /// Represents a match that was advertized in the lobby.
     /// </summary>
-    public sealed class AdvertizedMatch
+    public sealed class AdvertizedMatch : IEquatable<AdvertizedMatch>
     {
         #region Fields
         private readonly IMatchQuerier source;
@@ -77,21 +77,46 @@ namespace Orion.Game.Matchmaking.Networking
         #endregion
 
         #region Methods
-        public static bool operator ==(AdvertizedMatch a, AdvertizedMatch b)
+        public bool Equals(AdvertizedMatch other)
+        {
+        	if (ReferenceEquals(other, null)) return false;
+        	return name == other.name && openSlotCount == other.openSlotCount;
+        }
+        
+		public override bool Equals(object obj)
+        {
+			return Equals(obj as AdvertizedMatch);
+        }
+		
+		public override int GetHashCode()
+		{
+			return name.GetHashCode();
+		}
+		
+		public override string ToString()
+		{
+			return "{0} ({1} places)".FormatInvariant(name, openSlotCount);
+		}
+        
+        public void KeepAlive()
+        {
+            lastUpdateTime = DateTime.Now;
+        }
+        
+        public static bool Equals(AdvertizedMatch a, AdvertizedMatch b)
         {
             if (object.ReferenceEquals(a, null)) return object.ReferenceEquals(b, null);
-            if (object.ReferenceEquals(b, null)) return false;
-            return a.endPoint == b.endPoint && a.name == b.name;
+            return a.Equals(b);
+        }
+        
+        public static bool operator ==(AdvertizedMatch a, AdvertizedMatch b)
+        {
+        	return Equals(a, b);
         }
 
         public static bool operator !=(AdvertizedMatch a, AdvertizedMatch b)
         {
-            return !(a == b);
-        }
-
-        public void KeepAlive()
-        {
-            lastUpdateTime = DateTime.Now;
+        	return !Equals(a, b);
         }
         #endregion
     }

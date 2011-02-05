@@ -89,7 +89,7 @@ namespace Orion.Game.Matchmaking.TowerDefense
 
         public override void Update(SimulationStep step)
         {
-            if (spawnedCreepCount == CreepsPerWave && Faction.Units.Count() > 0)
+            if (spawnedCreepCount == CreepsPerWave && Faction.Units.Any())
                 return;
 
             timeBeforeNextCreep -= step.TimeDeltaInSeconds;

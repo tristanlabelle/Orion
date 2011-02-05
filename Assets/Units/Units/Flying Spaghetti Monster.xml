@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="10" MaxHealth="150" ArmorType="Heavy" Armor="4" AladdiumCost="250" AlageneCost="175" FoodCost="3"/>
 		<Move Speed="2"/>
-		<Attack Power="24" Range="6" Delay="5" SplashRadius="3" EffectiveAgainst="Surnatural" IneffectiveAgainst=""/>
+		<Attack Power="24" Range="6" Delay="5" SplashRadius="3" EffectiveAgainst="Supernatural" IneffectiveAgainst=""/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Ta mère" AladdiumCost="0" AlageneCost="0"/>

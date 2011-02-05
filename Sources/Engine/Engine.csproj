@@ -44,6 +44,7 @@
     <Optimize>false</Optimize>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>..\bin\release\</OutputPath>
@@ -64,10 +65,6 @@
     <Reference Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\OpenTK.GLControl.dll</HintPath>
-    </Reference>
-    <Reference Include="irrKlang.NET, Version=1.1.3.0, Culture=neutral, PublicKeyToken=a854741bd80517c7">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\irrKlang.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -103,6 +100,8 @@
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Collections\Subarray.cs" />
     <Compile Include="Collections\ValidatingCollection.cs" />
+    <Compile Include="Data\Bindable.cs" />
+    <Compile Include="Data\BindingDirection.cs" />
     <Compile Include="DisposableHandle.cs" />
     <Compile Include="Collections\BitArray2D.cs" />
     <Compile Include="Collections\BufferPool.cs" />
@@ -122,9 +121,12 @@
     <Compile Include="Graphics\GameWindowForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Graphics\NormalizedZoneChartRenderer.cs" />
     <Compile Include="Graphics\OpenTKGameWindow.cs" />
+    <Compile Include="Graphics\TextOverflowPolicy.cs" />
     <Compile Include="Graphics\TextRenderer.cs" />
+    <Compile Include="Graphics\TextRenderer.Glyph.cs" />
+    <Compile Include="Graphics\TextRenderer.RenderedFont.cs" />
+    <Compile Include="Graphics\TextRenderingOptions.cs" />
     <Compile Include="Graphics\WindowsFormsGameWindow.cs">
     </Compile>
     <Compile Include="Graphics\WindowMode.cs" />
@@ -137,52 +139,84 @@
     <Compile Include="Graphics\Text.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureManager.cs" />
-    <Compile Include="Gui\Button.cs" />
-    <Compile Include="Gui\Checkbox.cs" />
-    <Compile Include="Gui\CheckboxRenderer.cs" />
-    <Compile Include="Gui\ClippedView.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Gui\Adornments\ColorAdornment.cs" />
+    <Compile Include="Gui\Adornments\TextureAdornment.cs" />
+    <Compile Include="Gui\Alignment.cs" />
+    <Compile Include="Gui\Control.Focus.cs" />
+    <Compile Include="Gui\Control.Hierarchy.cs" />
+    <Compile Include="Gui\Control.Input.cs" />
+    <Compile Include="Gui\Control.Layout.cs" />
+    <Compile Include="Gui\Control.Visual.cs" />
+    <Compile Include="Gui\Controls\ButtonClickEvent.cs" />
+    <Compile Include="Gui\Controls\ButtonClickType.cs" />
+    <Compile Include="Gui\Controls\ComboBox.cs" />
+    <Compile Include="Gui\Controls\ComboBox.DropDown.cs" />
+    <Compile Include="Gui\Controls\ControlViewport.cs" />
+    <Compile Include="Gui\Controls\ListBox.cs" />
+    <Compile Include="Gui\Controls\ListBox.ItemCollection.cs" />
+    <Compile Include="Gui\Controls\ModalDialog.cs" />
+    <Compile Include="Gui\Controls\Popup.cs" />
+    <Compile Include="Gui\Controls\ScrollPanel.cs" />
+    <Compile Include="Gui\Layouts\FormLayout.EntryCollection.cs" />
+    <Compile Include="Gui\Layouts\FormLayoutEntry.cs" />
+    <Compile Include="Gui\Layouts\FormLayout.cs" />
+    <Compile Include="Gui\Layouts\GridLayout.ChildCollection.cs" />
+    <Compile Include="Gui\Layouts\GridLayout.cs" />
+    <Compile Include="Gui\HandleableEvent.cs" />
+    <Compile Include="Gui\Controls\Button.cs" />
+    <Compile Include="Gui\Controls\CheckBox.cs" />
+    <Compile Include="Gui\ContentControl.cs" />
+    <Compile Include="Gui\Layouts\OverlapLayout.ChildCollection.cs" />
+    <Compile Include="Gui\Layouts\OverlapLayout.cs" />
+    <Compile Include="Gui\Controls\ViewportBox.cs" />
+    <Compile Include="Data\BindableProperty.cs" />
+    <Compile Include="Gui\Direction.cs" />
+    <Compile Include="Gui\Layouts\DockedControl.cs" />
+    <Compile Include="Gui\Layouts\DockLayout.ChildCollection.cs" />
+    <Compile Include="Gui\Layouts\DockLayout.cs" />
+    <Compile Include="Gui\GuiSprite.cs" />
+    <Compile Include="Gui\IAdornment.cs" />
+    <Compile Include="Gui\GuiRenderer.cs" />
+    <Compile Include="Gui\Controls\ImageBox.cs" />
+    <Compile Include="Gui\Controls\Label.cs" />
+    <Compile Include="Gui\Borders.cs" />
+    <Compile Include="Gui\KeyEvent.cs" />
+    <Compile Include="Gui\KeyEventType.cs" />
+    <Compile Include="Gui\Layouts\WrapLayout.ChildCollection.cs" />
+    <Compile Include="Gui\Layouts\WrapLayout.cs" />
+    <Compile Include="Gui\ModifierKeys.cs" />
+    <Compile Include="Gui\MouseButtons.cs" />
+    <Compile Include="Gui\MouseEvent.cs" />
+    <Compile Include="Gui\MouseEventType.cs" />
+    <Compile Include="Gui\Adornments\BorderTextureAdornment.cs" />
+    <Compile Include="Gui\Orientation.cs" />
+    <Compile Include="Gui\Controls\RepeatButton.cs" />
+    <Compile Include="Gui\Controls\ScrollBar.cs" />
+    <Compile Include="Gui\Layouts\StackLayout.ChildCollection.cs" />
+    <Compile Include="Gui\Layouts\StackLayout.cs" />
+    <Compile Include="Gui\Controls\TextField.cs" />
+    <Compile Include="Gui\Controls\Thumb.cs" />
+    <Compile Include="Gui\Control.cs" />
+    <Compile Include="Data\Binding.cs" />
+    <Compile Include="Gui\OrientationStrategy.cs" />
+    <Compile Include="Gui\Stretch.cs" />
+    <Compile Include="Gui\UIManager.PopupCollection.cs" />
+    <Compile Include="Gui\Visibility.cs" />
+    <Compile Include="Gui\UIManager.cs" />
     <Compile Include="Graphics\CustomGLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gui\DelegatedRenderer.cs" />
-    <Compile Include="Gui\DropdownList.cs" />
-    <Compile Include="Gui\FilledRenderer.cs" />
-    <Compile Include="Data\ChartModel.cs" />
     <Compile Include="Input\InputEvent.cs" />
     <Compile Include="Input\InputEventType.cs" />
-    <Compile Include="Gui\Panel.cs" />
-    <Compile Include="Gui\Instant.cs" />
-    <Compile Include="Gui\IViewRenderer.cs" />
     <Compile Include="Input\KeyboardEventType.cs" />
-    <Compile Include="Gui\Label.cs" />
-    <Compile Include="Gui\ListPanel.cs" />
+    <Compile Include="Input\InputEnums.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Input\MouseEventType.cs" />
-    <Compile Include="Gui\RenderedView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\Responder.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\RootView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\RoundedRectangleRenderer.cs" />
-    <Compile Include="Gui\Scrollbar.cs" />
-    <Compile Include="Gui\TextField.cs" />
-    <Compile Include="Gui\TexturedRenderer.cs" />
-    <Compile Include="Gui\View.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\ViewChildrenCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Gui\ViewContainer.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Localization\Definition.cs" />
+    <Compile Include="Localization\Genders.cs" />
+    <Compile Include="Localization\Localizer.cs" />
+    <Compile Include="Localization\Translation.cs" />
     <Compile Include="Networking\Http\HttpHeaderMethods.cs" />
     <Compile Include="Networking\Http\HttpRequest.cs" />
     <Compile Include="Networking\Http\HttpRequestHeader.cs" />
@@ -202,6 +236,7 @@
     <Compile Include="Networking\SafeTransporter.cs" />
     <Compile Include="Networking\UdpSocketAdaptor.cs" />
     <Compile Include="Networking\RandomPacketLossUdpSocketDecorator.cs" />
+    <Compile Include="NullableExtensions.cs" />
     <Compile Include="NumericExtensions.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Point16.cs" />
@@ -212,10 +247,13 @@
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Input\KeyboardEventArgs.cs" />
+    <Compile Include="PropertyChangedEventAttribute.cs" />
+    <Compile Include="Reflection.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="Substring.cs" />
     <Compile Include="Transform.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="MersenneTwister.cs" />

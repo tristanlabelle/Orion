@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Jésus" Width="2" Height="2" IsAirborne="True">
 	<Skills>
-		<Basic SightRange="8" MaxHealth="80" ArmorType="Surnatural" Armor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
+		<Basic SightRange="8" MaxHealth="80" ArmorType="Supernatural" Armor="1" AladdiumCost="80" AlageneCost="40" FoodCost="2"/>
 		<Move Speed="12"/>
 		<Heal Speed="2" Range="4"/>
 	</Skills>

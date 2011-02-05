@@ -91,6 +91,12 @@ namespace Orion.Game.Simulation
             identity.AladdiumCost = builder.BasicSkill.AladdiumCost;
             identity.AlageneCost = builder.BasicSkill.AlageneCost;
             AddComponent(identity);
+
+            Health health = new Health(this);
+            health.Armor = builder.BasicSkill.Armor;
+            health.ArmorType = builder.BasicSkill.ArmorType;
+            health.MaxHealth = builder.BasicSkill.MaxHealth;
+            AddComponent(health);
         }
 
         /// <summary>
@@ -126,6 +132,7 @@ namespace Orion.Game.Simulation
             spatial.Position = position;
             AddComponent(spatial);
             AddComponent(meta.GetComponent<Identity>().Clone(this));
+            AddComponent(meta.GetComponent<Health>().Clone(this));
 
             this.faction = faction;
             this.taskQueue = new TaskQueue(this);
@@ -275,18 +282,8 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float Damage
         {
-            get { return damage; }
-            set
-            {
-                if (float.IsNaN(value)) throw new ArgumentException("The damage cannot be set to NaN.", "Damage");
-                if (value < 0) value = 0;
-                else if (value > MaxHealth) value = MaxHealth;
-                else if (value == damage) return;
-
-                damage = value;
-
-                if (damage == MaxHealth) Die();
-            }
+            get { return GetComponent<Health>().Damage; }
+            set { GetComponent<Health>().Damage = value; }
         }
 
         /// <summary>
@@ -302,7 +299,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float Health
         {
-            get { return MaxHealth - damage; }
+            get { return MaxHealth - Damage; }
             set { Damage = MaxHealth - value; }
         }
 
@@ -545,7 +542,7 @@ namespace Orion.Game.Simulation
             UnitStat armorTypeStat = BasicSkill.ArmorTypeStat;
 
             int targetArmor = target.GetStat(armorStat);
-            BasicSkill.ArmorTypes targetArmorType = (BasicSkill.ArmorTypes)target.GetStat(BasicSkill.ArmorTypeStat);
+            ArmorType targetArmorType = (ArmorType)target.GetStat(BasicSkill.ArmorTypeStat);
 
             int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
             
@@ -582,7 +579,7 @@ namespace Orion.Game.Simulation
             timeElapsedSinceLastHitInSeconds = 0;
         }
 
-        public bool IsSuperEffectiveAgainst(BasicSkill.ArmorTypes type)
+        public bool IsSuperEffectiveAgainst(ArmorType type)
         {
             AttackSkill skill = Type.TryGetSkill<AttackSkill>();
             if (skill == null)
@@ -591,7 +588,7 @@ namespace Orion.Game.Simulation
                 return skill.IsSuperEffectiveAgainst(type);
         }
 
-        public bool IsIneffectiveAgainst(BasicSkill.ArmorTypes type)
+        public bool IsIneffectiveAgainst(ArmorType type)
         {
             AttackSkill skill = Type.TryGetSkill<AttackSkill>();
             if (skill != null)

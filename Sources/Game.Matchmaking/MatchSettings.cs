@@ -64,6 +64,26 @@ namespace Orion.Game.Matchmaking
         }
 
         /// <summary>
+        /// Accesses the width of the world map.
+        /// </summary>
+        [PropertyChangedEvent("MapSizeChanged")]
+        public int MapWidth
+        {
+            get { return mapSize.Width; }
+            set { MapSize = new Size(value, mapSize.Height); }
+        }
+
+        /// <summary>
+        /// Accesses the height of the world map.
+        /// </summary>
+        [PropertyChangedEvent("MapSizeChanged")]
+        public int MapHeight
+        {
+            get { return mapSize.Height; }
+            set { MapSize = new Size(mapSize.Width, value); }
+        }
+
+        /// <summary>
         /// Accesses the maximum amount of food that can be used by factions.
         /// </summary>
         public int FoodLimit

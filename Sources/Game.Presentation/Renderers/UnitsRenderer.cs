@@ -201,9 +201,9 @@ namespace Orion.Game.Presentation.Renderers
 
             float drawingAngle = GetUnitDrawingAngle(unit);
             float oscillation = GetOscillation(unit);
-            float distance = shadowDistance + oscillation * 0.1f;
-            Vector2 center = unit.Center - new Vector2(distance, distance);
-            float scaling = shadowScaling + oscillation * -0.1f;
+            float distance = shadowDistance - oscillation * 0.1f;
+            Vector2 center = unit.Center + new Vector2(-distance, distance);
+            float scaling = shadowScaling + oscillation * 0.1f;
             using (graphicsContext.PushTransform(center, drawingAngle, scaling))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
@@ -233,7 +233,7 @@ namespace Orion.Game.Presentation.Renderers
 
             Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
             float angle = unit.GetComponent<Spatial>().Angle;
-            float baseAngle = angle - (float)Math.PI * 0.5f;
+            float baseAngle = angle + (float)Math.PI * 0.5f;
 
             bool isMelee = unit.HasSkill<AttackSkill>() && unit.GetStat(AttackSkill.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)

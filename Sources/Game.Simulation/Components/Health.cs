@@ -32,6 +32,10 @@ namespace Orion.Game.Simulation.Components
         public Health(Entity entity) : base(entity) { }
         #endregion
 
+        #region Events
+        public event Action<Entity> DamageChanged;
+        #endregion
+
         #region Properties
         [Mandatory]
         public int MaxHealth
@@ -65,7 +69,10 @@ namespace Orion.Game.Simulation.Components
         public float CurrentHealth
         {
             get { return maxHealth - currentDamage; }
-            set { currentDamage = maxHealth - value; }
+            set
+            {
+                Damage = maxHealth - value;
+            }
         }
 
         [Persistent]
@@ -81,24 +88,36 @@ namespace Orion.Game.Simulation.Components
             get { return damageReduction; }
             set { damageReduction = value; }
         }
+
+        public float Damage
+        {
+            get { return currentDamage; }
+            set
+            {
+                Argument.EnsureNotNaN(value, "value");
+                float actualDamage = value - damageReduction;
+
+                if (value < 0) value = 0;
+                if (value > MaxHealth) value = MaxHealth;
+
+                currentDamage = value;
+                DamageChanged.Raise(Entity);
+
+                if (currentDamage >= Entity.GetStat(MaxHealthStat).IntegerValue)
+                    Entity.Die();
+            }
+        }
         #endregion
 
         #region Methods
         public override void Update(SimulationStep step)
         {
-            currentDamage -= regenerationRate * step.TimeDeltaInSeconds;
-            if (currentDamage < 0)
-                currentDamage = 0;
-        }
-
-        public void Damage(float damage)
-        {
-            float actualDamage = damage - damageReduction;
-            if (actualDamage < 0) actualDamage = 0;
-            currentDamage += actualDamage;
-
-            if (currentDamage >= Entity.GetStat(MaxHealthStat).IntegerValue)
-                Entity.Die();
+            float regeneration = regenerationRate * step.TimeDeltaInSeconds;
+            float newDamage = currentDamage - regeneration;
+            if (newDamage < 0) newDamage = 0;
+            if (newDamage != currentDamage)
+                DamageChanged.Raise(Entity);
+            currentDamage = newDamage;
         }
         #endregion
     }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UnitType Name="Allah Skywalker" VoicesTemplate="Jedihad" Width="1" Height="1">
 	<Skills>
-		<Basic SightRange="8" MaxHealth="160" ArmorType="Surnatural" Armor="5" FoodCost="2"/>
+		<Basic SightRange="8" MaxHealth="160" ArmorType="Supernatural" Armor="5" FoodCost="2"/>
 		<Move Speed="9"/>
-		<Attack Power="14" Range="3" Delay="3" EffectiveAgainst="Light Surnatural" IneffectiveAgainst=""/>
+		<Attack Power="14" Range="3" Delay="3" EffectiveAgainst="Light Supernatural" IneffectiveAgainst=""/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>

@@ -3,7 +3,7 @@
 	<Skills>
 		<Basic SightRange="8" MaxHealth="70" ArmorType="Heavy" Armor="2" AladdiumCost="100" AlageneCost="25" FoodCost="3"/>
 		<Move Speed="6"/>
-		<Attack Power="13" Range="0" Delay="4" EffectiveAgainst="Heavy" IneffectiveAgainst="Surnatural"/>
+		<Attack Power="13" Range="0" Delay="4" EffectiveAgainst="Heavy" IneffectiveAgainst="Supernatural"/>
 	</Skills>
 	<Upgrades>
 		<Upgrade Target="Thor" AladdiumCost="0" AlageneCost="0"/>

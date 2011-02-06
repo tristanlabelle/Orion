@@ -114,6 +114,8 @@ namespace Orion.Game.Presentation.Gui
 
                 statsForm.Entries.Add(headerLabel, valueLabel);
             }
+
+            entity = unit;
         }
 
         /// <summary>
@@ -131,6 +133,8 @@ namespace Orion.Game.Presentation.Gui
             UpdateAmount(resourceNode);
 
             resourceNode.RemainingAmountChanged += remainingAmountChangedEventHandler;
+
+            entity = resourceNode;
         }
 
         /// <summary>

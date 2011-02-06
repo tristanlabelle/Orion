@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui;
-using Orion.Engine.Graphics;
-using Orion.Game.Simulation.Tasks;
 using Orion.Engine;
+using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -61,6 +62,12 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Methods
+            protected override void OnClicked(ButtonClickEvent @event)
+            {
+                Debug.Assert(task != null);
+                panel.TaskCancelled.Raise(panel, task);
+            }
+
             private static void OnPostDrawing(Control sender, GuiRenderer renderer)
             {
                 TodoButton button = (TodoButton)sender;

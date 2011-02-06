@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation
 
         #region Properties
         /// <summary>
-        /// Gets the value of this <see cref="Uid"/>.
+        /// Gets the value of this <see cref="Handle"/>.
         /// </summary>
         public uint Value
         {
@@ -74,13 +74,12 @@ namespace Orion.Game.Simulation
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Handle)) return false;
-            return Equals((Handle)obj);
+            return obj is Handle && Equals((Handle)obj);
         }
 
         public override int GetHashCode()
         {
-            return (int)value;
+            return unchecked((int)value);
         }
 
         public override string ToString()

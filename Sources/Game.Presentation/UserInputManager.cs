@@ -13,6 +13,7 @@ using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Utilities;
 using Keys = System.Windows.Forms.Keys;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation
 {
@@ -390,7 +391,7 @@ namespace Orion.Game.Presentation
             {
                 IEnumerable<Unit> units = Selection.Units
                     .Where(unit => IsUnitControllable(unit) && !unit.Type.IsBuilding);
-                commander.LaunchCancel(units);
+                commander.LaunchCancelAllTasks(units);
             }
         }
 
@@ -522,11 +523,19 @@ namespace Orion.Game.Presentation
             commander.LaunchSuicide(targetUnits);
         }
 
-        public void LaunchCancel()
+        public void LaunchCancelAllTasks()
         {
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction);
-            commander.LaunchCancel(targetUnits);
+            commander.LaunchCancelAllTasks(targetUnits);
+        }
+
+        public void LaunchCancelTask(Task task)
+        {
+            Argument.EnsureNotNull(task, "task");
+            Debug.Assert(Selection.Count == 1 && task.Unit == Selection.FirstOrDefault());
+
+            commander.LaunchCancelTask(task);
         }
 
         public void LaunchChangeDiplomacy(Faction targetFaction, DiplomaticStance newStance)

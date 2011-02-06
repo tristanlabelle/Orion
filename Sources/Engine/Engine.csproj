@@ -98,6 +98,7 @@
     <Compile Include="Audio\SoundManager.cs" />
     <Compile Include="Audio\SoundSampleFormat.cs" />
     <Compile Include="BinarySerializer.cs" />
+    <Compile Include="Collections\BiDictionary.cs" />
     <Compile Include="Collections\Subarray.cs" />
     <Compile Include="Collections\ValidatingCollection.cs" />
     <Compile Include="Data\Bindable.cs" />

@@ -59,6 +59,13 @@ namespace Orion.Game.Presentation.Gui
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Unit"/>.
+        /// </summary>
+        public event Action<SingleEntitySelectionPanel, Task> TaskCancelled;
+        #endregion
+
         #region Properties
         /// <summary>
         /// Accesses the entity for which information is being displayed.
@@ -172,7 +179,11 @@ namespace Orion.Game.Presentation.Gui
         private void ClearTodoList()
         {
             foreach (TodoButton todoButton in todoButtonStack.Children)
+            {
+                // Stop referencing the task to prevent keeping alive units
+                todoButton.Task = null;
                 unusedTodoButtons.Add(todoButton);
+            }
 
             todoButtonStack.Children.Clear();
         }

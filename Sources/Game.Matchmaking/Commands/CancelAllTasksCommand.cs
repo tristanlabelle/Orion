@@ -10,17 +10,17 @@ using Orion.Game.Simulation;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cancels the current <see cref="Task"/> of a set of <see cref="Unit"/>s.
+    /// A <see cref="Command"/> which cancels all <see cref="Task"/>s of a set of <see cref="Unit"/>s.
     /// </summary>
     [Serializable]
-    public sealed class CancelCommand : Command
+    public sealed class CancelAllTasksCommand : Command
     {
         #region Fields
         private readonly ReadOnlyCollection<Handle> unitHandles;
         #endregion
 
         #region Constructors
-        public CancelCommand(Handle factionHandle, IEnumerable<Handle> unitHandles)
+        public CancelAllTasksCommand(Handle factionHandle, IEnumerable<Handle> unitHandles)
             : base(factionHandle)
         {
             Argument.EnsureNotNullNorEmpty(unitHandles, "unitHandles");
@@ -66,7 +66,7 @@ namespace Orion.Game.Matchmaking.Commands
         }
 
         #region Serialization
-        public static void Serialize(CancelCommand command, BinaryWriter writer)
+        public static void Serialize(CancelAllTasksCommand command, BinaryWriter writer)
         {
             Argument.EnsureNotNull(command, "command");
             Argument.EnsureNotNull(writer, "writer");
@@ -75,13 +75,13 @@ namespace Orion.Game.Matchmaking.Commands
             WriteLengthPrefixedHandleArray(writer, command.unitHandles);
         }
 
-        public static CancelCommand Deserialize(BinaryReader reader)
+        public static CancelAllTasksCommand Deserialize(BinaryReader reader)
         {
             Argument.EnsureNotNull(reader, "reader");
 
             Handle factionHandle = ReadHandle(reader);
             var unitHandles = ReadLengthPrefixedHandleArray(reader);
-            return new CancelCommand(factionHandle, unitHandles);
+            return new CancelAllTasksCommand(factionHandle, unitHandles);
         }
         #endregion
         #endregion

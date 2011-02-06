@@ -80,6 +80,8 @@ namespace Orion.Game.Main
             this.ui.Exited += OnUserExited;
 
             this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(Graphics);
+            this.singleEntitySelectionPanel.TaskCancelled += (sender, task) => userInputManager.LaunchCancelTask(task);
+
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(Graphics);
             this.multipleUnitSelectionPanel.UnitSelected += OnMultipleSelectionPanelUnitSelected;
             this.multipleUnitSelectionPanel.UnitDeselected += OnMultipleSelectionPanelUnitDeselected;

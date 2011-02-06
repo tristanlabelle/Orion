@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
+    <Compile Include="Commands\CancelTaskCommand.cs" />
     <Compile Include="Commands\DisembarkCommand.cs" />
     <Compile Include="Commands\EmbarkCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
@@ -116,7 +117,7 @@
     <Compile Include="Commands\ChangeRallyPointCommand.cs" />
     <Compile Include="Commands\HealCommand.cs" />
     <Compile Include="Commands\HarvestCommand.cs" />
-    <Compile Include="Commands\CancelCommand.cs" />
+    <Compile Include="Commands\CancelAllTasksCommand.cs" />
     <Compile Include="Commands\SendMessageCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Commands\RepairCommand.cs" />

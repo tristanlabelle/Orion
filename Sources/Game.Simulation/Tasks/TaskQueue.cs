@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Engine.Collections;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -14,10 +15,15 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class TaskQueue : IList<Task>
     {
         #region Fields
-        private const int maxLength = 8;
-
         private readonly Unit unit;
         private readonly List<Task> tasks = new List<Task>();
+
+        /// <summary>
+        /// Associates unique IDs to each of a <see cref="Unit"/>'s <see cref="Task"/>s
+        /// so that they can be referred over the network. This is used to cancel <see cref="Task"/>s.
+        /// </summary>
+        private readonly BiDictionary<Task, uint> taskIDs = new BiDictionary<Task, uint>();
+        private uint nextTaskID = 1;
         #endregion
 
         #region Constructors
@@ -53,14 +59,6 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="TaskQueue"/> is at its maximum capacity. *HACKHACK*
-        /// </summary>
-        public bool IsFull
-        {
-            get { return tasks.Count >= maxLength; }
-        }
-
-        /// <summary>
         /// Gets the <see cref="Task"/> currently being executed.
         /// </summary>
         public Task Current
@@ -91,19 +89,51 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Methods
         /// <summary>
+        /// Attempts to retrieve the handle to a given <see cref="Task"/> in this <see cref="TaskQueue"/>.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> for which the identifier is retrieved.</param>
+        /// <returns>The handle of <paramref name="task"/>, or <c>0</c> if the <see cref="Task"/> was not found.</returns>
+        public Handle TryGetTaskHandle(Task task)
+        {
+            if (task == null) return new Handle(0);
+            return new Handle(taskIDs.GetValueOrDefault(task));
+        }
+
+        /// <summary>
+        /// Attempts to retrieve a <see cref="Task"/> in this <see cref="TaskQueue"/> from its handle.
+        /// </summary>
+        /// <param name="handle">The handle of the <see cref="Task"/>.</param>
+        /// <returns>The <see cref="Task"/> with that handle, or <c>null</c> if no task has this handle.</returns>
+        public Task TryResolveTask(Handle handle)
+        {
+            return taskIDs.GetKeyOrDefault(handle.Value);
+        }
+
+        /// <summary>
         /// Updates the current task for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
         public void Update(SimulationStep step)
         {
             if (IsEmpty) return;
+            Debug.Assert(tasks.Count == taskIDs.Count,
+                "The task ID dictionary was not kept synched to the task list.");
 
             Task task = Current;
             task.Update(step);
             if (task.HasEnded)
             {
                 task.Dispose();
-                if (tasks.Remove(task)) Changed.Raise(this);
+
+                // As the task could involve modifying the task queue,
+                // it cannot be assumed that the task is still the first one.
+                if (tasks.Count > 0 && tasks[0] == task)
+                {
+                    tasks.RemoveAt(0);
+                    taskIDs.RemoveByKey(task);
+
+                    Changed.Raise(this);
+                }
             }
         }
 
@@ -115,13 +145,14 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(task, "task");
             if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
-            // This can now voluntarily happen, so I'm commenting out the assert
-            // Debug.Assert(Count <= 1, "More than one task was overriden, is this voluntary?");
             Debug.Assert(!unit.IsUnderConstruction);
 
-            Clear();
+            foreach (Task t in tasks) task.Dispose();
+            tasks.Clear();
+            taskIDs.Clear();
 
             tasks.Add(task);
+            taskIDs.Add(task, nextTaskID++);
 
             Changed.Raise(this);
         }
@@ -132,30 +163,60 @@ namespace Orion.Game.Simulation.Tasks
         /// <param name="task">The new task that must now be completed.</param>
         public void ReplaceWith(Task task)
         {
-            if (tasks.Count == 0)
-                throw new InvalidOperationException("Cannot replace the first task of the queue if the queue is empty");
+            if (tasks.Count == 0) throw new InvalidOperationException("Cannot replace the first task of the queue if the queue is empty");
+
+            taskIDs.RemoveByKey(tasks[0]);
             tasks[0] = task;
+            taskIDs.Add(task, nextTaskID++);
+
             Changed.Raise(this);
         }
 
+        /// <summary>
+        /// Enqueues a new <see cref="Task"/> at the end of this <see cref="Unit"/>'s queue of <see cref="Task"/>s.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be enqueued.</param>
         public void Enqueue(Task task)
         {
             Argument.EnsureNotNull(task, "task");
             if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
-            if (tasks.Contains(task)) throw new InvalidOperationException("Cannot add a task already present.");
-            //if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
+            if (taskIDs.ContainsKey(task)) throw new InvalidOperationException("Cannot add a task already present.");
             Debug.Assert(!unit.IsUnderConstruction);
 
             tasks.Add(task);
+            taskIDs.Add(task, nextTaskID++);
 
             Changed.Raise(this);
         }
 
+        /// <summary>
+        /// Cancels a given <see cref="Task"/> from this <see cref="TaskQueue"/>.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> to be cancelled.</param>
+        public void CancelTask(Task task)
+        {
+            Argument.EnsureNotNull(task, "task");
+
+            if (tasks.Remove(task))
+            {
+                taskIDs.RemoveByKey(task);
+
+                Changed.Raise(this);
+            }
+        }
+
+        /// <summary>
+        /// Gets an enumerator over this <see cref="TaskQueue"/>'s <see cref="Task"/>s.
+        /// </summary>
+        /// <returns>A new <see cref="Task"/> enumerator.</returns>
         public List<Task>.Enumerator GetEnumerator()
         {
             return tasks.GetEnumerator();
         }
 
+        /// <summary>
+        /// Removes all <see cref="Task"/>s from this <see cref="Unit"/>'s queue.
+        /// </summary>
         public void Clear()
         {
             if (tasks.Count == 0) return;
@@ -163,6 +224,7 @@ namespace Orion.Game.Simulation.Tasks
             foreach (Task task in tasks)
                 task.Dispose();
             tasks.Clear();
+            taskIDs.Clear();
 
             Changed.Raise(this);
         }
@@ -200,7 +262,7 @@ namespace Orion.Game.Simulation.Tasks
 
         bool ICollection<Task>.Contains(Task item)
         {
-            return tasks.Contains(item);
+            return taskIDs.ContainsKey(item);
         }
 
         void ICollection<Task>.CopyTo(Task[] array, int arrayIndex)

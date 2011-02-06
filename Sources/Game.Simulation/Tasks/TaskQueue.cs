@@ -200,6 +200,7 @@ namespace Orion.Game.Simulation.Tasks
             if (tasks.Remove(task))
             {
                 taskIDs.RemoveByKey(task);
+                task.Dispose();
 
                 Changed.Raise(this);
             }

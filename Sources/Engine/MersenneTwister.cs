@@ -161,7 +161,7 @@ namespace Orion.Engine
                     high |= low >> (sizeof(long) * 8 - shift);
                     low <<= shift;
 
-                    return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                    return new Vector128((uint)(high >> 32), (uint)high, (uint)(low >> 32), (uint)low);
                 }
             }
 
@@ -181,7 +181,7 @@ namespace Orion.Engine
                     low |= high << (sizeof(long) * 8 - shift);
                     high >>= shift;
 
-                    return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                    return new Vector128((uint)(high >> 32), (uint)high, (uint)(low >> 32), (uint)low);
                 }
             }
         }

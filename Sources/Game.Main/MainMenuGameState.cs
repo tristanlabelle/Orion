@@ -23,7 +23,7 @@ namespace Orion.Game.Main
         public MainMenuGameState(GameStateManager manager)
             : base(manager)
         {
-            ui = new MainMenuUI(Graphics.GuiStyle);
+            ui = new MainMenuUI(Graphics);
 
             ui.SinglePlayerClicked += sender => Manager.Push(new SinglePlayerDeathmatchSetupGameState(Manager));
             ui.MultiplayerClicked += sender => Manager.Push(new MultiplayerLobbyGameState(Manager));

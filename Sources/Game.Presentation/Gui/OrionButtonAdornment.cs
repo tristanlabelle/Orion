@@ -22,14 +22,14 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public OrionButtonAdornment(GuiRenderer renderer)
+        public OrionButtonAdornment(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(renderer, "renderer");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            upTexture = renderer.GetTexture("Gui/Button_Up");
-            overTexture = renderer.GetTexture("Gui/Button_Over");
-            downTexture = renderer.GetTexture("Gui/Button_Down");
-            disabledTexture = renderer.GetTexture("Gui/Button_Disabled");
+            upTexture = graphics.GetGuiTexture("Button_Up");
+            overTexture = graphics.GetGuiTexture("Button_Over");
+            downTexture = graphics.GetGuiTexture("Button_Down");
+            disabledTexture = graphics.GetGuiTexture("Button_Disabled");
         }
         #endregion
 

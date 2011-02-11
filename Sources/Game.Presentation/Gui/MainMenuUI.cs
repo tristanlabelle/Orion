@@ -15,24 +15,21 @@ namespace Orion.Game.Presentation.Gui
     /// </summary>
     public sealed class MainMenuUI : ContentControl
     {
-        #region Fields
-        private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
-        private const string artistName = "Guillaume Lacasse";
-        #endregion
-
         #region Constructors
-        public MainMenuUI(OrionGuiStyle style)
+        public MainMenuUI(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(graphics, "graphics");
 
+            var style = graphics.GuiStyle;
+            
             DockLayout dock = style.Create<DockLayout>();
-            dock.Adornment = new TextureAdornment(style.GetTexture("Gui/MenuBackground"));
+            dock.Adornment = new TextureAdornment(graphics.GetGuiTexture("MenuBackground"));
             dock.LastChildFill = true;
             Content = dock;
 
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
-            titleImageBox.Texture = style.GetTexture("Gui/Title");
+            titleImageBox.Texture = graphics.GetGuiTexture("Title");
             dock.Dock(titleImageBox, Direction.NegativeY);
 
             StackLayout buttonsStack = new StackLayout()

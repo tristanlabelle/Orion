@@ -22,24 +22,21 @@ namespace Orion.Game.Presentation.Gui
         private static readonly ColorRgb enabledTextColor = Colors.Black;
         private static readonly ColorRgb disabledTextColor = Colors.Gray;
 
-        private readonly GraphicsContext graphicsContext;
-        private readonly TextureManager textureManager;
+        private readonly GameGraphics graphics;
         private readonly OrionButtonAdornment buttonAdornment;
         private readonly OrionCheckBoxButtonAdornment checkBoxButtonAdornment;
         private readonly BorderTextureAdornment comboBoxAdornment;
         #endregion
 
         #region Constructors
-        public OrionGuiStyle(GraphicsContext graphicsContext, TextureManager textureManager)
+        public OrionGuiStyle(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(graphicsContext, "graphicsContext");
-            Argument.EnsureNotNull(textureManager, "textureManager");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            this.graphicsContext = graphicsContext;
-            this.textureManager = textureManager;
-            this.buttonAdornment = new OrionButtonAdornment(this);
-            this.checkBoxButtonAdornment = new OrionCheckBoxButtonAdornment(this);
-            this.comboBoxAdornment = new BorderTextureAdornment(GetGuiTexture("ComboBox_Border_Up"));
+            this.graphics = graphics;
+            this.buttonAdornment = new OrionButtonAdornment(graphics);
+            this.checkBoxButtonAdornment = new OrionCheckBoxButtonAdornment(graphics);
+            this.comboBoxAdornment = new BorderTextureAdornment(graphics.GetGuiTexture("ComboBox_Border_Up"));
         }
         #endregion
 
@@ -51,50 +48,50 @@ namespace Orion.Game.Presentation.Gui
         {
             get { return font; }
         }
+        
+        private GraphicsContext GraphicsContext
+        {
+        	get { return graphics.Context; }
+        }
         #endregion
 
         #region Methods
         #region GuiRenderer Implementation
         protected override void PushTransformImpl(Transform transform)
         {
-            graphicsContext.PushTransform(transform);
+            GraphicsContext.PushTransform(transform);
         }
 
         protected override void PopTransformImpl()
         {
-            graphicsContext.PopTransform();
+            GraphicsContext.PopTransform();
         }
 
         protected override void PushClippingRectangleImpl(Region rectangle)
         {
-            graphicsContext.PushScissorRegion(rectangle);
+            GraphicsContext.PushScissorRegion(rectangle);
         }
 
         protected override void PopClippingRectangleImpl()
         {
-            graphicsContext.PopScissorRegion();
+            GraphicsContext.PopScissorRegion();
         }
-
-        public override Texture GetTexture(string name)
-        {
-            return textureManager.Get(name);
-        }
-
+        
         public override Size MeasureText(Substring text, ref TextRenderingOptions options)
         {
-            return graphicsContext.Measure(text, ref options);
+            return GraphicsContext.Measure(text, ref options);
         }
 
         public override void DrawText(Substring text, ref TextRenderingOptions options)
         {
-            graphicsContext.Draw(text, ref options);
+            GraphicsContext.Draw(text, ref options);
         }
 
         public override void DrawSprite(ref GuiSprite sprite)
         {
             if (sprite.Texture == null)
             {
-                graphicsContext.Fill(sprite.Rectangle, sprite.Color);
+                GraphicsContext.Fill(sprite.Rectangle, sprite.Color);
             }
             else
             {
@@ -103,7 +100,7 @@ namespace Orion.Game.Presentation.Gui
                     sprite.PixelRectangle.MinY / (float)sprite.Texture.Height,
                     sprite.PixelRectangle.Width / (float)sprite.Texture.Width,
                     sprite.PixelRectangle.Height / (float)sprite.Texture.Height);
-                graphicsContext.Fill(sprite.Rectangle, sprite.Texture, normalizedTextureRectangle, sprite.Color);
+                GraphicsContext.Fill(sprite.Rectangle, sprite.Texture, normalizedTextureRectangle, sprite.Color);
             }
         }
         #endregion
@@ -183,16 +180,11 @@ namespace Orion.Game.Presentation.Gui
             GetType().InvokeMember("ApplySpecificStyle", bindingFlags, null, this, new[] { control });
         }
 
-        private Texture GetGuiTexture(string name)
-        {
-            return textureManager.Get("Gui/" + name);
-        }
-
         private void ApplySpecificStyle(Control control) { }
 
         private void ApplySpecificStyle(UIManager uiManager)
         {
-            uiManager.CursorTexture = GetGuiTexture("Cursors/Default");
+            uiManager.CursorTexture = graphics.GetGuiCursorTexture("Default");
         }
 
         private void ApplySpecificStyle(Label label)
@@ -240,7 +232,7 @@ namespace Orion.Game.Presentation.Gui
             button.Content = new ImageBox()
             {
                 Stretch = Stretch.None,
-                Texture = GetGuiTexture("Down_Arrow")
+                Texture = graphics.GetGuiTexture("Down_Arrow")
             };
             button.PreDrawing += OnComboBoxButtonPreDrawing;
 

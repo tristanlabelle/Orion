@@ -57,5 +57,11 @@ namespace Orion.Engine
         {
             if (@event != null) @event(arg1, arg2, arg3);
         }
+        
+        [Obsolete("If you end up using this, refactor to introduce a parameter object.", true)]
+        public static void Raise<T1, T2, T3, T4>(this Action<T1, T2, T3, T4> @event, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+        	throw new NotImplementedException();
+        }
     }
 }

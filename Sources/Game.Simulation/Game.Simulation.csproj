@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiplomaticStanceChange.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />
     <Compile Include="IO\WorldData.cs" />

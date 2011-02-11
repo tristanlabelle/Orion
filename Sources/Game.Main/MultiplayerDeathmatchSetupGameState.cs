@@ -55,7 +55,7 @@ namespace Orion.Game.Main
             this.matchName = matchName;
             this.playerName = playerName;
 
-            this.ui = new MatchConfigurationUI(Graphics.GuiStyle)
+            this.ui = new MatchConfigurationUI(Graphics)
             {
                 CanChangeSettings = IsHost,
                 CanStart = IsHost,

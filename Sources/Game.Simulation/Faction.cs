@@ -102,9 +102,9 @@ namespace Orion.Game.Simulation
         public event Action<Faction, Technology> TechnologyResearched;
 
         /// <summary>
-        /// Raised when the faction changes of diplomatic stance.
+        /// Raised when the faction changes its diplomatic stance with regard to another faction.
         /// </summary>
-        public event Action<Faction, Faction, DiplomaticStance> DiplomaticStanceChanged;
+        public event Action<Faction, DiplomaticStanceChange> DiplomaticStanceChanged;
 
         public event Action<Faction> AladdiumAmountChanged;
         public event Action<Faction> AlageneAmountChanged;
@@ -113,15 +113,9 @@ namespace Orion.Game.Simulation
 
         public event Action<Faction, string> Warning;
 
-        public void RaiseWarning(string message, Faction source)
-        {
-#warning Ugly hack, event sender should always be the event owner!
-            Warning.Raise(source, message);
-        }
-
         public void RaiseWarning(string message)
         {
-            RaiseWarning(message, this);
+            Warning.Raise(this, message);
         }
         #endregion
 
@@ -544,27 +538,11 @@ namespace Orion.Game.Simulation
 
             DiplomaticStance previousStance = GetDiplomaticStance(target);
             DiplomaticStance otherFactionStance = target.GetDiplomaticStance(this);
-
-            if (stance.HasFlag(DiplomaticStance.SharedControl))
-            {
-                target.RaiseWarning("{0} désire partager le contrôle avec vous.".FormatInvariant(this), this);
-            }
-            else
-            {
-                if (stance.HasFlag(DiplomaticStance.SharedVision) && !previousStance.HasFlag(DiplomaticStance.SharedVision))
-                    target.RaiseWarning("{0} partage sa vision avec vous.".FormatInvariant(this), this);
-                else if (!stance.HasFlag(DiplomaticStance.SharedVision) && previousStance.HasFlag(DiplomaticStance.SharedVision))
-                    target.RaiseWarning("{0} ne partage plus sa vision avec vous.".FormatInvariant(this), this);
-
-
-                if (stance.HasFlag(DiplomaticStance.AlliedVictory) && !previousStance.HasFlag(DiplomaticStance.AlliedVictory))
-                    target.RaiseWarning("{0} désire partager la victoire avec vous.".FormatInvariant(this), this);
-                else if (!stance.HasFlag(DiplomaticStance.AlliedVictory) && previousStance.HasFlag(DiplomaticStance.AlliedVictory))
-                    target.RaiseWarning("{0} ne partagera plus la victoire avec vous.".FormatInvariant(this), this);
-            }
-
+            
             diplomaticStances[target] = stance;
-            DiplomaticStanceChanged.Raise(this, target, stance);
+            
+            DiplomaticStanceChange change = new DiplomaticStanceChange(this, target, previousStance, stance);
+            DiplomaticStanceChanged.Raise(this, change);
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
 

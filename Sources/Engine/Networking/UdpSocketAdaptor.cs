@@ -28,7 +28,6 @@ namespace Orion.Engine.Networking
 
         private readonly Socket socket;
         private readonly IPv4EndPoint localEndPoint;
-
         #endregion
 
         #region Constructors
@@ -59,7 +58,7 @@ namespace Orion.Engine.Networking
                 throw;
             }
 
-            localEndPoint = (IPv4EndPoint)socket.LocalEndPoint;
+            this.localEndPoint = (IPv4EndPoint)socket.LocalEndPoint;
         }
 
         public UdpSocketAdaptor(IPv4Address address, ushort localPort) : this(new IPv4EndPoint(address, localPort)) { }

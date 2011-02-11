@@ -17,7 +17,7 @@ namespace Orion.Game.Presentation.Gui
     public sealed partial class MatchConfigurationUI : ContentControl
     {
         #region Fields
-        private readonly OrionGuiStyle style;
+        private readonly GameGraphics graphics;
         private readonly PlayerCollection players;
         private StackLayout playerStack;
         private FormLayout settingsForm;
@@ -28,15 +28,15 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(OrionGuiStyle style)
+        public MatchConfigurationUI(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            this.style = style;
+            this.graphics = graphics;
             this.players = new PlayerCollection(this);
 
             Padding = 5;
-            Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true };
+            Adornment = new TextureAdornment(graphics.GetGuiTexture("Granite")) { IsTiling = true };
 
             DockLayout mainDock = new DockLayout()
             {
@@ -122,6 +122,11 @@ namespace Orion.Game.Presentation.Gui
             get { return settingsForm.HasEnabledFlag; }
             set { settingsForm.HasEnabledFlag = value; }
         }
+        
+        private OrionGuiStyle Style
+        {
+        	get { return graphics.GuiStyle; }
+        }
         #endregion
 
         #region Methods
@@ -135,7 +140,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(action, "action");
 
-            Label text = style.CreateLabel(name);
+            Label text = Style.CreateLabel(name);
             text.Tag = action;
             aiBuilderComboBox.Items.Add(text);
             if (aiBuilderComboBox.SelectedItemIndex == -1)
@@ -164,7 +169,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(text, "text");
             Argument.EnsureNotNull(bindingSourcePropertyExpression, "bindingSourcePropertyExpression");
 
-            TextField textField = style.Create<TextField>();
+            TextField textField = Style.Create<TextField>();
 
             Bindable bindable = BindableProperty.FromExpression(bindingSourcePropertyExpression);
             textField.Text = bindable.Value.ToString();
@@ -188,7 +193,7 @@ namespace Orion.Game.Presentation.Gui
 
         public void AddBooleanSetting(string text, Expression<Func<bool>> bindingSourcePropertyExpression)
         {
-            CheckBox checkBox = style.Create<CheckBox>();
+            CheckBox checkBox = Style.Create<CheckBox>();
             Binding.CreateTwoWay(bindingSourcePropertyExpression, () => checkBox.IsChecked);
             AddSetting(text, checkBox);
         }
@@ -197,7 +202,7 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(text, "text");
 
-            Label label = style.CreateLabel(text);
+            Label label = Style.CreateLabel(text);
             label.VerticalAlignment = Alignment.Center;
             control.VerticalAlignment = Alignment.Center;
             settingsForm.AddEntry(label, control);
@@ -210,18 +215,18 @@ namespace Orion.Game.Presentation.Gui
                 MinYMargin = 5
             };
 
-            Button backButton = style.CreateTextButton("Retour");
+            Button backButton = Style.CreateTextButton("Retour");
             backButton.MinSize = new Size(150, 40);
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             bottomDock.Dock(backButton, Direction.NegativeX);
 
-            startButton = style.CreateTextButton("Commencer");
+            startButton = Style.CreateTextButton("Commencer");
             startButton.MinSize = new Size(150, 40);
             startButton.MinXMargin = 20;
             startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
             bottomDock.Dock(startButton, Direction.PositiveX);
 
-            readyCheckBox = style.CreateTextCheckBox("Je suis prêt");
+            readyCheckBox = Style.CreateTextCheckBox("Je suis prêt");
             readyCheckBox.StateChanged += sender => ReadinessChanged.Raise(this);
             bottomDock.Dock(readyCheckBox, Direction.PositiveX);
             return bottomDock;
@@ -243,7 +248,7 @@ namespace Orion.Game.Presentation.Gui
             };
             contentDock.Dock(settingsForm, Direction.PositiveX);
 
-            Label playersLabel = style.CreateLabel("Joueurs:");
+            Label playersLabel = Style.CreateLabel("Joueurs:");
             playersLabel.Margin = 5;
             contentDock.Dock(playersLabel, Direction.NegativeY);
 
@@ -269,15 +274,15 @@ namespace Orion.Game.Presentation.Gui
                 VisibilityFlag = Visibility.Hidden
             };
 
-            Label label = style.CreateLabel("Intelligence artificielle:");
+            Label label = Style.CreateLabel("Intelligence artificielle:");
             label.VerticalAlignment = Alignment.Center;
             stack.Stack(label);
 
-            aiBuilderComboBox = style.Create<ComboBox>();
+            aiBuilderComboBox = Style.Create<ComboBox>();
             aiBuilderComboBox.VerticalAlignment = Alignment.Center;
             stack.Stack(aiBuilderComboBox);
 
-            Button createAIButton = style.CreateTextButton("Créer");
+            Button createAIButton = Style.CreateTextButton("Créer");
             createAIButton.Clicked += (sender, @args) => 
             {
                 Label aiBuilderLabel = (Label)aiBuilderComboBox.SelectedItem;

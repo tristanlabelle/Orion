@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui;
 using Orion.Engine;
-using Orion.Game.Simulation;
+using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Game.Presentation.Actions;
+using Orion.Game.Simulation;
 using Key = OpenTK.Input.Key;
 
 namespace Orion.Game.Presentation.Gui
@@ -26,10 +27,12 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Constructors
-            public ActionToolTip(OrionGuiStyle style)
+            public ActionToolTip(GameGraphics graphics)
             {
-                Argument.EnsureNotNull(style, "style");
+                Argument.EnsureNotNull(graphics, "graphics");
 
+                var style = graphics.GuiStyle;
+                
                 Margin = new Borders(4);
                 Padding = new Borders(2);
                 MinWidth = 200;
@@ -46,9 +49,9 @@ namespace Orion.Game.Presentation.Gui
                     Direction = Direction.PositiveX
                 };
 
-                StackResource(style, costsStack, "Aladdium", out aladdiumImageBox, out aladdiumCostLabel);
-                StackResource(style, costsStack, "Alagene", out alageneImageBox, out alageneCostLabel);
-                StackResource(style, costsStack, "Gui/Food", out foodImageBox, out foodCostLabel);
+                StackResource(style, costsStack, graphics.GetMiscTexture("Aladdium"), out aladdiumImageBox, out aladdiumCostLabel);
+                StackResource(style, costsStack, graphics.GetMiscTexture("Alagene"), out alageneImageBox, out alageneCostLabel);
+                StackResource(style, costsStack, graphics.GetGuiTexture("Food"), out foodImageBox, out foodCostLabel);
 
                 dock.Dock(costsStack, Direction.PositiveY);
 
@@ -106,13 +109,13 @@ namespace Orion.Game.Presentation.Gui
                 }
             }
 
-            private void StackResource(OrionGuiStyle style, StackLayout stack, string textureName, out ImageBox imageBox, out Label costLabel)
+            private void StackResource(OrionGuiStyle style, StackLayout stack, Texture texture, out ImageBox imageBox, out Label costLabel)
             {
                 imageBox = new ImageBox()
                 {
                     Width = 16,
                     Height = 16,
-                    Texture = style.GetTexture(textureName),
+                    Texture = texture
                 };
                 stack.Stack(imageBox);
 

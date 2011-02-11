@@ -107,14 +107,6 @@ namespace Orion.Engine.Gui
         protected abstract void PopClippingRectangleImpl();
         #endregion
 
-        /// <summary>
-        /// Attempts to retrieve a texture by its name.
-        /// </summary>
-        /// <param name="name">The name of the texture to be retrieve.</param>
-        /// <returns>The texture identified by that name, or a dummy texture if no such texture was found.</returns>
-        [Obsolete("Use GameGraphics texture getters.")]
-        public abstract Texture GetTexture(string name);
-
         #region Text
         /// <summary>
         /// Measures the space occupied by a string of text.

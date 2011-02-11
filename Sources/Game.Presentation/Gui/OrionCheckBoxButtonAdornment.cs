@@ -20,13 +20,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public OrionCheckBoxButtonAdornment(GuiRenderer renderer)
+        public OrionCheckBoxButtonAdornment(GameGraphics graphics)
         {
-            Argument.EnsureNotNull(renderer, "renderer");
+            Argument.EnsureNotNull(graphics, "graphics");
 
-            buttonTexture = renderer.GetTexture("Gui/CheckBox_Button");
-            checkTexture = renderer.GetTexture("Gui/CheckBox_Check");
-            disabledCheckTexture = renderer.GetTexture("Gui/CheckBox_Check_Disabled");
+            buttonTexture = graphics.GetGuiTexture("CheckBox_Button");
+            checkTexture = graphics.GetGuiTexture("CheckBox_Check");
+            disabledCheckTexture = graphics.GetGuiTexture("CheckBox_Check_Disabled");
         }
         #endregion
 

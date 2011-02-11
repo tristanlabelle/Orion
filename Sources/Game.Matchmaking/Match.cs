@@ -50,6 +50,13 @@ namespace Orion.Game.Matchmaking
 
         #region Events
         /// <summary>
+        /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s uses a cheat code.
+        /// The first argument specifies the faction that used the cheat.
+        /// The second argument specifies the cheat that was used.
+        /// </summary>
+        public event Action<Match, Faction, string> CheatUsed;
+        
+        /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
         public event Action<Match, FactionMessage> FactionMessageReceived;
@@ -132,6 +139,16 @@ namespace Orion.Game.Matchmaking
         {
             return world.IsFree(region, CollisionLayer.Ground)
                 && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
+        }
+        
+        /// <summary>
+        /// Raises the <see cref="E:CheatUsed"/> event.
+        /// </summary>
+        /// <param name="faction">The <see cref="Faction"/> that cheated.</param>
+        /// <param name="cheat">The cheat that was used.</param>
+        public void RaiseCheatUsed(Faction faction, string cheat)
+        {
+        	CheatUsed.Raise(this, faction, cheat);
         }
 
         /// <summary>

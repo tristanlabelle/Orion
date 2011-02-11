@@ -52,6 +52,8 @@ namespace Orion.Game.Main
 
             this.match = match;
             this.match.FactionMessageReceived += OnFactionMessageReceived;
+            this.match.CheatUsed += OnCheatUsed;
+            this.match.World.DiplomaticStanceChanged += OnDiplomaticStanceChanged;
             this.match.World.EntityRemoved += OnEntityRemoved;
             this.match.World.FactionDefeated += OnFactionDefeated;
 
@@ -410,6 +412,59 @@ namespace Orion.Game.Main
 
             string text = "{0}: {1}".FormatInvariant(message.Sender.Name, message.Text);
             ui.AddMessage(text, message.Sender.Color);
+        }
+        
+        private void OnCheatUsed(Match match, Faction faction, string cheat)
+        {
+        	if (faction == LocalFaction)
+        	{
+        		string message = "Code de triche '{0}' appliqué!".FormatInvariant(cheat);
+        		ui.AddMessage(message, faction.Color);
+        	}
+        	else
+        	{
+        		string message = "'{0}' a triché!".FormatInvariant(faction.Name);
+        		ui.AddMessage(message, faction.Color);
+        	}
+        }
+        
+        private void OnDiplomaticStanceChanged(World sender, DiplomaticStanceChange change)
+        {
+        	if (change.SourceFaction == LocalFaction) return;
+        	
+            if (change.NewDiplomaticStance.HasFlag(DiplomaticStance.SharedControl))
+            {
+            	string message = "{0} désire partager le contrôle avec vous.".FormatInvariant(change.TargetFaction.Name);
+            	ui.AddMessage(message, change.TargetFaction.Color);
+            }
+            else
+            {
+                if (change.NewDiplomaticStance.HasFlag(DiplomaticStance.SharedVision)
+            	    && !change.OldDiplomaticStance.HasFlag(DiplomaticStance.SharedVision))
+            	{
+            		string message = "{0} partage sa vision avec vous.".FormatInvariant(change.TargetFaction.Name);
+                    ui.AddMessage(message, change.TargetFaction.Color);
+            	}
+                else if (!change.NewDiplomaticStance.HasFlag(DiplomaticStance.SharedVision)
+            	    && change.OldDiplomaticStance.HasFlag(DiplomaticStance.SharedVision))
+                {
+            		string message = "{0} ne partage plus sa vision avec vous.".FormatInvariant(change.TargetFaction.Name);
+                    ui.AddMessage(message, change.TargetFaction.Color);
+                }
+
+                if (change.NewDiplomaticStance.HasFlag(DiplomaticStance.AlliedVictory)
+            	    && !change.OldDiplomaticStance.HasFlag(DiplomaticStance.AlliedVictory))
+            	{
+            		string message = "{0} désire partager la victoire avec vous.".FormatInvariant(change.TargetFaction.Name);
+                    ui.AddMessage(message, change.TargetFaction.Color);
+            	}
+                else if (!change.NewDiplomaticStance.HasFlag(DiplomaticStance.AlliedVictory)
+            	         && change.OldDiplomaticStance.HasFlag(DiplomaticStance.AlliedVictory))
+                {
+            		string message = "{0} ne partagera plus la victoire avec vous.".FormatInvariant(change.TargetFaction.Name);
+                    ui.AddMessage(message, change.TargetFaction.Color);
+                }
+            }
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

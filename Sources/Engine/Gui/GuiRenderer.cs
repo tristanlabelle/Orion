@@ -12,6 +12,17 @@ namespace Orion.Engine.Gui
     /// </summary>
     public abstract class GuiRenderer
     {
+        #region Fields
+        private readonly Action popClippingRectangleDelegate;
+        #endregion
+
+        #region Constructors
+        protected GuiRenderer()
+        {
+            popClippingRectangleDelegate = PopClippingRectangle;
+        }
+        #endregion
+
         #region Methods
         #region Begin/End
         /// <summary>
@@ -84,7 +95,7 @@ namespace Orion.Engine.Gui
         public DisposableHandle PushClippingRectangle(Region rectangle)
         {
             PushClippingRectangleImpl(rectangle);
-            return new DisposableHandle(PopClippingRectangle);
+            return new DisposableHandle(popClippingRectangleDelegate);
         }
 
         /// <summary>

@@ -188,18 +188,6 @@ namespace Orion.Game.Simulation
             get { return status; }
         }
 
-        private IEnumerable<Faction> FactionsSharingTheirVision
-        {
-            get
-            {
-                foreach (KeyValuePair<Faction, DiplomaticStance> pair in diplomaticStances)
-                {
-                	if (pair.Key.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
-                        yield return pair.Key;
-                }
-            }
-        }
-
         #region Resources
         /// <summary>
         /// Accesses the amount of the aladdium resource that this <see cref="Faction"/> possesses.
@@ -655,13 +643,27 @@ namespace Orion.Game.Simulation
             return CanSee(entity.GridRegion);
         }
 
+        /// <summary>
+        /// Gets the <see cref="TileVisibility"/> which indicates if this <see cref="Faction"/>
+        /// currently sees a given tile.
+        /// </summary>
+        /// <param name="point">The coordinates of the tile.</param>
+        /// <returns>The visibility of that tile.</returns>
+        /// <remarks>
+        /// This method is performance critical as it is called by the pathfinder.
+        /// It should make no allocations and run as fast as possible.
+        /// </remarks>
         public TileVisibility GetTileVisibility(Point point)
         {
             TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
             if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
 
-            foreach (Faction faction in FactionsSharingTheirVision)
+            foreach (var pair in diplomaticStances)
             {
+                Faction faction = pair.Key;
+                if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
+                    continue;
+
                 if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
                     return TileVisibility.Visible;
                 else if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
@@ -676,13 +678,23 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="point">The point to be tested.</param>
         /// <returns>A value indicating if that tile has been seen.</returns>
+        /// <remarks>
+        /// This method is performance critical as it is called by the pathfinder.
+        /// It should make no allocations and run as fast as possible.
+        /// </remarks>
         public bool HasSeen(Point point)
         {
             if (localFogOfWar.IsDiscovered(point)) return true;
 
-            foreach (Faction faction in FactionsSharingTheirVision)
+            foreach (var pair in diplomaticStances)
+            {
+                Faction faction = pair.Key;
+                if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
+                    continue;
+
                 if (faction.localFogOfWar.IsDiscovered(point))
                     return true;
+            }
 
             return false;
         }

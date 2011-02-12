@@ -23,6 +23,7 @@ namespace Orion.Game.Simulation.Components
         private float range;
         private float delay;
         private float splashRadius;
+        private float timeElapsedSinceLastHit = float.PositiveInfinity;
         private readonly List<DamageFilter> damageFilters = new List<DamageFilter>();
         #endregion
 
@@ -64,6 +65,12 @@ namespace Orion.Game.Simulation.Components
         {
             get { return damageFilters; }
         }
+
+        public float TimeElapsedSinceLastHit
+        {
+            get { return timeElapsedSinceLastHit; }
+            set { timeElapsedSinceLastHit = value; }
+        }
         #endregion
 
         #region Methods
@@ -76,6 +83,11 @@ namespace Orion.Game.Simulation.Components
                     finalDamage += filter.AdditionalDamage;
             }
             return finalDamage;
+        }
+
+        public override void Update(SimulationStep step)
+        {
+            timeElapsedSinceLastHit += step.TimeDeltaInSeconds;
         }
         #endregion
     }

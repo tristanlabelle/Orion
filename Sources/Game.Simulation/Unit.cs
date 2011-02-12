@@ -35,7 +35,6 @@ namespace Orion.Game.Simulation
         private float healthBuilt = float.NaN;
 
         private Vector2 rallyPoint;
-        private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Dictionary<Type, UnitSkill> skills;
         #endregion
 
@@ -318,7 +317,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float TimeElapsedSinceLastHitInSeconds
         {
-            get { return timeElapsedSinceLastHitInSeconds; }
+            get { return Components.Get<Attack>().TimeElapsedSinceLastHit; }
         }
         #endregion
 
@@ -503,7 +502,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(target, "target");
             float hitDelayInSeconds = GetStat(AttackSkill.DelayStat);
-            if (timeElapsedSinceLastHitInSeconds < hitDelayInSeconds)
+            if (Components.Get<Attack>().TimeElapsedSinceLastHit < hitDelayInSeconds)
                 return false;
             Hit(target);
             return true;
@@ -552,7 +551,7 @@ namespace Orion.Game.Simulation
                 }
             }
 
-            timeElapsedSinceLastHitInSeconds = 0;
+            Components.Get<Attack>().TimeElapsedSinceLastHit = 0;
         }
 
         public bool IsSuperEffectiveAgainst(ArmorType type)
@@ -668,8 +667,6 @@ namespace Orion.Game.Simulation
         #region Updating
         protected override void DoUpdate(SimulationStep step)
         {
-            timeElapsedSinceLastHitInSeconds += step.TimeDeltaInSeconds;
-
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.

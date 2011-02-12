@@ -60,12 +60,12 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 // They can only be build on alagene nodes.
                 IEnumerable<Entity> alageneResourceNodes = World.Entities
                     .Intersecting(Rectangle.FromCenterSize(minLocation.Value, Vector2.One))
-                    .Where(e => e.HasComponent<Harvestable>())
-                    .Where(e => e.GetComponent<Harvestable>().Type == ResourceType.Alagene);
+                    .Where(e => e.Components.Has<Harvestable>())
+                    .Where(e => e.Components.Get<Harvestable>().Type == ResourceType.Alagene);
 
                 foreach (Entity entity in alageneResourceNodes)
                 {
-                    Spatial position = entity.GetComponent<Spatial>();
+                    Spatial position = entity.Components.Get<Spatial>();
                     if (position.Position == minLocation.Value)
                         return true;
                 }

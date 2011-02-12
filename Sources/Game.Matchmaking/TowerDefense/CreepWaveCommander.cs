@@ -117,8 +117,8 @@ namespace Orion.Game.Matchmaking.TowerDefense
 
             Point spawnPoint = path.Points[0];
             Region spawnRegion = new Region(spawnPoint, creepType.Size);
-            Debug.Assert(creepType.HasComponent<Spatial>(), "Creep type has no Spatial component!");
-            if (!World.IsFree(spawnRegion, creepType.GetComponent<Spatial>().CollisionLayer))
+            Debug.Assert(creepType.Components.Has<Spatial>(), "Creep type has no Spatial component!");
+            if (!World.IsFree(spawnRegion, creepType.Components.Get<Spatial>().CollisionLayer))
                 return false;
 
             Unit creep = Faction.CreateUnit(creepType, spawnPoint);

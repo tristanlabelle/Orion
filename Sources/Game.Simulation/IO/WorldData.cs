@@ -48,10 +48,10 @@ namespace Orion.Game.Simulation.IO
             numberOfFactions = world.Factions.Count();
             terrain = world.Terrain;
 
-            IEnumerable<Entity> concreteResourceNodes = world.Entities.Where(e => e.HasComponent<Harvestable>());
+            IEnumerable<Entity> concreteResourceNodes = world.Entities.Where(e => e.Components.Has<Harvestable>());
             foreach (Entity node in concreteResourceNodes)
             {
-                Harvestable harvestData = node.GetComponent<Harvestable>();
+                Harvestable harvestData = node.Components.Get<Harvestable>();
                 ResourceNodeTemplate template = new ResourceNodeTemplate(harvestData.Type, Point.Truncate(node.Position), harvestData.AmountRemaining);
                 resourceNodes.Add(template);
             }

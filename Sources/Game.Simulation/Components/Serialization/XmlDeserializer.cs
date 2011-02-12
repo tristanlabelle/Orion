@@ -67,7 +67,7 @@ namespace Orion.Game.Simulation.Components.Serialization
             {
                 string name = componentElement.Name;
                 Type componentType = currentAssembly.GetType(name, true, true);
-                if (entity.HasComponent(componentType))
+                if (entity.Components.Has(componentType))
                     throw new InvalidOperationException("Trying to attach multiple components of the same type to an entity ");
 
                 if (!componentClass.IsAssignableFrom(componentType))
@@ -91,7 +91,7 @@ namespace Orion.Game.Simulation.Components.Serialization
                 if (mandatoryProperties.Count != 0)
                     throw new InvalidOperationException("Not all mandatory properties were assigned during deserialization");
 
-                entity.AddComponent(component);
+                entity.Components.Add(component);
             }
             return entity;
         }

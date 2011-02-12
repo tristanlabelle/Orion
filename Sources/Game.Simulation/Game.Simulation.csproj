@@ -99,6 +99,7 @@
     <Compile Include="Components\TrainProgress.cs" />
     <Compile Include="Components\TrainProgressType.cs" />
     <Compile Include="Components\Transport.cs" />
+    <Compile Include="Entity.ComponentCollection.cs" />
     <Compile Include="IO\ResourceNodeTemplate.cs" />
     <Compile Include="IO\UnitTemplate.cs" />
     <Compile Include="IO\WorldData.cs" />

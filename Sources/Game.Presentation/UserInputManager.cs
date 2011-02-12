@@ -169,7 +169,7 @@ namespace Orion.Game.Presentation
         {
             Point point = (Point)position;
             Entity clickedEntity = World.IsWithinBounds(point)
-                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.GetComponent<Spatial>().CollisionLayer)
+                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.Components.Get<Spatial>().CollisionLayer)
                 : null;
 
             if (clickedEntity == null)
@@ -308,9 +308,9 @@ namespace Orion.Game.Presentation
             {
                 LaunchDefaultCommand((Unit)targetEntity);
             }
-            else if (targetEntity != null && targetEntity.HasComponent<Harvestable>())
+            else if (targetEntity != null && targetEntity.Components.Has<Harvestable>())
             {
-                Spatial position = targetEntity.GetComponent<Spatial>();
+                Spatial position = targetEntity.Components.Get<Spatial>();
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(position.Center);
                 else
@@ -346,7 +346,7 @@ namespace Orion.Game.Presentation
 
                 Entity alageneNode = World.Entities
                     .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
-                    .Where(e => e.HasComponent<Harvestable>())
+                    .Where(e => e.Components.Has<Harvestable>())
                     .FirstOrDefault(node => node.Position == target.Position);
                 if (alageneNode != null && LocalFaction.CanHarvest(alageneNode))
                 {
@@ -367,7 +367,7 @@ namespace Orion.Game.Presentation
 
         private void LaunchDefaultCommand(Entity target)
         {
-            Debug.Assert(target.HasComponent<Harvestable>(), "Target is not harvestable!");
+            Debug.Assert(target.Components.Has<Harvestable>(), "Target is not harvestable!");
             if (LocalFaction.CanHarvest(target))
                 LaunchHarvest(target);
             else
@@ -421,7 +421,7 @@ namespace Orion.Game.Presentation
 
         public void LaunchHarvest(Entity node)
         {
-            Debug.Assert(node.HasComponent<Harvestable>(), "Node is not a resource node!");
+            Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
             IEnumerable<Unit> movableUnits = Selection.Units
                 .Where(unit => IsUnitControllable(unit) && unit.HasSkill<MoveSkill>());
             // Those who can harvest do so, the others simply move to the resource's position

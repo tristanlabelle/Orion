@@ -55,7 +55,7 @@ namespace Orion.Game.Simulation.Tasks
 
         public override string Description
         {
-            get { return "harvesting " + node.GetComponent<Harvestable>().Type; }
+            get { return "harvesting " + node.Components.Get<Harvestable>().Type; }
         }
         #endregion
 
@@ -102,7 +102,7 @@ namespace Orion.Game.Simulation.Tasks
             int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
-                Harvestable harvest = node.GetComponent<Harvestable>();
+                Harvestable harvest = node.Components.Get<Harvestable>();
                 if (!node.IsAliveInWorld)
                 {
                     Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvest.Type));
@@ -158,7 +158,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             
             //adds the resources to the unit's faction
-            Harvestable harvest = node.GetComponent<Harvestable>();
+            Harvestable harvest = node.Components.Get<Harvestable>();
             if (harvest.Type == ResourceType.Aladdium)
                 Unit.Faction.AladdiumAmount += amountCarrying;
             else if (harvest.Type == ResourceType.Alagene)

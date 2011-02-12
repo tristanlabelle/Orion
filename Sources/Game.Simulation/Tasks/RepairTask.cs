@@ -102,8 +102,8 @@ namespace Orion.Game.Simulation.Tasks
                     // Smells like a hack!
                     Entity node = Unit.World.Entities
                         .Intersecting(target.BoundingRectangle)
-                        .Where(e => e.HasComponent<Harvestable>())
-                        .Where(e => !e.GetComponent<Harvestable>().IsEmpty)
+                        .Where(e => e.Components.Has<Harvestable>())
+                        .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
 
                     if (Unit.TaskQueue.Count == 1)

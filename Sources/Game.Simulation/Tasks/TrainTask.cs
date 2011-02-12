@@ -121,7 +121,7 @@ namespace Orion.Game.Simulation.Tasks
                 .Where(point =>
                 {
                     Region region = new Region(point, spawneeType.Size);
-                    CollisionLayer layer = spawneeType.GetComponent<Spatial>().CollisionLayer;
+                    CollisionLayer layer = spawneeType.Components.Get<Spatial>().CollisionLayer;
                     return new Region(World.Size).Contains(region)
                         && World.IsFree(new Region(point, spawneeType.Size), layer);
                 });
@@ -147,7 +147,7 @@ namespace Orion.Game.Simulation.Tasks
 
             Unit spawnee = Unit.Faction.CreateUnit(spawneeType, point.Value);
             Vector2 traineeDelta = spawnee.Center - Unit.Center;
-            spawnee.GetComponent<Spatial>().Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
+            spawnee.Components.Get<Spatial>().Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 
             return spawnee;
         }
@@ -162,8 +162,8 @@ namespace Orion.Game.Simulation.Tasks
             {
                 Entity resourceNode = World.Entities
                     .Intersecting(Unit.RallyPoint)
-                    .Where(e => e.HasComponent<Harvestable>())
-                    .FirstOrDefault(e => !e.GetComponent<Harvestable>().IsEmpty);
+                    .Where(e => e.Components.Has<Harvestable>())
+                    .FirstOrDefault(e => !e.Components.Get<Harvestable>().IsEmpty);
 
                 if (resourceNode != null && unit.Faction.CanHarvest(resourceNode))
                     rallyPointTask = new HarvestTask(unit, resourceNode);

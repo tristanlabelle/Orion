@@ -48,8 +48,8 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
-            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
-            Debug.Assert(unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
+            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+            Debug.Assert(unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
         }
@@ -135,11 +135,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             foreach (Point point in targetRegion.Points)
             {
-                Debug.Assert(Unit.HasComponent<Spatial>(), "Unit has no spatial component!");
-                if (Unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground
+                Debug.Assert(Unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+                if (Unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground
                     && !World.Terrain.IsWalkable(point)) return false;
 
-                Entity entity = World.Entities.GetEntityAt(point, Unit.GetComponent<Spatial>().CollisionLayer);
+                Entity entity = World.Entities.GetEntityAt(point, Unit.Components.Get<Spatial>().CollisionLayer);
                 if (entity != null && entity != Unit) return false;
             }
 
@@ -166,7 +166,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private Func<Point, bool> GetWalkabilityTester()
         {
-            CollisionLayer layer = Unit.GetComponent<Spatial>().CollisionLayer;
+            CollisionLayer layer = Unit.Components.Get<Spatial>().CollisionLayer;
             if (layer == CollisionLayer.Ground) return IsGroundPathable;
             if (layer == CollisionLayer.Air) return IsAirPathable;
             throw new InvalidOperationException(
@@ -210,9 +210,9 @@ namespace Orion.Game.Simulation.Tasks
             Region grownRegion = Region.Grow(region, 1);
             Func<Point, float> destinationDistanceEvaluator = point =>
             {
-                Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
+                Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
                 if (region.Contains(point))
-                    return unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air ? 0 : 1;
+                    return unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air ? 0 : 1;
 
                 return ((Vector2)point - (Vector2)grownRegion.Clamp(point)).LengthFast;
             };

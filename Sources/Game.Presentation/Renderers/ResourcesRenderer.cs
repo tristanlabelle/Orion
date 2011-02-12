@@ -57,9 +57,9 @@ namespace Orion.Game.Presentation.Renderers
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
             Rectangle clippingBounds = viewBounds;
-            foreach (Entity entity in World.Entities.Where(e => e.HasComponent<Harvestable>()))
+            foreach (Entity entity in World.Entities.Where(e => e.Components.Has<Harvestable>()))
             {
-                Spatial positionComponent = entity.GetComponent<Spatial>();
+                Spatial positionComponent = entity.Components.Get<Spatial>();
                 Rectangle boundingRectangle = entity.BoundingRectangle;
                 if (!Rectangle.Intersects(clippingBounds, boundingRectangle)
                     || !faction.HasPartiallySeen(positionComponent.GridRegion))
@@ -71,8 +71,8 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            Debug.Assert(resourceNode.HasComponent<Harvestable>(), "Entity is not a resource node!");
-            Harvestable harvestData = resourceNode.GetComponent<Harvestable>();
+            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not a resource node!");
+            Harvestable harvestData = resourceNode.Components.Get<Harvestable>();
             string resourceTypeName = harvestData.Type.ToStringInvariant();
             Texture texture = gameGraphics.GetMiscTexture(resourceTypeName);
             graphicsContext.Fill(resourceNode.BoundingRectangle, texture);
@@ -80,8 +80,8 @@ namespace Orion.Game.Presentation.Renderers
 
         private void DrawMiniatureUnclipped(GraphicsContext graphicsContext, Entity resourceNode)
         {
-            Debug.Assert(resourceNode.HasComponent<Harvestable>(), "Entity is not a resource node!");
-            Harvestable harvestData = resourceNode.GetComponent<Harvestable>();
+            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not a resource node!");
+            Harvestable harvestData = resourceNode.Components.Get<Harvestable>();
             ColorRgb color = GetResourceColor(harvestData.Type);
             graphicsContext.Fill(resourceNode.BoundingRectangle, color);
         }

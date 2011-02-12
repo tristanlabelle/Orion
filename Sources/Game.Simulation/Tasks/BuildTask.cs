@@ -76,7 +76,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            CollisionLayer layer = buildingPlan.BuildingType.GetComponent<Spatial>().CollisionLayer;
+            CollisionLayer layer = buildingPlan.BuildingType.Components.Get<Spatial>().CollisionLayer;
             if (!Unit.World.IsFree(buildingPlan.GridRegion, layer))
             {
                 string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);

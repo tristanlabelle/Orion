@@ -242,7 +242,7 @@ namespace Orion.Game.Main
                     ui.SelectionInfoPanel = singleEntitySelectionPanel;
                 }
 
-                if (entity.HasComponent<Harvestable>())
+                if (entity.Components.Has<Harvestable>())
                 {
                     singleEntitySelectionPanel.ShowResourceNode(entity);
                     ui.SelectionInfoPanel = singleEntitySelectionPanel;

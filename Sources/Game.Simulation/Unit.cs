@@ -60,7 +60,7 @@ namespace Orion.Game.Simulation
             spatial.CollisionLayer = builder.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground;
             spatial.SightRange = builder.BasicSkill.SightRange;
             spatial.Size = builder.Size;
-            AddComponent(spatial);
+            Components.Add(spatial);
 
             Identity identity = new Identity(this);
             identity.Name = builder.Name;
@@ -76,19 +76,19 @@ namespace Orion.Game.Simulation
                 : TrainType.OnSite;
             identity.AladdiumCost = builder.BasicSkill.AladdiumCost;
             identity.AlageneCost = builder.BasicSkill.AlageneCost;
-            AddComponent(identity);
+            Components.Add(identity);
 
             Health health = new Health(this);
             health.Armor = builder.BasicSkill.Armor;
             health.ArmorType = builder.BasicSkill.ArmorType;
             health.MaxHealth = builder.BasicSkill.MaxHealth;
-            AddComponent(health);
+            Components.Add(health);
 
             FactionMembership membership = new FactionMembership(this);
             membership.FoodRequirement = builder.BasicSkill.FoodCost;
             if (HasSkill<ProvideFoodSkill>())
                 membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
-            AddComponent(membership);
+            Components.Add(membership);
         }
 
         /// <summary>
@@ -115,14 +115,14 @@ namespace Orion.Game.Simulation
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(meta.Name));
 
             // components stuff
-            Spatial spatial = Component.Clone(meta.GetComponent<Spatial>(), this);
+            Spatial spatial = Component.Clone(meta.Components.Get<Spatial>(), this);
             spatial.Position = position;
-            AddComponent(spatial);
-            FactionMembership membership = Component.Clone(meta.GetComponent<FactionMembership>(), this);
+            Components.Add(spatial);
+            FactionMembership membership = Component.Clone(meta.Components.Get<FactionMembership>(), this);
             membership.Faction = faction;
-            AddComponent(membership);
-            AddComponent(Component.Clone(meta.GetComponent<Identity>(), this));
-            AddComponent(Component.Clone(meta.GetComponent<Health>(), this));
+            Components.Add(membership);
+            Components.Add(Component.Clone(meta.Components.Get<Identity>(), this));
+            Components.Add(Component.Clone(meta.Components.Get<Health>(), this));
 
             this.taskQueue = new TaskQueue(this);
             this.rallyPoint = Center;
@@ -169,20 +169,20 @@ namespace Orion.Game.Simulation
 
         public string Name
         {
-            get { return GetComponent<Identity>().Name; }
-            private set { GetComponent<Identity>().Name = value; }
+            get { return Components.Get<Identity>().Name; }
+            private set { Components.Get<Identity>().Name = value; }
         }
 
         public string GraphicsTemplate
         {
-            get { return GetComponent<Identity>().VisualIdentity; }
-            set { GetComponent<Identity>().VisualIdentity = value; }
+            get { return Components.Get<Identity>().VisualIdentity; }
+            set { Components.Get<Identity>().VisualIdentity = value; }
         }
 
         public string VoicesTemplate
         {
-            get { return GetComponent<Identity>().SoundIdentity; }
-            set { GetComponent<Identity>().SoundIdentity = value; }
+            get { return Components.Get<Identity>().SoundIdentity; }
+            set { Components.Get<Identity>().SoundIdentity = value; }
         }
 
         public bool IsBuilding
@@ -197,10 +197,10 @@ namespace Orion.Game.Simulation
 
         public ICollection<UnitTypeUpgrade> Upgrades
         {
-            get { return GetComponent<Identity>().Upgrades; }
+            get { return Components.Get<Identity>().Upgrades; }
             private set
             {
-                Identity identity = GetComponent<Identity>();
+                Identity identity = Components.Get<Identity>();
                 identity.Upgrades.Clear();
                 foreach (UnitTypeUpgrade upgrade in value)
                     identity.Upgrades.Add(upgrade);
@@ -211,13 +211,13 @@ namespace Orion.Game.Simulation
         #region Spatial Component
         public override Size Size
         {
-            get { return GetComponent<Spatial>().Size; }
+            get { return Components.Get<Spatial>().Size; }
         }
 
         public new Vector2 Position
         {
-            get { return GetComponent<Spatial>().Position; }
-            set { GetComponent<Spatial>().Position = value; }
+            get { return Components.Get<Spatial>().Position; }
+            set { Components.Get<Spatial>().Position = value; }
         }
         #endregion
 
@@ -247,7 +247,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Faction Faction
         {
-            get { return GetComponent<FactionMembership>().Faction; }
+            get { return Components.Get<FactionMembership>().Faction; }
         }
         #endregion
 
@@ -259,8 +259,8 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float Damage
         {
-            get { return GetComponent<Health>().Damage; }
-            set { GetComponent<Health>().Damage = value; }
+            get { return Components.Get<Health>().Damage; }
+            set { Components.Get<Health>().Damage = value; }
         }
 
         /// <summary>
@@ -418,10 +418,10 @@ namespace Orion.Game.Simulation
             int range = GetStat(AttackSkill.RangeStat);
             if (range == 0)
             {
-                Debug.Assert(HasComponent<Spatial>(), "Unit has no spatial component!");
-                Debug.Assert(other.HasComponent<Spatial>(), "Enemy unit has no spatial component!");
-                bool selfIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
-                bool otherIsAirborne = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air;
+                Debug.Assert(Components.Has<Spatial>(), "Unit has no spatial component!");
+                Debug.Assert(other.Components.Has<Spatial>(), "Enemy unit has no spatial component!");
+                bool selfIsAirborne = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air;
+                bool otherIsAirborne = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air;
                 if (!selfIsAirborne && otherIsAirborne) return false;
                 return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
             }
@@ -443,8 +443,8 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(unit, "unitType");
 
-            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
-            bool isGroundUnit = unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground;
+            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+            bool isGroundUnit = unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
             return HasSkill<TransportSkill>()
                 && unit.HasSkill<MoveSkill>()
                 && isGroundUnit
@@ -489,8 +489,8 @@ namespace Orion.Game.Simulation
             Vector2 delta = target - Center;
             if (delta.LengthSquared < 0.01f) return;
 
-            Debug.Assert(HasComponent<Spatial>(), "Unit has no Spatial component!");
-            GetComponent<Spatial>().Angle = (float)Math.Atan2(delta.Y, delta.X);
+            Debug.Assert(Components.Has<Spatial>(), "Unit has no Spatial component!");
+            Components.Get<Spatial>().Angle = (float)Math.Atan2(delta.Y, delta.X);
         }
 
         protected override Vector2 GetPosition()
@@ -728,9 +728,9 @@ namespace Orion.Game.Simulation
                 .Where(unit => !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
                     && IsInLineOfSight(unit));
 
-            bool isGroundUnit = GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground;
+            bool isGroundUnit = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
             if (!isGroundUnit && GetStat(AttackSkill.RangeStat) == 0)
-                attackableUnits = attackableUnits.Where(u => u.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground);
+                attackableUnits = attackableUnits.Where(u => u.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground);
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits

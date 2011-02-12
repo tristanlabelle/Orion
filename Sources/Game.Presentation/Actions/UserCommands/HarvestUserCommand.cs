@@ -21,7 +21,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             {
                 Entity resourceNode = World.Entities
                     .Intersecting(location)
-                    .Where(e => e.HasComponent<Harvestable>())
+                    .Where(e => e.Components.Has<Harvestable>())
                     .FirstOrDefault(node => LocalFaction.CanHarvest(node));
                 if (resourceNode == null) return;
 

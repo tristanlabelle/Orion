@@ -323,8 +323,8 @@ namespace Orion.Game.Simulation
         /// <remarks>Invoked by World.EntityCollection.</remarks>
         private void OnEntityAdded(Entity entity)
         {
-            Debug.Assert(entity.HasComponent<Spatial>(), "Entity has no Spatial component!");
-            Spatial spatial = entity.GetComponent<Spatial>();
+            Debug.Assert(entity.Components.Has<Spatial>(), "Entity has no Spatial component!");
+            Spatial spatial = entity.Components.Get<Spatial>();
             spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
 
             EntityAdded.Raise(this, entity);
@@ -348,7 +348,7 @@ namespace Orion.Game.Simulation
             EntityDied.Raise(this, entity);
             entities.Remove(entity);
 
-            Identity identity = entity.GetComponent<Identity>();
+            Identity identity = entity.Components.Get<Identity>();
             if (identity.LeavesRemains)
             {
                 CreateRuinsForEntity(entity);
@@ -362,24 +362,24 @@ namespace Orion.Game.Simulation
             identity.LeavesRemains = false;
             identity.IsSelectable = false;
             identity.Name = "Ruins";
-            identity.TrainType = entity.GetComponent<Identity>().TrainType;
-            ruins.AddComponent(identity);
+            identity.TrainType = entity.Components.Get<Identity>().TrainType;
+            ruins.Components.Add(identity);
 
             TimedExistence timeout = new TimedExistence(ruins);
-            timeout.LifeSpan = entity.HasComponent<Move>() ? 30 : 120;
-            ruins.AddComponent(timeout);
+            timeout.LifeSpan = entity.Components.Has<Move>() ? 30 : 120;
+            ruins.Components.Add(timeout);
 
             Spatial spatial = new Spatial(ruins);
             spatial.Position = entity.Position;
             spatial.CollisionLayer = CollisionLayer.None;
-            spatial.Size = entity.GetComponent<Spatial>().Size;
-            ruins.AddComponent(spatial);
+            spatial.Size = entity.Components.Get<Spatial>().Size;
+            ruins.Components.Add(spatial);
 
-            if (entity.HasComponent<FactionMembership>())
+            if (entity.Components.Has<FactionMembership>())
             {
                 FactionMembership membership = new FactionMembership(ruins);
-                membership.Faction = entity.GetComponent<FactionMembership>().Faction;
-                ruins.AddComponent(membership);
+                membership.Faction = entity.Components.Get<FactionMembership>().Faction;
+                ruins.Components.Add(membership);
             }
             entities.Add(ruins);
         }

@@ -16,7 +16,7 @@ namespace Orion.Game.Simulation.Components
         {
             return entity.World.Entities
                 .Intersecting(new Circle(entity.Center, (float)Math.Sqrt(2)))
-                .Any(e => e.GetComponent<Identity>().Name == identity);
+                .Any(e => e.Components.Get<Identity>().Name == identity);
         }
         #endregion
 

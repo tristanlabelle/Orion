@@ -51,20 +51,20 @@ namespace Orion.Game.Presentation.Renderers
         {
             Argument.EnsureNotNull(graphicsContext, "graphicsContext");
 
-            foreach (Entity ruin in faction.World.Entities.Where(e => e.HasComponent<TimedExistence>()))
+            foreach (Entity ruin in faction.World.Entities.Where(e => e.Components.Has<TimedExistence>()))
             {
-                Region gridRegion = ruin.GetComponent<Spatial>().GridRegion;
+                Region gridRegion = ruin.Components.Get<Spatial>().GridRegion;
                 Rectangle rectangle = gridRegion.ToRectangle();
                 if (!Rectangle.Intersects(rectangle, viewBounds))
                     continue;
 
                 if (!faction.CanSee(gridRegion)) continue;
 
-                TimedExistence timeout = ruin.GetComponent<TimedExistence>();
-                Identity identity = ruin.GetComponent<Identity>();
+                TimedExistence timeout = ruin.Components.Get<TimedExistence>();
+                Identity identity = ruin.Components.Get<Identity>();
 
-                ColorRgb factionColor = ruin.HasComponent<FactionMembership>()
-                    ? ruin.GetComponent<FactionMembership>().Faction.Color
+                ColorRgb factionColor = ruin.Components.Has<FactionMembership>()
+                    ? ruin.Components.Get<FactionMembership>().Faction.Color
                     : Colors.White;
 
                 float alpha = timeout.TimeLeft / ruinFadeDurationInSeconds;

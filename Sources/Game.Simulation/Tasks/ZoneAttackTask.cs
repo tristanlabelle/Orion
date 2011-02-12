@@ -76,7 +76,7 @@ namespace Orion.Game.Simulation.Tasks
                     .Intersecting(Unit.LineOfSight)
                     .OfType<Unit>()
                     .FirstOrDefault(other => Unit.IsInLineOfSight(other)
-                        && (isRanged || other.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground)
+                        && (isRanged || other.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground)
                         && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
 
                 if (target != null) attack = new AttackTask(Unit, target);

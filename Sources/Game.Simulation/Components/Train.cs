@@ -37,7 +37,7 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public bool Supports(Entity type)
         {
-            return trainableTypes.Contains(type.GetComponent<Identity>().Name);
+            return trainableTypes.Contains(type.Components.Get<Identity>().Name);
         }
         #endregion
     }

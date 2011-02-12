@@ -81,8 +81,8 @@ namespace Orion.Game.Matchmaking.Commands
             if (buildingType.HasSkill<ExtractAlageneSkill>())
             {
                 Harvestable harvestingInfo = match.World.Entities
-                    .Where(e => e.HasComponent<Harvestable>())
-                    .Select(e => e.GetComponent<Harvestable>())
+                    .Where(e => e.Components.Has<Harvestable>())
+                    .Select(e => e.Components.Get<Harvestable>())
                     .Where(h => h.Type == ResourceType.Alagene)
                     .FirstOrDefault(h => !h.IsEmpty);
                 Debug.Assert(harvestingInfo != null, "Extractors can only be built on resource node of Alagene.");

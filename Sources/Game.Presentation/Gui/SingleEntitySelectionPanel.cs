@@ -94,7 +94,7 @@ namespace Orion.Game.Presentation.Gui
             imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
 
             UpdateHealth(unit);
-            Health health = unit.GetComponent<Health>();
+            Health health = unit.Components.Get<Health>();
             health.DamageChanged += damageChangedEventHandler;
 
             if (showTasks)
@@ -129,7 +129,7 @@ namespace Orion.Game.Presentation.Gui
             if (resourceNode == entity) return;
             Clear();
 
-            Harvestable harvest = resourceNode.GetComponent<Harvestable>();
+            Harvestable harvest = resourceNode.Components.Get<Harvestable>();
 
             nameLabel.Text = harvest.Type.ToStringInvariant();
             imageBox.Texture = graphics.GetResourceTexture(resourceNode);
@@ -159,13 +159,13 @@ namespace Orion.Game.Presentation.Gui
             {
                 Unit unit = (Unit)entity;
 
-                Health health = unit.GetComponent<Health>();
+                Health health = unit.Components.Get<Health>();
                 health.DamageChanged -= damageChangedEventHandler;
                 unit.TaskQueue.Changed -= taskQueueChangedEventHandler;
             }
-            else if (entity.HasComponent<Harvestable>())
+            else if (entity.Components.Has<Harvestable>())
             {
-                Harvestable harvest = entity.GetComponent<Harvestable>();
+                Harvestable harvest = entity.Components.Get<Harvestable>();
                 harvest.RemainingAmountChanged -= remainingAmountChangedEventHandler;
             }
 
@@ -182,7 +182,7 @@ namespace Orion.Game.Presentation.Gui
 
         private void UpdateHealth(Entity unit)
         {
-            Health health = unit.GetComponent<Health>();
+            Health health = unit.Components.Get<Health>();
             healthLabel.Text = (int)Math.Ceiling(health.CurrentHealth) + "/" + health.MaxHealth;
         }
 
@@ -208,8 +208,8 @@ namespace Orion.Game.Presentation.Gui
 
         private void UpdateAmount(Entity resourceNode)
         {
-            Debug.Assert(resourceNode.HasComponent<Harvestable>(), "Entity is not harvestable!");
-            Harvestable harvest = resourceNode.GetComponent<Harvestable>();
+            Debug.Assert(resourceNode.Components.Has<Harvestable>(), "Entity is not harvestable!");
+            Harvestable harvest = resourceNode.Components.Get<Harvestable>();
             healthLabel.Text = harvest.AmountRemaining.ToString();
         }
 

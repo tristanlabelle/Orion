@@ -108,7 +108,7 @@ namespace Orion.Game.Presentation
         /// </summary>
         public Entity ResourceNode
         {
-            get { return entities.FirstOrDefault(e => e.HasComponent<Harvestable>()); }
+            get { return entities.FirstOrDefault(e => e.Components.Has<Harvestable>()); }
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            if (entity.HasComponent<Harvestable>())
+            if (entity.Components.Has<Harvestable>())
             {
                 Set(entity);
                 return;
@@ -346,7 +346,7 @@ namespace Orion.Game.Presentation
                 && !Contains(entity)
                 && entity.IsAliveInWorld
                 && (localFaction == null || localFaction.CanSee(entity))
-                && !(Type == SelectionType.Units && entity.HasComponent<Harvestable>());
+                && !(Type == SelectionType.Units && entity.Components.Has<Harvestable>());
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

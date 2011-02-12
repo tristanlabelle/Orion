@@ -69,7 +69,7 @@ namespace Orion.Game.Simulation.Components
             get
             {
                 return loadedUnits
-                    .Select(e => e.GetComponent<FactionMembership>())
+                    .Select(e => e.Components.Get<FactionMembership>())
                     .Sum(c => c.FoodRequirement);
             }
         }
@@ -90,16 +90,16 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public bool CanEmbark(Entity entity)
         {
-            Move mobility = entity.GetComponentOrNull<Move>();
+            Move mobility = entity.Components.TryGet<Move>();
             if (mobility == null) return false;
 
-            Spatial embarkeePosition = entity.GetComponentOrNull<Spatial>();
+            Spatial embarkeePosition = entity.Components.TryGet<Spatial>();
             if (embarkeePosition == null) return false;
 
-            FactionMembership embarkeeMembership = entity.GetComponentOrNull<FactionMembership>();
+            FactionMembership embarkeeMembership = entity.Components.TryGet<FactionMembership>();
             if (embarkeeMembership == null) return false;
 
-            FactionMembership embarkerMembership = entity.GetComponentOrNull<FactionMembership>();
+            FactionMembership embarkerMembership = entity.Components.TryGet<FactionMembership>();
 
             if (embarkerMembership == null)
                 return RemainingSpace <= embarkeeMembership.FoodRequirement;
@@ -113,8 +113,8 @@ namespace Orion.Game.Simulation.Components
             if (!CanEmbark(entity))
                 throw new ArgumentException("entity");
 
-            Spatial embarkeePosition = entity.GetComponent<Spatial>();
-            entity.RemoveComponent<Spatial>();
+            Spatial embarkeePosition = entity.Components.Get<Spatial>();
+            entity.Components.Remove<Spatial>();
 
             positionComponents.Add(embarkeePosition);
             loadedUnits.Add(entity);
@@ -125,8 +125,8 @@ namespace Orion.Game.Simulation.Components
             if (!loadedUnits.Contains(entity))
                 throw new ArgumentException("entity");
 
-            Spatial embarkerPosition = Entity.GetComponent<Spatial>();
-            Spatial embarkeePosition = entity.GetComponent<Spatial>();
+            Spatial embarkerPosition = Entity.Components.Get<Spatial>();
+            Spatial embarkeePosition = entity.Components.Get<Spatial>();
             Point? location = embarkerPosition
                 .GridRegion.Points
                 .Concat(embarkerPosition.GridRegion.GetAdjacentPoints())
@@ -144,7 +144,7 @@ namespace Orion.Game.Simulation.Components
             positionComponents.RemoveAt(embarkeeIndex);
 
             position.Position = location.Value;
-            entity.AddComponent(position);
+            entity.Components.Add(position);
         }
         #endregion
     }

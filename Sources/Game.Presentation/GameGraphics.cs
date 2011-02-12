@@ -165,8 +165,8 @@ namespace Orion.Game.Presentation
         public Texture GetResourceTexture(Entity node)
         {
             Argument.EnsureNotNull(node, "node");
-            Debug.Assert(node.HasComponent<Harvestable>(), "Entity is not a resource node!");
-            return GetResourceTexture(node.GetComponent<Harvestable>().Type);
+            Debug.Assert(node.Components.Has<Harvestable>(), "Entity is not a resource node!");
+            return GetResourceTexture(node.Components.Get<Harvestable>().Type);
         }
 
         /// <summary>

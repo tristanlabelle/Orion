@@ -123,7 +123,7 @@ namespace Orion.Game.Matchmaking
             {
                 foreach (Entity entity in World.Entities)
                 {
-                    if (!entity.HasComponent<Harvestable>()) continue;
+                    if (!entity.Components.Has<Harvestable>()) continue;
                     if (!Faction.CanSee(entity)) continue;
                     yield return entity;
                 }
@@ -241,7 +241,7 @@ namespace Orion.Game.Matchmaking
                 ++nodeData.HarvesterCount;
             }
 
-            var resourceNodes = World.Entities.Where(e => e.HasComponent<Harvestable>());
+            var resourceNodes = World.Entities.Where(e => e.Components.Has<Harvestable>());
             foreach (Entity node in resourceNodes)
             {
                 ResourceNodeData nodeData;
@@ -254,7 +254,7 @@ namespace Orion.Game.Matchmaking
                 }
 
 
-                if (nodeData.Node.GetComponent<Harvestable>().Type == ResourceType.Alagene
+                if (nodeData.Node.Components.Get<Harvestable>().Type == ResourceType.Alagene
                     && (nodeData.Extractor == null || !nodeData.Extractor.IsAliveInWorld)
                     && World.IsFree(node.GridRegion, CollisionLayer.Ground))
                 {
@@ -467,7 +467,7 @@ namespace Orion.Game.Matchmaking
                 if (unit.Type == alageneExtractorUnitType)
                 {
                     Entity node = World.Entities.Intersecting(unit.Center)
-                        .First(e => e.HasComponent<Harvestable>());
+                        .First(e => e.Components.Has<Harvestable>());
 
                     var nodeData = resourceNodesData[node];
                     nodeData.Extractor = unit;
@@ -477,7 +477,7 @@ namespace Orion.Game.Matchmaking
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Debug.Assert(entity.HasComponent<Harvestable>(), "Entity is not a resource node!");
+            Debug.Assert(entity.Components.Has<Harvestable>(), "Entity is not a resource node!");
             if (entity != null)
             {
                 resourceNodesData.Remove(entity);

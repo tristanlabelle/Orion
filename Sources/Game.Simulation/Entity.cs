@@ -16,7 +16,7 @@ namespace Orion.Game.Simulation
     /// Abstract base class for game objects present in the game world.
     /// </summary>
     [Serializable]
-    public class Entity
+    public partial class Entity
     {
         #region Instance
         #region Fields
@@ -24,7 +24,7 @@ namespace Orion.Game.Simulation
         private readonly Handle handle;
         private bool isDead;
 
-        private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
+        private readonly ComponentCollection components;
         #endregion
 
         #region Constructors
@@ -37,13 +37,14 @@ namespace Orion.Game.Simulation
         public Entity(Handle handle)
         {
             this.handle = handle;
+            this.components = new ComponentCollection(this);
         }
 
         public Entity(World world, Handle handle)
+            : this(handle)
         {
             Argument.EnsureNotNull(world, "world");
             this.world = world;
-            this.handle = handle;
         }
         #endregion
 
@@ -78,6 +79,14 @@ namespace Orion.Game.Simulation
             get { return handle; }
         }
 
+        /// <summary>
+        /// Gets the collection of this <see cref="Entity"/>'s components.
+        /// </summary>
+        public ComponentCollection Components
+        {
+            get { return components; }
+        }
+
         #region Location/Size
         /// <summary>
         /// Gets the size of this <see cref="Entity"/>, in tiles.
@@ -86,7 +95,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual Size Size
         {
-            get { return GetComponent<Spatial>().Size; }
+            get { return Components.Get<Spatial>().Size; }
         }
 
         /// <summary>
@@ -169,82 +178,21 @@ namespace Orion.Game.Simulation
 
         #region Methods
         #region Components
-        public bool HasComponent<T>() where T : Component
-        {
-            return HasComponent(typeof(T));
-        }
-
-        public bool HasComponent(Type componentType)
-        {
-            return components.ContainsKey(componentType);
-        }
-
-        public Component GetComponent(Type type)
-        {
-            return components[type];
-        }
-
-        public T GetComponent<T>() where T : Component
-        {
-            return (T)components[typeof(T)];
-        }
-
-        public Component GetComponentOrNull(Type type)
-        {
-            Component result;
-            if (!components.TryGetValue(type, out result))
-                return null;
-            return result;
-        }
-
-        public T GetComponentOrNull<T>() where T : Component
-        {
-            return (T)GetComponentOrNull(typeof(T));
-        }
-
-        public IEnumerable<Component> GetComponents()
-        {
-            return components.Values;
-        }
-
-        public void AddComponent(Component component)
-        {
-            Type componentType = component.GetType();
-            if (components.ContainsKey(componentType))
-                throw new ArgumentException("component");
-            components.Add(componentType, component);
-        }
-
-        public void RemoveComponent<T>() where T : Component
-        {
-            RemoveComponent(typeof(T));
-        }
-
-        public void RemoveComponent(Type componentType)
-        {
-            components.Remove(componentType);
-        }
-
-        public void RemoveComponent(Component component)
-        {
-            components.Remove(component.GetType());
-        }
-
         public Stat GetStat(EntityStat stat)
         {
             if (stat.NumericType == StatType.Integer)
-                return new Stat(GetComponents().Sum(c => c.GetStatBonus(stat).IntegerValue));
+                return new Stat(Components.Sum(c => c.GetStatBonus(stat).IntegerValue));
             else
-                return new Stat(GetComponents().Sum(c => c.GetStatBonus(stat).RealValue));
+                return new Stat(Components.Sum(c => c.GetStatBonus(stat).RealValue));
         }
 
         public Entity CloneIntoExistence(World world, Handle handle)
         {
             Entity clone = new Entity(world, handle);
-            foreach (Component component in GetComponents())
+            foreach (Component component in Components)
             {
                 Component componentCopy = component.Clone(clone);
-                clone.AddComponent(componentCopy);
+                clone.Components.Add(componentCopy);
             }
             return clone;
         }
@@ -252,7 +200,7 @@ namespace Orion.Game.Simulation
 
         internal void RaiseWarning(string warning)
         {
-            FactionMembership factionComponent = GetComponentOrNull<FactionComponent>();
+            FactionMembership factionComponent = Components.TryGet<FactionComponent>();
             if (factionComponent == null)
                 Debug.WriteLine(warning);
             else
@@ -316,7 +264,7 @@ namespace Orion.Game.Simulation
                 return;
             }
 
-            foreach (Component component in GetComponents())
+            foreach (Component component in Components)
                 component.Update(step);
 
             DoUpdate(step);
@@ -325,7 +273,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         protected virtual Vector2 GetPosition()
         {
-            return GetComponent<Spatial>().Position;
+            return Components.Get<Spatial>().Position;
         }
 
         protected virtual void DoUpdate(SimulationStep step) { }

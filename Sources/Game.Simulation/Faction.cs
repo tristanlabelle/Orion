@@ -377,8 +377,8 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(type, "type");
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
-            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no Spatial component!");
-            Spatial spatialComponent = unit.GetComponent<Spatial>();
+            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no Spatial component!");
+            Spatial spatialComponent = unit.Components.Get<Spatial>();
             spatialComponent.Moved += (s, oldPos, newPos) => OnUnitMoved(unit, oldPos, newPos);
 
             UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
@@ -505,9 +505,9 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(node, "node");
 
-            if (node.GetComponent<Harvestable>().Type == ResourceType.Aladdium) return true;
+            if (node.Components.Get<Harvestable>().Type == ResourceType.Aladdium) return true;
 
-            Vector2 location = node.GetComponent<Spatial>().Position;
+            Vector2 location = node.Components.Get<Spatial>().Position;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.HasSkill<ExtractAlageneSkill>()

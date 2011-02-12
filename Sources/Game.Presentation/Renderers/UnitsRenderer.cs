@@ -150,14 +150,14 @@ namespace Orion.Game.Presentation.Renderers
         private void DrawGroundUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             var units = GetClippedVisibleUnits(viewBounds)
-                .Where(unit => unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground);
+                .Where(unit => unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground);
             foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
         }
 
         private void DrawAirborneUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
             var units = GetClippedVisibleUnits(viewBounds)
-                .Where(unit => unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Air);
+                .Where(unit => unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air);
             foreach (Unit unit in units) DrawUnitShadow(graphicsContext, unit);
             foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
         }
@@ -213,8 +213,8 @@ namespace Orion.Game.Presentation.Renderers
 
         private float GetOscillation(Unit unit)
         {
-            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
-            if (unit.GetComponent<Spatial>().CollisionLayer == CollisionLayer.Ground) return 0;
+            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+            if (unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground) return 0;
 
             float period = 3 + unit.Size.Area / 4.0f;
             float offset = (unit.Handle.Value % 8) / 8.0f * period;
@@ -231,8 +231,8 @@ namespace Orion.Game.Presentation.Renderers
             // and building textures are not supposed to be rotated.
             if (unit.IsBuilding) return 0;
 
-            Debug.Assert(unit.HasComponent<Spatial>(), "Unit has no spatial component!");
-            float angle = unit.GetComponent<Spatial>().Angle;
+            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+            float angle = unit.Components.Get<Spatial>().Angle;
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
             bool isMelee = unit.HasSkill<AttackSkill>() && unit.GetStat(AttackSkill.RangeStat) == 0;
@@ -251,8 +251,8 @@ namespace Orion.Game.Presentation.Renderers
             {
                 HitEventArgs hit = hitEvents[i];
                 Entity hitter = hit.Hitter;
-                Debug.Assert(hitter.HasComponent<Spatial>(), "Hitter has no Spatial component!");
-                if (hitter.GetComponent<Spatial>().CollisionLayer != layer)
+                Debug.Assert(hitter.Components.Has<Spatial>(), "Hitter has no Spatial component!");
+                if (hitter.Components.Get<Spatial>().CollisionLayer != layer)
                     continue;
 
                 if (hit.Hitter.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)

@@ -135,18 +135,6 @@ namespace Orion.Game.Matchmaking
             if (units.Any())
                 IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetType.Handle));
         }
-
-        public void LaunchEmbark(IEnumerable<Unit> embarkers, Unit transporter)
-        {
-            if (embarkers.Any())
-                IssueCommand(new EmbarkCommand(Faction.Handle, embarkers.Select(u => u.Handle), transporter.Handle));
-        }
-
-        public void LaunchDisembark(IEnumerable<Unit> transporters)
-        {
-            if (transporters.Any())
-                IssueCommand(new DisembarkCommand(Faction.Handle, transporters.Select(u => u.Handle)));
-        }
         #endregion
     }
 }

@@ -69,19 +69,19 @@ namespace Orion.Game.Presentation.Actions
                     {
                         userInputManager.SelectedCommand = new AttackUserCommand(userInputManager, graphics);
                         actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
-        }
+                    }
                 };
             }
 
             if (unitType.HasSkill<BuildSkill>())
-        {
+            {
                 actions[0, 0] = new ActionDescriptor()
             {
-                    Name = "Construire",
-                    Texture = graphics.GetActionTexture("Build"),
-                    HotKey = Key.B,
-                    Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
-                };
+                Name = "Construire",
+                Texture = graphics.GetActionTexture("Build"),
+                HotKey = Key.B,
+                Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
+            };
 
                 actions[1, 0] = new ActionDescriptor()
                 {
@@ -93,17 +93,6 @@ namespace Orion.Game.Presentation.Actions
                         userInputManager.SelectedCommand = new RepairUserCommand(userInputManager);
                         actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
                     }
-                };
-                }
-
-            if (unitType.HasSkill<TransportSkill>())
-            {
-                actions[3, 0] = new ActionDescriptor()
-                {
-                    Name = "Débarquer",
-                    Texture = graphics.GetActionTexture("Disembark"),
-                    HotKey = Key.D,
-                    Action = () => userInputManager.LaunchDisembark()
                 };
             }
 
@@ -118,7 +107,7 @@ namespace Orion.Game.Presentation.Actions
                     {
                         userInputManager.SelectedCommand = new HarvestUserCommand(userInputManager);
                         actionPanel.Push(new CancelActionProvider(actionPanel, userInputManager, graphics));
-        }
+                    }
                 };
             }
 
@@ -258,7 +247,7 @@ namespace Orion.Game.Presentation.Actions
         {
             for (int y = 0; y < actions.GetLength(1); ++y)
                 for (int x = 0; x < actions.GetLength(0); ++x)
-                        actions[x, y] = null;
+                    actions[x, y] = null;
         }
         #endregion
     }

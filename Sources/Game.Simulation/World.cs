@@ -346,9 +346,7 @@ namespace Orion.Game.Simulation
         internal void OnEntityDied(Entity entity)
         {
             EntityDied.Raise(this, entity);
-
-            bool isEmbarkedUnit = entity is Unit && ((Unit)entity).IsEmbarked;
-            if (!isEmbarkedUnit) entities.Remove(entity);
+            entities.Remove(entity);
 
             Identity identity = entity.GetComponent<Identity>();
             if (identity.LeavesRemains)

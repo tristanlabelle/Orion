@@ -354,11 +354,6 @@ namespace Orion.Game.Presentation
                     return;
                 }
             }
-            else if (target.HasSkill<TransportSkill>())
-            {
-                LaunchEmbark(target);
-                return;
-            }
             else if (target.Damage > 0)
             {
                 if (target.IsBuilding) LaunchRepair(target);
@@ -563,24 +558,6 @@ namespace Orion.Game.Presentation
             var targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction && unit.Type.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
             commander.LaunchUpgrade(targetUnits, targetType);
-        }
-
-        public void LaunchDisembark()
-        {
-            var transporters = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<TransportSkill>());
-            OverrideIfNecessary();
-            commander.LaunchDisembark(transporters);
-        }
-
-        public void LaunchEmbark(Unit transporter)
-        {
-            Argument.EnsureNotNull(transporter, "transporter");
-
-            var embarkers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && transporter.Type.CanTransport(unit.Type));
-            OverrideIfNecessary();
-            commander.LaunchEmbark(embarkers, transporter);
         }
         #endregion
         #endregion

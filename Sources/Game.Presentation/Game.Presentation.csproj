@@ -75,7 +75,6 @@
     <Compile Include="Actions\CancelActionProvider.cs" />
     <Compile Include="Actions\UpgradeActionProvider.cs" />
     <Compile Include="Actions\UserCommands\BuildUserCommand.cs" />
-    <Compile Include="Actions\UserCommands\EmbarkUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HealUserCommand.cs" />
     <Compile Include="Actions\UserCommands\HarvestUserCommand.cs" />
     <Compile Include="Actions\UserCommands\IRenderableUserCommand.cs" />

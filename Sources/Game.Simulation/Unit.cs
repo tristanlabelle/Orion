@@ -34,7 +34,6 @@ namespace Orion.Game.Simulation
         /// </summary>
         private float healthBuilt = float.NaN;
 
-        private readonly TaskQueue taskQueue;
         private Vector2 rallyPoint;
         private float timeElapsedSinceLastHitInSeconds = float.PositiveInfinity;
         private Dictionary<Type, UnitSkill> skills;
@@ -123,8 +122,8 @@ namespace Orion.Game.Simulation
             Components.Add(membership);
             Components.Add(Component.Clone(meta.Components.Get<Identity>(), this));
             Components.Add(Component.Clone(meta.Components.Get<Health>(), this));
+            Components.Add(new Todo(this));
 
-            this.taskQueue = new TaskQueue(this);
             this.rallyPoint = Center;
 
             if (IsBuilding)
@@ -303,7 +302,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public TaskQueue TaskQueue
         {
-            get { return taskQueue; }
+            get { return Components.Get<Todo>().Queue; }
         }
 
         /// <summary>
@@ -311,7 +310,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool IsIdle
         {
-            get { return taskQueue.Count == 0; }
+            get { return Components.Get<Todo>().IsIdle; }
         }
 
         /// <summary>
@@ -660,7 +659,7 @@ namespace Orion.Game.Simulation
 
         protected override void OnDied()
         {
-            taskQueue.Clear();
+            Components.Get<Todo>().Queue.Clear();
             base.OnDied();
             Faction.OnUnitDied(this);
         }
@@ -684,7 +683,6 @@ namespace Orion.Game.Simulation
                 else if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>()
                     && TryAttackNearbyUnit()) { }
             }
-            taskQueue.Update(step);
         }
 
         /// <summary>
@@ -740,7 +738,7 @@ namespace Orion.Game.Simulation
             if (unitToAttack == null) return false;
         
             AttackTask attackTask = new AttackTask(this, unitToAttack);
-            taskQueue.Enqueue(attackTask);
+            Components.Get<Todo>().Queue.Enqueue(attackTask);
             return true;
         }
 
@@ -759,7 +757,7 @@ namespace Orion.Game.Simulation
             if (unitToHeal == null) return false;
 
             HealTask healTask = new HealTask(this, unitToHeal);
-            taskQueue.OverrideWith(healTask);
+            Components.Get<Todo>().Queue.OverrideWith(healTask);
             return true;
         }
 
@@ -778,7 +776,7 @@ namespace Orion.Game.Simulation
             if (unitToRepair == null) return false;
 
             RepairTask repairTask = new RepairTask(this, unitToRepair);
-            taskQueue.OverrideWith(repairTask);
+            Components.Get<Todo>().Queue.OverrideWith(repairTask);
             return true;
         }
         #endregion

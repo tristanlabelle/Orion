@@ -94,6 +94,7 @@
     <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\StatType.cs" />
     <Compile Include="Components\Tags.cs" />
+    <Compile Include="Components\Todo.cs" />
     <Compile Include="Components\TimedExistence.cs" />
     <Compile Include="Components\Train.cs" />
     <Compile Include="Components\TrainProgress.cs" />

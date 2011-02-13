@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Game.Simulation.Components.Serialization;
+using OpenTK;
 
 namespace Orion.Game.Simulation.Components
 {
     public class Train : Component
     {
-        #region Properties
+        #region Fields
         public static readonly Stat SpeedMultiplierStat = new Stat(typeof(Train), StatType.Real, "SpeedMultiplier");
 
         private float speedMultiplier;
+        private Vector2 rallyPoint;
         private HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
@@ -31,6 +33,12 @@ namespace Orion.Game.Simulation.Components
         public ICollection<string> TrainableTypes
         {
             get { return trainableTypes; }
+        }
+
+        public Vector2 RallyPoint
+        {
+            get { return rallyPoint; }
+            set { rallyPoint = value; }
         }
         #endregion
 

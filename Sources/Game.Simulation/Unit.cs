@@ -34,7 +34,6 @@ namespace Orion.Game.Simulation
         /// </summary>
         private float healthBuilt = float.NaN;
 
-        private Vector2 rallyPoint;
         private Dictionary<Type, UnitSkill> skills;
         #endregion
 
@@ -132,7 +131,12 @@ namespace Orion.Game.Simulation
             Components.Get<Spatial>().Position = position;
             Components.Get<FactionMembership>().Faction = faction;
 
-            this.rallyPoint = Center;
+            if (HasSkill<TrainSkill>())
+            {
+                Train trainComponent = new Train(this);
+                trainComponent.RallyPoint = Center;
+                Components.Add(trainComponent);
+            }
 
             if (IsBuilding)
             {
@@ -336,7 +340,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool HasRallyPoint
         {
-            get { return HasSkill<TrainSkill>() && !BoundingRectangle.ContainsPoint(rallyPoint); }
+            get { return HasSkill<TrainSkill>() && !BoundingRectangle.ContainsPoint(RallyPoint); }
         }
 
         /// <summary>
@@ -345,12 +349,8 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Vector2 RallyPoint
         {
-            get { return rallyPoint; }
-            set
-            {
-                Debug.Assert(HasSkill<TrainSkill>());
-                rallyPoint = value;
-            }
+            get { return Components.Get<Train>().RallyPoint; }
+            set { Components.Get<Train>().RallyPoint = value; }
         }
         #endregion
         #endregion

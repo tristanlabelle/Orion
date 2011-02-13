@@ -8,24 +8,28 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Health : Component
+    /// <summary>
+    /// Provides an <see cref="Entity"/> with a health value,
+    /// which makes it damageable by damaging actions.
+    /// </summary>
+    public sealed class Health : Component
     {
         #region Static
-        public static readonly EntityStat MaxHealthStat = new EntityStat(typeof(Health), StatType.Integer, "MaxHealth", "Points de vie maximum");
-        public static readonly EntityStat RegenerationRateStat = new EntityStat(typeof(Health), StatType.Real, "RegenerationRate", "Regénération");
-        public static readonly EntityStat DamageReductionStat = new EntityStat(typeof(Health), StatType.Integer, "DamageReduction", "Réduction de dégâts");
-        public static readonly EntityStat CurrentHealthStat = new EntityStat(typeof(Health), StatType.Integer, "CurrentHealth", "Points de vie");
-        public static readonly EntityStat ArmorStat = new EntityStat(typeof(Health), StatType.Real, "Armor", "Armure");
+        public static readonly Stat MaxHealthStat = new Stat(typeof(Health), StatType.Integer, "MaximumValue");
+        public static readonly Stat RegenerationRateStat = new Stat(typeof(Health), StatType.Real, "RegenerationRate");
+        public static readonly Stat DamageReductionStat = new Stat(typeof(Health), StatType.Integer, "DamageReduction");
+        public static readonly Stat ValueStat = new Stat(typeof(Health), StatType.Integer, "Value");
+        public static readonly Stat ArmorStat = new Stat(typeof(Health), StatType.Real, "Armor");
         #endregion
 
         #region Fields
-        private int maxHealth;
+        private int maximumValue;
         private ArmorType armorType;
         private int threatLevel;
         private float regenerationRate;
         private float damageReduction;
         private float armor;
-        private float currentDamage;
+        private float damage;
         #endregion
 
         #region Constructors
@@ -33,15 +37,21 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Events
-        public event Action<Entity> DamageChanged;
+        /// <summary>
+        /// Raised when the host <see cref="Entity"/> gets damaged or healed.
+        /// </summary>
+        public event Action<Health> DamageChanged;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Accesses the maximum number of health points that can be had by the host <see cref="Entity"/>.
+        /// </summary>
         [Mandatory]
-        public int MaxHealth
+        public int MaximumValue
         {
-            get { return maxHealth; }
-            set { maxHealth = value; }
+            get { return maximumValue; }
+            set { maximumValue = value; }
         }
 
         [Mandatory]
@@ -65,14 +75,14 @@ namespace Orion.Game.Simulation.Components
             set { threatLevel = value; }
         }
 
+        /// <summary>
+        /// Accesses the current health value of the host <see cref="Entity"/>.
+        /// </summary>
         [Transient]
-        public float CurrentHealth
+        public float Value
         {
-            get { return maxHealth - currentDamage; }
-            set
-            {
-                Damage = maxHealth - value;
-            }
+            get { return maximumValue - damage; }
+            set { Damage = maximumValue - value; }
         }
 
         [Persistent]
@@ -89,21 +99,24 @@ namespace Orion.Game.Simulation.Components
             set { damageReduction = value; }
         }
 
+        /// <summary>
+        /// Accesses the current amount of health lost by the host <see cref="Entity"/>.
+        /// </summary>
         public float Damage
         {
-            get { return currentDamage; }
+            get { return damage; }
             set
             {
                 Argument.EnsureNotNaN(value, "value");
                 float actualDamage = value - damageReduction;
 
                 if (value < 0) value = 0;
-                if (value > MaxHealth) value = MaxHealth;
+                if (value > MaximumValue) value = MaximumValue;
 
-                currentDamage = value;
-                DamageChanged.Raise(Entity);
+                damage = value;
+                DamageChanged.Raise(this);
 
-                if (currentDamage >= Entity.GetStat(MaxHealthStat).IntegerValue)
+                if (damage >= Entity.GetStatValue(MaxHealthStat).IntegerValue)
                     Entity.Die();
             }
         }
@@ -113,11 +126,10 @@ namespace Orion.Game.Simulation.Components
         public override void Update(SimulationStep step)
         {
             float regeneration = regenerationRate * step.TimeDeltaInSeconds;
-            float newDamage = currentDamage - regeneration;
+            float newDamage = damage - regeneration;
             if (newDamage < 0) newDamage = 0;
-            if (newDamage != currentDamage)
-                DamageChanged.Raise(Entity);
-            currentDamage = newDamage;
+            if (newDamage != damage) DamageChanged.Raise(this);
+            damage = newDamage;
         }
         #endregion
     }

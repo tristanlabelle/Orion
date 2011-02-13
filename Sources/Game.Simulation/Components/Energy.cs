@@ -10,8 +10,8 @@ namespace Orion.Game.Simulation.Components
     public class Energy : Component
     {
         #region Fields
-        public static readonly EntityStat MaximumEnergyStat = new EntityStat(typeof(Energy), StatType.Integer, "Energy", "Énergie");
-        public static readonly EntityStat RegenerationRateStat = new EntityStat(typeof(Energy), StatType.Real, "RegenerationRate", "Vitesse de régénération");
+        public static readonly Stat MaximumEnergyStat = new Stat(typeof(Energy), StatType.Integer, "MaximumEnergy");
+        public static readonly Stat RegenerationRateStat = new Stat(typeof(Energy), StatType.Real, "RegenerationRate");
 
         private int maximumEnergy;
         private float spentEnergy;

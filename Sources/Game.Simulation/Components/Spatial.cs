@@ -13,7 +13,7 @@ namespace Orion.Game.Simulation.Components
     public class Spatial : Component
     {
         #region Static
-        public static readonly EntityStat SightRangeStat = new EntityStat(typeof(Spatial), StatType.Real, "SightRange", "Portée de vision");
+        public static readonly Stat SightRangeStat = new Stat(typeof(Spatial), StatType.Real, "SightRange");
         #endregion
 
         #region Fields
@@ -50,7 +50,7 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public Circle LineOfSight
         {
-            get { return new Circle(Center, Entity.GetStat(SightRangeStat).RealValue); }
+            get { return new Circle(Center, Entity.GetStatValue(SightRangeStat).RealValue); }
         }
 
         [Mandatory]

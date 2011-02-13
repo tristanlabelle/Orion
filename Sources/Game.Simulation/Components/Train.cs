@@ -9,7 +9,7 @@ namespace Orion.Game.Simulation.Components
     public class Train : Component
     {
         #region Properties
-        public static readonly EntityStat SpeedMultiplierStat = new EntityStat(typeof(Train), StatType.Real, "Speed Multiplier", "Multiplicateur de vitesse");
+        public static readonly Stat SpeedMultiplierStat = new Stat(typeof(Train), StatType.Real, "SpeedMultiplier");
 
         private float speedMultiplier;
         private HashSet<string> trainableTypes = new HashSet<string>();

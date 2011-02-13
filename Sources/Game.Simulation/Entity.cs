@@ -178,12 +178,20 @@ namespace Orion.Game.Simulation
 
         #region Methods
         #region Components
-        public Stat GetStat(EntityStat stat)
+        /// <summary>
+        /// Gets the value of a given <see cref="Stat"/> for this <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="stat">The <see cref="Stat"/> for which the value is to be found.</param>
+        /// <returns>The value associated with that <see cref="Stat"/>.</returns>
+        public StatValue GetStatValue(Stat stat)
         {
-            if (stat.NumericType == StatType.Integer)
-                return new Stat(Components.Sum(c => c.GetStatBonus(stat).IntegerValue));
-            else
-                return new Stat(Components.Sum(c => c.GetStatBonus(stat).RealValue));
+            Argument.EnsureNotNull(stat, "stat");
+
+            StatValue sum = StatValue.CreateZero(stat.Type);
+            foreach (Component component in components)
+                sum += component.GetStatBonus(stat);
+
+            return sum;
         }
 
         public Entity CloneIntoExistence(World world, Handle handle)

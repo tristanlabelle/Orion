@@ -79,7 +79,7 @@ namespace Orion.Game.Simulation
             Health health = new Health(this);
             health.Armor = builder.BasicSkill.Armor;
             health.ArmorType = builder.BasicSkill.ArmorType;
-            health.MaxHealth = builder.BasicSkill.MaxHealth;
+            health.MaximumValue = builder.BasicSkill.MaxHealth;
             Components.Add(health);
 
             FactionMembership membership = new FactionMembership(this);

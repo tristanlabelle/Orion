@@ -22,8 +22,8 @@ namespace Orion.Game.Simulation.Components
 
         #region Instance
         #region Fields
-        public static readonly EntityStat RadiusStat = new EntityStat(typeof(Kamikaze), StatType.Real, "Radius", "Rayon d'explosion");
-        public static readonly EntityStat DamageStat = new EntityStat(typeof(Kamikaze), StatType.Integer, "Damage", "Dégâts");
+        public static readonly Stat RadiusStat = new Stat(typeof(Kamikaze), StatType.Real, "Radius");
+        public static readonly Stat DamageStat = new Stat(typeof(Kamikaze), StatType.Integer, "Damage");
 
         private Func<bool> shouldExplode;
         private float radius;

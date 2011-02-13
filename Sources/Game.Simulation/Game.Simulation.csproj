@@ -77,9 +77,8 @@
     <Compile Include="Components\FactionMembership.cs" />
     <Compile Include="Components\Harvest.cs" />
     <Compile Include="Components\Health.cs" />
-    <Compile Include="Components\EntityStat.cs" />
+    <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\Identity.cs" />
-    <Compile Include="Components\InvalidComponentStatException.cs" />
     <Compile Include="Components\Kamikaze.cs" />
     <Compile Include="Components\Move.cs" />
     <Compile Include="Components\Spatial.cs" />
@@ -91,7 +90,7 @@
     <Compile Include="Components\Serialization\TransientAttribute.cs" />
     <Compile Include="Components\Serialization\TypeMismatchException.cs" />
     <Compile Include="Components\Serialization\XmlDeserializer.cs" />
-    <Compile Include="Components\Stat.cs" />
+    <Compile Include="Components\StatValue.cs" />
     <Compile Include="Components\StatType.cs" />
     <Compile Include="Components\Tags.cs" />
     <Compile Include="Components\Todo.cs" />

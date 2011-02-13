@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Components
     public class Harvestable : Component
     {
         #region Fields
-        public static readonly EntityStat HarvestRateStat = new EntityStat(typeof(Harvestable), StatType.Real, "HarvestRate", "Vitesse de récolte");
+        public static readonly Stat HarvestRateStat = new Stat(typeof(Harvestable), StatType.Real, "HarvestRate");
 
         private int resourceAmount;
         private ResourceType type;

@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Components
     public class TimedExistence : Component
     {
         #region Fields
-        public static readonly EntityStat LifeSpanStat = new EntityStat(typeof(TimedExistence), StatType.Real, "LifeSpan", "Durée de vie");
+        public static readonly Stat LifeSpanStat = new Stat(typeof(TimedExistence), StatType.Real, "LifeSpan");
 
         private float lifeSpan;
         private float elapsedTime;

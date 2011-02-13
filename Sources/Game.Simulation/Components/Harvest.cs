@@ -10,8 +10,8 @@ namespace Orion.Game.Simulation.Components
     public class Harvest : Component
     {
         #region Fields
-        public static readonly EntityStat SpeedStat = new EntityStat(typeof(Harvest), StatType.Real, "Speed", "Vitesse de récolte");
-        public static readonly EntityStat MaxCarryingAmountStat = new EntityStat(typeof(Harvest), StatType.Integer, "MaxCarryingAmount", "Quantité maximum");
+        public static readonly Stat SpeedStat = new Stat(typeof(Harvest), StatType.Real, "Speed");
+        public static readonly Stat MaxCarryingAmountStat = new Stat(typeof(Harvest), StatType.Integer, "MaxCarryingAmount");
 
         private float speed;
         private int maxCarryingAmount;

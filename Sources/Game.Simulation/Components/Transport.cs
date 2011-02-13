@@ -11,9 +11,9 @@ namespace Orion.Game.Simulation.Components
     public class Transport : Component
     {
         #region Fields
-        public static readonly EntityStat CapacityStat = new EntityStat(typeof(Transport), StatType.Integer, "Capacity", "Capacité de transport");
-        public static readonly EntityStat EmbarkSpeedStat = new EntityStat(typeof(Transport), StatType.Real, "EmbarkSpeed", "Vitesse d'embarquement");
-        public static readonly EntityStat DisembarkSpeedStat = new EntityStat(typeof(Transport), StatType.Real, "DisembarkSpeed", "Vitesse de débarquement");
+        public static readonly Stat CapacityStat = new Stat(typeof(Transport), StatType.Integer, "Capacity");
+        public static readonly Stat EmbarkSpeedStat = new Stat(typeof(Transport), StatType.Real, "EmbarkSpeed");
+        public static readonly Stat DisembarkSpeedStat = new Stat(typeof(Transport), StatType.Real, "DisembarkSpeed");
 
         private int capacity;
         private float loadSpeed;

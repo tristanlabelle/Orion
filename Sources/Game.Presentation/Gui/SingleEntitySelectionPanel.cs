@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
+using Orion.Engine.Gui;
 using Orion.Game.Simulation;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Skills;
-using System.Diagnostics;
 using Orion.Game.Simulation.Components;
+using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -29,7 +29,7 @@ namespace Orion.Game.Presentation.Gui
 
         private readonly GameGraphics graphics;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
-        private readonly Action<Entity> damageChangedEventHandler;
+        private readonly Action<Health> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
         private readonly Action<Entity> remainingAmountChangedEventHandler;
 
@@ -48,7 +48,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(graphics, "graphics");
 
             this.graphics = graphics;
-            this.damageChangedEventHandler = UpdateHealth;
+            this.damageChangedEventHandler = health => UpdateHealth(health.Entity);
             this.taskQueueChangedEventHandler = UpdateTodoList;
             this.remainingAmountChangedEventHandler = UpdateAmount;
 
@@ -183,7 +183,7 @@ namespace Orion.Game.Presentation.Gui
         private void UpdateHealth(Entity unit)
         {
             Health health = unit.Components.Get<Health>();
-            healthLabel.Text = (int)Math.Ceiling(health.CurrentHealth) + "/" + health.MaxHealth;
+            healthLabel.Text = (int)Math.Ceiling(health.Value) + "/" + health.MaximumValue;
         }
 
         private void UpdateTodoList(TaskQueue taskQueue)

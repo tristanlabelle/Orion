@@ -9,8 +9,8 @@ namespace Orion.Game.Simulation.Components
     public class Move : Component
     {
         #region Fields
-        public static readonly EntityStat SpeedStat = new EntityStat(typeof(Move), StatType.Real, "Speed", "Vitesse");
-        public static readonly EntityStat AccelerationStat = new EntityStat(typeof(Move), StatType.Real, "Acceleration", "Accélération");
+        public static readonly Stat SpeedStat = new Stat(typeof(Move), StatType.Real, "Speed");
+        public static readonly Stat AccelerationStat = new Stat(typeof(Move), StatType.Real, "Acceleration");
 
         private float speed;
         private float acceleration;

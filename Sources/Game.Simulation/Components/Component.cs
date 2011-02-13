@@ -7,9 +7,14 @@ using Orion.Game.Simulation.Skills;
 using System.Reflection;
 using Orion.Game.Simulation.Components.Serialization;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
+    /// <summary>
+    /// Abstract base class for <see cref="Entity"/> components.
+    /// Components provide behavior and/or state to the <see cref="Entity"/> to which they are attached.
+    /// </summary>
     public abstract class Component
     {
         #region Static
@@ -17,11 +22,6 @@ namespace Orion.Game.Simulation.Components
         public static T Clone<T>(T component, Entity entity) where T : Component
         {
             return (T)component.Clone(entity);
-        }
-
-        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
-        {
-            foreach (T item in from) to.Add(item);
         }
         #endregion
         #endregion
@@ -46,23 +46,25 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public virtual void Update(SimulationStep step)
-        { }
+        public virtual void Update(SimulationStep step) { }
 
-        public virtual Stat GetStatBonus(EntityStat stat)
+        public virtual StatValue GetStatBonus(Stat stat)
         {
             Type type = GetType();
-            if (type != stat.ComponentType)
-                return new Stat();
+            if (type != stat.ComponentType) return StatValue.CreateZero(stat.Type);
 
             PropertyInfo property = type.GetProperty(stat.Name);
             if (property == null)
-                throw new InvalidComponentStatException(type, stat);
+            {
+                Debug.Fail("Component {0} defines stat {1} but does not implement a property for it."
+                    .FormatInvariant(GetType().FullName, stat.Name));
+                return StatValue.CreateZero(stat.Type);
+            }
 
-            if (stat.NumericType == StatType.Integer)
-                return new Stat((int)property.GetValue(this, null));
+            if (stat.Type == StatType.Integer)
+                return StatValue.CreateInteger((int)property.GetValue(this, null));
             else
-                return new Stat((float)property.GetValue(this, null));
+                return StatValue.CreateReal((float)property.GetValue(this, null));
         }
 
         public Component Clone(Entity entity)

@@ -1,81 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
+using System.Reflection;
+using System.Diagnostics;
+using Orion.Engine;
+using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Simulation.Components
 {
-    public struct Stat
+    /// <summary>
+    /// Identifies a characteristic associated with an entity.
+    /// </summary>
+    [Serializable]
+    [ImmutableObject(true)]
+    public sealed class Stat
     {
-        #region Static
-        #region Methods
-        public static Stat operator +(Stat a, Stat b)
-        {
-            if (a.Type == b.Type && a.Type == StatType.Integer)
-                return new Stat(a.IntegerValue + b.IntegerValue);
-            else
-                return new Stat(a.RealValue + b.RealValue);
-        }
-
-        public static Stat operator -(Stat a, Stat b)
-        {
-            if (a.Type == b.Type && a.Type == StatType.Integer)
-                return new Stat(a.IntegerValue - b.IntegerValue);
-            else
-                return new Stat(a.RealValue - b.RealValue);
-        }
-
-        public static explicit operator int(Stat that)
-        {
-            return that.IntegerValue;
-        }
-
-        public static explicit operator float(Stat that)
-        {
-            return that.RealValue;
-        }
-        #endregion
-        #endregion
-
-        #region Instance
         #region Fields
+        private readonly Type componentType;
         private readonly StatType type;
-        private readonly int integer;
-        private readonly float real;
+        private readonly string name;
+        private readonly string fullName;
         #endregion
 
         #region Constructors
-        public Stat(int integer)
+        public Stat(Type componentType, StatType type, string name)
         {
-            type = StatType.Integer;
-            this.integer = integer;
-            this.real = 0;
-        }
+            Argument.EnsureNotNull(componentType, "componentType");
+            Argument.EnsureDefined(type, "type");
+            Argument.EnsureNotNull(name, "name");
 
-        public Stat(float real)
-        {
-            type = StatType.Real;
-            this.real = real;
-            this.integer = 0;
+            this.type = type;
+            this.componentType = componentType;
+            this.name = name;
+            this.fullName = componentType.Name + "." + name;
         }
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the type of the component which defines this stat.
+        /// </summary>
+        public Type ComponentType
+        {
+            get { return componentType; }
+        }
+
+        /// <summary>
+        /// Gets the type in which are the values of this stat represented.
+        /// </summary>
         public StatType Type
         {
             get { return type; }
         }
 
-        public int IntegerValue
+        /// <summary>
+        /// Gets the name of this stat within its component.
+        /// </summary>
+        public string Name
         {
-            get { return type == StatType.Integer ? integer : (int)real; }
+            get { return name; }
         }
 
-        public float RealValue
+        /// <summary>
+        /// Gets the full name of this <see cref="Stat"/>, in the form <c>ComponentName.StatName</c>.
+        /// </summary>
+        public string FullName
         {
-            get { return type == StatType.Real ? real : (float)integer; }
+            get { return fullName; }
         }
         #endregion
+
+        #region Methods
+        public override string ToString()
+        {
+            return fullName;
+        }
         #endregion
     }
 }

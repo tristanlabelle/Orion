@@ -6,10 +6,13 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Build : Component
+    /// <summary>
+    /// Provides an <see cref="Entity"/> with the capability to build structures.
+    /// </summary>
+    public sealed class Build : Component
     {
         #region Fields
-        public static readonly EntityStat BuildSpeedStat = new EntityStat(typeof(Build), StatType.Real, "BuildSpeed", "Vitesse de construction");
+        public static readonly Stat BuildSpeedStat = new Stat(typeof(Build), StatType.Real, "Speed");
 
         private readonly HashSet<string> buildableTypes = new HashSet<string>();
         private float speed;

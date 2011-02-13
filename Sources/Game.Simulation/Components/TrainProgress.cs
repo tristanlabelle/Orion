@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Components
     public class TrainProgress : Component
     {
         #region Fields
-        public static readonly EntityStat RequiredTimeStat = new EntityStat(typeof(TrainProgress), StatType.Real, "RequiredTime", "Temps requis");
+        public static readonly Stat RequiredTimeStat = new Stat(typeof(TrainProgress), StatType.Real, "RequiredTime");
 
         private static readonly HashSet<Type> essentialComponents = new HashSet<Type>()
         {
@@ -65,7 +65,7 @@ namespace Orion.Game.Simulation.Components
                 Entity.Components.Remove(hiddenComponent);
 
             Debug.Assert(Entity.Components.Has<Health>(), "Entity doesn't have a Health component!");
-            Entity.Components.Get<Health>().MaxHealth = 1;
+            Entity.Components.Get<Health>().MaximumValue = 1;
         }
 
         public void SpendTime(float time)
@@ -81,11 +81,11 @@ namespace Orion.Game.Simulation.Components
             {
                 foreach (Component hiddenComponent in hiddenComponents)
                     Entity.Components.Add(hiddenComponent);
-                health.MaxHealth = finalHealth.MaxHealth;
+                health.MaximumValue = finalHealth.MaximumValue;
                 Entity.Components.Remove(this);
                 return;
             }
-            health.MaxHealth = (int)(finalHealth.MaxHealth * (timeSpent / requiredTime));
+            health.MaximumValue = (int)(finalHealth.MaximumValue * (timeSpent / requiredTime));
         }
         #endregion
     }

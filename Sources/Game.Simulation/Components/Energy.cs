@@ -7,7 +7,11 @@ using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Energy : Component
+    /// <summary>
+    /// A <see cref="Component"/> which provides an <see cref="Entity"/> with magic energy,
+    /// making it possible for it to use magic skills.
+    /// </summary>
+    public sealed class Energy : Component
     {
         #region Fields
         public static readonly Stat MaximumEnergyStat = new Stat(typeof(Energy), StatType.Integer, "MaximumEnergy");
@@ -37,6 +41,12 @@ namespace Orion.Game.Simulation.Components
         {
             get { return (int)(maximumEnergy - spentEnergy); }
             set { spentEnergy = maximumEnergy - value; }
+        }
+
+        public float RegenerationRate
+        {
+            get { return regenerationRate; }
+            set { regenerationRate = value; }
         }
         #endregion
 

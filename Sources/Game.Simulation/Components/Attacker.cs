@@ -7,14 +7,14 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Attack : Component
+    public class Attacker : Component
     {
         #region Static
         #region Fields
-        public static readonly Stat PowerStat = new Stat(typeof(Attack), StatType.Real, "Power");
-        public static readonly Stat RangeStat = new Stat(typeof(Attack), StatType.Real, "Range");
-        public static readonly Stat DelayStat = new Stat(typeof(Attack), StatType.Real, "Delay");
-        public static readonly Stat SplashRadiusStat = new Stat(typeof(Attack), StatType.Real, "SplashRadius");
+        public static readonly Stat PowerStat = new Stat(typeof(Attacker), StatType.Real, "Power");
+        public static readonly Stat RangeStat = new Stat(typeof(Attacker), StatType.Real, "Range");
+        public static readonly Stat DelayStat = new Stat(typeof(Attacker), StatType.Real, "Delay");
+        public static readonly Stat SplashRadiusStat = new Stat(typeof(Attacker), StatType.Real, "SplashRadius");
         #endregion
         #endregion
 
@@ -28,7 +28,7 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Constructors
-        public Attack(Entity entity) : base(entity) { }
+        public Attacker(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties

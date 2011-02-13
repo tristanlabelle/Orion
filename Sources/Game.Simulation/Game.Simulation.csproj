@@ -69,7 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\ArmorType.cs" />
-    <Compile Include="Components\Attack.cs" />
+    <Compile Include="Components\Attacker.cs" />
     <Compile Include="Components\Build.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DamageFilter.cs" />
@@ -93,7 +93,6 @@
     <Compile Include="Components\StatValue.cs" />
     <Compile Include="Components\StatType.cs" />
     <Compile Include="Components\Tags.cs" />
-    <Compile Include="Components\Todo.cs" />
     <Compile Include="Components\TimedExistence.cs" />
     <Compile Include="Components\Train.cs" />
     <Compile Include="Components\TrainProgress.cs" />
@@ -154,7 +153,7 @@
     </Compile>
     <Compile Include="Tasks\StandGuardTask.cs" />
     <Compile Include="Tasks\Task.cs" />
-    <Compile Include="Tasks\TaskQueue.cs" />
+    <Compile Include="Components\TaskQueue.cs" />
     <Compile Include="Tasks\AttackTask.cs" />
     <Compile Include="Tasks\BuildTask.cs" />
     <Compile Include="Tasks\FollowTask.cs" />

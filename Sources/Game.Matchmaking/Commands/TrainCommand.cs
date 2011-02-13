@@ -88,26 +88,11 @@ namespace Orion.Game.Matchmaking.Commands
             int aladdiumCost = faction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
             int alageneCost = faction.GetStat(traineeType, BasicSkill.AlageneCostStat);
 
-            bool taskQueueFullWarningRaised = false;
             for (int i = 0; i < traineeCount; ++i)
             {
                 foreach (Handle trainerHandle in trainerHandles)
                 {
                     Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
-
-                    if (trainer.TaskQueue.IsFull)
-                    {
-                        // Prevent multiple "task queue full" warnings, the player only needs to know it once,
-                        // even when it applies to multiple trainers.
-                        if (!taskQueueFullWarningRaised)
-                        {
-                            faction.RaiseWarning("Impossible d'entraîner un {0}, la queue de tâches est pleine."
-                                .FormatInvariant(traineeType.Name));
-                            taskQueueFullWarningRaised = true;
-                        }
-
-                        continue;
-                    }
 
                     if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
                     {

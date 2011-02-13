@@ -82,11 +82,24 @@ namespace Orion.Game.Simulation
             health.MaximumValue = builder.BasicSkill.MaxHealth;
             Components.Add(health);
 
+            if (HasSkill<AttackSkill>())
+            {
+                AttackSkill attackSkill = TryGetSkill<AttackSkill>();
+                Attacker attacker = new Attacker(this);
+                attacker.Delay = attackSkill.Delay;
+                attacker.Power = attackSkill.Power;
+                attacker.Range = attackSkill.Range;
+                attacker.SplashRadius = attackSkill.SplashRadius;
+                Components.Add(attacker);
+            }
+
             FactionMembership membership = new FactionMembership(this);
             membership.FoodRequirement = builder.BasicSkill.FoodCost;
             if (HasSkill<ProvideFoodSkill>())
                 membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
             Components.Add(membership);
+
+            Components.Add(new TaskQueue(this));
         }
 
         /// <summary>
@@ -100,28 +113,24 @@ namespace Orion.Game.Simulation
         /// </param>
         /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
         /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
-        internal Unit(Handle handle, Unit meta, Faction faction, Vector2 position)
+        internal Unit(Handle handle, Unit prototype, Faction faction, Vector2 position)
             : base(faction.World, handle)
         {
-            Argument.EnsureNotNull(meta, "meta");
+            Argument.EnsureNotNull(prototype, "meta");
             Argument.EnsureNotNull(faction, "faction");
 
-            skills = meta.skills;
+            skills = prototype.skills;
 
             Debug.Assert(!HasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(meta.Name));
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(prototype.Name));
 
             // components stuff
-            Spatial spatial = Component.Clone(meta.Components.Get<Spatial>(), this);
-            spatial.Position = position;
-            Components.Add(spatial);
-            FactionMembership membership = Component.Clone(meta.Components.Get<FactionMembership>(), this);
-            membership.Faction = faction;
-            Components.Add(membership);
-            Components.Add(Component.Clone(meta.Components.Get<Identity>(), this));
-            Components.Add(Component.Clone(meta.Components.Get<Health>(), this));
-            Components.Add(new Todo(this));
+            foreach (Component component in prototype.Components)
+                Components.Add(component.Clone(this));
+
+            Components.Get<Spatial>().Position = position;
+            Components.Get<FactionMembership>().Faction = faction;
 
             this.rallyPoint = Center;
 
@@ -301,7 +310,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public TaskQueue TaskQueue
         {
-            get { return Components.Get<Todo>().Queue; }
+            get { return Components.Get<TaskQueue>(); }
         }
 
         /// <summary>
@@ -309,7 +318,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool IsIdle
         {
-            get { return Components.Get<Todo>().IsIdle; }
+            get { return Components.Get<TaskQueue>().IsEmpty; }
         }
 
         /// <summary>
@@ -317,7 +326,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public float TimeElapsedSinceLastHitInSeconds
         {
-            get { return Components.Get<Attack>().TimeElapsedSinceLastHit; }
+            get { return Components.Get<Attacker>().TimeElapsedSinceLastHit; }
         }
         #endregion
 
@@ -502,7 +511,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(target, "target");
             float hitDelayInSeconds = GetStat(AttackSkill.DelayStat);
-            if (Components.Get<Attack>().TimeElapsedSinceLastHit < hitDelayInSeconds)
+            if (Components.Get<Attacker>().TimeElapsedSinceLastHit < hitDelayInSeconds)
                 return false;
             Hit(target);
             return true;
@@ -551,7 +560,7 @@ namespace Orion.Game.Simulation
                 }
             }
 
-            Components.Get<Attack>().TimeElapsedSinceLastHit = 0;
+            Components.Get<Attacker>().TimeElapsedSinceLastHit = 0;
         }
 
         public bool IsSuperEffectiveAgainst(ArmorType type)
@@ -658,7 +667,7 @@ namespace Orion.Game.Simulation
 
         protected override void OnDied()
         {
-            Components.Get<Todo>().Queue.Clear();
+            TaskQueue.Clear();
             base.OnDied();
             Faction.OnUnitDied(this);
         }
@@ -735,7 +744,7 @@ namespace Orion.Game.Simulation
             if (unitToAttack == null) return false;
         
             AttackTask attackTask = new AttackTask(this, unitToAttack);
-            Components.Get<Todo>().Queue.Enqueue(attackTask);
+            TaskQueue.Enqueue(attackTask);
             return true;
         }
 
@@ -754,7 +763,7 @@ namespace Orion.Game.Simulation
             if (unitToHeal == null) return false;
 
             HealTask healTask = new HealTask(this, unitToHeal);
-            Components.Get<Todo>().Queue.OverrideWith(healTask);
+            TaskQueue.OverrideWith(healTask);
             return true;
         }
 
@@ -773,7 +782,7 @@ namespace Orion.Game.Simulation
             if (unitToRepair == null) return false;
 
             RepairTask repairTask = new RepairTask(this, unitToRepair);
-            Components.Get<Todo>().Queue.OverrideWith(repairTask);
+            TaskQueue.OverrideWith(repairTask);
             return true;
         }
         #endregion

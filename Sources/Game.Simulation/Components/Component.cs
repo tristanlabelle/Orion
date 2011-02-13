@@ -23,6 +23,17 @@ namespace Orion.Game.Simulation.Components
         {
             return (T)component.Clone(entity);
         }
+
+        /// <summary>
+        /// Helper method to copy items between two collections
+        /// </summary>
+        /// <remarks>
+        /// Used via reflection by <see cref="M:Clone"/>.
+        /// </remarks>
+        private static void CopyCollection<T>(ICollection<T> from, ICollection<T> to)
+        {
+            foreach (T item in from) to.Add(item);
+        }
         #endregion
         #endregion
 

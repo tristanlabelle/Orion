@@ -5,27 +5,22 @@ using System.Text;
 using System.Collections;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Game.Simulation.Tasks;
 
-namespace Orion.Game.Simulation.Tasks
+namespace Orion.Game.Simulation.Components
 {
     /// <summary>
     /// Represents a queue of <see cref="Task"/>s to be executed by a <see cref="Unit"/>.
     /// </summary>
-    public sealed class TaskQueue : IList<Task>
+    public sealed class TaskQueue : Component, IList<Task>
     {
         #region Fields
-        private const int maxLength = 8;
-
-        private readonly Unit unit;
         private readonly List<Task> tasks = new List<Task>();
         #endregion
 
         #region Constructors
-        public TaskQueue(Unit unit)
-        {
-            Argument.EnsureNotNull(unit, "unit");
-            this.unit = unit;
-        }
+        public TaskQueue(Entity entity)
+            : base(entity) { }
         #endregion
 
         #region Events
@@ -53,14 +48,6 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
-        /// Gets a value indicating if this <see cref="TaskQueue"/> is at its maximum capacity. *HACKHACK*
-        /// </summary>
-        public bool IsFull
-        {
-            get { return tasks.Count >= maxLength; }
-        }
-
-        /// <summary>
         /// Gets the <see cref="Task"/> currently being executed.
         /// </summary>
         public Task Current
@@ -73,7 +60,7 @@ namespace Orion.Game.Simulation.Tasks
         /// </summary>
         public Unit Unit
         {
-            get { return unit; }
+            get { return (Unit)Entity; }
         }
         #endregion
 
@@ -94,7 +81,7 @@ namespace Orion.Game.Simulation.Tasks
         /// Updates the current task for a frame.
         /// </summary>
         /// <param name="info">Information on the update.</param>
-        public void Update(SimulationStep step)
+        public override void Update(SimulationStep step)
         {
             if (IsEmpty) return;
 
@@ -114,10 +101,10 @@ namespace Orion.Game.Simulation.Tasks
         public void OverrideWith(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
+            if (task.Unit != Unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
             // This can now voluntarily happen, so I'm commenting out the assert
             // Debug.Assert(Count <= 1, "More than one task was overriden, is this voluntary?");
-            Debug.Assert(!unit.IsUnderConstruction);
+            Debug.Assert(!Unit.IsUnderConstruction);
 
             Clear();
 
@@ -141,10 +128,10 @@ namespace Orion.Game.Simulation.Tasks
         public void Enqueue(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            if (task.Unit != unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
+            if (task.Unit != Unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
             if (tasks.Contains(task)) throw new InvalidOperationException("Cannot add a task already present.");
             //if (IsFull) throw new InvalidOperationException("Cannot enqueue a task to a full queue");
-            Debug.Assert(!unit.IsUnderConstruction);
+            Debug.Assert(!Unit.IsUnderConstruction);
 
             tasks.Add(task);
 

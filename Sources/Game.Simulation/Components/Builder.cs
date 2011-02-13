@@ -9,17 +9,17 @@ namespace Orion.Game.Simulation.Components
     /// <summary>
     /// Provides an <see cref="Entity"/> with the capability to build structures.
     /// </summary>
-    public sealed class Build : Component
+    public sealed class Builder : Component
     {
         #region Fields
-        public static readonly Stat BuildSpeedStat = new Stat(typeof(Build), StatType.Real, "Speed");
+        public static readonly Stat BuildSpeedStat = new Stat(typeof(Builder), StatType.Real, "Speed");
 
         private readonly HashSet<string> buildableTypes = new HashSet<string>();
         private float speed;
         #endregion
 
         #region Constructors
-        public Build(Entity entity) : base(entity) { }
+        public Builder(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
@@ -38,9 +38,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public bool Supports(Entity type)
+        /// <summary>
+        /// Tests if an <see cref="Entity"/> described by a given prototype can be built by the host <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="prototype">The <see cref="Entity"/> prototype.</param>
+        /// <returns>A value indicating if such <see cref="Entity"/> instances can be built.</returns>
+        public bool Supports(Entity prototype)
         {
-            return buildableTypes.Contains(type.Components.Get<Identity>().Name);
+            return buildableTypes.Contains(prototype.Components.Get<Identity>().Name);
         }
         #endregion
     }

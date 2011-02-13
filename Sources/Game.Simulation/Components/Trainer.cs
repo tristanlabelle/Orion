@@ -4,21 +4,25 @@ using System.Linq;
 using System.Text;
 using Orion.Game.Simulation.Components.Serialization;
 using OpenTK;
+using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Train : Component
+    /// <summary>
+    /// Allows an <see cref="Entity"/> to train other <see cref="Entity">entities</see>.
+    /// </summary>
+    public sealed class Trainer : Component
     {
         #region Fields
-        public static readonly Stat SpeedMultiplierStat = new Stat(typeof(Train), StatType.Real, "SpeedMultiplier");
+        public static readonly Stat SpeedMultiplierStat = new Stat(typeof(Trainer), StatType.Real, "SpeedMultiplier");
 
-        private float speedMultiplier;
+        private float speedMultiplier = 1;
         private Vector2 rallyPoint;
         private HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
         #region Constructors
-        public Train(Entity entity) : base(entity) { }
+        public Trainer(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
@@ -26,7 +30,11 @@ namespace Orion.Game.Simulation.Components
         public float SpeedMultiplier
         {
             get { return speedMultiplier; }
-            set { speedMultiplier = value; }
+            set
+            {
+                Argument.EnsureNotNaN(value, "SpeedMultiplier");
+                speedMultiplier = value;
+            }
         }
 
         [Mandatory]
@@ -43,9 +51,9 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
-        public bool Supports(Entity type)
+        public bool Supports(Entity prototype)
         {
-            return trainableTypes.Contains(type.Components.Get<Identity>().Name);
+            return trainableTypes.Contains(prototype.Components.Get<Identity>().Name);
         }
         #endregion
     }

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
-using System.Collections.ObjectModel;
 using Orion.Game.Simulation.Technologies;
-using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -38,47 +38,47 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Constructors
-        internal Unit(Handle handle, UnitTypeBuilder builder)
+        internal Unit(Handle handle, UnitTypeBuilder type)
             : base(handle)
         {
-            Argument.EnsureNotNull(builder, "builder");
+            Argument.EnsureNotNull(type, "type");
 
-            skills = builder.Skills
+            skills = type.Skills
                 .Select(skill => skill.CreateFrozenClone())
                 .ToDictionary(skill => skill.GetType());
-            skills.Add(typeof(BasicSkill), builder.BasicSkill);
+            skills.Add(typeof(BasicSkill), type.BasicSkill);
 
             Debug.Assert(!HasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(builder.Name));
+                "{0} has an attack range bigger than its line of sight.".FormatInvariant(type.Name));
 
             // components stuff
             Spatial spatial = new Spatial(this);
-            spatial.CollisionLayer = builder.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground;
-            spatial.SightRange = builder.BasicSkill.SightRange;
-            spatial.Size = builder.Size;
+            spatial.CollisionLayer = type.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground;
+            spatial.SightRange = type.BasicSkill.SightRange;
+            spatial.Size = type.Size;
             Components.Add(spatial);
 
             Identity identity = new Identity(this);
-            identity.Name = builder.Name;
-            identity.VisualIdentity = builder.GraphicsTemplate ?? builder.Name; ;
-            identity.SoundIdentity = builder.VoicesTemplate ?? builder.Name;
+            identity.Name = type.Name;
+            identity.VisualIdentity = type.GraphicsTemplate ?? type.Name; ;
+            identity.SoundIdentity = type.VoicesTemplate ?? type.Name;
             identity.LeavesRemains = true;
             identity.IsSelectable = true;
             identity.TemplateEntity = this;
-            foreach (UnitTypeUpgrade upgrade in builder.Upgrades)
+            foreach (UnitTypeUpgrade upgrade in type.Upgrades)
                 identity.Upgrades.Add(upgrade);
             identity.TrainType = HasSkill<MoveSkill>()
                 ? TrainType.Immaterial
                 : TrainType.OnSite;
-            identity.AladdiumCost = builder.BasicSkill.AladdiumCost;
-            identity.AlageneCost = builder.BasicSkill.AlageneCost;
+            identity.AladdiumCost = type.BasicSkill.AladdiumCost;
+            identity.AlageneCost = type.BasicSkill.AlageneCost;
             Components.Add(identity);
 
             Health health = new Health(this);
-            health.Armor = builder.BasicSkill.Armor;
-            health.ArmorType = builder.BasicSkill.ArmorType;
-            health.MaximumValue = builder.BasicSkill.MaxHealth;
+            health.Armor = type.BasicSkill.Armor;
+            health.ArmorType = type.BasicSkill.ArmorType;
+            health.MaximumValue = type.BasicSkill.MaxHealth;
             Components.Add(health);
 
             if (HasSkill<AttackSkill>())
@@ -92,8 +92,37 @@ namespace Orion.Game.Simulation
                 Components.Add(attacker);
             }
 
+            if (HasSkill<HarvestSkill>())
+            {
+                HarvestSkill harvestSkill = TryGetSkill<HarvestSkill>();
+                Harvester harvester = new Harvester(this);
+                harvester.Speed = harvestSkill.Speed;
+                harvester.MaxCarryingAmount = harvestSkill.MaxCarryingAmount;
+                Components.Add(harvester);
+            }
+
+            if (HasSkill<BuildSkill>())
+            {
+                BuildSkill buildSkill = TryGetSkill<BuildSkill>();
+                Builder builder = new Builder(this);
+                builder.Speed = buildSkill.Speed;
+                foreach (string target in buildSkill.Targets)
+                    builder.BuildableTypes.Add(target);
+                Components.Add(builder);
+            }
+
+            if (HasSkill<TrainSkill>())
+            {
+                TrainSkill trainSkill = TryGetSkill<TrainSkill>();
+                Trainer trainer = new Trainer(this);
+                trainer.SpeedMultiplier = trainSkill.Speed;
+                foreach (string target in trainSkill.Targets)
+                    trainer.TrainableTypes.Add(target);
+                Components.Add(trainer);
+            }
+
             FactionMembership membership = new FactionMembership(this);
-            membership.FoodRequirement = builder.BasicSkill.FoodCost;
+            membership.FoodRequirement = type.BasicSkill.FoodCost;
             if (HasSkill<ProvideFoodSkill>())
                 membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
             Components.Add(membership);
@@ -130,13 +159,8 @@ namespace Orion.Game.Simulation
 
             Components.Get<Spatial>().Position = position;
             Components.Get<FactionMembership>().Faction = faction;
-
-            if (HasSkill<TrainSkill>())
-            {
-                Train trainComponent = new Train(this);
-                trainComponent.RallyPoint = Center;
-                Components.Add(trainComponent);
-            }
+            Trainer trainer = Components.TryGet<Trainer>();
+            if (trainer != null) trainer.RallyPoint = Center;
 
             if (IsBuilding)
             {
@@ -349,8 +373,8 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Vector2 RallyPoint
         {
-            get { return Components.Get<Train>().RallyPoint; }
-            set { Components.Get<Train>().RallyPoint = value; }
+            get { return Components.Get<Trainer>().RallyPoint; }
+            set { Components.Get<Trainer>().RallyPoint = value; }
         }
         #endregion
         #endregion

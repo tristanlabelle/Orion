@@ -70,12 +70,12 @@
   <ItemGroup>
     <Compile Include="Components\ArmorType.cs" />
     <Compile Include="Components\Attacker.cs" />
-    <Compile Include="Components\Build.cs" />
+    <Compile Include="Components\Builder.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DamageFilter.cs" />
     <Compile Include="Components\Energy.cs" />
     <Compile Include="Components\FactionMembership.cs" />
-    <Compile Include="Components\Harvest.cs" />
+    <Compile Include="Components\Harvester.cs" />
     <Compile Include="Components\Health.cs" />
     <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\Identity.cs" />
@@ -94,7 +94,7 @@
     <Compile Include="Components\StatType.cs" />
     <Compile Include="Components\Tags.cs" />
     <Compile Include="Components\TimedExistence.cs" />
-    <Compile Include="Components\Train.cs" />
+    <Compile Include="Components\Trainer.cs" />
     <Compile Include="Components\TrainProgress.cs" />
     <Compile Include="Components\TrainProgressType.cs" />
     <Compile Include="Components\Transport.cs" />

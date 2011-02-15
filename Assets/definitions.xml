@@ -13,6 +13,26 @@
 		<Translation lang="en">Jedihad</Translation>
 		<Translation lang="fr" gender="M">Jedihad</Translation>
 	</Noun>
+	<Noun key="SinglePlayer">
+		<Translation lang="en">Single player</Translation>
+		<Translation lang="fr">Monojoueur</Translation>
+	</Noun>
+	<Noun key="Multiplayer">
+		<Translation lang="en">Multiplayer</Translation>
+		<Translation lang="fr">Multijoueur</Translation>
+	</Noun>
+	<Noun key="ViewReplay">
+		<Translation lang="en">View replay</Translation>
+		<Translation lang="fr">Visionner une partie</Translation>
+	</Noun>
+	<Noun key="Credits">
+		<Translation lang="en">Credits</Translation>
+		<Translation lang="fr">Générique</Translation>
+	</Noun>
+	<Noun key="Quit">
+		<Translation lang="en">Quit</Translation>
+		<Translation lang="fr">Quitter</Translation>
+	</Noun>
 </NounDefinitions>
 
 <SentenceDefinitions>

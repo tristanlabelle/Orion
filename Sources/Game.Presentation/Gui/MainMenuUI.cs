@@ -7,6 +7,7 @@ using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -16,9 +17,10 @@ namespace Orion.Game.Presentation.Gui
     public sealed class MainMenuUI : ContentControl
     {
         #region Constructors
-        public MainMenuUI(GameGraphics graphics)
+        public MainMenuUI(GameGraphics graphics, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             var style = graphics.GuiStyle;
             
@@ -42,11 +44,11 @@ namespace Orion.Game.Presentation.Gui
             };
             dock.Dock(buttonsStack, Direction.PositiveX);
 
-            StackButton(buttonsStack, style, "Monojoueur", () => SinglePlayerClicked);
-            StackButton(buttonsStack, style, "Multijoueur", () => MultiplayerClicked);
-            StackButton(buttonsStack, style, "Visionner une partie", () => ReplayClicked);
-            StackButton(buttonsStack, style, "Crédits", () => CreditsClicked);
-            StackButton(buttonsStack, style, "Quitter", () => QuitClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("SinglePlayer"), () => SinglePlayerClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Multiplayer"), () => MultiplayerClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("ViewReplay"), () => ReplayClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Credits"), () => CreditsClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Quit"), () => QuitClicked);
         }
         #endregion
 

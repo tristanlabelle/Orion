@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions>
+<NounDefinitions>
+	<Noun key="Smurf">
+		<Translation lang="en">Smurf</Translation>
+		<Translation lang="fr" gender="M">Schtroumpf</Translation>
+	</Noun>
+	<Noun key="Smurfette">
+		<Translation lang="en">Smurfette</Translation>
+		<Translation lang="fr" gender="F">Schtroumpfette</Translation>
+	</Noun>
+	<Noun key="Jedihad">
+		<Translation lang="en">Jedihad</Translation>
+		<Translation lang="fr" gender="M">Jedihad</Translation>
+	</Noun>
+</NounDefinitions>
+
+<SentenceDefinitions>
+	<Sentence key="UnitCreation">
+		<Translation lang="en">A %n0 spawned.</Translation>
+		<Translation lang="fr">Un{n0~F?e:} %n0 a ete cree;{n0~F?e:}.</Translation>
+	</Sentence>
+	<Sentence key="ResourceAcquisition">
+		<Translation lang="en">%n0 obtained %n1 %n2.</Translation>
+		<Translation lang="fr">%n0 a obtenu %n1 %n2.</Translation>
+	</Sentence>
+	<Sentence key="PointAcquisition">
+		<Translation lang="en">%n0 received %n1 point{n1>1?s:}.</Translation>
+		<Translation lang="fr">%n0 a reeu %n1 point{n1>1?s:}.</Translation>
+	</Sentence>
+</SentenceDefinitions>
+</Definitions>

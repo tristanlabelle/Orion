@@ -13,8 +13,10 @@
 		<Translation lang="en">Jedihad</Translation>
 		<Translation lang="fr" gender="M">Jedihad</Translation>
 	</Noun>
+	
+	<!-- Main menu -->
 	<Noun key="SinglePlayer">
-		<Translation lang="en">Single player</Translation>
+		<Translation lang="en">Single Player</Translation>
 		<Translation lang="fr">Monojoueur</Translation>
 	</Noun>
 	<Noun key="Multiplayer">
@@ -22,7 +24,7 @@
 		<Translation lang="fr">Multijoueur</Translation>
 	</Noun>
 	<Noun key="ViewReplay">
-		<Translation lang="en">View replay</Translation>
+		<Translation lang="en">View Replay</Translation>
 		<Translation lang="fr">Visionner une partie</Translation>
 	</Noun>
 	<Noun key="Credits">
@@ -32,6 +34,72 @@
 	<Noun key="Quit">
 		<Translation lang="en">Quit</Translation>
 		<Translation lang="fr">Quitter</Translation>
+	</Noun>
+	
+	<!-- Match configuration -->
+	<Noun key="MapWidth">
+		<Translation lang="en">Map Width</Translation>
+		<Translation lang="fr">Largeur de la carte</Translation>
+	</Noun>
+	<Noun key="MapHeight">
+		<Translation lang="en">Map Height</Translation>
+		<Translation lang="fr">Hauteur de la carte</Translation>
+	</Noun>
+	<Noun key="InitialAladdium">
+		<Translation lang="en">Initial Aladdium Amount</Translation>
+		<Translation lang="fr">Quantité initiale d'aladdium</Translation>
+	</Noun>
+	<Noun key="InitialAlagene">
+		<Translation lang="en">Initial Alagene Amount</Translation>
+		<Translation lang="fr">Quantité initiale d'alagène</Translation>
+	</Noun>
+	<Noun key="FoodLimit">
+		<Translation lang="en">Food Limit</Translation>
+		<Translation lang="fr">Limite de nourriture</Translation>
+	</Noun>
+	<Noun key="RandomSeed">
+		<Translation lang="en">Random Seed</Translation>
+		<Translation lang="fr">Germe de génération</Translation>
+	</Noun>
+	<Noun key="CheatCodes">
+		<Translation lang="en">Cheat Codes</Translation>
+		<Translation lang="fr">Codes de triche</Translation>
+	</Noun>
+	<Noun key="StartNomad">
+		<Translation lang="en">Start Nomad</Translation>
+		<Translation lang="fr">Début nomade</Translation>
+	</Noun>
+	<Noun key="RandomHeroes">
+		<Translation lang="en">Random Heroes</Translation>
+		<Translation lang="fr">Héros aléatoires</Translation>
+	</Noun>
+	<Noun key="RevealTopology">
+		<Translation lang="en">Reveal Topology</Translation>
+		<Translation lang="fr">Révéler la topologie</Translation>
+	</Noun>
+	<Noun key="Back">
+		<Translation lang="en">Back</Translation>
+		<Translation lang="fr">Retour</Translation>
+	</Noun>
+	<Noun key="Start">
+		<Translation lang="en">Start</Translation>
+		<Translation lang="fr">Commencer</Translation>
+	</Noun>
+	<Noun key="Ready">
+		<Translation lang="en">Ready</Translation>
+		<Translation lang="fr">Prêt</Translation>
+	</Noun>
+	<Noun key="Players">
+		<Translation lang="en">Players</Translation>
+		<Translation lang="fr">Joueurs</Translation>
+	</Noun>
+	<Noun key="Bot">
+		<Translation lang="en">Bot</Translation>
+		<Translation lang="fr">Bot</Translation>
+	</Noun>
+	<Noun key="Create">
+		<Translation lang="en">Create</Translation>
+		<Translation lang="fr">Créer</Translation>
 	</Noun>
 </NounDefinitions>
 

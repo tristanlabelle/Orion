@@ -92,7 +92,8 @@ namespace Orion.Engine.Localization
         /// <returns>The localized string for the noun.</returns>
         public string GetNoun(string key)
         {
-            Definition matchingDefinition = nouns[key];
+            Definition matchingDefinition;
+            if (!nouns.TryGetValue(key, out matchingDefinition)) return key;
 
             return matchingDefinition.GetTranslation(cultureInfo).TranslatedString;
         }

@@ -38,7 +38,7 @@ namespace Orion.Game.Main
         	this.graphics = new GameGraphics(assets);
             this.localizer = new Localizer();
             this.localizer.LoadDictionary(Path.Combine(assetsPath, "definitions.xml"));
-            this.localizer.CultureInfo = Localizer.FrenchCulture;
+            this.localizer.CultureInfo = Localizer.EnglishCulture;
         }
         #endregion
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="TurboTurbo">
+  <Target>Smurf</Target>
+  <Target>PapaSmurf</Target>
+  <Target>Pyramid</Target>
+  <Target>2012Temple</Target>
+  <Target>DemonicTemple</Target>
+  <Target>PropagandaCenter</Target>
+  <Target>TristansHous</Target>
+  <Effect Stat="Build.Speed" Change="150"/>
+  <Effect Stat="Train.Speed" Change="100"/>
+</Technology>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="Pandemic" AlageneCost="400">
+  <Target>SwineFlu</Target>
+  <Effect Stat="Basic.AlageneCost" Change="-30"/>
+</Technology>

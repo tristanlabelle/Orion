@@ -165,11 +165,6 @@
     <Compile Include="ReplayReader.cs" />
     <Compile Include="ReplayWriter.cs" />
     <Compile Include="SlaveCommander.cs" />
-    <Compile Include="TowerDefense\CreepPath.cs" />
-    <Compile Include="TowerDefense\CreepPhrase.cs" />
-    <Compile Include="TowerDefense\CreepTask.cs" />
-    <Compile Include="TowerDefense\CreepWaveCommander.cs" />
-    <Compile Include="TowerDefense\TypingCreepCommander.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="SwineFlu" Width="1" Height="1" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="7" MaxHealth="70" ArmorType="Light" Armor="1" AlageneCost="80" FoodCost="1"/>
+		<Move Speed="14"/>
+		<Attack Power="2" Range="7" Delay="1" EffectiveAgainst="Light" IneffectiveAgainst="Heavy" />
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="Anthrax" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

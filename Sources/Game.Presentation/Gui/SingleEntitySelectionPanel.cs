@@ -99,7 +99,7 @@ namespace Orion.Game.Presentation.Gui
             if (unit == entity) return;
             Clear();
 
-            nameLabel.Text = unit.Type.Name;
+            nameLabel.Text = localizer.GetNoun(unit.Type.Name);
             imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
 
             UpdateHealth(unit);

@@ -75,7 +75,7 @@ namespace Orion.Game.Main
             this.ui.SelectingIdleWorkers += OnSelectingIdleWorkers;
             this.ui.ViewportZoomed += OnViewportZoomed;
             this.ui.KeyEvent += OnViewportKeyEvent;
-            this.ui.Chatted += (sender, message) => userInputManager.LaunchChatMessage(message);
+            this.ui.Chatted += OnChatted;
             this.ui.DiplomaticStanceChanged += (sender, targetFaction, newStance) => userInputManager.LaunchChangeDiplomacy(targetFaction, newStance);
             this.ui.Paused += sender => match.Pause();
             this.ui.Resumed += sender => match.Resume();
@@ -389,6 +389,12 @@ namespace Orion.Game.Main
             else userInputManager.HandleKeyUp(args);
 
             return true;
+        }
+
+        private void OnChatted(Control sender, string message)
+        {
+            message = ProfanityFilter.Filter(message, Localizer.GetNoun("Smurf").ToLowerInvariant());
+            userInputManager.LaunchChatMessage(message);
         }
 
         public override void Dispose()

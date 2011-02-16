@@ -6,6 +6,6 @@
 		<Attack Power="50" Range="0" Delay="4" EffectiveAgainst="Light" IneffectiveAgainst="Surnatural"/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="Chuck Norris" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="ChuckNorris" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

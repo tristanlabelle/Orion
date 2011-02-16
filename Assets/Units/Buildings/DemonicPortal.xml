@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="DemonicPortal" Width="3" Height="3">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="300" ArmorType="Heavy" Armor="3" AladdiumCost="180" AlageneCost="70"/>
+		<Train Speed="10">
+			<Target>SwineFlu</Target>
+			<Target>UFO</Target>
+			<Target>FlyingCarpet</Target>
+		</Train>
+	</Skills>
+</UnitType>

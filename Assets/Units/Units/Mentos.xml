@@ -4,7 +4,7 @@
 		<Basic SightRange="3" MaxHealth="160" ArmorType="Surnatural" Armor="4" AladdiumCost="2000" FoodCost="5"/>
 		<Move Speed="3"/>
 		<SuicideBomb Radius="10" Damage="400">
-			<Target>Coke diète</Target>
+			<Target>DietCoke</Target>
 		</SuicideBomb>
 	</Skills>
 </UnitType>

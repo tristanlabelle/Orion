@@ -4,7 +4,6 @@ using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
-using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 

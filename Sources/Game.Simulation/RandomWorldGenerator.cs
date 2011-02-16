@@ -166,7 +166,7 @@ namespace Orion.Game.Simulation
             Faction faction, Vector2 campCenter, bool placePyramid)
         {
             Region buildingRegion;
-            UnitType pyramid = unitTypes.FromName("Pyramide");
+            UnitType pyramid = unitTypes.FromName("Pyramid");
             if (placePyramid)
             {
                 Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
@@ -178,7 +178,7 @@ namespace Orion.Game.Simulation
                 buildingRegion = new Region((Point)campCenter, pyramid.Size);
             }
 
-            UnitType unitType = unitTypes.FromName("Schtroumpf");
+            UnitType unitType = unitTypes.FromName("Smurf");
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY));
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX, buildingRegion.MinY + 1));
             faction.CreateUnit(unitType, new Point(buildingRegion.ExclusiveMaxX + 1, buildingRegion.MinY));

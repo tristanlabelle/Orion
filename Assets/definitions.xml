@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Definitions>
 <NounDefinitions>
-    <!-- Units -->
+    <!-- Resources -->
     <Noun key="Alagene">
         <Translation lang="en">Alagene</Translation>
         <Translation lang="fr" gender="M">Alagène</Translation>
@@ -14,17 +14,209 @@
         <Translation lang="en">Food</Translation>
         <Translation lang="fr" gender="F">Nourriture</Translation>
     </Noun>
+	
+    <!-- Units -->
+    <Noun key="DietCoke">
+        <Translation lang="en">Diet Coke</Translation>
+        <Translation lang="fr" gender="M">Coke diète</Translation>
+    </Noun>
+    <Noun key="FlyingSpaghettiMonster">
+        <Translation lang="en">Flying Spaghetti Monster</Translation>
+        <Translation lang="fr" gender="M">Monstre de spaghettis volant</Translation>
+    </Noun>
+    <Noun key="GabraelMartien">
+        <Translation lang="en">Gabrael Martien</Translation>
+        <Translation lang="fr" gender="M">Gabraël Martien</Translation>
+    </Noun>
+    <Noun key="SwineFlu">
+        <Translation lang="en">Swine Flu</Translation>
+        <Translation lang="fr" gender="F">Grippe A(H1N1)</Translation>
+    </Noun>
+    <Noun key="TvaHelicopter">
+        <Translation lang="en">TVA Helicopter</Translation>
+        <Translation lang="fr" gender="M">Hélicoptère TVA</Translation>
+    </Noun>
+    <Noun key="Jedihad">
+        <Translation lang="en">Jedihad</Translation>
+        <Translation lang="fr" gender="M">Jedihad</Translation>
+    </Noun>
+    <Noun key="Jesus">
+        <Translation lang="en">Jesus</Translation>
+        <Translation lang="fr" gender="M">Jésus</Translation>
+    </Noun>
+    <Noun key="Mentos">
+        <Translation lang="en">Mentos</Translation>
+        <Translation lang="fr" gender="M">Mentos</Translation>
+    </Noun>
+    <Noun key="Ninja">
+        <Translation lang="en">Ninja</Translation>
+        <Translation lang="fr" gender="M">Ninja</Translation>
+    </Noun>
+    <Noun key="Ufo">
+        <Translation lang="en">UFO</Translation>
+        <Translation lang="fr" gender="M">OVNI</Translation>
+    </Noun>
+    <Noun key="Pirate">
+        <Translation lang="en">Pirate</Translation>
+        <Translation lang="fr" gender="M">Pirate</Translation>
+    </Noun>
     <Noun key="Smurf">
         <Translation lang="en">Smurf</Translation>
         <Translation lang="fr" gender="M">Schtroumpf</Translation>
+    </Noun>
+    <Noun key="FlyingCarpet">
+        <Translation lang="en">Flying Carpet</Translation>
+        <Translation lang="fr" gender="M">Tapis Volant</Translation>
+    </Noun>
+    <Noun key="Viking">
+        <Translation lang="en">Viking</Translation>
+        <Translation lang="fr" gender="M">Viking</Translation>
+    </Noun>
+	
+    <!-- Héros -->
+    <Noun key="AllahSkywalker">
+        <Translation lang="en">Allah Skywalker</Translation>
+        <Translation lang="fr" gender="M">Allah Skywalker</Translation>
+    </Noun>
+    <Noun key="Anthrax">
+        <Translation lang="en">Anthrax</Translation>
+        <Translation lang="fr" gender="M">Anthrax</Translation>
+    </Noun>
+    <Noun key="Bluebeard">
+        <Translation lang="en">Bluebeard</Translation>
+        <Translation lang="fr" gender="M">Barbe blueue</Translation>
+    </Noun>
+    <Noun key="ChuckNorris">
+        <Translation lang="en">Chuck Norris</Translation>
+        <Translation lang="fr" gender="M">Chuck Norris</Translation>
+    </Noun>
+    <Noun key="PapaSmurf">
+        <Translation lang="en">Papa Smurf</Translation>
+        <Translation lang="fr" gender="M">Grand Schtroumpf</Translation>
+    </Noun>
+    <Noun key="RaptorJesus">
+        <Translation lang="en">Raptor Jesus</Translation>
+        <Translation lang="fr" gender="M">Jésus-raptor</Translation>
+    </Noun>
+    <Noun key="Leonardo">
+        <Translation lang="en">Leonardo</Translation>
+        <Translation lang="fr" gender="M">Léonardo</Translation>
+    </Noun>
+    <Noun key="MrT">
+        <Translation lang="en">Mr T</Translation>
+        <Translation lang="fr" gender="M">M. T</Translation>
+    </Noun>
+    <Noun key="Obelix">
+        <Translation lang="en">Obelix</Translation>
+        <Translation lang="fr" gender="M">Obélix</Translation>
+    </Noun>
+    <Noun key="BlueCollarSmurf">
+        <Translation lang="en">Blue Collar Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf Col Bleu</Translation>
     </Noun>
     <Noun key="Smurfette">
         <Translation lang="en">Smurfette</Translation>
         <Translation lang="fr" gender="F">Schtroumpfette</Translation>
     </Noun>
-    <Noun key="Jedihad">
-        <Translation lang="en">Jedihad</Translation>
-        <Translation lang="fr" gender="M">Jedihad</Translation>
+    <Noun key="YourMom">
+        <Translation lang="en">Your Mom</Translation>
+        <Translation lang="fr" gender="F">Ta mère</Translation>
+    </Noun>
+    <Noun key="AladdinsCarpet">
+        <Translation lang="en">Aladdin's Carpet</Translation>
+        <Translation lang="fr" gender="M">Tapis d'Aladdin</Translation>
+    </Noun>
+    <Noun key="Thor">
+        <Translation lang="en">Thor</Translation>
+        <Translation lang="fr" gender="M">Thor</Translation>
+    </Noun>
+    <Noun key="Mothership">
+        <Translation lang="en">Mothership</Translation>
+        <Translation lang="fr" gender="M">Vaisseau-mère</Translation>
+    </Noun>
+	
+	<!-- Buildings -->
+    <Noun key="BritishJeanMarc">
+        <Translation lang="en">British Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Jean-Marc Britannique</Translation>
+    </Noun>
+    <Noun key="CarrefourLaval">
+        <Translation lang="en">Carrefour Laval</Translation>
+        <Translation lang="fr" gender="M">Carrefour Laval</Translation>
+    </Noun>
+    <Noun key="PropagandaCenter">
+        <Translation lang="en">Propaganda Center</Translation>
+        <Translation lang="fr" gender="M">Centre de propagande</Translation>
+    </Noun>
+    <Noun key="HellsCostco">
+        <Translation lang="en">Hells' Costco</Translation>
+        <Translation lang="fr" gender="M">Costco des Hells</Translation>
+    </Noun>
+    <Noun key="AlageneExtractor">
+        <Translation lang="en">Alagene Extractor</Translation>
+        <Translation lang="fr" gender="M">Extracteur d'alagène</Translation>
+    </Noun>
+    <Noun key="JeanMarc">
+        <Translation lang="en">Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Jean-Marc</Translation>
+    </Noun>
+    <Noun key="TristansHouse">
+        <Translation lang="en">Tristan's House</Translation>
+        <Translation lang="fr" gender="F">Maison de Tristan</Translation>
+    </Noun>
+    <Noun key="SauronsEye">
+        <Translation lang="en">Sauron's Eye</Translation>
+        <Translation lang="fr" gender="M">Œil de Sauron</Translation>
+    </Noun>
+    <Noun key="DemonicPortal">
+        <Translation lang="en">Demonic Portal</Translation>
+        <Translation lang="fr" gender="M">Portail Démoniaque</Translation>
+    </Noun>
+    <Noun key="Pyramid">
+        <Translation lang="en">Pyramid</Translation>
+        <Translation lang="fr" gender="M">Pyramide</Translation>
+    </Noun>
+    <Noun key="Supply">
+        <Translation lang="en">Supply</Translation>
+        <Translation lang="fr" gender="M">Réserve</Translation>
+    </Noun>
+    <Noun key="2012Temple">
+        <Translation lang="en">2012 Temple</Translation>
+        <Translation lang="fr" gender="M">Temple de 2012</Translation>
+    </Noun>
+	
+	<!-- Technologies -->
+    <Noun key="HeftySmurf">
+        <Translation lang="en">Hefty Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf costaud</Translation>
+    </Noun>
+    <Noun key="HolyTrinity">
+        <Translation lang="en">Holy Trinity</Translation>
+        <Translation lang="fr" gender="F">Sainte Trinité</Translation>
+    </Noun>
+    <Noun key="ImportJeanMarc">
+        <Translation lang="en">Import Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Importer Jean-Marc</Translation>
+    </Noun>
+    <Noun key="IslamForce">
+        <Translation lang="en">Islam Force</Translation>
+        <Translation lang="fr" gender="M">Force islamique</Translation>
+    </Noun>
+    <Noun key="Pandemic">
+        <Translation lang="en">Pandemic</Translation>
+        <Translation lang="fr" gender="F">Pandémie</Translation>
+    </Noun>
+    <Noun key="SpaghettiAlfredo">
+        <Translation lang="en">Spaghetti Alfredo</Translation>
+        <Translation lang="fr" gender="M">Spaghetti Alfredo</Translation>
+    </Noun>
+    <Noun key="SwiftSmurf">
+        <Translation lang="en">Swift Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf véloce</Translation>
+    </Noun>
+    <Noun key="TurboTurbo">
+        <Translation lang="en">Turbo Turbo</Translation>
+        <Translation lang="fr" gender="M">Turbo Turbo</Translation>
     </Noun>
     
     <!-- Stats -->

@@ -554,8 +554,6 @@ namespace Orion.Game.Presentation
             text = text.Trim();
             if (text.Length == 0) return;
 
-            text = ProfanityFilter.Filter(text);
-
             if (text[0] == '#')
                 commander.SendAllyMessage(text.Substring(1));
             else

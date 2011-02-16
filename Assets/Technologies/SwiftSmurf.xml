@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="SwiftSmurf" AladdiumCost="150" AlageneCost="50">
+  <Target>Smurf</Target>
+  <Target>PapaSmurf</Target>
+  <Effect Stat="Move.Speed" Change="2"/>
+</Technology>

@@ -80,12 +80,13 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasSkill<BuildSkill>())
             {
+                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, unitType);
                 actions[0, 0] = new ActionDescriptor()
                 {
                     Name = localizer.GetNoun("Build"),
                     Texture = graphics.GetActionTexture("Build"),
                     HotKey = Key.B,
-                    Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
+                    Action = () => actionPanel.Push(buildActionProvider)
                 };
 
                 actions[1, 0] = new ActionDescriptor()
@@ -212,7 +213,7 @@ namespace Orion.Game.Presentation.Actions
                 UnitType traineeTypeForClosure = traineeType;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = traineeType.Name,
+                    Name = localizer.GetNoun(traineeType.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
                     Texture = graphics.GetUnitTexture(traineeType),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
@@ -234,7 +235,7 @@ namespace Orion.Game.Presentation.Actions
                 Technology technologyForClosure = technology;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = technology.Name,
+                    Name = localizer.GetNoun(technology.Name),
                     Cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost),
                     Texture = graphics.GetTechnologyTexture(technology),
                     Action = () => userInputManager.LaunchResearch(technologyForClosure)

@@ -6,7 +6,6 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System.Diagnostics;

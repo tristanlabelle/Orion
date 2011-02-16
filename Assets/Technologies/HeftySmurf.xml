@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="HeftySmurf" AladdiumCost="150" AlageneCost="100">
+  <Target>Smurf</Target>
+  <Target>PapaSmurf</Target>
+  <Effect Stat="Attack.Power" Change="1"/>
+  <Effect Stat="MaxHealth" Change="25"/>
+  <Effect Stat="Armor" Change="1"/>
+</Technology>

@@ -6,6 +6,6 @@
 		<Attack Power="5" Range="0" Delay="3" EffectiveAgainst="Heavy" IneffectiveAgainst=""/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="Barbe bleue" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="Bluebeard" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

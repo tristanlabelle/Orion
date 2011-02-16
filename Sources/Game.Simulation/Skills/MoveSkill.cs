@@ -11,7 +11,7 @@ namespace Orion.Game.Simulation.Skills
     public sealed class MoveSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat SpeedStat = new UnitStat(typeof(MoveSkill), "Speed", "Vitesse de déplacement");
+        public static readonly UnitStat SpeedStat = new UnitStat(typeof(MoveSkill), "Speed");
 
         private int speed = 1;
         #endregion

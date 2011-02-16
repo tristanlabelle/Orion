@@ -23,13 +23,13 @@ namespace Orion.Game.Simulation.Skills
         #endregion
 
         #region Fields
-        public static readonly UnitStat AlageneCostStat = new UnitStat(typeof(BasicSkill), "AlageneCost", "Coût en alagène");
-        public static readonly UnitStat AladdiumCostStat = new UnitStat(typeof(BasicSkill), "AladdiumCost", "Coût en aladdium");
-        public static readonly UnitStat FoodCostStat = new UnitStat(typeof(BasicSkill), "FoodCost", "Coût en nourriture");
-        public static readonly UnitStat MaxHealthStat = new UnitStat(typeof(BasicSkill), "MaxHealth", "Points de vie maximum");
-        public static readonly UnitStat ArmorTypeStat = new UnitStat(typeof(BasicSkill), "ArmorType", "Type d'armure");
-        public static readonly UnitStat ArmorStat = new UnitStat(typeof(BasicSkill), "Armor", "Armure");
-        public static readonly UnitStat SightRangeStat = new UnitStat(typeof(BasicSkill), "SightRange", "Portée de vision");
+        public static readonly UnitStat AlageneCostStat = new UnitStat(typeof(BasicSkill), "AlageneCost");
+        public static readonly UnitStat AladdiumCostStat = new UnitStat(typeof(BasicSkill), "AladdiumCost");
+        public static readonly UnitStat FoodCostStat = new UnitStat(typeof(BasicSkill), "FoodCost");
+        public static readonly UnitStat MaxHealthStat = new UnitStat(typeof(BasicSkill), "MaxHealth");
+        public static readonly UnitStat ArmorTypeStat = new UnitStat(typeof(BasicSkill), "ArmorType");
+        public static readonly UnitStat ArmorStat = new UnitStat(typeof(BasicSkill), "Armor");
+        public static readonly UnitStat SightRangeStat = new UnitStat(typeof(BasicSkill), "SightRange");
 
         private int alageneCost;
         private int aladdiumCost;

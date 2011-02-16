@@ -12,7 +12,7 @@ namespace Orion.Game.Simulation.Skills
     public sealed class TransportSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat CapacityStat = new UnitStat(typeof(TransportSkill), "Capacity", "Capacité");
+        public static readonly UnitStat CapacityStat = new UnitStat(typeof(TransportSkill), "Capacity");
         private int capacity = 1;
         #endregion
 

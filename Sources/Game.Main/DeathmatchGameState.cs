@@ -218,8 +218,10 @@ namespace Orion.Game.Main
 
             bool allSelectedUnitsAllied = Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl));
             if (SelectionManager.FocusedUnitType == null || !allSelectedUnitsAllied) return;
-            
-            actionPanel.Push(new UnitActionProvider(actionPanel, userInputManager, Graphics, SelectionManager.FocusedUnitType));
+
+            var actionProvider = new UnitActionProvider(actionPanel, userInputManager,
+                Graphics, Localizer, SelectionManager.FocusedUnitType);
+            actionPanel.Push(actionProvider);
         }
 
         private void OnSelectionChanged(Selection selection)

@@ -10,8 +10,8 @@ namespace Orion.Game.Simulation.Skills
     public sealed class HealSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat SpeedStat = new UnitStat(typeof(HealSkill), "Speed", "Vitesse de soin");
-        public static readonly UnitStat RangeStat = new UnitStat(typeof(HealSkill), "Range", "Portée de soin");
+        public static readonly UnitStat SpeedStat = new UnitStat(typeof(HealSkill), "Speed");
+        public static readonly UnitStat RangeStat = new UnitStat(typeof(HealSkill), "Range");
 
         private int speed = 1;
         private int range = 1;

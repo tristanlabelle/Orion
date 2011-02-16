@@ -213,6 +213,47 @@
         <Translation lang="fr">Tâches</Translation>
     </Noun>
     
+	<!-- Actions -->
+    <Noun key="Attack">
+        <Translation lang="en">Attack</Translation>
+        <Translation lang="fr">Attaquer</Translation>
+    </Noun>
+	<Noun key="Build">
+        <Translation lang="en">Build</Translation>
+        <Translation lang="fr">Construire</Translation>
+    </Noun>
+	<Noun key="Repair">
+        <Translation lang="en">Repair</Translation>
+        <Translation lang="fr">Réparer</Translation>
+    </Noun>
+	<Noun key="Disembark">
+        <Translation lang="en">Disembark</Translation>
+        <Translation lang="fr">Débarquer</Translation>
+    </Noun>
+	<Noun key="Harvest">
+        <Translation lang="en">Harvest</Translation>
+        <Translation lang="fr">Ramasser</Translation>
+    </Noun>
+	<Noun key="Heal">
+        <Translation lang="en">Heal</Translation>
+        <Translation lang="fr">Soigner</Translation>
+    </Noun>
+	<Noun key="Move">
+        <Translation lang="en">Move</Translation>
+        <Translation lang="fr">Déplacer</Translation>
+    </Noun>
+	<Noun key="Sell">
+        <Translation lang="en">Sell</Translation>
+        <Translation lang="fr">Vendre</Translation>
+    </Noun>
+	<Noun key="StandGuard">
+        <Translation lang="en">Stand Guard</Translation>
+        <Translation lang="fr">Guarder</Translation>
+    </Noun>
+	<Noun key="Upgrade">
+        <Translation lang="en">Upgrade</Translation>
+        <Translation lang="fr">Améliorer</Translation>
+    </Noun>
 </NounDefinitions>
 
     <SentenceDefinitions>

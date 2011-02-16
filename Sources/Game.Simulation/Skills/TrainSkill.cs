@@ -14,7 +14,7 @@ namespace Orion.Game.Simulation.Skills
     public sealed class TrainSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat SpeedStat = new UnitStat(typeof(TrainSkill), "Speed", "Vitesse d'entraînement");
+        public static readonly UnitStat SpeedStat = new UnitStat(typeof(TrainSkill), "Speed");
         private static readonly Func<string, bool> itemValidator = item => item != null;
 
         private ICollection<string> targets

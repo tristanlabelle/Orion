@@ -13,8 +13,8 @@ namespace Orion.Game.Simulation.Skills
     public sealed class SellableSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat AlageneValueStat = new UnitStat(typeof(SellableSkill), "AlageneValue", "Valeur en alagène");
-        public static readonly UnitStat AladdiumValueStat = new UnitStat(typeof(SellableSkill), "AladdiumValue", "Valeur en aladdium");
+        public static readonly UnitStat AlageneValueStat = new UnitStat(typeof(SellableSkill), "AlageneValue");
+        public static readonly UnitStat AladdiumValueStat = new UnitStat(typeof(SellableSkill), "AladdiumValue");
 
         private int alageneValue;
         private int aladdiumValue;

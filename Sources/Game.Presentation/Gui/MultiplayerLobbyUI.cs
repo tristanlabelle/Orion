@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Gui.Adornments;
 using Orion.Engine.Networking;
 using Orion.Game.Matchmaking.Networking;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -14,6 +15,7 @@ namespace Orion.Game.Presentation.Gui
     {
         #region Fields
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private TextField playerNameTextField;
         private ListBox matchListBox;
         private TextField ipEndPointTextField;
@@ -22,11 +24,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MultiplayerLobbyUI(GameGraphics graphics)
+        public MultiplayerLobbyUI(GameGraphics graphics, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             this.graphics = graphics;
+            this.localizer = localizer;
 
             Adornment = new TextureAdornment(graphics.GetGuiTexture("Granite")) { IsTiling = true };
             Padding = 5;
@@ -38,11 +42,11 @@ namespace Orion.Game.Presentation.Gui
 
             dock.Dock(CreatePlayerNameControls(), Direction.NegativeY);
 
-            Label matchesLabel = graphics.GuiStyle.CreateLabel("Parties:");
+            Label matchesLabel = graphics.GuiStyle.CreateLabel(localizer.GetNoun("Matches"));
             matchesLabel.MaxYMargin = 5;
             dock.Dock(matchesLabel, Direction.NegativeY);
 
-            Button backButton = graphics.GuiStyle.CreateTextButton("Retour");
+            Button backButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("Back"));
             backButton.HorizontalAlignment = Alignment.Negative;
             backButton.MinSize = new Size(150, 40);
             backButton.MinYMargin = 5;
@@ -116,7 +120,9 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(match, "match");
 
-            string text = "[{0}] {1} ({2} places libres)".FormatInvariant(match.Source.Tag, match.Name, match.OpenSlotCount);
+#warning TODO: Localize this properly:
+            string text = "[{0}] {1} ({2} places restantes)".FormatInvariant(
+                match.Source.Tag, match.Name, match.OpenSlotCount);
             Label label = graphics.GuiStyle.CreateLabel(text);
             label.Tag = match;
             matchListBox.Items.Add(label);
@@ -131,7 +137,7 @@ namespace Orion.Game.Presentation.Gui
                 MaxYMargin = 5
             };
 
-            Label label = graphics.GuiStyle.CreateLabel("Nom de joueur:");
+            Label label = graphics.GuiStyle.CreateLabel(localizer.GetNoun("PlayerName"));
             label.VerticalAlignment = Alignment.Center;
             stack.Stack(label);
 
@@ -151,7 +157,7 @@ namespace Orion.Game.Presentation.Gui
                 MinYMargin = 5
             };
 
-            Label label = graphics.GuiStyle.CreateLabel("Héberger une partie nommée:");
+            Label label = graphics.GuiStyle.CreateLabel(localizer.GetNoun("HostGameNamed"));
             label.VerticalAlignment = Alignment.Center;
             stack.Stack(label);
 
@@ -160,7 +166,7 @@ namespace Orion.Game.Presentation.Gui
             createdGameNameTextField.VerticalAlignment = Alignment.Center;
             stack.Stack(createdGameNameTextField);
 
-            Button createGameButton = graphics.GuiStyle.CreateTextButton("Créer");
+            Button createGameButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("Create"));
             createGameButton.Clicked += (sender, @event) => Hosted.Raise(this, createdGameNameTextField.Text);
             stack.Stack(createGameButton);
 
@@ -176,7 +182,7 @@ namespace Orion.Game.Presentation.Gui
                 MinYMargin = 5
             };
 
-            Label label = graphics.GuiStyle.CreateLabel("Jointer par IP:");
+            Label label = graphics.GuiStyle.CreateLabel(localizer.GetNoun("JoinByIP"));
             label.VerticalAlignment = Alignment.Center;
             stack.Stack(label);
 
@@ -186,12 +192,12 @@ namespace Orion.Game.Presentation.Gui
             ipEndPointTextField.TextChanged += OnIPEndPointTextChanged;
             stack.Stack(ipEndPointTextField);
 
-            joinIPButton = graphics.GuiStyle.CreateTextButton("Jointer");
+            joinIPButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("Join"));
             joinIPButton.HasEnabledFlag = false;
             joinIPButton.Clicked += (sender, @event) => JoinByIP();
             stack.Stack(joinIPButton);
 
-            pingIPButton = graphics.GuiStyle.CreateTextButton("Pinger");
+            pingIPButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("Ping"));
             pingIPButton.HasEnabledFlag = false;
             pingIPButton.Clicked += (sender, @event) => JoinByIP();
             stack.Stack(pingIPButton);

@@ -12,8 +12,9 @@ using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Renderers;
-using Key = OpenTK.Input.Key;
 using Orion.Game.Simulation;
+using Key = OpenTK.Input.Key;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -24,6 +25,7 @@ namespace Orion.Game.Presentation.Gui
     {
         #region Fields
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly Action<UIManager, TimeSpan> updatedEventHandler;
         private readonly InterpolatedCounter aladdiumAmountCounter = new InterpolatedCounter(0);
         private readonly InterpolatedCounter alageneAmountCounter = new InterpolatedCounter(0);
@@ -54,12 +56,14 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI(GameGraphics graphics, Faction localFaction)
+        public MatchUI(GameGraphics graphics, Faction localFaction, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localFaction, "localFaction");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             this.graphics = graphics;
+            this.localizer = localizer;
             this.updatedEventHandler = OnGuiUpdated;
 
             this.modalDialog = new ModalDialog()
@@ -413,11 +417,11 @@ namespace Orion.Game.Presentation.Gui
 
         private Button CreatePauseButton()
         {
-            Button button = Style.CreateTextButton("Pause");
+            Button button = Style.CreateTextButton(localizer.GetNoun("Pause"));
             button.AcquireKeyboardFocusWhenPressed = false;
             button.VerticalAlignment = Alignment.Center;
 
-            pausePanel = new PausePanel(Style);
+            pausePanel = new PausePanel(Style, localizer);
 
             button.Clicked += (sender, @event) => ShowPauseDialog();
 
@@ -439,12 +443,12 @@ namespace Orion.Game.Presentation.Gui
 
         private Button CreateDiplomacyButton(Faction localFaction)
         {
-            Button button = Style.CreateTextButton("Diplomatie");
+            Button button = Style.CreateTextButton(localizer.GetNoun("Diplomacy"));
             button.AcquireKeyboardFocusWhenPressed = false;
             button.VerticalAlignment = Alignment.Center;
             button.MaxXMargin = 10;
 
-            diplomacyPanel = new DiplomacyPanel(Style, localFaction);
+            diplomacyPanel = new DiplomacyPanel(Style, localFaction, localizer);
 
             button.Clicked += (sender, @event) => ShowDiplomacyDialog();
 

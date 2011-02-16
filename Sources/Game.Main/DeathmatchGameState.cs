@@ -66,7 +66,7 @@ namespace Orion.Game.Main
             this.userInputManager.Selection.Changed += OnSelectionChanged;
             this.userInputManager.SelectionManager.FocusedUnitTypeChanged += OnFocusedUnitTypeChanged;
 
-            this.ui = new MatchUI(Graphics, userInputManager.LocalFaction);
+            this.ui = new MatchUI(Graphics, userInputManager.LocalFaction, Localizer);
             this.ui.MinimapCameraMoved += OnMinimapCameraMoved;
             this.ui.MinimapRightClicked += OnMinimapRightClicked;
             this.ui.MinimapRendering += OnMinimapRendering;
@@ -81,7 +81,7 @@ namespace Orion.Game.Main
             this.ui.Resumed += sender => match.Resume();
             this.ui.Exited += OnUserExited;
 
-            this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(Graphics);
+            this.singleEntitySelectionPanel = new SingleEntitySelectionPanel(Graphics, Localizer);
             this.singleEntitySelectionPanel.TaskCancelled += (sender, task) => userInputManager.LaunchCancelTask(task);
 
             this.multipleUnitSelectionPanel = new MultipleUnitSelectionPanel(Graphics);

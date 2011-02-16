@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -14,9 +15,10 @@ namespace Orion.Game.Presentation.Gui
     public sealed class PausePanel : ContentControl
     {
         #region Constructors
-        public PausePanel(OrionGuiStyle style)
+        public PausePanel(OrionGuiStyle style, Localizer localizer)
         {
             Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             MinWidth = 200;
             Adornment = new ColorAdornment(Colors.Gray);
@@ -27,8 +29,8 @@ namespace Orion.Game.Presentation.Gui
                 ChildGap = 10,
             };
 
-            stack.Stack(CreateButton(style, "Reprendre", () => Resumed));
-            stack.Stack(CreateButton(style, "Quitter", () => Exited));
+            stack.Stack(CreateButton(style, localizer.GetNoun("Resume"), () => Resumed));
+            stack.Stack(CreateButton(style, localizer.GetNoun("Quit"), () => Exited));
 
             Content = stack;
         }

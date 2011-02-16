@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -19,9 +20,10 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public ReplayBrowser(GameGraphics graphics)
+        public ReplayBrowser(GameGraphics graphics, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             this.graphics = graphics;
 
@@ -33,16 +35,16 @@ namespace Orion.Game.Presentation.Gui
                 LastChildFill = true
             };
 
-            dock.Dock(graphics.GuiStyle.CreateLabel("Parties enregistrées:"), Direction.NegativeY);
+            dock.Dock(graphics.GuiStyle.CreateLabel(localizer.GetNoun("SavedReplays")), Direction.NegativeY);
 
             DockLayout buttonDock = new DockLayout();
             
-            Button backButton = graphics.GuiStyle.CreateTextButton("Retour");
+            Button backButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("Back"));
             backButton.MinSize = new Size(150, 40);
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             buttonDock.Dock(backButton, Direction.NegativeX);
 
-            Button viewButton = graphics.GuiStyle.CreateTextButton("Visionner");
+            Button viewButton = graphics.GuiStyle.CreateTextButton(localizer.GetNoun("View"));
             viewButton.MinSize = new Size(150, 40);
             viewButton.HasEnabledFlag = false;
             viewButton.Clicked += (sender, @event) => TryStartSelectedReplay();

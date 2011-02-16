@@ -28,7 +28,7 @@ namespace Orion.Game.Main
         public ReplayBrowserGameState(GameStateManager manager)
             : base(manager)
         {
-            this.ui = new ReplayBrowser(Graphics);
+            this.ui = new ReplayBrowser(Graphics, Localizer);
 
             this.ui.Exited += OnExited;
             this.ui.Started += OnStarted;

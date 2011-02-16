@@ -29,7 +29,7 @@ namespace Orion.Game.Main
             this.graphics = manager.Graphics;
             this.networking = new GameNetworking();
             this.lobby = new MultiplayerLobby(this.networking);
-            this.ui = new MultiplayerLobbyUI(graphics);
+            this.ui = new MultiplayerLobbyUI(graphics, Localizer);
             this.ui.PlayerName = Dns.GetHostName();
 
             this.lobby.Disable();

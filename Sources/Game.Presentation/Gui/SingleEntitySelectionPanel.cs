@@ -9,6 +9,7 @@ using Orion.Engine.Graphics;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Skills;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -26,6 +27,7 @@ namespace Orion.Game.Presentation.Gui
         };
 
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
         private readonly Action<Unit> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
@@ -41,11 +43,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public SingleEntitySelectionPanel(GameGraphics graphics)
+        public SingleEntitySelectionPanel(GameGraphics graphics, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             this.graphics = graphics;
+            this.localizer = localizer;
             this.damageChangedEventHandler = UpdateHealth;
             this.taskQueueChangedEventHandler = UpdateTodoList;
             this.remainingAmountChangedEventHandler = UpdateAmount;
@@ -116,7 +120,8 @@ namespace Orion.Game.Presentation.Gui
                 int value = unit.GetStat(stat);
                 if (value == 0) continue;
 
-                Label headerLabel = Style.CreateLabel(stat.Description + ":");
+                string statName = localizer.GetNoun(stat.Name + "Stat");
+                Label headerLabel = Style.CreateLabel(statName + ":");
                 Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
 
                 statsForm.Entries.Add(headerLabel, valueLabel);
@@ -135,7 +140,7 @@ namespace Orion.Game.Presentation.Gui
             if (resourceNode == entity) return;
             Clear();
 
-            nameLabel.Text = resourceNode.Type.ToStringInvariant();
+            nameLabel.Text = localizer.GetNoun(resourceNode.Type.ToStringInvariant());
             imageBox.Texture = graphics.GetResourceTexture(resourceNode);
             UpdateAmount(resourceNode);
 
@@ -266,7 +271,7 @@ namespace Orion.Game.Presentation.Gui
             topStack.MinHeight = 32;
             topStack.MaxYMargin = 6;
 
-            todoLabel = Style.CreateLabel("Todo:");
+            todoLabel = Style.CreateLabel(localizer.GetNoun("Tasks"));
             todoLabel.VerticalAlignment = Alignment.Center;
             todoLabel.MaxXMargin = 6;
             topStack.Stack(todoLabel);

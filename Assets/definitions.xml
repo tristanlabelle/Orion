@@ -1,19 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Definitions>
 <NounDefinitions>
-	<Noun key="Smurf">
-		<Translation lang="en">Smurf</Translation>
-		<Translation lang="fr" gender="M">Schtroumpf</Translation>
-	</Noun>
-	<Noun key="Smurfette">
-		<Translation lang="en">Smurfette</Translation>
-		<Translation lang="fr" gender="F">Schtroumpfette</Translation>
-	</Noun>
-	<Noun key="Jedihad">
-		<Translation lang="en">Jedihad</Translation>
-		<Translation lang="fr" gender="M">Jedihad</Translation>
-	</Noun>
-	
+    <!-- Units -->
+    <Noun key="Alagene">
+        <Translation lang="en">Alagene</Translation>
+        <Translation lang="fr" gender="M">Alagène</Translation>
+    </Noun>
+    <Noun key="Aladdium">
+        <Translation lang="en">Aladdium</Translation>
+        <Translation lang="fr" gender="M">Aladdium</Translation>
+    </Noun>
+    <Noun key="Food">
+        <Translation lang="en">Food</Translation>
+        <Translation lang="fr" gender="F">Nourriture</Translation>
+    </Noun>
+    <Noun key="Smurf">
+        <Translation lang="en">Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf</Translation>
+    </Noun>
+    <Noun key="Smurfette">
+        <Translation lang="en">Smurfette</Translation>
+        <Translation lang="fr" gender="F">Schtroumpfette</Translation>
+    </Noun>
+    <Noun key="Jedihad">
+        <Translation lang="en">Jedihad</Translation>
+        <Translation lang="fr" gender="M">Jedihad</Translation>
+    </Noun>
+    
+    <!-- Stats -->
+    <Noun key="PowerStat">
+        <Translation lang="en">Power</Translation>
+        <Translation lang="fr">Force</Translation>
+    </Noun>
+    <Noun key="ArmorStat">
+        <Translation lang="en">Armor</Translation>
+        <Translation lang="fr">Armure</Translation>
+    </Noun>
+    <Noun key="SpeedStat">
+        <Translation lang="en">Speed</Translation>
+        <Translation lang="fr">Vitesse</Translation>
+    </Noun>
+    <Noun key="RangeStat">
+        <Translation lang="en">Attack Range</Translation>
+        <Translation lang="fr">Portée d'attaque</Translation>
+    </Noun>
+    <Noun key="ArmorTypeStat">
+        <Translation lang="en">Armor Type</Translation>
+        <Translation lang="fr">Type d'armure</Translation>
+    </Noun>
+    <Noun key="SightRangeStat">
+        <Translation lang="en">Sight Range</Translation>
+        <Translation lang="fr">Portée de vision</Translation>
+    </Noun>
+    
 	<!-- Main menu -->
 	<Noun key="SinglePlayer">
 		<Translation lang="en">Single Player</Translation>
@@ -101,9 +140,78 @@
 		<Translation lang="en">Create</Translation>
 		<Translation lang="fr">Créer</Translation>
 	</Noun>
+
+    <!-- Match UI-->
+    <Noun key="Pause">
+        <Translation lang="en">Pause</Translation>
+        <Translation lang="fr">Pause</Translation>
+    </Noun>
+    <Noun key="Diplomacy">
+        <Translation lang="en">Diplomacy</Translation>
+        <Translation lang="fr" gender="M">Diplomacie</Translation>
+    </Noun>
+
+    <!-- DiplomacyPanel-->
+    <Noun key="OtherFactions">
+        <Translation lang="en">Other Factions</Translation>
+        <Translation lang="fr">Autres factions</Translation>
+    </Noun>
+        <Noun key="OK">
+        <Translation lang="en">OK</Translation>
+        <Translation lang="fr">OK</Translation>
+    </Noun>
+    
+    <!-- PausePanel -->
+    <Noun key="Resume">
+        <Translation lang="en">Resume</Translation>
+        <Translation lang="fr">Reprendre</Translation>
+    </Noun>
+    
+    <!-- MultiplayerLobbyUI -->
+    <Noun key="Matches">
+        <Translation lang="en">Matches</Translation>
+        <Translation lang="fr">Parties</Translation>
+    </Noun>
+    <Noun key="PlayerName">
+        <Translation lang="en">Player Name</Translation>
+        <Translation lang="fr">Nom du joueur</Translation>
+    </Noun>
+    <Noun key="HostGameNamed">
+        <Translation lang="en">Host a game named</Translation>
+        <Translation lang="fr">Héberger une partie nommé</Translation>
+    </Noun>
+    <Noun key="JoinByIP">
+        <Translation lang="en">Join by IP</Translation>
+        <Translation lang="fr">Rejoindre par IP</Translation>
+    </Noun>
+    <Noun key="Join">
+        <Translation lang="en">Join</Translation>
+        <Translation lang="fr">Rejoindre</Translation>
+    </Noun>
+    <Noun key="Ping">
+        <Translation lang="en">Ping</Translation>
+        <Translation lang="fr">Pinger</Translation>
+    </Noun>
+    
+    <!-- ReplayBrowser -->
+    <Noun key="SavedReplays">
+        <Translation lang="en">Saved Replays</Translation>
+        <Translation lang="fr">Parties enregistrées</Translation>
+    </Noun>
+    <Noun key="View">
+        <Translation lang="en">View</Translation>
+        <Translation lang="fr">Visionner</Translation>
+    </Noun>
+    
+    <!-- SingleEntitySelectionPanel -->
+    <Noun key="Tasks">
+        <Translation lang="en">Tasks</Translation>
+        <Translation lang="fr">Tâches</Translation>
+    </Noun>
+    
 </NounDefinitions>
 
-<SentenceDefinitions>
+    <SentenceDefinitions>
 	<Sentence key="UnitCreation">
 		<Translation lang="en">A %n0 spawned.</Translation>
 		<Translation lang="fr">Un{n0~F?e:} %n0 a ete cree;{n0~F?e:}.</Translation>
@@ -116,5 +224,9 @@
 		<Translation lang="en">%n0 received %n1 point{n1>1?s:}.</Translation>
 		<Translation lang="fr">%n0 a reeu %n1 point{n1>1?s:}.</Translation>
 	</Sentence>
+    <Sentence key="FreeSlots">
+        <Translation lang="en">%n0 free slot{n0>1?s}</Translation>
+        <Translation lang="fr">%n0 place{n0>1?s} libre{n0>1?s:}</Translation>
+    </Sentence>
 </SentenceDefinitions>
 </Definitions>

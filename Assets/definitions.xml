@@ -156,9 +156,13 @@
         <Translation lang="en">Other Factions</Translation>
         <Translation lang="fr">Autres factions</Translation>
     </Noun>
-        <Noun key="OK">
+    <Noun key="OK">
         <Translation lang="en">OK</Translation>
         <Translation lang="fr">OK</Translation>
+    </Noun>
+    <Noun key="Allied">
+        <Translation lang="en">Allied</Translation>
+        <Translation lang="fr">Allié</Translation>
     </Noun>
     
     <!-- PausePanel -->

@@ -447,8 +447,8 @@
         <Translation lang="fr">Améliorer</Translation>
     </Noun>
 </NounDefinitions>
-
-    <SentenceDefinitions>
+<SentenceDefinitions>
+	<!-- Testing -->
 	<Sentence key="UnitCreation">
 		<Translation lang="en">A %n0 spawned.</Translation>
 		<Translation lang="fr">Un{n0~F?e:} %n0 a ete cree;{n0~F?e:}.</Translation>
@@ -464,6 +464,36 @@
     <Sentence key="FreeSlots">
         <Translation lang="en">%n0 free slot{n0>1?s}</Translation>
         <Translation lang="fr">%n0 place{n0>1?s} libre{n0>1?s:}</Translation>
+    </Sentence>
+	
+	<!-- Simulation events -->
+    <Sentence key="NoSpaceToBuild">
+        <Translation lang="en">Not enough space to build a %0.</Translation>
+        <Translation lang="fr">Pas assez de place pour construire un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoResourcesToBuild">
+        <Translation lang="en">Not enough resources to build a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de ressources pour construire un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoFoodToTrain">
+        <Translation lang="en">Not enough food to train a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de nourriture pour entraîner un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoPlaceToSpawn">
+        <Translation lang="en">No place to spawn a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas de place faire apparaître un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoResourcesToRepair">
+        <Translation lang="en">Not enough resources to repair a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de ressources pour réparer un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoPlaceToEmbark">
+        <Translation lang="en">Not enough place to embark a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de place pour embarquer un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="ResourceMineDepleted">
+        <Translation lang="en">%0 mine depleted.</Translation>
+        <Translation lang="fr">Mine de %0 vidé{0F?e}.</Translation>
     </Sentence>
 </SentenceDefinitions>
 </Definitions>

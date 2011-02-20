@@ -11,6 +11,7 @@ using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Technologies;
+using HealthComponent = Orion.Game.Simulation.Components.Health;
 
 namespace Orion.Game.Simulation
 {
@@ -121,7 +122,7 @@ namespace Orion.Game.Simulation
             {
                 TrainSkill trainSkill = InternalTryGetSkill<TrainSkill>();
                 Trainer trainer = new Trainer(this);
-                trainer.SpeedMultiplier = trainSkill.Speed;
+                trainer.Speed = trainSkill.Speed;
                 foreach (string target in trainSkill.Targets)
                     trainer.TrainableTypes.Add(target);
                 Components.Add(trainer);
@@ -282,7 +283,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(Center, GetStat(BasicSkill.SightRangeStat)); }
+            get { return new Circle(Center, GetStatValue(BasicSkill.SightRangeStat)); }
         }
 
         public bool KeepsFactionAlive
@@ -323,7 +324,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public int MaxHealth
         {
-            get { return GetStat(BasicSkill.MaxHealthStat); }
+            get { return GetStatValue(BasicSkill.MaxHealthStat); }
         }
 
         /// <summary>
@@ -482,15 +483,40 @@ namespace Orion.Game.Simulation
 
             return skill.GetStat(stat);
         }
+
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
         /// </summary>
         /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
         /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
-        [Obsolete("Skills are being obsoleted, use components instead.")]
-        public int GetStat(UnitStat stat)
+        [Obsolete("Skills are being obsoleted, use components instead or GetStatValue to ease migration.")]
+        public int GetStatValue(UnitStat stat)
         {
             return Faction.GetStat(Type, stat);
+        }
+
+        /// <summary>
+        /// Obtains the value of a given <see cref="Stat"/>,
+        /// asserting that the corresponding <see cref="UnitStat"/> has the same value.
+        /// </summary>
+        /// <param name="componentStat">The <see cref="Stat"/> being retrieved.</param>
+        /// <param name="skillStat">The corresponding <see cref="UnitStat"/>.</param>
+        /// <returns>The value of the <see cref="Stat"/>.</returns>
+        public StatValue GetStatValue(Stat componentStat, UnitStat skillStat)
+        {
+            Argument.EnsureNotNull(componentStat, "componentStat");
+            Argument.EnsureNotNull(skillStat, "skillStat");
+
+            StatValue componentValue = GetStatValue(componentStat);
+            int skillValue = Faction.GetStat(Type, skillStat);
+            if (componentValue.RealValue != skillValue)
+            {
+                string message = "Component stat {0} did not have the same value as skill stat {1}."
+                    .FormatInvariant(componentStat.FullName, skillStat.FullName);
+                Debug.Fail(message);
+            }
+
+            return componentValue;
         }
 
         /// <summary>
@@ -511,7 +537,7 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(other, "other");
             Debug.Assert(HasComponent<Attacker, AttackSkill>());
 
-            int range = GetStat(AttackSkill.RangeStat);
+            float range = (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat);
             if (range == 0)
             {
                 Debug.Assert(Components.Has<Spatial>(), "Unit has no spatial component!");
@@ -530,7 +556,7 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(other, "other");
             Debug.Assert(HasComponent<Healer, HealSkill>());
 
-            int range = GetStat(HealSkill.RangeStat);
+            float range = (float)GetStatValue(Healer.RangeStat, HealSkill.RangeStat);
             return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
         }
 
@@ -589,7 +615,7 @@ namespace Orion.Game.Simulation
         public bool TryHit(Unit target)
         {
             Argument.EnsureNotNull(target, "target");
-            float hitDelayInSeconds = GetStat(AttackSkill.DelayStat);
+            float hitDelayInSeconds = (float)GetStatValue(Attacker.DelayStat, AttackSkill.DelayStat);
             if (Components.Get<Attacker>().TimeElapsedSinceLastHit < hitDelayInSeconds)
                 return false;
             Hit(target);
@@ -600,14 +626,11 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(target, "target");
 
-            bool isMelee = GetStat(AttackSkill.RangeStat) == 0;
-            UnitStat armorStat = BasicSkill.ArmorStat;
-            UnitStat armorTypeStat = BasicSkill.ArmorTypeStat;
+            bool isMelee = (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
+            int targetArmor = (int)target.GetStatValue(HealthComponent.ArmorStat, BasicSkill.ArmorStat);
+            ArmorType targetArmorType = (ArmorType)target.GetStatValue(BasicSkill.ArmorTypeStat);
 
-            int targetArmor = target.GetStat(armorStat);
-            ArmorType targetArmorType = (ArmorType)target.GetStat(BasicSkill.ArmorTypeStat);
-
-            int damage = Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor);
+            int damage = Math.Max(1, (int)GetStatValue(Attacker.PowerStat, AttackSkill.PowerStat) - targetArmor);
             
             if(IsSuperEffectiveAgainst(targetArmorType))
                 damage *= 2;
@@ -617,7 +640,7 @@ namespace Orion.Game.Simulation
             target.Health -= damage;
             OnHitting(target, damage);
 
-            int splashRadius = GetStat(AttackSkill.SplashRadiusStat);
+            float splashRadius = (float)GetStatValue(Attacker.SplashRadiusStat, AttackSkill.SplashRadiusStat);
             if (splashRadius != 0)
             {
                 Circle splashCircle = new Circle(target.Center, splashRadius);
@@ -633,8 +656,8 @@ namespace Orion.Game.Simulation
                     float distance = (splashCircle.Center - potentiallySplashedUnit.Center).LengthFast;
                     if (distance > splashRadius) continue;
 
-                    int splashedTargetArmor = potentiallySplashedUnit.GetStat(armorStat);
-                    int splashDamage = (int)(Math.Max(1, GetStat(AttackSkill.PowerStat) - targetArmor) * (1 - distance / splashRadius));
+                    int splashedTargetArmor = (int)potentiallySplashedUnit.GetStatValue(HealthComponent.ArmorStat, BasicSkill.ArmorStat);
+                    int splashDamage = (int)(Math.Max(1, (int)GetStatValue(Attacker.PowerStat, AttackSkill.PowerStat) - targetArmor) * (1 - distance / splashRadius));
                     potentiallySplashedUnit.Health -= splashDamage;
                 }
             }
@@ -645,19 +668,13 @@ namespace Orion.Game.Simulation
         public bool IsSuperEffectiveAgainst(ArmorType type)
         {
             AttackSkill skill = Type.TryGetSkill<AttackSkill>();
-            if (skill == null)
-                return false;
-            else
-                return skill.IsSuperEffectiveAgainst(type);
+            return skill != null && skill.IsSuperEffectiveAgainst(type);
         }
 
         public bool IsIneffectiveAgainst(ArmorType type)
         {
             AttackSkill skill = Type.TryGetSkill<AttackSkill>();
-            if (skill != null)
-                return false;
-            else
-                return skill.IsIneffectiveAgainst(type);
+            return skill != null && skill.IsIneffectiveAgainst(type);
         }
 
         private void OnHitting(Unit target, float damage)
@@ -708,7 +725,7 @@ namespace Orion.Game.Simulation
         #region Exploding
         private void Explode()
         {
-            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
+            float explosionRadius = GetStatValue(SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle(Center, explosionRadius);
 
             World.OnExplosionOccured(explosionCircle);
@@ -720,7 +737,7 @@ namespace Orion.Game.Simulation
                 .Where(unit => unit != this && unit.IsAliveInWorld)
                 .ToArray();
 
-            float explosionDamage = GetStat(SuicideBombSkill.DamageStat);
+            float explosionDamage = GetStatValue(SuicideBombSkill.DamageStat);
             foreach (Unit damagedUnit in damagedUnits)
             {
                 if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
@@ -794,7 +811,7 @@ namespace Orion.Game.Simulation
 
             if (explodingTarget == null) return false;
 
-            float explosionRadius = GetStat(SuicideBombSkill.RadiusStat);
+            float explosionRadius = GetStatValue(SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, explosionRadius);
 
             explodingTarget.Suicide();
@@ -812,7 +829,7 @@ namespace Orion.Game.Simulation
                     && IsInLineOfSight(unit));
 
             bool isGroundUnit = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
-            if (!isGroundUnit && GetStat(AttackSkill.RangeStat) == 0)
+            if (!isGroundUnit && (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0)
                 attackableUnits = attackableUnits.Where(u => u.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground);
 
             // HACK: Attack units which can attack first, then other units.

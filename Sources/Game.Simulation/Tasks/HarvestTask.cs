@@ -96,10 +96,10 @@ namespace Orion.Game.Simulation.Tasks
 
             Unit.LookAt(node.Center);
 
-            float extractingSpeed = Unit.GetStat(HarvestSkill.SpeedStat);
+            float extractingSpeed = (float)Unit.GetStatValue(Harvester.SpeedStat, HarvestSkill.SpeedStat);
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
-            int maxCarryingAmount = Unit.GetStat(HarvestSkill.MaxCarryingAmountStat);
+            int maxCarryingAmount = (int)Unit.GetStatValue(Harvester.MaxCarryingAmountStat, HarvestSkill.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
                 Harvestable harvest = node.Components.Get<Harvestable>();

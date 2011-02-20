@@ -12,6 +12,7 @@ using Orion.Game.Matchmaking.Commands;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Utilities;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Audio
 {
@@ -210,7 +211,7 @@ namespace Orion.Game.Presentation.Audio
             bool isVisible = LocalFaction.CanSee(args.Hitter) || LocalFaction.CanSee(args.Target);
             if (!isVisible) return;
 
-            bool isMelee = args.Hitter.GetStat(AttackSkill.RangeStat) == 0;
+            bool isMelee = (int)args.Hitter.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
             audio.PlaySfx(soundName, args.Hitter.Center);

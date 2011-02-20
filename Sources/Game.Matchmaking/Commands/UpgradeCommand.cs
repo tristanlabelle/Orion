@@ -78,7 +78,7 @@ namespace Orion.Game.Matchmaking.Commands
                         .FormatInvariant(unit.Type.Name, upgrade.Target));
                 }
 
-                int unitFoodCost = unit.GetStat(BasicSkill.FoodCostStat);
+                int unitFoodCost = unit.GetStatValue(BasicSkill.FoodCostStat);
 
                 if (upgrade.AladdiumCost > faction.AladdiumAmount || upgrade.AlageneCost > faction.AlageneAmount)
                 {

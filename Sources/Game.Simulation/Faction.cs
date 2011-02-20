@@ -394,7 +394,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit.Faction == this);
             Debug.Assert(!unit.IsBuilding);
 
-            int sightRange = unit.GetStat(BasicSkill.SightRangeStat);
+            int sightRange = unit.GetStatValue(BasicSkill.SightRangeStat);
             Vector2 extent = unit.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
@@ -453,7 +453,7 @@ namespace Orion.Game.Simulation
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
             if (unit.HasSkill<ProvideFoodSkill>())
-                TotalFoodAmount += unit.GetStat(ProvideFoodSkill.AmountStat);
+                TotalFoodAmount += unit.GetStatValue(ProvideFoodSkill.AmountStat);
         }
         #endregion
 
@@ -469,7 +469,7 @@ namespace Orion.Game.Simulation
             else
             {
                 if (unit.Type.HasSkill<ProvideFoodSkill>())
-                    TotalFoodAmount -= unit.GetStat(ProvideFoodSkill.AmountStat);
+                    TotalFoodAmount -= unit.GetStatValue(ProvideFoodSkill.AmountStat);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }

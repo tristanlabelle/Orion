@@ -96,9 +96,8 @@ namespace Orion.Game.Presentation.Renderers
 
         private void OnUnitHitting(World sender, HitEventArgs args)
         {     
-            bool isRanged = args.Hitter.GetStat(AttackSkill.RangeStat) > 0;
-            if (!isRanged)
-                return;
+            bool isRanged = (int)args.Hitter.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) > 0;
+            if (!isRanged) return;
 
             hitEvents.Add(args);
         }
@@ -235,7 +234,8 @@ namespace Orion.Game.Presentation.Renderers
             float angle = unit.Components.Get<Spatial>().Angle;
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
-            bool isMelee = unit.HasComponent<Attacker, AttackSkill>() && unit.GetStat(AttackSkill.RangeStat) == 0;
+            bool isMelee = unit.HasComponent<Attacker, AttackSkill>()
+                && (int)unit.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
                 return baseAngle;
 

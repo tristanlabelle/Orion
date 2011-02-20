@@ -109,7 +109,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 if (!unit.Type.HasSkill(stat.SkillType)) continue;
 
-                int value = unit.GetStat(stat);
+                int value = unit.GetStatValue(stat);
                 if (value == 0) continue;
 
                 Label headerLabel = Style.CreateLabel(stat.Description + ":");

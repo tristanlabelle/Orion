@@ -98,7 +98,7 @@ namespace Orion.Game.Simulation.Tasks
             bool needsNewPath = (path == null || targetPathPointIndex == path.PointCount);
             if (needsNewPath && !Repath()) return;
 
-            float distance = Unit.GetStat(MoveSkill.SpeedStat) * step.TimeDeltaInSeconds;
+            float distance = (float)Unit.GetStatValue(Move.SpeedStat, MoveSkill.SpeedStat) * step.TimeDeltaInSeconds;
 
             Vector2 targetPathPoint = path.Points[targetPathPointIndex];
             Unit.LookAt(targetPathPoint + (Vector2)Unit.Size * 0.5f);

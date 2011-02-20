@@ -91,7 +91,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (target.IsUnderConstruction)
             {
-                target.Build(Unit.GetStat(BuildSkill.SpeedStat) * step.TimeDeltaInSeconds);
+                target.Build((float)Unit.GetStatValue(Builder.SpeedStat, BuildSkill.SpeedStat) * step.TimeDeltaInSeconds);
             }
 
             if (!target.IsUnderConstruction)
@@ -118,10 +118,11 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (!TryGetCredit()) return;
 
-            int aladdiumCost = Target.GetStat(BasicSkill.AladdiumCostStat);
-            int alageneCost = Target.GetStat(BasicSkill.AlageneCostStat);
+            int aladdiumCost = Target.GetStatValue(BasicSkill.AladdiumCostStat);
+            int alageneCost = Target.GetStatValue(BasicSkill.AlageneCostStat);
 
-            float healthToRepair = Unit.GetStat(BuildSkill.SpeedStat) * repairSpeedRatio * step.TimeDeltaInSeconds;
+            float healthToRepair = (float)Unit.GetStatValue(Builder.SpeedStat, BuildSkill.SpeedStat)
+                * repairSpeedRatio * step.TimeDeltaInSeconds;
             if (healthToRepair > target.Damage) healthToRepair = target.Damage;
 
             float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;
@@ -148,8 +149,8 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool TryGetCredit()
         {
-            int aladdiumCost = Target.GetStat(BasicSkill.AladdiumCostStat);
-            int alageneCost = Target.GetStat(BasicSkill.AlageneCostStat);
+            int aladdiumCost = Target.GetStatValue(BasicSkill.AladdiumCostStat);
+            int alageneCost = Target.GetStatValue(BasicSkill.AlageneCostStat);
 
             bool needsAladdiumCredit = aladdiumCost > 0 && aladdiumCreditRemaining <= 0;
             bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;

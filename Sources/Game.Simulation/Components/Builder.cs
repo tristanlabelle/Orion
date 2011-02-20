@@ -12,7 +12,7 @@ namespace Orion.Game.Simulation.Components
     public sealed class Builder : Component
     {
         #region Fields
-        public static readonly Stat BuildSpeedStat = new Stat(typeof(Builder), StatType.Real, "Speed");
+        public static readonly Stat SpeedStat = new Stat(typeof(Builder), StatType.Real, "Speed");
 
         private readonly HashSet<string> buildableTypes = new HashSet<string>();
         private float speed;

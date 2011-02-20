@@ -55,8 +55,8 @@ namespace Orion.Game.Matchmaking.Commands
 
                 if (unit.HasComponent<Sellable, SellableSkill>())
                 {
-                    int aladdiumValue = unit.GetStat(SellableSkill.AladdiumValueStat);
-                    int alageneValue = unit.GetStat(SellableSkill.AlageneValueStat);
+                    int aladdiumValue = (int)unit.GetStatValue(Sellable.AladdiumValueStat, SellableSkill.AladdiumValueStat);
+                    int alageneValue = (int)unit.GetStatValue(Sellable.AlageneValueStat, SellableSkill.AlageneValueStat);
                     unit.Faction.AladdiumAmount += aladdiumValue;
                     unit.Faction.AlageneAmount += alageneValue;
                 }

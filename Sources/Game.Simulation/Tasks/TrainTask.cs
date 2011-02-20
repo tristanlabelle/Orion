@@ -85,7 +85,7 @@ namespace Orion.Game.Simulation.Tasks
             int maxHealth = faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
-                float trainingSpeed = Unit.GetStat(TrainSkill.SpeedStat);
+                float trainingSpeed = (float)Unit.GetStatValue(Trainer.SpeedStat, TrainSkill.SpeedStat);
                 healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
                 return;
             }

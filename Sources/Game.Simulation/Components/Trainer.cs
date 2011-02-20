@@ -14,9 +14,9 @@ namespace Orion.Game.Simulation.Components
     public sealed class Trainer : Component
     {
         #region Fields
-        public static readonly Stat SpeedMultiplierStat = new Stat(typeof(Trainer), StatType.Real, "SpeedMultiplier");
+        public static readonly Stat SpeedStat = new Stat(typeof(Trainer), StatType.Real, "Speed");
 
-        private float speedMultiplier = 1;
+        private float speed = 1;
         private Vector2 rallyPoint;
         private readonly HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
@@ -27,13 +27,13 @@ namespace Orion.Game.Simulation.Components
 
         #region Properties
         [Mandatory]
-        public float SpeedMultiplier
+        public float Speed
         {
-            get { return speedMultiplier; }
+            get { return speed; }
             set
             {
-                Argument.EnsureNotNaN(value, "SpeedMultiplier");
-                speedMultiplier = value;
+                Argument.EnsureNotNaN(value, "Speed");
+                speed = value;
             }
         }
 

@@ -466,7 +466,7 @@ namespace Orion.Game.Presentation
             if (target.Type.IsBuilding) return;
 
             IEnumerable<Unit> healers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasSkill<HealSkill>());
+                .Where(unit => unit.Faction == LocalFaction && unit.HasComponent<Healer, HealSkill>());
             if (healers.Any(unit => unit.Faction != target.Faction)) return;
             OverrideIfNecessary();
             commander.LaunchHeal(healers, target);

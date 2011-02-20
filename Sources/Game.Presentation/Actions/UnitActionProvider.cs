@@ -112,7 +112,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<HealSkill>())
+            if (unitType.HasComponent<Healer, HealSkill>())
             {
                 actions[3, 2] = new ActionDescriptor()
                 {

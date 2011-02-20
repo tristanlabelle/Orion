@@ -8,25 +8,21 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Transport : Component
+    /// <summary>
+    /// Enables an <see cref="Entity"/> to transport other <see cref="Entities"/>.
+    /// </summary>
+    public sealed class Transporter : Component
     {
         #region Fields
-        public static readonly Stat CapacityStat = new Stat(typeof(Transport), StatType.Integer, "Capacity");
-        public static readonly Stat EmbarkSpeedStat = new Stat(typeof(Transport), StatType.Real, "EmbarkSpeed");
-        public static readonly Stat DisembarkSpeedStat = new Stat(typeof(Transport), StatType.Real, "DisembarkSpeed");
+        public static readonly Stat CapacityStat = new Stat(typeof(Transporter), StatType.Integer, "Capacity");
 
-        private int capacity;
-        private float loadSpeed;
-        private float unloadSpeed;
-
-        private float lastLoadTime;
-        private float lastUnloadTime;
-        private List<Entity> loadedUnits = new List<Entity>();
-        private List<Spatial> positionComponents = new List<Spatial>();
+        private int capacity = 1;
+        private readonly List<Entity> passengers = new List<Entity>();
+        private readonly List<Spatial> positionComponents = new List<Spatial>();
         #endregion
 
         #region Constructors
-        public Transport(Entity entity) : base(entity) { }
+        public Transporter(Entity entity) : base(entity) { }
         #endregion
 
         #region Properties
@@ -34,33 +30,11 @@ namespace Orion.Game.Simulation.Components
         public int Capacity
         {
             get { return capacity; }
-            set { capacity = value; }
-        }
-
-        [Mandatory]
-        public float LoadSpeed
-        {
-            get { return loadSpeed; }
-            set { loadSpeed = value; }
-        }
-
-        [Mandatory]
-        public float UnloadSpeed
-        {
-            get { return unloadSpeed; }
-            set { unloadSpeed = value; }
-        }
-
-        public float LastLoadTime
-        {
-            get { return lastLoadTime; }
-            set { lastLoadTime = value; }
-        }
-
-        public float LastUnloadTime
-        {
-            get { return lastUnloadTime; }
-            set { lastUnloadTime = value; }
+            set
+            {
+                Argument.EnsureStrictlyPositive(value, "Capacity");
+                capacity = value;
+            }
         }
 
         [Transient]
@@ -68,7 +42,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                return loadedUnits
+                return passengers
                     .Select(e => e.Components.Get<FactionMembership>())
                     .Sum(c => c.FoodRequirement);
             }
@@ -81,20 +55,21 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Transient]
-        public IEnumerable<Entity> LoadedEntities
+        public IEnumerable<Entity> Passengers
         {
-            get { return loadedUnits; }
+            get { return passengers; }
         }
         #endregion
 
         #region Methods
         public bool CanEmbark(Entity entity)
         {
-            Move mobility = entity.Components.TryGet<Move>();
-            if (mobility == null) return false;
+            Argument.EnsureNotNull(entity, "entity");
 
-            Spatial embarkeePosition = entity.Components.TryGet<Spatial>();
-            if (embarkeePosition == null) return false;
+            if (!entity.Components.Has<Move>() || entity.Components.Has<Transporter>()) return false;
+
+            Spatial embarkeeSpatial = entity.Components.TryGet<Spatial>();
+            if (embarkeeSpatial == null || embarkeeSpatial.CollisionLayer != CollisionLayer.Ground) return false;
 
             FactionMembership embarkeeMembership = entity.Components.TryGet<FactionMembership>();
             if (embarkeeMembership == null) return false;
@@ -108,8 +83,10 @@ namespace Orion.Game.Simulation.Components
                 && RemainingSpace <= embarkeeMembership.FoodRequirement;
         }
 
-        public void Load(Entity entity)
+        public void Embark(Entity entity)
         {
+            Argument.EnsureNotNull(entity, "entity");
+
             if (!CanEmbark(entity))
                 throw new ArgumentException("entity");
 
@@ -117,12 +94,14 @@ namespace Orion.Game.Simulation.Components
             entity.Components.Remove<Spatial>();
 
             positionComponents.Add(embarkeePosition);
-            loadedUnits.Add(entity);
+            passengers.Add(entity);
         }
 
-        public void Unload(Entity entity)
+        public void Disembark(Entity entity)
         {
-            if (!loadedUnits.Contains(entity))
+            Argument.EnsureNotNull(entity, "entity");
+
+            if (!passengers.Contains(entity))
                 throw new ArgumentException("entity");
 
             Spatial embarkerPosition = Entity.Components.Get<Spatial>();
@@ -138,9 +117,9 @@ namespace Orion.Game.Simulation.Components
                 return;
             }
 
-            int embarkeeIndex = loadedUnits.IndexOf(entity);
+            int embarkeeIndex = passengers.IndexOf(entity);
             Spatial position = positionComponents[embarkeeIndex];
-            loadedUnits.RemoveAt(embarkeeIndex);
+            passengers.RemoveAt(embarkeeIndex);
             positionComponents.RemoveAt(embarkeeIndex);
 
             position.Position = location.Value;

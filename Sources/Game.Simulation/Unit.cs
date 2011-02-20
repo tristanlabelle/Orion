@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation
                 .ToDictionary(skill => skill.GetType());
             skills.Add(typeof(BasicSkill), type.BasicSkill);
 
-            Debug.Assert(!HasSkill<AttackSkill>()
+            Debug.Assert(!InternalHasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(type.Name));
 
@@ -127,6 +127,23 @@ namespace Orion.Game.Simulation
                 Components.Add(trainer);
             }
 
+            if (InternalHasSkill<HealSkill>())
+            {
+                HealSkill healSkill = InternalTryGetSkill<HealSkill>();
+                Healer healer = new Healer(this);
+                healer.Speed = healSkill.Speed;
+                healer.Range = healSkill.Range;
+                Components.Add(healer);
+            }
+
+            if (InternalHasSkill<TransportSkill>())
+            {
+                TransportSkill transportSkill = InternalTryGetSkill<TransportSkill>();
+                Transporter transporter = new Transporter(this);
+                transporter.Capacity = transportSkill.Capacity;
+                Components.Add(transporter);
+            }
+
             FactionMembership membership = new FactionMembership(this);
             membership.FoodRequirement = type.BasicSkill.FoodCost;
             if (InternalHasSkill<ProvideFoodSkill>())
@@ -186,7 +203,7 @@ namespace Orion.Game.Simulation
         #region Properties
         #region Type-Related
         /// <summary>
-        /// Temporary measure until we 
+        /// Temporary measure until we broadly use the identity component.
         /// </summary>
         public Unit Type
         {
@@ -195,12 +212,16 @@ namespace Orion.Game.Simulation
             {
                 Argument.EnsureNotNull(value, "Type");
 
-                Name = value.Name;
-                GraphicsTemplate = value.GraphicsTemplate;
-                VoicesTemplate = value.VoicesTemplate;
+                Identity identity = Components.Get<Identity>();
+                identity.Name = value.Name;
+                identity.VisualIdentity = value.GraphicsTemplate;
+                identity.SoundIdentity = value.VoicesTemplate;
 
                 skills = value.skills;
-                Upgrades = value.Upgrades;
+
+                identity.Upgrades.Clear();
+                foreach (UnitTypeUpgrade upgrade in value.Upgrades)
+                    identity.Upgrades.Add(upgrade);
 
                 Debug.Assert(!HasComponent<Attacker, AttackSkill>()
                     || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
@@ -211,19 +232,16 @@ namespace Orion.Game.Simulation
         public string Name
         {
             get { return Components.Get<Identity>().Name; }
-            private set { Components.Get<Identity>().Name = value; }
         }
 
         public string GraphicsTemplate
         {
             get { return Components.Get<Identity>().VisualIdentity; }
-            set { Components.Get<Identity>().VisualIdentity = value; }
         }
 
         public string VoicesTemplate
         {
             get { return Components.Get<Identity>().SoundIdentity; }
-            set { Components.Get<Identity>().SoundIdentity = value; }
         }
 
         public bool IsBuilding
@@ -242,13 +260,6 @@ namespace Orion.Game.Simulation
         public ICollection<UnitTypeUpgrade> Upgrades
         {
             get { return Components.Get<Identity>().Upgrades; }
-            private set
-            {
-                Identity identity = Components.Get<Identity>();
-                identity.Upgrades.Clear();
-                foreach (UnitTypeUpgrade upgrade in value)
-                    identity.Upgrades.Add(upgrade);
-            }
         }
         #endregion
 
@@ -425,7 +436,7 @@ namespace Orion.Game.Simulation
         /// <remarks>
         /// Same as <see cref="TryGetSkill"/>, but not obsoleted so internal usages do not cause warnings.
         /// </remarks>
-        public TSkill InternalTryGetSkill<TSkill>() where TSkill : UnitSkill
+        private TSkill InternalTryGetSkill<TSkill>() where TSkill : UnitSkill
         {
             UnitSkill skill;
             skills.TryGetValue(typeof(TSkill), out skill);
@@ -517,41 +528,31 @@ namespace Orion.Game.Simulation
         public bool IsWithinHealingRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
-            Debug.Assert(HasSkill<HealSkill>());
+            Debug.Assert(HasComponent<Healer, HealSkill>());
 
             int range = GetStat(HealSkill.RangeStat);
             return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
         }
 
         #region Can*** Testing
-        public bool CanTransport(Unit unit)
-        {
-            Argument.EnsureNotNull(unit, "unitType");
-
-            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
-            bool isGroundUnit = unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
-            return HasSkill<TransportSkill>()
-                && unit.HasComponent<Move, MoveSkill>()
-                && isGroundUnit
-                && !unit.HasSkill<TransportSkill>();
-        }
-
         public bool CanBuild(Unit buildingType)
         {
             Argument.EnsureNotNull(buildingType, "buildingType");
-            BuildSkill skill = TryGetSkill<BuildSkill>();
+
+            Builder builder = Components.TryGet<Builder>();
             return buildingType.IsBuilding
-                && skill != null
-                && skill.Supports(buildingType);
+                && builder != null
+                && builder.Supports(buildingType);
         }
 
         public bool CanTrain(Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
-            TrainSkill skill = TryGetSkill<TrainSkill>();
+
+            Trainer trainer = Components.TryGet<Trainer>();
             return !unitType.IsBuilding
-                && skill != null
-                && skill.Supports(unitType);
+                && trainer != null
+                && trainer.Supports(unitType);
         }
 
         public bool CanResearch(Technology technology)
@@ -763,7 +764,7 @@ namespace Orion.Game.Simulation
                     return;
 
                 if (HasComponent<Builder, BuildSkill>() && TryRepairNearbyUnit()) { }
-                else if (HasSkill<HealSkill>() && TryHealNearbyUnit()) { }
+                else if (HasComponent<Healer, HealSkill>() && TryHealNearbyUnit()) { }
                 else if (!IsUnderConstruction && HasComponent<Attacker, AttackSkill>() && !HasComponent<Builder, BuildSkill>()
                     && TryAttackNearbyUnit()) { }
             }

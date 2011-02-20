@@ -9,6 +9,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Technologies;
 using Key = OpenTK.Input.Key;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -58,7 +59,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            if (unitType.HasSkill<AttackSkill>())
+            if (unitType.HasComponent<Attacker, AttackSkill>())
             {
                 actions[2, 3] = new ActionDescriptor()
                 {
@@ -73,15 +74,15 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<BuildSkill>())
+            if (unitType.HasComponent<Builder, BuildSkill>())
             {
                 actions[0, 0] = new ActionDescriptor()
-            {
-                Name = "Construire",
-                Texture = graphics.GetActionTexture("Build"),
-                HotKey = Key.B,
-                Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
-            };
+                {
+                    Name = "Construire",
+                    Texture = graphics.GetActionTexture("Build"),
+                    HotKey = Key.B,
+                    Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
+                };
 
                 actions[1, 0] = new ActionDescriptor()
                 {
@@ -96,7 +97,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<HarvestSkill>())
+            if (unitType.HasComponent<Harvester, HarvestSkill>())
             {
                 actions[1, 2] = new ActionDescriptor()
                 {
@@ -126,7 +127,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<MoveSkill>())
+            if (unitType.HasComponent<Move, MoveSkill>())
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
@@ -141,7 +142,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<SellableSkill>())
+            if (unitType.HasComponent<Sellable, SellableSkill>())
             {
                 actions[3, 0] = new ActionDescriptor()
                 {
@@ -151,7 +152,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasSkill<AttackSkill>() && unitType.HasSkill<MoveSkill>())
+            if (unitType.HasComponent<Attacker, AttackSkill>() && unitType.HasComponent<Move, MoveSkill>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {

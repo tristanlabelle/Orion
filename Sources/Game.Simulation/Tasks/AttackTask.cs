@@ -3,6 +3,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {    
@@ -22,12 +23,12 @@ namespace Orion.Game.Simulation.Tasks
             : base(attacker)
         {
             Argument.EnsureNotNull(attacker, "attacker");
-            if (!attacker.HasSkill<AttackSkill>())
+            if (!attacker.HasComponent<Attacker, AttackSkill>())
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
             this.target = target;
-            if (attacker.HasSkill<MoveSkill>()) this.follow = new FollowTask(attacker, target);
+            if (attacker.HasComponent<Move, MoveSkill>()) this.follow = new FollowTask(attacker, target);
         }
         #endregion
 

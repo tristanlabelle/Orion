@@ -61,16 +61,14 @@ namespace Orion.Game.Simulation
 
             Identity identity = new Identity(this);
             identity.Name = type.Name;
-            identity.VisualIdentity = type.GraphicsTemplate ?? type.Name; ;
+            identity.VisualIdentity = type.GraphicsTemplate ?? type.Name;
             identity.SoundIdentity = type.VoicesTemplate ?? type.Name;
             identity.LeavesRemains = true;
             identity.IsSelectable = true;
             identity.TemplateEntity = this;
             foreach (UnitTypeUpgrade upgrade in type.Upgrades)
                 identity.Upgrades.Add(upgrade);
-            identity.TrainType = HasSkill<MoveSkill>()
-                ? TrainType.Immaterial
-                : TrainType.OnSite;
+            identity.TrainType = InternalHasSkill<MoveSkill>() ? TrainType.Immaterial : TrainType.OnSite;
             identity.AladdiumCost = type.BasicSkill.AladdiumCost;
             identity.AlageneCost = type.BasicSkill.AlageneCost;
             Components.Add(identity);
@@ -81,9 +79,17 @@ namespace Orion.Game.Simulation
             health.MaximumValue = type.BasicSkill.MaxHealth;
             Components.Add(health);
 
-            if (HasSkill<AttackSkill>())
+            if (InternalHasSkill<MoveSkill>())
             {
-                AttackSkill attackSkill = TryGetSkill<AttackSkill>();
+                MoveSkill moveSkill = InternalTryGetSkill<MoveSkill>();
+                Move move = new Move(this);
+                move.Speed = moveSkill.Speed;
+                Components.Add(move);
+            }
+
+            if (InternalHasSkill<AttackSkill>())
+            {
+                AttackSkill attackSkill = InternalTryGetSkill<AttackSkill>();
                 Attacker attacker = new Attacker(this);
                 attacker.Delay = attackSkill.Delay;
                 attacker.Power = attackSkill.Power;
@@ -92,18 +98,18 @@ namespace Orion.Game.Simulation
                 Components.Add(attacker);
             }
 
-            if (HasSkill<HarvestSkill>())
+            if (InternalHasSkill<HarvestSkill>())
             {
-                HarvestSkill harvestSkill = TryGetSkill<HarvestSkill>();
+                HarvestSkill harvestSkill = InternalTryGetSkill<HarvestSkill>();
                 Harvester harvester = new Harvester(this);
                 harvester.Speed = harvestSkill.Speed;
                 harvester.MaxCarryingAmount = harvestSkill.MaxCarryingAmount;
                 Components.Add(harvester);
             }
 
-            if (HasSkill<BuildSkill>())
+            if (InternalHasSkill<BuildSkill>())
             {
-                BuildSkill buildSkill = TryGetSkill<BuildSkill>();
+                BuildSkill buildSkill = InternalTryGetSkill<BuildSkill>();
                 Builder builder = new Builder(this);
                 builder.Speed = buildSkill.Speed;
                 foreach (string target in buildSkill.Targets)
@@ -111,9 +117,9 @@ namespace Orion.Game.Simulation
                 Components.Add(builder);
             }
 
-            if (HasSkill<TrainSkill>())
+            if (InternalHasSkill<TrainSkill>())
             {
-                TrainSkill trainSkill = TryGetSkill<TrainSkill>();
+                TrainSkill trainSkill = InternalTryGetSkill<TrainSkill>();
                 Trainer trainer = new Trainer(this);
                 trainer.SpeedMultiplier = trainSkill.Speed;
                 foreach (string target in trainSkill.Targets)
@@ -123,7 +129,7 @@ namespace Orion.Game.Simulation
 
             FactionMembership membership = new FactionMembership(this);
             membership.FoodRequirement = type.BasicSkill.FoodCost;
-            if (HasSkill<ProvideFoodSkill>())
+            if (InternalHasSkill<ProvideFoodSkill>())
                 membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
             Components.Add(membership);
 
@@ -149,7 +155,7 @@ namespace Orion.Game.Simulation
 
             skills = prototype.skills;
 
-            Debug.Assert(!HasSkill<AttackSkill>()
+            Debug.Assert(!InternalHasSkill<AttackSkill>()
                 || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                 "{0} has an attack range bigger than its line of sight.".FormatInvariant(prototype.Name));
 
@@ -196,7 +202,7 @@ namespace Orion.Game.Simulation
                 skills = value.skills;
                 Upgrades = value.Upgrades;
 
-                Debug.Assert(!HasSkill<AttackSkill>()
+                Debug.Assert(!HasComponent<Attacker, AttackSkill>()
                     || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
                     "{0} has an attack range bigger than its line of sight.".FormatInvariant(Name));
             }
@@ -222,12 +228,15 @@ namespace Orion.Game.Simulation
 
         public bool IsBuilding
         {
-            get { return !HasSkill<MoveSkill>(); }
+            get { return !HasComponent<Move, MoveSkill>(); }
         }
 
-        public bool IsSuicidable
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Unit"/> can commit suicide.
+        /// </summary>
+        public bool CanSuicide
         {
-            get { return false; }
+            get { return true; }
         }
 
         public ICollection<UnitTypeUpgrade> Upgrades
@@ -267,7 +276,7 @@ namespace Orion.Game.Simulation
 
         public bool KeepsFactionAlive
         {
-            get { return HasSkill<TrainSkill>() || HasSkill<AttackSkill>(); }
+            get { return HasComponent<Trainer, TrainSkill>() || HasComponent<Attacker, AttackSkill>(); }
         }
         #endregion
 
@@ -364,7 +373,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool HasRallyPoint
         {
-            get { return HasSkill<TrainSkill>() && !BoundingRectangle.ContainsPoint(RallyPoint); }
+            get { return HasComponent<Trainer, TrainSkill>() && !BoundingRectangle.ContainsPoint(RallyPoint); }
         }
 
         /// <summary>
@@ -382,28 +391,72 @@ namespace Orion.Game.Simulation
         #region Methods
         #region Skills/Type
         /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
+        /// Tests if this <see cref="Unit"/> has a given <see cref="Component"/>,
+        /// also checking if it has the corresponding <see cref="UnitSkill"/> to aid migration.
         /// </summary>
-        /// <typeparam name="TSkill">The type of skill to be found.</typeparam>
-        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
-        public bool HasSkill<TSkill>() where TSkill : UnitSkill
+        /// <typeparam name="TComponent">The type of the component to be found.</typeparam>
+        /// <typeparam name="TSkill">The type of the corresponding skill.</typeparam>
+        /// <returns>A value indicating if this <see cref="Unit"/> has a given <see cref="Component"/>.</returns>
+        public bool HasComponent<TComponent, TSkill>()
+            where TComponent : Component
+            where TSkill : UnitSkill
         {
-            return skills.ContainsKey(typeof(TSkill)); ;
+            bool hasComponent = Components.Has<TComponent>();
+            bool hasSkill = skills.ContainsKey(typeof(TSkill));
+
+            if (hasComponent != hasSkill)
+            {
+                string message = "Unit has component {0} without skill {1} or vice-versa."
+                    .FormatInvariant(typeof(TComponent).FullName, typeof(TSkill).FullName);
+                Debug.Fail(message);
+            }
+
+            return hasComponent;
         }
 
-        public bool HasSkill(Type skillType)
+        /// <remarks>
+        /// Same as <see cref="HasSkill"/>, but not obsoleted so internal usages do not cause warnings.
+        /// </remarks>
+        private bool InternalHasSkill<TSkill>() where TSkill : UnitSkill
         {
-            Argument.EnsureNotNull(skillType, "skillType");
-            return skills.ContainsKey(skillType);
+            return skills.ContainsKey(typeof(TSkill));
         }
 
-        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
+        /// <remarks>
+        /// Same as <see cref="TryGetSkill"/>, but not obsoleted so internal usages do not cause warnings.
+        /// </remarks>
+        public TSkill InternalTryGetSkill<TSkill>() where TSkill : UnitSkill
         {
             UnitSkill skill;
             skills.TryGetValue(typeof(TSkill), out skill);
             return skill as TSkill;
         }
 
+        /// <summary>
+        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
+        /// </summary>
+        /// <typeparam name="TSkill">The type of skill to be found.</typeparam>
+        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
+        [Obsolete("Skills are being obsoleted, use components instead, or HasComponent<TComponent, TSkill> to aid transition.")]
+        public bool HasSkill<TSkill>() where TSkill : UnitSkill
+        {
+            return InternalHasSkill<TSkill>();
+        }
+
+        [Obsolete("Skills are being obsoleted, use components instead.")]
+        public bool HasSkill(Type skillType)
+        {
+            Argument.EnsureNotNull(skillType, "skillType");
+            return skills.ContainsKey(skillType);
+        }
+
+        [Obsolete("Skills are being obsoleted, use components instead.")]
+        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
+        {
+            return InternalTryGetSkill<TSkill>();
+        }
+
+        [Obsolete("Skills are being obsoleted, use components instead.")]
         public int GetBaseStat(UnitStat stat)
         {
             Argument.EnsureNotNull(stat, "stat");
@@ -423,6 +476,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
         /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
+        [Obsolete("Skills are being obsoleted, use components instead.")]
         public int GetStat(UnitStat stat)
         {
             return Faction.GetStat(Type, stat);
@@ -444,7 +498,7 @@ namespace Orion.Game.Simulation
         public bool IsWithinAttackRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
-            Debug.Assert(HasSkill<AttackSkill>());
+            Debug.Assert(HasComponent<Attacker, AttackSkill>());
 
             int range = GetStat(AttackSkill.RangeStat);
             if (range == 0)
@@ -477,7 +531,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
             bool isGroundUnit = unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
             return HasSkill<TransportSkill>()
-                && unit.HasSkill<MoveSkill>()
+                && unit.HasComponent<Move, MoveSkill>()
                 && isGroundUnit
                 && !unit.HasSkill<TransportSkill>();
         }
@@ -708,9 +762,9 @@ namespace Orion.Game.Simulation
                 if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
                     return;
 
-                if (HasSkill<BuildSkill>() && TryRepairNearbyUnit()) { }
+                if (HasComponent<Builder, BuildSkill>() && TryRepairNearbyUnit()) { }
                 else if (HasSkill<HealSkill>() && TryHealNearbyUnit()) { }
-                else if (!IsUnderConstruction && HasSkill<AttackSkill>() && !HasSkill<BuildSkill>()
+                else if (!IsUnderConstruction && HasComponent<Attacker, AttackSkill>() && !HasComponent<Builder, BuildSkill>()
                     && TryAttackNearbyUnit()) { }
             }
         }
@@ -763,7 +817,7 @@ namespace Orion.Game.Simulation
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits
                 .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared
-                    + (unit.HasSkill<AttackSkill>() ? 0 : 100));
+                    + (unit.HasComponent<Attacker, AttackSkill>() ? 0 : 100));
 
             if (unitToAttack == null) return false;
         

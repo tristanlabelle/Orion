@@ -4,6 +4,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -38,7 +39,7 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.HasSkill<AttackSkill>()) return;
+            if (!Unit.HasComponent<Attacker, AttackSkill>()) return;
 
             if (!IsTargetValid(target))
             {

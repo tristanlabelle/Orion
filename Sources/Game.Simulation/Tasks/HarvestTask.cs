@@ -38,7 +38,7 @@ namespace Orion.Game.Simulation.Tasks
         public HarvestTask(Unit harvester, Entity node)
             : base(harvester)
         {
-            if (!harvester.HasSkill<HarvestSkill>())
+            if (!harvester.HasComponent<Harvester, HarvestSkill>())
                 throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
             Argument.EnsureNotNull(node, "node");
 

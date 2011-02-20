@@ -18,7 +18,7 @@ namespace Orion.Game.Simulation.Components
 
         private float speedMultiplier = 1;
         private Vector2 rallyPoint;
-        private HashSet<string> trainableTypes = new HashSet<string>();
+        private readonly HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
         #region Constructors

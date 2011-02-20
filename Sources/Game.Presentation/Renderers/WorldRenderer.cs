@@ -7,6 +7,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -127,7 +128,7 @@ namespace Orion.Game.Presentation.Renderers
             var plans = World.Entities
                 .OfType<Unit>()
                 .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
-                    && u.HasSkill<BuildSkill>())
+                    && u.HasComponent<Builder, BuildSkill>())
                 .SelectMany(u => u.TaskQueue)
                 .OfType<BuildTask>()
                 .Select(t => t.BuildingPlan)

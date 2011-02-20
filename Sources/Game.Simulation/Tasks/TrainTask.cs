@@ -33,13 +33,6 @@ namespace Orion.Game.Simulation.Tasks
             if (trainer.IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an building under construction");
 
-            if (!trainer.Type.HasSkill<TrainSkill>())
-                throw new ArgumentException("Cannot train without the train skill.", "trainer");
-
-            // Normally we'd check if the train skill supports the trainee type, but as the trainee type
-            // can be a hero, which is not explicitely specified in the skill targets, that check has
-            // been delegated to the TrainCommand level. Please update your bookmarks.
-
             this.traineeType = traineeType;
         }
         #endregion
@@ -68,20 +61,28 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (Unit.Faction.RemainingFoodAmount < Unit.Faction.GetStat(traineeType, BasicSkill.FoodCostStat))
+            if (!Unit.Components.Has<Trainer>())
+            {
+                MarkAsEnded();
+                return;
+            }
+
+            FactionMembership factionMembership = Unit.Components.TryGet<FactionMembership>();
+            Faction faction = factionMembership == null ? null : factionMembership.Faction;
+            if (faction != null && faction.RemainingFoodAmount < faction.GetStat(traineeType, BasicSkill.FoodCostStat))
             {
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
                     string warning = "Pas assez de nourriture pour entraîner un {0}".FormatInvariant(traineeType.Name);
-                    Faction.RaiseWarning(warning);
+                    faction.RaiseWarning(warning);
                 }
 
                 return;
             }
             waitingForEnoughFood = false;
 
-            int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
+            int maxHealth = faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
                 float trainingSpeed = Unit.GetStat(TrainSkill.SpeedStat);
@@ -92,11 +93,11 @@ namespace Orion.Game.Simulation.Tasks
             Unit trainee = TrySpawn(traineeType);
             if (trainee == null)
             {
-                if (!attemptingToPlaceUnit)
+                if (faction != null && !attemptingToPlaceUnit)
                 {
                     attemptingToPlaceUnit = true;
                     string warning = "Pas de place pour faire apparaître un {0}".FormatInvariant(traineeType.Name);
-                    Faction.RaiseWarning(warning);
+                    faction.RaiseWarning(warning);
                 }
                 return;
             }
@@ -158,7 +159,7 @@ namespace Orion.Game.Simulation.Tasks
 
             Task rallyPointTask = null;
             // Check to see if we can harvest automatically
-            if (unit.HasSkill<HarvestSkill>())
+            if (unit.HasComponent<Harvester, HarvestSkill>())
             {
                 Entity resourceNode = World.Entities
                     .Intersecting(Unit.RallyPoint)

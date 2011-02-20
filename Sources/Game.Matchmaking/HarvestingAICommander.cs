@@ -327,7 +327,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            if (unit.HasSkill<HarvestSkill>())
+            if (unit.HasComponent<Harvester, HarvestSkill>())
             {
                 var nodeData = resourceNodesData.Values
                     .Where(d => Faction.CanHarvest(d.Node) && d.HarvesterCount < maximumHarvestersPerResourceNode)
@@ -342,7 +342,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            if (unit.HasSkill<MoveSkill>())
+            if (unit.HasComponent<Move, MoveSkill>())
             {
                 var placeToExplore = placesToExplore
                     .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > minimumTimeBetweenSuccessiveExplorations)
@@ -477,7 +477,8 @@ namespace Orion.Game.Matchmaking
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Debug.Assert(entity.Components.Has<Harvestable>(), "Entity is not a resource node!");
+            if (!entity.Components.Has<Harvestable>()) return;
+
             if (entity != null)
             {
                 resourceNodesData.Remove(entity);

@@ -5,6 +5,7 @@ using Orion.Engine;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Actions
 {
@@ -66,7 +67,7 @@ namespace Orion.Game.Presentation.Actions
 
             var buildingTypes = inputManager.Match.UnitTypes
                 .Where(buildingType => buildSkill.Supports(buildingType))
-                .OrderByDescending(buildingType => buildingType.HasSkill<TrainSkill>())
+                .OrderByDescending(buildingType => buildingType.HasComponent<Trainer, TrainSkill>())
                 .ThenBy(buildingType => buildingType.GetBaseStat(BasicSkill.AladdiumCostStat) + buildingType.GetBaseStat(BasicSkill.AlageneCostStat));
 
             foreach (Unit buildingType in buildingTypes)

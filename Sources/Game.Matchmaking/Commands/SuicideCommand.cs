@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -52,7 +53,7 @@ namespace Orion.Game.Matchmaking.Commands
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
 
-                if (unit.HasSkill<SellableSkill>())
+                if (unit.HasComponent<Sellable, SellableSkill>())
                 {
                     int aladdiumValue = unit.GetStat(SellableSkill.AladdiumValueStat);
                     int alageneValue = unit.GetStat(SellableSkill.AlageneValueStat);

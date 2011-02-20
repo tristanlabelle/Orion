@@ -134,7 +134,7 @@ namespace Orion.Game.Simulation.Utilities
 
         private static bool IsWorker(Unit unit)
         {
-            return unit.HasSkill<BuildSkill>();
+            return unit.HasComponent<Builder, BuildSkill>();
         }
         #endregion
     }

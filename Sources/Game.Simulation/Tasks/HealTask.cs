@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -32,7 +33,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal buildings.", "target");
 
             this.target = target;
-            if (healer.HasSkill<MoveSkill>()) this.follow = new FollowTask(healer, target);
+            if (healer.HasComponent<Move, MoveSkill>()) this.follow = new FollowTask(healer, target);
         }
         #endregion
 

@@ -35,7 +35,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(repairer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!repairer.HasSkill<BuildSkill>())
+            if (!repairer.HasComponent<Builder, BuildSkill>())
                 throw new ArgumentException("Cannot repair without the build skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
@@ -97,7 +97,7 @@ namespace Orion.Game.Simulation.Tasks
             if (!target.IsUnderConstruction)
             {
                 // If we just built an alagene extractor, start harvesting.
-                if (Unit.HasSkill<HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
+                if (Unit.HasComponent<Harvester, HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
                 {
                     // Smells like a hack!
                     Entity node = Unit.World.Entities

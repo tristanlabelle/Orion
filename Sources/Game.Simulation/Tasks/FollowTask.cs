@@ -3,6 +3,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -31,7 +32,7 @@ namespace Orion.Game.Simulation.Tasks
         public FollowTask(Unit follower, Unit target)
             : base(follower)
         {
-            if (!follower.HasSkill<MoveSkill>())
+            if (!follower.HasComponent<Move, MoveSkill>())
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");

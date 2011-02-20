@@ -34,6 +34,13 @@ namespace Orion.Game.Simulation.Components
         {
             foreach (T item in from) to.Add(item);
         }
+
+        private static bool IsGenericCollection(Type type, bool checkInterfaces)
+        {
+            if (type.IsGenericTypeDefinition) return type == typeof(ICollection<>);
+            if (type.IsGenericType) return type.GetGenericTypeDefinition() == typeof(ICollection<>);
+            return checkInterfaces && type.GetInterfaces().Any(interfaceType => IsGenericCollection(interfaceType, false));
+        }
         #endregion
         #endregion
 
@@ -91,10 +98,11 @@ namespace Orion.Game.Simulation.Components
                 if (property.GetCustomAttributes(typeof(PersistentAttribute), true).Length == 0)
                     continue;
 
+                Type propertyType = property.PropertyType;
+                bool isGenericCollection = IsGenericCollection(propertyType, true);
                 object currentValue = property.GetValue(this, null);
-                Type propertyType = currentValue.GetType();
 
-                if (typeof(ICollection).IsAssignableFrom(propertyType))
+                if (isGenericCollection)
                 {
                     // if it's a collection, copy the contents
                     object newCollection = property.GetValue(newInstance, null);

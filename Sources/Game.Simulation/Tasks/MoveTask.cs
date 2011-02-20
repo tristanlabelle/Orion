@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation.Tasks
             : base(unit)
         {
             Argument.EnsureNotNull(unit, "unit");
-            if (!unit.HasSkill<MoveSkill>())
+            if (!unit.HasComponent<Move, MoveSkill>())
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 

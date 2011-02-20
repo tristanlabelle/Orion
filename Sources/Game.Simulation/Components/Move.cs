@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Game.Simulation.Components.Serialization;
+using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Move : Component
+    /// <summary>
+    /// Allows an <see cref="Entity"/> to be assigned tasks which imply movement.
+    /// </summary>
+    public sealed class Move : Component
     {
         #region Fields
         public static readonly Stat SpeedStat = new Stat(typeof(Move), StatType.Real, "Speed");
-        public static readonly Stat AccelerationStat = new Stat(typeof(Move), StatType.Real, "Acceleration");
 
-        private float speed;
-        private float acceleration;
+        private float speed = 1;
         #endregion
 
         #region Constructors
@@ -21,18 +23,18 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Accesses the maximum movement speed of the host <see cref="Entity"/>.
+        /// </summary>
         [Mandatory]
         public float Speed
         {
             get { return speed; }
-            set { speed = value; }
-        }
-
-        [Mandatory]
-        public float Acceleration
-        {
-            get { return acceleration; }
-            set { acceleration = value; }
+            set
+            {
+                Argument.EnsureStrictlyPositive(value, "Speed");
+                speed = value;
+            }
         }
         #endregion
     }

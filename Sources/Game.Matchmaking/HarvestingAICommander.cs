@@ -361,7 +361,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
             
-            if (unit.HasSkill<ResearchSkill>())
+            if (unit.HasComponent<Researcher, ResearchSkill>())
             {
             	foreach (var technology in Match.TechnologyTree.Technologies)
             	{

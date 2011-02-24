@@ -153,6 +153,23 @@ namespace Orion.Engine.Collections
         #endregion
         #endregion
 
+        #region AddRange
+        /// <summary>
+        /// Adds each items from a sequence to a collection.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the collection.</typeparam>
+        /// <typeparam name="U">The type of the items in the sequence.</typeparam>
+        /// <param name="collection">The sequence to which items should be added.</param>
+        /// <param name="items">The items to be added.</param>
+        public static void AddRange<T, U>(this ICollection<T> collection, IEnumerable<U> items) where U : T
+        {
+            Argument.EnsureNotNull(collection, "collection");
+            Argument.EnsureNotNull(items, "items");
+
+            foreach (T item in items) collection.Add(item);
+        }
+        #endregion
+
         #region RemoveLast
         /// <summary>
         /// Removes the last item from a given list.

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using Orion.Engine;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -50,7 +51,11 @@ namespace Orion.Game.Simulation.Components
         /// </summary>
         public int IntegerValue
         {
-            get { return (int)value; }
+            get
+            {
+                Debug.Assert(type == StatType.Integer, "Getting a real stat as an integer, the value will be truncated.");
+                return (int)value;
+            }
         }
 
         /// <summary>

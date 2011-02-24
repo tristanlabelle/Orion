@@ -179,12 +179,13 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateTrainButtons()
         {
-            TrainSkill trainSkill = unitType.TryGetSkill<TrainSkill>();
-            if (trainSkill == null) return;
+            Trainer trainer = unitType.Components.TryGet<Trainer>();
+            if (trainer == null) return;
 
             var traineeTypes = userInputManager.Match.UnitTypes
-                .Where(traineeType => trainSkill.Supports(traineeType))
-                .OrderBy(traineeType => traineeType.GetBaseStat(BasicSkill.AladdiumCostStat) + traineeType.GetBaseStat(BasicSkill.AlageneCostStat));
+                .Where(traineeType => trainer.Supports(traineeType))
+                .OrderBy(traineeType => traineeType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
+                    + traineeType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
 
             foreach (Unit traineeType in traineeTypes)
             {
@@ -207,11 +208,11 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateResearchButtons()
         {
-            ResearchSkill researchSkill = unitType.TryGetSkill<ResearchSkill>();
-            if (researchSkill == null) return;
+            Researcher researcher = unitType.Components.TryGet<Researcher>();
+            if (researcher == null) return;
 
             var technologies = userInputManager.Match.TechnologyTree.Technologies
-                .Where(tech => userInputManager.LocalFaction.IsResearchable(tech) && researchSkill.Supports(tech));
+                .Where(tech => userInputManager.LocalFaction.IsResearchable(tech) && researcher.Supports(tech));
 
             foreach (Technology technology in technologies)
             {

@@ -118,8 +118,8 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (!TryGetCredit()) return;
 
-            int aladdiumCost = Target.GetStatValue(BasicSkill.AladdiumCostStat);
-            int alageneCost = Target.GetStatValue(BasicSkill.AlageneCostStat);
+            int aladdiumCost = (int)Target.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat);
+            int alageneCost = (int)Target.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat);
 
             float healthToRepair = (float)Unit.GetStatValue(Builder.SpeedStat, BuildSkill.SpeedStat)
                 * repairSpeedRatio * step.TimeDeltaInSeconds;

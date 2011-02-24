@@ -10,15 +10,13 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Spatial : Component
+    /// <summary>
+    /// Allows an <see cref="Entity"/> have a position and rotation in the world.
+    /// </summary>
+    public sealed class Spatial : Component
     {
-        #region Static
-        public static readonly Stat SightRangeStat = new Stat(typeof(Spatial), StatType.Real, "SightRange");
-        #endregion
-
         #region Fields
         private CollisionLayer collisionLayer;
-        private float sightRange;
         private Size size;
 
         private Vector2 position;
@@ -34,32 +32,9 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        public float Angle
-        {
-            get { return angle; }
-            set { angle = value; }
-        }
-
-        [Mandatory]
-        public float SightRange
-        {
-            get { return sightRange; }
-            set { sightRange = value; }
-        }
-
-        [Transient]
-        public Circle LineOfSight
-        {
-            get { return new Circle(Center, Entity.GetStatValue(SightRangeStat).RealValue); }
-        }
-
-        [Mandatory]
-        public CollisionLayer CollisionLayer
-        {
-            get { return collisionLayer; }
-            set { collisionLayer = value; }
-        }
-
+        /// <summary>
+        /// Accesses the position of this <see cref="Entity"/>, in world units.
+        /// </summary>
         public Vector2 Position
         {
             get { return position; }
@@ -75,6 +50,22 @@ namespace Orion.Game.Simulation.Components
                 position = value;
                 Moved.Raise(this, oldPosition, position);
             }
+        }
+
+        /// <summary>
+        /// Accesses the angle this <see cref="Entity"/> is oriented at, in radians.
+        /// </summary>
+        public float Angle
+        {
+            get { return angle; }
+            set { angle = value; }
+        }
+
+        [Mandatory]
+        public CollisionLayer CollisionLayer
+        {
+            get { return collisionLayer; }
+            set { collisionLayer = value; }
         }
 
         [Mandatory]
@@ -101,19 +92,13 @@ namespace Orion.Game.Simulation.Components
         [Transient]
         public Vector2 Center
         {
-            get
-            {
-                return new Vector2(Position.X + size.Width * 0.5f, Position.Y + size.Height * 0.5f);
-            }
+            get { return new Vector2(Position.X + size.Width * 0.5f, Position.Y + size.Height * 0.5f); }
         }
 
         [Transient]
         public Rectangle BoundingRectangle
         {
-            get
-            {
-                return new Rectangle(Position.X, Position.Y, size.Width, size.Height);
-            }
+            get { return new Rectangle(Position.X, Position.Y, size.Width, size.Height); }
         }
 
         [Transient]

@@ -15,7 +15,7 @@ namespace Orion.Game.Simulation.Components
     public sealed class Health : Component
     {
         #region Static
-        public static readonly Stat MaxHealthStat = new Stat(typeof(Health), StatType.Integer, "MaximumValue");
+        public static readonly Stat MaximumValueStat = new Stat(typeof(Health), StatType.Integer, "MaximumValue");
         public static readonly Stat RegenerationRateStat = new Stat(typeof(Health), StatType.Real, "RegenerationRate");
         public static readonly Stat DamageReductionStat = new Stat(typeof(Health), StatType.Integer, "DamageReduction");
         public static readonly Stat ValueStat = new Stat(typeof(Health), StatType.Integer, "Value");
@@ -116,7 +116,7 @@ namespace Orion.Game.Simulation.Components
                 damage = value;
                 DamageChanged.Raise(this);
 
-                if (damage >= Entity.GetStatValue(MaxHealthStat).IntegerValue)
+                if (damage >= Entity.GetStatValue(MaximumValueStat).IntegerValue)
                     Entity.Die();
             }
         }

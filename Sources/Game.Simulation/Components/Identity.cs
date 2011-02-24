@@ -7,9 +7,12 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
-    public class Identity : Component
+    public sealed class Identity : Component
     {
         #region Fields
+        public static readonly Stat AladdiumCostStat = new Stat(typeof(Identity), StatType.Integer, "AladdiumCost");
+        public static readonly Stat AlageneCostStat = new Stat(typeof(Identity), StatType.Integer, "AlageneCost");
+
         private string name;
         private string visualIdentity;
         private string soundIdentity;

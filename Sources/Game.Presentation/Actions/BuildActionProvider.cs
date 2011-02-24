@@ -59,16 +59,17 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            BuildSkill buildSkill = unitType.TryGetSkill<BuildSkill>();
-            Debug.Assert(buildSkill != null);
+            Builder builder = unitType.Components.TryGet<Builder>();
+            Debug.Assert(builder != null);
 
             int x = 0;
             int y = 3;
 
             var buildingTypes = inputManager.Match.UnitTypes
-                .Where(buildingType => buildSkill.Supports(buildingType))
+                .Where(buildingType => builder.Supports(buildingType))
                 .OrderByDescending(buildingType => buildingType.HasComponent<Trainer, TrainSkill>())
-                .ThenBy(buildingType => buildingType.GetBaseStat(BasicSkill.AladdiumCostStat) + buildingType.GetBaseStat(BasicSkill.AlageneCostStat));
+                .ThenBy(buildingType => buildingType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
+                    + buildingType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
 
             foreach (Unit buildingType in buildingTypes)
             {
@@ -90,17 +91,17 @@ namespace Orion.Game.Presentation.Actions
             Faction faction = inputManager.LocalFaction;
             int aladdiumCost = faction.GetStat(buildingType, BasicSkill.AladdiumCostStat);
             int alageneCost = faction.GetStat(buildingType, BasicSkill.AlageneCostStat);
-        	
+            
             return new ActionDescriptor()
             {
-            	Name = buildingType.Name,
+                Name = buildingType.Name,
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
-            	Texture = graphics.GetUnitTexture(buildingType),
-            	Action = () =>
-	            {
+                Texture = graphics.GetUnitTexture(buildingType),
+                Action = () =>
+                {
                 inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);
                 actionPanel.Push(new CancelActionProvider(actionPanel, inputManager, graphics));
-	            }
+                }
             };
         }
 

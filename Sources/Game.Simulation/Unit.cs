@@ -49,17 +49,7 @@ namespace Orion.Game.Simulation
                 .ToDictionary(skill => skill.GetType());
             skills.Add(typeof(BasicSkill), type.BasicSkill);
 
-            Debug.Assert(!InternalHasSkill<AttackSkill>()
-                || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(type.Name));
-
             // components stuff
-            Spatial spatial = new Spatial(this);
-            spatial.CollisionLayer = type.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground;
-            spatial.SightRange = type.BasicSkill.SightRange;
-            spatial.Size = type.Size;
-            Components.Add(spatial);
-
             Identity identity = new Identity(this);
             identity.Name = type.Name;
             identity.VisualIdentity = type.GraphicsTemplate ?? type.Name;
@@ -73,6 +63,15 @@ namespace Orion.Game.Simulation
             identity.AladdiumCost = type.BasicSkill.AladdiumCost;
             identity.AlageneCost = type.BasicSkill.AlageneCost;
             Components.Add(identity);
+
+            Spatial spatial = new Spatial(this);
+            spatial.CollisionLayer = type.IsAirborne ? CollisionLayer.Air : CollisionLayer.Ground;
+            spatial.Size = type.Size;
+            Components.Add(spatial);
+
+            Vision vision = new Vision(this);
+            vision.Range = type.BasicSkill.SightRange;
+            Components.Add(vision);
 
             Health health = new Health(this);
             health.Armor = type.BasicSkill.Armor;
@@ -128,6 +127,14 @@ namespace Orion.Game.Simulation
                 Components.Add(trainer);
             }
 
+            if (InternalHasSkill<ResearchSkill>())
+            {
+                ResearchSkill researchSkill = InternalTryGetSkill<ResearchSkill>();
+                Researcher researcher = new Researcher(this);
+                researcher.Technologies.AddRange(researcher.Technologies);
+                Components.Add(researcher);
+            }
+
             if (InternalHasSkill<HealSkill>())
             {
                 HealSkill healSkill = InternalTryGetSkill<HealSkill>();
@@ -172,10 +179,6 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(faction, "faction");
 
             skills = prototype.skills;
-
-            Debug.Assert(!InternalHasSkill<AttackSkill>()
-                || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                "{0} has an attack range bigger than its line of sight.".FormatInvariant(prototype.Name));
 
             // components stuff
             foreach (Component component in prototype.Components)
@@ -223,10 +226,6 @@ namespace Orion.Game.Simulation
                 identity.Upgrades.Clear();
                 foreach (UnitTypeUpgrade upgrade in value.Upgrades)
                     identity.Upgrades.Add(upgrade);
-
-                Debug.Assert(!HasComponent<Attacker, AttackSkill>()
-                    || GetBaseStat(AttackSkill.RangeStat) <= GetBaseStat(BasicSkill.SightRangeStat),
-                    "{0} has an attack range bigger than its line of sight.".FormatInvariant(Name));
             }
         }
 
@@ -283,7 +282,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Circle LineOfSight
         {
-            get { return new Circle(Center, GetStatValue(BasicSkill.SightRangeStat)); }
+            get { return new Circle(Center, (float)GetStatValue(Vision.RangeStat, BasicSkill.SightRangeStat)); }
         }
 
         public bool KeepsFactionAlive
@@ -324,7 +323,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public int MaxHealth
         {
-            get { return GetStatValue(BasicSkill.MaxHealthStat); }
+            get { return (int)GetStatValue(HealthComponent.MaximumValueStat, BasicSkill.MaxHealthStat); }
         }
 
         /// <summary>
@@ -584,9 +583,9 @@ namespace Orion.Game.Simulation
         public bool CanResearch(Technology technology)
         {
             Argument.EnsureNotNull(technology, "technology");
-            ResearchSkill skill = TryGetSkill<ResearchSkill>();
-            return skill != null
-                && skill.Supports(technology);
+
+            Researcher researcher = Components.TryGet<Researcher>();
+            return researcher != null && researcher.Supports(technology);
         }
         #endregion
         #endregion

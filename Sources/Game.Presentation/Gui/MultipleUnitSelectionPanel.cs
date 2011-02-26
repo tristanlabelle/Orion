@@ -39,12 +39,12 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Raised when the selection should change to a specific unit.
         /// </summary>
-        public event Action<MultipleUnitSelectionPanel, Unit> UnitSelected;
+        public event Action<MultipleUnitSelectionPanel, Entity> UnitSelected;
 
         /// <summary>
         /// Raised when a unit should be removed from the selection.
         /// </summary>
-        public event Action<MultipleUnitSelectionPanel, Unit> UnitDeselected;
+        public event Action<MultipleUnitSelectionPanel, Entity> UnitDeselected;
         #endregion
 
         #region Methods

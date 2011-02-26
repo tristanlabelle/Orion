@@ -7,6 +7,7 @@ using Orion.Engine.Gui;
 using Orion.Engine;
 using System.Diagnostics;
 using Orion.Game.Presentation.Renderers;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -17,7 +18,7 @@ namespace Orion.Game.Presentation.Gui
             #region Fields
             private readonly MultipleUnitSelectionPanel panel;
             private readonly ImageBox imageBox;
-            private Unit unit;
+            private Entity unit;
             #endregion
 
             #region Constructors
@@ -40,9 +41,9 @@ namespace Orion.Game.Presentation.Gui
 
             #region Properties
             /// <summary>
-            /// Accesses the <see cref="Unit"/> displayed by this button.
+            /// Accesses the <see cref="Entity"/> displayed by this button.
             /// </summary>
-            public Unit Unit
+            public Entity Unit
             {
                 get { return unit; }
                 set
@@ -60,7 +61,13 @@ namespace Orion.Game.Presentation.Gui
             /// </summary>
             public void UpdateImageTint()
             {
-                float healthFraction = unit == null ? 1 : unit.Health / unit.MaxHealth;
+                float healthFraction = 1;
+                if (unit != null)
+                {
+                    Health health = unit.Components.TryGet<Health>();
+                    if (health != null)
+                        healthFraction = health.Value / health.MaximumValue;
+                }
                 imageBox.Tint = HealthBarRenderer.GetColor(healthFraction);
             }
 

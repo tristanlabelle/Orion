@@ -266,12 +266,12 @@ namespace Orion.Game.Main
             UpdateActionPanel();
         }
 
-        private void OnMultipleSelectionPanelUnitSelected(MultipleUnitSelectionPanel sender, Unit unit)
+        private void OnMultipleSelectionPanelUnitSelected(MultipleUnitSelectionPanel sender, Entity unit)
         {
             Selection.Set(unit);
         }
 
-        private void OnMultipleSelectionPanelUnitDeselected(MultipleUnitSelectionPanel sender, Unit unit)
+        private void OnMultipleSelectionPanelUnitDeselected(MultipleUnitSelectionPanel sender, Entity unit)
         {
             Selection.Remove(unit);
         }

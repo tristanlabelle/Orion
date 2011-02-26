@@ -95,9 +95,8 @@ namespace Orion.Game.Presentation.Renderers
         }
 
         private void OnUnitHitting(World sender, HitEventArgs args)
-        {     
-            bool isRanged = (int)args.Hitter.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) > 0;
-            if (!isRanged) return;
+        {
+            if (!args.Hitter.Components.Get<Attacker>().IsRanged) return;
 
             hitEvents.Add(args);
         }

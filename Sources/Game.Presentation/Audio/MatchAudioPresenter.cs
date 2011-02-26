@@ -110,26 +110,30 @@ namespace Orion.Game.Presentation.Audio
         {
             if (!isGameStarted) return;
 
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-            
-            if (unit.Type.Name == "Chuck Norris")
+            Identity identity = entity.Components.TryGet<Identity>();
+            if (identity.Name == "Chuck Norris")
             {
                 audio.PlayUISound("Chuck Norris.Spawn");
                 return;
             }
 
-            if (unit.Faction != LocalFaction) return;
+            FactionMembership membership = entity.Components.TryGet<FactionMembership>();
+            if (membership != null && membership.Faction != LocalFaction) return;
 
-            if (unit.IsBuilding && unit.IsUnderConstruction)
+            Unit unit = entity as Unit;
+            if (unit == null) return;
+
+            bool isBuilding = !entity.Components.Has<Move>();
+            if (isBuilding && unit.IsUnderConstruction)
             {
                 unit.ConstructionCompleted += OnBuildingConstructionCompleted;
                 audio.PlaySfx("UnderConstruction", unit.Center);
                 return;
             }
 
-            string soundName = audio.GetUnitSoundName(unit.Type, "Select");
-            audio.PlaySfx(soundName, unit.Center);
+            string soundName = audio.GetUnitSoundName(entity, "Select");
+            Spatial spatial = entity.Components.Get<Spatial>();
+            audio.PlaySfx(soundName, spatial.Center);
         }
 
         private void OnEntityDied(World arg1, Entity arg2)
@@ -211,7 +215,7 @@ namespace Orion.Game.Presentation.Audio
             bool isVisible = LocalFaction.CanSee(args.Hitter) || LocalFaction.CanSee(args.Target);
             if (!isVisible) return;
 
-            bool isMelee = (int)args.Hitter.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
+            bool isMelee = args.Hitter.Components.Get<Attacker>().IsMelee;
             string soundName = isMelee ? "MeleeAttack" : "RangeAttack";
 
             audio.PlaySfx(soundName, args.Hitter.Center);

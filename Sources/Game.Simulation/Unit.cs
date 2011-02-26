@@ -95,6 +95,8 @@ namespace Orion.Game.Simulation
                 attacker.Power = attackSkill.Power;
                 attacker.Range = attackSkill.Range;
                 attacker.SplashRadius = attackSkill.SplashRadius;
+                attacker.SuperEffectiveTargets.AddRange(attackSkill.SuperEffectiveAgainst);
+                attacker.IneffectiveTargets.AddRange(attackSkill.IneffectiveAgainst);
                 Components.Add(attacker);
             }
 
@@ -164,8 +166,13 @@ namespace Orion.Game.Simulation
 
             FactionMembership membership = new FactionMembership(this);
             membership.FoodCost = type.BasicSkill.FoodCost;
+
             if (InternalHasSkill<ProvideFoodSkill>())
-                membership.ProvidedFood = GetBaseStat(ProvideFoodSkill.AmountStat);
+            {
+                ProvideFoodSkill provideFoodSkill = InternalTryGetSkill<ProvideFoodSkill>();
+                membership.ProvidedFood = provideFoodSkill.Amount;
+            }
+
             Components.Add(membership);
 
             Components.Add(new TaskQueue(this));

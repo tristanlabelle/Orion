@@ -191,8 +191,8 @@ namespace Orion.Game.Presentation.Actions
 
             var traineeTypes = userInputManager.Match.UnitTypes
                 .Where(traineeType => trainer.Supports(traineeType))
-                .OrderBy(traineeType => traineeType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
-                    + traineeType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
+                .OrderBy(traineeType => (int)traineeType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
+                    + (int)traineeType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
 
             foreach (Unit traineeType in traineeTypes)
             {

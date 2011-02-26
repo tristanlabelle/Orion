@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking
 {
@@ -121,11 +122,19 @@ namespace Orion.Game.Matchmaking
 
         private static void InstantVictory(Match match, Faction faction)
         {
-            List<Unit> enemyUnits = match.World.Entities
-                .OfType<Unit>()
-                .Where(u => u.Faction != faction)
+            List<Entity> enemyUnits = match.World.Entities
+                .Where(e =>
+                    {
+                        FactionMembership membership = e.Components.TryGet<FactionMembership>();
+                        if (membership == null) return false;
+                        return membership.Faction != faction;
+                    })
                 .ToList();
-            foreach (Unit enemy in enemyUnits) enemy.Suicide();
+            foreach (Entity enemy in enemyUnits)
+            {
+                Health health = enemy.Components.Get<Health>();
+                health.Value = 0;
+            }
         }
 
         private static void IncreaseBuildAndTrainSpeed(Match match, Faction faction)

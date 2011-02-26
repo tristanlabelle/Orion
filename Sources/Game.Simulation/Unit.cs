@@ -470,30 +470,6 @@ namespace Orion.Game.Simulation
             return skill as TSkill;
         }
 
-        /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="UnitSkill"/>.
-        /// </summary>
-        /// <typeparam name="TSkill">The type of skill to be found.</typeparam>
-        /// <returns>True if this <see cref="Unit"/> has that <see cref="UnitSkill"/>, false if not.</returns>
-        [Obsolete("Skills are being obsoleted, use components instead, or HasComponent<TComponent, TSkill> to aid transition.")]
-        public bool HasSkill<TSkill>() where TSkill : UnitSkill
-        {
-            return InternalHasSkill<TSkill>();
-        }
-
-        [Obsolete("Skills are being obsoleted, use components instead.")]
-        public bool HasSkill(Type skillType)
-        {
-            Argument.EnsureNotNull(skillType, "skillType");
-            return skills.ContainsKey(skillType);
-        }
-
-        [Obsolete("Skills are being obsoleted, use components instead.")]
-        public TSkill TryGetSkill<TSkill>() where TSkill : UnitSkill
-        {
-            return InternalTryGetSkill<TSkill>();
-        }
-
         [Obsolete("Skills are being obsoleted, use components instead.")]
         public int GetBaseStat(UnitStat stat)
         {
@@ -502,17 +478,6 @@ namespace Orion.Game.Simulation
             UnitSkill skill;
             // As skills are being phased out, return 0 instead of throwing an exception
             return skills.TryGetValue(stat.SkillType, out skill) ? skill.GetStat(stat) : 0;
-        }
-
-        /// <summary>
-        /// Gets the value of a <see cref="UnitStat"/> for this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="stat">The <see cref="UnitStat"/> which's value is to be retrieved.</param>
-        /// <returns>The value associed with that <see cref="UnitStat"/>.</returns>
-        [Obsolete("Skills are being obsoleted, use components instead or GetStatValue to ease migration.")]
-        public int GetStatValue(UnitStat stat)
-        {
-            return Faction.GetStat(Type, stat);
         }
 
         /// <summary>

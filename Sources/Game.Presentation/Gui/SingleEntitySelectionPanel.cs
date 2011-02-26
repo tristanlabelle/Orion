@@ -21,11 +21,11 @@ namespace Orion.Game.Presentation.Gui
     public sealed partial class SingleEntitySelectionPanel : ContentControl
     {
         #region Fields
-        private static readonly UnitStat[] statsToDisplay = new[]
+        private static readonly Stat[] statsToDisplay = new[]
         {
-            AttackSkill.PowerStat, AttackSkill.RangeStat,
-            BasicSkill.ArmorStat, BasicSkill.ArmorTypeStat,
-            MoveSkill.SpeedStat, BasicSkill.SightRangeStat
+            Attacker.PowerStat, Attacker.RangeStat,
+            Health.ArmorStat,
+            Move.SpeedStat, Vision.RangeStat
         };
 
         private readonly GameGraphics graphics;
@@ -116,11 +116,9 @@ namespace Orion.Game.Presentation.Gui
             }
 
             statsForm.VisibilityFlag = Visibility.Visible;
-            foreach (UnitStat stat in statsToDisplay)
+            foreach (Stat stat in statsToDisplay)
             {
-                if (!unit.Type.HasSkill(stat.SkillType)) continue;
-
-                int value = unit.GetStatValue(stat);
+                float value = (float)unit.GetStatValue(stat);
                 if (value == 0) continue;
 
                 string statName = localizer.GetNoun(stat.Name + "Stat");

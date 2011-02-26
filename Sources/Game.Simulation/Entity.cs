@@ -188,6 +188,11 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(stat, "stat");
 
             StatValue sum = StatValue.CreateZero(stat.Type);
+
+            // In the absence of its declaring component,
+            // a stat can only have a value of zero.
+            if (!Components.Has(stat.ComponentType)) return sum;
+
             foreach (Component component in components)
                 sum += component.GetStatBonus(stat);
 

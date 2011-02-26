@@ -492,9 +492,14 @@ namespace Orion.Game.Simulation
             UnitSkill skill;
             if (!skills.TryGetValue(stat.SkillType, out skill))
             {
+                // Commented out because skills are being phased out, and now this situation can happen
+                // in normal cases
+                /*
                 throw new ArgumentException(
                     "Cannot get base stat {0} without skill {1}."
                     .FormatInvariant(stat, stat.SkillName));
+                 */
+                return 0;
             }
 
             return skill.GetStat(stat);

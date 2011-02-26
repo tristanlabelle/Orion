@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Technology Name="Schtroumpf costaud" AladdiumCost="150" AlageneCost="100">
-  <Target>Schtroumpf</Target>
-  <Target>Grand schtroumpf</Target>
-  <Effect Stat="Attack.Power" Change="1"/>
-  <Effect Stat="MaxHealth" Change="25"/>
-  <Effect Stat="Armor" Change="1"/>
-</Technology>

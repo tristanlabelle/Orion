@@ -14,11 +14,20 @@ namespace Orion.Engine.Localization
     /// using a culture setting to retrieve the matching
     /// translation of the definition.
     /// </summary>
-    public class Localizer
+    public sealed class Localizer
     {
         #region Fields
-        private CultureInfo cultureInfo;
-
+        #region Constants
+        /// <summary>
+        /// A <see cref="CultureInfo"/> representing the english culture.
+        /// </summary>
+        public static readonly CultureInfo EnglishCulture = new CultureInfo(1033);
+        
+        /// <summary>
+        /// A <see cref="CultureInfo"/> representing the french culture.
+        /// </summary>
+        public static readonly CultureInfo FrenchCulture = new CultureInfo(12);
+        
         private static readonly Regex objArgPattern
             = new Regex(@"%n[0-9]", RegexOptions.Compiled);
 
@@ -28,47 +37,33 @@ namespace Orion.Engine.Localization
         private static readonly Regex subReplaceValuesPattern 
             = new Regex(@".*\?(.*?:?.*?)\}.*", RegexOptions.Compiled);
 
-        private Dictionary<string, Definition> nouns;
-        private Dictionary<string, Definition> sentences;
-
-        #region XmlConst
-        private const string NOUN_DEFINITIONS = "NounDefinitions";
-        private const string SENTENCTE_DEFINITIONS = "SentenceDefinitions";
-        private const string NOUN = "Noun";
-        private const string SENTENCE = "Sentence";
-        private const string KEY = "key";
-        private const string TRANSLATION = "Translation";
-        private const string LANG = "lang";
-        private const string GENDER = "gender";
-        #endregion
+        private const string NounDefinitionsElement = "NounDefinitions";
+        private const string SentenceDefinitionsElement = "SentenceDefinitions";
+        private const string NounElement = "Noun";
+        private const string SentenceElement = "Sentence";
+        private const string KeyElement = "key";
+        private const string TranslationElement = "Translation";
+        private const string LangElement = "lang";
+        private const string GenderElement = "gender";
         #endregion
 
-        #region Constructors
-        /// <summary>
-        /// Main constructor of the Localizer.
-        /// Loads definitions from the XML.
-        /// Also sets the CultureInfo to English-UnitedStates by default (LCID=1033)
-        /// </summary>
-        /// <param name="path">The path to the XML file where the definitions are stored.</param>
-        public Localizer()
-        {
-            nouns = new Dictionary<string, Definition>();
-            sentences = new Dictionary<string, Definition>();
-
-            cultureInfo = new CultureInfo(1033); //English-United States
-        }
+        private CultureInfo cultureInfo = EnglishCulture;
+        private readonly Dictionary<string, Definition> nouns = new Dictionary<string, Definition>();
+        private readonly Dictionary<string, Definition> sentences = new Dictionary<string, Definition>();
         #endregion
 
         #region Properties
         /// <summary>
         /// Gets or sets the culture info to be used when retrieving the string value of a definitions.
-        /// English LCID = 1033
-        /// French LCID = 12
         /// </summary>
         public CultureInfo CultureInfo
         {
             get { return cultureInfo; }
-            set { cultureInfo = value; }
+            set
+            {
+            	Argument.EnsureNotNull(value, "value");
+            	cultureInfo = value;
+            }
         }
 
         /// <summary>
@@ -86,7 +81,6 @@ namespace Orion.Engine.Localization
         {
             get { return sentences; }
         }
-
         #endregion
 
         #region Methods
@@ -98,7 +92,8 @@ namespace Orion.Engine.Localization
         /// <returns>The localized string for the noun.</returns>
         public string GetNoun(string key)
         {
-            Definition matchingDefinition = nouns[key];
+            Definition matchingDefinition;
+            if (!nouns.TryGetValue(key, out matchingDefinition)) return key;
 
             return matchingDefinition.GetTranslation(cultureInfo).TranslatedString;
         }
@@ -181,33 +176,33 @@ namespace Orion.Engine.Localization
                 if (xr.NodeType == XmlNodeType.Element)
                 {
                     //If it's a noun definition or a sentence definition
-                    if (xr.Name == NOUN || xr.Name == SENTENCE)
+                    if (xr.Name == NounElement || xr.Name == SentenceElement)
                     {
-                        bool isNoun = xr.Name == NOUN;
+                        bool isNoun = xr.Name == NounElement;
 
                         //xr.MoveToAttribute(KEY);
 
-                        Definition definition = new Definition(xr.GetAttribute(KEY));
+                        Definition definition = new Definition(xr.GetAttribute(KeyElement));
 
                         //While the noun or sentence is not read completely
                         while(
-                            (isNoun && xr.Name != "/"+NOUN && xr.NodeType != XmlNodeType.EndElement) ||
-                            (!isNoun && xr.Name != "/"+SENTENCE && xr.NodeType != XmlNodeType.EndElement)
+                            (isNoun && xr.Name != "/"+NounElement && xr.NodeType != XmlNodeType.EndElement) ||
+                            (!isNoun && xr.Name != "/"+SentenceElement && xr.NodeType != XmlNodeType.EndElement)
                             )
                         {
                             //If a translation is found
-                            if(xr.Name == TRANSLATION && xr.NodeType == XmlNodeType.Element)
+                            if(xr.Name == TranslationElement && xr.NodeType == XmlNodeType.Element)
                             {
                                 string language = string.Empty;
                                 Genders gender = Genders.Na;
                                 string text = string.Empty;
 
                                 //Read the attributes and the content
-                                if(xr.MoveToAttribute(LANG)) 
-                                { language = xr.GetAttribute(LANG); } else { throw new Exception("Language is mandatory"); }
-                                if (xr.MoveToAttribute(GENDER))
+                                if(xr.MoveToAttribute(LangElement)) 
+                                { language = xr.GetAttribute(LangElement); } else { throw new Exception("Language is mandatory"); }
+                                if (xr.MoveToAttribute(GenderElement))
                                 {
-                                    switch (xr.GetAttribute(GENDER))
+                                    switch (xr.GetAttribute(GenderElement))
                                     {
                                         case "M": gender = Genders.M;  break;
                                         case "F": gender = Genders.F; break;
@@ -238,7 +233,7 @@ namespace Orion.Engine.Localization
         /// <summary>
         /// Clears the dictionary.
         /// </summary>
-        public void UnloadDictionary()
+        public void ClearDictionary()
         {
             nouns.Clear();
             sentences.Clear();

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="SpaghettiAlfredo" AladdiumCost="200" AlageneCost="150">
+  <Target>FlyingSpaghettiMonster</Target>
+  <Target>YourMom</Target>
+  <Effect Stat="Move.Speed" Change="2"/>
+  <Effect Stat="Attack.Delay" Change="-1"/>
+</Technology>

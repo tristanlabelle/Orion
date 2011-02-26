@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions>
+<NounDefinitions>
+    <!-- Resources -->
+    <Noun key="Alagene">
+        <Translation lang="en">Alagene</Translation>
+        <Translation lang="fr" gender="M">Alagène</Translation>
+    </Noun>
+    <Noun key="Aladdium">
+        <Translation lang="en">Aladdium</Translation>
+        <Translation lang="fr" gender="M">Aladdium</Translation>
+    </Noun>
+    <Noun key="Food">
+        <Translation lang="en">Food</Translation>
+        <Translation lang="fr" gender="F">Nourriture</Translation>
+    </Noun>
+	
+    <!-- Units -->
+    <Noun key="DietCoke">
+        <Translation lang="en">Diet Coke</Translation>
+        <Translation lang="fr" gender="M">Coke diète</Translation>
+    </Noun>
+    <Noun key="FlyingSpaghettiMonster">
+        <Translation lang="en">Flying Spaghetti Monster</Translation>
+        <Translation lang="fr" gender="M">Monstre de spaghettis volant</Translation>
+    </Noun>
+    <Noun key="GabraelMartien">
+        <Translation lang="en">Gabrael Martien</Translation>
+        <Translation lang="fr" gender="M">Gabraël Martien</Translation>
+    </Noun>
+    <Noun key="SwineFlu">
+        <Translation lang="en">Swine Flu</Translation>
+        <Translation lang="fr" gender="F">Grippe A(H1N1)</Translation>
+    </Noun>
+    <Noun key="TvaHelicopter">
+        <Translation lang="en">TVA Helicopter</Translation>
+        <Translation lang="fr" gender="M">Hélicoptère TVA</Translation>
+    </Noun>
+    <Noun key="Jedihad">
+        <Translation lang="en">Jedihad</Translation>
+        <Translation lang="fr" gender="M">Jedihad</Translation>
+    </Noun>
+    <Noun key="Jesus">
+        <Translation lang="en">Jesus</Translation>
+        <Translation lang="fr" gender="M">Jésus</Translation>
+    </Noun>
+    <Noun key="Mentos">
+        <Translation lang="en">Mentos</Translation>
+        <Translation lang="fr" gender="M">Mentos</Translation>
+    </Noun>
+    <Noun key="Ninja">
+        <Translation lang="en">Ninja</Translation>
+        <Translation lang="fr" gender="M">Ninja</Translation>
+    </Noun>
+    <Noun key="Ufo">
+        <Translation lang="en">UFO</Translation>
+        <Translation lang="fr" gender="M">OVNI</Translation>
+    </Noun>
+    <Noun key="Pirate">
+        <Translation lang="en">Pirate</Translation>
+        <Translation lang="fr" gender="M">Pirate</Translation>
+    </Noun>
+    <Noun key="Smurf">
+        <Translation lang="en">Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf</Translation>
+    </Noun>
+    <Noun key="FlyingCarpet">
+        <Translation lang="en">Flying Carpet</Translation>
+        <Translation lang="fr" gender="M">Tapis Volant</Translation>
+    </Noun>
+    <Noun key="Viking">
+        <Translation lang="en">Viking</Translation>
+        <Translation lang="fr" gender="M">Viking</Translation>
+    </Noun>
+	
+    <!-- Héros -->
+    <Noun key="AllahSkywalker">
+        <Translation lang="en">Allah Skywalker</Translation>
+        <Translation lang="fr" gender="M">Allah Skywalker</Translation>
+    </Noun>
+    <Noun key="Anthrax">
+        <Translation lang="en">Anthrax</Translation>
+        <Translation lang="fr" gender="M">Anthrax</Translation>
+    </Noun>
+    <Noun key="Bluebeard">
+        <Translation lang="en">Bluebeard</Translation>
+        <Translation lang="fr" gender="M">Barbe blueue</Translation>
+    </Noun>
+    <Noun key="ChuckNorris">
+        <Translation lang="en">Chuck Norris</Translation>
+        <Translation lang="fr" gender="M">Chuck Norris</Translation>
+    </Noun>
+    <Noun key="PapaSmurf">
+        <Translation lang="en">Papa Smurf</Translation>
+        <Translation lang="fr" gender="M">Grand Schtroumpf</Translation>
+    </Noun>
+    <Noun key="RaptorJesus">
+        <Translation lang="en">Raptor Jesus</Translation>
+        <Translation lang="fr" gender="M">Jésus-raptor</Translation>
+    </Noun>
+    <Noun key="Leonardo">
+        <Translation lang="en">Leonardo</Translation>
+        <Translation lang="fr" gender="M">Léonardo</Translation>
+    </Noun>
+    <Noun key="MrT">
+        <Translation lang="en">Mr T</Translation>
+        <Translation lang="fr" gender="M">M. T</Translation>
+    </Noun>
+    <Noun key="Obelix">
+        <Translation lang="en">Obelix</Translation>
+        <Translation lang="fr" gender="M">Obélix</Translation>
+    </Noun>
+    <Noun key="BlueCollarSmurf">
+        <Translation lang="en">Blue Collar Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf Col Bleu</Translation>
+    </Noun>
+    <Noun key="Smurfette">
+        <Translation lang="en">Smurfette</Translation>
+        <Translation lang="fr" gender="F">Schtroumpfette</Translation>
+    </Noun>
+    <Noun key="YourMom">
+        <Translation lang="en">Your Mom</Translation>
+        <Translation lang="fr" gender="F">Ta mère</Translation>
+    </Noun>
+    <Noun key="AladdinsCarpet">
+        <Translation lang="en">Aladdin's Carpet</Translation>
+        <Translation lang="fr" gender="M">Tapis d'Aladdin</Translation>
+    </Noun>
+    <Noun key="Thor">
+        <Translation lang="en">Thor</Translation>
+        <Translation lang="fr" gender="M">Thor</Translation>
+    </Noun>
+    <Noun key="Mothership">
+        <Translation lang="en">Mothership</Translation>
+        <Translation lang="fr" gender="M">Vaisseau-mère</Translation>
+    </Noun>
+	
+	<!-- Buildings -->
+    <Noun key="BritishJeanMarc">
+        <Translation lang="en">British Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Jean-Marc Britannique</Translation>
+    </Noun>
+    <Noun key="CarrefourLaval">
+        <Translation lang="en">Carrefour Laval</Translation>
+        <Translation lang="fr" gender="M">Carrefour Laval</Translation>
+    </Noun>
+    <Noun key="PropagandaCenter">
+        <Translation lang="en">Propaganda Center</Translation>
+        <Translation lang="fr" gender="M">Centre de propagande</Translation>
+    </Noun>
+    <Noun key="HellsCostco">
+        <Translation lang="en">Hells' Costco</Translation>
+        <Translation lang="fr" gender="M">Costco des Hells</Translation>
+    </Noun>
+    <Noun key="AlageneExtractor">
+        <Translation lang="en">Alagene Extractor</Translation>
+        <Translation lang="fr" gender="M">Extracteur d'alagène</Translation>
+    </Noun>
+    <Noun key="JeanMarc">
+        <Translation lang="en">Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Jean-Marc</Translation>
+    </Noun>
+    <Noun key="TristansHouse">
+        <Translation lang="en">Tristan's House</Translation>
+        <Translation lang="fr" gender="F">Maison de Tristan</Translation>
+    </Noun>
+    <Noun key="SauronsEye">
+        <Translation lang="en">Sauron's Eye</Translation>
+        <Translation lang="fr" gender="M">Œil de Sauron</Translation>
+    </Noun>
+    <Noun key="DemonicPortal">
+        <Translation lang="en">Demonic Portal</Translation>
+        <Translation lang="fr" gender="M">Portail Démoniaque</Translation>
+    </Noun>
+    <Noun key="Pyramid">
+        <Translation lang="en">Pyramid</Translation>
+        <Translation lang="fr" gender="M">Pyramide</Translation>
+    </Noun>
+    <Noun key="Supply">
+        <Translation lang="en">Supply</Translation>
+        <Translation lang="fr" gender="M">Réserve</Translation>
+    </Noun>
+    <Noun key="2012Temple">
+        <Translation lang="en">2012 Temple</Translation>
+        <Translation lang="fr" gender="M">Temple de 2012</Translation>
+    </Noun>
+	
+	<!-- Technologies -->
+    <Noun key="HeftySmurf">
+        <Translation lang="en">Hefty Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf costaud</Translation>
+    </Noun>
+    <Noun key="HolyTrinity">
+        <Translation lang="en">Holy Trinity</Translation>
+        <Translation lang="fr" gender="F">Sainte Trinité</Translation>
+    </Noun>
+    <Noun key="ImportJeanMarc">
+        <Translation lang="en">Import Jean-Marc</Translation>
+        <Translation lang="fr" gender="M">Importer Jean-Marc</Translation>
+    </Noun>
+    <Noun key="IslamForce">
+        <Translation lang="en">Islam Force</Translation>
+        <Translation lang="fr" gender="M">Force islamique</Translation>
+    </Noun>
+    <Noun key="Pandemic">
+        <Translation lang="en">Pandemic</Translation>
+        <Translation lang="fr" gender="F">Pandémie</Translation>
+    </Noun>
+    <Noun key="SpaghettiAlfredo">
+        <Translation lang="en">Spaghetti Alfredo</Translation>
+        <Translation lang="fr" gender="M">Spaghetti Alfredo</Translation>
+    </Noun>
+    <Noun key="SwiftSmurf">
+        <Translation lang="en">Swift Smurf</Translation>
+        <Translation lang="fr" gender="M">Schtroumpf véloce</Translation>
+    </Noun>
+    <Noun key="TurboTurbo">
+        <Translation lang="en">Turbo Turbo</Translation>
+        <Translation lang="fr" gender="M">Turbo Turbo</Translation>
+    </Noun>
+    
+    <!-- Stats -->
+    <Noun key="PowerStat">
+        <Translation lang="en">Power</Translation>
+        <Translation lang="fr">Force</Translation>
+    </Noun>
+    <Noun key="ArmorStat">
+        <Translation lang="en">Armor</Translation>
+        <Translation lang="fr">Armure</Translation>
+    </Noun>
+    <Noun key="SpeedStat">
+        <Translation lang="en">Speed</Translation>
+        <Translation lang="fr">Vitesse</Translation>
+    </Noun>
+    <Noun key="RangeStat">
+        <Translation lang="en">Attack Range</Translation>
+        <Translation lang="fr">Portée d'attaque</Translation>
+    </Noun>
+    <Noun key="ArmorTypeStat">
+        <Translation lang="en">Armor Type</Translation>
+        <Translation lang="fr">Type d'armure</Translation>
+    </Noun>
+    <Noun key="SightRangeStat">
+        <Translation lang="en">Sight Range</Translation>
+        <Translation lang="fr">Portée de vision</Translation>
+    </Noun>
+    
+	<!-- Main menu -->
+	<Noun key="SinglePlayer">
+		<Translation lang="en">Single Player</Translation>
+		<Translation lang="fr">Monojoueur</Translation>
+	</Noun>
+	<Noun key="Multiplayer">
+		<Translation lang="en">Multiplayer</Translation>
+		<Translation lang="fr">Multijoueur</Translation>
+	</Noun>
+	<Noun key="ViewReplay">
+		<Translation lang="en">View Replay</Translation>
+		<Translation lang="fr">Visionner une partie</Translation>
+	</Noun>
+	<Noun key="Credits">
+		<Translation lang="en">Credits</Translation>
+		<Translation lang="fr">Générique</Translation>
+	</Noun>
+	<Noun key="Quit">
+		<Translation lang="en">Quit</Translation>
+		<Translation lang="fr">Quitter</Translation>
+	</Noun>
+	
+	<!-- Match configuration -->
+	<Noun key="MapWidth">
+		<Translation lang="en">Map Width</Translation>
+		<Translation lang="fr">Largeur de la carte</Translation>
+	</Noun>
+	<Noun key="MapHeight">
+		<Translation lang="en">Map Height</Translation>
+		<Translation lang="fr">Hauteur de la carte</Translation>
+	</Noun>
+	<Noun key="InitialAladdium">
+		<Translation lang="en">Initial Aladdium Amount</Translation>
+		<Translation lang="fr">Quantité initiale d'aladdium</Translation>
+	</Noun>
+	<Noun key="InitialAlagene">
+		<Translation lang="en">Initial Alagene Amount</Translation>
+		<Translation lang="fr">Quantité initiale d'alagène</Translation>
+	</Noun>
+	<Noun key="FoodLimit">
+		<Translation lang="en">Food Limit</Translation>
+		<Translation lang="fr">Limite de nourriture</Translation>
+	</Noun>
+	<Noun key="RandomSeed">
+		<Translation lang="en">Random Seed</Translation>
+		<Translation lang="fr">Germe de génération</Translation>
+	</Noun>
+	<Noun key="CheatCodes">
+		<Translation lang="en">Cheat Codes</Translation>
+		<Translation lang="fr">Codes de triche</Translation>
+	</Noun>
+	<Noun key="StartNomad">
+		<Translation lang="en">Start Nomad</Translation>
+		<Translation lang="fr">Début nomade</Translation>
+	</Noun>
+	<Noun key="RandomHeroes">
+		<Translation lang="en">Random Heroes</Translation>
+		<Translation lang="fr">Héros aléatoires</Translation>
+	</Noun>
+	<Noun key="RevealTopology">
+		<Translation lang="en">Reveal Topology</Translation>
+		<Translation lang="fr">Révéler la topologie</Translation>
+	</Noun>
+	<Noun key="Back">
+		<Translation lang="en">Back</Translation>
+		<Translation lang="fr">Retour</Translation>
+	</Noun>
+	<Noun key="Start">
+		<Translation lang="en">Start</Translation>
+		<Translation lang="fr">Commencer</Translation>
+	</Noun>
+	<Noun key="Ready">
+		<Translation lang="en">Ready</Translation>
+		<Translation lang="fr">Prêt</Translation>
+	</Noun>
+	<Noun key="Players">
+		<Translation lang="en">Players</Translation>
+		<Translation lang="fr">Joueurs</Translation>
+	</Noun>
+	<Noun key="Bot">
+		<Translation lang="en">Bot</Translation>
+		<Translation lang="fr">Bot</Translation>
+	</Noun>
+	<Noun key="Create">
+		<Translation lang="en">Create</Translation>
+		<Translation lang="fr">Créer</Translation>
+	</Noun>
+
+    <!-- Match UI-->
+    <Noun key="Pause">
+        <Translation lang="en">Pause</Translation>
+        <Translation lang="fr">Pause</Translation>
+    </Noun>
+    <Noun key="Diplomacy">
+        <Translation lang="en">Diplomacy</Translation>
+        <Translation lang="fr" gender="M">Diplomacie</Translation>
+    </Noun>
+
+    <!-- DiplomacyPanel-->
+    <Noun key="OtherFactions">
+        <Translation lang="en">Other Factions</Translation>
+        <Translation lang="fr">Autres factions</Translation>
+    </Noun>
+    <Noun key="OK">
+        <Translation lang="en">OK</Translation>
+        <Translation lang="fr">OK</Translation>
+    </Noun>
+    <Noun key="Allied">
+        <Translation lang="en">Allied</Translation>
+        <Translation lang="fr">Allié</Translation>
+    </Noun>
+    
+    <!-- PausePanel -->
+    <Noun key="Resume">
+        <Translation lang="en">Resume</Translation>
+        <Translation lang="fr">Reprendre</Translation>
+    </Noun>
+    
+    <!-- MultiplayerLobbyUI -->
+    <Noun key="Matches">
+        <Translation lang="en">Matches</Translation>
+        <Translation lang="fr">Parties</Translation>
+    </Noun>
+    <Noun key="PlayerName">
+        <Translation lang="en">Player Name</Translation>
+        <Translation lang="fr">Nom du joueur</Translation>
+    </Noun>
+    <Noun key="HostGameNamed">
+        <Translation lang="en">Host a game named</Translation>
+        <Translation lang="fr">Héberger une partie nommé</Translation>
+    </Noun>
+    <Noun key="JoinByIP">
+        <Translation lang="en">Join by IP</Translation>
+        <Translation lang="fr">Rejoindre par IP</Translation>
+    </Noun>
+    <Noun key="Join">
+        <Translation lang="en">Join</Translation>
+        <Translation lang="fr">Rejoindre</Translation>
+    </Noun>
+    <Noun key="Ping">
+        <Translation lang="en">Ping</Translation>
+        <Translation lang="fr">Pinger</Translation>
+    </Noun>
+    
+    <!-- ReplayBrowser -->
+    <Noun key="SavedReplays">
+        <Translation lang="en">Saved Replays</Translation>
+        <Translation lang="fr">Parties enregistrées</Translation>
+    </Noun>
+    <Noun key="View">
+        <Translation lang="en">View</Translation>
+        <Translation lang="fr">Visionner</Translation>
+    </Noun>
+    
+    <!-- SingleEntitySelectionPanel -->
+    <Noun key="Tasks">
+        <Translation lang="en">Tasks</Translation>
+        <Translation lang="fr">Tâches</Translation>
+    </Noun>
+    
+	<!-- Actions -->
+    <Noun key="Attack">
+        <Translation lang="en">Attack</Translation>
+        <Translation lang="fr">Attaquer</Translation>
+    </Noun>
+	<Noun key="Build">
+        <Translation lang="en">Build</Translation>
+        <Translation lang="fr">Construire</Translation>
+    </Noun>
+	<Noun key="Repair">
+        <Translation lang="en">Repair</Translation>
+        <Translation lang="fr">Réparer</Translation>
+    </Noun>
+	<Noun key="Disembark">
+        <Translation lang="en">Disembark</Translation>
+        <Translation lang="fr">Débarquer</Translation>
+    </Noun>
+	<Noun key="Harvest">
+        <Translation lang="en">Harvest</Translation>
+        <Translation lang="fr">Ramasser</Translation>
+    </Noun>
+	<Noun key="Heal">
+        <Translation lang="en">Heal</Translation>
+        <Translation lang="fr">Soigner</Translation>
+    </Noun>
+	<Noun key="Move">
+        <Translation lang="en">Move</Translation>
+        <Translation lang="fr">Déplacer</Translation>
+    </Noun>
+	<Noun key="Sell">
+        <Translation lang="en">Sell</Translation>
+        <Translation lang="fr">Vendre</Translation>
+    </Noun>
+	<Noun key="StandGuard">
+        <Translation lang="en">Stand Guard</Translation>
+        <Translation lang="fr">Guarder</Translation>
+    </Noun>
+	<Noun key="Upgrade">
+        <Translation lang="en">Upgrade</Translation>
+        <Translation lang="fr">Améliorer</Translation>
+    </Noun>
+</NounDefinitions>
+<SentenceDefinitions>
+	<!-- Testing -->
+	<Sentence key="UnitCreation">
+		<Translation lang="en">A %n0 spawned.</Translation>
+		<Translation lang="fr">Un{n0~F?e:} %n0 a ete cree;{n0~F?e:}.</Translation>
+	</Sentence>
+	<Sentence key="ResourceAcquisition">
+		<Translation lang="en">%n0 obtained %n1 %n2.</Translation>
+		<Translation lang="fr">%n0 a obtenu %n1 %n2.</Translation>
+	</Sentence>
+	<Sentence key="PointAcquisition">
+		<Translation lang="en">%n0 received %n1 point{n1>1?s:}.</Translation>
+		<Translation lang="fr">%n0 a reeu %n1 point{n1>1?s:}.</Translation>
+	</Sentence>
+    <Sentence key="FreeSlots">
+        <Translation lang="en">%n0 free slot{n0>1?s}</Translation>
+        <Translation lang="fr">%n0 place{n0>1?s} libre{n0>1?s:}</Translation>
+    </Sentence>
+	
+	<!-- Simulation events -->
+    <Sentence key="NoSpaceToBuild">
+        <Translation lang="en">Not enough space to build a %0.</Translation>
+        <Translation lang="fr">Pas assez de place pour construire un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoResourcesToBuild">
+        <Translation lang="en">Not enough resources to build a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de ressources pour construire un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoFoodToTrain">
+        <Translation lang="en">Not enough food to train a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de nourriture pour entraîner un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoPlaceToSpawn">
+        <Translation lang="en">No place to spawn a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas de place faire apparaître un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoResourcesToRepair">
+        <Translation lang="en">Not enough resources to repair a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de ressources pour réparer un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="NoPlaceToEmbark">
+        <Translation lang="en">Not enough place to embark a{0V?n} %0.</Translation>
+        <Translation lang="fr">Pas assez de place pour embarquer un{0F?e} %0.</Translation>
+    </Sentence>
+    <Sentence key="ResourceMineDepleted">
+        <Translation lang="en">%0 mine depleted.</Translation>
+        <Translation lang="fr">Mine de %0 vidé{0F?e}.</Translation>
+    </Sentence>
+</SentenceDefinitions>
+</Definitions>

@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Data;
 using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Localization;
 using Orion.Game.Matchmaking;
 
 namespace Orion.Game.Presentation.Gui
@@ -17,7 +18,8 @@ namespace Orion.Game.Presentation.Gui
     public sealed partial class MatchConfigurationUI : ContentControl
     {
         #region Fields
-        private readonly OrionGuiStyle style;
+        private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly PlayerCollection players;
         private StackLayout playerStack;
         private FormLayout settingsForm;
@@ -28,15 +30,17 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchConfigurationUI(OrionGuiStyle style)
+        public MatchConfigurationUI(GameGraphics graphics, Localizer localizer)
         {
-            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
-            this.style = style;
+            this.graphics = graphics;
+            this.localizer = localizer;
             this.players = new PlayerCollection(this);
 
             Padding = 5;
-            Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true };
+            Adornment = new TextureAdornment(graphics.GetGuiTexture("Granite")) { IsTiling = true };
 
             DockLayout mainDock = new DockLayout()
             {
@@ -122,6 +126,11 @@ namespace Orion.Game.Presentation.Gui
             get { return settingsForm.HasEnabledFlag; }
             set { settingsForm.HasEnabledFlag = value; }
         }
+        
+        private OrionGuiStyle Style
+        {
+        	get { return graphics.GuiStyle; }
+        }
         #endregion
 
         #region Methods
@@ -135,7 +144,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(name, "name");
             Argument.EnsureNotNull(action, "action");
 
-            Label text = style.CreateLabel(name);
+            Label text = Style.CreateLabel(name);
             text.Tag = action;
             aiBuilderComboBox.Items.Add(text);
             if (aiBuilderComboBox.SelectedItemIndex == -1)
@@ -146,17 +155,17 @@ namespace Orion.Game.Presentation.Gui
 
         public void AddSettings(MatchSettings settings)
         {
-            AddIntegerSetting("Largeur de la carte", () => settings.MapWidth, MatchSettings.SuggestedMinimumMapSize.Width);
-            AddIntegerSetting("Hauteur de la carte", () => settings.MapHeight, MatchSettings.SuggestedMinimumMapSize.Height);
-            AddIntegerSetting("Aladdium initial", () => settings.InitialAladdiumAmount, MatchSettings.SuggestedMinimumAladdium);
-            AddIntegerSetting("Alagène initial", () => settings.InitialAlageneAmount, MatchSettings.SuggestedMinimumAlagene);
-            AddIntegerSetting("Limite de nourriture", () => settings.FoodLimit, MatchSettings.SuggestedMinimumPopulation);
+            AddIntegerSetting(localizer.GetNoun("MapWidth"), () => settings.MapWidth, MatchSettings.SuggestedMinimumMapSize.Width);
+            AddIntegerSetting(localizer.GetNoun("MapHeight"), () => settings.MapHeight, MatchSettings.SuggestedMinimumMapSize.Height);
+            AddIntegerSetting(localizer.GetNoun("InitialAladdium"), () => settings.InitialAladdiumAmount, MatchSettings.SuggestedMinimumAladdium);
+            AddIntegerSetting(localizer.GetNoun("InitialAlagene"), () => settings.InitialAlageneAmount, MatchSettings.SuggestedMinimumAlagene);
+            AddIntegerSetting(localizer.GetNoun("FoodLimit"), () => settings.FoodLimit, MatchSettings.SuggestedMinimumPopulation);
 
-            AddIntegerSetting("Germe de génération", () => settings.RandomSeed, int.MinValue);
-            AddBooleanSetting("Codes de triche", () => settings.AreCheatsEnabled);
-            AddBooleanSetting("Début nomade", () => settings.StartNomad);
-            AddBooleanSetting("Héros aléatoires", () => settings.AreRandomHeroesEnabled);
-            AddBooleanSetting("Topologie révélée", () => settings.RevealTopology);
+            AddIntegerSetting(localizer.GetNoun("RandomSeed"), () => settings.RandomSeed, int.MinValue);
+            AddBooleanSetting(localizer.GetNoun("CheatCodes"), () => settings.AreCheatsEnabled);
+            AddBooleanSetting(localizer.GetNoun("StartNomad"), () => settings.StartNomad);
+            AddBooleanSetting(localizer.GetNoun("RandomHeroes"), () => settings.AreRandomHeroesEnabled);
+            AddBooleanSetting(localizer.GetNoun("RevealTopology"), () => settings.RevealTopology);
         }
         
         public void AddIntegerSetting(string text, Expression<Func<int>> bindingSourcePropertyExpression, int minimumValue)
@@ -164,7 +173,7 @@ namespace Orion.Game.Presentation.Gui
             Argument.EnsureNotNull(text, "text");
             Argument.EnsureNotNull(bindingSourcePropertyExpression, "bindingSourcePropertyExpression");
 
-            TextField textField = style.Create<TextField>();
+            TextField textField = Style.Create<TextField>();
 
             Bindable bindable = BindableProperty.FromExpression(bindingSourcePropertyExpression);
             textField.Text = bindable.Value.ToString();
@@ -188,7 +197,7 @@ namespace Orion.Game.Presentation.Gui
 
         public void AddBooleanSetting(string text, Expression<Func<bool>> bindingSourcePropertyExpression)
         {
-            CheckBox checkBox = style.Create<CheckBox>();
+            CheckBox checkBox = Style.Create<CheckBox>();
             Binding.CreateTwoWay(bindingSourcePropertyExpression, () => checkBox.IsChecked);
             AddSetting(text, checkBox);
         }
@@ -197,7 +206,7 @@ namespace Orion.Game.Presentation.Gui
         {
             Argument.EnsureNotNull(text, "text");
 
-            Label label = style.CreateLabel(text);
+            Label label = Style.CreateLabel(text);
             label.VerticalAlignment = Alignment.Center;
             control.VerticalAlignment = Alignment.Center;
             settingsForm.AddEntry(label, control);
@@ -210,18 +219,18 @@ namespace Orion.Game.Presentation.Gui
                 MinYMargin = 5
             };
 
-            Button backButton = style.CreateTextButton("Retour");
+            Button backButton = Style.CreateTextButton(localizer.GetNoun("Back"));
             backButton.MinSize = new Size(150, 40);
             backButton.Clicked += (sender, @event) => Exited.Raise(this);
             bottomDock.Dock(backButton, Direction.NegativeX);
 
-            startButton = style.CreateTextButton("Commencer");
+            startButton = Style.CreateTextButton(localizer.GetNoun("Start"));
             startButton.MinSize = new Size(150, 40);
             startButton.MinXMargin = 20;
             startButton.Clicked += (sender, @event) => MatchStarted.Raise(this);
             bottomDock.Dock(startButton, Direction.PositiveX);
 
-            readyCheckBox = style.CreateTextCheckBox("Je suis prêt");
+            readyCheckBox = Style.CreateTextCheckBox(localizer.GetNoun("Ready"));
             readyCheckBox.StateChanged += sender => ReadinessChanged.Raise(this);
             bottomDock.Dock(readyCheckBox, Direction.PositiveX);
             return bottomDock;
@@ -243,7 +252,7 @@ namespace Orion.Game.Presentation.Gui
             };
             contentDock.Dock(settingsForm, Direction.PositiveX);
 
-            Label playersLabel = style.CreateLabel("Joueurs:");
+            Label playersLabel = Style.CreateLabel(localizer.GetNoun("Players"));
             playersLabel.Margin = 5;
             contentDock.Dock(playersLabel, Direction.NegativeY);
 
@@ -269,15 +278,15 @@ namespace Orion.Game.Presentation.Gui
                 VisibilityFlag = Visibility.Hidden
             };
 
-            Label label = style.CreateLabel("Intelligence artificielle:");
+            Label label = Style.CreateLabel(localizer.GetNoun("Bot"));
             label.VerticalAlignment = Alignment.Center;
             stack.Stack(label);
 
-            aiBuilderComboBox = style.Create<ComboBox>();
+            aiBuilderComboBox = Style.Create<ComboBox>();
             aiBuilderComboBox.VerticalAlignment = Alignment.Center;
             stack.Stack(aiBuilderComboBox);
 
-            Button createAIButton = style.CreateTextButton("Créer");
+            Button createAIButton = Style.CreateTextButton(localizer.GetNoun("Create"));
             createAIButton.Clicked += (sender, @args) => 
             {
                 Label aiBuilderLabel = (Label)aiBuilderComboBox.SelectedItem;

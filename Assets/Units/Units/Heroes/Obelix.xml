@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="Obelix" Width="1" Height="1">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="200" ArmorType="Heavy" Armor="3" FoodCost="4"/>
+		<Move Speed="8"/>
+		<Attack Power="25" Range="0" Delay="2" EffectiveAgainst="Light" IneffectiveAgainst=""/>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="ChuckNorris" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

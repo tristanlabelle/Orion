@@ -11,6 +11,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -28,6 +29,7 @@ namespace Orion.Game.Presentation.Gui
         };
 
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly List<TodoButton> unusedTodoButtons = new List<TodoButton>();
         private readonly Action<Health> damageChangedEventHandler;
         private readonly Action<TaskQueue> taskQueueChangedEventHandler;
@@ -43,11 +45,13 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public SingleEntitySelectionPanel(GameGraphics graphics)
+        public SingleEntitySelectionPanel(GameGraphics graphics, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             this.graphics = graphics;
+            this.localizer = localizer;
             this.damageChangedEventHandler = health => UpdateHealth(health.Entity);
             this.taskQueueChangedEventHandler = UpdateTodoList;
             this.remainingAmountChangedEventHandler = UpdateAmount;
@@ -59,6 +63,13 @@ namespace Orion.Game.Presentation.Gui
             dock.Dock(CreatePhoto(), Direction.NegativeX);
             dock.Dock(CreateInfoForm(), Direction.PositiveX);
         }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Unit"/>.
+        /// </summary>
+        public event Action<SingleEntitySelectionPanel, Task> TaskCancelled;
         #endregion
 
         #region Properties
@@ -90,7 +101,7 @@ namespace Orion.Game.Presentation.Gui
             if (unit == entity) return;
             Clear();
 
-            nameLabel.Text = unit.Type.Name;
+            nameLabel.Text = localizer.GetNoun(unit.Type.Name);
             imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
 
             UpdateHealth(unit);
@@ -112,11 +123,14 @@ namespace Orion.Game.Presentation.Gui
                 int value = unit.GetStatValue(stat);
                 if (value == 0) continue;
 
-                Label headerLabel = Style.CreateLabel(stat.Description + ":");
+                string statName = localizer.GetNoun(stat.Name + "Stat");
+                Label headerLabel = Style.CreateLabel(statName + ":");
                 Label valueLabel = Style.CreateLabel(value.ToStringInvariant());
 
                 statsForm.Entries.Add(headerLabel, valueLabel);
             }
+
+            entity = unit;
         }
 
         /// <summary>
@@ -129,13 +143,14 @@ namespace Orion.Game.Presentation.Gui
             if (resourceNode == entity) return;
             Clear();
 
-            Harvestable harvest = resourceNode.Components.Get<Harvestable>();
-
-            nameLabel.Text = harvest.Type.ToStringInvariant();
+            Harvestable harvestable = resourceNode.Components.Get<Harvestable>();
+            nameLabel.Text = localizer.GetNoun(harvestable.Type.ToStringInvariant());
             imageBox.Texture = graphics.GetResourceTexture(resourceNode);
             UpdateAmount(resourceNode);
 
-            harvest.RemainingAmountChanged += remainingAmountChangedEventHandler;
+            harvestable.RemainingAmountChanged += remainingAmountChangedEventHandler;
+
+            entity = resourceNode;
         }
 
         /// <summary>
@@ -175,7 +190,11 @@ namespace Orion.Game.Presentation.Gui
         private void ClearTodoList()
         {
             foreach (TodoButton todoButton in todoButtonStack.Children)
+            {
+                // Stop referencing the task to prevent keeping alive units
+                todoButton.Task = null;
                 unusedTodoButtons.Add(todoButton);
+            }
 
             todoButtonStack.Children.Clear();
         }
@@ -261,7 +280,7 @@ namespace Orion.Game.Presentation.Gui
             topStack.MinHeight = 32;
             topStack.MaxYMargin = 6;
 
-            todoLabel = Style.CreateLabel("Todo:");
+            todoLabel = Style.CreateLabel(localizer.GetNoun("Tasks"));
             todoLabel.VerticalAlignment = Alignment.Center;
             todoLabel.MaxXMargin = 6;
             topStack.Stack(todoLabel);

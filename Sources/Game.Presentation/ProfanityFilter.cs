@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Orion.Engine;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation
 {
@@ -49,12 +50,13 @@ viarge".Split('\n')
               .ToArray();
          }
 
-        public static string Filter(string message)
+        public static string Filter(string message, string replacement)
         {
             Argument.EnsureNotNull(message, "message");
+            Argument.EnsureNotNull(replacement, "replacement");
 
             foreach (Regex regex in regexes)
-                message = regex.Replace(message, "schtroumpf");
+                message = regex.Replace(message, replacement);
 
             return message;
         }

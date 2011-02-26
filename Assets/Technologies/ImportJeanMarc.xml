@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology Name="ImportJeanMarc" AladdiumCost="250" AlageneCost="200">
+  <Target>JeanMarc</Target>
+  <Target>BritishJeanMarc</Target>
+  <Effect Stat="Attack.Power" Change="3"/>
+</Technology>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Technology Name="Import Jean-Marc" AladdiumCost="250" AlageneCost="200">
-  <Target>Jean-Marc</Target>
-  <Target>British Jean-Marc</Target>
-  <Effect Stat="Attack.Power" Change="3"/>
-</Technology>

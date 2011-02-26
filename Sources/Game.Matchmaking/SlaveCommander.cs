@@ -9,6 +9,7 @@ using Orion.Game.Matchmaking.Commands.Pipeline;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System;
+using Orion.Game.Simulation.Tasks;
 
 namespace Orion.Game.Matchmaking
 {
@@ -41,10 +42,17 @@ namespace Orion.Game.Matchmaking
             IssueCommand(new SendMessageCommand(Faction.Handle, allyFactionHandles, message));
         }
 
-        public void LaunchCancel(IEnumerable<Unit> units)
+        public void LaunchCancelAllTasks(IEnumerable<Unit> units)
         {
             if (units.Any())
-                IssueCommand(new CancelCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+                IssueCommand(new CancelAllTasksCommand(Faction.Handle, units.Select(unit => unit.Handle)));
+        }
+
+        public void LaunchCancelTask(Task task)
+        {
+            Unit unit = task.Unit;
+            Handle taskHandle = unit.TaskQueue.TryGetTaskHandle(task);
+            IssueCommand(new CancelTaskCommand(unit.Faction.Handle, unit.Handle, taskHandle));
         }
 
         public void LaunchAttack(IEnumerable<Unit> units, Unit target)

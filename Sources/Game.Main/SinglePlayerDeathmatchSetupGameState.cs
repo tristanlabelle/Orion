@@ -34,7 +34,7 @@ namespace Orion.Game.Main
             LocalPlayer localPlayer = new LocalPlayer(Environment.MachineName, playerSettings.AvailableColors.First());
             this.playerSettings.AddPlayer(localPlayer);
 
-            this.ui = new MatchConfigurationUI(Graphics.GuiStyle)
+            this.ui = new MatchConfigurationUI(Graphics, Localizer)
             {
                 NeedsReadying = false,
             };

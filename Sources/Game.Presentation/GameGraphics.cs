@@ -41,7 +41,7 @@ namespace Orion.Game.Presentation
             this.textureManager = new TextureManager(window.GraphicsContext, assets);
             this.textureManager.PreloadByExtension("png");
 
-            OrionGuiStyle style = new OrionGuiStyle(window.GraphicsContext, textureManager);
+            OrionGuiStyle style = new OrionGuiStyle(this);
             uiManager = style.CreateUIManager();
             uiManager.SetSize(window.ClientAreaSize);
         }
@@ -123,7 +123,7 @@ namespace Orion.Game.Presentation
         }
         
         /// <summary>
-        /// Gets a texture for a GUI element
+        /// Gets a texture for a GUI element.
         /// </summary>
         /// <param name="name">The name of the gui texture.</param>
         /// <returns>The GUI texture with that name.</returns>
@@ -132,6 +132,19 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(name, "name");
 
             string fullName = Path.Combine("Gui", name);
+            return GetTexture(fullName);
+        }
+        
+        /// <summary>
+        /// Gets a texture for a mouse ursor.
+        /// </summary>
+        /// <param name="name">The name of the mouse cursor.</param>
+        /// <returns>The mouse cursor texture with that name.</returns>
+        public Texture GetGuiCursorTexture(string name)
+        {
+            Argument.EnsureNotNull(name, "name");
+
+            string fullName = Path.Combine("Gui", Path.Combine("Cursors", name));
             return GetTexture(fullName);
         }
 

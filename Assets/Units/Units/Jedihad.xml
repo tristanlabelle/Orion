@@ -6,6 +6,6 @@
 		<Attack Power="5" Range="3" Delay="4" EffectiveAgainst="Light Supernatural" IneffectiveAgainst=""/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="Allah Skywalker" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="AllahSkywalker" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

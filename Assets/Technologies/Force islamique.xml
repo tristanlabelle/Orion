@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Technology Name="Force islamique" AladdiumCost="100" AlageneCost="250">
-  <Target>Jedihad</Target>
-  <Target>Allah Skywalker</Target>
-  <Effect Stat="Attack.Power" Change="2"/>
-  <Effect Stat="Attack.Delay" Change="-2"/>
-</Technology>

@@ -131,7 +131,7 @@ namespace Orion.Game.Matchmaking
         private static void IncreaseBuildAndTrainSpeed(Match match, Faction faction)
         {
             Technology technology = match.TechnologyTree.Technologies
-                .FirstOrDefault(tech => tech.Name == "Turbo turbo");
+                .FirstOrDefault(tech => tech.Name == "TurboTurbo");
             if (technology == null)
             {
                 Debug.Fail("Failed to find fast build & train technology.");

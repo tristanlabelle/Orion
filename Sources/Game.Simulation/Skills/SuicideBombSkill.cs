@@ -15,8 +15,8 @@ namespace Orion.Game.Simulation.Skills
     public sealed class SuicideBombSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat RadiusStat = new UnitStat(typeof(SuicideBombSkill), "Radius", "Rayon d'explosion");
-        public static readonly UnitStat DamageStat = new UnitStat(typeof(SuicideBombSkill), "Damage", "Dégats d'explosion");
+        public static readonly UnitStat RadiusStat = new UnitStat(typeof(SuicideBombSkill), "Radius");
+        public static readonly UnitStat DamageStat = new UnitStat(typeof(SuicideBombSkill), "Damage");
         private static readonly Func<string, bool> itemValidator = item => item != null;
 
         private ICollection<string> targets

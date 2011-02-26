@@ -103,9 +103,9 @@ namespace Orion.Game.Simulation
         public event Action<Faction, Technology> TechnologyResearched;
 
         /// <summary>
-        /// Raised when the faction changes of diplomatic stance.
+        /// Raised when the faction changes its diplomatic stance with regard to another faction.
         /// </summary>
-        public event Action<Faction, Faction, DiplomaticStance> DiplomaticStanceChanged;
+        public event Action<Faction, DiplomaticStanceChange> DiplomaticStanceChanged;
 
         public event Action<Faction> AladdiumAmountChanged;
         public event Action<Faction> AlageneAmountChanged;
@@ -114,15 +114,9 @@ namespace Orion.Game.Simulation
 
         public event Action<Faction, string> Warning;
 
-        public void RaiseWarning(string message, Faction source)
-        {
-#warning Ugly hack, event sender should always be the event owner!
-            Warning.Raise(source, message);
-        }
-
         public void RaiseWarning(string message)
         {
-            RaiseWarning(message, this);
+            Warning.Raise(this, message);
         }
         #endregion
 
@@ -193,18 +187,6 @@ namespace Orion.Game.Simulation
         public FactionStatus Status
         {
             get { return status; }
-        }
-
-        private IEnumerable<Faction> FactionsSharingTheirVision
-        {
-            get
-            {
-                foreach (KeyValuePair<Faction, DiplomaticStance> pair in diplomaticStances)
-                {
-                	if (pair.Key.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
-                        yield return pair.Key;
-                }
-            }
         }
 
         #region Resources
@@ -549,27 +531,11 @@ namespace Orion.Game.Simulation
 
             DiplomaticStance previousStance = GetDiplomaticStance(target);
             DiplomaticStance otherFactionStance = target.GetDiplomaticStance(this);
-
-            if (stance.HasFlag(DiplomaticStance.SharedControl))
-            {
-                target.RaiseWarning("{0} désire partager le contrôle avec vous.".FormatInvariant(this), this);
-            }
-            else
-            {
-                if (stance.HasFlag(DiplomaticStance.SharedVision) && !previousStance.HasFlag(DiplomaticStance.SharedVision))
-                    target.RaiseWarning("{0} partage sa vision avec vous.".FormatInvariant(this), this);
-                else if (!stance.HasFlag(DiplomaticStance.SharedVision) && previousStance.HasFlag(DiplomaticStance.SharedVision))
-                    target.RaiseWarning("{0} ne partage plus sa vision avec vous.".FormatInvariant(this), this);
-
-
-                if (stance.HasFlag(DiplomaticStance.AlliedVictory) && !previousStance.HasFlag(DiplomaticStance.AlliedVictory))
-                    target.RaiseWarning("{0} désire partager la victoire avec vous.".FormatInvariant(this), this);
-                else if (!stance.HasFlag(DiplomaticStance.AlliedVictory) && previousStance.HasFlag(DiplomaticStance.AlliedVictory))
-                    target.RaiseWarning("{0} ne partagera plus la victoire avec vous.".FormatInvariant(this), this);
-            }
-
+            
             diplomaticStances[target] = stance;
-            DiplomaticStanceChanged.Raise(this, target, stance);
+            
+            DiplomaticStanceChange change = new DiplomaticStanceChange(this, target, previousStance, stance);
+            DiplomaticStanceChanged.Raise(this, change);
             target.OnOtherFactionDiplomaticStanceChanged(this, stance);
         }
 
@@ -682,13 +648,27 @@ namespace Orion.Game.Simulation
             return CanSee(entity.GridRegion);
         }
 
+        /// <summary>
+        /// Gets the <see cref="TileVisibility"/> which indicates if this <see cref="Faction"/>
+        /// currently sees a given tile.
+        /// </summary>
+        /// <param name="point">The coordinates of the tile.</param>
+        /// <returns>The visibility of that tile.</returns>
+        /// <remarks>
+        /// This method is performance critical as it is called by the pathfinder.
+        /// It should make no allocations and run as fast as possible.
+        /// </remarks>
         public TileVisibility GetTileVisibility(Point point)
         {
             TileVisibility visibility = localFogOfWar.GetTileVisibility(point);
             if (visibility == TileVisibility.Visible) return TileVisibility.Visible;
 
-            foreach (Faction faction in FactionsSharingTheirVision)
+            foreach (var pair in diplomaticStances)
             {
+                Faction faction = pair.Key;
+                if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
+                    continue;
+
                 if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Visible)
                     return TileVisibility.Visible;
                 else if (faction.localFogOfWar.GetTileVisibility(point) == TileVisibility.Discovered)
@@ -703,13 +683,23 @@ namespace Orion.Game.Simulation
         /// </summary>
         /// <param name="point">The point to be tested.</param>
         /// <returns>A value indicating if that tile has been seen.</returns>
+        /// <remarks>
+        /// This method is performance critical as it is called by the pathfinder.
+        /// It should make no allocations and run as fast as possible.
+        /// </remarks>
         public bool HasSeen(Point point)
         {
             if (localFogOfWar.IsDiscovered(point)) return true;
 
-            foreach (Faction faction in FactionsSharingTheirVision)
+            foreach (var pair in diplomaticStances)
+            {
+                Faction faction = pair.Key;
+                if (!faction.GetDiplomaticStance(this).HasFlag(DiplomaticStance.SharedVision))
+                    continue;
+
                 if (faction.localFogOfWar.IsDiscovered(point))
                     return true;
+            }
 
             return false;
         }

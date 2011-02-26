@@ -13,20 +13,9 @@ namespace Orion.Tests
     /// </summary>
     public sealed class LocalizationTests
     {
-        private Localizer localizer;
-
-        private void Init()
+        private static Localizer CreateLocalizer()
         {
-            localizer = new Localizer();
-        }
-
-        private void LoadValidXML()
-        {
-           localizer.LoadDictionary(System.IO.Directory.GetCurrentDirectory() + "valid_definitions.xml");
-        }
-
-        private void LoadValidDictionaryDynamically()
-        {
+            Localizer localizer = new Localizer();
             Definition newDefinition;
             
             //Nouns
@@ -62,46 +51,46 @@ namespace Orion.Tests
             newDefinition.AddTranslation(new Translation("%n0 received %n1 point{n1>1?s:}.", "en"));
             newDefinition.AddTranslation(new Translation("%n0 a recu %n1 point{n1>1?s}.", "fr"));
             localizer.AddSentence(newDefinition);
+
+            return localizer;
         }
         
         [Fact]
         public void TestFailsWhenFileDoesNotExist()
         {
-            Init();
-
+            Localizer localizer = new Localizer();
             Assert.Throws<FileNotFoundException>(() => localizer.LoadDictionary("tamaman123.xml"));
         }
 
-        //[Fact]
-        public void ValidXMLIsLoadedCorrectly()
+        [Fact]
+        public static void TestRetrieveUndefinedNoun()
         {
-            Init();
-            
-            //Assert.DoesNotThrow(() => localizer.LoadDictionary("valid_definitions.xml"));
+            Localizer localizer = CreateLocalizer();
+
+            const string noun = "SomethingWhichDoesNotExist";
+            Assert.Equal(noun, localizer.GetNoun(noun));
         }
 
         [Fact]
         public void NounsAreLoadedCorrectly()
         {
-            Init();
-            LoadValidDictionaryDynamically();
+            Localizer localizer = CreateLocalizer();
 
-            Assert.Same("Smurf", localizer.GetNoun("Smurf"));
-            Assert.Same("Smurfette", localizer.GetNoun("Smurfette"));
-            Assert.Same("Jedihad", localizer.GetNoun("Jedihad"));
+            Assert.Equal("Smurf", localizer.GetNoun("Smurf"));
+            Assert.Equal("Smurfette", localizer.GetNoun("Smurfette"));
+            Assert.Equal("Jedihad", localizer.GetNoun("Jedihad"));
 
             localizer.CultureInfo = new CultureInfo(12);
 
-            Assert.Same("Schtroumpf", localizer.GetNoun("Smurf"));
-            Assert.Same("Schtroumpfette", localizer.GetNoun("Smurfette"));
-            Assert.Same("Jedihad", localizer.GetNoun("Jedihad"));
+            Assert.Equal("Schtroumpf", localizer.GetNoun("Smurf"));
+            Assert.Equal("Schtroumpfette", localizer.GetNoun("Smurfette"));
+            Assert.Equal("Jedihad", localizer.GetNoun("Jedihad"));
         }
 
         [Fact]
         public void GendersAreLoadedCorrectly()
         {
-            Init();
-            LoadValidDictionaryDynamically();
+            Localizer localizer = CreateLocalizer();
 
             localizer.CultureInfo = new CultureInfo(12);
 
@@ -135,20 +124,19 @@ namespace Orion.Tests
         [Fact]
         public void SentencesAreLoadedCorrectly()
         {
-            Init();
-            LoadValidDictionaryDynamically();
+            Localizer localizer = CreateLocalizer();
 
-            Assert.Same("UnitCreation", localizer.Sentences["UnitCreation"].Key);
-            Assert.Same("ResourceAcquisition", localizer.Sentences["ResourceAcquisition"].Key);
-            Assert.Same("PointAcquisition", localizer.Sentences["PointAcquisition"].Key);
+            Assert.Equal("UnitCreation", localizer.Sentences["UnitCreation"].Key);
+            Assert.Equal("ResourceAcquisition", localizer.Sentences["ResourceAcquisition"].Key);
+            Assert.Equal("PointAcquisition", localizer.Sentences["PointAcquisition"].Key);
 
-            Assert.Same
+            Assert.Equal
                 (
                 "%n0 received %n1 point{n1>1?s:}."
                 ,localizer.Sentences["PointAcquisition"].GetTranslation(localizer.CultureInfo).TranslatedString
                 );
 
-            Assert.Same
+            Assert.Equal
                 (
                 "%n0 a recu %n1 point{n1>1?s}."
                 , localizer.Sentences["PointAcquisition"].GetTranslation(new CultureInfo(12)).TranslatedString

@@ -11,8 +11,8 @@ namespace Orion.Game.Simulation.Skills
     public sealed class HarvestSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat SpeedStat = new UnitStat(typeof(HarvestSkill), "Speed", "Vitesse de récolte");
-        public static readonly UnitStat MaxCarryingAmountStat = new UnitStat(typeof(HarvestSkill), "MaxCarryingAmount", "Quantité maximum");
+        public static readonly UnitStat SpeedStat = new UnitStat(typeof(HarvestSkill), "Speed");
+        public static readonly UnitStat MaxCarryingAmountStat = new UnitStat(typeof(HarvestSkill), "MaxCarryingAmount");
 
         private int speed = 1;
         private int maxCarryingAmount = 1;

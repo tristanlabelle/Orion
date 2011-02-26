@@ -33,19 +33,19 @@ namespace Orion.Game.Presentation.Gui
                 DockLayout dock = new DockLayout();
                 Content = dock;
 
-                Label nameLabel = ui.style.CreateLabel(player.Name);
+                Label nameLabel = ui.Style.CreateLabel(player.Name);
                 nameLabel.VerticalAlignment = Alignment.Center;
                 nameLabel.MinXMargin = 5;
                 dock.Dock(nameLabel, Direction.NegativeX);
 
-                kickButton = ui.style.CreateTextButton("Kick");
+                kickButton = ui.Style.CreateTextButton("Kick");
                 kickButton.VerticalAlignment = Alignment.Center;
                 kickButton.MinXMargin = 5;
                 kickButton.MaxXMargin = 5;
                 kickButton.Clicked += (sender, @event) => ui.PlayerKicked.Raise(ui, player);
                 dock.Dock(kickButton, Direction.PositiveX);
 
-                colorComboBox = ui.style.Create<ComboBox>();
+                colorComboBox = ui.Style.Create<ComboBox>();
                 colorComboBox.Button.Width = 24;
                 colorComboBox.SelectedItemViewport.Width = 60;
                 colorComboBox.DropDown.Width = 60;

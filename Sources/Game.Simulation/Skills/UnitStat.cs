@@ -21,21 +21,18 @@ namespace Orion.Game.Simulation.Skills
         private readonly string skillName;
         private readonly string name;
         private readonly string fullName;
-        private readonly string description;
         #endregion
 
         #region Constructors
-        internal UnitStat(Type skillType, string name, string description)
+        internal UnitStat(Type skillType, string name)
         {
             Argument.EnsureNotNull(skillType, "skillType");
             Argument.EnsureNotNull(name, "name");
-            Argument.EnsureNotNull(description, "description");
 
             this.skillType = skillType;
             this.skillName = UnitSkill.GetTypeName(skillType);
             this.name = name;
             this.fullName = skillName + '.' + name;
-            this.description = description;
         }
         #endregion
 
@@ -70,14 +67,6 @@ namespace Orion.Game.Simulation.Skills
         public string FullName
         {
             get { return fullName; }
-        }
-
-        /// <summary>
-        /// Gets a human-readable description of this stat.
-        /// </summary>
-        public string Description
-        {
-            get { return description; }
         }
         #endregion
 

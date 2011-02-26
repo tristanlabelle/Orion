@@ -20,8 +20,8 @@ namespace Orion.Game.Simulation.IO
 
         public UnitTemplate(Point location, string unitName)
         {
-            location = location;
-            unitName = unitName;
+            this.location = location;
+            this.unitName = unitName;
         }
         #endregion
 

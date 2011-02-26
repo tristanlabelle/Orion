@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Technology Name="Schtroumpf véloce" AladdiumCost="150" AlageneCost="50">
-  <Target>Schtroumpf</Target>
-  <Target>Grand schtroumpf</Target>
-  <Effect Stat="Move.Speed" Change="2"/>
-</Technology>

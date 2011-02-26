@@ -7,6 +7,7 @@ using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation;
 using Font = System.Drawing.Font;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -15,24 +16,22 @@ namespace Orion.Game.Presentation.Gui
     /// </summary>
     public sealed class MainMenuUI : ContentControl
     {
-        #region Fields
-        private const string programmerNames = "Anthony Vallée-Dubois / Étienne-Joseph Charles / Félix Cloutier / François Pelletier / Mathieu Lavoie / Tristan Labelle";
-        private const string artistName = "Guillaume Lacasse";
-        #endregion
-
         #region Constructors
-        public MainMenuUI(OrionGuiStyle style)
+        public MainMenuUI(GameGraphics graphics, Localizer localizer)
         {
-            Argument.EnsureNotNull(style, "style");
+            Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
 
+            var style = graphics.GuiStyle;
+            
             DockLayout dock = style.Create<DockLayout>();
-            dock.Adornment = new TextureAdornment(style.GetTexture("Gui/MenuBackground"));
+            dock.Adornment = new TextureAdornment(graphics.GetGuiTexture("MenuBackground"));
             dock.LastChildFill = true;
             Content = dock;
 
             ImageBox titleImageBox = style.Create<ImageBox>();
             titleImageBox.HorizontalAlignment = Alignment.Center;
-            titleImageBox.Texture = style.GetTexture("Gui/Title");
+            titleImageBox.Texture = graphics.GetGuiTexture("Title");
             dock.Dock(titleImageBox, Direction.NegativeY);
 
             StackLayout buttonsStack = new StackLayout()
@@ -45,11 +44,11 @@ namespace Orion.Game.Presentation.Gui
             };
             dock.Dock(buttonsStack, Direction.PositiveX);
 
-            StackButton(buttonsStack, style, "Monojoueur", () => SinglePlayerClicked);
-            StackButton(buttonsStack, style, "Multijoueur", () => MultiplayerClicked);
-            StackButton(buttonsStack, style, "Visionner une partie", () => ReplayClicked);
-            StackButton(buttonsStack, style, "Crédits", () => CreditsClicked);
-            StackButton(buttonsStack, style, "Quitter", () => QuitClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("SinglePlayer"), () => SinglePlayerClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Multiplayer"), () => MultiplayerClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("ViewReplay"), () => ReplayClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Credits"), () => CreditsClicked);
+            StackButton(buttonsStack, style, localizer.GetNoun("Quit"), () => QuitClicked);
         }
         #endregion
 

@@ -27,6 +27,8 @@ namespace Orion.Engine.Graphics
         private readonly Action backbufferSwapper;
         private readonly Stack<Region> scissorStack = new Stack<Region>();
         private readonly TextRenderer textRenderer;
+        private readonly Action popScissorRegionDelegate;
+        private readonly Action popTransformDelegate;
 
         /// <summary>
         /// The size of the OpenGL viewport.
@@ -48,6 +50,8 @@ namespace Orion.Engine.Graphics
 
             this.backbufferSwapper = backbufferSwapper;
             this.textRenderer = new TextRenderer(this);
+            this.popScissorRegionDelegate = PopScissorRegion;
+            this.popTransformDelegate = PopTransform;
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
@@ -271,7 +275,7 @@ namespace Orion.Engine.Graphics
 
             scissorStack.Push(clippedRegion);
 
-            return new DisposableHandle(PopScissorRegion);
+            return new DisposableHandle(popScissorRegionDelegate);
         }
 
         /// <summary>
@@ -317,7 +321,7 @@ namespace Orion.Engine.Graphics
 
             GL.Scale(transform.Scaling.X, transform.Scaling.Y, 1);
 
-            return new DisposableHandle(PopTransform);
+            return new DisposableHandle(popTransformDelegate);
         }
 
         /// <summary>

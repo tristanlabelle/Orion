@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Orion.Engine;
+using Orion.Engine.Localization;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
@@ -18,22 +19,25 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager inputManager;
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly Unit unitType;
         private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
         public BuildActionProvider(ActionPanel actionPanel, UserInputManager inputManager,
-            GameGraphics graphics, Unit unitType)
+            GameGraphics graphics,  Localizer localizer, Unit unitType)
         {
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(inputManager, "inputManager");
             Argument.EnsureNotNull(graphics, "graphics");
+            Argument.EnsureNotNull(localizer, "localizer");
             Argument.EnsureNotNull(unitType, "unitType");
 
             this.actionPanel = actionPanel;
             this.inputManager = inputManager;
             this.graphics = graphics;
+            this.localizer = localizer;
             this.unitType = unitType;
 
             CreateButtons();
@@ -94,7 +98,7 @@ namespace Orion.Game.Presentation.Actions
             
             return new ActionDescriptor()
             {
-                Name = buildingType.Name,
+                Name = localizer.GetNoun(buildingType.Name),
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
                 Texture = graphics.GetUnitTexture(buildingType),
                 Action = () =>

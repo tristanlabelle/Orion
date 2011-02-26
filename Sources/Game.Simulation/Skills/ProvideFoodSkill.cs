@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Skills
     public sealed class ProvideFoodSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat AmountStat = new UnitStat(typeof(ProvideFoodSkill), "Amount", "Nourriture fournie");
+        public static readonly UnitStat AmountStat = new UnitStat(typeof(ProvideFoodSkill), "Amount");
 
         private int amount = 1;
         #endregion

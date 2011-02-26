@@ -39,10 +39,6 @@ namespace Orion.Game.Matchmaking.Commands.Pipeline
 
                 if (command.ValidateHandles(match))
                 {
-#if DEBUG
-                    // #if'd so FormatInvariant is not executed in release
-                    Debug.WriteLine("Update #{0}: {1}.".FormatInvariant(step.Number, command));
-#endif
                     command.Execute(match);
                 }
                 else

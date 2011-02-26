@@ -16,10 +16,9 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Constructors
-            public MessageLabel(string text, ColorRgb color, TimeSpan expirationTime)
+            public MessageLabel(string text, TimeSpan expirationTime)
             {
                 Text = text;
-                TextColor = color;
                 this.expirationTime = expirationTime;
             }
             #endregion
@@ -65,8 +64,9 @@ namespace Orion.Game.Presentation.Gui
             /// <param name="color">The color of the message.</param>
             public void AddMessage(string text, ColorRgb color)
             {
-                MessageLabel label = new MessageLabel(text, color, time + messageLifeSpan);
+                MessageLabel label = new MessageLabel(text, time + messageLifeSpan);
                 style.ApplyStyle(label);
+                label.TextColor = color;
 
                 if (Children.Count == maxMessageCount)
                     Children.RemoveAt(Children.Count - 1);

@@ -6,7 +6,6 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Matchmaking;
 using Orion.Game.Matchmaking.Commands.Pipeline;
-using Orion.Game.Matchmaking.TowerDefense;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System.Diagnostics;
@@ -49,6 +48,13 @@ namespace Orion.Game.Matchmaking
         #endregion
 
         #region Events
+        /// <summary>
+        /// Raised when one of this <see cref="World"/>'s <see cref="Faction"/>s uses a cheat code.
+        /// The first argument specifies the faction that used the cheat.
+        /// The second argument specifies the cheat that was used.
+        /// </summary>
+        public event Action<Match, Faction, string> CheatUsed;
+        
         /// <summary>
         /// Raised when a message was received from a <see cref="Faction"/>.
         /// </summary>
@@ -132,6 +138,16 @@ namespace Orion.Game.Matchmaking
         {
             return world.IsFree(region, CollisionLayer.Ground)
                 && (canBuildPredicate == null || region.Points.All(p => canBuildPredicate(p)));
+        }
+        
+        /// <summary>
+        /// Raises the <see cref="E:CheatUsed"/> event.
+        /// </summary>
+        /// <param name="faction">The <see cref="Faction"/> that cheated.</param>
+        /// <param name="cheat">The cheat that was used.</param>
+        public void RaiseCheatUsed(Faction faction, string cheat)
+        {
+        	CheatUsed.Raise(this, faction, cheat);
         }
 
         /// <summary>

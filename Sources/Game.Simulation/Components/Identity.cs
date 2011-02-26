@@ -22,7 +22,7 @@ namespace Orion.Game.Simulation.Components
         private int alageneCost;
         private TrainType trainType;
         private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
-        private Entity templateEntity;
+        private Entity prototype;
         #endregion
 
         #region Constructors
@@ -92,10 +92,10 @@ namespace Orion.Game.Simulation.Components
             set { leavesRemains = value; }
         }
 
-        public Entity TemplateEntity
+        public Entity Prototype
         {
-            get { return templateEntity; }
-            set { templateEntity = value; }
+            get { return prototype; }
+            set { prototype = value; }
         }
         #endregion
     }

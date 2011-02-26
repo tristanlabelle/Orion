@@ -12,8 +12,9 @@ using Orion.Engine.Gui;
 using Orion.Engine.Gui.Adornments;
 using Orion.Game.Presentation.Actions;
 using Orion.Game.Presentation.Renderers;
-using Key = OpenTK.Input.Key;
 using Orion.Game.Simulation;
+using Key = OpenTK.Input.Key;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -23,7 +24,8 @@ namespace Orion.Game.Presentation.Gui
     public sealed partial class MatchUI : ContentControl
     {
         #region Fields
-        private readonly OrionGuiStyle style;
+        private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly Action<UIManager, TimeSpan> updatedEventHandler;
         private readonly InterpolatedCounter aladdiumAmountCounter = new InterpolatedCounter(0);
         private readonly InterpolatedCounter alageneAmountCounter = new InterpolatedCounter(0);
@@ -54,12 +56,14 @@ namespace Orion.Game.Presentation.Gui
         #endregion
 
         #region Constructors
-        public MatchUI(GameGraphics graphics, Faction localFaction)
+        public MatchUI(GameGraphics graphics, Faction localFaction, Localizer localizer)
         {
             Argument.EnsureNotNull(graphics, "graphics");
             Argument.EnsureNotNull(localFaction, "localFaction");
+            Argument.EnsureNotNull(localizer, "localizer");
 
-            this.style = graphics.GuiStyle;
+            this.graphics = graphics;
+            this.localizer = localizer;
             this.updatedEventHandler = OnGuiUpdated;
 
             this.modalDialog = new ModalDialog()
@@ -262,6 +266,11 @@ namespace Orion.Game.Presentation.Gui
             get { return Manager != null && Manager.Popups.Contains(modalDialog); }
         }
 
+        private OrionGuiStyle Style
+        {
+        	get { return graphics.GuiStyle; }
+        }
+        
         private ActionButton ActionButtonUnderMouse
         {
             get
@@ -365,7 +374,7 @@ namespace Orion.Game.Presentation.Gui
             ContentControl container = new ContentControl();
             container.IsMouseEventSink = true;
             container.HorizontalAlignment = Alignment.Center;
-            BorderTextureAdornment adornment = new BorderTextureAdornment(style.GetTexture("Gui/Header"));
+            BorderTextureAdornment adornment = new BorderTextureAdornment(graphics.GetGuiTexture("Header"));
             container.Adornment = adornment;
             container.Padding = new Borders(adornment.Texture.Width / 2 - 10, 8);
 
@@ -379,19 +388,19 @@ namespace Orion.Game.Presentation.Gui
             resourcesStack.MaxXMargin = 15;
 
             ImageBox dummyImageBox;
-            resourcesStack.Stack(CreateResourcePanel("Aladdium", out dummyImageBox, out aladdiumAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel(graphics.GetMiscTexture("Aladdium"), out dummyImageBox, out aladdiumAmountLabel));
             Binding.CreateOneWay(() => aladdiumAmountCounter.DisplayedValue, () => aladdiumAmountLabel.Text);
 
-            resourcesStack.Stack(CreateResourcePanel("Alagene", out dummyImageBox, out alageneAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel(graphics.GetMiscTexture("Alagene"), out dummyImageBox, out alageneAmountLabel));
             Binding.CreateOneWay(() => alageneAmountCounter.DisplayedValue, () => alageneAmountLabel.Text);
 
-            resourcesStack.Stack(CreateResourcePanel("Gui/Food", out dummyImageBox, out foodAmountLabel));
+            resourcesStack.Stack(CreateResourcePanel(graphics.GetGuiTexture("Food"), out dummyImageBox, out foodAmountLabel));
             foodAmountLabel.Text = "0/0";
 
             Button inactiveWorkersButton = new Button()
             {
                 AcquireKeyboardFocusWhenPressed = false,
-                Content = CreateResourcePanel("Units/Schtroumpf", out idleWorkerCountImageBox, out idleWorkerCountLabel)
+                Content = CreateResourcePanel(graphics.GetUnitTexture("Smurf"), out idleWorkerCountImageBox, out idleWorkerCountLabel)
             };
 
             // Hack to detect if button is pressed while shift is down.
@@ -408,11 +417,11 @@ namespace Orion.Game.Presentation.Gui
 
         private Button CreatePauseButton()
         {
-            Button button = style.CreateTextButton("Pause");
+            Button button = Style.CreateTextButton(localizer.GetNoun("Pause"));
             button.AcquireKeyboardFocusWhenPressed = false;
             button.VerticalAlignment = Alignment.Center;
 
-            pausePanel = new PausePanel(style);
+            pausePanel = new PausePanel(Style, localizer);
 
             button.Clicked += (sender, @event) => ShowPauseDialog();
 
@@ -434,12 +443,12 @@ namespace Orion.Game.Presentation.Gui
 
         private Button CreateDiplomacyButton(Faction localFaction)
         {
-            Button button = style.CreateTextButton("Diplomatie");
+            Button button = Style.CreateTextButton(localizer.GetNoun("Diplomacy"));
             button.AcquireKeyboardFocusWhenPressed = false;
             button.VerticalAlignment = Alignment.Center;
             button.MaxXMargin = 10;
 
-            diplomacyPanel = new DiplomacyPanel(style, localFaction);
+            diplomacyPanel = new DiplomacyPanel(Style, localFaction, localizer);
 
             button.Clicked += (sender, @event) => ShowDiplomacyDialog();
 
@@ -454,21 +463,21 @@ namespace Orion.Game.Presentation.Gui
             return button;
         }
 
-        private StackLayout CreateResourcePanel(string textureName, out ImageBox imageBox, out Label label)
+        private StackLayout CreateResourcePanel(Texture texture, out ImageBox imageBox, out Label label)
         {
             StackLayout stack = new StackLayout();
             stack.Direction = Direction.PositiveX;
 
             imageBox = new ImageBox()
             {
-                Texture = style.GetTexture(textureName),
+                Texture = texture,
                 VerticalAlignment = Alignment.Center,
                 Width = 30,
                 Height = 30
             };
             stack.Stack(imageBox);
 
-            label = style.CreateLabel("0");
+            label = Style.CreateLabel("0");
             label.TextColor = Colors.White;
             label.VerticalAlignment = Alignment.Center;
             label.MinXMargin = 5;
@@ -484,7 +493,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 Padding = new Borders(6),
                 IsMouseEventSink = true,
-                Adornment = new TextureAdornment(style.GetTexture("Gui/Granite")) { IsTiling = true }
+                Adornment = new TextureAdornment(graphics.GetGuiTexture("Granite")) { IsTiling = true }
             };
             bottomBar = container;
 
@@ -493,7 +502,7 @@ namespace Orion.Game.Presentation.Gui
 
             ImageBox carvingImageBox = new ImageBox
             {
-                Texture = style.GetTexture("Gui/Carving"),
+                Texture = graphics.GetGuiTexture("Carving"),
                 HorizontalAlignment = Alignment.Center,
                 VerticalAlignment = Alignment.Center,
             };
@@ -536,7 +545,7 @@ namespace Orion.Game.Presentation.Gui
             {
                 for (int columnIndex = 0; columnIndex < grid.ColumnCount; ++columnIndex)
                 {
-                    ActionButton actionButton = style.Create<ActionButton>();
+                    ActionButton actionButton = Style.Create<ActionButton>();
                     actionButton.VisibilityFlag = Visibility.Hidden;
                     grid.Children[rowIndex, columnIndex] = actionButton;
                 }
@@ -560,7 +569,7 @@ namespace Orion.Game.Presentation.Gui
         {
             DockLayout dock = new DockLayout();
 
-            actionToolTip = new ActionToolTip(style)
+            actionToolTip = new ActionToolTip(graphics)
             {
                 Adornment = new ColorAdornment(Colors.Gray),
                 VerticalAlignment = Alignment.Positive,
@@ -569,7 +578,7 @@ namespace Orion.Game.Presentation.Gui
             };
             dock.Dock(actionToolTip, Direction.PositiveX);
 
-            chatTextField = style.Create<TextField>();
+            chatTextField = Style.Create<TextField>();
             dock.Dock(chatTextField, Direction.PositiveY);
             chatTextField.MinXMargin = 5;
             chatTextField.MaxYMargin = 5;
@@ -578,7 +587,7 @@ namespace Orion.Game.Presentation.Gui
             chatTextField.VisibilityFlag = Visibility.Hidden;
             chatTextField.KeyEvent += OnChatTextFieldKeyEvent;
 
-            messageConsole = new MessageConsole(style)
+            messageConsole = new MessageConsole(Style)
             {
                 Direction = Direction.NegativeY,
                 MinXMargin = 5,

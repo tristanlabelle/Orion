@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Graphics;
+using Orion.Engine.Localization;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
 
@@ -20,6 +22,7 @@ namespace Orion.Game.Main
         private readonly AssetsDirectory assets;
         private readonly GameAudio audio;
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly Stack<GameState> states = new Stack<GameState>();
         private bool deferActions;
         private Action deferredAction;
@@ -33,6 +36,9 @@ namespace Orion.Game.Main
             assets = new AssetsDirectory(assetsPath);
         	this.audio = new GameAudio(assets);
         	this.graphics = new GameGraphics(assets);
+            this.localizer = new Localizer();
+            this.localizer.LoadDictionary(Path.Combine(assetsPath, "definitions.xml"));
+            this.localizer.CultureInfo = Localizer.EnglishCulture;
         }
         #endregion
 
@@ -50,6 +56,11 @@ namespace Orion.Game.Main
         public GameGraphics Graphics
         {
         	get { return graphics; }
+        }
+
+        public Localizer Localizer
+        {
+            get { return localizer; }
         }
         
         public GameState ActiveState

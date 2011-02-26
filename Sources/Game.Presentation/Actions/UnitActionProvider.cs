@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Engine.Localization;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Actions.UserCommands;
 using Orion.Game.Simulation;
@@ -19,21 +20,26 @@ namespace Orion.Game.Presentation.Actions
         private readonly ActionPanel actionPanel;
         private readonly UserInputManager userInputManager;
         private readonly GameGraphics graphics;
+        private readonly Localizer localizer;
         private readonly Unit unitType;
         private readonly ActionDescriptor[,] actions = new ActionDescriptor[4, 4];
         #endregion
 
         #region Constructors
-        public UnitActionProvider(ActionPanel actionPanel, UserInputManager userInputManager, GameGraphics graphics, Unit unitType)
+        public UnitActionProvider(ActionPanel actionPanel, UserInputManager userInputManager,
+            GameGraphics graphics, Localizer localizer, Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
             Argument.EnsureNotNull(actionPanel, "actionPanel");
             Argument.EnsureNotNull(userInputManager, "userInputManager");
             Argument.EnsureNotNull(graphics, "graphics");
-
+            Argument.EnsureNotNull(localizer, "localizer");
+            Argument.EnsureNotNull(unitType, "unitType");
+            
             this.actionPanel = actionPanel;
             this.userInputManager = userInputManager;
             this.graphics = graphics;
+            this.localizer = localizer;
             this.unitType = unitType;
 
             CreateButtons();
@@ -63,7 +69,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[2, 3] = new ActionDescriptor()
                 {
-                    Name = "Attaquer",
+                    Name = localizer.GetNoun("Attack"),
                     Texture = graphics.GetActionTexture("Attack"),
                     HotKey = Key.A,
                     Action = () =>
@@ -76,17 +82,18 @@ namespace Orion.Game.Presentation.Actions
 
             if (unitType.HasComponent<Builder, BuildSkill>())
             {
+                var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, unitType);
                 actions[0, 0] = new ActionDescriptor()
                 {
-                    Name = "Construire",
+                    Name = localizer.GetNoun("Build"),
                     Texture = graphics.GetActionTexture("Build"),
                     HotKey = Key.B,
-                    Action = () => actionPanel.Push(new BuildActionProvider(actionPanel, userInputManager, graphics, unitType))
+                    Action = () => actionPanel.Push(buildActionProvider)
                 };
 
                 actions[1, 0] = new ActionDescriptor()
                 {
-                    Name = "Réparer",
+                    Name = localizer.GetNoun("Repair"),
                     Texture = graphics.GetActionTexture("Repair"),
                     HotKey = Key.R,
                     Action = () =>
@@ -101,7 +108,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[1, 2] = new ActionDescriptor()
                 {
-                    Name = "Ramasser",
+                    Name = localizer.GetNoun("Harvest"),
                     Texture = graphics.GetActionTexture("Harvest"),
                     HotKey = Key.H,
                     Action = () =>
@@ -116,7 +123,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[3, 2] = new ActionDescriptor()
                 {
-                    Name = "Soigner",
+                    Name = localizer.GetNoun("Heal"),
                     Texture = graphics.GetActionTexture("Heal"),
                     HotKey = Key.H,
                     Action = () =>
@@ -131,7 +138,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
-                    Name = "Déplacer",
+                    Name = localizer.GetNoun("Move"),
                     Texture = graphics.GetActionTexture("Move"),
                     HotKey = Key.M,
                     Action = () =>
@@ -146,7 +153,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[3, 0] = new ActionDescriptor()
                 {
-                    Name = "Vendre",
+                    Name = localizer.GetNoun("Sell"),
                     Texture = graphics.GetActionTexture("Sell"),
                     Action = () => userInputManager.LaunchSell()
                 };
@@ -156,7 +163,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[3, 3] = new ActionDescriptor()
                 {
-                    Name = "Guarder",
+                    Name = localizer.GetNoun("StandGuard"),
                     Texture = graphics.GetActionTexture("Stand Guard"),
                     HotKey = Key.G,
                     Action = () => userInputManager.LaunchStandGuard()
@@ -167,7 +174,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 actions[2, 0] = new ActionDescriptor()
                 {
-                    Name = "Améliorer",
+                    Name = localizer.GetNoun("Upgrade"),
                     Texture = graphics.GetActionTexture("Upgrade"),
                     Action = () => actionPanel.Push(new UpgradeActionProvider(actionPanel, userInputManager, graphics, unitType))
                 };
@@ -198,7 +205,7 @@ namespace Orion.Game.Presentation.Actions
                 Unit traineeTypeForClosure = traineeType;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = traineeType.Name,
+                    Name = localizer.GetNoun(traineeType.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
                     Texture = graphics.GetUnitTexture(traineeType),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
@@ -220,7 +227,7 @@ namespace Orion.Game.Presentation.Actions
                 Technology technologyForClosure = technology;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = technology.Name,
+                    Name = localizer.GetNoun(technology.Name),
                     Cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost),
                     Texture = graphics.GetTechnologyTexture(technology),
                     Action = () => userInputManager.LaunchResearch(technologyForClosure)

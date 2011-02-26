@@ -6,6 +6,7 @@ using Orion.Engine.Gui;
 using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Engine.Gui.Adornments;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Presentation.Gui
 {
@@ -21,7 +22,7 @@ namespace Orion.Game.Presentation.Gui
             #endregion
 
             #region Constructors
-            public FactionRow(DiplomacyPanel panel, OrionGuiStyle style, Faction localFaction, Faction otherFaction)
+            public FactionRow(DiplomacyPanel panel, OrionGuiStyle style, Localizer localizer, Faction localFaction, Faction otherFaction)
             {
                 Dock(new ImageBox()
                     {
@@ -39,7 +40,7 @@ namespace Orion.Game.Presentation.Gui
 
                 CheckBox alliedCheckBox = style.Create<CheckBox>();
                 alliedCheckBox.VerticalAlignment = Alignment.Center;
-                alliedCheckBox.Content = style.CreateLabel("Allié");
+                alliedCheckBox.Content = style.CreateLabel(localizer.GetNoun("Allied"));
                 alliedCheckBox.IsChecked = (localFaction.GetDiplomaticStance(otherFaction) & DiplomaticStance.SharedVision) != 0;
                 alliedCheckBox.StateChanged += sender =>
                 {
@@ -64,10 +65,11 @@ namespace Orion.Game.Presentation.Gui
         }
 
         #region Constructors
-        public DiplomacyPanel(OrionGuiStyle style, Faction faction)
+        public DiplomacyPanel(OrionGuiStyle style, Faction faction, Localizer localizer)
         {
             Argument.EnsureNotNull(style, "style");
             Argument.EnsureNotNull(faction, "faction");
+            Argument.EnsureNotNull(localizer, "localizer");
 
             StackLayout stack = new StackLayout()
             {
@@ -75,15 +77,15 @@ namespace Orion.Game.Presentation.Gui
                 ChildGap = 10,
             };
 
-            stack.Stack(style.CreateLabel("Autres factions:"));
+            stack.Stack(style.CreateLabel(localizer.GetNoun("OtherFactions")));
 
             foreach (Faction otherFaction in faction.World.Factions)
             {
                 if (otherFaction == faction) continue;
-                stack.Stack(new FactionRow(this, style, faction, otherFaction));
+                stack.Stack(new FactionRow(this, style, localizer, faction, otherFaction));
             }
 
-            Button closeButton = style.CreateTextButton("Accepter");
+            Button closeButton = style.CreateTextButton(localizer.GetNoun("OK"));
             closeButton.HorizontalAlignment = Alignment.Positive;
             closeButton.Clicked += (sender, @event) => Closed.Raise(this);
             stack.Stack(closeButton);

@@ -6,6 +6,6 @@
 		<Attack Power="4" Range="5" Delay="2" EffectiveAgainst="Light Supernatural" IneffectiveAgainst="Heavy"/>
 	</Skills>
 	<Upgrades>
-		<Upgrade Target="Léonardo" AladdiumCost="0" AlageneCost="0"/>
+		<Upgrade Target="Leonardo" AladdiumCost="0" AlageneCost="0"/>
 	</Upgrades>
 </UnitType>

@@ -12,6 +12,17 @@ namespace Orion.Engine.Gui
     /// </summary>
     public abstract class GuiRenderer
     {
+        #region Fields
+        private readonly Action popClippingRectangleDelegate;
+        #endregion
+
+        #region Constructors
+        protected GuiRenderer()
+        {
+            popClippingRectangleDelegate = PopClippingRectangle;
+        }
+        #endregion
+
         #region Methods
         #region Begin/End
         /// <summary>
@@ -84,7 +95,7 @@ namespace Orion.Engine.Gui
         public DisposableHandle PushClippingRectangle(Region rectangle)
         {
             PushClippingRectangleImpl(rectangle);
-            return new DisposableHandle(PopClippingRectangle);
+            return new DisposableHandle(popClippingRectangleDelegate);
         }
 
         /// <summary>
@@ -106,14 +117,6 @@ namespace Orion.Engine.Gui
         /// </summary>
         protected abstract void PopClippingRectangleImpl();
         #endregion
-
-        /// <summary>
-        /// Attempts to retrieve a texture by its name.
-        /// </summary>
-        /// <param name="name">The name of the texture to be retrieve.</param>
-        /// <returns>The texture identified by that name, or a dummy texture if no such texture was found.</returns>
-        [Obsolete("Use GameGraphics texture getters.")]
-        public abstract Texture GetTexture(string name);
 
         #region Text
         /// <summary>

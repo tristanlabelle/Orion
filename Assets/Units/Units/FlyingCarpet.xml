@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UnitType Name="FlyingCarpet" Width="2" Height="2" IsAirborne="True">
+	<Skills>
+		<Basic SightRange="8" MaxHealth="75" ArmorType="Light" Armor="1" AladdiumCost="25" AlageneCost="50" FoodCost="2"/>
+		<Move Speed="6"/>
+		<Transport Capacity="6"/>
+	</Skills>
+	<Upgrades>
+		<Upgrade Target="AladdinsCarpet" AladdiumCost="0" AlageneCost="0"/>
+	</Upgrades>
+</UnitType>

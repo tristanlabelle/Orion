@@ -6,6 +6,7 @@ using Orion.Engine;
 using Orion.Engine.Graphics;
 using Orion.Game.Presentation;
 using Orion.Game.Presentation.Audio;
+using Orion.Engine.Localization;
 
 namespace Orion.Game.Main
 {
@@ -54,6 +55,11 @@ namespace Orion.Game.Main
         protected GameAudio Audio
         {
             get { return manager.Audio; }
+        }
+
+        protected Localizer Localizer
+        {
+            get { return manager.Localizer; }
         }
         #endregion
 

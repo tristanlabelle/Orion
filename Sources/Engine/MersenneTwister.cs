@@ -155,14 +155,14 @@ namespace Orion.Engine
             {
                 unchecked
                 {
-                long high = vec.a << 32 | vec.b;
-                long low = vec.c << 32 | vec.d;
-                high <<= shift;
-                high |= low >> (sizeof(long) * 8 - shift);
-                low <<= shift;
+                    long high = vec.a << 32 | vec.b;
+                    long low = vec.c << 32 | vec.d;
+                    high <<= shift;
+                    high |= low >> (sizeof(long) * 8 - shift);
+                    low <<= shift;
 
-                return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
-            }
+                    return new Vector128((uint)(high >> 32), (uint)high, (uint)(low >> 32), (uint)low);
+                }
             }
 
             /// <summary>
@@ -175,15 +175,15 @@ namespace Orion.Engine
             {
                 unchecked
                 {
-                long high = vec.a << 32 | vec.b;
-                long low = vec.c << 32 | vec.d;
-                low >>= shift;
-                low |= high << (sizeof(long) * 8 - shift);
-                high >>= shift;
+                    long high = vec.a << 32 | vec.b;
+                    long low = vec.c << 32 | vec.d;
+                    low >>= shift;
+                    low |= high << (sizeof(long) * 8 - shift);
+                    high >>= shift;
 
-                return new Vector128((uint)high >> 32, (uint)high, (uint)low >> 32, (uint)low);
+                    return new Vector128((uint)(high >> 32), (uint)high, (uint)(low >> 32), (uint)low);
+                }
             }
-        }
         }
         #endregion
 

@@ -85,13 +85,13 @@ namespace Orion.Game.Matchmaking
         public HarvestingAICommander(Match match, Faction faction)
             : base(match, faction)
         {
-            workerUnitType = match.UnitTypes.FromName("Schtroumpf");
-            foodSupplyUnitType = match.UnitTypes.FromName("Réserve");
-            resourceDepotUnitType = match.UnitTypes.FromName("Costco des Hells");
-            alageneExtractorUnitType = match.UnitTypes.FromName("Extracteur d'alagène");
-            pyramidUnitType = match.UnitTypes.FromName("Pyramide");
-            defenseTowerUnitType = match.UnitTypes.FromName("Jean-Marc");
-            laboratoryUnitType = match.UnitTypes.FromName("Maison de Tristan");
+            workerUnitType = match.UnitTypes.FromName("Smurf");
+            foodSupplyUnitType = match.UnitTypes.FromName("Supply");
+            resourceDepotUnitType = match.UnitTypes.FromName("HellsCostco");
+            alageneExtractorUnitType = match.UnitTypes.FromName("AlageneExtractor");
+            pyramidUnitType = match.UnitTypes.FromName("Pyramid");
+            defenseTowerUnitType = match.UnitTypes.FromName("JeanMarc");
+            laboratoryUnitType = match.UnitTypes.FromName("TristansHouse");
 
             for (int y = 0; y < World.Height / explorationZoneSize; ++y)
             {

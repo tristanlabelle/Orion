@@ -56,7 +56,7 @@ namespace Orion.Game.Simulation
             identity.SoundIdentity = type.VoicesTemplate ?? type.Name;
             identity.LeavesRemains = true;
             identity.IsSelectable = true;
-            identity.TemplateEntity = this;
+            identity.Prototype = this;
             foreach (UnitTypeUpgrade upgrade in type.Upgrades)
                 identity.Upgrades.Add(upgrade);
             identity.TrainType = InternalHasSkill<MoveSkill>() ? TrainType.Immaterial : TrainType.OnSite;

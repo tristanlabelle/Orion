@@ -12,12 +12,12 @@ namespace Orion.Game.Simulation.Skills
     public sealed class AttackSkill : UnitSkill
     {
         #region Fields
-        public static readonly UnitStat PowerStat = new UnitStat(typeof(AttackSkill), "Power", "Puissance d'attaque");
-        public static readonly UnitStat RangeStat = new UnitStat(typeof(AttackSkill), "Range", "Portée d'attaque");
-        public static readonly UnitStat DelayStat = new UnitStat(typeof(AttackSkill), "Delay", "Délai d'attaque");
-        public static readonly UnitStat SplashRadiusStat = new UnitStat(typeof(AttackSkill), "SplashRadius", "Rayon de dégâts");
-        public static readonly UnitStat SuperEffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "EffectiveAgainst", "Super puissant contre");
-        public static readonly UnitStat InffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "IneffectiveAgainst", "Impuissant contre");
+        public static readonly UnitStat PowerStat = new UnitStat(typeof(AttackSkill), "Power");
+        public static readonly UnitStat RangeStat = new UnitStat(typeof(AttackSkill), "Range");
+        public static readonly UnitStat DelayStat = new UnitStat(typeof(AttackSkill), "Delay");
+        public static readonly UnitStat SplashRadiusStat = new UnitStat(typeof(AttackSkill), "SplashRadius");
+        public static readonly UnitStat SuperEffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "EffectiveAgainst");
+        public static readonly UnitStat InffectiveAgainstStat = new UnitStat(typeof(AttackSkill), "IneffectiveAgainst");
 
         private int power = 1;
         private int range;

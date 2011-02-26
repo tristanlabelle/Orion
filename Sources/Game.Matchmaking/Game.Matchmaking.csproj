@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
+    <Compile Include="Commands\CancelTaskCommand.cs" />
     <Compile Include="Commands\UpgradeCommand.cs" />
     <Compile Include="HarvestingAICommander.cs" />
     <Compile Include="Networking\CompositeMatchAdvertiser.cs" />
@@ -114,7 +115,7 @@
     <Compile Include="Commands\ChangeRallyPointCommand.cs" />
     <Compile Include="Commands\HealCommand.cs" />
     <Compile Include="Commands\HarvestCommand.cs" />
-    <Compile Include="Commands\CancelCommand.cs" />
+    <Compile Include="Commands\CancelAllTasksCommand.cs" />
     <Compile Include="Commands\SendMessageCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Commands\RepairCommand.cs" />
@@ -162,11 +163,6 @@
     <Compile Include="ReplayReader.cs" />
     <Compile Include="ReplayWriter.cs" />
     <Compile Include="SlaveCommander.cs" />
-    <Compile Include="TowerDefense\CreepPath.cs" />
-    <Compile Include="TowerDefense\CreepPhrase.cs" />
-    <Compile Include="TowerDefense\CreepTask.cs" />
-    <Compile Include="TowerDefense\CreepWaveCommander.cs" />
-    <Compile Include="TowerDefense\TypingCreepCommander.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">

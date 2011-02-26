@@ -507,12 +507,16 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(skillStat, "skillStat");
 
             StatValue componentValue = GetStatValue(componentStat);
-            int skillValue = Faction.GetStat(Type, skillStat);
-            if (componentValue.RealValue != skillValue)
+            Faction faction = Faction;
+            if (faction != null)
             {
-                string message = "Component stat {0} did not have the same value as skill stat {1}."
-                    .FormatInvariant(componentStat.FullName, skillStat.FullName);
-                Debug.Fail(message);
+                int skillValue = Faction.GetStat(Type, skillStat);
+                if (componentValue.RealValue != skillValue)
+                {
+                    string message = "Component stat {0} did not have the same value as skill stat {1}."
+                        .FormatInvariant(componentStat.FullName, skillStat.FullName);
+                    Debug.Fail(message);
+                }
             }
 
             return componentValue;

@@ -39,7 +39,12 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.HasComponent<Attacker, AttackSkill>()) return;
+            Attacker attacker = Unit.Components.TryGet<Attacker>();
+            if (attacker == null)
+            {
+                MarkAsEnded();
+                return;
+            }
 
             if (!IsTargetValid(target))
             {
@@ -61,7 +66,7 @@ namespace Orion.Game.Simulation.Tasks
             if (target != null)
             {
                 Unit.LookAt(target.Center);
-                Unit.TryHit(target);
+                attacker.TryHit(target);
             }
         }
 

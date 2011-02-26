@@ -183,7 +183,7 @@ namespace Orion.Game.Simulation.Tasks
         private Unit FindClosestDepot()
         {
             return Faction.Units
-                .Where(other => !other.IsUnderConstruction && other.HasSkill<StoreResourcesSkill>())
+                .Where(other => !other.IsUnderConstruction && other.HasComponent<ResourceDepot, StoreResourcesSkill>())
                 .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Unit.GridRegion));
         }
         #endregion

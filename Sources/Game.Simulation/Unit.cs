@@ -152,10 +152,20 @@ namespace Orion.Game.Simulation
                 Components.Add(transporter);
             }
 
+            if (InternalHasSkill<StoreResourcesSkill>())
+            {
+                Components.Add(new ResourceDepot(this));
+            }
+
+            if (InternalHasSkill<ExtractAlageneSkill>())
+            {
+                Components.Add(new AlageneExtractor(this));
+            }
+
             FactionMembership membership = new FactionMembership(this);
-            membership.FoodRequirement = type.BasicSkill.FoodCost;
+            membership.FoodCost = type.BasicSkill.FoodCost;
             if (InternalHasSkill<ProvideFoodSkill>())
-                membership.FoodProvided = GetBaseStat(ProvideFoodSkill.AmountStat);
+                membership.ProvidedFood = GetBaseStat(ProvideFoodSkill.AmountStat);
             Components.Add(membership);
 
             Components.Add(new TaskQueue(this));
@@ -615,72 +625,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Hitting
-        public bool TryHit(Unit target)
-        {
-            Argument.EnsureNotNull(target, "target");
-            float hitDelayInSeconds = (float)GetStatValue(Attacker.DelayStat, AttackSkill.DelayStat);
-            if (Components.Get<Attacker>().TimeElapsedSinceLastHit < hitDelayInSeconds)
-                return false;
-            Hit(target);
-            return true;
-        }
-
-        public void Hit(Unit target)
-        {
-            Argument.EnsureNotNull(target, "target");
-
-            bool isMelee = (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
-            int targetArmor = (int)target.GetStatValue(HealthComponent.ArmorStat, BasicSkill.ArmorStat);
-            ArmorType targetArmorType = (ArmorType)target.GetStatValue(BasicSkill.ArmorTypeStat);
-
-            int damage = Math.Max(1, (int)GetStatValue(Attacker.PowerStat, AttackSkill.PowerStat) - targetArmor);
-            
-            if(IsSuperEffectiveAgainst(targetArmorType))
-                damage *= 2;
-            else if(IsIneffectiveAgainst(targetArmorType))
-                damage /= 2;
-
-            target.Health -= damage;
-            OnHitting(target, damage);
-
-            float splashRadius = (float)GetStatValue(Attacker.SplashRadiusStat, AttackSkill.SplashRadiusStat);
-            if (splashRadius != 0)
-            {
-                Circle splashCircle = new Circle(target.Center, splashRadius);
-                IEnumerable<Unit> potentiallySplashedUnits = World.Entities
-                    .Intersecting(splashCircle)
-                    .OfType<Unit>();
-
-                foreach (Unit potentiallySplashedUnit in potentiallySplashedUnits)
-                {
-                    if (potentiallySplashedUnit == target) continue;
-                    if (Faction.GetDiplomaticStance(potentiallySplashedUnit.Faction).HasFlag(DiplomaticStance.AlliedVictory)) continue;
-
-                    float distance = (splashCircle.Center - potentiallySplashedUnit.Center).LengthFast;
-                    if (distance > splashRadius) continue;
-
-                    int splashedTargetArmor = (int)potentiallySplashedUnit.GetStatValue(HealthComponent.ArmorStat, BasicSkill.ArmorStat);
-                    int splashDamage = (int)(Math.Max(1, (int)GetStatValue(Attacker.PowerStat, AttackSkill.PowerStat) - targetArmor) * (1 - distance / splashRadius));
-                    potentiallySplashedUnit.Health -= splashDamage;
-                }
-            }
-
-            Components.Get<Attacker>().TimeElapsedSinceLastHit = 0;
-        }
-
-        public bool IsSuperEffectiveAgainst(ArmorType type)
-        {
-            AttackSkill skill = Type.TryGetSkill<AttackSkill>();
-            return skill != null && skill.IsSuperEffectiveAgainst(type);
-        }
-
-        public bool IsIneffectiveAgainst(ArmorType type)
-        {
-            AttackSkill skill = Type.TryGetSkill<AttackSkill>();
-            return skill != null && skill.IsIneffectiveAgainst(type);
-        }
-
-        private void OnHitting(Unit target, float damage)
+        internal void OnHitting(Unit target, float damage)
         {
             HitEventArgs args = new HitEventArgs(this, target, damage, World.LastSimulationStep.TimeInSeconds);
 

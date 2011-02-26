@@ -46,7 +46,7 @@ namespace Orion.Game.Simulation.Components
 
         #region Fields
         private static readonly Type[] constructorArguments = new Type[] { typeof(Entity) };
-        private Entity entity;
+        private readonly Entity entity;
         #endregion
 
         #region Constructors
@@ -57,9 +57,17 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Entity"/> hosting this <see cref="Component"/>.
+        /// </summary>
         public Entity Entity
         {
             get { return entity; }
+        }
+
+        protected World World
+        {
+            get { return entity.World; }
         }
         #endregion
 

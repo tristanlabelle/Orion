@@ -68,17 +68,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\AlageneExtractor.cs" />
     <Compile Include="Components\ArmorType.cs" />
     <Compile Include="Components\Attacker.cs" />
     <Compile Include="Components\Builder.cs" />
     <Compile Include="Components\Component.cs" />
-    <Compile Include="Components\DamageFilter.cs" />
     <Compile Include="Components\Energy.cs" />
     <Compile Include="Components\FactionMembership.cs" />
     <Compile Include="Components\Harvester.cs" />
     <Compile Include="Components\Healer.cs" />
     <Compile Include="Components\Health.cs" />
     <Compile Include="Components\Researcher.cs" />
+    <Compile Include="Components\ResourceDepot.cs" />
     <Compile Include="Components\Stat.cs" />
     <Compile Include="Components\Identity.cs" />
     <Compile Include="Components\Kamikaze.cs" />

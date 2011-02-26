@@ -44,7 +44,7 @@ namespace Orion.Game.Simulation.Components
             {
                 return passengers
                     .Select(e => e.Components.Get<FactionMembership>())
-                    .Sum(c => c.FoodRequirement);
+                    .Sum(c => c.FoodCost);
             }
         }
 
@@ -77,10 +77,10 @@ namespace Orion.Game.Simulation.Components
             FactionMembership embarkerMembership = entity.Components.TryGet<FactionMembership>();
 
             if (embarkerMembership == null)
-                return RemainingSpace <= embarkeeMembership.FoodRequirement;
+                return RemainingSpace <= embarkeeMembership.FoodCost;
 
             return (embarkerMembership == null || embarkerMembership.Faction == embarkeeMembership.Faction)
-                && RemainingSpace <= embarkeeMembership.FoodRequirement;
+                && RemainingSpace <= embarkeeMembership.FoodCost;
         }
 
         public void Embark(Entity entity)

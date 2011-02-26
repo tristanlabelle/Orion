@@ -15,9 +15,9 @@ namespace Orion.Game.Simulation.Components
     public sealed class Vision : Component
     {
         #region Fields
-        public static readonly Stat RangeStat = new Stat(typeof(Vision), StatType.Real, "Range");
+        public static readonly Stat RangeStat = new Stat(typeof(Vision), StatType.Integer, "Range");
 
-        private float range = 1;
+        private int range = 1;
         #endregion
 
         #region Constructors
@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Components
         /// Accesses the radius of the line-of-sight circle around this <see cref="Entity"/>.
         /// </summary>
         [Mandatory]
-        public float Range
+        public int Range
         {
             get { return range; }
             set

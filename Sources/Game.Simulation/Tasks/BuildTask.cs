@@ -20,23 +20,21 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public BuildTask(Unit builder, BuildingPlan buildingPlan)
-            : base(builder)
+        public BuildTask(Unit buildingUnit, BuildingPlan buildingPlan)
+            : base(buildingUnit)
         {
-            Argument.EnsureNotNull(builder, "builder");
+            Argument.EnsureNotNull(buildingUnit, "builder");
             Argument.EnsureNotNull(buildingPlan, "buildingPlan");
 
-            BuildSkill buildSkill = builder.Type.TryGetSkill<BuildSkill>();
-            if (buildSkill == null)
-                throw new ArgumentException("Cannot build without the build skill.", "builder");
-            if (!buildSkill.Supports(buildingPlan.BuildingType))
+            Builder builder = buildingUnit.Components.TryGet<Builder>();
+            if (builder == null || !builder.Supports(buildingPlan.BuildingType))
             {
                 throw new ArgumentException("Builder {0} cannot build {1}."
-                    .FormatInvariant(builder, buildingPlan.BuildingType));
+                    .FormatInvariant(buildingUnit, buildingPlan.BuildingType));
             }
 
             this.buildingPlan = buildingPlan;
-            this.move = MoveTask.ToNearRegion(builder, buildingPlan.GridRegion);
+            this.move = MoveTask.ToNearRegion(buildingUnit, buildingPlan.GridRegion);
         }
         #endregion
 

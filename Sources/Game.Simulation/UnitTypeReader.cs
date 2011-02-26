@@ -130,27 +130,21 @@ namespace Orion.Game.Simulation
             {
                 if (statAttribute.Name == "EffectiveAgainst")
                 {
-                    List<ArmorType> effectiveTypes = new List<ArmorType>();
-                    if (statAttribute.Value != "")
+                    if (statAttribute.Value.Length > 0)
                     {
-                        foreach (string effective in statAttribute.Value.Split(' '))
-                        {
-                            effectiveTypes.Add((ArmorType)Enum.Parse(typeof(ArmorType), effective, true));
-                        }
+                        var types = statAttribute.Value.Split(' ')
+                            .Select(str => (ArmorType)Enum.Parse(typeof(ArmorType), str, true));
+                        ((AttackSkill)skill).SuperEffectiveAgainst.AddRange(types);
                     }
-                    ((AttackSkill)skill).SuperEffectiveAgainst = effectiveTypes;
                 }
                 else if (statAttribute.Name == "IneffectiveAgainst")
                 {
-                    List<ArmorType> ineffectiveTypes = new List<ArmorType>();
-                    if (statAttribute.Value != "")
+                    if (statAttribute.Value.Length > 0)
                     {
-                        foreach (string ineffective in statAttribute.Value.Split(' '))
-                        {
-                            ineffectiveTypes.Add((ArmorType)Enum.Parse(typeof(ArmorType), ineffective, true));
-                        }
+                        var types = statAttribute.Value.Split(' ')
+                            .Select(str => (ArmorType)Enum.Parse(typeof(ArmorType), str, true));
+                        ((AttackSkill)skill).IneffectiveAgainst.AddRange(types);
                     }
-                    ((AttackSkill)skill).IneffectiveAgainst = ineffectiveTypes;
                 }
                 else
                 {

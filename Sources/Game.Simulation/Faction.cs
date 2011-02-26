@@ -376,7 +376,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit.Faction == this);
             Debug.Assert(!unit.IsBuilding);
 
-            int sightRange = unit.GetStatValue(BasicSkill.SightRangeStat);
+            int sightRange = (int)unit.GetStatValue(Vision.RangeStat, BasicSkill.SightRangeStat);
             Vector2 extent = unit.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
@@ -434,8 +434,7 @@ namespace Orion.Game.Simulation
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.LineOfSight);
 
-            if (unit.HasSkill<ProvideFoodSkill>())
-                TotalFoodAmount += unit.GetStatValue(ProvideFoodSkill.AmountStat);
+            TotalFoodAmount += (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat);
         }
         #endregion
 
@@ -450,8 +449,7 @@ namespace Orion.Game.Simulation
             }
             else
             {
-                if (unit.Type.HasSkill<ProvideFoodSkill>())
-                    TotalFoodAmount -= unit.GetStatValue(ProvideFoodSkill.AmountStat);
+                TotalFoodAmount -= (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat, ProvideFoodSkill.AmountStat);
 
                 localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
             }
@@ -492,7 +490,7 @@ namespace Orion.Game.Simulation
             Vector2 location = node.Components.Get<Spatial>().Position;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
-                && extractor.HasSkill<ExtractAlageneSkill>()
+                && extractor.HasComponent<AlageneExtractor, ExtractAlageneSkill>()
                 && !extractor.IsUnderConstruction
                 && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
         }

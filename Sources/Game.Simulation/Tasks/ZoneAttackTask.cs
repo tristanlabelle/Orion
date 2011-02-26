@@ -49,7 +49,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (attack == null && Unit.CanPerformProximityChecks(step))
             {
-                bool isRanged = Unit.Type.TryGetSkill<AttackSkill>().IsRanged;
+                bool isRanged = Unit.Components.Get<Attacker>().IsRanged;
 
                 Unit target = Unit.World.Entities
                     .Intersecting(Unit.LineOfSight)

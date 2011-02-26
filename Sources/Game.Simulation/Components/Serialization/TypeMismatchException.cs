@@ -8,7 +8,7 @@ namespace Orion.Game.Simulation.Components.Serialization
     /// <summary>
     /// Thrown internally when an object is inappropriately deserialized.
     /// </summary>
-    class TypeMismatchException : Exception
+    internal class TypeMismatchException : Exception
     {
         #region Fields
         private Type expectedType;
@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Components.Serialization
             get { return expectedType; }
         }
 
-        public string Data
+        public new string Data
         {
             get { return data; }
         }

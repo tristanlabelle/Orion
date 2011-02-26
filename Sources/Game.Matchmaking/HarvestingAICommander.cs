@@ -189,36 +189,36 @@ namespace Orion.Game.Matchmaking
         
         private void UpdateDefense(ref ResourceAmount budget)
         {
-        	var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
-        		.FirstOrDefault(u => Faction.CanSee(u)
-        		    && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
-        	if (firstUnthreatenedVisibleEnemy == null) return;
-        	
-        	var defenseTowerCost = GetCost(defenseTowerUnitType);
-        	if (budget >= defenseTowerCost)
-        	{
-    		    Unit unit = GetNearbyUnit(u => u.Type.CanBuild(defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
+            var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
+                .FirstOrDefault(u => Faction.CanSee(u)
+                    && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
+            if (firstUnthreatenedVisibleEnemy == null) return;
+            
+            var defenseTowerCost = GetCost(defenseTowerUnitType);
+            if (budget >= defenseTowerCost)
+            {
+                Unit unit = GetNearbyUnit(u => u.Type.CanBuild(defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
                 if (unit != null && TryBuildNear(unit, defenseTowerUnitType, firstUnthreatenedVisibleEnemy.Center))
                     assignedUnits.Add(unit);
-        	}
-        	
-        	budget -= defenseTowerCost;
+            }
+            
+            budget -= defenseTowerCost;
         }
         
         private void UpdateTechnologies(ref ResourceAmount budget)
         {
-        	if (Faction.UsedFoodAmount < 50) return;
-        	if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
-        	
-        	var laboratoryCost = GetCost(laboratoryUnitType);
-        	if (budget >= laboratoryCost)
-        	{
-    		    Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(laboratoryUnitType));
+            if (Faction.UsedFoodAmount < 50) return;
+            if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
+            
+            var laboratoryCost = GetCost(laboratoryUnitType);
+            if (budget >= laboratoryCost)
+            {
+                Unit unit = GetMostIdleUnit(u => u.Type.CanBuild(laboratoryUnitType));
                 if (unit != null && TryBuildNear(unit, laboratoryUnitType, unit.Center))
                     assignedUnits.Add(unit);
-        	}
-        	
-        	budget -= laboratoryCost;
+            }
+            
+            budget -= laboratoryCost;
         }
 
         private void UpdateResourceNodes(ref ResourceAmount budget)
@@ -280,7 +280,7 @@ namespace Orion.Game.Matchmaking
                 nodeData.NearbyDepot = World.Entities
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
                     .OfType<Unit>()
-                    .Where(u => u.Faction == Faction && u.HasSkill<StoreResourcesSkill>())
+                    .Where(u => u.Faction == Faction && u.HasComponent<ResourceDepot, StoreResourcesSkill>())
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
@@ -363,39 +363,39 @@ namespace Orion.Game.Matchmaking
             
             if (unit.HasComponent<Researcher, ResearchSkill>())
             {
-            	foreach (var technology in Match.TechnologyTree.Technologies)
-            	{
-            		if (!unit.Type.CanResearch(technology)) continue;
+                foreach (var technology in Match.TechnologyTree.Technologies)
+                {
+                    if (!unit.Type.CanResearch(technology)) continue;
                     if (Faction.HasResearched(technology)) continue;
-            		if (createdUnitTypes.None(type => technology.AppliesTo(type))) continue;
-            		
-            		var cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost);
-            		if (!(budget >= cost)) continue;
-            		
-	            	var command = new ResearchCommand(Faction.Handle, unit.Handle, technology.Handle);
-	            	IssueCommand(command);
-            		
-            		budget -= cost;
-            		
-            		break;
-            	}
+                    if (createdUnitTypes.None(type => technology.AppliesTo(type))) continue;
+                    
+                    var cost = new ResourceAmount(technology.AladdiumCost, technology.AlageneCost);
+                    if (!(budget >= cost)) continue;
+                    
+                    var command = new ResearchCommand(Faction.Handle, unit.Handle, technology.Handle);
+                    IssueCommand(command);
+                    
+                    budget -= cost;
+                    
+                    break;
+                }
             }
             
             foreach (UnitTypeUpgrade upgrade in unit.Type.Upgrades)
             {
-            	if (upgrade.IsFree) continue;
-            	
-            	var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
-            	if (!(budget >= upgradeCost)) continue;
-            	
-            	var upgradedUnitType = Match.UnitTypes.FromName(upgrade.Target);
-            	if (upgradedUnitType == null) continue;
-            	
-            	var command = new UpgradeCommand(Faction.Handle, unit.Handle, upgradedUnitType.Handle);
-            	IssueCommand(command);
-            	
-            	budget -= upgradeCost;
-            	break;
+                if (upgrade.IsFree) continue;
+                
+                var upgradeCost = new ResourceAmount(upgrade.AladdiumCost, upgrade.AlageneCost);
+                if (!(budget >= upgradeCost)) continue;
+                
+                var upgradedUnitType = Match.UnitTypes.FromName(upgrade.Target);
+                if (upgradedUnitType == null) continue;
+                
+                var command = new UpgradeCommand(Faction.Handle, unit.Handle, upgradedUnitType.Handle);
+                IssueCommand(command);
+                
+                budget -= upgradeCost;
+                break;
             }
         }
         #endregion

@@ -53,7 +53,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
                 if (!LocalFaction.HasFullySeen(region))
                     return false;
 
-                if (!buildingType.HasSkill<ExtractAlageneSkill>())
+                if (!buildingType.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
                     return true;
 
                 // Special case for alagene extractors:

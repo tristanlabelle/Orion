@@ -78,7 +78,7 @@ namespace Orion.Game.Matchmaking.Commands
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
             Unit buildingType = match.UnitTypes.FromHandle(buildingTypeHandle);
 
-            if (buildingType.HasSkill<ExtractAlageneSkill>())
+            if (buildingType.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
             {
                 Harvestable harvestingInfo = match.World.Entities
                     .Where(e => e.Components.Has<Harvestable>())

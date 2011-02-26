@@ -52,6 +52,13 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            Attacker attacker = Unit.Components.TryGet<Attacker>();
+            if (attacker == null)
+            {
+                MarkAsEnded();
+                return;
+            }
+
             if (!target.IsAliveInWorld || !Unit.Faction.CanSee(target))
             {
                 // If the target has died while we weren't yet in attack range,
@@ -65,7 +72,7 @@ namespace Orion.Game.Simulation.Tasks
             if (Unit.IsWithinAttackRange(target))
             {
                 Unit.LookAt(target.Center);
-                Unit.TryHit(target);
+                attacker.TryHit(target);
                 return;
             }
             else

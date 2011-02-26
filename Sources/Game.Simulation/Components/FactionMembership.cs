@@ -4,18 +4,22 @@ using System.Linq;
 using System.Text;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components.Serialization;
+using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
     /// <summary>
     /// Indicates membership of a faction, and all what it implies.
     /// </summary>
-    public class FactionMembership : Component
+    public sealed class FactionMembership : Component
     {
         #region Fields
+        public static readonly Stat FoodCostStat = new Stat(typeof(FactionMembership), StatType.Integer, "FoodCost");
+        public static readonly Stat ProvidedFoodStat = new Stat(typeof(FactionMembership), StatType.Integer, "ProvidedFood");
+
         private Faction faction;
-        private int foodRequirement;
-        private int foodProvided;
+        private int foodCost;
+        private int providedFood;
         #endregion
 
         #region Constructors
@@ -30,17 +34,39 @@ namespace Orion.Game.Simulation.Components
         }
 
         [Mandatory]
-        public int FoodRequirement
+        public int FoodCost
         {
-            get { return foodRequirement; }
-            set { foodRequirement = value; }
+            get { return foodCost; }
+            set
+            {
+                Argument.EnsurePositive(value, "FoodCost");
+                foodCost = value; }
         }
 
         [Persistent]
-        public int FoodProvided
+        public int ProvidedFood
         {
-            get { return foodProvided; }
-            set { foodProvided = value; }
+            get { return providedFood; }
+            set
+            {
+                Argument.EnsurePositive(value, "ProvidedFood");
+                providedFood = value;
+            }
+        }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Gets the <see cref="Faction"/> of a given <see cref="Entity"/>, if any.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> for which the <see cref="Faction"/> is requested.</param>
+        /// <returns>The <see cref="Faction"/> of <paramref name="entity"/>, or <c>null</c> if it has none.</returns>
+        public static Faction GetFaction(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            FactionMembership factionMembership = entity.Components.TryGet<FactionMembership>();
+            return factionMembership == null ? null : factionMembership.Faction;
         }
         #endregion
     }

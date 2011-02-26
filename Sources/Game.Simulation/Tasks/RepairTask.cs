@@ -97,7 +97,7 @@ namespace Orion.Game.Simulation.Tasks
             if (!target.IsUnderConstruction)
             {
                 // If we just built an alagene extractor, start harvesting.
-                if (Unit.HasComponent<Harvester, HarvestSkill>() && target.HasSkill<ExtractAlageneSkill>())
+                if (Unit.HasComponent<Harvester, HarvestSkill>() && target.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
                 {
                     // Smells like a hack!
                     Entity node = Unit.World.Entities
@@ -149,8 +149,8 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool TryGetCredit()
         {
-            int aladdiumCost = Target.GetStatValue(BasicSkill.AladdiumCostStat);
-            int alageneCost = Target.GetStatValue(BasicSkill.AlageneCostStat);
+            int aladdiumCost = (int)Target.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat);
+            int alageneCost = (int)Target.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat);
 
             bool needsAladdiumCredit = aladdiumCost > 0 && aladdiumCreditRemaining <= 0;
             bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;

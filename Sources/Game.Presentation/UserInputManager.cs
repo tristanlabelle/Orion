@@ -337,7 +337,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (target.HasSkill<ExtractAlageneSkill>())
+            if (target.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
             {
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
                 {

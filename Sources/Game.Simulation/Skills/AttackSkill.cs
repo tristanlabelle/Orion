@@ -1,6 +1,7 @@
 ﻿using System;
-using Orion.Engine;
 using System.Collections.Generic;
+using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Skills
@@ -23,8 +24,8 @@ namespace Orion.Game.Simulation.Skills
         private int range;
         private int delay = 1;
         private int splashRadius;
-        private List<ArmorType> superEffectiveAgainst = new List<ArmorType>();
-        private List<ArmorType> ineffectiveAgainst = new List<ArmorType>();
+        private readonly ICollection<ArmorType> superEffectiveAgainst = new HashSet<ArmorType>();
+        private readonly ICollection<ArmorType> ineffectiveAgainst = new HashSet<ArmorType>();
         #endregion
 
         #region Properties
@@ -43,29 +44,19 @@ namespace Orion.Game.Simulation.Skills
         }
 
         /// <summary>
-        /// Returns the list of armor types this attack skill is very effective against
+        /// Gets the list of armor types this attack skill is very effective against.
         /// </summary>
-        public List<ArmorType> SuperEffectiveAgainst
+        public ICollection<ArmorType> SuperEffectiveAgainst
         {
             get { return superEffectiveAgainst; }
-            set
-            {
-                EnsureNotFrozen();
-                superEffectiveAgainst = value;
-            }
         }
 
         /// <summary>
-        /// Returns the list of armor types this attack skill is ineffective against
+        /// Gets the list of armor types this attack skill is ineffective against.
         /// </summary>
-        public List<ArmorType> IneffectiveAgainst
+        public ICollection<ArmorType> IneffectiveAgainst
         {
             get { return ineffectiveAgainst; }
-            set
-            {
-                EnsureNotFrozen();
-                ineffectiveAgainst = value;
-            }
         }
 
         /// <summary>
@@ -139,15 +130,18 @@ namespace Orion.Game.Simulation.Skills
         #region Methods
         protected override UnitSkill Clone()
         {
-            return new AttackSkill
+            AttackSkill clone = new AttackSkill
             {
                 power = power,
                 range = range,
                 delay = delay,
-                splashRadius = splashRadius,
-                superEffectiveAgainst = superEffectiveAgainst,
-                ineffectiveAgainst = ineffectiveAgainst
+                splashRadius = splashRadius
             };
+
+            clone.SuperEffectiveAgainst.AddRange(superEffectiveAgainst);
+            clone.IneffectiveAgainst.AddRange(ineffectiveAgainst);
+
+            return clone;
         }
 
         /// <summary>

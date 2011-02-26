@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Text;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
-using System.IO;
+using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Skills;
 
 namespace Orion.Game.Matchmaking.Commands
@@ -78,7 +78,7 @@ namespace Orion.Game.Matchmaking.Commands
                         .FormatInvariant(unit.Type.Name, upgrade.Target));
                 }
 
-                int unitFoodCost = unit.GetStatValue(BasicSkill.FoodCostStat);
+                int unitFoodCost = (int)unit.GetStatValue(FactionMembership.FoodCostStat, BasicSkill.FoodCostStat);
 
                 if (upgrade.AladdiumCost > faction.AladdiumAmount || upgrade.AlageneCost > faction.AlageneAmount)
                 {

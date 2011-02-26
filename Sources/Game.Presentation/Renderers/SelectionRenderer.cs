@@ -5,6 +5,7 @@ using Orion.Engine.Graphics;
 using Orion.Game.Matchmaking;
 using Orion.Game.Simulation;
 using Orion.Engine.Geometry;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -51,7 +52,7 @@ namespace Orion.Game.Presentation.Renderers
 
         #region Methods
         /// <summary>
-        /// Draws the selection markers under the <see cref="Unit"/>s.
+        /// Draws the selection markers under the <see cref="Entity"/>.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
         public void DrawSelectionMarkers(GraphicsContext graphics)
@@ -71,17 +72,22 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in Selection)
             {
-                Unit unit = entity as Unit;
-                if (unit != null && unit.Faction == Faction && unit.HasRallyPoint)
+                FactionMembership membership = entity.Components.TryGet<FactionMembership>();
+                if (membership != null && membership.Faction == Faction)
                 {
-                    LineSegment lineSegment = new LineSegment(unit.Center, unit.RallyPoint);
-                    graphics.Stroke(lineSegment, selectionMarkerColor);
+                    Trainer train = entity.Components.TryGet<Trainer>();
+                    if (train != null)
+                    {
+                        Spatial spatial = entity.Components.Get<Spatial>();
+                        LineSegment lineSegment = new LineSegment(spatial.Center, train.RallyPoint);
+                        graphics.Stroke(lineSegment, selectionMarkerColor);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Draws the selection markers over the <see cref="Unit"/>s.
+        /// Draws the selection markers over the <see cref="Entity"/>s.
         /// </summary>
         /// <param name="graphics">The <see cref="GraphicsContext"/> to be used for rendering.</param>
         public void DrawSelectionRectangle(GraphicsContext graphics)

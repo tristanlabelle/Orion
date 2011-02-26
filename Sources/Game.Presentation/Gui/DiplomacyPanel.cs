@@ -92,7 +92,9 @@ namespace Orion.Game.Presentation.Gui
 
             faction.World.FactionDefeated += (sender, defeatedFaction) =>
             {
-                stack.Children.Remove(stack.Children.First(child => ((FactionRow)child).Faction == defeatedFaction));
+                var factionRow = stack.Children.OfType<FactionRow>()
+                    .First(row => row.Faction == defeatedFaction);
+                stack.Children.Remove(factionRow);
             };
 
             Adornment = new ColorAdornment(Colors.Gray);

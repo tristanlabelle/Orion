@@ -136,13 +136,14 @@ namespace Orion.Game.Presentation.Audio
             audio.PlaySfx(soundName, spatial.Center);
         }
 
-        private void OnEntityDied(World arg1, Entity arg2)
+        private void OnEntityDied(World world, Entity entity)
         {
-            Unit unit = arg2 as Unit;
-            if (unit == null) return;
-
-            string soundName = audio.GetUnitSoundName(unit.Type, "Die");
-            audio.PlaySfx(soundName, unit.Center);
+            Spatial spatial = entity.Components.TryGet<Spatial>();
+            if (spatial != null)
+            {
+                string soundName = audio.GetUnitSoundName(entity, "Die");
+                audio.PlaySfx(soundName, spatial.Center);
+            }
         }
 
         private void OnEntityRemoved(World sender, Entity entity)

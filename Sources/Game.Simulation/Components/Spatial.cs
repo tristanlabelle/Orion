@@ -122,5 +122,19 @@ namespace Orion.Game.Simulation.Components
             }
         }
         #endregion
+
+        #region Methods
+        /// <summary>
+        /// Rotates this <see cref="Unit"/> so that it faces a target.
+        /// </summary>
+        /// <param name="target">The location of the target to be faced.</param>
+        public void LookAt(Vector2 target)
+        {
+            Vector2 delta = target - Center;
+            if (delta.LengthSquared < 0.01f) return;
+
+            Angle = (float)Math.Atan2(delta.Y, delta.X);
+        }
+        #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Orion.Engine;
 using System.Diagnostics;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -11,15 +12,15 @@ namespace Orion.Game.Simulation.Tasks
     public abstract class Task : IDisposable
     {
         #region Fields
-        private readonly Unit unit;
+        private readonly Entity entity;
         private bool hasEnded;
         #endregion
 
         #region Constructors
-        protected Task(Unit unit)
+        protected Task(Entity entity)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            this.unit = unit;
+            Argument.EnsureNotNull(entity, "unit");
+            this.entity = entity;
         }
         #endregion
 
@@ -27,9 +28,15 @@ namespace Orion.Game.Simulation.Tasks
         /// <summary>
         /// Gets the <see cref="Unit"/> accomplishing this task.
         /// </summary>
+        public Entity Entity
+        {
+            get { return entity; }
+        }
+
+        [Obsolete("Move on to Entity please")]
         public Unit Unit
         {
-            get { return unit; }
+            get { return (Unit)entity; }
         }
 
         /// <summary>
@@ -57,12 +64,16 @@ namespace Orion.Game.Simulation.Tasks
 
         protected Faction Faction
         {
-            get { return unit.Faction; }
+            get
+            {
+                FactionMembership membership = entity.Components.TryGet<FactionMembership>();
+                return membership == null ? null : membership.Faction;
+            }
         }
 
         protected World World
         {
-            get { return unit.World; }
+            get { return entity.World; }
         }
         #endregion
 

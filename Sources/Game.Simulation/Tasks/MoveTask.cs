@@ -13,7 +13,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/>, which causes a <see cref="Unit"/>
+    /// A <see cref="Task"/>, which causes an <see cref="Entity"/>
     /// to walk on the ground to a specified destination.
     /// </summary>
     [Serializable]
@@ -33,29 +33,29 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="Walk"/> task from the <see cref="Unit"/>
+        /// Initializes a new <see cref="Walk"/> task from the <see cref="Entity"/>
         /// that gets moved and a delegate to find its destination.
         /// </summary>
         /// <param name="unit">The <see cref="Unit"/> to be moved.</param>
         /// <param name="destinationDistanceEvaluator">
         /// A delegate to a method which evaluates the distance of tiles to the destination.
         /// </param>
-        public MoveTask(Unit unit, Func<Point, float> destinationDistanceEvaluator)
-            : base(unit)
+        public MoveTask(Entity entity, Func<Point, float> destinationDistanceEvaluator)
+            : base(entity)
         {
-            Argument.EnsureNotNull(unit, "unit");
-            if (!unit.HasComponent<Move, MoveSkill>())
+            Argument.EnsureNotNull(entity, "unit");
+            if (!entity.Components.Has<Move>())
                 throw new ArgumentException("Cannot move without the move skill.", "unit");
             Argument.EnsureNotNull(destinationDistanceEvaluator, "destinationDistanceEvaluator");
 
-            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
-            Debug.Assert(unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air || unit.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
+            Debug.Assert(entity.Components.Has<Spatial>(), "Unit has no spatial component!");
+            Debug.Assert(entity.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air || entity.Size.Area == 1, "Ground units bigger than 1x1 are not supported.");
 
             this.destinationDistanceEvaluator = destinationDistanceEvaluator;
         }
 
-        public MoveTask(Unit unit, Point destination)
-            : this(unit, (point => ((Vector2)point - (Vector2)destination).LengthFast)) { }
+        public MoveTask(Entity entity, Point destination)
+            : this(entity, (point => ((Vector2)point - (Vector2)destination).LengthFast)) { }
         #endregion
 
         #region Properties
@@ -100,10 +100,11 @@ namespace Orion.Game.Simulation.Tasks
 
             float distance = (float)Unit.GetStatValue(Move.SpeedStat, MoveSkill.SpeedStat) * step.TimeDeltaInSeconds;
 
+            Spatial spatial = Entity.Components.Get<Spatial>();
             Vector2 targetPathPoint = path.Points[targetPathPointIndex];
-            Unit.LookAt(targetPathPoint + (Vector2)Unit.Size * 0.5f);
+            spatial.LookAt(targetPathPoint + (Vector2)spatial.Size * 0.5f);
 
-            Vector2 deltaToPathPoint = targetPathPoint - Unit.Position;
+            Vector2 deltaToPathPoint = targetPathPoint - spatial.Position;
 
             Vector2 targetPosition;
             if (distance > deltaToPathPoint.LengthFast)
@@ -113,7 +114,7 @@ namespace Orion.Game.Simulation.Tasks
             }
             else
             {
-                targetPosition = Unit.Position + Vector2.Normalize(deltaToPathPoint) * distance;
+                targetPosition = spatial.Position + Vector2.Normalize(deltaToPathPoint) * distance;
             }
 
             // Prevents floating point inaccuracies, we've had values of -0.0000001f
@@ -122,7 +123,7 @@ namespace Orion.Game.Simulation.Tasks
             Region targetRegion = Entity.GetGridRegion(targetPosition, Unit.Size);
             if (CanMoveOn(targetRegion))
             {
-                Unit.Position = targetPosition;
+                spatial.Position = targetPosition;
             }
             else
             {
@@ -135,12 +136,12 @@ namespace Orion.Game.Simulation.Tasks
         {
             foreach (Point point in targetRegion.Points)
             {
-                Debug.Assert(Unit.Components.Has<Spatial>(), "Unit has no spatial component!");
-                if (Unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground
+                Debug.Assert(Entity.Components.Has<Spatial>(), "Unit has no spatial component!");
+                if (Entity.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground
                     && !World.Terrain.IsWalkable(point)) return false;
 
                 Entity entity = World.Entities.GetEntityAt(point, Unit.Components.Get<Spatial>().CollisionLayer);
-                if (entity != null && entity != Unit) return false;
+                if (entity != null && entity != Entity) return false;
             }
 
             return true;
@@ -152,7 +153,7 @@ namespace Orion.Game.Simulation.Tasks
             if (timeSinceLastPathing < timeBetweenRepathings)
                 return false;
 
-            path = Unit.World.FindPath(Unit.GridRegion.Min, destinationDistanceEvaluator, GetWalkabilityTester());
+            path = Entity.World.FindPath(Unit.GridRegion.Min, destinationDistanceEvaluator, GetWalkabilityTester());
             targetPathPointIndex = (path.PointCount > 1) ? 1 : 0;
             timeSinceLastPathing = 0;
 
@@ -166,7 +167,7 @@ namespace Orion.Game.Simulation.Tasks
 
         private Func<Point, bool> GetWalkabilityTester()
         {
-            CollisionLayer layer = Unit.Components.Get<Spatial>().CollisionLayer;
+            CollisionLayer layer = Entity.Components.Get<Spatial>().CollisionLayer;
             if (layer == CollisionLayer.Ground) return IsGroundPathable;
             if (layer == CollisionLayer.Air) return IsAirPathable;
             throw new InvalidOperationException(
@@ -175,8 +176,9 @@ namespace Orion.Game.Simulation.Tasks
 
         private bool IsGroundPathable(Point point)
         {
-            if (!Unit.Faction.HasSeen(point)) return true;
-            return Unit.World.Terrain.IsWalkable(point) && World.Entities.GetGroundEntityAt(point) == null;
+            FactionMembership membership = Entity.Components.TryGet<FactionMembership>();
+            if (membership == null || !membership.Faction.HasSeen(point)) return true;
+            return Entity.World.Terrain.IsWalkable(point) && World.Entities.GetGroundEntityAt(point) == null;
         }
 
         private bool IsAirPathable(Point minPoint)
@@ -202,22 +204,22 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Static
         #region Methods
-        public static MoveTask ToNearRegion(Unit unit, Region region)
+        public static MoveTask ToNearRegion(Entity entity, Region region)
         {
-            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureNotNull(entity, "entity");
 
             // Walk to a tile surrounding the region
             Region grownRegion = Region.Grow(region, 1);
             Func<Point, float> destinationDistanceEvaluator = point =>
             {
-                Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
+                Debug.Assert(entity.Components.Has<Spatial>(), "Unit has no spatial component!");
                 if (region.Contains(point))
-                    return unit.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air ? 0 : 1;
+                    return entity.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air ? 0 : 1;
 
                 return ((Vector2)point - (Vector2)grownRegion.Clamp(point)).LengthFast;
             };
 
-            return new MoveTask(unit, destinationDistanceEvaluator);
+            return new MoveTask(entity, destinationDistanceEvaluator);
         }
         #endregion
         #endregion

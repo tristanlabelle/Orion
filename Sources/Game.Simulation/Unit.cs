@@ -164,6 +164,16 @@ namespace Orion.Game.Simulation
                 Components.Add(new AlageneExtractor(this));
             }
 
+            if (InternalHasSkill<SuicideBombSkill>())
+            {
+                SuicideBombSkill suicideBombSkill = InternalTryGetSkill<SuicideBombSkill>();
+                Kamikaze kamikaze = new Kamikaze(this);
+                kamikaze.Targets.AddRange(suicideBombSkill.Targets);
+                kamikaze.Damage = suicideBombSkill.Damage;
+                kamikaze.Radius = suicideBombSkill.Radius;
+                Components.Add(kamikaze);
+            }
+
             FactionMembership membership = new FactionMembership(this);
             membership.FoodCost = type.BasicSkill.FoodCost;
 
@@ -490,19 +500,8 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(stat, "stat");
 
             UnitSkill skill;
-            if (!skills.TryGetValue(stat.SkillType, out skill))
-            {
-                // Commented out because skills are being phased out, and now this situation can happen
-                // in normal cases
-                /*
-                throw new ArgumentException(
-                    "Cannot get base stat {0} without skill {1}."
-                    .FormatInvariant(stat, stat.SkillName));
-                 */
-                return 0;
-            }
-
-            return skill.GetStat(stat);
+            // As skills are being phased out, return 0 instead of throwing an exception
+            return skills.TryGetValue(stat.SkillType, out skill) ? skill.GetStat(stat) : 0;
         }
 
         /// <summary>
@@ -685,7 +684,7 @@ namespace Orion.Game.Simulation
         #region Exploding
         private void Explode()
         {
-            float explosionRadius = GetStatValue(SuicideBombSkill.RadiusStat);
+            float explosionRadius = (float)GetStatValue(Kamikaze.RadiusStat, SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle(Center, explosionRadius);
 
             World.OnExplosionOccured(explosionCircle);
@@ -697,10 +696,10 @@ namespace Orion.Game.Simulation
                 .Where(unit => unit != this && unit.IsAliveInWorld)
                 .ToArray();
 
-            float explosionDamage = GetStatValue(SuicideBombSkill.DamageStat);
+            float explosionDamage = (float)GetStatValue(Kamikaze.DamageStat, SuicideBombSkill.DamageStat);
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                if (damagedUnit.HasComponent<Kamikaze, SuicideBombSkill>()) continue;
                 float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
                 float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
                     * explosionDamage;
@@ -709,7 +708,7 @@ namespace Orion.Game.Simulation
 
             foreach (Unit damagedUnit in damagedUnits)
             {
-                if (!damagedUnit.HasSkill<SuicideBombSkill>()) continue;
+                if (!damagedUnit.HasComponent<Kamikaze, SuicideBombSkill>()) continue;
                 damagedUnit.Explode();
             }
         }
@@ -737,7 +736,7 @@ namespace Orion.Game.Simulation
             // so the units do not make their checks all at once.
             if (CanPerformProximityChecks(step) && IsIdle)
             {
-                if (HasSkill<SuicideBombSkill>() && TryExplodeWithNearbyUnit())
+                if (HasComponent<Kamikaze, SuicideBombSkill>() && TryExplodeWithNearbyUnit())
                     return;
 
                 if (HasComponent<Builder, BuildSkill>() && TryRepairNearbyUnit()) { }
@@ -760,18 +759,18 @@ namespace Orion.Game.Simulation
 
         private bool TryExplodeWithNearbyUnit()
         {
-            SuicideBombSkill suicideBombSkill = TryGetSkill<SuicideBombSkill>();
+            Kamikaze kamikaze = Components.Get<Kamikaze>();
 
             Unit explodingTarget = World.Entities
                 .Intersecting(Rectangle.FromCenterSize(Center, new Vector2(3, 3)))
                 .OfType<Unit>()
                 .FirstOrDefault(unit => unit != this
-                    && suicideBombSkill.IsExplodingTarget(unit)
+                    && kamikaze.IsTarget(unit)
                     && Region.AreAdjacentOrIntersecting(GridRegion, unit.GridRegion));
 
             if (explodingTarget == null) return false;
 
-            float explosionRadius = GetStatValue(SuicideBombSkill.RadiusStat);
+            float explosionRadius = (float)GetStatValue(Kamikaze.RadiusStat, SuicideBombSkill.RadiusStat);
             Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, explosionRadius);
 
             explodingTarget.Suicide();

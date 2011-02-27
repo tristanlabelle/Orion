@@ -531,7 +531,7 @@ namespace Orion.Game.Presentation
         public void LaunchCancelTask(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            Debug.Assert(Selection.Count == 1 && task.Unit == Selection.FirstOrDefault());
+            Debug.Assert(Selection.Count == 1 && task.Entity == Selection.FirstOrDefault());
 
             commander.LaunchCancelTask(task);
         }

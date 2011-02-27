@@ -50,7 +50,7 @@ namespace Orion.Game.Matchmaking
 
         public void LaunchCancelTask(Task task)
         {
-            Unit unit = task.Unit;
+            Unit unit = (Unit)task.Entity;
             Handle taskHandle = unit.TaskQueue.TryGetTaskHandle(task);
             IssueCommand(new CancelTaskCommand(unit.Faction.Handle, unit.Handle, taskHandle));
         }

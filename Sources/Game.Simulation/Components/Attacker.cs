@@ -178,7 +178,7 @@ namespace Orion.Game.Simulation.Components
             else
             {
                 float range = (float)Entity.GetStatValue(Attacker.RangeStat);
-                return Region.SquaredDistance(spatial.GridRegion, targetSpatial.GridRegion) <= range * range + 0.001f;
+                return spatial.IsInRange(target, range);
             }
         }
 

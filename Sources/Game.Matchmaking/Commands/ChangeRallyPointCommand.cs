@@ -8,6 +8,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -56,7 +57,8 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle buildingHandle in buildingHandles)
             {
                 Unit building = (Unit)match.World.Entities.FromHandle(buildingHandle);
-                if (!building.IsUnderConstruction) building.RallyPoint = position;
+                if (!building.IsUnderConstruction)
+                    building.Components.Get<Trainer>().RallyPoint = position;
             }
         }
 

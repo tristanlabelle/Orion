@@ -52,7 +52,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             get
             {
-                int maxHealth = Unit.Faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
+                int maxHealth = FactionMembership.GetFaction(Entity).GetStat(traineeType, BasicSkill.MaxHealthStat);
                 return Math.Min(healthPointsTrained / maxHealth, 1);
             }
         }
@@ -61,14 +61,15 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.Components.Has<Trainer>())
+            if (Entity.Spatial == null
+                || !Entity.Components.Has<Trainer>()
+                || FactionMembership.GetFaction(Entity) == null)
             {
                 MarkAsEnded();
                 return;
             }
 
-            FactionMembership factionMembership = Unit.Components.TryGet<FactionMembership>();
-            Faction faction = factionMembership == null ? null : factionMembership.Faction;
+            Faction faction = FactionMembership.GetFaction(Entity);
             if (faction != null && faction.RemainingFoodAmount < faction.GetStat(traineeType, BasicSkill.FoodCostStat))
             {
                 if (!waitingForEnoughFood)
@@ -85,7 +86,7 @@ namespace Orion.Game.Simulation.Tasks
             int maxHealth = faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
-                float trainingSpeed = (float)Unit.GetStatValue(Trainer.SpeedStat, TrainSkill.SpeedStat);
+                float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
                 healthPointsTrained += trainingSpeed * step.TimeDeltaInSeconds;
                 return;
             }
@@ -111,7 +112,7 @@ namespace Orion.Game.Simulation.Tasks
         {
             Argument.EnsureNotNull(spawneeType, "spawneeType");
 
-            Region trainerRegion = Unit.GridRegion;
+            Region trainerRegion = Entity.Spatial.GridRegion;
 
             Region spawnRegion = new Region(
                 trainerRegion.MinX - spawneeType.Size.Width,
@@ -127,11 +128,12 @@ namespace Orion.Game.Simulation.Tasks
                         && World.IsFree(new Region(point, spawneeType.Size), layer);
                 });
 
-            if (Unit.HasRallyPoint)
+            Trainer trainer = Entity.Components.Get<Trainer>();
+            if (trainer.HasRallyPoint)
             {
                 return potentialSpawnPoints
                     .Select(point => (Point?)point)
-                    .WithMinOrDefault(point => ((Vector2)point - Unit.RallyPoint).LengthSquared);
+                    .WithMinOrDefault(point => ((Vector2)point - trainer.RallyPoint.Value).LengthSquared);
             }
             else
             {
@@ -146,8 +148,8 @@ namespace Orion.Game.Simulation.Tasks
             Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
             if (!point.HasValue) return null;
 
-            Unit spawnee = Unit.Faction.CreateUnit(spawneeType, point.Value);
-            Vector2 traineeDelta = spawnee.Center - Unit.Center;
+            Unit spawnee = FactionMembership.GetFaction(Entity).CreateUnit(spawneeType, point.Value);
+            Vector2 traineeDelta = spawnee.Center - Entity.Spatial.Center;
             spawnee.Spatial.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 
             return spawnee;
@@ -155,14 +157,17 @@ namespace Orion.Game.Simulation.Tasks
 
         private void TryApplyRallyPoint(Unit unit)
         {
-            if (!Unit.HasRallyPoint) return;
+            Trainer trainer = Entity.Components.Get<Trainer>();
+            if (!trainer.HasRallyPoint) return;
+
+            Vector2 rallyPoint = trainer.RallyPoint.Value;
 
             Task rallyPointTask = null;
             // Check to see if we can harvest automatically
             if (unit.HasComponent<Harvester, HarvestSkill>())
             {
                 Entity resourceNode = World.Entities
-                    .Intersecting(Unit.RallyPoint)
+                    .Intersecting(rallyPoint)
                     .Where(e => e.Components.Has<Harvestable>())
                     .FirstOrDefault(e => !e.Components.Get<Harvestable>().IsEmpty);
 
@@ -172,7 +177,7 @@ namespace Orion.Game.Simulation.Tasks
             
             if (rallyPointTask == null)
             {
-                Point targetPoint = (Point)Unit.RallyPoint;
+                Point targetPoint = (Point)rallyPoint;
                 rallyPointTask = new MoveTask(unit, targetPoint);
             }
 

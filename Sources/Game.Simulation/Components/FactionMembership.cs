@@ -5,11 +5,13 @@ using System.Text;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Components.Serialization;
 using Orion.Engine;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
     /// <summary>
-    /// Indicates membership of a faction, and all what it implies.
+    /// Allows an <see cref="Entity"/> to be affiliated to a <see cref="Faction"/>,
+    /// and affected by its technologies.
     /// </summary>
     public sealed class FactionMembership : Component
     {
@@ -18,6 +20,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat ProvidedFoodStat = new Stat(typeof(FactionMembership), StatType.Integer, "ProvidedFood");
 
         private Faction faction;
+        private bool isKeepAlive = true;
         private int foodCost;
         private int providedFood;
         #endregion
@@ -27,10 +30,30 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Accesses the <see cref="Faction"/>
+        /// </summary>
         public Faction Faction
         {
             get { return faction; }
-            set { faction = value; }
+            set
+            {
+                Debug.Assert(faction == null || value == faction,
+                    "Warning: an entity is changing faction membership, "
+                    + "this might cause lots of issues with technologies, fog of war, etc. "
+                    + "If the feature has been properly implemented, this assert can be removed.");
+                faction = value;
+            }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Entity"/> keeps
+        /// its <see cref="Faction"/> alive.
+        /// </summary>
+        public bool IsKeepAlive
+        {
+            get { return isKeepAlive; }
+            set { isKeepAlive = value; }
         }
 
         [Mandatory]

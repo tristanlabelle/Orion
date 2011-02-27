@@ -33,12 +33,6 @@ namespace Orion.Game.Simulation.Tasks
             get { return entity; }
         }
 
-        [Obsolete("Move on to Entity please")]
-        public Unit Unit
-        {
-            get { return (Unit)entity; }
-        }
-
         /// <summary>
         /// Gets a value indicating if this <see cref="Task"/> has terminated its execution,
         /// rendering the unit idle.

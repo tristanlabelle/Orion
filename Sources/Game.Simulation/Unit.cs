@@ -49,7 +49,7 @@ namespace Orion.Game.Simulation
                 .ToDictionary(skill => skill.GetType());
             skills.Add(typeof(BasicSkill), type.BasicSkill);
 
-            // components stuff
+            // Mandatory components
             Identity identity = new Identity(this);
             identity.Name = type.Name;
             identity.VisualIdentity = type.GraphicsTemplate ?? type.Name;
@@ -79,6 +79,19 @@ namespace Orion.Game.Simulation
             health.MaximumValue = type.BasicSkill.MaxHealth;
             Components.Add(health);
 
+            FactionMembership factionMembership = new FactionMembership(this);
+            factionMembership.IsKeepAlive = InternalHasSkill<TrainSkill>() || InternalHasSkill<AttackSkill>();
+            factionMembership.FoodCost = type.BasicSkill.FoodCost;
+            if (InternalHasSkill<ProvideFoodSkill>())
+            {
+                ProvideFoodSkill provideFoodSkill = InternalTryGetSkill<ProvideFoodSkill>();
+                factionMembership.ProvidedFood = provideFoodSkill.Amount;
+            }
+            Components.Add(factionMembership);
+
+            Components.Add(new TaskQueue(this));
+
+            // Optional components
             if (InternalHasSkill<MoveSkill>())
             {
                 MoveSkill moveSkill = InternalTryGetSkill<MoveSkill>();
@@ -173,19 +186,6 @@ namespace Orion.Game.Simulation
                 kamikaze.Radius = suicideBombSkill.Radius;
                 Components.Add(kamikaze);
             }
-
-            FactionMembership membership = new FactionMembership(this);
-            membership.FoodCost = type.BasicSkill.FoodCost;
-
-            if (InternalHasSkill<ProvideFoodSkill>())
-            {
-                ProvideFoodSkill provideFoodSkill = InternalTryGetSkill<ProvideFoodSkill>();
-                membership.ProvidedFood = provideFoodSkill.Amount;
-            }
-
-            Components.Add(membership);
-
-            Components.Add(new TaskQueue(this));
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace Orion.Game.Simulation
 
         public bool KeepsFactionAlive
         {
-            get { return HasComponent<Trainer, TrainSkill>() || HasComponent<Attacker, AttackSkill>(); }
+            get { return Components.Get<FactionMembership>().IsKeepAlive; }
         }
         #endregion
 
@@ -402,26 +402,6 @@ namespace Orion.Game.Simulation
         public float TimeElapsedSinceLastHitInSeconds
         {
             get { return Components.Get<Attacker>().TimeElapsedSinceLastHit; }
-        }
-        #endregion
-
-        #region Rally Point
-        /// <summary>
-        /// Gets a value indicating if this <see cref="Unit"/> has a rally point.
-        /// </summary>
-        public bool HasRallyPoint
-        {
-            get { return HasComponent<Trainer, TrainSkill>() && !BoundingRectangle.ContainsPoint(RallyPoint); }
-        }
-
-        /// <summary>
-        /// Accesses the rally point of this <see cref="Unit"/>, in absolute coordinates.
-        /// This is used for buildings.
-        /// </summary>
-        public Vector2 RallyPoint
-        {
-            get { return Components.Get<Trainer>().RallyPoint; }
-            set { Components.Get<Trainer>().RallyPoint = value; }
         }
         #endregion
         #endregion
@@ -519,15 +499,6 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(other, "other");
             return Intersection.Test(LineOfSight, other.BoundingRectangle);
-        }
-
-        public bool IsWithinHealingRange(Unit other)
-        {
-            Argument.EnsureNotNull(other, "other");
-            Debug.Assert(HasComponent<Healer, HealSkill>());
-
-            float range = (float)GetStatValue(Healer.RangeStat, HealSkill.RangeStat);
-            return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
         }
 
         #region Can*** Testing

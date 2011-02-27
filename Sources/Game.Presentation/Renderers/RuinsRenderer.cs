@@ -63,9 +63,8 @@ namespace Orion.Game.Presentation.Renderers
                 TimedExistence timeout = ruin.Components.Get<TimedExistence>();
                 Identity identity = ruin.Components.Get<Identity>();
 
-                ColorRgb factionColor = ruin.Components.Has<FactionMembership>()
-                    ? ruin.Components.Get<FactionMembership>().Faction.Color
-                    : Colors.White;
+                Faction ruinFaction = FactionMembership.GetFaction(ruin);
+                ColorRgb factionColor = faction == null ? Colors.White : faction.Color;
 
                 float alpha = timeout.TimeLeft / ruinFadeDurationInSeconds;
                 if (alpha < 0) alpha = 0;

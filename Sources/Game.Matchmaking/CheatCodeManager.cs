@@ -123,17 +123,12 @@ namespace Orion.Game.Matchmaking
         private static void InstantVictory(Match match, Faction faction)
         {
             List<Entity> enemyUnits = match.World.Entities
-                .Where(e =>
-                    {
-                        FactionMembership membership = e.Components.TryGet<FactionMembership>();
-                        if (membership == null) return false;
-                        return membership.Faction != faction;
-                    })
+                .Where(e => FactionMembership.GetFaction(e) != faction)
                 .ToList();
             foreach (Entity enemy in enemyUnits)
             {
-                Health health = enemy.Components.Get<Health>();
-                health.Value = 0;
+                Health health = enemy.Components.TryGet<Health>();
+                if (health != null) health.Value = 0;
             }
         }
 

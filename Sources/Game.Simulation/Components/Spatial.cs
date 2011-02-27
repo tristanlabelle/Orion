@@ -135,6 +135,21 @@ namespace Orion.Game.Simulation.Components
 
             Angle = (float)Math.Atan2(delta.Y, delta.X);
         }
+
+        /// <summary>
+        /// Tests if a given <see cref="Entity"/> is within a given range of this <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="target">The target <see cref="Entity"/> to be tested.</param>
+        /// <param name="radius">The radius of the range circle.</param>
+        /// <returns>A value indicating if <paramref name="target"/> is in range.</returns>
+        public bool IsInRange(Entity target, float radius)
+        {
+            Argument.EnsureNotNull(target, "target");
+
+            Spatial targetSpatial = target.Spatial;
+            return targetSpatial != null
+                && Region.SquaredDistance(GridRegion, targetSpatial.GridRegion) <= radius * radius + 0.001f;
+        }
         #endregion
     }
 }

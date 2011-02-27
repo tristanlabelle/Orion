@@ -15,17 +15,17 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class HealTask : Task
     {
         #region Fields
-        private readonly Unit target;
+        private readonly Entity target;
         private readonly FollowTask follow;    
         #endregion
 
         #region Constructors
-        public HealTask(Unit healer, Unit target)
+        public HealTask(Entity healer, Unit target)
             : base(healer)
         {
             Argument.EnsureNotNull(healer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!healer.HasComponent<Healer, HealSkill>())
+            if (!healer.Components.Has<Healer>())
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");
@@ -33,16 +33,11 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal buildings.", "target");
 
             this.target = target;
-            if (healer.HasComponent<Move, MoveSkill>()) this.follow = new FollowTask(healer, target);
+            if (healer.Components.Has<Move>()) this.follow = new FollowTask(healer, target);
         }
         #endregion
 
         #region Properties
-        public Unit Target
-        {
-            get { return target; }
-        }
-
         public override string Description
         {
             get { return "healing {0}".FormatInvariant(target); }
@@ -52,7 +47,15 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!Unit.Faction.CanSee(target))
+            Spatial spatial = Entity.Spatial;
+            Healer healer = Entity.Components.TryGet<Healer>();
+            Faction faction = FactionMembership.GetFaction(Entity);
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (spatial == null
+                || healer == null
+                || faction == null
+                || !faction.CanSee(target)
+                || targetHealth == null)
             {
                 MarkAsEnded();
                 return;
@@ -62,18 +65,18 @@ namespace Orion.Game.Simulation.Tasks
             {
                 // If the target has died while we weren't yet in attack range,
                 // but were coming, complete the motion with a move task.
-                if (follow != null && !Unit.IsWithinHealingRange(target) && Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
+                if (follow != null && !healer.IsInRange(target) && TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)target.Center));
                 MarkAsEnded();
                 return;
             }
 
-            if (Unit.IsWithinHealingRange(target))
+            if (healer.IsInRange(target))
             {
-                Unit.LookAt(target.Center);
-                int speed = (int)Unit.GetStatValue(Healer.SpeedStat, HealSkill.SpeedStat);
-                target.Health += speed * step.TimeDeltaInSeconds;
-                if (target.Health == target.MaxHealth) MarkAsEnded();
+                spatial.LookAt(target.Center);
+                int speed = (int)Entity.GetStatValue(Healer.SpeedStat);
+                targetHealth.Value += speed * step.TimeDeltaInSeconds;
+                if (targetHealth.Value == (int)target.GetStatValue(Health.MaximumValueStat)) MarkAsEnded();
                 return;
             }
             else

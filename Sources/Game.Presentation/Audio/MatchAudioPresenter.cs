@@ -117,8 +117,8 @@ namespace Orion.Game.Presentation.Audio
                 return;
             }
 
-            FactionMembership membership = entity.Components.TryGet<FactionMembership>();
-            if (membership != null && membership.Faction != LocalFaction) return;
+            Faction faction = FactionMembership.GetFaction(entity);
+            if (faction != LocalFaction) return;
 
             Unit unit = entity as Unit;
             if (unit == null) return;

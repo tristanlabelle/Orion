@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat SpeedStat = new Stat(typeof(Trainer), StatType.Real, "Speed");
 
         private float speed = 1;
-        private Vector2 rallyPoint;
+        private Vector2? rallyPoint;
         private readonly HashSet<string> trainableTypes = new HashSet<string>();
         #endregion
 
@@ -43,16 +43,29 @@ namespace Orion.Game.Simulation.Components
             get { return trainableTypes; }
         }
 
-        public Vector2 RallyPoint
+        /// <summary>
+        /// Accesses the rally point of the trained <see cref="Entity">entities</see>.
+        /// This is <c>null</c> if no rally point is set.
+        /// </summary>
+        public Vector2? RallyPoint
         {
             get { return rallyPoint; }
             set { rallyPoint = value; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if this <see cref="Entity"/> has a rally point.
+        /// </summary>
+        public bool HasRallyPoint
+        {
+            get { return rallyPoint.HasValue; }
         }
         #endregion
 
         #region Methods
         public bool Supports(Entity prototype)
         {
+            Argument.EnsureNotNull(prototype, "prototype");
             return trainableTypes.Contains(prototype.Components.Get<Identity>().Name);
         }
         #endregion

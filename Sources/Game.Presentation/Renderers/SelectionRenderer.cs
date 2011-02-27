@@ -72,16 +72,13 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in Selection)
             {
-                FactionMembership membership = entity.Components.TryGet<FactionMembership>();
-                if (membership != null && membership.Faction == Faction)
+                Faction faction = FactionMembership.GetFaction(entity);
+                Trainer trainer = entity.Components.TryGet<Trainer>();
+                if (faction != null && trainer != null && trainer.HasRallyPoint)
                 {
-                    Trainer train = entity.Components.TryGet<Trainer>();
-                    if (train != null)
-                    {
-                        Spatial spatial = entity.Spatial;
-                        LineSegment lineSegment = new LineSegment(spatial.Center, train.RallyPoint);
-                        graphics.Stroke(lineSegment, selectionMarkerColor);
-                    }
+                    Spatial spatial = entity.Spatial;
+                    LineSegment lineSegment = new LineSegment(spatial.Center, trainer.RallyPoint.Value);
+                    graphics.Stroke(lineSegment, selectionMarkerColor);
                 }
             }
         }

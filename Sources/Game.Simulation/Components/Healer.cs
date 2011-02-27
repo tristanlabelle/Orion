@@ -53,6 +53,19 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Tests if a given <see cref="Entity"/> is within this <see cref="Entity"/>'s healing range.
+        /// </summary>
+        /// <param name="target">The target <see cref="Entity"/>.</param>
+        /// <returns>A value indicating if <paramref name="target"/> is in the healing range.</returns>
+        public bool IsInRange(Entity target)
+        {
+            Argument.EnsureNotNull(target, "target");
+
+            Spatial spatial = Entity.Spatial;
+            float range = (float)Entity.GetStatValue(Healer.RangeStat);
+            return spatial != null && spatial.IsInRange(target, range);
+        }
         #endregion
     }
 }

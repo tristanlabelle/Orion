@@ -20,7 +20,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(hitter, "hitter");
             Argument.EnsureNotNull(target, "target");
-            Argument.EnsureStrictlyPositive(damage, "damage");
+            Argument.EnsurePositive(damage, "damage");
 
             this.Hitter = hitter;
             this.Target = target;

@@ -47,7 +47,7 @@ namespace Orion.Game.Simulation.Components
         {
             get
             {
-                Spatial spatial = Entity.Components.TryGet<Spatial>();
+                Spatial spatial = Entity.Spatial;
                 Vector2 center = spatial == null ? new Vector2(float.NaN, float.NaN) : spatial.Center;
                 return new Circle(center, (float)Entity.GetStatValue(RangeStat));
             }
@@ -62,7 +62,7 @@ namespace Orion.Game.Simulation.Components
         /// <returns><c>True</c> if the <see cref="point"/> can be seen, <c>false</c> if not.</returns>
         public bool CanSee(Vector2 point)
         {
-            Spatial spatial = Entity.Components.TryGet<Spatial>();
+            Spatial spatial = Entity.Spatial;
             if (spatial == null) return false;
 
             Circle lineOfSight = new Circle(spatial.Center, (float)Entity.GetStatValue(RangeStat));

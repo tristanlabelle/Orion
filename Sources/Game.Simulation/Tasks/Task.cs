@@ -26,7 +26,7 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Properties
         /// <summary>
-        /// Gets the <see cref="Unit"/> accomplishing this task.
+        /// Gets the <see cref="Entity"/> accomplishing this task.
         /// </summary>
         public Entity Entity
         {
@@ -49,7 +49,7 @@ namespace Orion.Game.Simulation.Tasks
         }
 
         /// <summary>
-        /// Gets a human-readable string describing this <see cref="Task"/>.
+        /// Gets a string describing this <see cref="Task"/>, for logging and debugging purposes.
         /// </summary>
         public abstract string Description { get; }
 

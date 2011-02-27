@@ -58,7 +58,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(entity, "entity");
             Debug.Assert(entity.Components.Has<Spatial>(), "An immaterial entity is being added to the grid.");
-            Debug.Assert(entity.Components.Get<Spatial>().CollisionLayer != CollisionLayer.None,
+            Debug.Assert(entity.Spatial.CollisionLayer != CollisionLayer.None,
                 "A non-collidable entity is being added to the grid.");
             Debug.Assert(entity.IsAliveInWorld, "An entity that is not alive in the world is being added to the grid.");
 
@@ -79,7 +79,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(entity, "entity");
             Debug.Assert(entity.Components.Has<Spatial>(), "An immaterial entity is being removed from the grid.");
-            if (entity.Components.Get<Spatial>().CollisionLayer == CollisionLayer.None)
+            if (entity.Spatial.CollisionLayer == CollisionLayer.None)
             {
                 Debug.Fail("A non-collidable entity is being removed from the grid.");
                 return;

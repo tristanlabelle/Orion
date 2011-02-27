@@ -141,7 +141,7 @@ namespace Orion.Game.Simulation.Components
         public void OverrideWith(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            if (task.Unit != Unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
+            if (task.Entity != Entity) throw new ArgumentException("Cannot enqueue a task belonging to another entity.");
             Debug.Assert(!Unit.IsUnderConstruction);
 
             foreach (Task t in tasks) task.Dispose();
@@ -176,7 +176,7 @@ namespace Orion.Game.Simulation.Components
         public void Enqueue(Task task)
         {
             Argument.EnsureNotNull(task, "task");
-            if (task.Unit != Unit) throw new ArgumentException("Cannot enqueue a task belonging to another unit.");
+            if (task.Entity != Entity) throw new ArgumentException("Cannot enqueue a task belonging to another entity.");
             if (taskIDs.ContainsKey(task)) throw new InvalidOperationException("Cannot add a task already present.");
             Debug.Assert(!Unit.IsUnderConstruction);
 

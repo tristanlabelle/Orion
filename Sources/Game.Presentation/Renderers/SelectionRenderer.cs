@@ -78,7 +78,7 @@ namespace Orion.Game.Presentation.Renderers
                     Trainer train = entity.Components.TryGet<Trainer>();
                     if (train != null)
                     {
-                        Spatial spatial = entity.Components.Get<Spatial>();
+                        Spatial spatial = entity.Spatial;
                         LineSegment lineSegment = new LineSegment(spatial.Center, train.RallyPoint);
                         graphics.Stroke(lineSegment, selectionMarkerColor);
                     }

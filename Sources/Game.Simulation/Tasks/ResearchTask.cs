@@ -30,6 +30,9 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the <see cref="Technology"/> being researched.
+        /// </summary>
         public Technology Technology
         {
             get { return technology; }

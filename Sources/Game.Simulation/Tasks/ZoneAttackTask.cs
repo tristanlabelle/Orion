@@ -47,18 +47,19 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            Attacker attacker = Entity.Components.TryGet<Attacker>();
+            if (attacker == null)
+            {
+                MarkAsEnded();
+                return;
+            }
+
             if (attack == null && Unit.CanPerformProximityChecks(step))
             {
-                bool isRanged = Unit.Components.Get<Attacker>().IsRanged;
+                bool isRanged = attacker.IsRanged;
 
-                Unit target = Unit.World.Entities
-                    .Intersecting(Unit.LineOfSight)
-                    .OfType<Unit>()
-                    .FirstOrDefault(other => Unit.IsInLineOfSight(other)
-                        && (isRanged || other.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground)
-                        && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
-
-                if (target != null) attack = new AttackTask(Unit, target);
+                Entity target = attacker.FindVisibleTarget();
+                if (target != null) attack = new AttackTask(target, target);
             }
 
             if (attack == null)

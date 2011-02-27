@@ -14,64 +14,58 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class AttackTask : Task
     {
         #region Fields
-        private readonly Unit target;
+        private readonly Entity target;
         private readonly FollowTask follow;
         #endregion
 
         #region Constructors
-        public AttackTask(Unit attacker, Unit target)
+        public AttackTask(Entity attacker, Entity target)
             : base(attacker)
         {
             Argument.EnsureNotNull(attacker, "attacker");
-            if (!attacker.HasComponent<Attacker, AttackSkill>())
+            if (!attacker.Components.Has<Attacker>())
                 throw new ArgumentException("Cannot attack without the attack skill.", "attacker");
             Argument.EnsureNotNull(target, "target");
             
             this.target = target;
-            if (attacker.HasComponent<Move, MoveSkill>()) this.follow = new FollowTask(attacker, target);
+            if (attacker.Components.Has<Move>()) this.follow = new FollowTask(attacker, (Unit)target);
         }
         #endregion
 
         #region Properties
-        public Unit Attacker
-        {
-            get { return Unit; }
-        }
-
-        public Unit Target
-        {
-            get { return target; }
-        }
-
         public override string Description
         {
-            get { return "attacking"; }
+            get { return "Attacking {0}".FormatInvariant(target); }
         }
         #endregion
 
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            Attacker attacker = Unit.Components.TryGet<Attacker>();
-            if (attacker == null)
+            Spatial spatial = Entity.Spatial;
+            Attacker attacker = Entity.Components.TryGet<Attacker>();
+            if (spatial == null || attacker == null)
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (!target.IsAliveInWorld || !Unit.Faction.CanSee(target))
+            Faction faction = FactionMembership.GetFaction(Entity);
+            TaskQueue taskQueue = Entity.Components.Get<TaskQueue>();
+
+            if (!target.IsAliveInWorld || (faction != null && !faction.CanSee(target)))
             {
                 // If the target has died while we weren't yet in attack range,
                 // or if the unit moved out of sight,  but we're coming, complete the motion with a move task.
-                if (follow != null && !Unit.IsWithinAttackRange(target) && Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)target.Center));
+                if (follow != null && !attacker.IsInRange(target) && taskQueue.Count == 1)
+                    taskQueue.OverrideWith(new MoveTask(Entity, (Point)target.Center));
                 MarkAsEnded();
                 return;
             }
 
-            if (Unit.IsWithinAttackRange(target))
+            if (attacker.IsInRange(target))
             {
-                Unit.LookAt(target.Center);
+                spatial.LookAt(target.Center);
                 attacker.TryHit(target);
                 return;
             }

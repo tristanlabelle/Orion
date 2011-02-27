@@ -521,25 +521,6 @@ namespace Orion.Game.Simulation
             return Intersection.Test(LineOfSight, other.BoundingRectangle);
         }
 
-        public bool IsWithinAttackRange(Unit other)
-        {
-            Argument.EnsureNotNull(other, "other");
-            Debug.Assert(HasComponent<Attacker, AttackSkill>());
-
-            float range = (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat);
-            if (range == 0)
-            {
-                Debug.Assert(Components.Has<Spatial>(), "Unit has no spatial component!");
-                Debug.Assert(other.Components.Has<Spatial>(), "Enemy unit has no spatial component!");
-                bool selfIsAirborne = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air;
-                bool otherIsAirborne = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Air;
-                if (!selfIsAirborne && otherIsAirborne) return false;
-                return Region.AreAdjacentOrIntersecting(GridRegion, other.GridRegion);
-            }
-
-            return Region.SquaredDistance(GridRegion, other.GridRegion) <= range * range + 0.001f;
-        }
-
         public bool IsWithinHealingRange(Unit other)
         {
             Argument.EnsureNotNull(other, "other");
@@ -754,7 +735,7 @@ namespace Orion.Game.Simulation
 
             bool isGroundUnit = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
             if (!isGroundUnit && (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0)
-                attackableUnits = attackableUnits.Where(u => u.Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground);
+                attackableUnits = attackableUnits.Where(u => u.Spatial.CollisionLayer == CollisionLayer.Ground);
 
             // HACK: Attack units which can attack first, then other units.
             Unit unitToAttack = attackableUnits

@@ -59,7 +59,7 @@ namespace Orion.Game.Presentation.Renderers
             Rectangle clippingBounds = viewBounds;
             foreach (Entity entity in World.Entities.Where(e => e.Components.Has<Harvestable>()))
             {
-                Spatial positionComponent = entity.Components.Get<Spatial>();
+                Spatial positionComponent = entity.Spatial;
                 Rectangle boundingRectangle = entity.BoundingRectangle;
                 if (!Rectangle.Intersects(clippingBounds, boundingRectangle)
                     || !faction.HasPartiallySeen(positionComponent.GridRegion))

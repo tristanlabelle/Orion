@@ -5,6 +5,7 @@ using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation.Components.Serialization;
 using Orion.Engine.Geometry;
+using System.Diagnostics;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -130,6 +131,57 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Finds an <see cref="Entity"/> to attack within this <see cref="Entity"/>'s sight range.
+        /// </summary>
+        /// <returns>An <see cref="Entity"/> to attack, or <c>null</c> if no enemies are visible.</returns>
+        public Entity FindVisibleTarget()
+        {
+            Vision vision = Entity.Components.TryGet<Vision>();
+            if (Entity.Spatial == null || vision == null) return null;
+
+            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
+            {
+                Spatial targetSpatial = target.Spatial;
+                if (targetSpatial != null
+                    && IsInRange(target)
+                    && (IsRanged || targetSpatial.CollisionLayer == CollisionLayer.Ground)
+                    && !FactionMembership.IsAlliedTo(Entity, target))
+                {
+                    return target;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Tests if a given <see cref="Entity"/> is within this <see cref="Entity"/>'s attack range.
+        /// </summary>
+        /// <param name="target">The target <see cref="Entity"/>.</param>
+        /// <returns>A value indicating if <paramref name="target"/> is in the attack range.</returns>
+        public bool IsInRange(Entity target)
+        {
+            Argument.EnsureNotNull(target, "target");
+
+            Spatial spatial = Entity.Spatial;
+            Spatial targetSpatial = target.Spatial;
+            if (spatial == null || targetSpatial == null) return false;
+
+            if (IsMelee)
+            {
+                bool selfIsAirborne = spatial.CollisionLayer == CollisionLayer.Air;
+                bool otherIsAirborne = targetSpatial.CollisionLayer == CollisionLayer.Air;
+                if (!selfIsAirborne && otherIsAirborne) return false;
+
+                return Region.AreAdjacentOrIntersecting(spatial.GridRegion, targetSpatial.GridRegion);
+            }
+            else
+            {
+                float range = (float)Entity.GetStatValue(Attacker.RangeStat);
+                return Region.SquaredDistance(spatial.GridRegion, targetSpatial.GridRegion) <= range * range + 0.001f;
+            }
+        }
+
         public bool TryHit(Entity target)
         {
             Argument.EnsureNotNull(target, "target");
@@ -171,7 +223,7 @@ namespace Orion.Game.Simulation.Components
 
                     Health splashedEntityHealth = splashedEntity.Components.TryGet<Health>();
 
-                    float distance = (splashCircle.Center - splashedEntity.Components.Get<Spatial>().Center).LengthFast;
+                    float distance = (splashCircle.Center - splashedEntity.Spatial.Center).LengthFast;
                     if (distance > splashRadius) continue;
 
                     int splashedTargetArmor = (int)splashedEntity.GetStatValue(Health.ArmorStat);

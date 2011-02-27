@@ -170,7 +170,7 @@ namespace Orion.Game.Presentation
         {
             Point point = (Point)position;
             Entity clickedEntity = World.IsWithinBounds(point)
-                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.Components.Get<Spatial>().CollisionLayer)
+                ? World.Entities.Intersecting(position).WithMaxOrDefault(e => e.Spatial.CollisionLayer)
                 : null;
 
             if (clickedEntity == null)
@@ -311,7 +311,7 @@ namespace Orion.Game.Presentation
             }
             else if (targetEntity != null && targetEntity.Components.Has<Harvestable>())
             {
-                Spatial position = targetEntity.Components.Get<Spatial>();
+                Spatial position = targetEntity.Spatial;
                 if (Selection.Units.All(unit => unit.Type.IsBuilding))
                     LaunchChangeRallyPoint(position.Center);
                 else

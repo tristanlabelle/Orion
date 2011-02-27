@@ -68,7 +68,7 @@ namespace Orion.Game.Simulation.Components
 
             if (!entity.Components.Has<Move>() || entity.Components.Has<Transporter>()) return false;
 
-            Spatial embarkeeSpatial = entity.Components.TryGet<Spatial>();
+            Spatial embarkeeSpatial = entity.Spatial;
             if (embarkeeSpatial == null || embarkeeSpatial.CollisionLayer != CollisionLayer.Ground) return false;
 
             FactionMembership embarkeeMembership = entity.Components.TryGet<FactionMembership>();
@@ -90,7 +90,7 @@ namespace Orion.Game.Simulation.Components
             if (!CanEmbark(entity))
                 throw new ArgumentException("entity");
 
-            Spatial embarkeePosition = entity.Components.Get<Spatial>();
+            Spatial embarkeePosition = entity.Spatial;
             entity.Components.Remove<Spatial>();
 
             positionComponents.Add(embarkeePosition);
@@ -104,8 +104,8 @@ namespace Orion.Game.Simulation.Components
             if (!passengers.Contains(entity))
                 throw new ArgumentException("entity");
 
-            Spatial embarkerPosition = Entity.Components.Get<Spatial>();
-            Spatial embarkeePosition = entity.Components.Get<Spatial>();
+            Spatial embarkerPosition = Entity.Spatial;
+            Spatial embarkeePosition = entity.Spatial;
             Point? location = embarkerPosition
                 .GridRegion.Points
                 .Concat(embarkerPosition.GridRegion.GetAdjacentPoints())

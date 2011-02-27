@@ -360,7 +360,7 @@ namespace Orion.Game.Simulation
 
             Unit unit = world.Entities.CreateUnit(type, this, point);
             Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no Spatial component!");
-            Spatial spatialComponent = unit.Components.Get<Spatial>();
+            Spatial spatialComponent = unit.Spatial;
             spatialComponent.Moved += (s, oldPos, newPos) => OnUnitMoved(unit, oldPos, newPos);
 
             UsedFoodAmount += GetStat(type, BasicSkill.FoodCostStat);
@@ -487,7 +487,7 @@ namespace Orion.Game.Simulation
 
             if (node.Components.Get<Harvestable>().Type == ResourceType.Aladdium) return true;
 
-            Vector2 location = node.Components.Get<Spatial>().Position;
+            Vector2 location = node.Spatial.Position;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.HasComponent<AlageneExtractor, ExtractAlageneSkill>()

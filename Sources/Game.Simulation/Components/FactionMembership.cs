@@ -68,6 +68,26 @@ namespace Orion.Game.Simulation.Components
             FactionMembership factionMembership = entity.Components.TryGet<FactionMembership>();
             return factionMembership == null ? null : factionMembership.Faction;
         }
+
+        /// <summary>
+        /// Tests if an <see cref="Entity"/> is allied to another one. That is,
+        /// if they belong to allied factions.
+        /// </summary>
+        /// <param name="entity">The source <see cref="Entity"/>.</param>
+        /// <param name="target">The target <see cref="Entity"/>.</param>
+        /// <returns>A value indcating if <paramref name="entity"/> is allied to <paramref name="target"/>.</returns>
+        public static bool IsAlliedTo(Entity entity, Entity target)
+        {
+            Argument.EnsureNotNull(entity, "first");
+            Argument.EnsureNotNull(target, "target");
+            
+            Faction sourceFaction = GetFaction(entity);
+            Faction targetFaction = GetFaction(target);
+
+            return sourceFaction != null
+                && targetFaction != null
+                && sourceFaction.GetDiplomaticStance(targetFaction).HasFlag(DiplomaticStance.AlliedVictory);
+        }
         #endregion
     }
 }

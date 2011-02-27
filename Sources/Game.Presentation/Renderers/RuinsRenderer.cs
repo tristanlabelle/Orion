@@ -53,7 +53,7 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity ruin in faction.World.Entities.Where(e => e.Components.Has<TimedExistence>()))
             {
-                Region gridRegion = ruin.Components.Get<Spatial>().GridRegion;
+                Region gridRegion = ruin.Spatial.GridRegion;
                 Rectangle rectangle = gridRegion.ToRectangle();
                 if (!Rectangle.Intersects(rectangle, viewBounds))
                     continue;

@@ -199,7 +199,7 @@ namespace Orion.Game.Simulation
                 if (isUpdating) DeferAdd(entity);
                 else CommitAdd(entity);
 
-                EntityGrid grid = GetGrid(entity.Components.Get<Spatial>().CollisionLayer);
+                EntityGrid grid = GetGrid(entity.Spatial.CollisionLayer);
                 if (grid != null) grid.Add(entity);
             }
 
@@ -208,7 +208,7 @@ namespace Orion.Game.Simulation
                 if (isUpdating) DeferMove(entity, oldPosition);
                 else CommitMove(entity, oldPosition);
 
-                EntityGrid grid = GetGrid(entity.Components.Get<Spatial>().CollisionLayer);
+                EntityGrid grid = GetGrid(entity.Spatial.CollisionLayer);
                 if (grid != null)
                 {
                     Region oldRegion = Entity.GetGridRegion(oldPosition, entity.Size);
@@ -232,7 +232,7 @@ namespace Orion.Game.Simulation
                 if (isUpdating) DeferRemove(entity);
                 else CommitRemove(entity);
 
-                EntityGrid grid = GetGrid(entity.Components.Get<Spatial>().CollisionLayer);
+                EntityGrid grid = GetGrid(entity.Spatial.CollisionLayer);
                 if (grid != null) grid.Remove(entity);
             }
 
@@ -382,7 +382,7 @@ namespace Orion.Game.Simulation
 
                 Vector2 tileCenter = new Vector2(point.X + 0.5f, point.Y + 0.5f);
                 return Intersecting(tileCenter)
-                    .WithMaxOrDefault(e => e.Components.Get<Spatial>().CollisionLayer);
+                    .WithMaxOrDefault(e => e.Spatial.CollisionLayer);
             }
 
             public Unit GetTopmostUnitAt(Point point)

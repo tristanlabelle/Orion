@@ -323,7 +323,7 @@ namespace Orion.Game.Simulation
         private void OnEntityAdded(Entity entity)
         {
             Debug.Assert(entity.Components.Has<Spatial>(), "Entity has no Spatial component!");
-            Spatial spatial = entity.Components.Get<Spatial>();
+            Spatial spatial = entity.Spatial;
             spatial.Moved += (s, oldPos, newPos) => OnEntityMoved(entity, oldPos, newPos);
 
             EntityAdded.Raise(this, entity);
@@ -371,7 +371,7 @@ namespace Orion.Game.Simulation
             Spatial spatial = new Spatial(ruins);
             spatial.Position = entity.Position;
             spatial.CollisionLayer = CollisionLayer.None;
-            spatial.Size = entity.Components.Get<Spatial>().Size;
+            spatial.Size = entity.Spatial.Size;
             ruins.Components.Add(spatial);
 
             if (entity.Components.Has<FactionMembership>())

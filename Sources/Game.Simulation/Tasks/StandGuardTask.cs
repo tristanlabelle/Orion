@@ -21,11 +21,11 @@ namespace Orion.Game.Simulation.Tasks
         /// </summary>
         private static int enemyCheckInterval = 6;
 
-        private Unit target;
+        private Entity target;
         #endregion
 
         #region Constructors
-        public StandGuardTask(Unit guard)
+        public StandGuardTask(Entity guard)
             : base(guard) {}
         #endregion
 
@@ -39,40 +39,30 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            Attacker attacker = Unit.Components.TryGet<Attacker>();
-            if (attacker == null)
+            Spatial spatial = Entity.Spatial;
+            Attacker attacker = Entity.Components.TryGet<Attacker>();
+            if (spatial == null || attacker == null)
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (!IsTargetValid(target))
+            if (!IsTargetValid(attacker, target))
             {
-                bool canAttemptFindingTarget = ((step.Number + Unit.Handle.Value) % enemyCheckInterval) == 0;
-                if (canAttemptFindingTarget)
-                {
-                    target = Unit.World.Entities
-                        .Intersecting(Unit.LineOfSight)
-                        .OfType<Unit>()
-                        .FirstOrDefault(other => Unit.IsWithinAttackRange(other)
-                            && !Unit.Faction.GetDiplomaticStance(other.Faction).HasFlag(DiplomaticStance.AlliedVictory));
-                }
-                else
-                {
-                    target = null;
-                }
+                bool canAttemptFindingTarget = ((step.Number + Entity.Handle.Value) % enemyCheckInterval) == 0;
+                target = canAttemptFindingTarget ? attacker.FindVisibleTarget() : null;
             }
 
             if (target != null)
             {
-                Unit.LookAt(target.Center);
+                spatial.LookAt(target.Center);
                 attacker.TryHit(target);
             }
         }
 
-        private bool IsTargetValid(Unit target)
+        private bool IsTargetValid(Attacker attacker, Entity target)
         {
-            return target != null && target.IsAliveInWorld && Unit.IsWithinAttackRange(target);
+            return target != null && target.IsAliveInWorld && attacker.IsInRange(target);
         }
         #endregion
     }

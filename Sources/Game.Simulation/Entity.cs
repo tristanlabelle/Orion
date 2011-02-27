@@ -87,6 +87,18 @@ namespace Orion.Game.Simulation
             get { return components; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="Spatial"/> component of this <see cref="Entity"/>.
+        /// If there is none, returns <c>null</c>.
+        /// </summary>
+        /// <remarks>
+        /// This property is provided as a convenence because the spatial component is often needed.
+        /// </remarks>
+        public Spatial Spatial
+        {
+            get { return components.TryGet<Spatial>(); }
+        }
+
         #region Location/Size
         /// <summary>
         /// Gets the size of this <see cref="Entity"/>, in tiles.
@@ -95,7 +107,7 @@ namespace Orion.Game.Simulation
 #warning Temporary hack until components take over
         public virtual Size Size
         {
-            get { return Components.Get<Spatial>().Size; }
+            get { return Spatial.Size; }
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class FollowTask : Task
     {
         #region Fields
-        private readonly Unit target;
+        private readonly Entity target;
         private Vector2 oldTargetPosition;
         private MoveTask moveTask;
         #endregion
@@ -29,10 +29,10 @@ namespace Orion.Game.Simulation.Tasks
         /// <param name="targetDistance">
         /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
         /// </param>
-        public FollowTask(Unit follower, Unit target)
+        public FollowTask(Entity follower, Entity target)
             : base(follower)
         {
-            if (!follower.HasComponent<Move, MoveSkill>())
+            if (!follower.Components.Has<Move>())
                 throw new ArgumentException("Cannot follow without the move skill.", "follower");
             Argument.EnsureNotNull(target, "target");
             if (follower == target) throw new ArgumentException("Expected the follower and followee to be different.");
@@ -45,20 +45,11 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Properties
         /// <summary>
-        /// Gets the target <see cref="Unit"/> that gets followed.
+        /// Gets the target <see cref="Entity"/> that is being followed.
         /// </summary>
-        public Unit Target
+        public Entity Target
         {
             get { return target; }
-        }
-
-        /// <summary>
-        /// Gets the current distance remaining between this <see cref="Unit"/>
-        /// and the followed <see cref="Unit"/>.
-        /// </summary>
-        public float CurrentDistance
-        {
-            get { return Region.Distance(Unit.GridRegion, target.GridRegion); }
         }
 
         public override string Description
@@ -70,20 +61,25 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!target.IsAliveInWorld || !Unit.Faction.CanSee(target))
+            Spatial spatial = Entity.Spatial;
+            Spatial targetSpatial = Target.Spatial;
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (spatial == null
+                || !target.IsAliveInWorld
+                || (faction != null && !Faction.CanSee(target)))
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (Region.AreAdjacentOrIntersecting(Unit.GridRegion, target.GridRegion))
+            if (Region.AreAdjacentOrIntersecting(spatial.GridRegion, targetSpatial.GridRegion))
                 return;
 
             float targetDisplacementLength = (target.Position - oldTargetPosition).LengthFast;
-            float distanceToTarget = (target.Position - Unit.Position).LengthFast;
+            float distanceToTarget = (target.Position - spatial.Position).LengthFast;
             if (targetDisplacementLength > distanceToTarget * 0.1f)
             {
-                moveTask = new MoveTask(Unit, (Point)target.Center);
+                moveTask = new MoveTask(Entity, (Point)target.Center);
                 oldTargetPosition = target.Position;
             }
 

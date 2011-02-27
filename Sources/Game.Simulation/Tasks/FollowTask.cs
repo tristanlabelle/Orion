@@ -66,7 +66,7 @@ namespace Orion.Game.Simulation.Tasks
             Faction faction = FactionMembership.GetFaction(Entity);
             if (spatial == null
                 || !target.IsAliveInWorld
-                || (faction != null && !Faction.CanSee(target)))
+                || (faction != null && !faction.CanSee(target)))
             {
                 MarkAsEnded();
                 return;

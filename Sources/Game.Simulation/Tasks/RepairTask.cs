@@ -30,12 +30,12 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public RepairTask(Unit repairer, Unit target)
+        public RepairTask(Entity repairer, Unit target)
             : base(repairer)
         {
             Argument.EnsureNotNull(repairer, "unit");
             Argument.EnsureNotNull(target, "target");
-            if (!repairer.HasComponent<Builder, BuildSkill>())
+            if (!repairer.Components.Has<Builder>())
                 throw new ArgumentException("Cannot repair without the build skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
@@ -68,8 +68,14 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
-            if (!target.IsAliveInWorld)
+            Spatial spatial = Entity.Spatial;
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (spatial == null
+                || !Entity.Components.Has<Builder>()
+                || faction == null
+                || !target.IsAliveInWorld)
             {
+                Debug.Assert(faction != null, "Repairing without a faction is unimplemented.");
                 MarkAsEnded();
                 return;
             }
@@ -82,7 +88,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            Unit.LookAt(target.Center);
+            spatial.LookAt(target.Center);
             if (building) UpdateBuild(step);
             else UpdateRepair(step);
         }
@@ -91,23 +97,23 @@ namespace Orion.Game.Simulation.Tasks
         {
             if (target.IsUnderConstruction)
             {
-                target.Build((float)Unit.GetStatValue(Builder.SpeedStat, BuildSkill.SpeedStat) * step.TimeDeltaInSeconds);
+                target.Build((float)Entity.GetStatValue(Builder.SpeedStat) * step.TimeDeltaInSeconds);
             }
 
             if (!target.IsUnderConstruction)
             {
                 // If we just built an alagene extractor, start harvesting.
-                if (Unit.HasComponent<Harvester, HarvestSkill>() && target.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
+                if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
                 {
                     // Smells like a hack!
-                    Entity node = Unit.World.Entities
+                    Entity node = World.Entities
                         .Intersecting(target.BoundingRectangle)
                         .Where(e => e.Components.Has<Harvestable>())
                         .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
                         .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
 
-                    if (Unit.TaskQueue.Count == 1)
-                        Unit.TaskQueue.OverrideWith(new HarvestTask(Unit, node));
+                    if (TaskQueue.Count == 1)
+                        TaskQueue.OverrideWith(new HarvestTask(Entity, node));
                 }
 
                 MarkAsEnded();
@@ -121,7 +127,7 @@ namespace Orion.Game.Simulation.Tasks
             int aladdiumCost = (int)Target.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat);
             int alageneCost = (int)Target.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat);
 
-            float healthToRepair = (float)Unit.GetStatValue(Builder.SpeedStat, BuildSkill.SpeedStat)
+            float healthToRepair = (float)Entity.GetStatValue(Builder.SpeedStat)
                 * repairSpeedRatio * step.TimeDeltaInSeconds;
             if (healthToRepair > target.Damage) healthToRepair = target.Damage;
 
@@ -156,23 +162,25 @@ namespace Orion.Game.Simulation.Tasks
             bool needsAlageneCredit = alageneCost > 0 && alageneCreditRemaining <= 0;
             if (!needsAladdiumCredit && !needsAlageneCredit) return true;
 
-            if ((needsAladdiumCredit && Faction.AladdiumAmount == 0)
-                || (needsAlageneCredit && Faction.AlageneAmount == 0))
+            Faction faction = FactionMembership.GetFaction(Entity);
+
+            if ((needsAladdiumCredit && faction.AladdiumAmount == 0)
+                || (needsAlageneCredit && faction.AlageneAmount == 0))
             {
                 string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Type.Name);
-                Faction.RaiseWarning(warning);
+                faction.RaiseWarning(warning);
                 return false;
             }
 
             if (needsAladdiumCredit)
             {
-                --Faction.AladdiumAmount;
+                --faction.AladdiumAmount;
                 ++aladdiumCreditRemaining;
             }
 
             if (needsAlageneCredit)
             {
-                --Faction.AlageneAmount;
+                --faction.AlageneAmount;
                 ++alageneCreditRemaining;
             }
 

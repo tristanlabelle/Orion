@@ -35,10 +35,10 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public HarvestTask(Unit harvester, Entity node)
+        public HarvestTask(Entity harvester, Entity node)
             : base(harvester)
         {
-            if (!harvester.HasComponent<Harvester, HarvestSkill>())
+            if (!harvester.Components.Has<Harvester>())
                 throw new ArgumentException("Cannot harvest without the harvest skill.", "harvester");
             Argument.EnsureNotNull(node, "node");
 
@@ -62,6 +62,16 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (Entity.Spatial == null
+                || !Entity.Components.Has<Harvester>()
+                || faction == null)
+            {
+                Debug.Assert(faction != null, "Harvesting without a faction is unimplemented.");
+                MarkAsEnded();
+                return;
+            }
+
             if (!move.HasEnded)
             {
                 move.Update(step);
@@ -82,7 +92,8 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateExtracting(SimulationStep step)
         {
-            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (!node.IsAliveInWorld || !faction.CanHarvest(node))
             {
                 if (amountCarrying == 0)
                 {
@@ -94,19 +105,19 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            Unit.LookAt(node.Center);
+            Entity.Spatial.LookAt(node.Center);
 
-            float extractingSpeed = (float)Unit.GetStatValue(Harvester.SpeedStat, HarvestSkill.SpeedStat);
+            float extractingSpeed = (float)Entity.GetStatValue(Harvester.SpeedStat);
             amountAccumulator += extractingSpeed * step.TimeDeltaInSeconds;
 
-            int maxCarryingAmount = (int)Unit.GetStatValue(Harvester.MaxCarryingAmountStat, HarvestSkill.MaxCarryingAmountStat);
+            int maxCarryingAmount = (int)Entity.GetStatValue(Harvester.MaxCarryingAmountStat);
             while (amountAccumulator >= 1)
             {
                 Harvestable harvest = node.Components.Get<Harvestable>();
                 if (!node.IsAliveInWorld)
                 {
-                    Faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvest.Type));
-                    move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                    faction.RaiseWarning("Mine d'{0} vidée!".FormatInvariant(harvest.Type));
+                    move = MoveTask.ToNearRegion(Entity, depot.GridRegion);
                     mode = Mode.Delivering;
                     return;
                 }
@@ -127,7 +138,7 @@ namespace Orion.Game.Simulation.Tasks
                     }
                     else
                     {
-                        move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                        move = MoveTask.ToNearRegion(Entity, depot.GridRegion);
                         mode = Mode.Delivering;
                     }
 
@@ -147,44 +158,45 @@ namespace Orion.Game.Simulation.Tasks
                     return;
                 }
 
-                move = MoveTask.ToNearRegion(Unit, depot.GridRegion);
+                move = MoveTask.ToNearRegion(Entity, depot.GridRegion);
                 return;
             }
 
-            Unit.LookAt(depot.Center);
+            Entity.Spatial.LookAt(depot.Center);
 
             secondsGivingResource += step.TimeDeltaInSeconds;
             if (secondsGivingResource < depositingDuration)
                 return;
-            
+
             //adds the resources to the unit's faction
+            Faction faction = FactionMembership.GetFaction(Entity);
             Harvestable harvest = node.Components.Get<Harvestable>();
             if (harvest.Type == ResourceType.Aladdium)
-                Unit.Faction.AladdiumAmount += amountCarrying;
+                faction.AladdiumAmount += amountCarrying;
             else if (harvest.Type == ResourceType.Alagene)
-                Unit.Faction.AlageneAmount += amountCarrying;
+                faction.AlageneAmount += amountCarrying;
             amountCarrying = 0;
 
-            if (!node.IsAliveInWorld || !Unit.Faction.CanHarvest(node))
+            if (!node.IsAliveInWorld || !faction.CanHarvest(node))
             {
-                if (Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new MoveTask(Unit, (Point)node.Center));
+                if (TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new MoveTask(Entity, (Point)node.Center));
                 MarkAsEnded();
                 return;
             }
 
             // if the unit was enqueued other tasks, stop harvesting
-            if (Unit.TaskQueue.Count > 1) MarkAsEnded();
+            if (TaskQueue.Count > 1) MarkAsEnded();
 
-            move = MoveTask.ToNearRegion(Unit, node.GridRegion);
+            move = MoveTask.ToNearRegion(Entity, node.GridRegion);
             mode = Mode.Extracting;
         }
 
         private Unit FindClosestDepot()
         {
-            return Faction.Units
+            return FactionMembership.GetFaction(Entity).Units
                 .Where(other => !other.IsUnderConstruction && other.HasComponent<ResourceDepot, StoreResourcesSkill>())
-                .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Unit.GridRegion));
+                .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Entity.Spatial.GridRegion));
         }
         #endregion
         #endregion

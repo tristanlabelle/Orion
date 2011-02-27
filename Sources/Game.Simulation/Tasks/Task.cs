@@ -62,12 +62,17 @@ namespace Orion.Game.Simulation.Tasks
             get { return float.NaN; }
         }
 
-        protected Faction Faction
+        /// <summary>
+        /// Obtains the <see cref="TaskQueue"/> of the <see cref="Entity"/> doing this task.
+        /// </summary>
+        protected TaskQueue TaskQueue
         {
             get
             {
-                FactionMembership membership = entity.Components.TryGet<FactionMembership>();
-                return membership == null ? null : membership.Faction;
+                // As it is TaskQueue which updates the Tasks,
+                // it should be safe to assume that the entity has a TaskQueue component,
+                // hence the Get instead of TryGet.
+                return entity.Components.Get<TaskQueue>();
             }
         }
 

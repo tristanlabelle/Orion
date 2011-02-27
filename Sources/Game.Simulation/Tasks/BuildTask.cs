@@ -53,6 +53,16 @@ namespace Orion.Game.Simulation.Tasks
         #region Methods
         protected override void DoUpdate(SimulationStep step)
         {
+            Spatial spatial = Entity.Spatial;
+            Builder builder = Entity.Components.TryGet<Builder>();
+            Faction faction = FactionMembership.GetFaction(Entity);
+            if (spatial == null || builder == null || faction == null)
+            {
+                Debug.Assert(faction != null, "Building without a faction is unimplemented.");
+                MarkAsEnded();
+                return;
+            }
+
             if (!move.HasEnded)
             {
                 move.Update(step);
@@ -60,7 +70,7 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             // Test if we're in the building's surrounding area
-            if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, Unit.GridRegion))
+            if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, spatial.GridRegion))
             {
                 MarkAsEnded();
                 return;
@@ -68,41 +78,41 @@ namespace Orion.Game.Simulation.Tasks
 
             if (buildingPlan.IsBuildingCreated)
             {
-                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth && Unit.TaskQueue.Count == 1)
-                    Unit.TaskQueue.OverrideWith(new RepairTask(Unit, buildingPlan.Building));
+                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth && TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new RepairTask(Entity, buildingPlan.Building));
                 MarkAsEnded();
                 return;
             }
 
             CollisionLayer layer = buildingPlan.BuildingType.Spatial.CollisionLayer;
-            if (!Unit.World.IsFree(buildingPlan.GridRegion, layer))
+            if (!World.IsFree(buildingPlan.GridRegion, layer))
             {
                 string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
-                Faction.RaiseWarning(warning);
+                faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            int aladdiumCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AladdiumCostStat);
-            int alageneCost = Unit.Faction.GetStat(buildingPlan.BuildingType, BasicSkill.AlageneCostStat);
-            bool hasEnoughResources = Unit.Faction.AladdiumAmount >= aladdiumCost
-                && Unit.Faction.AlageneAmount >= alageneCost;
+            int aladdiumCost = faction.GetStat(buildingPlan.BuildingType, BasicSkill.AladdiumCostStat);
+            int alageneCost = faction.GetStat(buildingPlan.BuildingType, BasicSkill.AlageneCostStat);
+            bool hasEnoughResources = faction.AladdiumAmount >= aladdiumCost
+                && faction.AlageneAmount >= alageneCost;
 
             if (!hasEnoughResources)
             {
                 string warning = "Pas assez de ressources pour construire le bâtiment {0}"
                     .FormatInvariant(buildingPlan.BuildingType.Name);
-                Faction.RaiseWarning(warning);
+                faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            Unit.Faction.AladdiumAmount -= aladdiumCost;
-            Unit.Faction.AlageneAmount -= alageneCost;
+            faction.AladdiumAmount -= aladdiumCost;
+            faction.AlageneAmount -= alageneCost;
 
             buildingPlan.CreateBuilding();
 
-            Unit.TaskQueue.ReplaceWith(new RepairTask(Unit, buildingPlan.Building));
+            TaskQueue.ReplaceWith(new RepairTask(Entity, buildingPlan.Building));
             MarkAsEnded();
         }
         #endregion

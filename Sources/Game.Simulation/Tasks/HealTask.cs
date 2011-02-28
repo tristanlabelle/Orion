@@ -20,7 +20,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public HealTask(Entity healer, Unit target)
+        public HealTask(Entity healer, Entity target)
             : base(healer)
         {
             Argument.EnsureNotNull(healer, "unit");
@@ -29,7 +29,7 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot heal without the heal skill.", "unit");
             if (target == healer)
                 throw new ArgumentException("A unit cannot heal itself.");
-            if (target.IsBuilding)
+            if (((Unit)target).IsBuilding)
                 throw new ArgumentException("Cannot heal buildings.", "target");
 
             this.target = target;

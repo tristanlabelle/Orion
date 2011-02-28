@@ -30,7 +30,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public RepairTask(Entity repairer, Unit target)
+        public RepairTask(Entity repairer, Entity target)
             : base(repairer)
         {
             Argument.EnsureNotNull(repairer, "unit");
@@ -39,12 +39,12 @@ namespace Orion.Game.Simulation.Tasks
                 throw new ArgumentException("Cannot repair without the build skill.", "unit");
             if (target == repairer)
                 throw new ArgumentException("A unit cannot repair itself.");
-            if (!target.Type.IsBuilding)
+            if (!((Unit)target).IsBuilding)
                 throw new ArgumentException("Can only repair buildings.", "target");
 
-            this.target = target;
+            this.target = (Unit)target;
             this.move = MoveTask.ToNearRegion(repairer, target.GridRegion);
-            this.building = target.IsUnderConstruction;
+            this.building = this.target.IsUnderConstruction;
         }
         #endregion
 

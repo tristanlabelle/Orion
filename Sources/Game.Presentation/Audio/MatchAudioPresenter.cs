@@ -157,7 +157,7 @@ namespace Orion.Game.Presentation.Audio
         {
             building.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
 
-            string soundName = audio.GetUnitSoundName(building.Type, "Select");
+            string soundName = audio.GetUnitSoundName(building, "Select");
             audio.PlaySfx(soundName, building.Center);
         }
 

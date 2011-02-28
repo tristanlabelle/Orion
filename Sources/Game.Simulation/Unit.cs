@@ -303,15 +303,6 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        /// <summary>
-        /// Gets a circle representing the area of the world that is within
-        /// the line of sight of this <see cref="Unit"/>.
-        /// </summary>
-        public Circle LineOfSight
-        {
-            get { return new Circle(Center, (float)GetStatValue(Vision.RangeStat, BasicSkill.SightRangeStat)); }
-        }
-
         public bool KeepsFactionAlive
         {
             get { return Components.Get<FactionMembership>().IsKeepAlive; }
@@ -486,19 +477,6 @@ namespace Orion.Game.Simulation
             }
 
             return componentValue;
-        }
-
-        /// <summary>
-        /// Tests if a <see cref="Unit"/> is within the line of sight of this <see cref="Unit"/>.
-        /// </summary>
-        /// <param name="other">The <see cref="Entity"/> to be tested.</param>
-        /// <returns>
-        /// <c>True</c> if it is within the line of sight of this <see cref="Unit"/>, <c>false</c> if not.
-        /// </returns>
-        public bool IsInLineOfSight(Entity other)
-        {
-            Argument.EnsureNotNull(other, "other");
-            return Intersection.Test(LineOfSight, other.BoundingRectangle);
         }
 
         #region Can*** Testing
@@ -698,62 +676,30 @@ namespace Orion.Game.Simulation
 
         private bool TryAttackNearbyUnit()
         {
-            IEnumerable<Unit> attackableUnits = World.Entities
-                .Intersecting(LineOfSight)
-                .OfType<Unit>()
-                .Where(unit => !Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
-                    && IsInLineOfSight(unit));
-
-            bool isGroundUnit = Components.Get<Spatial>().CollisionLayer == CollisionLayer.Ground;
-            if (!isGroundUnit && (float)GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0)
-                attackableUnits = attackableUnits.Where(u => u.Spatial.CollisionLayer == CollisionLayer.Ground);
-
-            // HACK: Attack units which can attack first, then other units.
-            Unit unitToAttack = attackableUnits
-                .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared
-                    + (unit.HasComponent<Attacker, AttackSkill>() ? 0 : 100));
-
-            if (unitToAttack == null) return false;
+            Entity target = Components.Get<Attacker>().FindVisibleTarget();
+            if (target == null) return false;
         
-            AttackTask attackTask = new AttackTask(this, unitToAttack);
+            AttackTask attackTask = new AttackTask(this, target);
             TaskQueue.Enqueue(attackTask);
             return true;
         }
 
         private bool TryHealNearbyUnit()
         {
-            Unit unitToHeal = World.Entities
-               .Intersecting(LineOfSight)
-               .OfType<Unit>()
-               .Where(unit => unit != this
-                   && unit.Damage > 0
-                   && !unit.IsBuilding
-                   && Faction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.AlliedVictory)
-                   && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
+            Entity target = Components.Get<Healer>().FindVisibleTarget();
+            if (target == null) return false;
 
-            if (unitToHeal == null) return false;
-
-            HealTask healTask = new HealTask(this, unitToHeal);
+            HealTask healTask = new HealTask(this, target);
             TaskQueue.OverrideWith(healTask);
             return true;
         }
 
         private bool TryRepairNearbyUnit()
         {
-            Unit unitToRepair = World.Entities
-               .Intersecting(LineOfSight)
-               .OfType<Unit>()
-               .Where(unit => unit != this
-                   && unit.IsBuilding
-                   && unit.IsUnderConstruction
-                   && unit.Faction == Faction
-                   && IsInLineOfSight(unit))
-               .WithMinOrDefault(unit => (unit.Position - Position).LengthSquared);
+            Entity target = Components.Get<Builder>().FindVisibleRepairTarget();
+            if (target == null) return false;
 
-            if (unitToRepair == null) return false;
-
-            RepairTask repairTask = new RepairTask(this, unitToRepair);
+            RepairTask repairTask = new RepairTask(this, target);
             TaskQueue.OverrideWith(repairTask);
             return true;
         }

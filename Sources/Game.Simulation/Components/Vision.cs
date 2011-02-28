@@ -68,6 +68,21 @@ namespace Orion.Game.Simulation.Components
             Circle lineOfSight = new Circle(spatial.Center, (float)Entity.GetStatValue(RangeStat));
             return lineOfSight.ContainsPoint(point);
         }
+
+        /// <summary>
+        /// Tests if an <see cref="Entity"/> is within the line of sight of this <see cref="Entity"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="Entity"/> to be tested.</param>
+        /// <returns>
+        /// <c>True</c> if it is within the line of sight of this <see cref="Entity"/>, <c>false</c> if not.
+        /// </returns>
+        public bool CanSee(Entity other)
+        {
+            Argument.EnsureNotNull(other, "other");
+
+            Spatial spatial = Entity.Spatial;
+            return spatial != null && spatial.IsInRange(other, range);
+        }
         #endregion
     }
 }

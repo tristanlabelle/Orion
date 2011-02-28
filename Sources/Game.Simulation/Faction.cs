@@ -432,7 +432,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit.IsBuilding);
 
             localFogOfWar.RemoveRegion(unit.GridRegion);
-            localFogOfWar.AddLineOfSight(unit.LineOfSight);
+            localFogOfWar.AddLineOfSight(unit.Components.Get<Vision>().LineOfSight);
 
             TotalFoodAmount += (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat);
         }
@@ -451,7 +451,7 @@ namespace Orion.Game.Simulation
             {
                 TotalFoodAmount -= (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat, ProvideFoodSkill.AmountStat);
 
-                localFogOfWar.RemoveLineOfSight(unit.LineOfSight);
+                localFogOfWar.RemoveLineOfSight(unit.Components.Get<Vision>().LineOfSight);
             }
         }
 
@@ -463,7 +463,7 @@ namespace Orion.Game.Simulation
             if (unit.IsBuilding && unit.IsUnderConstruction)
                 localFogOfWar.AddRegion(unit.GridRegion);
             else
-                localFogOfWar.AddLineOfSight(unit.LineOfSight);
+                localFogOfWar.AddLineOfSight(unit.Components.Get<Vision>().LineOfSight);
         }
 
         /// <summary>

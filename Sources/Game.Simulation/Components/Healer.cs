@@ -66,6 +66,43 @@ namespace Orion.Game.Simulation.Components
             float range = (float)Entity.GetStatValue(Healer.RangeStat);
             return spatial != null && spatial.IsInRange(target, range);
         }
+
+        /// <summary>
+        /// Finds an <see cref="Entity"/> to attack within this <see cref="Entity"/>'s sight range.
+        /// </summary>
+        /// <returns>An <see cref="Entity"/> to attack, or <c>null</c> if no appropriate targets are visible.</returns>
+        public Entity FindVisibleTarget()
+        {
+            Spatial spatial = Entity.Spatial;
+            Vision vision = Entity.Components.TryGet<Vision>();
+            if (spatial == null || vision == null) return null;
+
+            Entity bestTarget = null;
+            float bestScore = float.NegativeInfinity;
+            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
+            {
+                Unit targetUnit = target as Unit;
+                Spatial targetSpatial = target.Spatial;
+                Health targetHealth = target.Components.TryGet<Health>();
+                if (target == Entity
+                    || targetUnit == null
+                    || targetSpatial == null
+                    || targetHealth == null
+                    || targetUnit.IsBuilding
+                    || targetHealth.Damage == 0
+                    || !vision.CanSee(target)
+                    || !IsInRange(target)
+                    || !FactionMembership.IsAlliedTo(Entity, target))
+                {
+                    continue;
+                }
+
+                float score = Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
+                if (score > bestScore) bestTarget = target;
+            }
+
+            return bestTarget;
+        }
         #endregion
     }
 }

@@ -101,8 +101,8 @@ namespace Orion.Game.Presentation.Gui
             if (unit == entity) return;
             Clear();
 
-            nameLabel.Text = localizer.GetNoun(unit.Type.Name);
-            imageBox.Texture = graphics.GetUnitTexture(unit.Type.Name);
+            nameLabel.Text = localizer.GetNoun(unit.Name);
+            imageBox.Texture = graphics.GetUnitTexture(unit.Name);
 
             UpdateHealth(unit);
             Health health = unit.Components.Get<Health>();

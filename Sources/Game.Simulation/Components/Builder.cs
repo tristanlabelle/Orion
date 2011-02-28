@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Game.Simulation.Components.Serialization;
+using Orion.Engine;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -15,7 +16,7 @@ namespace Orion.Game.Simulation.Components
         public static readonly Stat SpeedStat = new Stat(typeof(Builder), StatType.Real, "Speed");
 
         private readonly HashSet<string> buildableTypes = new HashSet<string>();
-        private float speed;
+        private float speed = 1;
         #endregion
 
         #region Constructors
@@ -27,7 +28,11 @@ namespace Orion.Game.Simulation.Components
         public float Speed
         {
             get { return speed; }
-            set { speed = value; }
+            set
+            {
+                Argument.EnsureStrictlyPositive(value, "Speed");
+                speed = value;
+            }
         }
 
         [Persistent]
@@ -45,7 +50,44 @@ namespace Orion.Game.Simulation.Components
         /// <returns>A value indicating if such <see cref="Entity"/> instances can be built.</returns>
         public bool Supports(Entity prototype)
         {
+            Argument.EnsureNotNull(prototype, "prototype");
             return buildableTypes.Contains(prototype.Components.Get<Identity>().Name);
+        }
+
+        /// <summary>
+        /// Finds an <see cref="Entity"/> in need of reparation within this <see cref="Entity"/>'s sight range.
+        /// </summary>
+        /// <returns>An <see cref="Entity"/> to repair, or <c>null</c> if no appropriate targets are visible.</returns>
+        public Entity FindVisibleRepairTarget()
+        {
+            Spatial spatial = Entity.Spatial;
+            Vision vision = Entity.Components.TryGet<Vision>();
+            if (spatial == null || vision == null) return null;
+
+            Entity bestTarget = null;
+            float bestScore = float.NegativeInfinity;
+            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
+            {
+                Unit targetUnit = target as Unit;
+                Spatial targetSpatial = target.Spatial;
+                Health targetHealth = target.Components.TryGet<Health>();
+                if (target == Entity
+                    || targetUnit == null
+                    || targetSpatial == null
+                    || targetHealth == null
+                    || !targetUnit.IsBuilding
+                    || targetHealth.Damage == 0
+                    || !vision.CanSee(target)
+                    || !FactionMembership.IsAlliedTo(Entity, target))
+                {
+                    continue;
+                }
+
+                float score = Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
+                if (score > bestScore) bestTarget = target;
+            }
+
+            return bestTarget;
         }
         #endregion
     }

@@ -132,29 +132,6 @@ namespace Orion.Game.Simulation.Components
 
         #region Methods
         /// <summary>
-        /// Finds an <see cref="Entity"/> to attack within this <see cref="Entity"/>'s sight range.
-        /// </summary>
-        /// <returns>An <see cref="Entity"/> to attack, or <c>null</c> if no enemies are visible.</returns>
-        public Entity FindVisibleTarget()
-        {
-            Vision vision = Entity.Components.TryGet<Vision>();
-            if (Entity.Spatial == null || vision == null) return null;
-
-            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
-            {
-                Spatial targetSpatial = target.Spatial;
-                if (targetSpatial != null
-                    && IsInRange(target)
-                    && (IsRanged || targetSpatial.CollisionLayer == CollisionLayer.Ground)
-                    && !FactionMembership.IsAlliedTo(Entity, target))
-                {
-                    return target;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Tests if a given <see cref="Entity"/> is within this <see cref="Entity"/>'s attack range.
         /// </summary>
         /// <param name="target">The target <see cref="Entity"/>.</param>
@@ -180,6 +157,41 @@ namespace Orion.Game.Simulation.Components
                 float range = (float)Entity.GetStatValue(Attacker.RangeStat);
                 return spatial.IsInRange(target, range);
             }
+        }
+
+        /// <summary>
+        /// Finds an <see cref="Entity"/> to attack within this <see cref="Entity"/>'s sight range.
+        /// </summary>
+        /// <returns>An <see cref="Entity"/> to attack, or <c>null</c> if no appropriate targets are visible.</returns>
+        public Entity FindVisibleTarget()
+        {
+            Spatial spatial = Entity.Spatial;
+            Vision vision = Entity.Components.TryGet<Vision>();
+            if (spatial == null || vision == null) return null;
+
+            Entity bestTarget = null;
+            float bestScore = float.NegativeInfinity;
+            foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
+            {
+                Spatial targetSpatial = target.Spatial;
+                if (target == Entity
+                    || targetSpatial == null
+                    || !vision.CanSee(target)
+                    || !IsInRange(target)
+                    || FactionMembership.IsAlliedTo(Entity, target))
+                {
+                    continue;
+                }
+
+                float score = Region.Distance(spatial.GridRegion, targetSpatial.GridRegion);
+
+                // Favor attackers first.
+                if (target.Components.Has<Attacker>()) score += 100;
+
+                if (score > bestScore) bestTarget = target;
+            }
+
+            return bestTarget;
         }
 
         public bool TryHit(Entity target)

@@ -499,7 +499,13 @@ namespace Orion.Game.Presentation
         public void LaunchSuicide()
         {
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.CanSuicide);
+                .Where(unit =>
+                {
+                    Health health = unit.Components.TryGet<Health>();
+                    return unit.Faction == LocalFaction
+                        && health != null
+                        && health.CanSuicide;
+                });
             OverrideIfNecessary();
             commander.LaunchSuicide(targetUnits);
         }

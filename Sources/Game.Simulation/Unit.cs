@@ -243,10 +243,12 @@ namespace Orion.Game.Simulation
             {
                 Argument.EnsureNotNull(value, "Type");
 
+                Identity newTypeIdentity = value.Components.Get<Identity>();
+
                 Identity identity = Components.Get<Identity>();
                 identity.Name = value.Name;
-                identity.VisualIdentity = value.GraphicsTemplate;
-                identity.SoundIdentity = value.VoicesTemplate;
+                identity.VisualIdentity = newTypeIdentity.VisualIdentity;
+                identity.SoundIdentity = newTypeIdentity.SoundIdentity;
 
                 skills = value.skills;
 
@@ -261,27 +263,9 @@ namespace Orion.Game.Simulation
             get { return Components.Get<Identity>().Name; }
         }
 
-        public string GraphicsTemplate
-        {
-            get { return Components.Get<Identity>().VisualIdentity; }
-        }
-
-        public string VoicesTemplate
-        {
-            get { return Components.Get<Identity>().SoundIdentity; }
-        }
-
         public bool IsBuilding
         {
             get { return !HasComponent<Move, MoveSkill>(); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this <see cref="Unit"/> can commit suicide.
-        /// </summary>
-        public bool CanSuicide
-        {
-            get { return true; }
         }
 
         public ICollection<UnitTypeUpgrade> Upgrades
@@ -302,11 +286,6 @@ namespace Orion.Game.Simulation
             set { Components.Get<Spatial>().Position = value; }
         }
         #endregion
-
-        public bool KeepsFactionAlive
-        {
-            get { return Components.Get<FactionMembership>().IsKeepAlive; }
-        }
         #endregion
 
         #region World & Faction
@@ -325,7 +304,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Physical
-
         #region Health
         /// <summary>
         /// Accesses the damage that has been inflicted to this <see cref="Unit"/>, in health points.
@@ -511,19 +489,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Position/Angle
-        /// <summary>
-        /// Rotates this <see cref="Unit"/> so that it faces a target.
-        /// </summary>
-        /// <param name="target">The location of the target to be faced.</param>
-        public void LookAt(Vector2 target)
-        {
-            Vector2 delta = target - Center;
-            if (delta.LengthSquared < 0.01f) return;
-
-            Debug.Assert(Components.Has<Spatial>(), "Unit has no Spatial component!");
-            Components.Get<Spatial>().Angle = (float)Math.Atan2(delta.Y, delta.X);
-        }
-
         protected override Vector2 GetPosition()
         {
             return Position;

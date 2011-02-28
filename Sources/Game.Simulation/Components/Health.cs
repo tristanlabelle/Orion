@@ -23,13 +23,14 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Fields
-        private int maximumValue;
+        private int maximumValue = 1;
         private ArmorType armorType;
         private int threatLevel;
         private float regenerationRate;
         private float damageReduction;
         private float armor;
         private float damage;
+        private bool canSuicide = true;
         #endregion
 
         #region Constructors
@@ -119,6 +120,16 @@ namespace Orion.Game.Simulation.Components
                 if (damage >= Entity.GetStatValue(MaximumValueStat).IntegerValue)
                     Entity.Die();
             }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Entity"/> can take part
+        /// in life relinquishing activities.
+        /// </summary>
+        public bool CanSuicide
+        {
+            get { return canSuicide; }
+            set { canSuicide = value; }
         }
         #endregion
 

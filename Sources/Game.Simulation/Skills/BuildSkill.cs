@@ -8,7 +8,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to erect buildings.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/> to erect buildings.
     /// </summary>
     [Serializable]
     public sealed class BuildSkill : UnitSkill

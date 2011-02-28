@@ -7,7 +7,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to attack.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/> to attack.
     /// </summary>
     [Serializable]
     public sealed class AttackSkill : UnitSkill
@@ -145,7 +145,7 @@ namespace Orion.Game.Simulation.Skills
         }
 
         /// <summary>
-        /// Tests if this <see cref="Unit"/> is super effective against the specified unit type
+        /// Tests if this <see cref="Entity"/> is super effective against the specified unit type
         /// </summary>
         /// <param name="type">The type of armor to check against</param>
         /// <returns>True if this unit is super effective against the specified type, else if not.</returns>
@@ -155,7 +155,7 @@ namespace Orion.Game.Simulation.Skills
         }
 
         /// <summary>
-        /// Tests if this <see cref="Unit"/> is ineffective against the specified unit type
+        /// Tests if this <see cref="Entity"/> is ineffective against the specified unit type
         /// </summary>
         /// <param name="type">The type of armor to check against</param>
         /// <returns>True if this unit is ineffective against the specified type, else if not.</returns>

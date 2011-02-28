@@ -13,7 +13,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes the rally point of a <see cref="Unit"/> to be changed to a new value.
+    /// A <see cref="Command"/> which causes the rally point of a <see cref="Entity"/> to be changed to a new value.
     /// </summary>
     [Serializable]
     public sealed class ChangeRallyPointCommand : Command

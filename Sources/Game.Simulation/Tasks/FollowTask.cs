@@ -8,7 +8,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/>, which makes a <see cref="Unit"/> follow another <see cref="Unit"/>.
+    /// A <see cref="Task"/>, which makes a <see cref="Entity"/> follow another <see cref="Entity"/>.
     /// </summary>
     [Serializable]
     public sealed class FollowTask : Task
@@ -21,11 +21,11 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="Follow"/> task from the <see cref="Unit"/>
+        /// Initializes a new <see cref="Follow"/> task from the <see cref="Entity"/>
         /// that follows, the one that is followed and the distance when to stop.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> that follows.</param>
-        /// <param name="followee">The <see cref="Unit"/> that gets followed.</param>
+        /// <param name="unit">The <see cref="Entity"/> that follows.</param>
+        /// <param name="followee">The <see cref="Entity"/> that gets followed.</param>
         /// <param name="targetDistance">
         /// The distance to reach between the <paramref name="follower"/> and the <see cref="followee"/>.
         /// </param>

@@ -120,12 +120,12 @@ namespace Orion.Game.Simulation
             #region Methods
             #region Entity Creation
             /// <summary>
-            /// Used by <see cref="Faction"/> to create new <see cref="Unit"/>
-            /// from its <see cref="Unit"/> and <see cref="Faction"/>.
+            /// Used by <see cref="Faction"/> to create new <see cref="Entity"/>
+            /// from its <see cref="Entity"/> and <see cref="Faction"/>.
             /// </summary>
-            /// <param name="type">The <see cref="Unit"/> of the <see cref="Unit"/> to be created.</param>
-            /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Unit"/>.</param>
-            /// <param name="point">The initial position of the <see cref="Unit"/> to be created.</param>
+            /// <param name="type">The <see cref="Entity"/> of the <see cref="Entity"/> to be created.</param>
+            /// <param name="faction">The <see cref="Faction"/> which creates the <see cref="Entity"/>.</param>
+            /// <param name="point">The initial position of the <see cref="Entity"/> to be created.</param>
             /// <returns>The newly created <see cref="Entity"/>.</returns>
             internal Unit CreateUnit(Unit type, Faction faction, Point point)
             {

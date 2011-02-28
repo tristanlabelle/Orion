@@ -8,7 +8,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// Basic skill which every <see cref="Unit"/> has.
+    /// Basic skill which every <see cref="Entity"/> has.
     /// </summary>
     [Serializable]
     public sealed class BasicSkill : UnitSkill

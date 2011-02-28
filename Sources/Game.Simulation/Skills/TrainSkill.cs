@@ -8,7 +8,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to train other units.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/> to train other units.
     /// </summary>
     [Serializable]
     public sealed class TrainSkill : UnitSkill

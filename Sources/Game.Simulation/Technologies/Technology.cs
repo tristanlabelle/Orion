@@ -10,7 +10,7 @@ namespace Orion.Game.Simulation.Technologies
 {
     /// <summary>
     /// Represents a technology that, when researched, has an effect
-    /// on one or more stats of a <see cref="Unit"/>.
+    /// on one or more stats of a <see cref="Entity"/>.
     /// </summary>
     /// <remarks>
     /// Possible requirements:

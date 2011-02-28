@@ -8,7 +8,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which causes a <see cref="Unit"/> to repair a target to its full health
+    /// A <see cref="Task"/> which causes a <see cref="Entity"/> to repair a target to its full health
     /// or to complete its construction.
     /// </summary>
     [Serializable]

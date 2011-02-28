@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace Orion.Game.Presentation
 {
     /// <summary>
-    /// Handles the selection of <see cref="Unit"/>s using the mouse and keyboard.
+    /// Handles the selection of <see cref="Entity"/>s using the mouse and keyboard.
     /// </summary>
     public sealed class SelectionManager
     {

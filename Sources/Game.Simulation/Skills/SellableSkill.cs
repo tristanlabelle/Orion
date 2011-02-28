@@ -7,7 +7,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A skill which allows a <see cref="Unit"/> to be sold.
+    /// A skill which allows a <see cref="Entity"/> to be sold.
     /// </summary>
     [Serializable]
     public sealed class SellableSkill : UnitSkill

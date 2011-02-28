@@ -8,7 +8,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {    
     /// <summary>
-    /// A <see cref="Task"/> which make attack an enemy <see cref="Unit"/>
+    /// A <see cref="Task"/> which make attack an enemy <see cref="Entity"/>
     /// </summary>
     [Serializable]
     public sealed class AttackTask : Task

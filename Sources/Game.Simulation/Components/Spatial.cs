@@ -125,7 +125,7 @@ namespace Orion.Game.Simulation.Components
 
         #region Methods
         /// <summary>
-        /// Rotates this <see cref="Unit"/> so that it faces a target.
+        /// Rotates this <see cref="Entity"/> so that it faces a target.
         /// </summary>
         /// <param name="target">The location of the target to be faced.</param>
         public void LookAt(Vector2 target)

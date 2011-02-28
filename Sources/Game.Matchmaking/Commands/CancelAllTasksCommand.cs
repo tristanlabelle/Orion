@@ -10,7 +10,7 @@ using Orion.Game.Simulation;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cancels all <see cref="Task"/>s of a set of <see cref="Unit"/>s.
+    /// A <see cref="Command"/> which cancels all <see cref="Task"/>s of a set of <see cref="Entity"/>s.
     /// </summary>
     [Serializable]
     public sealed class CancelAllTasksCommand : Command

@@ -308,7 +308,7 @@ namespace Orion.Game.Simulation
         #endregion
 
         /// <summary>
-        /// Updates this <see cref="World"/> and its <see cref="Unit"/>s for a frame.
+        /// Updates this <see cref="World"/> and its <see cref="Entity"/>s for a frame.
         /// </summary>
         /// <param name="step">Information on this simulation step.</param>
         public void Update(SimulationStep step)

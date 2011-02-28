@@ -17,7 +17,7 @@ namespace Orion.Game.Simulation
 {
     /// <summary>
     /// Represents an in-game unit, which can be a character, a vehicle or a building,
-    /// depending on its <see cref="Unit"/>.
+    /// depending on its <see cref="Entity"/>.
     /// </summary>
     [Serializable]
     public sealed class Unit : Entity
@@ -189,16 +189,16 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Initializes a new <see cref="Unit"/> from its identifier,
-        /// <see cref="Unit"/> and <see cref="World"/>.
+        /// Initializes a new <see cref="Entity"/> from its identifier,
+        /// <see cref="Entity"/> and <see cref="World"/>.
         /// </summary>
-        /// <param name="handle">A unique handle for this <see cref="Unit"/>.</param>
+        /// <param name="handle">A unique handle for this <see cref="Entity"/>.</param>
         /// <param name="type">
-        /// The <see cref="Unit"/> which determines
-        /// the stats and capabilities of this <see cref="Unit"/>
+        /// The <see cref="Entity"/> which determines
+        /// the stats and capabilities of this <see cref="Entity"/>
         /// </param>
-        /// <param name="position">The initial position of the <see cref="Unit"/>.</param>
-        /// <param name="faction">The <see cref="Faction"/> this <see cref="Unit"/> is part of.</param>
+        /// <param name="position">The initial position of the <see cref="Entity"/>.</param>
+        /// <param name="faction">The <see cref="Faction"/> this <see cref="Entity"/> is part of.</param>
         internal Unit(Handle handle, Unit prototype, Faction faction, Vector2 position)
             : base(faction.World, handle)
         {
@@ -226,7 +226,7 @@ namespace Orion.Game.Simulation
 
         #region Events
         /// <summary>
-        /// Raised when the construction of this <see cref="Unit"/> is completed.
+        /// Raised when the construction of this <see cref="Entity"/> is completed.
         /// </summary>
         public event Action<Unit> ConstructionCompleted;
         #endregion
@@ -295,7 +295,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Accesses the <see cref="Faction"/> which this <see cref="Unit"/> is a member of.
+        /// Accesses the <see cref="Faction"/> which this <see cref="Entity"/> is a member of.
         /// </summary>
         public Faction Faction
         {
@@ -306,7 +306,7 @@ namespace Orion.Game.Simulation
         #region Physical
         #region Health
         /// <summary>
-        /// Accesses the damage that has been inflicted to this <see cref="Unit"/>, in health points.
+        /// Accesses the damage that has been inflicted to this <see cref="Entity"/>, in health points.
         /// </summary>
         public float Damage
         {
@@ -315,7 +315,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the maximum amount of health points this <see cref="Unit"/> can have.
+        /// Gets the maximum amount of health points this <see cref="Entity"/> can have.
         /// </summary>
         public int MaxHealth
         {
@@ -323,7 +323,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the amount of health points this <see cref="Unit"/> has.
+        /// Gets the amount of health points this <see cref="Entity"/> has.
         /// </summary>
         public float Health
         {
@@ -366,7 +366,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Accesses the time elapsed since this <see cref="Unit"/> last hit something, in seconds.
+        /// Accesses the time elapsed since this <see cref="Entity"/> last hit something, in seconds.
         /// </summary>
         public float TimeElapsedSinceLastHitInSeconds
         {
@@ -378,12 +378,12 @@ namespace Orion.Game.Simulation
         #region Methods
         #region Skills/Type
         /// <summary>
-        /// Tests if this <see cref="Unit"/> has a given <see cref="Component"/>,
+        /// Tests if this <see cref="Entity"/> has a given <see cref="Component"/>,
         /// also checking if it has the corresponding <see cref="UnitSkill"/> to aid migration.
         /// </summary>
         /// <typeparam name="TComponent">The type of the component to be found.</typeparam>
         /// <typeparam name="TSkill">The type of the corresponding skill.</typeparam>
-        /// <returns>A value indicating if this <see cref="Unit"/> has a given <see cref="Component"/>.</returns>
+        /// <returns>A value indicating if this <see cref="Entity"/> has a given <see cref="Component"/>.</returns>
         public bool HasComponent<TComponent, TSkill>()
             where TComponent : Component
             where TSkill : UnitSkill

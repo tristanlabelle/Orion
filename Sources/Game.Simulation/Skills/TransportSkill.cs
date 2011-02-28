@@ -7,7 +7,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="Skill"/> permitting a <see cref="Unit"/> to transport other <see cref="Unit"/>s.
+    /// A <see cref="Skill"/> permitting a <see cref="Entity"/> to transport other <see cref="Entity"/>s.
     /// </summary>
     public sealed class TransportSkill : UnitSkill
     {

@@ -36,7 +36,7 @@ namespace Orion.Game.Simulation.Tasks
         /// Initializes a new <see cref="Walk"/> task from the <see cref="Entity"/>
         /// that gets moved and a delegate to find its destination.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> to be moved.</param>
+        /// <param name="unit">The <see cref="Entity"/> to be moved.</param>
         /// <param name="destinationDistanceEvaluator">
         /// A delegate to a method which evaluates the distance of tiles to the destination.
         /// </param>
@@ -60,7 +60,7 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Properties
         /// <summary>
-        /// Gets the <see cref="Path"/> this <see cref="Unit"/> uses to get to its destination.
+        /// Gets the <see cref="Path"/> this <see cref="Entity"/> uses to get to its destination.
         /// </summary>
         public Path Path
         {

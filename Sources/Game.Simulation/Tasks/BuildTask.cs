@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which makes a <see cref="Unit"/> build a building of a given type.
+    /// A <see cref="Task"/> which makes a <see cref="Entity"/> build a building of a given type.
     /// </summary>
     [Serializable]
     public sealed class BuildTask : Task

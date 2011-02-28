@@ -11,8 +11,8 @@ using RepairTask = Orion.Game.Simulation.Tasks.RepairTask;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
-    /// to attack another <see cref="Unit"/>.
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
+    /// to attack another <see cref="Entity"/>.
     /// </summary>
     public sealed class RepairCommand : Command
     {

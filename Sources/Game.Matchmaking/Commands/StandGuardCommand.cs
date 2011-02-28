@@ -11,8 +11,8 @@ using StandGuardTask = Orion.Game.Simulation.Tasks.StandGuardTask;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
-    /// to attack another <see cref="Unit"/> without ever following it.
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
+    /// to attack another <see cref="Entity"/> without ever following it.
     /// </summary>
     public sealed class StandGuardCommand : Command
     {

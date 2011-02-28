@@ -9,7 +9,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Keeps the collection of registered <see cref="Unit"/>s.
+    /// Keeps the collection of registered <see cref="Entity"/>s.
     /// </summary>
     [Serializable]
     public sealed class UnitTypeRegistry : IEnumerable<Unit>

@@ -13,7 +13,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cause some <see cref="Unit"/>s to suicide.
+    /// A <see cref="Command"/> which cause some <see cref="Entity"/>s to suicide.
     /// </summary>
     public sealed class SuicideCommand : Command
     {

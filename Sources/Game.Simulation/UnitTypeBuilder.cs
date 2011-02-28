@@ -10,7 +10,7 @@ using Orion.Engine.Collections;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Provides a mutable representation of a <see cref="Unit"/>
+    /// Provides a mutable representation of a <see cref="Entity"/>
     /// as a way to create instances.
     /// </summary>
     [Serializable]

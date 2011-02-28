@@ -164,7 +164,7 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets the collection of <see cref="Unit"/>s in this <see cref="Faction"/>.
+        /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
         /// </summary>
         public IEnumerable<Unit> Units
         {
@@ -265,9 +265,9 @@ namespace Orion.Game.Simulation
         #region Stats & Technologies
         /// <summary>
         /// Gets the value of a <see cref="UnitStat"/> which take researched technologies into account
-        /// for a unit of this <see cref="Faction"/> by its <see cref="Unit"/>.
+        /// for a unit of this <see cref="Faction"/> by its <see cref="Entity"/>.
         /// </summary>
-        /// <param name="type">The <see cref="Unit"/> of the unit for which the stat is to be retrieved.</param>
+        /// <param name="type">The <see cref="Entity"/> of the unit for which the stat is to be retrieved.</param>
         /// <param name="stat">The <see cref="UnitStat"/> to be retrieved.</param>
         /// <returns>The value of that stat for the specified <see cref="UnitTypeUpgrade"/>.</returns>
         public int GetStat(Unit type, UnitStat stat)
@@ -349,11 +349,11 @@ namespace Orion.Game.Simulation
 
         #region Units
         /// <summary>
-        /// Creates new <see cref="Unit"/> part of this <see cref="Faction"/>.
+        /// Creates new <see cref="Entity"/> part of this <see cref="Faction"/>.
         /// </summary>
-        /// <param name="type">The <see cref="Unit"/> of the <see cref="Unit"/> to be created.</param>
-        /// <param name="point">The initial position of the <see cref="Unit"/>.</param>
-        /// <returns>The newly created <see cref="Unit"/>.</returns>
+        /// <param name="type">The <see cref="Entity"/> of the <see cref="Entity"/> to be created.</param>
+        /// <param name="point">The initial position of the <see cref="Entity"/>.</param>
+        /// <returns>The newly created <see cref="Entity"/>.</returns>
         public Unit CreateUnit(Unit type, Point point)
         {
             Argument.EnsureNotNull(type, "type");

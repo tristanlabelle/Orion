@@ -15,7 +15,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes a <see cref="Unit"/>
+    /// A <see cref="Command"/> which causes a <see cref="Entity"/>
     /// to be assigned the <see cref="BuildTask"/> task.
     /// </summary>
     public sealed class BuildCommand : Command

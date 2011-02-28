@@ -6,7 +6,7 @@ using Orion.Game.Simulation;
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
-    /// Provides the buttons to build each <see cref="Unit"/> that is supported by a builder unit.
+    /// Provides the buttons to build each <see cref="Entity"/> that is supported by a builder unit.
     /// </summary>
     public sealed class UpgradeActionProvider : IActionProvider
     {

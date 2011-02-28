@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which makes a<see cref="Unit"/> move to a location and attack enemies on it's way.
+    /// A <see cref="Task"/> which makes a<see cref="Entity"/> move to a location and attack enemies on it's way.
     /// </summary>
     [Serializable]
     public sealed class ZoneAttackTask : Task
@@ -22,10 +22,10 @@ namespace Orion.Game.Simulation.Tasks
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="ZoneAttack"/> task from the <see cref="Unit"/>
+        /// Initializes a new <see cref="ZoneAttack"/> task from the <see cref="Entity"/>
         /// that attacks and its destination.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> who attacks.</param>
+        /// <param name="unit">The <see cref="Entity"/> who attacks.</param>
         /// <param name="destination">The destination of the unit'</param>
         public ZoneAttackTask(Unit unit, Vector2 destination)
             : base(unit)

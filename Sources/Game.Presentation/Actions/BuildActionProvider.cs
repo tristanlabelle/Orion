@@ -11,7 +11,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Presentation.Actions
 {
     /// <summary>
-    /// Provides the buttons to build each <see cref="Unit"/> that is supported by a builder unit.
+    /// Provides the buttons to build each <see cref="Entity"/> that is supported by a builder unit.
     /// </summary>
     public sealed class BuildActionProvider : IActionProvider
     {

@@ -6,7 +6,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Unit"/> behavior.
+    /// Abstract base class for tasks, which represent the basic building blocks of <see cref="Entity"/> behavior.
     /// </summary>
     [Serializable]
     public abstract class Task : IDisposable

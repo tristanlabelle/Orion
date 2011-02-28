@@ -3,7 +3,7 @@
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/>
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/>
     /// to receive resources that were harvested to store them.
     /// </summary>
     [Serializable]

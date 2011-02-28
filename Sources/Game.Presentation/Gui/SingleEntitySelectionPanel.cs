@@ -67,7 +67,7 @@ namespace Orion.Game.Presentation.Gui
 
         #region Events
         /// <summary>
-        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Unit"/>.
+        /// Raised when the user cancels a <see cref="Task"/> of the selected <see cref="Entity"/>.
         /// </summary>
         public event Action<SingleEntitySelectionPanel, Task> TaskCancelled;
         #endregion
@@ -91,9 +91,9 @@ namespace Orion.Game.Presentation.Gui
         /// <summary>
         /// Show information on a given unit.
         /// </summary>
-        /// <param name="unit">The <see cref="Unit"/> for which information is to be shown.</param>
+        /// <param name="unit">The <see cref="Entity"/> for which information is to be shown.</param>
         /// <param name="showTasks">
-        /// A value indicating if the <see cref="Task"/>s of the <see cref="Unit"/> are to be shown.
+        /// A value indicating if the <see cref="Task"/>s of the <see cref="Entity"/> are to be shown.
         /// </param>
         public void ShowUnit(Unit unit, bool showTasks)
         {

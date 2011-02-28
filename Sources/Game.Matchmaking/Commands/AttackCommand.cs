@@ -11,8 +11,8 @@ using AttackTask = Orion.Game.Simulation.Tasks.AttackTask;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
-    /// to attack another <see cref="Unit"/>.
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
+    /// to attack another <see cref="Entity"/>.
     /// </summary>
     public sealed class AttackCommand : Command
     {

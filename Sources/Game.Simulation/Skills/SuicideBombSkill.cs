@@ -9,7 +9,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A skill that allows units of a <see cref="Unit"/> to explode when in contact with another unit.
+    /// A skill that allows units of a <see cref="Entity"/> to explode when in contact with another unit.
     /// </summary>
     [Serializable]
     public sealed class SuicideBombSkill : UnitSkill

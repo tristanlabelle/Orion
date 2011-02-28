@@ -12,7 +12,7 @@ namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
     /// A <see cref="Command"/> which causes the <see cref="HarvestTask"/>
-    /// to be assigned to some <see cref="Unit"/>s.
+    /// to be assigned to some <see cref="Entity"/>s.
     /// </summary>
     public sealed class HarvestCommand : Command
     {

@@ -15,7 +15,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Reads <see cref="Unit"/>s from their definitions in files.
+    /// Reads <see cref="Entity"/>s from their definitions in files.
     /// </summary>
     public static class UnitTypeReader
     {

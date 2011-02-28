@@ -12,7 +12,7 @@ using MoveTask = Orion.Game.Simulation.Tasks.MoveTask;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which assigns to a set of <see cref="Unit"/>s the
+    /// A <see cref="Command"/> which assigns to a set of <see cref="Entity"/>s the
     /// <see cref="Task"/> to move to a destination.
     /// </summary>
     [Serializable]

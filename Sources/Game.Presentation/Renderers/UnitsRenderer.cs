@@ -16,7 +16,7 @@ using System.Diagnostics;
 namespace Orion.Game.Presentation.Renderers
 {
     /// <summary>
-    /// Provides functionality to draw <see cref="Unit"/>s on-screen.
+    /// Provides functionality to draw <see cref="Entity"/>s on-screen.
     /// </summary>
     public sealed class UnitsRenderer
     {

@@ -10,7 +10,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which causes a <see cref="Unit"/>
+    /// A <see cref="Task"/> which causes a <see cref="Entity"/>
     /// </summary>
     public sealed class ResearchTask : Task
     {

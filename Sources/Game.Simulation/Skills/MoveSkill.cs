@@ -4,7 +4,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to move,
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/> to move,
     /// follow and do other tasks involving movement.
     /// </summary>
     [Serializable]

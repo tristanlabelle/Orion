@@ -12,7 +12,7 @@ using Orion.Game.Simulation.Tasks;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which causes one or many <see cref="Unit"/>s
+    /// A <see cref="Command"/> which causes one or many <see cref="Entity"/>s
     /// to move to a location and attack enemies on their way.
     /// </summary>
     public sealed class ZoneAttackCommand : Command

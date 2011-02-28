@@ -11,7 +11,7 @@ using Orion.Game.Simulation.Tasks;
 namespace Orion.Game.Simulation.Components
 {
     /// <summary>
-    /// Represents a queue of <see cref="Task"/>s to be executed by a <see cref="Unit"/>.
+    /// Represents a queue of <see cref="Task"/>s to be executed by a <see cref="Entity"/>.
     /// </summary>
     public sealed class TaskQueue : Component, IList<Task>
     {
@@ -19,7 +19,7 @@ namespace Orion.Game.Simulation.Components
         private readonly List<Task> tasks = new List<Task>();
 
         /// <summary>
-        /// Associates unique IDs to each of a <see cref="Unit"/>'s <see cref="Task"/>s
+        /// Associates unique IDs to each of a <see cref="Entity"/>'s <see cref="Task"/>s
         /// so that they can be referred over the network. This is used to cancel <see cref="Task"/>s.
         /// </summary>
         private readonly BiDictionary<Task, uint> taskIDs = new BiDictionary<Task, uint>();
@@ -64,7 +64,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Gets the <see cref="Unit"/> to which this <see cref="TaskQueue"/> belongs.
+        /// Gets the <see cref="Entity"/> to which this <see cref="TaskQueue"/> belongs.
         /// </summary>
         public Unit Unit
         {
@@ -135,7 +135,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Clears the task queue of this <see cref="Unit"/> and sets a task as the current one.
+        /// Clears the task queue of this <see cref="Entity"/> and sets a task as the current one.
         /// </summary>
         /// <param name="task">The new task to be set.</param>
         public void OverrideWith(Task task)
@@ -155,7 +155,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Replaces the current task of this <see cref="Unit"/> with the given task.
+        /// Replaces the current task of this <see cref="Entity"/> with the given task.
         /// </summary>
         /// <param name="task">The new task that must now be completed.</param>
         public void ReplaceWith(Task task)
@@ -170,7 +170,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Enqueues a new <see cref="Task"/> at the end of this <see cref="Unit"/>'s queue of <see cref="Task"/>s.
+        /// Enqueues a new <see cref="Task"/> at the end of this <see cref="Entity"/>'s queue of <see cref="Task"/>s.
         /// </summary>
         /// <param name="task">The <see cref="Task"/> to be enqueued.</param>
         public void Enqueue(Task task)
@@ -212,7 +212,7 @@ namespace Orion.Game.Simulation.Components
         }
 
         /// <summary>
-        /// Removes all <see cref="Task"/>s from this <see cref="Unit"/>'s queue.
+        /// Removes all <see cref="Task"/>s from this <see cref="Entity"/>'s queue.
         /// </summary>
         public void Clear()
         {

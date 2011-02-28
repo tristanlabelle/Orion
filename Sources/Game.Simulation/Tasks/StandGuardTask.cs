@@ -9,7 +9,7 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A <see cref="Task"/> which makes an <see cref="Unit"/> attack enemy units within range, without following.
+    /// A <see cref="Task"/> which makes an <see cref="Entity"/> attack enemy units within range, without following.
     /// </summary>
     [Serializable]
     public sealed class StandGuardTask : Task

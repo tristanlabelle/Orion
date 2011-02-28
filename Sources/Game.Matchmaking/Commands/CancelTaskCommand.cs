@@ -10,7 +10,7 @@ using Orion.Game.Simulation.Tasks;
 namespace Orion.Game.Matchmaking.Commands
 {
     /// <summary>
-    /// A <see cref="Command"/> which cancels a single <see cref="Task"/> from a specific <see cref="Unit"/>.
+    /// A <see cref="Command"/> which cancels a single <see cref="Task"/> from a specific <see cref="Entity"/>.
     /// </summary>
     [Serializable]
     public sealed class CancelTaskCommand : Command

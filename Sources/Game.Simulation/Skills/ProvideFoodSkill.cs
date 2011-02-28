@@ -4,7 +4,7 @@ using Orion.Engine;
 namespace Orion.Game.Simulation.Skills
 {
     /// <summary>
-    /// A <see cref="UnitSkill"/> which permits a <see cref="Unit"/> to provide food.
+    /// A <see cref="UnitSkill"/> which permits a <see cref="Entity"/> to provide food.
     /// </summary>
     [Serializable]
     public sealed class ProvideFoodSkill : UnitSkill

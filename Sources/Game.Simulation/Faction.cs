@@ -440,30 +440,29 @@ namespace Orion.Game.Simulation
 
         private void OnWorldEntityRemoved(World world, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != this) return;
+            if (FactionMembership.GetFaction(entity) != this) return;
 
-            if (unit.IsUnderConstruction)
+            if (((Unit)entity).IsUnderConstruction)
             {
-                localFogOfWar.RemoveRegion(unit.GridRegion);
+                localFogOfWar.RemoveRegion(entity.Spatial.GridRegion);
             }
             else
             {
-                TotalFoodAmount -= (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat, ProvideFoodSkill.AmountStat);
+                TotalFoodAmount -= (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
 
-                localFogOfWar.RemoveLineOfSight(unit.Components.Get<Vision>().LineOfSight);
+                localFogOfWar.RemoveLineOfSight(entity.Components.Get<Vision>().LineOfSight);
             }
         }
 
         private void OnWorldEntityAdded(World world, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != this) return;
+            if (FactionMembership.GetFaction(entity) != this) return;
 
+            Unit unit = (Unit)entity;
             if (unit.IsBuilding && unit.IsUnderConstruction)
-                localFogOfWar.AddRegion(unit.GridRegion);
+                localFogOfWar.AddRegion(entity.Spatial.GridRegion);
             else
-                localFogOfWar.AddLineOfSight(unit.Components.Get<Vision>().LineOfSight);
+                localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
         }
 
         /// <summary>
@@ -640,10 +639,10 @@ namespace Orion.Game.Simulation
             Argument.EnsureNotNull(entity, "entity");
 
             // Early out for units of our faction, which we can always see.
-            Unit unit = entity as Unit;
-            if (unit != null && unit.Faction == this) return true;
+            if (FactionMembership.GetFaction(entity) == this) return true;
 
-            return CanSee(entity.GridRegion);
+            Spatial spatial = entity.Spatial;
+            return spatial != null && CanSee(spatial.GridRegion);
         }
 
         /// <summary>

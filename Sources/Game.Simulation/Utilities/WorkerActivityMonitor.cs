@@ -57,9 +57,9 @@ namespace Orion.Game.Simulation.Utilities
             get { return activeWorkers.Count + inactiveWorkers.Count; }
         }
 
-        public IEnumerable<Unit> ActiveWorkers
+        public IEnumerable<Entity> ActiveWorkers
         {
-            get { return activeWorkers; }
+            get { return activeWorkers.Cast<Entity>(); }
         }
 
         [PropertyChangedEvent("WorkerActivityStateChanged")]
@@ -85,27 +85,26 @@ namespace Orion.Game.Simulation.Utilities
         {
             HashSet<Unit> pool = worker.TaskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
             pool.Add(worker);
-            worker.TaskQueue.Changed += workerTaskQueueChangedEventHandler;
+            worker.Components.Get<TaskQueue>().Changed += workerTaskQueueChangedEventHandler;
         }
 
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;
+            if (FactionMembership.GetFaction(entity) != faction || !IsWorker(entity)) return;
 
+            Unit unit = (Unit)entity;
             AddWorker(unit);
-
             WorkerActivityStateChanged.Raise(this, unit);
         }
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != faction || !IsWorker(unit)) return;
+            if (FactionMembership.GetFaction(entity) != faction || !IsWorker(entity)) return;
 
+            Unit unit = (Unit)entity;
             inactiveWorkers.Remove(unit);
             activeWorkers.Remove(unit);
-            unit.TaskQueue.Changed -= workerTaskQueueChangedEventHandler;
+            unit.Components.Get<TaskQueue>().Changed -= workerTaskQueueChangedEventHandler;
 
             WorkerActivityStateChanged.Raise(this, unit);
         }
@@ -132,9 +131,9 @@ namespace Orion.Game.Simulation.Utilities
             }
         }
 
-        private static bool IsWorker(Unit unit)
+        private static bool IsWorker(Entity entity)
         {
-            return unit.HasComponent<Builder, BuildSkill>();
+            return entity.Components.Has<Builder>();
         }
         #endregion
     }

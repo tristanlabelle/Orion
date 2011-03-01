@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -52,16 +53,17 @@ namespace Orion.Game.Matchmaking.Commands
 
             Technology technology = match.TechnologyTree.FromHandle(technologyHandle);
             Faction faction = match.World.FindFactionFromHandle(FactionHandle);
-            Unit researcher = (Unit)match.World.Entities.FromHandle(researcherHandle);
+            Entity researcher = match.World.Entities.FromHandle(researcherHandle);
 
             int aladiumCost = technology.AladdiumCost;
             int alageneCost = technology.AlageneCost;
 
             if (faction.AladdiumAmount >= aladiumCost && faction.AlageneAmount >= alageneCost)
             {
-                if (researcher.TaskQueue.IsEmpty)
+                TaskQueue taskQueue = researcher.Components.Get<TaskQueue>();
+                if (taskQueue.IsEmpty)
                 {
-                    researcher.TaskQueue.Enqueue(new ResearchTask(researcher, technology));
+                    taskQueue.Enqueue(new ResearchTask(researcher, technology));
                     faction.AladdiumAmount -= aladiumCost;
                     faction.AlageneAmount -= alageneCost;
                 }

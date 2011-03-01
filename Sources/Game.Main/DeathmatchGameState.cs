@@ -102,9 +102,9 @@ namespace Orion.Game.Main
             this.camera = new Camera(match.World.Size, Graphics.Window.ClientAreaSize);
 
             // Center the camera on the player's largest unit, favoring buildings
-            Unit cameraTargetUnit = localCommander.Faction.Units
+            Entity cameraTargetEntity = localCommander.Faction.Units
                 .WithMaxOrDefault(unit => (unit.IsBuilding ? 1000 : 0) + unit.Size.Area);
-            if (cameraTargetUnit != null) this.camera.Target = cameraTargetUnit.Position;
+            if (cameraTargetEntity != null) this.camera.Target = cameraTargetEntity.Spatial.Center;
 
             this.matchRenderer = new DeathmatchRenderer(userInputManager, Graphics);
             this.audioPresenter = new MatchAudioPresenter(Audio, userInputManager);

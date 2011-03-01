@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using AttackTask = Orion.Game.Simulation.Tasks.AttackTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -65,12 +66,12 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit target = (Unit)match.World.Entities.FromHandle(targetHandle);
+            Entity target = match.World.Entities.FromHandle(targetHandle);
 
             foreach (Handle attackerHandle in attackerHandles)
             {
-                Unit attacker = (Unit)match.World.Entities.FromHandle(attackerHandle);
-                attacker.TaskQueue.Enqueue(new AttackTask(attacker, target));
+                Entity attackerEntity = match.World.Entities.FromHandle(attackerHandle);
+                attackerEntity.Components.Get<TaskQueue>().Enqueue(new AttackTask(attackerEntity, target));
             }
         }
 

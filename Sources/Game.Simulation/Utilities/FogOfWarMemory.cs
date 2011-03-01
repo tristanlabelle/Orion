@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Orion.Engine;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -55,8 +56,13 @@ namespace Orion.Game.Simulation.Utilities
             foreach (Entity entity in faction.World.Entities.Intersecting(region.ToRectangle()))
             {
                 Unit unit = entity as Unit;
-                if (unit == null || unit.Faction == faction || !unit.IsBuilding || Faction.CanSee(unit))
+                if (unit == null
+                    || FactionMembership.GetFaction(entity) == faction
+                    || !unit.IsBuilding
+                    || Faction.CanSee(unit))
+                {
                     continue;
+                }
 
                 RememberedBuilding building = new RememberedBuilding(unit);
                 buildings.Add(building);

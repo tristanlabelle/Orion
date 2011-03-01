@@ -24,13 +24,13 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public TrainTask(Unit trainer, Unit traineeType)
+        public TrainTask(Entity trainer, Unit traineeType)
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
-            if (trainer.IsUnderConstruction)
+            if (((Unit)trainer).IsUnderConstruction)
                 throw new ArgumentException("Cannot train with an building under construction");
 
             this.traineeType = traineeType;

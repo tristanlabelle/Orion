@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using HarvestTask = Orion.Game.Simulation.Tasks.HarvestTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -68,8 +69,8 @@ namespace Orion.Game.Matchmaking.Commands
             Entity resourceNode = match.World.Entities.FromHandle(resourceNodeHandle);
             foreach (Handle harvesterHandle in harvesterHandles)
             {
-                Unit harvester = (Unit)match.World.Entities.FromHandle(harvesterHandle);
-                harvester.TaskQueue.Enqueue(new HarvestTask(harvester, resourceNode));
+                Entity harvester = match.World.Entities.FromHandle(harvesterHandle);
+                harvester.Components.Get<TaskQueue>().Enqueue(new HarvestTask(harvester, resourceNode));
             }
         }
 

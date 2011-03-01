@@ -7,6 +7,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using RepairTask = Orion.Game.Simulation.Tasks.RepairTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -65,11 +66,11 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit target = (Unit)match.World.Entities.FromHandle(targetHandle);
+            Entity target = match.World.Entities.FromHandle(targetHandle);
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.TaskQueue.Enqueue(new RepairTask(unit, target));
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                entity.Components.Get<TaskQueue>().Enqueue(new RepairTask(entity, target));
             }
         }
 

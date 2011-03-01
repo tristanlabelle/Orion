@@ -20,7 +20,7 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public BuildTask(Unit buildingUnit, BuildingPlan buildingPlan)
+        public BuildTask(Entity buildingUnit, BuildingPlan buildingPlan)
             : base(buildingUnit)
         {
             Argument.EnsureNotNull(buildingUnit, "builder");

@@ -420,9 +420,9 @@ namespace Orion.Game.Matchmaking
                 .WithMinOrDefault(unit => GetOccupationImportance(unit));
         }
 
-        private float GetOccupationImportance(Unit unit)
+        private float GetOccupationImportance(Entity entity)
         {
-            Task task = unit.TaskQueue.FirstOrDefault();
+            Task task = entity.Components.Get<TaskQueue>().FirstOrDefault();
             if (task == null || task is MoveTask) return 0;
             if (task is HarvestTask) return 4;
             if (task is BuildTask) return 30;
@@ -456,9 +456,9 @@ namespace Orion.Game.Matchmaking
         #region Event Handlers
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != Faction) return;
+            if (FactionMembership.GetFaction(entity) != Faction) return;
 
+            Unit unit = (Unit)entity;
             createdUnitTypes.Add(unit.Type);
             
             if (unit.IsBuilding)
@@ -485,9 +485,9 @@ namespace Orion.Game.Matchmaking
                 return;
             }
 
-            Unit unit = entity as Unit;
-            if (unit == null || unit.Faction != Faction) return;
+            if (FactionMembership.GetFaction(entity) != Faction) return;
 
+            Unit unit = (Unit)entity;
             if (unit.IsBuilding) buildings.Remove(unit);
         }
         #endregion

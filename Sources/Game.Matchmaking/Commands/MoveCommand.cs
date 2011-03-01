@@ -8,6 +8,7 @@ using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using MoveTask = Orion.Game.Simulation.Tasks.MoveTask;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -70,9 +71,9 @@ namespace Orion.Game.Matchmaking.Commands
 
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                MoveTask task = new MoveTask(unit, (Point)destination);
-                unit.TaskQueue.Enqueue(task);
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                MoveTask task = new MoveTask(entity, (Point)destination);
+                entity.Components.Get<TaskQueue>().Enqueue(task);
             }
         }
 

@@ -189,25 +189,25 @@ namespace Orion.Game.Presentation.Actions
             Trainer trainer = unitType.Components.TryGet<Trainer>();
             if (trainer == null) return;
 
-            var traineeTypes = userInputManager.Match.UnitTypes
+            var traineePrototypes = userInputManager.Match.UnitTypes
                 .Where(traineeType => trainer.Supports(traineeType))
                 .OrderBy(traineeType => (int)traineeType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
                     + (int)traineeType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
 
-            foreach (Unit traineeType in traineeTypes)
+            foreach (Unit traineePrototype in traineePrototypes)
             {
                 Point point = FindUnusedButton();
 
-                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AladdiumCostStat);
-                int alageneCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.AlageneCostStat);
-                int foodCost = userInputManager.LocalFaction.GetStat(traineeType, BasicSkill.FoodCostStat);
+                int aladdiumCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.AladdiumCostStat);
+                int alageneCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.AlageneCostStat);
+                int foodCost = userInputManager.LocalFaction.GetStat(traineePrototype, BasicSkill.FoodCostStat);
 
-                Unit traineeTypeForClosure = traineeType;
+                Unit traineeTypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = localizer.GetNoun(traineeType.Name),
+                    Name = localizer.GetNoun(traineePrototype.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
-                    Texture = graphics.GetUnitTexture(traineeType),
+                    Texture = graphics.GetUnitTexture(traineePrototype),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
                 };
             }

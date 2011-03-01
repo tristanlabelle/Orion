@@ -6,6 +6,7 @@ using Orion.Game.Simulation;
 using Orion.Engine;
 using System.IO;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -54,9 +55,11 @@ namespace Orion.Game.Matchmaking.Commands
         {
             Argument.EnsureNotNull(match, "match");
 
-            Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-            Task task = unit.TaskQueue.TryResolveTask(taskHandle);
-            if (task != null) unit.TaskQueue.CancelTask(task);
+            Entity entity = match.World.Entities.FromHandle(unitHandle);
+
+            TaskQueue taskQueue = entity.Components.Get<TaskQueue>();
+            Task task = taskQueue.TryResolveTask(taskHandle);
+            if (task != null) taskQueue.CancelTask(task);
         }
 
         public override string ToString()

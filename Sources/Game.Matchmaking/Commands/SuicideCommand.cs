@@ -52,15 +52,6 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-
-                if (unit.HasComponent<Sellable, SellableSkill>())
-                {
-                    int aladdiumValue = (int)unit.GetStatValue(Sellable.AladdiumValueStat, SellableSkill.AladdiumValueStat);
-                    int alageneValue = (int)unit.GetStatValue(Sellable.AlageneValueStat, SellableSkill.AlageneValueStat);
-                    unit.Faction.AladdiumAmount += aladdiumValue;
-                    unit.Faction.AlageneAmount += alageneValue;
-                }
-
                 unit.Suicide();
             }
         }

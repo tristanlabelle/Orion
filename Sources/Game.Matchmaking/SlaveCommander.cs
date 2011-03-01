@@ -10,6 +10,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking
 {
@@ -50,9 +51,9 @@ namespace Orion.Game.Matchmaking
 
         public void LaunchCancelTask(Task task)
         {
-            Unit unit = (Unit)task.Entity;
-            Handle taskHandle = unit.TaskQueue.TryGetTaskHandle(task);
-            IssueCommand(new CancelTaskCommand(unit.Faction.Handle, unit.Handle, taskHandle));
+            Entity entity = task.Entity;
+            Handle taskHandle = entity.Components.Get<TaskQueue>().TryGetTaskHandle(task);
+            IssueCommand(new CancelTaskCommand(Faction.Handle, entity.Handle, taskHandle));
         }
 
         public void LaunchAttack(IEnumerable<Unit> units, Unit target)
@@ -138,10 +139,10 @@ namespace Orion.Game.Matchmaking
                 IssueCommand(new StandGuardCommand(Faction.Handle, units.Select(unit => unit.Handle)));
         }
 
-        public void LaunchUpgrade(IEnumerable<Unit> units, Unit targetType)
+        public void LaunchUpgrade(IEnumerable<Unit> units, Entity targetPrototype)
         {
             if (units.Any())
-                IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetType.Handle));
+                IssueCommand(new UpgradeCommand(Faction.Handle, units.Select(u => u.Handle), targetPrototype.Handle));
         }
         #endregion
     }

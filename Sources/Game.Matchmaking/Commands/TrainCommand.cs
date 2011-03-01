@@ -9,6 +9,7 @@ using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Matchmaking.Commands
 {
@@ -92,7 +93,7 @@ namespace Orion.Game.Matchmaking.Commands
             {
                 foreach (Handle trainerHandle in trainerHandles)
                 {
-                    Unit trainer = (Unit)match.World.Entities.FromHandle(trainerHandle);
+                    Entity trainer = match.World.Entities.FromHandle(trainerHandle);
 
                     if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
                     {
@@ -114,7 +115,7 @@ namespace Orion.Game.Matchmaking.Commands
                     // The hero randomization must be done here to so that every individual train
                     // an be a hero or not. Otherwise, heroes are created on all training units.
                     var actualTraineeType = match.RandomizeHero(traineeType);
-                    trainer.TaskQueue.Enqueue(new TrainTask(trainer, actualTraineeType));
+                    trainer.Components.Get<TaskQueue>().Enqueue(new TrainTask(trainer, actualTraineeType));
                 }
             }
         }

@@ -25,15 +25,15 @@ namespace Orion.Game.Simulation.Tasks
         /// Initializes a new <see cref="ZoneAttack"/> task from the <see cref="Entity"/>
         /// that attacks and its destination.
         /// </summary>
-        /// <param name="unit">The <see cref="Entity"/> who attacks.</param>
+        /// <param name="entity">The <see cref="Entity"/> who attacks.</param>
         /// <param name="destination">The destination of the unit'</param>
-        public ZoneAttackTask(Unit unit, Vector2 destination)
-            : base(unit)
+        public ZoneAttackTask(Entity entity, Vector2 destination)
+            : base(entity)
         {
-            Argument.EnsureNotNull(unit, "unit");
+            Argument.EnsureNotNull(entity, "entity");
             
             this.destination = destination;
-            this.move = new MoveTask(unit, (Point)destination);
+            this.move = new MoveTask(entity, (Point)destination);
         }
         #endregion
 

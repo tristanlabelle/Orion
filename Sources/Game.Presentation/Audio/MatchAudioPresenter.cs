@@ -123,8 +123,7 @@ namespace Orion.Game.Presentation.Audio
             Unit unit = entity as Unit;
             if (unit == null) return;
 
-            bool isBuilding = !entity.Components.Has<Move>();
-            if (isBuilding && unit.IsUnderConstruction)
+            if (unit.IsBuilding && unit.IsUnderConstruction)
             {
                 unit.ConstructionCompleted += OnBuildingConstructionCompleted;
                 audio.PlaySfx("UnderConstruction", unit.Center);
@@ -149,7 +148,8 @@ namespace Orion.Game.Presentation.Audio
         private void OnEntityRemoved(World sender, Entity entity)
         {
             Unit unit = entity as Unit;
-            if (unit != null && unit.Faction == LocalFaction && unit.IsUnderConstruction)
+            Faction faction = FactionMembership.GetFaction(entity);
+            if (unit != null && faction == LocalFaction && unit.IsUnderConstruction)
                 unit.ConstructionCompleted -= buildingConstructionCompletedEventHandler;
         }
 

@@ -110,14 +110,14 @@ namespace Orion.Game.Matchmaking
 
         private static void SpawnChuckNorris(Match match, Faction faction)
         {
-            Unit unitType = match.UnitTypes.FromName("ChuckNorris");
-            if (unitType == null)
+            Entity prototype = match.UnitTypes.FromName("ChuckNorris");
+            if (prototype == null)
             {
                 Debug.Fail("Failed to find hero unit type.");
                 return;
             }
 
-            faction.CreateUnit(unitType, (Point)match.World.Bounds.Center);
+            faction.CreateUnit((Unit)prototype, (Point)match.World.Bounds.Center);
         }
 
         private static void InstantVictory(Match match, Faction faction)
@@ -147,8 +147,10 @@ namespace Orion.Game.Matchmaking
 
         private static void InstantDefeat(Match match, Faction faction)
         {
-            List<Unit> userBuildings = match.World.Entities
-                .OfType<Unit>().Where(u => u.Faction == faction).ToList();
+            List<Entity> userBuildings = match.World.Entities
+                .Where(entity => FactionMembership.GetFaction(entity) == faction)
+                .ToList();
+
             foreach (Unit building in userBuildings) building.Suicide();
         }
 

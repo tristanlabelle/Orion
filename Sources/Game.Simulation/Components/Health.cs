@@ -53,7 +53,11 @@ namespace Orion.Game.Simulation.Components
         public int MaximumValue
         {
             get { return maximumValue; }
-            set { maximumValue = value; }
+            set
+            {
+                Argument.EnsureStrictlyPositive(value, "MaximumValue");
+                maximumValue = value;
+            }
         }
 
         /// <summary>
@@ -139,7 +143,7 @@ namespace Orion.Game.Simulation.Components
 
         /// <summary>
         /// Accesses a value indicating if this <see cref="Entity"/> can take part
-        /// in life relinquishing activities.
+        /// in user-triggered life relinquishing activities.
         /// </summary>
         public bool CanSuicide
         {
@@ -156,6 +160,15 @@ namespace Orion.Game.Simulation.Components
             if (newDamage < 0) newDamage = 0;
             if (newDamage != damage) DamageChanged.Raise(this);
             damage = newDamage;
+        }
+
+        /// <summary>
+        /// Kills this <see cref="Entity"/>.
+        /// This method works even if <see cref="CanSuicide"/> is <c>false</c>.
+        /// </summary>
+        public void Suicide()
+        {
+            Value = 0;
         }
         #endregion
     }

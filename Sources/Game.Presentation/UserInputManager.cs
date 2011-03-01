@@ -337,7 +337,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (target.HasComponent<AlageneExtractor, ExtractAlageneSkill>())
+            if (target.Components.Has<AlageneExtractor>())
             {
                 if (Selection.Units.All(unit => unit.IsBuilding))
                 {
@@ -406,35 +406,35 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> selection = Selection.Units.Where(unit => IsUnitControllable(unit));
             OverrideIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.HasComponent<Attacker, AttackSkill>()), target);
-            commander.LaunchMove(selection.Where(unit => !unit.HasComponent<Attacker, AttackSkill>() && unit.HasComponent<Move, MoveSkill>()), target.Position);
+            commander.LaunchAttack(selection.Where(unit => unit.Components.Has<Attacker>()), target);
+            commander.LaunchMove(selection.Where(unit => !unit.Components.Has<Attacker>() && unit.Components.Has<Move>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasComponent<Move, MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
             // Those who can attack do so, the others simply move to the destination
             OverrideIfNecessary();
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.HasComponent<Attacker, AttackSkill>()), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasComponent<Attacker, AttackSkill>()), destination);
+            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.Components.Has<Attacker>()), destination);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.Components.Has<Attacker>()), destination);
         }
 
         public void LaunchHarvest(Entity node)
         {
             Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasComponent<Move, MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
             // Those who can harvest do so, the others simply move to the resource's position
             OverrideIfNecessary();
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.HasComponent<Harvester, HarvestSkill>()), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.HasComponent<Harvester, HarvestSkill>()), node.Position);
+            commander.LaunchHarvest(movableUnits.Where(unit => unit.Components.Has<Harvester>()), node);
+            commander.LaunchMove(movableUnits.Where(unit => !unit.Components.Has<Harvester>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
             IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.HasComponent<Move, MoveSkill>());
+                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
             OverrideIfNecessary();
             commander.LaunchMove(movableUnits, destination);
         }
@@ -444,7 +444,7 @@ namespace Orion.Game.Presentation
             IEnumerable<Unit> targets = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction
                     && unit.IsBuilding
-                    && unit.HasComponent<Trainer, TrainSkill>());
+                    && unit.Components.Has<Trainer>());
             OverrideIfNecessary();
             commander.LaunchChangeRallyPoint(targets, at);
         }
@@ -456,7 +456,7 @@ namespace Orion.Game.Presentation
             if (!building.IsBuilding) return;
            
             IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasComponent<Builder, BuildSkill>());
+                .Where(unit => unit.Faction == LocalFaction && unit.Components.Has<Builder>());
             OverrideIfNecessary();
             commander.LaunchRepair(targetUnits, building);
         }
@@ -467,7 +467,7 @@ namespace Orion.Game.Presentation
             if (target.IsBuilding) return;
 
             IEnumerable<Unit> healers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.HasComponent<Healer, HealSkill>());
+                .Where(unit => unit.Faction == LocalFaction && unit.Components.Has<Healer>());
             if (healers.Any(unit => unit.Faction != target.Faction)) return;
             OverrideIfNecessary();
             commander.LaunchHeal(healers, target);
@@ -486,14 +486,21 @@ namespace Orion.Game.Presentation
 
         public void LaunchResearch(Technology technology)
         {
-            Unit researcher = Selection.Units
-                .FirstOrDefault(unit => unit.Faction == commander.Faction // I unilaterally decided you can't research from buildings that aren't yours
-                    && !unit.IsUnderConstruction
-                    && unit.IsIdle
-                    && unit.CanResearch(technology));
+            foreach (Unit unit in Selection.Units)
+            {
+                Researcher researcher = unit.Components.TryGet<Researcher>();
+                if (unit.Faction != commander.Faction
+                    || unit.IsUnderConstruction
+                    || !unit.Components.Has<TaskQueue>()
+                    || researcher == null
+                    || !researcher.Supports(technology))
+                {
+                    return;
+                }
 
-            OverrideIfNecessary();
-            commander.LaunchResearch(researcher, technology);
+                OverrideIfNecessary();
+                commander.LaunchResearch(unit, technology);
+            }
         }
 
         public void LaunchSuicide()
@@ -514,7 +521,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.HasComponent<Move, MoveSkill>());
+                .Where(unit => unit.Components.Has<Move>());
             OverrideIfNecessary();
             commander.LaunchStandGuard(targetUnits);
         }
@@ -523,7 +530,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Unit> targetUnits = Selection.Units
                 .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.HasComponent<Sellable, SellableSkill>());
+                .Where(unit => unit.Components.Has<Sellable>());
             commander.LaunchSuicide(targetUnits);
         }
 

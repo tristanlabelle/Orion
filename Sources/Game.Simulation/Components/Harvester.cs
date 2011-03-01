@@ -51,5 +51,22 @@ namespace Orion.Game.Simulation.Components
             set { transportedAmount = value; }
         }
         #endregion
+
+        #region Methods
+        /// <summary>
+        /// Determines if a given <see cref="Entity"/> can be harvested.
+        /// </summary>
+        /// <param name="target">The <see cref="Entity"/> to be checked.</param>
+        /// <returns>A value indicating if it can be harvested.</returns>
+        public bool CanHarvest(Entity target)
+        {
+            Argument.EnsureNotNull(target, "target");
+
+            Harvestable targetHarvestable = target.Components.TryGet<Harvestable>();
+            Faction faction = FactionMembership.GetFaction(Entity);
+            return targetHarvestable != null
+                && (faction == null || faction.CanHarvest(target));
+        }
+        #endregion
     }
 }

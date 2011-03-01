@@ -178,6 +178,7 @@ namespace Orion.Game.Simulation.Components
                     || targetSpatial == null
                     || !vision.CanSee(target)
                     || !IsInRange(target)
+                    || !target.Components.Has<Health>()
                     || FactionMembership.IsAlliedTo(Entity, target))
                 {
                     continue;

@@ -470,9 +470,10 @@ namespace Orion.Game.Simulation
         /// </summary>
         public void MassSuicide()
         {
-            Unit[] units = Units.OfType<Unit>().ToArray();
-            foreach (Unit unit in units)
-                unit.Suicide();
+            Units.Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null)
+                .NonDeferred()
+                .ForEach(entity => entity.Suicide());
         }
 
         /// <summary>
@@ -484,12 +485,14 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(node, "node");
 
-            if (node.Components.Get<Harvestable>().Type == ResourceType.Aladdium) return true;
+            Harvestable harvestable = node.Components.TryGet<Harvestable>();
+            if (harvestable == null
+                || harvestable.Type == ResourceType.Aladdium) return true;
 
             Vector2 location = node.Spatial.Position;
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
-                && extractor.HasComponent<AlageneExtractor, ExtractAlageneSkill>()
+                && extractor.Components.Has<AlageneExtractor>()
                 && !extractor.IsUnderConstruction
                 && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
         }

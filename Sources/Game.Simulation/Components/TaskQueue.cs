@@ -15,6 +15,7 @@ namespace Orion.Game.Simulation.Components
     /// </summary>
     public sealed class TaskQueue : Component, IList<Task>
     {
+        #region Instance
         #region Fields
         private readonly List<Task> tasks = new List<Task>();
 
@@ -289,6 +290,24 @@ namespace Orion.Game.Simulation.Components
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+        #endregion
+        #endregion
+        #endregion
+
+        #region Static
+        #region Methods
+        /// <summary>
+        /// Tests if a given <see cref="Entity"/> has an empty <see cref="TaskQueue"/> component.
+        /// </summary>
+        /// <param name="entity">The <see cref="Entity"/> to be tested.</param>
+        /// <returns>A value indicating if <paramref name="entity"/> has a <see cref="TaskQueue"/> that is empty.</returns>
+        public static bool HasEmpty(Entity entity)
+        {
+            Argument.EnsureNotNull(entity, "entity");
+
+            TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+            return taskQueue != null && taskQueue.IsEmpty;
         }
         #endregion
         #endregion

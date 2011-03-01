@@ -266,7 +266,7 @@ namespace Orion.Game.Simulation
 
         public bool IsBuilding
         {
-            get { return !HasComponent<Move, MoveSkill>(); }
+            get { return !Components.Has<Move>(); }
         }
 
         public ICollection<UnitTypeUpgrade> Upgrades
@@ -359,14 +359,6 @@ namespace Orion.Game.Simulation
         }
 
         /// <summary>
-        /// Gets a value indicating if the unit does nothing.
-        /// </summary>
-        public bool IsIdle
-        {
-            get { return Components.Get<TaskQueue>().IsEmpty; }
-        }
-
-        /// <summary>
         /// Accesses the time elapsed since this <see cref="Entity"/> last hit something, in seconds.
         /// </summary>
         public float TimeElapsedSinceLastHitInSeconds
@@ -378,30 +370,6 @@ namespace Orion.Game.Simulation
 
         #region Methods
         #region Skills/Type
-        /// <summary>
-        /// Tests if this <see cref="Entity"/> has a given <see cref="Component"/>,
-        /// also checking if it has the corresponding <see cref="UnitSkill"/> to aid migration.
-        /// </summary>
-        /// <typeparam name="TComponent">The type of the component to be found.</typeparam>
-        /// <typeparam name="TSkill">The type of the corresponding skill.</typeparam>
-        /// <returns>A value indicating if this <see cref="Entity"/> has a given <see cref="Component"/>.</returns>
-        public bool HasComponent<TComponent, TSkill>()
-            where TComponent : Component
-            where TSkill : UnitSkill
-        {
-            bool hasComponent = Components.Has<TComponent>();
-            bool hasSkill = skills.ContainsKey(typeof(TSkill));
-
-            if (hasComponent != hasSkill)
-            {
-                string message = "Unit has component {0} without skill {1} or vice-versa."
-                    .FormatInvariant(typeof(TComponent).FullName, typeof(TSkill).FullName);
-                Debug.Fail(message);
-            }
-
-            return hasComponent;
-        }
-
         /// <remarks>
         /// Same as <see cref="HasSkill"/>, but not obsoleted so internal usages do not cause warnings.
         /// </remarks>
@@ -478,14 +446,6 @@ namespace Orion.Game.Simulation
                 && trainer != null
                 && trainer.Supports(unitType);
         }
-
-        public bool CanResearch(Technology technology)
-        {
-            Argument.EnsureNotNull(technology, "technology");
-
-            Researcher researcher = Components.TryGet<Researcher>();
-            return researcher != null && researcher.Supports(technology);
-        }
         #endregion
         #endregion
 
@@ -542,45 +502,7 @@ namespace Orion.Game.Simulation
         }
         #endregion
 
-        #region Exploding
-        private void Explode()
-        {
-            float explosionRadius = (float)GetStatValue(Kamikaze.RadiusStat, SuicideBombSkill.RadiusStat);
-            Circle explosionCircle = new Circle(Center, explosionRadius);
-
-            World.OnExplosionOccured(explosionCircle);
-            Suicide();
-
-            Unit[] damagedUnits = World.Entities
-                .Intersecting(explosionCircle)
-                .OfType<Unit>()
-                .Where(unit => unit != this && unit.IsAliveInWorld)
-                .ToArray();
-
-            float explosionDamage = (float)GetStatValue(Kamikaze.DamageStat, SuicideBombSkill.DamageStat);
-            foreach (Unit damagedUnit in damagedUnits)
-            {
-                if (damagedUnit.HasComponent<Kamikaze, SuicideBombSkill>()) continue;
-                float distanceFromCenter = (explosionCircle.Center - damagedUnit.Center).LengthFast;
-                float damage = (1 - (float)Math.Pow(distanceFromCenter / explosionCircle.Radius, 5))
-                    * explosionDamage;
-                damagedUnit.Health -= damage;
-            }
-
-            foreach (Unit damagedUnit in damagedUnits)
-            {
-                if (!damagedUnit.HasComponent<Kamikaze, SuicideBombSkill>()) continue;
-                damagedUnit.Explode();
-            }
-        }
-        #endregion
-
         #region Dying
-        public void Suicide()
-        {
-            Health = 0;
-        }
-
         protected override void OnDied()
         {
             TaskQueue.Clear();
@@ -595,14 +517,15 @@ namespace Orion.Game.Simulation
             // OPTIM: As checking for nearby units takes a lot of processor time,
             // we only do it once every few frames. We take our handle value
             // so the units do not make their checks all at once.
-            if (CanPerformProximityChecks(step) && IsIdle)
+            if (CanPerformProximityChecks(step) && TaskQueue.HasEmpty(this))
             {
-                if (HasComponent<Kamikaze, SuicideBombSkill>() && TryExplodeWithNearbyUnit())
+                Kamikaze kamikaze = Components.TryGet<Kamikaze>();
+                if (kamikaze != null && kamikaze.TryExplodeWithNearbyTarget())
                     return;
 
-                if (HasComponent<Builder, BuildSkill>() && TryRepairNearbyUnit()) { }
-                else if (HasComponent<Healer, HealSkill>() && TryHealNearbyUnit()) { }
-                else if (!IsUnderConstruction && HasComponent<Attacker, AttackSkill>() && !HasComponent<Builder, BuildSkill>()
+                if (Components.Has<Builder>() && TryRepairNearbyUnit()) { }
+                else if (Components.Has<Healer>() && TryHealNearbyUnit()) { }
+                else if (!IsUnderConstruction && Components.Has<Attacker>() && !Components.Has<Builder>()
                     && TryAttackNearbyUnit()) { }
             }
         }
@@ -616,28 +539,6 @@ namespace Orion.Game.Simulation
         internal bool CanPerformProximityChecks(SimulationStep step)
         {
             return (step.Number + (int)Handle.Value) % nearbyEnemyCheckPeriod == 0;
-        }
-
-        private bool TryExplodeWithNearbyUnit()
-        {
-            Kamikaze kamikaze = Components.Get<Kamikaze>();
-
-            Unit explodingTarget = World.Entities
-                .Intersecting(Rectangle.FromCenterSize(Center, new Vector2(3, 3)))
-                .OfType<Unit>()
-                .FirstOrDefault(unit => unit != this
-                    && kamikaze.IsTarget(unit)
-                    && Region.AreAdjacentOrIntersecting(GridRegion, unit.GridRegion));
-
-            if (explodingTarget == null) return false;
-
-            float explosionRadius = (float)GetStatValue(Kamikaze.RadiusStat, SuicideBombSkill.RadiusStat);
-            Circle explosionCircle = new Circle((Center + explodingTarget.Center) * 0.5f, explosionRadius);
-
-            explodingTarget.Suicide();
-            Explode();
-
-            return true;
         }
 
         private bool TryAttackNearbyUnit()
@@ -670,11 +571,6 @@ namespace Orion.Game.Simulation
             return true;
         }
         #endregion
-
-        public override string ToString()
-        {
-            return "{0} {2} {1}".FormatInvariant(Handle, Name, Faction);
-        }
         #endregion
     }
 }

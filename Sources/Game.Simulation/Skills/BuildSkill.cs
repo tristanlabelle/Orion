@@ -48,7 +48,7 @@ namespace Orion.Game.Simulation.Skills
         #region Methods
         protected override void DoFreeze()
         {
-            targets = new ReadOnlyCollection<string>(targets.ToList());
+            targets = targets.ToList().AsReadOnly();
         }
 
         protected override UnitSkill Clone()

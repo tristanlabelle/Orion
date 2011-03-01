@@ -127,7 +127,7 @@ namespace Orion.Game.Presentation.Renderers
             var plans = World.Entities
                 .OfType<Unit>()
                 .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
-                    && u.HasComponent<Builder, BuildSkill>())
+                    && u.Components.Has<Builder>())
                 .SelectMany(u => u.TaskQueue)
                 .OfType<BuildTask>()
                 .Select(t => t.BuildingPlan)

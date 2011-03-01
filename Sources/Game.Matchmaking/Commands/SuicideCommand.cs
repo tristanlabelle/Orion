@@ -51,8 +51,8 @@ namespace Orion.Game.Matchmaking.Commands
             Argument.EnsureNotNull(match, "match");
             foreach (Handle unitHandle in unitHandles)
             {
-                Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                unit.Suicide();
+                Entity entity = match.World.Entities.FromHandle(unitHandle);
+                entity.Components.Get<Health>().Suicide();
             }
         }
 

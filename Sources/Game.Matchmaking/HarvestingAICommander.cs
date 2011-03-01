@@ -137,7 +137,7 @@ namespace Orion.Game.Matchmaking
                 return World.Entities
                     .OfType<Unit>()
                     .Where(unit => unit.Faction == Faction
-                        && unit.IsIdle
+                        && TaskQueue.HasEmpty(unit)
                         && !assignedUnits.Contains(unit));
             }
         }
@@ -282,7 +282,7 @@ namespace Orion.Game.Matchmaking
                 nodeData.NearbyDepot = World.Entities
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
                     .OfType<Unit>()
-                    .Where(u => u.Faction == Faction && u.HasComponent<ResourceDepot, StoreResourcesSkill>())
+                    .Where(u => u.Faction == Faction && u.Components.Has<ResourceDepot>())
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 
@@ -330,7 +330,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            if (unit.HasComponent<Harvester, HarvestSkill>())
+            if (unit.Components.Has<Harvester>())
             {
                 var nodeData = resourceNodesData.Values
                     .Where(d => Faction.CanHarvest(d.Node) && d.HarvesterCount < maximumHarvestersPerResourceNode)
@@ -345,7 +345,7 @@ namespace Orion.Game.Matchmaking
                 }
             }
 
-            if (unit.HasComponent<Move, MoveSkill>())
+            if (unit.Components.Has<Move>())
             {
                 var placeToExplore = placesToExplore
                     .Where(p => step.TimeInSeconds - p.TimeLastExplorerSent > minimumTimeBetweenSuccessiveExplorations)
@@ -363,12 +363,13 @@ namespace Orion.Game.Matchmaking
                     return;
                 }
             }
-            
-            if (unit.HasComponent<Researcher, ResearchSkill>())
+
+            Researcher researcher = unit.Components.TryGet<Researcher>();
+            if (researcher != null)
             {
                 foreach (var technology in Match.TechnologyTree.Technologies)
                 {
-                    if (!unit.CanResearch(technology)) continue;
+                    if (!researcher.Supports(technology)) continue;
                     if (Faction.HasResearched(technology)) continue;
                     if (createdUnitTypes.None(type => technology.AppliesTo(type))) continue;
                     

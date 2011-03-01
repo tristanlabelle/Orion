@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Game.Simulation;
 using Orion.Game.Simulation.Technologies;
 using System.Diagnostics;
@@ -122,14 +123,11 @@ namespace Orion.Game.Matchmaking
 
         private static void InstantVictory(Match match, Faction faction)
         {
-            List<Entity> enemyUnits = match.World.Entities
-                .Where(e => FactionMembership.GetFaction(e) != faction)
-                .ToList();
-            foreach (Entity enemy in enemyUnits)
-            {
-                Health health = enemy.Components.TryGet<Health>();
-                if (health != null) health.Value = 0;
-            }
+            match.World.Entities
+                .Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null && FactionMembership.GetFaction(health.Entity) != faction)
+                .NonDeferred()
+                .ForEach(health => health.Suicide());
         }
 
         private static void IncreaseBuildAndTrainSpeed(Match match, Faction faction)
@@ -147,11 +145,11 @@ namespace Orion.Game.Matchmaking
 
         private static void InstantDefeat(Match match, Faction faction)
         {
-            List<Entity> userBuildings = match.World.Entities
-                .Where(entity => FactionMembership.GetFaction(entity) == faction)
-                .ToList();
-
-            foreach (Unit building in userBuildings) building.Suicide();
+            match.World.Entities
+                .Select(entity => entity.Components.TryGet<Health>())
+                .Where(health => health != null && FactionMembership.GetFaction(health.Entity) == faction)
+                .NonDeferred()
+                .ForEach(health => health.Suicide());
         }
 
         private static void SpawnMisterT(Match match, Faction faction)

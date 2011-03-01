@@ -233,7 +233,7 @@ namespace Orion.Game.Presentation.Renderers
             float angle = unit.Spatial.Angle;
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
-            bool isMelee = unit.HasComponent<Attacker, AttackSkill>()
+            bool isMelee = unit.Components.Has<Attacker>()
                 && (float)unit.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
                 return baseAngle;

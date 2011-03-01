@@ -88,7 +88,7 @@ namespace Orion.Game.Simulation.Components
                     || targetUnit == null
                     || targetSpatial == null
                     || targetHealth == null
-                    || targetUnit.IsBuilding
+                    || targetHealth.Constitution != Constitution.Biological
                     || targetHealth.Damage == 0
                     || !vision.CanSee(target)
                     || !IsInRange(target)

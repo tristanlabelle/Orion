@@ -65,7 +65,7 @@ namespace Orion.Game.Presentation.Actions
 
         private void CreateButtons()
         {
-            if (unitType.HasComponent<Attacker, AttackSkill>())
+            if (unitType.Components.Has<Attacker>())
             {
                 actions[2, 3] = new ActionDescriptor()
                 {
@@ -80,7 +80,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Builder, BuildSkill>())
+            if (unitType.Components.Has<Builder>())
             {
                 var buildActionProvider = new BuildActionProvider(actionPanel, userInputManager, graphics, localizer, unitType);
                 actions[0, 0] = new ActionDescriptor()
@@ -104,7 +104,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Harvester, HarvestSkill>())
+            if (unitType.Components.Has<Harvester>())
             {
                 actions[1, 2] = new ActionDescriptor()
                 {
@@ -119,7 +119,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Healer, HealSkill>())
+            if (unitType.Components.Has<Healer>())
             {
                 actions[3, 2] = new ActionDescriptor()
                 {
@@ -134,7 +134,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Move, MoveSkill>())
+            if (unitType.Components.Has<Move>())
             {
                 actions[0, 3] = new ActionDescriptor()
                 {
@@ -149,7 +149,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Sellable, SellableSkill>())
+            if (unitType.Components.Has<Sellable>())
             {
                 actions[3, 0] = new ActionDescriptor()
                 {
@@ -159,7 +159,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.HasComponent<Attacker, AttackSkill>() && unitType.HasComponent<Move, MoveSkill>())
+            if (unitType.Components.Has<Attacker>() && unitType.Components.Has<Move>())
             {
                 actions[3, 3] = new ActionDescriptor()
                 {

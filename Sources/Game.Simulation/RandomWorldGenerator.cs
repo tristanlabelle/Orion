@@ -125,11 +125,11 @@ namespace Orion.Game.Simulation
 
             world.Entities.CommitDeferredChanges();
 
-            List<Vector2> buildingPositions = world.Entities
+            var buildingPositions = world.Entities
                 .OfType<Unit>()
                 .Where(unit => unit.IsBuilding)
                 .Select(unit => unit.Center)
-                .ToList();
+                .NonDeferred();
 
             Vector2 campCenter = Vector2.Zero;
             int attemptCount = 0;

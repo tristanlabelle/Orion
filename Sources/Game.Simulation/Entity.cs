@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 using Orion.Engine;
+using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
@@ -239,7 +240,30 @@ namespace Orion.Game.Simulation
 
         public override string ToString()
         {
-            return "Entity {0}".FormatInvariant(handle);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            // Write the faction name, if any
+            Faction faction = FactionMembership.GetFaction(this);
+            if (faction != null)
+            {
+                stringBuilder.Append(faction.Name);
+                stringBuilder.Append(' ');
+            }
+
+            // Write the stereotype name, or "Entity" if there's none
+            Identity identity = Components.TryGet<Identity>();
+            stringBuilder.Append(identity == null ? "Entity" : identity.Name);
+            stringBuilder.Append(' ');
+
+            // Write the handle value
+            stringBuilder.Append(handle);
+            stringBuilder.Append(": ");
+            
+            // Write the component names
+            foreach (string str in Components.Select(component => component.GetType().Name).Interleave(", "))
+                stringBuilder.Append(str);
+
+            return stringBuilder.ToString();
         }
 
         public void Die()

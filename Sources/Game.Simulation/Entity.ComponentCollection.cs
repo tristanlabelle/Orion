@@ -37,7 +37,7 @@ namespace Orion.Game.Simulation
             /// </summary>
             public int Count
             {
-                get { throw new NotImplementedException(); }
+                get { return components.Count; }
             }
             #endregion
 

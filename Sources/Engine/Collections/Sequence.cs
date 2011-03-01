@@ -773,6 +773,22 @@ namespace Orion.Engine.Collections
             }
         }
         #endregion
+
+        #region Non-Deferred
+        /// <summary>
+        /// Accumulates the results from a sequence into a buffer so subsequent
+        /// operations are not deferred.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to be buffered.</param>
+        /// <returns>The resulting non-deferred sequence.</returns>
+        public static IEnumerable<T> NonDeferred<T>(this IEnumerable<T> sequence)
+        {
+            Argument.EnsureNotNull(sequence, "sequence");
+
+            return new ChunkList<T>(sequence);
+        }
+        #endregion
         #endregion
     }
 }

@@ -155,7 +155,7 @@ namespace Orion.Game.Simulation.Tasks
             return spawnee;
         }
 
-        private void TryApplyRallyPoint(Unit unit)
+        private void TryApplyRallyPoint(Entity entity)
         {
             Trainer trainer = Entity.Components.Get<Trainer>();
             if (!trainer.HasRallyPoint) return;
@@ -164,24 +164,25 @@ namespace Orion.Game.Simulation.Tasks
 
             Task rallyPointTask = null;
             // Check to see if we can harvest automatically
-            if (unit.HasComponent<Harvester, HarvestSkill>())
+            Harvester harvester = entity.Components.TryGet<Harvester>();
+            if (harvester != null)
             {
                 Entity resourceNode = World.Entities
                     .Intersecting(rallyPoint)
                     .Where(e => e.Components.Has<Harvestable>())
                     .FirstOrDefault(e => !e.Components.Get<Harvestable>().IsEmpty);
 
-                if (resourceNode != null && unit.Faction.CanHarvest(resourceNode))
-                    rallyPointTask = new HarvestTask(unit, resourceNode);
+                if (resourceNode != null && harvester.CanHarvest(resourceNode))
+                    rallyPointTask = new HarvestTask(entity, resourceNode);
             }
             
             if (rallyPointTask == null)
             {
                 Point targetPoint = (Point)rallyPoint;
-                rallyPointTask = new MoveTask(unit, targetPoint);
+                rallyPointTask = new MoveTask(entity, targetPoint);
             }
 
-            unit.TaskQueue.OverrideWith(rallyPointTask);
+            entity.Components.Get<TaskQueue>().OverrideWith(rallyPointTask);
         }
         #endregion
     }

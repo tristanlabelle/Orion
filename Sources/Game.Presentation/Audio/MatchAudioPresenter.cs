@@ -183,6 +183,7 @@ namespace Orion.Game.Presentation.Audio
             }
 
             // Find the most frequent unit type in the newly selected units.
+#warning Unit type comparision
             var unitTypeGroup = sender.Except(previousSelection)
                 .Cast<Unit>()
                 .GroupBy(unit => unit.Type)

@@ -445,7 +445,7 @@ namespace Orion.Game.Simulation
             Faction faction = Faction;
             if (faction != null)
             {
-                int skillValue = Faction.GetStat(Type, skillStat);
+                int skillValue = Faction.GetStat(this, skillStat);
                 if (componentValue.RealValue != skillValue)
                 {
                     string message = "Component stat {0} did not have the same value as skill stat {1}."

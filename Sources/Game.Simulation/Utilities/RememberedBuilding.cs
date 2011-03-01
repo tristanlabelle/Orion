@@ -65,6 +65,7 @@ namespace Orion.Game.Simulation.Utilities
         public bool Matches(Unit building)
         {
             Argument.EnsureNotNull(building, "building");
+#warning Unit type comparision
             return location == building.GridRegion.Min
                 && type == building.Type
                 && faction == building.Faction;
@@ -79,8 +80,7 @@ namespace Orion.Game.Simulation.Utilities
 
         public override bool Equals(object obj)
         {
-            if (!(obj is RememberedBuilding)) return false;
-            return Equals((RememberedBuilding)obj);
+            return obj is RememberedBuilding && Equals((RememberedBuilding)obj);
         }
 
         public override int GetHashCode()

@@ -189,6 +189,7 @@ namespace Orion.Game.Matchmaking
         
         private void UpdateDefense(ref ResourceAmount budget)
         {
+#warning Unit type comparision
             var firstUnthreatenedVisibleEnemy = World.Entities.OfType<Unit>()
                 .FirstOrDefault(u => Faction.CanSee(u)
                     && buildings.None(b => b.Type == defenseTowerUnitType && (b.Center - u.Center).LengthFast < 5));
@@ -208,6 +209,7 @@ namespace Orion.Game.Matchmaking
         private void UpdateTechnologies(ref ResourceAmount budget)
         {
             if (Faction.UsedFoodAmount < 50) return;
+#warning Unit type comparision
             if (buildings.Any(b => b.Type == laboratoryUnitType)) return;
             
             var laboratoryCost = GetCost(laboratoryUnitType);
@@ -287,6 +289,7 @@ namespace Orion.Game.Matchmaking
                 // Build a nearby depot or pyramid
                 Unit buildingType = resourceDepotUnitType;
 
+#warning Unit type comparision
                 Unit nearestPyramid = buildings
                     .Where(building => building.Type == pyramidUnitType)
                     .WithMinOrDefault(pyramid => (pyramid.Center - node.Center).LengthSquared);
@@ -459,11 +462,13 @@ namespace Orion.Game.Matchmaking
             if (FactionMembership.GetFaction(entity) != Faction) return;
 
             Unit unit = (Unit)entity;
+#warning Unit type comparision
             createdUnitTypes.Add(unit.Type);
             
             if (unit.IsBuilding)
             {
                 buildings.Add(unit);
+#warning Unit type comparision
                 if (unit.Type == alageneExtractorUnitType)
                 {
                     Entity node = World.Entities.Intersecting(unit.Center)

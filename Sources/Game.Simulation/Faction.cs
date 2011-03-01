@@ -389,7 +389,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit != null);
             Debug.Assert(unit.Faction == this);
 
-            UsedFoodAmount -= GetStat(unit.Type, BasicSkill.FoodCostStat);
+            UsedFoodAmount -= GetStat(unit, BasicSkill.FoodCostStat);
         }
 
         /// <remarks>Invoked by Unit.</remarks>

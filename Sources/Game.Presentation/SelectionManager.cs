@@ -92,6 +92,7 @@ namespace Orion.Game.Presentation
                 if (selection.Type != SelectionType.Units)
                     throw new ArgumentException("Cannot change the focused unit type when the selection contains no units.");
 
+#warning Unit type comparision
                 if (selection.Units.None(unit => unit.Type == value))
                     throw new ArgumentException("The focused unit type must be of a type present in the selection.");
 
@@ -104,7 +105,11 @@ namespace Orion.Game.Presentation
         /// </summary>
         public Unit FocusedUnit
         {
-            get { return selection.Units.FirstOrDefault(unit => unit.Type == focusedUnitType); }
+            get
+            {
+#warning Unit type comparision
+                return selection.Units.FirstOrDefault(unit => unit.Type == focusedUnitType);
+            }
         }
 
         private World World
@@ -120,6 +125,7 @@ namespace Orion.Game.Presentation
         /// </summary>
         public void ResetFocusedUnitType()
         {
+#warning Unit type comparision
             Unit newSelectedUnitType = selection.Units
                 .Select(unit => unit.Type)
                 .FirstOrDefault();
@@ -131,11 +137,15 @@ namespace Orion.Game.Presentation
 
         private void UpdateFocusedUnitType()
         {
+#warning Unit type comparision
             bool isStillValid = selection.Units.Any(u => u.Type == focusedUnitType);
             if (isStillValid) return;
 
             if (selection.Type == SelectionType.Units)
+            {
+#warning Unit type comparision
                 focusedUnitType = selection.Units.GroupBy(u => u.Type).WithMax(group => group.Count()).Key;
+            }
             else
                 focusedUnitType = null;
 

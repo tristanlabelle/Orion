@@ -262,6 +262,7 @@ namespace Orion.Game.Presentation
 
             Unit unit = (Unit)entity;
             Circle circle = new Circle(entity.Center, NearbyRadius);
+#warning Unit type comparision
             var units = localFaction.World.Entities
                 .Intersecting(circle)
                 .OfType<Unit>()

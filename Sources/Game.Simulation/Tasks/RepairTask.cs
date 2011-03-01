@@ -167,7 +167,7 @@ namespace Orion.Game.Simulation.Tasks
             if ((needsAladdiumCredit && faction.AladdiumAmount == 0)
                 || (needsAlageneCredit && faction.AlageneAmount == 0))
             {
-                string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Type.Name);
+                string warning = "Pas assez de ressources pour réparer le bâtiment {0}".FormatInvariant(Target.Name);
                 faction.RaiseWarning(warning);
                 return false;
             }

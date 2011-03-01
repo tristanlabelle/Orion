@@ -74,9 +74,10 @@ namespace Orion.Game.Simulation
             Components.Add(vision);
 
             Health health = new Health(this);
+            health.MaximumValue = type.BasicSkill.MaxHealth;
+            health.Constitution = InternalHasSkill<MoveSkill>() ? Constitution.Biological : Constitution.Mechanical;
             health.Armor = type.BasicSkill.Armor;
             health.ArmorType = type.BasicSkill.ArmorType;
-            health.MaximumValue = type.BasicSkill.MaxHealth;
             Components.Add(health);
 
             FactionMembership factionMembership = new FactionMembership(this);

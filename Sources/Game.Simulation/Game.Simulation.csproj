@@ -73,6 +73,7 @@
     <Compile Include="Components\Attacker.cs" />
     <Compile Include="Components\Builder.cs" />
     <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\Constitution.cs" />
     <Compile Include="Components\Energy.cs" />
     <Compile Include="Components\FactionMembership.cs" />
     <Compile Include="Components\Harvester.cs" />

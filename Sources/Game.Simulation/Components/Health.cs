@@ -24,6 +24,7 @@ namespace Orion.Game.Simulation.Components
 
         #region Fields
         private int maximumValue = 1;
+        private Constitution constitution;
         private ArmorType armorType;
         private int threatLevel;
         private float regenerationRate;
@@ -53,6 +54,20 @@ namespace Orion.Game.Simulation.Components
         {
             get { return maximumValue; }
             set { maximumValue = value; }
+        }
+
+        /// <summary>
+        /// Accesses the <see cref="Constitution"/> of the <see cref="Entity"/>,
+        /// determining if it supports being repaired or healed.
+        /// </summary>
+        public Constitution Constitution
+        {
+            get { return constitution; }
+            set
+            {
+                Argument.EnsureDefined(value, "Constitution");
+                this.constitution = value;
+            }
         }
 
         [Mandatory]

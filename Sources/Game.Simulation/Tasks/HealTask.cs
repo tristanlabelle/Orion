@@ -20,20 +20,23 @@ namespace Orion.Game.Simulation.Tasks
         #endregion
 
         #region Constructors
-        public HealTask(Entity healer, Entity target)
-            : base(healer)
+        public HealTask(Entity entity, Entity target)
+            : base(entity)
         {
-            Argument.EnsureNotNull(healer, "unit");
+            Argument.EnsureNotNull(entity, "entity");
             Argument.EnsureNotNull(target, "target");
-            if (!healer.Components.Has<Healer>())
-                throw new ArgumentException("Cannot heal without the heal skill.", "unit");
-            if (target == healer)
-                throw new ArgumentException("A unit cannot heal itself.");
-            if (((Unit)target).IsBuilding)
-                throw new ArgumentException("Cannot heal buildings.", "target");
+            if (!entity.Components.Has<Healer>())
+                throw new ArgumentException("Cannot heal without the healer component.", "entity");
+            if (target == entity)
+                throw new ArgumentException("An entity cannot heal itself.", "entity");
+
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth == null) throw new ArgumentException("Cannot heal an entity without a health component.", "target");
+            if (targetHealth.Constitution == Constitution.Biological)
+                throw new ArgumentException("Cannot heal a non-biological entity.", "target");
 
             this.target = target;
-            if (healer.Components.Has<Move>()) this.follow = new FollowTask(healer, target);
+            if (entity.Components.Has<Move>()) this.follow = new FollowTask(entity, target);
         }
         #endregion
 
@@ -55,7 +58,8 @@ namespace Orion.Game.Simulation.Tasks
                 || healer == null
                 || faction == null
                 || !faction.CanSee(target)
-                || targetHealth == null)
+                || targetHealth == null
+                || targetHealth.Constitution != Constitution.Biological)
             {
                 MarkAsEnded();
                 return;

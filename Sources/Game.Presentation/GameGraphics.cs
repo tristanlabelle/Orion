@@ -156,7 +156,7 @@ namespace Orion.Game.Presentation
         public Texture GetUnitTexture(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
-            return GetUnitTexture(entity.Components.Get<Identity>().VisualIdentity);
+            return GetUnitTexture(entity.Identity.VisualIdentity);
         }
 
         /// <summary>

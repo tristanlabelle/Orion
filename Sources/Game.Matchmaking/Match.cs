@@ -177,7 +177,7 @@ namespace Orion.Game.Matchmaking
                 {
 #if DEBUG
                     Debug.Fail("Failed to retreive hero unit type {0} for unit type {1}."
-                        .FormatInvariant(upgrade.Target, unitType.Name));
+                        .FormatInvariant(upgrade.Target, unitType.Identity.Name));
 #endif
                     break;
                 }

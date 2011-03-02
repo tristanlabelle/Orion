@@ -87,7 +87,7 @@ namespace Orion.Game.Presentation.Audio
             Argument.EnsureNotNull(entity, "entity");
             Argument.EnsureNotNull(eventName, "eventName");
 
-            Identity identity = entity.Components.Get<Identity>();
+            Identity identity = entity.Identity;
 
             stringBuilder.Clear();
             stringBuilder.Append(identity.SoundIdentity);

@@ -229,7 +229,7 @@ namespace Orion.Game.Matchmaking
                 data.HarvesterCount = 0;
 
             var harvestTasks = Faction.Units
-                .Select(u => u.TaskQueue.FirstOrDefault() as HarvestTask)
+                .Select(u => u.Components.Get<TaskQueue>().FirstOrDefault() as HarvestTask)
                 .Where(t => t != null);
             foreach (HarvestTask harvestTask in harvestTasks)
             {
@@ -317,7 +317,8 @@ namespace Orion.Game.Matchmaking
         {
             if (unit.IsUnderConstruction) return;
 
-            if (unit.CanTrain(workerUnitType))
+            Trainer trainer = unit.Components.TryGet<Trainer>();
+            if (trainer.Supports(workerUnitType))
             {
                 var workerCost = GetCost(workerUnitType);
                 int workerToCreateCount = budget.GetQuotient(workerCost);

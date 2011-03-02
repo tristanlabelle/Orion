@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -7,14 +6,14 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
-using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Components;
 using FactionComponent = Orion.Game.Simulation.Components.FactionMembership;
 
 namespace Orion.Game.Simulation
 {
     /// <summary>
-    /// Abstract base class for game objects present in the game world.
+    /// Abstract base class for every entity in the game world,
+    /// including units, resource nodes, fauna, etc.
     /// </summary>
     [Serializable]
     public partial class Entity
@@ -80,12 +79,26 @@ namespace Orion.Game.Simulation
             get { return handle; }
         }
 
+        #region Components
         /// <summary>
-        /// Gets the collection of this <see cref="Entity"/>'s components.
+        /// Gets the collection of this <see cref="Entity">entity's</see> <see cref="Component">components</see>.
+        /// <see cref="Component">Components</see> are the building blocks of an <see cref="Entity">entity's</see> behaviour.
         /// </summary>
         public ComponentCollection Components
         {
             get { return components; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Identity"/> component of this <see cref="Entity"/>.
+        /// If there is none, returns <c>null</c>.
+        /// </summary>
+        /// <remarks>
+        /// This property is provided as a convenence because the identity component is often needed.
+        /// </remarks>
+        public Identity Identity
+        {
+            get { return Identity; }
         }
 
         /// <summary>
@@ -99,34 +112,16 @@ namespace Orion.Game.Simulation
         {
             get { return components.TryGet<Spatial>(); }
         }
+        #endregion
 
         #region Location/Size
         /// <summary>
         /// Gets the size of this <see cref="Entity"/>, in tiles.
         /// This value is garanteed to remain constant.
         /// </summary>
-#warning Temporary hack until components take over
-        public virtual Size Size
+        public Size Size
         {
             get { return Spatial.Size; }
-        }
-
-        /// <summary>
-        /// Gets the width of this <see cref="Entity"/>, in tiles.
-        /// This value is garantee to remain constant.
-        /// </summary>
-        public int Width
-        {
-            get { return Size.Width; }
-        }
-
-        /// <summary>
-        /// Gets the heigh tof this <see cref="Entity"/>, in tiles.
-        /// This value is garantee to remain constant.
-        /// </summary>
-        public int Height
-        {
-            get { return Size.Height; }
         }
 
         /// <summary>
@@ -134,7 +129,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public Vector2 Position
         {
-            get { return GetPosition(); }
+            get { return Spatial.Position; }
         }
 
         /// <summary>
@@ -151,14 +146,6 @@ namespace Orion.Game.Simulation
         public Rectangle BoundingRectangle
         {
             get { return new Rectangle(Position.X, Position.Y, Size.Width, Size.Height); }
-        }
-
-        /// <summary>
-        /// Gets the rectangle representing the part of this entity that can be collided with.
-        /// </summary>
-        public Rectangle CollisionRectangle
-        {
-            get { return GetCollisionRectangle(BoundingRectangle); }
         }
 
         /// <summary>
@@ -183,14 +170,29 @@ namespace Orion.Game.Simulation
         /// An entity is out of the world when it has died or when it is temporarily
         /// not interactible with (such as a unit being transported).
         /// </summary>
-        public virtual bool IsAliveInWorld
+        public bool IsAliveInWorld
         {
-            get { return IsAlive; }
+            get { return IsAlive && Components.Has<Move>(); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if heavier operations, such as detecting if there is an enemy
+        /// to attack within a range, can be performed during this frame.
+        /// This property is <c>true</c> every few frames, allowing to distribute computational work in time.
+        /// </summary>
+        public bool CanPerformHeavyOperation
+        {
+            get
+            {
+                const int frameDelta = 8;
+                // The value of the entity's handle is taken into account so that
+                // not all entities perform heavier operations on the same frame.
+                return (world.LastSimulationStep.Number + (int)handle.Value) % frameDelta == 0;
+            }
         }
         #endregion
 
         #region Methods
-        #region Components
         /// <summary>
         /// Gets the value of a given <see cref="Stat"/> for this <see cref="Entity"/>.
         /// </summary>
@@ -212,18 +214,6 @@ namespace Orion.Game.Simulation
             return sum;
         }
 
-        public Entity CloneIntoExistence(World world, Handle handle)
-        {
-            Entity clone = new Entity(world, handle);
-            foreach (Component component in Components)
-            {
-                Component componentCopy = component.Clone(clone);
-                clone.Components.Add(componentCopy);
-            }
-            return clone;
-        }
-        #endregion
-
         internal void RaiseWarning(string warning)
         {
             FactionMembership factionComponent = Components.TryGet<FactionComponent>();
@@ -231,39 +221,6 @@ namespace Orion.Game.Simulation
                 Debug.WriteLine(warning);
             else
                 factionComponent.Faction.RaiseWarning(warning);
-        }
-
-        public sealed override int GetHashCode()
-        {
-            return handle.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            // Write the faction name, if any
-            Faction faction = FactionMembership.GetFaction(this);
-            if (faction != null)
-            {
-                stringBuilder.Append(faction.Name);
-                stringBuilder.Append(' ');
-            }
-
-            // Write the stereotype name, or "Entity" if there's none
-            Identity identity = Components.TryGet<Identity>();
-            stringBuilder.Append(identity == null ? "Entity" : identity.Name);
-            stringBuilder.Append(' ');
-
-            // Write the handle value
-            stringBuilder.Append(handle);
-            stringBuilder.Append(": ");
-            
-            // Write the component names
-            foreach (string str in Components.Select(component => component.GetType().Name).Interleave(", "))
-                stringBuilder.Append(str);
-
-            return stringBuilder.ToString();
         }
 
         public void Die()
@@ -280,7 +237,14 @@ namespace Orion.Game.Simulation
 
         protected virtual void OnDied()
         {
+            TaskQueue taskQueue = Components.TryGet<TaskQueue>();
+            if (taskQueue != null) taskQueue.Clear();
+
             Died.Raise(this);
+
+            Faction faction = FactionMembership.GetFaction(this);
+            if (faction != null) faction.OnUnitDied((Unit)this);
+
             World.OnEntityDied(this);
         }
 
@@ -315,16 +279,42 @@ namespace Orion.Game.Simulation
 
             foreach (Component component in Components)
                 component.Update(step);
-
-            DoUpdate(step);
         }
 
-        protected virtual Vector2 GetPosition()
+        #region Object Model
+        public override int GetHashCode()
         {
-            return Components.Get<Spatial>().Position;
+            return handle.GetHashCode();
         }
 
-        protected virtual void DoUpdate(SimulationStep step) { }
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            // Write the faction name, if any
+            Faction faction = FactionMembership.GetFaction(this);
+            if (faction != null)
+            {
+                stringBuilder.Append(faction.Name);
+                stringBuilder.Append(' ');
+            }
+
+            // Write the stereotype name, or "Entity" if there's none
+            Identity identity = Identity;
+            stringBuilder.Append(identity == null ? "Entity" : identity.Name);
+            stringBuilder.Append(' ');
+
+            // Write the handle value
+            stringBuilder.Append(handle);
+            stringBuilder.Append(": ");
+            
+            // Write the component names
+            foreach (string str in Components.Select(component => component.GetType().Name).Interleave(", "))
+                stringBuilder.Append(str);
+
+            return stringBuilder.ToString();
+        }
+        #endregion
         #endregion
         #endregion
 
@@ -340,13 +330,6 @@ namespace Orion.Game.Simulation
         {
             Point min = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
             return new Region(min, size);
-        }
-
-        public static Rectangle GetCollisionRectangle(Rectangle boundingRectangle)
-        {
-            return Rectangle.FromCenterSize(
-                boundingRectangle.CenterX, boundingRectangle.CenterY,
-                boundingRectangle.Width - 0.2f, boundingRectangle.Height - 0.2f);
         }
         #endregion
         #endregion

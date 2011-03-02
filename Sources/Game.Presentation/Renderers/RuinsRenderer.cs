@@ -61,7 +61,7 @@ namespace Orion.Game.Presentation.Renderers
                 if (!faction.CanSee(gridRegion)) continue;
 
                 TimedExistence timeout = ruin.Components.Get<TimedExistence>();
-                Identity identity = ruin.Components.Get<Identity>();
+                Identity identity = ruin.Identity;
 
                 Faction ruinFaction = FactionMembership.GetFaction(ruin);
                 ColorRgb factionColor = faction == null ? Colors.White : faction.Color;

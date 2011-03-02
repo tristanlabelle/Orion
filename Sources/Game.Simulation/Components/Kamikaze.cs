@@ -70,20 +70,21 @@ namespace Orion.Game.Simulation.Components
         {
             Argument.EnsureNotNull(entity, "entity");
 
-            Identity entityIdentity = entity.Components.TryGet<Identity>();
+            Identity entityIdentity = entity.Identity;
             return entity != Entity
                 && entity.IsAliveInWorld
                 && entityIdentity != null
                 && targets.Contains(entityIdentity.Name);
         }
 
-        public bool TryExplodeWithNearbyTarget()
+        public override void Update(SimulationStep step)
         {
+            if (!Entity.CanPerformHeavyOperation) return;
+
             Spatial spatial = Entity.Spatial;
-            if (spatial == null) return false;
+            if (spatial == null) return;
 
             Rectangle broadPhaseIntersectionRectangle = Rectangle.FromCenterSize(spatial.Center, (Vector2)spatial.Size + Vector2.One * 2);
-
             foreach (Entity target in World.Entities.Intersecting(broadPhaseIntersectionRectangle))
             {
                 Spatial targetSpatial = target.Spatial;
@@ -95,16 +96,23 @@ namespace Orion.Game.Simulation.Components
                     continue;
                 }
 
-                float explosionRadius = (float)Entity.GetStatValue(Kamikaze.RadiusStat);
-                Circle explosionCircle = new Circle((spatial.Center + targetSpatial.Center) * 0.5f, explosionRadius);
-
-                target.Components.Get<Health>().Suicide();
-                Explode();
-
-                return true;
+                ExplodeWith(target);
+                return;
             }
+        }
 
-            return false;
+        private void ExplodeWith(Entity target)
+        {
+            Spatial spatial = Entity.Spatial;
+            Spatial targetSpatial = target.Spatial;
+
+            float explosionRadius = (float)Entity.GetStatValue(Kamikaze.RadiusStat);
+            Circle explosionCircle = new Circle((spatial.Center + targetSpatial.Center) * 0.5f, explosionRadius);
+
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth != null) targetHealth.Suicide();
+
+            Explode();
         }
 
         private void Explode()

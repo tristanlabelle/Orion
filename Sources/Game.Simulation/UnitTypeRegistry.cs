@@ -43,7 +43,7 @@ namespace Orion.Game.Simulation
         {
             Argument.EnsureNotNull(builder, "builder");
             Unit unitType = builder.Build(new Handle((uint)types.Count));
-            types.Add(unitType.Name, unitType);
+            types.Add(unitType.Identity.Name, unitType);
             return unitType;
         }
 

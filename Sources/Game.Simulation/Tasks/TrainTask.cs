@@ -75,7 +75,8 @@ namespace Orion.Game.Simulation.Tasks
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
-                    string warning = "Pas assez de nourriture pour entraîner un {0}".FormatInvariant(traineeType.Name);
+                    string warning = "Pas assez de nourriture pour entraîner un {0}"
+                        .FormatInvariant(traineeType.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
 
@@ -97,7 +98,8 @@ namespace Orion.Game.Simulation.Tasks
                 if (faction != null && !attemptingToPlaceUnit)
                 {
                     attemptingToPlaceUnit = true;
-                    string warning = "Pas de place pour faire apparaître un {0}".FormatInvariant(traineeType.Name);
+                    string warning = "Pas de place pour faire apparaître un {0}"
+                        .FormatInvariant(traineeType.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
                 return;

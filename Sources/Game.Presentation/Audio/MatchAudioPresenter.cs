@@ -110,7 +110,7 @@ namespace Orion.Game.Presentation.Audio
         {
             if (!isGameStarted) return;
 
-            Identity identity = entity.Components.TryGet<Identity>();
+            Identity identity = entity.Identity;
             if (identity.Name == "Chuck Norris")
             {
                 audio.PlayUISound("Chuck Norris.Spawn");

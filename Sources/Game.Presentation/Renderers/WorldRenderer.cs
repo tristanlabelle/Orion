@@ -7,6 +7,7 @@ using Orion.Game.Simulation;
 using Orion.Game.Simulation.Skills;
 using Orion.Game.Simulation.Tasks;
 using Orion.Game.Simulation.Components;
+using System.Collections.Generic;
 
 namespace Orion.Game.Presentation.Renderers
 {
@@ -124,19 +125,29 @@ namespace Orion.Game.Presentation.Renderers
 
         public void DrawBlueprints(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var plans = World.Entities
-                .OfType<Unit>()
-                .Where(u => u.Faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
-                    && u.Components.Has<Builder>())
-                .SelectMany(u => u.TaskQueue)
-                .OfType<BuildTask>()
-                .Select(t => t.BuildingPlan)
-                .Distinct();
+            HashSet<BuildingPlan> plans = new HashSet<BuildingPlan>();
+            foreach (Entity entity in World.Entities)
+            {
+                Faction faction = FactionMembership.GetFaction(entity);
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+                if (faction == null
+                    || !faction.GetDiplomaticStance(faction).HasFlag(DiplomaticStance.SharedVision)
+                    || taskQueue == null)
+                {
+                    continue;
+                }
+
+                foreach (Task task in taskQueue)
+                {
+                    BuildTask buildTask = task as BuildTask;
+                    if (buildTask != null) plans.Add(buildTask.Plan);
+                }
+            }
 
             ColorRgba tint = new ColorRgba(Colors.DarkBlue, 0.5f);
             foreach (BuildingPlan plan in plans)
             {
-                Texture buildingTexture = gameGraphics.GetUnitTexture(plan.BuildingType.Name);
+                Texture buildingTexture = gameGraphics.GetUnitTexture(plan.BuildingType.Identity.Name);
                 Rectangle buildingRectangle = plan.GridRegion.ToRectangle();
                 graphicsContext.Fill(buildingRectangle, buildingTexture, tint);
             }

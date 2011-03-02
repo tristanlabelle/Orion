@@ -205,7 +205,7 @@ namespace Orion.Game.Presentation.Actions
                 Unit traineeTypeForClosure = traineePrototype;
                 actions[point.X, point.Y] = new ActionDescriptor()
                 {
-                    Name = localizer.GetNoun(traineePrototype.Name),
+                    Name = localizer.GetNoun(traineePrototype.Identity.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
                     Texture = graphics.GetUnitTexture(traineePrototype),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)

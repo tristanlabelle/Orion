@@ -347,7 +347,7 @@ namespace Orion.Game.Simulation
             EntityDied.Raise(this, entity);
             entities.Remove(entity);
 
-            Identity identity = entity.Components.Get<Identity>();
+            Identity identity = entity.Identity;
             if (identity.LeavesRemains)
             {
                 CreateRuinsForEntity(entity);
@@ -361,7 +361,7 @@ namespace Orion.Game.Simulation
             identity.LeavesRemains = false;
             identity.IsSelectable = false;
             identity.Name = "Ruins";
-            identity.TrainType = entity.Components.Get<Identity>().TrainType;
+            identity.TrainType = entity.Identity.TrainType;
             ruins.Components.Add(identity);
 
             TimedExistence timeout = new TimedExistence(ruins);

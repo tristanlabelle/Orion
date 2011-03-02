@@ -61,7 +61,7 @@ namespace Orion.Game.Simulation.IO
                 List<UnitTemplate> units = new List<UnitTemplate>();
                 foreach (Unit unit in faction.Units)
                 {
-                    UnitTemplate template = new UnitTemplate(Point.Truncate(unit.Position), unit.Name);
+                    UnitTemplate template = new UnitTemplate(Point.Truncate(unit.Position), unit.Identity.Name);
                     units.Add(template);
                 }
                 unitsByFaction.Add(units);

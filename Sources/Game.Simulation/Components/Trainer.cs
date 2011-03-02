@@ -66,7 +66,7 @@ namespace Orion.Game.Simulation.Components
         public bool Supports(Entity prototype)
         {
             Argument.EnsureNotNull(prototype, "prototype");
-            return trainableTypes.Contains(prototype.Components.Get<Identity>().Name);
+            return trainableTypes.Contains(prototype.Identity.Name);
         }
         #endregion
     }

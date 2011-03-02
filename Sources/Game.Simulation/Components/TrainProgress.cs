@@ -73,7 +73,7 @@ namespace Orion.Game.Simulation.Components
             timeSpent += time;
 
             Debug.Assert(Entity.Components.Has<Health>(), "Entity doesn't have a Health component!");
-            Identity identity = Entity.Components.Get<Identity>();
+            Identity identity = Entity.Identity;
             Health health = Entity.Components.Get<Health>();
             Health finalHealth = identity.Prototype.Components.Get<Health>();
 

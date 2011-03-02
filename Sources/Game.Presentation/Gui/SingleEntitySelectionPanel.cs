@@ -101,8 +101,8 @@ namespace Orion.Game.Presentation.Gui
             if (unit == entity) return;
             Clear();
 
-            nameLabel.Text = localizer.GetNoun(unit.Name);
-            imageBox.Texture = graphics.GetUnitTexture(unit.Name);
+            nameLabel.Text = localizer.GetNoun(unit.Identity.Name);
+            imageBox.Texture = graphics.GetUnitTexture(unit.Identity.Name);
 
             UpdateHealth(unit);
             Health health = unit.Components.Get<Health>();
@@ -111,8 +111,10 @@ namespace Orion.Game.Presentation.Gui
             if (showTasks)
             {
                 todoLabel.VisibilityFlag = Visibility.Visible;
-                UpdateTodoList(unit.TaskQueue);
-                unit.TaskQueue.Changed += taskQueueChangedEventHandler;
+
+                TaskQueue taskQueue = unit.Components.Get<TaskQueue>();
+                UpdateTodoList(taskQueue);
+                taskQueue.Changed += taskQueueChangedEventHandler;
             }
 
             statsForm.VisibilityFlag = Visibility.Visible;
@@ -174,7 +176,9 @@ namespace Orion.Game.Presentation.Gui
 
                 Health health = unit.Components.Get<Health>();
                 health.DamageChanged -= damageChangedEventHandler;
-                unit.TaskQueue.Changed -= taskQueueChangedEventHandler;
+
+                TaskQueue taskQueue = unit.Components.Get<TaskQueue>();
+                taskQueue.Changed -= taskQueueChangedEventHandler;
             }
             else if (entity.Components.Has<Harvestable>())
             {

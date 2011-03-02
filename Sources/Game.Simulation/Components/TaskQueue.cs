@@ -113,24 +113,33 @@ namespace Orion.Game.Simulation.Components
         /// <param name="info">Information on the update.</param>
         public override void Update(SimulationStep step)
         {
-            if (IsEmpty) return;
-            Debug.Assert(tasks.Count == taskIDs.Count,
-                "The task ID dictionary was not kept synched to the task list.");
-
-            Task task = Current;
-            task.Update(step);
-            if (task.HasEnded)
+            if (IsEmpty)
             {
-                task.Dispose();
-
-                // As the task could involve modifying the task queue,
-                // it cannot be assumed that the task is still the first one.
-                if (tasks.Count > 0 && tasks[0] == task)
+                if (Entity.CanPerformHeavyOperation)
                 {
-                    tasks.RemoveAt(0);
-                    taskIDs.RemoveByKey(task);
+                    Task task = FindOccupation();
+                    if (task != null) Enqueue(task);
+                }
 
-                    Changed.Raise(this);
+                return;
+            }
+            else
+            {
+                Task task = Current;
+                task.Update(step);
+                if (task.HasEnded)
+                {
+                    task.Dispose();
+
+                    // As the task could involve modifying the task queue,
+                    // it cannot be assumed that the task is still the first one.
+                    if (tasks.Count > 0 && tasks[0] == task)
+                    {
+                        tasks.RemoveAt(0);
+                        taskIDs.RemoveByKey(task);
+
+                        Changed.Raise(this);
+                    }
                 }
             }
         }
@@ -225,6 +234,32 @@ namespace Orion.Game.Simulation.Components
             taskIDs.Clear();
 
             Changed.Raise(this);
+        }
+
+        private Task FindOccupation()
+        {
+            Builder builder = Entity.Components.TryGet<Builder>();
+            if (builder != null)
+            {
+                Entity target = builder.FindVisibleRepairTarget();
+                if (target != null) return new RepairTask(Entity, target);
+            }
+
+            Healer healer = Entity.Components.TryGet<Healer>();
+            if (healer != null)
+            {
+                Entity target = healer.FindVisibleTarget();
+                if (target != null) return new HealTask(Entity, target);
+            }
+
+            Attacker attacker = Entity.Components.TryGet<Attacker>();
+            if (attacker != null && builder == null && !Unit.IsUnderConstruction)
+            {
+                Entity target = attacker.FindVisibleTarget();
+                if (target != null) return new AttackTask(Entity, target);
+            }
+
+            return null;
         }
         #endregion
 

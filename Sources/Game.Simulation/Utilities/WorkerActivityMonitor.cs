@@ -83,9 +83,11 @@ namespace Orion.Game.Simulation.Utilities
         #region Methods
         private void AddWorker(Unit worker)
         {
-            HashSet<Unit> pool = worker.TaskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
+            TaskQueue taskQueue = worker.Components.Get<TaskQueue>();
+
+            HashSet<Unit> pool = taskQueue.IsEmpty ? inactiveWorkers : activeWorkers;
             pool.Add(worker);
-            worker.Components.Get<TaskQueue>().Changed += workerTaskQueueChangedEventHandler;
+            taskQueue.Changed += workerTaskQueueChangedEventHandler;
         }
 
         private void OnEntityAdded(World sender, Entity entity)

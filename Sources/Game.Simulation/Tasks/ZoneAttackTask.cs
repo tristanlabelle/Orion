@@ -54,7 +54,7 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            if (attack == null && ((Unit)Entity).CanPerformProximityChecks(step))
+            if (attack == null && Entity.CanPerformHeavyOperation)
             {
                 bool isRanged = attacker.IsRanged;
 

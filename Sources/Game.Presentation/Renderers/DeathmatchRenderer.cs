@@ -123,10 +123,7 @@ namespace Orion.Game.Presentation.Renderers
         #region Chuck Norris
         private void OnEntityAdded(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            if (unit.Name == "Chuck Norris")
+            if (entity.Identity.Name == "ChuckNorris")
                 shakingSecondsLeft = shakingDuration;
         }
 

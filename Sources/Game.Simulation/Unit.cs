@@ -24,12 +24,6 @@ namespace Orion.Game.Simulation
     {
         #region Fields
         /// <summary>
-        /// The number of frames between successive proximity checks.
-        /// Used as an optimization.
-        /// </summary>
-        private const int nearbyEnemyCheckPeriod = 8;
-
-        /// <summary>
         /// The amount of health that has been built.
         /// A value of <see cref="float.NaN"/> indicates that the construction has completed.
         /// </summary>
@@ -244,10 +238,10 @@ namespace Orion.Game.Simulation
             {
                 Argument.EnsureNotNull(value, "Type");
 
-                Identity newTypeIdentity = value.Components.Get<Identity>();
+                Identity newTypeIdentity = value.Identity;
 
-                Identity identity = Components.Get<Identity>();
-                identity.Name = value.Name;
+                Identity identity = Identity;
+                identity.Name = newTypeIdentity.Name;
                 identity.VisualIdentity = newTypeIdentity.VisualIdentity;
                 identity.SoundIdentity = newTypeIdentity.SoundIdentity;
 
@@ -259,11 +253,6 @@ namespace Orion.Game.Simulation
             }
         }
 
-        public string Name
-        {
-            get { return Components.Get<Identity>().Name; }
-        }
-
         public bool IsBuilding
         {
             get { return !Components.Has<Move>(); }
@@ -271,30 +260,12 @@ namespace Orion.Game.Simulation
 
         public ICollection<UnitTypeUpgrade> Upgrades
         {
-            get { return Components.Get<Identity>().Upgrades; }
-        }
-        #endregion
-
-        #region Spatial Component
-        public override Size Size
-        {
-            get { return Components.Get<Spatial>().Size; }
-        }
-
-        public new Vector2 Position
-        {
-            get { return Components.Get<Spatial>().Position; }
-            set { Components.Get<Spatial>().Position = value; }
+            get { return Identity.Upgrades; }
         }
         #endregion
         #endregion
 
         #region World & Faction
-        public override bool IsAliveInWorld
-        {
-            get { return IsAlive; }
-        }
-
         /// <summary>
         /// Accesses the <see cref="Faction"/> which this <see cref="Entity"/> is a member of.
         /// </summary>
@@ -350,14 +321,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Tasks
-        /// <summary>
-        /// Gets the queue of this unit's tasks.
-        /// </summary>
-        public TaskQueue TaskQueue
-        {
-            get { return Components.Get<TaskQueue>(); }
-        }
-
         /// <summary>
         /// Accesses the time elapsed since this <see cref="Entity"/> last hit something, in seconds.
         /// </summary>
@@ -426,7 +389,6 @@ namespace Orion.Game.Simulation
             return componentValue;
         }
 
-        #region Can*** Testing
         public bool CanBuild(Unit buildingType)
         {
             Argument.EnsureNotNull(buildingType, "buildingType");
@@ -435,24 +397,6 @@ namespace Orion.Game.Simulation
             return buildingType.IsBuilding
                 && builder != null
                 && builder.Supports(buildingType);
-        }
-
-        public bool CanTrain(Unit unitType)
-        {
-            Argument.EnsureNotNull(unitType, "unitType");
-
-            Trainer trainer = Components.TryGet<Trainer>();
-            return !unitType.IsBuilding
-                && trainer != null
-                && trainer.Supports(unitType);
-        }
-        #endregion
-        #endregion
-
-        #region Position/Angle
-        protected override Vector2 GetPosition()
-        {
-            return Position;
         }
         #endregion
 
@@ -499,76 +443,6 @@ namespace Orion.Game.Simulation
             healthBuilt = float.NaN;
             ConstructionCompleted.Raise(this);
             Faction.OnBuildingConstructionCompleted(this);
-        }
-        #endregion
-
-        #region Dying
-        protected override void OnDied()
-        {
-            TaskQueue.Clear();
-            base.OnDied();
-            Faction.OnUnitDied(this);
-        }
-        #endregion
-
-        #region Updating
-        protected override void DoUpdate(SimulationStep step)
-        {
-            // OPTIM: As checking for nearby units takes a lot of processor time,
-            // we only do it once every few frames. We take our handle value
-            // so the units do not make their checks all at once.
-            if (CanPerformProximityChecks(step) && TaskQueue.HasEmpty(this))
-            {
-                Kamikaze kamikaze = Components.TryGet<Kamikaze>();
-                if (kamikaze != null && kamikaze.TryExplodeWithNearbyTarget())
-                    return;
-
-                if (Components.Has<Builder>() && TryRepairNearbyUnit()) { }
-                else if (Components.Has<Healer>() && TryHealNearbyUnit()) { }
-                else if (!IsUnderConstruction && Components.Has<Attacker>() && !Components.Has<Builder>()
-                    && TryAttackNearbyUnit()) { }
-            }
-        }
-
-        /// <summary>
-        /// Tests if a frame is one in which this unit can perform proximity tests.
-        /// This is used to limit the number of such operations and distribute them in time.
-        /// </summary>
-        /// <param name="step">The current simulation step.</param>
-        /// <returns>A value indicating if proximity checks can be performed.</returns>
-        internal bool CanPerformProximityChecks(SimulationStep step)
-        {
-            return (step.Number + (int)Handle.Value) % nearbyEnemyCheckPeriod == 0;
-        }
-
-        private bool TryAttackNearbyUnit()
-        {
-            Entity target = Components.Get<Attacker>().FindVisibleTarget();
-            if (target == null) return false;
-        
-            AttackTask attackTask = new AttackTask(this, target);
-            TaskQueue.Enqueue(attackTask);
-            return true;
-        }
-
-        private bool TryHealNearbyUnit()
-        {
-            Entity target = Components.Get<Healer>().FindVisibleTarget();
-            if (target == null) return false;
-
-            HealTask healTask = new HealTask(this, target);
-            TaskQueue.OverrideWith(healTask);
-            return true;
-        }
-
-        private bool TryRepairNearbyUnit()
-        {
-            Entity target = Components.Get<Builder>().FindVisibleRepairTarget();
-            if (target == null) return false;
-
-            RepairTask repairTask = new RepairTask(this, target);
-            TaskQueue.OverrideWith(repairTask);
-            return true;
         }
         #endregion
         #endregion

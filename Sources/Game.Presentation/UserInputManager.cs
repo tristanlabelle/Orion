@@ -475,13 +475,18 @@ namespace Orion.Game.Presentation
 
         public void LaunchTrain(Unit unitType)
         {
-            IEnumerable<Unit> trainers = Selection.Units
-                .Where(unit => IsUnitControllable(unit)
-                    && !unit.IsUnderConstruction
-                    && unit.CanTrain(unitType));
+            IEnumerable<Unit> targets = Selection.Units
+                .Where(unit =>
+                {
+                    Trainer trainer = unit.Components.TryGet<Trainer>();
+                    return IsUnitControllable(unit)
+                        && !unit.IsUnderConstruction
+                        && trainer != null
+                        && trainer.Supports(unitType);
+                });
 
             OverrideIfNecessary();
-            commander.LaunchTrain(trainers, unitType);
+            commander.LaunchTrain(targets, unitType);
         }
 
         public void LaunchResearch(Technology technology)
@@ -576,7 +581,7 @@ namespace Orion.Game.Presentation
             Argument.EnsureNotNull(targetType, "targetType");
 
             var targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Upgrades.Any(upgrade => upgrade.Target == targetType.Name));
+                .Where(unit => unit.Faction == LocalFaction && unit.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name));
             commander.LaunchUpgrade(targetUnits, targetType);
         }
         #endregion

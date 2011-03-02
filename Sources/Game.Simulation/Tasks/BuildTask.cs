@@ -15,38 +15,38 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class BuildTask : Task
     {
         #region Fields
-        private readonly BuildingPlan buildingPlan;
+        private readonly BuildingPlan plan;
         private MoveTask move;
         #endregion
 
         #region Constructors
-        public BuildTask(Entity buildingUnit, BuildingPlan buildingPlan)
-            : base(buildingUnit)
+        public BuildTask(Entity entity, BuildingPlan plan)
+            : base(entity)
         {
-            Argument.EnsureNotNull(buildingUnit, "builder");
-            Argument.EnsureNotNull(buildingPlan, "buildingPlan");
+            Argument.EnsureNotNull(entity, "entity");
+            Argument.EnsureNotNull(plan, "plan");
 
-            Builder builder = buildingUnit.Components.TryGet<Builder>();
-            if (builder == null || !builder.Supports(buildingPlan.BuildingType))
+            Builder builder = entity.Components.TryGet<Builder>();
+            if (builder == null || !builder.Supports(plan.BuildingType))
             {
-                throw new ArgumentException("Builder {0} cannot build {1}."
-                    .FormatInvariant(buildingUnit, buildingPlan.BuildingType));
+                throw new ArgumentException("{0} cannot build {1}."
+                    .FormatInvariant(entity, plan.BuildingType));
             }
 
-            this.buildingPlan = buildingPlan;
-            this.move = MoveTask.ToNearRegion(buildingUnit, buildingPlan.GridRegion);
+            this.plan = plan;
+            this.move = MoveTask.ToNearRegion(entity, plan.GridRegion);
         }
         #endregion
 
         #region Properties
         public override string Description
         {
-            get { return "Building {0}".FormatInvariant(buildingPlan.BuildingType); }
+            get { return "Building {0}".FormatInvariant(plan.BuildingType); }
         }
 
-        public BuildingPlan BuildingPlan
+        public BuildingPlan Plan
         {
-            get { return buildingPlan; }
+            get { return plan; }
         }
         #endregion
 
@@ -70,38 +70,39 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             // Test if we're in the building's surrounding area
-            if (!Region.AreAdjacentOrIntersecting(buildingPlan.GridRegion, spatial.GridRegion))
+            if (!Region.AreAdjacentOrIntersecting(plan.GridRegion, spatial.GridRegion))
             {
                 MarkAsEnded();
                 return;
             }
 
-            if (buildingPlan.IsBuildingCreated)
+            if (plan.IsBuildingCreated)
             {
-                if (buildingPlan.Building.Health < buildingPlan.Building.MaxHealth && TaskQueue.Count == 1)
-                    TaskQueue.OverrideWith(new RepairTask(Entity, buildingPlan.Building));
+                if (plan.Building.Health < plan.Building.MaxHealth && TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new RepairTask(Entity, plan.Building));
                 MarkAsEnded();
                 return;
             }
 
-            CollisionLayer layer = buildingPlan.BuildingType.Spatial.CollisionLayer;
-            if (!World.IsFree(buildingPlan.GridRegion, layer))
+            CollisionLayer layer = plan.BuildingType.Spatial.CollisionLayer;
+            if (!World.IsFree(plan.GridRegion, layer))
             {
-                string warning = "Pas de place pour construire le bâtiment {0}".FormatInvariant(buildingPlan.BuildingType.Name);
+                string warning = "Pas de place pour construire le bâtiment {0}"
+                    .FormatInvariant(plan.BuildingType.Identity.Name);
                 faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
             }
 
-            int aladdiumCost = faction.GetStat(buildingPlan.BuildingType, BasicSkill.AladdiumCostStat);
-            int alageneCost = faction.GetStat(buildingPlan.BuildingType, BasicSkill.AlageneCostStat);
+            int aladdiumCost = faction.GetStat(plan.BuildingType, BasicSkill.AladdiumCostStat);
+            int alageneCost = faction.GetStat(plan.BuildingType, BasicSkill.AlageneCostStat);
             bool hasEnoughResources = faction.AladdiumAmount >= aladdiumCost
                 && faction.AlageneAmount >= alageneCost;
 
             if (!hasEnoughResources)
             {
                 string warning = "Pas assez de ressources pour construire le bâtiment {0}"
-                    .FormatInvariant(buildingPlan.BuildingType.Name);
+                    .FormatInvariant(plan.BuildingType.Identity.Name);
                 faction.RaiseWarning(warning);
                 MarkAsEnded();
                 return;
@@ -110,9 +111,9 @@ namespace Orion.Game.Simulation.Tasks
             faction.AladdiumAmount -= aladdiumCost;
             faction.AlageneAmount -= alageneCost;
 
-            buildingPlan.CreateBuilding();
+            plan.CreateBuilding();
 
-            TaskQueue.ReplaceWith(new RepairTask(Entity, buildingPlan.Building));
+            TaskQueue.ReplaceWith(new RepairTask(Entity, plan.Building));
             MarkAsEnded();
         }
         #endregion

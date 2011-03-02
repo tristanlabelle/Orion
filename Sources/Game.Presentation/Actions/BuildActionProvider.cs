@@ -98,7 +98,7 @@ namespace Orion.Game.Presentation.Actions
             
             return new ActionDescriptor()
             {
-                Name = localizer.GetNoun(buildingType.Name),
+                Name = localizer.GetNoun(buildingType.Identity.Name),
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
                 Texture = graphics.GetUnitTexture(buildingType),
                 Action = () =>

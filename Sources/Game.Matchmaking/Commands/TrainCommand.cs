@@ -98,14 +98,14 @@ namespace Orion.Game.Matchmaking.Commands
                     if (alageneCost > faction.AlageneAmount || aladdiumCost > faction.AladdiumAmount)
                     {
                         faction.RaiseWarning("Pas assez de ressources pour entraîner un {0}."
-                            .FormatInvariant(traineeType.Name));
+                            .FormatInvariant(traineeType.Identity.Name));
                         return;
                     }
 
                     if (foodCost > faction.RemainingFoodAmount)
                     {
                         faction.RaiseWarning("Pas assez de nourriture pour entraîner un {0}."
-                            .FormatInvariant(traineeType.Name));
+                            .FormatInvariant(traineeType.Identity.Name));
                         return;
                     }
 

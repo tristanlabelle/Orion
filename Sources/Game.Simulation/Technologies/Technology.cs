@@ -86,7 +86,7 @@ namespace Orion.Game.Simulation.Technologies
         public bool AppliesTo(Unit unitType)
         {
             Argument.EnsureNotNull(unitType, "unitType");
-            return targets.Contains(unitType.Name);
+            return targets.Contains(unitType.Identity.Name);
         }
 
         public int GetEffect(Unit unitType, UnitStat stat)

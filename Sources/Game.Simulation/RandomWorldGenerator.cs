@@ -6,6 +6,7 @@ using Orion.Game.Simulation;
 using Orion.Engine.Collections;
 using Orion.Engine;
 using OpenTK;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation
 {
@@ -170,7 +171,7 @@ namespace Orion.Game.Simulation
             if (placePyramid)
             {
                 Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
-                building.CompleteConstruction();
+                building.Components.Get<BuildProgress>().Complete();
                 buildingRegion = building.GridRegion;
             }
             else

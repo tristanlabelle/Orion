@@ -99,8 +99,7 @@
     <Compile Include="Components\Tags.cs" />
     <Compile Include="Components\TimedExistence.cs" />
     <Compile Include="Components\Trainer.cs" />
-    <Compile Include="Components\TrainProgress.cs" />
-    <Compile Include="Components\TrainProgressType.cs" />
+    <Compile Include="Components\BuildProgress.cs" />
     <Compile Include="Components\Transporter.cs" />
     <Compile Include="Components\Vision.cs" />
     <Compile Include="Entity.ComponentCollection.cs" />

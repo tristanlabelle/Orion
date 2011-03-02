@@ -19,7 +19,6 @@ namespace Orion.Game.Simulation.Tasks
 
         private readonly Unit target;
         private readonly MoveTask move;
-        private readonly bool building;
         
         /// <summary>
         /// Remaining amount of aladdium that has been taken from the <see cref="Faction"/>'s coffers
@@ -42,12 +41,11 @@ namespace Orion.Game.Simulation.Tasks
 
             Health targetHealth = target.Components.TryGet<Health>();
             if (targetHealth == null) throw new ArgumentException("Cannot heal an entity without a health component.", "target");
-            if (targetHealth.Constitution == Constitution.Mechanical)
+            if (targetHealth.Constitution != Constitution.Mechanical)
                 throw new ArgumentException("Cannot repair a non-mechanical entity.", "target");
 
             this.target = (Unit)target;
             this.move = MoveTask.ToNearRegion(entity, target.GridRegion);
-            this.building = this.target.IsUnderConstruction;
         }
         #endregion
 
@@ -92,34 +90,15 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             spatial.LookAt(target.Center);
-            if (building) UpdateBuild(step);
-            else UpdateRepair(step);
-        }
 
-        private void UpdateBuild(SimulationStep step)
-        {
-            if (target.IsUnderConstruction)
+            BuildProgress buildProgress = target.Components.TryGet<BuildProgress>();
+            if (buildProgress == null)
             {
-                target.Build((float)Entity.GetStatValue(Builder.SpeedStat) * step.TimeDeltaInSeconds);
+                UpdateRepair(step);
             }
-
-            if (!target.IsUnderConstruction)
+            else
             {
-                // If we just built an alagene extractor, start harvesting.
-                if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
-                {
-                    // Smells like a hack!
-                    Entity node = World.Entities
-                        .Intersecting(target.BoundingRectangle)
-                        .Where(e => e.Components.Has<Harvestable>())
-                        .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
-                        .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
-
-                    if (TaskQueue.Count == 1)
-                        TaskQueue.OverrideWith(new HarvestTask(Entity, node));
-                }
-
-                MarkAsEnded();
+                buildProgress.SpendTime((float)Entity.GetStatValue(Builder.SpeedStat) * step.TimeDeltaInSeconds);
             }
         }
 
@@ -153,7 +132,23 @@ namespace Orion.Game.Simulation.Tasks
             aladdiumCreditRemaining -= frameAladdiumCost;
             alageneCreditRemaining -= frameAlageneCost;
 
-            if (target.Damage < 0.001f) MarkAsEnded();
+            if (target.Damage >= 0.001f) return;
+
+            // If we just built an alagene extractor, start harvesting.
+            if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())
+            {
+                // Smells like a hack!
+                Entity node = World.Entities
+                    .Intersecting(target.BoundingRectangle)
+                    .Where(e => e.Components.Has<Harvestable>())
+                    .Where(e => !e.Components.Get<Harvestable>().IsEmpty)
+                    .First(n => Region.Intersects(n.GridRegion, target.GridRegion));
+
+                if (TaskQueue.Count == 1)
+                    TaskQueue.OverrideWith(new HarvestTask(Entity, node));
+            }
+
+            MarkAsEnded();
         }
 
         private bool TryGetCredit()

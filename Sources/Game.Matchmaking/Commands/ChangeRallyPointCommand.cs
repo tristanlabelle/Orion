@@ -56,9 +56,9 @@ namespace Orion.Game.Matchmaking.Commands
 
             foreach (Handle buildingHandle in buildingHandles)
             {
-                Unit building = (Unit)match.World.Entities.FromHandle(buildingHandle);
-                if (!building.IsUnderConstruction)
-                    building.Components.Get<Trainer>().RallyPoint = position;
+                Entity entity = match.World.Entities.FromHandle(buildingHandle);
+                Trainer trainer = entity.Components.TryGet<Trainer>();
+                if (trainer != null) trainer.RallyPoint = position;
             }
         }
 

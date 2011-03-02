@@ -404,7 +404,7 @@ namespace Orion.Game.Simulation
             UsedFoodAmount -= GetStat(oldType, BasicSkill.FoodCostStat);
             UsedFoodAmount += GetStat(newType, BasicSkill.FoodCostStat);
 
-            if (unit.IsUnderConstruction)
+            if (unit.Components.Has<BuildProgress>())
             {
                 Region oldRegion = Entity.GetGridRegion(unit.Position, oldType.Size);
                 Region newRegion = Entity.GetGridRegion(unit.Position, newType.Size);
@@ -442,7 +442,7 @@ namespace Orion.Game.Simulation
         {
             if (FactionMembership.GetFaction(entity) != this) return;
 
-            if (((Unit)entity).IsUnderConstruction)
+            if (entity.Components.Has<BuildProgress>())
             {
                 localFogOfWar.RemoveRegion(entity.Spatial.GridRegion);
             }
@@ -459,7 +459,7 @@ namespace Orion.Game.Simulation
             if (FactionMembership.GetFaction(entity) != this) return;
 
             Unit unit = (Unit)entity;
-            if (unit.IsBuilding && unit.IsUnderConstruction)
+            if (unit.IsBuilding && unit.Components.Has<BuildProgress>())
                 localFogOfWar.AddRegion(entity.Spatial.GridRegion);
             else
                 localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
@@ -493,7 +493,7 @@ namespace Orion.Game.Simulation
             Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
             return extractor != null
                 && extractor.Components.Has<AlageneExtractor>()
-                && !extractor.IsUnderConstruction
+                && !extractor.Components.Has<BuildProgress>()
                 && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
         }
         #endregion

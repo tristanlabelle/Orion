@@ -480,7 +480,7 @@ namespace Orion.Game.Presentation
                 {
                     Trainer trainer = unit.Components.TryGet<Trainer>();
                     return IsUnitControllable(unit)
-                        && !unit.IsUnderConstruction
+                        && unit.Components.Has<TaskQueue>()
                         && trainer != null
                         && trainer.Supports(unitType);
                 });
@@ -495,7 +495,6 @@ namespace Orion.Game.Presentation
             {
                 Researcher researcher = unit.Components.TryGet<Researcher>();
                 if (unit.Faction != commander.Faction
-                    || unit.IsUnderConstruction
                     || !unit.Components.Has<TaskQueue>()
                     || researcher == null
                     || !researcher.Supports(technology))

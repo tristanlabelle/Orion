@@ -8,6 +8,7 @@ using Orion.Engine.Collections;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Components;
 using FactionComponent = Orion.Game.Simulation.Components.FactionMembership;
+using System.Collections.Generic;
 
 namespace Orion.Game.Simulation
 {
@@ -98,7 +99,7 @@ namespace Orion.Game.Simulation
         /// </remarks>
         public Identity Identity
         {
-            get { return Identity; }
+            get { return Components.TryGet<Identity>(); }
         }
 
         /// <summary>
@@ -172,7 +173,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public bool IsAliveInWorld
         {
-            get { return IsAlive && Components.Has<Move>(); }
+            get { return IsAlive && Components.Has<Spatial>(); }
         }
 
         /// <summary>
@@ -277,8 +278,24 @@ namespace Orion.Game.Simulation
                 return;
             }
 
-            foreach (Component component in Components)
-                component.Update(step);
+            // Components are copied to a temporary buffer before being updated
+            // so any modifications to the component collection while iterating
+            // does not raise collection modification during iteration exceptions.
+            if (tempComponents == null) tempComponents = new List<Component>();
+            else tempComponents.Clear();
+
+            foreach (Component component in components)
+                tempComponents.Add(component);
+
+            try
+            {
+                foreach (Component component in tempComponents)
+                    component.Update(step);
+            }
+            finally
+            {
+                tempComponents.Clear();
+            }
         }
 
         #region Object Model
@@ -320,6 +337,9 @@ namespace Orion.Game.Simulation
 
         #region Static
         #region Methods
+        [ThreadStatic]
+        private static List<Component> tempComponents;
+
         /// <summary>
         /// The maximum size (in width or height) of entities.
         /// This limitation exists to optimize the EntityZoneManager.

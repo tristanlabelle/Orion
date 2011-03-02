@@ -23,12 +23,6 @@ namespace Orion.Game.Simulation
     public sealed class Unit : Entity
     {
         #region Fields
-        /// <summary>
-        /// The amount of health that has been built.
-        /// A value of <see cref="float.NaN"/> indicates that the construction has completed.
-        /// </summary>
-        private float healthBuilt = float.NaN;
-
         private Dictionary<Type, UnitSkill> skills;
         #endregion
 
@@ -84,7 +78,17 @@ namespace Orion.Game.Simulation
             }
             Components.Add(factionMembership);
 
-            Components.Add(new TaskQueue(this));
+            bool isBuilding = !InternalHasSkill<MoveSkill>();
+            if (isBuilding)
+            {
+                BuildProgress buildProgress = new BuildProgress(this);
+                buildProgress.RequiredTime = health.MaximumValue;
+                Components.Add(buildProgress);
+            }
+            else
+            {
+                Components.Add(new TaskQueue(this));
+            }
 
             // Optional components
             if (InternalHasSkill<MoveSkill>())
@@ -210,12 +214,6 @@ namespace Orion.Game.Simulation
             Components.Get<FactionMembership>().Faction = faction;
             Trainer trainer = Components.TryGet<Trainer>();
             if (trainer != null) trainer.RallyPoint = Center;
-
-            if (IsBuilding)
-            {
-                Health = 1;
-                healthBuilt = 1;
-            }
         }
         #endregion
 
@@ -301,22 +299,6 @@ namespace Orion.Game.Simulation
         {
             get { return MaxHealth - Damage; }
             set { Damage = MaxHealth - value; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating if this unit is under construction.
-        /// </summary>
-        public bool IsUnderConstruction
-        {
-            get { return !float.IsNaN(healthBuilt); }
-        }
-
-        /// <summary>
-        /// Gets the progress of the construction as a value from zero to one.
-        /// </summary>
-        public float ConstructionProgress
-        {
-            get { return IsUnderConstruction ? Math.Min(healthBuilt / MaxHealth, 1) : 1; }
         }
         #endregion
 
@@ -410,37 +392,8 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Building
-        public void Build(float amount)
+        internal void OnConstructionCompleted()
         {
-            Argument.EnsurePositive(amount, "amount");
-
-            if (!IsUnderConstruction)
-            {
-                Debug.Fail("Cannot build a building not under construction.");
-                return;
-            }
-
-            Health += amount;
-            healthBuilt += amount;
-            if (healthBuilt >= MaxHealth) OnConstructionCompleted();
-        }
-
-        public void CompleteConstruction()
-        {
-            if (!IsUnderConstruction)
-            {
-                Debug.Fail("Cannot complete the construction of a building not under construction.");
-                return;
-            }
-
-            Health = MaxHealth;
-            OnConstructionCompleted();
-        }
-
-        private void OnConstructionCompleted()
-        {
-            Debug.Assert(IsUnderConstruction);
-            healthBuilt = float.NaN;
             ConstructionCompleted.Raise(this);
             Faction.OnBuildingConstructionCompleted(this);
         }

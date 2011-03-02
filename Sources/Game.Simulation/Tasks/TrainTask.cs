@@ -30,8 +30,6 @@ namespace Orion.Game.Simulation.Tasks
             Argument.EnsureNotNull(trainer, "trainer");
             Argument.EnsureNotNull(traineeType, "traineeType");
             Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
-            if (((Unit)trainer).IsUnderConstruction)
-                throw new ArgumentException("Cannot train with an building under construction");
 
             this.traineeType = traineeType;
         }

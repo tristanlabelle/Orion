@@ -176,7 +176,7 @@ namespace Orion.Game.Presentation.Renderers
 
             if (unit.IsBuilding)
             {
-                if (unit.IsUnderConstruction)
+                if (unit.Components.Has<BuildProgress>())
                 {
                     graphics.Fill(unit.BoundingRectangle, UnderConstructionTexture, Colors.White);
                 }

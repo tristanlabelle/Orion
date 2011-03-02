@@ -194,8 +194,9 @@ namespace Orion.Game.Simulation.Tasks
 
         private Unit FindClosestDepot()
         {
+#warning The resource depot component should not be present while the build is in progress
             return FactionMembership.GetFaction(Entity).Units
-                .Where(other => !other.IsUnderConstruction && other.Components.Has<ResourceDepot>())
+                .Where(other => !other.Components.Has<BuildProgress>() && other.Components.Has<ResourceDepot>())
                 .WithMinOrDefault(storage => Region.SquaredDistance(storage.GridRegion, Entity.Spatial.GridRegion));
         }
         #endregion

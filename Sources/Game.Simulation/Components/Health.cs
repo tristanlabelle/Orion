@@ -98,11 +98,9 @@ namespace Orion.Game.Simulation.Components
         /// <summary>
         /// Accesses the current health value of the host <see cref="Entity"/>.
         /// </summary>
-        [Transient]
         public float Value
         {
-            get { return maximumValue - damage; }
-            set { Damage = maximumValue - value; }
+            get { return (float)Entity.GetStatValue(MaximumValueStat) - damage; }
         }
 
         [Persistent]
@@ -128,16 +126,13 @@ namespace Orion.Game.Simulation.Components
             set
             {
                 Argument.EnsureNotNaN(value, "value");
-                float actualDamage = value - damageReduction;
+                float finalDamage = value - damageReduction;
 
-                if (value < 0) value = 0;
-                if (value > MaximumValue) value = MaximumValue;
+                if (finalDamage < 0) finalDamage = 0;
+                if (finalDamage == damage) return;
 
-                damage = value;
+                damage = finalDamage;
                 DamageChanged.Raise(this);
-
-                if (damage >= Entity.GetStatValue(MaximumValueStat).IntegerValue)
-                    Entity.Die();
             }
         }
 
@@ -155,10 +150,17 @@ namespace Orion.Game.Simulation.Components
         #region Methods
         public override void Update(SimulationStep step)
         {
+            if (damage >= (int)Entity.GetStatValue(MaximumValueStat))
+            {
+                Entity.Die();
+                return;
+            }
+
             float regeneration = regenerationRate * step.TimeDeltaInSeconds;
             float newDamage = damage - regeneration;
             if (newDamage < 0) newDamage = 0;
             if (newDamage != damage) DamageChanged.Raise(this);
+            
             damage = newDamage;
         }
 
@@ -168,7 +170,7 @@ namespace Orion.Game.Simulation.Components
         /// </summary>
         public void Suicide()
         {
-            Value = 0;
+            damage = float.MaxValue;
         }
         #endregion
     }

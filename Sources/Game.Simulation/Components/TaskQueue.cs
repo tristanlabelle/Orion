@@ -152,7 +152,6 @@ namespace Orion.Game.Simulation.Components
         {
             Argument.EnsureNotNull(task, "task");
             if (task.Entity != Entity) throw new ArgumentException("Cannot enqueue a task belonging to another entity.");
-            Debug.Assert(!Unit.IsUnderConstruction);
 
             foreach (Task t in tasks) task.Dispose();
             tasks.Clear();
@@ -188,7 +187,6 @@ namespace Orion.Game.Simulation.Components
             Argument.EnsureNotNull(task, "task");
             if (task.Entity != Entity) throw new ArgumentException("Cannot enqueue a task belonging to another entity.");
             if (taskIDs.ContainsKey(task)) throw new InvalidOperationException("Cannot add a task already present.");
-            Debug.Assert(!Unit.IsUnderConstruction);
 
             tasks.Add(task);
             taskIDs.Add(task, nextTaskID++);
@@ -253,7 +251,7 @@ namespace Orion.Game.Simulation.Components
             }
 
             Attacker attacker = Entity.Components.TryGet<Attacker>();
-            if (attacker != null && builder == null && !Unit.IsUnderConstruction)
+            if (attacker != null && builder == null)
             {
                 Entity target = attacker.FindVisibleTarget();
                 if (target != null) return new AttackTask(Entity, target);

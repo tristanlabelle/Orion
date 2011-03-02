@@ -228,11 +228,14 @@ namespace Orion.Game.Matchmaking
             foreach (ResourceNodeData data in resourceNodesData.Values)
                 data.HarvesterCount = 0;
 
-            var harvestTasks = Faction.Units
-                .Select(u => u.Components.Get<TaskQueue>().FirstOrDefault() as HarvestTask)
-                .Where(t => t != null);
-            foreach (HarvestTask harvestTask in harvestTasks)
+            foreach (Entity entity in Faction.Units)
             {
+                TaskQueue taskQueue = entity.Components.TryGet<TaskQueue>();
+                if (taskQueue == null) continue;
+
+                HarvestTask harvestTask = taskQueue.FirstOrDefault() as HarvestTask;
+                if (harvestTask == null) continue;
+
                 ResourceNodeData nodeData;
                 if (!resourceNodesData.TryGetValue(harvestTask.ResourceNode, out nodeData))
                 {
@@ -315,10 +318,10 @@ namespace Orion.Game.Matchmaking
 
         private void UpdateIdleUnit(SimulationStep step, Unit unit, ref ResourceAmount budget)
         {
-            if (unit.IsUnderConstruction) return;
+            if (unit.Components.Has<BuildProgress>()) return;
 
             Trainer trainer = unit.Components.TryGet<Trainer>();
-            if (trainer.Supports(workerUnitType))
+            if (trainer != null && trainer.Supports(workerUnitType))
             {
                 var workerCost = GetCost(workerUnitType);
                 int workerToCreateCount = budget.GetQuotient(workerCost);

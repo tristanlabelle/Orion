@@ -103,7 +103,8 @@ namespace Orion.Game.Simulation.Components
             PropertyInfo[] properties = type.GetProperties();
             foreach (PropertyInfo property in properties)
             {
-                if (property.GetCustomAttributes(typeof(PersistentAttribute), true).Length == 0)
+                MethodInfo getter = property.GetGetMethod();
+                if (getter == null || getter.GetParameters().Length > 0)
                     continue;
 
                 Type propertyType = property.PropertyType;
@@ -120,7 +121,7 @@ namespace Orion.Game.Simulation.Components
                         .MakeGenericMethod(typeArgument);
                     copyCollection.Invoke(null, new object[] { currentValue, newCollection });
                 }
-                else
+                else if (property.GetSetMethod() != null)
                 {
                     // otherwise, set the value
                     property.SetValue(newInstance, currentValue, null);

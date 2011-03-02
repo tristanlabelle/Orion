@@ -79,7 +79,7 @@ namespace Orion.Game.Simulation.Tasks
             {
                 spatial.LookAt(target.Center);
                 int speed = (int)Entity.GetStatValue(Healer.SpeedStat);
-                targetHealth.Value += speed * step.TimeDeltaInSeconds;
+                targetHealth.Damage -= speed * step.TimeDeltaInSeconds;
                 if (targetHealth.Value == (int)target.GetStatValue(Health.MaximumValueStat)) MarkAsEnded();
                 return;
             }

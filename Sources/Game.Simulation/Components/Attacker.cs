@@ -215,7 +215,7 @@ namespace Orion.Game.Simulation.Components
             if (targetHealth == null) return;
 
             float damage = GetDamage(targetHealth);
-            targetHealth.Value -= damage;
+            targetHealth.Damage += damage;
             ((Unit)Entity).OnHitting((Unit)target, damage);
 
             if (Splashes)
@@ -240,7 +240,7 @@ namespace Orion.Game.Simulation.Components
                     if (distance > splashRadius) continue;
 
                     int splashedTargetArmor = (int)splashedEntity.GetStatValue(Health.ArmorStat);
-                    splashedEntityHealth.Value -= GetDamage(splashedEntityHealth) * (1 - distance / splashRadius);
+                    splashedEntityHealth.Damage += GetDamage(splashedEntityHealth) * (1 - distance / splashRadius);
                 }
             }
 

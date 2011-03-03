@@ -172,7 +172,7 @@ namespace Orion.Game.Simulation
             {
                 return world.Entities
                     .OfType<Unit>()
-                    .Where(unit => unit.Faction == this);
+                    .Where(unit => FactionMembership.GetFaction(unit) == this);
             }
         }
 
@@ -369,12 +369,12 @@ namespace Orion.Game.Simulation
         }
 
         #region Notifications invoked by Unit
-        /// <remarks>Invoked by Unit.</remarks>
+        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
         internal void OnUnitMoved(Unit unit, Vector2 oldPosition, Vector2 newPosition)
         {
             Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
             Debug.Assert(!unit.IsBuilding);
+            Debug.Assert(FactionMembership.GetFaction(unit) == this);
 
             int sightRange = (int)unit.GetStatValue(Vision.RangeStat);
             Vector2 extent = unit.BoundingRectangle.Extent;
@@ -383,20 +383,20 @@ namespace Orion.Game.Simulation
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
+        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
         internal void OnUnitDied(Unit unit)
         {
             Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
+            Debug.Assert(FactionMembership.GetFaction(unit) == this);
 
             UsedFoodAmount -= GetStat(unit, BasicSkill.FoodCostStat);
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnUnitTypeChanged(Unit unit, Unit oldType, Unit newType)
+        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
+        internal void OnUnitTypeChanged(Entity entity, Unit oldType, Unit newType)
         {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
+            Debug.Assert(entity != null);
+            Debug.Assert(FactionMembership.GetFaction(entity) == this);
             Debug.Assert(oldType != null);
             Debug.Assert(newType != null);
             Debug.Assert(oldType != newType);
@@ -404,19 +404,19 @@ namespace Orion.Game.Simulation
             UsedFoodAmount -= GetStat(oldType, BasicSkill.FoodCostStat);
             UsedFoodAmount += GetStat(newType, BasicSkill.FoodCostStat);
 
-            if (unit.Components.Has<BuildProgress>())
+            if (entity.Components.Has<BuildProgress>())
             {
-                Region oldRegion = Entity.GetGridRegion(unit.Position, oldType.Size);
-                Region newRegion = Entity.GetGridRegion(unit.Position, newType.Size);
+                Region oldRegion = Entity.GetGridRegion(entity.Position, oldType.Size);
+                Region newRegion = Entity.GetGridRegion(entity.Position, newType.Size);
                 localFogOfWar.RemoveRegion(oldRegion);
                 localFogOfWar.AddRegion(newRegion);
             }
             else
             {
-                Vector2 oldCenter = unit.Position + (Vector2)oldType.Size * 0.5f;
+                Vector2 oldCenter = entity.Position + (Vector2)oldType.Size * 0.5f;
                 int oldSightRange = GetStat(oldType, BasicSkill.SightRangeStat);
                 
-                Vector2 newCenter = unit.Position + (Vector2)newType.Size * 0.5f;
+                Vector2 newCenter = entity.Position + (Vector2)newType.Size * 0.5f;
                 int newSightRange = GetStat(newType, BasicSkill.SightRangeStat);
 
                 localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
@@ -428,8 +428,8 @@ namespace Orion.Game.Simulation
         internal void OnBuildingConstructionCompleted(Unit unit)
         {
             Debug.Assert(unit != null);
-            Debug.Assert(unit.Faction == this);
             Debug.Assert(unit.IsBuilding);
+            Debug.Assert(FactionMembership.GetFaction(unit) == this);
 
             localFogOfWar.RemoveRegion(unit.GridRegion);
             localFogOfWar.AddLineOfSight(unit.Components.Get<Vision>().LineOfSight);
@@ -490,11 +490,15 @@ namespace Orion.Game.Simulation
                 || harvestable.Type == ResourceType.Aladdium) return true;
 
             Vector2 location = node.Spatial.Position;
-            Unit extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location)) as Unit;
+            Entity extractor = world.Entities.GetGroundEntityAt(Point.Truncate(location));
+            if (extractor == null) return false;
+
+            Faction extractorFaction = FactionMembership.GetFaction(extractor);
             return extractor != null
                 && extractor.Components.Has<AlageneExtractor>()
                 && !extractor.Components.Has<BuildProgress>()
-                && GetDiplomaticStance(extractor.Faction).HasFlag(DiplomaticStance.AlliedVictory);
+                && extractorFaction != null
+                && GetDiplomaticStance(extractorFaction).HasFlag(DiplomaticStance.AlliedVictory);
         }
         #endregion
 

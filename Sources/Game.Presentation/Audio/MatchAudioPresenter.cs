@@ -228,7 +228,7 @@ namespace Orion.Game.Presentation.Audio
             bool isNearBase = World.Entities
                 .Intersecting(new Circle(position, 6))
                 .OfType<Unit>()
-                .Any(unit => unit.IsBuilding && unit.Faction == LocalFaction);
+                .Any(unit => unit.IsBuilding && FactionMembership.GetFaction(unit) == LocalFaction);
 
             string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
             audio.PlayUISound(soundName);

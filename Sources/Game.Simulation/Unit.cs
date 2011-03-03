@@ -187,7 +187,7 @@ namespace Orion.Game.Simulation
         /// the stats and capabilities of this <see cref="Entity"/>
         /// </param>
         /// <param name="position">The initial position of the <see cref="Entity"/>.</param>
-        /// <param name="faction">The <see cref="Faction"/> this <see cref="Entity"/> is part of.</param>
+        /// <param name="faction">The <see cref="T:Faction"/> this <see cref="Entity"/> is part of.</param>
         internal Unit(Handle handle, Unit prototype, Faction faction, Vector2 position)
             : base(faction.World, handle)
         {
@@ -251,17 +251,6 @@ namespace Orion.Game.Simulation
             get { return Identity.Upgrades; }
         }
         #endregion
-        #endregion
-
-        #region World & Faction
-        /// <summary>
-        /// Accesses the <see cref="Faction"/> which this <see cref="Entity"/> is a member of.
-        /// </summary>
-        [Obsolete("Use Entity instead of Unit and FactionMembership.GetFaction(entity)")]
-        public Faction Faction
-        {
-            get { return Components.Get<FactionMembership>().Faction; }
-        }
         #endregion
 
         #region Physical
@@ -343,7 +332,9 @@ namespace Orion.Game.Simulation
         internal void OnConstructionCompleted()
         {
             ConstructionCompleted.Raise(this);
-            Faction.OnBuildingConstructionCompleted(this);
+
+            Faction faction = FactionMembership.GetFaction(this);
+            if (faction != null) faction.OnBuildingConstructionCompleted(this);
         }
         #endregion
     }

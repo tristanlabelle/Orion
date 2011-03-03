@@ -206,7 +206,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (clickedUnit.Faction == LocalFaction)
+            if (FactionMembership.GetFaction(clickedUnit) == LocalFaction)
                 Selection.SetToNearbySimilar(clickedUnit);
             else
                 Selection.Set(clickedUnit);
@@ -266,10 +266,7 @@ namespace Orion.Game.Presentation
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            if (unit == hoveredUnit) hoveredUnit = null;
+            if (entity == hoveredUnit) hoveredUnit = null;
         }
         #endregion
 
@@ -305,46 +302,48 @@ namespace Orion.Game.Presentation
             }
 
             Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
-            if (targetEntity is Unit)
+            if (targetEntity == null)
             {
-                LaunchDefaultCommand((Unit)targetEntity);
-            }
-            else if (targetEntity != null && targetEntity.Components.Has<Harvestable>())
-            {
-                Spatial position = targetEntity.Spatial;
-                if (Selection.Units.All(unit => unit.IsBuilding))
-                    LaunchChangeRallyPoint(position.Center);
-                else
-                    LaunchDefaultCommand(targetEntity);
-            }
-            else
-            {
-                Debug.Assert(targetEntity == null);
                 if (Selection.Units.All(unit => unit.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
             }
+            else
+            {
+                LaunchDefaultCommand(targetEntity);
+            }
         }
 
-        private void LaunchDefaultCommand(Unit target)
+        private void LaunchDefaultCommand(Entity target)
         {
             if (Selection.Type != SelectionType.Units) return;
 
-            if (LocalFaction.GetDiplomaticStance(target.Faction) == DiplomaticStance.Enemy)
+            if (target.Components.Has<Harvestable>())
             {
-                LaunchAttack(target);
+                if (LocalFaction.CanHarvest(target))
+                    LaunchHarvest(target);
+                else
+                    LaunchMove(target.Position);
+                return;
+            }
+
+            Faction targetFaction = FactionMembership.GetFaction(target);
+            if (targetFaction == null || LocalFaction.GetDiplomaticStance(targetFaction) == DiplomaticStance.Enemy)
+            {
+                if (target.Components.Has<Health>()) LaunchAttack(target);
+                else LaunchMove(target.Center);
+                return;
+            }
+
+            if (Selection.Units.All(unit => unit.IsBuilding))
+            {
+                LaunchChangeRallyPoint(target.Center);
                 return;
             }
 
             if (target.Components.Has<AlageneExtractor>())
             {
-                if (Selection.Units.All(unit => unit.IsBuilding))
-                {
-                    LaunchChangeRallyPoint(target.Center);
-                    return;
-                }
-
                 Entity alageneNode = World.Entities
                     .Intersecting(Rectangle.FromCenterSize(target.Position, Vector2.One))
                     .Where(e => e.Components.Has<Harvestable>())
@@ -355,24 +354,27 @@ namespace Orion.Game.Presentation
                     return;
                 }
             }
-            else if (target.Damage > 0)
+            else
             {
-                if (target.IsBuilding) LaunchRepair(target);
-                else LaunchHeal(target);
+                Health entityHealth = target.Components.TryGet<Health>();
+                if (entityHealth != null && entityHealth.Damage > 0)
+                {
+                    switch (entityHealth.Constitution)
+                    {
+                        case Constitution.Mechanical:
+                            LaunchRepair(target);
+                            break;
 
-                return;
+                        case Constitution.Biological:
+                            LaunchHeal(target);
+                            break;
+                    }
+
+                    return;
+                }
             }
             
             LaunchMove(target.Position);
-        }
-
-        private void LaunchDefaultCommand(Entity target)
-        {
-            Debug.Assert(target.Components.Has<Harvestable>(), "Target is not harvestable!");
-            if (LocalFaction.CanHarvest(target))
-                LaunchHarvest(target);
-            else
-                LaunchMove(target.Position);
         }
         #endregion
 

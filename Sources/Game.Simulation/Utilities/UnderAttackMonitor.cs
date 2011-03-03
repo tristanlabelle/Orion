@@ -7,6 +7,7 @@ using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Geometry;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -93,8 +94,8 @@ namespace Orion.Game.Simulation.Utilities
             Debug.Assert(args.Hitter != null);
             Debug.Assert(args.Target != null);
 
-            if (args.Hitter.Faction == faction) return;
-            if (args.Target.Faction != faction) return;
+            if (FactionMembership.GetFaction(args.Hitter) == faction) return;
+            if (FactionMembership.GetFaction(args.Target) != faction) return;
 
             AddWarning(args.Target.Center);
         }

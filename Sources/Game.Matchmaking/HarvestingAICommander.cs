@@ -134,11 +134,8 @@ namespace Orion.Game.Matchmaking
         {
             get
             {
-                return World.Entities
-                    .OfType<Unit>()
-                    .Where(unit => unit.Faction == Faction
-                        && TaskQueue.HasEmpty(unit)
-                        && !assignedUnits.Contains(unit));
+                return Faction.Units
+                    .Where(unit => TaskQueue.HasEmpty(unit) && !assignedUnits.Contains(unit));
             }
         }
         #endregion
@@ -285,7 +282,7 @@ namespace Orion.Game.Matchmaking
                 nodeData.NearbyDepot = World.Entities
                     .Intersecting(new Circle(node.Center, maximumResourceDepotDistance))
                     .OfType<Unit>()
-                    .Where(u => u.Faction == Faction && u.Components.Has<ResourceDepot>())
+                    .Where(u => FactionMembership.GetFaction(u) == Faction && u.Components.Has<ResourceDepot>())
                     .WithMinOrDefault(u => (u.Center - node.Center).LengthSquared);
                 if (nodeData.NearbyDepot != null) continue;
                 

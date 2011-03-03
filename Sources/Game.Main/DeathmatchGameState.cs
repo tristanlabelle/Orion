@@ -217,8 +217,13 @@ namespace Orion.Game.Main
             actionPanel.Clear();
             ui.ClearActionButtons();
 
-            bool allSelectedUnitsAllied = Selection.Units.All(u => u.Faction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl));
-            if (SelectionManager.FocusedUnitType == null || !allSelectedUnitsAllied) return;
+            bool allSelectedUnitsControllable = Selection.UnitEntities
+                .All(entity => 
+                {
+                    Faction entityFaction = FactionMembership.GetFaction(entity);
+                    return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
+                });
+            if (SelectionManager.FocusedUnitType == null || !allSelectedUnitsControllable) return;
 
             var actionProvider = new UnitActionProvider(actionPanel, userInputManager,
                 Graphics, Localizer, SelectionManager.FocusedUnitType);
@@ -243,7 +248,8 @@ namespace Orion.Game.Main
                 Unit unit = entity as Unit;
                 if (unit != null)
                 {
-                    bool isAllied = (LocalFaction.GetDiplomaticStance(unit.Faction) & DiplomaticStance.SharedVision) != 0;
+                    Faction entityFaction = FactionMembership.GetFaction(entity);
+                    bool isAllied = entityFaction != null && (LocalFaction.GetDiplomaticStance(entityFaction) & DiplomaticStance.SharedVision) != 0;
                     singleEntitySelectionPanel.ShowUnit(unit, isAllied);
                     ui.SelectionInfoPanel = singleEntitySelectionPanel;
                 }
@@ -477,11 +483,8 @@ namespace Orion.Game.Main
 
         private void OnEntityRemoved(World sender, Entity entity)
         {
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            Faction faction = unit.Faction;
-            if (faction.Status == FactionStatus.Defeated) return;
+            Faction faction = FactionMembership.GetFaction(entity);
+            if (faction == null || faction.Status == FactionStatus.Defeated) return;
 
             bool hasKeepAliveUnit = faction.Units.Any(u => 
             {

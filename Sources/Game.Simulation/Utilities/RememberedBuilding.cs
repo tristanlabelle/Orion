@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Utilities
 {
@@ -30,7 +31,7 @@ namespace Orion.Game.Simulation.Utilities
 
             this.location = building.GridRegion.Min;
             this.type = building.Type;
-            this.faction = building.Faction;
+            this.faction = FactionMembership.GetFaction(building);
         }
         #endregion
 
@@ -65,14 +66,13 @@ namespace Orion.Game.Simulation.Utilities
         public bool Matches(Unit building)
         {
             Argument.EnsureNotNull(building, "building");
-#warning Unit type comparision
-            return location == building.GridRegion.Min
-                && type == building.Type
-                && faction == building.Faction;
+
+            return new RememberedBuilding(building) == this;
         }
 
         public bool Equals(RememberedBuilding other)
         {
+#warning Unit type comparision
             return location == other.location
                 && type == other.type
                 && faction == other.faction;

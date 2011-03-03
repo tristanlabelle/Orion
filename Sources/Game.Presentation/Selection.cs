@@ -269,12 +269,14 @@ namespace Orion.Game.Presentation
             }
 
             Unit unit = (Unit)entity;
+            Faction unitFaction = FactionMembership.GetFaction(unit);
             Circle circle = new Circle(entity.Center, NearbyRadius);
+
 #warning Unit type comparision
             var units = localFaction.World.Entities
                 .Intersecting(circle)
                 .OfType<Unit>()
-                .Where(u => u.Type == unit.Type && u.Faction == unit.Faction);
+                .Where(u => u.Type == unit.Type && FactionMembership.GetFaction(u) == unitFaction);
 
             Set(units);
         }
@@ -335,11 +337,20 @@ namespace Orion.Game.Presentation
                 .ToList();
 
             // Filter out factions
-            bool containsControllableUnits = units.Any(unit => unit.Faction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
+            bool containsControllableUnits = units.Any(unit =>
+            {
+                Faction unitFaction = FactionMembership.GetFaction(unit);
+                return unitFaction != null && unitFaction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl);
+            });
+
             if (containsControllableUnits)
-                units.RemoveAll(unit => !unit.Faction.GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
+            {
+                units.RemoveAll(unit => !FactionMembership.GetFaction(unit).GetDiplomaticStance(localFaction).HasFlag(DiplomaticStance.SharedControl));
+            }
             else if (units.Count > 1)
+            {
                 units.RemoveRange(1, units.Count - 1);
+            }
 
             // Filter out buildings
             bool containsNonBuildingUnits = units.Any(unit => !unit.IsBuilding);

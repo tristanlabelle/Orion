@@ -376,7 +376,7 @@ namespace Orion.Game.Simulation
             Debug.Assert(unit.Faction == this);
             Debug.Assert(!unit.IsBuilding);
 
-            int sightRange = (int)unit.GetStatValue(Vision.RangeStat, BasicSkill.SightRangeStat);
+            int sightRange = (int)unit.GetStatValue(Vision.RangeStat);
             Vector2 extent = unit.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);

@@ -122,11 +122,11 @@ namespace Orion.Game.Presentation.Renderers
 
             foreach (Entity entity in World.Entities)
             {
-                Unit unit = entity as Unit;
-                if (unit == null || !faction.CanSee(unit)) continue;
-                
-                Rectangle rectangle = new Rectangle(unit.Position, (Vector2)miniatureUnitSize);
-                context.Fill(rectangle, unit.Faction.Color);
+                Faction entityFaction = FactionMembership.GetFaction(entity);
+                if (entityFaction == null || !faction.CanSee(entity)) continue;
+
+                Rectangle rectangle = new Rectangle(entity.Position, (Vector2)miniatureUnitSize);
+                context.Fill(rectangle, entityFaction.Color);
             }
         }
         #endregion
@@ -171,7 +171,8 @@ namespace Orion.Game.Presentation.Renderers
             using (graphics.PushTransform(center, drawingAngle))
             {
                 Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
-                graphics.Fill(localRectangle, texture, unit.Faction.Color);
+                Faction faction = FactionMembership.GetFaction(unit);
+                graphics.Fill(localRectangle, texture, faction == null ? Colors.White : faction.Color);
             }
 
             if (unit.IsBuilding)
@@ -209,13 +210,12 @@ namespace Orion.Game.Presentation.Renderers
             }
         }
 
-        private float GetOscillation(Unit unit)
+        private float GetOscillation(Entity entity)
         {
-            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
-            if (unit.Spatial.CollisionLayer == CollisionLayer.Ground) return 0;
+            if (entity.Spatial.CollisionLayer == CollisionLayer.Ground) return 0;
 
-            float period = 3 + unit.Size.Area / 4.0f;
-            float offset = (unit.Handle.Value % 8) / 8.0f * period;
+            float period = 3 + entity.Size.Area / 4.0f;
+            float offset = (entity.Handle.Value % 8) / 8.0f * period;
             float progress = ((simulationTimeInSeconds + offset) % period) / period;
             float sineAngle = (float)Math.PI * 2 * progress;
             float sine = (float)Math.Sin(sineAngle);
@@ -234,7 +234,7 @@ namespace Orion.Game.Presentation.Renderers
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
             bool isMelee = unit.Components.Has<Attacker>()
-                && (float)unit.GetStatValue(Attacker.RangeStat, AttackSkill.RangeStat) == 0;
+                && (float)unit.GetStatValue(Attacker.RangeStat) == 0;
             if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
                 return baseAngle;
 
@@ -283,7 +283,8 @@ namespace Orion.Game.Presentation.Renderers
                     * Math.Min(distance, laserProgress * distance + laserLength * 0.5f));
 
                 LineSegment lineSegment = new LineSegment(laserStart, laserEnd);
-                graphics.Stroke(lineSegment, hit.Hitter.Faction.Color);
+                Faction hitterFaction = FactionMembership.GetFaction(hit.Hitter);
+                graphics.Stroke(lineSegment, hitterFaction == null ? Colors.White : hitterFaction.Color);
             }
         }
         #endregion

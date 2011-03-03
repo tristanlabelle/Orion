@@ -11,27 +11,27 @@ using Orion.Game.Simulation.Components;
 namespace Orion.Game.Simulation.Tasks
 {
     /// <summary>
-    /// A task which causes a unit (typically a building) to create a unit.
+    /// A task which causes an <see cref="Entity"/> (typically a building) to create another <see cref="Entity"/>.
     /// </summary>
     [Serializable]
     public sealed class TrainTask : Task
     {
         #region Fields
-        private readonly Unit traineeType;
+        private readonly Unit traineePrototype;
         private float healthPointsTrained;
-        private bool attemptingToPlaceUnit;
+        private bool attemptingToPlaceEntity;
         private bool waitingForEnoughFood;
         #endregion
 
         #region Constructors
-        public TrainTask(Entity trainer, Unit traineeType)
+        public TrainTask(Entity trainer, Unit traineePrototype)
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            Argument.EnsureNotNull(traineeType, "traineeType");
-            Argument.EnsureEqual(traineeType.IsBuilding, false, "traineeType.IsBuilding");
+            Argument.EnsureNotNull(traineePrototype, "traineePrototype");
+            Argument.EnsureEqual(traineePrototype.IsBuilding, false, "traineeType.IsBuilding");
 
-            this.traineeType = traineeType;
+            this.traineePrototype = traineePrototype;
         }
         #endregion
 
@@ -41,16 +41,16 @@ namespace Orion.Game.Simulation.Tasks
             get { return "Training"; }
         }
 
-        public Unit TraineeType
+        public Unit TraineePrototype
         {
-            get { return traineeType; }
+            get { return traineePrototype; }
         }
         
         public override float Progress
         {
             get
             {
-                int maxHealth = FactionMembership.GetFaction(Entity).GetStat(traineeType, BasicSkill.MaxHealthStat);
+                int maxHealth = FactionMembership.GetFaction(Entity).GetStat(traineePrototype, BasicSkill.MaxHealthStat);
                 return Math.Min(healthPointsTrained / maxHealth, 1);
             }
         }
@@ -68,13 +68,13 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            if (faction != null && faction.RemainingFoodAmount < faction.GetStat(traineeType, BasicSkill.FoodCostStat))
+            if (faction != null && faction.RemainingFoodAmount < faction.GetStat(traineePrototype, BasicSkill.FoodCostStat))
             {
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
                     string warning = "Pas assez de nourriture pour entraîner un {0}"
-                        .FormatInvariant(traineeType.Identity.Name);
+                        .FormatInvariant(traineePrototype.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
 
@@ -82,7 +82,7 @@ namespace Orion.Game.Simulation.Tasks
             }
             waitingForEnoughFood = false;
 
-            int maxHealth = faction.GetStat(traineeType, BasicSkill.MaxHealthStat);
+            int maxHealth = faction.GetStat(traineePrototype, BasicSkill.MaxHealthStat);
             if (healthPointsTrained < maxHealth)
             {
                 float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
@@ -90,14 +90,14 @@ namespace Orion.Game.Simulation.Tasks
                 return;
             }
 
-            Unit trainee = TrySpawn(traineeType);
+            Entity trainee = TrySpawn(traineePrototype);
             if (trainee == null)
             {
-                if (faction != null && !attemptingToPlaceUnit)
+                if (faction != null && !attemptingToPlaceEntity)
                 {
-                    attemptingToPlaceUnit = true;
+                    attemptingToPlaceEntity = true;
                     string warning = "Pas de place pour faire apparaître un {0}"
-                        .FormatInvariant(traineeType.Identity.Name);
+                        .FormatInvariant(traineePrototype.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
                 return;
@@ -108,24 +108,24 @@ namespace Orion.Game.Simulation.Tasks
             MarkAsEnded();
         }
 
-        private Point? TryGetFreeSurroundingSpawnPoint(Unit spawneeType)
+        private Point? TryGetFreeSurroundingSpawnPoint(Entity spawneePrototype)
         {
-            Argument.EnsureNotNull(spawneeType, "spawneeType");
+            Argument.EnsureNotNull(spawneePrototype, "spawneePrototype");
 
             Region trainerRegion = Entity.Spatial.GridRegion;
 
             Region spawnRegion = new Region(
-                trainerRegion.MinX - spawneeType.Size.Width,
-                trainerRegion.MinY - spawneeType.Size.Height,
-                trainerRegion.Size.Width + spawneeType.Size.Width,
-                trainerRegion.Size.Height + spawneeType.Size.Height);
+                trainerRegion.MinX - spawneePrototype.Size.Width,
+                trainerRegion.MinY - spawneePrototype.Size.Height,
+                trainerRegion.Size.Width + spawneePrototype.Size.Width,
+                trainerRegion.Size.Height + spawneePrototype.Size.Height);
             var potentialSpawnPoints = spawnRegion.InternalBorderPoints
                 .Where(point =>
                 {
-                    Region region = new Region(point, spawneeType.Size);
-                    CollisionLayer layer = spawneeType.Spatial.CollisionLayer;
+                    Region region = new Region(point, spawneePrototype.Size);
+                    CollisionLayer layer = spawneePrototype.Spatial.CollisionLayer;
                     return new Region(World.Size).Contains(region)
-                        && World.IsFree(new Region(point, spawneeType.Size), layer);
+                        && World.IsFree(new Region(point, spawneePrototype.Size), layer);
                 });
 
             Trainer trainer = Entity.Components.Get<Trainer>();
@@ -141,15 +141,15 @@ namespace Orion.Game.Simulation.Tasks
             }
         }
 
-        private Unit TrySpawn(Unit spawneeType)
+        private Entity TrySpawn(Unit spawneeType)
         {
             Argument.EnsureNotNull(spawneeType, "spawneeType");
 
             Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
             if (!point.HasValue) return null;
 
-            Unit spawnee = FactionMembership.GetFaction(Entity).CreateUnit(spawneeType, point.Value);
-            Vector2 traineeDelta = spawnee.Center - Entity.Spatial.Center;
+            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit(spawneeType, point.Value);
+            Vector2 traineeDelta = spawnee.Spatial.Center - Entity.Spatial.Center;
             spawnee.Spatial.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 
             return spawnee;

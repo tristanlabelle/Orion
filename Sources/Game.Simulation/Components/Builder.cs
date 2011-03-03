@@ -68,11 +68,9 @@ namespace Orion.Game.Simulation.Components
             float bestScore = float.NegativeInfinity;
             foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
             {
-                Unit targetUnit = target as Unit;
                 Spatial targetSpatial = target.Spatial;
                 Health targetHealth = target.Components.TryGet<Health>();
                 if (target == Entity
-                    || targetUnit == null
                     || targetSpatial == null
                     || targetHealth == null
                     || targetHealth.Constitution != Constitution.Mechanical
@@ -88,6 +86,15 @@ namespace Orion.Game.Simulation.Components
             }
 
             return bestTarget;
+        }
+
+        public static bool Supports(Entity builderEntity, Entity buildingPrototype)
+        {
+            Argument.EnsureNotNull(builderEntity, "builderEntity");
+            Argument.EnsureNotNull(buildingPrototype, "buildingPrototype");
+
+            Builder builder = builderEntity.Components.TryGet<Builder>();
+            return builder != null && builder.Supports(buildingPrototype);
         }
         #endregion
     }

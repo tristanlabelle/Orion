@@ -112,11 +112,19 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets the units in this selection, if any.
+        /// Gets the <see cref="Unit"/>s in this selection, if any.
         /// </summary>
         public IEnumerable<Unit> Units
         {
             get { return entities.OfType<Unit>(); }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Unit"/>s in this selection as <see cref="Entity">entities</see>, if any.
+        /// </summary>
+        public IEnumerable<Entity> UnitEntities
+        {
+            get { return entities.Where(entity => entity is Unit); }
         }
         #endregion
 

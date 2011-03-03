@@ -171,7 +171,6 @@ namespace Orion.Game.Simulation
             if (placePyramid)
             {
                 Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
-                building.Components.Get<BuildProgress>().Complete();
                 buildingRegion = building.GridRegion;
             }
             else

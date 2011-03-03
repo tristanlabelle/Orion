@@ -178,7 +178,7 @@ namespace Orion.Game.Matchmaking
                 var foodSupplyCost = GetCost(foodSupplyUnitType);
                 if (budget >= foodSupplyCost)
                 {
-                    Unit unit = GetMostIdleUnit(u => u.CanBuild(foodSupplyUnitType));
+                    Unit unit = GetMostIdleUnit(u => Builder.Supports(u, foodSupplyUnitType));
                     if (unit != null && TryBuildNear(unit, foodSupplyUnitType, unit.Center))
                         assignedUnits.Add(unit);
                 }
@@ -198,7 +198,7 @@ namespace Orion.Game.Matchmaking
             var defenseTowerCost = GetCost(defenseTowerUnitType);
             if (budget >= defenseTowerCost)
             {
-                Unit unit = GetNearbyUnit(u => u.CanBuild(defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
+                Unit unit = GetNearbyUnit(u => Builder.Supports(u, defenseTowerUnitType), firstUnthreatenedVisibleEnemy.Center);
                 if (unit != null && TryBuildNear(unit, defenseTowerUnitType, firstUnthreatenedVisibleEnemy.Center))
                     assignedUnits.Add(unit);
             }
@@ -215,7 +215,7 @@ namespace Orion.Game.Matchmaking
             var laboratoryCost = GetCost(laboratoryUnitType);
             if (budget >= laboratoryCost)
             {
-                Unit unit = GetMostIdleUnit(u => u.CanBuild(laboratoryUnitType));
+                Unit unit = GetMostIdleUnit(u => Builder.Supports(u, laboratoryUnitType));
                 if (unit != null && TryBuildNear(unit, laboratoryUnitType, unit.Center))
                     assignedUnits.Add(unit);
             }
@@ -266,7 +266,7 @@ namespace Orion.Game.Matchmaking
                     var alageneExtractorCost = GetCost(alageneExtractorUnitType);
                     if (budget >= alageneExtractorCost)
                     {
-                        Unit builder = GetNearbyUnit(u => u.CanBuild(alageneExtractorUnitType), node.Center);
+                        Unit builder = GetNearbyUnit(u => Builder.Supports(u, alageneExtractorUnitType), node.Center);
                         if (builder != null)
                         {
                             var command = new BuildCommand(Faction.Handle, builder.Handle, alageneExtractorUnitType.Handle, Point.Truncate(node.Position));
@@ -302,7 +302,7 @@ namespace Orion.Game.Matchmaking
                 var buildingCost = GetCost(buildingType);
                 if (budget >= buildingCost)
                 {
-                    Unit builder = GetNearbyUnit(u => u.CanBuild(buildingType), node.Center);
+                    Unit builder = GetNearbyUnit(u => Builder.Supports(u, buildingType), node.Center);
                     if (builder != null && TryBuildNear(builder, buildingType, node.Center))
                         assignedUnits.Add(builder);
                 }

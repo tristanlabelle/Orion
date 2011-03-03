@@ -286,7 +286,7 @@ namespace Orion.Game.Presentation
         public void LaunchDefaultCommand(Vector2 target)
         {
             if (Selection.Type != SelectionType.Units) return;
-            if (!Selection.Units.Any(unit => IsUnitControllable(unit))) return;
+            if (!Selection.Units.Any(unit => IsControllable(unit))) return;
 
             Point point = (Point)target;
             if (!World.IsWithinBounds(point))
@@ -377,125 +377,149 @@ namespace Orion.Game.Presentation
         #endregion
 
         #region Launching individual commands
-        private bool IsUnitControllable(Unit unit)
+        private bool IsControllable(Entity entity)
         {
-            return LocalFaction.GetDiplomaticStance(unit.Faction).HasFlag(DiplomaticStance.SharedControl);
+            Faction entityFaction = FactionMembership.GetFaction(entity);
+            return entityFaction != null && entityFaction.GetDiplomaticStance(LocalFaction).HasFlag(DiplomaticStance.SharedControl);
         }
 
         private void OverrideIfNecessary()
         {
             if (!shiftKeyPressed)
             {
-                IEnumerable<Unit> units = Selection.Units
-                    .Where(unit => IsUnitControllable(unit) && !unit.IsBuilding);
+                IEnumerable<Entity> units = Selection.Units
+                    .Where(unit => IsControllable(unit) && !unit.IsBuilding)
+                    .Cast<Entity>();
                 commander.LaunchCancelAllTasks(units);
             }
         }
 
-        public void LaunchBuild(Point location, Unit buildingType)
+        public void LaunchBuild(Point location, Entity buildingPrototype)
         {
-            IEnumerable<Unit> builders = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.CanBuild(buildingType));
+            IEnumerable<Entity> builders = Selection.UnitEntities
+                .Where(unit => IsControllable(unit) && Builder.Supports(unit, buildingPrototype))
+                .Cast<Entity>();
 
             OverrideIfNecessary();
-            commander.LaunchBuild(builders, buildingType, location);
+            commander.LaunchBuild(builders, buildingPrototype, location);
         }
 
-        public void LaunchAttack(Unit target)
+        public void LaunchAttack(Entity target)
         {
-            IEnumerable<Unit> selection = Selection.Units.Where(unit => IsUnitControllable(unit));
+            IEnumerable<Entity> selection = Selection.UnitEntities.Where(entity => IsControllable(entity))
+                .Cast<Entity>();
+
             OverrideIfNecessary();
             // Those who can attack do so, the others simply move to the target's position
-            commander.LaunchAttack(selection.Where(unit => unit.Components.Has<Attacker>()), target);
-            commander.LaunchMove(selection.Where(unit => !unit.Components.Has<Attacker>() && unit.Components.Has<Move>()), target.Position);
+            commander.LaunchAttack(selection.Where(entity => entity.Components.Has<Attacker>()), target);
+            commander.LaunchMove(selection.Where(entity => !entity.Components.Has<Attacker>() && entity.Components.Has<Move>()), target.Position);
         }
 
         public void LaunchZoneAttack(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
+            IEnumerable<Entity> movableEntities = Selection.UnitEntities
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Cast<Entity>();
+
             // Those who can attack do so, the others simply move to the destination
             OverrideIfNecessary();
-            commander.LaunchZoneAttack(movableUnits.Where(unit => unit.Components.Has<Attacker>()), destination);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.Components.Has<Attacker>()), destination);
+            commander.LaunchZoneAttack(movableEntities.Where(entity => entity.Components.Has<Attacker>()), destination);
+            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Attacker>()), destination);
         }
 
         public void LaunchHarvest(Entity node)
         {
             Debug.Assert(node.Components.Has<Harvestable>(), "Node is not a resource node!");
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
+
+            IEnumerable<Entity> movableEntities = Selection.UnitEntities
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Cast<Entity>();
+
             // Those who can harvest do so, the others simply move to the resource's position
             OverrideIfNecessary();
-            commander.LaunchHarvest(movableUnits.Where(unit => unit.Components.Has<Harvester>()), node);
-            commander.LaunchMove(movableUnits.Where(unit => !unit.Components.Has<Harvester>()), node.Position);
+            commander.LaunchHarvest(movableEntities.Where(entity => entity.Components.Has<Harvester>()), node);
+            commander.LaunchMove(movableEntities.Where(entity => !entity.Components.Has<Harvester>()), node.Position);
         }
 
         public void LaunchMove(Vector2 destination)
         {
-            IEnumerable<Unit> movableUnits = Selection.Units
-                .Where(unit => IsUnitControllable(unit) && unit.Components.Has<Move>());
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => IsControllable(entity) && entity.Components.Has<Move>())
+                .Cast<Entity>();
+
             OverrideIfNecessary();
-            commander.LaunchMove(movableUnits, destination);
+            commander.LaunchMove(entities, destination);
         }
 
         public void LaunchChangeRallyPoint(Vector2 at)
         {
-            IEnumerable<Unit> targets = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction
-                    && unit.IsBuilding
-                    && unit.Components.Has<Trainer>());
+            IEnumerable<Entity> entities = Selection.Units
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
+                    && entity.IsBuilding
+                    && entity.Components.Has<Trainer>())
+                 .Cast<Entity>();
+
             OverrideIfNecessary();
-            commander.LaunchChangeRallyPoint(targets, at);
+            commander.LaunchChangeRallyPoint(entities, at);
         }
 
-        public void LaunchRepair(Unit building)
-        {
-            Argument.EnsureNotNull(building, "building");
-
-            if (!building.IsBuilding) return;
-           
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Components.Has<Builder>());
-            OverrideIfNecessary();
-            commander.LaunchRepair(targetUnits, building);
-        }
-
-        public void LaunchHeal(Unit target)
+        public void LaunchRepair(Entity target)
         {
             Argument.EnsureNotNull(target, "target");
-            if (target.IsBuilding) return;
 
-            IEnumerable<Unit> healers = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Components.Has<Healer>());
-            if (healers.Any(unit => unit.Faction != target.Faction)) return;
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth == null || targetHealth.Constitution != Constitution.Mechanical) return;
+           
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Builder>())
+                 .Cast<Entity>();
+
             OverrideIfNecessary();
-            commander.LaunchHeal(healers, target);
+            commander.LaunchRepair(entities, target);
         }
 
-        public void LaunchTrain(Unit unitType)
+        public void LaunchHeal(Entity target)
         {
-            IEnumerable<Unit> targets = Selection.Units
-                .Where(unit =>
-                {
-                    Trainer trainer = unit.Components.TryGet<Trainer>();
-                    return IsUnitControllable(unit)
-                        && unit.Components.Has<TaskQueue>()
-                        && trainer != null
-                        && trainer.Supports(unitType);
-                });
+            Argument.EnsureNotNull(target, "target");
+
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth.Constitution != Constitution.Biological) return;
+
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Healer>())
+                 .Cast<Entity>();
+
+            Faction targetFaction = FactionMembership.GetFaction(target);
+            if (entities.Any(entity => FactionMembership.GetFaction(entity) != targetFaction)) return;
 
             OverrideIfNecessary();
-            commander.LaunchTrain(targets, unitType);
+            commander.LaunchHeal(entities, target);
+        }
+
+        public void LaunchTrain(Entity prototype)
+        {
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity =>
+                {
+                    Trainer trainer = entity.Components.TryGet<Trainer>();
+                    return IsControllable(entity)
+                        && entity.Components.Has<TaskQueue>()
+                        && trainer != null
+                        && trainer.Supports(prototype);
+                })
+                .Cast<Entity>();
+
+            OverrideIfNecessary();
+            commander.LaunchTrain(entities, prototype);
         }
 
         public void LaunchResearch(Technology technology)
         {
-            foreach (Unit unit in Selection.Units)
+            foreach (Entity entity in Selection.UnitEntities)
             {
-                Researcher researcher = unit.Components.TryGet<Researcher>();
-                if (unit.Faction != commander.Faction
-                    || !unit.Components.Has<TaskQueue>()
+                Researcher researcher = entity.Components.TryGet<Researcher>();
+                if (FactionMembership.GetFaction(entity) != LocalFaction
+                    || !entity.Components.Has<TaskQueue>()
                     || researcher == null
                     || !researcher.Supports(technology))
                 {
@@ -503,46 +527,52 @@ namespace Orion.Game.Presentation
                 }
 
                 OverrideIfNecessary();
-                commander.LaunchResearch(unit, technology);
+                commander.LaunchResearch(entity, technology);
             }
         }
 
         public void LaunchSuicide()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit =>
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity =>
                 {
-                    Health health = unit.Components.TryGet<Health>();
-                    return unit.Faction == LocalFaction
+                    Health health = entity.Components.TryGet<Health>();
+                    return FactionMembership.GetFaction(entity) == LocalFaction
                         && health != null
                         && health.CanSuicide;
-                });
+                })
+                .Cast<Entity>();
+
             OverrideIfNecessary();
-            commander.LaunchSuicide(targetUnits);
+            commander.LaunchSuicide(entities);
         }
 
         public void LaunchStandGuard()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.Components.Has<Move>());
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Move>())
+                .Cast<Entity>();
+
             OverrideIfNecessary();
-            commander.LaunchStandGuard(targetUnits);
+            commander.LaunchStandGuard(entities);
         }
 
         public void LaunchSell()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction)
-                .Where(unit => unit.Components.Has<Sellable>());
-            commander.LaunchSuicide(targetUnits);
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction && entity.Components.Has<Sellable>())
+                .Cast<Entity>();
+
+            commander.LaunchSuicide(entities);
         }
 
         public void LaunchCancelAllTasks()
         {
-            IEnumerable<Unit> targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction);
-            commander.LaunchCancelAllTasks(targetUnits);
+            IEnumerable<Entity> entities = Selection.UnitEntities
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction)
+                .Cast<Entity>();
+
+            commander.LaunchCancelAllTasks(entities);
         }
 
         public void LaunchCancelTask(Task task)
@@ -579,9 +609,12 @@ namespace Orion.Game.Presentation
         {
             Argument.EnsureNotNull(targetType, "targetType");
 
-            var targetUnits = Selection.Units
-                .Where(unit => unit.Faction == LocalFaction && unit.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name));
-            commander.LaunchUpgrade(targetUnits, targetType);
+            var entities = Selection.Units
+                .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
+                    && entity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name))
+                .Cast<Entity>();
+
+            commander.LaunchUpgrade(entities, targetType);
         }
         #endregion
         #endregion

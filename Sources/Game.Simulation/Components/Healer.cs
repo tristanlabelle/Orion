@@ -81,11 +81,9 @@ namespace Orion.Game.Simulation.Components
             float bestScore = float.NegativeInfinity;
             foreach (Entity target in World.Entities.Intersecting(vision.LineOfSight))
             {
-                Unit targetUnit = target as Unit;
                 Spatial targetSpatial = target.Spatial;
                 Health targetHealth = target.Components.TryGet<Health>();
                 if (target == Entity
-                    || targetUnit == null
                     || targetSpatial == null
                     || targetHealth == null
                     || targetHealth.Constitution != Constitution.Biological

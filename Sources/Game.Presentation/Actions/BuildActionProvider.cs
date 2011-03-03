@@ -72,8 +72,8 @@ namespace Orion.Game.Presentation.Actions
             var buildingTypes = inputManager.Match.UnitTypes
                 .Where(buildingType => builder.Supports(buildingType))
                 .OrderByDescending(buildingType => buildingType.Components.Has<Trainer>())
-                .ThenBy(buildingType => (int)buildingType.GetStatValue(Identity.AladdiumCostStat, BasicSkill.AladdiumCostStat)
-                    + (int)buildingType.GetStatValue(Identity.AlageneCostStat, BasicSkill.AlageneCostStat));
+                .ThenBy(buildingType => (int)buildingType.GetStatValue(Identity.AladdiumCostStat)
+                    + (int)buildingType.GetStatValue(Identity.AlageneCostStat));
 
             foreach (Unit buildingType in buildingTypes)
             {

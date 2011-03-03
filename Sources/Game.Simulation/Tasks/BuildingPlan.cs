@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using Orion.Engine;
+using Orion.Game.Simulation.Components;
 
 namespace Orion.Game.Simulation.Tasks
 {
@@ -16,7 +17,7 @@ namespace Orion.Game.Simulation.Tasks
         private readonly Faction faction;
         private readonly Unit buildingType;
         private readonly Point location;
-        private Unit building;
+        private Entity building;
         #endregion
 
         #region Constructors
@@ -52,19 +53,36 @@ namespace Orion.Game.Simulation.Tasks
             get { return building != null; }
         }
 
-        public Unit Building
+        /// <summary>
+        /// Gets the <see cref="Entity"/> that was built,
+        /// or <c>null</c> if it hasn't been built yet.
+        /// </summary>
+        public Entity Building
         {
             get { return building; }
         }
         #endregion
 
         #region Methods
-        public void CreateBuilding()
+        public Entity CreateBuilding()
         {
             if (IsBuildingCreated)
                 throw new InvalidOperationException("Cannot create more than one building from a plan.");
 
             building = faction.CreateUnit(buildingType, location);
+
+            // Set the building to an "under construction" state
+            building.Components.Remove<TaskQueue>();
+
+            BuildProgress buildProgress = new BuildProgress(building);
+            building.Components.Add(buildProgress);
+
+            Health buildingHealth = building.Components.TryGet<Health>();
+            if (buildingHealth != null) buildingHealth.SetValue(1);
+            
+            buildProgress.RequiredTime = TimeSpan.FromSeconds((float)building.GetStatValue(Identity.SpawnTimeStat));
+
+            return building;
         }
         #endregion
     }

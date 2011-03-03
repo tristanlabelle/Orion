@@ -113,7 +113,7 @@ namespace Orion.Game.Simulation.Utilities
 
         private void OnWorkerTaskQueueChanged(TaskQueue taskQueue)
         {
-            Unit worker = taskQueue.Unit;
+            Unit worker = (Unit)taskQueue.Entity;
             if (taskQueue.IsEmpty)
             {
                 bool wasActive = activeWorkers.Remove(worker);

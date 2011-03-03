@@ -7,11 +7,15 @@ using Orion.Game.Simulation.Components.Serialization;
 
 namespace Orion.Game.Simulation.Components
 {
+    /// <summary>
+    /// Marks an <see cref="Entity"/> with general type information.
+    /// </summary>
     public sealed class Identity : Component
     {
         #region Fields
         public static readonly Stat AladdiumCostStat = new Stat(typeof(Identity), StatType.Integer, "AladdiumCost");
         public static readonly Stat AlageneCostStat = new Stat(typeof(Identity), StatType.Integer, "AlageneCost");
+        public static readonly Stat SpawnTimeStat = new Stat(typeof(Identity), StatType.Real, "SpawnTime");
 
         private string name;
         private string visualIdentity;
@@ -20,6 +24,7 @@ namespace Orion.Game.Simulation.Components
         private bool leavesRemains = true;
         private int aladdiumCost;
         private int alageneCost;
+        private float spawnTime = 1;
         private TrainType trainType;
         private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
         private Entity prototype;
@@ -62,14 +67,36 @@ namespace Orion.Game.Simulation.Components
         public int AladdiumCost
         {
             get { return aladdiumCost; }
-            set { aladdiumCost = value; }
+            set
+            {
+                Argument.EnsurePositive(value, "AladdiumCost");
+                aladdiumCost = value;
+            }
         }
 
         [Persistent]
         public int AlageneCost
         {
             get { return alageneCost; }
-            set { alageneCost = value; }
+            set
+            {
+                Argument.EnsurePositive(value, "AlageneCost");
+                alageneCost = value;
+            }
+        }
+
+        /// <summary>
+        /// Accesses the time needed to build or train this <see cref="Entity"/>.
+        /// </summary>
+        [Persistent]
+        public float SpawnTime
+        {
+            get { return spawnTime; }
+            set
+            {
+                Argument.EnsurePositive(value, "SpawnTime");
+                spawnTime = value;
+            }
         }
 
         [Persistent]

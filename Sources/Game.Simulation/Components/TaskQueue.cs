@@ -63,14 +63,6 @@ namespace Orion.Game.Simulation.Components
         {
             get { return IsEmpty ? null : tasks[0]; }
         }
-
-        /// <summary>
-        /// Gets the <see cref="Entity"/> to which this <see cref="TaskQueue"/> belongs.
-        /// </summary>
-        public Unit Unit
-        {
-            get { return (Unit)Entity; }
-        }
         #endregion
 
         #region Indexers

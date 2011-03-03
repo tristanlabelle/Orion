@@ -78,17 +78,7 @@ namespace Orion.Game.Simulation
             }
             Components.Add(factionMembership);
 
-            bool isBuilding = !InternalHasSkill<MoveSkill>();
-            if (isBuilding)
-            {
-                BuildProgress buildProgress = new BuildProgress(this);
-                buildProgress.RequiredTime = health.MaximumValue;
-                Components.Add(buildProgress);
-            }
-            else
-            {
-                Components.Add(new TaskQueue(this));
-            }
+            Components.Add(new TaskQueue(this));
 
             // Optional components
             if (InternalHasSkill<MoveSkill>())
@@ -267,6 +257,7 @@ namespace Orion.Game.Simulation
         /// <summary>
         /// Accesses the <see cref="Faction"/> which this <see cref="Entity"/> is a member of.
         /// </summary>
+        [Obsolete("Use Entity instead of Unit and FactionMembership.GetFaction(entity)")]
         public Faction Faction
         {
             get { return Components.Get<FactionMembership>().Faction; }
@@ -289,7 +280,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public int MaxHealth
         {
-            get { return (int)GetStatValue(HealthComponent.MaximumValueStat, BasicSkill.MaxHealthStat); }
+            get { return (int)GetStatValue(HealthComponent.MaximumValueStat); }
         }
 
         /// <summary>
@@ -314,7 +305,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Methods
-        #region Skills/Type
         /// <remarks>
         /// Same as <see cref="HasSkill"/>, but not obsoleted so internal usages do not cause warnings.
         /// </remarks>
@@ -343,61 +333,18 @@ namespace Orion.Game.Simulation
             return skills.TryGetValue(stat.SkillType, out skill) ? skill.GetStat(stat) : 0;
         }
 
-        /// <summary>
-        /// Obtains the value of a given <see cref="Stat"/>,
-        /// asserting that the corresponding <see cref="UnitStat"/> has the same value.
-        /// </summary>
-        /// <param name="componentStat">The <see cref="Stat"/> being retrieved.</param>
-        /// <param name="skillStat">The corresponding <see cref="UnitStat"/>.</param>
-        /// <returns>The value of the <see cref="Stat"/>.</returns>
-        public StatValue GetStatValue(Stat componentStat, UnitStat skillStat)
-        {
-            Argument.EnsureNotNull(componentStat, "componentStat");
-            Argument.EnsureNotNull(skillStat, "skillStat");
-
-            StatValue componentValue = GetStatValue(componentStat);
-            Faction faction = Faction;
-            if (faction != null)
-            {
-                int skillValue = Faction.GetStat(this, skillStat);
-                if (componentValue.RealValue != skillValue)
-                {
-                    string message = "Component stat {0} did not have the same value as skill stat {1}."
-                        .FormatInvariant(componentStat.FullName, skillStat.FullName);
-                    Debug.Fail(message);
-                }
-            }
-
-            return componentValue;
-        }
-
-        public bool CanBuild(Unit buildingType)
-        {
-            Argument.EnsureNotNull(buildingType, "buildingType");
-
-            Builder builder = Components.TryGet<Builder>();
-            return buildingType.IsBuilding
-                && builder != null
-                && builder.Supports(buildingType);
-        }
-        #endregion
-
-        #region Hitting
         internal void OnHitting(Unit target, float damage)
         {
             HitEventArgs args = new HitEventArgs(this, target, damage, World.LastSimulationStep.TimeInSeconds);
 
             World.OnUnitHitting(args);
         }
-        #endregion
 
-        #region Building
         internal void OnConstructionCompleted()
         {
             ConstructionCompleted.Raise(this);
             Faction.OnBuildingConstructionCompleted(this);
         }
-        #endregion
         #endregion
     }
 }

@@ -17,10 +17,8 @@ namespace Orion.Game.Simulation.Components
     public sealed class BuildProgress : Component
     {
         #region Fields
-        public static readonly Stat RequiredTimeStat = new Stat(typeof(BuildProgress), StatType.Real, "RequiredTime");
-
-        private float timeSpent;
-        private float requiredTime = 1;
+        private TimeSpan timeSpent = TimeSpan.Zero;
+        private TimeSpan requiredTime = TimeSpan.FromSeconds(1);
         #endregion
 
         #region Constructors
@@ -30,28 +28,30 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Properties
-        public float TimeSpent
+        /// <summary>
+        /// Accesses the amount of time that has been spent building this <see cref="Entity"/>.
+        /// </summary>
+        public TimeSpan TimeSpent
         {
             get { return timeSpent; }
-        }
-
-        [Mandatory]
-        public float RequiredTime
-        {
-            get { return requiredTime; }
             set
             {
-                Argument.EnsurePositive(value, "RequiredTime");
-                requiredTime = value;
+                Argument.EnsurePositive(value.Ticks, "TimeSpent");
+                timeSpent = value;
             }
         }
 
         /// <summary>
-        /// Gets the progress of the build within range [0,1].
+        /// Accesses the total required amount of time before this <see cref="Entity"/> is considered fully built.
         /// </summary>
-        public float Progress
+        public TimeSpan RequiredTime
         {
-            get { return Math.Min(1, timeSpent / (float)Entity.GetStatValue(RequiredTimeStat)); }
+            get { return requiredTime; }
+            set
+            {
+                Argument.EnsureStrictlyPositive(value.Ticks, "RequiredTime");
+                requiredTime = value;
+            }
         }
         #endregion
 
@@ -60,10 +60,10 @@ namespace Orion.Game.Simulation.Components
         /// Adds some time to the build time accumulator.
         /// </summary>
         /// <param name="time">The time to be added.</param>
-        public void SpendTime(float time)
+        public void SpendTime(TimeSpan time)
         {
-            Argument.EnsurePositive(time, "time");
-            if (time == 0) return;
+            Argument.EnsurePositive(time.Ticks, "time");
+            if (time == TimeSpan.Zero) return;
 
             timeSpent += time;
 
@@ -72,7 +72,8 @@ namespace Orion.Game.Simulation.Components
 
             if (health != null)
             {
-                health.Damage -= time / requiredTime * (float)Entity.GetStatValue(Health.MaximumValueStat);
+                float ratio = (float)(time.TotalSeconds / requiredTime.TotalSeconds);
+                health.Damage -= ratio * (float)Entity.GetStatValue(Health.MaximumValueStat);
             }
         }
 
@@ -83,7 +84,7 @@ namespace Orion.Game.Simulation.Components
                 Debug.Fail("{0} has a task queue while being built.".FormatInvariant(Entity));
             }
 
-            if (timeSpent >= (float)Entity.GetStatValue(RequiredTimeStat))
+            if (timeSpent >= RequiredTime)
                 Complete();
         }
 

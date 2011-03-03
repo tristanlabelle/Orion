@@ -78,8 +78,14 @@ namespace Orion.Game.Simulation.Tasks
 
             if (plan.IsBuildingCreated)
             {
-                if (plan.Building.Health < plan.Building.MaxHealth && TaskQueue.Count == 1)
+                Health buildingHealth = plan.Building.Components.TryGet<Health>();
+                if (TaskQueue.Count == 1
+                    && (plan.Building.Components.Has<BuildProgress>()
+                    || (buildingHealth != null && buildingHealth.Damage > 0)))
+                {
                     TaskQueue.OverrideWith(new RepairTask(Entity, plan.Building));
+                }
+
                 MarkAsEnded();
                 return;
             }
@@ -111,9 +117,8 @@ namespace Orion.Game.Simulation.Tasks
             faction.AladdiumAmount -= aladdiumCost;
             faction.AlageneAmount -= alageneCost;
 
-            plan.CreateBuilding();
-
-            TaskQueue.ReplaceWith(new RepairTask(Entity, plan.Building));
+            Entity building = plan.CreateBuilding();
+            TaskQueue.ReplaceWith(new RepairTask(Entity, building));
             MarkAsEnded();
         }
         #endregion

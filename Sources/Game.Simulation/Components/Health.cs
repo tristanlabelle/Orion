@@ -148,6 +148,11 @@ namespace Orion.Game.Simulation.Components
         #endregion
 
         #region Methods
+        public void SetValue(float value)
+        {
+            Damage = (int)Entity.GetStatValue(MaximumValueStat) - value;
+        }
+
         public override void Update(SimulationStep step)
         {
             if (damage >= (int)Entity.GetStatValue(MaximumValueStat))

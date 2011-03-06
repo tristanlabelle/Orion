@@ -137,75 +137,75 @@ namespace Orion.Game.Presentation.Renderers
             buildingMemoryRenderer.Draw(graphics);
         }
 
-        private IEnumerable<Unit> GetClippedVisibleUnits(Rectangle clippingBounds)
+        private IEnumerable<Entity> GetClippedVisibleUnits(Rectangle clippingBounds)
         {
             return World.Entities
                 .Intersecting(clippingBounds)
-                .OfType<Unit>()
-                .Where(unit => faction.CanSee(unit));
+                .Where(entity => entity is Unit && faction.CanSee(entity));
         }
 
         private void DrawGroundUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var units = GetClippedVisibleUnits(viewBounds)
-                .Where(unit => unit.Spatial.CollisionLayer == CollisionLayer.Ground);
-            foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
+            var entities = GetClippedVisibleUnits(viewBounds)
+                .Where(entity => entity.Spatial.CollisionLayer == CollisionLayer.Ground);
+            foreach (Entity entity in entities) DrawUnit(graphicsContext, entity);
         }
 
         private void DrawAirborneUnits(GraphicsContext graphicsContext, Rectangle viewBounds)
         {
-            var units = GetClippedVisibleUnits(viewBounds)
-                .Where(unit => unit.Spatial.CollisionLayer == CollisionLayer.Air);
-            foreach (Unit unit in units) DrawUnitShadow(graphicsContext, unit);
-            foreach (Unit unit in units) DrawUnit(graphicsContext, unit);
+            var entities = GetClippedVisibleUnits(viewBounds)
+                .Where(entity => entity.Spatial.CollisionLayer == CollisionLayer.Air);
+            foreach (Entity entity in entities) DrawUnitShadow(graphicsContext, entity);
+            foreach (Entity entity in entities) DrawUnit(graphicsContext, entity);
         }
 
-        private void DrawUnit(GraphicsContext graphics, Unit unit)
+        private void DrawUnit(GraphicsContext graphics, Entity entity)
         {
-            Texture texture = gameGraphics.GetUnitTexture(unit);
+            Texture texture = gameGraphics.GetEntityTexture(entity);
 
-            Vector2 center = unit.Center;
-            center.Y += GetOscillation(unit) * 0.15f;
+            Vector2 center = entity.Center;
+            center.Y += GetOscillation(entity) * 0.15f;
 
-            float drawingAngle = GetUnitDrawingAngle(unit);
+            float drawingAngle = GetUnitDrawingAngle(entity);
             using (graphics.PushTransform(center, drawingAngle))
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
-                Faction faction = FactionMembership.GetFaction(unit);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, entity.Size.Width, entity.Size.Height);
+                Faction faction = FactionMembership.GetFaction(entity);
                 graphics.Fill(localRectangle, texture, faction == null ? Colors.White : faction.Color);
             }
 
-            if (unit.IsBuilding)
+            if (entity.Identity.IsBuilding)
             {
-                if (unit.Components.Has<BuildProgress>())
+                Health health = entity.Components.TryGet<Health>();
+                if (entity.Components.Has<BuildProgress>())
                 {
-                    graphics.Fill(unit.BoundingRectangle, UnderConstructionTexture, Colors.White);
+                    graphics.Fill(entity.BoundingRectangle, UnderConstructionTexture, Colors.White);
                 }
-                else if (unit.Health / unit.MaxHealth < fireHealthRatio)
+                else if (health != null && health.Value / (float)entity.GetStatValue(Health.MaxValueStat) < fireHealthRatio)
                 {
-                    float fireTime = simulationTimeInSeconds + (unit.Handle.Value * fireSecondsPerFrame);
+                    float fireTime = simulationTimeInSeconds + (entity.Handle.Value * fireSecondsPerFrame);
                     Texture fireTexture = fireAnimation.GetTextureFromTime(simulationTimeInSeconds);
-                    Rectangle fireRectangle = Rectangle.FromCenterSize(unit.Center, new Vector2(fireSize, fireSize));
+                    Rectangle fireRectangle = Rectangle.FromCenterSize(entity.Center, new Vector2(fireSize, fireSize));
                     graphics.Fill(fireRectangle, fireTexture, new ColorRgba(1, 1, 1, fireAlpha));
                 }
             }
 
-            if (DrawHealthBars) HealthBarRenderer.Draw(graphics, unit);
+            if (DrawHealthBars) HealthBarRenderer.Draw(graphics, entity);
         }
 
-        private void DrawUnitShadow(GraphicsContext graphicsContext, Unit unit)
+        private void DrawUnitShadow(GraphicsContext graphicsContext, Entity entity)
         {
-            Texture texture = gameGraphics.GetUnitTexture(unit);
+            Texture texture = gameGraphics.GetEntityTexture(entity);
             ColorRgba tint = new ColorRgba(Colors.Black, shadowAlpha);
 
-            float drawingAngle = GetUnitDrawingAngle(unit);
-            float oscillation = GetOscillation(unit);
+            float drawingAngle = GetUnitDrawingAngle(entity);
+            float oscillation = GetOscillation(entity);
             float distance = shadowDistance - oscillation * 0.1f;
-            Vector2 center = unit.Center + new Vector2(-distance, distance);
+            Vector2 center = entity.Center + new Vector2(-distance, distance);
             float scaling = shadowScaling + oscillation * 0.1f;
             using (graphicsContext.PushTransform(center, drawingAngle, scaling))
             {
-                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, unit.Size.Width, unit.Size.Height);
+                Rectangle localRectangle = Rectangle.FromCenterSize(0, 0, entity.Size.Width, entity.Size.Height);
                 graphicsContext.Fill(localRectangle, texture, tint);
             }
         }
@@ -223,22 +223,21 @@ namespace Orion.Game.Presentation.Renderers
             return sine;
         }
 
-        private static float GetUnitDrawingAngle(Unit unit)
+        private static float GetUnitDrawingAngle(Entity entity)
         {
             // Workaround the fact that our unit textures face up,
             // and building textures are not supposed to be rotated.
-            if (unit.IsBuilding) return 0;
+            if (entity.Identity.IsBuilding) return 0;
 
-            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no spatial component!");
-            float angle = unit.Spatial.Angle;
+            Debug.Assert(entity.Components.Has<Spatial>(), "Unit has no spatial component!");
+            float angle = entity.Spatial.Angle;
             float baseAngle = angle + (float)Math.PI * 0.5f;
 
-            bool isMelee = unit.Components.Has<Attacker>()
-                && (float)unit.GetStatValue(Attacker.RangeStat) == 0;
-            if (!isMelee || unit.TimeElapsedSinceLastHitInSeconds > meleeHitSpinTimeInSeconds)
+            Attacker attacker = entity.Components.TryGet<Attacker>();
+            if (attacker == null || attacker.IsRanged || attacker.TimeElapsedSinceLastHit > meleeHitSpinTimeInSeconds)
                 return baseAngle;
 
-            float spinProgress = unit.TimeElapsedSinceLastHitInSeconds / meleeHitSpinTimeInSeconds;
+            float spinProgress = attacker.TimeElapsedSinceLastHit / meleeHitSpinTimeInSeconds;
             float spinAngle = spinProgress * (float)Math.PI * 2;
 
             return baseAngle + spinAngle;
@@ -254,7 +253,8 @@ namespace Orion.Game.Presentation.Renderers
                 if (hitter.Spatial.CollisionLayer != layer)
                     continue;
 
-                if (hit.Hitter.TimeElapsedSinceLastHitInSeconds > rangedShootTimeInSeconds)
+                Attacker attacker = hit.Hitter.Components.Get<Attacker>();
+                if (attacker.TimeElapsedSinceLastHit > rangedShootTimeInSeconds)
                     continue;
 
                 float laserProgress = (World.LastSimulationStep.TimeInSeconds - hit.TimeHitOccurred) / meleeHitSpinTimeInSeconds;

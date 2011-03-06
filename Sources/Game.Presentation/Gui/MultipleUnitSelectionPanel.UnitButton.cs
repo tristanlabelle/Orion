@@ -49,7 +49,7 @@ namespace Orion.Game.Presentation.Gui
                 set
                 {
                     unit = value;
-                    imageBox.Texture = unit == null ? null : panel.graphics.GetUnitTexture(unit);
+                    imageBox.Texture = unit == null ? null : panel.graphics.GetEntityTexture(unit);
                     UpdateImageTint();
                 }
             }

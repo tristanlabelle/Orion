@@ -24,13 +24,13 @@ namespace Orion.Game.Simulation.Utilities
         #endregion
 
         #region Constructors
-        public RememberedBuilding(Unit building)
+        public RememberedBuilding(Entity building)
         {
             Argument.EnsureNotNull(building, "building");
-            Debug.Assert(building.IsBuilding);
+            Debug.Assert(building.Identity.IsBuilding);
 
             this.location = building.GridRegion.Min;
-            this.type = building.Type;
+            this.type = ((Unit)building).Type;
             this.faction = FactionMembership.GetFaction(building);
         }
         #endregion

@@ -353,8 +353,8 @@ namespace Orion.Game.Presentation
             }
 
             // Filter out buildings
-            bool containsNonBuildingUnits = units.Any(unit => !unit.IsBuilding);
-            if (containsNonBuildingUnits) units.RemoveAll(unit => unit.IsBuilding);
+            bool containsNonBuildingUnits = units.Any(unit => !unit.Identity.IsBuilding);
+            if (containsNonBuildingUnits) units.RemoveAll(unit => unit.Identity.IsBuilding);
 
             if (add) Add(units);
             else Set(units);

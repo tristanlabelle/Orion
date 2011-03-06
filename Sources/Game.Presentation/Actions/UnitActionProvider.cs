@@ -170,7 +170,7 @@ namespace Orion.Game.Presentation.Actions
                 };
             }
 
-            if (unitType.Upgrades.Any(u => !u.IsFree))
+            if (unitType.Identity.Upgrades.Any(u => !u.IsFree))
             {
                 actions[2, 0] = new ActionDescriptor()
                 {
@@ -207,7 +207,7 @@ namespace Orion.Game.Presentation.Actions
                 {
                     Name = localizer.GetNoun(traineePrototype.Identity.Name),
                     Cost = new ResourceAmount(aladdiumCost, alageneCost, foodCost),
-                    Texture = graphics.GetUnitTexture(traineePrototype),
+                    Texture = graphics.GetEntityTexture(traineePrototype),
                     Action = () => userInputManager.LaunchTrain(traineeTypeForClosure)
                 };
             }

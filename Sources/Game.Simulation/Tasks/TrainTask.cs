@@ -17,21 +17,21 @@ namespace Orion.Game.Simulation.Tasks
     public sealed class TrainTask : Task
     {
         #region Fields
-        private readonly Unit traineePrototype;
+        private readonly Entity prototype;
         private float elapsedTime;
         private bool attemptingToPlaceEntity;
         private bool waitingForEnoughFood;
         #endregion
 
         #region Constructors
-        public TrainTask(Entity trainer, Unit traineePrototype)
+        public TrainTask(Entity trainer, Entity prototype)
             : base(trainer)
         {
             Argument.EnsureNotNull(trainer, "trainer");
-            Argument.EnsureNotNull(traineePrototype, "traineePrototype");
-            Argument.EnsureEqual(traineePrototype.IsBuilding, false, "traineeType.IsBuilding");
+            Argument.EnsureNotNull(prototype, "prototype");
+            Argument.EnsureEqual(prototype.Identity.IsBuilding, false, "prototype.IsBuilding");
 
-            this.traineePrototype = traineePrototype;
+            this.prototype = prototype;
         }
         #endregion
 
@@ -41,9 +41,9 @@ namespace Orion.Game.Simulation.Tasks
             get { return "Training"; }
         }
 
-        public Unit TraineePrototype
+        public Entity TraineePrototype
         {
-            get { return traineePrototype; }
+            get { return prototype; }
         }
         
         public override float Progress
@@ -51,7 +51,7 @@ namespace Orion.Game.Simulation.Tasks
             get
             {
                 float requiredTime = (float)FactionMembership.GetFaction(Entity)
-                    .GetStat(traineePrototype, Identity.SpawnTimeStat);
+                    .GetStat(prototype, Identity.SpawnTimeStat);
                 return Math.Min(elapsedTime / requiredTime, 1);
             }
         }
@@ -69,14 +69,14 @@ namespace Orion.Game.Simulation.Tasks
             }
 
             Faction faction = FactionMembership.GetFaction(Entity);
-            int foodCost = (int)faction.GetStat(traineePrototype, FactionMembership.FoodCostStat);
+            int foodCost = (int)faction.GetStat(prototype, FactionMembership.FoodCostStat);
             if (faction != null && faction.RemainingFoodAmount < foodCost)
             {
                 if (!waitingForEnoughFood)
                 {
                     waitingForEnoughFood = true;
                     string warning = "Pas assez de nourriture pour entraîner un {0}"
-                        .FormatInvariant(traineePrototype.Identity.Name);
+                        .FormatInvariant(prototype.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
 
@@ -87,17 +87,17 @@ namespace Orion.Game.Simulation.Tasks
             float trainingSpeed = (float)Entity.GetStatValue(Trainer.SpeedStat);
             elapsedTime += step.TimeDeltaInSeconds * trainingSpeed;
 
-            float requiredTime = (float)faction.GetStat(traineePrototype, Identity.SpawnTimeStat);
+            float requiredTime = (float)faction.GetStat(prototype, Identity.SpawnTimeStat);
             if (elapsedTime < requiredTime) return;
 
-            Entity trainee = TrySpawn(traineePrototype);
+            Entity trainee = TrySpawn();
             if (trainee == null)
             {
                 if (faction != null && !attemptingToPlaceEntity)
                 {
                     attemptingToPlaceEntity = true;
                     string warning = "Pas de place pour faire apparaître un {0}"
-                        .FormatInvariant(traineePrototype.Identity.Name);
+                        .FormatInvariant(prototype.Identity.Name);
                     faction.RaiseWarning(warning);
                 }
                 return;
@@ -141,14 +141,12 @@ namespace Orion.Game.Simulation.Tasks
             }
         }
 
-        private Entity TrySpawn(Unit spawneeType)
+        private Entity TrySpawn()
         {
-            Argument.EnsureNotNull(spawneeType, "spawneeType");
-
-            Point? point = TryGetFreeSurroundingSpawnPoint(spawneeType);
+            Point? point = TryGetFreeSurroundingSpawnPoint(prototype);
             if (!point.HasValue) return null;
 
-            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit(spawneeType, point.Value);
+            Entity spawnee = FactionMembership.GetFaction(Entity).CreateUnit((Unit)prototype, point.Value);
             Vector2 traineeDelta = spawnee.Spatial.Center - Entity.Spatial.Center;
             spawnee.Spatial.Angle = (float)Math.Atan2(traineeDelta.Y, traineeDelta.X);
 

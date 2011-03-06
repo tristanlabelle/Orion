@@ -69,7 +69,7 @@ namespace Orion.Game.Matchmaking.Commands
             foreach (Handle unitHandle in unitHandles)
             {
                 Unit unit = (Unit)match.World.Entities.FromHandle(unitHandle);
-                UnitTypeUpgrade upgrade = unit.Upgrades.FirstOrDefault(u => u.Target == targetUnitType.Identity.Name);
+                UnitTypeUpgrade upgrade = unit.Identity.Upgrades.FirstOrDefault(u => u.Target == targetUnitType.Identity.Name);
                 if (upgrade == null)
                 {
                     throw new InvalidOperationException(

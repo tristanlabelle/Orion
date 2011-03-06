@@ -176,6 +176,18 @@ namespace Orion.Game.Simulation
             }
         }
 
+        /// <summary>
+        /// Gets the collection of <see cref="Entity"/>s in this <see cref="Faction"/>.
+        /// </summary>
+        public IEnumerable<Entity> UnitEntities
+        {
+            get
+            {
+                return world.Entities
+                    .Where(unit => FactionMembership.GetFaction(unit) == this);
+            }
+        }
+
         public IEnumerable<Technology> Technologies
         {
             get { return technologies; }
@@ -354,30 +366,27 @@ namespace Orion.Game.Simulation
         /// <param name="type">The <see cref="Entity"/> of the <see cref="Entity"/> to be created.</param>
         /// <param name="point">The initial position of the <see cref="Entity"/>.</param>
         /// <returns>The newly created <see cref="Entity"/>.</returns>
-        public Unit CreateUnit(Unit type, Point point)
+        public Entity CreateUnit(Unit type, Point point)
         {
             Argument.EnsureNotNull(type, "type");
 
-            Unit unit = world.Entities.CreateUnit(type, this, point);
-            Debug.Assert(unit.Components.Has<Spatial>(), "Unit has no Spatial component!");
-            Spatial spatialComponent = unit.Spatial;
-            spatialComponent.Moved += (s, oldPos, newPos) => OnUnitMoved(unit, oldPos, newPos);
-
+            Entity entity = world.Entities.CreateUnit(type, this, point);
+            entity.Spatial.Moved += (s, oldPos, newPos) => OnUnitMoved(entity, oldPos, newPos);
             UsedFoodAmount += (int)GetStat(type, FactionMembership.FoodCostStat);
 
-            return unit;
+            return entity;
         }
 
         #region Notifications invoked by Unit
-        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
-        internal void OnUnitMoved(Unit unit, Vector2 oldPosition, Vector2 newPosition)
+        /// <remarks>Invoked by <see cref="Spatial"/>.</remarks>
+        internal void OnUnitMoved(Entity entity, Vector2 oldPosition, Vector2 newPosition)
         {
-            Debug.Assert(unit != null);
-            Debug.Assert(!unit.IsBuilding);
-            Debug.Assert(FactionMembership.GetFaction(unit) == this);
+            Debug.Assert(entity != null);
+            Debug.Assert(!entity.Identity.IsBuilding);
+            Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
-            int sightRange = (int)unit.GetStatValue(Vision.RangeStat);
-            Vector2 extent = unit.BoundingRectangle.Extent;
+            int sightRange = (int)entity.GetStatValue(Vision.RangeStat);
+            Vector2 extent = entity.BoundingRectangle.Extent;
             Circle oldLineOfSight = new Circle(oldPosition + extent, sightRange);
             Circle newLineOfSight = new Circle(newPosition + extent, sightRange);
             localFogOfWar.UpdateLineOfSight(oldLineOfSight, newLineOfSight);
@@ -392,49 +401,49 @@ namespace Orion.Game.Simulation
             UsedFoodAmount -= (int)GetStat(unit, FactionMembership.FoodCostStat);
         }
 
-        /// <remarks>Invoked by <see cref="Unit"/>.</remarks>
-        internal void OnUnitTypeChanged(Entity entity, Unit oldType, Unit newType)
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
+        internal void OnUnitTypeChanged(Entity entity, Entity oldPrototype, Entity newPrototype)
         {
             Debug.Assert(entity != null);
             Debug.Assert(FactionMembership.GetFaction(entity) == this);
-            Debug.Assert(oldType != null);
-            Debug.Assert(newType != null);
-            Debug.Assert(oldType != newType);
+            Debug.Assert(oldPrototype != null);
+            Debug.Assert(newPrototype != null);
+            Debug.Assert(oldPrototype != newPrototype);
 
-            UsedFoodAmount -= (int)GetStat(oldType, FactionMembership.FoodCostStat);
-            UsedFoodAmount += (int)GetStat(newType, FactionMembership.FoodCostStat);
+            UsedFoodAmount -= (int)GetStat(oldPrototype, FactionMembership.FoodCostStat);
+            UsedFoodAmount += (int)GetStat(newPrototype, FactionMembership.FoodCostStat);
 
             if (entity.Components.Has<BuildProgress>())
             {
-                Region oldRegion = Entity.GetGridRegion(entity.Position, oldType.Size);
-                Region newRegion = Entity.GetGridRegion(entity.Position, newType.Size);
+                Region oldRegion = Entity.GetGridRegion(entity.Position, oldPrototype.Size);
+                Region newRegion = Entity.GetGridRegion(entity.Position, newPrototype.Size);
                 localFogOfWar.RemoveRegion(oldRegion);
                 localFogOfWar.AddRegion(newRegion);
             }
             else
             {
-                Vector2 oldCenter = entity.Position + (Vector2)oldType.Size * 0.5f;
-                int oldSightRange = (int)GetStat(oldType, Vision.RangeStat);
+                Vector2 oldCenter = entity.Position + (Vector2)oldPrototype.Size * 0.5f;
+                int oldSightRange = (int)GetStat(oldPrototype, Vision.RangeStat);
                 
-                Vector2 newCenter = entity.Position + (Vector2)newType.Size * 0.5f;
-                int newSightRange = (int)GetStat(newType, Vision.RangeStat);
+                Vector2 newCenter = entity.Position + (Vector2)newPrototype.Size * 0.5f;
+                int newSightRange = (int)GetStat(newPrototype, Vision.RangeStat);
 
                 localFogOfWar.RemoveLineOfSight(new Circle(oldCenter, oldSightRange));
                 localFogOfWar.AddLineOfSight(new Circle(newCenter, newSightRange));
             }
         }
 
-        /// <remarks>Invoked by Unit.</remarks>
-        internal void OnBuildingConstructionCompleted(Unit unit)
+        /// <remarks>Invoked by <see cref="Entity"/>.</remarks>
+        internal void OnBuildingConstructionCompleted(Entity entity)
         {
-            Debug.Assert(unit != null);
-            Debug.Assert(unit.IsBuilding);
-            Debug.Assert(FactionMembership.GetFaction(unit) == this);
+            Debug.Assert(entity != null);
+            Debug.Assert(entity.Identity.IsBuilding);
+            Debug.Assert(FactionMembership.GetFaction(entity) == this);
 
-            localFogOfWar.RemoveRegion(unit.GridRegion);
-            localFogOfWar.AddLineOfSight(unit.Components.Get<Vision>().LineOfSight);
+            localFogOfWar.RemoveRegion(entity.GridRegion);
+            localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
 
-            TotalFoodAmount += (int)unit.GetStatValue(FactionMembership.ProvidedFoodStat);
+            TotalFoodAmount += (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
         }
         #endregion
 
@@ -449,7 +458,6 @@ namespace Orion.Game.Simulation
             else
             {
                 TotalFoodAmount -= (int)entity.GetStatValue(FactionMembership.ProvidedFoodStat);
-
                 localFogOfWar.RemoveLineOfSight(entity.Components.Get<Vision>().LineOfSight);
             }
         }
@@ -458,8 +466,7 @@ namespace Orion.Game.Simulation
         {
             if (FactionMembership.GetFaction(entity) != this) return;
 
-            Unit unit = (Unit)entity;
-            if (unit.IsBuilding && unit.Components.Has<BuildProgress>())
+            if (entity.Components.Has<BuildProgress>())
                 localFogOfWar.AddRegion(entity.Spatial.GridRegion);
             else
                 localFogOfWar.AddLineOfSight(entity.Components.Get<Vision>().LineOfSight);
@@ -470,7 +477,7 @@ namespace Orion.Game.Simulation
         /// </summary>
         public void MassSuicide()
         {
-            Units.Select(entity => entity.Components.TryGet<Health>())
+            UnitEntities.Select(entity => entity.Components.TryGet<Health>())
                 .Where(health => health != null)
                 .NonDeferred()
                 .ForEach(entity => entity.Suicide());

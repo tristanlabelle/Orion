@@ -162,7 +162,7 @@ namespace Orion.Game.Matchmaking
 
             while (true)
             {
-                var heroUpgrades = unitType.Upgrades
+                var heroUpgrades = unitType.Identity.Upgrades
                     .Where(u => u.AladdiumCost == 0 && u.AlageneCost == 0);
 
                 int upgradeCount = heroUpgrades.Count();

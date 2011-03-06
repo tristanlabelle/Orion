@@ -60,10 +60,10 @@ namespace Orion.Game.Simulation.Skills
             };
         }
 
-        public bool Supports(Unit unitType)
+        public bool Supports(Entity prototype)
         {
-            Argument.EnsureNotNull(unitType, "unitType");
-            return !unitType.IsBuilding && targets.Contains(unitType.Identity.Name);
+            Argument.EnsureNotNull(prototype, "unitType");
+            return !prototype.Identity.IsBuilding && targets.Contains(prototype.Identity.Name);
         }
 
         public override int GetStat(UnitStat stat)

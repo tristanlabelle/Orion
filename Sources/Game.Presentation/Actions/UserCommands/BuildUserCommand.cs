@@ -29,7 +29,7 @@ namespace Orion.Game.Presentation.Actions.UserCommands
             Argument.EnsureNotNull(buildingType, "buildingType");
 
             this.buildingType = buildingType;
-            this.texture = gameGraphics.GetUnitTexture(buildingType);
+            this.texture = gameGraphics.GetEntityTexture(buildingType);
         }
         #endregion
 

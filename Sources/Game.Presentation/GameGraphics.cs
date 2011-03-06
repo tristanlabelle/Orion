@@ -149,11 +149,11 @@ namespace Orion.Game.Presentation
         }
 
         /// <summary>
-        /// Gets a texture representing a unit.
+        /// Gets a texture representing an <see cref="Entity"/>.
         /// </summary>
-        /// <param name="entity">The unit.</param>
-        /// <returns>The texture for that unit.</returns>
-        public Texture GetUnitTexture(Entity entity)
+        /// <param name="entity">The <see cref="Entity"/>.</param>
+        /// <returns>The texture for that <see cref="Entity"/>.</returns>
+        public Texture GetEntityTexture(Entity entity)
         {
             Argument.EnsureNotNull(entity, "entity");
             return GetUnitTexture(entity.Identity.VisualIdentity);

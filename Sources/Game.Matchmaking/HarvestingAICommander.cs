@@ -385,8 +385,8 @@ namespace Orion.Game.Matchmaking
                     break;
                 }
             }
-            
-            foreach (UnitTypeUpgrade upgrade in unit.Upgrades)
+
+            foreach (UnitTypeUpgrade upgrade in unit.Identity.Upgrades)
             {
                 if (upgrade.IsFree) continue;
                 
@@ -467,13 +467,13 @@ namespace Orion.Game.Matchmaking
 #warning Unit type comparision
             createdUnitTypes.Add(unit.Type);
             
-            if (unit.IsBuilding)
+            if (entity.Identity.IsBuilding)
             {
                 buildings.Add(unit);
 #warning Unit type comparision
                 if (unit.Type == alageneExtractorUnitType)
                 {
-                    Entity node = World.Entities.Intersecting(unit.Center)
+                    Entity node = World.Entities.Intersecting(entity.Center)
                         .First(e => e.Components.Has<Harvestable>());
 
                     var nodeData = resourceNodesData[node];
@@ -494,8 +494,7 @@ namespace Orion.Game.Matchmaking
 
             if (FactionMembership.GetFaction(entity) != Faction) return;
 
-            Unit unit = (Unit)entity;
-            if (unit.IsBuilding) buildings.Remove(unit);
+            if (entity.Identity.IsBuilding) buildings.Remove((Unit)entity);
         }
         #endregion
         #endregion

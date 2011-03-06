@@ -127,9 +127,8 @@ namespace Orion.Game.Simulation
             world.Entities.CommitDeferredChanges();
 
             var buildingPositions = world.Entities
-                .OfType<Unit>()
-                .Where(unit => unit.IsBuilding)
-                .Select(unit => unit.Center)
+                .Where(entity => entity.Identity.IsBuilding)
+                .Select(entity => entity.Center)
                 .NonDeferred();
 
             Vector2 campCenter = Vector2.Zero;
@@ -170,7 +169,7 @@ namespace Orion.Game.Simulation
             Unit pyramid = unitTypes.FromName("Pyramid");
             if (placePyramid)
             {
-                Unit building = faction.CreateUnit(pyramid, (Point)campCenter);
+                Entity building = faction.CreateUnit(pyramid, (Point)campCenter);
                 buildingRegion = building.GridRegion;
             }
             else

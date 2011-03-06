@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Orion.Engine;
 using Orion.Game.Simulation.Components.Serialization;
+using Orion.Engine.Collections;
 
 namespace Orion.Game.Simulation.Components
 {
@@ -20,13 +21,15 @@ namespace Orion.Game.Simulation.Components
         private string name;
         private string visualIdentity;
         private string soundIdentity;
+        private bool isBuilding;
         private bool isSelectable = true;
         private bool leavesRemains = true;
         private int aladdiumCost;
         private int alageneCost;
         private float spawnTime = 1;
         private TrainType trainType;
-        private List<UnitTypeUpgrade> upgrades = new List<UnitTypeUpgrade>();
+        private readonly ICollection<UnitTypeUpgrade> upgrades
+            = new ValidatingCollection<UnitTypeUpgrade>(upgrade => upgrade != null);
         private Entity prototype;
         #endregion
 
@@ -54,6 +57,15 @@ namespace Orion.Game.Simulation.Components
         {
             get { return soundIdentity ?? name; }
             set { soundIdentity = value; }
+        }
+
+        /// <summary>
+        /// Accesses a value indicating if this <see cref="Entity"/> is classified as a building.
+        /// </summary>
+        public bool IsBuilding
+        {
+            get { return isBuilding; }
+            set { isBuilding = value; }
         }
 
         [Persistent]

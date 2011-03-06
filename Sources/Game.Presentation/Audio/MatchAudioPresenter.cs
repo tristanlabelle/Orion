@@ -120,13 +120,10 @@ namespace Orion.Game.Presentation.Audio
             Faction faction = FactionMembership.GetFaction(entity);
             if (faction != LocalFaction) return;
 
-            Unit unit = entity as Unit;
-            if (unit == null) return;
-
-            if (unit.IsBuilding && unit.Components.Has<BuildProgress>())
+            if (entity.Identity.IsBuilding && entity.Components.Has<BuildProgress>())
             {
-                unit.ConstructionCompleted += OnBuildingConstructionCompleted;
-                audio.PlaySfx("UnderConstruction", unit.Center);
+                ((Unit)entity).ConstructionCompleted += OnBuildingConstructionCompleted;
+                audio.PlaySfx("UnderConstruction", entity.Center);
                 return;
             }
 
@@ -227,8 +224,7 @@ namespace Orion.Game.Presentation.Audio
         {
             bool isNearBase = World.Entities
                 .Intersecting(new Circle(position, 6))
-                .OfType<Unit>()
-                .Any(unit => unit.IsBuilding && FactionMembership.GetFaction(unit) == LocalFaction);
+                .Any(entity => entity.Identity.IsBuilding && FactionMembership.GetFaction(entity) == LocalFaction);
 
             string soundName = isNearBase ? "UnderAttackBase" : "UnderAttackUnit";
             audio.PlayUISound(soundName);

@@ -100,7 +100,7 @@ namespace Orion.Game.Presentation.Actions
             {
                 Name = localizer.GetNoun(buildingType.Identity.Name),
                 Cost = new ResourceAmount(aladdiumCost, alageneCost),
-                Texture = graphics.GetUnitTexture(buildingType),
+                Texture = graphics.GetEntityTexture(buildingType),
                 Action = () =>
                 {
                     inputManager.SelectedCommand = new BuildUserCommand(inputManager, graphics, buildingType);

@@ -102,8 +102,8 @@ namespace Orion.Game.Main
             this.camera = new Camera(match.World.Size, Graphics.Window.ClientAreaSize);
 
             // Center the camera on the player's largest unit, favoring buildings
-            Entity cameraTargetEntity = localCommander.Faction.Units
-                .WithMaxOrDefault(unit => (unit.IsBuilding ? 1000 : 0) + unit.Size.Area);
+            Entity cameraTargetEntity = localCommander.Faction.UnitEntities
+                .WithMaxOrDefault(entity => (entity.Identity.IsBuilding ? 1000 : 0) + entity.Size.Area);
             if (cameraTargetEntity != null) this.camera.Target = cameraTargetEntity.Spatial.Center;
 
             this.matchRenderer = new DeathmatchRenderer(userInputManager, Graphics);
@@ -486,12 +486,12 @@ namespace Orion.Game.Main
             Faction faction = FactionMembership.GetFaction(entity);
             if (faction == null || faction.Status == FactionStatus.Defeated) return;
 
-            bool hasKeepAliveUnit = faction.Units.Any(u => 
+            bool hasKeepAliveEntity = faction.UnitEntities.Any(e => 
             {
-                FactionMembership factionMembership = u.Components.TryGet<FactionMembership>();
-                return u.IsAlive && factionMembership != null && factionMembership.IsKeepAlive;
+                FactionMembership factionMembership = e.Components.TryGet<FactionMembership>();
+                return e.IsAlive && factionMembership != null && factionMembership.IsKeepAlive;
             });
-            if (hasKeepAliveUnit) return;
+            if (hasKeepAliveEntity) return;
             
             faction.MarkAsDefeated();
         }

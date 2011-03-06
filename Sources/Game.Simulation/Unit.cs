@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using Orion.Engine;
 using Orion.Engine.Collections;
-using Orion.Engine.Geometry;
 using Orion.Game.Simulation.Components;
 using Orion.Game.Simulation.Skills;
-using Orion.Game.Simulation.Tasks;
-using Orion.Game.Simulation.Technologies;
-using HealthComponent = Orion.Game.Simulation.Components.Health;
 
 namespace Orion.Game.Simulation
 {
@@ -215,7 +209,6 @@ namespace Orion.Game.Simulation
         #endregion
 
         #region Properties
-        #region Type-Related
         /// <summary>
         /// Temporary measure until we broadly use the identity component.
         /// </summary>
@@ -236,61 +229,10 @@ namespace Orion.Game.Simulation
                 skills = value.skills;
 
                 identity.Upgrades.Clear();
-                foreach (UnitTypeUpgrade upgrade in value.Upgrades)
+                foreach (UnitTypeUpgrade upgrade in value.Identity.Upgrades)
                     identity.Upgrades.Add(upgrade);
             }
         }
-
-        public bool IsBuilding
-        {
-            get { return !Components.Has<Mobile>(); }
-        }
-
-        public ICollection<UnitTypeUpgrade> Upgrades
-        {
-            get { return Identity.Upgrades; }
-        }
-        #endregion
-        #endregion
-
-        #region Physical
-        #region Health
-        /// <summary>
-        /// Accesses the damage that has been inflicted to this <see cref="Entity"/>, in health points.
-        /// </summary>
-        public float Damage
-        {
-            get { return Components.Get<Health>().Damage; }
-            set { Components.Get<Health>().Damage = value; }
-        }
-
-        /// <summary>
-        /// Gets the maximum amount of health points this <see cref="Entity"/> can have.
-        /// </summary>
-        public int MaxHealth
-        {
-            get { return (int)GetStatValue(HealthComponent.MaxValueStat); }
-        }
-
-        /// <summary>
-        /// Gets the amount of health points this <see cref="Entity"/> has.
-        /// </summary>
-        public float Health
-        {
-            get { return MaxHealth - Damage; }
-            set { Damage = MaxHealth - value; }
-        }
-        #endregion
-
-        #region Tasks
-        /// <summary>
-        /// Accesses the time elapsed since this <see cref="Entity"/> last hit something, in seconds.
-        /// </summary>
-        public float TimeElapsedSinceLastHitInSeconds
-        {
-            get { return Components.Get<Attacker>().TimeElapsedSinceLastHit; }
-        }
-        #endregion
         #endregion
 
         #region Methods

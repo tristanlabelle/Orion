@@ -62,7 +62,13 @@ namespace Orion.Game.Simulation.Tasks
 
         public override float Progress
         {
-            get { return target.IsAliveInWorld ? target.Health / target.MaxHealth : float.NaN; }
+            get
+            {
+                Health targetHealth = target.Components.TryGet<Health>();
+                return targetHealth == null
+                    ? float.NaN
+                    : targetHealth.Value / (float)target.GetStatValue(Health.MaxValueStat);
+            }
         }
         #endregion
 
@@ -105,35 +111,39 @@ namespace Orion.Game.Simulation.Tasks
 
         private void UpdateRepair(SimulationStep step)
         {
+            Health targetHealth = target.Components.TryGet<Health>();
+            if (targetHealth == null) return;
+
             if (!TryGetCredit()) return;
 
-            int aladdiumCost = (int)Target.GetStatValue(Identity.AladdiumCostStat);
-            int alageneCost = (int)Target.GetStatValue(Identity.AlageneCostStat);
+            int aladdiumCost = (int)target.GetStatValue(Identity.AladdiumCostStat);
+            int alageneCost = (int)target.GetStatValue(Identity.AlageneCostStat);
 
             float healthToRepair = (float)Entity.GetStatValue(Builder.SpeedStat)
                 * repairSpeedRatio * step.TimeDeltaInSeconds;
-            if (healthToRepair > target.Damage) healthToRepair = target.Damage;
+            if (healthToRepair > targetHealth.Damage) healthToRepair = targetHealth.Damage;
 
-            float frameAladdiumCost = healthToRepair / Target.MaxHealth * aladdiumCost;
-            float frameAlageneCost = healthToRepair / Target.MaxHealth * alageneCost;
+            float maxHealth = (float)target.GetStatValue(Health.MaxValueStat);
+            float frameAladdiumCost = healthToRepair / maxHealth * aladdiumCost;
+            float frameAlageneCost = healthToRepair / maxHealth * alageneCost;
 
             if (frameAladdiumCost > aladdiumCreditRemaining)
             {
                 frameAladdiumCost = aladdiumCreditRemaining;
-                healthToRepair = aladdiumCreditRemaining / aladdiumCost * Target.MaxHealth;
+                healthToRepair = aladdiumCreditRemaining / aladdiumCost * maxHealth;
             }
 
             if (frameAlageneCost > alageneCreditRemaining)
             {
                 frameAlageneCost = alageneCreditRemaining;
-                healthToRepair = alageneCreditRemaining / alageneCost * Target.MaxHealth;
+                healthToRepair = alageneCreditRemaining / alageneCost * maxHealth;
             }
 
-            target.Health += healthToRepair;
+            targetHealth.Damage -= healthToRepair;
             aladdiumCreditRemaining -= frameAladdiumCost;
             alageneCreditRemaining -= frameAlageneCost;
 
-            if (target.Damage >= 0.001f) return;
+            if (targetHealth.Damage >= 0.001f) return;
 
             // If we just built an alagene extractor, start harvesting.
             if (Entity.Components.Has<Harvester>() && target.Components.Has<AlageneExtractor>())

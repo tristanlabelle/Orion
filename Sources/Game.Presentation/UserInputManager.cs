@@ -294,7 +294,7 @@ namespace Orion.Game.Presentation
             
             if (LocalFaction.GetTileVisibility(point) == TileVisibility.Undiscovered)
             {
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Identity.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -304,7 +304,7 @@ namespace Orion.Game.Presentation
             Entity targetEntity = World.Entities.GetTopmostEntityAt(point);
             if (targetEntity == null)
             {
-                if (Selection.Units.All(unit => unit.IsBuilding))
+                if (Selection.Units.All(unit => unit.Identity.IsBuilding))
                     LaunchChangeRallyPoint(target);
                 else
                     LaunchMove(target);
@@ -336,7 +336,7 @@ namespace Orion.Game.Presentation
                 return;
             }
 
-            if (Selection.Units.All(unit => unit.IsBuilding))
+            if (Selection.Units.All(unit => unit.Identity.IsBuilding))
             {
                 LaunchChangeRallyPoint(target.Center);
                 return;
@@ -390,7 +390,7 @@ namespace Orion.Game.Presentation
             if (!shiftKeyPressed)
             {
                 IEnumerable<Entity> units = Selection.Units
-                    .Where(unit => IsControllable(unit) && !unit.IsBuilding)
+                    .Where(unit => IsControllable(unit) && !unit.Identity.IsBuilding)
                     .Cast<Entity>();
                 commander.LaunchCancelAllTasks(units);
             }
@@ -457,7 +457,7 @@ namespace Orion.Game.Presentation
         {
             IEnumerable<Entity> entities = Selection.Units
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
-                    && entity.IsBuilding
+                    && entity.Identity.IsBuilding
                     && entity.Components.Has<Trainer>())
                  .Cast<Entity>();
 
@@ -613,7 +613,7 @@ namespace Orion.Game.Presentation
 
             var entities = Selection.Units
                 .Where(entity => FactionMembership.GetFaction(entity) == LocalFaction
-                    && entity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name))
+                    && entity.Identity.Upgrades.Any(upgrade => upgrade.Target == targetType.Identity.Name))
                 .Cast<Entity>();
 
             commander.LaunchUpgrade(entities, targetType);
